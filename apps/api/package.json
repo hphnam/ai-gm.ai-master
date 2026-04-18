@@ -6,20 +6,24 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main",
-    "start:prod": "node dist/main"
+    "start:prod": "node dist/main",
+    "probe:embeddings": "tsx scripts/probe-embeddings.ts"
   },
   "dependencies": {
-    "@nestjs/core": "latest",
+    "@gm-ai/database": "workspace:*",
+    "@gm-ai/types": "workspace:*",
     "@nestjs/common": "latest",
+    "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
+    "dotenv": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",
-    "@gm-ai/database": "workspace:*",
-    "@gm-ai/types": "workspace:*"
+    "voyageai": "latest"
   },
   "devDependencies": {
     "@nestjs/cli": "latest",
-    "typescript": "latest",
-    "@types/node": "latest"
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
   }
 }

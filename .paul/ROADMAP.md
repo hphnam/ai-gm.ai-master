@@ -15,7 +15,7 @@ Phases: 1 of 5 complete
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
 | 1 | Project Foundation | 2 | Complete | 2026-04-18 |
-| 2 | Embeddings & Seeding | 2 | Not started | - |
+| 2 | Embeddings & Seeding | 2 | In progress | - |
 | 3 | Retrieval Layer | 2 | Not started | - |
 | 4 | Chat Engine | 2 | Not started | - |
 | 5 | Web Interface | 2 | Not started | - |
@@ -53,7 +53,7 @@ Phases: 1 of 5 complete
 - Embedding storage via raw SQL (pgvector)
 
 **Plans:**
-- [ ] 02-01: Embeddings service — Voyage AI wrapper
+- [x] 02-01: Embeddings service — Voyage AI wrapper (completed 2026-04-18)
 - [ ] 02-02: Seeder command — seed data, Claude enrichment, embedding generation
 
 ### Phase 3: Retrieval Layer
