@@ -9,3 +9,6 @@ export type HealthCheck = z.infer<typeof healthCheckSchema>
 
 export * from './knowledge-metadata'
 export * from './tool-result'
+export * from './chat-tools'
+export * from './proactive-suggestion'
+export * from './adaptation'

@@ -128,6 +128,7 @@ model KnowledgeItem {
   updatedAt DateTime @updatedAt
 
   venue Venue? @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  retagQueueItems ReTagQueueItem[]
 
   @@index([venueId])
   @@map("knowledge_items")
@@ -167,4 +168,38 @@ model ChatMessage {
   createdAt        DateTime @default(now())
 
   conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  feedback        MessageFeedback?
+  retagQueueItems ReTagQueueItem[] @relation("sourceMessage")
+}
+
+model MessageFeedback {
+  id           String   @id @default(uuid())
+  messageId    String   @unique
+  kind         String
+  userFeedback String?
+  createdAt    DateTime @default(now())
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("message_feedback")
+}
+
+model ReTagQueueItem {
+  id              String   @id @default(uuid())
+  knowledgeItemId String
+  reason          String
+  status          String   @default("queued")
+  sourceMessageId String?
+  attempts        Int      @default(0)
+  lastError       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  knowledgeItem KnowledgeItem @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
+  sourceMessage ChatMessage?  @relation("sourceMessage", fields: [sourceMessageId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([knowledgeItemId, status])
+  @@index([sourceMessageId])
+  @@map("retag_queue_items")
 }

@@ -14,7 +14,7 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 |-----------|-------|
 | Type | Application |
 | Version | 0.0.0 |
-| Status | Phase 2 complete — ready for Phase 3 (Retrieval Layer) |
+| Status | Phase 4 complete — ready to plan Phase 5 (Web Interface) |
 | Last Updated | 2026-04-18 |
 
 ## Requirements
@@ -32,17 +32,22 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 - Prisma schema with pgvector — full 9-model schema (PAUL.md §4.2) applied to NeonDB; `vector(1024)` columns live on `StockItem.embedding` and `SopDocument.embedding`; typed PrismaClient singleton (lazy Proxy, PrismaPg adapter) exported from @gm-ai/database. (Phase 1, Plan 01-02 — 2026-04-18)
 - EmbeddingsService — Voyage AI wrapper with embedText/embedDocument/embedDocuments exposed via NestJS EmbeddingsModule; live-verified 1024-dim vectors, query vs document input paths distinguished. (Phase 2, Plan 02-01 — 2026-04-18)
 - Seeder with Claude enrichment — `pnpm seed` loads 2 venues, 5 suppliers, 7 categories, 24 stock items, 6 SOPs (each Claude-enriched with aiSummary + aiTags), 4 contacts; all stock and SOPs have 1024-dim pgvector embeddings; fully idempotent. (Phase 2, Plan 02-02 — 2026-04-18)
+- Agentic knowledge schema — `KnowledgeItem { content, metadata Json, embedding vector(1024) }` replaces `SopDocument`/`StockItem` enum split; `mock_*` ops tables rename with visible TEMPORARY markers; migration via `prisma migrate diff → deploy` (approval-gated); seeder rewritten to pure upsert. (Phase 3, Plan 03-01 — 2026-04-18)
+- Agentic ingest pipeline — `IngestService` authored freeform metadata (summary, tags, docType, crossRefs + emergent keys like errorCodes/timeOfDay/contactNames) via Claude; Zod `.passthrough()` contract in `@gm-ai/types` preserves emergent keys; transactional upsert + vector UPDATE; seeded docs average ~9 emergent keys each, 5/6 with populated crossRefs. (Phase 3, Plan 03-02 — 2026-04-18)
+- Knowledge retrieval + mock-ops tool adapters — `KnowledgeRetrievalService.find()` with honest no-data (0.3 threshold, gibberish → `ok: false`), `MockOpsService` with 4 tool adapters (getStockBelowPar, getStockByName, getSupplierByName, getUpcomingCutoffs), universal `ToolResult<T>` discriminated union in `@gm-ai/types`; every service method never throws (shared `guarded()` exception wrapper); PII-safe `retrieval.call` audit log. (Phase 3, Plan 03-03 — 2026-04-18)
+- Chat engine with Claude tool use — `ChatService.sendMessage()` runs a max-6-round tool-use loop over `find_knowledge` + `get_stock_below_par` + `get_stock_by_name` + `get_supplier_by_name` + `get_upcoming_cutoffs`; venue-context injected in system prompt; full conversation + tool provenance persisted (chat_messages with `toolCallLog` + `retrievedItemIds`); per-round `chat.claude_call` observability logs; Zod `SendMessageInputSchema` trust boundary; cross-tenant conversationId preflight. (Phase 4, Plan 04-01 — 2026-04-18)
+- Proactive suggestions — `SuggestionsService` with `onConversationOpen(venueId)` + `onTurn(venueId, msg, conversationId?)` returning `ProactiveSuggestion[]` (`kind: 'below-par' | 'cutoff'`, `severity: 'info' | 'warn'`, ToolName-typed `sourceToolCall`); deterministic composition via `composeSuggestions` pure helper; `runDispatchWithTimeout` 3000ms wrapper on every ToolDispatcher call; cross-tenant conversationId preflight; PII-safe logging (userMessage never logged). (Phase 4, Plan 04-02 — 2026-04-18)
+- Retrieval-quality adaptation loop — `MessageFeedback` + `ReTagQueueItem` schema; `AdaptationService` with `captureFeedback` (thumbs-up/down/regenerate + kind-transition + MAX_ENQUEUE_PER_FEEDBACK=10 cap) / `enqueueReTag` (active-status dedupe + MAX_RETAG_ATTEMPTS=3 failed-item lockout) / `captureRetrievalOutcome` (LOW_SIM_THRESHOLD=0.45, inline-awaited from ChatService with defensive type guards) / `processReTagQueue` (atomic claim + DRAIN_SOFT_DEADLINE_MS=60000 + drain_summary log); probe-eval canned query harness (6 queries, retrieval_hit pass rate exit gate at 60%). (Phase 4, Plan 04-03 — 2026-04-18)
 
 ### Active (In Progress)
-None yet.
+- Phase 5 — Web Interface (chat UI + debug/observability panel consuming ChatService + SuggestionsService + AdaptationService + named `*.call` / `*.generate` / `adaptation.*` observability events)
 
 ### Planned (Next)
-- Retrieval service (vector search)
-- Chat service + system prompt construction
-- Chat controller (REST API)
-- Basic Next.js chat UI (shadcn/ui)
+- Basic Next.js chat UI with suggestion surface, thumbs feedback wired to AdaptationService.captureFeedback, and conversation persistence (Phase 5, Plan 05-01)
+- Debug / observability panel — retrieval scores, re-tag queue state, tool call traces, low-similarity counters correlated via conversationId (Phase 5, Plan 05-02)
 
 ### Out of Scope
+- Real Xero / Square OAuth + API integration — mocked as `mock_*` tables for this milestone, swapped to real integrations in a later milestone
 - Auth / multi-tenancy (post-POC)
 - BullMQ queues (post-POC)
 - WhatsApp integration (post-POC)
@@ -75,6 +80,18 @@ None yet.
 | Full conversation history per call | Claude has no memory between calls — required for multi-turn context | 2026-04-13 | Active |
 | Coolify on Hetzner for deployment | Standard deployment target | 2026-04-13 | Active |
 | Prisma 7 with driver-adapter pattern | `latest` resolved to v7 which removed `url` from schema; PrismaPg + prisma.config.ts adopted to keep "never hardcode versions" constraint intact | 2026-04-18 | Active |
+| Agentic KB + mock_* ops tables | Type enums contradict emergent classification; ops data lives externally and will be swapped to Xero/Square — mock tables make the non-integrated state visible. Decided 2026-04-18 after /paul:discuss 03. | 2026-04-18 | Active |
+| `.passthrough()` Zod schema for metadata | Closed schema defeats agentic emergence; known fields documented + emergent keys preserved; seeded docs demonstrably emit 8-11 emergent keys | 2026-04-18 | Active |
+| `ToolResult<T>` discriminated union as universal service return contract | Consumers exhaustive-switch on ok/reason; three reasons (no-data/not-supported/error) cover the POC surface; fail-soft everywhere; no exceptions propagate | 2026-04-18 | Active |
+| Honest retrieval no-data at 0.3 similarity threshold | On 6-doc corpus: real hits 0.45-0.55, gibberish 0.15-0.20; 0.3 cleanly separates signal from noise; better than hallucinating the closest-but-irrelevant match | 2026-04-18 | Active |
+| PII-safe retrieval audit log (queryHash + queryLength) | Raw user query content should not enter persistent logs; sha256-prefix + length enable forensic correlation without PII; SOC-2-defensible | 2026-04-18 | Active |
+| Venue context injected in system prompt per call | Avoids asking Claude to ask for venueId — single-tenant request, single-call injection | 2026-04-18 | Active |
+| ChatModule exports ToolDispatcher alongside ChatService | SuggestionsService needs tool dispatch without re-instantiating; composition via shared DI | 2026-04-18 | Active |
+| runDispatchWithTimeout as the ONLY path to ToolDispatcher.dispatch in non-Claude consumers | Uniform timeout + error-log behaviour; grep-verifiable single call site per consumer | 2026-04-18 | Active |
+| SuggestionsService non-persistent (derived on each call) | Keeps chat_messages purely dialog; suggestions re-derivable from DB state + call time | 2026-04-18 | Active |
+| AdaptationService post-persist wiring in ChatService (inline-awaited, try/catch-shielded inside) | Deterministic signal capture without caller exposure to adaptation-side errors | 2026-04-18 | Active |
+| Adaptation cost ceilings exported from @gm-ai/types | MAX_RETAG_ATTEMPTS / MAX_ENQUEUE_PER_FEEDBACK / DRAIN_SOFT_DEADLINE_MS / MAX_DRAIN_LIMIT — one-place-tunable, type-visible to consumers | 2026-04-18 | Active |
+| Atomic queue-drain claim via updateMany WHERE status='queued' + count===1 gate | Single-process POC concurrency guard without advisory locks; Prisma 7 compatible | 2026-04-18 | Active |
 
 ## Success Metrics
 
@@ -104,3 +121,4 @@ None yet.
 
 ---
 *Created: 2026-04-13*
+*Last updated: 2026-04-18 after Phase 4*

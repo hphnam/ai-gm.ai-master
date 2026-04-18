@@ -8,7 +8,8 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. Start
 
 **v0.1 POC** (v0.1.0)
 Status: In progress
-Phases: 2 of 5 complete
+Phases: 4 of 5 complete
+Milestone plans: ~12 (grown from 10 after Phase 3 rescoping to agentic KB)
 
 ## Phases
 
@@ -16,8 +17,8 @@ Phases: 2 of 5 complete
 |-------|------|-------|--------|-----------|
 | 1 | Project Foundation | 2 | Complete | 2026-04-18 |
 | 2 | Embeddings & Seeding | 2 | Complete | 2026-04-18 |
-| 3 | Retrieval Layer | 2 | Not started | - |
-| 4 | Chat Engine | 2 | Not started | - |
+| 3 | Agentic Knowledge Layer | 3 | Complete | 2026-04-18 |
+| 4 | Chat Engine | 3 | Complete | 2026-04-18 |
 | 5 | Web Interface | 2 | Not started | - |
 
 ## Phase Details
@@ -56,53 +57,54 @@ Phases: 2 of 5 complete
 - [x] 02-01: Embeddings service — Voyage AI wrapper (completed 2026-04-18)
 - [x] 02-02: Seeder command — seed data, Claude enrichment, embedding generation (completed 2026-04-18)
 
-### Phase 3: Retrieval Layer
+### Phase 3: Agentic Knowledge Layer
 
-**Goal:** Vector search service that finds relevant SOPs and stock items by cosine similarity
+**Goal:** Shapeless knowledge base (KnowledgeItem with freeform `metadata Json`) + honest `mock_*` ops tables + agentic ingest + retrieval with tool-backed ops access. No type enums on knowledge; Claude classifies at ingest. Ops data lives in mock tables that mirror the shape of future Xero/Square integrations.
 **Depends on:** Phase 2 (seeded data with embeddings required)
-**Research:** Unlikely (pgvector cosine search is well-documented)
+**Research:** Unlikely (pgvector cosine search + Claude tool use are well-documented)
 
 **Scope:**
-- SOP retrieval by semantic similarity
-- Stock item retrieval by semantic similarity
-- Always-included context (contacts, below-par stock)
+- Schema reshape to KnowledgeItem + mock_* rename + re-seed
+- Agentic ingest pipeline (Claude → freeform metadata)
+- Knowledge retrieval service + mock-ops tool adapters with not-found guardrail
 
 **Plans:**
-- [ ] 03-01: Retrieval service — vector search for SOPs and stock items
-- [ ] 03-02: Always-included context queries — contacts, below-par stock
+- [x] 03-01: Schema reshape — KnowledgeItem + mock_* rename + re-seed fixture (completed 2026-04-18)
+- [x] 03-02: Agentic ingest pipeline — Claude-authored freeform metadata + embedding (completed 2026-04-18)
+- [x] 03-03: Knowledge retrieval + mock-ops tool adapters — KnowledgeRetrievalService + MockOpsService (4 tools) + ToolResult<T> envelope (completed 2026-04-18)
 
 ### Phase 4: Chat Engine
 
-**Goal:** Working chat endpoint that takes a message, retrieves context, calls Claude, and returns a response
-**Depends on:** Phase 3 (retrieval service required)
-**Research:** Unlikely (Anthropic SDK is straightforward)
+**Goal:** Chat orchestration with Claude tool use over knowledge retrieval + mock-ops tools. Honest "no data" when tools return empty. Proactive suggestions (below-par, supplier cutoffs). Adaptation loop via thumbs/regeneration → re-tag queue.
+**Depends on:** Phase 3 (retrieval service + mock-ops tools required)
+**Research:** Unlikely (Anthropic SDK tool use is well-documented)
 
 **Scope:**
-- System prompt construction from retrieved context
-- Chat service orchestrating embed → retrieve → prompt → respond flow
-- Chat controller with REST endpoint
-- Conversation persistence
-- Zod validation schemas in packages/types
+- Chat orchestration with Claude tool use
+- Conversation persistence, retrievedItemIds + toolCallLog provenance
+- Proactive suggestions (onConversationOpen, onTurn context checks)
+- Retrieval-quality adaptation loop (thumbs + regeneration → re-tag queue, eval harness)
 
 **Plans:**
-- [ ] 04-01: Chat service and prompt construction
-- [ ] 04-02: Chat controller, Zod schemas, conversation persistence
+- [x] 04-01: Chat with Claude tool use — knowledge retrieval + mock-ops tools, honest no-data responses, conversation persistence (completed 2026-04-18)
+- [x] 04-02: Proactive suggestions — conversation-open + mid-turn context checks powered by mock tools (completed 2026-04-18)
+- [x] 04-03: Adaptation loop — thumbs/regeneration/low-score → re-tag queue, eval harness with canned query set (completed 2026-04-18)
 
 ### Phase 5: Web Interface
 
-**Goal:** Basic Next.js chat UI for testing the AI — conversation thread + message input
-**Depends on:** Phase 4 (chat API must exist)
+**Goal:** Basic Next.js chat UI with suggestion surface and thumbs feedback. Debug panel for retrieval scores and tool call traces.
+**Depends on:** Phase 4 (chat API + suggestions + adaptation signals must exist)
 **Research:** Unlikely (standard Next.js + shadcn/ui)
 
 **Scope:**
-- Chat interface with conversation thread
-- Message input with send
-- Venue selection
-- Debug panel showing retrieved doc IDs (dev only)
+- Chat thread with conversation persistence
+- Suggestion surface (system-authored messages pre-input)
+- Thumbs feedback wired to adaptation loop
+- Debug panel: retrieval scores, re-tag queue status, tool call traces
 
 **Plans:**
-- [ ] 05-01: Chat UI components — conversation thread, message input, venue selector
-- [ ] 05-02: API integration and debug panel
+- [ ] 05-01: Chat UI — conversation thread, message input, venue selector, suggestion surface, thumbs feedback
+- [ ] 05-02: Debug / observability panel — retrieval scores, re-tag queue, tool call traces
 
 ---
 *Roadmap created: 2026-04-13*
