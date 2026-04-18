@@ -1,0 +1,23 @@
+{
+  "name": "@gm-ai/database",
+  "private": true,
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "build": "prisma generate"
+  },
+  "dependencies": {
+    "prisma": "latest",
+    "@prisma/client": "latest",
+    "@prisma/adapter-pg": "latest",
+    "pg": "latest"
+  },
+  "devDependencies": {
+    "@types/pg": "latest",
+    "dotenv": "latest"
+  }
+}

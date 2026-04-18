@@ -1,0 +1,25 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main",
+    "start:prod": "node dist/main"
+  },
+  "dependencies": {
+    "@nestjs/core": "latest",
+    "@nestjs/common": "latest",
+    "@nestjs/platform-express": "latest",
+    "reflect-metadata": "latest",
+    "rxjs": "latest",
+    "@gm-ai/database": "workspace:*",
+    "@gm-ai/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "latest",
+    "typescript": "latest",
+    "@types/node": "latest"
+  }
+}

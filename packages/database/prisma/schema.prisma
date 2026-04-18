@@ -1,0 +1,160 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [vector]
+}
+
+model Venue {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  type      String
+  timezone  String   @default("Europe/London")
+  createdAt DateTime @default(now())
+
+  stockItems     StockItem[]
+  sopDocuments   SopDocument[]
+  purchaseOrders PurchaseOrder[]
+  contacts       VenueContact[]
+}
+
+model Supplier {
+  id            String   @id @default(uuid())
+  name          String
+  contactName   String?
+  email         String?
+  phone         String?
+  leadTimeDays  Int      @default(2)
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  stockItems     StockItem[]
+  purchaseOrders PurchaseOrder[]
+}
+
+model StockCategory {
+  id   String @id @default(uuid())
+  name String @unique
+
+  stockItems StockItem[]
+}
+
+model StockItem {
+  id             String   @id @default(uuid())
+  venueId        String
+  supplierId     String?
+  categoryId     String
+  name           String
+  sku            String?
+  unit           String
+  unitSize       String?
+  currentQty     Decimal
+  parLevel       Decimal
+  reorderQty     Decimal
+  costPerUnit    Decimal?
+  avgWeeklyUsage Decimal?
+  notes          String?
+
+  embedding      Unsupported("vector(1024)")?
+  embeddingText  String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  venue              Venue               @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  supplier           Supplier?           @relation(fields: [supplierId], references: [id])
+  category           StockCategory       @relation(fields: [categoryId], references: [id])
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@index([venueId])
+  @@index([categoryId])
+}
+
+model PurchaseOrder {
+  id          String    @id @default(uuid())
+  venueId     String
+  supplierId  String
+  status      String    @default("draft")
+  orderedAt   DateTime?
+  expectedAt  DateTime?
+  receivedAt  DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  venue    Venue               @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  supplier Supplier            @relation(fields: [supplierId], references: [id])
+  items    PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id           String   @id @default(uuid())
+  poId         String
+  stockItemId  String
+  qtyOrdered   Decimal
+  qtyReceived  Decimal?
+  unitCost     Decimal?
+
+  purchaseOrder PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  stockItem     StockItem     @relation(fields: [stockItemId], references: [id])
+}
+
+model SopDocument {
+  id        String   @id @default(uuid())
+  venueId   String?
+  title     String
+  category  String
+  content   String
+  version   Int      @default(1)
+  updatedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  embedding   Unsupported("vector(1024)")?
+  aiSummary   String?
+  aiTags      String[]
+
+  venue Venue? @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([venueId])
+  @@index([category])
+}
+
+model VenueContact {
+  id                  String  @id @default(uuid())
+  venueId             String
+  name                String
+  role                String
+  phone               String?
+  email               String?
+  isEmergencyContact  Boolean @default(false)
+  notes               String?
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+}
+
+model ChatConversation {
+  id        String   @id @default(uuid())
+  venueId   String
+  userId    String?
+  channel   String   @default("web")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id                 String   @id @default(uuid())
+  conversationId     String
+  role               String
+  content            String
+  retrievedSopIds    String[]
+  retrievedStockIds  String[]
+  createdAt          DateTime @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
