@@ -9,7 +9,9 @@
     "start:prod": "node dist/src/main",
     "seed": "nest build && node dist/src/seed.js seed",
     "probe:embeddings": "tsx scripts/probe-embeddings.ts",
-    "probe:seed": "tsx scripts/probe-seed.ts"
+    "probe:seed": "tsx scripts/probe-seed.ts",
+    "probe:ingest": "nest build && node dist/src/scripts/probe-ingest.js",
+    "probe:retrieval": "nest build && node dist/src/scripts/probe-retrieval.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
@@ -22,7 +24,8 @@
     "nest-commander": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",
-    "voyageai": "latest"
+    "voyageai": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
     "@nestjs/cli": "latest",

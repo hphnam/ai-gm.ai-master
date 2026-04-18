@@ -2,13 +2,13 @@ import { Command, CommandRunner } from 'nest-commander'
 import { Logger } from '@nestjs/common'
 import { prisma } from '@gm-ai/database'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
-import { EnrichmentService } from './enrichment.service'
+import { IngestService } from '../ingest/ingest.service'
 import {
   venues,
-  suppliers,
-  stockCategories,
-  stockItems,
-  sopDocuments,
+  mockSupplierSeeds,
+  mockStockCategorySeeds,
+  mockStockSeeds,
+  knowledgeSeeds,
   venueContacts,
 } from './seed-data'
 
@@ -18,52 +18,86 @@ export class SeedCommand extends CommandRunner {
 
   constructor(
     private readonly embeddings: EmbeddingsService,
-    private readonly enrichment: EnrichmentService,
+    private readonly ingest: IngestService,
   ) {
     super()
   }
 
   async run(): Promise<void> {
-    this.logger.log('Wiping existing seed data...')
-    await prisma.chatMessage.deleteMany()
-    await prisma.chatConversation.deleteMany()
-    await prisma.purchaseOrderItem.deleteMany()
-    await prisma.purchaseOrder.deleteMany()
-    await prisma.venueContact.deleteMany()
-    await prisma.sopDocument.deleteMany()
-    await prisma.stockItem.deleteMany()
-    await prisma.stockCategory.deleteMany()
-    await prisma.supplier.deleteMany()
-    await prisma.venue.deleteMany()
+    this.logger.log(`Upserting ${venues.length} venues...`)
+    for (const v of venues) {
+      await prisma.venue.upsert({
+        where: { id: v.id },
+        create: { id: v.id, name: v.name, address: v.address, type: v.type },
+        update: { name: v.name, address: v.address, type: v.type },
+      })
+    }
 
-    this.logger.log(`Inserting ${venues.length} venues...`)
-    await prisma.venue.createMany({ data: [...venues] })
+    this.logger.log(`Upserting ${mockSupplierSeeds.length} mock suppliers...`)
+    for (const s of mockSupplierSeeds) {
+      await prisma.mockSupplier.upsert({
+        where: { id: s.id },
+        create: {
+          id: s.id,
+          name: s.name,
+          contactName: s.contactName,
+          email: s.email,
+          phone: s.phone,
+          leadTimeDays: s.leadTimeDays,
+          notes: s.notes,
+        },
+        update: {
+          name: s.name,
+          contactName: s.contactName,
+          email: s.email,
+          phone: s.phone,
+          leadTimeDays: s.leadTimeDays,
+          notes: s.notes,
+        },
+      })
+    }
 
-    this.logger.log(`Inserting ${suppliers.length} suppliers...`)
-    await prisma.supplier.createMany({ data: [...suppliers] })
+    this.logger.log(`Upserting ${mockStockCategorySeeds.length} mock stock categories...`)
+    for (const c of mockStockCategorySeeds) {
+      await prisma.mockStockCategory.upsert({
+        where: { id: c.id },
+        create: { id: c.id, name: c.name },
+        update: { name: c.name },
+      })
+    }
 
-    this.logger.log(`Inserting ${stockCategories.length} stock categories...`)
-    await prisma.stockCategory.createMany({ data: [...stockCategories] })
-
-    this.logger.log(`Embedding ${stockItems.length} stock items (batch)...`)
-    const stockEmbeddingTexts = stockItems.map((s) => {
-      const catName = stockCategories.find((c) => c.id === s.categoryId)?.name ?? ''
-      const parts = [
-        s.name,
-        `Category: ${catName}`,
-        `Unit: ${s.unitSize ?? s.unit}`,
-      ]
+    this.logger.log(`Embedding ${mockStockSeeds.length} mock stock items (batch)...`)
+    const stockEmbeddingTexts = mockStockSeeds.map((s) => {
+      const catName = mockStockCategorySeeds.find((c) => c.id === s.categoryId)?.name ?? ''
+      const parts = [s.name, `Category: ${catName}`, `Unit: ${s.unitSize ?? s.unit}`]
       if (s.notes) parts.push(s.notes)
       return parts.join('. ')
     })
     const stockVectors = await this.embeddings.embedDocuments(stockEmbeddingTexts)
 
-    this.logger.log(`Inserting stock items + writing vectors...`)
-    for (let i = 0; i < stockItems.length; i++) {
-      const item = stockItems[i]
-      await prisma.stockItem.create({
-        data: {
+    this.logger.log(`Upserting mock stock items + refreshing vectors...`)
+    for (let i = 0; i < mockStockSeeds.length; i++) {
+      const item = mockStockSeeds[i]
+      await prisma.mockStock.upsert({
+        where: { id: item.id },
+        create: {
           id: item.id,
+          venueId: item.venueId,
+          supplierId: item.supplierId,
+          categoryId: item.categoryId,
+          name: item.name,
+          sku: item.sku,
+          unit: item.unit,
+          unitSize: item.unitSize,
+          currentQty: item.currentQty,
+          parLevel: item.parLevel,
+          reorderQty: item.reorderQty,
+          costPerUnit: item.costPerUnit,
+          avgWeeklyUsage: item.avgWeeklyUsage,
+          notes: item.notes,
+          embeddingText: stockEmbeddingTexts[i],
+        },
+        update: {
           venueId: item.venueId,
           supplierId: item.supplierId,
           categoryId: item.categoryId,
@@ -82,41 +116,48 @@ export class SeedCommand extends CommandRunner {
       })
       const vec = stockVectors[i]
       await prisma.$executeRawUnsafe(
-        `UPDATE "StockItem" SET embedding = $1::vector WHERE id = $2`,
+        `UPDATE "mock_stock" SET embedding = $1::vector WHERE id = $2`,
         `[${vec.join(',')}]`,
         item.id,
       )
     }
 
-    this.logger.log(`Enriching + embedding ${sopDocuments.length} SOPs (sequential)...`)
-    for (const doc of sopDocuments) {
-      const enriched = await this.enrichment.enrichSop(doc)
-      const aiSummary = enriched?.summary ?? null
-      const aiTags = enriched?.tags ?? []
-      const embeddingText = `${doc.title}. ${aiSummary ?? ''}. Tags: ${aiTags.join(', ')}. ${doc.content}`
-      const [vec] = await this.embeddings.embedDocuments([embeddingText])
-      await prisma.sopDocument.create({
-        data: {
-          id: doc.id,
-          venueId: doc.venueId,
-          title: doc.title,
-          category: doc.category,
-          content: doc.content,
-          updatedBy: doc.updatedBy,
-          aiSummary,
-          aiTags,
-        },
+    this.logger.log(`Upserting ${venueContacts.length} venue contacts...`)
+    for (const c of venueContacts) {
+      const existing = await prisma.venueContact.findFirst({
+        where: { venueId: c.venueId, name: c.name, role: c.role },
       })
-      await prisma.$executeRawUnsafe(
-        `UPDATE "SopDocument" SET embedding = $1::vector WHERE id = $2`,
-        `[${vec.join(',')}]`,
-        doc.id,
-      )
-      this.logger.log(`  ✓ ${doc.title} — ${aiTags.length} tags`)
+      if (existing) {
+        await prisma.venueContact.update({
+          where: { id: existing.id },
+          data: {
+            phone: c.phone,
+            email: c.email,
+            isEmergencyContact: c.isEmergencyContact,
+            notes: c.notes,
+          },
+        })
+      } else {
+        await prisma.venueContact.create({ data: { ...c } })
+      }
     }
 
-    this.logger.log(`Inserting ${venueContacts.length} venue contacts...`)
-    await prisma.venueContact.createMany({ data: [...venueContacts] })
+    this.logger.log(`Ingesting ${knowledgeSeeds.length} knowledge docs (sequential)...`)
+    for (const doc of knowledgeSeeds) {
+      const { metadata } = await this.ingest.ingest({
+        id: doc.id,
+        title: doc.title,
+        category: doc.category,
+        content: doc.content,
+        venueId: doc.venueId ?? null,
+      })
+      const emergentKeys = Object.keys(metadata).filter(
+        (k) => !['summary', 'tags', 'docType', 'category', 'crossRefs'].includes(k),
+      )
+      this.logger.log(
+        `  ✓ ${doc.title} — docType=${metadata.docType ?? 'n/a'} tags=${metadata.tags?.length ?? 0} crossRefs=${metadata.crossRefs?.length ?? 0} emergent=[${emergentKeys.join(',')}]`,
+      )
+    }
 
     this.logger.log('Seed complete.')
     await prisma.$disconnect()

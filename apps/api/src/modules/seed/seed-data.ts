@@ -20,7 +20,7 @@ export const venues = [
   { id: VENUE_ANCHOR, name: 'The Anchor Bar', address: '7 Dock Road, Liverpool, L3 4AX', type: 'bar' },
 ] as const
 
-export const suppliers = [
+export const mockSupplierSeeds = [
   {
     id: SUPPLIER_MATTHEW_CLARK,
     name: 'Matthew Clark',
@@ -68,7 +68,7 @@ export const suppliers = [
   },
 ] as const
 
-export const stockCategories = [
+export const mockStockCategorySeeds = [
   { id: CAT_DRAUGHT, name: 'draught' },
   { id: CAT_SPIRITS, name: 'spirits' },
   { id: CAT_WINE, name: 'wine' },
@@ -78,7 +78,7 @@ export const stockCategories = [
   { id: CAT_DISPOSABLES, name: 'disposables' },
 ] as const
 
-export type StockItemSeed = {
+export type MockStockSeed = {
   id: string
   venueId: string
   supplierId: string | null
@@ -97,7 +97,7 @@ export type StockItemSeed = {
 
 const s = (i: number) => `d0000000-0000-4000-8000-${i.toString(16).padStart(12, '0')}`
 
-export const stockItems: ReadonlyArray<StockItemSeed> = [
+export const mockStockSeeds: ReadonlyArray<MockStockSeed> = [
   // Draught
   { id: s(1), venueId: VENUE_CROWN, supplierId: SUPPLIER_CARLSBERG, categoryId: CAT_DRAUGHT, name: 'Carlsberg Lager', sku: 'CAR-11G', unit: 'keg', unitSize: '11gal', currentQty: 3, parLevel: 4, reorderQty: 4, costPerUnit: 89.0, avgWeeklyUsage: 5.5, notes: 'Best seller. Check pressure daily.' },
   { id: s(2), venueId: VENUE_CROWN, supplierId: SUPPLIER_DIAGEO, categoryId: CAT_DRAUGHT, name: 'Guinness', sku: 'GUI-11G', unit: 'keg', unitSize: '11gal', currentQty: 2, parLevel: 3, reorderQty: 3, costPerUnit: 102.0, avgWeeklyUsage: 3.5, notes: null },
@@ -133,7 +133,7 @@ export const stockItems: ReadonlyArray<StockItemSeed> = [
 
 const d = (i: number) => `e0000000-0000-4000-8000-${i.toString(16).padStart(12, '0')}`
 
-export type SopSeed = {
+export type KnowledgeSeed = {
   id: string
   venueId: string | null
   title: string
@@ -142,7 +142,7 @@ export type SopSeed = {
   updatedBy: string | null
 }
 
-export const sopDocuments: ReadonlyArray<SopSeed> = [
+export const knowledgeSeeds: ReadonlyArray<KnowledgeSeed> = [
   {
     id: d(1),
     venueId: null,
