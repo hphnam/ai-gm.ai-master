@@ -14,7 +14,7 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 |-----------|-------|
 | Type | Application |
 | Version | 0.0.0 |
-| Status | Phase 1 complete — ready for Phase 2 (Embeddings & Seeding) |
+| Status | Phase 2 complete — ready for Phase 3 (Retrieval Layer) |
 | Last Updated | 2026-04-18 |
 
 ## Requirements
@@ -29,14 +29,14 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 
 ### Validated (Shipped)
 - Monorepo scaffold — Turborepo v2 + pnpm workspaces; apps/api (NestJS on :3001, CORS on), apps/web (Next.js 16 on :3000); packages/config, packages/database, packages/types. (Phase 1, Plan 01-01 — 2026-04-18)
-- Prisma schema with pgvector — full 9-model schema (PAUL.md §4.2) applied to NeonDB; `vector(1024)` columns live on `StockItem.embedding` and `SopDocument.embedding`; typed PrismaClient singleton via PrismaPg adapter exported from @gm-ai/database. (Phase 1, Plan 01-02 — 2026-04-18)
+- Prisma schema with pgvector — full 9-model schema (PAUL.md §4.2) applied to NeonDB; `vector(1024)` columns live on `StockItem.embedding` and `SopDocument.embedding`; typed PrismaClient singleton (lazy Proxy, PrismaPg adapter) exported from @gm-ai/database. (Phase 1, Plan 01-02 — 2026-04-18)
+- EmbeddingsService — Voyage AI wrapper with embedText/embedDocument/embedDocuments exposed via NestJS EmbeddingsModule; live-verified 1024-dim vectors, query vs document input paths distinguished. (Phase 2, Plan 02-01 — 2026-04-18)
+- Seeder with Claude enrichment — `pnpm seed` loads 2 venues, 5 suppliers, 7 categories, 24 stock items, 6 SOPs (each Claude-enriched with aiSummary + aiTags), 4 contacts; all stock and SOPs have 1024-dim pgvector embeddings; fully idempotent. (Phase 2, Plan 02-02 — 2026-04-18)
 
 ### Active (In Progress)
 None yet.
 
 ### Planned (Next)
-- Embeddings service (Voyage AI)
-- Seeder command with Claude enrichment for SOPs
 - Retrieval service (vector search)
 - Chat service + system prompt construction
 - Chat controller (REST API)

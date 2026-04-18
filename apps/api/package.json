@@ -7,15 +7,19 @@
     "build": "nest build",
     "start": "node dist/main",
     "start:prod": "node dist/main",
-    "probe:embeddings": "tsx scripts/probe-embeddings.ts"
+    "seed": "nest build && node dist/seed.js seed",
+    "probe:embeddings": "tsx scripts/probe-embeddings.ts",
+    "probe:seed": "tsx scripts/probe-seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "latest",
     "@gm-ai/database": "workspace:*",
     "@gm-ai/types": "workspace:*",
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
     "dotenv": "latest",
+    "nest-commander": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",
     "voyageai": "latest"

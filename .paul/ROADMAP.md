@@ -8,14 +8,14 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. Start
 
 **v0.1 POC** (v0.1.0)
 Status: In progress
-Phases: 1 of 5 complete
+Phases: 2 of 5 complete
 
 ## Phases
 
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
 | 1 | Project Foundation | 2 | Complete | 2026-04-18 |
-| 2 | Embeddings & Seeding | 2 | In progress | - |
+| 2 | Embeddings & Seeding | 2 | Complete | 2026-04-18 |
 | 3 | Retrieval Layer | 2 | Not started | - |
 | 4 | Chat Engine | 2 | Not started | - |
 | 5 | Web Interface | 2 | Not started | - |
@@ -54,7 +54,7 @@ Phases: 1 of 5 complete
 
 **Plans:**
 - [x] 02-01: Embeddings service — Voyage AI wrapper (completed 2026-04-18)
-- [ ] 02-02: Seeder command — seed data, Claude enrichment, embedding generation
+- [x] 02-02: Seeder command — seed data, Claude enrichment, embedding generation (completed 2026-04-18)
 
 ### Phase 3: Retrieval Layer
 
