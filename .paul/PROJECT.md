@@ -53,7 +53,7 @@ None yet.
 ### Technical Constraints
 - NeonDB with pgvector for vector storage — Prisma requires `$executeRaw` for vector writes
 - Voyage AI `voyage-3` produces 1024-dimension vectors
-- Claude claude-sonnet-4-20250514 for chat, no streaming in POC
+- Claude `claude-sonnet-4-6` for chat and SOP enrichment, no streaming in POC
 - All Zod schemas in `packages/types`, Prisma client from `packages/database`
 - Never hardcode package versions in package.json
 - Use `@nestjs/bullmq` — never legacy `@nestjs/bull`
@@ -96,7 +96,7 @@ None yet.
 | Database | NeonDB (Postgres + pgvector) | 1024-dim vectors |
 | Queue | BullMQ + Redis | Post-POC |
 | Auth | better-auth (org plugin) | Post-POC |
-| AI Chat | Anthropic SDK — Claude claude-sonnet-4-20250514 | |
+| AI Chat | Anthropic SDK — Claude `claude-sonnet-4-6` | |
 | AI Embeddings | Voyage AI — voyage-3 | 1024 dimensions |
 | Validation | Zod | Shared from packages/types |
 | Frontend | Next.js (App Router) + shadcn/ui | |

@@ -28,27 +28,40 @@ Category: ${doc.category}
 Content:
 ${doc.content}`
 
-    const response = await this.client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    })
+    // Try up to 2 times — Claude occasionally wraps JSON in markdown fences or
+    // adds a preamble despite "JSON only" instruction. Fences are stripped
+    // before parsing; if both attempts fail, log and skip per PAUL.md §7.3.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const response = await this.client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      })
 
-    const text = response.content
-      .filter((b) => b.type === 'text')
-      .map((b) => (b as { text: string }).text)
-      .join('')
+      const raw = response.content
+        .filter((b) => b.type === 'text')
+        .map((b) => (b as { text: string }).text)
+        .join('')
 
-    try {
-      const parsed = JSON.parse(text) as SopEnrichment
-      if (typeof parsed.summary !== 'string' || !Array.isArray(parsed.tags)) {
-        this.logger.warn(`Enrichment for "${doc.title}" returned wrong shape; skipping`)
-        return null
+      // Strip ```json ... ``` fences and leading/trailing whitespace.
+      const stripped = raw
+        .replace(/^\s*```(?:json)?\s*/i, '')
+        .replace(/\s*```\s*$/, '')
+        .trim()
+
+      try {
+        const parsed = JSON.parse(stripped) as SopEnrichment
+        if (typeof parsed.summary !== 'string' || !Array.isArray(parsed.tags)) {
+          this.logger.warn(`Enrichment for "${doc.title}" returned wrong shape (attempt ${attempt})`)
+          continue
+        }
+        return parsed
+      } catch {
+        this.logger.warn(`Enrichment for "${doc.title}" returned invalid JSON (attempt ${attempt})`)
       }
-      return parsed
-    } catch {
-      this.logger.warn(`Enrichment for "${doc.title}" returned invalid JSON; skipping`)
-      return null
     }
+
+    this.logger.warn(`Enrichment for "${doc.title}" failed after 2 attempts; skipping`)
+    return null
   }
 }

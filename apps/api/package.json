@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
-    "start": "node dist/main",
-    "start:prod": "node dist/main",
-    "seed": "nest build && node dist/seed.js seed",
+    "start": "node dist/src/main",
+    "start:prod": "node dist/src/main",
+    "seed": "nest build && node dist/src/seed.js seed",
     "probe:embeddings": "tsx scripts/probe-embeddings.ts",
     "probe:seed": "tsx scripts/probe-seed.ts"
   },
@@ -26,6 +26,8 @@
   },
   "devDependencies": {
     "@nestjs/cli": "latest",
+    "@swc/cli": "latest",
+    "@swc/core": "latest",
     "@types/node": "latest",
     "tsx": "latest",
     "typescript": "latest"

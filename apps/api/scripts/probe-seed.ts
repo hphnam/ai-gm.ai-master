@@ -1,6 +1,4 @@
-import { config } from 'dotenv'
-import { resolve } from 'node:path'
-config({ path: resolve(__dirname, '../../../.env') })
+import '../src/load-env'
 
 import { prisma } from '@gm-ai/database'
 

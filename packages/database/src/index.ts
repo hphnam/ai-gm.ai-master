@@ -4,11 +4,21 @@ import { PrismaPg } from '@prisma/adapter-pg'
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
 function createClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
+  const raw = process.env.DATABASE_URL
+  if (!raw) {
     throw new Error('DATABASE_URL is not set — add it to .env at repo root before using prisma')
   }
-  const adapter = new PrismaPg({ connectionString })
+  // Strip `sslmode` from the URL and pass `ssl` explicitly. pg-connection-string's
+  // sslmode aliasing (require/prefer/verify-ca → verify-full) emits a deprecation
+  // warning in pg v8.x ahead of a v9.0 semantics change. Setting ssl directly on
+  // the adapter bypasses the aliasing entirely.
+  const url = new URL(raw)
+  const sslmode = url.searchParams.get('sslmode')
+  url.searchParams.delete('sslmode')
+  const adapter = new PrismaPg({
+    connectionString: url.toString(),
+    ssl: sslmode && sslmode !== 'disable' ? { rejectUnauthorized: true } : false,
+  })
   return new PrismaClient({ adapter })
 }
 

@@ -46,8 +46,13 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - 2026-04-18: Plan 02-01 — Probe scripts pattern — apps/api/scripts/*.ts run via tsx, exposed as `probe:*` npm scripts. Phase 2 | Impact: same pattern for future live-API verification (Claude, retrieval).
 - 2026-04-18: Plan 02-02 — Workspace packages with runtime exports must compile to dist/ (not main: src/*.ts). Phase 2 | Impact: @gm-ai/database now has dist/; @gm-ai/types will need same treatment when Phase 4 consumes its Zod schemas at runtime.
 - 2026-04-18: Plan 02-02 — Lazy Prisma singleton via Proxy in @gm-ai/database. Phase 2 | Impact: import order no longer couples to env loading; any context (CLI, test, serverless) can load env at any time.
-- 2026-04-18: Plan 02-02 — CLI commands run via `nest build && node dist/...` (not tsx) because esbuild doesn't emit emitDecoratorMetadata. Phase 2 | Impact: all nest-commander CLIs pay a ~5s build tax; DI works correctly.
+- 2026-04-18: Plan 02-02 — CLI commands run via `nest build && node dist/src/...` (not tsx) because esbuild doesn't emit emitDecoratorMetadata. Phase 2 | Impact: all nest-commander CLIs rely on the compile step; swc makes it ~36ms.
 - 2026-04-18: Plan 02-02 — Deterministic seed UUIDs (d0000000-*, e0000000-*). Phase 2 | Impact: Phase 3 retrieval test fixtures can hardcode IDs like Carlsberg Lager=d0000000-0000-4000-8000-000000000001.
+- 2026-04-18: Post-02-02 — Switched NestJS compiler to swc (via @swc/core + .swcrc). Phase 2 | Impact: `nest build` down from ~5s → ~36ms; swc emits decoratorMetadata correctly so DI still works; dist/ now nests under dist/src/ (scripts updated).
+- 2026-04-18: Post-02-02 — Model bumped from `claude-sonnet-4-20250514` (deprecates 2026-06-15) to `claude-sonnet-4-6`. Phase 2 | Impact: PROJECT.md constraint + EnrichmentService in sync; no model tooling plan needed pre-launch.
+- 2026-04-18: Post-02-02 — Enrichment retry + markdown-fence strip — Claude 4.6 occasionally wraps JSON in ```json fences. Fence-stripper + 1-retry before fail-open. Phase 2 | Impact: all 6 SOPs enriched reliably; no silent empty aiTags.
+- 2026-04-18: Post-02-02 — Shared env loader `apps/api/src/load-env.ts` — walks up from __dirname to find pnpm-workspace.yaml, loads sibling .env. Phase 2 | Impact: works across tsx + nest build + swc + any future runtime; no hardcoded `../../../.env` strings.
+- 2026-04-18: Post-02-02 — Explicit `ssl: { rejectUnauthorized: true }` passed to PrismaPg, sslmode stripped from URL. Phase 2 | Impact: pg v8 sslmode deprecation warning silenced; future pg v9 upgrade is safe (won't trigger the alias semantics change).
 
 ### Deferred Issues
 - ESLint/Prettier setup (deferred from audit — add in dedicated plan or Phase 5)
@@ -58,9 +63,9 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Prisma query logging (`log: ['query']`) — add in dev config if Phase 3/4 needs debug visibility
 - `pnpm approve-builds` — **RESOLVED** in Plan 01-02 via `pnpm.onlyBuiltDependencies`
 - pnpm `save-prefix` — `pnpm add` inserts caret pins; manually reverted to `"latest"` in 02-01 and 02-02. Add `.npmrc save-prefix=""` in a future tooling plan so this enforces automatically.
-- **Claude model deprecation** — `claude-sonnet-4-20250514` reaches end-of-life 2026-06-15. PROJECT.md pins this model. Need tooling plan before that date: (a) choose successor, (b) update PROJECT.md, (c) update EnrichmentService + ChatService strings.
-- pg v9 SSL semantics change — `sslmode=require` behaviour changes in pg v9. Non-breaking for now; revisit pre-production.
-- Incremental build cache for nest-commander CLIs — `pnpm seed` rebuilds the api from scratch (~5s). Optimisation candidate once we have more CLIs.
+- **Claude model deprecation** — **RESOLVED** post-02-02: bumped to `claude-sonnet-4-6`.
+- pg v9 SSL semantics change — **RESOLVED** post-02-02: explicit `ssl` config bypasses `sslmode` aliasing.
+- Incremental build cache for nest-commander CLIs — **RESOLVED** post-02-02: switched api compiler to swc (~36ms, down from ~5s).
 
 ### Blockers/Concerns
 None yet.
