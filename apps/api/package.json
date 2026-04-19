@@ -15,7 +15,8 @@
     "probe:chat": "nest build && node dist/src/scripts/probe-chat.js",
     "probe:suggestions": "nest build && node dist/src/scripts/probe-suggestions.js",
     "probe:adaptation": "nest build && node dist/src/scripts/probe-adaptation.js",
-    "probe:eval": "nest build && node dist/src/scripts/probe-eval.js"
+    "probe:eval": "nest build && node dist/src/scripts/probe-eval.js",
+    "probe:api": "nest build && node dist/src/scripts/probe-api.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
@@ -25,6 +26,7 @@
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
     "dotenv": "latest",
+    "express": "latest",
     "nest-commander": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",

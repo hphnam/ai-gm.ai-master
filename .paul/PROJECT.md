@@ -14,8 +14,8 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 |-----------|-------|
 | Type | Application |
 | Version | 0.0.0 |
-| Status | Phase 4 complete — ready to plan Phase 5 (Web Interface) |
-| Last Updated | 2026-04-18 |
+| Status | v0.1 POC milestone complete — all 5 phases shipped (13/13 plans); phase-5 commit pending |
+| Last Updated | 2026-04-19 |
 
 ## Requirements
 
@@ -38,13 +38,9 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 - Chat engine with Claude tool use — `ChatService.sendMessage()` runs a max-6-round tool-use loop over `find_knowledge` + `get_stock_below_par` + `get_stock_by_name` + `get_supplier_by_name` + `get_upcoming_cutoffs`; venue-context injected in system prompt; full conversation + tool provenance persisted (chat_messages with `toolCallLog` + `retrievedItemIds`); per-round `chat.claude_call` observability logs; Zod `SendMessageInputSchema` trust boundary; cross-tenant conversationId preflight. (Phase 4, Plan 04-01 — 2026-04-18)
 - Proactive suggestions — `SuggestionsService` with `onConversationOpen(venueId)` + `onTurn(venueId, msg, conversationId?)` returning `ProactiveSuggestion[]` (`kind: 'below-par' | 'cutoff'`, `severity: 'info' | 'warn'`, ToolName-typed `sourceToolCall`); deterministic composition via `composeSuggestions` pure helper; `runDispatchWithTimeout` 3000ms wrapper on every ToolDispatcher call; cross-tenant conversationId preflight; PII-safe logging (userMessage never logged). (Phase 4, Plan 04-02 — 2026-04-18)
 - Retrieval-quality adaptation loop — `MessageFeedback` + `ReTagQueueItem` schema; `AdaptationService` with `captureFeedback` (thumbs-up/down/regenerate + kind-transition + MAX_ENQUEUE_PER_FEEDBACK=10 cap) / `enqueueReTag` (active-status dedupe + MAX_RETAG_ATTEMPTS=3 failed-item lockout) / `captureRetrievalOutcome` (LOW_SIM_THRESHOLD=0.45, inline-awaited from ChatService with defensive type guards) / `processReTagQueue` (atomic claim + DRAIN_SOFT_DEADLINE_MS=60000 + drain_summary log); probe-eval canned query harness (6 queries, retrieval_hit pass rate exit gate at 60%). (Phase 4, Plan 04-03 — 2026-04-18)
-
-### Active (In Progress)
-- Phase 5 — Web Interface (chat UI + debug/observability panel consuming ChatService + SuggestionsService + AdaptationService + named `*.call` / `*.generate` / `adaptation.*` observability events)
-
-### Planned (Next)
-- Basic Next.js chat UI with suggestion surface, thumbs feedback wired to AdaptationService.captureFeedback, and conversation persistence (Phase 5, Plan 05-01)
-- Debug / observability panel — retrieval scores, re-tag queue state, tool call traces, low-similarity counters correlated via conversationId (Phase 5, Plan 05-02)
+- REST API surface over Phase 4 services — ChatController / SuggestionsController / FeedbackController / VenuesController behind `zodPipe(Schema)` factory; canonical `ApiErrorResponse = {error: ApiErrorCode; details?}` with closed `API_ERROR_CODES` in `@gm-ai/types/api.ts`; CORS origin allowlist via `WEB_ORIGIN`; 32kb body-parser cap; X-Request-Id middleware + PII-safe `http.request` JSON logger; Anthropic `sendWithRetry()` on 429/5xx; cross-tenant `?venueId` 404-not-403 pattern; `translate-chat-error.ts` single-source error helper; probe-api.ts 22 assertions with `channel='probe-api'` FK-safe cleanup. (Phase 5, Plan 05-01 — 2026-04-18)
+- Next.js chat UI — Tailwind v4 + shadcn/ui (new-york) foundation; apiFetch singleton with UUID v4 X-Request-Id per call + ApiError.requestId capture; URL-as-state (?venue=, ?conv=); React Query for all server state; react-hook-form + zodResolver; venue selector + multi-turn thread with optimistic render + proactive suggestions + thumbs feedback; XSS-safe plain-text rendering (whitespace-pre-wrap, zero dangerouslySetInnerHTML, zero markdown libs); WCAG AA baseline (role="log"+aria-live="polite", aria-label/aria-pressed on icon-only buttons, icon+text severity never color-only); App Router error.tsx + loading.tsx per segment; `mapApiError()` single-source client-side code-to-string translation. (Phase 5, Plan 05-02 — 2026-04-18)
+- Debug / observability panel — read-only `/debug/*` surface (3 endpoints) on apps/api exposing Phase 4 provenance; `/debug?venue=&conv=` route on apps/web rendering conversation trace (per-message cards with collapsible toolCallLog + similarity color bands with text labels + feedback badges) + re-tag queue panel (counts across 5 known statuses + items with status/attempts/lastError/sourceMessageId click-to-scroll); tenant-strict OR clause on retag queue (probe D5 guards cross-tenant leak); dual content caps (server 2048-char toolCallLog content + client 64KB JSON viewer with omitted-byte banner); dual-layer noindex defence (Next.js `robots:{index:false,follow:false}` metadata + `X-Robots-Tag: noindex, nofollow` response header via next.config.ts headers()) + amber operator warning banner; 90-day retention gate via typed `RETENTION_90D_MS` constant; `debug.access` per-call structured log via shared `logAccess()` helper; `DebugRequestIdBadge` + `apiFetchWithMeta<T>()` surfacing X-Request-Id on success; probe-api raised 29 → 36 assertions (D1–D7). (Phase 5, Plan 05-03 — 2026-04-19)
 
 ### Out of Scope
 - Real Xero / Square OAuth + API integration — mocked as `mock_*` tables for this milestone, swapped to real integrations in a later milestone
@@ -92,6 +88,22 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 | AdaptationService post-persist wiring in ChatService (inline-awaited, try/catch-shielded inside) | Deterministic signal capture without caller exposure to adaptation-side errors | 2026-04-18 | Active |
 | Adaptation cost ceilings exported from @gm-ai/types | MAX_RETAG_ATTEMPTS / MAX_ENQUEUE_PER_FEEDBACK / DRAIN_SOFT_DEADLINE_MS / MAX_DRAIN_LIMIT — one-place-tunable, type-visible to consumers | 2026-04-18 | Active |
 | Atomic queue-drain claim via updateMany WHERE status='queued' + count===1 gate | Single-process POC concurrency guard without advisory locks; Prisma 7 compatible | 2026-04-18 | Active |
+| Canonical `ApiErrorResponse` with closed `API_ERROR_CODES` in `@gm-ai/types/api.ts` | Prevents per-endpoint error handling drift; UI consumes one closed union; `translate-chat-error.ts` helper consolidates regex substring mapping | 2026-04-18 | Active |
+| X-Request-Id middleware + PII-safe `http.request` JSON logger | Per-request correlation handle without logging body/query/param VALUES; echoed in response header; captured in ApiError for UI toasts | 2026-04-18 | Active |
+| `zodPipe(Schema)` factory replacing inline `new ZodValidationPipe(...)` | Single-line controller validation; shared @Body/@Query/@Param pattern | 2026-04-18 | Active |
+| Cross-tenant GETs return 404-not-403 on venueId mismatch | Avoids enumeration leak (403 confirms existence); probe A8b/A8c/A8d + D2/D5 guard | 2026-04-18 | Active |
+| URL-as-state (?venue=, ?conv=) for conversation persistence | POC has no auth; URL is the only persistence surface a refresh / bookmark / tab share can rely on without localStorage privacy edge cases | 2026-04-18 | Active |
+| apiFetch singleton as single trust boundary for all apps/web network I/O | Generates UUID v4 X-Request-Id per call; captures server-echoed id on ApiError; AbortSignal passthrough; grep-verified zero other fetch() sites | 2026-04-18 | Active |
+| Assistant content rendered as plain text with `whitespace-pre-wrap`, NEVER dangerouslySetInnerHTML | Claude outputs are untrusted enough to ship prompt-injection XSS; sanitized markdown renderer blocked behind explicit threat-model plan | 2026-04-18 | Active |
+| WCAG AA baseline shipped pre-emptively (role="log"+aria-live="polite", aria-label/aria-pressed, icon+text severity) | Blockers landed before any accessibility audit could flag them; severity NEVER color-only | 2026-04-18 | Active |
+| `mapApiError` hoisted to `apps/web/src/lib/map-api-error.ts` as single-source client-side code-to-string translator | Used by `useFeedback` hook + chat page; mirrors server-side `translateChatServiceError`; any future client-side server-error → user-string mapping goes in `map-*-error.ts`, not duplicated at call sites | 2026-04-18 | Active |
+| Read-only `/debug/*` surface: zero writes, zero live AI calls, Prisma joins over persisted state | Debug exists to expose Phase 3/4 provenance without re-running retrieval (would burn Voyage credit + introduce time-skew); write actions (retry queue item, clear failed, force drain) explicitly out of scope | 2026-04-19 | Active |
+| Tenant-strict OR clause on retag queue: `(sourceMessage.conversation.venueId) OR (sourceMessageId null AND knowledgeItem.venueId)` | The permissive `{ knowledgeItem: { OR: [{ venueId }, { venueId: null }] } }` form leaks cross-tenant state drift on shared globals (SOC-2 CC6.6 failure); probe D5 regression-guards | 2026-04-19 | Active |
+| Dual content caps: server 2048-char `toolCallLog.result.data[].content` + client 64KB JSON viewer with omitted-byte banner | Prevents 100KB toolCallLog entries from freezing main thread on low-end devices; server cap uses `__truncated: true` sibling marker; full payload reachable only via direct DB access | 2026-04-19 | Active |
+| Dual-layer noindex defence: Next.js `robots:{index:false,follow:false}` metadata + `X-Robots-Tag: noindex, nofollow` response header | Defence-in-depth for pre-auth /debug URL; amber operator warning banner discourages accidental screenshots; NOT a replacement for auth — documented as defence-in-depth in boundaries | 2026-04-19 | Active |
+| `RETENTION_90D_MS` typed constant in `@gm-ai/types` gating all debug findFirst + list queries | Bounds GDPR subject-access scope; one-place-tunable; applied via `retentionCutoff()` helper in service layer | 2026-04-19 | Active |
+| `debug.access` per-call structured log via shared `logAccess()` helper | Separates operator-debug from user traffic in grep without branching shared `http-logger.middleware.ts`; DRY factoring over 3 endpoints | 2026-04-19 | Active |
+| `apiFetchWithMeta<T>()` as sibling variant to `apiFetch<T>()` surfacing X-Request-Id on SUCCESS | Operator needs requestId handle on success path, not just failure; apiFetch signature frozen — chat hooks unchanged; future observability surfaces import apiFetchWithMeta | 2026-04-19 | Active |
 
 ## Success Metrics
 
@@ -121,4 +133,4 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 
 ---
 *Created: 2026-04-13*
-*Last updated: 2026-04-18 after Phase 4*
+*Last updated: 2026-04-19 after Phase 5 (v0.1 POC milestone complete — all 5 phases shipped; phase-5 git commit pending)*

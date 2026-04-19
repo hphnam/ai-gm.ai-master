@@ -7,9 +7,9 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. Start
 ## Current Milestone
 
 **v0.1 POC** (v0.1.0)
-Status: In progress
-Phases: 4 of 5 complete
-Milestone plans: ~12 (grown from 10 after Phase 3 rescoping to agentic KB)
+Status: Complete (13/13 plans shipped — phase-5 git commit pending)
+Phases: 5 of 5 complete
+Milestone plans: 13 total (grown from 10 → 12 after Phase 3 rescope; Phase 5 rescoped 2→3 plans on 2026-04-18 to split API surface from UI)
 
 ## Phases
 
@@ -19,7 +19,7 @@ Milestone plans: ~12 (grown from 10 after Phase 3 rescoping to agentic KB)
 | 2 | Embeddings & Seeding | 2 | Complete | 2026-04-18 |
 | 3 | Agentic Knowledge Layer | 3 | Complete | 2026-04-18 |
 | 4 | Chat Engine | 3 | Complete | 2026-04-18 |
-| 5 | Web Interface | 2 | Not started | - |
+| 5 | Web Interface | 3 | Complete | 2026-04-19 |
 
 ## Phase Details
 
@@ -92,20 +92,22 @@ Milestone plans: ~12 (grown from 10 after Phase 3 rescoping to agentic KB)
 
 ### Phase 5: Web Interface
 
-**Goal:** Basic Next.js chat UI with suggestion surface and thumbs feedback. Debug panel for retrieval scores and tool call traces.
-**Depends on:** Phase 4 (chat API + suggestions + adaptation signals must exist)
-**Research:** Unlikely (standard Next.js + shadcn/ui)
+**Goal:** HTTP API surface + Next.js chat UI with suggestion surface and thumbs feedback + debug/observability panel for retrieval scores and tool call traces.
+**Depends on:** Phase 4 (chat + suggestions + adaptation services must exist)
+**Research:** Unlikely (standard NestJS controllers + Next.js + shadcn/ui)
 
 **Scope:**
+- REST API surface over Phase 4 services (chat, suggestions, feedback, venues) with input validation + cross-tenant preflight
 - Chat thread with conversation persistence
 - Suggestion surface (system-authored messages pre-input)
 - Thumbs feedback wired to adaptation loop
 - Debug panel: retrieval scores, re-tag queue status, tool call traces
 
 **Plans:**
-- [ ] 05-01: Chat UI — conversation thread, message input, venue selector, suggestion surface, thumbs feedback
-- [ ] 05-02: Debug / observability panel — retrieval scores, re-tag queue, tool call traces
+- [x] 05-01: API controllers — chat, suggestions, feedback, venues endpoints + zodPipe + probe-api.ts 22/22 (completed 2026-04-18)
+- [x] 05-02: Chat UI — conversation thread, message input, venue selector, suggestion surface, thumbs feedback (completed 2026-04-18)
+- [x] 05-03: Debug / observability panel — retrieval scores, re-tag queue, tool call traces with probe-api 36/36 (completed 2026-04-19)
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-18*
+*Last updated: 2026-04-19 (Phase 5 complete — v0.1 POC milestone at 13/13 plans; phase-5 git commit pending)*

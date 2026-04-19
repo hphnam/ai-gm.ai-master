@@ -8,17 +8,31 @@
     "start": "next start"
   },
   "dependencies": {
+    "@gm-ai/types": "workspace:*",
+    "@hookform/resolvers": "latest",
+    "@radix-ui/react-collapsible": "latest",
+    "@radix-ui/react-select": "latest",
+    "@radix-ui/react-slot": "latest",
+    "@tanstack/react-query": "latest",
+    "class-variance-authority": "latest",
+    "clsx": "latest",
+    "lucide-react": "latest",
     "next": "latest",
+    "next-themes": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "@gm-ai/types": "workspace:*"
+    "react-hook-form": "latest",
+    "sonner": "latest",
+    "tailwind-merge": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
+    "@tailwindcss/postcss": "latest",
+    "@tanstack/react-query-devtools": "latest",
+    "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/node": "latest",
     "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest"
+    "typescript": "latest"
   }
 }
