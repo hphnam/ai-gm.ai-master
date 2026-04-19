@@ -13,8 +13,8 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 | Attribute | Value |
 |-----------|-------|
 | Type | Application |
-| Version | 0.0.0 |
-| Status | v0.1 POC milestone complete — all 5 phases shipped (13/13 plans); phase-5 commit pending |
+| Version | 0.1.0 |
+| Status | v0.1 POC milestone ✅ complete — all 5 phases shipped (13/13 plans); awaiting next milestone |
 | Last Updated | 2026-04-19 |
 
 ## Requirements
@@ -133,4 +133,4 @@ Hospitality staff and managers can get instant, accurate answers about stock, or
 
 ---
 *Created: 2026-04-13*
-*Last updated: 2026-04-19 after Phase 5 (v0.1 POC milestone complete — all 5 phases shipped; phase-5 git commit pending)*
+*Last updated: 2026-04-19 after v0.1 POC milestone completion (5 phases, 13 plans shipped — archived in .paul/milestones/0.1.0-ROADMAP.md)*

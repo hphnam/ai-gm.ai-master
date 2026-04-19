@@ -8,7 +8,7 @@
 ```yaml
 project:
   name: gm-ai
-  version: 0.0.0
+  version: 0.1.0
 ```
 
 ## Integrations

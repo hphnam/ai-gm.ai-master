@@ -5,30 +5,25 @@
 See: .paul/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Hospitality staff and managers can get instant, accurate answers about stock, ordering, procedures, equipment, and contacts — like having a knowledgeable GM available 24/7 via chat.
-**Current focus:** Phase 5 complete (all 3 plans shipped). v0.1 POC milestone at 13/13 plans (100%). Ready for Phase 5 transition commit + milestone completion.
+**Current focus:** v0.1 POC ✅ complete (2026-04-19). Awaiting next milestone — run /paul:discuss-milestone or /paul:milestone.
 
 ## Current Position
 
-Milestone: v0.1 POC (v0.1.0) — 100% (13/13 plans complete)
-Phase: 5 of 5 (Web Interface) — **Complete** (3 of 3 plans shipped; 05-03 UNIFY ✓ 2026-04-19)
-Plan: 05-03 (Debug / Observability Panel) PLAN ✓ AUDIT ✓ APPLY ✓ UNIFY ✓ — SUMMARY at `.paul/phases/05-web-interface/05-03-SUMMARY.md`.
-Status: Loop closed on 05-03. Phase 5 complete. **Pending:** Phase 5 transition (PROJECT.md + ROADMAP.md phase-complete updates + phase-level git commit). After transition: milestone completion flow.
-Last activity: 2026-04-19 09:30 — Plan 05-03 UNIFY. SUMMARY.md created capturing 19 files created + 6 modified + 2 helper-factoring clarifications (logAccess() helper 1 literal hit; retentionCutoff() helper 2 literal hits — DRY-factoring stronger than plan's grep-count heuristic). Zero auto-fixes; zero deviations on contract/behaviour/coverage. UAT approved.
+Milestone: Awaiting next milestone (v0.1 POC complete — archived in `.paul/milestones/0.1.0-ROADMAP.md`)
+Phase: None active
+Plan: None
+Status: v0.1 POC milestone complete — ready for next milestone
+Last activity: 2026-04-19 — v0.1 POC milestone completion workflow executed; MILESTONES.md entry written; v0.1.0-ROADMAP.md archived; PROJECT.md version-bumped 0.0.0 → 0.1.0 and status updated; ROADMAP.md reorganized (Current Milestone cleared, v0.1 POC collapsed under Completed Milestones with commit trail); paul.json synced (milestone.status=complete); config.md version aligned to 0.1.0. Git tag v0.1.0 awaiting user approval.
 
 Progress:
-- Milestone: [██████████] 100% (13/13 plans complete: 01-01, 01-02, 02-01, 02-02, 03-01, 03-02, 03-03, 04-01, 04-02, 04-03, 05-01, 05-02, 05-03).
-- Phase 1: [██████████] 100% ✓ (committed 51af306)
-- Phase 2: [██████████] 100% ✓ (02-01 = 88ab109; 02-02 = 11e6049; post-concerns = 1abd945)
-- Phase 3: [██████████] 100% ✓ (03-01 + 03-02 + 03-03 complete — 2026-04-18)
-- Phase 4: [██████████] 100% ✓ (04-01 + 04-02 + 04-03 complete — 2026-04-18)
-- Phase 5: [██████████] 100% ✓ (05-01 + 05-02 + 05-03 complete — 2026-04-19; phase transition commit pending)
+- v0.1 POC: [██████████] 100% ✓ (13/13 plans, 5/5 phases — 2026-04-19)
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Loop complete — Phase 5 ready for transition → milestone completion]
+  ○        ○        ○     [Milestone complete — awaiting next milestone]
 ```
 
 ## Accumulated Context
@@ -99,16 +94,27 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Session Continuity
 
-Last session: 2026-04-19 09:30
-Stopped at: Phase 5 transition mostly executed — PROJECT.md evolved (Plans 05-01/05-02/05-03 moved to Validated; Active/Planned Phase 5 sections cleared; 17 new Key Decisions logged from Phase 5), ROADMAP.md updated (v0.1 POC 5/5 phases complete; all three 05-* plans marked [x]), paul.json updated (phase.status=complete, loop.position=IDLE). **PENDING: phase-5 git commit** — uncommitted Phase 5 source (apps/api debug module, apps/web debug + chat routes, packages/types debug.ts, etc.) plus .paul/* doc updates are sitting in the working tree; per global CLAUDE.md rule, git commits require explicit user request and have NOT been taken autonomously.
-Next action: User confirms phase-5 commit scope → create `feat(05-web-interface): REST API + chat UI + debug panel` commit → then `/paul:complete-milestone` for v0.1 POC (13/13 plans, 5/5 phases).
-Resume file: .paul/phases/05-web-interface/05-03-SUMMARY.md
+Last session: 2026-04-19
+Stopped at: v0.1 POC milestone completion workflow executed end-to-end. Artefacts created: .paul/MILESTONES.md (entry with 9-bullet accomplishments + decisions + remaining-deferred table), .paul/milestones/0.1.0-ROADMAP.md (archive snapshot). PROJECT.md evolved (Version 0.0.0 → 0.1.0; Status → v0.1 POC complete; footer updated). ROADMAP.md reorganized (Current Milestone cleared with /paul:discuss-milestone routing; v0.1 POC collapsed into <details> under Completed Milestones with commit trail). STATE.md cleared for post-milestone state (Current Position / Loop Position / Progress). config.md version aligned 0.0.0 → 0.1.0. paul.json milestone.status → "complete". Working tree has uncommitted milestone-completion doc updates (MILESTONES.md + milestones/0.1.0-ROADMAP.md + .paul/* edits). Git tag v0.1.0 NOT yet created — awaiting user approval before `git tag -a v0.1.0 -m "..."` + optional milestone-completion commit.
+Next action: `/paul:discuss-milestone` (explore next milestone scope) OR `/paul:milestone` (create directly) — after user confirms git tag + commit for the milestone-completion doc updates.
+Resume file: .paul/MILESTONES.md
 
-### Git State (pending phase-5 commit)
-Last committed phase: Phase 4 (commit 3569f16 — feat(04-chat-engine): tool-use chat + proactive suggestions + adaptation loop)
-Uncommitted scope on working tree:
-- Phase 5 source: `apps/api/src/modules/debug/*`, `apps/api/src/modules/chat/**` (controller), `apps/api/src/modules/suggestions/**` (controller), `apps/api/src/modules/feedback/**`, `apps/api/src/modules/venues/**`, `apps/api/src/common/{zod-pipe,translate-chat-error,http-logger.middleware,request-id.middleware}.ts`, `apps/api/src/scripts/probe-api.ts`, `apps/web/src/**` (chat + debug routes + hooks + components + api-client), `packages/types/src/{api,debug}.ts`, `packages/types/src/index.ts`, `apps/api/src/app.module.ts`, `apps/api/src/main.ts`, `apps/web/next.config.ts`, `apps/api/package.json`, `apps/web/package.json`
-- Doc updates: `.paul/STATE.md`, `.paul/PROJECT.md`, `.paul/ROADMAP.md`, `.paul/paul.json`, `.paul/phases/05-web-interface/05-01-PLAN.md`, `.paul/phases/05-web-interface/05-01-AUDIT.md`, `.paul/phases/05-web-interface/05-01-SUMMARY.md`, `.paul/phases/05-web-interface/05-02-PLAN.md`, `.paul/phases/05-web-interface/05-02-AUDIT.md`, `.paul/phases/05-web-interface/05-02-SUMMARY.md`, `.paul/phases/05-web-interface/05-03-PLAN.md`, `.paul/phases/05-web-interface/05-03-AUDIT.md`, `.paul/phases/05-web-interface/05-03-SUMMARY.md`
+### Git State
+Last commit: a12c78a — plan 05-03 — debug / observability panel + phase 5 complete
+Branch: main
+Working tree: uncommitted milestone-completion doc work (MILESTONES.md new file; milestones/0.1.0-ROADMAP.md new file; PROJECT.md / ROADMAP.md / STATE.md / config.md / paul.json modified)
+Pending git tag: v0.1.0 (awaiting user approval)
+
+Milestone commit trail (v0.1 POC):
+- 51af306 — Phase 1 (scaffold + prisma schema)
+- 88ab109 — plan 02-01 (embeddings service)
+- 11e6049 — plan 02-02 (seeder + claude enrichment)
+- 1abd945 — post-phase-2 concerns (swc, claude-sonnet-4-6, pg ssl)
+- ceb81bb — Phase 3 (agentic knowledge + ingest + retrieval)
+- 3569f16 — Phase 4 (chat engine + suggestions + adaptation)
+- 9efb5a5 — plan 05-01 (api controllers + zodPipe + probe-api)
+- fe88a8a — plan 05-02 (chat ui)
+- a12c78a — plan 05-03 + Phase 5 transition (debug panel + aggregate docs)
 
 ---
 *STATE.md — Updated after every significant action*
