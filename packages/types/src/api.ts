@@ -9,6 +9,16 @@ export const API_ERROR_CODES = [
   'conversation-not-found',
   'message-not-found',
   'not-assistant-message',
+  // v0.2 Phase 1 — Auth + Organizations (append-only; never reorder)
+  'unauthorized',
+  'forbidden',
+  'email-already-registered',
+  'invalid-credentials',
+  'organization-not-found',
+  'member-not-found',
+  'invalid-redirect',
+  'payload-too-large',
+  'organization-slug-conflict',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

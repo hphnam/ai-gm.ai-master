@@ -1,3 +1,8 @@
+// v0.2 Phase 1 — Demo Organization (audit-added)
+export const DEMO_ORG_ID = 'b9000000-0000-4000-8000-000000000001'
+export const DEMO_ORG_NAME = 'Demo Organization'
+export const DEMO_ORG_SLUG = 'demo'
+
 export const VENUE_CROWN = 'a1000000-0000-0000-0000-000000000001'
 export const VENUE_ANCHOR = 'a1000000-0000-0000-0000-000000000002'
 

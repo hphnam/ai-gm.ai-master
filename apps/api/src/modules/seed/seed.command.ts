@@ -4,6 +4,9 @@ import { prisma } from '@gm-ai/database'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IngestService } from '../ingest/ingest.service'
 import {
+  DEMO_ORG_ID,
+  DEMO_ORG_NAME,
+  DEMO_ORG_SLUG,
   venues,
   mockSupplierSeeds,
   mockStockCategorySeeds,
@@ -11,6 +14,29 @@ import {
   knowledgeSeeds,
   venueContacts,
 } from './seed-data'
+
+// audit-added M4: prod-safe seed guard
+const DEFAULT_DEMO_PASSWORD = 'demo-CHANGE-me-before-prod-Xk7t9'
+
+function assertSeedSafe(logger: Logger): { demoEnabled: boolean } {
+  const isProd = process.env.NODE_ENV === 'production'
+  const seedDemo = process.env.SEED_DEMO !== 'false'
+  const pw = process.env.DEMO_USER_PASSWORD ?? ''
+
+  if (isProd && seedDemo) {
+    if (!pw || pw === DEFAULT_DEMO_PASSWORD) {
+      logger.error(
+        '[seed] refusing to seed demo in NODE_ENV=production with default/missing DEMO_USER_PASSWORD. Set SEED_DEMO=false or override DEMO_USER_PASSWORD with a strong value.',
+      )
+      process.exit(1)
+    }
+  }
+  if (isProd && !seedDemo) {
+    logger.log('[seed.demo_skipped] production + SEED_DEMO=false — skipping demo user + Demo Organization')
+    return { demoEnabled: false }
+  }
+  return { demoEnabled: seedDemo }
+}
 
 @Command({ name: 'seed', description: 'Seed NeonDB with POC fixture + embeddings' })
 export class SeedCommand extends CommandRunner {
@@ -24,12 +50,24 @@ export class SeedCommand extends CommandRunner {
   }
 
   async run(): Promise<void> {
+    const { demoEnabled } = assertSeedSafe(this.logger)
+
+    if (demoEnabled) {
+      this.logger.log(`Upserting Demo Organization (${DEMO_ORG_ID})...`)
+      await prisma.organization.upsert({
+        where: { id: DEMO_ORG_ID },
+        create: { id: DEMO_ORG_ID, name: DEMO_ORG_NAME, slug: DEMO_ORG_SLUG },
+        update: {},
+      })
+      this.logger.log(`Demo Organization ready.`)
+    }
+
     this.logger.log(`Upserting ${venues.length} venues...`)
     for (const v of venues) {
       await prisma.venue.upsert({
         where: { id: v.id },
-        create: { id: v.id, name: v.name, address: v.address, type: v.type },
-        update: { name: v.name, address: v.address, type: v.type },
+        create: { id: v.id, name: v.name, address: v.address, type: v.type, organizationId: DEMO_ORG_ID },
+        update: { name: v.name, address: v.address, type: v.type, organizationId: DEMO_ORG_ID },
       })
     }
 

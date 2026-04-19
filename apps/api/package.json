@@ -16,7 +16,9 @@
     "probe:suggestions": "nest build && node dist/src/scripts/probe-suggestions.js",
     "probe:adaptation": "nest build && node dist/src/scripts/probe-adaptation.js",
     "probe:eval": "nest build && node dist/src/scripts/probe-eval.js",
-    "probe:api": "nest build && node dist/src/scripts/probe-api.js"
+    "probe:api": "nest build && node dist/src/scripts/probe-api.js",
+    "probe:auth": "nest build && node dist/src/scripts/probe-auth.js",
+    "migrate:phase-1-data": "tsx scripts/migrate-phase-1-data.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
@@ -25,8 +27,10 @@
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
+    "better-auth": "^1.6.5",
     "dotenv": "latest",
     "express": "latest",
+    "kysely": "^0.28.16",
     "nest-commander": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",
@@ -34,6 +38,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
     "@nestjs/cli": "latest",
     "@swc/cli": "latest",
     "@swc/core": "latest",
