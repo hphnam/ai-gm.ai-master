@@ -19,6 +19,17 @@ export const API_ERROR_CODES = [
   'invalid-redirect',
   'payload-too-large',
   'organization-slug-conflict',
+  // v0.2 Phase 1 — Invitations (Plan 01-02; append-only)
+  'invitation-not-found',
+  'invitation-expired',
+  'invitation-already-accepted',
+  'invitation-email-mismatch',
+  'mail-send-failed',
+  // 01-02 audit-added (M4, M7, M9, M2)
+  'invalid-invitation-role',
+  'invitation-limit-reached',
+  'already-a-member',
+  'email-not-verified',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

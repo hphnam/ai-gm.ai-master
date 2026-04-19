@@ -6,6 +6,7 @@ export const TOOL_NAMES = [
   'get_stock_by_name',
   'get_supplier_by_name',
   'get_upcoming_cutoffs',
+  'save_knowledge_doc',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -25,6 +26,11 @@ export const TOOL_INPUT_SCHEMAS = {
   get_upcoming_cutoffs: z.object({
     venueId: UUID,
     withinHours: z.number().int().min(1).max(720).optional(),
+  }),
+  save_knowledge_doc: z.object({
+    title: z.string().trim().min(3).max(200),
+    content: z.string().trim().min(20).max(50_000),
+    venueId: UUID.nullable(),
   }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
@@ -110,6 +116,30 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         withinHours: { type: 'integer', description: 'Hour threshold (default 48)' },
       },
       required: ['venueId'],
+    },
+  },
+  {
+    name: 'save_knowledge_doc',
+    description:
+      "Save a new SOP / procedure / Q&A / troubleshooting note to the organisation's knowledge base so the chat can retrieve it later. CAPTURE FLOW: when the user wants to add knowledge (SOP, procedure, Q&A, note), DO NOT call this tool immediately. First ask follow-up questions across multiple turns until you have: (1) a concise TITLE (<200 chars, descriptive); (2) the CONTENT — full procedure, answer, or instructions (at least 20 chars, rewrite into a clear authoritative paragraph or numbered steps before saving); (3) whether it's VENUE-SPECIFIC (pass that venueId) or GLOBAL (pass venueId: null). Only call save_knowledge_doc once all three are clear. On success the server returns { id, summary, tags }; confirm to the user with the summary. On { ok: false, reason: 'forbidden' } tell the user only managers/owners can save docs. On { ok: false, reason: 'error' } describe the failure verbatim.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Concise title (3-200 chars), descriptive of the doc',
+        },
+        content: {
+          type: 'string',
+          description:
+            'Full content (20-50000 chars). For Q&A format as "Q: ...\\nA: ...". For SOPs use numbered steps. For troubleshooting use "Problem / Cause / Fix".',
+        },
+        venueId: {
+          type: ['string', 'null'],
+          description: 'Venue UUID if venue-specific, or null for global (all venues)',
+        },
+      },
+      required: ['title', 'content', 'venueId'],
     },
   },
 ]

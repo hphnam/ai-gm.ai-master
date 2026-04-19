@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { prisma } from '@gm-ai/database'
 import { AppModule } from '../app.module'
 import { AdaptationService } from '../modules/adaptation/adaptation.service'
-import { VENUE_CROWN } from '../modules/seed/seed-data'
+import { DEMO_ORG_ID, VENUE_CROWN } from '../modules/seed/seed-data'
 
 type ProbeResult = { name: string; ok: boolean; detail?: string }
 
@@ -82,7 +82,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
       detail: `m1=[${m1.retrievedItemIds.length}] m2=[${m2.retrievedItemIds.length}]`,
     })
 
-    const r2 = await adaptation.captureFeedback({ messageId: m1.id, kind: 'down' })
+    const r2 = await adaptation.captureFeedback({ messageId: m1.id, kind: 'down' }, DEMO_ORG_ID)
     const feedback1 = await prisma.messageFeedback.findUnique({ where: { messageId: m1.id } })
     checks.push({
       name: '2. captureFeedback({kind:down}) persists MessageFeedback',
@@ -108,7 +108,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
     })
 
     const beforeSecond = await prisma.reTagQueueItem.count({ where: { sourceMessageId: m1.id } })
-    await adaptation.captureFeedback({ messageId: m1.id, kind: 'down' })
+    await adaptation.captureFeedback({ messageId: m1.id, kind: 'down' }, DEMO_ORG_ID)
     const afterSecond = await prisma.reTagQueueItem.count({ where: { sourceMessageId: m1.id } })
     checks.push({
       name: '4. Second captureFeedback({kind:down}) is deduped (count unchanged)',
@@ -178,7 +178,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
     })
     fixtureMessageIds.push(upMsg.id)
     const beforeUp = await prisma.reTagQueueItem.count({ where: { sourceMessageId: upMsg.id } })
-    const upRes = await adaptation.captureFeedback({ messageId: upMsg.id, kind: 'up' })
+    const upRes = await adaptation.captureFeedback({ messageId: upMsg.id, kind: 'up' }, DEMO_ORG_ID)
     const afterUp = await prisma.reTagQueueItem.count({ where: { sourceMessageId: upMsg.id } })
     checks.push({
       name: "7. captureFeedback({kind:up}) persists feedback but does NOT enqueue",
@@ -198,7 +198,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
       },
     })
     fixtureMessageIds.push(regenMsg.id)
-    await adaptation.captureFeedback({ messageId: regenMsg.id, kind: 'regenerate' })
+    await adaptation.captureFeedback({ messageId: regenMsg.id, kind: 'regenerate' }, DEMO_ORG_ID)
     const regenRows = await prisma.reTagQueueItem.findMany({
       where: { sourceMessageId: regenMsg.id },
       select: { reason: true, knowledgeItemId: true },
@@ -213,10 +213,13 @@ async function runProbe(): Promise<{ ok: boolean }> {
       detail: `${regenRows.length} rows, reason=${regenRows[0]?.reason}`,
     })
 
-    const missing = await adaptation.captureFeedback({
-      messageId: '00000000-0000-0000-0000-000000000000',
-      kind: 'down',
-    })
+    const missing = await adaptation.captureFeedback(
+      {
+        messageId: '00000000-0000-0000-0000-000000000000',
+        kind: 'down',
+      },
+      DEMO_ORG_ID,
+    )
     checks.push({
       name: '9. captureFeedback({messageId:missing}) returns ok:false and does not throw',
       ok: missing.ok === false,
@@ -262,8 +265,8 @@ async function runProbe(): Promise<{ ok: boolean }> {
       where: { knowledgeItemId: { in: [K1.id, K2.id] } },
     })
     await Promise.all([
-      adaptation.captureFeedback({ messageId: concurrentMsg.id, kind: 'down' }),
-      adaptation.captureFeedback({ messageId: concurrentMsg.id, kind: 'down' }),
+      adaptation.captureFeedback({ messageId: concurrentMsg.id, kind: 'down' }, DEMO_ORG_ID),
+      adaptation.captureFeedback({ messageId: concurrentMsg.id, kind: 'down' }, DEMO_ORG_ID),
     ])
     const concurrentRows = await prisma.reTagQueueItem.count({
       where: { knowledgeItemId: { in: [K1.id, K2.id] }, reason: 'thumbs-down' },

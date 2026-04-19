@@ -1,7 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { prisma } from '@gm-ai/database'
 import { TOOL_INPUT_SCHEMAS, type ToolName, fail, type ToolResult } from '@gm-ai/types'
+import { IngestService } from '../ingest/ingest.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
+
+export type DispatchContext = {
+  orgId: string
+  userId: string
+  userRole: string
+}
 
 @Injectable()
 export class ToolDispatcher {
@@ -10,9 +18,14 @@ export class ToolDispatcher {
   constructor(
     private readonly retrieval: RetrievalService,
     private readonly mockOps: MockOpsService,
+    private readonly ingest: IngestService,
   ) {}
 
-  async dispatch(toolName: string, input: unknown): Promise<ToolResult<unknown>> {
+  async dispatch(
+    toolName: string,
+    input: unknown,
+    ctx?: DispatchContext,
+  ): Promise<ToolResult<unknown>> {
     if (!(toolName in TOOL_INPUT_SCHEMAS)) {
       return fail('not-supported', `tool: ${toolName}`)
     }
@@ -54,6 +67,60 @@ export class ToolDispatcher {
         case 'get_upcoming_cutoffs': {
           const i = parsed.data as { venueId: string; withinHours?: number }
           return await this.mockOps.getUpcomingCutoffs(i.venueId, i.withinHours)
+        }
+        case 'save_knowledge_doc': {
+          if (!ctx) {
+            return fail('error', 'save_knowledge_doc requires an authenticated context')
+          }
+          if (ctx.userRole !== 'owner' && ctx.userRole !== 'manager') {
+            return fail('error', 'only managers or owners can save knowledge docs')
+          }
+          const i = parsed.data as {
+            title: string
+            content: string
+            venueId: string | null
+          }
+          if (i.venueId) {
+            const venue = await prisma.venue.findFirst({
+              where: { id: i.venueId, organizationId: ctx.orgId },
+              select: { id: true },
+            })
+            if (!venue) {
+              return fail('error', 'venue not found in your organisation')
+            }
+          }
+          const result = await this.ingest.ingest({
+            title: i.title,
+            content: i.content,
+            venueId: i.venueId,
+          })
+          const tags = Array.isArray(result.metadata.tags)
+            ? (result.metadata.tags as unknown[]).filter(
+                (t): t is string => typeof t === 'string',
+              )
+            : []
+          const docType =
+            typeof result.metadata.docType === 'string' ? result.metadata.docType : null
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.save_knowledge_doc',
+              docId: result.id,
+              venueId: i.venueId,
+              userId: ctx.userId,
+              orgId: ctx.orgId,
+              titleLen: i.title.length,
+              contentLen: i.content.length,
+            }),
+          )
+          return {
+            ok: true,
+            data: {
+              id: result.id,
+              summary: result.aiSummary,
+              tags,
+              docType,
+            },
+          }
         }
       }
     } catch (err) {

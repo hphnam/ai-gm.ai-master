@@ -5,9 +5,17 @@ import { json } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
+import { securityHeadersMiddleware } from './common/security-headers.middleware'
+import { assertAuthEnv } from './modules/auth/assert-auth-env'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  // audit-added M8: fail-fast startup — missing/malformed BETTER_AUTH_* + WEB_ORIGIN exit 1
+  assertAuthEnv()
+
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+    rawBody: false,
+  })
 
   const allowlist = (process.env.WEB_ORIGIN ?? 'http://localhost:3000')
     .split(',')
@@ -25,9 +33,19 @@ async function bootstrap() {
     allowedHeaders: ['content-type', 'x-request-id'],
   })
 
-  app.use(json({ limit: '32kb' }))
+  // Middleware order (DO NOT REORDER without updating probe-api + probe-auth):
+  //   1) request-id        — stamps X-Request-Id
+  //   2) security-headers  — nosniff/frameguard
+  //   3) http-logger       — reads requestId; redacts /api/auth/*
+  //   4) body caps         — 8 KB on /api/auth/*, 32 KB elsewhere
+  //   5) (NestJS) AuthGuard via @UseGuards → OrgContextMiddleware → handlers
   app.use(requestIdMiddleware)
+  app.use(securityHeadersMiddleware)
   app.use(httpLoggerMiddleware)
+
+  // audit-added M9: tight 8 KB cap on /api/auth/*, 32 KB default elsewhere.
+  app.use('/api/auth', json({ limit: '8kb' }))
+  app.use(json({ limit: '32kb' }))
 
   app.enableShutdownHooks()
 

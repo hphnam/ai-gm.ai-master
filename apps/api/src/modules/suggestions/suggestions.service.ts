@@ -46,7 +46,7 @@ export class SuggestionsService {
 
   constructor(private readonly toolDispatcher: ToolDispatcher) {}
 
-  async onConversationOpen(venueId: string): Promise<ProactiveSuggestion[]> {
+  async onConversationOpen(venueId: string, orgId: string): Promise<ProactiveSuggestion[]> {
     const startedAt = Date.now()
     if (!UUID_RE.test(venueId)) {
       this.logger.warn(
@@ -60,6 +60,8 @@ export class SuggestionsService {
       )
       return []
     }
+
+    if (!(await this.venueBelongsToOrg(venueId, orgId))) return []
 
     const generatedAt = new Date().toISOString()
     const belowParInput = { venueId }
@@ -93,11 +95,14 @@ export class SuggestionsService {
   async onTurn(
     venueId: string,
     userMessage: string,
+    orgId: string,
     conversationId?: string,
   ): Promise<ProactiveSuggestion[]> {
     const startedAt = Date.now()
     if (!userMessage || userMessage.trim().length === 0) return []
     if (!UUID_RE.test(venueId)) return []
+
+    if (!(await this.venueBelongsToOrg(venueId, orgId))) return []
 
     if (conversationId !== undefined) {
       const conv = await prisma.chatConversation
@@ -181,6 +186,16 @@ export class SuggestionsService {
     })
 
     return deduped
+  }
+
+  private async venueBelongsToOrg(venueId: string, orgId: string): Promise<boolean> {
+    const hit = await prisma.venue
+      .findFirst({
+        where: { id: venueId, organizationId: orgId },
+        select: { id: true },
+      })
+      .catch(() => null)
+    return Boolean(hit)
   }
 
   private async runDispatchWithTimeout(

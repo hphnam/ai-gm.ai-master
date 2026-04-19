@@ -40,15 +40,21 @@ export class AdaptationService {
 
   constructor(private readonly ingestService: IngestService) {}
 
-  async captureFeedback(input: CaptureFeedbackInput): Promise<CaptureFeedbackResult> {
+  async captureFeedback(
+    input: CaptureFeedbackInput,
+    orgId: string,
+  ): Promise<CaptureFeedbackResult> {
     const parsed = CaptureFeedbackInputSchema.safeParse(input)
     if (!parsed.success) {
       return { ok: false, reason: 'invalid-input' }
     }
     const { messageId, kind, userFeedback } = parsed.data
 
-    const message = await prisma.chatMessage.findUnique({
-      where: { id: messageId },
+    const message = await prisma.chatMessage.findFirst({
+      where: {
+        id: messageId,
+        conversation: { venue: { organizationId: orgId } },
+      },
       select: { id: true, role: true, retrievedItemIds: true },
     })
     if (!message) return { ok: false, reason: 'message-not-found' }

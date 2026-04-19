@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { prisma } from '@gm-ai/database'
 import { ChatModule } from '../modules/chat/chat.module'
 import { ChatService } from '../modules/chat/chat.service'
+import { DEMO_ORG_ID } from '../modules/seed/seed-data'
 
 const VENUE_CROWN = 'a1000000-0000-0000-0000-000000000001'
 
@@ -18,7 +19,11 @@ async function runConversation(
   toolCallLog: unknown[]
   retrievedItemIds: string[]
 }> {
-  const res = await chat.sendMessage({ venueId: VENUE_CROWN, userMessage })
+  const res = await chat.sendMessage(
+    { venueId: VENUE_CROWN, userMessage },
+    DEMO_ORG_ID,
+    'probe-chat-user',
+  )
   return {
     conversationId: res.conversationId,
     reply: res.assistantMessage.content,

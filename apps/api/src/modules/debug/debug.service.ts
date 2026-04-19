@@ -37,6 +37,7 @@ export class DebugService {
   async getConversation(
     id: string,
     venueId: string,
+    orgId: string,
     requestId?: string,
   ): Promise<DebugConversationResponse | null> {
     const started = Date.now()
@@ -44,6 +45,7 @@ export class DebugService {
       where: {
         id,
         venueId,
+        venue: { organizationId: orgId },
         createdAt: { gte: this.retentionCutoff() },
       },
       include: {
@@ -102,6 +104,7 @@ export class DebugService {
   async getMessage(
     id: string,
     venueId: string,
+    orgId: string,
     requestId?: string,
   ): Promise<DebugMessageResponse | null> {
     const started = Date.now()
@@ -109,7 +112,7 @@ export class DebugService {
       where: {
         id,
         createdAt: { gte: this.retentionCutoff() },
-        conversation: { venueId },
+        conversation: { venueId, venue: { organizationId: orgId } },
       },
       include: {
         feedback: true,
@@ -188,16 +191,28 @@ export class DebugService {
   async getRetagQueue(
     venueId: string,
     limit: number,
+    orgId: string,
     requestId?: string,
   ): Promise<DebugRetagQueueResponse> {
     const started = Date.now()
     const safeLimit = Math.max(1, Math.min(200, Math.floor(limit)))
 
+    // audit-added M6: org + venue scoping. Cross-org leak on shared globals
+    // is closed by the `knowledgeItem.venue.organizationId` clause even when
+    // KnowledgeItem.venueId is NULL (global doc); that clause fails because
+    // the relation resolves null → doesn't match.
     const where = {
       createdAt: { gte: this.retentionCutoff() },
       OR: [
-        { sourceMessage: { conversation: { venueId } } },
-        { sourceMessageId: null, knowledgeItem: { venueId } },
+        {
+          sourceMessage: {
+            conversation: { venueId, venue: { organizationId: orgId } },
+          },
+        },
+        {
+          sourceMessageId: null,
+          knowledgeItem: { venueId, venue: { organizationId: orgId } },
+        },
       ],
     }
 

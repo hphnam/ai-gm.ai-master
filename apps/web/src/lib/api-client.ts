@@ -20,6 +20,7 @@ export async function apiFetch<T>(path: string, init?: FetchOpts): Promise<T> {
   const requestId = crypto.randomUUID()
   const res = await fetch(API_URL + path, {
     ...init,
+    credentials: 'include',
     signal: init?.signal,
     headers: {
       'content-type': 'application/json',
@@ -67,6 +68,7 @@ export async function apiFetchWithMeta<T>(
   const requestId = crypto.randomUUID()
   const res = await fetch(API_URL + path, {
     ...init,
+    credentials: 'include',
     signal: init?.signal,
     headers: {
       'content-type': 'application/json',

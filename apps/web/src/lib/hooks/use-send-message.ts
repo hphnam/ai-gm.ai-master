@@ -17,6 +17,9 @@ export function useSendMessage() {
       queryClient.invalidateQueries({
         queryKey: ['conversation', data.conversationId, vars.venueId],
       })
+      queryClient.invalidateQueries({
+        queryKey: ['chat-conversations', vars.venueId],
+      })
     },
   })
 }

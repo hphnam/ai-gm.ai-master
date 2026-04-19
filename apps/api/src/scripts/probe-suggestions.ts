@@ -5,7 +5,7 @@ import { prisma } from '@gm-ai/database'
 import { TOOL_NAMES, type ProactiveSuggestion } from '@gm-ai/types'
 import { AppModule } from '../app.module'
 import { SuggestionsService } from '../modules/suggestions/suggestions.service'
-import { VENUE_ANCHOR, VENUE_CROWN } from '../modules/seed/seed-data'
+import { DEMO_ORG_ID, VENUE_ANCHOR, VENUE_CROWN } from '../modules/seed/seed-data'
 
 type ProbeResult = { name: string; ok: boolean; detail?: string }
 
@@ -28,7 +28,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
     const baselineConvs = await prisma.chatConversation.count()
     const baselineMsgs = await prisma.chatMessage.count()
 
-    const open = await suggestions.onConversationOpen(VENUE_CROWN)
+    const open = await suggestions.onConversationOpen(VENUE_CROWN, DEMO_ORG_ID)
 
     checks.push({
       name: '1. onConversationOpen(CROWN) returns >=1 below-par suggestion',
@@ -55,6 +55,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
 
     const unknownVenue = await suggestions.onConversationOpen(
       '00000000-0000-0000-0000-000000000000',
+      DEMO_ORG_ID,
     )
     checks.push({
       name: '5. onConversationOpen(unknown UUID) returns []',
@@ -62,21 +63,21 @@ async function runProbe(): Promise<{ ok: boolean }> {
       detail: `${unknownVenue.length} returned`,
     })
 
-    const malformed = await suggestions.onConversationOpen('not-a-uuid')
+    const malformed = await suggestions.onConversationOpen('not-a-uuid', DEMO_ORG_ID)
     checks.push({
       name: '6. onConversationOpen(malformed) returns [] (fail-soft)',
       ok: malformed.length === 0,
       detail: `${malformed.length} returned`,
     })
 
-    const noGate = await suggestions.onTurn(VENUE_CROWN, "what's the weather")
+    const noGate = await suggestions.onTurn(VENUE_CROWN, "what's the weather", DEMO_ORG_ID)
     checks.push({
       name: '7. onTurn(weather) returns [] (no heuristic match)',
       ok: noGate.length === 0,
       detail: `${noGate.length} returned`,
     })
 
-    const stockGate = await suggestions.onTurn(VENUE_CROWN, 'any beer running low?')
+    const stockGate = await suggestions.onTurn(VENUE_CROWN, 'any beer running low?', DEMO_ORG_ID)
     checks.push({
       name: '8. onTurn(running low) returns >=1 below-par suggestion with itemIds',
       ok:
@@ -95,6 +96,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
     const bothGates = await suggestions.onTurn(
       VENUE_CROWN,
       'need to place an order — what stock is below par?',
+      DEMO_ORG_ID,
     )
     const dedupeKeys = new Set(
       bothGates.map((s) => `${s.kind}|${s.itemIds[0] ?? s.sourceToolCall.tool}`),
@@ -108,6 +110,7 @@ async function runProbe(): Promise<{ ok: boolean }> {
     const crossTenant = await suggestions.onTurn(
       VENUE_CROWN,
       'any beer running low?',
+      DEMO_ORG_ID,
       otherVenueConvId,
     )
     checks.push({

@@ -54,7 +54,12 @@ export class ChatService implements OnModuleInit {
     this.client = new Anthropic({ apiKey })
   }
 
-  async sendMessage(rawInput: SendMessageInput): Promise<SendMessageResult> {
+  async sendMessage(
+    rawInput: SendMessageInput,
+    orgId: string,
+    userId: string,
+    userRole: string = 'staff',
+  ): Promise<SendMessageResult> {
     const parsed = SendMessageInputSchema.safeParse(rawInput)
     if (!parsed.success) {
       throw new Error(
@@ -63,8 +68,8 @@ export class ChatService implements OnModuleInit {
     }
     const input = parsed.data
 
-    const venue = await prisma.venue.findUnique({
-      where: { id: input.venueId },
+    const venue = await prisma.venue.findFirst({
+      where: { id: input.venueId, organizationId: orgId },
       select: { id: true, name: true },
     })
     if (!venue) throw new Error(`venue ${input.venueId} not found`)
@@ -86,7 +91,7 @@ export class ChatService implements OnModuleInit {
       input.conversationId ??
       (
         await prisma.chatConversation.create({
-          data: { venueId: input.venueId, channel: 'web' },
+          data: { venueId: input.venueId, channel: 'web', userId },
           select: { id: true },
         })
       ).id
@@ -111,7 +116,7 @@ export class ChatService implements OnModuleInit {
       content: m.content,
     }))
 
-    const contextualSystemPrompt = `${CHAT_SYSTEM_PROMPT}\n\n<current_context>\nvenueId: ${venue.id}\nvenueName: ${venue.name}\n</current_context>`
+    const contextualSystemPrompt = `${CHAT_SYSTEM_PROMPT}\n\n<current_context>\nvenueId: ${venue.id}\nvenueName: ${venue.name}\nuserRole: ${userRole}\n</current_context>`
 
     const toolCallLog: ToolCallLogEntry[] = []
     const retrievedItemIds = new Set<string>()
@@ -167,7 +172,11 @@ export class ChatService implements OnModuleInit {
         const results = await Promise.all(
           toolUseBlocks.map(async (block) => ({
             block,
-            result: await this.dispatcher.dispatch(block.name, block.input),
+            result: await this.dispatcher.dispatch(block.name, block.input, {
+              orgId,
+              userId,
+              userRole,
+            }),
           })),
         )
 
@@ -244,5 +253,29 @@ export class ChatService implements OnModuleInit {
       toolCallLog,
       retrievedItemIds: Array.from(retrievedItemIds),
     }
+  }
+
+  async listRecent(
+    orgId: string,
+    userId: string,
+    venueId: string,
+    limit = 20,
+  ): Promise<Array<{ id: string; venueId: string; lastMessageAt: string }>> {
+    const safeLimit = Math.max(1, Math.min(100, limit))
+    const rows = await prisma.chatConversation.findMany({
+      where: {
+        venueId,
+        userId,
+        venue: { organizationId: orgId },
+      },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+      take: safeLimit,
+      select: { id: true, venueId: true, updatedAt: true },
+    })
+    return rows.map((r) => ({
+      id: r.id,
+      venueId: r.venueId,
+      lastMessageAt: r.updatedAt.toISOString(),
+    }))
   }
 }

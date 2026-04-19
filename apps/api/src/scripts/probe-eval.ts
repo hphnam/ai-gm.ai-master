@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { prisma } from '@gm-ai/database'
 import { AppModule } from '../app.module'
 import { ChatService } from '../modules/chat/chat.service'
-import { VENUE_CROWN } from '../modules/seed/seed-data'
+import { DEMO_ORG_ID, VENUE_CROWN } from '../modules/seed/seed-data'
 
 type ToolName =
   | 'find_knowledge'
@@ -132,7 +132,11 @@ async function runProbe(): Promise<{ ok: boolean }> {
         ? await resolveExpectedKnowledgeIds(q.expectedKnowledgeContent)
         : undefined
 
-      const res = await chat.sendMessage({ venueId: q.venueId, userMessage: q.query })
+      const res = await chat.sendMessage(
+        { venueId: q.venueId, userMessage: q.query },
+        DEMO_ORG_ID,
+        'probe-eval-user',
+      )
       createdConversationIds.push(res.conversationId)
 
       const retrieval_hit = expectedIds
