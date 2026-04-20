@@ -1,14 +1,11 @@
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { prisma } from '@gm-ai/database'
-import { DEMO_ORG_ID } from '../seed/seed-data'
 import { assertAuthEnv } from './assert-auth-env'
 import { generateOrgSlug, OrgSlugConflictError } from './generate-org-slug'
 
 const env = assertAuthEnv()
 const isProd = process.env.NODE_ENV === 'production'
-
-const DEMO_USER_EMAIL = process.env.DEMO_USER_EMAIL?.toLowerCase() ?? ''
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
@@ -41,27 +38,6 @@ export const auth = betterAuth({
         after: async (user) => {
           try {
             const email = (user.email ?? '').toLowerCase()
-
-            // Demo user claims the pre-seeded Demo Organization on first sign-up.
-            if (DEMO_USER_EMAIL && email === DEMO_USER_EMAIL) {
-              const demoOrg = await prisma.organization.findUnique({
-                where: { id: DEMO_ORG_ID },
-                select: { id: true },
-              })
-              if (demoOrg) {
-                await prisma.organizationMember.create({
-                  data: {
-                    userId: user.id,
-                    organizationId: DEMO_ORG_ID,
-                    role: 'owner',
-                  },
-                })
-                return
-              }
-              // Demo org doesn't exist (e.g. fresh dev DB pre-seed) — fall through
-              // to create a new org so the demo user is never stranded.
-            }
-
             const base =
               (typeof user.name === 'string' && user.name.trim()) ||
               email.split('@')[0] ||

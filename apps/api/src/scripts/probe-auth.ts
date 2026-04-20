@@ -15,6 +15,7 @@ import { MailService } from '../modules/invitations/mail.service'
 
 const PORT = parseInt(process.env.PROBE_AUTH_PORT ?? '3098', 10)
 const BASE = `http://localhost:${PORT}`
+const PROBE_ORIGIN = (process.env.WEB_ORIGIN ?? 'http://localhost:3000').split(',')[0]!.trim()
 
 const PROBE_EMAIL_A = 'probe-auth-a@gm-ai.local'
 const PROBE_EMAIL_B = 'probe-auth-b@gm-ai.local'
@@ -107,7 +108,10 @@ type PostResult = {
 }
 
 async function post(path: string, body: unknown, cookie?: string): Promise<PostResult> {
-  const headers: Record<string, string> = { 'content-type': 'application/json' }
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+    Origin: PROBE_ORIGIN,
+  }
   if (cookie) headers.Cookie = cookie
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
@@ -859,16 +863,13 @@ async function runProbe(mailService: MailService): Promise<boolean> {
         .catch(() => undefined)
     }
   }
-  Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true })
+  process.env.NODE_ENV = 'production'
   const p21prod = await post(
     `/org/invitations/${unverifiedInvite.id}/accept`,
     {},
     unverifiedSignUp.cookie,
   )
-  Object.defineProperty(process.env, 'NODE_ENV', {
-    value: originalNodeEnv ?? 'development',
-    configurable: true,
-  })
+  process.env.NODE_ENV = originalNodeEnv ?? 'development'
   assert(
     'P21 unverified email + NODE_ENV=production → 403 email-not-verified',
     p21prod.status === 403 &&

@@ -75,6 +75,14 @@ export type VenueListItem = {
   timezone: string
 }
 
+export const CreateVenueBodySchema = z.object({
+  name: z.string().trim().min(1, 'name required').max(120, 'name too long'),
+  type: z.string().trim().min(1, 'type required').max(40, 'type too long'),
+  address: z.string().trim().max(240, 'address too long').optional().or(z.literal('')),
+  timezone: z.string().trim().min(1, 'timezone required').max(64),
+})
+export type CreateVenueBody = z.infer<typeof CreateVenueBodySchema>
+
 export type ChatMessageDto = {
   id: string
   role: 'user' | 'assistant'

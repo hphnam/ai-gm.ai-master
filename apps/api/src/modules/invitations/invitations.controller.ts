@@ -6,6 +6,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Logger,
@@ -164,6 +165,7 @@ export class InvitationsController {
   }
 
   @Post(':id/accept')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async accept(
     @Param() params: { id: string },

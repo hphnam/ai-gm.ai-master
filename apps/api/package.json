@@ -7,18 +7,10 @@
     "build": "nest build",
     "start": "node dist/src/main",
     "start:prod": "node dist/src/main",
-    "seed": "nest build && node dist/src/seed.js seed",
     "probe:embeddings": "tsx scripts/probe-embeddings.ts",
-    "probe:seed": "tsx scripts/probe-seed.ts",
     "probe:ingest": "nest build && node dist/src/scripts/probe-ingest.js",
-    "probe:retrieval": "nest build && node dist/src/scripts/probe-retrieval.js",
-    "probe:chat": "nest build && node dist/src/scripts/probe-chat.js",
-    "probe:suggestions": "nest build && node dist/src/scripts/probe-suggestions.js",
-    "probe:adaptation": "nest build && node dist/src/scripts/probe-adaptation.js",
-    "probe:eval": "nest build && node dist/src/scripts/probe-eval.js",
     "probe:api": "nest build && node dist/src/scripts/probe-api.js",
-    "probe:auth": "nest build && node dist/src/scripts/probe-auth.js",
-    "migrate:phase-1-data": "tsx scripts/migrate-phase-1-data.ts"
+    "probe:auth": "nest build && node dist/src/scripts/probe-auth.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",

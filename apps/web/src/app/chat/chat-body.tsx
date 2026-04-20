@@ -84,7 +84,11 @@ function ChatInner() {
           </p>
           <VenueSelector />
           <p className="text-xs text-muted-foreground max-w-sm">
-            No venues listed? Ask your manager to add you to one of their venues.
+            No venues yet?{' '}
+            <Link href="/venues/new" className="underline underline-offset-4 hover:text-foreground">
+              Create one
+            </Link>{' '}
+            or ask your manager to add you to one.
           </p>
         </div>
       </main>

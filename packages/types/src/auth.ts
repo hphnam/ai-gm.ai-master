@@ -95,9 +95,10 @@ export const InvitationIdParamSchema = z.object({
   id: z.string().regex(UUID_RE, 'invalid uuid'),
 })
 
-// audit-added S1: paginated list contract
+// audit-added S1: paginated list contract. Schema allows up to 10000 to avoid
+// DoS via huge values; service layer (invitations.service.ts) clamps to 100.
 export const ListInvitationsQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(50),
+  limit: z.coerce.number().int().min(1).max(10000).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 })
 export type ListInvitationsQuery = z.infer<typeof ListInvitationsQuerySchema>
