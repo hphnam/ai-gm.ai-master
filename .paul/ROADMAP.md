@@ -19,7 +19,7 @@ Estimated plans: 10-14
 |-------|------|-------|--------|-----------|
 | 1 | Auth + Organizations | 3 of 3 (01-01 ✓, 01-02 ✓, 01-03 ✓) | Complete | 2026-04-20 |
 | 2 | Document Ingest UI | 2 of 2 (02-01 ✓, 02-02 ✓) | Complete | 2026-04-20 |
-| 3 | WhatsApp Integration | TBD (3-4 est) | Planning | - |
+| 3 | WhatsApp Integration | 1 of 3-4 est (03-01 ✓) | In Progress | - |
 | 4 | Coolify Deployment | TBD (2-3 est) | Not started | - |
 
 ### Phase 1: Auth + Organizations
