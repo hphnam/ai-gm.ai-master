@@ -3,11 +3,13 @@ import '../load-env'
 import { NestFactory } from '@nestjs/core'
 import { json } from 'express'
 import { prisma } from '@gm-ai/database'
-import { API_ERROR_CODES, type ApiErrorCode } from '@gm-ai/types'
+import { API_ERROR_CODES, TOOL_INPUT_SCHEMAS, type ApiErrorCode } from '@gm-ai/types'
 import { AppModule } from '../app.module'
 import { httpLoggerMiddleware } from '../common/http-logger.middleware'
 import { requestIdMiddleware } from '../common/request-id.middleware'
 import { securityHeadersMiddleware } from '../common/security-headers.middleware'
+import { IngestService } from '../modules/ingest/ingest.service'
+import { RetrievalService } from '../modules/retrieval/retrieval.service'
 
 const PORT = parseInt(process.env.PROBE_API_PORT ?? '3099', 10)
 const BASE = `http://localhost:${PORT}`
@@ -111,6 +113,9 @@ async function cleanupProbeRows(): Promise<void> {
         await prisma.venueContact.deleteMany({ where: { venueId: { in: vIds } } })
         await prisma.venue.deleteMany({ where: { id: { in: vIds } } })
       }
+      // KnowledgeItem rows with venueId NULL (Plan 02-01 A30/A32/A37 fixtures)
+      // must be deleted by organizationId directly — not caught by venueId sweep.
+      await prisma.knowledgeItem.deleteMany({ where: { organizationId: { in: orgIds } } })
       await prisma.invitation.deleteMany({ where: { organizationId: { in: orgIds } } })
       await prisma.organizationMember.deleteMany({ where: { organizationId: { in: orgIds } } })
       await prisma.organization.deleteMany({ where: { id: { in: orgIds } } })
@@ -300,7 +305,10 @@ async function setupSession(
   }
 }
 
-async function runProbe(): Promise<boolean> {
+async function runProbe(
+  ingestService: IngestService,
+  retrievalService: RetrievalService,
+): Promise<boolean> {
   console.log(
     `probe-api issues ~3 Claude calls per run (~$0.01–0.03). PORT=${PORT} BASE=${BASE}`,
   )
@@ -856,6 +864,93 @@ async function runProbe(): Promise<boolean> {
   assert('A29 Auth-route accessible via cookie-authenticated request (redaction path exercised)',
     a29.status === 200, `status=${a29.status}`)
 
+  // ───────── Plan 02-01: KnowledgeItem cross-org isolation (A30–A37) ─────────
+  // Seed one OtherOrg KnowledgeItem (real Voyage embedding so retrieval SQL
+  // returns it). A30-A32 assert leak paths are closed; A33/A34/A35 are
+  // contract tests; A36/A37 are positive-path regressions.
+
+  const otherOrgDoc = await ingestService.ingest({
+    title: 'Probe 02-01 OTHER_ORG_SECRET_PROBE_MARKER',
+    content:
+      'OTHER_ORG_SECRET_PROBE_MARKER — this knowledge item belongs exclusively to the other organisation probe-api-other. If a different organisation can retrieve or list it, the cross-organisation scoping has failed.',
+    organizationId: otherSession.orgId,
+    venueId: null,
+  })
+
+  // A30: Global-venue OtherOrg doc must NOT appear in Primary Org's /docs list.
+  const a30 = await demo('/docs')
+  const a30body = a30.body as Array<{ id: string; contentPreview?: string }>
+  const a30leak = Array.isArray(a30body) &&
+    a30body.some(
+      (r) =>
+        r.id === otherOrgDoc.id ||
+        (r.contentPreview ?? '').includes('OTHER_ORG_SECRET_PROBE_MARKER'),
+    )
+  assert('A30 GET /docs as primary org excludes other-org global doc (cross-org list leak closed)',
+    a30.status === 200 && !a30leak,
+    `status=${a30.status} leak=${a30leak}`)
+
+  // A31: GET /docs/:otherOrgDocId as primary org must return 404 not-found.
+  const a31 = await demo(`/docs/${otherOrgDoc.id}`)
+  const a31body = a31.body as { error?: string }
+  assert('A31 GET /docs/:id across orgs returns 404 not-found (no existence leak)',
+    a31.status === 404 && a31body.error === 'not-found',
+    `status=${a31.status} error=${a31body.error}`)
+
+  // A32: retrieval.find() as primary org with a query matching OtherOrg doc → no hit.
+  const a32hits = await retrievalService.find('OTHER_ORG_SECRET_PROBE_MARKER', {
+    orgId: demoSession.orgId,
+  })
+  const a32leak =
+    a32hits.ok && a32hits.data.some((h: { id: string }) => h.id === otherOrgDoc.id)
+  assert('A32 retrieval.find as primary org excludes other-org doc (cross-org retrieval closed)',
+    !a32leak,
+    `ok=${a32hits.ok} ${a32hits.ok ? 'hits=' + a32hits.data.length : 'reason=' + (a32hits as { reason: string }).reason}`)
+
+  // A33: retrieval.find with invalid orgId returns fail('error', /invalid orgId/i).
+  const a33 = await retrievalService.find('any query', {
+    orgId: 'not-a-uuid',
+  })
+  assert('A33 retrieval.find with invalid orgId fails with /invalid orgId/ (contract guard)',
+    !a33.ok && (a33 as { reason: string }).reason === 'error' && /invalid orgId/i.test((a33 as { detail: string }).detail ?? ''),
+    `ok=${a33.ok} detail=${(a33 as { detail: string }).detail}`)
+
+  // A34: Post-migration orphan integrity — no row may have NULL organizationId.
+  const a34rows = (await prisma.$queryRawUnsafe<{ n: bigint }[]>(
+    `SELECT COUNT(*)::bigint AS n FROM "knowledge_items" WHERE "organizationId" IS NULL`,
+  ))
+  const a34count = Number(a34rows[0]?.n ?? 0)
+  assert('A34 No knowledge_items rows have NULL organizationId post-migration (seed integrity)',
+    a34count === 0,
+    `orphan_count=${a34count}`)
+
+  // A35: TOOL_INPUT_SCHEMAS.find_knowledge strips any caller-supplied orgId.
+  const a35parsed = TOOL_INPUT_SCHEMAS.find_knowledge.safeParse({
+    query: 'probe-35',
+    orgId: '00000000-0000-4000-8000-000000000000',
+  })
+  const a35data = a35parsed.success ? (a35parsed.data as Record<string, unknown>) : {}
+  assert('A35 TOOL_INPUT_SCHEMAS.find_knowledge strips caller-supplied orgId (no cross-org bypass)',
+    a35parsed.success && !('orgId' in a35data),
+    `success=${a35parsed.success} keys=${Object.keys(a35data).join(',')}`)
+
+  // A36: Primary Org's /docs list returns ≥1 row (anchorKnowledge fixture seeded earlier).
+  const a36 = await demo('/docs')
+  const a36body = a36.body as Array<{ id: string }>
+  assert('A36 GET /docs as primary org returns ≥1 row post-migration (positive list path)',
+    a36.status === 200 && Array.isArray(a36body) && a36body.length >= 1,
+    `status=${a36.status} count=${Array.isArray(a36body) ? a36body.length : 'n/a'}`)
+
+  // A37: retrieval.find() scoped to OtherOrg returns the OtherOrg doc (positive retrieval path).
+  const a37hits = await retrievalService.find('OTHER_ORG_SECRET_PROBE_MARKER', {
+    orgId: otherSession.orgId,
+  })
+  const a37found =
+    a37hits.ok && a37hits.data.some((h: { id: string }) => h.id === otherOrgDoc.id)
+  assert('A37 retrieval.find as other org returns the other-org doc (positive retrieval path)',
+    a37found,
+    `ok=${a37hits.ok} ${a37hits.ok ? 'hits=' + a37hits.data.length : 'reason=' + (a37hits as { reason: string }).reason}`)
+
   return true
 }
 
@@ -893,9 +988,12 @@ async function main(): Promise<void> {
   process.on('SIGINT', onSignal)
   process.on('SIGTERM', onSignal)
 
+  const ingestService = app.get(IngestService)
+  const retrievalService = app.get(RetrievalService)
+
   let ok = false
   try {
-    ok = await runProbe()
+    ok = await runProbe(ingestService, retrievalService)
   } catch (err) {
     console.error('probe threw:', err)
     ok = false
