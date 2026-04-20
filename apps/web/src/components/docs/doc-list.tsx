@@ -1,7 +1,21 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import type { DocListItem } from '@gm-ai/types'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useDeleteDoc } from '@/lib/hooks/use-docs'
+import { mapApiError } from '@/lib/map-api-error'
 
 function formatRelative(iso: string): string {
   const ts = new Date(iso).getTime()
@@ -14,6 +28,61 @@ function formatRelative(iso: string): string {
   const days = Math.round(hrs / 24)
   if (days < 30) return `${days}d ago`
   return new Date(iso).toLocaleDateString()
+}
+
+function DeleteDocButton({ doc }: { doc: DocListItem }) {
+  const [open, setOpen] = useState(false)
+  const deleteDoc = useDeleteDoc()
+
+  async function handleConfirm() {
+    try {
+      await deleteDoc.mutateAsync(doc.id)
+      toast.success('Deleted')
+      setOpen(false)
+    } catch (err) {
+      toast.error(mapApiError(err))
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Delete doc"
+        onClick={() => setOpen(true)}
+        className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors"
+      >
+        <Trash2 className="h-4 w-4" aria-hidden />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete this doc?</DialogTitle>
+            <DialogDescription>
+              This cannot be undone. The knowledge item will be removed from the
+              knowledge base and stop appearing in chat results.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={deleteDoc.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={deleteDoc.isPending}
+            >
+              {deleteDoc.isPending ? 'Deleting…' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }
 
 export function DocList({
@@ -58,6 +127,7 @@ export function DocList({
             <span className="ml-auto text-xs text-muted-foreground">
               {formatRelative(d.updatedAt)}
             </span>
+            <DeleteDocButton doc={d} />
           </header>
           <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
             {d.summary ?? d.contentPreview}

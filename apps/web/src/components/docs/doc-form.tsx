@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useVenues } from '@/lib/hooks/use-venues'
-import { useCreateDoc } from '@/lib/hooks/use-docs'
+import { useCreateDoc, useUploadDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 
 const GLOBAL_VENUE = '__global__'
@@ -77,9 +77,12 @@ export function DocForm({ onSaved }: { onSaved?: () => void }) {
   )
 }
 
+const BINARY_UPLOAD_EXTS = /\.(pdf|docx)$/i
+
 function FullDocForm({ onSaved }: { onSaved?: () => void }) {
   const { data: venues } = useVenues()
   const createDoc = useCreateDoc()
+  const uploadDoc = useUploadDoc()
   const [reading, setReading] = useState(false)
 
   const form = useForm<CreateDocRequest>({
@@ -90,8 +93,26 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    const isBinary = BINARY_UPLOAD_EXTS.test(file.name)
     setReading(true)
     try {
+      if (isBinary) {
+        const venueId = form.getValues('venueId') ?? null
+        const res = await uploadDoc.mutateAsync({ file, venueId })
+        if (res.failSoft) {
+          toast.warning(
+            'Uploaded, but AI enrichment failed — the doc is stored without tags/summary.',
+          )
+        } else {
+          toast.success(
+            `Uploaded — ${res.tags.length} tags${res.docType ? ` · ${res.docType}` : ''}`,
+          )
+        }
+        form.reset({ title: '', content: '', venueId })
+        e.target.value = ''
+        onSaved?.()
+        return
+      }
       const text = await file.text()
       form.setValue('content', text, { shouldValidate: true })
       if (!form.getValues('title')) {
@@ -101,8 +122,8 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
           { shouldValidate: true },
         )
       }
-    } catch {
-      toast.error('Could not read file')
+    } catch (err) {
+      toast.error(isBinary ? mapApiError(err) : 'Could not read file')
     } finally {
       setReading(false)
     }
@@ -210,12 +231,14 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
           <label className="text-sm text-muted-foreground cursor-pointer hover:text-foreground">
             <input
               type="file"
-              accept=".md,.txt,text/plain,text/markdown"
+              accept=".md,.txt,.pdf,.docx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               className="hidden"
               onChange={handleFileChange}
-              disabled={submitting || reading}
+              disabled={submitting || reading || uploadDoc.isPending}
             />
-            {reading ? 'Reading…' : 'Upload .md or .txt'}
+            {reading || uploadDoc.isPending
+              ? 'Uploading…'
+              : 'Upload .md, .txt, .pdf, or .docx'}
           </label>
           <div className="ml-auto">
             <Button type="submit" disabled={submitting}>
