@@ -124,11 +124,46 @@ export function assertAuthEnv(): AuthEnv {
     )
   }
 
+  // 03-02 audit-added: ChatService test-mode knobs — probe-only, production-forbidden.
+  const probeDelayRaw = process.env.PROBE_CHAT_SERVICE_DELAY_MS
+  const probeDelayParsed = probeDelayRaw !== undefined ? Number(probeDelayRaw) : 0
+  const probeStubRaw = process.env.PROBE_CHAT_SERVICE_STUB
+  if (probeDelayRaw !== undefined) {
+    if (!Number.isFinite(probeDelayParsed) || probeDelayParsed < 0 || !/^\d+$/.test(probeDelayRaw)) {
+      errs.push(
+        `PROBE_CHAT_SERVICE_DELAY_MS must be a non-negative integer (milliseconds), got "${probeDelayRaw}"`,
+      )
+    } else if (isProd && probeDelayParsed > 0) {
+      errs.push(
+        'PROBE_CHAT_SERVICE_DELAY_MS must be 0 or unset in production — probe-only test-mode latency knob',
+      )
+    }
+  }
+  if (isProd && probeStubRaw === 'true') {
+    errs.push(
+      'PROBE_CHAT_SERVICE_STUB must not be set in production — probe-only ChatService skip switch',
+    )
+  }
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
     )
     process.exit(1)
+  }
+
+  // 03-02 audit-added S2: non-prod WARN logs so staging misconfig is visible.
+  if (!isProd) {
+    if (probeDelayParsed > 0) {
+      process.stderr.write(
+        `[chat] WARN: PROBE_CHAT_SERVICE_DELAY_MS=${probeDelayParsed} active (non-production only)\n`,
+      )
+    }
+    if (probeStubRaw === 'true') {
+      process.stderr.write(
+        '[chat] WARN: PROBE_CHAT_SERVICE_STUB=true active — Claude calls skipped (non-production only)\n',
+      )
+    }
   }
 
   const webOrigins = webOriginRaw!

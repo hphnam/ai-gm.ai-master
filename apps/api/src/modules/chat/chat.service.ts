@@ -68,6 +68,47 @@ export class ChatService implements OnModuleInit {
     }
     const input = parsed.data
 
+    // 03-02: test-mode latency injection — opt-in, production-forbidden by assertAuthEnv.
+    const probeDelayMs = Number(process.env.PROBE_CHAT_SERVICE_DELAY_MS ?? '0')
+    if (probeDelayMs > 0) {
+      await new Promise<void>((r) => setTimeout(r, probeDelayMs))
+    }
+
+    // 03-02 audit-added S1: test-mode stub — skip Claude entirely, return deterministic
+    // assistant message. Production-forbidden via assertAuthEnv.
+    if (process.env.PROBE_CHAT_SERVICE_STUB === 'true') {
+      const stubVenue = await prisma.venue.findFirst({
+        where: { id: input.venueId, organizationId: orgId },
+        select: { id: true },
+      })
+      if (!stubVenue) throw new Error(`venue ${input.venueId} not found in org ${orgId}`)
+      const stubConversationId =
+        input.conversationId ??
+        (
+          await prisma.chatConversation.create({
+            data: { venueId: stubVenue.id, userId, channel: 'whatsapp' },
+            select: { id: true },
+          })
+        ).id
+      await prisma.chatMessage.create({
+        data: { conversationId: stubConversationId, role: 'user', content: input.userMessage },
+      })
+      const stubAssistant = await prisma.chatMessage.create({
+        data: {
+          conversationId: stubConversationId,
+          role: 'assistant',
+          content: '[PROBE_STUB_REPLY] Stubbed assistant response for probe testing.',
+        },
+        select: { id: true, content: true },
+      })
+      return {
+        conversationId: stubConversationId,
+        assistantMessage: stubAssistant,
+        toolCallLog: [],
+        retrievedItemIds: [],
+      }
+    }
+
     const venue = await prisma.venue.findFirst({
       where: { id: input.venueId, organizationId: orgId },
       select: { id: true, name: true },
