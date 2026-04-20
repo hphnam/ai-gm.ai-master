@@ -5,14 +5,16 @@
 See: .paul/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Hospitality staff and managers can get instant, accurate answers about stock, ordering, procedures, equipment, and contacts — like having a knowledgeable GM available 24/7 via chat.
-**Current focus:** v0.2 Multi-Tenant WhatsApp — Phase 1 complete (3 of 3 plans). Next up: Phase 2 Document Ingest UI planning.
+**Current focus:** v0.2 Multi-Tenant WhatsApp — Phase 2 Document Ingest UI. Plan 02-01 (KnowledgeItem org-scoping fix) PLAN ✓ — awaiting AUDIT.
 
 ## Current Position
 
-Milestone: v0.2 Multi-Tenant WhatsApp (v0.2.0) — 25% (3 of ~12 plans complete)
-Phase: 1 of 4 (Auth + Organizations) — ✓ Complete (3 of 3 plans). Phase 2 (Document Ingest UI) not yet started.
-Plan: 01-03 (Phone Linking via Twilio Verify) PLAN ✓ + AUDIT ✓ + APPLY ✓ + UNIFY ✓
-Status: Phase 1 closes at 3/3. Plan 01-03 shipped PhoneModule (NestJS) + /settings/phone UI (Next.js) + 13 new probe-auth assertions (54/54 green total; plan required ≥40). probe-api 44/44 — zero regressions. Twilio driver modes: live/console/disabled (disabled is a getter-based kill-switch). AC-1-9 + AC-12 + AC-13-16 Pass. AC-10 probe-deferred (plan-documented single-process limitation). AC-11 UAT deferred (UI-only human walk). Deviations: (1) mode is getter, not constructor-cached — kill-switch works without redeploy; (2) disabled-check precedes pending-match guard — outage vs abuse distinguishable; (3) SID regex accepts SK prefix (API Keys); (4) code schema accepts [A-Z0-9-]{6,12} to cover both live numeric and console PROBE-{6} formats; (5) maskPhone imported by UI only — controller response intentionally unmasked. Full deviation rationale + decisions in 01-03-SUMMARY.md.
+Milestone: v0.2 Multi-Tenant WhatsApp (v0.2.0) — 25% (3 of ~13 plans complete; 02-01 planning)
+Phase: 2 of 4 (Document Ingest UI) — Planning. Plan 02-01 created 2026-04-20 11:30.
+Plan: 02-01 (KnowledgeItem organizationId — close cross-org leak on global docs) PLAN ✓, awaiting AUDIT.
+Status: Plan 02-01 scopes the schema + service + retrieval changes needed to close the documented cross-org leak on `KnowledgeItem` rows with `venueId = NULL` before Phase 2 feature work (file upload) lands in 02-02. 3 tasks + 1 UAT checkpoint. Standard track. Files: schema.prisma + new migration + ingest.service + docs.service + retrieval.service + tool-dispatcher + chat.service + suggestions.service + seed.ts + probe-api.ts + @gm-ai/types barrel. Probe assertion target raised 44 → ≥47 (A30 cross-org list, A31 cross-org getById, A32 cross-org retrieval).
+
+Phase 1 closes at 3/3. Plan 01-03 shipped PhoneModule (NestJS) + /settings/phone UI (Next.js) + 13 new probe-auth assertions (54/54 green total; plan required ≥40). probe-api 44/44 — zero regressions. Twilio driver modes: live/console/disabled (disabled is a getter-based kill-switch). AC-1-9 + AC-12 + AC-13-16 Pass. AC-10 probe-deferred (plan-documented single-process limitation). AC-11 UAT deferred (UI-only human walk). Deviations: (1) mode is getter, not constructor-cached — kill-switch works without redeploy; (2) disabled-check precedes pending-match guard — outage vs abuse distinguishable; (3) SID regex accepts SK prefix (API Keys); (4) code schema accepts [A-Z0-9-]{6,12} to cover both live numeric and console PROBE-{6} formats; (5) maskPhone imported by UI only — controller response intentionally unmasked. Full deviation rationale + decisions in 01-03-SUMMARY.md.
 Last activity: 2026-04-20 10:58 — UNIFY complete. Plan 01-03 SUMMARY written with all 10 AC assessed (AC-9 UAT deferred, AC-7 probe regression run deferred pre-01-02). Enterprise audit performed on Plan 01-01. Verdict: conditionally acceptable pre-fix → enterprise-ready post-fix. 10 must-have upgrades (M1 open-redirect guard via isSafeRedirect helper, M2 atomic sign-up + org creation via databaseHooks.user.create.after replacing client-side organization.create, M3 idempotent migration UPDATE with WHERE organization_id IS NULL, M4 prod-safe seed guard refusing NODE_ENV=production + default password, M5 API_ERROR_CODES append venue-not-found/invalid-redirect/payload-too-large/organization-slug-conflict, M6 withOrgScope type-safe split into withOrgScope for org-direct tables + withOrgScopeVia for join-scoped, M7 HTTP logger redaction contract for /api/auth/* bodies + Cookie/Authorization headers, M8 assertAuthEnv fail-fast startup ban on process.env.X! non-null assertions, M9 8 KB body cap on /api/auth/* NOT exempted, M10 explicit advanced.defaultCookieAttributes with secure=isProd). 17 strongly-recommended (S1 password min=12, S2 bcrypt 72-ceiling, S3 strong demo password default demo-CHANGE-me-before-prod-Xk7t9, S4 generateOrgSlug + OrgSlugSchema + collision retry, S5 probe-api A24 slug prefix probe-api-other-, S6 probe-auth cleanup pre+post, S7 security-headers middleware nosniff+DENY, S9 autocomplete attrs on forms, S10 middleware order comment block + first-log-field-order probe, S13 90-min spike time-box + concrete exit criteria, S14 rollback data-loss SQL header, S15 email-enumeration-safe invalid-credentials contract + probe P10, S16 trustedOrigins via env.webOrigin, S17 probe A29 body-redaction runtime assertion). 7 deferred with triggers: D1 account lockout (public deploy), D2 persistent audit log table (SOC2 Type II), D3 GDPR cascade (first RtBF request), D4 migration rollback CI test (pre-launch), D5 secret rotation (post-POC ops), D6 cross-subdomain cookie (Phase 4), D7 session fixation probe (post-POC). probe-api assertion count raised 36 → ≥42 (A23 unauth, A24 cross-org, A25 authed baseline, A26 staff role denied, A27 8KB cap 413, A28 nosniff+frameguard headers, A29 log body-redaction); probe-auth 0 → ≥11 (P1-P8 plus P9 redirect, P10 email-enum, P11 hook rollback). New files: apps/web/src/lib/safe-redirect.ts + server-session.ts, apps/api/src/modules/auth/assert-auth-env.ts + generate-org-slug.ts, apps/api/src/common/security-headers.middleware.ts. Total files_modified grew from 41 → 46.
 
 Progress:
@@ -25,7 +27,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Phase 1 complete — Plan 01-03 loop closed; ready for Phase 2 PLAN]
+  ✓        ○        ○     [Plan 02-01 created, awaiting AUDIT → APPLY]
 ```
 
 ## Accumulated Context
@@ -99,8 +101,17 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Session Continuity
 
-Last session: 2026-04-20 10:58
-Stopped at: Plan 01-03 (Phone Linking via Twilio Verify) UNIFY ✓ — loop closed. SUMMARY.md at .paul/phases/01-auth-organizations/01-03-SUMMARY.md. Phase 1 (Auth + Organizations) closes at 3/3 plans. v0.2.0 milestone progresses 17% → 25%. Single commit shipped: `4419a0f plan 01-03 — phone linking via twilio verify` (17 files changed: 8 new + 9 modified).
+Last session: 2026-04-20 11:30
+Stopped at: Plan 02-01 (KnowledgeItem organizationId) PLAN ✓ — awaiting AUDIT then APPLY. PLAN.md at .paul/phases/02-document-ingest/02-01-PLAN.md. 3 tasks + 1 UAT checkpoint. Scope: schema migration adding `KnowledgeItem.organizationId` FK, idempotent backfill from `venue.organizationId`, direct-org-scoping on docs.service + retrieval.service + downstream callers (chat / suggestions / tool-dispatcher), seed + ingest write-path updates, probe-api raised 44 → ≥47 (A30 list, A31 getById, A32 retrieval cross-org). Closes the SOC-2 CC6.6 leak documented in docs.service.ts:42 before Phase 2 feature work (file upload → Plan 02-02).
+
+Next action: `/paul:audit 02-01` (enterprise audit enabled in config.md) then `/paul:apply 02-01`.
+Resume file: .paul/phases/02-document-ingest/02-01-PLAN.md
+
+---
+
+### Prior session notes (Plan 01-03 UNIFY — 2026-04-20 10:58)
+
+Prior session stopped at: Plan 01-03 (Phone Linking via Twilio Verify) UNIFY ✓ — loop closed. SUMMARY.md at .paul/phases/01-auth-organizations/01-03-SUMMARY.md. Phase 1 (Auth + Organizations) closes at 3/3 plans. v0.2.0 milestone progresses 17% → 25%. Single commit shipped: `4419a0f plan 01-03 — phone linking via twilio verify` (17 files changed: 8 new + 9 modified).
 
 Phase 1 exit-gate outstanding items (carry forward):
   - **AC-11 UI UAT (01-03)** — BLOCKER for Phase 1 retrospective closure. Two-step send→verify flow + unlink confirmation dialog walk at /settings/phone. Human-only; not reachable by probe.
