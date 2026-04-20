@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '@gm-ai/database'
 import type {
   CreateDocRequest,
@@ -33,18 +33,16 @@ export class DocNotFoundOrCrossOrgError extends Error {
 
 @Injectable()
 export class DocsService {
+  private readonly logger = new Logger(DocsService.name)
+
   constructor(private readonly ingestService: IngestService) {}
 
   async list(orgId: string): Promise<DocListItem[]> {
-    // Two clean clauses OR'd together. Global docs (venueId null) are shared
-    // across all orgs until per-org ownership lands in a later phase.
+    // Plan 02-01: direct organizationId scope. KnowledgeItem.organizationId
+    // is NOT NULL; global docs (venueId null) still live inside exactly one
+    // org. The former OR-with-null-venue clause leaked cross-org — removed.
     const rows = await prisma.knowledgeItem.findMany({
-      where: {
-        OR: [
-          { venueId: null },
-          { venueId: { not: null }, venue: { is: { organizationId: orgId } } },
-        ],
-      },
+      where: { organizationId: orgId },
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
       select: {
         id: true,
@@ -86,19 +84,31 @@ export class DocsService {
       where: { id },
       select: {
         id: true,
+        organizationId: true,
         venueId: true,
         content: true,
         metadata: true,
         aiSummary: true,
         createdAt: true,
         updatedAt: true,
-        venue: { select: { id: true, name: true, organizationId: true } },
+        venue: { select: { id: true, name: true } },
       },
     })
     if (!row) return null
-    // Access check: global doc (venueId null) OR venue belongs to this org.
-    const allowed = row.venueId === null || row.venue?.organizationId === orgId
-    if (!allowed) return null
+    // Cross-org access: row exists but belongs to a different org.
+    // SOC-2 CC6.6: emit audit-defensible access-denied event. Response
+    // body stays 404 (enumeration-safe) — the log is the audit surface.
+    if (row.organizationId !== orgId) {
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'docs.cross_org_denied',
+          targetRowId: id,
+          actingOrgId: orgId,
+        }),
+      )
+      return null
+    }
     const metadata = (row.metadata ?? {}) as Record<string, unknown>
     const tags = Array.isArray(metadata.tags)
       ? (metadata.tags as unknown[]).filter((t): t is string => typeof t === 'string')
@@ -132,6 +142,7 @@ export class DocsService {
     const result = await this.ingestService.ingest({
       title: input.title,
       content: input.content,
+      organizationId: orgId,
       venueId: input.venueId,
     })
 

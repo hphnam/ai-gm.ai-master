@@ -710,6 +710,7 @@ async function runProbe(): Promise<boolean> {
   // guard has something to key off. Uses a zero-vector placeholder via raw SQL.
   const anchorKnowledge = await prisma.knowledgeItem.create({
     data: {
+      organizationId: demoSession.orgId,
       venueId: anchor.id,
       content: 'probe-d5 fixture',
       metadata: {},

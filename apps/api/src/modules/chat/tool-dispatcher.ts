@@ -40,6 +40,9 @@ export class ToolDispatcher {
     try {
       switch (toolName as ToolName) {
         case 'find_knowledge': {
+          if (!ctx) {
+            return fail('error', 'find_knowledge requires an authenticated context')
+          }
           const i = parsed.data as {
             query: string
             venueId?: string
@@ -47,6 +50,7 @@ export class ToolDispatcher {
             minSimilarity?: number
           }
           return await this.retrieval.find(i.query, {
+            orgId: ctx.orgId,
             venueId: i.venueId,
             limit: i.limit,
             minSimilarity: i.minSimilarity,
@@ -92,6 +96,7 @@ export class ToolDispatcher {
           const result = await this.ingest.ingest({
             title: i.title,
             content: i.content,
+            organizationId: ctx.orgId,
             venueId: i.venueId,
           })
           const tags = Array.isArray(result.metadata.tags)

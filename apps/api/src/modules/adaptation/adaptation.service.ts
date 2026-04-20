@@ -315,7 +315,7 @@ export class AdaptationService {
 
       const knowledge = await prisma.knowledgeItem.findUnique({
         where: { id: row.knowledgeItemId },
-        select: { id: true, content: true, venueId: true },
+        select: { id: true, content: true, venueId: true, organizationId: true },
       })
       if (!knowledge) {
         await prisma.reTagQueueItem.update({
@@ -343,6 +343,7 @@ export class AdaptationService {
         await this.ingestService.ingest({
           id: knowledge.id,
           content: knowledge.content,
+          organizationId: knowledge.organizationId,
           venueId: knowledge.venueId,
         })
         await prisma.reTagQueueItem.update({

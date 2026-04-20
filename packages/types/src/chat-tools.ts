@@ -14,6 +14,10 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const UUID = z.string().regex(UUID_RE, 'invalid uuid')
 
 export const TOOL_INPUT_SCHEMAS = {
+  // find_knowledge: orgId is NEVER in this schema — it is injected by
+  // ToolDispatcher from authenticated DispatchContext. Adding it here
+  // would expose a cross-org scoping bypass (Claude could emit another
+  // tenant's UUID). See Plan 02-01 audit M3.
   find_knowledge: z.object({
     query: z.string().min(1),
     venueId: UUID.optional(),

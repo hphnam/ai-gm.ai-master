@@ -61,7 +61,17 @@ export class SuggestionsService {
       return []
     }
 
-    if (!(await this.venueBelongsToOrg(venueId, orgId))) return []
+    if (!(await this.venueBelongsToOrg(venueId, orgId))) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'suggestions.org_mismatch',
+          trigger: 'conversation_open',
+          targetVenueId: venueId,
+          actingOrgId: orgId,
+        }),
+      )
+      return []
+    }
 
     const generatedAt = new Date().toISOString()
     const belowParInput = { venueId }
@@ -102,7 +112,17 @@ export class SuggestionsService {
     if (!userMessage || userMessage.trim().length === 0) return []
     if (!UUID_RE.test(venueId)) return []
 
-    if (!(await this.venueBelongsToOrg(venueId, orgId))) return []
+    if (!(await this.venueBelongsToOrg(venueId, orgId))) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'suggestions.org_mismatch',
+          trigger: 'turn',
+          targetVenueId: venueId,
+          actingOrgId: orgId,
+        }),
+      )
+      return []
+    }
 
     if (conversationId !== undefined) {
       const conv = await prisma.chatConversation
