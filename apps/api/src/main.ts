@@ -45,6 +45,8 @@ async function bootstrap() {
 
   // audit-added M9: tight 8 KB cap on /api/auth/*, 32 KB default elsewhere.
   app.use('/api/auth', json({ limit: '8kb' }))
+  // 01-03 audit-added S10: phoneNumber + 6-digit code fits in <100 bytes; 2 KB cap blunts payload abuse.
+  app.use('/auth/phone', json({ limit: '2kb' }))
   app.use(json({ limit: '32kb' }))
 
   app.enableShutdownHooks()

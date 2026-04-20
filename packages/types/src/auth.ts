@@ -146,3 +146,62 @@ export type InvitationPreview = {
 export type AcceptInvitationResponse = {
   activeOrganization: { id: string; name: string; slug: string }
 }
+
+// --- 01-03 Phone linking (audit-hardened) ---
+
+// ITU-T E.164: + then 7–14 digits after a non-zero country-code digit
+export const E164_RE = /^\+[1-9]\d{7,14}$/
+
+// audit-added M6: strip whitespace server-side before regex so users can paste
+// "+44 7700 900 123" without a false-positive phone-invalid-format.
+export const PhoneNumberSchema = z
+  .string()
+  .trim()
+  .transform((s) => s.replace(/\s+/g, ''))
+  .pipe(z.string().regex(E164_RE, 'phone-invalid-format'))
+
+export const SendPhoneCodeBodySchema = z.object({
+  phoneNumber: PhoneNumberSchema,
+})
+export type SendPhoneCodeBody = z.infer<typeof SendPhoneCodeBodySchema>
+
+export const VerifyPhoneCodeBodySchema = z.object({
+  phoneNumber: PhoneNumberSchema,
+  code: z.string().regex(/^[A-Z0-9-]{6,12}$/, 'phone-invalid-code'),
+})
+export type VerifyPhoneCodeBody = z.infer<typeof VerifyPhoneCodeBodySchema>
+
+export type SendPhoneCodeResponse = { ok: true; expiresInSeconds: number }
+export type VerifyPhoneCodeResponse = {
+  ok: true
+  phoneNumber: string
+  phoneVerifiedAt: string
+}
+export type PhoneStatusResponse = {
+  phoneNumber: string | null
+  phoneVerifiedAt: string | null
+}
+
+// Twilio Verify default code TTL
+export const VERIFY_CODE_TTL_SECONDS = 600
+
+// audit-added M1: pending-verification map TTL matches Twilio's 10-min code TTL
+export const PENDING_VERIFICATION_TTL_MS = 10 * 60_000
+
+// audit-added M10: add MAX_SENDS_PER_IP for per-IP defence-in-depth rate limit
+export const PhoneRateLimit = {
+  WINDOW_MS: 15 * 60_000,
+  MAX_SENDS_PER_USER: 5,
+  MAX_SENDS_PER_NUMBER: 3,
+  MAX_SENDS_PER_IP: 20,
+} as const
+
+// audit-added S1: shared phone masker — used by controller response serializer AND UI
+// status card. Keeps display logic single-source between backend and frontend.
+export function maskPhone(phoneNumber: string): string {
+  // Expect E.164 — "+44 7*** ***123" style: country code + space + masked middle + last 3
+  if (phoneNumber.length < 6) return '***'
+  const cc = phoneNumber.slice(0, 3) // "+44"
+  const tail = phoneNumber.slice(-3)
+  return `${cc} *** ***${tail}`
+}

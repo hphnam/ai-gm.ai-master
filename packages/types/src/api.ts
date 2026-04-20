@@ -30,6 +30,14 @@ export const API_ERROR_CODES = [
   'invitation-limit-reached',
   'already-a-member',
   'email-not-verified',
+  // v0.2 Phase 1 — Phone linking (Plan 01-03; append-only)
+  'phone-invalid-format',
+  'phone-invalid-code',
+  'phone-already-linked',
+  'phone-change-requires-unlink',
+  'phone-verification-failed',
+  'phone-rate-limited',
+  'phone-service-unavailable',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

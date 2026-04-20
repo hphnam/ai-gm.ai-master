@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Building2, LogOut, User as UserIcon } from 'lucide-react'
+import { Building2, LogOut, Phone, User as UserIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -68,6 +68,12 @@ export function UserMenu() {
           <Link href="/settings/organization">
             <Building2 className="h-4 w-4" aria-hidden />
             Organisation settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings/phone">
+            <Phone className="h-4 w-4" aria-hidden />
+            Phone number
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem disabled>

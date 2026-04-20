@@ -3,6 +3,8 @@ import '../load-env'
 // 01-02 audit-added M10: force MailService to console mode BEFORE any import that
 // initializes the invitations module. Must run before AppModule import chain.
 process.env.MAIL_DRIVER_OVERRIDE = 'console'
+// 01-03: force TwilioVerifyService to console mode so probe runs spend zero SMS.
+process.env.TWILIO_DRIVER_OVERRIDE = 'console'
 
 import { NestFactory } from '@nestjs/core'
 import { json } from 'express'
@@ -24,6 +26,8 @@ const PROBE_PASSWORD = 'probe-password-abc12345'
 
 // 01-02: isolated prefix from 01-01's probe-auth-* (S3) to prevent cleanup-glob collision
 const INVITE_PROBE_PREFIX = 'probe-invites-'
+// 01-03: isolated prefix from 01-01/01-02 prefixes to prevent cleanup-glob collision
+const PHONE_PROBE_PREFIX = 'probe-phone-'
 const TS = Date.now().toString(36)
 const ORG_OWNER_EMAIL = `${INVITE_PROBE_PREFIX}owner-${TS}@gm-ai.local`
 const ORG_STAFF_EMAIL = `${INVITE_PROBE_PREFIX}staff-${TS}@gm-ai.local`
@@ -51,6 +55,7 @@ async function cleanup(): Promise<void> {
         OR: [
           { email: { contains: 'probe-auth' } },
           { email: { contains: INVITE_PROBE_PREFIX } },
+          { email: { contains: PHONE_PROBE_PREFIX } },
         ],
       },
       select: { id: true },
@@ -92,6 +97,7 @@ async function cleanup(): Promise<void> {
         OR: [
           { slug: { startsWith: 'probe-auth-' } },
           { slug: { startsWith: INVITE_PROBE_PREFIX } },
+          { slug: { startsWith: PHONE_PROBE_PREFIX } },
         ],
       },
     })
@@ -888,6 +894,445 @@ async function runProbe(mailService: MailService): Promise<boolean> {
       (p21dev.body as { activeOrganization?: { id: string } }).activeOrganization?.id ===
         ownerOrgId,
     `status=${p21dev.status}`,
+  )
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 01-03 Phone-linking probes (P22–P31)
+  //
+  // TWILIO_DRIVER_OVERRIDE=console is forced at script top → zero SMS spend.
+  // Each probe user gets a deterministic +44 7700 900 XXXXXX number keyed to Date.now()
+  // to avoid collisions across runs while staying E.164-valid.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function phoneNumberFor(suffix: number | string): string {
+    const base = String(suffix).replace(/\D/g, '').padStart(6, '0').slice(-6)
+    return `+447700900${base}`
+  }
+  function consoleCodeFor(phoneNumber: string): string {
+    const digits = phoneNumber.replace(/\D/g, '')
+    return `PROBE-${digits.slice(-6)}`
+  }
+  async function signUpPhoneProbeUser(
+    tag: string,
+  ): Promise<{ userId: string; email: string; cookie: string } | null> {
+    const email = `${PHONE_PROBE_PREFIX}${tag}-${TS}@gm-ai.local`
+    const signUp = await post('/api/auth/sign-up/email', {
+      email,
+      password: PROBE_PASSWORD,
+      name: `Phone ${tag}`,
+    })
+    if (signUp.status < 200 || signUp.status >= 300) return null
+    const u = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, memberships: { select: { organizationId: true } } },
+    })
+    if (!u) return null
+    // Relabel auto-org slug for cleanup isolation
+    const autoOrg = u.memberships[0]?.organizationId
+    if (autoOrg) {
+      await prisma.organization
+        .update({
+          where: { id: autoOrg },
+          data: { slug: `${PHONE_PROBE_PREFIX}${tag}-${TS}` },
+        })
+        .catch(() => undefined)
+    }
+    return { userId: u.id, email, cookie: signUp.cookie }
+  }
+
+  const baseSuffixA = 210000 + (Date.now() % 1000)
+  const phoneA = phoneNumberFor(baseSuffixA)
+
+  // P22 — happy path link (console driver)
+  const phA = await signUpPhoneProbeUser('a')
+  if (!phA) {
+    assert('P22 phone user A sign-up bootstrap', false, 'signUp failed')
+    return false
+  }
+  const phSendA = await post(
+    '/auth/phone/send',
+    { phoneNumber: phoneA },
+    phA.cookie,
+  )
+  const phSendABody = phSendA.body as Record<string, unknown>
+  assert(
+    'P22  send returns 200 + ok + expiresInSeconds=600',
+    phSendA.status === 200 && phSendABody.ok === true && phSendABody.expiresInSeconds === 600,
+    `status=${phSendA.status} body=${JSON.stringify(phSendABody)}`,
+  )
+  const phVerifyA = await post(
+    '/auth/phone/verify',
+    { phoneNumber: phoneA, code: consoleCodeFor(phoneA) },
+    phA.cookie,
+  )
+  const phVerifyABody = phVerifyA.body as Record<string, unknown>
+  const phDbA = await prisma.user.findUnique({
+    where: { id: phA.userId },
+    select: { phoneNumber: true, phoneVerifiedAt: true },
+  })
+  assert(
+    'P22  verify returns 200 + phone persisted in DB',
+    phVerifyA.status === 200 &&
+      phVerifyABody.ok === true &&
+      phVerifyABody.phoneNumber === phoneA &&
+      typeof phVerifyABody.phoneVerifiedAt === 'string' &&
+      phDbA?.phoneNumber === phoneA &&
+      phDbA.phoneVerifiedAt !== null,
+    `status=${phVerifyA.status} db.phone=${phDbA?.phoneNumber}`,
+  )
+  const phStatusA = await get('/auth/phone/status', phA.cookie)
+  const phStatusABody = phStatusA.body as Record<string, unknown>
+  assert(
+    'P22  GET /auth/phone/status returns linked number',
+    phStatusA.status === 200 && phStatusABody.phoneNumber === phoneA,
+    `status=${phStatusA.status} body=${JSON.stringify(phStatusABody)}`,
+  )
+
+  // P22b — whitespace normalization (M6)
+  const phA2 = await signUpPhoneProbeUser('a2')
+  if (phA2) {
+    const phoneA2 = phoneNumberFor(baseSuffixA + 1)
+    const spaced = `+44 7700 900 ${phoneA2.slice(-6)}`
+    const phSendA2 = await post(
+      '/auth/phone/send',
+      { phoneNumber: spaced },
+      phA2.cookie,
+    )
+    assert(
+      'P22b send accepts spaced E.164 (whitespace normalized server-side)',
+      phSendA2.status === 200 &&
+        (phSendA2.body as Record<string, unknown>).ok === true,
+      `status=${phSendA2.status}`,
+    )
+    const phVerifyA2 = await post(
+      '/auth/phone/verify',
+      { phoneNumber: spaced, code: consoleCodeFor(phoneA2) },
+      phA2.cookie,
+    )
+    const phVerifyA2Body = phVerifyA2.body as Record<string, unknown>
+    assert(
+      'P22b verify response phoneNumber = whitespace-stripped form',
+      phVerifyA2.status === 200 && phVerifyA2Body.phoneNumber === phoneA2,
+      `status=${phVerifyA2.status} got=${phVerifyA2Body.phoneNumber}`,
+    )
+  } else {
+    assert('P22b phone user A2 sign-up bootstrap', false, 'signUp failed')
+  }
+
+  // P23 — wrong code rejects
+  const phB = await signUpPhoneProbeUser('b')
+  if (phB) {
+    const phoneB = phoneNumberFor(baseSuffixA + 2)
+    await post('/auth/phone/send', { phoneNumber: phoneB }, phB.cookie)
+    const wrong = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneB, code: '000000' },
+      phB.cookie,
+    )
+    const phDbB = await prisma.user.findUnique({
+      where: { id: phB.userId },
+      select: { phoneNumber: true },
+    })
+    assert(
+      'P23  wrong code → 400 phone-verification-failed + DB unchanged',
+      wrong.status === 400 &&
+        (wrong.body as Record<string, unknown>).error === 'phone-verification-failed' &&
+        phDbB?.phoneNumber === null,
+      `status=${wrong.status} err=${(wrong.body as Record<string, unknown>).error} dbPhone=${phDbB?.phoneNumber}`,
+    )
+  }
+
+  // P24 — phone-already-linked cross-user conflict
+  const phC = await signUpPhoneProbeUser('c')
+  if (phC) {
+    const phSendC = await post(
+      '/auth/phone/send',
+      { phoneNumber: phoneA },
+      phC.cookie,
+    )
+    assert(
+      'P24  userC send for userA phone → 200 (send succeeds; conflict surfaces at verify)',
+      phSendC.status === 200,
+      `status=${phSendC.status}`,
+    )
+    const phVerifyC = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneA, code: consoleCodeFor(phoneA) },
+      phC.cookie,
+    )
+    const phDbC = await prisma.user.findUnique({
+      where: { id: phC.userId },
+      select: { phoneNumber: true },
+    })
+    const phDbACheck = await prisma.user.findUnique({
+      where: { id: phA.userId },
+      select: { phoneNumber: true },
+    })
+    assert(
+      'P24  userC verify of userA number → 409 phone-already-linked; userC unchanged; userA unchanged',
+      phVerifyC.status === 409 &&
+        (phVerifyC.body as Record<string, unknown>).error === 'phone-already-linked' &&
+        phDbC?.phoneNumber === null &&
+        phDbACheck?.phoneNumber === phoneA,
+      `status=${phVerifyC.status} err=${(phVerifyC.body as Record<string, unknown>).error}`,
+    )
+  }
+
+  // P25 — E.164 validation rejects non-international format
+  const phD = await signUpPhoneProbeUser('d')
+  if (phD) {
+    const bad1 = await post(
+      '/auth/phone/send',
+      { phoneNumber: '07700900123' },
+      phD.cookie,
+    )
+    assert(
+      'P25  non-international format (no +) → 400 invalid-input',
+      bad1.status === 400 &&
+        (bad1.body as Record<string, unknown>).error === 'invalid-input',
+      `status=${bad1.status} err=${(bad1.body as Record<string, unknown>).error}`,
+    )
+    const bad2 = await post(
+      '/auth/phone/send',
+      { phoneNumber: '+0700900123' },
+      phD.cookie,
+    )
+    assert(
+      'P25  leading-zero country code (+0…) → 400',
+      bad2.status === 400,
+      `status=${bad2.status}`,
+    )
+  }
+
+  // P26 — per-user rate limit
+  const phE = await signUpPhoneProbeUser('e')
+  if (phE) {
+    const results: number[] = []
+    for (let i = 0; i < 5; i++) {
+      const r = await post(
+        '/auth/phone/send',
+        { phoneNumber: phoneNumberFor(baseSuffixA + 100 + i) },
+        phE.cookie,
+      )
+      results.push(r.status)
+    }
+    const sixth = await post(
+      '/auth/phone/send',
+      { phoneNumber: phoneNumberFor(baseSuffixA + 106) },
+      phE.cookie,
+    )
+    const sixthBody = sixth.body as Record<string, unknown> & {
+      details?: { retryAfterSeconds?: number; window?: string }
+    }
+    const retryAfterHeader = sixth.headers.get('retry-after')
+    assert(
+      'P26  first 5 sends succeed',
+      results.every((s) => s === 200),
+      `statuses=${results.join(',')}`,
+    )
+    assert(
+      'P26  6th send → 429 phone-rate-limited + details.window (user or number) + Retry-After header',
+      sixth.status === 429 &&
+        sixthBody.error === 'phone-rate-limited' &&
+        (sixthBody.details?.window === 'user-send-15m' ||
+          sixthBody.details?.window === 'number-send-15m') &&
+        (sixthBody.details?.retryAfterSeconds ?? 0) > 0 &&
+        retryAfterHeader !== null &&
+        parseInt(retryAfterHeader ?? '0', 10) > 0,
+      `status=${sixth.status} err=${sixthBody.error} window=${sixthBody.details?.window} retryAfter=${retryAfterHeader}`,
+    )
+  }
+
+  // P27 — unlink flow (reuse phA)
+  const phUnlinkA = await del('/auth/phone', phA.cookie)
+  const phDbAUnlinked = await prisma.user.findUnique({
+    where: { id: phA.userId },
+    select: { phoneNumber: true, phoneVerifiedAt: true },
+  })
+  assert(
+    'P27  DELETE /auth/phone → 200 + DB cleared',
+    phUnlinkA.status === 200 &&
+      (phUnlinkA.body as Record<string, unknown>).ok === true &&
+      phDbAUnlinked?.phoneNumber === null &&
+      phDbAUnlinked.phoneVerifiedAt === null,
+    `status=${phUnlinkA.status} dbPhone=${phDbAUnlinked?.phoneNumber}`,
+  )
+  const phStatusAAfter = await get('/auth/phone/status', phA.cookie)
+  assert(
+    'P27  GET /auth/phone/status after unlink → { phoneNumber: null, phoneVerifiedAt: null }',
+    phStatusAAfter.status === 200 &&
+      (phStatusAAfter.body as Record<string, unknown>).phoneNumber === null &&
+      (phStatusAAfter.body as Record<string, unknown>).phoneVerifiedAt === null,
+    `status=${phStatusAAfter.status}`,
+  )
+  const phoneARelink = phoneNumberFor(baseSuffixA + 200)
+  await post('/auth/phone/send', { phoneNumber: phoneARelink }, phA.cookie)
+  const phRelinkVerify = await post(
+    '/auth/phone/verify',
+    { phoneNumber: phoneARelink, code: consoleCodeFor(phoneARelink) },
+    phA.cookie,
+  )
+  assert(
+    'P27  relink after unlink succeeds',
+    phRelinkVerify.status === 200,
+    `status=${phRelinkVerify.status}`,
+  )
+
+  // P27b — idempotent unlink
+  const phA3 = await signUpPhoneProbeUser('a3')
+  if (phA3) {
+    const unlink1 = await del('/auth/phone', phA3.cookie)
+    const unlink2 = await del('/auth/phone', phA3.cookie)
+    assert(
+      'P27b unlink with no linked phone → 200 both times (idempotent)',
+      unlink1.status === 200 &&
+        unlink2.status === 200 &&
+        (unlink1.body as Record<string, unknown>).ok === true &&
+        (unlink2.body as Record<string, unknown>).ok === true,
+      `status1=${unlink1.status} status2=${unlink2.status}`,
+    )
+  }
+
+  // P28 — cross-session verify blocked (M1)
+  const phF = await signUpPhoneProbeUser('f')
+  const phG = await signUpPhoneProbeUser('g')
+  if (phF && phG) {
+    const phoneF = phoneNumberFor(baseSuffixA + 300)
+    await post('/auth/phone/send', { phoneNumber: phoneF }, phF.cookie)
+    const cross = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneF, code: consoleCodeFor(phoneF) },
+      phG.cookie,
+    )
+    const phDbG = await prisma.user.findUnique({
+      where: { id: phG.userId },
+      select: { phoneNumber: true },
+    })
+    const phDbF = await prisma.user.findUnique({
+      where: { id: phF.userId },
+      select: { phoneNumber: true },
+    })
+    assert(
+      'P28  userG verify with userF number → 400 phone-verification-failed; neither user linked',
+      cross.status === 400 &&
+        (cross.body as Record<string, unknown>).error === 'phone-verification-failed' &&
+        phDbG?.phoneNumber === null &&
+        phDbF?.phoneNumber === null,
+      `status=${cross.status} err=${(cross.body as Record<string, unknown>).error}`,
+    )
+    const fVerify = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneF, code: consoleCodeFor(phoneF) },
+      phF.cookie,
+    )
+    assert(
+      'P28  userF verify still succeeds after G cross-session attempt',
+      fVerify.status === 200,
+      `status=${fVerify.status}`,
+    )
+  }
+
+  // P29 — require-unlink-to-change (M2)
+  if (phF) {
+    const phoneFNew = phoneNumberFor(baseSuffixA + 400)
+    const change = await post(
+      '/auth/phone/send',
+      { phoneNumber: phoneFNew },
+      phF.cookie,
+    )
+    assert(
+      'P29  send new number while already linked → 409 phone-change-requires-unlink',
+      change.status === 409 &&
+        (change.body as Record<string, unknown>).error === 'phone-change-requires-unlink',
+      `status=${change.status} err=${(change.body as Record<string, unknown>).error}`,
+    )
+    const phUnlinkF = await del('/auth/phone', phF.cookie)
+    assert('P29  unlink → 200', phUnlinkF.status === 200, `status=${phUnlinkF.status}`)
+    await post('/auth/phone/send', { phoneNumber: phoneFNew }, phF.cookie)
+    const newVerify = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneFNew, code: consoleCodeFor(phoneFNew) },
+      phF.cookie,
+    )
+    assert(
+      'P29  relink different number after unlink → 200',
+      newVerify.status === 200,
+      `status=${newVerify.status}`,
+    )
+  }
+
+  // P30 — disabled driver kill-switch (M3)
+  process.env.TWILIO_DRIVER_OVERRIDE = 'disabled'
+  const phH = await signUpPhoneProbeUser('h')
+  if (phH) {
+    const phoneH = phoneNumberFor(baseSuffixA + 500)
+    const sendH = await post(
+      '/auth/phone/send',
+      { phoneNumber: phoneH },
+      phH.cookie,
+    )
+    const sendHBody = sendH.body as Record<string, unknown> & {
+      details?: { reason?: string }
+    }
+    assert(
+      'P30  send with TWILIO_DRIVER_OVERRIDE=disabled → 503 + details.reason=disabled',
+      sendH.status === 503 &&
+        sendHBody.error === 'phone-service-unavailable' &&
+        sendHBody.details?.reason === 'disabled',
+      `status=${sendH.status} err=${sendHBody.error} reason=${sendHBody.details?.reason}`,
+    )
+    const verifyH = await post(
+      '/auth/phone/verify',
+      { phoneNumber: phoneH, code: '123456' },
+      phH.cookie,
+    )
+    const verifyHBody = verifyH.body as Record<string, unknown> & {
+      details?: { reason?: string }
+    }
+    assert(
+      'P30  verify with disabled driver → 503 + details.reason=disabled',
+      verifyH.status === 503 &&
+        verifyHBody.error === 'phone-service-unavailable' &&
+        verifyHBody.details?.reason === 'disabled',
+      `status=${verifyH.status} err=${verifyHBody.error} reason=${verifyHBody.details?.reason}`,
+    )
+  }
+  process.env.TWILIO_DRIVER_OVERRIDE = 'console'
+
+  // P31 — unauth 401 on all 4 endpoints
+  const unauthSend = await post(
+    '/auth/phone/send',
+    { phoneNumber: '+447700900000' },
+  )
+  const unauthVerify = await post(
+    '/auth/phone/verify',
+    { phoneNumber: '+447700900000', code: '000000' },
+  )
+  const unauthDel = await del('/auth/phone')
+  const unauthStatus = await get('/auth/phone/status')
+  assert(
+    'P31  unauth POST /auth/phone/send → 401 unauthorized',
+    unauthSend.status === 401 &&
+      (unauthSend.body as Record<string, unknown>).error === 'unauthorized',
+    `status=${unauthSend.status}`,
+  )
+  assert(
+    'P31  unauth POST /auth/phone/verify → 401 unauthorized',
+    unauthVerify.status === 401 &&
+      (unauthVerify.body as Record<string, unknown>).error === 'unauthorized',
+    `status=${unauthVerify.status}`,
+  )
+  assert(
+    'P31  unauth DELETE /auth/phone → 401 unauthorized',
+    unauthDel.status === 401 &&
+      (unauthDel.body as Record<string, unknown>).error === 'unauthorized',
+    `status=${unauthDel.status}`,
+  )
+  assert(
+    'P31  unauth GET /auth/phone/status → 401 unauthorized',
+    unauthStatus.status === 401 &&
+      (unauthStatus.body as Record<string, unknown>).error === 'unauthorized',
+    `status=${unauthStatus.status}`,
   )
 
   return true

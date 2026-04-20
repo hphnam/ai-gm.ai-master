@@ -52,6 +52,32 @@ export function mapApiError(err: unknown): string {
         return 'That email is already a member of this organisation.'
       case 'email-not-verified':
         return 'Verify your email first before accepting this invitation.'
+      // v0.2 Phase 1 — Phone linking (01-03)
+      case 'phone-invalid-format':
+        return 'Enter a number in international format (e.g. +447700900123).'
+      case 'phone-invalid-code':
+        return 'Enter the 6-digit code you received by SMS.'
+      case 'phone-already-linked':
+        return 'That number is already linked to another account.'
+      case 'phone-change-requires-unlink':
+        return 'You already have a phone linked. Unlink it first to link a different number.'
+      case 'phone-verification-failed':
+        return 'That code is incorrect or has expired. Request a new code.'
+      case 'phone-rate-limited': {
+        const retryRaw = (err.details as { retryAfterSeconds?: number } | undefined)?.retryAfterSeconds
+        if (typeof retryRaw === 'number' && retryRaw > 0) {
+          const minutes = Math.max(1, Math.ceil(retryRaw / 60))
+          return `Too many attempts. Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`
+        }
+        return 'Too many attempts. Try again in a few minutes.'
+      }
+      case 'phone-service-unavailable': {
+        const reason = (err.details as { reason?: string } | undefined)?.reason
+        if (reason === 'disabled') {
+          return 'SMS verification is currently disabled. Contact support if this persists.'
+        }
+        return 'Phone verification is temporarily unavailable. Try again shortly.'
+      }
       default:
         return 'Something went wrong — please retry.'
     }

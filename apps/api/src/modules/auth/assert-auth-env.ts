@@ -4,6 +4,8 @@ export type AuthEnv = {
   webOrigins: string[]
   // 01-02 audit-added: Resend config; undefined when dev console fallback is used
   resend?: { apiKey: string; mailFrom: string }
+  // 01-03 audit-added: Twilio Verify config; undefined when console fallback is used
+  twilio?: { accountSid: string; authToken: string; verifyServiceSid: string }
 }
 
 // Name <addr@domain> format per RFC 5322 shorthand — required by Resend's from field
@@ -15,6 +17,10 @@ export function assertAuthEnv(): AuthEnv {
   const webOriginRaw = process.env.WEB_ORIGIN
   const resendKey = process.env.RESEND_API_KEY
   const mailFrom = process.env.MAIL_FROM
+  // 01-03: Twilio Verify config — all-or-nothing. Partial config fails fast.
+  const twilioSid = process.env.TWILIO_ACCOUNT_SID
+  const twilioToken = process.env.TWILIO_AUTH_TOKEN
+  const twilioVerifySid = process.env.TWILIO_VERIFY_SERVICE_SID
 
   const errs: string[] = []
   if (!secret || !/^[0-9a-f]{64}$/i.test(secret)) {
@@ -40,6 +46,25 @@ export function assertAuthEnv(): AuthEnv {
     )
   }
 
+  // 01-03: Twilio all-or-nothing check + shape validation on the two SIDs
+  const twilioPresentBits: Array<boolean> = [!!twilioSid, !!twilioToken, !!twilioVerifySid]
+  const presentCount = twilioPresentBits.filter(Boolean).length
+  if (presentCount !== 0 && presentCount !== 3) {
+    errs.push(
+      `Twilio config is all-or-nothing: got [SID?: ${!!twilioSid}, token?: ${!!twilioToken}, verifyServiceSid?: ${!!twilioVerifySid}] — set all three or none`,
+    )
+  }
+  if (presentCount === 3) {
+    // Twilio Account SIDs start with "AC"; API Keys (used as an alternative to
+    // Account SID / Auth Token for Basic Auth) start with "SK". Both are 34 chars.
+    if (!/^(AC|SK)[A-Za-z0-9]{32}$/.test(twilioSid!)) {
+      errs.push('TWILIO_ACCOUNT_SID must start with AC or SK and be 34 chars')
+    }
+    if (!/^VA[A-Za-z0-9]{32}$/.test(twilioVerifySid!)) {
+      errs.push('TWILIO_VERIFY_SERVICE_SID must start with VA and be 34 chars')
+    }
+  }
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
@@ -57,5 +82,13 @@ export function assertAuthEnv(): AuthEnv {
     baseURL: baseURL!,
     webOrigins,
     resend: resendKey ? { apiKey: resendKey, mailFrom: mailFrom! } : undefined,
+    twilio:
+      presentCount === 3
+        ? {
+            accountSid: twilioSid!,
+            authToken: twilioToken!,
+            verifyServiceSid: twilioVerifySid!,
+          }
+        : undefined,
   }
 }
