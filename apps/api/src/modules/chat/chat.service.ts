@@ -17,6 +17,15 @@ const SendMessageInputSchema = z.object({
   conversationId: z.string().regex(UUID_RE, 'invalid uuid').optional(),
   venueId: z.string().regex(UUID_RE, 'invalid uuid'),
   userMessage: z.string().min(1).max(MAX_USER_MESSAGE_CHARS),
+  // 03-03 Task 3: optional image attachment for multimodal inbound (WhatsApp).
+  attachment: z
+    .object({
+      mediaType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
+      base64: z.string().min(1),
+      // audit S2: channel-specific source reference (e.g. Twilio MessageSid) for forensics.
+      sourceRef: z.string().min(1).max(64).optional(),
+    })
+    .optional(),
 })
 
 export type SendMessageInput = z.infer<typeof SendMessageInputSchema>
@@ -90,8 +99,20 @@ export class ChatService implements OnModuleInit {
             select: { id: true },
           })
         ).id
+      // 03-03 Task 3: stub branch persists the SAME placeholder shape as the real
+      // branch when an attachment is present, so probe assertions can verify
+      // the persistence contract without a Claude call.
+      const stubUserContent = input.attachment
+        ? (() => {
+            const byteSize = Buffer.from(input.attachment!.base64, 'base64').length
+            const sidSuffix = input.attachment!.sourceRef
+              ? `, sid:${input.attachment!.sourceRef}`
+              : ''
+            return `${input.userMessage}\n[image: ${input.attachment!.mediaType}, ${byteSize}B${sidSuffix}]`
+          })()
+        : input.userMessage
       await prisma.chatMessage.create({
-        data: { conversationId: stubConversationId, role: 'user', content: input.userMessage },
+        data: { conversationId: stubConversationId, role: 'user', content: stubUserContent },
       })
       const stubAssistant = await prisma.chatMessage.create({
         data: {
@@ -137,11 +158,25 @@ export class ChatService implements OnModuleInit {
         })
       ).id
 
+    // 03-03 Task 3: when an image attachment is present, persist a placeholder into
+    // ChatMessage.content (schema has no image column) so conversation history shows
+    // "user sent image" without storing base64. Placeholder includes sourceRef
+    // (Twilio MessageSid in WhatsApp flow) for forensic correlation (audit S2).
+    const userContent = input.attachment
+      ? (() => {
+          const byteSize = Buffer.from(input.attachment.base64, 'base64').length
+          const sidSuffix = input.attachment.sourceRef
+            ? `, sid:${input.attachment.sourceRef}`
+            : ''
+          return `${input.userMessage}\n[image: ${input.attachment.mediaType}, ${byteSize}B${sidSuffix}]`
+        })()
+      : input.userMessage
+
     await prisma.chatMessage.create({
       data: {
         conversationId,
         role: 'user',
-        content: input.userMessage,
+        content: userContent,
         retrievedItemIds: [],
         toolCallLog: [],
       },
@@ -156,6 +191,26 @@ export class ChatService implements OnModuleInit {
       role: m.role === 'assistant' ? 'assistant' : 'user',
       content: m.content,
     }))
+
+    // 03-03 Task 3: replace the last user message with a content-block array
+    // containing text + image when an attachment is present. History mapping above
+    // used the placeholder string which is fine for DB/forensics but not for Claude.
+    if (input.attachment && messages.length > 0) {
+      const last = messages[messages.length - 1]
+      if (last.role === 'user') {
+        last.content = [
+          { type: 'text', text: input.userMessage || 'User sent an image.' },
+          {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: input.attachment.mediaType,
+              data: input.attachment.base64,
+            },
+          },
+        ] as unknown as Anthropic.Messages.ContentBlockParam[]
+      }
+    }
 
     const contextualSystemPrompt = `${CHAT_SYSTEM_PROMPT}\n\n<current_context>\nvenueId: ${venue.id}\nvenueName: ${venue.name}\nuserRole: ${userRole}\n</current_context>`
 

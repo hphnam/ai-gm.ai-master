@@ -38,6 +38,7 @@ process.env.PROBE_CHAT_SERVICE_DELAY_MS = '0'
 
 import { createHmac } from 'crypto'
 import { spawnSync } from 'node:child_process'
+import { createServer, type Server as HttpServer } from 'node:http'
 import { NestFactory, type INestApplication } from '@nestjs/core'
 import { json, urlencoded } from 'express'
 import { prisma } from '@gm-ai/database'
@@ -48,11 +49,79 @@ import { securityHeadersMiddleware } from '../common/security-headers.middleware
 import { __resetForTest as resetUnknownNumber } from '../modules/whatsapp/unknown-number-rate-limit'
 import { __resetForTest as resetVerifiedSender } from '../modules/whatsapp/verified-sender-rate-limit'
 import { __resetForTest as resetSeenSids } from '../modules/whatsapp/seen-message-sids'
+import { __resetForTest as resetTypingTimers } from '../modules/whatsapp/typing-indicator-timers'
 
 const PORT = Number(process.env.PROBE_WHATSAPP_PORT ?? 3099)
 const BASE = `http://localhost:${PORT}`
 const WEBHOOK_PATH = '/webhooks/twilio/whatsapp'
 const WEBHOOK_URL = `${BASE}${WEBHOOK_PATH}`
+
+// 03-03 image-server ports (audit S4/S8). Each runs a purpose-built fixture:
+const IMG_HAPPY_PORT = PORT + 1 // valid 1x1 JPEG (AC-4 / W21)
+const IMG_CORRUPT_PORT = PORT + 3 // image/jpeg Content-Type + 100 zero bytes (AC-14 / W25)
+const IMG_SVG_PORT = PORT + 4 // image/svg+xml (AC-15 / W26)
+const IMG_HAPPY_URL = `http://localhost:${IMG_HAPPY_PORT}/probe-image.jpg`
+const IMG_CORRUPT_URL = `http://localhost:${IMG_CORRUPT_PORT}/corrupt.jpg`
+const IMG_SVG_URL = `http://localhost:${IMG_SVG_PORT}/tiny.svg`
+const IMG_NO_SERVER_URL = `http://localhost:${PORT + 2}/does-not-exist.jpg`
+const IMG_SSRF_URL = 'http://169.254.169.254/latest/meta-data/instance-id'
+
+// Pre-built 1x1 JPEG (smallest-possible valid JPEG, 125 bytes).
+const IMG_1X1_JPEG_BASE64 =
+  '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAECAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A//2Q=='
+const IMG_1X1_JPEG_BYTES = Buffer.from(IMG_1X1_JPEG_BASE64, 'base64')
+const SVG_BYTES = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>', 'utf8')
+const CORRUPT_BYTES = Buffer.alloc(100, 0x00)
+
+async function bootImageServers(): Promise<{ close: () => Promise<void> }> {
+  const happy = createServer((_req, res) => {
+    res.writeHead(200, {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': IMG_1X1_JPEG_BYTES.length,
+    })
+    res.end(IMG_1X1_JPEG_BYTES)
+  })
+  const corrupt = createServer((_req, res) => {
+    res.writeHead(200, {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': CORRUPT_BYTES.length,
+    })
+    res.end(CORRUPT_BYTES)
+  })
+  const svg = createServer((_req, res) => {
+    res.writeHead(200, {
+      'Content-Type': 'image/svg+xml',
+      'Content-Length': SVG_BYTES.length,
+    })
+    res.end(SVG_BYTES)
+  })
+  await Promise.all(
+    [
+      [happy, IMG_HAPPY_PORT] as const,
+      [corrupt, IMG_CORRUPT_PORT] as const,
+      [svg, IMG_SVG_PORT] as const,
+    ].map(
+      ([s, port]) =>
+        new Promise<void>((resolve, reject) => {
+          s.on('error', reject)
+          s.listen(port, () => resolve())
+        }),
+    ),
+  )
+  const servers: HttpServer[] = [happy, corrupt, svg]
+  return {
+    close: async () => {
+      await Promise.all(
+        servers.map(
+          (s) =>
+            new Promise<void>((resolve) => {
+              s.close(() => resolve())
+            }),
+        ),
+      )
+    },
+  }
+}
 
 const PROBE_MARKER = 'probe-whatsapp'
 const PROBE_EMAIL = 'probe-whatsapp@gm-ai.local'
@@ -287,10 +356,18 @@ async function bootstrap(): Promise<INestApplication> {
 
 // -- assertions --------------------------------------------------------------
 async function runAssertions(fx: ProbeFixture): Promise<void> {
+  // 03-03 audit S4/S8: probe-only SSRF allowlist + local image servers for W21/W25/W26.
+  // PROBE_MEDIA_HOST_ALLOWLIST is only honored in non-production; set BEFORE any
+  // image-download test runs.
+  process.env.PROBE_MEDIA_HOST_ALLOWLIST = `localhost:${IMG_HAPPY_PORT},localhost:${IMG_CORRUPT_PORT},localhost:${IMG_SVG_PORT}`
+  const imgServers = await bootImageServers()
+
+  try {
   // Reset all in-memory limiters + dedupe for deterministic state.
   resetUnknownNumber()
   resetVerifiedSender()
   resetSeenSids()
+  resetTypingTimers()
 
   // W1: signFor helper round-trips through guard (AC-2).
   await assert('W1 signFor helper round-trips through guard → 200', async () => {
@@ -362,8 +439,12 @@ async function runAssertions(fx: ProbeFixture): Promise<void> {
     return 'status=200 no outbound'
   })
 
-  // W6: image inbound → friendly rejection (AC-7 image). Uses verified probe user.
-  await assert('W6 image inbound → friendly rejection', async () => {
+  // W6: image inbound WITHOUT MediaUrl0 → image_download_failed fallback.
+  // 03-03 deviation: image is no longer "unsupported media" — the new flow attempts
+  // download and only rejects when MediaUrl0 is missing or the download fails.
+  // W21/W25/W26 cover the in-band image paths; W6 specifically covers
+  // "WhatsApp said NumMedia=1 but didn't include MediaUrl0".
+  await assert('W6 image w/o MediaUrl0 → image_download_failed fallback', async () => {
     const msgCountBefore = await prisma.chatMessage.count({
       where: { conversation: { venueId: fx.venueId } },
     })
@@ -374,20 +455,18 @@ async function runAssertions(fx: ProbeFixture): Promise<void> {
       MessageSid: 'SM-w6-image',
     })
     const mark = capturedOutput.length
-    const outboundBefore = captureCountSince(0, 'whatsapp.console_outbound')
     const { status } = await postWebhook(body)
     mustBe(status, 200, 'W6 status')
-    if (!captureContainsSince(mark, 'whatsapp.unsupported_media'))
-      throw new Error('W6: expected whatsapp.unsupported_media event')
-    const outboundAfter = captureCountSince(0, 'whatsapp.console_outbound')
-    if (outboundAfter !== outboundBefore + 1)
-      throw new Error('W6: expected exactly 1 console_outbound (rejection reply)')
+    if (!captureContainsSince(mark, 'whatsapp.image_download_failed'))
+      throw new Error('W6: expected whatsapp.image_download_failed event')
+    if (!captureContainsSince(mark, 'no-media-url'))
+      throw new Error('W6: expected errorKind=no-media-url')
     const msgCountAfter = await prisma.chatMessage.count({
       where: { conversation: { venueId: fx.venueId } },
     })
     if (msgCountAfter !== msgCountBefore)
       throw new Error(`W6: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`)
-    return 'rejection + no ChatService call'
+    return 'image w/o MediaUrl0 → fallback + no ChatService call'
   })
 
   // W7: audio inbound → friendly rejection (AC-7 audio).
@@ -654,6 +733,346 @@ async function runAssertions(fx: ProbeFixture): Promise<void> {
     }
     return `total-patterns=${matches.length} after-config-strip=0`
   })
+
+  // ==========================================================================
+  // 03-03 new assertions (W18-W26)
+  // ==========================================================================
+
+  // W18 typing indicator fires immediately on inbound (AC-1).
+  resetSeenSids()
+  resetVerifiedSender()
+  resetTypingTimers()
+  await assert('W18 typing_indicator_sent emitted before inbound/outbound', async () => {
+    const body = makeBody({ MessageSid: 'SM-w18-typing-immediate' })
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W18 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.typing_indicator_sent') && !captured.includes('whatsapp.console_typing_indicator')) {
+      throw new Error('W18: expected whatsapp.typing_indicator_sent / console_typing_indicator event')
+    }
+    // Ordering: typing event index < whatsapp.inbound index.
+    const joined = capturedOutput.slice(mark)
+    const typingIdx = joined.findIndex((s) =>
+      s.includes('whatsapp.typing_indicator_sent') || s.includes('whatsapp.console_typing_indicator'),
+    )
+    const inboundIdx = joined.findIndex((s) => s.includes('whatsapp.inbound'))
+    if (typingIdx < 0) throw new Error('W18: typing event index not found')
+    if (inboundIdx > 0 && typingIdx > inboundIdx) {
+      throw new Error('W18: typing event must appear BEFORE whatsapp.inbound')
+    }
+    return 'typing fired first'
+  })
+
+  // W19 typing indicator re-fires during slow ChatService (AC-2).
+  // 03-03 APPLY deviation: production refire is 20s but CHAT_TIMEOUT_MS=12s would
+  // cut handler off before the first refire. Probe-only PROBE_TYPING_REFIRE_MS env
+  // shortens the refire interval so the test fits in budget.
+  // refire=1s, ChatService delay=4s → expect ≥2 refires before cleared.
+  await assert('W19 typing re-fires during slow ChatService (refire+cleared logged)', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const prevDelay = process.env.PROBE_CHAT_SERVICE_DELAY_MS ?? '0'
+    const prevRefire = process.env.PROBE_TYPING_REFIRE_MS
+    try {
+      process.env.PROBE_CHAT_SERVICE_DELAY_MS = '4000'
+      process.env.PROBE_TYPING_REFIRE_MS = '1000'
+      const body = makeBody({ MessageSid: 'SM-w19-typing-refire', Body: 'slow probe' })
+      const mark = capturedOutput.length
+      const t0 = Date.now()
+      const { status } = await postWebhook(body)
+      const elapsed = Date.now() - t0
+      mustBe(status, 200, 'W19 status')
+      const captured = capturedOutput.slice(mark).join('')
+      if (!captured.includes('whatsapp.typing_indicator_refired')) {
+        throw new Error('W19: expected whatsapp.typing_indicator_refired event')
+      }
+      if (!captured.includes('whatsapp.typing_indicator_cleared')) {
+        throw new Error('W19: expected whatsapp.typing_indicator_cleared on return')
+      }
+      // Sanity: refire count > 0 in cleared log.
+      const clearedMatch = captured.match(/refireCount:\s*\u001b\[\d+m?(\d+)/)
+      if (clearedMatch && Number(clearedMatch[1]) === 0) {
+        throw new Error('W19: cleared refireCount=0 — refires never landed')
+      }
+      return `refire+cleared logged (elapsed=${elapsed}ms)`
+    } finally {
+      process.env.PROBE_CHAT_SERVICE_DELAY_MS = prevDelay
+      if (prevRefire === undefined) delete process.env.PROBE_TYPING_REFIRE_MS
+      else process.env.PROBE_TYPING_REFIRE_MS = prevRefire
+    }
+  })
+
+  // W20 proactive opener on new 24h session + within-session skip (AC-3 / AC-7).
+  await assert('W20 proactive opener: new session → check fired; second → within-session', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    // Ensure zero prior whatsapp ChatConversations for this user — otherwise
+    // the within-session branch fires on the first request.
+    await prisma.chatConversation.deleteMany({
+      where: { userId: fx.userId, channel: 'whatsapp' },
+    })
+    const body1 = makeBody({ MessageSid: 'SM-w20-opener-1', Body: 'first msg' })
+    const mark1 = capturedOutput.length
+    const { status: s1 } = await postWebhook(body1)
+    mustBe(s1, 200, 'W20 first status')
+    const cap1 = capturedOutput.slice(mark1).join('')
+    const firedOrSkipped =
+      cap1.includes('whatsapp.proactive_opener_sent') ||
+      cap1.includes('whatsapp.proactive_opener_skipped')
+    if (!firedOrSkipped) {
+      throw new Error('W20: expected proactive_opener_sent OR _skipped on first inbound')
+    }
+    if (!cap1.includes('whatsapp.proactive_opener_sent') && !cap1.match(/"reason":\s*"no-suggestions"|reason.*no-suggestions|no-suggestions/)) {
+      // Accept either "sent" or "skipped no-suggestions"
+      // but NOT "within-session" on first turn.
+      if (cap1.includes('within-session')) {
+        throw new Error('W20 first turn: unexpected within-session skip (should be new session)')
+      }
+    }
+
+    const body2 = makeBody({ MessageSid: 'SM-w20-opener-2', Body: 'second msg' })
+    const mark2 = capturedOutput.length
+    const { status: s2 } = await postWebhook(body2)
+    mustBe(s2, 200, 'W20 second status')
+    const cap2 = capturedOutput.slice(mark2).join('')
+    if (!cap2.includes('whatsapp.proactive_opener_skipped')) {
+      throw new Error('W20 second turn: expected proactive_opener_skipped')
+    }
+    if (!cap2.match(/within-session/)) {
+      throw new Error('W20 second turn: expected reason="within-session"')
+    }
+    if (cap2.includes('whatsapp.proactive_opener_sent')) {
+      throw new Error('W20 second turn: opener must NOT be sent again')
+    }
+    return 'new-session → check; within-session → skipped'
+  })
+
+  // W21 image happy path (AC-4).
+  await assert('W21 image inbound happy path → image_ingested + placeholder persisted', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const msgCountBefore = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    const body = makeBody({
+      MessageSid: 'SM-w21-image-happy',
+      NumMedia: '1',
+      MediaContentType0: 'image/jpeg',
+      Body: 'here is a photo',
+    })
+    ;(body as Record<string, string>).MediaUrl0 = IMG_HAPPY_URL
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W21 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.image_ingested')) {
+      throw new Error('W21: expected whatsapp.image_ingested event')
+    }
+    const msgCountAfter = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    if (msgCountAfter < msgCountBefore + 2) {
+      throw new Error(
+        `W21: expected ≥2 new messages (user + assistant), got ${msgCountAfter - msgCountBefore}`,
+      )
+    }
+    const placeholder = await prisma.chatMessage.findFirst({
+      where: {
+        conversation: { venueId: fx.venueId },
+        role: 'user',
+        content: { contains: '[image:' },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+    if (!placeholder) throw new Error('W21: expected ChatMessage with [image: placeholder')
+    if (!placeholder.content.includes('sid:SM-w21-image-happy')) {
+      throw new Error(`W21: placeholder missing sid: ${placeholder.content}`)
+    }
+    return 'image ingested + placeholder + assistant reply'
+  })
+
+  // W22 image download failure → friendly fallback (AC-5).
+  await assert('W22 image download failure → fallback + no ChatMessage', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    // Use a local port with NO server listening — connection refused.
+    // IMPORTANT: also add it to PROBE_MEDIA_HOST_ALLOWLIST so we hit the
+    // download error path (not the SSRF gate — SSRF gate is W24).
+    const prevAllow = process.env.PROBE_MEDIA_HOST_ALLOWLIST
+    process.env.PROBE_MEDIA_HOST_ALLOWLIST = `${prevAllow ?? ''},localhost:${PORT + 2}`
+    try {
+      const msgCountBefore = await prisma.chatMessage.count({
+        where: { conversation: { venueId: fx.venueId } },
+      })
+      const body = makeBody({
+        MessageSid: 'SM-w22-image-fail',
+        NumMedia: '1',
+        MediaContentType0: 'image/jpeg',
+      })
+      ;(body as Record<string, string>).MediaUrl0 = IMG_NO_SERVER_URL
+      const mark = capturedOutput.length
+      const { status } = await postWebhook(body)
+      mustBe(status, 200, 'W22 status')
+      const captured = capturedOutput.slice(mark).join('')
+      if (!captured.includes('whatsapp.image_download_failed')) {
+        throw new Error('W22: expected whatsapp.image_download_failed event')
+      }
+      const msgCountAfter = await prisma.chatMessage.count({
+        where: { conversation: { venueId: fx.venueId } },
+      })
+      if (msgCountAfter !== msgCountBefore) {
+        throw new Error(
+          `W22: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`,
+        )
+      }
+      return 'download fail + fallback + no ChatService call'
+    } finally {
+      process.env.PROBE_MEDIA_HOST_ALLOWLIST = prevAllow ?? ''
+    }
+  })
+
+  // W23 audio still rejects — AC-6 regression guard (preserves 03-01/02 behavior).
+  await assert('W23 audio still rejects (verified user)', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const msgCountBefore = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    const body = makeBody({
+      MessageSid: 'SM-w23-audio',
+      From: PROBE_PHONE,
+      NumMedia: '1',
+      MediaContentType0: 'audio/ogg',
+    })
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W23 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.unsupported_media')) {
+      throw new Error('W23: expected whatsapp.unsupported_media event')
+    }
+    const msgCountAfter = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    if (msgCountAfter !== msgCountBefore) {
+      throw new Error(`W23: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`)
+    }
+    return 'audio rejected; ChatService not invoked'
+  })
+
+  // W24 ssrf: non-allowlisted host blocked BEFORE fetch (AC-13 / audit M1).
+  await assert('W24 ssrf: non-allowlisted host rejected pre-fetch', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const msgCountBefore = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    const body = makeBody({
+      MessageSid: 'SM-w24-ssrf',
+      NumMedia: '1',
+      MediaContentType0: 'image/jpeg',
+    })
+    ;(body as Record<string, string>).MediaUrl0 = IMG_SSRF_URL
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W24 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.image_download_failed')) {
+      throw new Error('W24: expected whatsapp.image_download_failed event')
+    }
+    if (!captured.includes('ssrf-rejected')) {
+      throw new Error(`W24: expected errorKind=ssrf-rejected in capture`)
+    }
+    // Raw host MUST NOT appear unhashed in logs (only hostHash sha256 prefix).
+    if (captured.includes('169.254.169.254')) {
+      throw new Error('W24: raw SSRF host leaked into logs')
+    }
+    const msgCountAfter = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    if (msgCountAfter !== msgCountBefore) {
+      throw new Error(`W24: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`)
+    }
+    return 'ssrf host rejected + no leak'
+  })
+
+  // W25 magic_byte: image MIME but corrupt body (AC-14 / audit M3).
+  await assert('W25 magic_byte: declared image/jpeg + zero bytes → media-content-mismatch', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const msgCountBefore = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    const body = makeBody({
+      MessageSid: 'SM-w25-magic-byte',
+      NumMedia: '1',
+      MediaContentType0: 'image/jpeg',
+    })
+    ;(body as Record<string, string>).MediaUrl0 = IMG_CORRUPT_URL
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W25 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.image_download_failed')) {
+      throw new Error('W25: expected whatsapp.image_download_failed event')
+    }
+    if (!captured.includes('media-content-mismatch')) {
+      throw new Error(`W25: expected errorKind=media-content-mismatch`)
+    }
+    const msgCountAfter = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    if (msgCountAfter !== msgCountBefore) {
+      throw new Error(`W25: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`)
+    }
+    return 'magic-byte mismatch rejected'
+  })
+
+  // W26 unsupported_mime: image/svg+xml blocked (AC-15 / audit M2).
+  await assert('W26 unsupported_mime: image/svg+xml → unsupported-mime fallback', async () => {
+    resetSeenSids()
+    resetVerifiedSender()
+    resetTypingTimers()
+    const msgCountBefore = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    const body = makeBody({
+      MessageSid: 'SM-w26-svg',
+      NumMedia: '1',
+      MediaContentType0: 'image/svg+xml',
+    })
+    ;(body as Record<string, string>).MediaUrl0 = IMG_SVG_URL
+    const mark = capturedOutput.length
+    const { status } = await postWebhook(body)
+    mustBe(status, 200, 'W26 status')
+    const captured = capturedOutput.slice(mark).join('')
+    if (!captured.includes('whatsapp.image_download_failed')) {
+      throw new Error('W26: expected whatsapp.image_download_failed event')
+    }
+    if (!captured.includes('unsupported-mime')) {
+      throw new Error(`W26: expected errorKind=unsupported-mime`)
+    }
+    const msgCountAfter = await prisma.chatMessage.count({
+      where: { conversation: { venueId: fx.venueId } },
+    })
+    if (msgCountAfter !== msgCountBefore) {
+      throw new Error(`W26: expected NO new ChatMessage rows, got +${msgCountAfter - msgCountBefore}`)
+    }
+    return 'svg rejected + specific fallback'
+  })
+
+  } finally {
+    await imgServers.close()
+    delete process.env.PROBE_MEDIA_HOST_ALLOWLIST
+  }
 }
 
 // -- main --------------------------------------------------------------------

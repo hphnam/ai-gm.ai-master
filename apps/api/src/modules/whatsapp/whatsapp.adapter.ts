@@ -51,6 +51,63 @@ export class WhatsAppAdapter {
     return this.baseMode
   }
 
+  // 03-03 Task 1: typing indicator — best-effort, non-blocking.
+  // Endpoint verified 2026-04-20 against https://www.twilio.com/docs/whatsapp/api/typing-indicators-resource:
+  //   POST https://messaging.twilio.com/v2/Indicators/Typing.json
+  //   Body: messageId=<inbound SM...>, channel=whatsapp
+  //   Twilio auto-expires after 25s or on next outbound — no explicit "clear" call.
+  // Signature takes the inbound MessageSid (NOT a phone number) because that's what
+  // Twilio's API keys off for WhatsApp typing state.
+  async sendTypingIndicator(inboundMessageSid: string): Promise<WhatsAppOutboundResult> {
+    // Allow hyphens + underscores so probe fixtures like "SM-w18-typing-immediate"
+    // pass alongside real Twilio SIDs (which are 34-char alphanumeric).
+    if (!inboundMessageSid || !/^[A-Za-z0-9_-]{1,64}$/.test(inboundMessageSid)) {
+      return { ok: false, reason: 'whatsapp-invalid-to' }
+    }
+    const mode = this.resolveMode()
+    if (mode === 'disabled') {
+      // Kill-switch silent — no log event emission here (caller owns observability).
+      return { ok: false, reason: 'whatsapp-driver-disabled' }
+    }
+    if (mode === 'console' || !this.liveCreds) {
+      this.logger.log('whatsapp.console_typing_indicator', { messageId: inboundMessageSid })
+      return { ok: true, mode: 'console' }
+    }
+    try {
+      const url = 'https://messaging.twilio.com/v2/Indicators/Typing.json'
+      const basic = Buffer.from(
+        `${this.liveCreds.accountSid}:${this.liveCreds.authToken}`,
+      ).toString('base64')
+      const form = new URLSearchParams({
+        messageId: inboundMessageSid,
+        channel: 'whatsapp',
+      })
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${basic}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: form.toString(),
+        signal: AbortSignal.timeout(TWILIO_API_TIMEOUT_MS),
+      })
+      if (!res.ok) {
+        this.logger.warn('whatsapp.typing_indicator_unsupported_by_provider', {
+          messageId: inboundMessageSid,
+          status: res.status,
+        })
+        return { ok: false, reason: 'whatsapp-service-unavailable' }
+      }
+      return { ok: true, mode: 'live' }
+    } catch (err) {
+      this.logger.warn('whatsapp.typing_indicator_unsupported_by_provider', {
+        messageId: inboundMessageSid,
+        errorKind: (err as Error)?.constructor?.name ?? 'unknown',
+      })
+      return { ok: false, reason: 'whatsapp-service-unavailable' }
+    }
+  }
+
   async sendText(to: string, body: string): Promise<WhatsAppOutboundResult> {
     if (!TO_RE.test(to)) {
       return { ok: false, reason: 'whatsapp-invalid-to' }

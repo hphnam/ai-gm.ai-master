@@ -7,7 +7,7 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.2 Multi-Tenant WhatsApp** (v0.2.0)
-Status: 🚧 In Progress (2 of 4 phases complete)
+Status: 🚧 In Progress (3 of 4 phases complete)
 Phases: 4
 Estimated plans: 10-14
 
@@ -19,8 +19,8 @@ Estimated plans: 10-14
 |-------|------|-------|--------|-----------|
 | 1 | Auth + Organizations | 3 of 3 (01-01 ✓, 01-02 ✓, 01-03 ✓) | Complete | 2026-04-20 |
 | 2 | Document Ingest UI | 2 of 2 (02-01 ✓, 02-02 ✓) | Complete | 2026-04-20 |
-| 3 | WhatsApp Integration | 2 of 3-4 est (03-01 ✓, 03-02 ✓) | In Progress | - |
-| 4 | Coolify Deployment | TBD (2-3 est) | Not started | - |
+| 3 | WhatsApp Integration | 3 of 3 (03-01 ✓, 03-02 ✓, 03-03 ✓) | ✅ Complete | 2026-04-20 |
+| 4 | Coolify Deployment | TBD (2-3 est) | 🔵 Next | - |
 
 ### Phase 1: Auth + Organizations
 
@@ -115,4 +115,4 @@ Estimated plans: 10-14
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-19 — v0.2 Multi-Tenant WhatsApp milestone created (4 phases defined; plans TBD per phase)*
+*Last updated: 2026-04-20 — v0.2 Phase 3 (WhatsApp Integration) complete (3/3 plans); ready for Phase 4 (Coolify Deployment)*
