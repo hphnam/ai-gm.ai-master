@@ -11,7 +11,7 @@ See: .paul/PROJECT.md (updated 2026-04-13)
 
 Milestone: v0.2 Multi-Tenant WhatsApp (v0.2.0) — 25% (3 of ~13 plans complete; 02-01 planning)
 Phase: 2 of 4 (Document Ingest UI) — Planning. Plan 02-01 created 2026-04-20 11:30.
-Plan: 02-01 (KnowledgeItem organizationId — close cross-org leak on global docs) PLAN ✓ + AUDIT ✓ + APPLY ✓ + UNIFY ✓
+Plan: 02-02 (Manager file upload + extraction + DELETE) PLAN ✓, awaiting AUDIT then APPLY. Plan 02-01 fully closed.
 Status: Plan 02-01 scopes the schema + service + retrieval changes needed to close the documented cross-org leak on `KnowledgeItem` rows with `venueId = NULL` before Phase 2 feature work (file upload) lands in 02-02. 3 tasks + 1 non-blocking post-deploy note (UAT replaced by probe A36/A37 per audit S2). `autonomous: true`. Files: schema.prisma + new migration + ingest.service + docs.service + retrieval.service + tool-dispatcher + chat.service + suggestions.service + seed.ts + probe-api.ts + @gm-ai/types. Probe assertion target raised 44 → ≥52 (A30 list leak, A31 getById 404, A32 retrieval leak, A33 invalid-orgId contract, A34 seed orphan integrity, A35 tool-schema shape, A36 positive list path, A37 positive retrieval path). Enterprise audit performed 2026-04-20 11:45. Verdict: conditionally acceptable pre-fix → enterprise-ready post-fix. 5 must-have + 7 strongly-recommended upgrades applied; 5 deferred with explicit triggers.
 
 Phase 1 closes at 3/3. Plan 01-03 shipped PhoneModule (NestJS) + /settings/phone UI (Next.js) + 13 new probe-auth assertions (54/54 green total; plan required ≥40). probe-api 44/44 — zero regressions. Twilio driver modes: live/console/disabled (disabled is a getter-based kill-switch). AC-1-9 + AC-12 + AC-13-16 Pass. AC-10 probe-deferred (plan-documented single-process limitation). AC-11 UAT deferred (UI-only human walk). Deviations: (1) mode is getter, not constructor-cached — kill-switch works without redeploy; (2) disabled-check precedes pending-match guard — outage vs abuse distinguishable; (3) SID regex accepts SK prefix (API Keys); (4) code schema accepts [A-Z0-9-]{6,12} to cover both live numeric and console PROBE-{6} formats; (5) maskPhone imported by UI only — controller response intentionally unmasked. Full deviation rationale + decisions in 01-03-SUMMARY.md.
@@ -27,7 +27,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Plan 02-01 loop closed — SUMMARY.md written]
+  ✓        ○        ○     [Plan 02-02 PLAN ✓, awaiting AUDIT → APPLY]
 ```
 
 ## Accumulated Context
@@ -102,13 +102,15 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Session Continuity
 
-Last session: 2026-04-20 12:02
-Stopped at: Plan 02-01 (KnowledgeItem organizationId) UNIFY ✓ — loop closed. SUMMARY.md at .paul/phases/02-document-ingest/02-01-SUMMARY.md. All 9 AC assessed: AC-1-5 + AC-7-9 Pass (runtime-verified via probe-api 52/52 + probe-auth 54/54 zero regression); AC-6 Partial/Deviated (seed.ts portion converted to probe A34 live-DB integrity check — seed.ts eliminated in prior PAUL automation cleanup, probe is strictly stronger guard). Two deviations documented: (1) migration first attempt failed E42804 UUID vs TEXT; Prisma's String maps to TEXT in Postgres, corrected via `migrate resolve --rolled-back` + retyped column to TEXT; (2) probe-ingest.ts dependent change not listed in plan files_modified — mandatory once IngestInput shape changed. Grep-sweep clarification: `"venueId" IS NULL` still matches inside the orgId-scoped retrieval branch (legitimate global-within-this-org allowance; leaky Prisma OR pattern removed from docs.service). 5 commits: `ede6ee9 plan`, `a5e728f audit`, `9eea65c Task 1`, `1c175ec Task 2`, `13bfe74 Task 3`.
+Last session: 2026-04-20 12:10
+Stopped at: Plan 02-02 (Manager file upload + extraction + DELETE) PLAN ✓, awaiting AUDIT then APPLY. PLAN.md at .paul/phases/02-document-ingest/02-02-PLAN.md. 3 tasks. Scope: multer + unpdf + mammoth deps, `POST /docs/upload` multipart endpoint with MIME allowlist (txt/md/pdf/docx) + 10 MB size cap, doc-extract.ts router, `DELETE /docs/:id` with cross-org denial reusing 02-01's `docs.cross_org_denied` pattern, UI wiring (file picker + AlertDialog delete confirmation), probe-api +5 assertions (A38-A42). New API error codes: `file-too-large` + `unsupported-file-type` + `extraction-failed`. Probe target raised 52 → ≥57.
 
-Phase 2 progress: 1 of ~3 plans complete. v0.2.0 milestone progresses 25% → ~31% (4 of ~13 plans).
+Plan 02-01 fully closed prior in this session (6 commits: `ede6ee9 plan`, `a5e728f audit`, `9eea65c Task 1`, `1c175ec Task 2`, `13bfe74 Task 3`, `e511727 UNIFY`). probe-api 52/52 + probe-auth 54/54 green. SOC-2 CC6.6 cross-org leak on global KnowledgeItem rows closed.
 
-Next action: Phase 2 Plan 02 (file upload) PLAN. Run `/paul:plan` to scope Plan 02-02 which brings in: POST /docs/upload multipart endpoint + MIME validation + size cap + text extraction pipeline (pdf-parse, mammoth, plain-text) + DELETE endpoint + UI upload/delete.
-Resume file: .paul/phases/02-document-ingest/02-01-SUMMARY.md
+Phase 2 progress: 1 of ~3 plans complete; 02-02 planning. v0.2.0 milestone ~31% (4 of ~13 plans).
+
+Next action: `/paul:audit 02-02` then `/paul:apply 02-02`. Plan 02-02 APPLY is non-trivial — involves `pnpm install` (network-dependent), multer integration quirks around NestJS body-parser ordering (main.ts needs path-based bypass for `/docs/upload` to preserve A19 40KB cap on JSON routes), unpdf dynamic-import behaviour, and @radix-ui/react-alert-dialog may need adding for the delete confirmation dialog (check before relying). Fresh context recommended.
+Resume file: .paul/phases/02-document-ingest/02-02-PLAN.md
 
 ---
 
