@@ -90,9 +90,9 @@ Blockers (stop + emit BLOCKER: marker):
 - A plan requires external credentials not in .env (e.g. TWILIO_*, real
   RESEND_API_KEY, Stripe keys)
 - A plan requires UI-based UAT (human-only verification)
-- A destructive operation you can't safely auto-decide
-- A test/probe failure you cannot fix within the current plan's scope
-- An ambiguity that the plan doesn't resolve and a discuss-auto default
+- A destructive operation you cannot safely auto-decide
+- A test/probe failure you cannot fix within the current plan scope
+- An ambiguity that the plan does not resolve and a discuss-auto default
   would materially affect scope
 
 On milestone completion (not a blocker), emit:
@@ -115,7 +115,7 @@ notify() {
   local title="$1"
   local message="$2"
   if command -v osascript >/dev/null 2>&1; then
-    osascript -e "display notification \"${message//\"/\\\"}\" with title \"${title//\"/\\\"}\" sound name \"Glass\"" || true
+    osascript -e "display notification \"$message\" with title \"$title\" sound name \"Glass\"" 2>/dev/null || true
   fi
   # Uncomment for phone push via ntfy.sh (free, no account required):
   # curl -fsS -d "$message" "https://ntfy.sh/YOUR-UNIQUE-TOPIC-HERE" \
