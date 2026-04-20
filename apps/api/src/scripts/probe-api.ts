@@ -2,6 +2,7 @@ import '../load-env'
 
 import { NestFactory } from '@nestjs/core'
 import { json } from 'express'
+import { crc32 } from 'node:zlib'
 import { prisma } from '@gm-ai/database'
 import { API_ERROR_CODES, TOOL_INPUT_SCHEMAS, type ApiErrorCode } from '@gm-ai/types'
 import { AppModule } from '../app.module'
@@ -170,6 +171,166 @@ function authedFetch(cookie: string) {
       ...opts,
       headers: { ...(opts.headers ?? {}), Cookie: cookie },
     })
+}
+
+// Plan 02-02 fixtures (A38b/A38c): minimal PDF + DOCX builders.
+// Node-native only; no new deps. PDF hand-built with correct xref offsets.
+// DOCX = ZIP (stored, no deflate) with [Content_Types].xml + _rels/.rels + word/document.xml.
+function buildMinimalPdf(text: string): Buffer {
+  const stream = `BT\n/F1 24 Tf\n72 720 Td\n(${text}) Tj\nET\n`
+  const streamLen = Buffer.byteLength(stream)
+  const header = '%PDF-1.4\n%\xFF\xFF\xFF\xFF\n'
+  const parts: Buffer[] = []
+  const offsets: number[] = [0]
+  let current = Buffer.byteLength(header, 'binary')
+  const add = (s: string): void => {
+    offsets.push(current)
+    const b = Buffer.from(s, 'binary')
+    parts.push(b)
+    current += b.length
+  }
+  add('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n')
+  add('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n')
+  add(
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] ' +
+      '/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n',
+  )
+  add('4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n')
+  add(`5 0 obj\n<< /Length ${streamLen} >>\nstream\n${stream}endstream\nendobj\n`)
+  const xrefStart = current
+  let xref = 'xref\n0 6\n0000000000 65535 f \n'
+  for (let i = 1; i <= 5; i++) {
+    xref += offsets[i]!.toString().padStart(10, '0') + ' 00000 n \n'
+  }
+  const trailer = `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`
+  return Buffer.concat([Buffer.from(header, 'binary'), ...parts, Buffer.from(xref, 'binary'), Buffer.from(trailer, 'binary')])
+}
+
+function buildMinimalDocx(text: string): Buffer {
+  const contentTypes = Buffer.from(
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`,
+    'utf-8',
+  )
+  const rels = Buffer.from(
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`,
+    'utf-8',
+  )
+  const doc = Buffer.from(
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:body><w:p><w:r><w:t>${text}</w:t></w:r></w:p></w:body>
+</w:document>`,
+    'utf-8',
+  )
+  const entries = [
+    { name: '[Content_Types].xml', data: contentTypes },
+    { name: '_rels/.rels', data: rels },
+    { name: 'word/document.xml', data: doc },
+  ]
+  type LocalEntry = {
+    localHeader: Buffer
+    nameBuf: Buffer
+    data: Buffer
+    crc: number
+    size: number
+  }
+  const locals: LocalEntry[] = entries.map((e) => {
+    const nameBuf = Buffer.from(e.name, 'utf-8')
+    const crc = crc32(e.data)
+    const localHeader = Buffer.alloc(30)
+    localHeader.writeUInt32LE(0x04034b50, 0)
+    localHeader.writeUInt16LE(20, 4)
+    localHeader.writeUInt16LE(0, 6)
+    localHeader.writeUInt16LE(0, 8)
+    localHeader.writeUInt16LE(0, 10)
+    localHeader.writeUInt16LE(0, 12)
+    localHeader.writeUInt32LE(crc, 14)
+    localHeader.writeUInt32LE(e.data.length, 18)
+    localHeader.writeUInt32LE(e.data.length, 22)
+    localHeader.writeUInt16LE(nameBuf.length, 26)
+    localHeader.writeUInt16LE(0, 28)
+    return { localHeader, nameBuf, data: e.data, crc, size: e.data.length }
+  })
+  const parts: Buffer[] = []
+  let offset = 0
+  const centrals: Array<{ central: Buffer; nameBuf: Buffer }> = []
+  for (const l of locals) {
+    parts.push(l.localHeader, l.nameBuf, l.data)
+    const central = Buffer.alloc(46)
+    central.writeUInt32LE(0x02014b50, 0)
+    central.writeUInt16LE(20, 4)
+    central.writeUInt16LE(20, 6)
+    central.writeUInt16LE(0, 8)
+    central.writeUInt16LE(0, 10)
+    central.writeUInt16LE(0, 12)
+    central.writeUInt16LE(0, 14)
+    central.writeUInt32LE(l.crc, 16)
+    central.writeUInt32LE(l.size, 20)
+    central.writeUInt32LE(l.size, 24)
+    central.writeUInt16LE(l.nameBuf.length, 28)
+    central.writeUInt16LE(0, 30)
+    central.writeUInt16LE(0, 32)
+    central.writeUInt16LE(0, 34)
+    central.writeUInt16LE(0, 36)
+    central.writeUInt32LE(0, 38)
+    central.writeUInt32LE(offset, 42)
+    centrals.push({ central, nameBuf: l.nameBuf })
+    offset += l.localHeader.length + l.nameBuf.length + l.data.length
+  }
+  const cdStart = offset
+  let cdSize = 0
+  for (const c of centrals) {
+    parts.push(c.central, c.nameBuf)
+    cdSize += c.central.length + c.nameBuf.length
+  }
+  const eocd = Buffer.alloc(22)
+  eocd.writeUInt32LE(0x06054b50, 0)
+  eocd.writeUInt16LE(0, 4)
+  eocd.writeUInt16LE(0, 6)
+  eocd.writeUInt16LE(centrals.length, 8)
+  eocd.writeUInt16LE(centrals.length, 10)
+  eocd.writeUInt32LE(cdSize, 12)
+  eocd.writeUInt32LE(cdStart, 16)
+  eocd.writeUInt16LE(0, 20)
+  parts.push(eocd)
+  return Buffer.concat(parts)
+}
+
+type UploadResp = { status: number; body: unknown; headers: Headers }
+
+async function uploadFetch(
+  path: string,
+  cookie: string,
+  file: { name: string; mime: string; bytes: Buffer },
+  extraFields: Record<string, string> = {},
+): Promise<UploadResp> {
+  const form = new FormData()
+  for (const [k, v] of Object.entries(extraFields)) form.append(k, v)
+  const blob = new Blob([new Uint8Array(file.bytes)], { type: file.mime })
+  form.append('file', blob, file.name)
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'POST',
+    headers: { Origin: PROBE_ORIGIN, Cookie: cookie },
+    body: form,
+  })
+  let body: unknown = null
+  const text = await res.text()
+  if (text) {
+    try {
+      body = JSON.parse(text)
+    } catch {
+      body = text
+    }
+  }
+  return { status: res.status, body, headers: res.headers }
 }
 
 function authedRetry(cookie: string) {
@@ -950,6 +1111,162 @@ async function runProbe(
   assert('A37 retrieval.find as other org returns the other-org doc (positive retrieval path)',
     a37found,
     `ok=${a37hits.ok} ${a37hits.ok ? 'hits=' + a37hits.data.length : 'reason=' + (a37hits as { reason: string }).reason}`)
+
+  // ───────── Plan 02-02: Document upload + DELETE (A38–A44) ─────────
+  // A38 text-fallback happy path; A38b PDF via unpdf; A38c DOCX via mammoth;
+  // A39 MIME reject; A40 size reject; A41 DELETE with cascade assertion;
+  // A42 cross-org DELETE denied; A43 corrupt-file extraction-failed; A44 staff-role forbidden.
+
+  const a38 = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a38.txt',
+    mime: 'text/plain',
+    bytes: Buffer.from('A38 UPLOAD PROBE — text-fallback branch', 'utf-8'),
+  })
+  const a38body = a38.body as { id?: string; summary?: string | null; tags?: unknown; docType?: unknown; failSoft?: unknown }
+  assert('A38 POST /docs/upload text/plain happy path returns 200 with CreateDocResponse shape',
+    a38.status === 200 &&
+      typeof a38body.id === 'string' &&
+      Array.isArray(a38body.tags) &&
+      typeof a38body.failSoft === 'boolean',
+    `status=${a38.status} id=${a38body.id ?? 'none'}`)
+
+  const pdfBytes = buildMinimalPdf('A38b UNPDF PROBE')
+  const a38b = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a38b.pdf',
+    mime: 'application/pdf',
+    bytes: pdfBytes,
+  })
+  const a38bBody = a38b.body as { id?: string }
+  let a38bContent = ''
+  if (typeof a38bBody.id === 'string') {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: a38bBody.id },
+      select: { content: true },
+    })
+    a38bContent = row?.content ?? ''
+  }
+  assert('A38b POST /docs/upload real PDF via unpdf returns 200 and KnowledgeItem.content contains extracted text',
+    a38b.status === 200 && /UNPDF PROBE/i.test(a38bContent),
+    `status=${a38b.status} id=${a38bBody.id ?? 'none'} content.len=${a38bContent.length}`)
+
+  const docxBytes = buildMinimalDocx('A38c MAMMOTH PROBE')
+  const a38c = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a38c.docx',
+    mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    bytes: docxBytes,
+  })
+  const a38cBody = a38c.body as { id?: string }
+  let a38cContent = ''
+  if (typeof a38cBody.id === 'string') {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: a38cBody.id },
+      select: { content: true },
+    })
+    a38cContent = row?.content ?? ''
+  }
+  assert('A38c POST /docs/upload real DOCX via mammoth returns 200 and KnowledgeItem.content contains extracted text',
+    a38c.status === 200 && /MAMMOTH PROBE/i.test(a38cContent),
+    `status=${a38c.status} id=${a38cBody.id ?? 'none'} content.len=${a38cContent.length}`)
+
+  const a39 = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a39.zip',
+    mime: 'application/zip',
+    bytes: Buffer.from('PK\x03\x04', 'binary'),
+  })
+  const a39body = a39.body as { error?: string }
+  assert('A39 POST /docs/upload with application/zip MIME returns 415 unsupported-file-type',
+    a39.status === 415 && a39body.error === 'unsupported-file-type',
+    `status=${a39.status} error=${a39body.error}`)
+
+  const bigBuf = Buffer.alloc(12 * 1024 * 1024, 0x41)
+  const a40 = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a40.txt',
+    mime: 'text/plain',
+    bytes: bigBuf,
+  })
+  const a40body = a40.body as { error?: string }
+  assert('A40 POST /docs/upload with 12 MB body returns 413 file-too-large',
+    a40.status === 413 && a40body.error === 'file-too-large',
+    `status=${a40.status} error=${a40body.error}`)
+
+  // A41 DELETE happy + cascade verification: create doc, insert retag row referencing it, DELETE, verify both gone.
+  const a41created = await authedFetch(demoSession.cookie)('/docs', {
+    method: 'POST',
+    body: {
+      title: 'Probe A41 delete-cascade fixture',
+      content: 'A41 DELETE PROBE — will be deleted and the cascade checked',
+      venueId: null,
+    },
+  })
+  const a41id = (a41created.body as { id?: string }).id ?? ''
+  // Insert a retag_queue_items row referencing this knowledgeItemId to exercise the cascade.
+  if (a41id) {
+    await prisma.reTagQueueItem.create({
+      data: {
+        knowledgeItemId: a41id,
+        reason: 'probe-a41-cascade',
+        status: 'queued',
+      },
+    })
+  }
+  const a41del = await fetch(`${BASE}/docs/${a41id}`, {
+    method: 'DELETE',
+    headers: { Origin: PROBE_ORIGIN, Cookie: demoSession.cookie },
+  })
+  const a41deleted = await prisma.knowledgeItem.findUnique({ where: { id: a41id } })
+  const a41retagCount = await prisma.reTagQueueItem.count({ where: { knowledgeItemId: a41id } })
+  assert('A41 DELETE /docs/:id returns 204, knowledge_items row gone, retag_queue_items cascade fired',
+    a41del.status === 204 && a41deleted === null && a41retagCount === 0,
+    `status=${a41del.status} row=${a41deleted ? 'present' : 'null'} retagCount=${a41retagCount}`)
+
+  // A42 cross-org DELETE denied: DELETE an OtherOrg doc as demo-manager → 404 + not-found + row still exists.
+  const a42target = await prisma.knowledgeItem.create({
+    data: {
+      organizationId: otherSession.orgId,
+      venueId: null,
+      content: 'A42 cross-org delete target — must not be deleted by demo',
+      metadata: {},
+    },
+  })
+  const a42del = await fetch(`${BASE}/docs/${a42target.id}`, {
+    method: 'DELETE',
+    headers: { Origin: PROBE_ORIGIN, Cookie: demoSession.cookie },
+  })
+  let a42body: { error?: string } = {}
+  const a42text = await a42del.text()
+  if (a42text) {
+    try {
+      a42body = JSON.parse(a42text) as { error?: string }
+    } catch {
+      a42body = {}
+    }
+  }
+  const a42still = await prisma.knowledgeItem.findUnique({ where: { id: a42target.id } })
+  assert('A42 cross-org DELETE returns 404 not-found and row still exists (cross_org_denied logged)',
+    a42del.status === 404 && a42body.error === 'not-found' && a42still !== null,
+    `status=${a42del.status} error=${a42body.error} rowPresent=${a42still !== null}`)
+
+  // A43 corrupt-file: application/pdf MIME with garbage bytes → 422 extraction-failed.
+  const a43 = await uploadFetch('/docs/upload', demoSession.cookie, {
+    name: 'probe-a43.pdf',
+    mime: 'application/pdf',
+    bytes: Buffer.from('not a real pdf at all — just noise bytes'.repeat(3), 'utf-8'),
+  })
+  const a43body = a43.body as { error?: string }
+  assert('A43 POST /docs/upload with corrupt pdf bytes returns 422 extraction-failed',
+    a43.status === 422 && a43body.error === 'extraction-failed',
+    `status=${a43.status} error=${a43body.error}`)
+
+  // A44 staff-role upload rejected: RoleGuard must enforce on /docs/upload.
+  const a44 = await uploadFetch('/docs/upload', staffSession.cookie, {
+    name: 'probe-a44.txt',
+    mime: 'text/plain',
+    bytes: Buffer.from('A44 staff-role upload probe — must be rejected', 'utf-8'),
+  })
+  const a44body = a44.body as { error?: string }
+  assert('A44 staff-role POST /docs/upload returns 403 forbidden (RoleGuard enforces @RequireRole)',
+    a44.status === 403 && a44body.error === 'forbidden',
+    `status=${a44.status} error=${a44body.error}`)
 
   return true
 }
