@@ -14,6 +14,7 @@ import { PhoneModule } from './modules/phone/phone.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
 import { SuggestionsModule } from './modules/suggestions/suggestions.module'
 import { VenuesModule } from './modules/venues/venues.module'
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { VenuesModule } from './modules/venues/venues.module'
     DocsModule,
     InvitationsModule,
     PhoneModule,
+    WhatsappModule,
   ],
   controllers: [AppController],
 })

@@ -6,6 +6,13 @@ export type AuthEnv = {
   resend?: { apiKey: string; mailFrom: string }
   // 01-03 audit-added: Twilio Verify config; undefined when console fallback is used
   twilio?: { accountSid: string; authToken: string; verifyServiceSid: string }
+  // 03-01 audit-added: WhatsApp (Twilio) config + URL pin + dev-bypass gate
+  whatsapp?: {
+    fromNumber: string
+    driverOverride: 'live' | 'console' | 'disabled' | undefined
+    webhookPublicUrl: string
+    allowDevBypass: boolean
+  }
 }
 
 // Name <addr@domain> format per RFC 5322 shorthand — required by Resend's from field
@@ -65,6 +72,58 @@ export function assertAuthEnv(): AuthEnv {
     }
   }
 
+  // 03-01 audit-added: WhatsApp (Twilio) env block — additive-only to 01-03 Verify.
+  const waFrom = process.env.TWILIO_WHATSAPP_FROM
+  const waOverrideRaw = process.env.TWILIO_WHATSAPP_DRIVER_OVERRIDE
+  const waPublicUrl = process.env.WHATSAPP_WEBHOOK_PUBLIC_URL
+  const waAllowDevBypassRaw = process.env.ALLOW_WEBHOOK_DEV_BYPASS
+  const isProd = process.env.NODE_ENV === 'production'
+
+  const waOverride: 'live' | 'console' | 'disabled' | undefined =
+    waOverrideRaw === 'live' || waOverrideRaw === 'console' || waOverrideRaw === 'disabled'
+      ? waOverrideRaw
+      : undefined
+
+  if (waOverrideRaw && !waOverride) {
+    errs.push(
+      `TWILIO_WHATSAPP_DRIVER_OVERRIDE must be one of live|console|disabled, got "${waOverrideRaw}"`,
+    )
+  }
+
+  if (waFrom) {
+    if (!/^whatsapp:\+[0-9]{6,20}$/.test(waFrom)) {
+      errs.push(
+        'TWILIO_WHATSAPP_FROM must match "whatsapp:+<digits>" format (e.g. whatsapp:+14155551234)',
+      )
+    }
+    // audit-added S3: allow boot in console OR disabled mode without creds.
+    const credsOptional = waOverride === 'console' || waOverride === 'disabled'
+    if (!credsOptional && presentCount !== 3) {
+      errs.push(
+        'TWILIO_WHATSAPP_FROM requires TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN unless TWILIO_WHATSAPP_DRIVER_OVERRIDE in {console, disabled}',
+      )
+    }
+    // audit-added M1: URL-pin is REQUIRED whenever live outbound is possible.
+    if (waOverride !== 'console') {
+      if (!waPublicUrl) {
+        errs.push(
+          'WHATSAPP_WEBHOOK_PUBLIC_URL required when TWILIO_WHATSAPP_FROM set and driver override != "console" — set to the exact https URL configured in Twilio Console (e.g. https://api.yourdomain.com/webhooks/twilio/whatsapp)',
+        )
+      } else if (!/^https:\/\/[^\s?#]+\/webhooks\/twilio\/whatsapp$/.test(waPublicUrl)) {
+        errs.push(
+          `WHATSAPP_WEBHOOK_PUBLIC_URL must be https:// and end with /webhooks/twilio/whatsapp, got "${waPublicUrl}"`,
+        )
+      }
+    }
+  }
+
+  // audit-added M2: dev-bypass MUST NOT be enabled in production.
+  if (isProd && waAllowDevBypassRaw === 'true') {
+    errs.push(
+      'ALLOW_WEBHOOK_DEV_BYPASS must not be set to "true" in production — remove before deploying',
+    )
+  }
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
@@ -76,6 +135,17 @@ export function assertAuthEnv(): AuthEnv {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
+
+  // 03-01 audit-added: whatsapp block populated when FROM is set or console override is explicit.
+  const waPopulated = !!waFrom || waOverride === 'console'
+  const whatsapp = waPopulated
+    ? {
+        fromNumber: waFrom ?? '',
+        driverOverride: waOverride,
+        webhookPublicUrl: waPublicUrl ?? '',
+        allowDevBypass: !isProd && waAllowDevBypassRaw === 'true',
+      }
+    : undefined
 
   return {
     secret: secret!,
@@ -90,5 +160,6 @@ export function assertAuthEnv(): AuthEnv {
             verifyServiceSid: twilioVerifySid!,
           }
         : undefined,
+    whatsapp,
   }
 }
