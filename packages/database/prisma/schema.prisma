@@ -109,9 +109,10 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members     OrganizationMember[]
-  invitations Invitation[]
-  venues      Venue[]
+  members        OrganizationMember[]
+  invitations    Invitation[]
+  venues         Venue[]
+  knowledgeItems KnowledgeItem[]
 
   @@index([slug])
   @@map("organizations")
@@ -243,19 +244,22 @@ model MockPurchaseOrderItem {
 }
 
 model KnowledgeItem {
-  id        String   @id @default(uuid())
-  venueId   String?
-  content   String
-  metadata  Json     @default("{}")
-  embedding Unsupported("vector(1024)")?
-  embeddingText String?
-  aiSummary String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid())
+  organizationId String
+  venueId        String?
+  content        String
+  metadata       Json     @default("{}")
+  embedding      Unsupported("vector(1024)")?
+  embeddingText  String?
+  aiSummary      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  venue Venue? @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  venue           Venue?           @relation(fields: [venueId], references: [id], onDelete: Cascade)
   retagQueueItems ReTagQueueItem[]
 
+  @@index([organizationId])
   @@index([venueId])
   @@map("knowledge_items")
 }

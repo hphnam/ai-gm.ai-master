@@ -12,12 +12,16 @@ async function runProbe(): Promise<boolean> {
   const app = await NestFactory.createApplicationContext(IngestModule, { logger: false })
   const ingest = app.get(IngestService)
 
+  const org = await prisma.organization.findUnique({ where: { slug: 'demo' }, select: { id: true } })
+  if (!org) throw new Error('probe-ingest: demo organization not found — run auth seed first')
+
   await prisma.knowledgeItem.deleteMany({ where: { id: PROBE_ID } })
 
   const input = {
     id: PROBE_ID,
     title: 'Friday Night Menu Pairing Notes',
     category: 'menu',
+    organizationId: org.id,
     content: `These are unofficial pairing suggestions for the Friday pub-quiz crowd at The Crown.
 
         When guests order the steak special, recommend the Merlot (house red) — full-bodied, cuts through the fat. Do not recommend the Pinot Grigio with steak.

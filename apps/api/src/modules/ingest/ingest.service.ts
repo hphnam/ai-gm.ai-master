@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
 import { prisma } from '@gm-ai/database'
-import { KnowledgeMetadataSchema, type KnowledgeMetadata } from '@gm-ai/types'
+import { KnowledgeMetadataSchema, UUID_RE, type KnowledgeMetadata } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 
 export type IngestInput = {
@@ -10,6 +10,7 @@ export type IngestInput = {
   title?: string
   content: string
   category?: string
+  organizationId: string
   venueId?: string | null
 }
 
@@ -33,6 +34,9 @@ export class IngestService implements OnModuleInit {
   }
 
   async ingest(input: IngestInput): Promise<IngestResult> {
+    if (!input.organizationId || !UUID_RE.test(input.organizationId)) {
+      throw new Error('ingest: organizationId required and must be a valid UUID')
+    }
     const id = input.id ?? randomUUID()
     const parsed = await this.enrich(input)
 
@@ -59,6 +63,7 @@ export class IngestService implements OnModuleInit {
         where: { id },
         create: {
           id,
+          organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
           metadata: parsed as object,
@@ -66,6 +71,7 @@ export class IngestService implements OnModuleInit {
           embeddingText,
         },
         update: {
+          organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
           metadata: parsed as object,
@@ -164,6 +170,7 @@ ${input.content}`
         where: { id },
         create: {
           id,
+          organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
           metadata: metadata as object,
@@ -171,6 +178,7 @@ ${input.content}`
           embeddingText,
         },
         update: {
+          organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
           metadata: metadata as object,
