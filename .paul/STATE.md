@@ -5,21 +5,22 @@
 See: .paul/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Hospitality staff and managers can get instant, accurate answers about stock, ordering, procedures, equipment, and contacts — like having a knowledgeable GM available 24/7 via chat.
-**Current focus:** v0.2 Multi-Tenant WhatsApp — Phase 2 Document Ingest UI. Plan 02-02 (Manager file upload + extraction + DELETE) UNIFY ✓ — loop closed. Phase 2 at 2 of ~2-3 plans complete; scope items in ROADMAP functionally delivered.
+**Current focus:** v0.2 Multi-Tenant WhatsApp — Phase 2 (Document Ingest UI) complete 2026-04-20 at 2/2 plans. Transitioning to Phase 3 (WhatsApp Integration) — planning.
 
 ## Current Position
 
-Milestone: v0.2 Multi-Tenant WhatsApp (v0.2.0) — 25% (3 of ~13 plans complete; 02-01 planning)
-Phase: 2 of 4 (Document Ingest UI) — Planning. Plan 02-01 created 2026-04-20 11:30.
-Plan: 02-02 (Manager file upload + extraction + DELETE) fully closed — UNIFY ✓. Plan 02-01 fully closed.
+Milestone: v0.2 Multi-Tenant WhatsApp (v0.2.0) — ~38% (5 of ~13 plans complete; 2 of 4 phases complete)
+Phase: 3 of 4 (WhatsApp Integration) — Planning. First Phase 3 plan TBD.
+Plan: None active. Phase 2 closed 2026-04-20 (enterprise-audit-recommended default applied: all ROADMAP Phase 2 scope items functionally delivered; deferred items D1-D5 from 02-02 audit remain logged with triggers).
 Status: Plan 02-01 scopes the schema + service + retrieval changes needed to close the documented cross-org leak on `KnowledgeItem` rows with `venueId = NULL` before Phase 2 feature work (file upload) lands in 02-02. 3 tasks + 1 non-blocking post-deploy note (UAT replaced by probe A36/A37 per audit S2). `autonomous: true`. Files: schema.prisma + new migration + ingest.service + docs.service + retrieval.service + tool-dispatcher + chat.service + suggestions.service + seed.ts + probe-api.ts + @gm-ai/types. Probe assertion target raised 44 → ≥52 (A30 list leak, A31 getById 404, A32 retrieval leak, A33 invalid-orgId contract, A34 seed orphan integrity, A35 tool-schema shape, A36 positive list path, A37 positive retrieval path). Enterprise audit performed 2026-04-20 11:45. Verdict: conditionally acceptable pre-fix → enterprise-ready post-fix. 5 must-have + 7 strongly-recommended upgrades applied; 5 deferred with explicit triggers.
 
 Phase 1 closes at 3/3. Plan 01-03 shipped PhoneModule (NestJS) + /settings/phone UI (Next.js) + 13 new probe-auth assertions (54/54 green total; plan required ≥40). probe-api 44/44 — zero regressions. Twilio driver modes: live/console/disabled (disabled is a getter-based kill-switch). AC-1-9 + AC-12 + AC-13-16 Pass. AC-10 probe-deferred (plan-documented single-process limitation). AC-11 UAT deferred (UI-only human walk). Deviations: (1) mode is getter, not constructor-cached — kill-switch works without redeploy; (2) disabled-check precedes pending-match guard — outage vs abuse distinguishable; (3) SID regex accepts SK prefix (API Keys); (4) code schema accepts [A-Z0-9-]{6,12} to cover both live numeric and console PROBE-{6} formats; (5) maskPhone imported by UI only — controller response intentionally unmasked. Full deviation rationale + decisions in 01-03-SUMMARY.md.
 Last activity: 2026-04-20 10:58 — UNIFY complete. Plan 01-03 SUMMARY written with all 10 AC assessed (AC-9 UAT deferred, AC-7 probe regression run deferred pre-01-02). Enterprise audit performed on Plan 01-01. Verdict: conditionally acceptable pre-fix → enterprise-ready post-fix. 10 must-have upgrades (M1 open-redirect guard via isSafeRedirect helper, M2 atomic sign-up + org creation via databaseHooks.user.create.after replacing client-side organization.create, M3 idempotent migration UPDATE with WHERE organization_id IS NULL, M4 prod-safe seed guard refusing NODE_ENV=production + default password, M5 API_ERROR_CODES append venue-not-found/invalid-redirect/payload-too-large/organization-slug-conflict, M6 withOrgScope type-safe split into withOrgScope for org-direct tables + withOrgScopeVia for join-scoped, M7 HTTP logger redaction contract for /api/auth/* bodies + Cookie/Authorization headers, M8 assertAuthEnv fail-fast startup ban on process.env.X! non-null assertions, M9 8 KB body cap on /api/auth/* NOT exempted, M10 explicit advanced.defaultCookieAttributes with secure=isProd). 17 strongly-recommended (S1 password min=12, S2 bcrypt 72-ceiling, S3 strong demo password default demo-CHANGE-me-before-prod-Xk7t9, S4 generateOrgSlug + OrgSlugSchema + collision retry, S5 probe-api A24 slug prefix probe-api-other-, S6 probe-auth cleanup pre+post, S7 security-headers middleware nosniff+DENY, S9 autocomplete attrs on forms, S10 middleware order comment block + first-log-field-order probe, S13 90-min spike time-box + concrete exit criteria, S14 rollback data-loss SQL header, S15 email-enumeration-safe invalid-credentials contract + probe P10, S16 trustedOrigins via env.webOrigin, S17 probe A29 body-redaction runtime assertion). 7 deferred with triggers: D1 account lockout (public deploy), D2 persistent audit log table (SOC2 Type II), D3 GDPR cascade (first RtBF request), D4 migration rollback CI test (pre-launch), D5 secret rotation (post-POC ops), D6 cross-subdomain cookie (Phase 4), D7 session fixation probe (post-POC). probe-api assertion count raised 36 → ≥42 (A23 unauth, A24 cross-org, A25 authed baseline, A26 staff role denied, A27 8KB cap 413, A28 nosniff+frameguard headers, A29 log body-redaction); probe-auth 0 → ≥11 (P1-P8 plus P9 redirect, P10 email-enum, P11 hook rollback). New files: apps/web/src/lib/safe-redirect.ts + server-session.ts, apps/api/src/modules/auth/assert-auth-env.ts + generate-org-slug.ts, apps/api/src/common/security-headers.middleware.ts. Total files_modified grew from 41 → 46.
 
 Progress:
-- v0.2 Multi-Tenant WhatsApp: [██░░░░░░░░] 25% (3/~12 plans; 1/4 phases complete)
+- v0.2 Multi-Tenant WhatsApp: [███░░░░░░░] ~38% (5/~13 plans; 2/4 phases complete)
 - Phase 1 (Auth + Organizations): [██████████] 100% ✓ (3/3 plans complete)
+- Phase 2 (Document Ingest UI): [██████████] 100% ✓ (2/2 plans complete)
 - v0.1 POC: [██████████] 100% ✓ (archived in .paul/milestones/0.1.0-ROADMAP.md, tag v0.1.0)
 
 ## Loop Position
@@ -27,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Plan 02-02 fully closed — loop complete; ready for next scope decision]
+  ○        ○        ○     [Phase 3 Plan 01 pending /paul:plan]
 ```
 
 ## Accumulated Context
@@ -104,15 +105,21 @@ PLAN ──▶ APPLY ──▶ UNIFY
 
 ## Session Continuity
 
-Last session: 2026-04-20 12:32
-Stopped at: Plan 02-02 fully closed (PLAN ✓ + AUDIT ✓ + APPLY ✓ + UNIFY ✓). SUMMARY at .paul/phases/02-document-ingest/02-02-SUMMARY.md. 5 commits: `8e2782e plan`, `de08845 audit`, `4c426da Task 1`, `63fe1b8 Task 2`, `ac7aceb Task 3`. probe-api 61/61 + probe-auth 54/54 green. Manager self-serve document surface end-to-end (upload + list + get + delete) complete. SOC-2 CC6.6 audit trail symmetric on read + write + delete paths (docs.uploaded + docs.cross_org_denied with op discriminator).
+Last session: 2026-04-20 14:43
+Stopped at: Phase 2 (Document Ingest UI) closed at 2/2 plans via enterprise-audit-recommended default (option a). ROADMAP Phase 2 → Complete 2026-04-20; paul.json phase advanced to 3/WhatsApp Integration/planning. Unattended PAUL runner applied the scope decision documented in prior session — no 02-03 plan; deferred items D1-D5 from 02-02 audit remain logged with triggers; Phase 2 ROADMAP reuse-note (05-03 debug-panel JSON viewer for doc metadata) left as post-POC item, not gated for Phase 3.
 
-Plan 02-01 fully closed prior in this session (6 commits: `ede6ee9 plan`, `a5e728f audit`, `9eea65c Task 1`, `1c175ec Task 2`, `13bfe74 Task 3`, `e511727 UNIFY`). probe-api 52/52 → 61/61 + probe-auth 54/54 green. SOC-2 CC6.6 cross-org leak on global KnowledgeItem rows closed.
+Phase 1 exit-gate items still carried forward (UI-only UATs and pre-Phase-4 go-live blockers): AC-11 /settings/phone walk (01-03); AC-10 cross-org isolation walk (01-01); AC-10 invitation flow walk (01-02); D-01-02-F real email-verification flow; D-01-03-F strip TWILIO_DRIVER_OVERRIDE=console default. None block Phase 3 planning or APPLY.
 
-Phase 2 progress: 2 of ~2-3 plans complete. ROADMAP Phase 2 scope items all functionally delivered (POST multipart upload, multi-format extraction, organizationId scoping, Next.js /docs list/upload/metadata/delete, manager-only role gate). Only "reuse 05-03 debug-panel JSON viewer pattern" remains ambiguous — a reuse note rather than a mandatory deliverable. v0.2.0 milestone ~38% (5 of ~13 plans, rough est.).
+Next action: /paul:plan for Phase 3 Plan 01 (first WhatsApp Integration plan). ROADMAP Phase 3 scope: WhatsAppAdapter over Twilio REST, POST /webhooks/twilio/whatsapp with HMAC-SHA1 signature validation, phone From-lookup via user.findFirst (pattern established in 01-03), unknown-number rate-limited onboarding reply, typing indicator + read receipt refire, inbound text → ChatService.sendMessage, inbound image → Claude multimodal, audio → friendly rejection, outbound via Twilio messages, proactive-suggestions opening message inside 24h session, probe-whatsapp.ts against Twilio sandbox, structured logs (whatsapp.inbound/outbound/typing_indicator_refired) with phone hashed. First plan likely scopes webhook + signature validation + phone lookup + basic inbound text route; image/proactive/adapter split across subsequent plans.
+Resume file: .paul/phases/02-document-ingest/02-02-SUMMARY.md (Phase 2 closure point)
 
-Next action: Decide Phase 2 closure vs. 02-03 scope. Three options: (a) close Phase 2 at 2/2 plans and transition to Phase 3 (WhatsApp Integration) — plan output explicitly authorised this with "phase may close at 02-02"; (b) scope a 02-03 plan for remaining ROADMAP items (debug-panel reuse for docs, bulk upload, per-doc edit, history) if the product needs them pre-launch; (c) punt deferred items to a backlog phase. Enterprise-audit-recommended default: (a) close Phase 2 and transition — all listed ROADMAP scope items are delivered; deferred items (D1-D5 from 02-02 audit) remain logged with triggers. Transition requires: update PROJECT.md (requirements shipped), mark Phase 2 complete in ROADMAP.md, commit feat(phase-2) capstone. This is a scope decision outside a single plan — recommend human decision at next session start.
-Resume file: .paul/phases/02-document-ingest/02-02-SUMMARY.md
+---
+
+### Prior session notes (Plan 02-02 UNIFY + Phase 2 closure — 2026-04-20 12:32)
+
+Plan 02-02 fully closed (PLAN ✓ + AUDIT ✓ + APPLY ✓ + UNIFY ✓). SUMMARY at .paul/phases/02-document-ingest/02-02-SUMMARY.md. 5 commits: `8e2782e plan`, `de08845 audit`, `4c426da Task 1`, `63fe1b8 Task 2`, `ac7aceb Task 3`, `c71154f UNIFY`. probe-api 61/61 + probe-auth 54/54 green. Manager self-serve document surface end-to-end (upload + list + get + delete) complete. SOC-2 CC6.6 audit trail symmetric on read + write + delete paths (docs.uploaded + docs.cross_org_denied with op discriminator).
+
+Plan 02-01 fully closed prior (6 commits: `ede6ee9 plan`, `a5e728f audit`, `9eea65c Task 1`, `1c175ec Task 2`, `13bfe74 Task 3`, `e511727 UNIFY`). probe-api 52/52 → 61/61 + probe-auth 54/54 green. SOC-2 CC6.6 cross-org leak on global KnowledgeItem rows closed.
 
 ---
 
