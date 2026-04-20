@@ -10,7 +10,8 @@
     "probe:embeddings": "tsx scripts/probe-embeddings.ts",
     "probe:ingest": "nest build && node dist/src/scripts/probe-ingest.js",
     "probe:api": "nest build && node dist/src/scripts/probe-api.js",
-    "probe:auth": "nest build && node dist/src/scripts/probe-auth.js"
+    "probe:auth": "nest build && node dist/src/scripts/probe-auth.js",
+    "probe:whatsapp": "nest build && node dist/src/scripts/probe-whatsapp.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",
