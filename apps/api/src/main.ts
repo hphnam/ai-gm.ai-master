@@ -1,7 +1,7 @@
 import './load-env'
 
 import { NestFactory } from '@nestjs/core'
-import { json } from 'express'
+import { json, urlencoded } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
@@ -49,9 +49,13 @@ async function bootstrap() {
   app.use('/auth/phone', json({ limit: '2kb' }))
   // 02-02 audit-added M5/S4: path-filtered 32 KB json parser; /docs/upload must reach multer
   // with its multipart body intact. Hoisted jsonDefault avoids per-request middleware construction.
+  // 03-01: Twilio posts application/x-www-form-urlencoded; json parser would leave req.body empty
+  // and break signature validation. Webhook path uses urlencoded parser instead.
   const jsonDefault = json({ limit: '32kb' })
+  const webhookUrlencoded = urlencoded({ limit: '32kb', extended: false })
   app.use((req, res, next) => {
     if (req.path === '/docs/upload') return next()
+    if (req.path === '/webhooks/twilio/whatsapp') return webhookUrlencoded(req, res, next)
     return jsonDefault(req, res, next)
   })
 
