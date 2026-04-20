@@ -969,14 +969,19 @@ async function main(): Promise<void> {
       return cb(null, false)
     },
     credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['content-type', 'x-request-id'],
   })
   app.use(requestIdMiddleware)
   app.use(securityHeadersMiddleware)
   app.use(httpLoggerMiddleware)
   app.use('/api/auth', json({ limit: '8kb' }))
-  app.use(json({ limit: '32kb' }))
+  // 02-02 audit-added M5: mirror main.ts path-filtered json body parser — /docs/upload bypasses json()
+  const jsonDefault = json({ limit: '32kb' })
+  app.use((req, res, next) => {
+    if (req.path === '/docs/upload') return next()
+    return jsonDefault(req, res, next)
+  })
   app.enableShutdownHooks()
 
   await app.listen(PORT)

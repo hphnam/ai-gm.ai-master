@@ -160,4 +160,27 @@ export class DocsService {
       failSoft: tags.length === 0 && result.aiSummary === null,
     }
   }
+
+  async remove(id: string, orgId: string): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id },
+      select: { id: true, organizationId: true },
+    })
+    if (!row) {
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    if (row.organizationId !== orgId) {
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'docs.cross_org_denied',
+          op: 'delete',
+          targetRowId: id,
+          actingOrgId: orgId,
+        }),
+      )
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    await prisma.knowledgeItem.delete({ where: { id } })
+  }
 }

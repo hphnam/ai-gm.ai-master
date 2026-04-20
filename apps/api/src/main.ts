@@ -29,7 +29,7 @@ async function bootstrap() {
       return cb(null, false)
     },
     credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['content-type', 'x-request-id'],
   })
 
@@ -47,7 +47,13 @@ async function bootstrap() {
   app.use('/api/auth', json({ limit: '8kb' }))
   // 01-03 audit-added S10: phoneNumber + 6-digit code fits in <100 bytes; 2 KB cap blunts payload abuse.
   app.use('/auth/phone', json({ limit: '2kb' }))
-  app.use(json({ limit: '32kb' }))
+  // 02-02 audit-added M5/S4: path-filtered 32 KB json parser; /docs/upload must reach multer
+  // with its multipart body intact. Hoisted jsonDefault avoids per-request middleware construction.
+  const jsonDefault = json({ limit: '32kb' })
+  app.use((req, res, next) => {
+    if (req.path === '/docs/upload') return next()
+    return jsonDefault(req, res, next)
+  })
 
   app.enableShutdownHooks()
 

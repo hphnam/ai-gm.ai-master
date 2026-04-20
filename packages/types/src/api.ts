@@ -38,6 +38,10 @@ export const API_ERROR_CODES = [
   'phone-verification-failed',
   'phone-rate-limited',
   'phone-service-unavailable',
+  // v0.2 Phase 2 — Document upload (Plan 02-02; append-only)
+  'file-too-large',
+  'unsupported-file-type',
+  'extraction-failed',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }
