@@ -129,7 +129,9 @@ while (( iter < MAX_ITERATIONS )); do
   log="$LOG_DIR/iter-$ts.log"
   echo "[run-paul] iteration $iter/$MAX_ITERATIONS — logging to $log"
 
-  if ! claude --dangerously-skip-permissions -p "$PROMPT" 2>&1 | tee "$log"; then
+  # --verbose streams tool calls + messages to stdout in real time so you
+  # can tail -f the log. Without it, -p buffers everything until completion.
+  if ! claude --dangerously-skip-permissions --verbose -p "$PROMPT" 2>&1 | tee "$log"; then
     notify "PAUL runner crashed" "iteration $iter exited non-zero — see $log"
     echo "[run-paul] iteration $iter exited non-zero — stopping"
     exit 1
