@@ -24,6 +24,7 @@
     "mammoth": "latest",
     "multer": "latest",
     "nest-commander": "latest",
+    "officeparser": "latest",
     "reflect-metadata": "latest",
     "rxjs": "latest",
     "unpdf": "latest",

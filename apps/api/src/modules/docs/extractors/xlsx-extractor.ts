@@ -4,21 +4,12 @@
 
 import ExcelJS from 'exceljs'
 import { ExtractError, MAX_EXTRACT_CHARS } from '../doc-extract'
+import { isZipHeader } from './zip-header'
 
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 // audit-M1 boundary: NO raw cell text / sheet content in logger payloads.
-// Magic-byte check: XLSX is OOXML/ZIP — first 4 bytes are PK\x03\x04 (ZIP local file header).
-// Source: https://en.wikipedia.org/wiki/ZIP_(file_format)#Local_file_header · verified 2026-04-21
-function isZipHeader(buffer: Buffer): boolean {
-  return (
-    buffer.length >= 4 &&
-    buffer[0] === 0x50 &&
-    buffer[1] === 0x4b &&
-    buffer[2] === 0x03 &&
-    buffer[3] === 0x04
-  )
-}
+// Magic-byte check via shared isZipHeader (Plan 04-01 Task 2 — factored for pptx reuse).
 
 export async function extractXlsx(buffer: Buffer): Promise<string> {
   if (!isZipHeader(buffer)) {

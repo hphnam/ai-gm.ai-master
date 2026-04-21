@@ -79,7 +79,7 @@ export function DocForm({ onSaved }: { onSaved?: () => void }) {
 
 // Plan 04-01: binary extensions handled via server-side extraction through POST /docs/upload.
 // Text formats (.md, .txt) are still client-side text() read into the textarea.
-const BINARY_UPLOAD_EXTS = /\.(pdf|docx|xlsx|csv)$/i
+const BINARY_UPLOAD_EXTS = /\.(pdf|docx|xlsx|csv|pptx)$/i
 
 function FullDocForm({ onSaved }: { onSaved?: () => void }) {
   const { data: venues } = useVenues()
@@ -233,14 +233,14 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
           <label className="text-sm text-muted-foreground cursor-pointer hover:text-foreground">
             <input
               type="file"
-              accept=".md,.txt,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+              accept=".md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/vnd.openxmlformats-officedocument.presentationml.presentation"
               className="hidden"
               onChange={handleFileChange}
               disabled={submitting || reading || uploadDoc.isPending}
             />
             {reading || uploadDoc.isPending
               ? 'Uploading…'
-              : 'Upload .md, .txt, .pdf, .docx, .xlsx, or .csv'}
+              : 'Upload .md, .txt, .pdf, .docx, .xlsx, .csv, or .pptx'}
           </label>
           <div className="ml-auto">
             <Button type="submit" disabled={submitting}>
