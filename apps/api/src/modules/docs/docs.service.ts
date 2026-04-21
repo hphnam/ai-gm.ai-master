@@ -1,12 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
-import type {
-  CreateDocRequest,
-  CreateDocResponse,
-  DocDetail,
-  DocListItem,
+import { Prisma, prisma } from '@gm-ai/database'
+import {
+  ProposedDocTypeSchema,
+  type CreateDocRequest,
+  type CreateDocResponse,
+  type DocDetail,
+  type DocListItem,
+  type DocumentTypeDto,
+  type ProposedDocType,
 } from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
+import { ClassifierService } from './classifier.service'
 
 function contentPreview(raw: string, len = 160): string {
   const cleaned = raw.replace(/\s+/g, ' ').trim()
@@ -31,11 +35,47 @@ export class DocNotFoundOrCrossOrgError extends Error {
   }
 }
 
+// Plan 04-02 Task 3 — accept/reject endpoint error classes.
+export class TypeProposalMissingError extends Error {
+  constructor() {
+    super('type-proposal-missing')
+    this.name = 'TypeProposalMissingError'
+  }
+}
+export class TypeNameConflictError extends Error {
+  constructor() {
+    super('type-name-conflict')
+    this.name = 'TypeNameConflictError'
+  }
+}
+
+// Plan 04-02 Task 2 — helper: hydrate DocumentType + pendingTypeProposal onto API responses.
+function toDocumentTypeDto(
+  dt: { id: string; name: string; description: string | null; schema: unknown } | null,
+): DocumentTypeDto | null {
+  if (!dt) return null
+  return {
+    id: dt.id,
+    name: dt.name,
+    description: dt.description,
+    schema: (dt.schema ?? {}) as Record<string, unknown>,
+  }
+}
+
+function toPendingProposal(raw: unknown): ProposedDocType | null {
+  if (!raw || typeof raw !== 'object') return null
+  const parsed = ProposedDocTypeSchema.safeParse(raw)
+  return parsed.success ? parsed.data : null
+}
+
 @Injectable()
 export class DocsService {
   private readonly logger = new Logger(DocsService.name)
 
-  constructor(private readonly ingestService: IngestService) {}
+  constructor(
+    private readonly ingestService: IngestService,
+    private readonly classifier: ClassifierService,
+  ) {}
 
   async list(orgId: string): Promise<DocListItem[]> {
     // Plan 02-01: direct organizationId scope. KnowledgeItem.organizationId
@@ -53,6 +93,11 @@ export class DocsService {
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
+        // Plan 04-02 Task 2 — include confirmed DocumentType + pending proposal.
+        documentType: {
+          select: { id: true, name: true, description: true, schema: true },
+        },
+        pendingTypeProposal: true,
       },
       take: 200,
     })
@@ -73,6 +118,8 @@ export class DocsService {
         summary: r.aiSummary,
         tags,
         docType,
+        documentType: toDocumentTypeDto(r.documentType),
+        pendingTypeProposal: toPendingProposal(r.pendingTypeProposal),
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
       }
@@ -92,6 +139,10 @@ export class DocsService {
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
+        documentType: {
+          select: { id: true, name: true, description: true, schema: true },
+        },
+        pendingTypeProposal: true,
       },
     })
     if (!row) return null
@@ -123,6 +174,8 @@ export class DocsService {
       summary: row.aiSummary,
       tags,
       docType,
+      documentType: toDocumentTypeDto(row.documentType),
+      pendingTypeProposal: toPendingProposal(row.pendingTypeProposal),
       metadata,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
@@ -133,7 +186,8 @@ export class DocsService {
     input: CreateDocRequest & { sourceImageBytes?: Buffer | null; sourceImageMime?: string | null },
     orgId: string,
   ): Promise<CreateDocResponse> {
-    // If a venueId was supplied, it MUST belong to the user's active org.
+    // If a venueId was supplied, it MUST belong to the user's active org. Run BEFORE
+    // the classifier call so a bogus venueId doesn't burn Claude cost.
     if (input.venueId) {
       const venue = await prisma.venue.findFirst({
         where: { id: input.venueId, organizationId: orgId },
@@ -142,14 +196,28 @@ export class DocsService {
       if (!venue) throw new DocNotFoundOrCrossOrgError()
     }
 
+    // Plan 04-02 Task 2 — per-tenant classifier pass. Fail-soft to { kind: 'none' } on any
+    // error (logged internally); upload still succeeds with the row landing unclassified.
+    const classified = await this.classifier.classify({
+      content: input.content,
+      title: input.title,
+      orgId,
+    })
+    const documentTypeId = classified.kind === 'matched' ? classified.typeId : null
+    const pendingTypeProposal =
+      classified.kind === 'proposal'
+        ? (classified.proposal as unknown as Record<string, unknown>)
+        : null
+
     const result = await this.ingestService.ingest({
       title: input.title,
       content: input.content,
       organizationId: orgId,
       venueId: input.venueId,
-      // Plan 04-01 Task 3 — image-via-Claude-vision source persistence passes through.
       sourceImageBytes: input.sourceImageBytes ?? null,
       sourceImageMime: input.sourceImageMime ?? null,
+      documentTypeId,
+      pendingTypeProposal,
     })
 
     const tags = Array.isArray(result.metadata.tags)
@@ -158,13 +226,136 @@ export class DocsService {
     const docType =
       typeof result.metadata.docType === 'string' ? result.metadata.docType : null
 
+    // Hydrate DocumentType row for the response (matched path only — proposal path
+    // returns the proposal itself, not a confirmed DocumentType).
+    let matchedType: DocumentTypeDto | null = null
+    if (classified.kind === 'matched') {
+      const row = await prisma.documentType.findUnique({
+        where: { id: classified.typeId },
+        select: { id: true, name: true, description: true, schema: true },
+      })
+      matchedType = toDocumentTypeDto(row)
+    }
+
     return {
       id: result.id,
       summary: result.aiSummary,
       tags,
       docType,
       failSoft: tags.length === 0 && result.aiSummary === null,
+      documentType: matchedType,
+      pendingTypeProposal: classified.kind === 'proposal' ? classified.proposal : null,
     }
+  }
+
+  // Plan 04-02 Task 3 — owner accepts a pending proposal → promote to DocumentType + link.
+  async acceptProposedType(
+    knowledgeItemId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<DocumentTypeDto> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: knowledgeItemId },
+      select: { id: true, organizationId: true, pendingTypeProposal: true },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'accept-type',
+            targetRowId: knowledgeItemId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+
+    const proposal = toPendingProposal(row.pendingTypeProposal)
+    if (!proposal) throw new TypeProposalMissingError()
+
+    try {
+      const created = await prisma.$transaction(async (tx) => {
+        const newType = await tx.documentType.create({
+          data: {
+            organizationId: orgId,
+            name: proposal.name,
+            description: proposal.description,
+            schema: (proposal.schema ?? {}) as object,
+            confirmedByUserId: userId,
+          },
+          select: { id: true, name: true, description: true, schema: true },
+        })
+        await tx.knowledgeItem.update({
+          where: { id: knowledgeItemId },
+          data: { documentTypeId: newType.id, pendingTypeProposal: Prisma.JsonNull },
+        })
+        return newType
+      })
+
+      // Log name only (not schema body — may carry content-derived field names).
+      this.logger.log(
+        JSON.stringify({
+          level: 'log',
+          event: 'docs.type_accepted',
+          orgId,
+          actingUserId: userId,
+          knowledgeItemId,
+          documentTypeId: created.id,
+          name: created.name,
+        }),
+      )
+      return toDocumentTypeDto(created) as DocumentTypeDto
+    } catch (err) {
+      // Prisma P2002 on @@unique([organizationId, name]).
+      if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'P2002') {
+        throw new TypeNameConflictError()
+      }
+      throw err
+    }
+  }
+
+  // Plan 04-02 Task 3 — owner rejects a pending proposal → clear proposal, leave unclassified.
+  async rejectProposedType(
+    knowledgeItemId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: knowledgeItemId },
+      select: { id: true, organizationId: true, pendingTypeProposal: true },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'reject-type',
+            targetRowId: knowledgeItemId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    if (!row.pendingTypeProposal) throw new TypeProposalMissingError()
+
+    await prisma.knowledgeItem.update({
+      where: { id: knowledgeItemId },
+      data: { pendingTypeProposal: Prisma.JsonNull },
+    })
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.type_rejected',
+        orgId,
+        actingUserId: userId,
+        knowledgeItemId,
+      }),
+    )
   }
 
   async remove(id: string, orgId: string): Promise<void> {

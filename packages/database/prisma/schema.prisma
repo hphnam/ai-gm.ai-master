@@ -113,6 +113,7 @@ model Organization {
   invitations    Invitation[]
   venues         Venue[]
   knowledgeItems KnowledgeItem[]
+  documentTypes  DocumentType[]
 
   @@index([slug])
   @@map("organizations")
@@ -258,16 +259,44 @@ model KnowledgeItem {
   // Object-storage migration deferred as D-04-01-F with concrete trigger in SUMMARY.
   sourceImageBytes Bytes?
   sourceImageMime  String?
+  // Plan 04-02 Task 2 — per-tenant classifier output (D-04-02 taxonomy layer).
+  // documentTypeId   NULL → unclassified OR rejected proposal (owner left it open)
+  //                  non-null → owner-confirmed type assignment
+  // pendingTypeProposal — classifier's new-type proposal awaiting owner action.
+  //   shape: { name, description, schema, confidence }
+  documentTypeId      String?
+  pendingTypeProposal Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   venue           Venue?           @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  documentType    DocumentType?    @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
   retagQueueItems ReTagQueueItem[]
 
   @@index([organizationId])
   @@index([venueId])
+  @@index([documentTypeId])
   @@map("knowledge_items")
+}
+
+model DocumentType {
+  id                String    @id @default(uuid())
+  organizationId    String
+  name              String
+  description       String?
+  schema            Json      @default("{}")
+  confirmedAt       DateTime  @default(now())
+  confirmedByUserId String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  knowledgeItems KnowledgeItem[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("document_types")
 }
 
 model VenueContact {

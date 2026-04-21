@@ -8,6 +8,31 @@ export const CreateDocRequestSchema = z.object({
 })
 export type CreateDocRequest = z.infer<typeof CreateDocRequestSchema>
 
+// Plan 04-02 Task 2 — per-tenant classifier output shape (owner-confirmable).
+// `.passthrough()` on schema preserves emergent per-doc-type keys the classifier proposes
+// (same agentic pattern as KnowledgeMetadataSchema — PROJECT.md Key Decision 2026-04-18).
+export const ProposedDocTypeSchema = z
+  .object({
+    name: z.string().trim().min(1).max(80),
+    description: z.string().trim().max(400).nullable(),
+    schema: z.record(z.string(), z.unknown()).default({}),
+    confidence: z.number().min(0).max(1),
+  })
+  .passthrough()
+export type ProposedDocType = z.infer<typeof ProposedDocTypeSchema>
+
+export type DocumentTypeDto = {
+  id: string
+  name: string
+  description: string | null
+  schema: Record<string, unknown>
+}
+
+// Accept/reject endpoints take no body — server reads the pending proposal from DB.
+export const AcceptTypeRequestSchema = z.object({}).passthrough()
+export type AcceptTypeRequest = z.infer<typeof AcceptTypeRequestSchema>
+export type AcceptTypeResponse = DocumentTypeDto
+
 export type DocListItem = {
   id: string
   title: string | null
@@ -17,6 +42,8 @@ export type DocListItem = {
   summary: string | null
   tags: string[]
   docType: string | null
+  documentType: DocumentTypeDto | null
+  pendingTypeProposal: ProposedDocType | null
   createdAt: string
   updatedAt: string
 }
@@ -27,6 +54,8 @@ export type CreateDocResponse = {
   tags: string[]
   docType: string | null
   failSoft: boolean
+  documentType: DocumentTypeDto | null
+  pendingTypeProposal: ProposedDocType | null
 }
 
 export type DocDetail = {
@@ -38,6 +67,8 @@ export type DocDetail = {
   summary: string | null
   tags: string[]
   docType: string | null
+  documentType: DocumentTypeDto | null
+  pendingTypeProposal: ProposedDocType | null
   metadata: Record<string, unknown>
   createdAt: string
   updatedAt: string

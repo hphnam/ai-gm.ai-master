@@ -1,9 +1,15 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
-import { prisma } from '@gm-ai/database'
+import { Prisma, prisma } from '@gm-ai/database'
 import { KnowledgeMetadataSchema, UUID_RE, type KnowledgeMetadata } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
+
+// Plan 04-02 Task 2 — Prisma 7 Json columns reject raw `null`; must use Prisma.JsonNull
+// sentinel for explicit-null writes. Helper keeps upsert sites readable.
+function proposalToJsonInput(p: Record<string, unknown> | null | undefined): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+  return p ? (p as Prisma.InputJsonValue) : Prisma.JsonNull
+}
 
 export type IngestInput = {
   id?: string
@@ -13,10 +19,13 @@ export type IngestInput = {
   organizationId: string
   venueId?: string | null
   // Plan 04-01 Task 3 — image-via-Claude-vision source persistence (audit-S3 Option A).
-  // Text extracted from the image goes to `content`; raw bytes + declared mime are stored
-  // on KnowledgeItem for future Plan 04-02 re-classification.
   sourceImageBytes?: Buffer | null
   sourceImageMime?: string | null
+  // Plan 04-02 Task 2 — per-tenant classifier output persistence.
+  // documentTypeId non-null → matched an existing confirmed type (auto-classified).
+  // pendingTypeProposal non-null → classifier proposed a new type; owner confirms in UI.
+  documentTypeId?: string | null
+  pendingTypeProposal?: Record<string, unknown> | null
 }
 
 export type IngestResult = {
@@ -80,6 +89,8 @@ export class IngestService implements OnModuleInit {
             ? new Uint8Array(input.sourceImageBytes)
             : null,
           sourceImageMime: input.sourceImageMime ?? null,
+          documentTypeId: input.documentTypeId ?? null,
+          pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
         },
         update: {
           organizationId: input.organizationId,
@@ -94,6 +105,8 @@ export class IngestService implements OnModuleInit {
             ? new Uint8Array(input.sourceImageBytes)
             : null,
           sourceImageMime: input.sourceImageMime ?? null,
+          documentTypeId: input.documentTypeId ?? null,
+          pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
         },
       })
       await tx.$executeRawUnsafe(
@@ -199,6 +212,8 @@ ${input.content}`
             ? new Uint8Array(input.sourceImageBytes)
             : null,
           sourceImageMime: input.sourceImageMime ?? null,
+          documentTypeId: input.documentTypeId ?? null,
+          pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
         },
         update: {
           organizationId: input.organizationId,
@@ -213,6 +228,8 @@ ${input.content}`
             ? new Uint8Array(input.sourceImageBytes)
             : null,
           sourceImageMime: input.sourceImageMime ?? null,
+          documentTypeId: input.documentTypeId ?? null,
+          pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
         },
       })
       await tx.$executeRawUnsafe(
