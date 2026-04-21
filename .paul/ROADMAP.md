@@ -9,7 +9,7 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 **v0.2 Multi-Tenant WhatsApp** (v0.2.0)
 Status: 🚧 In Progress (3 of 4 phases complete; Phase 4 pivoted 2026-04-21 to Dynamic Document Intelligence)
 Phases: 4
-Estimated plans: 14-18 (Phase 3 grew +2 for Infobip migration; Phase 4 plan count TBD via /paul:discuss)
+Estimated plans: 15 (Phase 3: 5 shipped / 3 superseded; Phase 4: 5 finalized during /paul:plan 04-01)
 
 **Theme:** "Managers sign up, invite their team, upload their venue docs, connect their WhatsApp number, and staff chat with the GM assistant from their phones — with the assistant understanding what KIND of document each upload is (reference vs procedural) and executing procedural docs as stateful checklists."
 
@@ -20,7 +20,7 @@ Estimated plans: 14-18 (Phase 3 grew +2 for Infobip migration; Phase 4 plan coun
 | 1 | Auth + Organizations | 3 of 3 (01-01 ✓, 01-02 ✓, 01-03 ✓) | Complete | 2026-04-20 |
 | 2 | Document Ingest UI | 2 of 2 (02-01 ✓, 02-02 ✓) | Complete | 2026-04-20 |
 | 3 | WhatsApp Integration | 3 superseded (Twilio: 03-01 ⊘, 03-02 ⊘, 03-03 ⊘) + 03-04 ✓ (Infobip WhatsApp) + 03-05 ✓ (Infobip 2FA SMS OTP) | Complete | 2026-04-21 |
-| 4 | Dynamic Document Intelligence | TBD (3-4 est; /paul:discuss pending) | ⏸ Not started | - |
+| 4 | Dynamic Document Intelligence | 5 plans (04-01 in PLAN; 04-02 taxonomy / 04-03 procedural model / 04-04 scheduler+notifications / 04-05 WhatsApp runtime) | 🚧 In Progress | - |
 
 ### Phase 1: Auth + Organizations
 
@@ -86,7 +86,12 @@ Estimated plans: 14-18 (Phase 3 grew +2 for Infobip migration; Phase 4 plan coun
 - Runtime routing: reference docs → existing RAG path (unchanged); procedural docs → Checklist/Procedure entities with persisted completion state that the assistant can query, present, and tick off interactively.
 - Optional cross-tenant priors (new-tenant cold-start): seed a new org's classifier with anonymized shapes of doc types seen across existing orgs. Privacy-gated; behind a feature flag.
 
-**Plans:** TBD (defined during /paul:discuss — estimated 3-4 plans covering classifier + storage + owner UI + runtime routing)
+**Plans (5, finalized 2026-04-21 during /paul:plan 04-01 scope-split):**
+- `04-01` — Broadened extraction layer (XLSX/CSV/PPTX/image-via-Claude-vision; 3 tasks; standard track; IN PLAN)
+- `04-02` — Classifier + per-tenant taxonomy + owner confirmation UI
+- `04-03` — Procedural doc model (Checklist entity) + schedule extraction
+- `04-04` — Scheduler + WhatsApp notifications
+- `04-05` — WhatsApp runtime for procedural docs (walkthrough + ad-hoc + completion tracking)
 
 **Deployment:** Out of roadmap scope — user self-managing production deploy, Infobip Portal UAT, domain/HTTPS/DB migrations.
 

@@ -94,29 +94,35 @@ Concrete headline use case from user: *"Remind all staff of the weekly checklist
 | Storage shape | Single flexible Prisma model (JSON per-tenant schemas) or per-tenant tables? | **Open — resolve in plan 04-01** |
 | XLSX multi-sheet handling | Each sheet = separate doc, or one doc with multiple tab sections? | **Open — resolve in plan 04-01** |
 
-## Proposed plan breakdown (4 plans)
+## Proposed plan breakdown (5 plans — split revised 2026-04-21 during /paul:plan 04-01)
 
-1. **04-01 — Classifier + taxonomy + extraction** (ingest-time brain)
-   - Broadened extraction layer (XLSX / CSV / PPTX / image-via-vision)
-   - Per-tenant taxonomy model in Prisma
-   - Classifier pass on upload (LLM tag + confidence + escape hatch)
-   - Pending → clustering → promoted lifecycle
-   - Schema widening (additive registry semantics)
+1. **04-01 — Broadened extraction layer** (this plan — standard track, 3 tasks)
+   - XLSX / XLS-drop / CSV / PPTX / image-via-Claude-vision wired into existing `/docs` upload pipeline
+   - Per-MIME size cap map + magic-byte validation reusing Phase 3 Plan 03-03 primitives
+   - Immediate value: beerhall xlsx canaries ingest end-to-end before classifier lands
+   - NO classifier logic; NO taxonomy schema; NO procedural model — this is pure extraction foundation
 
-2. **04-02 — Procedural doc model + owner UI**
-   - Checklist / Procedure entity schema
-   - Schedule extraction from classified docs
-   - Owner confirmation UI: inline upload modal + dedicated taxonomy inbox page
+2. **04-02 — Classifier + per-tenant taxonomy + owner UI**
+   - Classifier pass on every upload (Claude) — LLM tag + confidence + escape hatch
+   - Per-tenant `DocumentType` + `DocumentTypeSchema` Prisma models
+   - Pending → embedding-cluster → promote lifecycle
+   - Additive-only schema widening (registry semantics)
+   - Owner confirmation UI: inline upload modal (high-confidence) + taxonomy-inbox settings page (ambiguous)
 
-3. **04-03 — Scheduler + notifications**
-   - Cron-ish firing layer
-   - Audience resolution (all-staff / role-scoped)
-   - WhatsApp outbound via Infobip adapter
+3. **04-03 — Procedural doc model + schedule extraction**
+   - `Checklist` / `Procedure` entity schema with schedule dimension
+   - Schedule extraction pass (LLM-parses "every Monday morning" → structured cron-equivalent)
+   - Completion state model (per-instance + per-staff-member, with auto-reset driven by schedule)
+
+4. **04-04 — Scheduler + WhatsApp notifications**
+   - Cron-ish firing layer driven by extracted schedules
+   - Audience resolution via OrganizationMember (all-staff / role-scoped / specific users)
+   - WhatsApp outbound via existing Infobip adapter (Plan 03-04)
    - Delivery + ack tracking
-   - Dedup / rate-limit
+   - Dedup + rate-limit
 
-4. **04-04 — WhatsApp runtime for procedural docs**
-   - Interactive walkthrough state machine (current-step persistence)
+5. **04-05 — WhatsApp runtime for procedural docs**
+   - Interactive walkthrough state machine (current-step persistence per conversation)
    - Ad-hoc completion queries ("has closing been done?")
    - Completion tracking persistence
    - Manager "who did what" queries via existing chat surface
