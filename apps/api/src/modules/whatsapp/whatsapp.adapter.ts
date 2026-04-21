@@ -3,10 +3,14 @@ import { Injectable, Logger } from '@nestjs/common'
 import type { WhatsAppOutboundResult } from '@gm-ai/types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
 
+// 03-04 Infobip WhatsApp adapter (replaces Twilio WhatsApp adapter from 03-01).
+// Source: Infobip WhatsApp API community patterns · UAT-VERIFY: outbound response shape
+// + error status codes confirmed on first live Portal send.
 type DriverMode = 'live' | 'console' | 'disabled'
 
-const TWILIO_API_TIMEOUT_MS = 10_000
-const TO_RE = /^whatsapp:\+[0-9]{6,20}$/
+const INFOBIP_API_TIMEOUT_MS = 10_000
+// Bare E.164 — Infobip delivers + expects digits only (no `whatsapp:` or `+` prefix).
+const TO_RE = /^[0-9]{6,20}$/
 
 function sha256Prefix(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
@@ -15,97 +19,61 @@ function sha256Prefix(s: string): string {
 @Injectable()
 export class WhatsAppAdapter {
   private readonly logger = new Logger(WhatsAppAdapter.name)
-  // baseMode captured at boot; 'disabled' is read per-call from env so the
-  // kill-switch takes effect without redeploy (mirrors 01-03 TwilioVerifyService).
+  // baseMode captured at boot; 'disabled' is read per-call from env so the kill-switch
+  // takes effect without redeploy (mirrors the Phase 1 phone-verify pattern).
   private readonly baseMode: 'live' | 'console'
   private readonly liveCreds?: {
-    accountSid: string
-    authToken: string
-    fromNumber: string
+    baseUrl: string
+    apiKey: string
+    sender: string
   }
 
   constructor() {
     const env = assertAuthEnv()
-    const override = env.whatsapp?.driverOverride
-    // Console override OR missing whatsapp/twilio block → console mode.
-    if (override === 'console' || !env.whatsapp || !env.twilio) {
+    const override = env.infobip?.driverOverride
+    // Console override OR missing infobip block → console mode.
+    if (override === 'console' || !env.infobip) {
       this.baseMode = 'console'
       return
     }
-    // Live mode fail-fast: any missing cred is a boot error (audit-added M6).
-    const accountSid = env.twilio.accountSid
-    const authToken = env.twilio.authToken
-    const fromNumber = env.whatsapp.fromNumber
-    if (!accountSid || !authToken || !fromNumber) {
+    // Live mode fail-fast: any missing cred is a boot error.
+    const baseUrl = env.infobip.baseUrl
+    const apiKey = env.infobip.apiKey
+    const sender = env.infobip.sender
+    if (!baseUrl || !apiKey || !sender) {
       throw new Error(
-        'WhatsAppAdapter: live mode requires TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_WHATSAPP_FROM',
+        'WhatsAppAdapter: live mode requires INFOBIP_BASE_URL + INFOBIP_API_KEY + INFOBIP_WHATSAPP_SENDER',
       )
     }
     this.baseMode = 'live'
-    this.liveCreds = { accountSid, authToken, fromNumber }
+    this.liveCreds = { baseUrl, apiKey, sender }
+
+    // D-03-04-F: Infobip WhatsApp has no public typing-indicator endpoint.
+    // One-time boot WARN when live is configured so ops know typing is console-only.
+    this.logger.warn(
+      '[whatsapp] Infobip WhatsApp has no typing-indicator endpoint; console-mode-only (D-03-04-F)',
+    )
   }
 
   private resolveMode(): DriverMode {
-    if (process.env.TWILIO_WHATSAPP_DRIVER_OVERRIDE === 'disabled') return 'disabled'
-    if (process.env.TWILIO_WHATSAPP_DRIVER_OVERRIDE === 'console') return 'console'
+    if (process.env.INFOBIP_DRIVER_OVERRIDE === 'disabled') return 'disabled'
+    if (process.env.INFOBIP_DRIVER_OVERRIDE === 'console') return 'console'
     return this.baseMode
   }
 
-  // 03-03 Task 1: typing indicator — best-effort, non-blocking.
-  // Endpoint verified 2026-04-20 against https://www.twilio.com/docs/whatsapp/api/typing-indicators-resource:
-  //   POST https://messaging.twilio.com/v2/Indicators/Typing.json
-  //   Body: messageId=<inbound SM...>, channel=whatsapp
-  //   Twilio auto-expires after 25s or on next outbound — no explicit "clear" call.
-  // Signature takes the inbound MessageSid (NOT a phone number) because that's what
-  // Twilio's API keys off for WhatsApp typing state.
-  async sendTypingIndicator(inboundMessageSid: string): Promise<WhatsAppOutboundResult> {
-    // Allow hyphens + underscores so probe fixtures like "SM-w18-typing-immediate"
-    // pass alongside real Twilio SIDs (which are 34-char alphanumeric).
-    if (!inboundMessageSid || !/^[A-Za-z0-9_-]{1,64}$/.test(inboundMessageSid)) {
+  // 03-03 Task 1: typing indicator — console-mode only under Infobip (D-03-04-F).
+  // Signature preserved (takes inbound messageId) so typing-indicator-timers module is untouched.
+  async sendTypingIndicator(inboundMessageId: string): Promise<WhatsAppOutboundResult> {
+    if (!inboundMessageId || !/^[A-Za-z0-9_-]{1,128}$/.test(inboundMessageId)) {
       return { ok: false, reason: 'whatsapp-invalid-to' }
     }
     const mode = this.resolveMode()
     if (mode === 'disabled') {
-      // Kill-switch silent — no log event emission here (caller owns observability).
       return { ok: false, reason: 'whatsapp-driver-disabled' }
     }
-    if (mode === 'console' || !this.liveCreds) {
-      this.logger.log('whatsapp.console_typing_indicator', { messageId: inboundMessageSid })
-      return { ok: true, mode: 'console' }
-    }
-    try {
-      const url = 'https://messaging.twilio.com/v2/Indicators/Typing.json'
-      const basic = Buffer.from(
-        `${this.liveCreds.accountSid}:${this.liveCreds.authToken}`,
-      ).toString('base64')
-      const form = new URLSearchParams({
-        messageId: inboundMessageSid,
-        channel: 'whatsapp',
-      })
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${basic}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: form.toString(),
-        signal: AbortSignal.timeout(TWILIO_API_TIMEOUT_MS),
-      })
-      if (!res.ok) {
-        this.logger.warn('whatsapp.typing_indicator_unsupported_by_provider', {
-          messageId: inboundMessageSid,
-          status: res.status,
-        })
-        return { ok: false, reason: 'whatsapp-service-unavailable' }
-      }
-      return { ok: true, mode: 'live' }
-    } catch (err) {
-      this.logger.warn('whatsapp.typing_indicator_unsupported_by_provider', {
-        messageId: inboundMessageSid,
-        errorKind: (err as Error)?.constructor?.name ?? 'unknown',
-      })
-      return { ok: false, reason: 'whatsapp-service-unavailable' }
-    }
+    // Both 'live' and 'console' log the event and return — Infobip has no live endpoint.
+    this.logger.log('whatsapp.console_typing_indicator', { messageId: inboundMessageId })
+    return { ok: true, mode: 'console' }
   }
 
   async sendText(to: string, body: string): Promise<WhatsAppOutboundResult> {
@@ -129,44 +97,47 @@ export class WhatsAppAdapter {
     }
 
     const startedAt = Date.now()
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${this.liveCreds.accountSid}/Messages.json`
-    const basic = Buffer.from(
-      `${this.liveCreds.accountSid}:${this.liveCreds.authToken}`,
-    ).toString('base64')
-    const form = new URLSearchParams({
-      From: this.liveCreds.fromNumber,
-      To: to,
-      Body: body,
-    })
+    const url = `${this.liveCreds.baseUrl}/whatsapp/1/message/text`
+    const requestBody = {
+      from: this.liveCreds.sender,
+      to,
+      content: { text: body },
+    }
 
     try {
       const res = await fetch(url, {
         method: 'POST',
         headers: {
-          Authorization: `Basic ${basic}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `App ${this.liveCreds.apiKey}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-        body: form.toString(),
-        signal: AbortSignal.timeout(TWILIO_API_TIMEOUT_MS),
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(INFOBIP_API_TIMEOUT_MS),
       })
       if (!res.ok) {
-        this.logger.warn('whatsapp.twilio_error', {
+        this.logger.warn('whatsapp.infobip_error', {
           to: sha256Prefix(to),
           status: res.status,
           latencyMs: Date.now() - startedAt,
         })
         return { ok: false, reason: 'whatsapp-service-unavailable' }
       }
-      const json = (await res.json()) as { sid?: string }
+      // Infobip success response shape: { messages: [{ messageId, status: {...} }] }.
+      // UAT-VERIFY: exact field names confirmed on first live send.
+      const json = (await res.json()) as {
+        messages?: Array<{ messageId?: string }>
+      }
+      const messageId = json.messages?.[0]?.messageId
       this.logger.log('whatsapp.outbound', {
         to: sha256Prefix(to),
         mode: 'live',
-        sid: json.sid,
+        messageId,
         latencyMs: Date.now() - startedAt,
       })
-      return { ok: true, mode: 'live', sid: json.sid }
+      return { ok: true, mode: 'live', messageId }
     } catch (err) {
-      this.logger.warn('whatsapp.twilio_error', {
+      this.logger.warn('whatsapp.infobip_error', {
         to: sha256Prefix(to),
         errorKind: (err as Error)?.constructor?.name ?? 'unknown',
         latencyMs: Date.now() - startedAt,

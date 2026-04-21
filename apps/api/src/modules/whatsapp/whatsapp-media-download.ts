@@ -1,6 +1,6 @@
 import {
   ALLOWED_IMAGE_MIME_TYPES,
-  DEFAULT_TWILIO_MEDIA_HOST_ALLOWLIST,
+  DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST,
   MAX_IMAGE_DOWNLOAD_BYTES,
   MEDIA_DOWNLOAD_TIMEOUT_MS,
   type AllowedImageMimeType,
@@ -21,8 +21,9 @@ export type MediaDownloadResult =
       mediaType?: string
     }
 
-// SSRF defense (audit M1): validate URL host against an allowlist BEFORE any network call.
-//   - Production: TWILIO_MEDIA_HOST_ALLOWLIST env (comma-separated; falls back to DEFAULT)
+// 03-04 Infobip migration — SSRF defense (03-03 audit M1): validate URL host against allowlist
+// BEFORE any network call.
+//   - Production: WHATSAPP_MEDIA_HOST_ALLOWLIST env (comma-separated; falls back to DEFAULT)
 //   - Probe-only: PROBE_MEDIA_HOST_ALLOWLIST env (additive; ONLY when NODE_ENV !== 'production')
 // Wildcards via `*.suffix` (suffix match). Ports included in host comparison.
 export function isHostAllowed(urlString: string): { allowed: boolean; host: string } {
@@ -32,10 +33,11 @@ export function isHostAllowed(urlString: string): { allowed: boolean; host: stri
   } catch {
     return { allowed: false, host: '' }
   }
-  const envProd = process.env.TWILIO_MEDIA_HOST_ALLOWLIST
-  const prod = envProd !== undefined && envProd.length > 0
-    ? envProd.split(',').map((s) => s.trim()).filter(Boolean)
-    : DEFAULT_TWILIO_MEDIA_HOST_ALLOWLIST
+  const envProd = process.env.WHATSAPP_MEDIA_HOST_ALLOWLIST
+  const prod =
+    envProd !== undefined && envProd.length > 0
+      ? envProd.split(',').map((s) => s.trim()).filter(Boolean)
+      : DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST
   const probe =
     process.env.NODE_ENV !== 'production'
       ? (process.env.PROBE_MEDIA_HOST_ALLOWLIST ?? '')
@@ -48,7 +50,7 @@ export function isHostAllowed(urlString: string): { allowed: boolean; host: stri
   return { allowed: match, host }
 }
 
-// Magic-byte validator (audit M3): declared MIME must match actual byte signature.
+// Magic-byte validator (03-03 audit M3): declared MIME must match actual byte signature.
 function magicByteMatchesMime(bytes: Uint8Array, declaredMime: string): boolean {
   if (bytes.length < 12) return false
   const b = bytes
@@ -79,34 +81,78 @@ function isAllowedMime(mime: string): mime is AllowedImageMimeType {
   return (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(mime)
 }
 
-export async function downloadTwilioMedia(
+// 03-04 audit-added S3 (G10): auth trial matrix for Infobip media URLs.
+// Infobip docs don't clearly document whether media URLs are pre-signed (no auth) or
+// require the App apiKey. This function tries App-header first; on 401/403 retries with
+// no auth; if both fail returns media-download-failed with errorKind signaling the gap.
+// Total wall-clock stays bounded by MEDIA_DOWNLOAD_TIMEOUT_MS shared across attempts.
+async function fetchWithAuthTrial(
   url: string,
-  accountSid: string,
-  authToken: string,
+  apiKey: string,
+  deadline: number,
+): Promise<{ res: Response | null; authMode: 'app-key' | 'no-auth' | 'unknown'; errorKind?: string }> {
+  const tryFetch = async (mode: 'app-key' | 'no-auth'): Promise<Response> => {
+    const headers: Record<string, string> =
+      mode === 'app-key' ? { Authorization: `App ${apiKey}` } : {}
+    const remaining = Math.max(100, deadline - Date.now())
+    return fetch(url, {
+      method: 'GET',
+      headers,
+      redirect: 'manual',
+      signal: AbortSignal.timeout(remaining),
+    })
+  }
+
+  try {
+    const first = await tryFetch('app-key')
+    if (first.status !== 401 && first.status !== 403) {
+      return { res: first, authMode: 'app-key' }
+    }
+    // 401/403 on App apiKey → retry without auth (Infobip may use pre-signed URLs).
+    const second = await tryFetch('no-auth')
+    if (second.status !== 401 && second.status !== 403) {
+      return { res: second, authMode: 'no-auth' }
+    }
+    return {
+      res: null,
+      authMode: 'unknown',
+      errorKind: `auth-trial-exhausted-app=${first.status}-noauth=${second.status}`,
+    }
+  } catch (err) {
+    return {
+      res: null,
+      authMode: 'unknown',
+      errorKind: (err as Error)?.constructor?.name ?? 'unknown',
+    }
+  }
+}
+
+export async function downloadWhatsappMedia(
+  url: string,
+  apiKey: string,
 ): Promise<MediaDownloadResult> {
-  // audit M1: SSRF gate BEFORE any fetch.
+  // 03-03 audit M1: SSRF gate BEFORE any fetch.
   const initial = isHostAllowed(url)
   if (!initial.allowed) {
     return { ok: false, reason: 'ssrf-rejected', errorKind: 'host-not-allowlisted' }
   }
 
-  const basic = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
-  const headers = {
-    Authorization: `Basic ${basic}`,
-  }
+  const deadline = Date.now() + MEDIA_DOWNLOAD_TIMEOUT_MS
 
   try {
-    // Manual redirect follow so the redirect target gets re-validated through isHostAllowed.
-    // Twilio responds with 302 → S3; both hops must pass the allowlist.
+    // Manual redirect follow with allowlist re-validation on every hop.
     let currentUrl = url
     let res: Response | null = null
+    let authMode: 'app-key' | 'no-auth' | 'unknown' = 'unknown'
+    let trialErrorKind: string | undefined
+
     for (let hop = 0; hop < 5; hop++) {
-      res = await fetch(currentUrl, {
-        method: 'GET',
-        headers,
-        redirect: 'manual',
-        signal: AbortSignal.timeout(MEDIA_DOWNLOAD_TIMEOUT_MS),
-      })
+      const attempt = await fetchWithAuthTrial(currentUrl, apiKey, deadline)
+      res = attempt.res
+      authMode = attempt.authMode
+      trialErrorKind = attempt.errorKind
+      if (!res) break
+
       if (res.status >= 300 && res.status < 400) {
         const loc = res.headers.get('location')
         if (!loc) {
@@ -127,19 +173,24 @@ export async function downloadTwilioMedia(
       }
       break
     }
+
     if (!res) {
-      return { ok: false, reason: 'media-download-failed', errorKind: 'no-response' }
+      return {
+        ok: false,
+        reason: 'media-download-failed',
+        errorKind: trialErrorKind ?? 'no-response',
+      }
     }
     if (!res.ok) {
       return {
         ok: false,
         reason: 'media-download-failed',
         status: res.status,
-        errorKind: `http-${res.status}`,
+        errorKind: `http-${res.status}-via-${authMode}`,
       }
     }
 
-    // audit M2: MIME allowlist check BEFORE reading body.
+    // 03-03 audit M2: MIME allowlist check BEFORE reading body.
     const declaredMime = (res.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()
     if (!declaredMime) {
       return { ok: false, reason: 'unsupported-mime', mediaType: '' }
@@ -148,7 +199,7 @@ export async function downloadTwilioMedia(
       return { ok: false, reason: 'unsupported-mime', mediaType: declaredMime }
     }
 
-    // audit M4: streaming byte counter (don't trust Content-Length alone).
+    // 03-03 audit M4: streaming byte counter (don't trust Content-Length alone).
     const body = res.body
     if (!body) {
       return { ok: false, reason: 'media-download-failed', errorKind: 'no-body-stream' }
@@ -170,7 +221,7 @@ export async function downloadTwilioMedia(
     }
     const bytes = Buffer.concat(chunks)
 
-    // audit M3: magic-byte signature validation post-download.
+    // 03-03 audit M3: magic-byte signature validation post-download.
     if (!magicByteMatchesMime(bytes, declaredMime)) {
       return { ok: false, reason: 'media-content-mismatch', mediaType: declaredMime }
     }

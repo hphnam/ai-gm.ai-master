@@ -56,7 +56,7 @@ export function startTypingRefire(
         round: cur.refireCount,
       })
       // Best-effort: errors are swallowed; the refire itself is fire-and-forget.
-      // Twilio's typing indicator is keyed on the inbound MessageSid (not phone).
+      // Previous Twilio implementation keyed typing on the inbound MessageSid (not phone); Infobip has no public typing endpoint for WhatsApp so the adapter runs in console-mode unconditionally (D-03-03-F / D-03-04-F).
       adapter.sendTypingIndicator(messageSid).catch(() => {})
 
       if (cur.refireCount >= TYPING_MAX_REFIRES) {

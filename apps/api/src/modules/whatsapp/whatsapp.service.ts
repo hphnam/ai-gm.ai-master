@@ -5,8 +5,8 @@ import {
   CHAT_TIMEOUT_MS,
   PROACTIVE_SESSION_WINDOW_MS,
   VERIFIED_SENDER_LIMIT_PER_HOUR,
+  type InfobipInboundResult,
   type ProactiveSuggestion,
-  type TwilioWebhookPayload,
 } from '@gm-ai/types'
 import { ChatService } from '../chat/chat.service'
 import { SuggestionsService } from '../suggestions/suggestions.service'
@@ -15,30 +15,25 @@ import { recordAndCheckOnboardingReply } from './unknown-number-rate-limit'
 import { recordAndCheckVerifiedSender } from './verified-sender-rate-limit'
 import { markAndCheckSid } from './seen-message-sids'
 import { clearTypingRefire, startTypingRefire } from './typing-indicator-timers'
-import { downloadTwilioMedia } from './twilio-media-download'
+import { downloadWhatsappMedia } from './whatsapp-media-download'
 
 const WA_CONVERSATION_IDLE_MS = 2 * 60 * 60 * 1000
 const WA_CHANNEL = 'whatsapp'
-const MEDIA_DOWNLOAD_RETRY = 0 // no retry — fail-soft only
 
 function sha256Prefix(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
 }
 
-function stripWhatsappPrefix(from: string): string {
-  return from.startsWith('whatsapp:') ? from.slice('whatsapp:'.length) : from
-}
-
-function classifyMedia(
-  payload: TwilioWebhookPayload,
+// 03-04 Infobip migration — media type classification from Infobip's message.type enum.
+function classifyInfobipMedia(
+  result: InfobipInboundResult,
 ): 'none' | 'image' | 'audio' | 'other' {
-  const numMedia = parseInt(payload.NumMedia ?? '0', 10)
-  const ct = payload.MediaContentType0 ?? ''
-  if (numMedia === 0 && !ct) return 'none'
-  if (ct.startsWith('image/')) return 'image'
-  if (ct.startsWith('audio/')) return 'audio'
-  if (ct.startsWith('video/')) return 'other'
-  return numMedia >= 1 ? 'other' : 'none'
+  const t = result.message.type
+  if (t === 'TEXT') return 'none'
+  if (t === 'IMAGE') return 'image'
+  if (t === 'AUDIO') return 'audio'
+  // VIDEO | DOCUMENT | LOCATION | STICKER | CONTACT | UNSUPPORTED
+  return 'other'
 }
 
 // 03-03 Task 2 / AC-17 / audit S1: sanitize KnowledgeItem-derived text before
@@ -75,53 +70,53 @@ export class WhatsappService {
     private readonly suggestions: SuggestionsService,
   ) {}
 
-  async handleInbound(payload: TwilioWebhookPayload): Promise<void> {
+  async handleInbound(result: InfobipInboundResult): Promise<void> {
     // 03-03 Task 1: typing indicator fires IMMEDIATELY (before any DB / sender resolution).
-    // Fire-and-forget; errors swallowed. Then start the 20s refire ticker.
     this.adapter
-      .sendTypingIndicator(payload.MessageSid)
+      .sendTypingIndicator(result.messageId)
       .then((r) => {
         if (r.ok) {
           this.logger.log('whatsapp.typing_indicator_sent', {
-            from: sha256Prefix(payload.From),
-            messageSid: payload.MessageSid,
+            from: sha256Prefix(result.from),
+            messageId: result.messageId,
             mode: r.mode,
           })
         }
       })
       .catch(() => {})
-    startTypingRefire(payload.MessageSid, this.adapter, this.logger)
+    startTypingRefire(result.messageId, this.adapter, this.logger)
 
     try {
-      // 03-01 M3: MessageSid idempotency — dedupe Twilio retries + replay attacks.
-      const dedupe = markAndCheckSid(payload.MessageSid)
+      // 03-01 M3: messageId idempotency — dedupe Infobip retries + replay attacks.
+      const dedupe = markAndCheckSid(result.messageId)
       if (dedupe.seen) {
         this.logger.log('whatsapp.replay_dedupe', {
-          messageSid: payload.MessageSid,
-          from: sha256Prefix(payload.From),
+          messageId: result.messageId,
+          from: sha256Prefix(result.from),
         })
         return
       }
 
       // 03-03 Task 3: audio/video still reject. Image now flows through (after
       // sender resolution) via the dedicated image handler below.
-      const mediaKind = classifyMedia(payload)
+      const mediaKind = classifyInfobipMedia(result)
       if (mediaKind === 'audio' || mediaKind === 'other') {
-        await this.handleUnsupportedMedia(payload, mediaKind)
+        await this.handleUnsupportedMedia(result, mediaKind)
         return
       }
       // mediaKind === 'none' or 'image' — continue to sender resolution.
 
-      const fromHash = sha256Prefix(payload.From)
-      const waIdHash = payload.WaId ? sha256Prefix(payload.WaId) : undefined
-      const phoneNumber = stripWhatsappPrefix(payload.From)
+      const fromHash = sha256Prefix(result.from)
+      // Phase 1 Plan 01-03 stores User.phoneNumber in E.164 WITH `+` prefix.
+      // Infobip delivers bare digits — prepend `+` so the lookup matches.
+      const phoneNumber = '+' + result.from
 
       // Sender resolution — verified users only pass.
       const user = await prisma.user.findFirst({
         where: { phoneNumber, phoneVerifiedAt: { not: null } },
       })
       if (!user) {
-        await this.handleUnknownNumber(payload, fromHash)
+        await this.handleUnknownNumber(result, fromHash)
         return
       }
 
@@ -135,7 +130,7 @@ export class WhatsappService {
         })
         if (rate.shouldSendThrottleReply) {
           await this.adapter.sendText(
-            payload.From,
+            result.from,
             "You've hit the message limit for the hour — try again later.",
           )
         }
@@ -150,7 +145,7 @@ export class WhatsappService {
         })
         if (!member) {
           this.logger.warn('whatsapp.orphan_user', { userId: user.id })
-          await this.handleUnknownNumber(payload, fromHash)
+          await this.handleUnknownNumber(result, fromHash)
           return
         }
 
@@ -174,15 +169,13 @@ export class WhatsappService {
         if (!venue) {
           this.logger.warn('whatsapp.no_venue', { orgId: member.organizationId })
           await this.adapter.sendText(
-            payload.From,
+            result.from,
             'Your organization has no venue configured yet — contact your admin.',
           )
           return
         }
 
         // 03-03 Task 2: proactive opener on new 24h channel='whatsapp' session.
-        // Runs BEFORE ChatConversation resolve+create so the conversation created
-        // this turn becomes the one that starts the session.
         const sessionWindowStart = new Date(Date.now() - PROACTIVE_SESSION_WINDOW_MS)
         const priorSession = await prisma.chatConversation.findFirst({
           where: {
@@ -205,7 +198,7 @@ export class WhatsappService {
             )
             if (suggestions.length > 0) {
               const openerText = composeOpenerText(suggestions)
-              await this.adapter.sendText(payload.From, openerText)
+              await this.adapter.sendText(result.from, openerText)
               this.logger.log('whatsapp.proactive_opener_sent', {
                 venueId: venue.id,
                 suggestionCount: suggestions.length,
@@ -259,11 +252,11 @@ export class WhatsappService {
         })
         if (!convCheck) {
           this.logger.warn('whatsapp.cross_tenant_conv_mismatch', {
-            messageSid: payload.MessageSid,
+            messageId: result.messageId,
             userId: user.id,
           })
           await this.adapter.sendText(
-            payload.From,
+            result.from,
             "Couldn't load your conversation — please try again.",
           )
           return
@@ -271,12 +264,16 @@ export class WhatsappService {
 
         // 03-03 Task 3: image inbound — download + attach OR fallback to friendly reject.
         let attachment:
-          | { mediaType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'; base64: string; sourceRef: string }
+          | {
+              mediaType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+              base64: string
+              sourceRef: string
+            }
           | undefined = undefined
         if (mediaKind === 'image') {
-          if (!payload.MediaUrl0) {
+          if (!result.message.url) {
             await this.adapter.sendText(
-              payload.From,
+              result.from,
               "I couldn't load that image — try re-sending or describe what's in it.",
             )
             this.logger.warn('whatsapp.image_download_failed', {
@@ -285,31 +282,30 @@ export class WhatsappService {
             })
             return
           }
-          const accountSid = process.env.TWILIO_ACCOUNT_SID
-          const authToken = process.env.TWILIO_AUTH_TOKEN
-          if (!accountSid || !authToken) {
+          const apiKey = process.env.INFOBIP_API_KEY
+          if (!apiKey) {
             await this.adapter.sendText(
-              payload.From,
+              result.from,
               "Image support isn't configured — send text instead.",
             )
             this.logger.warn('whatsapp.image_download_failed', {
               status: 0,
-              errorKind: 'no-twilio-creds',
+              errorKind: 'no-infobip-api-key',
             })
             return
           }
-          const dl = await downloadTwilioMedia(payload.MediaUrl0, accountSid, authToken)
+          const dl = await downloadWhatsappMedia(result.message.url, apiKey)
           if (!dl.ok) {
             const friendly =
               dl.reason === 'unsupported-mime'
                 ? 'I can only process JPEG, PNG, WebP, or GIF images.'
                 : "I couldn't load that image — try re-sending or describe what's in it."
-            await this.adapter.sendText(payload.From, friendly)
+            await this.adapter.sendText(result.from, friendly)
             // audit S5: hash the host when surfacing SSRF-reject so raw host stays out of logs.
             let hostHash: string | undefined
             if (dl.reason === 'ssrf-rejected') {
               try {
-                hostHash = sha256Prefix(new URL(payload.MediaUrl0).host)
+                hostHash = sha256Prefix(new URL(result.message.url).host)
               } catch {
                 hostHash = 'invalid-url'
               }
@@ -325,33 +321,35 @@ export class WhatsappService {
           attachment = {
             mediaType: dl.mediaType,
             base64: dl.base64,
-            sourceRef: payload.MessageSid,
+            sourceRef: result.messageId,
           }
           this.logger.log('whatsapp.image_ingested', {
             from: fromHash,
             mediaType: dl.mediaType,
             byteSize: dl.byteSize,
-            messageSid: payload.MessageSid,
+            messageId: result.messageId,
           })
         }
 
+        const bodyText = result.message.text ?? ''
         this.logger.log('whatsapp.inbound', {
           from: fromHash,
-          messageSid: payload.MessageSid,
-          waIdHash,
-          bodyLength: payload.Body.length,
+          messageId: result.messageId,
+          bodyLength: bodyText.length,
           hasImage: !!attachment,
+          // 03-04 audit-added M5 (G5): contact name NEVER logged (raw OR hashed).
+          // Previously this slot carried waIdHash (Twilio WaId). Dropped entirely.
         })
 
         // 03-01 M3/AC-10: hard 12s timeout on ChatService call.
         const startedAt = Date.now()
         const userMessage =
-          payload.Body && payload.Body.length > 0
-            ? payload.Body
+          bodyText.length > 0
+            ? bodyText
             : attachment
               ? 'User sent an image.'
-              : payload.Body
-        const result = await Promise.race([
+              : bodyText
+        const chatResult = await Promise.race([
           this.chatService.sendMessage(
             {
               venueId: venue.id,
@@ -368,20 +366,23 @@ export class WhatsappService {
           ),
         ])
 
-        if (result === '__timeout') {
+        if (chatResult === '__timeout') {
           this.logger.warn('whatsapp.chat_timeout', {
             userId: user.id,
             conversationId: conversation.id,
             elapsedMs: Date.now() - startedAt,
           })
           await this.adapter.sendText(
-            payload.From,
+            result.from,
             "I'm still thinking — I'll follow up shortly.",
           )
           return
         }
 
-        const out = await this.adapter.sendText(payload.From, result.assistantMessage.content)
+        const out = await this.adapter.sendText(
+          result.from,
+          chatResult.assistantMessage.content,
+        )
         if (out.ok) {
           this.logger.log('whatsapp.outbound', {
             to: fromHash,
@@ -395,28 +396,28 @@ export class WhatsappService {
           errorKind: (err as Error)?.constructor?.name ?? 'unknown',
         })
         await this.adapter.sendText(
-          payload.From,
+          result.from,
           'Sorry — something went wrong on my end. Try again in a moment.',
         )
       }
     } finally {
       // 03-03 Task 1: ALWAYS clear the typing refire timer on any return path.
-      const cleared = clearTypingRefire(payload.MessageSid)
+      const cleared = clearTypingRefire(result.messageId)
       this.logger.log('whatsapp.typing_indicator_cleared', {
-        messageSid: payload.MessageSid,
+        messageId: result.messageId,
         refireCount: cleared?.refireCount ?? 0,
       })
     }
   }
 
   private async handleUnknownNumber(
-    payload: TwilioWebhookPayload,
+    result: InfobipInboundResult,
     fromHash: string,
   ): Promise<void> {
     const { shouldReply } = recordAndCheckOnboardingReply(fromHash)
     if (shouldReply) {
       await this.adapter.sendText(
-        payload.From,
+        result.from,
         "Welcome to GM AI. Your number isn't linked yet — an account owner needs to invite you, then you can verify this phone at /settings/phone.",
       )
       this.logger.log('whatsapp.unknown_number', { from: fromHash, replied: true })
@@ -430,17 +431,17 @@ export class WhatsappService {
   }
 
   private async handleUnsupportedMedia(
-    payload: TwilioWebhookPayload,
+    result: InfobipInboundResult,
     mediaKind: 'image' | 'audio' | 'other',
   ): Promise<void> {
     await this.adapter.sendText(
-      payload.From,
+      result.from,
       "Photos and voice notes aren't supported yet — send me a text message and I'll help.",
     )
     this.logger.log('whatsapp.unsupported_media', {
-      from: sha256Prefix(payload.From),
+      from: sha256Prefix(result.from),
       mediaKind,
-      numMedia: Number(payload.NumMedia ?? 0),
+      messageType: result.message.type,
     })
   }
 }

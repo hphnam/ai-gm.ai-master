@@ -22,7 +22,7 @@ const SendMessageInputSchema = z.object({
     .object({
       mediaType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
       base64: z.string().min(1),
-      // audit S2: channel-specific source reference (e.g. Twilio MessageSid) for forensics.
+      // audit S2: channel-specific source reference (e.g. Infobip inbound messageId) for forensics.
       sourceRef: z.string().min(1).max(64).optional(),
     })
     .optional(),
@@ -161,7 +161,7 @@ export class ChatService implements OnModuleInit {
     // 03-03 Task 3: when an image attachment is present, persist a placeholder into
     // ChatMessage.content (schema has no image column) so conversation history shows
     // "user sent image" without storing base64. Placeholder includes sourceRef
-    // (Twilio MessageSid in WhatsApp flow) for forensic correlation (audit S2).
+    // (Infobip inbound messageId in the WhatsApp flow — previously Twilio MessageSid) for forensic correlation (audit S2).
     const userContent = input.attachment
       ? (() => {
           const byteSize = Buffer.from(input.attachment.base64, 'base64').length

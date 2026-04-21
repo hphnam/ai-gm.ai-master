@@ -1,7 +1,7 @@
 import './load-env'
 
 import { NestFactory } from '@nestjs/core'
-import { json, urlencoded } from 'express'
+import { json, raw as rawParser } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
@@ -33,7 +33,7 @@ async function bootstrap() {
     allowedHeaders: ['content-type', 'x-request-id'],
   })
 
-  // Middleware order (DO NOT REORDER without updating probe-api + probe-auth):
+  // Middleware order (DO NOT REORDER — breaks request-id/logger/body-cap contracts):
   //   1) request-id        — stamps X-Request-Id
   //   2) security-headers  — nosniff/frameguard
   //   3) http-logger       — reads requestId; redacts /api/auth/*
@@ -49,15 +49,58 @@ async function bootstrap() {
   app.use('/auth/phone', json({ limit: '2kb' }))
   // 02-02 audit-added M5/S4: path-filtered 32 KB json parser; /docs/upload must reach multer
   // with its multipart body intact. Hoisted jsonDefault avoids per-request middleware construction.
-  // 03-01: Twilio posts application/x-www-form-urlencoded; json parser would leave req.body empty
-  // and break signature validation. Webhook path uses urlencoded parser instead.
+  //
+  // 03-04 audit-added M6 (G6) — Middleware order contract: webhook-path branches MUST run
+  // BEFORE jsonDefault. Drift = 403 on every inbound because req.rawBody would be missing.
+  // Do NOT reorder without re-validating the HMAC flow end-to-end against Infobip.
+  //
+  // Infobip posts application/json; we use express.raw() to preserve the raw body bytes on
+  // req.rawBody so the HMAC-SHA256 guard can verify the signature, then we JSON.parse
+  // ourselves into req.body so the controller sees a parsed payload. The Content-Type
+  // allowlist tolerates parameterized variants (e.g. "application/json; charset=utf-8").
   const jsonDefault = json({ limit: '32kb' })
-  const webhookUrlencoded = urlencoded({ limit: '32kb', extended: false })
+  const webhookRaw = rawParser({
+    limit: '32kb',
+    type: ['application/json', 'application/*+json'],
+  })
   app.use((req, res, next) => {
     if (req.path === '/docs/upload') return next()
-    if (req.path === '/webhooks/twilio/whatsapp') return webhookUrlencoded(req, res, next)
+    if (req.path === '/webhooks/infobip/whatsapp') {
+      return webhookRaw(req, res, (err) => {
+        if (err) return next(err)
+        const buf: Buffer | undefined = req.body instanceof Buffer ? req.body : undefined
+        if (!buf || buf.length === 0) {
+          req.rawBody = Buffer.alloc(0)
+          req.body = {}
+          return next()
+        }
+        req.rawBody = buf
+        try {
+          req.body = JSON.parse(buf.toString('utf8'))
+        } catch {
+          req.body = {}
+        }
+        next()
+      })
+    }
     return jsonDefault(req, res, next)
   })
+
+  // 03-04 audit-added M6 (G6) — middleware-order contract enforcement:
+  //   The /webhooks/infobip/whatsapp branch above MUST run before jsonDefault to populate
+  //   req.rawBody for HMAC verification. Drift = 403 on every inbound.
+  //
+  //   Original audit recommended runtime Express router introspection but it's brittle
+  //   across Express 4/5 (_router vs router lazy-init semantics) and SWC-compiled source.
+  //   Fallback per the audit's own note: rely on this comment + a grep-based verification
+  //   step. The contract is enforced by reading this file, not by runtime assertion.
+  //
+  //   VERIFY BEFORE DEPLOY:
+  //     grep -n "webhooks/infobip/whatsapp" apps/api/src/main.ts  → must return 1 hit
+  //     grep -n "req.rawBody = " apps/api/src/main.ts             → must return 1 hit
+  //     `curl -X POST .../webhooks/infobip/whatsapp -H 'x-callback-signature: probe-console' \
+  //        -d '{}' -H 'content-type: application/json'` → expect 200 with ALLOW_WEBHOOK_DEV_BYPASS=true
+  //        (curl-bypass validates the raw-body middleware actually fired; 403 "no-raw-body" = broken).
 
   app.enableShutdownHooks()
 
