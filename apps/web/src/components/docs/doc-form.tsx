@@ -6,7 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { CreateDocRequestSchema, type CreateDocRequest } from '@gm-ai/types'
+import {
+  CreateDocRequestSchema,
+  type CreateDocRequest,
+  type ProposedDocType,
+} from '@gm-ai/types'
+import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -86,6 +91,10 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
   const createDoc = useCreateDoc()
   const uploadDoc = useUploadDoc()
   const [reading, setReading] = useState(false)
+  // Plan 04-02 Task 3 — inline owner-confirmation modal state for classifier proposals.
+  const [proposal, setProposal] = useState<
+    { docId: string; proposal: ProposedDocType } | null
+  >(null)
 
   const form = useForm<CreateDocRequest>({
     resolver: zodResolver(CreateDocRequestSchema),
@@ -112,6 +121,10 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
         }
         form.reset({ title: '', content: '', venueId })
         e.target.value = ''
+        // Plan 04-02 Task 3 — surface classifier's new-type proposal for owner confirmation.
+        if (res.pendingTypeProposal) {
+          setProposal({ docId: res.id, proposal: res.pendingTypeProposal })
+        }
         onSaved?.()
         return
       }
@@ -144,6 +157,10 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
         )
       }
       form.reset({ title: '', content: '', venueId: values.venueId ?? null })
+      // Plan 04-02 Task 3 — surface classifier's new-type proposal for owner confirmation.
+      if (res.pendingTypeProposal) {
+        setProposal({ docId: res.id, proposal: res.pendingTypeProposal })
+      }
       onSaved?.()
     } catch (err) {
       toast.error(mapApiError(err))
@@ -256,6 +273,16 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
           </div>
         </div>
       </form>
+      {proposal ? (
+        <DocTypeProposalModal
+          docId={proposal.docId}
+          proposal={proposal.proposal}
+          open={proposal !== null}
+          onOpenChange={(v) => {
+            if (!v) setProposal(null)
+          }}
+        />
+      ) : null}
     </Form>
   )
 }

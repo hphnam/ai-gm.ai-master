@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
+import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 
 function formatRelative(iso: string): string {
   const ts = new Date(iso).getTime()
@@ -85,6 +86,49 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
   )
 }
 
+// Plan 04-02 Task 3 — per-row taxonomy state: confirmed type / pending proposal / unclassified.
+function TaxonomyBadge({ doc }: { doc: DocListItem }) {
+  const [open, setOpen] = useState(false)
+
+  if (doc.documentType) {
+    return (
+      <span
+        className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-medium"
+        title={doc.documentType.description ?? undefined}
+      >
+        {doc.documentType.name}
+      </span>
+    )
+  }
+  if (doc.pendingTypeProposal) {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-medium hover:bg-amber-500/25 transition-colors"
+          aria-label={`Review proposed type "${doc.pendingTypeProposal.name}"`}
+        >
+          Pending: {doc.pendingTypeProposal.name}
+        </button>
+        {open ? (
+          <DocTypeProposalModal
+            docId={doc.id}
+            proposal={doc.pendingTypeProposal}
+            open={open}
+            onOpenChange={setOpen}
+          />
+        ) : null}
+      </>
+    )
+  }
+  return (
+    <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border">
+      Unclassified
+    </span>
+  )
+}
+
 export function DocList({
   docs,
   isLoading,
@@ -116,9 +160,10 @@ export function DocList({
           <header className="flex flex-wrap items-baseline gap-2">
             <h3 className="text-sm font-semibold truncate">
               <Link href={`/docs/${d.id}`} className="hover:underline underline-offset-4">
-                {d.title ?? d.docType ?? 'Untitled'}
+                {d.title ?? d.documentType?.name ?? d.docType ?? 'Untitled'}
               </Link>
             </h3>
+            <TaxonomyBadge doc={d} />
             {d.docType ? (
               <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
                 {d.docType}

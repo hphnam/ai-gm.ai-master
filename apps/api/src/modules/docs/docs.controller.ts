@@ -20,8 +20,11 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
 import { z } from 'zod'
 import {
+  AcceptTypeRequestSchema,
   CreateDocRequestSchema,
   UUID_RE,
+  type AcceptTypeRequest,
+  type AcceptTypeResponse,
   type ApiErrorResponse,
   type CreateDocRequest,
   type CreateDocResponse,
@@ -30,7 +33,7 @@ import {
 } from '@gm-ai/types'
 import { zodPipe } from '../../common/zod-pipe'
 import { AuthGuard } from '../auth/auth.guard'
-import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import {
   ExtractError,
@@ -41,7 +44,12 @@ import {
   sanitizeUploadTitle,
 } from './doc-extract'
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
-import { DocNotFoundOrCrossOrgError, DocsService } from './docs.service'
+import {
+  DocNotFoundOrCrossOrgError,
+  DocsService,
+  TypeNameConflictError,
+  TypeProposalMissingError,
+} from './docs.service'
 
 const DocIdParamSchema = z.object({
   id: z.string().regex(UUID_RE, 'invalid uuid'),
@@ -212,6 +220,63 @@ export class DocsController {
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // Plan 04-02 Task 3 — owner accepts a pending DocumentType proposal.
+  @Post(':id/accept-type')
+  @HttpCode(200)
+  @RequireRole('owner', 'manager')
+  async acceptType(
+    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Body(zodPipe(AcceptTypeRequestSchema)) _body: AcceptTypeRequest,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<AcceptTypeResponse> {
+    try {
+      return await this.docsService.acceptProposedType(params.id, org.id, user?.id ?? null)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      if (err instanceof TypeProposalMissingError) {
+        throw new HttpException(
+          { error: 'type-proposal-missing' } satisfies ApiErrorResponse,
+          422,
+        )
+      }
+      if (err instanceof TypeNameConflictError) {
+        throw new HttpException(
+          { error: 'type-name-conflict' } satisfies ApiErrorResponse,
+          422,
+        )
+      }
+      throw err
+    }
+  }
+
+  // Plan 04-02 Task 3 — owner rejects a pending proposal (KnowledgeItem stays unclassified).
+  @Post(':id/reject-type')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  async rejectType(
+    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<void> {
+    try {
+      await this.docsService.rejectProposedType(params.id, org.id, user?.id ?? null)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      if (err instanceof TypeProposalMissingError) {
+        throw new HttpException(
+          { error: 'type-proposal-missing' } satisfies ApiErrorResponse,
+          422,
+        )
       }
       throw err
     }

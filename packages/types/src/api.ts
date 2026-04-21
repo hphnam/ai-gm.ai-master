@@ -42,6 +42,9 @@ export const API_ERROR_CODES = [
   'file-too-large',
   'unsupported-file-type',
   'extraction-failed',
+  // v0.2 Phase 4 — Document taxonomy (Plan 04-02; append-only)
+  'type-proposal-missing',
+  'type-name-conflict',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

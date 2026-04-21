@@ -80,6 +80,11 @@ export function mapApiError(err: unknown): string {
       }
       // Plan 04-01 audit-S6: per-reason strings for doc extraction failures.
       // Upstream in apps/api/src/modules/docs/docs.controller.ts — 422 with details: { reason }.
+      // Plan 04-02 Task 3 — document-taxonomy owner actions.
+      case 'type-proposal-missing':
+        return 'That document no longer has a pending type — it may already be classified.'
+      case 'type-name-conflict':
+        return 'A document type with that name already exists. Try a different name or merge manually.'
       case 'extraction-failed': {
         const reason = (err.details as { reason?: string } | undefined)?.reason
         switch (reason) {
