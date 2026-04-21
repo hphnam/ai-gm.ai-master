@@ -13,11 +13,11 @@
   },
   "loop": {
     "plan": "04-01",
-    "position": "PLAN"
+    "position": "APPLY_PARTIAL"
   },
   "timestamps": {
     "created_at": "2026-04-13T21:03:00Z",
-    "updated_at": "2026-04-21T10:10:00Z"
+    "updated_at": "2026-04-21T11:00:00Z"
   },
   "satellite": {
     "groom": true
