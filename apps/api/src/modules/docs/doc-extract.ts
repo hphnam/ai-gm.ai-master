@@ -92,8 +92,12 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
 const TITLE_MAX = 200
 
 export function sanitizeUploadTitle(originalname: string): string {
-  // Plan 04-01: extended extension set (XLSX/CSV/PPTX added here; images added in Task 3).
-  const withoutExt = originalname.replace(/\.(pdf|docx|md|txt|xlsx|csv|pptx)$/i, '')
+  // Plan 04-01: extended extension set (XLSX/CSV/PPTX/image formats).
+  // HEIC omitted — see D-04-01-J in 04-01-SUMMARY (Anthropic SDK media_type union excludes heic).
+  const withoutExt = originalname.replace(
+    /\.(pdf|docx|md|txt|xlsx|csv|pptx|jpe?g|png|webp)$/i,
+    '',
+  )
   const noSeparators = withoutExt.replace(/[\\/]/g, ' ')
   // eslint-disable-next-line no-control-regex
   const noControl = noSeparators.replace(/[\x00-\x1f\x7f]/g, '')
@@ -111,6 +115,12 @@ export const UPLOAD_MIME_ALLOWLIST = [
   'text/csv',
   // Plan 04-01 Task 2 — PPTX.
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  // Plan 04-01 Task 3 — images (jpeg/png/webp). HEIC dropped per D-04-01-J — Anthropic SDK
+  // media_type union doesn't include heic. Image path bypasses extractText and is handled
+  // directly in DocsController.upload via extractImage (Claude vision).
+  'image/jpeg',
+  'image/png',
+  'image/webp',
 ] as const
 
 // Plan 04-01 per-MIME cap map (replaces the single UPLOAD_MAX_BYTES gate for fine-grained limits).
@@ -125,7 +135,10 @@ export const UPLOAD_MAX_BYTES_BY_MIME: Readonly<Record<string, number>> = {
   'text/csv': 10 * 1024 * 1024,
   // Plan 04-01 Task 2 — PPTX gets a larger cap (slide decks carry embedded assets).
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': 15 * 1024 * 1024,
-  // Images appended in Task 3.
+  // Plan 04-01 Task 3 — images capped at 5MB (Claude vision base64 input budget).
+  'image/jpeg': 5 * 1024 * 1024,
+  'image/png': 5 * 1024 * 1024,
+  'image/webp': 5 * 1024 * 1024,
 } as const
 
 export const UPLOAD_MAX_BYTES = 15 * 1024 * 1024 // ceiling across all formats; per-MIME cap refines per type

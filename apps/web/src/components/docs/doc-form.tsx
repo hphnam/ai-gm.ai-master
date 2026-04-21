@@ -233,14 +233,14 @@ function FullDocForm({ onSaved }: { onSaved?: () => void }) {
           <label className="text-sm text-muted-foreground cursor-pointer hover:text-foreground">
             <input
               type="file"
-              accept=".md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+              accept=".md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,.jpg,.jpeg,.png,.webp,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={handleFileChange}
               disabled={submitting || reading || uploadDoc.isPending}
             />
             {reading || uploadDoc.isPending
               ? 'Uploading…'
-              : 'Upload .md, .txt, .pdf, .docx, .xlsx, .csv, or .pptx'}
+              : 'Upload .md, .txt, .pdf, .docx, .xlsx, .csv, .pptx, or image (.jpg/.png/.webp)'}
           </label>
           <div className="ml-auto">
             <Button type="submit" disabled={submitting}>

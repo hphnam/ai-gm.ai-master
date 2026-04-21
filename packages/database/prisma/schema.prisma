@@ -252,6 +252,12 @@ model KnowledgeItem {
   embedding      Unsupported("vector(1024)")?
   embeddingText  String?
   aiSummary      String?
+  // Plan 04-01 Task 3 — image-via-Claude-vision source persistence (audit-S3 Option A committed).
+  // Additive nullable columns; all pre-Phase-4 rows keep NULL for both. Image bytes are stored
+  // inline for POC scale (≤500 uploads × 5MB cap = ≤2.5GB aggregate — NeonDB storage non-issue).
+  // Object-storage migration deferred as D-04-01-F with concrete trigger in SUMMARY.
+  sourceImageBytes Bytes?
+  sourceImageMime  String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

@@ -129,7 +129,10 @@ export class DocsService {
     }
   }
 
-  async create(input: CreateDocRequest, orgId: string): Promise<CreateDocResponse> {
+  async create(
+    input: CreateDocRequest & { sourceImageBytes?: Buffer | null; sourceImageMime?: string | null },
+    orgId: string,
+  ): Promise<CreateDocResponse> {
     // If a venueId was supplied, it MUST belong to the user's active org.
     if (input.venueId) {
       const venue = await prisma.venue.findFirst({
@@ -144,6 +147,9 @@ export class DocsService {
       content: input.content,
       organizationId: orgId,
       venueId: input.venueId,
+      // Plan 04-01 Task 3 — image-via-Claude-vision source persistence passes through.
+      sourceImageBytes: input.sourceImageBytes ?? null,
+      sourceImageMime: input.sourceImageMime ?? null,
     })
 
     const tags = Array.isArray(result.metadata.tags)

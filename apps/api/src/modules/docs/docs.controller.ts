@@ -40,6 +40,7 @@ import {
   extractText,
   sanitizeUploadTitle,
 } from './doc-extract'
+import { extractImage, isDocsImageMime } from './extractors/image-extractor'
 import { DocNotFoundOrCrossOrgError, DocsService } from './docs.service'
 
 const DocIdParamSchema = z.object({
@@ -124,8 +125,29 @@ export class DocsController {
 
     const extractStart = Date.now()
     let content: string
+    // Plan 04-01 Task 3 — image path owns its own persistence pipeline because it also writes
+    // the raw bytes to KnowledgeItem.sourceImageBytes for future Plan 04-02 re-classification.
+    // Text-only formats stay on the existing extractText path.
+    let sourceImageBytes: Buffer | null = null
+    let sourceImageMime: string | null = null
     try {
-      content = await extractText(file.buffer, file.mimetype)
+      if (isDocsImageMime(file.mimetype)) {
+        const result = await extractImage(file.buffer, file.mimetype, this.logger)
+        content = result.text
+        sourceImageBytes = result.sourceBytes
+        sourceImageMime = file.mimetype
+        // audit-M1: cost log carries tokens/bytes/mime/USD only — never the extracted text,
+        // never the base64 payload, never the Anthropic API key.
+        this.logger.log(
+          JSON.stringify({
+            level: 'log',
+            event: 'docs.image_extract_cost',
+            ...result.cost,
+          }),
+        )
+      } else {
+        content = await extractText(file.buffer, file.mimetype)
+      }
     } catch (err) {
       if (err instanceof ExtractError) {
         // Plan 04-01 audit-S6: plumb ExtractError.reason through the response so the UI can
@@ -151,7 +173,10 @@ export class DocsController {
 
     let result: CreateDocResponse
     try {
-      result = await this.docsService.create({ title, content, venueId }, org.id)
+      result = await this.docsService.create(
+        { title, content, venueId, sourceImageBytes, sourceImageMime },
+        org.id,
+      )
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'venue-not-found' } satisfies ApiErrorResponse)

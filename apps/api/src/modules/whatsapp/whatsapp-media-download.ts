@@ -5,6 +5,7 @@ import {
   MEDIA_DOWNLOAD_TIMEOUT_MS,
   type AllowedImageMimeType,
 } from '@gm-ai/types'
+import { magicByteMatchesMime } from '../../common/image-magic-bytes'
 
 export type MediaDownloadResult =
   | { ok: true; base64: string; mediaType: AllowedImageMimeType; byteSize: number }
@@ -51,31 +52,7 @@ export function isHostAllowed(urlString: string): { allowed: boolean; host: stri
 }
 
 // Magic-byte validator (03-03 audit M3): declared MIME must match actual byte signature.
-function magicByteMatchesMime(bytes: Uint8Array, declaredMime: string): boolean {
-  if (bytes.length < 12) return false
-  const b = bytes
-  switch (declaredMime) {
-    case 'image/jpeg':
-      return b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff
-    case 'image/png':
-      return b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47
-    case 'image/gif':
-      return b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x38
-    case 'image/webp':
-      return (
-        b[0] === 0x52 &&
-        b[1] === 0x49 &&
-        b[2] === 0x46 &&
-        b[3] === 0x46 &&
-        b[8] === 0x57 &&
-        b[9] === 0x45 &&
-        b[10] === 0x42 &&
-        b[11] === 0x50
-      )
-    default:
-      return false
-  }
-}
+// Plan 04-01 Task 3: factored to apps/api/src/common/image-magic-bytes.ts for docs reuse.
 
 function isAllowedMime(mime: string): mime is AllowedImageMimeType {
   return (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(mime)

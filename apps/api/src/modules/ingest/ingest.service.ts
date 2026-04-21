@@ -12,6 +12,11 @@ export type IngestInput = {
   category?: string
   organizationId: string
   venueId?: string | null
+  // Plan 04-01 Task 3 — image-via-Claude-vision source persistence (audit-S3 Option A).
+  // Text extracted from the image goes to `content`; raw bytes + declared mime are stored
+  // on KnowledgeItem for future Plan 04-02 re-classification.
+  sourceImageBytes?: Buffer | null
+  sourceImageMime?: string | null
 }
 
 export type IngestResult = {
@@ -69,6 +74,12 @@ export class IngestService implements OnModuleInit {
           metadata: parsed as object,
           aiSummary: parsed.summary ?? null,
           embeddingText,
+          // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
+          // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
+          sourceImageBytes: input.sourceImageBytes
+            ? new Uint8Array(input.sourceImageBytes)
+            : null,
+          sourceImageMime: input.sourceImageMime ?? null,
         },
         update: {
           organizationId: input.organizationId,
@@ -77,6 +88,12 @@ export class IngestService implements OnModuleInit {
           metadata: parsed as object,
           aiSummary: parsed.summary ?? null,
           embeddingText,
+          // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
+          // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
+          sourceImageBytes: input.sourceImageBytes
+            ? new Uint8Array(input.sourceImageBytes)
+            : null,
+          sourceImageMime: input.sourceImageMime ?? null,
         },
       })
       await tx.$executeRawUnsafe(
@@ -176,6 +193,12 @@ ${input.content}`
           metadata: metadata as object,
           aiSummary: null,
           embeddingText,
+          // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
+          // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
+          sourceImageBytes: input.sourceImageBytes
+            ? new Uint8Array(input.sourceImageBytes)
+            : null,
+          sourceImageMime: input.sourceImageMime ?? null,
         },
         update: {
           organizationId: input.organizationId,
@@ -184,6 +207,12 @@ ${input.content}`
           metadata: metadata as object,
           aiSummary: null,
           embeddingText,
+          // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
+          // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
+          sourceImageBytes: input.sourceImageBytes
+            ? new Uint8Array(input.sourceImageBytes)
+            : null,
+          sourceImageMime: input.sourceImageMime ?? null,
         },
       })
       await tx.$executeRawUnsafe(
