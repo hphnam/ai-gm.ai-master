@@ -1,6 +1,8 @@
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { assertAuthEnv } from '../auth/assert-auth-env'
+// Plan 04-01 audit-M2: sanitiseError factored to shared util; preserved behaviour + redaction contract.
+import { sanitiseError } from '../../common/sanitise-error'
 
 type DriverMode = 'console' | 'live' | 'disabled'
 
@@ -45,13 +47,8 @@ function consoleCodeFor(phoneNumber: string): string {
   return `PROBE-${digits.slice(-6)}`
 }
 
-// audit-M4: never pass raw fetch errors through String(err) / JSON.stringify(err) —
-// fetch errors can carry request metadata including the Authorization header.
-function sanitiseError(err: unknown): string {
-  const msg = err instanceof Error ? err.message : 'unknown error'
-  // audit-M5: redact E.164-ish patterns that may leak via error chains
-  return msg.replace(/\+?\d{10,15}/g, '[PHONE]').slice(0, 200)
-}
+// audit-M4/M5: `sanitiseError` moved to apps/api/src/common/sanitise-error.ts (Plan 04-01 audit-M2).
+// Imported above; behaviour preserved. Shared with new docs image-extractor.
 
 // audit-M5: Infobip error text regularly contains the submitted phone number verbatim
 // (e.g. "Number +447... is not valid"). Redact before capturing into any log payload.

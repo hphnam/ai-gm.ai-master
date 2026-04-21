@@ -78,6 +78,23 @@ export function mapApiError(err: unknown): string {
         }
         return 'Phone verification is temporarily unavailable. Try again shortly.'
       }
+      // Plan 04-01 audit-S6: per-reason strings for doc extraction failures.
+      // Upstream in apps/api/src/modules/docs/docs.controller.ts — 422 with details: { reason }.
+      case 'extraction-failed': {
+        const reason = (err.details as { reason?: string } | undefined)?.reason
+        switch (reason) {
+          case 'unsupported-mime':
+            return 'That file format is not supported — try .pdf, .docx, .xlsx, .csv, .pptx, or an image.'
+          case 'corrupt-bytes':
+            return 'That file appears corrupted or the extension does not match its contents.'
+          case 'timeout':
+            return 'Extraction took too long — try a smaller file.'
+          case 'empty-result':
+            return 'No text could be extracted from that file.'
+          default:
+            return "We couldn't read that file — please retry."
+        }
+      }
       default:
         return 'Something went wrong — please retry.'
     }

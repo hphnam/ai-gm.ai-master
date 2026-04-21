@@ -35,6 +35,7 @@ import { RoleGuard } from '../auth/role.guard'
 import {
   ExtractError,
   UPLOAD_MAX_BYTES,
+  UPLOAD_MAX_BYTES_BY_MIME,
   UPLOAD_MIME_ALLOWLIST,
   extractText,
   sanitizeUploadTitle,
@@ -99,16 +100,26 @@ export class DocsController {
     if (!file) {
       throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
     }
-    if (file.size > UPLOAD_MAX_BYTES) {
-      throw new PayloadTooLargeException({
-        error: 'file-too-large',
-      } satisfies ApiErrorResponse)
-    }
+    // Plan 04-01: MIME check runs BEFORE size check so unknown types reject with 415 (clearer
+    // signal) rather than a 413 that looks like a quota issue. Per-MIME cap then refines the
+    // single UPLOAD_MAX_BYTES ceiling.
     if (!UPLOAD_MIME_ALLOWLIST.includes(file.mimetype as (typeof UPLOAD_MIME_ALLOWLIST)[number])) {
       throw new HttpException(
         { error: 'unsupported-file-type' } satisfies ApiErrorResponse,
         415,
       )
+    }
+    const perMimeCap = UPLOAD_MAX_BYTES_BY_MIME[file.mimetype]
+    if (perMimeCap !== undefined && file.size > perMimeCap) {
+      throw new PayloadTooLargeException({
+        error: 'file-too-large',
+      } satisfies ApiErrorResponse)
+    }
+    // Defense-in-depth: global ceiling (also multer's limits.fileSize).
+    if (file.size > UPLOAD_MAX_BYTES) {
+      throw new PayloadTooLargeException({
+        error: 'file-too-large',
+      } satisfies ApiErrorResponse)
     }
 
     const extractStart = Date.now()
@@ -117,8 +128,14 @@ export class DocsController {
       content = await extractText(file.buffer, file.mimetype)
     } catch (err) {
       if (err instanceof ExtractError) {
+        // Plan 04-01 audit-S6: plumb ExtractError.reason through the response so the UI can
+        // render specific user-friendly strings instead of a generic fall-through. Consumed by
+        // apps/web/src/lib/map-api-error.ts which branches on details.reason.
         throw new HttpException(
-          { error: 'extraction-failed' } satisfies ApiErrorResponse,
+          {
+            error: 'extraction-failed',
+            details: { reason: err.reason },
+          } satisfies ApiErrorResponse,
           422,
         )
       }

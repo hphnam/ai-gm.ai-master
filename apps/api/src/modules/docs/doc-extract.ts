@@ -16,7 +16,9 @@ export class ExtractError extends Error {
   }
 }
 
-const MAX_EXTRACT_CHARS = 1_000_000
+// Plan 04-01: exported so per-format extractors (apps/api/src/modules/docs/extractors/*.ts)
+// can respect the same cap without duplicating the constant.
+export const MAX_EXTRACT_CHARS = 1_000_000
 const EXTRACT_TIMEOUT_MS = 30_000
 
 async function withTimeout<T>(p: Promise<T>, mimeType: string): Promise<T> {
@@ -58,6 +60,17 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
         text = (value ?? '').slice(0, MAX_EXTRACT_CHARS)
         break
       }
+      // Plan 04-01: new cases (existing PDF/DOCX/TXT/MD cases above are byte-identical per AC-6).
+      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
+        const { extractXlsx } = await import('./extractors/xlsx-extractor')
+        text = await withTimeout(extractXlsx(buffer), mimeType)
+        break
+      }
+      case 'text/csv': {
+        const { extractCsv } = await import('./extractors/csv-extractor')
+        text = await withTimeout(extractCsv(buffer), mimeType)
+        break
+      }
       default:
         throw new ExtractError(mimeType, 'unsupported-mime')
     }
@@ -74,7 +87,8 @@ export async function extractText(buffer: Buffer, mimeType: string): Promise<str
 const TITLE_MAX = 200
 
 export function sanitizeUploadTitle(originalname: string): string {
-  const withoutExt = originalname.replace(/\.(pdf|docx|md|txt)$/i, '')
+  // Plan 04-01: extended extension set (XLSX/CSV added here; PPTX + images added in Tasks 2/3).
+  const withoutExt = originalname.replace(/\.(pdf|docx|md|txt|xlsx|csv)$/i, '')
   const noSeparators = withoutExt.replace(/[\\/]/g, ' ')
   // eslint-disable-next-line no-control-regex
   const noControl = noSeparators.replace(/[\x00-\x1f\x7f]/g, '')
@@ -87,7 +101,23 @@ export const UPLOAD_MIME_ALLOWLIST = [
   'text/markdown',
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  // Plan 04-01 Task 1 — XLSX + CSV.
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/csv',
 ] as const
 
-export const UPLOAD_MAX_BYTES = 10 * 1024 * 1024
+// Plan 04-01 per-MIME cap map (replaces the single UPLOAD_MAX_BYTES gate for fine-grained limits).
+// Multer still uses UPLOAD_MAX_BYTES as the ceiling (highest cap across all formats) — per-MIME is
+// a second gate enforced in docs.controller.ts after multer accepts. See SCOPE LIMITS in PLAN (audit-S7).
+export const UPLOAD_MAX_BYTES_BY_MIME: Readonly<Record<string, number>> = {
+  'text/plain': 10 * 1024 * 1024,
+  'text/markdown': 10 * 1024 * 1024,
+  'application/pdf': 10 * 1024 * 1024,
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 10 * 1024 * 1024,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 10 * 1024 * 1024,
+  'text/csv': 10 * 1024 * 1024,
+  // PPTX + images appended in Tasks 2 & 3.
+} as const
+
+export const UPLOAD_MAX_BYTES = 15 * 1024 * 1024 // ceiling across all formats; per-MIME cap refines per type
 export const UPLOAD_EXTRACT_TIMEOUT_MS = EXTRACT_TIMEOUT_MS
