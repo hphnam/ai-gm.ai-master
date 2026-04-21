@@ -7,11 +7,11 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.2 Multi-Tenant WhatsApp** (v0.2.0)
-Status: 🚧 In Progress (3 of 4 phases complete)
+Status: 🚧 In Progress (3 of 4 phases complete; Phase 4 pivoted 2026-04-21 to Dynamic Document Intelligence)
 Phases: 4
-Estimated plans: 10-14
+Estimated plans: 14-18 (Phase 3 grew +2 for Infobip migration; Phase 4 plan count TBD via /paul:discuss)
 
-**Theme:** "Managers sign up, invite their team, upload their venue docs, connect their WhatsApp number, and staff chat with the GM assistant from their phones — deployed to Coolify."
+**Theme:** "Managers sign up, invite their team, upload their venue docs, connect their WhatsApp number, and staff chat with the GM assistant from their phones — with the assistant understanding what KIND of document each upload is (reference vs procedural) and executing procedural docs as stateful checklists."
 
 ### Phase Overview
 
@@ -19,8 +19,8 @@ Estimated plans: 10-14
 |-------|------|-------|--------|-----------|
 | 1 | Auth + Organizations | 3 of 3 (01-01 ✓, 01-02 ✓, 01-03 ✓) | Complete | 2026-04-20 |
 | 2 | Document Ingest UI | 2 of 2 (02-01 ✓, 02-02 ✓) | Complete | 2026-04-20 |
-| 3 | WhatsApp Integration | 3 of 3 (03-01 ✓, 03-02 ✓, 03-03 ✓) | ✅ Complete | 2026-04-20 |
-| 4 | Coolify Deployment | TBD (2-3 est) | 🔵 Next | - |
+| 3 | WhatsApp Integration | 3 superseded (Twilio: 03-01 ⊘, 03-02 ⊘, 03-03 ⊘) + 03-04 ✓ (Infobip WhatsApp) + 03-05 ✓ (Infobip 2FA SMS OTP) | Complete | 2026-04-21 |
+| 4 | Dynamic Document Intelligence | TBD (3-4 est; /paul:discuss pending) | ⏸ Not started | - |
 
 ### Phase 1: Auth + Organizations
 
@@ -72,23 +72,23 @@ Estimated plans: 10-14
 
 **Plans:** TBD (defined during /paul:plan)
 
-### Phase 4: Coolify Deployment
+### Phase 4: Dynamic Document Intelligence
 
-**Focus:** Production cutover. Dockerfiles + Coolify service config; domain + HTTPS + CORS; Neon production branch + migrations via prisma migrate deploy; Twilio webhook URL swings from ngrok → production HTTPS; end-to-end smoke test (Ryan's phone → real Coolify URL → Claude reply). Live WhatsApp sender contingent on Meta Business verification; sandbox fallback if paperwork pending.
+**Pivot 2026-04-21:** Original Phase 4 (Coolify Deployment) removed from roadmap — user self-managing deployment. Replaced with a document-intelligence layer that handles what RAG alone can't: procedural artifacts (checklists, SOPs, daily-routine docs) that require state tracking and execution, not just retrieval.
 
-**Scope:**
-- apps/api + apps/web Dockerfiles (multi-stage, pnpm+turbo build)
-- Coolify service + env/secret config
-- app.gm-ai.example.com + api.gm-ai.example.com (final domain TBD)
-- Let's Encrypt HTTPS via Coolify
-- Production seed script (env-gated, minimal — not full dev seed)
-- Webhook cutover in Twilio console
-- Meta Business verification completion OR sandbox fallback path
-- .paul/DEPLOY.md runbook with rollback procedure + secret rotation
-- Health checks (/health endpoints)
-- Smoke test acceptance: full sign-up → invite → upload → phone link → WhatsApp → AI reply flow, live
+**Focus:** Ingest-time document classification + per-tenant taxonomy + schema extraction + runtime routing. Every tenant's taxonomy evolves as they upload docs — no hardcoded document types, no releases required to support new doc shapes. Procedural docs become first-class Checklist/Procedure entities the WhatsApp assistant can present interactively and track completion on.
 
-**Plans:** TBD (defined during /paul:plan)
+**Scope (pre-discuss sketch — concrete shape to come from /paul:discuss):**
+- Ingest-time classifier: on upload, LLM tags the doc against tenant's current taxonomy with an explicit escape hatch ("if none fit, propose a new type + schema")
+- Per-tenant taxonomy + schema stored as DB entities (not code). Starts empty; grows with uploads.
+- Cluster-and-promote loop: pending type proposals cluster via embeddings (duplicates collapse); promotion to active after N examples with stable schema. Schema widening is additive-only (registry semantics).
+- Owner-facing confirmation UI in the web app: auto-accept above confidence threshold; surface "new doc type detected — keep / rename / merge" for ambiguous cases. No silent taxonomy drift.
+- Runtime routing: reference docs → existing RAG path (unchanged); procedural docs → Checklist/Procedure entities with persisted completion state that the assistant can query, present, and tick off interactively.
+- Optional cross-tenant priors (new-tenant cold-start): seed a new org's classifier with anonymized shapes of doc types seen across existing orgs. Privacy-gated; behind a feature flag.
+
+**Plans:** TBD (defined during /paul:discuss — estimated 3-4 plans covering classifier + storage + owner UI + runtime routing)
+
+**Deployment:** Out of roadmap scope — user self-managing production deploy, Infobip Portal UAT, domain/HTTPS/DB migrations.
 
 ---
 
@@ -115,4 +115,4 @@ Estimated plans: 10-14
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-20 — v0.2 Phase 3 (WhatsApp Integration) complete (3/3 plans); ready for Phase 4 (Coolify Deployment)*
+*Last updated: 2026-04-21 — v0.2 Phase 3 closed (Twilio fully removed via Plans 03-04 + 03-05 Infobip migration); Phase 4 pivoted from Coolify Deployment to Dynamic Document Intelligence*
