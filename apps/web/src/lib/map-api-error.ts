@@ -85,6 +85,9 @@ export function mapApiError(err: unknown): string {
         return 'That document no longer has a pending type — it may already be classified.'
       case 'type-name-conflict':
         return 'A document type with that name already exists. Try a different name or merge manually.'
+      // Plan 04-03 Task 3 — procedural extraction (reserved; no current endpoint returns this).
+      case 'checklist-extraction-failed':
+        return "We couldn't extract checklist structure — the document was saved but may not have procedural steps we can detect."
       case 'extraction-failed': {
         const reason = (err.details as { reason?: string } | undefined)?.reason
         switch (reason) {

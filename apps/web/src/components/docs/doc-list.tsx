@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Trash2 } from 'lucide-react'
+import { CheckSquare, Trash2 } from 'lucide-react'
 import type { DocListItem } from '@gm-ai/types'
 import { Button } from '@/components/ui/button'
 import {
@@ -86,6 +86,21 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
   )
 }
 
+// Plan 04-03 Task 3 — procedural indicator shown alongside the TaxonomyBadge
+// when documentType.kind === 'procedural'. Icon+text per 05-02 WCAG AA decision
+// (never icon-only). Amber hue is distinct from the emerald DocumentType badge.
+function ProceduralIndicator() {
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-medium"
+      aria-label="Procedural document"
+    >
+      <CheckSquare className="h-3 w-3" aria-hidden />
+      Procedural
+    </span>
+  )
+}
+
 // Plan 04-02 Task 3 — per-row taxonomy state: confirmed type / pending proposal / unclassified.
 function TaxonomyBadge({ doc }: { doc: DocListItem }) {
   const [open, setOpen] = useState(false)
@@ -164,6 +179,7 @@ export function DocList({
               </Link>
             </h3>
             <TaxonomyBadge doc={d} />
+            {d.isProcedural ? <ProceduralIndicator /> : null}
             {d.docType ? (
               <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
                 {d.docType}

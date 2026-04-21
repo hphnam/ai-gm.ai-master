@@ -1,12 +1,14 @@
 'use client'
 
 // Plan 04-02 Task 3 — inline owner-confirmation modal for classifier proposals.
+// Plan 04-03 Task 3 — kind toggle (reference | procedural) + extractor context hint.
 // Surfaces after a successful upload (CreateDocResponse.pendingTypeProposal non-null)
 // OR from a /docs list row Accept action. Owner: Accept → promote to DocumentType +
 // link KnowledgeItem; Reject → clear the proposal, row becomes Unclassified.
 
+import { useState } from 'react'
 import { toast } from 'sonner'
-import type { ProposedDocType } from '@gm-ai/types'
+import type { DocumentTypeKind, ProposedDocType } from '@gm-ai/types'
 import {
   Dialog,
   DialogContent,
@@ -42,9 +44,16 @@ export function DocTypeProposalModal({
   const busy = acceptMut.isPending || rejectMut.isPending
   const conf = confidenceLabel(proposal.confidence)
 
+  // Plan 04-03 Task 3 — owner can flip classifier's proposed kind before accepting.
+  // Default to the classifier's suggestion (proposal.kind), fall back to 'reference' if missing.
+  const proposedKind: DocumentTypeKind = proposal.kind ?? 'reference'
+  const [selectedKind, setSelectedKind] = useState<DocumentTypeKind>(proposedKind)
+
   async function handleAccept() {
     try {
-      await acceptMut.mutateAsync(docId)
+      // Only send kind if owner actually overrode — keeps accept body minimal.
+      const kindArg = selectedKind !== proposedKind ? selectedKind : undefined
+      await acceptMut.mutateAsync({ docId, kind: kindArg })
       toast.success(`Type accepted: ${proposal.name}`)
       onOpenChange(false)
     } catch (err) {
@@ -111,6 +120,57 @@ export function DocTypeProposalModal({
               </pre>
             </div>
           ) : null}
+
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              Document type
+            </p>
+            <div role="radiogroup" aria-label="Document type" className="flex gap-2">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={selectedKind === 'reference'}
+                onClick={() => setSelectedKind('reference')}
+                disabled={busy}
+                className={
+                  selectedKind === 'reference'
+                    ? 'flex-1 rounded-md border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-left'
+                    : 'flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-left hover:bg-accent'
+                }
+              >
+                <div className="font-medium">Reference</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  Prose, policies, menus, contact lists — retrieval only.
+                </div>
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={selectedKind === 'procedural'}
+                onClick={() => setSelectedKind('procedural')}
+                disabled={busy}
+                className={
+                  selectedKind === 'procedural'
+                    ? 'flex-1 rounded-md border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-left'
+                    : 'flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-left hover:bg-accent'
+                }
+              >
+                <div className="font-medium">Procedural</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  Checklists and routines with steps + cadence.
+                </div>
+              </button>
+            </div>
+            {selectedKind === 'procedural' ? (
+              <p className="text-xs text-muted-foreground mt-2">
+                We&apos;ll try to extract steps + schedule after you accept.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-2">
+                Stored as reference material for retrieval. No procedural extraction.
+              </p>
+            )}
+          </div>
         </div>
 
         <DialogFooter>

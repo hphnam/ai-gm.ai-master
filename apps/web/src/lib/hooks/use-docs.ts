@@ -8,6 +8,7 @@ import type {
   CreateDocResponse,
   DocDetail,
   DocListItem,
+  DocumentTypeKind,
 } from '@gm-ai/types'
 import { API_URL, ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
@@ -76,11 +77,15 @@ export function useUploadDoc() {
 }
 
 // Plan 04-02 Task 3 — owner accepts the classifier's new-type proposal.
+// Plan 04-03 Task 3 — optional kind override lets owner flip procedural↔reference pre-promote.
 export function useAcceptDocType() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (docId: string) =>
-      apiPost<AcceptTypeResponse>(`/docs/${docId}/accept-type`, {}),
+    mutationFn: ({ docId, kind }: { docId: string; kind?: DocumentTypeKind }) =>
+      apiPost<AcceptTypeResponse>(
+        `/docs/${docId}/accept-type`,
+        kind ? { kind } : {},
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
     },

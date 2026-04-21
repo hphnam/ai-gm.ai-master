@@ -85,9 +85,11 @@ export class DocsController {
   async create(
     @Body(zodPipe(CreateDocRequestSchema)) body: CreateDocRequest,
     @CurrentOrg() org: { id: string },
+    // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
+    @CurrentUser() user: { id: string } | null,
   ): Promise<CreateDocResponse> {
     try {
-      return await this.docsService.create(body, org.id)
+      return await this.docsService.create(body, org.id, user?.id ?? null)
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'venue-not-found' } satisfies ApiErrorResponse)
@@ -105,6 +107,8 @@ export class DocsController {
     @UploadedFile() file: Express.Multer.File | undefined,
     @Body() body: { venueId?: string },
     @CurrentOrg() org: { id: string },
+    // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
+    @CurrentUser() user: { id: string } | null,
   ): Promise<CreateDocResponse> {
     if (!file) {
       throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
@@ -184,6 +188,7 @@ export class DocsController {
       result = await this.docsService.create(
         { title, content, venueId, sourceImageBytes, sourceImageMime },
         org.id,
+        user?.id ?? null,
       )
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
@@ -226,17 +231,23 @@ export class DocsController {
   }
 
   // Plan 04-02 Task 3 — owner accepts a pending DocumentType proposal.
+  // Plan 04-03 Task 3 — optional body.kind overrides classifier's proposed kind.
   @Post(':id/accept-type')
   @HttpCode(200)
   @RequireRole('owner', 'manager')
   async acceptType(
     @Param(zodPipe(DocIdParamSchema)) params: { id: string },
-    @Body(zodPipe(AcceptTypeRequestSchema)) _body: AcceptTypeRequest,
+    @Body(zodPipe(AcceptTypeRequestSchema)) body: AcceptTypeRequest,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
   ): Promise<AcceptTypeResponse> {
     try {
-      return await this.docsService.acceptProposedType(params.id, org.id, user?.id ?? null)
+      return await this.docsService.acceptProposedType(
+        params.id,
+        org.id,
+        user?.id ?? null,
+        body.kind,
+      )
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)

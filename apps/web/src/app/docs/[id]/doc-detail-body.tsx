@@ -1,11 +1,56 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Camera, CheckSquare, FileText, Hash } from 'lucide-react'
+import type { AudienceRole, ChecklistStep, Schedule } from '@gm-ai/types'
 import { UserMenu } from '@/components/auth/user-menu'
 import { Button } from '@/components/ui/button'
 import { useDoc } from '@/lib/hooks/use-docs'
 import { ApiError } from '@/lib/api-client'
+
+// Plan 04-03 Task 3 — Schedule + Audience + Step rendering helpers (co-located; small + pure).
+
+function formatScheduleLine(s: Schedule): string {
+  if (s.cadence === 'unknown') return s.rawText || 'Unspecified schedule'
+  const parts: string[] = [s.cadence.charAt(0).toUpperCase() + s.cadence.slice(1)]
+  if (s.dayOfWeek != null) parts.push(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.dayOfWeek])
+  if (s.dayOfMonth != null) parts.push(`day ${s.dayOfMonth}`)
+  if (s.timeOfDay) parts.push(`@ ${s.timeOfDay}`)
+  return parts.join(' • ')
+}
+
+function RolePill({ role }: { role: AudienceRole }) {
+  const styles: Record<AudienceRole, string> = {
+    staff: 'bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-500/30',
+    manager: 'bg-violet-500/15 text-violet-800 dark:text-violet-300 border-violet-500/30',
+    owner: 'bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/30',
+  }
+  return (
+    <span
+      className={`text-[11px] px-2 py-0.5 rounded-full border font-medium capitalize ${styles[role]}`}
+    >
+      {role}
+    </span>
+  )
+}
+
+function StepKindIcon({ kind }: { kind: ChecklistStep['kind'] }) {
+  const common = 'h-3.5 w-3.5 shrink-0'
+  switch (kind) {
+    case 'tick':
+      return <CheckSquare className={common} aria-hidden />
+    case 'numeric':
+      return <Hash className={common} aria-hidden />
+    case 'photo':
+      return <Camera className={common} aria-hidden />
+    case 'text':
+    default:
+      return <FileText className={common} aria-hidden />
+  }
+}
+
+// Plan 04-03 audit-S6 — bound the DOM size on pathological extractor output.
+const STEP_DISPLAY_CAP = 200
 
 export function DocDetailBody({ id }: { id: string }) {
   const doc = useDoc(id)
@@ -79,6 +124,75 @@ export function DocDetailBody({ id }: { id: string }) {
               {doc.data.content}
             </pre>
           </section>
+
+          {doc.data.checklist ? (
+            <section
+              aria-labelledby="checklist-heading"
+              className="rounded-md border bg-card p-4 space-y-4"
+            >
+              <h2 id="checklist-heading" className="text-lg font-semibold">
+                Procedural structure
+              </h2>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Schedule
+                </p>
+                <p className="text-sm">
+                  {formatScheduleLine(doc.data.checklist.schedule)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  Audience
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {doc.data.checklist.audience.roles.length > 0 ? (
+                    doc.data.checklist.audience.roles.map((r) => (
+                      <RolePill key={r} role={r} />
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      {doc.data.checklist.audience.rawText || 'Unspecified'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  Steps ({doc.data.checklist.steps.length})
+                </p>
+                <ol className="list-decimal pl-5 space-y-1.5">
+                  {doc.data.checklist.steps.slice(0, STEP_DISPLAY_CAP).map((s) => (
+                    <li key={s.index} className="text-sm">
+                      <span className="inline-flex items-start gap-2">
+                        <StepKindIcon kind={s.kind} />
+                        <span>
+                          {s.text}
+                          {s.required === false ? (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              (optional)
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
+                      {s.hint ? (
+                        <div className="ml-5 text-xs text-muted-foreground mt-0.5">
+                          {s.hint}
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+                {doc.data.checklist.steps.length > STEP_DISPLAY_CAP ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Showing first {STEP_DISPLAY_CAP} of{' '}
+                    {doc.data.checklist.steps.length} steps. Remaining steps are
+                    persisted in the database.
+                  </p>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
 
           {Object.keys(doc.data.metadata).length > 0 ? (
             <details className="rounded-md border bg-card p-4">

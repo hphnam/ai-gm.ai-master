@@ -349,10 +349,14 @@ export class DocsService {
   }
 
   // Plan 04-02 Task 3 — owner accepts a pending proposal → promote to DocumentType + link.
+  // Plan 04-03 Task 3 — accepts optional kindOverride. Owner can flip classifier's proposed
+  // kind ('procedural' ↔ 'reference') at acceptance time. Post-promotion: if resolved kind is
+  // procedural, fire the ChecklistExtractorService against the just-promoted KI.
   async acceptProposedType(
     knowledgeItemId: string,
     orgId: string,
     userId: string | null,
+    kindOverride?: DocumentTypeKind,
   ): Promise<DocumentTypeDto> {
     const row = await prisma.knowledgeItem.findUnique({
       where: { id: knowledgeItemId },
@@ -376,6 +380,11 @@ export class DocsService {
     const proposal = toPendingProposal(row.pendingTypeProposal)
     if (!proposal) throw new TypeProposalMissingError()
 
+    // Plan 04-03 audit-S5 — track kind resolution for the accountability log.
+    const proposalKind: DocumentTypeKind = proposal.kind ?? 'reference'
+    const resolvedKind: DocumentTypeKind = kindOverride ?? proposalKind
+    const kindOverridden = kindOverride !== undefined && kindOverride !== proposalKind
+
     try {
       const created = await prisma.$transaction(async (tx) => {
         const newType = await tx.documentType.create({
@@ -384,6 +393,7 @@ export class DocsService {
             name: proposal.name,
             description: proposal.description,
             schema: (proposal.schema ?? {}) as object,
+            kind: resolvedKind,
             confirmedByUserId: userId,
           },
           select: { id: true, name: true, description: true, schema: true, kind: true },
@@ -395,7 +405,7 @@ export class DocsService {
         return newType
       })
 
-      // Log name only (not schema body — may carry content-derived field names).
+      // Log name + kind metadata (audit-S5). Never the schema body — may carry content-derived keys.
       this.logger.log(
         JSON.stringify({
           level: 'log',
@@ -405,8 +415,35 @@ export class DocsService {
           knowledgeItemId,
           documentTypeId: created.id,
           name: created.name,
+          kind: resolvedKind,
+          kindOverridden,
         }),
       )
+
+      // Plan 04-03 Task 3 — post-accept extraction fires fire-and-forget for procedural types.
+      // Extractor is fail-soft (any failure returns null + operator log); no extra try/catch.
+      if (resolvedKind === 'procedural') {
+        const ki = await prisma.knowledgeItem.findUnique({
+          where: { id: knowledgeItemId },
+          select: { content: true, metadata: true },
+        })
+        if (ki) {
+          const metadata = (ki.metadata ?? {}) as Record<string, unknown>
+          const title =
+            typeof metadata.title === 'string' && metadata.title.trim()
+              ? metadata.title.trim()
+              : '(untitled)'
+          await this.checklistExtractor.extract({
+            knowledgeItemId,
+            orgId,
+            title,
+            content: ki.content,
+            userId,
+            kindSource: 'accept-type',
+          })
+        }
+      }
+
       return toDocumentTypeDto(created) as DocumentTypeDto
     } catch (err) {
       // Prisma P2002 on @@unique([organizationId, name]).
