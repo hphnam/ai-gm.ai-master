@@ -114,6 +114,7 @@ model Organization {
   venues         Venue[]
   knowledgeItems KnowledgeItem[]
   documentTypes  DocumentType[]
+  checklists     Checklist[]
 
   @@index([slug])
   @@map("organizations")
@@ -273,6 +274,7 @@ model KnowledgeItem {
   venue           Venue?           @relation(fields: [venueId], references: [id], onDelete: Cascade)
   documentType    DocumentType?    @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
   retagQueueItems ReTagQueueItem[]
+  checklist       Checklist?
 
   @@index([organizationId])
   @@index([venueId])
@@ -286,6 +288,9 @@ model DocumentType {
   name              String
   description       String?
   schema            Json      @default("{}")
+  /// Plan 04-03 Task 1 — 'reference' (RAG path) | 'procedural' (Checklist extraction path).
+  /// Enforced at the Zod layer via DocumentTypeKindSchema in @gm-ai/types.
+  kind              String    @default("reference")
   confirmedAt       DateTime  @default(now())
   confirmedByUserId String?
   createdAt         DateTime  @default(now())
@@ -297,6 +302,70 @@ model DocumentType {
   @@unique([organizationId, name])
   @@index([organizationId])
   @@map("document_types")
+}
+
+/// Plan 04-03 Task 1 — procedural doc model (Checklist entity).
+/// 1-1 with KnowledgeItem (knowledgeItemId @unique). Created when a KI is classified
+/// into a procedural-kind DocumentType; re-extraction replaces via upsert.
+model Checklist {
+  id              String   @id @default(uuid())
+  organizationId  String
+  knowledgeItemId String   @unique
+  title           String
+  steps           Json     @default("[]")
+  schedule        Json     @default("{}")
+  audience        Json     @default("{}")
+  extractedAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization  Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  knowledgeItem KnowledgeItem       @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
+  instances     ChecklistInstance[]
+
+  @@index([organizationId])
+  @@map("checklists")
+}
+
+/// Plan 04-03 Task 1 — per-occurrence instance of a Checklist (today's opening vs yesterday's).
+/// EMPTY SCHEMA this plan. 04-04 scheduler is the first writer.
+/// @see packages/types/src/docs.ts — ChecklistInstanceKeySchema for instanceKey format contract.
+model ChecklistInstance {
+  id          String    @id @default(uuid())
+  checklistId String
+  /// Format: "YYYY-MM-DD" daily | "YYYY-W##" weekly | "YYYY-MM" monthly | "ad-hoc-<uuid>" ad-hoc.
+  /// Enforce via ChecklistInstanceKeySchema from @gm-ai/types before every write.
+  instanceKey String
+  openedAt    DateTime  @default(now())
+  completedAt DateTime?
+  completedBy String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  checklist   Checklist                 @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  completions ChecklistStepCompletion[]
+
+  @@unique([checklistId, instanceKey])
+  @@index([checklistId])
+  @@map("checklist_instances")
+}
+
+/// Plan 04-03 Task 1 — per-step completion record within a ChecklistInstance.
+/// EMPTY SCHEMA this plan. 04-05 walkthrough runtime is the first writer.
+model ChecklistStepCompletion {
+  id          String   @id @default(uuid())
+  instanceId  String
+  stepIndex   Int
+  /// Opaque value-per-step-kind payload: tick → {ticked:true}; numeric → {value:N}; photo → {ref}; text → {text}.
+  value       Json?
+  completedAt DateTime @default(now())
+  completedBy String?
+
+  instance ChecklistInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@unique([instanceId, stepIndex])
+  @@index([instanceId])
+  @@map("checklist_step_completions")
 }
 
 model VenueContact {

@@ -45,6 +45,9 @@ export const API_ERROR_CODES = [
   // v0.2 Phase 4 — Document taxonomy (Plan 04-02; append-only)
   'type-proposal-missing',
   'type-name-conflict',
+  // v0.2 Phase 4 — Procedural doc model (Plan 04-03; append-only)
+  // Reserved for the future retry-extract endpoint (D-04-03-F); no current endpoint returns this.
+  'checklist-extraction-failed',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

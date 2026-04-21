@@ -1,13 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Prisma, prisma } from '@gm-ai/database'
 import {
+  AudienceSchema,
+  ChecklistStepSchema,
+  DocumentTypeKindSchema,
   ProposedDocTypeSchema,
+  ScheduleSchema,
+  type Audience,
+  type ChecklistDto,
+  type ChecklistStep,
   type CreateDocRequest,
   type CreateDocResponse,
   type DocDetail,
   type DocListItem,
   type DocumentTypeDto,
+  type DocumentTypeKind,
   type ProposedDocType,
+  type Schedule,
 } from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
 import { ClassifierService } from './classifier.service'
@@ -50,15 +59,19 @@ export class TypeNameConflictError extends Error {
 }
 
 // Plan 04-02 Task 2 — helper: hydrate DocumentType + pendingTypeProposal onto API responses.
+// Plan 04-03 Task 1 — `kind` threaded through. DocumentTypeKindSchema.safeParse on read guards
+// against stored bad values (shouldn't happen — DB column is TEXT NOT NULL DEFAULT 'reference').
 function toDocumentTypeDto(
-  dt: { id: string; name: string; description: string | null; schema: unknown } | null,
+  dt: { id: string; name: string; description: string | null; schema: unknown; kind: string } | null,
 ): DocumentTypeDto | null {
   if (!dt) return null
+  const parsedKind = DocumentTypeKindSchema.safeParse(dt.kind)
   return {
     id: dt.id,
     name: dt.name,
     description: dt.description,
     schema: (dt.schema ?? {}) as Record<string, unknown>,
+    kind: parsedKind.success ? parsedKind.data : 'reference',
   }
 }
 
@@ -66,6 +79,45 @@ function toPendingProposal(raw: unknown): ProposedDocType | null {
   if (!raw || typeof raw !== 'object') return null
   const parsed = ProposedDocTypeSchema.safeParse(raw)
   return parsed.success ? parsed.data : null
+}
+
+// Plan 04-03 Task 1 — defence-in-depth hydration of the persisted Checklist JSON columns.
+// Pattern mirrors toPendingProposal: safeParse; malformed rows degrade to null rather than
+// surfacing as 500s. `steps` is extracted to ChecklistStep[] array (default [] on drift).
+function toChecklistDto(
+  raw: {
+    id: string
+    knowledgeItemId: string
+    title: string
+    steps: unknown
+    schedule: unknown
+    audience: unknown
+    extractedAt: Date
+  } | null,
+): ChecklistDto | null {
+  if (!raw) return null
+  const stepsArr = Array.isArray(raw.steps) ? raw.steps : []
+  const steps: ChecklistStep[] = stepsArr
+    .map((s) => ChecklistStepSchema.safeParse(s))
+    .filter((r): r is { success: true; data: ChecklistStep } => r.success)
+    .map((r) => r.data)
+  const schedule: Schedule = (() => {
+    const parsed = ScheduleSchema.safeParse(raw.schedule ?? {})
+    return parsed.success ? parsed.data : ScheduleSchema.parse({})
+  })()
+  const audience: Audience = (() => {
+    const parsed = AudienceSchema.safeParse(raw.audience ?? {})
+    return parsed.success ? parsed.data : AudienceSchema.parse({})
+  })()
+  return {
+    id: raw.id,
+    knowledgeItemId: raw.knowledgeItemId,
+    title: raw.title,
+    steps,
+    schedule,
+    audience,
+    extractedAt: raw.extractedAt.toISOString(),
+  }
 }
 
 @Injectable()
@@ -94,8 +146,9 @@ export class DocsService {
         updatedAt: true,
         venue: { select: { id: true, name: true } },
         // Plan 04-02 Task 2 — include confirmed DocumentType + pending proposal.
+        // Plan 04-03 Task 1 — + kind for procedural-badge rendering.
         documentType: {
-          select: { id: true, name: true, description: true, schema: true },
+          select: { id: true, name: true, description: true, schema: true, kind: true },
         },
         pendingTypeProposal: true,
       },
@@ -109,6 +162,7 @@ export class DocsService {
         : []
       const docType = typeof metadata.docType === 'string' ? metadata.docType : null
       const title = titleFromMetadata(metadata)
+      const documentType = toDocumentTypeDto(r.documentType)
       return {
         id: r.id,
         title,
@@ -118,8 +172,10 @@ export class DocsService {
         summary: r.aiSummary,
         tags,
         docType,
-        documentType: toDocumentTypeDto(r.documentType),
+        documentType,
         pendingTypeProposal: toPendingProposal(r.pendingTypeProposal),
+        // Plan 04-03 Task 1 — explicit convenience flag for UI procedural-badge rendering.
+        isProcedural: documentType?.kind === 'procedural',
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
       }
@@ -140,9 +196,21 @@ export class DocsService {
         updatedAt: true,
         venue: { select: { id: true, name: true } },
         documentType: {
-          select: { id: true, name: true, description: true, schema: true },
+          select: { id: true, name: true, description: true, schema: true, kind: true },
         },
         pendingTypeProposal: true,
+        // Plan 04-03 Task 1 — include 1-1 Checklist for procedural docs.
+        checklist: {
+          select: {
+            id: true,
+            knowledgeItemId: true,
+            title: true,
+            steps: true,
+            schedule: true,
+            audience: true,
+            extractedAt: true,
+          },
+        },
       },
     })
     if (!row) return null
@@ -176,6 +244,7 @@ export class DocsService {
       docType,
       documentType: toDocumentTypeDto(row.documentType),
       pendingTypeProposal: toPendingProposal(row.pendingTypeProposal),
+      checklist: toChecklistDto(row.checklist),
       metadata,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
@@ -232,7 +301,7 @@ export class DocsService {
     if (classified.kind === 'matched') {
       const row = await prisma.documentType.findUnique({
         where: { id: classified.typeId },
-        select: { id: true, name: true, description: true, schema: true },
+        select: { id: true, name: true, description: true, schema: true, kind: true },
       })
       matchedType = toDocumentTypeDto(row)
     }
@@ -245,6 +314,8 @@ export class DocsService {
       failSoft: tags.length === 0 && result.aiSummary === null,
       documentType: matchedType,
       pendingTypeProposal: classified.kind === 'proposal' ? classified.proposal : null,
+      // Plan 04-03 Task 1 — placeholder null; Task 2 populates via ChecklistExtractorService.
+      checklist: null,
     }
   }
 
@@ -286,7 +357,7 @@ export class DocsService {
             schema: (proposal.schema ?? {}) as object,
             confirmedByUserId: userId,
           },
-          select: { id: true, name: true, description: true, schema: true },
+          select: { id: true, name: true, description: true, schema: true, kind: true },
         })
         await tx.knowledgeItem.update({
           where: { id: knowledgeItemId },
