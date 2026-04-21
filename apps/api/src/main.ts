@@ -1,7 +1,7 @@
 import './load-env'
 
 import { NestFactory } from '@nestjs/core'
-import { json, raw as rawParser } from 'express'
+import { json, raw as rawParser, type NextFunction, type Request, type Response } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
@@ -23,7 +23,7 @@ async function bootstrap() {
     .filter(Boolean)
 
   app.enableCors({
-    origin: (origin, cb) => {
+    origin: (origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => {
       if (!origin) return cb(null, true)
       if (allowlist.includes(origin)) return cb(null, true)
       return cb(null, false)
@@ -63,7 +63,7 @@ async function bootstrap() {
     limit: '32kb',
     type: ['application/json', 'application/*+json'],
   })
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path === '/docs/upload') return next()
     if (req.path === '/webhooks/infobip/whatsapp') {
       return webhookRaw(req, res, (err) => {

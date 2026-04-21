@@ -8,7 +8,7 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "Node10",
-    "types": ["node", "multer"],
+    "types": ["node", "multer", "express"],
     "ignoreDeprecations": "6.0"
   },
   "include": ["src"]

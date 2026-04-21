@@ -36,6 +36,7 @@
     "@nestjs/cli": "latest",
     "@swc/cli": "latest",
     "@swc/core": "latest",
+    "@types/express": "latest",
     "@types/multer": "latest",
     "@types/node": "latest",
     "tsx": "latest",

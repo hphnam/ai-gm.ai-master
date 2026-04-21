@@ -1,4 +1,8 @@
-import type { Prisma } from '@prisma/client'
+// Plan 04-02 Task 1 APPLY deviation: import via @gm-ai/database (which re-exports Prisma types)
+// per PROJECT.md convention ("Prisma client from packages/database"). @prisma/client is not a
+// direct dep of apps/api; post-@types/express install, pnpm hoist changed and the indirect
+// resolution broke. Routing through @gm-ai/database is the CLAUDE.md-aligned fix.
+import type { Prisma } from '@gm-ai/database'
 
 // Org-direct tables: carry organizationId as a top-level column.
 // KnowledgeItem is venue-scoped via Venue.organizationId, NOT org-direct —

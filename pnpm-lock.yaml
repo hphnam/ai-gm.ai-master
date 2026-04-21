@@ -60,7 +60,7 @@ importers:
         specifier: latest
         version: 3.20.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@types/inquirer@8.2.12)(@types/node@25.6.0)(typescript@6.0.3)
       officeparser:
-        specifier: ^6.1.0
+        specifier: latest
         version: 6.1.0
       reflect-metadata:
         specifier: latest
@@ -90,6 +90,9 @@ importers:
       '@swc/core':
         specifier: latest
         version: 1.15.30
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/multer':
         specifier: latest
         version: 2.1.0

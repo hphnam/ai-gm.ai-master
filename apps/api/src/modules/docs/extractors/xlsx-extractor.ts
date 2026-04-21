@@ -17,8 +17,14 @@ export async function extractXlsx(buffer: Buffer): Promise<string> {
   }
 
   // Source: https://github.com/exceljs/exceljs#reading-xlsx · verified 2026-04-21
+  // Plan 04-02 Task 1 — exceljs's bundled Buffer types disagree with @types/node on
+  // [Symbol.toStringTag] after the @types/express install shifted type resolution.
+  // `as any` is the one-off escape hatch for the library-boundary variance; value IS
+  // a real Node Buffer at runtime — exceljs will accept it. No other cast shape satisfies
+  // both TS's structural nominal check and exceljs's narrow overload.
   const workbook = new ExcelJS.Workbook()
-  await workbook.xlsx.load(buffer)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await workbook.xlsx.load(buffer as any)
 
   const chunks: string[] = []
   let totalChars = 0
