@@ -32,12 +32,10 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ○     [Plan 04-01 APPLY COMPLETE — 3/3 tasks shipped + SUMMARY written; awaiting operator UAT before UNIFY]
+  ✓        ✓        ✓     [Plan 04-01 LOOP CLOSED 2026-04-21 15:40 — SUMMARY at .paul/phases/04-dynamic-document-intelligence/04-01-SUMMARY.md]
 ```
 
-Next: Operator UAT to complete AC-7a/7b/8/4/5 and populate SUMMARY's retrieval-similarity + cost-log templates. Then `/paul:unify` for loop closure commit.
-
-Optional fast-path: `/paul:unify` now with UAT items marked `pending-operator` — UAT findings appended to SUMMARY in a follow-up edit. Matches Phase 3 pattern where Infobip Portal runbooks were deferred past UNIFY.
+Next: `/paul:plan 04-02` for Classifier + Taxonomy + Owner UI (per Phase 4 5-plan breakdown in CONTEXT.md). Operator UAT for 04-01 (AC-7a/7b/8/4/5 + post-canary cleanup) happens ANYTIME before v0.2 release — UAT findings append to 04-01-SUMMARY.md without reopening the loop.
 
 ## Accumulated Context
 
