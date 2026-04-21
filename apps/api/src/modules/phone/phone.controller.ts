@@ -30,7 +30,7 @@ import { zodPipe } from '../../common/zod-pipe'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentUser } from '../auth/auth.decorators'
 import { PhoneError, PhoneService } from './phone.service'
-import { TwilioVerifyService } from './twilio-verify.service'
+import { InfobipVerifyService } from './infobip-verify.service'
 
 function mapPhoneError(
   code: PhoneError['code'],
@@ -65,7 +65,7 @@ export class PhoneController {
 
   constructor(
     private readonly service: PhoneService,
-    private readonly twilio: TwilioVerifyService,
+    private readonly verifier: InfobipVerifyService,
   ) {}
 
   @Post('send')
@@ -80,11 +80,13 @@ export class PhoneController {
     const phoneHash = PhoneService.hashPhoneStatic(body.phoneNumber)
     const ip = req.ip ?? req.socket?.remoteAddress ?? 'unknown'
     const ipHash = PhoneService.hashIpStatic(ip)
+    // audit-S4: propagate HTTP X-Request-Id into service-layer logs for send→verify correlation
+    const requestId = req.header('x-request-id') ?? undefined
     try {
       // audit-added M2: block silent number swap — require explicit unlink first.
       await this.service.assertNoExistingPhone(user.id)
       this.service.assertSendRateLimit(user.id, phoneHash, ipHash)
-      const start = await this.twilio.startVerification(body.phoneNumber)
+      const start = await this.verifier.startVerification(body.phoneNumber, { requestId })
       if (!start.ok) {
         if (start.reason === 'phone-invalid-format') {
           const errBody: ApiErrorResponse = { error: 'phone-invalid-format' }
@@ -127,11 +129,14 @@ export class PhoneController {
   async verify(
     @Body(zodPipe(VerifyPhoneCodeBodySchema)) body: VerifyPhoneCodeBody,
     @CurrentUser() user: { id: string },
+    @Req() req: Request,
   ): Promise<VerifyPhoneCodeResponse> {
+    // audit-S4: propagate HTTP X-Request-Id into service-layer logs for send→verify correlation
+    const requestId = req.header('x-request-id') ?? undefined
     try {
-      // audit-added M3: kill-switch precedes pending-match so a disabled-driver caller
-      // sees 503 not 400 (observable distinction between abuse and outage).
-      if (this.twilio.mode === 'disabled') {
+      // PHONE_VERIFY_DRIVER_OVERRIDE kill-switch precedes pending-match so a disabled-driver
+      // caller sees 503 not 400 (observable distinction between abuse and outage).
+      if (this.verifier.mode === 'disabled') {
         const errBody: ApiErrorResponse = {
           error: 'phone-service-unavailable',
           details: { reason: 'disabled' },
@@ -140,9 +145,10 @@ export class PhoneController {
       }
       // audit-added M1: cross-session code-claim guard — requires pending entry for THIS user.
       this.service.assertPendingVerificationMatches(user.id, body.phoneNumber)
-      const check = await this.twilio.checkVerification(
+      const check = await this.verifier.checkVerification(
         body.phoneNumber,
         body.code,
+        { requestId },
       )
       if (!check.ok) {
         const errBody: ApiErrorResponse = {
