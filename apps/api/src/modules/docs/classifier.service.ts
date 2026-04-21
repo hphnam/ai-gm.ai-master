@@ -216,11 +216,14 @@ ${existing}
 
 ## Rules
 1. If the document fits an existing type with high confidence, return \`{"match":{"typeId":"<id>","confidence":<0..1>}}\`.
-2. If it's genuinely a new kind of document not represented in the existing types, return \`{"proposal":{"name":"<short label>","description":"<one-liner>","schema":{...},"confidence":<0..1>}}\`.
+2. If it's genuinely a new kind of document not represented in the existing types, return \`{"proposal":{"name":"<short label>","description":"<one-liner>","schema":{...},"confidence":<0..1>,"kind":"reference"|"procedural"}}\`.
    - "name": 1-3 words, title case (e.g. "Opening Checklist", "Supplier Price List", "Fire Drill Report").
    - "description": one short sentence describing what this type is for.
    - "schema": a JSON object describing the expected fields/structure of this type (e.g. \`{"steps":"list of checklist items","schedule":"cadence like 'weekly'","role":"who performs"}\`). Keys are YOUR invention based on what this doc looks like.
    - "confidence": how sure you are this is a coherent new type (not garbage, not a mix of types).
+   - "kind":
+     - "procedural" ONLY if the doc describes an ordered set of tasks with some cadence (e.g. checklists, SOPs with numbered steps, daily routines, opening/closing procedures).
+     - "reference" for prose, policies, menus, contact lists, price sheets, training materials.
 3. If the document is genuinely low-signal (empty, garbage, single-line, or you can't tell anything useful), return \`{"none":true}\`.
 
 ## Output

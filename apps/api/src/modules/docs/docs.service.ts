@@ -19,6 +19,7 @@ import {
   type Schedule,
 } from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
+import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService } from './classifier.service'
 
 function contentPreview(raw: string, len = 160): string {
@@ -127,6 +128,7 @@ export class DocsService {
   constructor(
     private readonly ingestService: IngestService,
     private readonly classifier: ClassifierService,
+    private readonly checklistExtractor: ChecklistExtractorService,
   ) {}
 
   async list(orgId: string): Promise<DocListItem[]> {
@@ -254,6 +256,8 @@ export class DocsService {
   async create(
     input: CreateDocRequest & { sourceImageBytes?: Buffer | null; sourceImageMime?: string | null },
     orgId: string,
+    // Plan 04-03 Task 2 audit-M8 — actingUserId threaded for docs.checklist_extracted audit log.
+    userId: string | null = null,
   ): Promise<CreateDocResponse> {
     // If a venueId was supplied, it MUST belong to the user's active org. Run BEFORE
     // the classifier call so a bogus venueId doesn't burn Claude cost.
@@ -297,13 +301,39 @@ export class DocsService {
 
     // Hydrate DocumentType row for the response (matched path only — proposal path
     // returns the proposal itself, not a confirmed DocumentType).
+    // Plan 04-03 Task 2 — matched-to-procedural path fires extractor post-ingest.
     let matchedType: DocumentTypeDto | null = null
+    let checklist: ChecklistDto | null = null
     if (classified.kind === 'matched') {
       const row = await prisma.documentType.findUnique({
         where: { id: classified.typeId },
         select: { id: true, name: true, description: true, schema: true, kind: true },
       })
-      matchedType = toDocumentTypeDto(row)
+      if (!row) {
+        // audit-M6 — race: classifier matched a typeId but the row is gone (owner deleted
+        // between classify and this hook). Extraction silently skips; log is the audit surface.
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.matched_type_missing',
+            actingOrgId: orgId,
+            targetTypeId: classified.typeId,
+            knowledgeItemId: result.id,
+          }),
+        )
+      } else {
+        matchedType = toDocumentTypeDto(row)
+        if (row.kind === 'procedural') {
+          checklist = await this.checklistExtractor.extract({
+            knowledgeItemId: result.id,
+            orgId,
+            title: input.title ?? '(untitled)',
+            content: input.content,
+            userId,
+            kindSource: 'matched',
+          })
+        }
+      }
     }
 
     return {
@@ -314,8 +344,7 @@ export class DocsService {
       failSoft: tags.length === 0 && result.aiSummary === null,
       documentType: matchedType,
       pendingTypeProposal: classified.kind === 'proposal' ? classified.proposal : null,
-      // Plan 04-03 Task 1 — placeholder null; Task 2 populates via ChecklistExtractorService.
-      checklist: null,
+      checklist,
     }
   }
 
