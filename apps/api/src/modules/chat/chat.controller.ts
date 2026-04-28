@@ -15,39 +15,37 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import {
+  ApiTags,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { Response } from 'express'
 import { prisma } from '@gm-ai/database'
-import {
-  ConversationIdParamSchema,
-  GetConversationQuerySchema,
-  SendChatMessageRequestSchema,
-  StreamChatMessageRequestSchema,
-  type ApiErrorResponse,
-  type ChatMessageDto,
-  type ConversationResponse,
-  type SendChatMessageRequest,
-  type SendChatMessageResponse,
-  type StreamChatMessageRequest,
-} from '@gm-ai/types'
-import { z } from 'zod'
-import { zodPipe } from '../../common/zod-pipe'
+import { type ApiErrorResponse } from '@gm-ai/types'
 import { translateChatServiceError } from '../../common/translate-chat-error'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, CurrentRole, CurrentUser } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import { ChatService } from './chat.service'
+import {
+  ChatMessageDto,
+  ConversationIdParamDto,
+  ConversationResponseDto,
+  GetConversationQueryDto,
+  ListConversationItemDto,
+  ListConversationsQueryDto,
+  SendChatMessageRequestDto,
+  SendChatMessageResponseDto,
+  StreamChatMessageRequestDto,
+} from './dto/chat.dto'
 
-const ListConversationsQuerySchema = z.object({
-  venueId: z
-    .string()
-    .regex(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-      'invalid uuid',
-    )
-    .optional(),
-})
-
+@ApiTags('chat')
+@ApiBearerAuth()
 @Controller('chat')
 @UseGuards(AuthGuard, RoleGuard)
 export class ChatController {
@@ -55,17 +53,18 @@ export class ChatController {
 
   @Post('messages')
   @HttpCode(200)
+  @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
   async sendMessage(
-    @Body(zodPipe(SendChatMessageRequestSchema)) body: SendChatMessageRequest,
+    @Body() body: SendChatMessageRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
-  ): Promise<SendChatMessageResponse> {
+  ): Promise<SendChatMessageResponseDto> {
     try {
-      return await this.chatService.sendMessage(body, org.id, user.id, role ?? 'staff', {
+      return (await this.chatService.sendMessage(body, org.id, user.id, role ?? 'staff', {
         name: user.name,
         email: user.email,
-      })
+      })) as SendChatMessageResponseDto
     } catch (err) {
       const translated = translateChatServiceError(err as Error)
       if (translated) throw translated
@@ -80,6 +79,20 @@ export class ChatController {
   // an image; pure-text messages stay on the streaming endpoint.
   @Post('messages/with-image')
   @HttpCode(200)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', format: 'binary' },
+        venueId: { type: 'string' },
+        userMessage: { type: 'string' },
+        conversationId: { type: 'string' },
+      },
+      required: ['image', 'venueId'],
+    },
+  })
+  @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
   @UseInterceptors(
     FileInterceptor('image', {
       limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
@@ -96,7 +109,7 @@ export class ChatController {
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
-  ): Promise<SendChatMessageResponse> {
+  ): Promise<SendChatMessageResponseDto> {
     if (!file) {
       throw new BadRequestException({
         error: 'invalid-input',
@@ -128,7 +141,7 @@ export class ChatController {
         : undefined
 
     try {
-      return await this.chatService.sendMessage(
+      return (await this.chatService.sendMessage(
         {
           venueId,
           userMessage,
@@ -146,7 +159,7 @@ export class ChatController {
         user.id,
         role ?? 'staff',
         { name: user.name, email: user.email },
-      )
+      )) as SendChatMessageResponseDto
     } catch (err) {
       const translated = translateChatServiceError(err as Error)
       if (translated) throw translated
@@ -161,15 +174,12 @@ export class ChatController {
   @Post('stream')
   @HttpCode(200)
   async streamMessage(
-    @Body(zodPipe(StreamChatMessageRequestSchema)) body: StreamChatMessageRequest,
+    @Body() body: StreamChatMessageRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
     @Res() res: Response,
   ): Promise<void> {
-    // Bind the agent loop to the client socket: if the user closes the tab
-    // mid-stream, cancel the in-flight tool chain instead of letting it run
-    // to completion (wasted tokens + stale writes).
     const abortController = new AbortController()
     res.on('close', () => {
       if (!abortController.signal.aborted) abortController.abort()
@@ -187,8 +197,6 @@ export class ChatController {
         abortSignal: abortController.signal,
       })
       result.pipeUIMessageStreamToResponse(res, {
-        // Pin the streamed UIMessage.id to the persisted DB UUID so the client
-        // can pass it straight to /feedback (which requires a UUID).
         generateMessageId: () => assistantMessageId,
         messageMetadata: ({ part }) => {
           if (part.type === 'start') {
@@ -206,20 +214,26 @@ export class ChatController {
   }
 
   @Get('conversations')
+  @ApiResponse({ status: 200, type: [ListConversationItemDto] })
   async listConversations(
-    @Query(zodPipe(ListConversationsQuerySchema)) q: { venueId?: string },
+    @Query(new ZodValidationPipe(ListConversationsQueryDto)) q: ListConversationsQueryDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
-  ) {
-    return this.chatService.listRecent(org.id, user.id, q.venueId)
+  ): Promise<ListConversationItemDto[]> {
+    return (await this.chatService.listRecent(
+      org.id,
+      user.id,
+      q.venueId,
+    )) as ListConversationItemDto[]
   }
 
   @Get('conversations/:id')
+  @ApiResponse({ status: 200, type: ConversationResponseDto })
   async getConversation(
-    @Param(zodPipe(ConversationIdParamSchema)) params: { id: string },
-    @Query(zodPipe(GetConversationQuerySchema)) query: { venueId: string },
+    @Param(new ZodValidationPipe(ConversationIdParamDto)) params: ConversationIdParamDto,
+    @Query(new ZodValidationPipe(GetConversationQueryDto)) query: GetConversationQueryDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<ConversationResponse> {
+  ): Promise<ConversationResponseDto> {
     const conv = await prisma.chatConversation.findUnique({
       where: { id: params.id },
       select: {
@@ -254,34 +268,37 @@ export class ChatController {
       throw new NotFoundException(notFound)
     }
 
-    const messages: ChatMessageDto[] = conv.messages.map((m) => ({
-      id: m.id,
-      role: m.role === 'assistant' ? 'assistant' : 'user',
-      content: m.content,
-      createdAt: m.createdAt.toISOString(),
-      retrievedItemIds: m.retrievedItemIds,
-      followUps: m.followUps,
-      reasoning: m.reasoning,
-      parts: m.parts ?? undefined,
-      toolCallLog: Array.isArray(m.toolCallLog)
-        ? (m.toolCallLog as unknown[])
-        : undefined,
-      feedbackKind: (m.feedback?.kind ?? null) as ChatMessageDto['feedbackKind'],
-    }))
+    const messages: ChatMessageDto[] = conv.messages.map(
+      (m) =>
+        ({
+          id: m.id,
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content,
+          createdAt: m.createdAt.toISOString(),
+          retrievedItemIds: m.retrievedItemIds,
+          followUps: m.followUps,
+          reasoning: m.reasoning,
+          parts: m.parts ?? undefined,
+          toolCallLog: Array.isArray(m.toolCallLog)
+            ? (m.toolCallLog as unknown[])
+            : undefined,
+          feedbackKind: (m.feedback?.kind ?? null) as ChatMessageDto['feedbackKind'],
+        }) as ChatMessageDto,
+    )
 
     return {
       id: conv.id,
       venueId: conv.venueId,
       channel: conv.channel,
       messages,
-    }
+    } as ConversationResponseDto
   }
 
   @Delete('conversations/:id')
   @HttpCode(204)
   async deleteConversation(
-    @Param(zodPipe(ConversationIdParamSchema)) params: { id: string },
-    @Query(zodPipe(GetConversationQuerySchema)) query: { venueId: string },
+    @Param(new ZodValidationPipe(ConversationIdParamDto)) params: ConversationIdParamDto,
+    @Query(new ZodValidationPipe(GetConversationQueryDto)) query: GetConversationQueryDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
   ): Promise<void> {
