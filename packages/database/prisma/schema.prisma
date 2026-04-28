@@ -260,20 +260,20 @@ model MockPurchaseOrderItem {
 }
 
 model KnowledgeItem {
-  id             String   @id @default(uuid())
-  organizationId String
-  venueId        String?
-  content        String
-  metadata       Json     @default("{}")
-  embedding      Unsupported("vector(1024)")?
-  embeddingText  String?
-  aiSummary      String?
+  id                  String                       @id @default(uuid())
+  organizationId      String
+  venueId             String?
+  content             String
+  metadata            Json                         @default("{}")
+  embedding           Unsupported("vector(1024)")?
+  embeddingText       String?
+  aiSummary           String?
   // Plan 04-01 Task 3 — image-via-Claude-vision source persistence (audit-S3 Option A committed).
   // Additive nullable columns; all pre-Phase-4 rows keep NULL for both. Image bytes are stored
   // inline for POC scale (≤500 uploads × 5MB cap = ≤2.5GB aggregate — NeonDB storage non-issue).
   // Object-storage migration deferred as D-04-01-F with concrete trigger in SUMMARY.
-  sourceImageBytes Bytes?
-  sourceImageMime  String?
+  sourceImageBytes    Bytes?
+  sourceImageMime     String?
   // Plan 04-02 Task 2 — per-tenant classifier output (D-04-02 taxonomy layer).
   // documentTypeId   NULL → unclassified OR rejected proposal (owner left it open)
   //                  non-null → owner-confirmed type assignment
@@ -284,21 +284,23 @@ model KnowledgeItem {
   // Async enrichment state. Uploads create the row with 'processing', the
   // background pipeline flips to 'ready' on success or 'failed' on error.
   // Existing rows default to 'ready' so pre-async history stays visible.
-  processingStatus String   @default("ready")
-  processingError  String?
+  processingStatus    String                       @default("ready")
+  processingError     String?
   /// Phase C — knowledge gap capture. 'answered' = full Q+A landed (default
   /// for all pre-Phase-C rows). 'pending' = question captured by record_kb_gap,
   /// awaiting GM answer in the dashboard.
-  answerStatus     String   @default("answered")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  answerStatus        String                       @default("answered")
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
 
-  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  venue           Venue?           @relation(fields: [venueId], references: [id], onDelete: Cascade)
-  documentType    DocumentType?    @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  venue           Venue?             @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  documentType    DocumentType?      @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
   retagQueueItems ReTagQueueItem[]
   checklist       Checklist?
   sections        KnowledgeSection[]
+  tabularRows     TabularRow[]
+  tabularColumns  TabularColumn[]
 
   @@index([organizationId])
   @@index([venueId])
@@ -342,7 +344,7 @@ model KnowledgeSection {
 /// embedding deferred to Phase 2 graph traversal). Sliding-window 1024-token
 /// chunks with 128-token overlap when a section exceeds chunk target.
 model KnowledgeChunk {
-  id             String   @id @default(uuid())
+  id             String                       @id @default(uuid())
   sectionId      String
   organizationId String
   /// 0-based ordinal within the parent section.
@@ -352,7 +354,7 @@ model KnowledgeChunk {
   /// Text actually sent to Voyage (kept for re-embed / audit). Non-null once Phase 2 embed completes.
   embeddingText  String?
   tokenCount     Int
-  createdAt      DateTime @default(now())
+  createdAt      DateTime                     @default(now())
 
   section      KnowledgeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
@@ -363,19 +365,61 @@ model KnowledgeChunk {
   @@map("knowledge_chunks")
 }
 
+/// Plan 05-01 (v0.3 Phase 5 Tabular Query Path) — structured-data path parallel
+/// to the embedded-text path. Every row of a CSV/XLSX is tee'd here at ingest;
+/// query_document_table tool runs deterministic aggregates / enumerations over
+/// JSONB data without going through similarity-ranked retrieval.
+model TabularRow {
+  id        String   @id @default(uuid())
+  docId     String
+  /// 0-based source-row position. Used for `_row_index` magic sort column to
+  /// restore source order on enumeration queries ("list all opening steps").
+  rowIndex  Int
+  /// JSONB row payload — keys = header column names, values = string cell content.
+  /// Numeric/date casting happens at query-time via tabular_columns.inferredType.
+  data      Json
+  createdAt DateTime @default(now())
+
+  doc KnowledgeItem @relation(fields: [docId], references: [id], onDelete: Cascade)
+
+  @@unique([docId, rowIndex])
+  @@index([docId])
+  @@map("tabular_rows")
+}
+
+/// Plan 05-01 — column metadata for tabular docs. inferredType is the
+/// majority-vote outcome (≥80% threshold) used to gate aggregate fns
+/// (sum/avg/min/max require 'number') and choose JSONB cast at query time.
+model TabularColumn {
+  id           String @id @default(uuid())
+  docId        String
+  name         String
+  /// 0-based column position in the source header.
+  ordinal      Int
+  /// 'number' | 'date' | 'string' — enforced via CHECK constraint added in migration SQL
+  /// (Prisma does not emit CHECK constraints natively).
+  inferredType String
+
+  doc KnowledgeItem @relation(fields: [docId], references: [id], onDelete: Cascade)
+
+  @@unique([docId, name])
+  @@index([docId])
+  @@map("tabular_columns")
+}
+
 model DocumentType {
-  id                String    @id @default(uuid())
+  id                String   @id @default(uuid())
   organizationId    String
   name              String
   description       String?
-  schema            Json      @default("{}")
+  schema            Json     @default("{}")
   /// Plan 04-03 Task 1 — 'reference' (RAG path) | 'procedural' (Checklist extraction path).
   /// Enforced at the Zod layer via DocumentTypeKindSchema in @gm-ai/types.
-  kind              String    @default("reference")
-  confirmedAt       DateTime  @default(now())
+  kind              String   @default("reference")
+  confirmedAt       DateTime @default(now())
   confirmedByUserId String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   knowledgeItems KnowledgeItem[]
@@ -512,13 +556,13 @@ model VenueContact {
 }
 
 model ChatConversation {
-  id        String   @id @default(uuid())
-  venueId   String
-  userId    String?
-  channel   String   @default("web")
+  id                      String   @id @default(uuid())
+  venueId                 String
+  userId                  String?
+  channel                 String   @default("web")
   /// Phase E — conversation mode set by classifier on first user message.
   /// 'default' | 'incident' | 'handover' | 'training'.
-  mode      String   @default("default")
+  mode                    String   @default("default")
   /// Phase F — Haiku-generated summary of older turns once a thread crosses
   /// COMPACT_THRESHOLD. NULL until first compaction.
   compactionSummary       String?
@@ -526,8 +570,8 @@ model ChatConversation {
   /// (those <= this id by createdAt order) are dropped from the model context
   /// and replaced by the summary. New messages after this id stay verbatim.
   compactionUpToMessageId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   venue    Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
   messages ChatMessage[]
@@ -547,7 +591,7 @@ model ChatMessage {
   parts            Json?
   createdAt        DateTime @default(now())
 
-  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   feedback        MessageFeedback?
   retagQueueItems ReTagQueueItem[] @relation("sourceMessage")
 }
@@ -570,22 +614,22 @@ model MessageFeedback {
 /// an assistant ChatMessage. Source entity remains source of truth; this table
 /// is purely a denormalised retrieval index.
 model SearchableEntity {
-  id             String   @id @default(uuid())
+  id             String  @id @default(uuid())
   organizationId String
   venueId        String?
 
   /// 'knowledge_item' | 'checklist_step' | 'venue_contact' | 'mock_supplier' | 'venue_profile' | 'chat_message'
   entityType String
   /// Source-table id (no Prisma relation — heterogeneous targets).
-  entityId String
+  entityId   String
   /// Sub-identifier within an entity (e.g. checklist step index). '' = whole-entity row.
-  subKey String @default("")
+  subKey     String @default("")
 
   embedding     Unsupported("vector(1024)")?
   embeddingText String
 
   /// GIN-indexed for tag filtering at retrieval time.
-  tags String[] @default([])
+  tags    String[] @default([])
   /// Entity-specific subkind: docType.kind, contact.role, supplier category, etc.
   kind    String?
   title   String?
