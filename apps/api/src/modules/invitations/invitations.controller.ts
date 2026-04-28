@@ -17,7 +17,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
 import type { Request } from 'express'
 import { type ApiErrorResponse, InvitationIdParamSchema } from '@gm-ai/types'
@@ -147,6 +147,7 @@ export class InvitationsController {
   }
 
   @Get(':id/preview')
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: InvitationPreviewDto })
   async preview(@Param() params: { id: string }, @Req() req: Request): Promise<InvitationPreviewDto> {
     // Unauth endpoint; throttle by IP to blunt a crawl/scrape.
@@ -171,6 +172,7 @@ export class InvitationsController {
   @Post(':id/accept')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: AcceptInvitationResponseDto })
   async accept(
     @Param() params: { id: string },
@@ -207,6 +209,7 @@ export class InvitationsController {
   @Delete(':id')
   @UseGuards(AuthGuard, RoleGuard)
   @RequireRole('owner', 'manager')
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: RevokeInvitationResponseDto })
   async revoke(
     @Param() params: { id: string },

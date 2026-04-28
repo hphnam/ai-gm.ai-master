@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "api:generate": "orval"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.170",
@@ -41,6 +42,7 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "orval": "^8.9.0",
     "tailwindcss": "latest",
     "typescript": "latest"
   }

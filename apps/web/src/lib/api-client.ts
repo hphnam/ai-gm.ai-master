@@ -14,7 +14,7 @@ export class ApiError extends Error {
   }
 }
 
-type FetchOpts = RequestInit & { signal?: AbortSignal }
+export type FetchOpts = RequestInit & { signal?: AbortSignal | null }
 
 export async function apiFetch<T>(path: string, init?: FetchOpts): Promise<T> {
   const requestId = crypto.randomUUID()
