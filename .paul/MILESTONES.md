@@ -4,7 +4,64 @@ Completed milestone log for this project.
 
 | Milestone | Completed | Duration | Stats |
 |-----------|-----------|----------|-------|
+| v0.2 Multi-Tenant WhatsApp (v0.2.0) — partial | 2026-04-27 (closed early at ~96%) | 2026-04-19 → 2026-04-27 | 4 phases, 12 plans (3 superseded mid-milestone), Phase 4 partial — 04-04/05 rolled forward into v0.3 |
 | v0.1 POC (v0.1.0) | 2026-04-19 | ~2 active days | 5 phases, 13 plans, ~7,500 LOC across 120+ files |
+
+---
+
+## ◐ v0.2 Multi-Tenant WhatsApp (v0.2.0) — Partial / Superseded by v0.3
+
+**Closed early:** 2026-04-27 at ~96%
+**Duration:** 2026-04-19 → 2026-04-27 (~8 active days)
+
+### Why closed early
+
+Phases 1–3 + Phase 4 plans 04-01/02/03 fully shipped (auth + organizations, document ingest UI, WhatsApp via Infobip, broadened extraction, classifier + DocumentType taxonomy, procedural Checklist model). Phase 4 plans 04-04 (scheduler + WhatsApp notifications) and 04-05 (WhatsApp procedural runtime) were intentionally **not shipped under v0.2** — the project pivoted to a knowledge-graph architecture (v0.3 Neural Brain), and 04-04/05 are better delivered on top of the graph from day one rather than rebuilt later. v0.2's WhatsApp + procedural-runtime theme is now delivered by v0.3 Phases 3 + 4.
+
+### Stats
+
+| Metric | Value |
+|--------|-------|
+| Phases | 4 (Phase 4 partial) |
+| Plans shipped | 12 (3 Twilio plans superseded mid-milestone by Infobip migration) |
+| Plans rolled forward to v0.3 | 2 (04-04 → v0.3 Phase 3, 04-05 → v0.3 Phase 4) |
+| Probe gates at closure | probe-api 61/61, probe-auth 54/54 (probe-whatsapp retired during 03-04 scope expansion) |
+
+### Key Accomplishments
+
+- **Auth + Organizations** — better-auth with Prisma 7 adapter; Organization + OrganizationMember + User.phoneNumber schema; sign-up + sign-in + invitation flows; NestJS AuthGuard + RoleGuard wrapping every controller; tenant scoping via type-split `withOrgScope` (org-direct) + `withOrgScopeVia` (join-scoped); URL-pin open-redirect guard; atomic sign-up + org creation via better-auth `databaseHooks.user.create.after`; security-headers middleware; HTTP logger redaction contract for `/api/auth/*`; `assertAuthEnv` boot-time env validation banning `process.env.X!`; phone-linking via Twilio Verify SMS OTP with kill-switch driver modes (later migrated to Infobip 2FA in 03-05).
+- **Manager document upload UI + delete** — POST/GET/DELETE `/docs/*` with multipart upload, MIME validation (text/markdown/PDF via unpdf, DOCX via mammoth), `@RequireRole` manager-only, `sanitizeUploadTitle`, MulterExceptionFilter → 413, 30s extraction timeout, `docs.uploaded` + `docs.cross_org_denied` audit logs (SOC-2 CC6.6 symmetric on read+write+delete); KnowledgeItem cross-org leak on `venueId=NULL` rows closed via direct `organizationId` FK.
+- **WhatsApp via Infobip** — full Twilio→Infobip provider migration (Phase 3 was originally Twilio Plans 03-01/02/03, all superseded mid-milestone after pre-flight UAT surfaced API friction). Infobip inbound (HMAC-SHA256 over raw body via `x-callback-signature`, JSON `results[]` payload), outbound (`POST /whatsapp/1/message/text` with App API key auth), media download with provider-agnostic 4-layer hardening (SSRF allowlist + MIME allowlist + magic-byte + streaming counter), typing indicator gracefully degrades to console-mode. SMS OTP also migrated to Infobip 2FA in 03-05 (`InfobipVerifyService` with pinId in-memory cache, FIFO eviction, shape validation, PII redaction). Project went 100% Twilio-free; D-01-03-F closed.
+- **Broadened extraction** (04-01) — XLSX (exceljs) + CSV (csv-parse) + PPTX (officeparser AST-walking for per-slide output) + image-via-Claude-vision (Anthropic SDK with `MAX_CONCURRENT_IMAGE_EXTRACTS=3` semaphore + 15s queue timeout + cost calculator); shared `sanitiseError` factored to `apps/api/src/common/sanitise-error.ts`; magic-byte gating; per-MIME upload caps; `KnowledgeItem.sourceImageBytes` + `sourceImageMime` additive migration; HEIC dropped from AC-4 (Anthropic media_type union limitation, registered as D-04-01-J).
+- **Classifier + DocumentType taxonomy** (04-02) — single `DocumentType` Prisma model with `schema Json`, per-tenant `organizationId`-scoped, `@@unique([organizationId, name])`. `CLASSIFIER_AUTO_ACCEPT_CONFIDENCE=0.7` project-wide constant. Owner hand-accepts each proposal (no cluster-and-promote — D-04-02-B). Inline-on-/docs modal + row badges (no dedicated taxonomy-inbox page — D-04-02-D).
+- **Procedural Checklist model** (04-03) — `DocumentType.kind` + `Checklist` entity + `ChecklistExtractorService` with full audit envelope; 30s `AbortController` timeout on extractor; `MAX_CONCURRENT_CHECKLIST_EXTRACTS=3` semaphore; post-parse step-index normalization; `ChecklistInstanceKeySchema` Zod regex for downstream scheduler dedup; `docs.checklist_extracted` success audit log; `kindOverridden` boolean in `docs.type_accepted` log.
+- **Enterprise audit workflow continued from v0.1** — every plan got formal enterprise audit before APPLY. Across v0.2: ~100+ upgrades applied (M+S), ~30+ items deferred with explicit triggers. Caught (among others): cross-tenant `KnowledgeItem.venueId=NULL` leak in 02-01 audit, SSRF + MIME + magic-byte + streaming-byte-counter hardening in 03-03 audit, HEIC `media_type` union mismatch in 04-01 audit, race-condition warn log in 04-03 audit.
+
+### Key Decisions Carried Forward
+
+- Provider migration: Twilio → Infobip (consolidated WhatsApp + SMS OTP under one API key + base URL)
+- `DocumentType` per-tenant taxonomy (not enum) — owners hand-accept, classifier escapes through propose-new path
+- `Checklist` as first-class entity (not just structured metadata) — schedule cadence + `instanceKey` dedup surface ready for v0.3 Phase 3 scheduler
+- HEIC server-side conversion (sharp/heic-convert) deferred to v0.3 (D-04-01-J)
+- 13 D-04-02-* deferred items + 10 D-04-03-* deferred items carry into v0.3 with concrete triggers
+
+### Carry-Forward UATs (Outstanding into v0.3)
+
+| Item | Origin | Note |
+|------|--------|------|
+| AC-11 /settings/phone walk | 01-03 | UI-only human walk |
+| AC-10 cross-org isolation walk | 01-01 | UI-only human walk |
+| AC-10 invitation flow walk | 01-02 | UI-only human walk |
+| 04-03 operator UAT (AC-2/3/4/5/6/7/8) | 04-03 | Append findings to 04-03-SUMMARY.md without reopening loop |
+| Infobip Portal UAT runbooks | 03-04, 03-05 | Both pending — Ryan running these post-deploy |
+| D-01-02-F real email-verification flow | 01-02 | Public-deploy trigger |
+
+### Plans Rolled Forward to v0.3
+
+- **04-04 Scheduler + WhatsApp notifications** → v0.3 Phase 3 (Scheduler + Graph-Aware WhatsApp Notifications), now enriched with 1-hop graph context
+- **04-05 WhatsApp procedural runtime** → v0.3 Phase 4 (WhatsApp Procedural Runtime), all retrieval flows through v0.3 Phase 2 graph layer
+
+**Archive:** Full per-plan SUMMARY files preserved at `.paul/phases/0[1-4]-*/[plan]-SUMMARY.md`; ROADMAP.md v0.2 details collapsed under "Completed Milestones" details block.
 
 ---
 

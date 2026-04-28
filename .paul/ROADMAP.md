@@ -2,102 +2,131 @@
 
 ## Overview
 
-Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 POC is complete — the system can answer stock, SOP, equipment, and contact queries via semantic retrieval over seeded data with a Next.js chat UI and a read-only debug panel. v0.2 Multi-Tenant WhatsApp takes that proven loop from dev-only → production: real users, real orgs with role-based membership, manager-uploaded documents, phone-number-to-account linking, WhatsApp as the primary channel, and a Coolify deployment.
+Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 POC is complete — the system can answer stock, SOP, equipment, and contact queries via semantic retrieval over seeded data with a Next.js chat UI and a read-only debug panel. v0.2 took that loop from dev-only → production: real users, real orgs with role-based membership, manager-uploaded documents, phone-number-to-account linking, WhatsApp via Infobip, and dynamic document intelligence (classifier + per-tenant taxonomy + procedural Checklist entity). v0.2 closed early at ~96% — Phase 4 plans 04-04 (scheduler + WhatsApp notifications) and 04-05 (WhatsApp procedural runtime) deliberately rolled forward into v0.3 so they ship on top of the new graph layer from day one.
 
 ## Current Milestone
 
-**v0.2 Multi-Tenant WhatsApp** (v0.2.0)
-Status: 🚧 In Progress (3 of 4 phases complete; Phase 4 pivoted 2026-04-21 to Dynamic Document Intelligence)
+**v0.3 Neural Brain** (v0.3.0)
+Status: 🚧 In Progress (0 of 4 phases complete)
 Phases: 4
-Estimated plans: 15 (Phase 3: 5 shipped / 3 superseded; Phase 4: 5 finalized during /paul:plan 04-01)
 
-**Theme:** "Managers sign up, invite their team, upload their venue docs, connect their WhatsApp number, and staff chat with the GM assistant from their phones — with the assistant understanding what KIND of document each upload is (reference vs procedural) and executing procedural docs as stateful checklists."
+**Theme:** "Per-venue neural brain — the assistant doesn't search docs, it knows the venue. Connections between docs are first-class data, and the WhatsApp channel speaks fluent venue-context."
+
+**Vision:** Pivot from flat RAG to a per-tenant **Obsidian-style knowledge graph**. Every doc is a node, every `[[wikilink]]` is a synapse, the agent walks associations the way a real GM does. Builds on the Phase 4 foundation (DocumentType taxonomy, Checklist entity, broadened extraction) and absorbs the unshipped 04-04/05 scope so notifications + procedural walkthroughs are graph-aware from launch.
 
 ### Phase Overview
 
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
-| 1 | Auth + Organizations | 3 of 3 (01-01 ✓, 01-02 ✓, 01-03 ✓) | Complete | 2026-04-20 |
-| 2 | Document Ingest UI | 2 of 2 (02-01 ✓, 02-02 ✓) | Complete | 2026-04-20 |
-| 3 | WhatsApp Integration | 3 superseded (Twilio: 03-01 ⊘, 03-02 ⊘, 03-03 ⊘) + 03-04 ✓ (Infobip WhatsApp) + 03-05 ✓ (Infobip 2FA SMS OTP) | Complete | 2026-04-21 |
-| 4 | Dynamic Document Intelligence | 5 plans (04-01 in PLAN; 04-02 taxonomy / 04-03 procedural model / 04-04 scheduler+notifications / 04-05 WhatsApp runtime) | 🚧 In Progress | - |
+| 1 | Hierarchical Retrieval | 01-01 created (additive schema + ingest); 01-02 to follow (backfill + retrieval + cache + probe-eval) | 🚧 Planning | - |
+| 2 | Graph Layer | TBD | Not started | - |
+| 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Not started | - |
+| 4 | WhatsApp Procedural Runtime | TBD | Not started | - |
 
-### Phase 1: Auth + Organizations
+### Phase 1: Hierarchical Retrieval
 
-**Focus:** Multi-tenant foundation with better-auth `organization` + `phoneNumber` plugins; roles (owner/manager/staff); schema migration so Venue → Organization; every existing endpoint gets auth-guarded; phone verification via Twilio Verify SMS OTP; seeded Crown + Anchor migrate into a Demo Organization.
+**Focus:** Refactor chunk storage from flat to **doc → section → chunk** hierarchy. Vector retrieval continues to hit at chunk granularity, but injection expands to the whole containing section. This is the foundation everything else stacks on — the "I clicked into the note" feel that flat RAG can't deliver. Cache-friendly so repeat queries on the same sections are cheap.
 
-**Scope:**
-- better-auth integration with Prisma 7 adapter
-- Schema: Organization + OrganizationMember + User.phoneNumber; Venue gains organizationId FK
-- NestJS AuthGuard + role guards wrapping existing controllers
-- Sign-up / sign-in / invite flows (email-only; no SMS invites)
-- Tenant scoping at service layer (orgId + venueId in WHERE clauses; probe extends cross-org isolation tests)
-- Next.js /auth/* routes + org switcher + /settings/organization UI
-- Phone-linking flow via Twilio Verify
-- Kick off Meta Business verification paperwork (calendar-time parallel track; blocks Phase 4 live cutover)
+**Scope (pre-discuss sketch):**
+- Chunk schema reshape: parent `Section` row carrying heading/title + `[Section.id]` FK on chunks
+- Section-boundary detection at ingest (markdown headings as primary signal; semantic clustering as fallback for unstructured docs)
+- Retrieval path refactor: vector hit → expand to section → inject section content (capped) into Claude context
+- One-time backfill migration to re-derive section boundaries on existing `KnowledgeItem` rows
+- Prompt-cache alignment: section payloads structured for stable cache keys
+- Probe assertions raised to cover boundary detection, section expansion, and cache-hit behavior
 
 **Plans:** TBD (defined during /paul:plan)
 
-### Phase 2: Document Ingest UI
+### Phase 2: Graph Layer
 
-**Focus:** Manager self-service document upload. Extends existing IngestService (v0.1 Phase 3) with HTTP upload endpoint + multi-format text extraction (.txt, .md, .pdf via pdf-parse/unpdf, .docx via mammoth, plain-text paste). Org-scoped at the repository layer. Manager-only via role guard.
+**Focus:** The headline feature. **Wikilinks parsed at ingest**, **`DocLink` schema**, **graph traversal tool** exposed to the agent, **wikilink autocomplete in `/docs` editor**. Vector finds the entry node; the graph tool walks its neighborhood. Connections are pre-baked at ingest, so retrieval stays cheap — the model isn't paying tokens to re-derive relationships every turn.
 
-**Scope:**
-- POST /ingest/documents endpoint with multipart upload + MIME validation + size cap
-- Text extraction pipeline per file type; plain-text pass-through
-- KnowledgeItem gains organizationId; retrieval filters on org AND venue (null venueId = org-wide doc)
-- Next.js /docs route: list, upload, view metadata, delete
-- Manager-only role gate via NestJS guard + UI hide for staff role
-- Reuse 05-03 debug-panel JSON viewer pattern for agentic-metadata inspection
-
-**Plans:** TBD (defined during /paul:plan)
-
-### Phase 3: WhatsApp Integration
-
-**Focus:** The payoff — Twilio WhatsApp inbound webhook routed through existing ChatService; typing-indicator UX (free, mandatory); image support via Claude multimodal; session mapping to ChatConversation with 2-hour idle heuristic; adapter pattern preserves Meta-direct swap for v0.3+. Voice notes out of scope (reply-with-friendly-rejection).
-
-**Scope:**
-- WhatsAppAdapter wrapping Twilio REST API (mirror of EmbeddingsService → Voyage pattern)
-- POST /webhooks/twilio/whatsapp with signature validation (HMAC-SHA1)
-- Phone-number lookup: From → User → Org → default Venue
-- Unknown-number handling (rate-limited onboarding reply)
-- Typing indicator + read receipt on inbound (free; ~30 lines; re-fire every 20s if Claude takes > 20s)
-- Inbound text → ChatService.sendMessage (reuses v0.1 Phase 4 loop)
-- Inbound image → Twilio media download → Claude multimodal content block
-- Inbound audio → friendly rejection message
-- Outbound via Twilio messages endpoint
-- Proactive suggestions from onConversationOpen sent as opening message within 24h session
-- probe-whatsapp.ts exercising webhook end-to-end against Twilio sandbox
-- Observability: whatsapp.inbound / whatsapp.outbound / whatsapp.typing_indicator_refired structured logs; phone hashed for PII safety
+**Scope (pre-discuss sketch):**
+- Wikilink parser detecting `[[Doc Title]]` and `[[Doc Title|alias]]` syntax at ingest + edit time
+- `DocLink(fromDocId, toDocId, anchor, orgId)` table — separate from `Doc` for indexability, tenant-scoped via FK + index
+- Resolution policy for unresolved targets (silently store as unresolved, prompt user, or auto-create stub — to be decided in /paul:discuss)
+- Graph traversal tool `get_related_docs(docId, depth=1|2)` registered alongside existing `find_knowledge` vector tool; returns ~100–200 tokens of edge metadata
+- Backlinks via reverse query on `DocLink` — no separate table
+- Wikilink autocomplete in `/docs` editor: typing `[[` opens tenant-scoped doc picker with fuzzy match
+- Tenant boundary discipline: `[[X]]` only ever resolves to a Doc with the same `organizationId`, no cross-tenant link leakage
+- Composition with existing `SearchableEntity` heterogeneous index — to be decided in /paul:discuss (extend it, or keep `DocLink` strictly separate)
 
 **Plans:** TBD (defined during /paul:plan)
 
-### Phase 4: Dynamic Document Intelligence
+### Phase 3: Scheduler + Graph-Aware WhatsApp Notifications
 
-**Pivot 2026-04-21:** Original Phase 4 (Coolify Deployment) removed from roadmap — user self-managing deployment. Replaced with a document-intelligence layer that handles what RAG alone can't: procedural artifacts (checklists, SOPs, daily-routine docs) that require state tracking and execution, not just retrieval.
+**Focus:** Absorbed from v0.2's unshipped 04-04. Cron-ish firing layer over `Checklist.schedule` cadence + `@@unique([checklistId, instanceKey])` dedup surface (already shipped in 04-03). Outbound via the existing Infobip WhatsApp adapter. **Notifications are graph-aware** — a delivery reminder can pull adjacent context (related supplier docs, recent issues with this vendor) without a separate retrieval call.
 
-**Focus:** Ingest-time document classification + per-tenant taxonomy + schema extraction + runtime routing. Every tenant's taxonomy evolves as they upload docs — no hardcoded document types, no releases required to support new doc shapes. Procedural docs become first-class Checklist/Procedure entities the WhatsApp assistant can present interactively and track completion on.
+**Scope (pre-discuss sketch):**
+- Scheduler service consuming `Checklist.schedule` + dedup on `@@unique([checklistId, instanceKey])`
+- Notification composer that walks the graph from the firing checklist (1-hop neighbors) to enrich the WhatsApp message with relevant adjacent context
+- Outbound via existing Infobip adapter (no new provider work)
+- Idempotency on retries (notification fired exactly once per `instanceKey`)
+- Operator visibility: scheduled-fire log + delivery audit
+- Probe assertions covering schedule firing, dedup, graph-context enrichment, and Infobip outbound
 
-**Scope (pre-discuss sketch — concrete shape to come from /paul:discuss):**
-- Ingest-time classifier: on upload, LLM tags the doc against tenant's current taxonomy with an explicit escape hatch ("if none fit, propose a new type + schema")
-- Per-tenant taxonomy + schema stored as DB entities (not code). Starts empty; grows with uploads.
-- Cluster-and-promote loop: pending type proposals cluster via embeddings (duplicates collapse); promotion to active after N examples with stable schema. Schema widening is additive-only (registry semantics).
-- Owner-facing confirmation UI in the web app: auto-accept above confidence threshold; surface "new doc type detected — keep / rename / merge" for ambiguous cases. No silent taxonomy drift.
-- Runtime routing: reference docs → existing RAG path (unchanged); procedural docs → Checklist/Procedure entities with persisted completion state that the assistant can query, present, and tick off interactively.
-- Optional cross-tenant priors (new-tenant cold-start): seed a new org's classifier with anonymized shapes of doc types seen across existing orgs. Privacy-gated; behind a feature flag.
+**Plans:** TBD (defined during /paul:plan)
 
-**Plans (5, finalized 2026-04-21 during /paul:plan 04-01 scope-split):**
-- `04-01` — Broadened extraction layer (XLSX/CSV/PPTX/image-via-Claude-vision; 3 tasks; standard track; IN PLAN)
-- `04-02` — Classifier + per-tenant taxonomy + owner confirmation UI
-- `04-03` — Procedural doc model (Checklist entity) + schedule extraction
-- `04-04` — Scheduler + WhatsApp notifications
-- `04-05` — WhatsApp runtime for procedural docs (walkthrough + ad-hoc + completion tracking)
+### Phase 4: WhatsApp Procedural Runtime
 
-**Deployment:** Out of roadmap scope — user self-managing production deploy, Infobip Portal UAT, domain/HTTPS/DB migrations.
+**Focus:** Absorbed from v0.2's unshipped 04-05. Closes the original v0.2 milestone theme — staff can run procedural docs (opening checklist, closing routine, weekly stocktake) interactively over WhatsApp with completion tracking. **Walkthrough mode** steps users through Checklist entities; **ad-hoc mode** answers spontaneous questions; **completion** persists across sessions. All retrieval flows through the graph layer from Phase 2.
+
+**Scope (pre-discuss sketch):**
+- Walkthrough flow: present step → wait for user reply → record completion → next step; resumable across WhatsApp turns
+- Ad-hoc retrieval interleaved with walkthroughs (user can ask a side question mid-checklist, then resume)
+- Completion persistence on `ChecklistInstance` + per-step completion state
+- WhatsApp UX: numbered steps, clear progress indicators, graceful re-prompt on ambiguous reply
+- Operator dashboard surface (read-only): which checklists ran today, which are stuck, which completed
+- Probe assertions covering walkthrough state machine, mid-flow ad-hoc retrieval, completion persistence, and re-prompt behavior
+
+**Plans:** TBD (defined during /paul:plan)
+
+---
+
+## Explicitly Deferred to v0.4 (with triggers)
+
+These came up during v0.3 discussion and have specific revisit conditions, not abandonment:
+
+| Item | Trigger |
+|------|---------|
+| Write-back proposals from chat (agent extracts new facts → review queue in /docs) | v0.3 graph proves stable + trusted; operator demand surfaces. Live mutation is too risky before the graph itself is reliable — proposal-queue-first when we get there. |
+| Obsidian vault zip import/export | Customer asks for it, or graph stabilizes enough that interop becomes a sales/migration argument. Nice-to-have, not load-bearing. |
+| Visual graph view in /docs (force-directed graph visualization) | Wikilink autocomplete shipped + used; customer feedback indicates spatial overview helps. Autocomplete is what makes authoring work; the visual is eye-candy. |
+| Background link inference (auto-detect entity mentions across vault, propose wikilinks) | Vault sizes grow past where manual linking scales (~100+ docs/tenant). |
+| Usage-signal retrieval tuning (feedback re-ranks chunks; gap detection) | Enough feedback volume to learn from. |
+
+## Cost Discipline (cross-cutting, applies to all v0.3 phases)
+
+- **Sonnet 4.6 default**, no Opus default ever. Aggressive prompt caching on system prompt + tool defs + recent retrieved sections.
+- Background jobs (any cross-doc scanning, classification, future link inference) run on **Haiku 4.5** — never Sonnet, never Opus.
+- Per-turn target: $0.01–0.02 average; deep-research turn (rare, opt-in) capped at ~$0.10.
+- Per-venue monthly target: $30–100 moderate use, ~$200 max heavy. Worst-case fits inside a $200–500/mo SaaS tier with healthy margin.
 
 ---
 
 ## Completed Milestones
+
+<details>
+<summary><strong>v0.2 Multi-Tenant WhatsApp</strong> (v0.2.0) — Closed early ~96% on 2026-04-27 · 4 phases · 12 plans (3 superseded mid-milestone) · Phase 4 partial — 04-04/05 rolled forward into v0.3</summary>
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 1 | Auth + Organizations | 3/3 (01-01, 01-02, 01-03) | Complete 2026-04-20 |
+| 2 | Document Ingest UI | 2/2 (02-01, 02-02) | Complete 2026-04-20 |
+| 3 | WhatsApp Integration | 03-04 + 03-05 (Infobip); 03-01/02/03 superseded (Twilio) | Complete 2026-04-21 |
+| 4 | Dynamic Document Intelligence | 04-01 + 04-02 + 04-03 shipped; **04-04 + 04-05 rolled forward into v0.3** | Partial — 3/5 |
+
+**Closure rationale:** Phases 1–3 + 04-01/02/03 fully shipped (extraction, classifier, taxonomy, procedural Checklist model). 04-04 (scheduler + WhatsApp notifications) and 04-05 (WhatsApp procedural runtime) intentionally **not shipped under v0.2** — pivoting to a knowledge-graph architecture in v0.3 means they're better delivered on top of the graph from day one, rather than rebuilt later. v0.2 marked partial-superseded; remaining theme delivery now belongs to v0.3 Phases 3 + 4.
+
+**Carried forward into v0.3 from v0.2 deferred-items:**
+- D-04-01-J HEIC image-extraction (sharp/heic-convert server-side)
+- D-04-02-A through M (13 items from 04-02 classifier+taxonomy plan)
+- D-04-03-* deferred items from 04-03 (probes, extraction cost-cap impl, mid-call budget, tz, version history, analytics)
+- Phase 1 carry-forward UATs (AC-11 phone walk, AC-10 cross-org walk, AC-10 invitation walk, D-01-02-F email verification)
+
+**Archive:** Full v0.2 details preserved in this file's git history; SUMMARY files remain at `.paul/phases/0[1-4]-*/[plan]-SUMMARY.md`.
+
+</details>
 
 <details>
 <summary><strong>v0.1 POC</strong> (v0.1.0) — Completed 2026-04-19 · 5 phases · 13 plans</summary>
@@ -110,14 +139,11 @@ Estimated plans: 15 (Phase 3: 5 shipped / 3 superseded; Phase 4: 5 finalized dur
 | 4 | Chat Engine | 3/3 | 2026-04-18 |
 | 5 | Web Interface | 3/3 | 2026-04-19 |
 
-**Commits on main:** 51af306 → 88ab109 → 11e6049 → 1abd945 → ceb81bb → 3569f16 → 9efb5a5 → fe88a8a → a12c78a → 7aba52d (milestone completion)
 **Tag:** v0.1.0
-
-**Archive:** `.paul/milestones/0.1.0-ROADMAP.md` (full phase details preserved at milestone-completion snapshot)
-**Entry:** `.paul/MILESTONES.md`
+**Archive:** `.paul/milestones/0.1.0-ROADMAP.md` · **Entry:** `.paul/MILESTONES.md`
 
 </details>
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-21 — v0.2 Phase 3 closed (Twilio fully removed via Plans 03-04 + 03-05 Infobip migration); Phase 4 pivoted from Coolify Deployment to Dynamic Document Intelligence*
+*Last updated: 2026-04-27 — v0.2 closed early at ~96% (04-04/05 rolled forward); v0.3 Neural Brain milestone created (4 phases: hierarchical retrieval, graph layer, scheduler+graph-aware notifications, WhatsApp procedural runtime).*
