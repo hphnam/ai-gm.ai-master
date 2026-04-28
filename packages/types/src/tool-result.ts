@@ -1,6 +1,15 @@
 import { z } from 'zod'
 
-export const TOOL_RESULT_REASONS = ['no-data', 'not-supported', 'error'] as const
+// Plan 05-01 Task 3 — additive: 'not-found' (doc id mismatched org guard;
+// 404-style per Phase 1 enumeration-leak decision) and 'invalid-input'
+// (Zod schema fail / unknown column / aggregate-on-non-numeric).
+export const TOOL_RESULT_REASONS = [
+  'no-data',
+  'not-supported',
+  'error',
+  'not-found',
+  'invalid-input',
+] as const
 export type ToolResultReason = (typeof TOOL_RESULT_REASONS)[number]
 
 export type ToolResult<T> =
