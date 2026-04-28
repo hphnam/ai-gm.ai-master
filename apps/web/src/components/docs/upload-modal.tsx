@@ -13,7 +13,6 @@ import {
   Upload as UploadIcon,
   X,
 } from 'lucide-react'
-import { CreateDocRequestSchema, type CreateDocRequest } from '@gm-ai/types'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -113,7 +112,7 @@ function IntentPicker({ onPick }: { onPick: (i: Intent) => void }) {
         <IntentCard
           icon={<FileText className="h-5 w-5" />}
           title="Document"
-          description="Upload a file (PDF, spreadsheet, doc, image) or paste a full SOP / procedure."
+          description="Upload a file — PDF, spreadsheet, Word doc, or image."
           onClick={() => onPick('document')}
         />
         <IntentCard
@@ -155,20 +154,16 @@ function IntentCard({
 
 // ─── Document form ────────────────────────────────────────────────────────
 
-const DocumentFormSchema = z
-  .object({
-    title: z.string().trim().min(1, 'Title required').max(200),
-    venueId: z.union([z.string().uuid(), z.null()]),
-    description: z.string().trim().max(1_000),
-    content: z.string().trim().max(50_000),
-  })
-  .refine((v) => v.content.length >= 1 || true, { message: '' })
+const DocumentFormSchema = z.object({
+  title: z.string().trim().min(1, 'Title required').max(200),
+  venueId: z.union([z.string().uuid(), z.null()]),
+  description: z.string().trim().max(1_000),
+})
 
 type DocumentFormValues = z.infer<typeof DocumentFormSchema>
 
 function DocumentForm({ onSaved }: { onSaved: () => void }) {
   const { data: venues } = useVenues()
-  const createDoc = useCreateDoc()
   const uploadDoc = useUploadDoc()
   const [file, setFile] = useState<File | null>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -176,7 +171,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
 
   const form = useForm<DocumentFormValues>({
     resolver: zodResolver(DocumentFormSchema),
-    defaultValues: { title: '', venueId: null, description: '', content: '' },
+    defaultValues: { title: '', venueId: null, description: '' },
   })
 
   const attachFile = useCallback(
@@ -207,33 +202,17 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
   }
 
   async function onSubmit(values: DocumentFormValues) {
+    if (!file) {
+      toast.error('Attach a file to upload.')
+      return
+    }
     try {
-      if (file) {
-        await uploadDoc.mutateAsync({
-          file,
-          venueId: values.venueId ?? null,
-          title: values.title,
-          description: values.description || undefined,
-        })
-        toast.success(`Added "${values.title}" — processing in background`)
-        onSaved()
-        return
-      }
-      // No file attached — paste-text path. content required.
-      if (!values.content.trim()) {
-        form.setError('content', {
-          type: 'manual',
-          message: 'Attach a file or write content.',
-        })
-        return
-      }
-      const body: CreateDocRequest = CreateDocRequestSchema.parse({
-        title: values.title,
-        content: values.content,
+      await uploadDoc.mutateAsync({
+        file,
         venueId: values.venueId ?? null,
+        title: values.title,
         description: values.description || undefined,
       })
-      await createDoc.mutateAsync(body)
       toast.success(`Added "${values.title}" — processing in background`)
       onSaved()
     } catch (err) {
@@ -241,7 +220,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
     }
   }
 
-  const submitting = createDoc.isPending || uploadDoc.isPending
+  const submitting = uploadDoc.isPending
 
   return (
     <Form {...form}>
@@ -253,7 +232,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
         <DialogHeader>
           <DialogTitle>Add a document</DialogTitle>
           <DialogDescription>
-            Upload a file or paste text. The AI extracts tags and doc type on save.
+            Upload a file. The AI extracts tags and doc type on save.
           </DialogDescription>
         </DialogHeader>
 
@@ -400,40 +379,14 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
           )}
         />
 
-        {!file ? (
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Content</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    rows={8}
-                    placeholder="Paste markdown or plain text here…"
-                    disabled={submitting}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Required when no file is attached.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ) : null}
-
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || !file}>
             {submitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Saving…
               </>
-            ) : file ? (
-              'Upload & save'
             ) : (
-              'Save'
+              'Upload & save'
             )}
           </Button>
         </div>

@@ -47,12 +47,18 @@ importers:
       bullmq:
         specifier: ^5.76.2
         version: 5.76.2
+      chardet:
+        specifier: ^2.1.1
+        version: 2.1.1
       dotenv:
         specifier: latest
         version: 17.4.2
       express:
         specifier: latest
         version: 5.2.1
+      iconv-lite:
+        specifier: ^0.7.2
+        version: 0.7.2
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1

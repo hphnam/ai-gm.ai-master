@@ -2,12 +2,25 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { HelpCircle, Loader2, Sparkles } from 'lucide-react'
-import type { KbGapDto } from '@gm-ai/types'
+import { HelpCircle, Loader2, Sparkles, Trash2, User } from 'lucide-react'
+import type { KbGapAsker, KbGapDto } from '@gm-ai/types'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useAnswerGap } from '@/lib/hooks/use-docs'
+import { useAnswerGap, useDeleteGap } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
+
+function askerLabel(a: KbGapAsker): string {
+  return a.name?.trim() || a.email || 'unknown user'
+}
+
+function formatAskedBy(askers: KbGapAsker[]): { primary: string; title: string } | null {
+  if (!askers.length) return null
+  const labels = askers.map(askerLabel)
+  const title = askers.map((a) => `${askerLabel(a)}${a.email && a.email !== askerLabel(a) ? ` <${a.email}>` : ''}`).join('\n')
+  if (labels.length === 1) return { primary: labels[0], title }
+  if (labels.length === 2) return { primary: `${labels[0]}, ${labels[1]}`, title }
+  return { primary: `${labels[0]}, ${labels[1]} +${labels.length - 2}`, title }
+}
 
 function formatRelative(iso: string): string {
   const ts = new Date(iso).getTime()
@@ -26,6 +39,8 @@ function GapCard({ gap }: { gap: KbGapDto }) {
   const [open, setOpen] = useState(false)
   const [answer, setAnswer] = useState('')
   const answerGap = useAnswerGap()
+  const deleteGap = useDeleteGap()
+  const askedBy = formatAskedBy(gap.askedBy)
 
   async function handleSubmit() {
     const trimmed = answer.trim()
@@ -38,6 +53,16 @@ function GapCard({ gap }: { gap: KbGapDto }) {
       toast.success('Answer saved — being indexed now')
       setAnswer('')
       setOpen(false)
+    } catch (err) {
+      toast.error(mapApiError(err))
+    }
+  }
+
+  async function handleDelete() {
+    if (!window.confirm('Delete this question? It will no longer appear in the queue.')) return
+    try {
+      await deleteGap.mutateAsync(gap.id)
+      toast.success('Question deleted')
     } catch (err) {
       toast.error(mapApiError(err))
     }
@@ -64,6 +89,15 @@ function GapCard({ gap }: { gap: KbGapDto }) {
             )}
           </div>
           <p className="text-sm font-medium leading-snug">{gap.question}</p>
+          {askedBy ? (
+            <div
+              className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground"
+              title={askedBy.title}
+            >
+              <User className="h-3 w-3" />
+              <span>by {askedBy.primary}</span>
+            </div>
+          ) : null}
           {gap.tentativeAnswer ? (
             <div className="mt-2 rounded-md border-l-2 border-blue-500/40 bg-blue-500/5 px-3 py-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-1 text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-0.5">
@@ -75,9 +109,26 @@ function GapCard({ gap }: { gap: KbGapDto }) {
           ) : null}
         </div>
         {!open ? (
-          <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
-            Answer
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+              Answer
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={deleteGap.isPending}
+              aria-label="Delete question"
+              title="Delete question"
+              className="text-muted-foreground hover:text-destructive"
+            >
+              {deleteGap.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </div>
         ) : null}
       </div>
 

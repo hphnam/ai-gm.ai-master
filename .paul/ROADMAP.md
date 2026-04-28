@@ -7,8 +7,8 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.3 Neural Brain** (v0.3.0)
-Status: 🚧 In Progress (1 of 4 phases complete — Phase 1 Hierarchical Retrieval closed 2026-04-28)
-Phases: 4
+Status: 🚧 In Progress (1 of 5 phases complete — Phase 1 Hierarchical Retrieval closed 2026-04-28)
+Phases: 5
 
 **Theme:** "Per-venue neural brain — the assistant doesn't search docs, it knows the venue. Connections between docs are first-class data, and the WhatsApp channel speaks fluent venue-context."
 
@@ -22,6 +22,7 @@ Phases: 4
 | 2 | Graph Layer | TBD | 🔵 Ready to plan | - |
 | 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Not started | - |
 | 4 | WhatsApp Procedural Runtime | TBD | Not started | - |
+| 5 | Tabular Query Path | 1 (05-01 schema+ingest+query+tool+probe) | 📋 Planned | - |
 
 ### Phase 1: Hierarchical Retrieval
 
@@ -78,6 +79,21 @@ Phases: 4
 - WhatsApp UX: numbered steps, clear progress indicators, graceful re-prompt on ambiguous reply
 - Operator dashboard surface (read-only): which checklists ran today, which are stuck, which completed
 - Probe assertions covering walkthrough state machine, mid-flow ad-hoc retrieval, completion persistence, and re-prompt behavior
+
+**Plans:** TBD (defined during /paul:plan)
+
+### Phase 5: Tabular Query Path
+
+**Focus:** Close the aggregate-query gap on tabular documents. Current ingest preserves every row at section/chunk level (Phase 1), but aggregate questions ("top 3 selling wines", "total revenue", "highest priced item") fail because retrieval surfaces a slice of rows and Claude can only eyeball — there's no compute layer over the full table. This phase adds a **structured-data path** alongside the embedded-text path: at ingest, CSV/XLSX rows are tee'd into a JSONB row store; the agent gets a `query_document_table` tool with structured filter/group_by/aggregate/sort/limit params; Postgres does the math.
+
+**Scope (pre-discuss sketch):**
+- `tabular_rows(doc_id, row_index, data JSONB)` + `tabular_columns(doc_id, name, inferred_type)` schema, tenant-scoped via `KnowledgeItem.organizationId` FK
+- Ingest tee: extend the existing CSV/XLSX path (`csv-extractor.ts` + XLSX equivalent) to persist rows alongside section creation — parsing already happens, this is a second sink
+- Naive column-type inference at ingest (try number → try date → fall back to string) stored on `tabular_columns`
+- Structured agent tool `query_document_table(doc_id, filters[], group_by?, aggregate?, sort?, limit?)` — typed params not raw SQL, Postgres JSONB operators do the work, no injection surface
+- Prompt nudge: when retrieval surfaces a tabular doc and the question is aggregate-shaped, agent uses the tool instead of approximating from sections
+- Tenant boundary: `doc_id` always validated against caller's `organizationId` — same SOC-2 CC6.6 discipline as Phase 1
+- Probe coverage: ingest tee fidelity (every row persisted), tool query correctness (top-N / sum / count / filter), cross-tenant isolation, large-doc behaviour (>1000 rows)
 
 **Plans:** TBD (defined during /paul:plan)
 
@@ -146,4 +162,4 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-28 — v0.3 Phase 1 (Hierarchical Retrieval) CLOSED at 3/3 plans; Phase 2 (Graph Layer) ready to plan. CONTEXT.md decisions D-01-A through D-01-E all shipped end-to-end.*
+*Last updated: 2026-04-28 — Phase 5 (Tabular Query Path) added to v0.3 milestone to close aggregate-query gap on CSV/XLSX docs (e.g. "top 3 selling wines"). Milestone now 5 phases. v0.3 Phase 1 (Hierarchical Retrieval) CLOSED at 3/3 plans; Phase 2 (Graph Layer) ready to plan.*

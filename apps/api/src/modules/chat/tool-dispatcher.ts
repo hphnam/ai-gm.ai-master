@@ -377,7 +377,80 @@ export class ToolDispatcher {
           // (defence-in-depth — chat-tools.ts schema is the agent-facing contract;
           // tabular.service is the canonical security boundary). It also enforces
           // the cross-org guard via knowledge_items JOIN.
-          const result = await this.tabular.query(ctx.orgId, parsed.data)
+          const queryInput = parsed.data as {
+            docId?: string
+          } & Record<string, unknown>
+
+          // Resolve a starting docId. The agent may omit docId when it doesn't
+          // know which tabular doc holds the answer — pick the most recent
+          // tabular doc and let auto-widen iterate the rest if it misses.
+          let startingDocId = queryInput.docId
+          if (!startingDocId) {
+            const seed = await prisma.knowledgeItem.findFirst({
+              where: {
+                organizationId: ctx.orgId,
+                tabularColumns: { some: {} },
+              },
+              select: { id: true },
+              orderBy: { updatedAt: 'desc' },
+            })
+            if (!seed) {
+              return fail('not-found', 'no tabular documents available in this organization')
+            }
+            startingDocId = seed.id
+          }
+
+          // Auto-widen — if the chosen doc has no matching rows or doesn't even
+          // carry the referenced columns, try other tabular docs in the org.
+          // Bounded at 10 candidates. Result selection priority:
+          //   1. ok with rows > 0 (the answer)  → return immediately
+          //   2. ok with rows = 0               → keep as fallback
+          //   3. fail invalid-input / not-supported → only if nothing better
+          // Prevents a stray column-mismatch on one doc from being surfaced
+          // when another doc returned a clean empty result.
+          const others = await prisma.knowledgeItem.findMany({
+            where: {
+              organizationId: ctx.orgId,
+              id: { not: startingDocId },
+              tabularColumns: { some: {} },
+            },
+            select: { id: true },
+            orderBy: { updatedAt: 'desc' },
+            take: 10,
+          })
+          const candidateDocs = [startingDocId, ...others.map((d) => d.id)]
+
+          type TabularResult = Awaited<ReturnType<typeof this.tabular.query>>
+          let hit: TabularResult | null = null
+          let cleanMiss: TabularResult | null = null
+          let firstFailure: TabularResult | null = null
+          let resolvedDocId = startingDocId
+          let attempts = 0
+
+          for (const docId of candidateDocs) {
+            attempts += 1
+            const r = await this.tabular.query(ctx.orgId, { ...queryInput, docId })
+            if (r.ok && r.data.rowCount > 0) {
+              hit = r
+              resolvedDocId = docId
+              break
+            }
+            if (r.ok && r.data.rowCount === 0 && !cleanMiss) {
+              cleanMiss = r
+              resolvedDocId = docId
+              continue
+            }
+            if (!r.ok && !firstFailure) {
+              firstFailure = r
+            }
+          }
+
+          const result: TabularResult =
+            hit ??
+            cleanMiss ??
+            firstFailure ??
+            fail('not-found', 'no tabular documents available in this organization')
+
           this.logger.log(
             JSON.stringify({
               event: 'tool_dispatcher.query_document_table',
@@ -388,6 +461,9 @@ export class ToolDispatcher {
               rowsReturned: result.ok ? result.data.rowCount : 0,
               truncated: result.ok ? result.data.truncated : false,
               reason: result.ok ? null : result.reason,
+              attempts,
+              fellBack: resolvedDocId !== startingDocId,
+              docIdSupplied: !!queryInput.docId,
             }),
           )
           return result

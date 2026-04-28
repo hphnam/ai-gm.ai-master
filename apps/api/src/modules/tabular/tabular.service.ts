@@ -136,38 +136,78 @@ export class TabularQueryService {
     const typeByName = new Map<string, InferredColumnType>(
       columnRows.map((c) => [c.name, c.inferredType as InferredColumnType]),
     )
-    const validColumn = (name: string) => typeByName.has(name)
+    // Fuzzy column resolution — the agent often guesses snake_case or
+    // lowercased variants ("product_name", "net sales", "items_sold") when
+    // the source columns are display-cased ("Product Name", "Items Sold").
+    // Normalize on lookup so trivial casing/whitespace/underscore differences
+    // resolve to the canonical column name. Order matters: build the map
+    // before any validation runs, then rewrite input.* in place to canonical
+    // names so downstream SQL composition uses the real column.
+    const normaliseColumnKey = (s: string) =>
+      s.toLowerCase().replace(/[_\s]+/g, ' ').trim()
+    const canonicalByNormalised = new Map<string, string>()
+    for (const c of columnRows) {
+      const key = normaliseColumnKey(c.name)
+      if (!canonicalByNormalised.has(key)) canonicalByNormalised.set(key, c.name)
+    }
+    const availableColumns = columnRows.map((c) => c.name).join(', ')
+    const resolveColumn = (raw: string): string | null => {
+      if (typeByName.has(raw)) return raw
+      return canonicalByNormalised.get(normaliseColumnKey(raw)) ?? null
+    }
 
     // 4. Validate every column reference upfront. Whitelist + safe-identifier
     // gate (the latter blocks injection via attacker-controlled CSV headers).
+    // Resolve fuzzy matches up-front and rewrite input.* so the rest of the
+    // function deals only with canonical column names.
     const referencedColumns = new Set<string>()
     if (input.filters) {
       for (const f of input.filters) {
-        if (!validColumn(f.column)) {
-          return fail('invalid-input', `unknown column: ${f.column}`)
+        const resolved = resolveColumn(f.column)
+        if (!resolved) {
+          return fail(
+            'invalid-input',
+            `unknown column: ${f.column}. Available: ${availableColumns}`,
+          )
         }
-        referencedColumns.add(f.column)
+        f.column = resolved
+        referencedColumns.add(resolved)
       }
     }
     if (input.groupBy) {
-      if (!validColumn(input.groupBy)) {
-        return fail('invalid-input', `unknown groupBy column: ${input.groupBy}`)
+      const resolved = resolveColumn(input.groupBy)
+      if (!resolved) {
+        return fail(
+          'invalid-input',
+          `unknown groupBy column: ${input.groupBy}. Available: ${availableColumns}`,
+        )
       }
-      referencedColumns.add(input.groupBy)
+      input.groupBy = resolved
+      referencedColumns.add(resolved)
     }
     if (input.aggregate?.column) {
-      if (!validColumn(input.aggregate.column)) {
-        return fail('invalid-input', `unknown aggregate column: ${input.aggregate.column}`)
+      const resolved = resolveColumn(input.aggregate.column)
+      if (!resolved) {
+        return fail(
+          'invalid-input',
+          `unknown aggregate column: ${input.aggregate.column}. Available: ${availableColumns}`,
+        )
       }
-      referencedColumns.add(input.aggregate.column)
+      input.aggregate.column = resolved
+      referencedColumns.add(resolved)
     }
     if (input.sort) {
       const isMagic = input.sort.column === '_aggregate' || input.sort.column === '_row_index'
       if (!isMagic) {
-        if (!validColumn(input.sort.column)) {
-          return fail('invalid-input', `unknown sort column: ${input.sort.column}`)
+        const resolved = resolveColumn(input.sort.column)
+        if (!resolved) {
+          return fail(
+            'invalid-input',
+            `unknown sort column: ${input.sort.column}. Available: ${availableColumns}`,
+          )
         }
-        referencedColumns.add(input.sort.column)
+        input.sort.column = resolved
+        referencedColumns.add(resolved)
       }
       if (input.sort.column === '_aggregate' && !input.aggregate) {
         return fail('invalid-input', '_aggregate sort requires an aggregate')

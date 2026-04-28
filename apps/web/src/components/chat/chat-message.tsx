@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { isToolUIPart, type UIMessage } from 'ai'
+import { getToolName, isToolUIPart, type UIMessage } from 'ai'
 import {
   Brain,
   Check,
@@ -36,8 +36,7 @@ function stripFollowUpTail(raw: string): string {
 }
 
 function toolLabel(name: string): string {
-  const bare = name.replace(/^tool-/, '')
-  switch (bare) {
+  switch (name) {
     case 'find_knowledge':
       return 'Searching knowledge'
     case 'get_stock_below_par':
@@ -50,8 +49,12 @@ function toolLabel(name: string): string {
       return 'Checking order cutoffs'
     case 'save_knowledge_doc':
       return 'Saving to knowledge base'
+    case 'query_document_table':
+      return 'Querying tabular data'
+    case 'record_kb_gap':
+      return 'Recording knowledge gap'
     default:
-      return `Running ${bare}`
+      return `Running ${name.replace(/_/g, ' ')}`
   }
 }
 
@@ -74,9 +77,30 @@ function BrandDot() {
 
 type ReasoningPart = { type: 'reasoning'; text: string; state?: string }
 
-function ReasoningBlock({ text, streaming }: { text: string; streaming: boolean }) {
+function ReasoningBlock({
+  text,
+  streaming,
+  chips,
+}: {
+  text: string
+  streaming: boolean
+  chips: ToolChip[]
+}) {
   const [open, setOpen] = useState(streaming)
-  if (!text.trim()) return null
+  const hasText = text.trim().length > 0
+  const hasChips = chips.length > 0
+  if (!hasText && !hasChips) return null
+  const inFlightChip = chips.find((c) => !c.done)
+  const erroredCount = chips.filter((c) => c.errored).length
+
+  // Header summary: while a tool is running, show its label; otherwise the
+  // standard Thinking… / Thought process state. Chips render as a compact
+  // row inside the expanded body, alongside the reasoning text.
+  const headerLabel = inFlightChip
+    ? inFlightChip.label
+    : streaming
+      ? 'Thinking…'
+      : 'Thought process'
   return (
     <div className="rounded-lg border border-border bg-muted/40">
       <button
@@ -86,9 +110,15 @@ function ReasoningBlock({ text, streaming }: { text: string; streaming: boolean 
         aria-expanded={open}
       >
         <Brain className="h-3.5 w-3.5 text-brand" aria-hidden />
-        <span>{streaming ? 'Thinking…' : 'Thought process'}</span>
+        <span>{headerLabel}</span>
+        {hasChips && !inFlightChip ? (
+          <span className="text-[11px] font-normal text-muted-foreground/80">
+            · {chips.length} {chips.length === 1 ? 'tool' : 'tools'}
+            {erroredCount ? ` · ${erroredCount} failed` : ''}
+          </span>
+        ) : null}
         <span className="ml-auto flex items-center gap-1">
-          {streaming ? <BrandDot /> : null}
+          {streaming || inFlightChip ? <BrandDot /> : null}
           {open ? (
             <ChevronDown className="h-3.5 w-3.5" aria-hidden />
           ) : (
@@ -97,8 +127,41 @@ function ReasoningBlock({ text, streaming }: { text: string; streaming: boolean 
         </span>
       </button>
       {open ? (
-        <div className="border-t border-border px-3 py-2 text-[13px] italic leading-relaxed text-muted-foreground whitespace-pre-wrap break-words">
-          {text}
+        <div className="space-y-2 border-t border-border px-3 py-2">
+          {hasChips ? (
+            <div className="flex flex-wrap gap-1.5">
+              {chips.map((c) => (
+                <div
+                  key={c.id}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px]',
+                    c.errored
+                      ? 'border-destructive/30 bg-destructive/5 text-destructive'
+                      : !c.done
+                        ? 'border-brand/30 bg-brand/5 text-brand'
+                        : 'border-border bg-background text-muted-foreground',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-block h-1 w-1 rounded-full',
+                      c.errored
+                        ? 'bg-destructive'
+                        : !c.done
+                          ? 'bg-brand'
+                          : 'bg-muted-foreground/60',
+                    )}
+                  />
+                  {c.label}
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {hasText ? (
+            <div className="text-[13px] italic leading-relaxed text-muted-foreground whitespace-pre-wrap break-words">
+              {text}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
@@ -188,6 +251,31 @@ function AssistantMarkdown({ text }: { text: string }) {
               </a>
             )
           },
+          table: ({ children }) => (
+            <div className="my-2 overflow-x-auto rounded-md border border-border last:mb-0">
+              <table className="w-full border-collapse text-[13px]">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-muted/60 text-foreground">{children}</thead>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr className="border-b border-border last:border-b-0">{children}</tr>
+          ),
+          th: ({ children, style }) => (
+            <th
+              className="px-3 py-1.5 text-left text-[12px] font-semibold uppercase tracking-wide text-muted-foreground"
+              style={style}
+            >
+              {children}
+            </th>
+          ),
+          td: ({ children, style }) => (
+            <td className="px-3 py-1.5 align-top" style={style}>
+              {children}
+            </td>
+          ),
         }}
       >
         {rewritten}
@@ -201,6 +289,13 @@ function AssistantMarkdown({ text }: { text: string }) {
  * We render each segment inline so the "thinking" block, the tool chip, and
  * the final answer stay visually separate and reorderable.
  */
+type ToolChip = {
+  id: string
+  label: string
+  done: boolean
+  errored: boolean
+}
+
 function AssistantBody({
   parts,
   isStreaming,
@@ -209,70 +304,60 @@ function AssistantBody({
   isStreaming: boolean
 }) {
   const lastIdx = parts.length - 1
+  // Hide narration text between tool calls so the assistant doesn't look line-
+  // by-line. Only render the LAST text part (the real answer); everything
+  // before it gets folded into a single Thought-process block (reasoning +
+  // tool chips together).
+  const lastTextIdx = (() => {
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (parts[i]?.type === 'text') return i
+    }
+    return -1
+  })()
+  const toolChips: ToolChip[] = []
+  parts.forEach((p, i) => {
+    if (!isToolUIPart(p)) return
+    const name = getToolName(p)
+    if (name === 'suggest_followups') return
+    toolChips.push({
+      id: (p as { toolCallId?: string }).toolCallId ?? `tool-${i}`,
+      label: toolLabel(name),
+      done: p.state === 'output-available' || p.state === 'output-error',
+      errored: p.state === 'output-error',
+    })
+  })
+  let reasoningStreaming = false
+  const reasoningTextParts: string[] = []
+  parts.forEach((p, i) => {
+    if (p.type !== 'reasoning') return
+    const rp = p as ReasoningPart
+    const isLast = i === lastIdx
+    if (isStreaming && isLast && rp.state === 'streaming') reasoningStreaming = true
+    const t = (rp.text ?? '').trim()
+    if (t.length > 0) reasoningTextParts.push(t)
+  })
+  const mergedReasoningText = reasoningTextParts.join('\n\n')
+  const finalTextPart = lastTextIdx >= 0 ? parts[lastTextIdx] : null
+  const finalText =
+    finalTextPart && finalTextPart.type === 'text'
+      ? stripFollowUpTail(finalTextPart.text).trim()
+      : ''
+
   return (
     <div className="flex flex-col gap-2.5">
-      {parts.map((p, i) => {
-        const isLast = i === lastIdx
-        if (p.type === 'text') {
-          const visible = stripFollowUpTail(p.text).trim()
-          if (!visible) return null
-          return (
-            <div key={`text-${i}`} className="relative">
-              <AssistantMarkdown text={visible} />
-              {isStreaming && isLast ? (
-                <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
-              ) : null}
-            </div>
-          )
-        }
-        if (p.type === 'reasoning') {
-          const rp = p as ReasoningPart
-          return (
-            <ReasoningBlock
-              key={`reasoning-${i}`}
-              text={rp.text ?? ''}
-              streaming={Boolean(isStreaming && isLast && rp.state === 'streaming')}
-            />
-          )
-        }
-        if (isToolUIPart(p)) {
-          // suggest_followups is a mechanism — don't render it as a chip.
-          const bare = p.type.replace(/^tool-/, '')
-          if (bare === 'suggest_followups') return null
-          const toolCallId =
-            (p as { toolCallId?: string }).toolCallId ?? `tool-${i}`
-          const done =
-            p.state === 'output-available' || p.state === 'output-error'
-          const errored = p.state === 'output-error'
-          const label = toolLabel(p.type)
-          return (
-            <div
-              key={toolCallId}
-              className={cn(
-                'inline-flex w-fit items-center gap-2 rounded-full border px-2.5 py-1 text-[12px]',
-                done
-                  ? errored
-                    ? 'border-destructive/30 bg-destructive/5 text-destructive'
-                    : 'border-border bg-muted/70 text-muted-foreground'
-                  : 'border-brand/30 bg-brand/5 text-brand',
-              )}
-            >
-              {done ? (
-                <span
-                  className={cn(
-                    'inline-block h-1.5 w-1.5 rounded-full',
-                    errored ? 'bg-destructive' : 'bg-muted-foreground/60',
-                  )}
-                />
-              ) : (
-                <BrandDot />
-              )}
-              <span>{label}</span>
-            </div>
-          )
-        }
-        return null
-      })}
+      <ReasoningBlock
+        text={mergedReasoningText}
+        streaming={reasoningStreaming}
+        chips={toolChips}
+      />
+      {finalText ? (
+        <div className="relative">
+          <AssistantMarkdown text={finalText} />
+          {isStreaming && lastTextIdx === lastIdx ? (
+            <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
+          ) : null}
+        </div>
+      ) : null}
       {isStreaming && parts.length === 0 ? (
         <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
       ) : null}

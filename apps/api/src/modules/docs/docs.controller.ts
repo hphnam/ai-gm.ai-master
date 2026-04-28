@@ -46,6 +46,8 @@ import {
   UPLOAD_MAX_BYTES,
   UPLOAD_MAX_BYTES_BY_MIME,
   UPLOAD_MIME_ALLOWLIST,
+  normalizeDelimiter,
+  normalizeTextBufferEncoding,
   sanitizeUploadTitle,
 } from './doc-extract'
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
@@ -248,7 +250,23 @@ export class DocsController {
         // Reducto upload is fast (single multipart round-trip). Parse runs
         // in enrichInBackground so the controller returns a stub immediately.
         // Buffer is consumed here; multer's request-lifecycle buffer is fine.
-        reductoFileId = await this.reducto.upload(file.buffer, file.originalname, file.mimetype)
+        // Text-like uploads (CSV/TSV/TXT/MD) get encoding-normalised to UTF-8
+        // first via BOM check + chardet sniff so Reducto doesn't byte-walk
+        // UTF-16 / Windows-1252 / MacRoman as ASCII (every char would come
+        // back interleaved with NUL or replacement glyphs and Postgres would
+        // reject the write). Binary formats (PDF/DOCX/XLSX/PPTX) pass through
+        // — Reducto handles their internal encoding natively.
+        const decoded = normalizeTextBufferEncoding(
+          file.buffer,
+          file.mimetype,
+          file.originalname,
+        )
+        // Square/Excel often save TSV with a .csv extension. Reducto's CSV
+        // parser splits on commas, which shreds £-formatted UK numbers like
+        // £2,284.04 in tab-delimited rows. Convert to proper quoted CSV so
+        // Reducto only sees one delimiter.
+        const buffer = normalizeDelimiter(decoded, file.mimetype, file.originalname)
+        reductoFileId = await this.reducto.upload(buffer, file.originalname, file.mimetype)
       }
     } catch (err) {
       if (err instanceof ReductoError) {

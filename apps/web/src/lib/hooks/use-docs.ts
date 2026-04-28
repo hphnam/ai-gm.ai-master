@@ -208,6 +208,34 @@ export function useAnswerGap() {
   })
 }
 
+export function useDeleteGap() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string): Promise<void> => {
+      const requestId = crypto.randomUUID()
+      const res = await fetch(API_URL + `/docs/gaps/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'x-request-id': requestId },
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        let body: ApiErrorResponse | null = null
+        try {
+          body = text ? (JSON.parse(text) as ApiErrorResponse) : null
+        } catch {
+          body = null
+        }
+        const serverRequestId = res.headers.get('x-request-id') ?? requestId
+        throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['docs', 'gaps'] })
+    },
+  })
+}
+
 export function useDeleteDoc() {
   const queryClient = useQueryClient()
   return useMutation({

@@ -215,6 +215,7 @@ export class DocsService {
       tentativeAnswer: string | null
       askCount: number
       askedByUserIds: string[]
+      askedBy: Array<{ id: string; name: string | null; email: string | null }>
       venueId: string | null
       venueName: string | null
       createdAt: string
@@ -236,14 +237,39 @@ export class DocsService {
       },
       take: 200,
     })
-    return rows.map((r) => {
+
+    const allAskerIds = new Set<string>()
+    const perRowAskerIds: string[][] = rows.map((r) => {
       const meta = (r.metadata ?? {}) as Record<string, unknown>
-      const askCount = typeof meta.askCount === 'number' ? meta.askCount : 1
-      const askedByUserIds = Array.isArray(meta.askedByUserIds)
+      const ids = Array.isArray(meta.askedByUserIds)
         ? (meta.askedByUserIds as unknown[]).filter(
             (v): v is string => typeof v === 'string',
           )
         : []
+      ids.forEach((id) => allAskerIds.add(id))
+      return ids
+    })
+
+    const askers = allAskerIds.size
+      ? await prisma.user.findMany({
+          where: { id: { in: Array.from(allAskerIds) } },
+          select: { id: true, name: true, email: true },
+        })
+      : []
+    const askerById = new Map(askers.map((u) => [u.id, u]))
+
+    return rows.map((r, i) => {
+      const meta = (r.metadata ?? {}) as Record<string, unknown>
+      const askCount = typeof meta.askCount === 'number' ? meta.askCount : 1
+      const askedByUserIds = perRowAskerIds[i] ?? []
+      const askedBy = askedByUserIds.map((id) => {
+        const u = askerById.get(id)
+        return {
+          id,
+          name: u?.name ?? null,
+          email: u?.email ?? null,
+        }
+      })
       const tentativeAnswer =
         typeof meta.tentativeAnswer === 'string' && meta.tentativeAnswer.length > 0
           ? meta.tentativeAnswer
@@ -256,6 +282,7 @@ export class DocsService {
         tentativeAnswer,
         askCount,
         askedByUserIds,
+        askedBy,
         venueId: r.venueId,
         venueName: r.venue?.name ?? null,
         createdAt: r.createdAt.toISOString(),

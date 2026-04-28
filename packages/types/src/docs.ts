@@ -206,12 +206,19 @@ export type DocDetail = {
 }
 
 /// Phase C — knowledge gap surfaced from chat for GM to answer.
+export type KbGapAsker = {
+  id: string
+  name: string | null
+  email: string | null
+}
+
 export type KbGapDto = {
   id: string
   question: string
   tentativeAnswer: string | null
   askCount: number
   askedByUserIds: string[]
+  askedBy: KbGapAsker[]
   venueId: string | null
   venueName: string | null
   createdAt: string

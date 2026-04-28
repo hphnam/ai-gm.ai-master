@@ -1,3 +1,6 @@
+import * as chardet from 'chardet'
+import iconv from 'iconv-lite'
+
 export type ExtractErrorReason =
   | 'unsupported-mime'
   | 'corrupt-bytes'
@@ -77,3 +80,101 @@ export const UPLOAD_MAX_BYTES_BY_MIME: Readonly<Record<string, number>> = {
 } as const
 
 export const UPLOAD_MAX_BYTES = 15 * 1024 * 1024 // ceiling across all formats; per-MIME cap refines per type
+
+const TEXTLIKE_MIMES = new Set([
+  'text/plain',
+  'text/markdown',
+  'text/csv',
+  'text/tab-separated-values',
+  'application/csv',
+  'application/x-csv',
+  'application/vnd.ms-excel', // some browsers tag CSV this way
+  'application/octet-stream', // generic — sniff by extension
+])
+
+const TEXTLIKE_EXTENSIONS = /\.(csv|tsv|txt|md|log)$/i
+
+export function isTextLikeUpload(mime: string, filename: string): boolean {
+  return TEXTLIKE_MIMES.has(mime) || TEXTLIKE_EXTENSIONS.test(filename)
+}
+
+// Detect the buffer's encoding (BOM fast-path → chardet fallback) and
+// re-emit as UTF-8 so downstream consumers (Reducto, Postgres) get clean
+// text. POS exports are commonly UTF-16 LE (Square), Windows-1252 (legacy
+// Excel on Windows), or MacRoman; chardet covers all of these plus the
+// long tail. UTF-8 input passes through unchanged.
+export function normalizeTextBufferEncoding(
+  buf: Buffer,
+  mime: string,
+  filename = '',
+): Buffer {
+  if (!isTextLikeUpload(mime, filename) || buf.length < 2) return buf
+
+  // BOM fast-path — explicit BOMs are authoritative, skip chardet.
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) {
+    return buf.subarray(3) // UTF-8 BOM — strip and pass through.
+  }
+  if (buf[0] === 0xff && buf[1] === 0xfe) {
+    return Buffer.from(buf.subarray(2).toString('utf16le'), 'utf8')
+  }
+  if (buf[0] === 0xfe && buf[1] === 0xff) {
+    const swapped = Buffer.from(buf.subarray(2))
+    swapped.swap16()
+    return Buffer.from(swapped.toString('utf16le'), 'utf8')
+  }
+
+  // No BOM — let chardet sniff. Sample the first 64KB to keep large files cheap.
+  const sample = buf.length > 65_536 ? buf.subarray(0, 65_536) : buf
+  const detected = chardet.detect(sample)
+  if (!detected) return buf
+
+  const enc = detected.toUpperCase()
+  if (enc === 'UTF-8' || enc === 'ASCII') return buf
+  if (!iconv.encodingExists(enc)) return buf
+
+  return iconv.encode(iconv.decode(buf, enc), 'utf8')
+}
+
+// Reducto's CSV parser splits on commas, but Square/Excel "save as CSV" often
+// produces tab-delimited content (especially in UK/EU locales where £2,284.04
+// uses commas as thousand separators). The result: cells get shredded mid-
+// number. Detect tab-as-delimiter on text-like uploads and re-emit as proper
+// quoted CSV before sending to Reducto.
+const TAB_VS_COMMA_THRESHOLD = 1.5
+
+export function normalizeDelimiter(buf: Buffer, mime: string, filename = ''): Buffer {
+  if (!isTextLikeUpload(mime, filename) || buf.length < 2) return buf
+
+  // Sample first ~16 lines to decide. CSV files have stable structure so this
+  // is enough to disambiguate without scanning the whole file.
+  const sampleText = buf.subarray(0, Math.min(buf.length, 8_192)).toString('utf8')
+  const sampleLines = sampleText.split(/\r?\n/).slice(0, 16).filter((l) => l.length > 0)
+  if (sampleLines.length < 2) return buf
+
+  let tabs = 0
+  let commas = 0
+  for (const line of sampleLines) {
+    for (let i = 0; i < line.length; i++) {
+      const c = line.charCodeAt(i)
+      if (c === 9) tabs++
+      else if (c === 44) commas++
+    }
+  }
+
+  // Only convert when tabs clearly dominate. A pure CSV with stray tabs in a
+  // notes column should not flip; a TSV with commas inside numeric values
+  // should.
+  if (tabs < commas * TAB_VS_COMMA_THRESHOLD || tabs === 0) return buf
+
+  const text = buf.toString('utf8')
+  const converted = text
+    .split(/\r?\n/)
+    .map((line) =>
+      line
+        .split('\t')
+        .map((cell) => (/[",\r\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell))
+        .join(','),
+    )
+    .join('\n')
+  return Buffer.from(converted, 'utf8')
+}

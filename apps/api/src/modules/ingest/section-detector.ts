@@ -210,6 +210,10 @@ export class SectionDetector {
   }
 
   private chunksFor(content: string, tokenCount: number): DetectedChunk[] {
+    // Empty/whitespace-only body (e.g. heading with no following content)
+    // would produce a 400 from Voyage. Section row still persists for
+    // navigation; just skip the unembeddable chunk.
+    if (content.trim().length === 0) return []
     if (tokenCount <= CHUNK_TARGET_TOKENS) {
       return [{ content, tokenCount }]
     }

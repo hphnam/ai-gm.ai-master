@@ -7,6 +7,8 @@ import {
   type ModelMessage,
   type StreamTextResult,
   type TextPart,
+  type ToolCallPart,
+  type ToolResultPart,
   type ToolSet,
 } from 'ai'
 import { VenueProfileSchema } from '@gm-ai/types'
@@ -30,6 +32,85 @@ import { UserProfileService } from './user-profile.service'
 const MAX_USER_MESSAGE_CHARS = 8000
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+type PersistedToolCall = {
+  round?: number
+  toolUseId?: string
+  tool?: string
+  input?: unknown
+  result?: unknown
+}
+
+// Reconstruct AI SDK ModelMessage[] for the recent (un-compacted) window.
+// Prior implementation flattened every assistant turn to plain text, which
+// hid which doc / row a previous turn already resolved — the model would
+// then refuse follow-up questions about that doc ("I don't have access to
+// sales data") because nothing in its context indicated a tool had been
+// called. We now replay each completed tool round as
+// [assistant: tool-call parts, tool: tool-result parts, assistant: final text]
+// so the model sees the docId / output it produced earlier and can reuse it.
+//
+// Replay is all-or-nothing per assistant turn: if any persisted tool call has
+// a null result (incomplete dispatch), we fall back to plain text for that
+// turn — Anthropic rejects a tool_use without its matching tool_result.
+function expandRecentToModelMessages(
+  recent: CompactableMessage[],
+  toolCallsByMessageId: Map<string, PersistedToolCall[]>,
+): ModelMessage[] {
+  const out: ModelMessage[] = []
+  for (const m of recent) {
+    if (m.role === 'user') {
+      out.push({ role: 'user', content: m.content })
+      continue
+    }
+    const log = toolCallsByMessageId.get(m.id) ?? []
+    const allComplete =
+      log.length > 0 &&
+      log.every(
+        (e) =>
+          typeof e.toolUseId === 'string' &&
+          e.toolUseId.length > 0 &&
+          typeof e.tool === 'string' &&
+          e.tool.length > 0 &&
+          e.result !== null &&
+          e.result !== undefined,
+      )
+    if (allComplete) {
+      const toolCallParts: ToolCallPart[] = log.map((e) => ({
+        type: 'tool-call',
+        toolCallId: e.toolUseId as string,
+        toolName: e.tool as string,
+        input: e.input ?? {},
+      }))
+      const toolResultParts: ToolResultPart[] = log.map((e) => ({
+        type: 'tool-result',
+        toolCallId: e.toolUseId as string,
+        toolName: e.tool as string,
+        // 'json' output type — provider serialises and the model reads it as
+        // structured JSON, so docIds and metadata fields stay intact.
+        output: { type: 'json', value: (e.result ?? null) as never },
+      }))
+      out.push({ role: 'assistant', content: toolCallParts })
+      out.push({ role: 'tool', content: toolResultParts })
+      out.push({ role: 'assistant', content: m.content })
+    } else {
+      out.push({ role: 'assistant', content: m.content })
+    }
+  }
+  return out
+}
+
+function buildToolCallMap(
+  rows: Array<{ id: string; role: string; toolCallLog: unknown }>,
+): Map<string, PersistedToolCall[]> {
+  const map = new Map<string, PersistedToolCall[]>()
+  for (const r of rows) {
+    if (r.role !== 'assistant') continue
+    if (!Array.isArray(r.toolCallLog)) continue
+    map.set(r.id, r.toolCallLog as PersistedToolCall[])
+  }
+  return map
+}
 
 const SendMessageInputSchema = z.object({
   conversationId: z.string().regex(UUID_RE, 'invalid uuid').optional(),
@@ -330,23 +411,25 @@ export class ChatService {
     const historyRaw = await prisma.chatMessage.findMany({
       where: { conversationId },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      select: { id: true, role: true, content: true },
+      select: { id: true, role: true, content: true, toolCallLog: true },
     })
     // Anthropic rejects empty text blocks with 400. Aborted or failed prior
     // turns can leave assistant rows with empty content — filter them out.
-    const history: CompactableMessage[] = historyRaw
-      .filter((m) => m.content && m.content.trim().length > 0)
-      .map((m) => ({
-        id: m.id,
-        role: m.role === 'assistant' ? 'assistant' : ('user' as const),
-        content: m.content,
-      }))
-
-    const compaction = await this.compactor.compactIfNeeded(conversationId, history)
-    const messages: ModelMessage[] = compaction.recent.map((m) => ({
-      role: m.role,
+    const filteredRaw = historyRaw.filter(
+      (m) => m.content && m.content.trim().length > 0,
+    )
+    const history: CompactableMessage[] = filteredRaw.map((m) => ({
+      id: m.id,
+      role: m.role === 'assistant' ? 'assistant' : ('user' as const),
       content: m.content,
     }))
+    const toolCallsByMessageId = buildToolCallMap(filteredRaw)
+
+    const compaction = await this.compactor.compactIfNeeded(conversationId, history)
+    const messages: ModelMessage[] = expandRecentToModelMessages(
+      compaction.recent,
+      toolCallsByMessageId,
+    )
 
     // When an image attachment is present, replace the last user message with
     // a multi-part array (text + AI SDK ImagePart) so the model sees the image
@@ -695,31 +778,35 @@ export class ChatService {
     const assistantMessageId = crypto.randomUUID()
 
     // Load full history (includes the just-persisted user message) and convert
-    // to AI SDK ModelMessage[]. We drop tool-call reconstruction — prior turns
-    // are shown to the model as plain text (same as the non-streaming path).
+    // to AI SDK ModelMessage[]. Tool-call replay (mirrors the non-streaming
+    // path) — without it the model loses sight of prior turns' docIds and
+    // re-asks find_knowledge for follow-ups about the same doc, often
+    // bailing with "I don't have access to sales data".
     const streamHistoryRaw = await prisma.chatMessage.findMany({
       where: { conversationId },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      select: { id: true, role: true, content: true },
+      select: { id: true, role: true, content: true, toolCallLog: true },
     })
     // Anthropic rejects empty text blocks with 400 ("text content blocks must
     // be non-empty"). Aborted or failed prior turns can leave assistant rows
     // with empty content — filter them out before sending to the model.
-    const streamHistory: CompactableMessage[] = streamHistoryRaw
-      .filter((m) => m.content && m.content.trim().length > 0)
-      .map((m) => ({
-        id: m.id,
-        role: m.role === 'assistant' ? 'assistant' : ('user' as const),
-        content: m.content,
-      }))
+    const filteredStreamRaw = streamHistoryRaw.filter(
+      (m) => m.content && m.content.trim().length > 0,
+    )
+    const streamHistory: CompactableMessage[] = filteredStreamRaw.map((m) => ({
+      id: m.id,
+      role: m.role === 'assistant' ? 'assistant' : ('user' as const),
+      content: m.content,
+    }))
+    const streamToolCallsByMessageId = buildToolCallMap(filteredStreamRaw)
     const streamCompaction = await this.compactor.compactIfNeeded(
       conversationId,
       streamHistory,
     )
-    const modelMessages: ModelMessage[] = streamCompaction.recent.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }))
+    const modelMessages: ModelMessage[] = expandRecentToModelMessages(
+      streamCompaction.recent,
+      streamToolCallsByMessageId,
+    )
 
     const ctx: DispatchContext = {
       orgId: params.orgId,

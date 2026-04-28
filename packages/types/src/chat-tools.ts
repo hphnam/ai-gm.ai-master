@@ -114,7 +114,7 @@ export const TOOL_INPUT_SCHEMAS = {
   // tabular.ts; both must stay in sync — the dispatcher re-validates against
   // TabularQueryInputSchema before executing).
   query_document_table: z.object({
-    docId: UUID,
+    docId: UUID.optional(),
     filters: z
       .array(
         z.object({
@@ -261,7 +261,7 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
   {
     name: 'record_kb_gap',
     description:
-      "Capture a question that the knowledge base couldn't answer so the GM can authoritatively answer it later from their dashboard. Call this whenever find_knowledge returns no-data on an OPERATIONAL question (where things go, how routine tasks work, who handles X) — NOT for policy/safety/numerical questions where guessing is dangerous. The captured row appears in the GM's pending-answers queue. Dedupes against prior gaps via semantic similarity — if a near-identical question is already pending, this just bumps its ask-count. Returns { id, askCount, dedupedFromExisting }. Pair this with a lenient unverified answer to the user (your tentativeAnswer) plus a note that you've flagged it for the GM.",
+      "Capture a question that the knowledge base couldn't answer so the GM can authoritatively answer it later from their dashboard. PRECONDITION (enforced by the dispatcher — calls without it are REJECTED): you MUST have called find_knowledge in the current turn AND the most recent find_knowledge call must have returned { ok: false, reason: 'no-data' }. Never speculate a gap; never call this in place of search. If find_knowledge returned hits, answer from those instead — the KB has the answer. After a confirmed no-data, only use this for OPERATIONAL or POLICY questions (where things go, how routine tasks work, what's our policy on X) — pair with a lenient unverified answer for operational questions, an empty tentativeAnswer for strict/policy questions. The captured row appears in the GM's pending-answers queue. Dedupes against prior gaps via semantic similarity — if a near-identical question is already pending, this bumps its ask-count. Returns { id, askCount, dedupedFromExisting }.",
     input_schema: {
       type: 'object',
       properties: {
@@ -377,11 +377,15 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
   {
     name: 'query_document_table',
     description:
-      "Run a deterministic computation over a tabular knowledge document (CSV / XLSX). Use ONLY for whole-table question shapes against a SINGLE doc: (1) AGGREGATE / RANKING — totals, top-N, counts, averages, min/max ('top 3 selling wines', 'total revenue this month', 'highest priced item'); pass the appropriate `aggregate` / `groupBy` / `filters` / `sort`. (2) ENUMERATION — listing or walking through all rows ('list all opening steps', 'what do we need to follow to open?', 'walk me through the closing checklist'); pass NO aggregate, NO groupBy, with `sort: { column: '_row_index', direction: 'asc' }` to get rows back in source order. Always pass a doc_id obtained via find_knowledge or current_context. Magic sort columns: `_aggregate` (sort by aggregate result — only valid when an aggregate is present) and `_row_index` (sort by source-row position). Returns { rows, rowCount, truncated } where truncated:true means the result hit the LIMIT (default 100, max 1000) — communicate that to the user. For LOOKUP-shaped questions targeting a single fact ('when do we open the cask vents?'), use find_knowledge instead, not this tool. Aggregate fns sum/avg/min/max require a numeric column; otherwise the tool returns ok:false reason='invalid-input'. Cross-org doc id returns ok:false reason='not-found'.",
+      "Run a deterministic computation over a tabular knowledge document (CSV / XLSX). Use ONLY for whole-table question shapes: (1) AGGREGATE / RANKING — totals, top-N, counts, averages, min/max ('top 3 selling wines', 'total revenue this month', 'highest priced item'); pass the appropriate `aggregate` / `groupBy` / `filters` / `sort`. (2) ENUMERATION — listing or walking through all rows ('list all opening steps', 'what do we need to follow to open?', 'walk me through the closing checklist'); pass NO aggregate, NO groupBy, with `sort: { column: '_row_index', direction: 'asc' }` to get rows back in source order. PREFER passing `docId` from a find_knowledge hit or prior tool call. If you don't know which doc holds the data, OMIT `docId` — the dispatcher will search every tabular doc in the org and return the first one that produces matches. Magic sort columns: `_aggregate` (sort by aggregate result — only valid when an aggregate is present) and `_row_index` (sort by source-row position). Returns { rows, rowCount, truncated } where truncated:true means the result hit the LIMIT (default 100, max 1000) — communicate that to the user. For LOOKUP-shaped questions targeting a single fact ('when do we open the cask vents?'), use find_knowledge instead, not this tool. Aggregate fns sum/avg/min/max require a numeric column; otherwise the tool returns ok:false reason='invalid-input'. Cross-org doc id returns ok:false reason='not-found'.",
     input_schema: {
       type: 'object',
       properties: {
-        docId: { type: 'string', description: 'UUID of the tabular knowledge_item to query' },
+        docId: {
+          type: 'string',
+          description:
+            'UUID of the tabular knowledge_item to query. Omit when you do not know which doc holds the data — the dispatcher will iterate every tabular doc in the org and return the first match.',
+        },
         filters: {
           type: 'array',
           description: 'AND-chained filters; each { column, op, value }',
@@ -419,7 +423,7 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
           description: 'Max rows to return (default 100, max 1000)',
         },
       },
-      required: ['docId'],
+      required: [],
     },
   },
 ]
