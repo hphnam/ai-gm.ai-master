@@ -1,16 +1,16 @@
 import { config } from 'dotenv'
-import { readdirSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
+import { resolve } from 'node:path'
 
-function findRepoRoot(start: string): string {
-  let dir = start
-  while (dir !== dirname(dir)) {
-    try {
-      if (readdirSync(dir).includes('pnpm-workspace.yaml')) return dir
-    } catch {}
-    dir = dirname(dir)
-  }
-  throw new Error(`Could not find repo root (pnpm-workspace.yaml) from ${start}`)
+// Load apps/api/.env relative to this file. In dev (tsx/swc) this file lives at
+// apps/api/src/load-env.ts; in prod (compiled) at apps/api/dist/src/load-env.js.
+// Try both candidate locations; whichever resolves to apps/api/.env wins.
+// Production deploys should rely on platform-injected env vars — these calls
+// are best-effort and silently no-op when no .env file is present.
+const candidates = [
+  resolve(__dirname, '../.env'),       // dev:  apps/api/src/  → apps/api/.env
+  resolve(__dirname, '../../.env'),    // prod: apps/api/dist/src/ → apps/api/.env
+]
+
+for (const path of candidates) {
+  config({ path, override: false })
 }
-
-config({ path: resolve(findRepoRoot(__dirname), '.env') })
