@@ -17,26 +17,25 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
 import type { Request } from 'express'
-import {
-  type ApiErrorResponse,
-  type CreateInvitationResponse,
-  InviteBodySchema,
-  type InviteBody,
-  InvitationIdParamSchema,
-  ListInvitationsQuerySchema,
-  type ListInvitationsQuery,
-  type ListInvitationsResponse,
-  type InvitationPreview,
-  type AcceptInvitationResponse,
-} from '@gm-ai/types'
-import { zodPipe } from '../../common/zod-pipe'
+import { type ApiErrorResponse, InvitationIdParamSchema } from '@gm-ai/types'
 import { AuthGuard, type AuthedRequest } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { assertAuthEnv } from '../auth/assert-auth-env'
 import { InvitationError, InvitationsService } from './invitations.service'
 import { MailService } from './mail.service'
+import {
+  AcceptInvitationResponseDto,
+  CreateInvitationResponseDto,
+  InvitationPreviewDto,
+  InviteBodyDto,
+  ListInvitationsQueryDto,
+  ListInvitationsResponseDto,
+  RevokeInvitationResponseDto,
+} from './dto/invitations.dto'
 
 // 01-02 audit-added S2: in-memory per-IP throttler for unauth preview endpoint.
 // Single-node POC; swap for Redis at multi-instance scale (D-01-02-G).
@@ -82,6 +81,8 @@ function mapInvitationError(code: InvitationError['code'], details?: unknown): H
   }
 }
 
+@ApiTags('invitations')
+@ApiBearerAuth()
 @Controller('org/invitations')
 export class InvitationsController {
   private readonly logger = new Logger(InvitationsController.name)
@@ -97,11 +98,12 @@ export class InvitationsController {
   @Post()
   @UseGuards(AuthGuard, RoleGuard)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 201, type: CreateInvitationResponseDto })
   async create(
-    @Body(zodPipe(InviteBodySchema)) body: InviteBody,
+    @Body() body: InviteBodyDto,
     @CurrentUser() user: { id: string; name: string | null },
     @CurrentOrg() org: { id: string; name: string; slug: string },
-  ): Promise<CreateInvitationResponse> {
+  ): Promise<CreateInvitationResponseDto> {
     try {
       const { row, reissued } = await this.service.createInvitation({
         organizationId: org.id,
@@ -122,7 +124,7 @@ export class InvitationsController {
         inviteUrl,
         warning: mail.ok ? undefined : 'mail-send-failed',
         reissued: reissued || undefined,
-      }
+      } as CreateInvitationResponseDto
     } catch (err) {
       if (err instanceof InvitationError) throw mapInvitationError(err.code, err.details)
       throw err
@@ -132,19 +134,21 @@ export class InvitationsController {
   @Get()
   @UseGuards(AuthGuard, RoleGuard)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: ListInvitationsResponseDto })
   async list(
-    @Query(zodPipe(ListInvitationsQuerySchema)) query: ListInvitationsQuery,
+    @Query(new ZodValidationPipe(ListInvitationsQueryDto)) query: ListInvitationsQueryDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<ListInvitationsResponse> {
-    return this.service.listInvitations({
+  ): Promise<ListInvitationsResponseDto> {
+    return (await this.service.listInvitations({
       organizationId: org.id,
       limit: query.limit,
       offset: query.offset,
-    })
+    })) as ListInvitationsResponseDto
   }
 
   @Get(':id/preview')
-  async preview(@Param() params: { id: string }, @Req() req: Request): Promise<InvitationPreview> {
+  @ApiResponse({ status: 200, type: InvitationPreviewDto })
+  async preview(@Param() params: { id: string }, @Req() req: Request): Promise<InvitationPreviewDto> {
     // Unauth endpoint; throttle by IP to blunt a crawl/scrape.
     const ip = req.ip ?? req.socket?.remoteAddress ?? 'unknown'
     if (!previewThrottleOk(ip)) {
@@ -157,7 +161,7 @@ export class InvitationsController {
       throw new NotFoundException(body)
     }
     try {
-      return await this.service.getInvitationPreview(parsed.data.id)
+      return (await this.service.getInvitationPreview(parsed.data.id)) as InvitationPreviewDto
     } catch (err) {
       if (err instanceof InvitationError) throw mapInvitationError(err.code)
       throw err
@@ -167,10 +171,11 @@ export class InvitationsController {
   @Post(':id/accept')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
+  @ApiResponse({ status: 200, type: AcceptInvitationResponseDto })
   async accept(
     @Param() params: { id: string },
     @Req() req: AuthedRequest,
-  ): Promise<AcceptInvitationResponse> {
+  ): Promise<AcceptInvitationResponseDto> {
     const parsed = InvitationIdParamSchema.safeParse(params)
     if (!parsed.success) {
       const body: ApiErrorResponse = { error: 'invitation-not-found' }
@@ -188,11 +193,11 @@ export class InvitationsController {
       throw new HttpException(body, HttpStatus.UNAUTHORIZED)
     }
     try {
-      return await this.service.acceptInvitation({
+      return (await this.service.acceptInvitation({
         id: parsed.data.id,
         currentUser: fresh,
         sessionId,
-      })
+      })) as AcceptInvitationResponseDto
     } catch (err) {
       if (err instanceof InvitationError) throw mapInvitationError(err.code)
       throw err
@@ -202,11 +207,12 @@ export class InvitationsController {
   @Delete(':id')
   @UseGuards(AuthGuard, RoleGuard)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: RevokeInvitationResponseDto })
   async revoke(
     @Param() params: { id: string },
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
-  ): Promise<{ ok: true }> {
+  ): Promise<RevokeInvitationResponseDto> {
     const parsed = InvitationIdParamSchema.safeParse(params)
     if (!parsed.success) {
       const body: ApiErrorResponse = { error: 'invitation-not-found' }
@@ -218,7 +224,7 @@ export class InvitationsController {
         organizationId: org.id,
         revokerUserId: user.id,
       })
-      return { ok: true }
+      return { ok: true } as RevokeInvitationResponseDto
     } catch (err) {
       if (err instanceof InvitationError) throw mapInvitationError(err.code)
       throw err
