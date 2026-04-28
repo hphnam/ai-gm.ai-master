@@ -14,23 +14,24 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 import {
   type ApiErrorResponse,
-  type PhoneStatusResponse,
-  type SendPhoneCodeBody,
-  type SendPhoneCodeResponse,
-  SendPhoneCodeBodySchema,
   VERIFY_CODE_TTL_SECONDS,
-  type VerifyPhoneCodeBody,
-  VerifyPhoneCodeBodySchema,
-  type VerifyPhoneCodeResponse,
 } from '@gm-ai/types'
-import { zodPipe } from '../../common/zod-pipe'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentUser } from '../auth/auth.decorators'
 import { PhoneError, PhoneService } from './phone.service'
 import { InfobipVerifyService } from './infobip-verify.service'
+import {
+  PhoneStatusResponseDto,
+  SendPhoneCodeBodyDto,
+  SendPhoneCodeResponseDto,
+  UnlinkPhoneResponseDto,
+  VerifyPhoneCodeBodyDto,
+  VerifyPhoneCodeResponseDto,
+} from './dto/phone.dto'
 
 function mapPhoneError(
   code: PhoneError['code'],
@@ -59,6 +60,8 @@ function mapPhoneError(
   }
 }
 
+@ApiTags('phone')
+@ApiBearerAuth()
 @Controller('auth/phone')
 export class PhoneController {
   private readonly logger = new Logger(PhoneController.name)
@@ -71,12 +74,13 @@ export class PhoneController {
   @Post('send')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
+  @ApiResponse({ status: 200, type: SendPhoneCodeResponseDto })
   async send(
-    @Body(zodPipe(SendPhoneCodeBodySchema)) body: SendPhoneCodeBody,
+    @Body() body: SendPhoneCodeBodyDto,
     @CurrentUser() user: { id: string },
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<SendPhoneCodeResponse> {
+  ): Promise<SendPhoneCodeResponseDto> {
     const phoneHash = PhoneService.hashPhoneStatic(body.phoneNumber)
     const ip = req.ip ?? req.socket?.remoteAddress ?? 'unknown'
     const ipHash = PhoneService.hashIpStatic(ip)
@@ -108,7 +112,7 @@ export class PhoneController {
           phoneHash,
         }),
       )
-      return { ok: true, expiresInSeconds: VERIFY_CODE_TTL_SECONDS }
+      return { ok: true, expiresInSeconds: VERIFY_CODE_TTL_SECONDS } as SendPhoneCodeResponseDto
     } catch (err) {
       if (err instanceof PhoneError) {
         // audit-added M8: Retry-After header on 429
@@ -126,11 +130,12 @@ export class PhoneController {
   @Post('verify')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
+  @ApiResponse({ status: 200, type: VerifyPhoneCodeResponseDto })
   async verify(
-    @Body(zodPipe(VerifyPhoneCodeBodySchema)) body: VerifyPhoneCodeBody,
+    @Body() body: VerifyPhoneCodeBodyDto,
     @CurrentUser() user: { id: string },
     @Req() req: Request,
-  ): Promise<VerifyPhoneCodeResponse> {
+  ): Promise<VerifyPhoneCodeResponseDto> {
     // audit-S4: propagate HTTP X-Request-Id into service-layer logs for send→verify correlation
     const requestId = req.header('x-request-id') ?? undefined
     try {
@@ -169,7 +174,7 @@ export class PhoneController {
         ok: true,
         phoneNumber: linked.phoneNumber,
         phoneVerifiedAt: linked.phoneVerifiedAt.toISOString(),
-      }
+      } as VerifyPhoneCodeResponseDto
     } catch (err) {
       if (err instanceof PhoneError) throw mapPhoneError(err.code, err.details)
       throw err
@@ -179,17 +184,19 @@ export class PhoneController {
   @Delete()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  async unlink(@CurrentUser() user: { id: string }): Promise<{ ok: true }> {
+  @ApiResponse({ status: 200, type: UnlinkPhoneResponseDto })
+  async unlink(@CurrentUser() user: { id: string }): Promise<UnlinkPhoneResponseDto> {
     // audit-added M9: idempotent — no-op when nothing is linked; always 200.
     await this.service.unlinkNumber(user.id)
-    return { ok: true }
+    return { ok: true } as UnlinkPhoneResponseDto
   }
 
   @Get('status')
   @UseGuards(AuthGuard)
+  @ApiResponse({ status: 200, type: PhoneStatusResponseDto })
   async status(
     @CurrentUser() user: { id: string },
-  ): Promise<PhoneStatusResponse> {
-    return this.service.getStatus(user.id)
+  ): Promise<PhoneStatusResponseDto> {
+    return this.service.getStatus(user.id) as Promise<PhoneStatusResponseDto>
   }
 }

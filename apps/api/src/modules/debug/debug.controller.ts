@@ -7,24 +7,27 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
 import type { Request } from 'express'
-import {
-  DebugIdParamSchema,
-  DebugQuerySchema,
-  DebugRetagQueueQuerySchema,
-  type ApiErrorResponse,
-  type DebugConversationResponse,
-  type DebugMessageResponse,
-  type DebugRetagQueueResponse,
-} from '@gm-ai/types'
-import { zodPipe } from '../../common/zod-pipe'
+import { type ApiErrorResponse } from '@gm-ai/types'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import { DebugService } from './debug.service'
+import {
+  DebugConversationResponseDto,
+  DebugIdParamDto,
+  DebugMessageResponseDto,
+  DebugQueryDto,
+  DebugRetagQueueQueryDto,
+  DebugRetagQueueResponseDto,
+} from './dto/debug.dto'
 
 type RequestWithId = Request & { requestId?: string }
 
+@ApiTags('debug')
+@ApiBearerAuth()
 @Controller('debug')
 @UseGuards(AuthGuard, RoleGuard)
 @RequireRole('owner', 'manager')
@@ -32,12 +35,13 @@ export class DebugController {
   constructor(private readonly service: DebugService) {}
 
   @Get('conversations/:id')
+  @ApiResponse({ status: 200, type: DebugConversationResponseDto })
   async getConversation(
-    @Param(zodPipe(DebugIdParamSchema)) params: { id: string },
-    @Query(zodPipe(DebugQuerySchema)) q: { venueId: string },
+    @Param(new ZodValidationPipe(DebugIdParamDto)) params: DebugIdParamDto,
+    @Query(new ZodValidationPipe(DebugQueryDto)) q: DebugQueryDto,
     @CurrentOrg() org: { id: string },
     @Req() req: RequestWithId,
-  ): Promise<DebugConversationResponse> {
+  ): Promise<DebugConversationResponseDto> {
     const result = await this.service.getConversation(
       params.id,
       q.venueId,
@@ -47,16 +51,17 @@ export class DebugController {
     if (!result) {
       throw new NotFoundException({ error: 'conversation-not-found' } satisfies ApiErrorResponse)
     }
-    return result
+    return result as DebugConversationResponseDto
   }
 
   @Get('messages/:id')
+  @ApiResponse({ status: 200, type: DebugMessageResponseDto })
   async getMessage(
-    @Param(zodPipe(DebugIdParamSchema)) params: { id: string },
-    @Query(zodPipe(DebugQuerySchema)) q: { venueId: string },
+    @Param(new ZodValidationPipe(DebugIdParamDto)) params: DebugIdParamDto,
+    @Query(new ZodValidationPipe(DebugQueryDto)) q: DebugQueryDto,
     @CurrentOrg() org: { id: string },
     @Req() req: RequestWithId,
-  ): Promise<DebugMessageResponse> {
+  ): Promise<DebugMessageResponseDto> {
     const result = await this.service.getMessage(
       params.id,
       q.venueId,
@@ -66,15 +71,21 @@ export class DebugController {
     if (!result) {
       throw new NotFoundException({ error: 'message-not-found' } satisfies ApiErrorResponse)
     }
-    return result
+    return result as DebugMessageResponseDto
   }
 
   @Get('retag-queue')
+  @ApiResponse({ status: 200, type: DebugRetagQueueResponseDto })
   async getRetagQueue(
-    @Query(zodPipe(DebugRetagQueueQuerySchema)) q: { venueId: string; limit?: number },
+    @Query(new ZodValidationPipe(DebugRetagQueueQueryDto)) q: DebugRetagQueueQueryDto,
     @CurrentOrg() org: { id: string },
     @Req() req: RequestWithId,
-  ): Promise<DebugRetagQueueResponse> {
-    return this.service.getRetagQueue(q.venueId, q.limit ?? 50, org.id, req.requestId)
+  ): Promise<DebugRetagQueueResponseDto> {
+    return (await this.service.getRetagQueue(
+      q.venueId,
+      q.limit ?? 50,
+      org.id,
+      req.requestId,
+    )) as DebugRetagQueueResponseDto
   }
 }

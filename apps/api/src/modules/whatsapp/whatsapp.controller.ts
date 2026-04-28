@@ -6,6 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common'
+import { ApiExcludeController } from '@nestjs/swagger'
 import {
   BATCH_DEADLINE_MS,
   InfobipInboundWebhookSchema,
@@ -18,6 +19,7 @@ import { WhatsappSignatureGuard } from './whatsapp-signature.guard'
 // results[]. Each result is handled in its own try/catch so one malformed entry doesn't
 // starve the others. Batch-deadline (audit S4/AC-13) bounds total wall-clock against
 // Infobip's retry window.
+@ApiExcludeController()
 @Controller('webhooks/infobip')
 export class WhatsappController {
   private readonly logger = new Logger(WhatsappController.name)
