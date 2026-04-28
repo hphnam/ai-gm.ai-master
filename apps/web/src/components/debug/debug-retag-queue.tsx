@@ -8,7 +8,8 @@ import {
   Loader2,
   XCircle,
 } from 'lucide-react'
-import type { DebugRetagQueueItem, DebugRetagQueueResponse } from '@gm-ai/types'
+import type { DebugRetagQueueResponseDto as DebugRetagQueueResponse } from '@/generated/api'
+import type { DebugRetagQueueItemDto as DebugRetagQueueItem } from '@/lib/api-types'
 import { cn } from '@/lib/utils'
 import { mapApiError } from '@/lib/map-api-error'
 

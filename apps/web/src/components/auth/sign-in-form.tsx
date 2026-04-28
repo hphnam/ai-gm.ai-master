@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { EmailSchema } from '@gm-ai/types'
+import { EmailSchema } from '@/lib/auth-schemas'
 import {
   Form,
   FormControl,

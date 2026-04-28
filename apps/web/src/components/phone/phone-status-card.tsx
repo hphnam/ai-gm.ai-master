@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Phone } from 'lucide-react'
-import { maskPhone } from '@gm-ai/types'
+import { maskPhone } from '@/lib/format'
 import { ApiError } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
 import { usePhoneStatus, useUnlinkPhone } from '@/lib/hooks/use-phone'

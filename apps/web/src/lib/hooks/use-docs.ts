@@ -2,18 +2,23 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type {
-  AcceptTypeResponse,
-  ApiErrorResponse,
-  ClassifyDocRequest,
-  ClassifyDocResponse,
-  CreateDocRequest,
-  CreateDocResponse,
-  DocDetail,
-  DocListItem,
+  CreateDocRequestDto as CreateDocRequest,
+  CreateDocResponseDto as CreateDocResponse,
+  DocDetailDto as DocDetail,
+  DocListItemDto as DocListItem,
   DocumentTypeDto,
-  DocumentTypeKind,
+  DocumentTypeDtoKind as DocumentTypeKind,
   KbGapDto,
-} from '@gm-ai/types'
+} from '@/generated/api'
+import type { ApiErrorResponse } from '@/lib/api-errors'
+
+// Body types not regenerated as standalone (the classify endpoint uses a
+// z.union body, the accept-type endpoint shares DocumentTypeDto for output).
+type AcceptTypeResponse = DocumentTypeDto
+type ClassifyDocResponse = DocumentTypeDto
+type ClassifyDocRequest =
+  | { typeId: string }
+  | { name: string; kind: DocumentTypeKind }
 import { API_URL, ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
 export function useDocs() {

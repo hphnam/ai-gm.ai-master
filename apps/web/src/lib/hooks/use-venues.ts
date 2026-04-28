@@ -2,12 +2,12 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type {
-  ApiErrorCode,
-  CreateVenueBody,
-  UpdateVenueProfile,
-  VenueDetail,
-  VenueListItem,
-} from '@gm-ai/types'
+  CreateVenueBodyDto as CreateVenueBody,
+  UpdateVenueProfileDto as UpdateVenueProfile,
+  VenueDetailDto as VenueDetail,
+  VenueListItemDto as VenueListItem,
+} from '@/generated/api'
+import type { ApiErrorCode } from '@/lib/api-errors'
 import { API_URL, ApiError, apiFetch, apiPost } from '../api-client'
 
 export function useVenues() {

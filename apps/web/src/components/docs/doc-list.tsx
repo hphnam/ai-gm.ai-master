@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { AlertTriangle, CheckSquare, Loader2, Trash2 } from 'lucide-react'
-import type { DocListItem } from '@gm-ai/types'
+import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

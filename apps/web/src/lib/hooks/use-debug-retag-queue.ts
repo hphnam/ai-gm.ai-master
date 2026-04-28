@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import type { DebugRetagQueueResponse } from '@gm-ai/types'
+import type { DebugRetagQueueResponseDto as DebugRetagQueueResponse } from '@/generated/api'
 import { apiFetchWithMeta } from '@/lib/api-client'
 
 export function useDebugRetagQueue(venueId: string | null, limit = 50) {

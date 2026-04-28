@@ -2,7 +2,12 @@
 
 import Link from 'next/link'
 import { ArrowLeft, Camera, CheckSquare, FileText, Hash } from 'lucide-react'
-import type { AudienceRole, ChecklistStep, Schedule } from '@gm-ai/types'
+import type { DocDetailDto } from '@/generated/api'
+
+type Checklist = NonNullable<DocDetailDto['checklist']>
+type Schedule = Checklist['schedule']
+type ChecklistStep = Checklist['steps'][number]
+type AudienceRole = NonNullable<Checklist['audience']['roles']>[number]
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
@@ -12,8 +17,11 @@ import { ApiError } from '@/lib/api-client'
 // Plan 04-03 Task 3 — Schedule + Audience + Step rendering helpers (co-located; small + pure).
 
 function formatScheduleLine(s: Schedule): string {
-  if (s.cadence === 'unknown') return s.rawText || 'Unspecified schedule'
-  const parts: string[] = [s.cadence.charAt(0).toUpperCase() + s.cadence.slice(1)]
+  // OpenAPI marks cadence as optional because of zod .default('unknown');
+  // it's always populated at runtime — narrow with ?? for the typechecker.
+  const cadence = s.cadence ?? 'unknown'
+  if (cadence === 'unknown') return s.rawText || 'Unspecified schedule'
+  const parts: string[] = [cadence.charAt(0).toUpperCase() + cadence.slice(1)]
   if (s.dayOfWeek != null) parts.push(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.dayOfWeek])
   if (s.dayOfMonth != null) parts.push(`day ${s.dayOfMonth}`)
   if (s.timeOfDay) parts.push(`@ ${s.timeOfDay}`)
@@ -151,8 +159,8 @@ export function DocDetailBody({ id }: { id: string }) {
                   Audience
                 </p>
                 <div className="flex flex-wrap gap-1">
-                  {doc.data.checklist.audience.roles.length > 0 ? (
-                    doc.data.checklist.audience.roles.map((r) => (
+                  {(doc.data.checklist.audience.roles ?? []).length > 0 ? (
+                    (doc.data.checklist.audience.roles ?? []).map((r) => (
                       <RolePill key={r} role={r} />
                     ))
                   ) : (

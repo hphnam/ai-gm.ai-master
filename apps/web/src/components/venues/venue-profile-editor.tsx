@@ -4,11 +4,9 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  VenueProfileSchema,
-  type VenueDetail,
-  type VenueProfile,
-} from '@gm-ai/types'
+import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
+import type { VenueDetailDto as VenueDetail } from '@/generated/api'
+import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

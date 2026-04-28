@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ThumbsDown, ThumbsUp } from 'lucide-react'
-import type { FeedbackKind } from '@gm-ai/types'
+import type { CaptureFeedbackInputDtoKind as FeedbackKind } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import { useFeedback } from '@/lib/hooks/use-feedback'
 

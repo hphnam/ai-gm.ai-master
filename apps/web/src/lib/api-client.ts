@@ -1,4 +1,4 @@
-import type { ApiErrorCode, ApiErrorResponse } from '@gm-ai/types'
+import type { ApiErrorCode, ApiErrorResponse } from './api-errors'
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 

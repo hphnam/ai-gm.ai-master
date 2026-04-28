@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { DEBUG_JSON_UI_CAP } from '@gm-ai/types'
+import { DEBUG_JSON_UI_CAP } from '@/lib/format'
 import {
   Collapsible,
   CollapsibleContent,

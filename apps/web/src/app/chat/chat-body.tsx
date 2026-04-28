@@ -34,7 +34,8 @@ import {
 import { mapApiError } from '@/lib/map-api-error'
 import { API_URL } from '@/lib/api-client'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
-import type { ChatMessageDto, ConversationResponse } from '@gm-ai/types'
+import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
+import type { ChatMessageDto } from '@/lib/api-types'
 
 type GmUIMessage = UIMessage
 

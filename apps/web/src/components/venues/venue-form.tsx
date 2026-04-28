@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { CreateVenueBodySchema, type CreateVenueBody } from '@gm-ai/types'
+import { VenuesControllerCreateBody as CreateVenueBodySchema } from '@/generated/zod'
+import type { CreateVenueBodyDto as CreateVenueBody } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import {
   Form,

@@ -3,12 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type {
-  PhoneStatusResponse,
-  SendPhoneCodeBody,
-  SendPhoneCodeResponse,
-  VerifyPhoneCodeBody,
-  VerifyPhoneCodeResponse,
-} from '@gm-ai/types'
+  PhoneStatusResponseDto as PhoneStatusResponse,
+  SendPhoneCodeBodyDto as SendPhoneCodeBody,
+  SendPhoneCodeResponseDto as SendPhoneCodeResponse,
+  VerifyPhoneCodeBodyDto as VerifyPhoneCodeBody,
+  VerifyPhoneCodeResponseDto as VerifyPhoneCodeResponse,
+} from '@/generated/api'
 import { apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
 

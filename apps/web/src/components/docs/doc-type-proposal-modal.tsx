@@ -10,7 +10,12 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { BookOpen, ClipboardList, Sparkles } from 'lucide-react'
-import type { DocumentTypeKind, ProposedDocType } from '@gm-ai/types'
+import type {
+  DocumentTypeDtoKind as DocumentTypeKind,
+  DocListItemDtoPendingTypeProposal,
+} from '@/generated/api'
+
+type ProposedDocType = NonNullable<DocListItemDtoPendingTypeProposal>
 import {
   Dialog,
   DialogContent,

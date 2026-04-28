@@ -2,7 +2,8 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { InviteBodySchema, type InviteBody } from '@gm-ai/types'
+import { InvitationsControllerCreateBody as InviteBodySchema } from '@/generated/zod'
+import type { InviteBodyDto as InviteBody } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import {
   Form,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import type { DebugConversationResponse } from '@gm-ai/types'
+import type { DebugConversationResponseDto as DebugConversationResponse } from '@/generated/api'
 import { apiFetchWithMeta } from '@/lib/api-client'
 
 export function useDebugConversation(conversationId: string | null, venueId: string | null) {

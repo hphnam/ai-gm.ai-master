@@ -3,9 +3,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type {
-  CaptureFeedbackInput,
-  FeedbackResponse,
-} from '@gm-ai/types'
+  CaptureFeedbackInputDto as CaptureFeedbackInput,
+  FeedbackResponseDto as FeedbackResponse,
+} from '@/generated/api'
 import { apiPost } from '../api-client'
 import { mapApiError } from '../map-api-error'
 

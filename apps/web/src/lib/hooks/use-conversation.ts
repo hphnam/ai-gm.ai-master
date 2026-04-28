@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import type { ConversationResponse } from '@gm-ai/types'
+import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
 import { ApiError, apiFetch } from '../api-client'
 
 export function useConversation(

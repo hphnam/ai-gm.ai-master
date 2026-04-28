@@ -1,7 +1,7 @@
 'use client'
 
 import { RotateCw, ThumbsDown, ThumbsUp } from 'lucide-react'
-import type { DebugFeedback } from '@gm-ai/types'
+import type { DebugFeedbackDto as DebugFeedback } from '@/lib/api-types'
 import { cn } from '@/lib/utils'
 
 function relativeTime(iso: string): string {

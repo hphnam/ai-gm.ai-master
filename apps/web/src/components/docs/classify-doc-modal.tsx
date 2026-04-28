@@ -9,7 +9,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { BookOpen, ClipboardList, Plus } from 'lucide-react'
-import type { DocumentTypeDto, DocumentTypeKind } from '@gm-ai/types'
+import type { DocumentTypeDto, DocumentTypeDtoKind as DocumentTypeKind } from '@/generated/api'
 import {
   Dialog,
   DialogContent,

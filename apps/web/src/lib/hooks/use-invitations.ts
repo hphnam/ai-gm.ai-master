@@ -3,12 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type {
-  AcceptInvitationResponse,
-  CreateInvitationResponse,
-  InviteBody,
-  InvitationPreview,
-  ListInvitationsResponse,
-} from '@gm-ai/types'
+  AcceptInvitationResponseDto as AcceptInvitationResponse,
+  CreateInvitationResponseDto as CreateInvitationResponse,
+  InviteBodyDto as InviteBody,
+  InvitationPreviewDto as InvitationPreview,
+  ListInvitationsResponseDto as ListInvitationsResponse,
+} from '@/generated/api'
 import { ApiError, apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
 

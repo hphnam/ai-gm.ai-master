@@ -12,7 +12,7 @@ import {
   EmailSchema,
   NameSchema,
   PasswordSchema,
-} from '@gm-ai/types'
+} from '@/lib/auth-schemas'
 import {
   Form,
   FormControl,

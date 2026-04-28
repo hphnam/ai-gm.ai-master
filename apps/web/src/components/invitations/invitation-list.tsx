@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Clock, Copy, Trash2, UserPlus, CheckCircle2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import type { InvitationDTO, ListInvitationsResponse } from '@gm-ai/types'
+import type { ListInvitationsResponseDto as ListInvitationsResponse } from '@/generated/api'
+import type { InvitationDto as InvitationDTO } from '@/lib/api-types'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

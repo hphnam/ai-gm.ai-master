@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertTriangle, Info } from 'lucide-react'
-import type { ProactiveSuggestion } from '@gm-ai/types'
+import type { ProactiveSuggestionDto as ProactiveSuggestion } from '@/generated/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 

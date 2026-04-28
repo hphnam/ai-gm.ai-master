@@ -1,6 +1,7 @@
 'use client'
 
-import type { DebugConversationResponse, DebugMessage } from '@gm-ai/types'
+import type { DebugConversationResponseDto as DebugConversationResponse } from '@/generated/api'
+import type { DebugMessageDto as DebugMessage } from '@/lib/api-types'
 import { cn } from '@/lib/utils'
 import { mapApiError } from '@/lib/map-api-error'
 import { DebugFeedbackBadge } from './debug-feedback-badge'

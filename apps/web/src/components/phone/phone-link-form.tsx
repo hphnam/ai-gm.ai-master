@@ -3,13 +3,15 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { maskPhone } from '@/lib/format'
 import {
-  maskPhone,
-  SendPhoneCodeBodySchema,
-  type SendPhoneCodeBody,
-  VerifyPhoneCodeBodySchema,
-  type VerifyPhoneCodeBody,
-} from '@gm-ai/types'
+  PhoneControllerSendBody as SendPhoneCodeBodySchema,
+  PhoneControllerVerifyBody as VerifyPhoneCodeBodySchema,
+} from '@/generated/zod'
+import type {
+  SendPhoneCodeBodyDto as SendPhoneCodeBody,
+  VerifyPhoneCodeBodyDto as VerifyPhoneCodeBody,
+} from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
 import { useSendPhoneCode, useVerifyPhoneCode } from '@/lib/hooks/use-phone'

@@ -2,9 +2,9 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
-  ProactiveSuggestion,
-  SuggestionsOnTurnRequest,
-} from '@gm-ai/types'
+  ProactiveSuggestionDto as ProactiveSuggestion,
+  SuggestionsOnTurnRequestDto as SuggestionsOnTurnRequest,
+} from '@/generated/api'
 import { apiPost } from '../api-client'
 
 export function useOnOpenSuggestions(venueId: string | null) {
