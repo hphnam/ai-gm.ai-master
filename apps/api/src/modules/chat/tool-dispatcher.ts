@@ -13,6 +13,7 @@ import { IngestService } from '../ingest/ingest.service'
 import { RetrievalService, type RetrievalHit } from '../retrieval/retrieval.service'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { QuoteVerifierService } from './quote-verifier.service'
+import { TabularQueryService } from '../tabular/tabular.service'
 
 export type DispatchContext = {
   orgId: string
@@ -29,6 +30,7 @@ export class ToolDispatcher {
     private readonly mockOps: MockOpsService,
     private readonly ingest: IngestService,
     private readonly verifier: QuoteVerifierService,
+    private readonly tabular: TabularQueryService,
   ) {}
 
   async dispatch(
@@ -366,6 +368,29 @@ export class ToolDispatcher {
               docType,
             },
           }
+        }
+        case 'query_document_table': {
+          if (!ctx) {
+            return fail('error', 'query_document_table requires an authenticated context')
+          }
+          // TabularQueryService re-validates the input against TabularQueryInputSchema
+          // (defence-in-depth — chat-tools.ts schema is the agent-facing contract;
+          // tabular.service is the canonical security boundary). It also enforces
+          // the cross-org guard via knowledge_items JOIN.
+          const result = await this.tabular.query(ctx.orgId, parsed.data)
+          this.logger.log(
+            JSON.stringify({
+              event: 'tool_dispatcher.query_document_table',
+              ok: result.ok,
+              orgIdHash: createHash('sha256').update(ctx.orgId).digest('hex').slice(0, 12),
+              userId: ctx.userId,
+              // PII-safe: counts only — never row content / column names.
+              rowsReturned: result.ok ? result.data.rowCount : 0,
+              truncated: result.ok ? result.data.truncated : false,
+              reason: result.ok ? null : result.reason,
+            }),
+          )
+          return result
         }
       }
     } catch (err) {

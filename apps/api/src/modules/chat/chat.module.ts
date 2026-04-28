@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
 import { IngestModule } from '../ingest/ingest.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
+import { TabularModule } from '../tabular/tabular.module'
 import { ChatController } from './chat.controller'
 import { ChatService } from './chat.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -11,7 +12,7 @@ import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
 
 @Module({
-  imports: [RetrievalModule, AdaptationModule, IngestModule],
+  imports: [RetrievalModule, AdaptationModule, IngestModule, TabularModule],
   controllers: [ChatController],
   providers: [
     ChatService,

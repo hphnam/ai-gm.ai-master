@@ -12,6 +12,8 @@ export const TOOL_NAMES = [
   'log_incident',
   'update_stock',
   'add_supplier_note',
+  // Plan 05-01 — structured-data path over CSV/XLSX docs (aggregate / enumeration).
+  'query_document_table',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -106,6 +108,36 @@ export const TOOL_INPUT_SCHEMAS = {
     supplierName: z.string().trim().min(1).max(120),
     /// Append to the existing supplier notes (don't replace).
     note: z.string().trim().min(3).max(500),
+  }),
+  // Plan 05-01 — structured-data DSL over a single CSV/XLSX doc. Mirror of
+  // TabularQueryInputSchema (kept inline to avoid coupling chat-tools.ts to
+  // tabular.ts; both must stay in sync — the dispatcher re-validates against
+  // TabularQueryInputSchema before executing).
+  query_document_table: z.object({
+    docId: UUID,
+    filters: z
+      .array(
+        z.object({
+          column: z.string().min(1),
+          op: z.enum(['eq', 'gt', 'lt', 'gte', 'lte', 'contains']),
+          value: z.union([z.string(), z.number()]),
+        }),
+      )
+      .optional(),
+    groupBy: z.string().min(1).optional(),
+    aggregate: z
+      .object({
+        column: z.string().min(1).optional(),
+        fn: z.enum(['count', 'sum', 'avg', 'min', 'max']),
+      })
+      .optional(),
+    sort: z
+      .object({
+        column: z.string().min(1),
+        direction: z.enum(['asc', 'desc']),
+      })
+      .optional(),
+    limit: z.number().int().min(1).max(1000).optional(),
   }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
@@ -340,6 +372,54 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
       },
       required: ['title', 'content', 'venueId'],
+    },
+  },
+  {
+    name: 'query_document_table',
+    description:
+      "Run a deterministic computation over a tabular knowledge document (CSV / XLSX). Use ONLY for whole-table question shapes against a SINGLE doc: (1) AGGREGATE / RANKING — totals, top-N, counts, averages, min/max ('top 3 selling wines', 'total revenue this month', 'highest priced item'); pass the appropriate `aggregate` / `groupBy` / `filters` / `sort`. (2) ENUMERATION — listing or walking through all rows ('list all opening steps', 'what do we need to follow to open?', 'walk me through the closing checklist'); pass NO aggregate, NO groupBy, with `sort: { column: '_row_index', direction: 'asc' }` to get rows back in source order. Always pass a doc_id obtained via find_knowledge or current_context. Magic sort columns: `_aggregate` (sort by aggregate result — only valid when an aggregate is present) and `_row_index` (sort by source-row position). Returns { rows, rowCount, truncated } where truncated:true means the result hit the LIMIT (default 100, max 1000) — communicate that to the user. For LOOKUP-shaped questions targeting a single fact ('when do we open the cask vents?'), use find_knowledge instead, not this tool. Aggregate fns sum/avg/min/max require a numeric column; otherwise the tool returns ok:false reason='invalid-input'. Cross-org doc id returns ok:false reason='not-found'.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        docId: { type: 'string', description: 'UUID of the tabular knowledge_item to query' },
+        filters: {
+          type: 'array',
+          description: 'AND-chained filters; each { column, op, value }',
+          items: {
+            type: 'object',
+            properties: {
+              column: { type: 'string' },
+              op: { type: 'string', enum: ['eq', 'gt', 'lt', 'gte', 'lte', 'contains'] },
+              value: { type: ['string', 'number'] },
+            },
+            required: ['column', 'op', 'value'],
+          },
+        },
+        groupBy: { type: 'string', description: 'Column to GROUP BY (with aggregate)' },
+        aggregate: {
+          type: 'object',
+          description: 'Aggregate fn over a column (column omitted when fn=count)',
+          properties: {
+            column: { type: 'string' },
+            fn: { type: 'string', enum: ['count', 'sum', 'avg', 'min', 'max'] },
+          },
+          required: ['fn'],
+        },
+        sort: {
+          type: 'object',
+          description: 'Result ordering. column may be a real column, _aggregate, or _row_index',
+          properties: {
+            column: { type: 'string' },
+            direction: { type: 'string', enum: ['asc', 'desc'] },
+          },
+          required: ['column', 'direction'],
+        },
+        limit: {
+          type: 'integer',
+          description: 'Max rows to return (default 100, max 1000)',
+        },
+      },
+      required: ['docId'],
     },
   },
 ]
