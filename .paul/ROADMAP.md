@@ -7,7 +7,7 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.3 Neural Brain** (v0.3.0)
-Status: 🚧 In Progress (0 of 4 phases complete)
+Status: 🚧 In Progress (1 of 4 phases complete — Phase 1 Hierarchical Retrieval closed 2026-04-28)
 Phases: 4
 
 **Theme:** "Per-venue neural brain — the assistant doesn't search docs, it knows the venue. Connections between docs are first-class data, and the WhatsApp channel speaks fluent venue-context."
@@ -18,8 +18,8 @@ Phases: 4
 
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
-| 1 | Hierarchical Retrieval | 01-01 created (additive schema + ingest); 01-02 to follow (backfill + retrieval + cache + probe-eval) | 🚧 Planning | - |
-| 2 | Graph Layer | TBD | Not started | - |
+| 1 | Hierarchical Retrieval | 3/3 (01-01 schema+ingest, 01-02 backfill+retrieval, 01-03 cache+section-payload+probe-eval) | ✅ Complete | 2026-04-28 |
+| 2 | Graph Layer | TBD | 🔵 Ready to plan | - |
 | 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Not started | - |
 | 4 | WhatsApp Procedural Runtime | TBD | Not started | - |
 
@@ -146,4 +146,4 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-27 — v0.2 closed early at ~96% (04-04/05 rolled forward); v0.3 Neural Brain milestone created (4 phases: hierarchical retrieval, graph layer, scheduler+graph-aware notifications, WhatsApp procedural runtime).*
+*Last updated: 2026-04-28 — v0.3 Phase 1 (Hierarchical Retrieval) CLOSED at 3/3 plans; Phase 2 (Graph Layer) ready to plan. CONTEXT.md decisions D-01-A through D-01-E all shipped end-to-end.*

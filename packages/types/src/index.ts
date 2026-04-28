@@ -8,6 +8,7 @@ export const healthCheckSchema = z.object({
 export type HealthCheck = z.infer<typeof healthCheckSchema>
 
 export * from './knowledge-metadata'
+export * from './section'
 export * from './tool-result'
 export * from './chat-tools'
 export * from './proactive-suggestion'

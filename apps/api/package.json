@@ -6,7 +6,10 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/src/main",
-    "start:prod": "node dist/src/main"
+    "start:prod": "node dist/src/main",
+    "probe:section": "tsx scripts/probe-section.ts",
+    "probe:eval": "tsx scripts/probe-eval.ts",
+    "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",

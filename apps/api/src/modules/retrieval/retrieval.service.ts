@@ -85,6 +85,13 @@ type FusedRow = {
   metadata: unknown
   kiContent: string | null
   kiAiSummary: string | null
+  // Plan 01-02 — section-expansion LATERAL JOIN columns. Populated only for
+  // entityType='knowledge_item' rows whose KI has been backfilled.
+  sectionId: string | null
+  sectionTitle: string | null
+  sectionContent: string | null
+  sectionTokenCount: number | null
+  sectionTruncated: boolean | null
   cosine: number | string | null
   bm25: number | string | null
   vec_rank: number | string | null
@@ -318,6 +325,11 @@ export class RetrievalService implements OnModuleInit {
         se.metadata      AS "metadata",
         ki.content       AS "kiContent",
         ki."aiSummary"   AS "kiAiSummary",
+        sec.section_id        AS "sectionId",
+        sec.section_title     AS "sectionTitle",
+        sec.section_content   AS "sectionContent",
+        sec.section_token_count AS "sectionTokenCount",
+        sec.section_truncated AS "sectionTruncated",
         f.cosine         AS "cosine",
         f.bm25           AS "bm25",
         f.vec_rank       AS "vec_rank",
@@ -327,34 +339,103 @@ export class RetrievalService implements OnModuleInit {
       JOIN "searchable_entities" se ON se.id = f.id
       LEFT JOIN "knowledge_items" ki
         ON se."entityType" = 'knowledge_item' AND se."entityId" = ki.id
+      -- Plan 01-02 — section-expansion LATERAL JOIN. For each knowledge_item
+      -- hit, pick the section whose chunks rank highest by cosine similarity
+      -- to the query vector. Single round-trip — no N+1.
+      LEFT JOIN LATERAL (
+        SELECT s.id AS section_id, s.title AS section_title, s.content AS section_content,
+               s."tokenCount" AS section_token_count, s.truncated AS section_truncated
+        FROM "knowledge_sections" s
+        JOIN "knowledge_chunks" c ON c."sectionId" = s.id
+        WHERE s."knowledgeItemId" = ki.id AND c.embedding IS NOT NULL
+        ORDER BY c.embedding <=> $1::vector ASC
+        LIMIT 1
+      ) sec ON se."entityType" = 'knowledge_item'
       ORDER BY f.rrf_score DESC, se.id ASC
       LIMIT ${limitParam}
     `
 
+    // Plan 01-02 audit-S3 — measure SQL-and-coerce window for ops latency obs.
+    const sqlT0 = Date.now()
     const rows = await prisma.$queryRawUnsafe<FusedRow[]>(sql, ...params)
 
-    const coerced: RetrievalHit[] = rows.map((r) => {
+    let sectionExpandedHits = 0
+    let kiContentFallbackHits = 0
+    let droppedNullContent = 0
+
+    const coerced: RetrievalHit[] = []
+    for (const r of rows) {
       const cosine = r.cosine !== null ? Number(r.cosine) : 0
       const matchedBy: ('vector' | 'lexical')[] = []
       if (r.vec_rank !== null) matchedBy.push('vector')
       if (r.bm25_rank !== null) matchedBy.push('lexical')
-      return {
+
+      // Plan 01-02 — content cascade: section.content → ki.content → summary → embeddingText.
+      // Pre-backfill KIs (no sections) fall through to ki.content (AC-5).
+      const content = r.sectionContent ?? r.kiContent ?? r.summary ?? r.embeddingText
+
+      // Plan 01-02 audit-M4 / AC-10 — drop knowledge_item rows where every
+      // fallback resolves to null/'' (deletion-race or data-integrity edge).
+      if (
+        r.entityType === 'knowledge_item' &&
+        (content === null || content === undefined || content === '')
+      ) {
+        droppedNullContent++
+        this.logger.warn(
+          JSON.stringify({
+            event: 'retrieval.row_dropped_null_content',
+            entityId: r.entityId,
+            reason: 'all-content-fallbacks-null',
+          }),
+        )
+        continue
+      }
+
+      const baseMetadata = (r.metadata ?? {}) as Record<string, unknown>
+      let metadata: Record<string, unknown> = baseMetadata
+      if (r.sectionId) {
+        sectionExpandedHits++
+        // Defensive merge — existing metadata keys win on conflict.
+        metadata = {
+          sectionId: r.sectionId,
+          sectionTitle: r.sectionTitle,
+          sectionTokenCount: r.sectionTokenCount,
+          sectionTruncated: r.sectionTruncated,
+          ...baseMetadata,
+        }
+      } else if (r.entityType === 'knowledge_item') {
+        kiContentFallbackHits++
+      }
+
+      coerced.push({
         id: r.id,
         entityType: r.entityType as EntityType,
         entityId: r.entityId,
         subKey: r.subKey,
-        content: r.kiContent ?? r.summary ?? r.embeddingText,
+        content,
         title: r.title,
         summary: r.summary,
         tags: r.tags,
         kind: r.kind,
-        metadata: (r.metadata ?? {}) as Record<string, unknown>,
+        metadata,
         aiSummary: r.kiAiSummary,
         similarity: cosine,
         score: Number(r.rrf_score),
         matchedBy,
-      }
-    })
+      })
+    }
+
+    const sectionExpansionLatencyMs = Date.now() - sqlT0
+    this.logger.log(
+      JSON.stringify({
+        event: 'retrieval.section_expanded',
+        totalHits: coerced.length,
+        sectionExpandedHits,
+        kiContentFallbackHits,
+        droppedNullContent,
+        sectionExpansionLatencyMs,
+      }),
+    )
 
     return coerced.filter((r) => r.matchedBy.includes('lexical') || r.similarity >= minSim)
   }

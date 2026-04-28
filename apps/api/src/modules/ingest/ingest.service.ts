@@ -2,9 +2,21 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
 import { Prisma, prisma } from '@gm-ai/database'
-import { KnowledgeMetadataSchema, UUID_RE, type KnowledgeMetadata } from '@gm-ai/types'
+import {
+  CURRENT_SECTION_VERSION,
+  EMBED_QUALITY_DEGRADED_THRESHOLD,
+  EMBED_QUEUE_TIMEOUT_MS,
+  INGEST_EMBED_PHASE_TIMEOUT_MS,
+  KnowledgeMetadataSchema,
+  MAX_CONCURRENT_CHUNK_EMBEDS,
+  MAX_EMBEDS_PER_DOCUMENT,
+  UUID_RE,
+  type KnowledgeMetadata,
+  type SectionDetectionResult,
+} from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
+import { SectionDetector } from './section-detector'
 
 // Plan 04-02 Task 2 — Prisma 7 Json columns reject raw `null`; must use Prisma.JsonNull
 // sentinel for explicit-null writes. Helper keeps upsert sites readable.
@@ -27,6 +39,9 @@ export type IngestInput = {
   // pendingTypeProposal non-null → classifier proposed a new type; owner confirms in UI.
   documentTypeId?: string | null
   pendingTypeProposal?: Record<string, unknown> | null
+  // Plan 01-01 — extractor mime hint for SectionDetector dispatch (CSV row-batch,
+  // PPTX slide-marker split, sheet-marker split). Optional; absent → heading regex fallback.
+  mimeType?: string | null
 }
 
 export type IngestResult = {
@@ -43,6 +58,7 @@ export class IngestService implements OnModuleInit {
   constructor(
     private readonly embeddings: EmbeddingsService,
     private readonly indexer: IndexerService,
+    private readonly sectionDetector: SectionDetector,
   ) {}
 
   onModuleInit() {
@@ -119,6 +135,15 @@ export class IngestService implements OnModuleInit {
         id,
       )
     })
+
+    // Plan 01-01 — hierarchical persistence (audit-M1 two-phase: section rows
+    // commit BEFORE Voyage chunk-embed calls, then bounded-concurrency embed worker).
+    await this.persistSectionsAndEmbed(
+      id,
+      input.content,
+      input.mimeType ?? null,
+      input.organizationId,
+    )
 
     await this.indexer.upsert({
       organizationId: input.organizationId,
@@ -259,6 +284,15 @@ ${input.content}`
         id,
       )
     })
+
+    // Plan 01-01 — hierarchical persistence runs even on enrichment fail-soft so
+    // chunk-level retrieval (01-02) still has structure to draw on.
+    await this.persistSectionsAndEmbed(
+      id,
+      input.content,
+      input.mimeType ?? null,
+      input.organizationId,
+    )
 
     await this.indexer.upsert({
       organizationId: input.organizationId,
@@ -431,4 +465,344 @@ ${input.content}`
 
     return { id, askCount: 1, dedupedFromExisting: false }
   }
+
+  // ──────────────────────────────────────────────────────────────────
+  // Plan 01-01 — hierarchical section/chunk persistence (audit-M1 two-phase).
+  //
+  // Phase 1 (in-tx): replace sections (cascade chunks) → create section + chunk
+  //                  rows with embedding=null. No Voyage HTTP inside the tx.
+  // Phase 2 (post-commit): bounded-concurrency embed worker writes
+  //                        knowledge_chunks.embedding via $executeRaw, with
+  //                        retry (M3), per-doc cap (M3), per-phase timeout (M2),
+  //                        per-chunk queue timeout (M2), aggregate telemetry (M7).
+  // ──────────────────────────────────────────────────────────────────
+
+  /**
+   * Plan 01-02 — public surface so backfill-knowledge-sections.ts can replay
+   * the persistence pipeline against existing KnowledgeItem rows. Return shape
+   * extended (audit-M5) with quality fields so backfill can aggregate signals
+   * across the run.
+   */
+  async persistSectionsAndEmbed(
+    knowledgeItemId: string,
+    content: string,
+    mimeType: string | null,
+    organizationId: string,
+  ): Promise<{
+    sectionCount: number
+    chunkCount: number
+    embeddedCount: number
+    embedFailedCount: number
+    embedQualityDegraded: boolean
+  }> {
+    const detection: SectionDetectionResult = this.sectionDetector.detect(content, mimeType)
+
+    // Phase 1 — in-tx row creation (no Voyage calls). Pre-generated UUIDs let
+    // us createMany sections+chunks in two bulk inserts (avoids interactive-tx
+    // timeout on 200+ chunk fixtures). Tx timeout extended to 30s for headroom.
+    const sectionRows = detection.sections.map((s, sIdx) => ({
+      id: randomUUID(),
+      knowledgeItemId,
+      organizationId,
+      sectionIndex: sIdx,
+      title: s.title ?? `Section ${sIdx + 1}`, // audit-S2 fallback at write time.
+      content: s.content,
+      tokenCount: s.tokenCount,
+      sectionVersion: CURRENT_SECTION_VERSION,
+      truncated: s.truncated,
+    }))
+    const chunkRows: {
+      id: string
+      sectionId: string
+      organizationId: string
+      chunkIndex: number
+      content: string
+      embeddingText: string
+      tokenCount: number
+    }[] = []
+    const persistedChunkIds: { id: string; sectionIndex: number; chunkIndex: number; text: string }[] = []
+    for (let sIdx = 0; sIdx < detection.sections.length; sIdx++) {
+      const section = detection.sections[sIdx]
+      const sectionId = sectionRows[sIdx].id
+      for (let cIdx = 0; cIdx < section.chunks.length; cIdx++) {
+        const chunk = section.chunks[cIdx]
+        const chunkId = randomUUID()
+        chunkRows.push({
+          id: chunkId,
+          sectionId,
+          organizationId,
+          chunkIndex: cIdx,
+          content: chunk.content,
+          embeddingText: chunk.content,
+          tokenCount: chunk.tokenCount,
+        })
+        persistedChunkIds.push({ id: chunkId, sectionIndex: sIdx, chunkIndex: cIdx, text: chunk.content })
+      }
+    }
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.knowledgeSection.deleteMany({ where: { knowledgeItemId } })
+        if (sectionRows.length > 0) await tx.knowledgeSection.createMany({ data: sectionRows })
+        if (chunkRows.length > 0) await tx.knowledgeChunk.createMany({ data: chunkRows })
+      },
+      { timeout: 30_000 },
+    )
+
+    // Phase 2 — post-commit chunk embedding with bounded concurrency.
+    const telemetry = await this.embedChunks(persistedChunkIds, knowledgeItemId, organizationId)
+
+    const sectionCount = detection.sections.length
+    const truncatedCount = detection.sections.filter((s) => s.truncated).length
+    const totalChunkCount = persistedChunkIds.length
+    const eligible = telemetry.eligibleChunkCount
+    const embedFailedRatio = eligible > 0 ? 1 - telemetry.embeddedCount / eligible : 0
+    const embedQualityDegraded = eligible > 0 && embedFailedRatio > EMBED_QUALITY_DEGRADED_THRESHOLD
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'info',
+        event: 'ingest.sections_persisted',
+        sectionCount,
+        chunkCount: totalChunkCount,
+        truncatedCount,
+        embeddedCount: telemetry.embeddedCount,
+        embedFailedCount: telemetry.embedFailedCount,
+        embedCapExceededCount: telemetry.embedCapExceededCount,
+        embedQueueTimeoutCount: telemetry.embedQueueTimeoutCount,
+        embedPhaseTimeoutCount: telemetry.embedPhaseTimeoutCount,
+        embedFailedRatio,
+        voyageCallCount: telemetry.voyageCallCount,
+        knowledgeItemId,
+        organizationId,
+      }),
+    )
+
+    // audit-M7: quality-degraded WARN signal for operator dashboards.
+    if (embedQualityDegraded) {
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'ingest.embed_quality_degraded',
+          embedFailedRatio,
+          eligibleChunkCount: eligible,
+          embeddedCount: telemetry.embeddedCount,
+          knowledgeItemId,
+          organizationId,
+        }),
+      )
+    }
+
+    return {
+      sectionCount,
+      chunkCount: totalChunkCount,
+      embeddedCount: telemetry.embeddedCount,
+      embedFailedCount: telemetry.embedFailedCount,
+      embedQualityDegraded,
+    }
+  }
+
+  private async embedChunks(
+    persistedChunks: { id: string; sectionIndex: number; chunkIndex: number; text: string }[],
+    knowledgeItemId: string,
+    organizationId: string,
+  ): Promise<{
+    eligibleChunkCount: number
+    embeddedCount: number
+    embedFailedCount: number
+    embedCapExceededCount: number
+    embedQueueTimeoutCount: number
+    embedPhaseTimeoutCount: number
+    voyageCallCount: number
+  }> {
+    // Sort by (sectionIndex, chunkIndex) so cap selection is deterministic.
+    const sorted = [...persistedChunks].sort((a, b) =>
+      a.sectionIndex !== b.sectionIndex
+        ? a.sectionIndex - b.sectionIndex
+        : a.chunkIndex - b.chunkIndex,
+    )
+
+    // audit-M3: per-doc embed budget cap.
+    const eligible = sorted.slice(0, MAX_EMBEDS_PER_DOCUMENT)
+    const overflow = sorted.length - eligible.length
+    if (overflow > 0) {
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'ingest.embed_cap_exceeded',
+          chunkCount: sorted.length,
+          cap: MAX_EMBEDS_PER_DOCUMENT,
+          knowledgeItemId,
+          organizationId,
+        }),
+      )
+    }
+
+    // audit-M2: AbortController for the entire phase-2 worker.
+    const controller = new AbortController()
+    const phaseTimer = setTimeout(() => controller.abort(), INGEST_EMBED_PHASE_TIMEOUT_MS)
+
+    let embeddedCount = 0
+    let embedFailedCount = 0
+    let embedQueueTimeoutCount = 0
+    let voyageCallCount = 0
+
+    // audit-M2: bounded concurrency semaphore.
+    let inFlight = 0
+    const queue: (() => void)[] = []
+    const acquire = (): Promise<void> =>
+      new Promise<void>((resolve, reject) => {
+        const tryAcquire = () => {
+          if (controller.signal.aborted) {
+            reject(new Error('embed_phase_timeout'))
+            return
+          }
+          if (inFlight < MAX_CONCURRENT_CHUNK_EMBEDS) {
+            inFlight++
+            resolve()
+            return
+          }
+          const queueTimer = setTimeout(() => {
+            const idx = queue.indexOf(slot)
+            if (idx >= 0) queue.splice(idx, 1)
+            reject(new Error('embed_queue_timeout'))
+          }, EMBED_QUEUE_TIMEOUT_MS)
+          const slot = () => {
+            clearTimeout(queueTimer)
+            tryAcquire()
+          }
+          queue.push(slot)
+        }
+        tryAcquire()
+      })
+    const release = () => {
+      inFlight--
+      const next = queue.shift()
+      if (next) next()
+    }
+
+    const tasks = eligible.map(async (chunk) => {
+      try {
+        await acquire()
+      } catch (err) {
+        const reason = (err as Error).message
+        if (reason === 'embed_queue_timeout') {
+          embedQueueTimeoutCount++
+          this.logger.warn(
+            JSON.stringify({
+              level: 'warn',
+              event: 'ingest.embed_queue_timeout',
+              sectionIndex: chunk.sectionIndex,
+              chunkIndex: chunk.chunkIndex,
+              knowledgeItemId,
+              organizationId,
+            }),
+          )
+        }
+        return
+      }
+      try {
+        if (controller.signal.aborted) return
+        voyageCallCount++
+        const vec = await this.embedWithRetry(chunk.text, controller.signal)
+        if (controller.signal.aborted) return
+        if (!vec) {
+          embedFailedCount++
+          return
+        }
+        await prisma.$executeRawUnsafe(
+          `UPDATE "knowledge_chunks" SET embedding = $1::vector WHERE id = $2`,
+          `[${vec.join(',')}]`,
+          chunk.id,
+        )
+        embeddedCount++
+      } catch (err) {
+        embedFailedCount++
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'ingest.embed_failed',
+            sectionIndex: chunk.sectionIndex,
+            chunkIndex: chunk.chunkIndex,
+            sanitisedError: sanitiseEmbedError((err as Error).message),
+            knowledgeItemId,
+            organizationId,
+          }),
+        )
+      } finally {
+        release()
+      }
+    })
+
+    await Promise.all(tasks)
+    clearTimeout(phaseTimer)
+
+    let embedPhaseTimeoutCount = 0
+    if (controller.signal.aborted) {
+      embedPhaseTimeoutCount = eligible.length - embeddedCount - embedFailedCount - embedQueueTimeoutCount
+      if (embedPhaseTimeoutCount < 0) embedPhaseTimeoutCount = 0
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'ingest.embed_phase_timeout',
+          embedPhaseTimeoutCount,
+          embeddedCount,
+          eligibleChunkCount: eligible.length,
+          knowledgeItemId,
+          organizationId,
+        }),
+      )
+    }
+
+    return {
+      eligibleChunkCount: eligible.length,
+      embeddedCount,
+      embedFailedCount,
+      embedCapExceededCount: overflow,
+      embedQueueTimeoutCount,
+      embedPhaseTimeoutCount,
+      voyageCallCount,
+    }
+  }
+
+  /**
+   * audit-M3: Voyage embed with one retry on 5xx/429. Synthetic-fail hook
+   * lives in EmbeddingsService.embedDocument (audit-M7) so all single-doc
+   * Voyage calls share the same probe affordance.
+   * Returns null on terminal failure (caller logs).
+   */
+  private async embedWithRetry(text: string, signal: AbortSignal): Promise<number[] | null> {
+    let lastErr: unknown = null
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      if (signal.aborted) return null
+      try {
+        return await this.embeddings.embedDocument(text)
+      } catch (err) {
+        lastErr = err
+        const code = extractStatusCode(err)
+        const transient = code === 429 || (code !== null && code >= 500 && code < 600)
+        if (attempt === 1 && transient) {
+          await new Promise((r) => setTimeout(r, 1000))
+          continue
+        }
+        throw err
+      }
+    }
+    throw lastErr instanceof Error ? lastErr : new Error('embed_failed')
+  }
+}
+
+function extractStatusCode(err: unknown): number | null {
+  if (typeof err !== 'object' || err === null) return null
+  const e = err as Record<string, unknown>
+  if (typeof e.status === 'number') return e.status
+  if (typeof e.statusCode === 'number') return e.statusCode
+  return null
+}
+
+function sanitiseEmbedError(msg: string): string {
+  // Strip URLs / keys / long token-like strings; keep first 120 chars.
+  return msg
+    .replace(/https?:\/\/\S+/g, '<url>')
+    .replace(/[A-Za-z0-9_\-]{32,}/g, '<token>')
+    .slice(0, 120)
 }

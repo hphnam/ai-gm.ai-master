@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { prisma } from '@gm-ai/database'
 import {
@@ -372,13 +373,14 @@ export class ChatService {
     const startedAt = Date.now()
 
     const agentMode = await this.resolveConversationMode(conversationId, input.userMessage)
+    const tierForLog = pickTier(input.userMessage, agentMode)
 
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       ctx: { orgId, userId, userRole },
       venueContext: await this.buildVenueContext(venue),
       mode: agentMode,
-      tier: pickTier(input.userMessage, agentMode),
+      tier: tierForLog,
       priorSummary: compaction.summary,
       emergencyAdvisory: (() => {
         const e = detectEmergency(input.userMessage)
@@ -440,6 +442,41 @@ export class ChatService {
         .reverse()
         .find((m) => m.role === 'assistant')
       if (lastAssistant) partsJson = lastAssistant.content as unknown as object
+
+      // Plan 01-03 audit-AC4 — observe Anthropic prompt-cache hit on the
+      // turn's response.usage. AI SDK 6.x unified usage shape:
+      // result.usage.inputTokenDetails.{cacheReadTokens,cacheWriteTokens}.
+      // PII boundary: counts + tier + conversationIdHash only — no message
+      // body, no retrieved content. `tier` is operator-only observability.
+      try {
+        const usage = result.usage as {
+          inputTokens?: number
+          outputTokens?: number
+          inputTokenDetails?: { cacheReadTokens?: number; cacheWriteTokens?: number }
+        } | undefined
+        const cacheRead = usage?.inputTokenDetails?.cacheReadTokens
+        const cacheWrite = usage?.inputTokenDetails?.cacheWriteTokens
+        if (cacheRead !== undefined || cacheWrite !== undefined) {
+          const conversationIdHash = createHash('sha256')
+            .update(conversationId)
+            .digest('hex')
+            .slice(0, 8)
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.cache_observed',
+              cache_read_input_tokens: cacheRead ?? 0,
+              cache_creation_input_tokens: cacheWrite ?? 0,
+              input_tokens: usage?.inputTokens ?? 0,
+              output_tokens: usage?.outputTokens ?? 0,
+              tier: tierForLog,
+              conversationIdHash,
+            }),
+          )
+        }
+      } catch {
+        // Defensive: usage shape variance (e.g. PROBE_CHAT_SERVICE_STUB) — skip silently.
+      }
+
       if (!finalText) {
         this.logger.warn(
           JSON.stringify({

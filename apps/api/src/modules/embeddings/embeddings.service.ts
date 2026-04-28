@@ -24,6 +24,14 @@ export class EmbeddingsService implements OnModuleInit {
   }
 
   async embedDocument(text: string): Promise<number[]> {
+    // Plan 01-01 audit-M7 — synthetic-fail hook for probe-section W17 (embed_quality_degraded warn).
+    // Gated by NODE_ENV !== 'production'; assertAuthEnv prod-fail backstops misuse.
+    if (process.env.NODE_ENV !== 'production') {
+      const ratio = Number(process.env.PROBE_VOYAGE_FAIL_RATIO ?? '0')
+      if (ratio > 0 && Math.random() < ratio) {
+        throw new Error('PROBE_VOYAGE_FAIL_RATIO synthetic failure')
+      }
+    }
     const response = await this.client.embed({
       model: 'voyage-3',
       input: text,

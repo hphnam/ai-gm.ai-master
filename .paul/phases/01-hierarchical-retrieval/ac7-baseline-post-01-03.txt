@@ -1,0 +1,16 @@
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.module.ts:2:import { EmbeddingsModule } from '../embeddings/embeddings.module'
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.module.ts:7:  imports: [EmbeddingsModule, MockOpsModule],
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:107:  constructor(private readonly embeddings: EmbeddingsService) {}
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:232:      vec = await this.embeddings.embedText(query)
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:281:          1 - (se.embedding <=> $1::vector) AS cosine,
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:282:          ROW_NUMBER() OVER (ORDER BY se.embedding <=> $1::vector ASC, se.id ASC) AS rank
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:284:        WHERE se.embedding IS NOT NULL
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:287:        ORDER BY se.embedding <=> $1::vector ASC, se.id ASC
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:320:        se."embeddingText" AS "embeddingText",
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:350:        WHERE s."knowledgeItemId" = ki.id AND c.embedding IS NOT NULL
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:351:        ORDER BY c.embedding <=> $1::vector ASC
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:373:      // Plan 01-02 — content cascade: section.content → ki.content → summary → embeddingText.
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:375:      const content = r.sectionContent ?? r.kiContent ?? r.summary ?? r.embeddingText
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:448:      const ranked = await this.embeddings.rerank(query, docs)
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:6:import { EmbeddingsService } from '../embeddings/embeddings.service'
+/Users/ryan/Developer/Websites/gm-ai/apps/api/src/modules/retrieval/retrieval.service.ts:80:  embeddingText: string

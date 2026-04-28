@@ -1,8 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { createHash } from 'node:crypto'
 import { prisma } from '@gm-ai/database'
-import { TOOL_INPUT_SCHEMAS, type ToolName, fail, type ToolResult } from '@gm-ai/types'
+import {
+  AGGREGATE_SECTION_TOKEN_BUDGET,
+  TOOL_INPUT_SCHEMAS,
+  fail,
+  formatSectionPayload,
+  type ToolName,
+  type ToolResult,
+} from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
-import { RetrievalService } from '../retrieval/retrieval.service'
+import { RetrievalService, type RetrievalHit } from '../retrieval/retrieval.service'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { QuoteVerifierService } from './quote-verifier.service'
 
@@ -64,7 +72,7 @@ export class ToolDispatcher {
             includePending?: boolean
             crossVenue?: boolean
           }
-          return await this.retrieval.find(i.query, {
+          const result = await this.retrieval.find(i.query, {
             orgId: ctx.orgId,
             venueId: i.venueId,
             limit: i.limit,
@@ -76,6 +84,8 @@ export class ToolDispatcher {
             includePending: i.includePending,
             crossVenue: i.crossVenue,
           })
+          if (!result.ok) return result
+          return this.applyFindKnowledgeFormat(result.data, ctx.orgId)
         }
         case 'get_stock_below_par':
           return await this.mockOps.getStockBelowPar(
@@ -365,5 +375,89 @@ export class ToolDispatcher {
       )
       return fail('error', message)
     }
+  }
+
+  /**
+   * Plan 01-03 — wrap find_knowledge hits with the byte-stable section payload
+   * prefix (audit-S7 from 01-02 release) and aggregate-token telemetry (audit-M3).
+   * Returns a NEW ToolResult; does not mutate the input array.
+   *
+   * Sort order: similarity DESC, sectionId ASC tie-break (within-run deterministic).
+   * Hits without metadata.sectionId pass through unchanged (AC-5 fallback path
+   * from 01-02 — pre-backfill KIs continue to surface ki.content without prefix
+   * so the prefix presence signals "section was injected" to consumers).
+   */
+  private applyFindKnowledgeFormat(
+    hits: RetrievalHit[],
+    orgId: string,
+  ): ToolResult<RetrievalHit[]> {
+    // ECMAScript Array.sort has been stable since ES2019. similarity DESC,
+    // tie-break sectionId ASC — round to 6 decimals so Voyage 5th-decimal
+    // drift doesn't reshuffle order on byte-identical re-runs.
+    const sorted = [...hits].sort((a, b) => {
+      const aSim = Math.round(a.similarity * 1_000_000)
+      const bSim = Math.round(b.similarity * 1_000_000)
+      if (aSim !== bSim) return bSim - aSim
+      const aId = (a.metadata.sectionId as string | undefined | null) ?? ''
+      const bId = (b.metadata.sectionId as string | undefined | null) ?? ''
+      return aId.localeCompare(bId)
+    })
+
+    let sectionInjectedHits = 0
+    let kiContentFallbackHits = 0
+    let aggregateSectionTokens = 0
+
+    const formatted: RetrievalHit[] = sorted.map((hit) => {
+      const sectionId = hit.metadata.sectionId as string | undefined | null
+      const sectionTitle = hit.metadata.sectionTitle as string | undefined | null
+      const sectionTokenCount =
+        typeof hit.metadata.sectionTokenCount === 'number'
+          ? hit.metadata.sectionTokenCount
+          : 0
+
+      if (sectionId) {
+        sectionInjectedHits++
+        aggregateSectionTokens += sectionTokenCount
+        return {
+          ...hit,
+          content: formatSectionPayload({
+            sectionId,
+            sectionTitle: sectionTitle ?? null,
+            content: hit.content,
+          }),
+        }
+      } else if (hit.entityType === 'knowledge_item') {
+        kiContentFallbackHits++
+      }
+      return hit
+    })
+
+    const orgIdHash = createHash('sha256').update(orgId).digest('hex').slice(0, 16)
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'tool_dispatcher.find_knowledge_formatted',
+        totalHits: formatted.length,
+        sectionInjectedHits,
+        kiContentFallbackHits,
+        aggregateSectionTokens,
+        deterministicSortKey: 'similarity_desc_sectionId_asc',
+        orgIdHash,
+      }),
+    )
+
+    if (aggregateSectionTokens > AGGREGATE_SECTION_TOKEN_BUDGET) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'tool_dispatcher.section_budget_exceeded',
+          aggregateSectionTokens,
+          budget: AGGREGATE_SECTION_TOKEN_BUDGET,
+          hitCount: formatted.length,
+          orgIdHash,
+        }),
+      )
+    }
+
+    return { ok: true, data: formatted }
   }
 }

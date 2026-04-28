@@ -5,12 +5,25 @@ import {
   tool,
   type ToolSet,
   type OnFinishEvent,
+  type SystemModelMessage,
 } from 'ai'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
 import { z } from 'zod'
 import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
 import { buildAiSdkTools } from './ai-sdk-tools'
 import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
+
+// Plan 01-03 — Anthropic prompt-cache wiring via AI SDK 6.x ToolLoopAgent.
+// Source: https://platform.claude.com/docs/en/build-with-claude/prompt-caching · verified 2026-04-28
+// Source: https://ai-sdk.dev/providers/ai-sdk-providers/anthropic · verified 2026-04-28
+//
+// Anthropic semantic: cache_control on a block caches `tools + system + messages`
+// (in that order) UP TO AND INCLUDING that block. So marker on the FIRST stable
+// system message caches `[tools + stable_system]` as one prefix; subsequent
+// dynamic system content + user messages stay outside the cache. Stable comes
+// FIRST (so the cached prefix is byte-stable across turns); dynamic comes
+// AFTER unmarked (so per-turn variation never breaks the cached prefix).
+const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
 
 export type AgentMode = 'default' | 'incident' | 'handover' | 'training'
 export type AgentTier = 'haiku' | 'sonnet'
@@ -200,7 +213,35 @@ export function buildGmAgent(params: {
     params.priorSummary && params.priorSummary.trim().length > 0
       ? `\n<prior_conversation_summary>\n${params.priorSummary.trim()}\n</prior_conversation_summary>`
       : ''
-  const contextualInstructions = `${CHAT_SYSTEM_PROMPT}${modeOverlay}${emergencyBlock}\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${params.mode ?? 'default'}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>${profileBlock}${contactBlock}${userProfileBlock}${priorSummaryBlock}`
+
+  // Plan 01-03 — split system message into stable (cache-marked) + dynamic (no marker).
+  // Stable goes FIRST so the cached prefix `[tools + stable_system]` is byte-stable
+  // across turns. Per-turn dynamic context comes AFTER, unmarked, so it never breaks
+  // the cache. See SYSTEM_CACHE_CONTROL comment for Anthropic semantic citation.
+  const stableSystemBody = `${CHAT_SYSTEM_PROMPT}${modeOverlay}`
+  const dynamicSystemBody = [
+    emergencyBlock,
+    `\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${params.mode ?? 'default'}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>`,
+    profileBlock,
+    contactBlock,
+    userProfileBlock,
+    priorSummaryBlock,
+  ]
+    .filter((s) => s && s.length > 0)
+    .join('')
+
+  const systemMessages: SystemModelMessage[] = [
+    {
+      role: 'system',
+      content: stableSystemBody,
+      providerOptions: {
+        anthropic: { cacheControl: SYSTEM_CACHE_CONTROL },
+      },
+    },
+    ...(dynamicSystemBody.length > 0
+      ? [{ role: 'system' as const, content: dynamicSystemBody }]
+      : []),
+  ]
 
   const tier = params.tier ?? DEFAULT_TIER
   const modelId = MODEL_BY_TIER[tier]
@@ -208,7 +249,7 @@ export function buildGmAgent(params: {
   return new ToolLoopAgent({
     id: 'gm-chat-agent',
     model: anthropicProvider(modelId),
-    instructions: contextualInstructions,
+    instructions: systemMessages,
     tools,
     toolChoice: 'auto',
     // Sequential tool use + adaptive thinking on Sonnet/Opus only. Haiku
@@ -229,3 +270,56 @@ export function buildGmAgent(params: {
 }
 
 export type GmAgent = ReturnType<typeof buildGmAgent>
+
+/**
+ * Plan 01-03 audit-S1 — wire-level inspector for cache_control marker placement.
+ *
+ * Distinguishes "cache_control not wired" from "cache_control wired but TTL expired"
+ * for ops debugging. Without this helper, both states surface as
+ * `cache_read_input_tokens === 0` from the response — indistinguishable.
+ *
+ * Per Anthropic prompt-cache semantics, marking cache_control on the FIRST stable
+ * system message caches the cumulative prefix `tools + stable_system` as one unit;
+ * so toolsCacheControl is implied by systemCacheControl (single marker covers both).
+ */
+export function inspectAgentProviderOptions(messages: SystemModelMessage[]): {
+  systemCacheControl: 'ephemeral' | null
+  toolsCacheControl: 'ephemeral' | null
+} {
+  const stable = messages[0]
+  const cc = (
+    stable?.providerOptions?.anthropic as
+      | { cacheControl?: { type?: string } }
+      | undefined
+  )?.cacheControl
+  const isEphemeral: 'ephemeral' | null = cc?.type === 'ephemeral' ? 'ephemeral' : null
+  return { systemCacheControl: isEphemeral, toolsCacheControl: isEphemeral }
+}
+
+/**
+ * Plan 01-03 — pure helper exposing the system-messages array buildGmAgent
+ * constructs. Probes use this directly to assert cache_control marker placement
+ * without instantiating the full agent (no Anthropic API key required, no model
+ * dependency).
+ *
+ * Implementation note: this function intentionally duplicates the inline
+ * `systemMessages` construction in buildGmAgent rather than factoring buildGmAgent
+ * to use this helper internally. The duplication is intentional — buildGmAgent's
+ * call site needs access to `params` for the dynamic context (timestamps, contacts);
+ * factoring the helper to take all those would burden the helper's signature for
+ * marginal DRY gain. APPLY-time decision: keep the small duplication for clarity.
+ */
+export function buildSystemMessagesForInspection(
+  mode: AgentMode = 'default',
+): SystemModelMessage[] {
+  const stableSystemBody = `${CHAT_SYSTEM_PROMPT}${CONVERSATION_MODE_OVERLAYS[mode]}`
+  return [
+    {
+      role: 'system',
+      content: stableSystemBody,
+      providerOptions: {
+        anthropic: { cacheControl: SYSTEM_CACHE_CONTROL },
+      },
+    },
+  ]
+}

@@ -196,6 +196,22 @@ export function assertAuthEnv(): AuthEnv {
     )
   }
 
+  // Plan 01-02 audit-M3: probe-only backfill cost-ceiling override — production-forbidden.
+  // Mirrors PROBE_VOYAGE_FAIL_RATIO + PROBE_CHAT_SERVICE_DELAY_MS pattern.
+  const probeBackfillCeilingRaw = process.env.PROBE_BACKFILL_COST_CEILING_USD
+  if (probeBackfillCeilingRaw !== undefined) {
+    const parsed = Number(probeBackfillCeilingRaw)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      errs.push(
+        `PROBE_BACKFILL_COST_CEILING_USD must be a non-negative number (USD), got "${probeBackfillCeilingRaw}"`,
+      )
+    } else if (isProd) {
+      errs.push(
+        'PROBE_BACKFILL_COST_CEILING_USD must not be set in production — probe-only backfill cost-ceiling override',
+      )
+    }
+  }
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
@@ -213,6 +229,11 @@ export function assertAuthEnv(): AuthEnv {
     if (probeStubRaw === 'true') {
       process.stderr.write(
         '[chat] WARN: PROBE_CHAT_SERVICE_STUB=true active — Claude calls skipped (non-production only)\n',
+      )
+    }
+    if (probeBackfillCeilingRaw !== undefined) {
+      process.stderr.write(
+        `[backfill] WARN: PROBE_BACKFILL_COST_CEILING_USD=${probeBackfillCeilingRaw} active — overrides BACKFILL_TENANT_COST_CEILING_USD (non-production only)\n`,
       )
     }
   }

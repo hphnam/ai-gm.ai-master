@@ -119,6 +119,8 @@ model Organization {
   invitations        Invitation[]
   venues             Venue[]
   knowledgeItems     KnowledgeItem[]
+  knowledgeSections  KnowledgeSection[]
+  knowledgeChunks    KnowledgeChunk[]
   documentTypes      DocumentType[]
   checklists         Checklist[]
   searchableEntities SearchableEntity[]
@@ -296,11 +298,69 @@ model KnowledgeItem {
   documentType    DocumentType?    @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
   retagQueueItems ReTagQueueItem[]
   checklist       Checklist?
+  sections        KnowledgeSection[]
 
   @@index([organizationId])
   @@index([venueId])
   @@index([documentTypeId])
   @@map("knowledge_items")
+}
+
+/// Plan 01-01 (v0.3 Hierarchical Retrieval) — doc → section → chunk hierarchy.
+/// Additive: existing KnowledgeItem.embedding remains source-of-truth for retrieval
+/// until 01-02 swap. Pre-existing KnowledgeItem rows that are NOT re-ingested via
+/// the v0.3 ingest path have zero corresponding section/chunk rows (intentional).
+model KnowledgeSection {
+  id              String   @id @default(uuid())
+  knowledgeItemId String
+  organizationId  String
+  /// 0-based ordinal within the parent doc.
+  sectionIndex    Int
+  /// Heading or extractor-emitted label; falls back to "Section ${index+1}" at write time (audit-S2).
+  title           String?
+  content         String
+  /// Estimated via Math.ceil(text.length / 4) — Latin-script-biased; see D-01-01-A.
+  tokenCount      Int
+  /// Used for backfill idempotency (01-02 may bump on re-ingest of same content).
+  sectionVersion  Int      @default(1)
+  /// True when graceful chunk-fallback applied (over-cap section with no sub-headings).
+  truncated       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  knowledgeItem KnowledgeItem    @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
+  organization  Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  chunks        KnowledgeChunk[]
+
+  @@unique([knowledgeItemId, sectionIndex])
+  @@index([organizationId])
+  @@index([knowledgeItemId])
+  @@map("knowledge_sections")
+}
+
+/// Plan 01-01 — chunks own embeddings (per CONTEXT.md decision; section-level
+/// embedding deferred to Phase 2 graph traversal). Sliding-window 1024-token
+/// chunks with 128-token overlap when a section exceeds chunk target.
+model KnowledgeChunk {
+  id             String   @id @default(uuid())
+  sectionId      String
+  organizationId String
+  /// 0-based ordinal within the parent section.
+  chunkIndex     Int
+  content        String
+  embedding      Unsupported("vector(1024)")?
+  /// Text actually sent to Voyage (kept for re-embed / audit). Non-null once Phase 2 embed completes.
+  embeddingText  String?
+  tokenCount     Int
+  createdAt      DateTime @default(now())
+
+  section      KnowledgeSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@unique([sectionId, chunkIndex])
+  @@index([organizationId])
+  @@index([sectionId])
+  @@map("knowledge_chunks")
 }
 
 model DocumentType {
