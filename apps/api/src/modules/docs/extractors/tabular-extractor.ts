@@ -13,6 +13,7 @@ import { parse } from 'csv-parse/sync'
 import ExcelJS from 'exceljs'
 import { ExtractError } from '../doc-extract'
 import { isZipHeader } from './zip-header'
+import { decodeCsvBuffer, looksLikeDelimitedText, sniffCsvDelimiter } from './decode-csv-text'
 import {
   TABULAR_MIMES,
   type TabularExtractionResult,
@@ -21,13 +22,6 @@ import {
 
 const CSV_MIME: TabularMime = 'text/csv'
 const XLSX_MIME: TabularMime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-function looksLikeCsvText(buffer: Buffer): boolean {
-  if (buffer.length === 0) return false
-  if (buffer.includes(0x00)) return false
-  const text = buffer.toString('utf-8')
-  return text.includes('\n')
-}
 
 function dedupeHeader(raw: string[]): string[] {
   // Source-row dicts are keyed by header name. Duplicate header cells would
@@ -44,10 +38,15 @@ function dedupeHeader(raw: string[]): string[] {
 }
 
 async function extractTabularCsv(buffer: Buffer): Promise<TabularExtractionResult> {
-  if (!looksLikeCsvText(buffer)) {
+  if (buffer.length === 0) {
     throw new ExtractError(CSV_MIME, 'corrupt-bytes')
   }
-  const text = buffer.toString('utf-8')
+  const text = decodeCsvBuffer(buffer)
+  if (!looksLikeDelimitedText(text)) {
+    throw new ExtractError(CSV_MIME, 'corrupt-bytes')
+  }
+
+  const delimiter = sniffCsvDelimiter(text)
 
   let raw: string[][]
   try {
@@ -55,6 +54,7 @@ async function extractTabularCsv(buffer: Buffer): Promise<TabularExtractionResul
       bom: true,
       skip_empty_lines: true,
       relax_column_count: true,
+      delimiter,
     }) as string[][]
   } catch (err) {
     throw new ExtractError(CSV_MIME, 'corrupt-bytes', err)

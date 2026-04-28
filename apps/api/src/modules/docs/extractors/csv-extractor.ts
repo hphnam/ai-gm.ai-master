@@ -4,33 +4,39 @@
 
 import { parse } from 'csv-parse/sync'
 import { ExtractError, MAX_EXTRACT_CHARS } from '../doc-extract'
+import { decodeCsvBuffer, looksLikeDelimitedText, sniffCsvDelimiter } from './decode-csv-text'
 
 const CSV_MIME = 'text/csv'
 
 // audit-M1 boundary: NO raw row content in logger payloads.
-// Sanity check: a CSV file must UTF-8 decode AND contain at least one newline AND no NUL bytes.
-// This catches binary payloads misdeclared as text/csv before csv-parse throws a cryptic error.
-function looksLikeCsvText(buffer: Buffer): boolean {
-  if (buffer.length === 0) return false
-  if (buffer.includes(0x00)) return false
-  const text = buffer.toString('utf-8')
-  return text.includes('\n')
-}
+// Decode → guard. UTF-16 LE/BE BOM detection happens in decodeCsvBuffer so
+// real-world POS exports (Square, Toast, Shopify) that ship UTF-16 with a
+// `.csv` extension don't trip the "corrupt-bytes" guard. Tab-delimited
+// exports (TSV-as-CSV) are handled by the multi-delimiter csv-parse config.
 
 export async function extractCsv(buffer: Buffer): Promise<string> {
-  if (!looksLikeCsvText(buffer)) {
+  if (buffer.length === 0) {
     throw new ExtractError(CSV_MIME, 'corrupt-bytes')
   }
 
-  const text = buffer.toString('utf-8')
+  const text = decodeCsvBuffer(buffer)
+  if (!looksLikeDelimitedText(text)) {
+    throw new ExtractError(CSV_MIME, 'corrupt-bytes')
+  }
+
+  const delimiter = sniffCsvDelimiter(text)
 
   let rows: string[][]
   try {
     // Source: https://csv.js.org/parse/options/ · verified 2026-04-21
+    // Single delimiter from the header sniff — passing an array makes
+    // csv-parse treat every char as a record separator simultaneously,
+    // which mangles cells like `£2,284.04` in tab-delimited POS exports.
     rows = parse(text, {
       bom: true,
       skip_empty_lines: true,
       relax_column_count: true,
+      delimiter,
     }) as string[][]
   } catch (err) {
     // csv-parse errors don't carry secrets, but we go through ExtractError for uniform handling.

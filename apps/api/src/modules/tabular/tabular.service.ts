@@ -82,6 +82,16 @@ function safeRawColumnName(name: string): string {
   return `"${name.replace(/"/g, '""')}"`
 }
 
+// Strip currency symbols + thousands separators inside SQL before ::numeric
+// cast. Mirrors stripCurrencyForNumber() in infer-column-types.ts — both
+// sides MUST agree on the strip set or aggregate queries will silently fail
+// on real-world POS data ("£2,284.04" → 2284.04).
+// Using a Postgres regex char class. NULLIF() catches all-stripped values
+// (e.g. "£") so they cast to NULL instead of throwing.
+function castJsonbToNumeric(col: string) {
+  return Prisma.sql`NULLIF(regexp_replace(data->>${col}, '[£$€¥,\\s]', '', 'g'), '')::numeric`
+}
+
 @Injectable()
 export class TabularQueryService {
   private readonly logger = new Logger(TabularQueryService.name)
@@ -200,12 +210,13 @@ export class TabularQueryService {
       if (f.op === 'contains') {
         return Prisma.sql`(data->>${col}) ILIKE ${'%' + String(f.value) + '%'}`
       }
-      // Numeric ops on numeric columns get JSONB→numeric cast; otherwise text comparison.
+      // Numeric ops on numeric columns get JSONB→numeric cast (currency-stripped);
+      // otherwise text comparison.
       if (
         colType === 'number' &&
         (f.op === 'gt' || f.op === 'lt' || f.op === 'gte' || f.op === 'lte' || f.op === 'eq')
       ) {
-        return Prisma.sql`(data->>${col})::numeric ${Prisma.raw(opSql)} ${Number(f.value)}`
+        return Prisma.sql`${castJsonbToNumeric(col)} ${Prisma.raw(opSql)} ${Number(f.value)}`
       }
       return Prisma.sql`(data->>${col}) ${Prisma.raw(opSql)} ${String(f.value)}`
     }) ?? []
@@ -224,7 +235,7 @@ export class TabularQueryService {
       const aggExpr =
         input.aggregate.fn === 'count'
           ? Prisma.sql`COUNT(*)::numeric`
-          : Prisma.sql`${Prisma.raw(fnSql)}((data->>${input.aggregate.column!})::numeric)`
+          : Prisma.sql`${Prisma.raw(fnSql)}(${castJsonbToNumeric(input.aggregate.column!)})`
 
       const groupColAlias = Prisma.raw(safeRawColumnName(groupCol))
       // Group by the SELECT alias (Postgres extension) instead of repeating
@@ -256,7 +267,7 @@ export class TabularQueryService {
       const aggExpr =
         input.aggregate.fn === 'count'
           ? Prisma.sql`COUNT(*)::numeric`
-          : Prisma.sql`${Prisma.raw(fnSql)}((data->>${input.aggregate.column!})::numeric)`
+          : Prisma.sql`${Prisma.raw(fnSql)}(${castJsonbToNumeric(input.aggregate.column!)})`
 
       queryRows = await prisma.$queryRaw<Array<Record<string, unknown>>>(
         Prisma.sql`SELECT ${aggExpr} AS _aggregate

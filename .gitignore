@@ -7,8 +7,11 @@ dist/
 out/
 *.tsbuildinfo
 
-# Canary fixtures — beerhall xlsx are test inputs only, never to be tracked
+# Canary fixtures — POS exports + beerhall xlsx are test inputs only,
+# never to be tracked (real venue revenue / payroll / customer data).
 docs/*.xlsx
+docs/*.csv
+docs/*.tsv
 
 # Turbo
 .turbo/

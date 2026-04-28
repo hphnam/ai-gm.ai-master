@@ -17,16 +17,28 @@ import type { InferredColumn } from '@gm-ai/types'
 const NUMBER_THRESHOLD = 0.8
 const DATE_THRESHOLD = 0.8
 
+// Strip currency symbols + thousands separators so values like "£2,284.04"
+// or "$1,000.50" are recognised as numbers. POS exports and accounting tools
+// routinely produce these. Kept in sync with the SQL strip in
+// TabularQueryService (NUMERIC_STRIP_REGEX) — both sides must agree on what
+// counts as a numeric prefix/separator or queries will silently fail.
+const CURRENCY_AND_SEPARATORS_RE = /[£$€¥,\s]/g
+
+export function stripCurrencyForNumber(v: string): string {
+  return v.replace(CURRENCY_AND_SEPARATORS_RE, '')
+}
+
 function isNonEmpty(v: string): boolean {
   return v != null && v.trim().length > 0
 }
 
 function isFiniteNumber(v: string): boolean {
   // Number('') === 0 and Number('   ') === 0 — both must be excluded.
-  // We pre-trim then check non-empty so empty/whitespace-only never count.
-  const trimmed = v.trim()
-  if (trimmed.length === 0) return false
-  const n = Number(trimmed)
+  // We pre-trim, strip currency/separators, then check non-empty so
+  // formatted values like "£2,284.04" are recognised as numbers.
+  const stripped = stripCurrencyForNumber(v.trim())
+  if (stripped.length === 0) return false
+  const n = Number(stripped)
   return Number.isFinite(n)
 }
 
