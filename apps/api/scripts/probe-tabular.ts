@@ -18,10 +18,38 @@ import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '@gm-ai/database'
-import { MAX_TABULAR_ROWS_PER_DOC } from '@gm-ai/types'
+import { MAX_TABULAR_ROWS_PER_DOC, type TabularExtractionResult } from '@gm-ai/types'
 import { TabularQueryService } from '../src/modules/tabular/tabular.service'
-import { extractTabular } from '../src/modules/docs/extractors/tabular-extractor'
 import { inferColumnTypes } from '../src/modules/tabular/infer-column-types'
+
+// Phase 6 — extractTabular() was retired with the move to Reducto. The probe
+// now seeds rows directly from in-test fixtures (no buffer parse step) and
+// that's actually a better test boundary: we're verifying the JSONB persistence
+// + query-DSL contract, NOT the upstream parser. Reducto is treated as a black
+// box that returns { columns, rows } — the probe asserts what happens to those
+// rows once the service-layer pipeline takes over.
+function fixtureToTable(csvLikeText: string): TabularExtractionResult {
+  const lines = csvLikeText.split('\n').filter((l) => l.length > 0)
+  const headerCells = lines[0].split(',')
+  const seen = new Map<string, number>()
+  const columns = headerCells.map((cell, idx) => {
+    const trimmed = cell.trim()
+    const base = trimmed === '' ? `column_${idx + 1}` : trimmed
+    const count = seen.get(base) ?? 0
+    seen.set(base, count + 1)
+    return count === 0 ? base : `${base}_${count + 1}`
+  })
+  const rows: Record<string, string>[] = []
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(',')
+    const obj: Record<string, string> = {}
+    for (let c = 0; c < columns.length; c++) {
+      obj[columns[c]] = String(cells[c] ?? '').trim()
+    }
+    rows.push(obj)
+  }
+  return { columns, rows }
+}
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('probe-tabular MUST NOT run in production — DB writes seed/cleanup test fixtures.')
@@ -169,7 +197,7 @@ async function seedTabular(args: {
     },
   })
 
-  const result = await extractTabular(Buffer.from(args.csv, 'utf-8'), 'text/csv')
+  const result = fixtureToTable(args.csv)
   const totalRows = result.rows.length
   const capExceeded =
     args.capExceededOverride ?? totalRows > MAX_TABULAR_ROWS_PER_DOC
@@ -489,7 +517,7 @@ async function W16_idempotentReingest(orgId: string, venueId: string): Promise<v
   // Re-seed using the SAME docId → seedTabular's $transaction deletes prior
   // rows + columns first so the unique constraint @@unique([docId, rowIndex])
   // would reject duplicates. Mirror that here: persist into the existing doc.
-  const result = await extractTabular(Buffer.from(csv, 'utf-8'), 'text/csv')
+  const result = fixtureToTable(csv)
   const inferred = inferColumnTypes(result.rows, result.columns)
   await prisma.$transaction(async (tx) => {
     await tx.tabularRow.deleteMany({ where: { docId } })

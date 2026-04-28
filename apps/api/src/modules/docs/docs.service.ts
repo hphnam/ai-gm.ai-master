@@ -21,8 +21,15 @@ import {
   type Schedule,
 } from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
+import { ReductoService, type ParsedDocument } from '../reducto/reducto.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService } from './classifier.service'
+
+function composeContent(description: string | undefined, body: string): string {
+  const desc = description?.trim()
+  if (desc && desc.length > 0 && body.length > 0) return `${desc}\n\n${body}`
+  return desc ?? body
+}
 
 function coerceProcessingStatus(raw: string): ProcessingStatus {
   if (raw === 'processing' || raw === 'ready' || raw === 'failed') return raw
@@ -136,6 +143,7 @@ export class DocsService {
     private readonly ingestService: IngestService,
     private readonly classifier: ClassifierService,
     private readonly checklistExtractor: ChecklistExtractorService,
+    private readonly reducto: ReductoService,
   ) {}
 
   async list(orgId: string): Promise<DocListItem[]> {
@@ -496,9 +504,11 @@ export class DocsService {
     input: CreateDocRequest & {
       sourceImageBytes?: Buffer | null
       sourceImageMime?: string | null
-      // Plan 05-01 Task 2 — threaded to IngestService.persistTabular for the
-      // structured-data tee. Both fields optional; tee is skipped when either is missing.
-      tabularSourceBytes?: Buffer | null
+      // Phase 6 — file_id from controller-side Reducto upload. enrichInBackground
+      // calls parse() against this id to get text + structured tables. Null for
+      // image uploads (Claude vision path) and text-only /docs creates.
+      reductoFileId?: string | null
+      description?: string
       mimeType?: string | null
     },
     orgId: string,
@@ -516,8 +526,26 @@ export class DocsService {
       }),
     )
     try {
+      // Phase 6 — Reducto parse runs in background. Replaces input.content
+      // (which at this point is just the user description) with composed
+      // description + parsed body text. Tables are passed straight through to
+      // IngestService for structured-row persistence.
+      let parsed: ParsedDocument | null = null
+      let composedContent = input.content
+      if (input.reductoFileId) {
+        try {
+          parsed = await this.reducto.parse(input.reductoFileId)
+          composedContent = composeContent(input.description, parsed.text)
+        } catch (err) {
+          // Reducto parse failures are surfaced as enrichment failures — same
+          // posture as classifier/ingest failures below: row stays in DB with
+          // status='failed', error string visible in the UI for retry.
+          throw err
+        }
+      }
+
       const classified = await this.classifier.classify({
-        content: input.content,
+        content: composedContent,
         title: input.title,
         orgId,
       })
@@ -539,16 +567,18 @@ export class DocsService {
       await this.ingestService.ingest({
         id,
         title: input.title,
-        content: input.content,
+        content: composedContent,
         organizationId: orgId,
         venueId: input.venueId,
         sourceImageBytes: input.sourceImageBytes ?? null,
         sourceImageMime: input.sourceImageMime ?? null,
         documentTypeId,
         pendingTypeProposal,
-        // Plan 05-01 Task 2 — structured-data tee inputs.
         mimeType: input.mimeType ?? null,
-        tabularSourceBytes: input.tabularSourceBytes ?? null,
+        // Phase 6 — pre-extracted tables straight from Reducto, no buffer
+        // re-parse in IngestService. First table only (multi-table-per-doc
+        // deferred — same posture as XLSX sheet 1 only, D-05-01-A).
+        parsedTables: parsed?.tables ?? null,
       })
 
       if (classified.kind === 'matched') {
@@ -561,7 +591,7 @@ export class DocsService {
             knowledgeItemId: id,
             orgId,
             title: input.title ?? '(untitled)',
-            content: input.content,
+            content: composedContent,
             userId,
             kindSource: 'matched',
           })
@@ -896,6 +926,51 @@ export class DocsService {
       )
       throw new DocNotFoundOrCrossOrgError()
     }
-    await prisma.knowledgeItem.delete({ where: { id } })
+    await prisma.$transaction([
+      prisma.searchableEntity.deleteMany({
+        where: { entityType: 'knowledge_item', entityId: id },
+      }),
+      prisma.knowledgeItem.delete({ where: { id } }),
+    ])
+  }
+
+  // Delete a pending knowledge gap. Hardened: only removes rows where
+  // answerStatus='pending' so this endpoint can never nuke an answered KB doc
+  // even if a stale id is replayed from the gaps UI after another manager
+  // promoted it.
+  async removeGap(id: string, orgId: string): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id },
+      select: { id: true, organizationId: true, answerStatus: true },
+    })
+    if (!row || row.answerStatus !== 'pending') {
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    if (row.organizationId !== orgId) {
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'docs.cross_org_denied',
+          op: 'delete_gap',
+          targetRowId: id,
+          actingOrgId: orgId,
+        }),
+      )
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    await prisma.$transaction([
+      prisma.searchableEntity.deleteMany({
+        where: { entityType: 'knowledge_item', entityId: id },
+      }),
+      prisma.knowledgeItem.delete({ where: { id } }),
+    ])
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.gap_deleted',
+        orgId,
+        knowledgeItemId: id,
+      }),
+    )
   }
 }

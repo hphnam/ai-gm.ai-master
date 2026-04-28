@@ -16,78 +16,13 @@ export class ExtractError extends Error {
   }
 }
 
-// Plan 04-01: exported so per-format extractors (apps/api/src/modules/docs/extractors/*.ts)
-// can respect the same cap without duplicating the constant.
+// Phase 6 — extractText() and the per-MIME dispatch switch were retired in
+// favour of ReductoService. See apps/api/src/modules/reducto/reducto.service.ts.
+// MAX_EXTRACT_CHARS is retained because image-extractor.ts (Claude vision —
+// kept local; different use case from document parsing) still caps its output
+// against this constant.
 export const MAX_EXTRACT_CHARS = 1_000_000
-const EXTRACT_TIMEOUT_MS = 30_000
-
-async function withTimeout<T>(p: Promise<T>, mimeType: string): Promise<T> {
-  let timer: NodeJS.Timeout | undefined
-  const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(
-      () => reject(new ExtractError(mimeType, 'timeout')),
-      EXTRACT_TIMEOUT_MS,
-    )
-  })
-  try {
-    return await Promise.race([p, timeout])
-  } finally {
-    if (timer) clearTimeout(timer)
-  }
-}
-
-export async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
-  try {
-    let text: string
-    switch (mimeType) {
-      case 'text/plain':
-      case 'text/markdown':
-        text = buffer.toString('utf-8').slice(0, MAX_EXTRACT_CHARS)
-        break
-      case 'application/pdf': {
-        const { extractText: unpdfExtract } = await import('unpdf')
-        const { text: unpdfText } = await withTimeout(
-          unpdfExtract(new Uint8Array(buffer), { mergePages: true }),
-          mimeType,
-        )
-        const joined = Array.isArray(unpdfText) ? unpdfText.join('\n\n') : unpdfText
-        text = (joined ?? '').slice(0, MAX_EXTRACT_CHARS)
-        break
-      }
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
-        const mammoth = await import('mammoth')
-        const { value } = await withTimeout(mammoth.extractRawText({ buffer }), mimeType)
-        text = (value ?? '').slice(0, MAX_EXTRACT_CHARS)
-        break
-      }
-      // Plan 04-01: new cases (existing PDF/DOCX/TXT/MD cases above are byte-identical per AC-6).
-      case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': {
-        const { extractXlsx } = await import('./extractors/xlsx-extractor')
-        text = await withTimeout(extractXlsx(buffer), mimeType)
-        break
-      }
-      case 'text/csv': {
-        const { extractCsv } = await import('./extractors/csv-extractor')
-        text = await withTimeout(extractCsv(buffer), mimeType)
-        break
-      }
-      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation': {
-        const { extractPptx } = await import('./extractors/pptx-extractor')
-        text = await withTimeout(extractPptx(buffer), mimeType)
-        break
-      }
-      default:
-        throw new ExtractError(mimeType, 'unsupported-mime')
-    }
-    if (text.trim().length === 0) {
-      throw new ExtractError(mimeType, 'empty-result')
-    }
-    return text
-  } catch (err) {
-    if (err instanceof ExtractError) throw err
-    throw new ExtractError(mimeType, 'corrupt-bytes', err)
-  }
-}
+export const UPLOAD_EXTRACT_TIMEOUT_MS = 30_000
 
 const TITLE_MAX = 200
 
@@ -142,4 +77,3 @@ export const UPLOAD_MAX_BYTES_BY_MIME: Readonly<Record<string, number>> = {
 } as const
 
 export const UPLOAD_MAX_BYTES = 15 * 1024 * 1024 // ceiling across all formats; per-MIME cap refines per type
-export const UPLOAD_EXTRACT_TIMEOUT_MS = EXTRACT_TIMEOUT_MS

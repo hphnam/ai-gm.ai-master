@@ -21,6 +21,13 @@ export type AuthEnv = {
     applicationId: string
     messageId: string
   }
+  // Phase 6 — Reducto extraction layer. Required for any document upload other
+  // than image MIMEs (which still go through Claude vision). REDUCTO_BASE_URL
+  // optional; defaults to the documented production endpoint.
+  reducto: {
+    baseUrl: string
+    apiKey: string
+  }
 }
 
 // Name <addr@domain> format per RFC 5322 shorthand — required by Resend's from field
@@ -273,6 +280,18 @@ export function assertAuthEnv(): AuthEnv {
       }
     : undefined
 
+  // Phase 6 — Reducto extraction. REDUCTO_API_KEY required at boot; the
+  // extractor path won't function without it. Same fail-fast posture as the
+  // other Phase-1+ env requirements (no soft fallbacks — if the key isn't
+  // there, uploads silently fail later, which is worse than refusing to start).
+  const reductoApiKey = process.env.REDUCTO_API_KEY
+  if (!reductoApiKey) {
+    errs.push(
+      'REDUCTO_API_KEY missing — required for document extraction (CSV / XLSX / PDF / DOCX / PPTX). Get a key at https://reducto.ai',
+    )
+  }
+  const reductoBaseUrl = process.env.REDUCTO_BASE_URL ?? 'https://platform.reducto.ai'
+
   return {
     secret: secret!,
     baseURL: baseURL!,
@@ -280,5 +299,6 @@ export function assertAuthEnv(): AuthEnv {
     resend: resendKey ? { apiKey: resendKey, mailFrom: mailFrom! } : undefined,
     infobip,
     infobip2fa,
+    reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey ?? '' },
   }
 }

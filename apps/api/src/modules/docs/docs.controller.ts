@@ -43,14 +43,13 @@ import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import {
-  ExtractError,
   UPLOAD_MAX_BYTES,
   UPLOAD_MAX_BYTES_BY_MIME,
   UPLOAD_MIME_ALLOWLIST,
-  extractText,
   sanitizeUploadTitle,
 } from './doc-extract'
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
+import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
   DocNotFoundOrCrossOrgError,
   DocsService,
@@ -67,7 +66,10 @@ const DocIdParamSchema = z.object({
 export class DocsController {
   private readonly logger = new Logger(DocsController.name)
 
-  constructor(private readonly docsService: DocsService) {}
+  constructor(
+    private readonly docsService: DocsService,
+    private readonly reducto: ReductoService,
+  ) {}
 
   @Get()
   list(@CurrentOrg() org: { id: string }): Promise<DocListItem[]> {
@@ -107,6 +109,25 @@ export class DocsController {
   ): Promise<CreateDocResponse> {
     try {
       return await this.docsService.answerGap(params.id, org.id, body.answer, user?.id ?? null)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // Declared BEFORE the generic @Delete(':id') so the specific path matches
+  // first. Service-side guard rejects rows whose answerStatus !== 'pending'.
+  @Delete('gaps/:id')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  async removeGap(
+    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @CurrentOrg() org: { id: string },
+  ): Promise<void> {
+    try {
+      await this.docsService.removeGap(params.id, org.id)
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -200,15 +221,14 @@ export class DocsController {
     }
 
     const extractStart = Date.now()
-    let content: string
-    // Plan 04-01 Task 3 — image path owns its own persistence pipeline because it also writes
-    // the raw bytes to KnowledgeItem.sourceImageBytes for future Plan 04-02 re-classification.
-    // Text-only formats stay on the existing extractText path.
+    // Phase 6 — Reducto extraction. Image path stays separate (Claude vision
+    // is for photo Q&A, not structured-document parsing). All other MIMEs
+    // upload to Reducto here, then enrichInBackground calls parse() against
+    // the returned file_id.
+    let content = ''
     let sourceImageBytes: Buffer | null = null
     let sourceImageMime: string | null = null
-    // Plan 05-01 Task 2 — preserve the original CSV/XLSX buffer for the structured-data
-    // tee in IngestService. Other mimes leave this null and skip the tee entirely.
-    let tabularSourceBytes: Buffer | null = null
+    let reductoFileId: string | null = null
     try {
       if (isDocsImageMime(file.mimetype)) {
         const result = await extractImage(file.buffer, file.mimetype, this.logger)
@@ -225,26 +245,21 @@ export class DocsController {
           }),
         )
       } else {
-        content = await extractText(file.buffer, file.mimetype)
-        if (
-          file.mimetype === 'text/csv' ||
-          file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        ) {
-          // Plan 05-01 Task 2 — keep the original buffer for the structured-data tee.
-          // Buffer.from(file.buffer) clones so multer's underlying memory is detached
-          // before the controller frees the request lifecycle.
-          tabularSourceBytes = Buffer.from(file.buffer)
-        }
+        // Reducto upload is fast (single multipart round-trip). Parse runs
+        // in enrichInBackground so the controller returns a stub immediately.
+        // Buffer is consumed here; multer's request-lifecycle buffer is fine.
+        reductoFileId = await this.reducto.upload(file.buffer, file.originalname, file.mimetype)
       }
     } catch (err) {
-      if (err instanceof ExtractError) {
-        // Plan 04-01 audit-S6: plumb ExtractError.reason through the response so the UI can
-        // render specific user-friendly strings instead of a generic fall-through. Consumed by
-        // apps/web/src/lib/map-api-error.ts which branches on details.reason.
+      if (err instanceof ReductoError) {
+        // Surface a uniform extraction-failed response so the existing UI
+        // mapApiError 'corrupt-bytes' path keeps working. Reducto-specific
+        // failures map to the same user-facing string the local extractor
+        // used: "the file appears corrupted or the extension does not match".
         throw new HttpException(
           {
             error: 'extraction-failed',
-            details: { reason: err.reason },
+            details: { reason: 'corrupt-bytes' },
           } satisfies ApiErrorResponse,
           422,
         )
@@ -271,12 +286,20 @@ export class DocsController {
     try {
       const enrichInput = {
         title,
+        // For images: content already populated. For Reducto-backed paths: the
+        // user description is all we have at stub time; enrichInBackground
+        // replaces this with composeContent(description, parsed.text) once
+        // parse() returns.
         content: composeContent(description, content),
         venueId,
         sourceImageBytes,
         sourceImageMime,
-        // Plan 05-01 Task 2 — threaded to IngestService.persistTabular via enrichInBackground.
-        tabularSourceBytes,
+        // Phase 6 — file_id from Reducto upload; consumed by enrichInBackground.
+        // Null for image uploads (no Reducto involvement).
+        reductoFileId,
+        // Description survives the parse round-trip so background enrichment
+        // can compose final content with it.
+        description,
         mimeType: file.mimetype,
       }
       result = await this.docsService.createStub(enrichInput, org.id)

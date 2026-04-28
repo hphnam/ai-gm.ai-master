@@ -11,16 +11,14 @@ import {
   MAX_CONCURRENT_CHUNK_EMBEDS,
   MAX_EMBEDS_PER_DOCUMENT,
   MAX_TABULAR_ROWS_PER_DOC,
-  TABULAR_MIMES,
   UUID_RE,
   type KnowledgeMetadata,
   type SectionDetectionResult,
-  type TabularMime,
+  type TabularExtractionResult,
 } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
 import { SectionDetector } from './section-detector'
-import { extractTabular } from '../docs/extractors/tabular-extractor'
 import { inferColumnTypes } from '../tabular/infer-column-types'
 
 function hashOrgId(orgId: string): string {
@@ -52,11 +50,11 @@ export type IngestInput = {
   // Plan 01-01 — extractor mime hint for SectionDetector dispatch (CSV row-batch,
   // PPTX slide-marker split, sheet-marker split). Optional; absent → heading regex fallback.
   mimeType?: string | null
-  // Plan 05-01 Task 2 — original CSV/XLSX bytes for the structured-data tee.
-  // Set only when mimeType is in TABULAR_MIMES; otherwise the tee is skipped.
-  // Buffer is consumed by extractTabular() post-section-persistence in a try/catch
-  // so a parse failure cannot poison Phase 1 retrieval.
-  tabularSourceBytes?: Buffer | null
+  // Phase 6 — tables already extracted upstream by Reducto. Replaces the
+  // previous tabularSourceBytes flow. First table gets persisted to
+  // tabular_rows + tabular_columns; rest are dropped (multi-table per doc
+  // deferred D-05-01-A). Null → tabular tee is skipped.
+  parsedTables?: TabularExtractionResult[] | null
 }
 
 export type IngestResult = {
@@ -811,28 +809,31 @@ ${input.content}`
   }
 
   /**
-   * Plan 05-01 Task 2 — structured-data tee. For CSV/XLSX uploads, parses the
-   * original buffer into rows, infers per-column types via majority-vote, and
-   * persists tabular_rows + tabular_columns alongside the existing section/chunk
-   * persistence. Runs in a try/catch — failure logs and returns; section/chunk
-   * data is unaffected (Phase 1 retrieval keeps working). Hard cap at
-   * MAX_TABULAR_ROWS_PER_DOC: rows beyond the cap are dropped, the warn log
-   * `tabular.row_cap_exceeded` is emitted, and KnowledgeItem.metadata gains
-   * tabularRowCapExceeded:true.
+   * Plan 05-01 Task 2 + Phase 6 — structured-data tee. Tables are extracted
+   * upstream by Reducto (controller-side upload + docs.service.parse); this
+   * method receives the already-parsed { columns, rows } and persists them
+   * to tabular_rows + tabular_columns. Runs in a try/catch — failure logs
+   * and returns; section/chunk data is unaffected (Phase 1 retrieval keeps
+   * working). Hard cap at MAX_TABULAR_ROWS_PER_DOC: rows beyond the cap are
+   * dropped, the warn log `tabular.row_cap_exceeded` is emitted, and
+   * KnowledgeItem.metadata gains tabularRowCapExceeded:true.
+   *
+   * Multi-table-per-doc deferred — Reducto can return multiple Table blocks
+   * (e.g. an XLSX with 3 sheets), but we currently persist only the first.
+   * Trigger to revisit: D-05-01-A (first customer with multi-sheet upload).
    *
    * audit-M1 boundary: payloads carry counts + capExceeded flag only — never
    * row content, never column names.
    */
   private async persistTabular(knowledgeItemId: string, input: IngestInput): Promise<void> {
-    const mime = input.mimeType ?? null
-    const buffer = input.tabularSourceBytes ?? null
-    if (!mime || !buffer) return
-    if (!(TABULAR_MIMES as readonly string[]).includes(mime)) return
+    const tables = input.parsedTables ?? null
+    if (!tables || tables.length === 0) return
+    const result = tables[0]
+    if (result.columns.length === 0) return
 
     const startedAt = Date.now()
     const orgIdHash = hashOrgId(input.organizationId)
     try {
-      const result = await extractTabular(buffer, mime as TabularMime)
       const totalRows = result.rows.length
       const capExceeded = totalRows > MAX_TABULAR_ROWS_PER_DOC
       const persistedRows = capExceeded ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC) : result.rows
@@ -908,7 +909,7 @@ ${input.content}`
           rowCount: persistedRows.length,
           columnCount: inferred.length,
           capExceeded,
-          mime,
+          mime: input.mimeType ?? null,
           latencyMs: Date.now() - startedAt,
         }),
       )
@@ -920,7 +921,7 @@ ${input.content}`
           event: 'tabular.tee_failed',
           knowledgeItemId,
           orgIdHash,
-          mime,
+          mime: input.mimeType ?? null,
           sanitisedError: sanitiseEmbedError((err as Error).message),
           latencyMs: Date.now() - startedAt,
         }),
