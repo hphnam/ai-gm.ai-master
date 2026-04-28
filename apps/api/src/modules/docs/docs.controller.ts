@@ -206,6 +206,9 @@ export class DocsController {
     // Text-only formats stay on the existing extractText path.
     let sourceImageBytes: Buffer | null = null
     let sourceImageMime: string | null = null
+    // Plan 05-01 Task 2 — preserve the original CSV/XLSX buffer for the structured-data
+    // tee in IngestService. Other mimes leave this null and skip the tee entirely.
+    let tabularSourceBytes: Buffer | null = null
     try {
       if (isDocsImageMime(file.mimetype)) {
         const result = await extractImage(file.buffer, file.mimetype, this.logger)
@@ -223,6 +226,15 @@ export class DocsController {
         )
       } else {
         content = await extractText(file.buffer, file.mimetype)
+        if (
+          file.mimetype === 'text/csv' ||
+          file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+          // Plan 05-01 Task 2 — keep the original buffer for the structured-data tee.
+          // Buffer.from(file.buffer) clones so multer's underlying memory is detached
+          // before the controller frees the request lifecycle.
+          tabularSourceBytes = Buffer.from(file.buffer)
+        }
       }
     } catch (err) {
       if (err instanceof ExtractError) {
@@ -263,6 +275,9 @@ export class DocsController {
         venueId,
         sourceImageBytes,
         sourceImageMime,
+        // Plan 05-01 Task 2 — threaded to IngestService.persistTabular via enrichInBackground.
+        tabularSourceBytes,
+        mimeType: file.mimetype,
       }
       result = await this.docsService.createStub(enrichInput, org.id)
       setImmediate(() => {

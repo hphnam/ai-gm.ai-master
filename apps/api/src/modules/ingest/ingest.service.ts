@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
 import { Prisma, prisma } from '@gm-ai/database'
 import {
@@ -10,13 +10,23 @@ import {
   KnowledgeMetadataSchema,
   MAX_CONCURRENT_CHUNK_EMBEDS,
   MAX_EMBEDS_PER_DOCUMENT,
+  MAX_TABULAR_ROWS_PER_DOC,
+  TABULAR_MIMES,
   UUID_RE,
   type KnowledgeMetadata,
   type SectionDetectionResult,
+  type TabularMime,
 } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
 import { SectionDetector } from './section-detector'
+import { extractTabular } from '../docs/extractors/tabular-extractor'
+import { inferColumnTypes } from '../tabular/infer-column-types'
+
+function hashOrgId(orgId: string): string {
+  // PII-safe correlation id for log search; sha-256 truncated to 12 hex chars.
+  return createHash('sha256').update(orgId).digest('hex').slice(0, 12)
+}
 
 // Plan 04-02 Task 2 — Prisma 7 Json columns reject raw `null`; must use Prisma.JsonNull
 // sentinel for explicit-null writes. Helper keeps upsert sites readable.
@@ -42,6 +52,11 @@ export type IngestInput = {
   // Plan 01-01 — extractor mime hint for SectionDetector dispatch (CSV row-batch,
   // PPTX slide-marker split, sheet-marker split). Optional; absent → heading regex fallback.
   mimeType?: string | null
+  // Plan 05-01 Task 2 — original CSV/XLSX bytes for the structured-data tee.
+  // Set only when mimeType is in TABULAR_MIMES; otherwise the tee is skipped.
+  // Buffer is consumed by extractTabular() post-section-persistence in a try/catch
+  // so a parse failure cannot poison Phase 1 retrieval.
+  tabularSourceBytes?: Buffer | null
 }
 
 export type IngestResult = {
@@ -144,6 +159,11 @@ export class IngestService implements OnModuleInit {
       input.mimeType ?? null,
       input.organizationId,
     )
+
+    // Plan 05-01 Task 2 — structured-data tee. Runs AFTER section/chunk persistence
+    // in a try/catch so a CSV/XLSX parse failure cannot poison Phase 1 retrieval.
+    // Only fires when both mimeType and tabularSourceBytes are present.
+    await this.persistTabular(id, input)
 
     await this.indexer.upsert({
       organizationId: input.organizationId,
@@ -788,6 +808,124 @@ ${input.content}`
       }
     }
     throw lastErr instanceof Error ? lastErr : new Error('embed_failed')
+  }
+
+  /**
+   * Plan 05-01 Task 2 — structured-data tee. For CSV/XLSX uploads, parses the
+   * original buffer into rows, infers per-column types via majority-vote, and
+   * persists tabular_rows + tabular_columns alongside the existing section/chunk
+   * persistence. Runs in a try/catch — failure logs and returns; section/chunk
+   * data is unaffected (Phase 1 retrieval keeps working). Hard cap at
+   * MAX_TABULAR_ROWS_PER_DOC: rows beyond the cap are dropped, the warn log
+   * `tabular.row_cap_exceeded` is emitted, and KnowledgeItem.metadata gains
+   * tabularRowCapExceeded:true.
+   *
+   * audit-M1 boundary: payloads carry counts + capExceeded flag only — never
+   * row content, never column names.
+   */
+  private async persistTabular(knowledgeItemId: string, input: IngestInput): Promise<void> {
+    const mime = input.mimeType ?? null
+    const buffer = input.tabularSourceBytes ?? null
+    if (!mime || !buffer) return
+    if (!(TABULAR_MIMES as readonly string[]).includes(mime)) return
+
+    const startedAt = Date.now()
+    const orgIdHash = hashOrgId(input.organizationId)
+    try {
+      const result = await extractTabular(buffer, mime as TabularMime)
+      const totalRows = result.rows.length
+      const capExceeded = totalRows > MAX_TABULAR_ROWS_PER_DOC
+      const persistedRows = capExceeded ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC) : result.rows
+
+      const inferred = inferColumnTypes(persistedRows, result.columns)
+
+      await prisma.$transaction(
+        async (tx) => {
+          // Idempotent re-ingest: drop prior rows + columns first.
+          await tx.tabularRow.deleteMany({ where: { docId: knowledgeItemId } })
+          await tx.tabularColumn.deleteMany({ where: { docId: knowledgeItemId } })
+
+          if (inferred.length > 0) {
+            await tx.tabularColumn.createMany({
+              data: inferred.map((c) => ({
+                id: randomUUID(),
+                docId: knowledgeItemId,
+                name: c.name,
+                ordinal: c.ordinal,
+                inferredType: c.inferredType,
+              })),
+            })
+          }
+
+          if (persistedRows.length > 0) {
+            await tx.tabularRow.createMany({
+              data: persistedRows.map((row, idx) => ({
+                id: randomUUID(),
+                docId: knowledgeItemId,
+                rowIndex: idx,
+                data: row as Prisma.InputJsonValue,
+              })),
+            })
+          }
+        },
+        { timeout: 30_000 },
+      )
+
+      if (capExceeded) {
+        // Surface the truncation so the agent can communicate it on aggregate
+        // queries. We read-modify-write the metadata column to preserve any
+        // pre-existing keys (Phase 4 classifier output, Plan 04-01 image flags).
+        const ki = await prisma.knowledgeItem.findUnique({
+          where: { id: knowledgeItemId },
+          select: { metadata: true },
+        })
+        const existing = (ki?.metadata as Record<string, unknown> | null) ?? {}
+        await prisma.knowledgeItem.update({
+          where: { id: knowledgeItemId },
+          data: {
+            metadata: { ...existing, tabularRowCapExceeded: true } as Prisma.InputJsonValue,
+          },
+        })
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'tabular.row_cap_exceeded',
+            knowledgeItemId,
+            orgIdHash,
+            totalRows,
+            persistedRows: persistedRows.length,
+            cap: MAX_TABULAR_ROWS_PER_DOC,
+          }),
+        )
+      }
+
+      this.logger.log(
+        JSON.stringify({
+          level: 'info',
+          event: 'tabular.ingested',
+          knowledgeItemId,
+          orgIdHash,
+          rowCount: persistedRows.length,
+          columnCount: inferred.length,
+          capExceeded,
+          mime,
+          latencyMs: Date.now() - startedAt,
+        }),
+      )
+    } catch (err) {
+      // Fail-soft. Section/chunk path already committed; retrieval still works.
+      this.logger.warn(
+        JSON.stringify({
+          level: 'warn',
+          event: 'tabular.tee_failed',
+          knowledgeItemId,
+          orgIdHash,
+          mime,
+          sanitisedError: sanitiseEmbedError((err as Error).message),
+          latencyMs: Date.now() - startedAt,
+        }),
+      )
+    }
   }
 }
 

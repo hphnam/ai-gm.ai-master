@@ -496,6 +496,10 @@ export class DocsService {
     input: CreateDocRequest & {
       sourceImageBytes?: Buffer | null
       sourceImageMime?: string | null
+      // Plan 05-01 Task 2 — threaded to IngestService.persistTabular for the
+      // structured-data tee. Both fields optional; tee is skipped when either is missing.
+      tabularSourceBytes?: Buffer | null
+      mimeType?: string | null
     },
     orgId: string,
     userId: string | null = null,
@@ -542,6 +546,9 @@ export class DocsService {
         sourceImageMime: input.sourceImageMime ?? null,
         documentTypeId,
         pendingTypeProposal,
+        // Plan 05-01 Task 2 — structured-data tee inputs.
+        mimeType: input.mimeType ?? null,
+        tabularSourceBytes: input.tabularSourceBytes ?? null,
       })
 
       if (classified.kind === 'matched') {
