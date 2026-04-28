@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { ArrowLeft, Camera, CheckSquare, FileText, Hash } from 'lucide-react'
 import type { AudienceRole, ChecklistStep, Schedule } from '@gm-ai/types'
-import { UserMenu } from '@/components/auth/user-menu'
+import { AppShell } from '@/components/shell/app-shell'
+import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
 import { useDoc } from '@/lib/hooks/use-docs'
 import { ApiError } from '@/lib/api-client'
@@ -56,16 +57,20 @@ export function DocDetailBody({ id }: { id: string }) {
   const doc = useDoc(id)
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-4">
-      <header className="flex items-center justify-between border-b pb-3">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/docs">
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            All docs
-          </Link>
-        </Button>
-        <UserMenu />
-      </header>
+    <AppShell>
+      <PageHeader
+        title={doc.data?.title ?? 'Document'}
+        actions={
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/docs">
+              <ArrowLeft className="h-4 w-4" aria-hidden />
+              All docs
+            </Link>
+          </Button>
+        }
+      />
+      <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6">
 
       {doc.isLoading ? (
         <p className="text-sm text-muted-foreground italic">Loading doc…</p>
@@ -206,6 +211,8 @@ export function DocDetailBody({ id }: { id: string }) {
           ) : null}
         </article>
       ) : null}
-    </main>
+        </div>
+      </div>
+    </AppShell>
   )
 }

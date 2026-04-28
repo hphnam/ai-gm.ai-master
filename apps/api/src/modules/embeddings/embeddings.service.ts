@@ -40,4 +40,25 @@ export class EmbeddingsService implements OnModuleInit {
     })
     return response.data!.map((d) => d.embedding!)
   }
+
+  /// Rerank a candidate set against a query using Voyage rerank-lite-1.
+  /// Returns indices into `documents` plus relevance scores, sorted by score desc.
+  /// Indices stay aligned with the caller's array.
+  async rerank(
+    query: string,
+    documents: string[],
+    topK?: number,
+  ): Promise<{ index: number; relevanceScore: number }[]> {
+    if (documents.length === 0) return []
+    const response = await this.client.rerank({
+      model: 'rerank-lite-1',
+      query,
+      documents,
+      topK,
+    })
+    return (response.data ?? []).map((d) => ({
+      index: d.index!,
+      relevanceScore: d.relevanceScore!,
+    }))
+  }
 }

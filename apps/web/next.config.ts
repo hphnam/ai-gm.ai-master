@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  allowedDevOrigins: [
+      "localhost:3000",
+      "local.andpro.digital"
+  ]
 }
 
 export default nextConfig

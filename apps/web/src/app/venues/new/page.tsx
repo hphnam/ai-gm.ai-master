@@ -1,7 +1,11 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { getServerSession } from '@/lib/server-session'
 import { VenueForm } from '@/components/venues/venue-form'
+import { AppShell } from '@/components/shell/app-shell'
+import { PageHeader } from '@/components/shell/page-header'
+import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,19 +14,26 @@ export default async function NewVenuePage() {
   if (!session) redirect('/auth/sign-in?redirect=/venues/new')
 
   return (
-    <main className="mx-auto max-w-lg p-6 space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">New venue</h1>
-        <p className="text-sm text-muted-foreground">
-          Venues scope knowledge, stock, and conversations. You can add more any time.
-        </p>
-      </header>
-      <VenueForm />
-      <footer className="pt-2 text-sm text-muted-foreground">
-        <Link href="/chat" className="underline underline-offset-4 hover:text-foreground">
-          Back to chat
-        </Link>
-      </footer>
-    </main>
+    <AppShell>
+      <PageHeader
+        title="New venue"
+        description="Venues scope knowledge, stock, and conversations."
+        actions={
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/chat">
+              <ArrowLeft className="h-4 w-4" aria-hidden />
+              Back to chat
+            </Link>
+          </Button>
+        }
+      />
+      <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-lg px-4 py-6 sm:px-6">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <VenueForm />
+          </div>
+        </div>
+      </div>
+    </AppShell>
   )
 }

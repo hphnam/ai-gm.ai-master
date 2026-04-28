@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { Prisma, prisma } from '@gm-ai/database'
 import { KnowledgeMetadataSchema, UUID_RE, type KnowledgeMetadata } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
+import { IndexerService } from '../indexer/indexer.service'
 
 // Plan 04-02 Task 2 — Prisma 7 Json columns reject raw `null`; must use Prisma.JsonNull
 // sentinel for explicit-null writes. Helper keeps upsert sites readable.
@@ -39,7 +40,10 @@ export class IngestService implements OnModuleInit {
   private readonly logger = new Logger(IngestService.name)
   private client!: Anthropic
 
-  constructor(private readonly embeddings: EmbeddingsService) {}
+  constructor(
+    private readonly embeddings: EmbeddingsService,
+    private readonly indexer: IndexerService,
+  ) {}
 
   onModuleInit() {
     const apiKey = process.env.ANTHROPIC_API_KEY
@@ -114,6 +118,23 @@ export class IngestService implements OnModuleInit {
         `[${vec.join(',')}]`,
         id,
       )
+    })
+
+    await this.indexer.upsert({
+      organizationId: input.organizationId,
+      venueId: input.venueId ?? null,
+      entityType: 'knowledge_item',
+      entityId: id,
+      embeddingText,
+      precomputedEmbedding: vec,
+      tags: parsed.tags ?? [],
+      kind: typeof parsed.docType === 'string' ? parsed.docType : null,
+      title: input.title ?? null,
+      summary: parsed.summary ?? null,
+      metadata: {
+        documentTypeId: input.documentTypeId ?? null,
+        contentLength: input.content.length,
+      },
     })
 
     return { id, metadata: parsed, aiSummary: parsed.summary ?? null }
@@ -239,6 +260,175 @@ ${input.content}`
       )
     })
 
+    await this.indexer.upsert({
+      organizationId: input.organizationId,
+      venueId: input.venueId ?? null,
+      entityType: 'knowledge_item',
+      entityId: id,
+      embeddingText,
+      precomputedEmbedding: vec,
+      tags: [],
+      kind: null,
+      title: input.title ?? null,
+      summary: null,
+      metadata: {
+        documentTypeId: input.documentTypeId ?? null,
+        contentLength: input.content.length,
+        failsafe: true,
+      },
+    })
+
     return { id, metadata, aiSummary: null }
+  }
+
+  /// Phase C — capture an unanswered question as a pending KnowledgeItem.
+  /// Dedupes by cosine similarity (≥ 0.85) against existing pending gaps in
+  /// the same org+venue scope; on dedup, bumps askCount + appends provenance.
+  async recordGap(input: {
+    question: string
+    tentativeAnswer?: string | null
+    organizationId: string
+    venueId: string | null
+    askedByUserId: string
+    sourceMessageId?: string | null
+  }): Promise<{ id: string; askCount: number; dedupedFromExisting: boolean }> {
+    if (!UUID_RE.test(input.organizationId)) {
+      throw new Error('recordGap: organizationId required and must be a valid UUID')
+    }
+    const question = input.question.trim()
+    if (question.length < 5) throw new Error('recordGap: question too short')
+
+    const [vec] = await this.embeddings.embedDocuments([question])
+    const vectorLiteral = `[${vec.join(',')}]`
+
+    // Look for an existing pending gap in scope. Same-venue OR global (null);
+    // keep the highest-similarity hit if it crosses the dedup threshold.
+    const candidates = await prisma.$queryRawUnsafe<
+      { id: string; metadata: unknown; similarity: number | string }[]
+    >(
+      `
+      SELECT ki.id, ki.metadata, 1 - (ki.embedding <=> $1::vector) AS similarity
+      FROM "knowledge_items" ki
+      WHERE ki.embedding IS NOT NULL
+        AND ki."organizationId" = $2
+        AND ki."answerStatus" = 'pending'
+        AND ($3::text IS NULL OR ki."venueId" IS NULL OR ki."venueId" = $3)
+      ORDER BY ki.embedding <=> $1::vector ASC
+      LIMIT 1
+      `,
+      vectorLiteral,
+      input.organizationId,
+      input.venueId,
+    )
+
+    const top = candidates[0]
+    if (top && Number(top.similarity) >= 0.85) {
+      // Bump existing pending gap.
+      const existingMeta = (top.metadata ?? {}) as Record<string, unknown>
+      const askCount =
+        (typeof existingMeta.askCount === 'number' ? existingMeta.askCount : 1) + 1
+      const askedByList = Array.isArray(existingMeta.askedByUserIds)
+        ? (existingMeta.askedByUserIds as unknown[]).filter(
+            (v): v is string => typeof v === 'string',
+          )
+        : []
+      if (!askedByList.includes(input.askedByUserId)) {
+        askedByList.push(input.askedByUserId)
+      }
+      const sourceList = Array.isArray(existingMeta.sourceMessageIds)
+        ? (existingMeta.sourceMessageIds as unknown[]).filter(
+            (v): v is string => typeof v === 'string',
+          )
+        : []
+      if (input.sourceMessageId && !sourceList.includes(input.sourceMessageId)) {
+        sourceList.push(input.sourceMessageId)
+      }
+      const newMeta = {
+        ...existingMeta,
+        askCount,
+        askedByUserIds: askedByList,
+        sourceMessageIds: sourceList,
+        isGap: true,
+        lastAskedAt: new Date().toISOString(),
+      }
+      await prisma.knowledgeItem.update({
+        where: { id: top.id },
+        data: { metadata: newMeta as object },
+      })
+      this.logger.log(
+        JSON.stringify({
+          event: 'kb_gap.deduped',
+          gapId: top.id,
+          orgId: input.organizationId,
+          askCount,
+          similarity: Number(top.similarity),
+        }),
+      )
+      return { id: top.id, askCount, dedupedFromExisting: true }
+    }
+
+    // Net-new gap.
+    const id = randomUUID()
+    const metadata = {
+      isGap: true,
+      tentativeAnswer: input.tentativeAnswer ?? null,
+      askCount: 1,
+      askedByUserIds: [input.askedByUserId],
+      sourceMessageIds: input.sourceMessageId ? [input.sourceMessageId] : [],
+      firstAskedAt: new Date().toISOString(),
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.knowledgeItem.create({
+        data: {
+          id,
+          organizationId: input.organizationId,
+          venueId: input.venueId,
+          content: question,
+          metadata,
+          aiSummary: null,
+          embeddingText: question,
+          answerStatus: 'pending',
+          // No documentTypeId yet — classifier runs once GM answers.
+        },
+      })
+      await tx.$executeRawUnsafe(
+        `UPDATE "knowledge_items" SET embedding = $1::vector WHERE id = $2`,
+        vectorLiteral,
+        id,
+      )
+    })
+
+    await this.indexer.upsert({
+      organizationId: input.organizationId,
+      venueId: input.venueId,
+      entityType: 'knowledge_item',
+      entityId: id,
+      embeddingText: question,
+      precomputedEmbedding: vec,
+      tags: ['gap', 'pending-answer'],
+      kind: 'gap',
+      title: question.slice(0, 120),
+      summary: input.tentativeAnswer ?? null,
+      metadata: {
+        answerStatus: 'pending',
+        askCount: 1,
+        isGap: true,
+      },
+    })
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'kb_gap.recorded',
+        gapId: id,
+        orgId: input.organizationId,
+        venueId: input.venueId,
+        askedByUserId: input.askedByUserId,
+        questionLength: question.length,
+        hasTentativeAnswer: !!input.tentativeAnswer,
+      }),
+    )
+
+    return { id, askCount: 1, dedupedFromExisting: false }
   }
 }

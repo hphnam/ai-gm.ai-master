@@ -1,15 +1,18 @@
 import { OrganizationSettingsBody } from '@/components/invitations/organization-settings-body'
+import { PageHeader } from '@/components/shell/page-header'
 
 export default function OrganizationSettingsPage() {
   return (
-    <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Organisation settings</h1>
-        <p className="text-sm text-muted-foreground">
-          Invite teammates to your organisation. Only owners and managers can create invitations.
-        </p>
-      </header>
-      <OrganizationSettingsBody />
-    </section>
+    <>
+      <PageHeader
+        title="Organisation"
+        description="Invite teammates. Only owners and managers can create invitations."
+      />
+      <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+          <OrganizationSettingsBody />
+        </div>
+      </div>
+    </>
   )
 }

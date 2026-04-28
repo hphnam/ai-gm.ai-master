@@ -47,6 +47,20 @@ function sanitizeOpenerLine(raw: string): string {
   return out
 }
 
+// Appends follow-up pills to the WhatsApp outbound body as a sanitised bullet
+// list. WhatsApp has no interactive pills in our current Infobip tier, so
+// inline text is the UX bridge — user can copy/type the suggestion back.
+// Later this can upgrade to Infobip interactive reply buttons (max 3).
+function composeOutboundBody(reply: string, followUps: string[]): string {
+  const trimmed = reply.trim()
+  if (!followUps || followUps.length === 0) return trimmed
+  const lines: string[] = [trimmed, '', 'Quick follow-ups:']
+  for (const q of followUps.slice(0, 3)) {
+    lines.push(`• ${sanitizeOpenerLine(q)}`)
+  }
+  return lines.join('\n')
+}
+
 function composeOpenerText(suggestions: ProactiveSuggestion[]): string {
   const intro = 'Hey — quick heads-up before you jump in:'
   const lines: string[] = [intro]
@@ -381,7 +395,10 @@ export class WhatsappService {
 
         const out = await this.adapter.sendText(
           result.from,
-          chatResult.assistantMessage.content,
+          composeOutboundBody(
+            chatResult.assistantMessage.content,
+            chatResult.assistantMessage.followUps,
+          ),
         )
         if (out.ok) {
           this.logger.log('whatsapp.outbound', {

@@ -14,6 +14,11 @@ model Venue {
   address        String?
   type           String
   timezone       String   @default("Europe/London")
+  /// Phase D — structured operational context (layout, fire safety, hours, etc.).
+  /// Shape contracted via VenueProfileSchema in @gm-ai/types. Indexed into
+  /// SearchableEntity on every write so the agent can retrieve "where's the
+  /// fire escape" or "what's the alarm code policy" semantically.
+  profile        Json     @default("{}")
   organizationId String
   createdAt      DateTime @default(now())
 
@@ -23,6 +28,7 @@ model Venue {
   mockPurchaseOrders MockPurchaseOrder[]
   contacts           VenueContact[]
   chatConversations  ChatConversation[]
+  incidentLogs       IncidentLog[]
 
   @@index([organizationId])
 }
@@ -109,12 +115,15 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members        OrganizationMember[]
-  invitations    Invitation[]
-  venues         Venue[]
-  knowledgeItems KnowledgeItem[]
-  documentTypes  DocumentType[]
-  checklists     Checklist[]
+  members            OrganizationMember[]
+  invitations        Invitation[]
+  venues             Venue[]
+  knowledgeItems     KnowledgeItem[]
+  documentTypes      DocumentType[]
+  checklists         Checklist[]
+  searchableEntities SearchableEntity[]
+  incidentLogs       IncidentLog[]
+  searchAnalytics    SearchAnalytics[]
 
   @@index([slug])
   @@map("organizations")
@@ -127,6 +136,9 @@ model OrganizationMember {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           String
+  /// Phase F — lazy GM profile cache (gmProfile sub-object: summary,
+  /// likelyShiftRole, commonTopics, languageHints, refreshedAt, sourceMessageCount).
+  metadata       Json         @default("{}")
   createdAt      DateTime     @default(now())
 
   @@unique([userId, organizationId])
@@ -267,6 +279,15 @@ model KnowledgeItem {
   //   shape: { name, description, schema, confidence }
   documentTypeId      String?
   pendingTypeProposal Json?
+  // Async enrichment state. Uploads create the row with 'processing', the
+  // background pipeline flips to 'ready' on success or 'failed' on error.
+  // Existing rows default to 'ready' so pre-async history stays visible.
+  processingStatus String   @default("ready")
+  processingError  String?
+  /// Phase C — knowledge gap capture. 'answered' = full Q+A landed (default
+  /// for all pre-Phase-C rows). 'pending' = question captured by record_kb_gap,
+  /// awaiting GM answer in the dashboard.
+  answerStatus     String   @default("answered")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -368,6 +389,55 @@ model ChecklistStepCompletion {
   @@map("checklist_step_completions")
 }
 
+/// Phase H — search analytics. One row per find_knowledge call. Surfaces
+/// top no-data queries via the /docs/analytics/no-data-queries endpoint so
+/// the GM can see what staff ask that the KB can't answer.
+model SearchAnalytics {
+  id             String   @id @default(uuid())
+  organizationId String
+  venueId        String?
+  userId         String?
+  query          String
+  /// 'hit' | 'no-data' | 'error'
+  outcome        String
+  hitCount       Int      @default(0)
+  topSimilarity  Float?
+  reformulated   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, outcome, createdAt(sort: Desc)])
+  @@map("search_analytics")
+}
+
+/// Phase G — agent-driven incident captures. Created by log_incident tool
+/// from incident-mode conversations; visible in the GM dashboard as a triage
+/// surface. Severity comes from the agent's classification or user input.
+model IncidentLog {
+  id              String   @id @default(uuid())
+  organizationId  String
+  venueId         String
+  loggedByUserId  String?
+  sourceMessageId String?
+  /// 'minor' | 'major' | 'critical'
+  severity        String   @default("minor")
+  summary         String
+  /// Free-form payload: who, when, what, escalated-to, etc.
+  details         Json     @default("{}")
+  /// 'open' | 'acknowledged' | 'closed'
+  status          String   @default("open")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  venue        Venue        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([venueId, createdAt(sort: Desc)])
+  @@map("incident_logs")
+}
+
 model VenueContact {
   id                 String  @id @default(uuid())
   venueId            String
@@ -386,6 +456,16 @@ model ChatConversation {
   venueId   String
   userId    String?
   channel   String   @default("web")
+  /// Phase E — conversation mode set by classifier on first user message.
+  /// 'default' | 'incident' | 'handover' | 'training'.
+  mode      String   @default("default")
+  /// Phase F — Haiku-generated summary of older turns once a thread crosses
+  /// COMPACT_THRESHOLD. NULL until first compaction.
+  compactionSummary       String?
+  /// The last ChatMessage.id included in compactionSummary. Older messages
+  /// (those <= this id by createdAt order) are dropped from the model context
+  /// and replaced by the summary. New messages after this id stay verbatim.
+  compactionUpToMessageId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -402,6 +482,9 @@ model ChatMessage {
   content          String
   retrievedItemIds String[]
   toolCallLog      Json     @default("[]")
+  followUps        String[] @default([])
+  reasoning        String?
+  parts            Json?
   createdAt        DateTime @default(now())
 
   conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -419,6 +502,48 @@ model MessageFeedback {
   message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@map("message_feedback")
+}
+
+/// Phase A1 — universal vector + tag index across heterogeneous entities.
+/// One row per searchable unit: a KnowledgeItem (subKey ''), a Checklist step
+/// (subKey = step index), a VenueContact, a MockSupplier, a Venue profile, or
+/// an assistant ChatMessage. Source entity remains source of truth; this table
+/// is purely a denormalised retrieval index.
+model SearchableEntity {
+  id             String   @id @default(uuid())
+  organizationId String
+  venueId        String?
+
+  /// 'knowledge_item' | 'checklist_step' | 'venue_contact' | 'mock_supplier' | 'venue_profile' | 'chat_message'
+  entityType String
+  /// Source-table id (no Prisma relation — heterogeneous targets).
+  entityId String
+  /// Sub-identifier within an entity (e.g. checklist step index). '' = whole-entity row.
+  subKey String @default("")
+
+  embedding     Unsupported("vector(1024)")?
+  embeddingText String
+
+  /// GIN-indexed for tag filtering at retrieval time.
+  tags String[] @default([])
+  /// Entity-specific subkind: docType.kind, contact.role, supplier category, etc.
+  kind    String?
+  title   String?
+  summary String?
+
+  /// Free-form payload: source-specific fields the retrieval result wants to surface.
+  metadata Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([entityType, entityId, subKey])
+  @@index([organizationId, entityType])
+  @@index([organizationId, venueId])
+  @@index([tags], type: Gin)
+  @@map("searchable_entities")
 }
 
 model ReTagQueueItem {

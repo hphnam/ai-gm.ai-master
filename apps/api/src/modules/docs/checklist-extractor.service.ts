@@ -25,6 +25,7 @@ import {
 } from '@gm-ai/types'
 import { z } from 'zod'
 import { sanitiseError } from '../../common/sanitise-error'
+import { IndexerService } from '../indexer/indexer.service'
 
 const EXTRACTOR_MAX_CONTENT_CHARS = 30_000
 const EXTRACTOR_MAX_TOKENS = 2048
@@ -113,6 +114,8 @@ export type ChecklistExtractInput = {
 export class ChecklistExtractorService implements OnModuleInit {
   private readonly logger = new Logger(ChecklistExtractorService.name)
   private client!: Anthropic
+
+  constructor(private readonly indexer: IndexerService) {}
 
   onModuleInit() {
     const apiKey = process.env.ANTHROPIC_API_KEY
@@ -307,6 +310,50 @@ export class ChecklistExtractorService implements OnModuleInit {
         }),
       )
 
+      // Phase A1 — per-step indexing into SearchableEntity. Each step becomes
+      // its own retrieval target so "what's step 3 of the closing procedure"
+      // hits the actual step row, not just the parent doc. Failures here are
+      // soft — checklist extraction itself already succeeded.
+      const venueId = await this.lookupVenueId(input.knowledgeItemId)
+      const cadenceTag = schedule.cadence
+      const indexJobs = normalized.map((step) =>
+        this.indexer
+          .upsert({
+            organizationId: input.orgId,
+            venueId,
+            entityType: 'checklist_step',
+            entityId: checklist.id,
+            subKey: String(step.index),
+            embeddingText: `${parsed.title} — step ${step.index + 1}: ${step.text}`,
+            tags: [parsed.title, cadenceTag].filter((t): t is string => !!t),
+            kind: step.kind,
+            title: `${parsed.title} — step ${step.index + 1}`,
+            summary: step.text,
+            metadata: {
+              checklistId: checklist.id,
+              knowledgeItemId: input.knowledgeItemId,
+              stepIndex: step.index,
+              stepKind: step.kind,
+              required: step.required,
+              cadence: cadenceTag,
+            },
+          })
+          .catch((err) => {
+            this.logger.warn(
+              JSON.stringify({
+                level: 'warn',
+                event: 'docs.checklist_step_index_failed',
+                orgId: input.orgId,
+                knowledgeItemId: input.knowledgeItemId,
+                checklistId: checklist.id,
+                stepIndex: step.index,
+                error: sanitiseError(err),
+              }),
+            )
+          }),
+      )
+      await Promise.all(indexJobs)
+
       return {
         id: checklist.id,
         knowledgeItemId: checklist.knowledgeItemId,
@@ -332,6 +379,14 @@ export class ChecklistExtractorService implements OnModuleInit {
     } finally {
       releaseSlot()
     }
+  }
+
+  private async lookupVenueId(knowledgeItemId: string): Promise<string | null> {
+    const ki = await prisma.knowledgeItem.findUnique({
+      where: { id: knowledgeItemId },
+      select: { venueId: true },
+    })
+    return ki?.venueId ?? null
   }
 }
 

@@ -1,14 +1,31 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger } from '@nestjs/common'
 import { z } from 'zod'
 import { prisma } from '@gm-ai/database'
-import { TOOL_DEFINITIONS } from '@gm-ai/types'
+import {
+  type ImagePart,
+  type ModelMessage,
+  type StreamTextResult,
+  type TextPart,
+  type ToolSet,
+} from 'ai'
+import { VenueProfileSchema } from '@gm-ai/types'
 import { AdaptationService } from '../adaptation/adaptation.service'
-import { ToolDispatcher } from './tool-dispatcher'
-import { CHAT_SYSTEM_PROMPT } from './system-prompt'
+import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
+import {
+  buildGmAgent,
+  type AgentMode,
+  type VenueContactSummary,
+  type VenueProfileContext,
+} from './gm-agent'
+import {
+  ConversationCompactorService,
+  type CompactableMessage,
+} from './conversation-compactor.service'
+import { ConversationModeService } from './conversation-mode.service'
+import { detectEmergency } from './emergency-detector'
+import { pickTier } from './tier-router'
+import { UserProfileService } from './user-profile.service'
 
-const MAX_ROUNDS = 6
-const MAX_TOKENS = 2048
 const MAX_USER_MESSAGE_CHARS = 8000
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -40,27 +57,145 @@ export type ToolCallLogEntry = {
 
 export type SendMessageResult = {
   conversationId: string
-  assistantMessage: { id: string; content: string }
+  assistantMessage: { id: string; content: string; followUps: string[] }
   toolCallLog: ToolCallLogEntry[]
   retrievedItemIds: string[]
 }
 
-type AnthropicMsg = Anthropic.Messages.MessageParam
-
 @Injectable()
-export class ChatService implements OnModuleInit {
+export class ChatService {
   private readonly logger = new Logger(ChatService.name)
-  private client!: Anthropic
 
   constructor(
     private readonly dispatcher: ToolDispatcher,
     private readonly adaptation: AdaptationService,
+    private readonly modeClassifier: ConversationModeService,
+    private readonly userProfile: UserProfileService,
+    private readonly compactor: ConversationCompactorService,
   ) {}
 
-  onModuleInit() {
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set')
-    this.client = new Anthropic({ apiKey })
+  /// Phase F — fetch (and lazily refresh) the user's GM profile summary for
+  /// injection into prompt context. Soft-fails to null so chat never blocks.
+  private async getUserProfileSummary(
+    userId: string,
+    orgId: string,
+  ): Promise<string | null> {
+    try {
+      const profile = await this.userProfile.getOrRefresh(userId, orgId)
+      if (!profile) return null
+      const parts: string[] = []
+      if (profile.summary) parts.push(profile.summary)
+      if (profile.likelyShiftRole && profile.likelyShiftRole !== 'unknown') {
+        parts.push(`likely role: ${profile.likelyShiftRole}`)
+      }
+      if (profile.commonTopics.length > 0) {
+        parts.push(`common topics: ${profile.commonTopics.join(', ')}`)
+      }
+      if (profile.languageHints) parts.push(`style: ${profile.languageHints}`)
+      return parts.length > 0 ? parts.join(' · ') : null
+    } catch {
+      return null
+    }
+  }
+
+  /// Phase E — resolve the conversation mode. Persisted on ChatConversation.
+  /// Hot path: stored mode if non-default, else regex-only sync classifier.
+  /// Haiku fallback runs in the background (fire-and-forget) — its result
+  /// persists for the NEXT turn so we never block a user-perceived send.
+  private async resolveConversationMode(
+    conversationId: string,
+    firstUserMessage: string | null,
+  ): Promise<AgentMode> {
+    const existing = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: { mode: true },
+    })
+    const stored = existing?.mode
+    if (stored && stored !== 'default') {
+      return stored as AgentMode
+    }
+    if (!firstUserMessage) return (stored as AgentMode) ?? 'default'
+
+    // Fast path: regex-only.
+    const syncMatch = this.modeClassifier.classifySync(firstUserMessage)
+    if (syncMatch && syncMatch !== 'default') {
+      await prisma.chatConversation
+        .update({ where: { id: conversationId }, data: { mode: syncMatch } })
+        .catch(() => undefined)
+      return syncMatch
+    }
+
+    // No sync match → default for this turn, but fire Haiku classification in
+    // the background so the persisted mode is correct on subsequent turns.
+    void this.modeClassifier
+      .classify(firstUserMessage)
+      .then((classified) => {
+        if (classified === 'default') return
+        return prisma.chatConversation
+          .update({ where: { id: conversationId }, data: { mode: classified } })
+          .catch(() => undefined)
+      })
+      .catch(() => undefined)
+    return 'default'
+  }
+
+  /// Phase D — hydrate venue profile + emergency-flagged contacts so the
+  /// agent has spatial / safety context on every turn without spending a
+  /// tool call. Cheap (one Postgres roundtrip per send).
+  private async buildVenueContext(venue: {
+    id: string
+    name: string
+    timezone: string
+    address: string | null
+    type: string
+    profile: unknown
+  }): Promise<{
+    id: string
+    name: string
+    timezone: string
+    address: string | null
+    type: string
+    profile: VenueProfileContext | null
+    contacts: VenueContactSummary[]
+  }> {
+    const parsed = VenueProfileSchema.safeParse(venue.profile ?? {})
+    const profile: VenueProfileContext | null = parsed.success
+      ? {
+          layoutNotes: parsed.data.layoutNotes ?? null,
+          fireEscapes: parsed.data.fireEscapes ?? null,
+          firstAidPoints: parsed.data.firstAidPoints ?? null,
+          keySafePolicy: parsed.data.keySafePolicy ?? null,
+          alarmPolicy: parsed.data.alarmPolicy ?? null,
+          openingHours: parsed.data.openingHours ?? null,
+          what3words: parsed.data.what3words ?? null,
+          accessibilityNotes: parsed.data.accessibilityNotes ?? null,
+          deliveryNotes: parsed.data.deliveryNotes ?? null,
+        }
+      : null
+
+    const contactRows = await prisma.venueContact.findMany({
+      where: { venueId: venue.id },
+      select: {
+        name: true,
+        role: true,
+        phone: true,
+        email: true,
+        isEmergencyContact: true,
+      },
+      // Cap at 12 — emergency contacts first, then the rest by role.
+      orderBy: [{ isEmergencyContact: 'desc' }, { role: 'asc' }, { name: 'asc' }],
+      take: 12,
+    })
+
+    return {
+      id: venue.id,
+      name: venue.name,
+      timezone: venue.timezone,
+      address: venue.address,
+      type: venue.type,
+      profile,
+      contacts: contactRows,
+    }
   }
 
   async sendMessage(
@@ -68,6 +203,7 @@ export class ChatService implements OnModuleInit {
     orgId: string,
     userId: string,
     userRole: string = 'staff',
+    userIdentity: { name: string | null; email: string } = { name: null, email: '' },
   ): Promise<SendMessageResult> {
     const parsed = SendMessageInputSchema.safeParse(rawInput)
     if (!parsed.success) {
@@ -119,8 +255,9 @@ export class ChatService implements OnModuleInit {
           conversationId: stubConversationId,
           role: 'assistant',
           content: '[PROBE_STUB_REPLY] Stubbed assistant response for probe testing.',
+          followUps: [],
         },
-        select: { id: true, content: true },
+        select: { id: true, content: true, followUps: true },
       })
       return {
         conversationId: stubConversationId,
@@ -132,7 +269,14 @@ export class ChatService implements OnModuleInit {
 
     const venue = await prisma.venue.findFirst({
       where: { id: input.venueId, organizationId: orgId },
-      select: { id: true, name: true },
+      select: {
+        id: true,
+        name: true,
+        timezone: true,
+        address: true,
+        type: true,
+        profile: true,
+      },
     })
     if (!venue) throw new Error(`venue ${input.venueId} not found`)
 
@@ -182,149 +326,152 @@ export class ChatService implements OnModuleInit {
       },
     })
 
-    const history = await prisma.chatMessage.findMany({
+    const historyRaw = await prisma.chatMessage.findMany({
       where: { conversationId },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
-      select: { role: true, content: true },
+      select: { id: true, role: true, content: true },
     })
-    const messages: AnthropicMsg[] = history.map((m) => ({
-      role: m.role === 'assistant' ? 'assistant' : 'user',
+    // Anthropic rejects empty text blocks with 400. Aborted or failed prior
+    // turns can leave assistant rows with empty content — filter them out.
+    const history: CompactableMessage[] = historyRaw
+      .filter((m) => m.content && m.content.trim().length > 0)
+      .map((m) => ({
+        id: m.id,
+        role: m.role === 'assistant' ? 'assistant' : ('user' as const),
+        content: m.content,
+      }))
+
+    const compaction = await this.compactor.compactIfNeeded(conversationId, history)
+    const messages: ModelMessage[] = compaction.recent.map((m) => ({
+      role: m.role,
       content: m.content,
     }))
 
-    // 03-03 Task 3: replace the last user message with a content-block array
-    // containing text + image when an attachment is present. History mapping above
-    // used the placeholder string which is fine for DB/forensics but not for Claude.
+    // When an image attachment is present, replace the last user message with
+    // a multi-part array (text + AI SDK ImagePart) so the model sees the image
+    // rather than the DB placeholder.
     if (input.attachment && messages.length > 0) {
       const last = messages[messages.length - 1]
       if (last.role === 'user') {
-        last.content = [
+        const parts: Array<TextPart | ImagePart> = [
           { type: 'text', text: input.userMessage || 'User sent an image.' },
           {
             type: 'image',
-            source: {
-              type: 'base64',
-              media_type: input.attachment.mediaType,
-              data: input.attachment.base64,
-            },
+            image: input.attachment.base64,
+            mediaType: input.attachment.mediaType,
           },
-        ] as unknown as Anthropic.Messages.ContentBlockParam[]
+        ]
+        last.content = parts
       }
     }
 
-    const contextualSystemPrompt = `${CHAT_SYSTEM_PROMPT}\n\n<current_context>\nvenueId: ${venue.id}\nvenueName: ${venue.name}\nuserRole: ${userRole}\n</current_context>`
-
     const toolCallLog: ToolCallLogEntry[] = []
     const retrievedItemIds = new Set<string>()
-    let finalText = ''
+    let followUps: string[] = []
+    let round = 0
+    const startedAt = Date.now()
 
-    try {
-      for (let round = 1; round <= MAX_ROUNDS; round++) {
-        const roundStart = Date.now()
-        const response = await this.client.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: MAX_TOKENS,
-          system: contextualSystemPrompt,
-          tools: TOOL_DEFINITIONS as unknown as Anthropic.Messages.Tool[],
-          messages,
-        })
+    const agentMode = await this.resolveConversationMode(conversationId, input.userMessage)
 
-        this.logger.log(
-          JSON.stringify({
-            event: 'chat.claude_call',
-            conversationId,
-            round,
-            stop_reason: response.stop_reason,
-            input_tokens: response.usage?.input_tokens ?? null,
-            output_tokens: response.usage?.output_tokens ?? null,
-            latency_ms: Date.now() - roundStart,
-          }),
-        )
-
-        messages.push({ role: 'assistant', content: response.content })
-
-        if (response.stop_reason !== 'tool_use') {
-          const textBlocks = response.content.filter(
-            (b): b is Anthropic.Messages.TextBlock => b.type === 'text',
-          )
-          finalText = textBlocks.map((b) => b.text).join('\n').trim()
-          if (!finalText) {
-            this.logger.warn(
-              JSON.stringify({
-                event: 'chat.empty_assistant_text',
-                conversationId,
-                stop_reason: response.stop_reason,
-              }),
-            )
-            finalText = "I couldn't produce an answer — please retry or rephrase."
-          }
-          break
-        }
-
-        const toolUseBlocks = response.content.filter(
-          (b): b is Anthropic.Messages.ToolUseBlock => b.type === 'tool_use',
-        )
-
-        const results = await Promise.all(
-          toolUseBlocks.map(async (block) => ({
-            block,
-            result: await this.dispatcher.dispatch(block.name, block.input, {
-              orgId,
-              userId,
-              userRole,
-            }),
-          })),
-        )
-
-        for (const { block, result } of results) {
+    const agent = buildGmAgent({
+      dispatcher: this.dispatcher,
+      ctx: { orgId, userId, userRole },
+      venueContext: await this.buildVenueContext(venue),
+      mode: agentMode,
+      tier: pickTier(input.userMessage, agentMode),
+      priorSummary: compaction.summary,
+      emergencyAdvisory: (() => {
+        const e = detectEmergency(input.userMessage)
+        return e.triggered ? { matched: e.matched ?? '' } : null
+      })(),
+      userContext: {
+        name: userIdentity.name,
+        email: userIdentity.email,
+        profileSummary: await this.getUserProfileSummary(userId, orgId),
+      },
+      onStepFinish: (step) => {
+        round++
+        for (const call of step.toolCalls ?? []) {
           toolCallLog.push({
             round,
-            toolUseId: block.id,
-            tool: block.name,
-            input: block.input,
-            result,
+            toolUseId: call.toolCallId,
+            tool: call.toolName,
+            input: call.input ?? null,
+            result: null,
           })
-          if (block.name === 'find_knowledge' && result.ok) {
-            const hits = result.data as Array<{ id: string }>
-            for (const h of hits) retrievedItemIds.add(h.id)
+        }
+        for (const tr of step.toolResults ?? []) {
+          const entry = toolCallLog.find(
+            (l) => l.toolUseId === tr.toolCallId && l.result === null,
+          )
+          if (entry) entry.result = tr.output
+
+          if (tr.toolName === 'find_knowledge') {
+            const output = tr.output as { ok?: boolean; data?: unknown } | null
+            if (output?.ok && Array.isArray(output.data)) {
+              for (const hit of output.data as Array<{ id?: string }>) {
+                if (hit?.id) retrievedItemIds.add(hit.id)
+              }
+            }
+          }
+
+          if (tr.toolName === 'suggest_followups') {
+            const output = tr.output as {
+              ok?: boolean
+              data?: { followUps?: string[] }
+            } | null
+            if (output?.ok && Array.isArray(output.data?.followUps)) {
+              followUps = output.data!.followUps!.slice(0, 3)
+            }
           }
         }
+      },
+    })
 
-        messages.push({
-          role: 'user',
-          content: results.map(({ block, result }) => ({
-            type: 'tool_result',
-            tool_use_id: block.id,
-            content: JSON.stringify(result),
-            is_error: !result.ok && result.reason === 'error',
-          })) as unknown as Anthropic.Messages.ToolResultBlockParam[],
-        })
+    let finalText = ''
+    let partsJson: object | null = null
+    let reasoningText: string | undefined
 
-        if (round === MAX_ROUNDS) {
-          this.logger.warn(
-            JSON.stringify({
-              event: 'chat.tool_loop_capped',
-              conversationId,
-              rounds: MAX_ROUNDS,
-            }),
-          )
-          finalText =
-            'I hit the tool-use round limit while working on your question — can you narrow it down?'
-        }
+    try {
+      const result = await agent.generate({ messages })
+      finalText = (result.text ?? '').trim()
+      reasoningText = result.reasoningText ?? undefined
+      const lastAssistant = [...result.response.messages]
+        .reverse()
+        .find((m) => m.role === 'assistant')
+      if (lastAssistant) partsJson = lastAssistant.content as unknown as object
+      if (!finalText) {
+        this.logger.warn(
+          JSON.stringify({
+            event: 'chat.empty_assistant_text',
+            conversationId,
+            finishReason: result.finishReason,
+          }),
+        )
+        finalText = "I couldn't produce an answer — please retry or rephrase."
       }
     } catch (err) {
-      const message = (err as Error).message ?? 'unknown anthropic error'
       this.logger.error(
         JSON.stringify({
-          event: 'chat.anthropic_error',
+          event: 'chat.agent_error',
           conversationId,
-          rounds_completed:
-            toolCallLog.length > 0 ? Math.max(...toolCallLog.map((e) => e.round)) : 0,
-          message,
+          rounds_completed: round,
+          message: (err as Error).message ?? 'unknown agent error',
         }),
       )
       finalText = 'I hit an error calling the model — please retry.'
     }
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'chat.sendmessage_finished',
+        conversationId,
+        rounds: round,
+        latency_ms: Date.now() - startedAt,
+        followUpCount: followUps.length,
+        hasReasoning: Boolean(reasoningText),
+      }),
+    )
 
     const assistantMessage = await prisma.chatMessage.create({
       data: {
@@ -333,8 +480,11 @@ export class ChatService implements OnModuleInit {
         content: finalText,
         retrievedItemIds: Array.from(retrievedItemIds),
         toolCallLog: toolCallLog as unknown as object,
+        followUps,
+        reasoning: reasoningText ?? null,
+        parts: (partsJson ?? undefined) as object | undefined,
       },
-      select: { id: true, content: true },
+      select: { id: true, content: true, followUps: true },
     })
 
     await this.adaptation.captureRetrievalOutcome({
@@ -351,27 +501,347 @@ export class ChatService implements OnModuleInit {
     }
   }
 
-  async listRecent(
+  async deleteConversation(
+    conversationId: string,
     orgId: string,
     userId: string,
     venueId: string,
-    limit = 20,
-  ): Promise<Array<{ id: string; venueId: string; lastMessageAt: string }>> {
+  ): Promise<void> {
+    const conv = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: {
+        id: true,
+        venueId: true,
+        userId: true,
+        venue: { select: { organizationId: true } },
+      },
+    })
+    if (
+      !conv ||
+      conv.venueId !== venueId ||
+      conv.venue.organizationId !== orgId ||
+      (conv.userId !== null && conv.userId !== userId)
+    ) {
+      throw new Error(`conversation ${conversationId} not found`)
+    }
+    await prisma.chatConversation.delete({ where: { id: conversationId } })
+  }
+
+  async listRecent(
+    orgId: string,
+    userId: string,
+    venueId: string | undefined,
+    limit = 40,
+  ): Promise<
+    Array<{
+      id: string
+      venueId: string
+      venueName: string
+      lastMessageAt: string
+      preview: string | null
+    }>
+  > {
     const safeLimit = Math.max(1, Math.min(100, limit))
     const rows = await prisma.chatConversation.findMany({
       where: {
-        venueId,
         userId,
         venue: { organizationId: orgId },
+        ...(venueId ? { venueId } : {}),
       },
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
       take: safeLimit,
-      select: { id: true, venueId: true, updatedAt: true },
+      select: {
+        id: true,
+        venueId: true,
+        updatedAt: true,
+        venue: { select: { name: true } },
+        messages: {
+          where: { role: 'user' },
+          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+          take: 1,
+          select: { content: true },
+        },
+      },
     })
     return rows.map((r) => ({
       id: r.id,
       venueId: r.venueId,
+      venueName: r.venue.name,
       lastMessageAt: r.updatedAt.toISOString(),
+      preview: r.messages[0]?.content ? truncate(r.messages[0].content, 80) : null,
     }))
   }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Streaming path — Vercel AI SDK streamText + tool loop.
+  // Used by the web /chat UI; WhatsApp stays on sendMessage() above.
+  // ─────────────────────────────────────────────────────────────────
+  async prepareStream(params: {
+    venueId: string
+    conversationId: string | undefined
+    userText: string
+    orgId: string
+    userId: string
+    userRole: string
+    userIdentity?: { name: string | null; email: string }
+    abortSignal?: AbortSignal
+  }): Promise<{
+    conversationId: string
+    assistantMessageId: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    result: StreamTextResult<ToolSet, any>
+  }> {
+    const venue = await prisma.venue.findFirst({
+      where: { id: params.venueId, organizationId: params.orgId },
+      select: {
+        id: true,
+        name: true,
+        timezone: true,
+        address: true,
+        type: true,
+        profile: true,
+      },
+    })
+    if (!venue) throw new Error(`venue ${params.venueId} not found`)
+
+    // Client-first conversation ids: the web UI generates the UUID the instant
+    // the user clicks "New chat" so the URL and state are stable from frame 0.
+    // If the id exists, we validate ownership; if not, we create with that id
+    // (idempotent upsert keyed on the UUID).
+    const conversationId = params.conversationId ?? crypto.randomUUID()
+    const existingConv = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: { id: true, venueId: true, userId: true },
+    })
+    this.logger.log(
+      JSON.stringify({
+        event: 'chat.prepare_stream.upsert',
+        conversationId,
+        providedByClient: params.conversationId != null,
+        existed: existingConv != null,
+      }),
+    )
+    if (existingConv) {
+      if (existingConv.venueId !== venue.id) {
+        throw new Error(
+          `conversation ${conversationId} does not belong to venue ${venue.id}`,
+        )
+      }
+      if (existingConv.userId && existingConv.userId !== params.userId) {
+        throw new Error(`conversation ${conversationId} belongs to another user`)
+      }
+    } else {
+      await prisma.chatConversation.create({
+        data: {
+          id: conversationId,
+          venueId: venue.id,
+          channel: 'web',
+          userId: params.userId,
+        },
+      })
+    }
+
+    // Persist user message BEFORE streaming starts so it survives disconnects.
+    await prisma.chatMessage.create({
+      data: {
+        conversationId,
+        role: 'user',
+        content: params.userText,
+        retrievedItemIds: [],
+        toolCallLog: [],
+      },
+    })
+
+    // Pre-allocate the assistant message UUID so the streamed UIMessage.id on
+    // the client matches the persisted DB row. Without this the AI SDK assigns
+    // its own nanoid, which then fails UUID validation on /feedback.
+    const assistantMessageId = crypto.randomUUID()
+
+    // Load full history (includes the just-persisted user message) and convert
+    // to AI SDK ModelMessage[]. We drop tool-call reconstruction — prior turns
+    // are shown to the model as plain text (same as the non-streaming path).
+    const streamHistoryRaw = await prisma.chatMessage.findMany({
+      where: { conversationId },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      select: { id: true, role: true, content: true },
+    })
+    // Anthropic rejects empty text blocks with 400 ("text content blocks must
+    // be non-empty"). Aborted or failed prior turns can leave assistant rows
+    // with empty content — filter them out before sending to the model.
+    const streamHistory: CompactableMessage[] = streamHistoryRaw
+      .filter((m) => m.content && m.content.trim().length > 0)
+      .map((m) => ({
+        id: m.id,
+        role: m.role === 'assistant' ? 'assistant' : ('user' as const),
+        content: m.content,
+      }))
+    const streamCompaction = await this.compactor.compactIfNeeded(
+      conversationId,
+      streamHistory,
+    )
+    const modelMessages: ModelMessage[] = streamCompaction.recent.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }))
+
+    const ctx: DispatchContext = {
+      orgId: params.orgId,
+      userId: params.userId,
+      userRole: params.userRole,
+    }
+
+    // First user message in this thread for mode classification (if not already set).
+    const firstUserMessage =
+      modelMessages.find((m) => m.role === 'user' && typeof m.content === 'string')?.content ??
+      null
+    const agentMode = await this.resolveConversationMode(
+      conversationId,
+      typeof firstUserMessage === 'string' ? firstUserMessage : null,
+    )
+
+    const retrievedItemIds = new Set<string>()
+    // Captured follow-ups from the terminal `suggest_followups` tool. The
+    // tool's execute() returns the input so we can observe it here.
+    let followUps: string[] = []
+    // Full tool call log for persistence + adaptation loop.
+    const toolCallLog: ToolCallLogEntry[] = []
+    let round = 0
+    const startedAt = Date.now()
+
+    // Agentic primary: ToolLoopAgent with adaptive reasoning + sequential
+    // tool use + terminal suggest_followups tool. Stop conditions: 20 steps or
+    // a successful save_knowledge_doc (destructive terminal).
+    const agent = buildGmAgent({
+      dispatcher: this.dispatcher,
+      ctx,
+      venueContext: await this.buildVenueContext(venue),
+      mode: agentMode,
+      tier: pickTier(params.userText, agentMode),
+      priorSummary: streamCompaction.summary,
+      emergencyAdvisory: (() => {
+        const e = detectEmergency(params.userText)
+        return e.triggered ? { matched: e.matched ?? '' } : null
+      })(),
+      userContext: {
+        ...(params.userIdentity ?? { name: null, email: '' }),
+        profileSummary: await this.getUserProfileSummary(params.userId, params.orgId),
+      },
+      onStepFinish: (step) => {
+        round++
+        for (const call of step.toolCalls ?? []) {
+          toolCallLog.push({
+            round,
+            toolUseId: call.toolCallId,
+            tool: call.toolName,
+            input: call.input ?? null,
+            result: null,
+          })
+        }
+        for (const tr of step.toolResults ?? []) {
+          // Backfill the matching log entry with the tool result so
+          // persistence carries input + output together.
+          const entry = toolCallLog.find(
+            (l) => l.toolUseId === tr.toolCallId && l.result === null,
+          )
+          if (entry) entry.result = tr.output
+
+          if (tr.toolName === 'find_knowledge') {
+            const output = tr.output as { ok?: boolean; data?: unknown } | null
+            if (output?.ok && Array.isArray(output.data)) {
+              for (const hit of output.data as Array<{ id?: string }>) {
+                if (hit?.id) retrievedItemIds.add(hit.id)
+              }
+            }
+          }
+
+          if (tr.toolName === 'suggest_followups') {
+            const output = tr.output as {
+              ok?: boolean
+              data?: { followUps?: string[] }
+            } | null
+            if (output?.ok && Array.isArray(output.data?.followUps)) {
+              followUps = output.data!.followUps!.slice(0, 3)
+            }
+          }
+        }
+      },
+      onFinish: async (event) => {
+        // Client closed the tab mid-stream: skip persistence so a half-written
+        // assistant turn doesn't land as a committed-looking row in history.
+        if (params.abortSignal?.aborted) {
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.stream_aborted',
+              conversationId,
+              rounds: round,
+              latency_ms: Date.now() - startedAt,
+              finishReason: event.finishReason,
+            }),
+          )
+          return
+        }
+
+        const text = event.text ?? ''
+        const reasoningText = (event as { reasoningText?: string }).reasoningText
+        // Never persist an empty assistant row — Anthropic rejects those as
+        // history on the next turn. Fall back to a visible placeholder.
+        const storedContent =
+          text.trim() || "I couldn't produce an answer — please retry or rephrase."
+
+        // Persist the full UIMessage-shaped parts snapshot for faithful replay
+        // (reasoning blocks, tool chips, streaming caret, etc).
+        const lastAssistant = [...event.response.messages]
+          .reverse()
+          .find((m) => m.role === 'assistant')
+        const partsJson = lastAssistant
+          ? (lastAssistant.content as unknown as object)
+          : null
+
+        const assistantMessage = await prisma.chatMessage.create({
+          data: {
+            id: assistantMessageId,
+            conversationId,
+            role: 'assistant',
+            content: storedContent,
+            retrievedItemIds: Array.from(retrievedItemIds),
+            toolCallLog: toolCallLog as unknown as object,
+            followUps,
+            reasoning: reasoningText ?? null,
+            parts: (partsJson ?? undefined) as object | undefined,
+          },
+          select: { id: true },
+        })
+
+        await this.adaptation.captureRetrievalOutcome({
+          assistantMessageId: assistantMessage.id,
+          toolCallLog,
+          retrievedItemIds: Array.from(retrievedItemIds),
+        })
+
+        this.logger.log(
+          JSON.stringify({
+            event: 'chat.stream_finished',
+            conversationId,
+            assistantMessageId: assistantMessage.id,
+            rounds: round,
+            latency_ms: Date.now() - startedAt,
+            followUpCount: followUps.length,
+            hasReasoning: Boolean(reasoningText),
+          }),
+        )
+      },
+    })
+
+    const result = await agent.stream({
+      messages: modelMessages,
+      abortSignal: params.abortSignal,
+    })
+
+    return { conversationId, assistantMessageId, result }
+  }
+}
+
+function truncate(s: string, max: number): string {
+  const trimmed = s.trim().replace(/\s+/g, ' ')
+  return trimmed.length > max ? trimmed.slice(0, max - 1) + '…' : trimmed
 }

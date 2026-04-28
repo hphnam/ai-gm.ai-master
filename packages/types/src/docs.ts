@@ -5,6 +5,9 @@ export const CreateDocRequestSchema = z.object({
   title: z.string().trim().min(1, 'title required').max(200),
   content: z.string().trim().min(1, 'content required').max(50_000),
   venueId: z.union([z.string().regex(UUID_RE, 'invalid uuid'), z.null()]),
+  // Optional uploader-supplied brief; prepended to content server-side so
+  // the classifier + embedder + chat retrieval all see the user's intent hint.
+  description: z.string().trim().max(1_000).optional(),
 })
 export type CreateDocRequest = z.infer<typeof CreateDocRequestSchema>
 
@@ -38,13 +41,31 @@ export type DocumentTypeDto = {
 
 // Plan 04-03 Task 3 — accept-type body gains optional kind override.
 // Absent = use proposal's kind; present = owner explicitly flips.
+// Added: optional `name` override so an owner can rename the proposed category
+// before it's saved (e.g. classifier said "Cellar Log" but the venue calls it
+// "Cellar Diary" — no need to reject+reclassify just for a label).
 export const AcceptTypeRequestSchema = z
   .object({
     kind: DocumentTypeKindSchema.optional(),
+    name: z.string().trim().min(1).max(80).optional(),
   })
   .passthrough()
 export type AcceptTypeRequest = z.infer<typeof AcceptTypeRequestSchema>
 export type AcceptTypeResponse = DocumentTypeDto
+
+// Manual classification for rows the classifier returned 'none' on. Caller picks
+// an existing DocumentType by id OR creates a new one (name + kind).
+export const ClassifyDocRequestSchema = z.union([
+  z.object({
+    typeId: z.string().regex(UUID_RE, 'invalid uuid'),
+  }),
+  z.object({
+    name: z.string().trim().min(1).max(80),
+    kind: DocumentTypeKindSchema,
+  }),
+])
+export type ClassifyDocRequest = z.infer<typeof ClassifyDocRequestSchema>
+export type ClassifyDocResponse = DocumentTypeDto
 
 // Plan 04-03 Task 1 — Checklist entity contracts.
 // Every shape uses `.passthrough()` so Claude-proposed emergent keys survive persistence.
@@ -133,6 +154,8 @@ export const ChecklistInstanceKeySchema = z
   )
 export type ChecklistInstanceKey = z.infer<typeof ChecklistInstanceKeySchema>
 
+export type ProcessingStatus = 'processing' | 'ready' | 'failed'
+
 export type DocListItem = {
   id: string
   title: string | null
@@ -145,6 +168,8 @@ export type DocListItem = {
   documentType: DocumentTypeDto | null
   pendingTypeProposal: ProposedDocType | null
   isProcedural: boolean
+  processingStatus: ProcessingStatus
+  processingError: string | null
   createdAt: string
   updatedAt: string
 }
@@ -158,6 +183,7 @@ export type CreateDocResponse = {
   documentType: DocumentTypeDto | null
   pendingTypeProposal: ProposedDocType | null
   checklist: ChecklistDto | null
+  processingStatus: ProcessingStatus
 }
 
 export type DocDetail = {
@@ -173,6 +199,27 @@ export type DocDetail = {
   pendingTypeProposal: ProposedDocType | null
   checklist: ChecklistDto | null
   metadata: Record<string, unknown>
+  processingStatus: ProcessingStatus
+  processingError: string | null
   createdAt: string
   updatedAt: string
 }
+
+/// Phase C — knowledge gap surfaced from chat for GM to answer.
+export type KbGapDto = {
+  id: string
+  question: string
+  tentativeAnswer: string | null
+  askCount: number
+  askedByUserIds: string[]
+  venueId: string | null
+  venueName: string | null
+  createdAt: string
+  updatedAt: string
+  lastAskedAt: string | null
+}
+
+export const AnswerGapRequestSchema = z.object({
+  answer: z.string().trim().min(5, 'answer too short').max(50_000),
+})
+export type AnswerGapRequest = z.infer<typeof AnswerGapRequestSchema>

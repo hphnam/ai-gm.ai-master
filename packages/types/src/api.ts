@@ -65,6 +65,16 @@ export const SendChatMessageRequestSchema = z.object({
 })
 export type SendChatMessageRequest = z.infer<typeof SendChatMessageRequestSchema>
 
+// Streaming endpoint — same contract as SendChatMessageRequest. Kept as a
+// separate type so its payload can evolve (e.g. rich message parts) without
+// breaking the WhatsApp-path POST /chat/messages schema.
+export const StreamChatMessageRequestSchema = z.object({
+  venueId: z.string().regex(UUID_RE, 'invalid uuid'),
+  userMessage: userMessageField,
+  conversationId: z.string().regex(UUID_RE, 'invalid uuid').optional(),
+})
+export type StreamChatMessageRequest = z.infer<typeof StreamChatMessageRequestSchema>
+
 export const SuggestionsOnOpenRequestSchema = z.object({
   venueId: z.string().regex(UUID_RE, 'invalid uuid'),
 })
@@ -101,17 +111,63 @@ export const CreateVenueBodySchema = z.object({
 })
 export type CreateVenueBody = z.infer<typeof CreateVenueBodySchema>
 
+/// Phase D — structured venue operational profile. All fields optional so
+/// owners can fill incrementally. The agent reads this on every conversation
+/// (auto-loaded into prompt context) so it knows fire escapes, hours,
+/// alarm policy, etc. without spending a tool call.
+export const VenueProfileSchema = z
+  .object({
+    layoutNotes: z.string().trim().max(2_000).optional(),
+    fireEscapes: z.array(z.string().trim().min(1).max(240)).max(10).optional(),
+    firstAidPoints: z.array(z.string().trim().min(1).max(240)).max(10).optional(),
+    keySafePolicy: z.string().trim().max(500).optional(),
+    alarmPolicy: z.string().trim().max(500).optional(),
+    openingHours: z.string().trim().max(500).optional(),
+    what3words: z.string().trim().max(60).optional(),
+    accessibilityNotes: z.string().trim().max(500).optional(),
+    deliveryNotes: z.string().trim().max(500).optional(),
+    /// Optional KnowledgeItem id pointing to an uploaded floor-plan image
+    /// (use the existing /docs upload flow with documentType=floor_plan).
+    floorPlanKnowledgeItemId: z.string().regex(UUID_RE, 'invalid uuid').nullable().optional(),
+  })
+  .strict()
+export type VenueProfile = z.infer<typeof VenueProfileSchema>
+
+export const UpdateVenueProfileSchema = VenueProfileSchema.partial()
+export type UpdateVenueProfile = z.infer<typeof UpdateVenueProfileSchema>
+
+export type VenueDetail = VenueListItem & {
+  profile: VenueProfile
+}
+
 export type ChatMessageDto = {
   id: string
   role: 'user' | 'assistant'
   content: string
   createdAt: string
   retrievedItemIds: string[]
+  followUps?: string[]
+  /** Extended thinking text (adaptive reasoning). Null for user messages. */
+  reasoning?: string | null
+  /**
+   * UIMessage content parts snapshot — arbitrary JSON matching the AI SDK
+   * `UIMessage['parts']` shape. Used to faithfully replay assistant turns
+   * with reasoning + tool chips in order.
+   */
+  parts?: unknown
+  /**
+   * Legacy tool-call log entries. Only populated on older assistant rows
+   * that pre-date the `parts` snapshot; used client-side to synthesise tool
+   * chips for historical replay.
+   */
+  toolCallLog?: unknown[]
+  /** Persisted feedback for this assistant message, if any. */
+  feedbackKind?: 'up' | 'down' | 'regenerate' | null
 }
 
 export type SendChatMessageResponse = {
   conversationId: string
-  assistantMessage: { id: string; content: string }
+  assistantMessage: { id: string; content: string; followUps: string[] }
   toolCallLog: unknown[]
   retrievedItemIds: string[]
 }

@@ -1,13 +1,15 @@
 'use client'
 
-// Plan 04-02 Task 3 — inline owner-confirmation modal for classifier proposals.
-// Plan 04-03 Task 3 — kind toggle (reference | procedural) + extractor context hint.
-// Surfaces after a successful upload (CreateDocResponse.pendingTypeProposal non-null)
-// OR from a /docs list row Accept action. Owner: Accept → promote to DocumentType +
-// link KnowledgeItem; Reject → clear the proposal, row becomes Unclassified.
+// Shown to an owner/manager when a document's classifier proposal is
+// pending. Two decisions for the user:
+//   1. What do you call this kind of document? (editable name)
+//   2. Is it a routine with steps, or just reference information?
+// Schema / confidence numbers / internal proposal fields stay out of sight —
+// they're server signals, not end-user decisions.
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { BookOpen, ClipboardList, Sparkles } from 'lucide-react'
 import type { DocumentTypeKind, ProposedDocType } from '@gm-ai/types'
 import {
   Dialog,
@@ -18,15 +20,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAcceptDocType, useRejectDocType } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
-
-function confidenceLabel(c: number): { text: string; tone: 'high' | 'mid' | 'low' } {
-  const pct = Math.round(c * 100)
-  if (c >= 0.7) return { text: `${pct}% · high`, tone: 'high' }
-  if (c >= 0.5) return { text: `${pct}% · medium`, tone: 'mid' }
-  return { text: `${pct}% · low`, tone: 'low' }
-}
+import { cn } from '@/lib/utils'
 
 export function DocTypeProposalModal({
   docId,
@@ -42,19 +40,23 @@ export function DocTypeProposalModal({
   const acceptMut = useAcceptDocType()
   const rejectMut = useRejectDocType()
   const busy = acceptMut.isPending || rejectMut.isPending
-  const conf = confidenceLabel(proposal.confidence)
 
-  // Plan 04-03 Task 3 — owner can flip classifier's proposed kind before accepting.
-  // Default to the classifier's suggestion (proposal.kind), fall back to 'reference' if missing.
   const proposedKind: DocumentTypeKind = proposal.kind ?? 'reference'
   const [selectedKind, setSelectedKind] = useState<DocumentTypeKind>(proposedKind)
+  const [name, setName] = useState(proposal.name)
+
+  const trimmedName = name.trim()
+  const canAccept = trimmedName.length > 0
 
   async function handleAccept() {
+    if (!canAccept) return
     try {
-      // Only send kind if owner actually overrode — keeps accept body minimal.
-      const kindArg = selectedKind !== proposedKind ? selectedKind : undefined
-      await acceptMut.mutateAsync({ docId, kind: kindArg })
-      toast.success(`Type accepted: ${proposal.name}`)
+      await acceptMut.mutateAsync({
+        docId,
+        kind: selectedKind !== proposedKind ? selectedKind : undefined,
+        name: trimmedName !== proposal.name ? trimmedName : undefined,
+      })
+      toast.success(`Added "${trimmedName}" to your types`)
       onOpenChange(false)
     } catch (err) {
       toast.error(mapApiError(err))
@@ -64,7 +66,7 @@ export function DocTypeProposalModal({
   async function handleReject() {
     try {
       await rejectMut.mutateAsync(docId)
-      toast.success('Proposal rejected')
+      toast.success('Left as unclassified')
       onOpenChange(false)
     } catch (err) {
       toast.error(mapApiError(err))
@@ -73,115 +75,115 @@ export function DocTypeProposalModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>New document type detected</DialogTitle>
+          <div className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5" />
+            Review a new category
+          </div>
+          <DialogTitle className="pt-1">Save this as a category?</DialogTitle>
           <DialogDescription>
-            The classifier thinks this is a new kind of document your organization hasn&apos;t
-            uploaded before. Accept to add it to your taxonomy, or reject to leave this
-            upload unclassified.
+            We haven’t seen a document like this before. Give it a short name and
+            pick how staff will use it — next time a similar doc comes in, we’ll
+            file it here automatically.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 py-2">
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">Proposed name</p>
-            <p className="text-base font-semibold">{proposal.name}</p>
-          </div>
-          {proposal.description ? (
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Description</p>
-              <p className="text-sm">{proposal.description}</p>
-            </div>
-          ) : null}
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">
-              Classifier confidence
-            </p>
-            <p
-              className={
-                conf.tone === 'high'
-                  ? 'text-sm text-emerald-700 dark:text-emerald-400'
-                  : conf.tone === 'mid'
-                    ? 'text-sm text-amber-700 dark:text-amber-400'
-                    : 'text-sm text-muted-foreground'
-              }
-            >
-              {conf.text}
-            </p>
-          </div>
-          {Object.keys(proposal.schema ?? {}).length > 0 ? (
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                Proposed schema
+        <div className="space-y-5 py-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="type-name" className="text-sm">
+              What do you call this kind of document?
+            </Label>
+            <Input
+              id="type-name"
+              value={name}
+              onChange={(e) => setName(e.target.value.slice(0, 80))}
+              placeholder="e.g. Cellar log, Supplier contacts, Closing checklist"
+              disabled={busy}
+              autoFocus
+            />
+            {proposal.description ? (
+              <p className="text-xs text-muted-foreground">
+                Hint from the AI: {proposal.description}
               </p>
-              <pre className="text-xs rounded-md bg-muted p-3 overflow-x-auto max-h-40">
-                {JSON.stringify(proposal.schema, null, 2)}
-              </pre>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
 
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-              Document type
-            </p>
-            <div role="radiogroup" aria-label="Document type" className="flex gap-2">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={selectedKind === 'reference'}
-                onClick={() => setSelectedKind('reference')}
+          <div className="space-y-2">
+            <Label className="text-sm">How will staff use it?</Label>
+            <div
+              role="radiogroup"
+              aria-label="Document type"
+              className="flex flex-col gap-2"
+            >
+              <KindOption
+                selected={selectedKind === 'reference'}
                 disabled={busy}
-                className={
-                  selectedKind === 'reference'
-                    ? 'flex-1 rounded-md border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-left'
-                    : 'flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-left hover:bg-accent'
-                }
-              >
-                <div className="font-medium">Reference</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  Prose, policies, menus, contact lists — retrieval only.
-                </div>
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={selectedKind === 'procedural'}
-                onClick={() => setSelectedKind('procedural')}
+                onSelect={() => setSelectedKind('reference')}
+                icon={<BookOpen className="h-4 w-4" />}
+                title="Look it up"
+                blurb="Menus, policies, contacts — staff find it when they need it."
+              />
+              <KindOption
+                selected={selectedKind === 'procedural'}
                 disabled={busy}
-                className={
-                  selectedKind === 'procedural'
-                    ? 'flex-1 rounded-md border-2 border-primary bg-primary/5 px-3 py-2 text-sm font-medium text-left'
-                    : 'flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-left hover:bg-accent'
-                }
-              >
-                <div className="font-medium">Procedural</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
-                  Checklists and routines with steps + cadence.
-                </div>
-              </button>
+                onSelect={() => setSelectedKind('procedural')}
+                icon={<ClipboardList className="h-4 w-4" />}
+                title="Follow on a schedule"
+                blurb="Steps to tick off daily, weekly, or at shift change."
+              />
             </div>
-            {selectedKind === 'procedural' ? (
-              <p className="text-xs text-muted-foreground mt-2">
-                We&apos;ll try to extract steps + schedule after you accept.
-              </p>
-            ) : (
-              <p className="text-xs text-muted-foreground mt-2">
-                Stored as reference material for retrieval. No procedural extraction.
-              </p>
-            )}
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleReject} disabled={busy}>
-            {rejectMut.isPending ? 'Rejecting…' : 'Reject'}
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="ghost" onClick={handleReject} disabled={busy}>
+            {rejectMut.isPending ? 'Skipping…' : 'Skip'}
           </Button>
-          <Button onClick={handleAccept} disabled={busy}>
-            {acceptMut.isPending ? 'Accepting…' : 'Accept'}
+          <Button onClick={handleAccept} disabled={busy || !canAccept}>
+            {acceptMut.isPending ? 'Saving…' : 'Save category'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function KindOption({
+  selected,
+  disabled,
+  onSelect,
+  icon,
+  title,
+  blurb,
+}: {
+  selected: boolean
+  disabled: boolean
+  onSelect: () => void
+  icon: React.ReactNode
+  title: string
+  blurb: string
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      disabled={disabled}
+      className={cn(
+        'w-full rounded-md px-3 py-2.5 text-left transition-colors',
+        selected
+          ? 'border-2 border-primary bg-primary/5'
+          : 'border border-input bg-background hover:bg-accent',
+        disabled ? 'cursor-not-allowed opacity-60' : '',
+      )}
+    >
+      <div className="flex items-center gap-2 text-sm font-medium">
+        {icon}
+        {title}
+      </div>
+      <div className="mt-1 text-xs text-muted-foreground">{blurb}</div>
+    </button>
   )
 }

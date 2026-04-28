@@ -1,34 +1,48 @@
 'use client'
 
-import { UserMenu } from '@/components/auth/user-menu'
-import { DocForm } from '@/components/docs/doc-form'
+import { useState } from 'react'
+import { Upload } from 'lucide-react'
 import { DocList } from '@/components/docs/doc-list'
-import { useDocs } from '@/lib/hooks/use-docs'
+import { GapList } from '@/components/docs/gap-list'
+import { NoDataQueriesPanel } from '@/components/docs/no-data-queries-panel'
+import { UploadModal } from '@/components/docs/upload-modal'
+import { AppShell } from '@/components/shell/app-shell'
+import { PageHeader } from '@/components/shell/page-header'
+import { Button } from '@/components/ui/button'
+import { useDocs, useGaps, useNoDataQueries } from '@/lib/hooks/use-docs'
 
 export function DocsBody() {
   const docs = useDocs()
-  return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 p-4">
-      <header className="flex items-center justify-between border-b pb-3">
-        <div>
-          <h1 className="text-lg font-semibold">Knowledge docs</h1>
-          <p className="text-xs text-muted-foreground">
-            Add procedures, checklists, supplier notes — the chat retrieves against this.
-          </p>
-        </div>
-        <UserMenu />
-      </header>
+  const gaps = useGaps()
+  const noData = useNoDataQueries()
+  const [uploadOpen, setUploadOpen] = useState(false)
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6">
-        <section aria-label="Existing docs" className="min-w-0">
-          <h2 className="text-sm font-semibold mb-3">Existing docs</h2>
-          <DocList docs={docs.data} isLoading={docs.isLoading} />
-        </section>
-        <aside aria-label="Add doc" className="min-w-0">
-          <h2 className="text-sm font-semibold mb-3">Add doc</h2>
-          <DocForm />
-        </aside>
+  return (
+    <AppShell>
+      <PageHeader
+        title="Knowledge"
+        description="Procedures, checklists, supplier notes — the chat retrieves against this."
+        actions={
+          <Button size="sm" onClick={() => setUploadOpen(true)} className="gap-1.5">
+            <Upload className="h-4 w-4" />
+            Upload
+          </Button>
+        }
+      />
+
+      <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
+          {noData.data && noData.data.length > 0 ? (
+            <NoDataQueriesPanel queries={noData.data} />
+          ) : null}
+          {gaps.data && gaps.data.length > 0 ? <GapList gaps={gaps.data} /> : null}
+          <section aria-label="Existing docs" className="min-w-0">
+            <DocList docs={docs.data} isLoading={docs.isLoading} />
+          </section>
+        </div>
       </div>
-    </main>
+
+      <UploadModal open={uploadOpen} onOpenChange={setUploadOpen} />
+    </AppShell>
   )
 }

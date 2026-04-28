@@ -6,8 +6,14 @@ import type { FeedbackKind } from '@gm-ai/types'
 import { Button } from '@/components/ui/button'
 import { useFeedback } from '@/lib/hooks/use-feedback'
 
-export function FeedbackButtons({ messageId }: { messageId: string }) {
-  const [selected, setSelected] = useState<FeedbackKind | null>(null)
+export function FeedbackButtons({
+  messageId,
+  initial = null,
+}: {
+  messageId: string
+  initial?: FeedbackKind | null
+}) {
+  const [selected, setSelected] = useState<FeedbackKind | null>(initial)
   const feedback = useFeedback()
 
   const onClick = (kind: FeedbackKind) => {
@@ -32,7 +38,11 @@ export function FeedbackButtons({ messageId }: { messageId: string }) {
         aria-pressed={selected === 'up'}
         disabled={isPending}
         onClick={() => onClick('up')}
-        className={selected === 'up' ? 'bg-accent text-accent-foreground' : ''}
+        className={
+          selected === 'up'
+            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-700'
+            : ''
+        }
       >
         <ThumbsUp />
       </Button>
@@ -43,7 +53,11 @@ export function FeedbackButtons({ messageId }: { messageId: string }) {
         aria-pressed={selected === 'down'}
         disabled={isPending}
         onClick={() => onClick('down')}
-        className={selected === 'down' ? 'bg-accent text-accent-foreground' : ''}
+        className={
+          selected === 'down'
+            ? 'bg-rose-100 text-rose-700 hover:bg-rose-100 hover:text-rose-700'
+            : ''
+        }
       >
         <ThumbsDown />
       </Button>

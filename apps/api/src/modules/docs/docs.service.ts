@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { randomUUID } from 'node:crypto'
 import { Prisma, prisma } from '@gm-ai/database'
 import {
   AudienceSchema,
@@ -15,12 +16,18 @@ import {
   type DocListItem,
   type DocumentTypeDto,
   type DocumentTypeKind,
+  type ProcessingStatus,
   type ProposedDocType,
   type Schedule,
 } from '@gm-ai/types'
 import { IngestService } from '../ingest/ingest.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService } from './classifier.service'
+
+function coerceProcessingStatus(raw: string): ProcessingStatus {
+  if (raw === 'processing' || raw === 'ready' || raw === 'failed') return raw
+  return 'ready'
+}
 
 function contentPreview(raw: string, len = 160): string {
   const cleaned = raw.replace(/\s+/g, ' ').trim()
@@ -135,8 +142,11 @@ export class DocsService {
     // Plan 02-01: direct organizationId scope. KnowledgeItem.organizationId
     // is NOT NULL; global docs (venueId null) still live inside exactly one
     // org. The former OR-with-null-venue clause leaked cross-org — removed.
+    // Phase C: pending knowledge gaps live in their own /docs/gaps surface;
+    // they're hidden from the main list so the GM doesn't see questions
+    // mixed with answered docs.
     const rows = await prisma.knowledgeItem.findMany({
-      where: { organizationId: orgId },
+      where: { organizationId: orgId, answerStatus: 'answered' },
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
       select: {
         id: true,
@@ -144,6 +154,8 @@ export class DocsService {
         content: true,
         metadata: true,
         aiSummary: true,
+        processingStatus: true,
+        processingError: true,
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
@@ -178,10 +190,179 @@ export class DocsService {
         pendingTypeProposal: toPendingProposal(r.pendingTypeProposal),
         // Plan 04-03 Task 1 — explicit convenience flag for UI procedural-badge rendering.
         isProcedural: documentType?.kind === 'procedural',
+        processingStatus: coerceProcessingStatus(r.processingStatus),
+        processingError: r.processingError,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
       }
     })
+  }
+
+  /// Phase C — list pending knowledge gaps (questions captured by record_kb_gap
+  /// awaiting GM authoritative answers).
+  async listGaps(orgId: string): Promise<
+    Array<{
+      id: string
+      question: string
+      tentativeAnswer: string | null
+      askCount: number
+      askedByUserIds: string[]
+      venueId: string | null
+      venueName: string | null
+      createdAt: string
+      updatedAt: string
+      lastAskedAt: string | null
+    }>
+  > {
+    const rows = await prisma.knowledgeItem.findMany({
+      where: { organizationId: orgId, answerStatus: 'pending' },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+      select: {
+        id: true,
+        venueId: true,
+        content: true,
+        metadata: true,
+        createdAt: true,
+        updatedAt: true,
+        venue: { select: { id: true, name: true } },
+      },
+      take: 200,
+    })
+    return rows.map((r) => {
+      const meta = (r.metadata ?? {}) as Record<string, unknown>
+      const askCount = typeof meta.askCount === 'number' ? meta.askCount : 1
+      const askedByUserIds = Array.isArray(meta.askedByUserIds)
+        ? (meta.askedByUserIds as unknown[]).filter(
+            (v): v is string => typeof v === 'string',
+          )
+        : []
+      const tentativeAnswer =
+        typeof meta.tentativeAnswer === 'string' && meta.tentativeAnswer.length > 0
+          ? meta.tentativeAnswer
+          : null
+      const lastAskedAt =
+        typeof meta.lastAskedAt === 'string' ? meta.lastAskedAt : null
+      return {
+        id: r.id,
+        question: r.content,
+        tentativeAnswer,
+        askCount,
+        askedByUserIds,
+        venueId: r.venueId,
+        venueName: r.venue?.name ?? null,
+        createdAt: r.createdAt.toISOString(),
+        updatedAt: r.updatedAt.toISOString(),
+        lastAskedAt,
+      }
+    })
+  }
+
+  /// Phase C — GM answers a pending gap. Composes Q+A content, flips status
+  /// to 'answered', kicks off enrichment so the row gets re-classified into
+  /// a proper DocumentType + re-embedded + retrieval-eligible.
+  async answerGap(
+    id: string,
+    orgId: string,
+    answer: string,
+    userId: string | null,
+  ): Promise<CreateDocResponse> {
+    const gap = await prisma.knowledgeItem.findFirst({
+      where: { id, organizationId: orgId, answerStatus: 'pending' },
+      select: { id: true, content: true, venueId: true, metadata: true },
+    })
+    if (!gap) throw new DocNotFoundOrCrossOrgError()
+
+    const question = gap.content
+    const composedContent = `Q: ${question}\n\nA: ${answer.trim()}`
+    const composedTitle = question.slice(0, 200)
+    const existingMeta = (gap.metadata ?? {}) as Record<string, unknown>
+    const newMeta = {
+      ...existingMeta,
+      gapAnsweredByUserId: userId,
+      gapAnsweredAt: new Date().toISOString(),
+      // Keep the agent's tentativeAnswer for audit even after the GM's
+      // authoritative answer lands.
+      gapOriginalQuestion: question,
+    }
+
+    await prisma.knowledgeItem.update({
+      where: { id },
+      data: {
+        content: composedContent,
+        answerStatus: 'answered',
+        processingStatus: 'processing',
+        metadata: newMeta as object,
+      },
+    })
+
+    const enrichInput = {
+      id,
+      title: composedTitle,
+      content: composedContent,
+      venueId: gap.venueId,
+    }
+    setImmediate(() => {
+      void this.enrichInBackground(id, enrichInput, orgId, userId)
+    })
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'kb_gap.answered',
+        gapId: id,
+        orgId,
+        venueId: gap.venueId,
+        answeredByUserId: userId,
+        answerLength: answer.length,
+      }),
+    )
+
+    // Mirror createStub's response so the UI can react immediately.
+    return {
+      id,
+      summary: null,
+      tags: [],
+      docType: null,
+      failSoft: false,
+      documentType: null,
+      pendingTypeProposal: null,
+      checklist: null,
+      processingStatus: 'processing',
+    }
+  }
+
+  /// Phase H (Task #22) — top no-data queries from the last N days. Groups
+  /// by lower-cased query so "where do empty kegs go" + "Where do empty kegs go"
+  /// dedupe; returns count desc, then most-recent-first.
+  async listNoDataQueries(
+    orgId: string,
+    days = 30,
+    limit = 20,
+  ): Promise<
+    Array<{
+      query: string
+      askCount: number
+      lastAskedAt: string
+    }>
+  > {
+    type Row = { query: string; ask_count: bigint; last_asked: Date }
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        LOWER(query) AS query,
+        COUNT(*) AS ask_count,
+        MAX("createdAt") AS last_asked
+      FROM "search_analytics"
+      WHERE "organizationId" = ${orgId}
+        AND outcome = 'no-data'
+        AND "createdAt" > NOW() - (${days} || ' days')::interval
+      GROUP BY LOWER(query)
+      ORDER BY ask_count DESC, last_asked DESC
+      LIMIT ${limit}
+    `
+    return rows.map((r) => ({
+      query: r.query,
+      askCount: Number(r.ask_count),
+      lastAskedAt: r.last_asked.toISOString(),
+    }))
   }
 
   async getById(id: string, orgId: string): Promise<DocDetail | null> {
@@ -194,6 +375,8 @@ export class DocsService {
         content: true,
         metadata: true,
         aiSummary: true,
+        processingStatus: true,
+        processingError: true,
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
@@ -248,19 +431,23 @@ export class DocsService {
       pendingTypeProposal: toPendingProposal(row.pendingTypeProposal),
       checklist: toChecklistDto(row.checklist),
       metadata,
+      processingStatus: coerceProcessingStatus(row.processingStatus),
+      processingError: row.processingError,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     }
   }
 
-  async create(
-    input: CreateDocRequest & { sourceImageBytes?: Buffer | null; sourceImageMime?: string | null },
+  // Sync phase — inserts a minimal KnowledgeItem with status 'processing' so the
+  // upload modal can close immediately and the doc shows up in the list. The
+  // caller is responsible for kicking off enrichInBackground() right after.
+  async createStub(
+    input: CreateDocRequest & {
+      sourceImageBytes?: Buffer | null
+      sourceImageMime?: string | null
+    },
     orgId: string,
-    // Plan 04-03 Task 2 audit-M8 — actingUserId threaded for docs.checklist_extracted audit log.
-    userId: string | null = null,
   ): Promise<CreateDocResponse> {
-    // If a venueId was supplied, it MUST belong to the user's active org. Run BEFORE
-    // the classifier call so a bogus venueId doesn't burn Claude cost.
     if (input.venueId) {
       const venue = await prisma.venue.findFirst({
         where: { id: input.venueId, organizationId: orgId },
@@ -269,63 +456,102 @@ export class DocsService {
       if (!venue) throw new DocNotFoundOrCrossOrgError()
     }
 
-    // Plan 04-02 Task 2 — per-tenant classifier pass. Fail-soft to { kind: 'none' } on any
-    // error (logged internally); upload still succeeds with the row landing unclassified.
-    const classified = await this.classifier.classify({
-      content: input.content,
-      title: input.title,
-      orgId,
+    const id = randomUUID()
+    await prisma.knowledgeItem.create({
+      data: {
+        id,
+        organizationId: orgId,
+        venueId: input.venueId ?? null,
+        content: input.content,
+        metadata: { title: input.title ?? null, tags: [] } as object,
+        aiSummary: null,
+        // Bytes handled by IngestService on enrichment. For images we stash the
+        // source on the stub so enrichment doesn't need the buffer re-passed.
+        sourceImageBytes: input.sourceImageBytes
+          ? new Uint8Array(input.sourceImageBytes)
+          : null,
+        sourceImageMime: input.sourceImageMime ?? null,
+        processingStatus: 'processing',
+      },
     })
-    const documentTypeId = classified.kind === 'matched' ? classified.typeId : null
-    const pendingTypeProposal =
-      classified.kind === 'proposal'
-        ? (classified.proposal as unknown as Record<string, unknown>)
-        : null
+    return {
+      id,
+      summary: null,
+      tags: [],
+      docType: null,
+      failSoft: false,
+      documentType: null,
+      pendingTypeProposal: null,
+      checklist: null,
+      processingStatus: 'processing',
+    }
+  }
 
-    const result = await this.ingestService.ingest({
-      title: input.title,
-      content: input.content,
-      organizationId: orgId,
-      venueId: input.venueId,
-      sourceImageBytes: input.sourceImageBytes ?? null,
-      sourceImageMime: input.sourceImageMime ?? null,
-      documentTypeId,
-      pendingTypeProposal,
-    })
-
-    const tags = Array.isArray(result.metadata.tags)
-      ? result.metadata.tags.filter((t): t is string => typeof t === 'string')
-      : []
-    const docType =
-      typeof result.metadata.docType === 'string' ? result.metadata.docType : null
-
-    // Hydrate DocumentType row for the response (matched path only — proposal path
-    // returns the proposal itself, not a confirmed DocumentType).
-    // Plan 04-03 Task 2 — matched-to-procedural path fires extractor post-ingest.
-    let matchedType: DocumentTypeDto | null = null
-    let checklist: ChecklistDto | null = null
-    if (classified.kind === 'matched') {
-      const row = await prisma.documentType.findUnique({
-        where: { id: classified.typeId },
-        select: { id: true, name: true, description: true, schema: true, kind: true },
+  // Async phase — classifier + ingest (embeddings, AI summary, tags) + checklist
+  // extraction for procedural-matched types. Updates the stub row in place.
+  // Called fire-and-forget from the controller; failures flip status to 'failed'
+  // with the error string so the UI can surface + offer a retry path later.
+  async enrichInBackground(
+    id: string,
+    input: CreateDocRequest & {
+      sourceImageBytes?: Buffer | null
+      sourceImageMime?: string | null
+    },
+    orgId: string,
+    userId: string | null = null,
+  ): Promise<void> {
+    const startedAt = Date.now()
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.enrich_started',
+        knowledgeItemId: id,
+        orgId,
+        titleLen: (input.title ?? '').length,
+        contentLen: input.content.length,
+      }),
+    )
+    try {
+      const classified = await this.classifier.classify({
+        content: input.content,
+        title: input.title,
+        orgId,
       })
-      if (!row) {
-        // audit-M6 — race: classifier matched a typeId but the row is gone (owner deleted
-        // between classify and this hook). Extraction silently skips; log is the audit surface.
-        this.logger.warn(
-          JSON.stringify({
-            level: 'warn',
-            event: 'docs.matched_type_missing',
-            actingOrgId: orgId,
-            targetTypeId: classified.typeId,
-            knowledgeItemId: result.id,
-          }),
-        )
-      } else {
-        matchedType = toDocumentTypeDto(row)
-        if (row.kind === 'procedural') {
-          checklist = await this.checklistExtractor.extract({
-            knowledgeItemId: result.id,
+      this.logger.log(
+        JSON.stringify({
+          level: 'log',
+          event: 'docs.enrich_classified',
+          knowledgeItemId: id,
+          orgId,
+          kind: classified.kind,
+        }),
+      )
+      const documentTypeId = classified.kind === 'matched' ? classified.typeId : null
+      const pendingTypeProposal =
+        classified.kind === 'proposal'
+          ? (classified.proposal as unknown as Record<string, unknown>)
+          : null
+
+      await this.ingestService.ingest({
+        id,
+        title: input.title,
+        content: input.content,
+        organizationId: orgId,
+        venueId: input.venueId,
+        sourceImageBytes: input.sourceImageBytes ?? null,
+        sourceImageMime: input.sourceImageMime ?? null,
+        documentTypeId,
+        pendingTypeProposal,
+      })
+
+      if (classified.kind === 'matched') {
+        const type = await prisma.documentType.findUnique({
+          where: { id: classified.typeId },
+          select: { kind: true },
+        })
+        if (type?.kind === 'procedural') {
+          await this.checklistExtractor.extract({
+            knowledgeItemId: id,
             orgId,
             title: input.title ?? '(untitled)',
             content: input.content,
@@ -334,17 +560,38 @@ export class DocsService {
           })
         }
       }
-    }
 
-    return {
-      id: result.id,
-      summary: result.aiSummary,
-      tags,
-      docType,
-      failSoft: tags.length === 0 && result.aiSummary === null,
-      documentType: matchedType,
-      pendingTypeProposal: classified.kind === 'proposal' ? classified.proposal : null,
-      checklist,
+      await prisma.knowledgeItem.update({
+        where: { id },
+        data: { processingStatus: 'ready', processingError: null },
+      })
+      this.logger.log(
+        JSON.stringify({
+          level: 'log',
+          event: 'docs.enrich_complete',
+          knowledgeItemId: id,
+          orgId,
+          latencyMs: Date.now() - startedAt,
+        }),
+      )
+    } catch (err) {
+      const message = (err as Error)?.message ?? 'unknown enrichment error'
+      this.logger.error(
+        JSON.stringify({
+          level: 'error',
+          event: 'docs.enrich_failed',
+          knowledgeItemId: id,
+          orgId,
+          latencyMs: Date.now() - startedAt,
+          message,
+        }),
+      )
+      await prisma.knowledgeItem
+        .update({
+          where: { id },
+          data: { processingStatus: 'failed', processingError: message.slice(0, 500) },
+        })
+        .catch(() => undefined)
     }
   }
 
@@ -357,6 +604,7 @@ export class DocsService {
     orgId: string,
     userId: string | null,
     kindOverride?: DocumentTypeKind,
+    nameOverride?: string,
   ): Promise<DocumentTypeDto> {
     const row = await prisma.knowledgeItem.findUnique({
       where: { id: knowledgeItemId },
@@ -385,12 +633,18 @@ export class DocsService {
     const resolvedKind: DocumentTypeKind = kindOverride ?? proposalKind
     const kindOverridden = kindOverride !== undefined && kindOverride !== proposalKind
 
+    const resolvedName =
+      nameOverride && nameOverride.trim().length > 0
+        ? nameOverride.trim().slice(0, 80)
+        : proposal.name
+    const nameOverridden = resolvedName !== proposal.name
+
     try {
       const created = await prisma.$transaction(async (tx) => {
         const newType = await tx.documentType.create({
           data: {
             organizationId: orgId,
-            name: proposal.name,
+            name: resolvedName,
             description: proposal.description,
             schema: (proposal.schema ?? {}) as object,
             kind: resolvedKind,
@@ -417,6 +671,7 @@ export class DocsService {
           name: created.name,
           kind: resolvedKind,
           kindOverridden,
+          nameOverridden,
         }),
       )
 
@@ -452,6 +707,125 @@ export class DocsService {
       }
       throw err
     }
+  }
+
+  // Manual classification for rows the classifier returned 'none' on. Two branches:
+  //   - typeId: link to an existing DocumentType (org-scoped).
+  //   - name + kind: create a new DocumentType and link. Falls back to reuse if a
+  //     type with that exact name already exists (keeps the user from creating
+  //     duplicates by typo).
+  async classifyManually(
+    knowledgeItemId: string,
+    orgId: string,
+    userId: string | null,
+    input: { typeId: string } | { name: string; kind: DocumentTypeKind },
+  ): Promise<DocumentTypeDto> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: knowledgeItemId },
+      select: { id: true, organizationId: true, documentTypeId: true, content: true, metadata: true },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'classify-manual',
+            targetRowId: knowledgeItemId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+
+    let typeRow: {
+      id: string
+      name: string
+      description: string | null
+      schema: unknown
+      kind: string
+    } | null = null
+
+    if ('typeId' in input) {
+      typeRow = await prisma.documentType.findFirst({
+        where: { id: input.typeId, organizationId: orgId },
+        select: { id: true, name: true, description: true, schema: true, kind: true },
+      })
+      if (!typeRow) throw new DocNotFoundOrCrossOrgError()
+    } else {
+      // Reuse-on-conflict so repeated manual classifies don't generate duplicate
+      // types when a user re-enters the same name.
+      const existing = await prisma.documentType.findFirst({
+        where: { organizationId: orgId, name: input.name },
+        select: { id: true, name: true, description: true, schema: true, kind: true },
+      })
+      if (existing) {
+        typeRow = existing
+      } else {
+        typeRow = await prisma.documentType.create({
+          data: {
+            organizationId: orgId,
+            name: input.name,
+            description: null,
+            schema: {} as object,
+            kind: input.kind,
+            confirmedByUserId: userId,
+          },
+          select: { id: true, name: true, description: true, schema: true, kind: true },
+        })
+      }
+    }
+
+    await prisma.knowledgeItem.update({
+      where: { id: knowledgeItemId },
+      data: { documentTypeId: typeRow.id, pendingTypeProposal: Prisma.JsonNull },
+    })
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.classified_manually',
+        orgId,
+        actingUserId: userId,
+        knowledgeItemId,
+        documentTypeId: typeRow.id,
+        name: typeRow.name,
+        created: !('typeId' in input),
+      }),
+    )
+
+    // Fire checklist extractor if the resolved type is procedural. Fail-soft.
+    if (typeRow.kind === 'procedural') {
+      const metadata = (row.metadata ?? {}) as Record<string, unknown>
+      const title =
+        typeof metadata.title === 'string' && metadata.title.trim()
+          ? metadata.title.trim()
+          : '(untitled)'
+      await this.checklistExtractor.extract({
+        knowledgeItemId,
+        orgId,
+        title,
+        content: row.content,
+        userId,
+        kindSource: 'accept-type',
+      })
+    }
+
+    return toDocumentTypeDto(typeRow) as DocumentTypeDto
+  }
+
+  // Lists the org's confirmed DocumentTypes so the classify-manually UI can offer
+  // "use an existing type" instead of forcing a new-name-every-time flow.
+  async listTypes(orgId: string): Promise<DocumentTypeDto[]> {
+    const rows = await prisma.documentType.findMany({
+      where: { organizationId: orgId },
+      select: { id: true, name: true, description: true, schema: true, kind: true },
+      orderBy: { name: 'asc' },
+    })
+    return rows
+      .map((r) => toDocumentTypeDto(r))
+      .filter((d): d is DocumentTypeDto => d !== null)
   }
 
   // Plan 04-02 Task 3 — owner rejects a pending proposal → clear proposal, leave unclassified.
