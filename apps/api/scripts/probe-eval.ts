@@ -26,6 +26,7 @@ import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
 import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
 import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
 import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
+import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 
 const PROBE_ORG_SLUG = 'probe-eval-org'
 
@@ -152,7 +153,9 @@ async function main() {
   const mockOps = new MockOpsService()
   const verifier = new QuoteVerifierService()
   verifier.onModuleInit()
-  const dispatcher = new ToolDispatcher(retrieval, mockOps, ingest, verifier)
+  // Plan 05-01 Task 4 — TabularQueryService threaded into dispatcher (5th arg).
+  const tabular = new TabularQueryService()
+  const dispatcher = new ToolDispatcher(retrieval, mockOps, ingest, verifier, tabular)
 
   console.log(
     JSON.stringify({

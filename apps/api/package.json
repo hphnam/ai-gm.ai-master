@@ -9,6 +9,7 @@
     "start:prod": "node dist/src/main",
     "probe:section": "tsx scripts/probe-section.ts",
     "probe:eval": "tsx scripts/probe-eval.ts",
+    "probe:tabular": "tsx scripts/probe-tabular.ts",
     "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts"
   },
   "dependencies": {

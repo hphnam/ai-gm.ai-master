@@ -227,12 +227,17 @@ export class TabularQueryService {
           : Prisma.sql`${Prisma.raw(fnSql)}((data->>${input.aggregate.column!})::numeric)`
 
       const groupColAlias = Prisma.raw(safeRawColumnName(groupCol))
+      // Group by the SELECT alias (Postgres extension) instead of repeating
+      // (data->>$N) — repeated parameter bindings are distinct slots in PG's
+      // parser even when the value is identical, which makes
+      // `GROUP BY (data->>$3)` vs `SELECT (data->>$1)` look like different
+      // expressions and triggers 42803 ("column tr.data must appear in GROUP BY").
       const sortColRef = input.sort
         ? input.sort.column === '_aggregate'
           ? Prisma.sql`_aggregate`
           : input.sort.column === '_row_index'
-            ? Prisma.sql`MIN(tr."rowIndex")` // stable proxy when sorting groups by source order
-            : Prisma.sql`MIN((data->>${input.sort.column}))` // tie-break friendly
+            ? Prisma.sql`MIN(tr."rowIndex")`
+            : Prisma.sql`MIN((data->>${input.sort.column}))`
         : Prisma.sql`${groupColAlias}` // default: stable group-by alphabetical
 
       queryRows = await prisma.$queryRaw<Array<Record<string, unknown>>>(
@@ -241,8 +246,8 @@ export class TabularQueryService {
                    JOIN knowledge_items ki ON tr."docId" = ki.id
                    WHERE ki."organizationId" = ${orgId}
                      AND tr."docId" = ${input.docId}${filterClause}
-                   GROUP BY (data->>${groupCol})
-                   ORDER BY ${sortColRef} ${directionFragment}, (data->>${groupCol}) ASC
+                   GROUP BY ${groupColAlias}
+                   ORDER BY ${sortColRef} ${directionFragment}, ${groupColAlias} ASC
                    LIMIT ${fetchLimit}`,
       )
     } else if (input.aggregate) {

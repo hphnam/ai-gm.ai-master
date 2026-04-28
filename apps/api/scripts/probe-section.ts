@@ -29,6 +29,7 @@ import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
 import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
 import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
 import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
+import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import {
   buildGmAgent,
   buildSystemMessagesForInspection,
@@ -1071,7 +1072,9 @@ async function main() {
   const mockOps = new MockOpsService()
   const verifier = new QuoteVerifierService()
   verifier.onModuleInit()
-  const dispatcher = new ToolDispatcher(retrieval, mockOps, ingest, verifier)
+  // Plan 05-01 Task 4 — TabularQueryService threaded into dispatcher (5th arg).
+  const tabular = new TabularQueryService()
+  const dispatcher = new ToolDispatcher(retrieval, mockOps, ingest, verifier, tabular)
 
   console.log(JSON.stringify({ event: 'probe.section.cost_banner', note: '27 assertions (W1-W27). ~16 small markdown ingests + 1 synthetic 200-chunk doc + 1 quality-degraded doc + W18-W23 backfill/retrieval probes + W24 chat cache (2 Sonnet 4.6 turns ~$0.010) + W25/W26/W27 retrieval + budget probes. Approx 50-70 voyage calls + 2 Sonnet turns @ ~$0.005 each (~$0.013 ceiling).' }))
 
