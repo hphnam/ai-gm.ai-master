@@ -16,27 +16,20 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import {
+  ApiTags,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
-import { z } from 'zod'
 import {
-  AcceptTypeRequestSchema,
-  AnswerGapRequestSchema,
   ClassifyDocRequestSchema,
-  CreateDocRequestSchema,
-  UUID_RE,
-  type AcceptTypeRequest,
-  type AcceptTypeResponse,
-  type AnswerGapRequest,
   type ApiErrorResponse,
   type ClassifyDocRequest,
-  type ClassifyDocResponse,
-  type CreateDocRequest,
-  type CreateDocResponse,
-  type DocDetail,
-  type DocListItem,
-  type DocumentTypeDto,
-  type KbGapDto,
 } from '@gm-ai/types'
 import { zodPipe } from '../../common/zod-pipe'
 import { AuthGuard } from '../auth/auth.guard'
@@ -58,11 +51,21 @@ import {
   TypeNameConflictError,
   TypeProposalMissingError,
 } from './docs.service'
+import {
+  AcceptTypeRequestDto,
+  AnswerGapRequestDto,
+  CreateDocRequestDto,
+  CreateDocResponseDto,
+  DocDetailDto,
+  DocIdParamDto,
+  DocListItemDto,
+  DocumentTypeDto,
+  KbGapDto,
+  NoDataQueryDto,
+} from './dto/docs.dto'
 
-const DocIdParamSchema = z.object({
-  id: z.string().regex(UUID_RE, 'invalid uuid'),
-})
-
+@ApiTags('docs')
+@ApiBearerAuth()
 @Controller('docs')
 @UseGuards(AuthGuard, RoleGuard)
 export class DocsController {
@@ -74,43 +77,53 @@ export class DocsController {
   ) {}
 
   @Get()
-  list(@CurrentOrg() org: { id: string }): Promise<DocListItem[]> {
-    return this.docsService.list(org.id)
+  @ApiResponse({ status: 200, type: [DocListItemDto] })
+  list(@CurrentOrg() org: { id: string }): Promise<DocListItemDto[]> {
+    return this.docsService.list(org.id) as Promise<DocListItemDto[]>
   }
 
   // Lists confirmed DocumentTypes for the org — used by the classify-manually
   // UI to offer "pick an existing category" before creating a new one.
   @Get('types')
+  @ApiResponse({ status: 200, type: [DocumentTypeDto] })
   listTypes(@CurrentOrg() org: { id: string }): Promise<DocumentTypeDto[]> {
-    return this.docsService.listTypes(org.id)
+    return this.docsService.listTypes(org.id) as Promise<DocumentTypeDto[]>
   }
 
   // Phase C — pending knowledge gaps surfaced for GM authoritative answer.
   @Get('gaps')
+  @ApiResponse({ status: 200, type: [KbGapDto] })
   listGaps(@CurrentOrg() org: { id: string }): Promise<KbGapDto[]> {
-    return this.docsService.listGaps(org.id)
+    return this.docsService.listGaps(org.id) as Promise<KbGapDto[]>
   }
 
   // Phase H — top no-data queries (what staff have been asking the KB but
   // can't be answered). Surfaces gaps the agent didn't proactively capture.
   @Get('analytics/no-data-queries')
+  @ApiResponse({ status: 200, type: [NoDataQueryDto] })
   listNoDataQueries(
     @CurrentOrg() org: { id: string },
-  ): Promise<Array<{ query: string; askCount: number; lastAskedAt: string }>> {
-    return this.docsService.listNoDataQueries(org.id)
+  ): Promise<NoDataQueryDto[]> {
+    return this.docsService.listNoDataQueries(org.id) as Promise<NoDataQueryDto[]>
   }
 
   @Post('gaps/:id/answer')
   @HttpCode(200)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: CreateDocResponseDto })
   async answerGap(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
-    @Body(zodPipe(AnswerGapRequestSchema)) body: AnswerGapRequest,
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @Body() body: AnswerGapRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
-  ): Promise<CreateDocResponse> {
+  ): Promise<CreateDocResponseDto> {
     try {
-      return await this.docsService.answerGap(params.id, org.id, body.answer, user?.id ?? null)
+      return (await this.docsService.answerGap(
+        params.id,
+        org.id,
+        body.answer,
+        user?.id ?? null,
+      )) as CreateDocResponseDto
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -125,7 +138,7 @@ export class DocsController {
   @HttpCode(204)
   @RequireRole('owner', 'manager')
   async removeGap(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
     @CurrentOrg() org: { id: string },
   ): Promise<void> {
     try {
@@ -139,26 +152,28 @@ export class DocsController {
   }
 
   @Get(':id')
+  @ApiResponse({ status: 200, type: DocDetailDto })
   async get(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<DocDetail> {
+  ): Promise<DocDetailDto> {
     const doc = await this.docsService.getById(params.id, org.id)
     if (!doc) {
       throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
     }
-    return doc
+    return doc as DocDetailDto
   }
 
   @Post()
   @HttpCode(200)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: CreateDocResponseDto })
   async create(
-    @Body(zodPipe(CreateDocRequestSchema)) body: CreateDocRequest,
+    @Body() body: CreateDocRequestDto,
     @CurrentOrg() org: { id: string },
     // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
     @CurrentUser() user: { id: string } | null,
-  ): Promise<CreateDocResponse> {
+  ): Promise<CreateDocResponseDto> {
     try {
       const { description, ...rest } = body
       const enrichInput = {
@@ -176,7 +191,7 @@ export class DocsController {
           user?.id ?? null,
         )
       })
-      return stub
+      return stub as CreateDocResponseDto
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'venue-not-found' } satisfies ApiErrorResponse)
@@ -190,19 +205,30 @@ export class DocsController {
   @RequireRole('owner', 'manager')
   @UseFilters(UploadPayloadTooLargeFilter)
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: UPLOAD_MAX_BYTES } }))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        venueId: { type: 'string' },
+        description: { type: 'string' },
+        title: { type: 'string' },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiResponse({ status: 200, type: CreateDocResponseDto })
   async upload(
     @UploadedFile() file: Express.Multer.File | undefined,
     @Body() body: { venueId?: string; description?: string; title?: string },
     @CurrentOrg() org: { id: string },
     // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
     @CurrentUser() user: { id: string } | null,
-  ): Promise<CreateDocResponse> {
+  ): Promise<CreateDocResponseDto> {
     if (!file) {
       throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
     }
-    // Plan 04-01: MIME check runs BEFORE size check so unknown types reject with 415 (clearer
-    // signal) rather than a 413 that looks like a quota issue. Per-MIME cap then refines the
-    // single UPLOAD_MAX_BYTES ceiling.
     if (!UPLOAD_MIME_ALLOWLIST.includes(file.mimetype as (typeof UPLOAD_MIME_ALLOWLIST)[number])) {
       throw new HttpException(
         { error: 'unsupported-file-type' } satisfies ApiErrorResponse,
@@ -215,7 +241,6 @@ export class DocsController {
         error: 'file-too-large',
       } satisfies ApiErrorResponse)
     }
-    // Defense-in-depth: global ceiling (also multer's limits.fileSize).
     if (file.size > UPLOAD_MAX_BYTES) {
       throw new PayloadTooLargeException({
         error: 'file-too-large',
@@ -223,10 +248,6 @@ export class DocsController {
     }
 
     const extractStart = Date.now()
-    // Phase 6 — Reducto extraction. Image path stays separate (Claude vision
-    // is for photo Q&A, not structured-document parsing). All other MIMEs
-    // upload to Reducto here, then enrichInBackground calls parse() against
-    // the returned file_id.
     let content = ''
     let sourceImageBytes: Buffer | null = null
     let sourceImageMime: string | null = null
@@ -237,8 +258,6 @@ export class DocsController {
         content = result.text
         sourceImageBytes = result.sourceBytes
         sourceImageMime = file.mimetype
-        // audit-M1: cost log carries tokens/bytes/mime/USD only — never the extracted text,
-        // never the base64 payload, never the Anthropic API key.
         this.logger.log(
           JSON.stringify({
             level: 'log',
@@ -247,33 +266,16 @@ export class DocsController {
           }),
         )
       } else {
-        // Reducto upload is fast (single multipart round-trip). Parse runs
-        // in enrichInBackground so the controller returns a stub immediately.
-        // Buffer is consumed here; multer's request-lifecycle buffer is fine.
-        // Text-like uploads (CSV/TSV/TXT/MD) get encoding-normalised to UTF-8
-        // first via BOM check + chardet sniff so Reducto doesn't byte-walk
-        // UTF-16 / Windows-1252 / MacRoman as ASCII (every char would come
-        // back interleaved with NUL or replacement glyphs and Postgres would
-        // reject the write). Binary formats (PDF/DOCX/XLSX/PPTX) pass through
-        // — Reducto handles their internal encoding natively.
         const decoded = normalizeTextBufferEncoding(
           file.buffer,
           file.mimetype,
           file.originalname,
         )
-        // Square/Excel often save TSV with a .csv extension. Reducto's CSV
-        // parser splits on commas, which shreds £-formatted UK numbers like
-        // £2,284.04 in tab-delimited rows. Convert to proper quoted CSV so
-        // Reducto only sees one delimiter.
         const buffer = normalizeDelimiter(decoded, file.mimetype, file.originalname)
         reductoFileId = await this.reducto.upload(buffer, file.originalname, file.mimetype)
       }
     } catch (err) {
       if (err instanceof ReductoError) {
-        // Surface a uniform extraction-failed response so the existing UI
-        // mapApiError 'corrupt-bytes' path keeps working. Reducto-specific
-        // failures map to the same user-facing string the local extractor
-        // used: "the file appears corrupted or the extension does not match".
         throw new HttpException(
           {
             error: 'extraction-failed',
@@ -300,27 +302,19 @@ export class DocsController {
         ? body.description.trim().slice(0, 1_000)
         : undefined
 
-    let result: CreateDocResponse
+    let result: CreateDocResponseDto
     try {
       const enrichInput = {
         title,
-        // For images: content already populated. For Reducto-backed paths: the
-        // user description is all we have at stub time; enrichInBackground
-        // replaces this with composeContent(description, parsed.text) once
-        // parse() returns.
         content: composeContent(description, content),
         venueId,
         sourceImageBytes,
         sourceImageMime,
-        // Phase 6 — file_id from Reducto upload; consumed by enrichInBackground.
-        // Null for image uploads (no Reducto involvement).
         reductoFileId,
-        // Description survives the parse round-trip so background enrichment
-        // can compose final content with it.
         description,
         mimeType: file.mimetype,
       }
-      result = await this.docsService.createStub(enrichInput, org.id)
+      result = (await this.docsService.createStub(enrichInput, org.id)) as CreateDocResponseDto
       setImmediate(() => {
         void this.docsService.enrichInBackground(
           result.id,
@@ -356,7 +350,7 @@ export class DocsController {
   @HttpCode(204)
   @RequireRole('owner', 'manager')
   async remove(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
     @CurrentOrg() org: { id: string },
   ): Promise<void> {
     try {
@@ -369,25 +363,24 @@ export class DocsController {
     }
   }
 
-  // Plan 04-02 Task 3 — owner accepts a pending DocumentType proposal.
-  // Plan 04-03 Task 3 — optional body.kind overrides classifier's proposed kind.
   @Post(':id/accept-type')
   @HttpCode(200)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: DocumentTypeDto })
   async acceptType(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
-    @Body(zodPipe(AcceptTypeRequestSchema)) body: AcceptTypeRequest,
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @Body() body: AcceptTypeRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
-  ): Promise<AcceptTypeResponse> {
+  ): Promise<DocumentTypeDto> {
     try {
-      return await this.docsService.acceptProposedType(
+      return (await this.docsService.acceptProposedType(
         params.id,
         org.id,
         user?.id ?? null,
         body.kind,
         body.name,
-      )
+      )) as DocumentTypeDto
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -408,24 +401,27 @@ export class DocsController {
     }
   }
 
-  // Manual classification for an Unclassified row. Body is either
-  // `{ typeId }` (pick existing) or `{ name, kind }` (create new).
   @Post(':id/classify')
   @HttpCode(200)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: DocumentTypeDto })
   async classifyManually(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    // ClassifyDocRequestSchema is a z.union — kept on zodPipe since createZodDto
+    // can't extend unions. Swagger loses the discriminated body schema for this
+    // one endpoint; the union still reaches the orval consumer through the
+    // ClassifyDocRequest type re-export.
     @Body(zodPipe(ClassifyDocRequestSchema)) body: ClassifyDocRequest,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
-  ): Promise<ClassifyDocResponse> {
+  ): Promise<DocumentTypeDto> {
     try {
-      return await this.docsService.classifyManually(
+      return (await this.docsService.classifyManually(
         params.id,
         org.id,
         user?.id ?? null,
         body,
-      )
+      )) as DocumentTypeDto
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -434,12 +430,11 @@ export class DocsController {
     }
   }
 
-  // Plan 04-02 Task 3 — owner rejects a pending proposal (KnowledgeItem stays unclassified).
   @Post(':id/reject-type')
   @HttpCode(204)
   @RequireRole('owner', 'manager')
   async rejectType(
-    @Param(zodPipe(DocIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
   ): Promise<void> {
@@ -462,8 +457,6 @@ export class DocsController {
 
 // Prepends the uploader's free-text brief to the doc content so the classifier,
 // embedder, and chat retrieval all receive it as part of the document's signal.
-// Labelled inline so a human inspecting the stored KnowledgeItem can see it
-// came from the uploader rather than the source file.
 function composeContent(description: string | undefined, content: string): string {
   const trimmed = (description ?? '').trim()
   if (trimmed.length === 0) return content
