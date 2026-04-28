@@ -1,17 +1,17 @@
 import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common'
-import {
-  SuggestionsOnOpenRequestSchema,
-  SuggestionsOnTurnRequestSchema,
-  type ProactiveSuggestion,
-  type SuggestionsOnOpenRequest,
-  type SuggestionsOnTurnRequest,
-} from '@gm-ai/types'
-import { zodPipe } from '../../common/zod-pipe'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import { SuggestionsService } from './suggestions.service'
+import {
+  ProactiveSuggestionDto,
+  SuggestionsOnOpenRequestDto,
+  SuggestionsOnTurnRequestDto,
+} from './dto/suggestions.dto'
 
+@ApiTags('suggestions')
+@ApiBearerAuth()
 @Controller('suggestions')
 @UseGuards(AuthGuard, RoleGuard)
 export class SuggestionsController {
@@ -19,24 +19,29 @@ export class SuggestionsController {
 
   @Post('on-open')
   @HttpCode(200)
+  @ApiResponse({ status: 200, type: [ProactiveSuggestionDto] })
   onOpen(
-    @Body(zodPipe(SuggestionsOnOpenRequestSchema)) body: SuggestionsOnOpenRequest,
+    @Body() body: SuggestionsOnOpenRequestDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<ProactiveSuggestion[]> {
-    return this.suggestionsService.onConversationOpen(body.venueId, org.id)
+  ): Promise<ProactiveSuggestionDto[]> {
+    return this.suggestionsService.onConversationOpen(
+      body.venueId,
+      org.id,
+    ) as Promise<ProactiveSuggestionDto[]>
   }
 
   @Post('on-turn')
   @HttpCode(200)
+  @ApiResponse({ status: 200, type: [ProactiveSuggestionDto] })
   onTurn(
-    @Body(zodPipe(SuggestionsOnTurnRequestSchema)) body: SuggestionsOnTurnRequest,
+    @Body() body: SuggestionsOnTurnRequestDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<ProactiveSuggestion[]> {
+  ): Promise<ProactiveSuggestionDto[]> {
     return this.suggestionsService.onTurn(
       body.venueId,
       body.userMessage,
       org.id,
       body.conversationId,
-    )
+    ) as Promise<ProactiveSuggestionDto[]>
   }
 }

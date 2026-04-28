@@ -7,18 +7,16 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common'
-import {
-  CaptureFeedbackInputSchema,
-  type ApiErrorResponse,
-  type CaptureFeedbackInput,
-  type FeedbackResponse,
-} from '@gm-ai/types'
-import { zodPipe } from '../../common/zod-pipe'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { type ApiErrorResponse } from '@gm-ai/types'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import { AdaptationService } from './adaptation.service'
+import { CaptureFeedbackInputDto, FeedbackResponseDto } from './dto/feedback.dto'
 
+@ApiTags('feedback')
+@ApiBearerAuth()
 @Controller('feedback')
 @UseGuards(AuthGuard, RoleGuard)
 export class FeedbackController {
@@ -26,10 +24,11 @@ export class FeedbackController {
 
   @Post()
   @HttpCode(200)
+  @ApiResponse({ status: 200, type: FeedbackResponseDto })
   async captureFeedback(
-    @Body(zodPipe(CaptureFeedbackInputSchema)) body: CaptureFeedbackInput,
+    @Body() body: CaptureFeedbackInputDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<FeedbackResponse> {
+  ): Promise<FeedbackResponseDto> {
     const result = await this.adaptationService.captureFeedback(body, org.id)
 
     if (result.ok === false) {
