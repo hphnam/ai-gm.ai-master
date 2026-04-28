@@ -24,6 +24,10 @@ docs/*.tsv
 # Prisma
 packages/database/src/generated/
 
+# Swagger / OpenAPI codegen — emitted by `pnpm --filter api swagger:generate`,
+# consumed by orval on the web side. Re-generate on demand; not committed.
+apps/api/swagger.json
+
 # IDE
 .idea/
 .vscode/

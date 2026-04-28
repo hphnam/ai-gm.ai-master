@@ -10,64 +10,64 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common'
-import { z } from 'zod'
-import {
-  CreateVenueBodySchema,
-  UpdateVenueProfileSchema,
-  UUID_RE,
-  type CreateVenueBody,
-  type UpdateVenueProfile,
-  type VenueDetail,
-  type VenueListItem,
-} from '@gm-ai/types'
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
-import { zodPipe } from '../../common/zod-pipe'
 import { VenuesService } from './venues.service'
+import {
+  CreateVenueBodyDto,
+  UpdateVenueProfileDto,
+  VenueDetailDto,
+  VenueIdParamDto,
+  VenueListItemDto,
+} from './dto/venues.dto'
 
-const VenueIdParamSchema = z.object({
-  id: z.string().regex(UUID_RE, 'invalid uuid'),
-})
-
+@ApiTags('venues')
+@ApiBearerAuth()
 @Controller('venues')
 @UseGuards(AuthGuard, RoleGuard)
 export class VenuesController {
   constructor(private readonly venuesService: VenuesService) {}
 
   @Get()
-  list(@CurrentOrg() org: { id: string }): Promise<VenueListItem[]> {
-    return this.venuesService.listByOrg(org.id)
+  @ApiResponse({ status: 200, type: [VenueListItemDto] })
+  list(@CurrentOrg() org: { id: string }): Promise<VenueListItemDto[]> {
+    return this.venuesService.listByOrg(org.id) as Promise<VenueListItemDto[]>
   }
 
   @Get(':id')
+  @ApiResponse({ status: 200, type: VenueDetailDto })
   async get(
-    @Param(zodPipe(VenueIdParamSchema)) params: { id: string },
+    @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<VenueDetail> {
+  ): Promise<VenueDetailDto> {
     const venue = await this.venuesService.getById(params.id, org.id)
     if (!venue) throw new NotFoundException({ error: 'venue-not-found' })
-    return venue
+    return venue as VenueDetailDto
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 201, type: VenueListItemDto })
   create(
     @CurrentOrg() org: { id: string },
-    @Body(zodPipe(CreateVenueBodySchema)) body: CreateVenueBody,
-  ): Promise<VenueListItem> {
-    return this.venuesService.create(org.id, body)
+    @Body() body: CreateVenueBodyDto,
+  ): Promise<VenueListItemDto> {
+    return this.venuesService.create(org.id, body) as Promise<VenueListItemDto>
   }
 
   @Patch(':id/profile')
   @HttpCode(HttpStatus.OK)
   @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: VenueDetailDto })
   updateProfile(
-    @Param(zodPipe(VenueIdParamSchema)) params: { id: string },
-    @Body(zodPipe(UpdateVenueProfileSchema)) body: UpdateVenueProfile,
+    @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
+    @Body() body: UpdateVenueProfileDto,
     @CurrentOrg() org: { id: string },
-  ): Promise<VenueDetail> {
-    return this.venuesService.updateProfile(params.id, org.id, body)
+  ): Promise<VenueDetailDto> {
+    return this.venuesService.updateProfile(params.id, org.id, body) as Promise<VenueDetailDto>
   }
 }

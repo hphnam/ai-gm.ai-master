@@ -1,6 +1,7 @@
 import './load-env'
 
 import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { json, raw as rawParser, type NextFunction, type Request, type Response } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
@@ -101,6 +102,16 @@ async function bootstrap() {
   //     `curl -X POST .../webhooks/infobip/whatsapp -H 'x-callback-signature: probe-console' \
   //        -d '{}' -H 'content-type: application/json'` → expect 200 with ALLOW_WEBHOOK_DEV_BYPASS=true
   //        (curl-bypass validates the raw-body middleware actually fired; 403 "no-raw-body" = broken).
+
+  // Swagger / OpenAPI — served at /api-docs in dev for browsing, the same
+  // document is emitted to swagger.json by `pnpm swagger:generate` for orval
+  // codegen on the web side.
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('GM AI API')
+    .setVersion('1.0')
+    .build()
+  const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig)
+  SwaggerModule.setup('api-docs', app, swaggerDoc)
 
   app.enableShutdownHooks()
 
