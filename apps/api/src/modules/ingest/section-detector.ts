@@ -12,7 +12,7 @@ import {
   type DetectedChunk,
   type DetectedSection,
   type SectionDetectionResult,
-} from '@gm-ai/types'
+} from '../../types'
 import { estimateTokens, slidingWindowChunks, splitByHeadings } from './section-tokens'
 
 const SLIDE_MARKER_RE = /^##\s+Slide\s+\d+/m

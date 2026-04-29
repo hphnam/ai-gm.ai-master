@@ -12,7 +12,7 @@
 // numeric aggregates (sum/avg/min/max) require inferredType='number'; otherwise
 // the query rejects with reason='invalid-input'.
 
-import type { InferredColumn } from '@gm-ai/types'
+import type { InferredColumn } from '../../types'
 
 const NUMBER_THRESHOLD = 0.8
 const DATE_THRESHOLD = 0.8

@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import type { ApiErrorResponse, Role } from '@gm-ai/types'
+import type { ApiErrorResponse, Role } from '../../types'
 import type { AuthedRequest } from './auth.guard'
 import { REQUIRE_ROLE_KEY } from './auth.decorators'
 

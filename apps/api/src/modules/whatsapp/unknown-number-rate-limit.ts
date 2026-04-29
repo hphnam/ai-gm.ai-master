@@ -1,4 +1,4 @@
-import { ONBOARDING_COOLDOWN_MS } from '@gm-ai/types'
+import { ONBOARDING_COOLDOWN_MS } from '../../types'
 
 const lastReplyAt = new Map<string, number>()
 const MAX_ENTRIES = 10_000

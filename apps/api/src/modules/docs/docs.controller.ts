@@ -30,7 +30,7 @@ import {
   ClassifyDocRequestSchema,
   type ApiErrorResponse,
   type ClassifyDocRequest,
-} from '@gm-ai/types'
+} from '../../types'
 import { zodPipe } from '../../common/zod-pipe'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'

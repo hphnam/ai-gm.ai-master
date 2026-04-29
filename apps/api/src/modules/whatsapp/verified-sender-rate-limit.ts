@@ -1,7 +1,7 @@
 import {
   VERIFIED_SENDER_LIMIT_PER_HOUR,
   VERIFIED_SENDER_WINDOW_MS,
-} from '@gm-ai/types'
+} from '../../types'
 
 type Bucket = { timestamps: number[]; throttleReplyAt?: number }
 

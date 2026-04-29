@@ -6,7 +6,7 @@ import {
   SendChatMessageRequestSchema,
   StreamChatMessageRequestSchema,
   UUID_RE,
-} from '@gm-ai/types'
+} from '../../../types'
 
 // Inputs
 export class SendChatMessageRequestDto extends createZodDto(SendChatMessageRequestSchema) {}

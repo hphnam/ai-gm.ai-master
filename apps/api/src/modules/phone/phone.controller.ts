@@ -19,7 +19,7 @@ import type { Request, Response } from 'express'
 import {
   type ApiErrorResponse,
   VERIFY_CODE_TTL_SECONDS,
-} from '@gm-ai/types'
+} from '../../types'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentUser } from '../auth/auth.decorators'
 import { PhoneError, PhoneService } from './phone.service'

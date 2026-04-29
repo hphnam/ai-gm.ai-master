@@ -15,7 +15,7 @@ import {
   type KnowledgeMetadata,
   type SectionDetectionResult,
   type TabularExtractionResult,
-} from '@gm-ai/types'
+} from '../../types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
 import { SectionDetector } from './section-detector'

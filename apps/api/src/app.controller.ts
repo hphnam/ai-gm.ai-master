@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common'
-import { type HealthCheck } from '@gm-ai/types'
+import { type HealthCheck } from './types'
 
 @Controller()
 export class AppController {

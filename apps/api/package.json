@@ -24,7 +24,6 @@
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
-    "@gm-ai/types": "workspace:*",
     "@nestjs/swagger": "^11.4.2",
     "@prisma/adapter-pg": "latest",
     "@prisma/client": "latest",

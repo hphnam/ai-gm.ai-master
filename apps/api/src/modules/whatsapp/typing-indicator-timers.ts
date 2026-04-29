@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common'
-import { TYPING_MAX_REFIRES, TYPING_REFIRE_MS } from '@gm-ai/types'
+import { TYPING_MAX_REFIRES, TYPING_REFIRE_MS } from '../../types'
 
 type TypingSender = {
   sendTypingIndicator: (inboundMessageSid: string) => Promise<unknown>

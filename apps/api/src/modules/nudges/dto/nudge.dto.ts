@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
-import { UUID_RE } from '@gm-ai/types'
+import { UUID_RE } from '../../../types'
 
 export const NudgeVenueIdParamSchema = z.object({
   venueId: z.string().regex(UUID_RE, 'invalid uuid'),

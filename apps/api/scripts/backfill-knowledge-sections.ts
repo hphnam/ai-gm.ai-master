@@ -27,7 +27,7 @@ import {
   BACKFILL_VOYAGE_BACKOFF_MS,
   CURRENT_SECTION_VERSION,
   VOYAGE_DOC_USD_PER_CALL,
-} from '@gm-ai/types'
+} from '../src/types'
 import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
 import { IndexerService } from '../src/modules/indexer/indexer.service'
 import { IngestService } from '../src/modules/ingest/ingest.service'

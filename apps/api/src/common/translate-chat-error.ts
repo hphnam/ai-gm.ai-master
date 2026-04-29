@@ -1,5 +1,5 @@
 import { BadRequestException, HttpException, NotFoundException } from '@nestjs/common'
-import type { ApiErrorResponse } from '@gm-ai/types'
+import type { ApiErrorResponse } from '../types'
 
 export function translateChatServiceError(err: Error): HttpException | null {
   const msg = err.message ?? ''

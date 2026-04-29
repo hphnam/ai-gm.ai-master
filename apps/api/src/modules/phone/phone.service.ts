@@ -10,7 +10,7 @@ import {
   PENDING_VERIFICATION_TTL_MS,
   PhoneRateLimit,
   type PhoneStatusResponse,
-} from '@gm-ai/types'
+} from '../../types'
 
 export type PhoneErrorCode =
   | 'phone-already-linked'

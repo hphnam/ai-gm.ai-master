@@ -3,7 +3,7 @@ import { createZodDto } from 'nestjs-zod'
 import {
   SuggestionsOnOpenRequestSchema,
   SuggestionsOnTurnRequestSchema,
-} from '@gm-ai/types'
+} from '../../../types'
 
 export class SuggestionsOnOpenRequestDto extends createZodDto(SuggestionsOnOpenRequestSchema) {}
 export class SuggestionsOnTurnRequestDto extends createZodDto(SuggestionsOnTurnRequestSchema) {}

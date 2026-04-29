@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import type { Request } from 'express'
 import { fromNodeHeaders } from 'better-auth/node'
-import type { ApiErrorResponse } from '@gm-ai/types'
+import type { ApiErrorResponse } from '../../types'
 import { auth } from './auth.config'
 
 export type AuthedRequest = Request & {

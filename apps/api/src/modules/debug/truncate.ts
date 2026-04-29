@@ -1,4 +1,4 @@
-import { DEBUG_CONTENT_TRUNCATE, type DebugRetagQueueCounts } from '@gm-ai/types'
+import { DEBUG_CONTENT_TRUNCATE, type DebugRetagQueueCounts } from '../../types'
 
 export function truncateAtWord(s: string, max = 160): string {
   if (typeof s !== 'string') return ''

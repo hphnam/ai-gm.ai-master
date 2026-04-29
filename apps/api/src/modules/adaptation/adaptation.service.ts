@@ -11,7 +11,7 @@ import {
   type CaptureFeedbackInput,
   type EnqueueReTagInput,
   type FeedbackKind,
-} from '@gm-ai/types'
+} from '../../types'
 import { IngestService } from '../ingest/ingest.service'
 
 const ACTIVE_STATUSES = ['queued', 'processing'] as const

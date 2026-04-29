@@ -8,7 +8,7 @@ import {
   formatSectionPayload,
   type ToolName,
   type ToolResult,
-} from '@gm-ai/types'
+} from '../../types'
 import { IngestService } from '../ingest/ingest.service'
 import { RetrievalService, type RetrievalHit } from '../retrieval/retrieval.service'
 import { MockOpsService } from '../mock-ops/mock-ops.service'

@@ -5,7 +5,7 @@ import {
   UpdateVenueProfileSchema,
   UUID_RE,
   VenueProfileSchema,
-} from '@gm-ai/types'
+} from '../../../types'
 
 export const VenueIdParamSchema = z.object({
   id: z.string().regex(UUID_RE, 'invalid uuid'),

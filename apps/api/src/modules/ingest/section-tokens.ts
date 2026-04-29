@@ -5,7 +5,7 @@ import {
   CHUNK_OVERLAP_TOKENS,
   CHUNK_TARGET_TOKENS,
   MAX_HEADING_RECURSION_DEPTH,
-} from '@gm-ai/types'
+} from '../../types'
 
 /**
  * Token estimator. Latin-script-biased — over-counts CJK ~4x and under-counts

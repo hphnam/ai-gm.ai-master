@@ -4,7 +4,7 @@ import {
   DebugIdParamSchema,
   DebugQuerySchema,
   DebugRetagQueueQuerySchema,
-} from '@gm-ai/types'
+} from '../../../types'
 
 export class DebugIdParamDto extends createZodDto(DebugIdParamSchema) {}
 export class DebugQueryDto extends createZodDto(DebugQuerySchema) {}

@@ -5,7 +5,7 @@
  */
 import { Injectable } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
-import { fail, ok, type ToolResult } from '@gm-ai/types'
+import { fail, ok, type ToolResult } from '../../types'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

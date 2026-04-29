@@ -4,7 +4,7 @@ import {
   MAX_IMAGE_DOWNLOAD_BYTES,
   MEDIA_DOWNLOAD_TIMEOUT_MS,
   type AllowedImageMimeType,
-} from '@gm-ai/types'
+} from '../../types'
 import { magicByteMatchesMime } from '../../common/image-magic-bytes'
 
 export type MediaDownloadResult =

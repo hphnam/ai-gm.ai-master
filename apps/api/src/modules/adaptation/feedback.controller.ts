@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { type ApiErrorResponse } from '@gm-ai/types'
+import { type ApiErrorResponse } from '../../types'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'

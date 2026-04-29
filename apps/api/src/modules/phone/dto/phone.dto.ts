@@ -3,7 +3,7 @@ import { createZodDto } from 'nestjs-zod'
 import {
   SendPhoneCodeBodySchema,
   VerifyPhoneCodeBodySchema,
-} from '@gm-ai/types'
+} from '../../../types'
 
 export class SendPhoneCodeBodyDto extends createZodDto(SendPhoneCodeBodySchema) {}
 export class VerifyPhoneCodeBodyDto extends createZodDto(VerifyPhoneCodeBodySchema) {}

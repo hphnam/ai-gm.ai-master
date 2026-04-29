@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
-import { CaptureFeedbackInputSchema } from '@gm-ai/types'
+import { CaptureFeedbackInputSchema } from '../../../types'
 
 export class CaptureFeedbackInputDto extends createZodDto(CaptureFeedbackInputSchema) {}
 

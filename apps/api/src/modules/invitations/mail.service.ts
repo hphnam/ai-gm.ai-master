@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import { MAIL_SEND_TIMEOUT_MS } from '@gm-ai/types'
+import { MAIL_SEND_TIMEOUT_MS } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
 import { renderInvitationEmail } from './invitation-email'
 

@@ -6,7 +6,7 @@ import {
   InviteBodySchema,
   InviteRole,
   ListInvitationsQuerySchema,
-} from '@gm-ai/types'
+} from '../../../types'
 
 export class InviteBodyDto extends createZodDto(InviteBodySchema) {}
 export class InvitationIdParamDto extends createZodDto(InvitationIdParamSchema) {}

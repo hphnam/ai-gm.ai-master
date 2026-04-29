@@ -19,7 +19,7 @@ import {
   type ProcessingStatus,
   type ProposedDocType,
   type Schedule,
-} from '@gm-ai/types'
+} from '../../types'
 import { IngestService } from '../ingest/ingest.service'
 import { ReductoService, type ParsedDocument } from '../reducto/reducto.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'

@@ -1,4 +1,4 @@
-import { SEEN_SID_MAX_ENTRIES, SEEN_SID_TTL_MS } from '@gm-ai/types'
+import { SEEN_SID_MAX_ENTRIES, SEEN_SID_TTL_MS } from '../../types'
 
 const seen = new Map<string, number>()
 

@@ -21,7 +21,7 @@ import {
   type InvitationPreview,
   type InvitationStatus,
   type InviteRoleType,
-} from '@gm-ai/types'
+} from '../../types'
 export type InvitationErrorCode =
   | 'invitation-not-found'
   | 'invitation-expired'

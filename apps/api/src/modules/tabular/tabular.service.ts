@@ -37,7 +37,7 @@ import {
   type TabularQueryInput,
   type TabularQueryResult,
   type ToolResult,
-} from '@gm-ai/types'
+} from '../../types'
 
 const FILTER_OP_SQL: Readonly<Record<TabularFilterOp, string>> = {
   eq: '=',

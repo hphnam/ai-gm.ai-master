@@ -1,5 +1,5 @@
 import { ExecutionContext, SetMetadata, createParamDecorator } from '@nestjs/common'
-import type { Role } from '@gm-ai/types'
+import type { Role } from '../../types'
 import type { AuthedRequest } from './auth.guard'
 
 export const CurrentUser = createParamDecorator(

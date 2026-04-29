@@ -10,7 +10,7 @@ import { ApiExcludeController } from '@nestjs/swagger'
 import {
   BATCH_DEADLINE_MS,
   InfobipInboundWebhookSchema,
-} from '@gm-ai/types'
+} from '../../types'
 import { WhatsappService } from './whatsapp.service'
 import { WhatsappSignatureGuard } from './whatsapp-signature.guard'
 

@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import type { WhatsAppOutboundResult } from '@gm-ai/types'
+import type { WhatsAppOutboundResult } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
 
 // 03-04 Infobip WhatsApp adapter (replaces Twilio WhatsApp adapter from 03-01).

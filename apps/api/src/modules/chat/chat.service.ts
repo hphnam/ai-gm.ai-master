@@ -11,7 +11,7 @@ import {
   type ToolResultPart,
   type ToolSet,
 } from 'ai'
-import { VenueProfileSchema } from '@gm-ai/types'
+import { VenueProfileSchema } from '../../types'
 import { AdaptationService } from '../adaptation/adaptation.service'
 import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
 import {

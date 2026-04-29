@@ -6,7 +6,7 @@ import {
   type SuggestionSeverity,
   type ToolName,
   type ToolResult,
-} from '@gm-ai/types'
+} from '../../types'
 import { ToolDispatcher } from '../chat/tool-dispatcher'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

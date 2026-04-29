@@ -20,7 +20,7 @@ import {
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
 import type { Request } from 'express'
-import { type ApiErrorResponse, InvitationIdParamSchema } from '@gm-ai/types'
+import { type ApiErrorResponse, InvitationIdParamSchema } from '../../types'
 import { AuthGuard, type AuthedRequest } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'

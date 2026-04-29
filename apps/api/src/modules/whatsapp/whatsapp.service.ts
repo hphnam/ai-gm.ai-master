@@ -7,7 +7,7 @@ import {
   VERIFIED_SENDER_LIMIT_PER_HOUR,
   type InfobipInboundResult,
   type ProactiveSuggestion,
-} from '@gm-ai/types'
+} from '../../types'
 import { ChatService } from '../chat/chat.service'
 import { SuggestionsService } from '../suggestions/suggestions.service'
 import { WhatsAppAdapter } from './whatsapp.adapter'

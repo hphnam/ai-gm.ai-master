@@ -7,7 +7,7 @@ import {
   type DebugMessageResponse,
   type DebugRetagQueueItem,
   type DebugRetagQueueResponse,
-} from '@gm-ai/types'
+} from '../../types'
 import {
   mapStatusCount,
   truncateAtWord,

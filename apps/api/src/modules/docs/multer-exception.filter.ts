@@ -6,7 +6,7 @@ import {
   PayloadTooLargeException,
 } from '@nestjs/common'
 import type { Response } from 'express'
-import type { ApiErrorResponse } from '@gm-ai/types'
+import type { ApiErrorResponse } from '../../types'
 
 @Catch(PayloadTooLargeException)
 export class UploadPayloadTooLargeFilter implements ExceptionFilter {

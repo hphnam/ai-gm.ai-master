@@ -20,7 +20,7 @@ import {
   CHUNK_TARGET_TOKENS,
   CSV_ROW_BATCH_SIZE,
   MAX_EMBEDS_PER_DOCUMENT,
-} from '@gm-ai/types'
+} from '../src/types'
 import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
 import { IndexerService } from '../src/modules/indexer/indexer.service'
 import { IngestService } from '../src/modules/ingest/ingest.service'

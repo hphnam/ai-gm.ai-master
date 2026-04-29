@@ -22,7 +22,7 @@ import {
   type ChecklistDto,
   type ChecklistStep,
   type Schedule,
-} from '@gm-ai/types'
+} from '../../types'
 import { z } from 'zod'
 import { sanitiseError } from '../../common/sanitise-error'
 import { IndexerService } from '../indexer/indexer.service'

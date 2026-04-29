@@ -1,7 +1,7 @@
 import { Controller, HttpCode, NotFoundException, Param, Post, UseGuards } from '@nestjs/common'
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
-import { type ApiErrorResponse } from '@gm-ai/types'
+import { type ApiErrorResponse } from '../../types'
 import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'

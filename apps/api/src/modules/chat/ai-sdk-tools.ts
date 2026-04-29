@@ -1,5 +1,5 @@
 import { tool, type ToolSet } from 'ai'
-import { fail, TOOL_DEFINITIONS, TOOL_INPUT_SCHEMAS } from '@gm-ai/types'
+import { fail, TOOL_DEFINITIONS, TOOL_INPUT_SCHEMAS } from '../../types'
 import type { ToolDispatcher, DispatchContext } from './tool-dispatcher'
 
 // Builds AI SDK tool objects that route through our existing ToolDispatcher.

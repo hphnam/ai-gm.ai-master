@@ -10,7 +10,7 @@ import {
   ProposedDocTypeSchema,
   ScheduleSchema,
   UUID_RE,
-} from '@gm-ai/types'
+} from '../../../types'
 
 // Inputs
 export const DocIdParamSchema = z.object({

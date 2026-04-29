@@ -16,7 +16,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
 import { prisma } from '../../database/prisma'
-import { ProposedDocTypeSchema, type ProposedDocType } from '@gm-ai/types'
+import { ProposedDocTypeSchema, type ProposedDocType } from '../../types'
 import { z } from 'zod'
 import { sanitiseError } from '../../common/sanitise-error'
 

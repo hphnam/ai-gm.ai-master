@@ -7,7 +7,7 @@ import {
   type VenueDetail,
   type VenueListItem,
   type VenueProfile,
-} from '@gm-ai/types'
+} from '../../types'
 import { IndexerService } from '../indexer/indexer.service'
 
 @Injectable()
