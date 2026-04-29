@@ -25,9 +25,19 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: 'gm_ai',
+    // In prod web (ai-gm.ai) and api (api.ai-gm.ai) live on different
+    // subdomains. Without crossSubDomainCookies the auth cookie set by
+    // the API would be scoped to api.ai-gm.ai only and never sent on
+    // requests originating from ai-gm.ai → fetches fail auth, sign-in
+    // bounces back to /sign-in. Widening to the parent domain fixes it.
+    // Pair with sameSite:'none'+secure:true (required for cross-site
+    // cookies in modern browsers).
+    crossSubDomainCookies: isProd
+      ? { enabled: true, domain: '.ai-gm.ai' }
+      : { enabled: false },
     defaultCookieAttributes: {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: isProd ? 'none' : 'lax',
       path: '/',
       secure: isProd,
     },
