@@ -21,7 +21,7 @@
 import '../src/load-env'
 import 'reflect-metadata'
 import { Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../src/database/prisma'
 import {
   BACKFILL_TENANT_COST_CEILING_USD,
   BACKFILL_VOYAGE_BACKOFF_MS,

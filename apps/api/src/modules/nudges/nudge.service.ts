@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { WhatsAppAdapter } from '../whatsapp/whatsapp.adapter'
 

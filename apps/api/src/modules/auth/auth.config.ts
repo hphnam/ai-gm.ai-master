@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { assertAuthEnv } from './assert-auth-env'
 import { generateOrgSlug, OrgSlugConflictError } from './generate-org-slug'
 

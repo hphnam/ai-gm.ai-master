@@ -1,4 +1,4 @@
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 
 const SLUG_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
 const SUFFIX_LEN = 6

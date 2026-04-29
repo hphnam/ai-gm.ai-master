@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
-import { Prisma, prisma } from '@gm-ai/database'
+import { Prisma, prisma } from '../../database/prisma'
 import {
   AudienceSchema,
   ChecklistStepSchema,

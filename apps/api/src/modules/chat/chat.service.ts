@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   type ImagePart,
   type ModelMessage,

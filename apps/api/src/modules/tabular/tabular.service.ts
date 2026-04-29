@@ -24,7 +24,7 @@
 
 import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
-import { Prisma, prisma } from '@gm-ai/database'
+import { Prisma, prisma } from '../../database/prisma'
 import {
   TABULAR_QUERY_DEFAULT_LIMIT,
   TABULAR_QUERY_MAX_LIMIT,

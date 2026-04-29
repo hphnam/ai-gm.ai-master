@@ -14,7 +14,7 @@
 
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   MAX_PENDING_INVITATIONS_PER_ORG,
   type InvitationDTO,

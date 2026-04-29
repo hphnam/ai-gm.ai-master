@@ -15,7 +15,7 @@ import '../src/load-env'
 import 'reflect-metadata'
 import { Logger } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../src/database/prisma'
 import {
   CHUNK_TARGET_TOKENS,
   CSV_ROW_BATCH_SIZE,

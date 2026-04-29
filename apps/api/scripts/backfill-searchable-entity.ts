@@ -14,7 +14,7 @@
  */
 
 import '../src/load-env'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../src/database/prisma'
 import { VoyageAIClient } from 'voyageai'
 
 const BATCH_SIZE = 32

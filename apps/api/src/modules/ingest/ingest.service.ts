@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash, randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
-import { Prisma, prisma } from '@gm-ai/database'
+import { Prisma, prisma } from '../../database/prisma'
 import {
   CURRENT_SECTION_VERSION,
   EMBED_QUALITY_DEGRADED_THRESHOLD,

@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   VenueProfileSchema,
   type CreateVenueBody,

@@ -5,7 +5,7 @@
 
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   PENDING_VERIFICATION_TTL_MS,
   PhoneRateLimit,

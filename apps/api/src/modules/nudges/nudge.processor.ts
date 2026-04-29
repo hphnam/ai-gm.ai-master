@@ -2,7 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq'
 import { Logger, OnApplicationBootstrap } from '@nestjs/common'
 import { InjectQueue } from '@nestjs/bullmq'
 import type { Job, Queue } from 'bullmq'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { NudgeService } from './nudge.service'
 import {
   NUDGE_JOB_FANOUT,

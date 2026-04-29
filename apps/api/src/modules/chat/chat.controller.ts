@@ -25,7 +25,7 @@ import {
 import { ZodValidationPipe } from 'nestjs-zod'
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { Response } from 'express'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { type ApiErrorResponse } from '@gm-ai/types'
 import { translateChatServiceError } from '../../common/translate-chat-error'
 import { AuthGuard } from '../auth/auth.guard'

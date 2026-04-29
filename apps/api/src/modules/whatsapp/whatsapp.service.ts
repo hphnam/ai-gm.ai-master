@@ -1,6 +1,6 @@
 import { createHash } from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   CHAT_TIMEOUT_MS,
   PROACTIVE_SESSION_WINDOW_MS,

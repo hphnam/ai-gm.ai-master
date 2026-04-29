@@ -1,7 +1,7 @@
 import { Injectable, Logger, NestMiddleware, NotFoundException } from '@nestjs/common'
 import type { NextFunction, Response } from 'express'
 import { fromNodeHeaders } from 'better-auth/node'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import type { ApiErrorResponse } from '@gm-ai/types'
 import { auth } from './auth.config'
 import type { AuthedRequest } from './auth.guard'

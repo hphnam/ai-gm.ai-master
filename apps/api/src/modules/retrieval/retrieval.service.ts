@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { fail, ok, type ToolResult } from '@gm-ai/types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 

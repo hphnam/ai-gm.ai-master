@@ -17,7 +17,7 @@
 import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../src/database/prisma'
 import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
 import { IndexerService } from '../src/modules/indexer/indexer.service'
 import { IngestService } from '../src/modules/ingest/ingest.service'

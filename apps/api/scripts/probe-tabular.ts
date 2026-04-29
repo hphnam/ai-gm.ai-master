@@ -17,7 +17,7 @@
 import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../src/database/prisma'
 import { MAX_TABULAR_ROWS_PER_DOC, type TabularExtractionResult } from '@gm-ai/types'
 import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import { inferColumnTypes } from '../src/modules/tabular/infer-column-types'

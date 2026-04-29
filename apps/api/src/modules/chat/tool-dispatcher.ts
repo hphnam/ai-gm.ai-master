@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import {
   AGGREGATE_SECTION_TOKEN_BUDGET,
   TOOL_INPUT_SCHEMAS,

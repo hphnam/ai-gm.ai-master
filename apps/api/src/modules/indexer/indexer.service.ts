@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { prisma } from '@gm-ai/database'
+import { prisma } from '../../database/prisma'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 
 export type EntityType =
