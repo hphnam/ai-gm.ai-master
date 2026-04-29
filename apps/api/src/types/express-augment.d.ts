@@ -7,7 +7,6 @@
 // express-serve-static-core. Declaring on both module IDs guarantees the augmentation merges
 // regardless of which import path a caller uses.
 import 'express'
-import 'express-serve-static-core'
 
 declare module 'express-serve-static-core' {
   interface Request {
