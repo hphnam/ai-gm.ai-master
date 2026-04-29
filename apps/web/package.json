@@ -2,6 +2,10 @@
   "name": "web",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "pnpm@10.4.1",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
