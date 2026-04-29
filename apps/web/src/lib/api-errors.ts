@@ -1,45 +1,8 @@
-// Web-side mirror of the API's closed-set error code list. Kept in sync
-// with apps/api by hand — not codegen'd because nestjs-zod doesn't expose
-// the API_ERROR_CODES enum through the OpenAPI surface. If the API adds a
-// new error code, add it here too.
-export const API_ERROR_CODES = [
-  'invalid-input',
-  'not-found',
-  'venue-not-found',
-  'conversation-not-found',
-  'message-not-found',
-  'not-assistant-message',
-  'unauthorized',
-  'forbidden',
-  'email-already-registered',
-  'invalid-credentials',
-  'organization-not-found',
-  'member-not-found',
-  'invalid-redirect',
-  'payload-too-large',
-  'organization-slug-conflict',
-  'invitation-not-found',
-  'invitation-expired',
-  'invitation-already-accepted',
-  'invitation-email-mismatch',
-  'mail-send-failed',
-  'invalid-invitation-role',
-  'invitation-limit-reached',
-  'already-a-member',
-  'email-not-verified',
-  'phone-invalid-format',
-  'phone-invalid-code',
-  'phone-already-linked',
-  'phone-change-requires-unlink',
-  'phone-verification-failed',
-  'phone-rate-limited',
-  'phone-service-unavailable',
-  'file-too-large',
-  'unsupported-file-type',
-  'extraction-failed',
-  'type-proposal-missing',
-  'type-name-conflict',
-  'checklist-extraction-failed',
-] as const
-export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
-export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }
+// Single source of truth lives in apps/api (registered with @ApiExtraModels
+// on AppController so orval picks it up). Web re-exports the generated
+// types here under the legacy names so the rest of the app keeps using
+// ApiErrorCode / ApiErrorResponse without touching call sites.
+export type {
+  ApiErrorResponseDto as ApiErrorResponse,
+  ApiErrorResponseDtoError as ApiErrorCode,
+} from '@/generated/api'
