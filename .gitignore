@@ -24,10 +24,10 @@ docs/*.tsv
 # Prisma
 packages/database/src/generated/
 
-# Swagger / OpenAPI codegen — emitted by `pnpm --filter api swagger:generate`,
-# consumed by orval on the web side. Re-generate on demand; not committed.
-apps/api/swagger.json
-apps/web/src/generated/
+# Swagger / OpenAPI codegen — committed so deploys don't have to run
+# the regen pipeline. Refresh with:
+#   pnpm --filter api swagger:generate && pnpm --filter web api:generate
+# Treat the diff like a Prisma migration — review before push.
 
 # IDE
 .idea/
