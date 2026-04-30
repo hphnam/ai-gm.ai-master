@@ -8,6 +8,7 @@ import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
 import { securityHeadersMiddleware } from './common/security-headers.middleware'
 import { assertAuthEnv } from './modules/auth/assert-auth-env'
+import { RedisIoAdapter } from './modules/realtime/redis-io.adapter'
 
 async function bootstrap() {
   // audit-added M8: fail-fast startup — missing/malformed BETTER_AUTH_* + WEB_ORIGIN exit 1
@@ -30,7 +31,7 @@ async function bootstrap() {
       return cb(null, false)
     },
     credentials: true,
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['content-type', 'x-request-id'],
   })
 
@@ -112,6 +113,15 @@ async function bootstrap() {
     .build()
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup('api-docs', app, swaggerDoc)
+
+  // Realtime fan-out across replicas. Same Redis instance BullMQ uses, no
+  // extra infra dep. Done after createDocument so swagger setup is unaffected.
+  const redisAdapter = new RedisIoAdapter(
+    app,
+    process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
+  )
+  await redisAdapter.connectToRedis()
+  app.useWebSocketAdapter(redisAdapter)
 
   app.enableShutdownHooks()
 

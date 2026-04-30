@@ -15,6 +15,7 @@ import {
   Hash,
   Loader2,
   MapPin,
+  Pencil,
   Sparkles,
   Tag,
   Trash2,
@@ -33,6 +34,7 @@ import {
 } from '@/components/ui/dialog'
 import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
+import { EditDocModal } from '@/components/docs/edit-doc-modal'
 import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
 import { ApiError } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
@@ -283,10 +285,12 @@ function DocActions({
   doc,
   onOpenClassify,
   onOpenProposal,
+  onOpenEdit,
 }: {
   doc: DocDetailDto
   onOpenClassify: () => void
   onOpenProposal: () => void
+  onOpenEdit: () => void
 }) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const canPickCategory = doc.processingStatus === 'ready'
@@ -310,6 +314,16 @@ function DocActions({
           {reclassifyLabel}
         </Button>
       ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={onOpenEdit}
+        aria-label="Edit document"
+        title="Edit document"
+        className="cursor-pointer text-muted-foreground hover:text-foreground"
+      >
+        <Pencil className="h-4 w-4" aria-hidden />
+      </Button>
       <Button
         size="sm"
         variant="ghost"
@@ -492,6 +506,7 @@ export function DocDetailBody({ id }: { id: string }) {
   const doc = useDoc(id)
   const [classifyOpen, setClassifyOpen] = useState(false)
   const [proposalOpen, setProposalOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
 
   const data = doc.data
   const title = data?.title?.trim() || 'Untitled document'
@@ -506,6 +521,7 @@ export function DocDetailBody({ id }: { id: string }) {
               doc={data}
               onOpenClassify={() => setClassifyOpen(true)}
               onOpenProposal={() => setProposalOpen(true)}
+              onOpenEdit={() => setEditOpen(true)}
             />
           ) : null
         }
@@ -542,6 +558,11 @@ export function DocDetailBody({ id }: { id: string }) {
                 >
                   {title}
                 </h1>
+                {data.summary ? (
+                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+                    {data.summary}
+                  </p>
+                ) : null}
                 <MetaLine doc={data} />
                 {data.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -562,20 +583,6 @@ export function DocDetailBody({ id }: { id: string }) {
                 onOpenClassify={() => setClassifyOpen(true)}
                 onOpenProposal={() => setProposalOpen(true)}
               />
-
-              {data.summary ? (
-                <section
-                  aria-label="Summary"
-                  className="rounded-xl border bg-muted/30 p-4 sm:p-5"
-                >
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                    Summary
-                  </p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-foreground">
-                    {data.summary}
-                  </p>
-                </section>
-              ) : null}
 
               <ContentBlock content={data.content} />
 
@@ -602,6 +609,13 @@ export function DocDetailBody({ id }: { id: string }) {
               proposal={data.pendingTypeProposal}
               open={proposalOpen}
               onOpenChange={setProposalOpen}
+            />
+          ) : null}
+          {editOpen ? (
+            <EditDocModal
+              doc={data}
+              open={editOpen}
+              onOpenChange={setEditOpen}
             />
           ) : null}
         </>

@@ -17,11 +17,15 @@ import {
   type DocumentTypeDto,
   type DocumentTypeKind,
   type ProcessingStatus,
+  type CategorySuggestionResponse,
   type ProposedDocType,
   type Schedule,
+  type UpdateDocRequest,
 } from '../../types'
 import { IngestService } from '../ingest/ingest.service'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { ReductoService, type ParsedDocument } from '../reducto/reducto.service'
+import { RetrievalService } from '../retrieval/retrieval.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService } from './classifier.service'
 
@@ -70,6 +74,12 @@ export class TypeNameConflictError extends Error {
   constructor() {
     super('type-name-conflict')
     this.name = 'TypeNameConflictError'
+  }
+}
+export class CategorySuggestionUnavailableError extends Error {
+  constructor() {
+    super('category-suggestion-unavailable')
+    this.name = 'CategorySuggestionUnavailableError'
   }
 }
 
@@ -144,7 +154,36 @@ export class DocsService {
     private readonly classifier: ClassifierService,
     private readonly checklistExtractor: ChecklistExtractorService,
     private readonly reducto: ReductoService,
+    private readonly retrieval: RetrievalService,
+    private readonly realtime: RealtimeGateway,
   ) {}
+
+  // Wraps a status update so callers don't have to remember to also push the
+  // realtime event. Returns the row id so callers can chain. Errors on the
+  // emit side are swallowed — realtime is best-effort.
+  private async setProcessingStatus(
+    knowledgeItemId: string,
+    orgId: string,
+    data: { processingStatus: 'processing' | 'ready' | 'failed'; processingError?: string | null },
+  ): Promise<void> {
+    await prisma.knowledgeItem
+      .update({
+        where: { id: knowledgeItemId },
+        data: {
+          processingStatus: data.processingStatus,
+          processingError: data.processingError ?? null,
+        },
+      })
+      .catch(() => undefined)
+    try {
+      this.realtime.emitDocUpdated(orgId, {
+        id: knowledgeItemId,
+        status: data.processingStatus,
+      })
+    } catch {
+      // realtime is best-effort
+    }
+  }
 
   async list(orgId: string): Promise<DocListItem[]> {
     // Plan 02-01: direct organizationId scope. KnowledgeItem.organizationId
@@ -537,6 +576,11 @@ export class DocsService {
       reductoFileId?: string | null
       description?: string
       mimeType?: string | null
+      // Re-ingest path. When set, the classifier is bypassed and the existing
+      // (user-confirmed) DocumentType is preserved on the row. The user picked
+      // this category — re-classifying would clobber their decision.
+      preserveDocumentTypeId?: string | null
+      preservePendingTypeProposal?: Record<string, unknown> | null
     },
     orgId: string,
     userId: string | null = null,
@@ -571,25 +615,56 @@ export class DocsService {
         }
       }
 
-      const classified = await this.classifier.classify({
-        content: composedContent,
-        title: input.title,
-        orgId,
-      })
-      this.logger.log(
-        JSON.stringify({
-          level: 'log',
-          event: 'docs.enrich_classified',
-          knowledgeItemId: id,
+      // Re-ingest path: caller passed the existing user-confirmed type. Skip the
+      // classifier entirely so we don't overwrite the user's decision.
+      let documentTypeId: string | null
+      let pendingTypeProposal: Record<string, unknown> | null
+      let matchedTypeKind: 'reference' | 'procedural' | null = null
+      if (input.preserveDocumentTypeId) {
+        documentTypeId = input.preserveDocumentTypeId
+        pendingTypeProposal = null
+        const t = await prisma.documentType.findUnique({
+          where: { id: input.preserveDocumentTypeId },
+          select: { kind: true },
+        })
+        matchedTypeKind = (t?.kind as 'reference' | 'procedural' | undefined) ?? null
+        this.logger.log(
+          JSON.stringify({
+            level: 'log',
+            event: 'docs.enrich_skipped_classifier',
+            knowledgeItemId: id,
+            orgId,
+            preservedDocumentTypeId: input.preserveDocumentTypeId,
+          }),
+        )
+      } else {
+        const classified = await this.classifier.classify({
+          content: composedContent,
+          title: input.title,
           orgId,
-          kind: classified.kind,
-        }),
-      )
-      const documentTypeId = classified.kind === 'matched' ? classified.typeId : null
-      const pendingTypeProposal =
-        classified.kind === 'proposal'
-          ? (classified.proposal as unknown as Record<string, unknown>)
-          : null
+        })
+        this.logger.log(
+          JSON.stringify({
+            level: 'log',
+            event: 'docs.enrich_classified',
+            knowledgeItemId: id,
+            orgId,
+            kind: classified.kind,
+          }),
+        )
+        documentTypeId = classified.kind === 'matched' ? classified.typeId : null
+        pendingTypeProposal =
+          classified.kind === 'proposal'
+            ? (classified.proposal as unknown as Record<string, unknown>)
+            : input.preservePendingTypeProposal ?? null
+        if (classified.kind === 'matched') {
+          const t = await prisma.documentType.findUnique({
+            where: { id: classified.typeId },
+            select: { kind: true },
+          })
+          matchedTypeKind = (t?.kind as 'reference' | 'procedural' | undefined) ?? null
+        }
+      }
 
       await this.ingestService.ingest({
         id,
@@ -608,26 +683,20 @@ export class DocsService {
         parsedTables: parsed?.tables ?? null,
       })
 
-      if (classified.kind === 'matched') {
-        const type = await prisma.documentType.findUnique({
-          where: { id: classified.typeId },
-          select: { kind: true },
+      if (matchedTypeKind === 'procedural' && documentTypeId) {
+        await this.checklistExtractor.extract({
+          knowledgeItemId: id,
+          orgId,
+          title: input.title ?? '(untitled)',
+          content: composedContent,
+          userId,
+          kindSource: input.preserveDocumentTypeId ? 'accept-type' : 'matched',
         })
-        if (type?.kind === 'procedural') {
-          await this.checklistExtractor.extract({
-            knowledgeItemId: id,
-            orgId,
-            title: input.title ?? '(untitled)',
-            content: composedContent,
-            userId,
-            kindSource: 'matched',
-          })
-        }
       }
 
-      await prisma.knowledgeItem.update({
-        where: { id },
-        data: { processingStatus: 'ready', processingError: null },
+      await this.setProcessingStatus(id, orgId, {
+        processingStatus: 'ready',
+        processingError: null,
       })
       this.logger.log(
         JSON.stringify({
@@ -650,13 +719,64 @@ export class DocsService {
           message,
         }),
       )
-      await prisma.knowledgeItem
-        .update({
-          where: { id },
-          data: { processingStatus: 'failed', processingError: message.slice(0, 500) },
-        })
-        .catch(() => undefined)
+      await this.setProcessingStatus(id, orgId, {
+        processingStatus: 'failed',
+        processingError: message.slice(0, 500),
+      })
     }
+  }
+
+  // Fire-and-forget checklist extraction. Called whenever a doc gets resolved
+  // to a procedural type (accept-type or classify). Flips processingStatus to
+  // 'processing' synchronously so the frontend's existing 3s poll picks it up
+  // and shows the row as in-flight, runs the AI extraction in the background,
+  // then flips status back to 'ready' (or 'failed' on error). Caller does not
+  // await — keeps the HTTP response sub-second.
+  private kickChecklistExtractionInBackground(args: {
+    knowledgeItemId: string
+    orgId: string
+    userId: string | null
+    title: string
+    content: string
+  }): void {
+    const { knowledgeItemId, orgId, userId, title, content } = args
+
+    void this.setProcessingStatus(knowledgeItemId, orgId, {
+      processingStatus: 'processing',
+      processingError: null,
+    })
+
+    setImmediate(async () => {
+      try {
+        await this.checklistExtractor.extract({
+          knowledgeItemId,
+          orgId,
+          title,
+          content,
+          userId,
+          kindSource: 'accept-type',
+        })
+        await this.setProcessingStatus(knowledgeItemId, orgId, {
+          processingStatus: 'ready',
+          processingError: null,
+        })
+      } catch (err) {
+        const message = (err as Error)?.message ?? 'checklist-extract-failed'
+        this.logger.error(
+          JSON.stringify({
+            level: 'error',
+            event: 'docs.checklist_extract_background_failed',
+            knowledgeItemId,
+            orgId,
+            message,
+          }),
+        )
+        await this.setProcessingStatus(knowledgeItemId, orgId, {
+          processingStatus: 'failed',
+          processingError: message.slice(0, 500),
+        })
+      }
+    })
   }
 
   // Plan 04-02 Task 3 — owner accepts a pending proposal → promote to DocumentType + link.
@@ -739,8 +859,9 @@ export class DocsService {
         }),
       )
 
-      // Plan 04-03 Task 3 — post-accept extraction fires fire-and-forget for procedural types.
-      // Extractor is fail-soft (any failure returns null + operator log); no extra try/catch.
+      // Post-accept extraction runs in the background for procedural types so
+      // the modal can close immediately. The frontend polls while the row sits
+      // in 'processing' and refreshes when it flips back to 'ready'.
       if (resolvedKind === 'procedural') {
         const ki = await prisma.knowledgeItem.findUnique({
           where: { id: knowledgeItemId },
@@ -752,13 +873,12 @@ export class DocsService {
             typeof metadata.title === 'string' && metadata.title.trim()
               ? metadata.title.trim()
               : '(untitled)'
-          await this.checklistExtractor.extract({
+          this.kickChecklistExtractionInBackground({
             knowledgeItemId,
             orgId,
+            userId,
             title,
             content: ki.content,
-            userId,
-            kindSource: 'accept-type',
           })
         }
       }
@@ -819,9 +939,13 @@ export class DocsService {
       if (!typeRow) throw new DocNotFoundOrCrossOrgError()
     } else {
       // Reuse-on-conflict so repeated manual classifies don't generate duplicate
-      // types when a user re-enters the same name.
+      // types when a user re-enters the same name. Case-insensitive so
+      // "staff note" routes to existing "Staff Note".
       const existing = await prisma.documentType.findFirst({
-        where: { organizationId: orgId, name: input.name },
+        where: {
+          organizationId: orgId,
+          name: { equals: input.name, mode: 'insensitive' },
+        },
         select: { id: true, name: true, description: true, schema: true, kind: true },
       })
       if (existing) {
@@ -859,24 +983,226 @@ export class DocsService {
       }),
     )
 
-    // Fire checklist extractor if the resolved type is procedural. Fail-soft.
+    // Background checklist extraction for procedural types — modal closes
+    // immediately, row sits in 'processing' until the AI work completes.
     if (typeRow.kind === 'procedural') {
       const metadata = (row.metadata ?? {}) as Record<string, unknown>
       const title =
         typeof metadata.title === 'string' && metadata.title.trim()
           ? metadata.title.trim()
           : '(untitled)'
-      await this.checklistExtractor.extract({
+      this.kickChecklistExtractionInBackground({
         knowledgeItemId,
         orgId,
+        userId,
         title,
         content: row.content,
-        userId,
-        kindSource: 'accept-type',
       })
     }
 
     return toDocumentTypeDto(typeRow) as DocumentTypeDto
+  }
+
+  // Edit-and-re-ingest. Persists title/venue/description changes synchronously,
+  // flips status to 'processing', then fires enrichInBackground. The user's
+  // confirmed DocumentType (if any) is preserved across re-ingest — re-classifying
+  // would clobber a decision they explicitly made.
+  async updateDoc(
+    id: string,
+    orgId: string,
+    userId: string | null,
+    input: UpdateDocRequest,
+  ): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        organizationId: true,
+        content: true,
+        metadata: true,
+        venueId: true,
+        documentTypeId: true,
+        pendingTypeProposal: true,
+      },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'update',
+            targetRowId: id,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+
+    if (input.venueId) {
+      const venue = await prisma.venue.findFirst({
+        where: { id: input.venueId, organizationId: orgId },
+        select: { id: true },
+      })
+      if (!venue) throw new DocNotFoundOrCrossOrgError()
+    }
+
+    // Description is stored prepended to content (`Context from uploader: …\n\n---\n\n<body>`).
+    // To re-ingest with a new description we strip any existing prefix from the
+    // body and re-compose. If the user didn't touch description, content is
+    // left as-is.
+    const PREFIX_RE = /^Context from uploader: [\s\S]*?\n\n---\n\n/
+    const bodyContent = row.content.replace(PREFIX_RE, '')
+    let nextContent = row.content
+    if (input.description !== undefined) {
+      const trimmed = input.description.trim()
+      nextContent = trimmed.length > 0
+        ? `Context from uploader: ${trimmed}\n\n---\n\n${bodyContent}`
+        : bodyContent
+    }
+
+    const existingMeta = (row.metadata ?? {}) as Record<string, unknown>
+    const existingTitle =
+      typeof existingMeta.title === 'string' ? existingMeta.title : null
+    const nextTitle = input.title ?? existingTitle
+    const nextVenueId =
+      input.venueId !== undefined ? input.venueId : row.venueId
+
+    await prisma.knowledgeItem.update({
+      where: { id },
+      data: {
+        venueId: nextVenueId,
+        content: nextContent,
+        metadata: { ...existingMeta, title: nextTitle } as object,
+        processingStatus: 'processing',
+        processingError: null,
+      },
+    })
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.updated',
+        orgId,
+        actingUserId: userId,
+        knowledgeItemId: id,
+        titleChanged: input.title !== undefined,
+        venueChanged: input.venueId !== undefined,
+        descriptionChanged: input.description !== undefined,
+        preservedDocumentTypeId: row.documentTypeId,
+      }),
+    )
+
+    const enrichInput = {
+      title: nextTitle ?? '',
+      content: nextContent,
+      venueId: nextVenueId ?? null,
+      description:
+        input.description !== undefined && input.description.trim().length > 0
+          ? input.description.trim()
+          : undefined,
+      preserveDocumentTypeId: row.documentTypeId,
+      preservePendingTypeProposal: (row.pendingTypeProposal ?? null) as
+        | Record<string, unknown>
+        | null,
+    }
+
+    setImmediate(() => {
+      void this.enrichInBackground(id, enrichInput, orgId, userId)
+    })
+  }
+
+  // Powers the "suggest a name" button in the classify modal's Create-new tab.
+  // Re-runs the classifier against the doc's content + the org's existing types.
+  // - matched   → returns the matched type's name/kind/desc with existing:true so the
+  //               UI can hint "you already have this"; reuse-on-conflict in
+  //               classifyManually still dedupes if the user proceeds anyway.
+  // - proposal  → returns the proposal's name/kind/desc with existing:false.
+  // - none      → throws CategorySuggestionUnavailableError (422 to the caller).
+  async suggestCategory(
+    knowledgeItemId: string,
+    orgId: string,
+  ): Promise<CategorySuggestionResponse> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: knowledgeItemId },
+      select: {
+        id: true,
+        organizationId: true,
+        content: true,
+        metadata: true,
+      },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'suggest-category',
+            targetRowId: knowledgeItemId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+
+    const metadata = (row.metadata ?? {}) as Record<string, unknown>
+    const title =
+      typeof metadata.title === 'string' && metadata.title.trim()
+        ? metadata.title.trim()
+        : null
+
+    const result = await this.classifier.classify({
+      content: row.content,
+      title,
+      orgId,
+    })
+
+    if (result.kind === 'matched') {
+      const existing = await prisma.documentType.findUnique({
+        where: { id: result.typeId },
+        select: { name: true, description: true, kind: true },
+      })
+      if (!existing) throw new CategorySuggestionUnavailableError()
+      const parsedKind = DocumentTypeKindSchema.safeParse(existing.kind)
+      return {
+        name: existing.name,
+        kind: parsedKind.success ? parsedKind.data : 'reference',
+        description: existing.description,
+        existing: true,
+      }
+    }
+    if (result.kind === 'proposal') {
+      // The classifier didn't link to an existing type, but the proposed name
+      // might collide (case-insensitively) with one the org already has. Surface
+      // that so the UI can show "you already have a category called X" — and
+      // align the returned name's casing with what's stored in DB.
+      const collision = await prisma.documentType.findFirst({
+        where: {
+          organizationId: orgId,
+          name: { equals: result.proposal.name, mode: 'insensitive' },
+        },
+        select: { name: true, description: true, kind: true },
+      })
+      if (collision) {
+        const parsedKind = DocumentTypeKindSchema.safeParse(collision.kind)
+        return {
+          name: collision.name,
+          kind: parsedKind.success ? parsedKind.data : 'reference',
+          description: collision.description,
+          existing: true,
+        }
+      }
+      return {
+        name: result.proposal.name,
+        kind: result.proposal.kind ?? 'reference',
+        description: result.proposal.description,
+        existing: false,
+      }
+    }
+    throw new CategorySuggestionUnavailableError()
   }
 
   // Lists the org's confirmed DocumentTypes so the classify-manually UI can offer
@@ -959,6 +1285,53 @@ export class DocsService {
       }),
       prisma.knowledgeItem.delete({ where: { id } }),
     ])
+  }
+
+  // KB-match search for the gap card "Search KB" button. Runs the gap's
+  // question through hybrid retrieval, scoped to the gap's venue. Returns the
+  // top hits with snippets so the GM can decide if the answer already exists
+  // in the KB (in which case they'd just delete the gap).
+  async findKbMatchesForGap(
+    gapId: string,
+    orgId: string,
+  ): Promise<
+    Array<{
+      docId: string
+      title: string | null
+      snippet: string
+      similarity: number
+    }>
+  > {
+    const gap = await prisma.knowledgeItem.findUnique({
+      where: { id: gapId },
+      select: {
+        id: true,
+        organizationId: true,
+        answerStatus: true,
+        content: true,
+        venueId: true,
+      },
+    })
+    if (!gap || gap.organizationId !== orgId || gap.answerStatus !== 'pending') {
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    const result = await this.retrieval.find(gap.content, {
+      orgId,
+      venueId: gap.venueId ?? undefined,
+      limit: 3,
+      minSimilarity: 0.6,
+      entityTypes: ['knowledge_item'],
+      // Multi-venue groups often share answers (e.g. "where do we keep X?");
+      // a thin venue still benefits from a sibling venue's docs.
+      crossVenue: true,
+    })
+    if (!result.ok) return []
+    return result.data.map((hit) => ({
+      docId: hit.entityId,
+      title: hit.title,
+      snippet: contentPreview(hit.content ?? '', 240),
+      similarity: hit.similarity,
+    }))
   }
 
   // Delete a pending knowledge gap. Hardened: only removes rows where

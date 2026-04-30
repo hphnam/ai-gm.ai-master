@@ -233,6 +233,8 @@ function AssistantMarkdown({ text }: { text: string }) {
               return (
                 <a
                   href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
                   className="ml-0.5 inline-flex items-baseline rounded-sm bg-brand/10 px-1 align-baseline text-[10px] font-medium text-brand no-underline hover:bg-brand/20"
                   aria-label="View source document"
                 >

@@ -11,6 +11,27 @@ export const CreateDocRequestSchema = z.object({
 })
 export type CreateDocRequest = z.infer<typeof CreateDocRequestSchema>
 
+// Edit-and-re-ingest. All fields optional, but at least one required so the
+// endpoint is never a no-op. Title and venue are cheap edits; description
+// triggers a full re-enrich because it's prepended to content (signal for the
+// classifier + embedder).
+export const UpdateDocRequestSchema = z
+  .object({
+    title: z.string().trim().min(1, 'title required').max(200).optional(),
+    venueId: z
+      .union([z.string().regex(UUID_RE, 'invalid uuid'), z.null()])
+      .optional(),
+    description: z.string().trim().max(1_000).optional(),
+  })
+  .refine(
+    (v) =>
+      v.title !== undefined ||
+      v.venueId !== undefined ||
+      v.description !== undefined,
+    { message: 'at least one field required' },
+  )
+export type UpdateDocRequest = z.infer<typeof UpdateDocRequestSchema>
+
 // Plan 04-03 Task 1 — DocumentType kind enum (shipped as TEXT + Zod; native enum
 // avoided because tenant-owned taxonomy columns incur migration cost on every new value).
 export const DocumentTypeKindSchema = z.enum(['reference', 'procedural'])
@@ -66,6 +87,18 @@ export const ClassifyDocRequestSchema = z.union([
 ])
 export type ClassifyDocRequest = z.infer<typeof ClassifyDocRequestSchema>
 export type ClassifyDocResponse = DocumentTypeDto
+
+// AI-generated category suggestion shown in the "create new" branch of the
+// classify modal. Wraps ClassifierService — if it finds a match in the org's
+// existing types, returns that name (reuse-on-conflict dedupes the eventual
+// create); if it proposes a fresh type, returns those fields.
+export const CategorySuggestionResponseSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  kind: DocumentTypeKindSchema,
+  description: z.string().nullable(),
+  existing: z.boolean(),
+})
+export type CategorySuggestionResponse = z.infer<typeof CategorySuggestionResponseSchema>
 
 // Plan 04-03 Task 1 — Checklist entity contracts.
 // Every shape uses `.passthrough()` so Claude-proposed emergent keys survive persistence.

@@ -795,6 +795,22 @@ export const DocsControllerAnswerGapResponse = zod.object({
 })
 
 
+export const docsControllerGapKbMatchesPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const DocsControllerGapKbMatchesParams = zod.object({
+  "id": zod.string().regex(docsControllerGapKbMatchesPathIdRegExp)
+})
+
+export const DocsControllerGapKbMatchesResponseItem = zod.object({
+  "docId": zod.string(),
+  "title": zod.union([zod.string(),zod.null()]),
+  "snippet": zod.string(),
+  "similarity": zod.number()
+})
+export const DocsControllerGapKbMatchesResponse = zod.array(DocsControllerGapKbMatchesResponseItem)
+
+
 export const docsControllerRemoveGapPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 
@@ -920,6 +936,27 @@ export const DocsControllerRemoveParams = zod.object({
 })
 
 
+export const docsControllerUpdatePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const DocsControllerUpdateParams = zod.object({
+  "id": zod.string().regex(docsControllerUpdatePathIdRegExp)
+})
+
+export const docsControllerUpdateBodyTitleMax = 200;
+
+export const docsControllerUpdateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const docsControllerUpdateBodyDescriptionMax = 1000;
+
+
+
+export const DocsControllerUpdateBody = zod.object({
+  "title": zod.string().min(1).max(docsControllerUpdateBodyTitleMax).optional(),
+  "venueId": zod.union([zod.string().regex(docsControllerUpdateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "description": zod.string().max(docsControllerUpdateBodyDescriptionMax).optional()
+})
+
+
 export const DocsControllerUploadBody = zod.object({
   "file": zod.instanceof(File),
   "venueId": zod.string().optional(),
@@ -1019,6 +1056,21 @@ export const DocsControllerUploadResponse = zod.object({
   "extractedAt": zod.string()
 }),zod.null()]),
   "processingStatus": zod.enum(['processing', 'ready', 'failed'])
+})
+
+
+export const docsControllerSuggestCategoryPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const DocsControllerSuggestCategoryParams = zod.object({
+  "id": zod.string().regex(docsControllerSuggestCategoryPathIdRegExp)
+})
+
+export const DocsControllerSuggestCategoryResponse = zod.object({
+  "name": zod.string(),
+  "kind": zod.enum(['reference', 'procedural']),
+  "description": zod.union([zod.string(),zod.null()]),
+  "existing": zod.boolean()
 })
 
 

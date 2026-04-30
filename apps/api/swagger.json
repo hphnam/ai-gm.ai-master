@@ -847,6 +847,45 @@
         ]
       }
     },
+    "/docs/gaps/{id}/kb-matches": {
+      "get": {
+        "operationId": "DocsController_gapKbMatches",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GapKbMatchDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
     "/docs/gaps/{id}": {
       "delete": {
         "operationId": "DocsController_removeGap",
@@ -937,6 +976,43 @@
         "tags": [
           "docs"
         ]
+      },
+      "patch": {
+        "operationId": "DocsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
       }
     },
     "/docs/upload": {
@@ -978,6 +1054,42 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateDocResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
+    "/docs/{id}/category-suggestion": {
+      "get": {
+        "operationId": "DocsController_suggestCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategorySuggestionDto"
                 }
               }
             }
@@ -1505,7 +1617,8 @@
               "extraction-failed",
               "type-proposal-missing",
               "type-name-conflict",
-              "checklist-extraction-failed"
+              "checklist-extraction-failed",
+              "category-suggestion-unavailable"
             ]
           },
           "details": {
@@ -3395,6 +3508,41 @@
           "processingStatus"
         ]
       },
+      "GapKbMatchDto": {
+        "type": "object",
+        "properties": {
+          "docId": {
+            "type": "string",
+            "x-nestjs_zod-has-null": true
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "snippet": {
+            "type": "string",
+            "x-nestjs_zod-has-null": true
+          },
+          "similarity": {
+            "type": "number",
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "docId",
+          "title",
+          "snippet",
+          "similarity"
+        ]
+      },
       "DocDetailDto": {
         "type": "object",
         "properties": {
@@ -3871,6 +4019,74 @@
           "title",
           "content",
           "venueId"
+        ]
+      },
+      "UpdateDocRequestDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "x-nestjs_zod-has-null": true
+          },
+          "venueId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "x-nestjs_zod-has-null": true
+          }
+        }
+      },
+      "CategorySuggestionDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "x-nestjs_zod-has-null": true
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reference",
+              "procedural"
+            ],
+            "x-nestjs_zod-has-null": true
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "existing": {
+            "type": "boolean",
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "description",
+          "existing"
         ]
       },
       "AcceptTypeRequestDto": {

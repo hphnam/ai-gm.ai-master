@@ -365,9 +365,10 @@ export class ChatService {
     if (input.conversationId) {
       const existing = await prisma.chatConversation.findUnique({
         where: { id: input.conversationId },
-        select: { id: true, venueId: true },
+        select: { id: true, venueId: true, deletedAt: true },
       })
-      if (!existing) throw new Error(`conversation ${input.conversationId} not found`)
+      if (!existing || existing.deletedAt !== null)
+        throw new Error(`conversation ${input.conversationId} not found`)
       if (existing.venueId !== venue.id) {
         throw new Error(
           `conversation ${input.conversationId} does not belong to venue ${venue.id}`,
@@ -633,18 +634,23 @@ export class ChatService {
         id: true,
         venueId: true,
         userId: true,
+        deletedAt: true,
         venue: { select: { organizationId: true } },
       },
     })
     if (
       !conv ||
+      conv.deletedAt !== null ||
       conv.venueId !== venueId ||
       conv.venue.organizationId !== orgId ||
       (conv.userId !== null && conv.userId !== userId)
     ) {
       throw new Error(`conversation ${conversationId} not found`)
     }
-    await prisma.chatConversation.delete({ where: { id: conversationId } })
+    await prisma.chatConversation.update({
+      where: { id: conversationId },
+      data: { deletedAt: new Date() },
+    })
   }
 
   async listRecent(
@@ -665,6 +671,7 @@ export class ChatService {
     const rows = await prisma.chatConversation.findMany({
       where: {
         userId,
+        deletedAt: null,
         venue: { organizationId: orgId },
         ...(venueId ? { venueId } : {}),
       },
@@ -731,8 +738,11 @@ export class ChatService {
     const conversationId = params.conversationId ?? crypto.randomUUID()
     const existingConv = await prisma.chatConversation.findUnique({
       where: { id: conversationId },
-      select: { id: true, venueId: true, userId: true },
+      select: { id: true, venueId: true, userId: true, deletedAt: true },
     })
+    if (existingConv && existingConv.deletedAt !== null) {
+      throw new Error(`conversation ${conversationId} not found`)
+    }
     this.logger.log(
       JSON.stringify({
         event: 'chat.prepare_stream.upsert',

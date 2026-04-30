@@ -48,6 +48,8 @@ export const API_ERROR_CODES = [
   // v0.2 Phase 4 — Procedural doc model (Plan 04-03; append-only)
   // Reserved for the future retry-extract endpoint (D-04-03-F); no current endpoint returns this.
   'checklist-extraction-failed',
+  // AI suggest-name button — classifier returned 'none' (low signal).
+  'category-suggestion-unavailable',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

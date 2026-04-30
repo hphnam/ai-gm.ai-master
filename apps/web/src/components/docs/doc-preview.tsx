@@ -52,13 +52,18 @@ export function DocPreview({ docId }: { docId: string }) {
 
   return (
     <div className="flex min-w-0 flex-col gap-3">
-      <div className="space-y-1">
+      <div className="space-y-2">
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Document preview
         </p>
-        <p className="text-sm font-semibold leading-snug break-words sm:text-base">
+        <p className="break-words text-sm font-semibold leading-snug sm:text-base">
           {title}
         </p>
+        {data.summary ? (
+          <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            {data.summary}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
@@ -80,28 +85,20 @@ export function DocPreview({ docId }: { docId: string }) {
         ) : null}
       </div>
 
-      {data.summary ? (
-        <p className="rounded-md bg-muted/50 p-3 text-xs leading-relaxed text-muted-foreground">
-          {data.summary}
-        </p>
-      ) : null}
-
       <div className="overflow-hidden rounded-md border bg-background">
         <div className="flex items-center gap-1.5 border-b bg-muted/30 px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           <FileText className="h-3 w-3" aria-hidden />
           Content
         </div>
-        <div className="scrollbar-thin max-h-[40vh] min-h-[140px] overflow-auto">
-          {excerpt ? (
-            <pre className="whitespace-pre-wrap break-words p-3 font-sans text-xs leading-relaxed text-foreground">
-              {excerpt}
-            </pre>
-          ) : (
-            <p className="p-3 text-xs italic text-muted-foreground">
-              No readable content was extracted from this file.
-            </p>
-          )}
-        </div>
+        {excerpt ? (
+          <pre className="whitespace-pre-wrap break-words p-3 font-sans text-xs leading-relaxed text-foreground">
+            {excerpt}
+          </pre>
+        ) : (
+          <p className="p-3 text-xs italic text-muted-foreground">
+            No readable content was extracted from this file.
+          </p>
+        )}
         {truncated ? (
           <div className="border-t bg-muted/20 px-3 py-1.5 text-[11px] text-muted-foreground">
             Showing first {PREVIEW_CHAR_LIMIT.toLocaleString()} characters of{' '}

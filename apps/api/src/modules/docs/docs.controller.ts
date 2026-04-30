@@ -9,6 +9,7 @@ import {
   Logger,
   NotFoundException,
   Param,
+  Patch,
   PayloadTooLargeException,
   Post,
   UploadedFile,
@@ -46,6 +47,7 @@ import {
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
 import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
+  CategorySuggestionUnavailableError,
   DocNotFoundOrCrossOrgError,
   DocsService,
   TypeNameConflictError,
@@ -54,14 +56,17 @@ import {
 import {
   AcceptTypeRequestDto,
   AnswerGapRequestDto,
+  CategorySuggestionDto,
   CreateDocRequestDto,
   CreateDocResponseDto,
   DocDetailDto,
   DocIdParamDto,
   DocListItemDto,
   DocumentTypeDto,
+  GapKbMatchDto,
   KbGapDto,
   NoDataQueryDto,
+  UpdateDocRequestDto,
 } from './dto/docs.dto'
 
 @ApiTags('docs')
@@ -124,6 +129,28 @@ export class DocsController {
         body.answer,
         user?.id ?? null,
       )) as CreateDocResponseDto
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // "Search KB" button on gap cards — returns top-3 KB hits for the gap's
+  // question so the GM can confirm the answer already exists and delete the gap.
+  @Get('gaps/:id/kb-matches')
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: [GapKbMatchDto] })
+  async gapKbMatches(
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<GapKbMatchDto[]> {
+    try {
+      return (await this.docsService.findKbMatchesForGap(
+        params.id,
+        org.id,
+      )) as GapKbMatchDto[]
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -358,6 +385,55 @@ export class DocsController {
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // Edit a doc (title, venue, description) and re-ingest. The user-confirmed
+  // DocumentType is preserved across re-ingest — see DocsService.updateDoc.
+  @Patch(':id')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  async update(
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @Body() body: UpdateDocRequestDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<void> {
+    try {
+      await this.docsService.updateDoc(params.id, org.id, user?.id ?? null, body)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // Suggest button in the classify modal's "Create new" tab — re-runs the
+  // classifier and returns a name + kind for the user to accept or edit.
+  @Get(':id/category-suggestion')
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: CategorySuggestionDto })
+  async suggestCategory(
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<CategorySuggestionDto> {
+    try {
+      return (await this.docsService.suggestCategory(
+        params.id,
+        org.id,
+      )) as CategorySuggestionDto
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      if (err instanceof CategorySuggestionUnavailableError) {
+        throw new HttpException(
+          { error: 'category-suggestion-unavailable' } satisfies ApiErrorResponse,
+          422,
+        )
       }
       throw err
     }

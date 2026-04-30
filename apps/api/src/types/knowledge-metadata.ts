@@ -7,6 +7,7 @@ export const KnowledgeCrossRefSchema = z.object({
 
 export const KnowledgeMetadataSchema = z
   .object({
+    title: z.string().nullable().optional(),
     summary: z.string().optional(),
     tags: z.array(z.string()).optional(),
     docType: z.string().optional(),

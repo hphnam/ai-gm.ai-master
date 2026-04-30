@@ -105,6 +105,15 @@ export class IngestService implements OnModuleInit {
 
     const [vec] = await this.embeddings.embedDocuments([embeddingText])
 
+    // Preserve user-supplied title/category — the LLM doesn't echo them back, so a
+    // raw `parsed` overwrite would wipe the title and the list-view falls back to
+    // `docType`, making the doc appear renamed (e.g. "Opening Checklist" → "checklist").
+    const mergedMetadata = {
+      ...parsed,
+      title: input.title ?? parsed.title ?? null,
+      category: input.category ?? parsed.category,
+    }
+
     await prisma.$transaction(async (tx) => {
       await tx.knowledgeItem.upsert({
         where: { id },
@@ -113,7 +122,7 @@ export class IngestService implements OnModuleInit {
           organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
-          metadata: parsed as object,
+          metadata: mergedMetadata as object,
           aiSummary: parsed.summary ?? null,
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
@@ -129,7 +138,7 @@ export class IngestService implements OnModuleInit {
           organizationId: input.organizationId,
           venueId: input.venueId ?? null,
           content: input.content,
-          metadata: parsed as object,
+          metadata: mergedMetadata as object,
           aiSummary: parsed.summary ?? null,
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
@@ -246,6 +255,9 @@ ${input.content}`
     const metadata: KnowledgeMetadata = {
       tags: [],
       category: input.category ?? undefined,
+      // Preserve user-supplied title — without it, the list view falls back to
+      // `docType` (which is empty here), and the doc renders as 'Untitled'.
+      title: input.title ?? null,
     }
     this.logger.warn(
       JSON.stringify({

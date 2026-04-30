@@ -54,53 +54,59 @@ export function DocTypeProposalModal({
   const trimmedName = name.trim()
   const canAccept = trimmedName.length > 0
 
-  async function handleAccept() {
+  function handleAccept() {
     if (!canAccept) return
-    try {
-      await acceptMut.mutateAsync({
+    acceptMut.mutate(
+      {
         docId,
         kind: selectedKind !== proposedKind ? selectedKind : undefined,
         name: trimmedName !== proposal.name ? trimmedName : undefined,
-      })
-      toast.success(`Added "${trimmedName}" to your types`)
-      onOpenChange(false)
-    } catch (err) {
-      toast.error(mapApiError(err))
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Added "${trimmedName}" to your types`, {
+            description:
+              selectedKind === 'procedural'
+                ? 'Reading the steps in the background — you’ll see them in a moment.'
+                : undefined,
+          })
+        },
+        onError: (err) => toast.error(mapApiError(err)),
+      },
+    )
+    onOpenChange(false)
   }
 
-  async function handleReject() {
-    try {
-      await rejectMut.mutateAsync(docId)
-      toast.success('Left as unclassified')
-      onOpenChange(false)
-    } catch (err) {
-      toast.error(mapApiError(err))
-    }
+  function handleReject() {
+    rejectMut.mutate(docId, {
+      onSuccess: () => toast.success('Left as unclassified'),
+      onError: (err) => toast.error(mapApiError(err)),
+    })
+    onOpenChange(false)
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader>
+      <DialogContent className="flex h-[100dvh] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-none p-0 sm:h-[92vh] sm:max-h-[920px] sm:w-[92vw] sm:max-w-6xl sm:rounded-lg">
+        <DialogHeader className="shrink-0 space-y-1 border-b px-6 py-4 text-left">
           <div className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5" />
             Review a new category
           </div>
-          <DialogTitle className="pt-1">Save this as a category?</DialogTitle>
+          <DialogTitle>Save this as a category?</DialogTitle>
           <DialogDescription>
-            We haven’t seen a document like this before. Check the preview, give
-            it a short name, and pick how staff will use it — next time a
-            similar doc comes in, we’ll file it here automatically.
+            Check the preview on the left, give it a short name, and pick how
+            staff will use it. Similar docs will be filed automatically next
+            time.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid min-w-0 gap-6 py-2 md:grid-cols-[minmax(0,1fr),minmax(0,1.05fr)] md:gap-8">
-          <div className="min-w-0 md:border-r md:pr-6">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto border-b px-6 py-5 md:border-b-0 md:border-r">
             <DocPreview docId={docId} />
           </div>
 
-          <div className="min-w-0 space-y-5">
+          <div className="scrollbar-thin min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-5">
             <div className="space-y-1.5">
               <Label htmlFor="type-name" className="text-sm">
                 What do you call this kind of document?
@@ -148,7 +154,7 @@ export function DocTypeProposalModal({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="shrink-0 gap-2 border-t px-6 py-3 sm:gap-2">
           <Button
             variant="ghost"
             onClick={handleReject}

@@ -9,6 +9,7 @@ import {
   DocumentTypeKindSchema,
   ProposedDocTypeSchema,
   ScheduleSchema,
+  UpdateDocRequestSchema,
   UUID_RE,
 } from '../../../types'
 
@@ -23,6 +24,7 @@ export class AcceptTypeRequestDto extends createZodDto(AcceptTypeRequestSchema) 
 // ClassifyDocRequestSchema is a z.union — createZodDto can't extend unions.
 // The controller validates this body manually via zodPipe(ClassifyDocRequestSchema).
 export class AnswerGapRequestDto extends createZodDto(AnswerGapRequestSchema) {}
+export class UpdateDocRequestDto extends createZodDto(UpdateDocRequestSchema) {}
 
 // Response shapes — derived from @gm-ai/types TS definitions.
 const DocumentTypeSchema = z.object({
@@ -126,3 +128,19 @@ export const NoDataQuerySchema = z.object({
   lastAskedAt: z.string(),
 })
 export class NoDataQueryDto extends createZodDto(NoDataQuerySchema) {}
+
+export const CategorySuggestionSchema = z.object({
+  name: z.string(),
+  kind: DocumentTypeKindSchema,
+  description: z.string().nullable(),
+  existing: z.boolean(),
+})
+export class CategorySuggestionDto extends createZodDto(CategorySuggestionSchema) {}
+
+const GapKbMatchSchema = z.object({
+  docId: z.string(),
+  title: z.string().nullable(),
+  snippet: z.string(),
+  similarity: z.number(),
+})
+export class GapKbMatchDto extends createZodDto(GapKbMatchSchema) {}

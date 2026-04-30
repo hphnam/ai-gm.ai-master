@@ -570,13 +570,18 @@ model ChatConversation {
   /// (those <= this id by createdAt order) are dropped from the model context
   /// and replaced by the summary. New messages after this id stay verbatim.
   compactionUpToMessageId String?
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  /// Soft-delete marker — set when a user "deletes" a conversation. Reads
+  /// filter on deletedAt IS NULL; the row stays in the DB so we keep the
+  /// transcript and tool-call telemetry for analysis / training.
+  deletedAt               DateTime?
 
   venue    Venue         @relation(fields: [venueId], references: [id], onDelete: Cascade)
   messages ChatMessage[]
 
   @@index([venueId])
+  @@index([deletedAt])
 }
 
 model ChatMessage {

@@ -240,6 +240,7 @@ export class ChatController {
         id: true,
         venueId: true,
         channel: true,
+        deletedAt: true,
         venue: { select: { organizationId: true } },
         messages: {
           orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
@@ -262,6 +263,7 @@ export class ChatController {
     const notFound: ApiErrorResponse = { error: 'not-found' }
     if (
       !conv ||
+      conv.deletedAt !== null ||
       conv.venueId !== query.venueId ||
       conv.venue.organizationId !== org.id
     ) {

@@ -65,6 +65,7 @@ export const ApiErrorResponseDtoError = {
   'type-proposal-missing': 'type-proposal-missing',
   'type-name-conflict': 'type-name-conflict',
   'checklist-extraction-failed': 'checklist-extraction-failed',
+  'category-suggestion-unavailable': 'category-suggestion-unavailable',
 } as const;
 
 export interface ApiErrorResponseDto {
@@ -597,6 +598,13 @@ export interface CreateDocResponseDto {
   processingStatus: CreateDocResponseDtoProcessingStatus;
 }
 
+export interface GapKbMatchDto {
+  docId: string;
+  title: string | null;
+  snippet: string;
+  similarity: number;
+}
+
 export type DocDetailDtoDocumentType = {
   id: string;
   name: string;
@@ -707,6 +715,32 @@ export interface CreateDocRequestDto {
   venueId: string | null;
   /** @maxLength 1000 */
   description?: string;
+}
+
+export interface UpdateDocRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title?: string;
+  venueId?: string | null;
+  /** @maxLength 1000 */
+  description?: string;
+}
+
+export type CategorySuggestionDtoKind = typeof CategorySuggestionDtoKind[keyof typeof CategorySuggestionDtoKind];
+
+
+export const CategorySuggestionDtoKind = {
+  reference: 'reference',
+  procedural: 'procedural',
+} as const;
+
+export interface CategorySuggestionDto {
+  name: string;
+  kind: CategorySuggestionDtoKind;
+  description: string | null;
+  existing: boolean;
 }
 
 export type AcceptTypeRequestDtoKind = typeof AcceptTypeRequestDtoKind[keyof typeof AcceptTypeRequestDtoKind];
@@ -3186,6 +3220,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getDocsControllerAnswerGapMutationOptions(options), queryClient);
     }
 
+export type docsControllerGapKbMatchesResponse200 = {
+  data: GapKbMatchDto[]
+  status: 200
+}
+
+export type docsControllerGapKbMatchesResponseSuccess = (docsControllerGapKbMatchesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerGapKbMatchesResponse = (docsControllerGapKbMatchesResponseSuccess)
+
+export const getDocsControllerGapKbMatchesUrl = (id: string,) => {
+
+
+
+
+  return `/docs/gaps/${id}/kb-matches`
+}
+
+export const docsControllerGapKbMatches = async (id: string, options?: RequestInit): Promise<docsControllerGapKbMatchesResponse> => {
+
+  return orvalMutator<docsControllerGapKbMatchesResponse>(getDocsControllerGapKbMatchesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDocsControllerGapKbMatchesQueryKey = (id: string,) => {
+    return [
+    `/docs/gaps/${id}/kb-matches`
+    ] as const;
+    }
+
+
+export const getDocsControllerGapKbMatchesQueryOptions = <TData = Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDocsControllerGapKbMatchesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof docsControllerGapKbMatches>>> = ({ signal }) => docsControllerGapKbMatches(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DocsControllerGapKbMatchesQueryResult = NonNullable<Awaited<ReturnType<typeof docsControllerGapKbMatches>>>
+export type DocsControllerGapKbMatchesQueryError = unknown
+
+
+export function useDocsControllerGapKbMatches<TData = Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerGapKbMatches>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerGapKbMatches>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerGapKbMatches<TData = Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerGapKbMatches>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerGapKbMatches>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerGapKbMatches<TData = Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDocsControllerGapKbMatches<TData = Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerGapKbMatches>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDocsControllerGapKbMatchesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export type docsControllerRemoveGapResponse204 = {
   data: void
   status: 204
@@ -3445,6 +3586,84 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getDocsControllerRemoveMutationOptions(options), queryClient);
     }
 
+export type docsControllerUpdateResponse204 = {
+  data: void
+  status: 204
+}
+
+export type docsControllerUpdateResponseSuccess = (docsControllerUpdateResponse204) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerUpdateResponse = (docsControllerUpdateResponseSuccess)
+
+export const getDocsControllerUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/docs/${id}`
+}
+
+export const docsControllerUpdate = async (id: string,
+    updateDocRequestDto: UpdateDocRequestDto, options?: RequestInit): Promise<docsControllerUpdateResponse> => {
+
+  return orvalMutator<docsControllerUpdateResponse>(getDocsControllerUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateDocRequestDto,)
+  }
+);}
+
+
+
+
+export const getDocsControllerUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerUpdate>>, TError,{id: string;data: UpdateDocRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof docsControllerUpdate>>, TError,{id: string;data: UpdateDocRequestDto}, TContext> => {
+
+const mutationKey = ['docsControllerUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof docsControllerUpdate>>, {id: string;data: UpdateDocRequestDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  docsControllerUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DocsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof docsControllerUpdate>>>
+    export type DocsControllerUpdateMutationBody = UpdateDocRequestDto
+    export type DocsControllerUpdateMutationError = unknown
+
+    export const useDocsControllerUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerUpdate>>, TError,{id: string;data: UpdateDocRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof docsControllerUpdate>>,
+        TError,
+        {id: string;data: UpdateDocRequestDto},
+        TContext
+      > => {
+      return useMutation(getDocsControllerUpdateMutationOptions(options), queryClient);
+    }
+
 export type docsControllerUploadResponse200 = {
   data: CreateDocResponseDto
   status: 200
@@ -3532,6 +3751,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDocsControllerUploadMutationOptions(options), queryClient);
     }
+
+export type docsControllerSuggestCategoryResponse200 = {
+  data: CategorySuggestionDto
+  status: 200
+}
+
+export type docsControllerSuggestCategoryResponseSuccess = (docsControllerSuggestCategoryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerSuggestCategoryResponse = (docsControllerSuggestCategoryResponseSuccess)
+
+export const getDocsControllerSuggestCategoryUrl = (id: string,) => {
+
+
+
+
+  return `/docs/${id}/category-suggestion`
+}
+
+export const docsControllerSuggestCategory = async (id: string, options?: RequestInit): Promise<docsControllerSuggestCategoryResponse> => {
+
+  return orvalMutator<docsControllerSuggestCategoryResponse>(getDocsControllerSuggestCategoryUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDocsControllerSuggestCategoryQueryKey = (id: string,) => {
+    return [
+    `/docs/${id}/category-suggestion`
+    ] as const;
+    }
+
+
+export const getDocsControllerSuggestCategoryQueryOptions = <TData = Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDocsControllerSuggestCategoryQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof docsControllerSuggestCategory>>> = ({ signal }) => docsControllerSuggestCategory(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DocsControllerSuggestCategoryQueryResult = NonNullable<Awaited<ReturnType<typeof docsControllerSuggestCategory>>>
+export type DocsControllerSuggestCategoryQueryError = unknown
+
+
+export function useDocsControllerSuggestCategory<TData = Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerSuggestCategory>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerSuggestCategory>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerSuggestCategory<TData = Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerSuggestCategory>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerSuggestCategory>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerSuggestCategory<TData = Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDocsControllerSuggestCategory<TData = Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerSuggestCategory>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDocsControllerSuggestCategoryQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type docsControllerAcceptTypeResponse200 = {
   data: DocumentTypeDto

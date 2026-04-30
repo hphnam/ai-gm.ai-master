@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { Inbox, Library, MessageCircleQuestion, Upload } from 'lucide-react'
 import { InboxTab, useInboxCount } from '@/components/docs/inbox-tab'
 import { LibraryTab } from '@/components/docs/library-tab'
@@ -14,26 +14,27 @@ import { Button } from '@/components/ui/button'
 import { useDocs } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 
-type Tab = 'library' | 'inbox' | 'questions'
-const TABS: Tab[] = ['library', 'inbox', 'questions']
+export type DocsTab = 'library' | 'inbox' | 'questions'
 
-function isTab(v: string | null): v is Tab {
-  return v === 'library' || v === 'inbox' || v === 'questions'
+const TABS: DocsTab[] = ['library', 'inbox', 'questions']
+
+const TAB_HREF: Record<DocsTab, string> = {
+  library: '/docs',
+  inbox: '/docs/inbox',
+  questions: '/docs/questions',
 }
 
 function TabBar({
   active,
-  onChange,
   inboxCount,
   questionsCount,
 }: {
-  active: Tab
-  onChange: (t: Tab) => void
+  active: DocsTab
   inboxCount: number
   questionsCount: number
 }) {
   const items: Array<{
-    id: Tab
+    id: DocsTab
     label: string
     Icon: typeof Library
     count: number
@@ -55,14 +56,14 @@ function TabBar({
       {items.map(({ id, label, Icon, count, urgent }) => {
         const selected = active === id
         return (
-          <button
+          <Link
             key={id}
-            type="button"
+            href={TAB_HREF[id]}
             role="tab"
             aria-selected={selected}
             aria-controls={`tabpanel-${id}`}
             id={`tab-${id}`}
-            onClick={() => onChange(id)}
+            scroll={false}
             className={cn(
               'relative -mb-px flex cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition-colors',
               selected
@@ -86,32 +87,18 @@ function TabBar({
                 {count}
               </span>
             ) : null}
-          </button>
+          </Link>
         )
       })}
     </div>
   )
 }
 
-export function DocsBody() {
+export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
   const docs = useDocs()
   const inboxCount = useInboxCount()
   const questionsCount = useQuestionsCount()
   const [uploadOpen, setUploadOpen] = useState(false)
-
-  const router = useRouter()
-  const pathname = usePathname()
-  const params = useSearchParams()
-  const tabParam = params.get('tab')
-  const tab: Tab = isTab(tabParam) ? tabParam : 'library'
-
-  const setTab = (next: Tab) => {
-    const sp = new URLSearchParams(params.toString())
-    if (next === 'library') sp.delete('tab')
-    else sp.set('tab', next)
-    const qs = sp.toString()
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }
 
   const totalDocs = docs.data?.length ?? 0
   const showFullEmpty = !docs.isLoading && totalDocs === 0
@@ -141,7 +128,6 @@ export function DocsBody() {
             <>
               <TabBar
                 active={tab}
-                onChange={setTab}
                 inboxCount={inboxCount}
                 questionsCount={questionsCount}
               />
