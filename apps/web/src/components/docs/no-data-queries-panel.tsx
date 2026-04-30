@@ -25,7 +25,7 @@ export function NoDataQueriesPanel({ queries }: { queries: NoDataQuery[] }) {
   return (
     <section
       aria-label="What staff couldn't find"
-      className="mb-6 rounded-lg border bg-card shadow-sm"
+      className="rounded-lg border bg-card shadow-sm"
     >
       <button
         type="button"

@@ -174,11 +174,11 @@ function GapCard({ gap }: { gap: KbGapDto }) {
 export function GapList({ gaps }: { gaps: KbGapDto[] }) {
   if (gaps.length === 0) return null
   return (
-    <section aria-label="Pending answers" className="mb-8">
-      <header className="mb-3 flex items-baseline gap-2">
-        <h2 className="text-sm font-semibold">Pending answers</h2>
+    <section aria-label="Pending answers">
+      <header className="mb-2 flex items-baseline gap-2 px-1">
+        <h3 className="text-sm font-semibold">Questions waiting for your answer</h3>
         <span className="text-xs text-muted-foreground">
-          {gaps.length} question{gaps.length === 1 ? '' : 's'} from staff awaiting your authoritative answer
+          {gaps.length} from staff
         </span>
       </header>
       <div className="space-y-2">

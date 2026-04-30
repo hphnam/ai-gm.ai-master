@@ -30,6 +30,7 @@ import { Label } from '@/components/ui/label'
 import { useAcceptDocType, useRejectDocType } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
+import { DocPreview } from '@/components/docs/doc-preview'
 
 export function DocTypeProposalModal({
   docId,
@@ -80,7 +81,7 @@ export function DocTypeProposalModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <div className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5" />
@@ -88,64 +89,79 @@ export function DocTypeProposalModal({
           </div>
           <DialogTitle className="pt-1">Save this as a category?</DialogTitle>
           <DialogDescription>
-            We haven’t seen a document like this before. Give it a short name and
-            pick how staff will use it — next time a similar doc comes in, we’ll
-            file it here automatically.
+            We haven’t seen a document like this before. Check the preview, give
+            it a short name, and pick how staff will use it — next time a
+            similar doc comes in, we’ll file it here automatically.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="type-name" className="text-sm">
-              What do you call this kind of document?
-            </Label>
-            <Input
-              id="type-name"
-              value={name}
-              onChange={(e) => setName(e.target.value.slice(0, 80))}
-              placeholder="e.g. Cellar log, Supplier contacts, Closing checklist"
-              disabled={busy}
-              autoFocus
-            />
-            {proposal.description ? (
-              <p className="text-xs text-muted-foreground">
-                Hint from the AI: {proposal.description}
-              </p>
-            ) : null}
+        <div className="grid min-w-0 gap-6 py-2 md:grid-cols-[minmax(0,1fr),minmax(0,1.05fr)] md:gap-8">
+          <div className="min-w-0 md:border-r md:pr-6">
+            <DocPreview docId={docId} />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm">How will staff use it?</Label>
-            <div
-              role="radiogroup"
-              aria-label="Document type"
-              className="flex flex-col gap-2"
-            >
-              <KindOption
-                selected={selectedKind === 'reference'}
+          <div className="min-w-0 space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="type-name" className="text-sm">
+                What do you call this kind of document?
+              </Label>
+              <Input
+                id="type-name"
+                value={name}
+                onChange={(e) => setName(e.target.value.slice(0, 80))}
+                placeholder="e.g. Cellar log, Supplier contacts, Closing checklist"
                 disabled={busy}
-                onSelect={() => setSelectedKind('reference')}
-                icon={<BookOpen className="h-4 w-4" />}
-                title="Look it up"
-                blurb="Menus, policies, contacts — staff find it when they need it."
+                autoFocus
               />
-              <KindOption
-                selected={selectedKind === 'procedural'}
-                disabled={busy}
-                onSelect={() => setSelectedKind('procedural')}
-                icon={<ClipboardList className="h-4 w-4" />}
-                title="Follow on a schedule"
-                blurb="Steps to tick off daily, weekly, or at shift change."
-              />
+              {proposal.description ? (
+                <p className="text-xs text-muted-foreground">
+                  Hint from the AI: {proposal.description}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">How will staff use it?</Label>
+              <div
+                role="radiogroup"
+                aria-label="Document type"
+                className="flex flex-col gap-2"
+              >
+                <KindOption
+                  selected={selectedKind === 'reference'}
+                  disabled={busy}
+                  onSelect={() => setSelectedKind('reference')}
+                  icon={<BookOpen className="h-4 w-4" />}
+                  title="Look it up"
+                  blurb="Menus, policies, contacts — staff find it when they need it."
+                />
+                <KindOption
+                  selected={selectedKind === 'procedural'}
+                  disabled={busy}
+                  onSelect={() => setSelectedKind('procedural')}
+                  icon={<ClipboardList className="h-4 w-4" />}
+                  title="Follow on a schedule"
+                  blurb="Steps to tick off daily, weekly, or at shift change."
+                />
+              </div>
             </div>
           </div>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="ghost" onClick={handleReject} disabled={busy}>
+          <Button
+            variant="ghost"
+            onClick={handleReject}
+            disabled={busy}
+            className="cursor-pointer"
+          >
             {rejectMut.isPending ? 'Skipping…' : 'Skip'}
           </Button>
-          <Button onClick={handleAccept} disabled={busy || !canAccept}>
+          <Button
+            onClick={handleAccept}
+            disabled={busy || !canAccept}
+            className="cursor-pointer"
+          >
             {acceptMut.isPending ? 'Saving…' : 'Save category'}
           </Button>
         </DialogFooter>

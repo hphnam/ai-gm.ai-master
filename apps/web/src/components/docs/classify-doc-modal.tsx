@@ -24,6 +24,7 @@ import { Label } from '@/components/ui/label'
 import { useClassifyDoc, useDocTypes } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
+import { DocPreview } from '@/components/docs/doc-preview'
 
 type Mode = 'pick' | 'create'
 
@@ -80,15 +81,22 @@ export function ClassifyDocModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Classify this document</DialogTitle>
           <DialogDescription>
-            Pick a category it belongs to, or create a new one. Staff will be
-            able to find it by that category going forward.
+            Check the preview on the left, then pick a category it belongs to
+            — or create a new one. Staff will find it by that category from
+            now on.
           </DialogDescription>
         </DialogHeader>
 
+        <div className="grid min-w-0 gap-6 py-2 md:grid-cols-[minmax(0,1fr),minmax(0,1.05fr)] md:gap-8">
+          <div className="min-w-0 md:border-r md:pr-6">
+            <DocPreview docId={docId} />
+          </div>
+
+          <div className="min-w-0">
         {hasExisting ? (
           <div className="flex gap-1 border-b pb-2">
             <TabButton
@@ -192,13 +200,21 @@ export function ClassifyDocModal({
             </div>
           </div>
         )}
+          </div>
+        </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
           {effectiveMode === 'create' ? (
-            <Button onClick={createNew} disabled={busy || !name.trim()}>
-              {busy ? 'Saving…' : (
+            <Button
+              onClick={createNew}
+              disabled={busy || !name.trim()}
+              className="cursor-pointer"
+            >
+              {busy ? (
+                'Saving…'
+              ) : (
                 <>
-                  <Plus className="h-4 w-4" /> Create & file
+                  <Plus className="h-4 w-4" /> Create &amp; file
                 </>
               )}
             </Button>

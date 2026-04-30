@@ -1,43 +1,77 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Camera, CheckSquare, FileText, Hash } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  BookOpen,
+  Camera,
+  CheckSquare,
+  ClipboardList,
+  FileText,
+  Hash,
+  Loader2,
+  MapPin,
+  Sparkles,
+  Tag,
+  Trash2,
+} from 'lucide-react'
 import type { DocDetailDto } from '@/generated/api'
+import { AppShell } from '@/components/shell/app-shell'
+import { PageHeader } from '@/components/shell/page-header'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
+import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
+import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
+import { ApiError } from '@/lib/api-client'
+import { mapApiError } from '@/lib/map-api-error'
+import { cn } from '@/lib/utils'
 
 type Checklist = NonNullable<DocDetailDto['checklist']>
 type Schedule = Checklist['schedule']
 type ChecklistStep = Checklist['steps'][number]
 type AudienceRole = NonNullable<Checklist['audience']['roles']>[number]
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
-import { Button } from '@/components/ui/button'
-import { useDoc } from '@/lib/hooks/use-docs'
-import { ApiError } from '@/lib/api-client'
 
-// Plan 04-03 Task 3 — Schedule + Audience + Step rendering helpers (co-located; small + pure).
+const STEP_DISPLAY_CAP = 200
+
+function formatRelative(iso: string): string {
+  const ts = new Date(iso).getTime()
+  const diffMs = Date.now() - ts
+  const mins = Math.round(diffMs / 60_000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.round(hrs / 24)
+  if (days < 30) return `${days}d ago`
+  return new Date(iso).toLocaleDateString()
+}
 
 function formatScheduleLine(s: Schedule): string {
-  // OpenAPI marks cadence as optional because of zod .default('unknown');
-  // it's always populated at runtime — narrow with ?? for the typechecker.
   const cadence = s.cadence ?? 'unknown'
-  if (cadence === 'unknown') return s.rawText || 'Unspecified schedule'
+  if (cadence === 'unknown') return s.rawText || 'Whenever needed'
   const parts: string[] = [cadence.charAt(0).toUpperCase() + cadence.slice(1)]
-  if (s.dayOfWeek != null) parts.push(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.dayOfWeek])
+  if (s.dayOfWeek != null)
+    parts.push(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][s.dayOfWeek])
   if (s.dayOfMonth != null) parts.push(`day ${s.dayOfMonth}`)
   if (s.timeOfDay) parts.push(`@ ${s.timeOfDay}`)
   return parts.join(' • ')
 }
 
 function RolePill({ role }: { role: AudienceRole }) {
-  const styles: Record<AudienceRole, string> = {
-    staff: 'bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-500/30',
-    manager: 'bg-violet-500/15 text-violet-800 dark:text-violet-300 border-violet-500/30',
-    owner: 'bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/30',
-  }
   return (
-    <span
-      className={`text-[11px] px-2 py-0.5 rounded-full border font-medium capitalize ${styles[role]}`}
-    >
+    <span className="rounded-full border bg-muted/50 px-2 py-0.5 text-[11px] font-medium capitalize text-muted-foreground">
       {role}
     </span>
   )
@@ -58,169 +92,520 @@ function StepKindIcon({ kind }: { kind: ChecklistStep['kind'] }) {
   }
 }
 
-// Plan 04-03 audit-S6 — bound the DOM size on pathological extractor output.
-const STEP_DISPLAY_CAP = 200
+function CategoryChip({ doc }: { doc: DocDetailDto }) {
+  if (doc.processingStatus === 'processing') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+        Reading…
+      </span>
+    )
+  }
+  if (doc.processingStatus === 'failed') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-300">
+        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        Couldn’t read
+      </span>
+    )
+  }
+  if (doc.documentType) {
+    const Icon =
+      doc.documentType.kind === 'procedural' ? ClipboardList : BookOpen
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+        <Icon className="h-3.5 w-3.5" aria-hidden />
+        {doc.documentType.name}
+      </span>
+    )
+  }
+  if (doc.pendingTypeProposal) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">
+        <Sparkles className="h-3.5 w-3.5" aria-hidden />
+        Awaiting your review
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+      <Tag className="h-3.5 w-3.5" aria-hidden />
+      Not categorized
+    </span>
+  )
+}
+
+function StatusBanner({
+  doc,
+  onOpenProposal,
+  onOpenClassify,
+}: {
+  doc: DocDetailDto
+  onOpenProposal: () => void
+  onOpenClassify: () => void
+}) {
+  if (doc.processingStatus === 'failed') {
+    return (
+      <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-700 dark:text-red-300">
+            <AlertTriangle className="h-4 w-4" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="text-sm font-semibold">We couldn’t read this file</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {doc.processingError
+                ? `${doc.processingError}. Try uploading a Word doc, or paste the text directly.`
+                : 'It might be a scanned image or password-protected PDF. Try uploading a Word doc, or paste the text directly.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  if (doc.pendingTypeProposal) {
+    const proposal = doc.pendingTypeProposal
+    return (
+      <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-300">
+            <Sparkles className="h-4 w-4" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <p className="text-sm font-semibold">
+              Is this a {proposal.name.toLowerCase()}?
+            </p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Our AI thinks so. Confirm and we’ll file similar docs the same
+              way next time.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button
+                size="sm"
+                onClick={onOpenProposal}
+                className="cursor-pointer"
+              >
+                Review &amp; confirm
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  if (!doc.documentType) {
+    return (
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+            <Tag className="h-4 w-4" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <p className="text-sm font-semibold">Pick a category</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Categorising this document helps the AI and your team know how
+              to use it. Takes about ten seconds.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button
+                size="sm"
+                onClick={onOpenClassify}
+                className="cursor-pointer"
+              >
+                Pick a category
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  return null
+}
+
+function DeleteDocDialog({
+  docId,
+  open,
+  onOpenChange,
+}: {
+  docId: string
+  open: boolean
+  onOpenChange: (v: boolean) => void
+}) {
+  const router = useRouter()
+  const deleteDoc = useDeleteDoc()
+
+  async function handleConfirm() {
+    try {
+      await deleteDoc.mutateAsync(docId)
+      toast.success('Deleted')
+      onOpenChange(false)
+      router.push('/docs')
+    } catch (err) {
+      toast.error(mapApiError(err))
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete this document?</DialogTitle>
+          <DialogDescription>
+            This can’t be undone. The document will be removed from your
+            knowledge base and stop showing up in chat answers.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={deleteDoc.isPending}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleConfirm}
+            disabled={deleteDoc.isPending}
+            className="cursor-pointer"
+          >
+            {deleteDoc.isPending ? 'Deleting…' : 'Delete'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function DocActions({
+  doc,
+  onOpenClassify,
+  onOpenProposal,
+}: {
+  doc: DocDetailDto
+  onOpenClassify: () => void
+  onOpenProposal: () => void
+}) {
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const canPickCategory = doc.processingStatus === 'ready'
+  const reclassifyLabel = doc.documentType
+    ? 'Change category'
+    : doc.pendingTypeProposal
+      ? 'Review category'
+      : 'Pick category'
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {canPickCategory ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={
+            doc.pendingTypeProposal ? onOpenProposal : onOpenClassify
+          }
+          className="cursor-pointer"
+        >
+          {reclassifyLabel}
+        </Button>
+      ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => setDeleteOpen(true)}
+        aria-label="Delete document"
+        title="Delete document"
+        className="cursor-pointer text-muted-foreground hover:text-destructive"
+      >
+        <Trash2 className="h-4 w-4" aria-hidden />
+      </Button>
+      <DeleteDocDialog
+        docId={doc.id}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+      />
+    </div>
+  )
+}
+
+function MetaLine({ doc }: { doc: DocDetailDto }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
+      <span className="inline-flex items-center gap-1">
+        <MapPin className="h-3.5 w-3.5" aria-hidden />
+        {doc.venueName ?? 'All venues'}
+      </span>
+      <span className="text-muted-foreground/40" aria-hidden>
+        ·
+      </span>
+      <span>Updated {formatRelative(doc.updatedAt)}</span>
+    </div>
+  )
+}
+
+function ContentBlock({ content }: { content: string }) {
+  const text = content.trim()
+  if (!text) {
+    return (
+      <p className="rounded-xl border border-dashed bg-card/40 p-6 text-center text-sm italic text-muted-foreground">
+        No readable content was extracted from this file.
+      </p>
+    )
+  }
+  return (
+    <section
+      aria-label="Document content"
+      className="overflow-hidden rounded-xl border bg-card shadow-sm"
+    >
+      <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <FileText className="h-3.5 w-3.5" aria-hidden />
+        Document content
+      </header>
+      <pre className="whitespace-pre-wrap break-words px-4 py-4 font-sans text-sm leading-relaxed text-foreground sm:px-6 sm:py-5">
+        {text}
+      </pre>
+    </section>
+  )
+}
+
+function ChecklistBlock({ checklist }: { checklist: Checklist }) {
+  const roles = checklist.audience.roles ?? []
+  const stepCount = checklist.steps.length
+  const visibleSteps = checklist.steps.slice(0, STEP_DISPLAY_CAP)
+
+  return (
+    <section
+      aria-labelledby="checklist-heading"
+      className="overflow-hidden rounded-xl border bg-card shadow-sm"
+    >
+      <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <ClipboardList className="h-3.5 w-3.5" aria-hidden />
+        <span id="checklist-heading">
+          Steps to follow ({stepCount})
+        </span>
+      </header>
+
+      <div className="space-y-5 px-4 py-5 sm:px-6">
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1">
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              When
+            </dt>
+            <dd className="text-sm">{formatScheduleLine(checklist.schedule)}</dd>
+          </div>
+          <div className="space-y-1">
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Who
+            </dt>
+            <dd className="flex flex-wrap items-center gap-1.5">
+              {roles.length > 0 ? (
+                roles.map((r) => <RolePill key={r} role={r} />)
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  {checklist.audience.rawText || 'Unspecified'}
+                </span>
+              )}
+            </dd>
+          </div>
+        </dl>
+
+        <ol className="space-y-2.5">
+          {visibleSteps.map((s, idx) => (
+            <li
+              key={s.index}
+              className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">
+                {idx + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start gap-2 text-sm">
+                  <StepKindIcon kind={s.kind} />
+                  <span className="break-words">
+                    {s.text}
+                    {s.required === false ? (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (optional)
+                      </span>
+                    ) : null}
+                  </span>
+                </div>
+                {s.hint ? (
+                  <p className="mt-1 break-words text-xs text-muted-foreground">
+                    {s.hint}
+                  </p>
+                ) : null}
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        {stepCount > STEP_DISPLAY_CAP ? (
+          <p className="text-xs text-muted-foreground">
+            Showing first {STEP_DISPLAY_CAP} of {stepCount} steps.
+          </p>
+        ) : null}
+      </div>
+    </section>
+  )
+}
+
+function NotFound() {
+  return (
+    <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
+      <p className="text-sm font-medium">Document not found</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        It may have been deleted, or you don’t have access. Head back to the
+        knowledge library.
+      </p>
+      <Button asChild variant="outline" size="sm" className="mt-4 cursor-pointer">
+        <Link href="/docs">Back to Knowledge</Link>
+      </Button>
+    </div>
+  )
+}
+
+function GenericError() {
+  return (
+    <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
+      <p className="text-sm font-medium">Couldn’t load this document</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Try refreshing the page in a moment.
+      </p>
+    </div>
+  )
+}
+
+function DocSkeleton() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="Loading document">
+      <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
+      <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
+      <div className="h-32 w-full animate-pulse rounded-xl bg-muted/60" />
+      <div className="h-64 w-full animate-pulse rounded-xl bg-muted/60" />
+    </div>
+  )
+}
 
 export function DocDetailBody({ id }: { id: string }) {
   const doc = useDoc(id)
+  const [classifyOpen, setClassifyOpen] = useState(false)
+  const [proposalOpen, setProposalOpen] = useState(false)
+
+  const data = doc.data
+  const title = data?.title?.trim() || 'Untitled document'
 
   return (
     <AppShell>
       <PageHeader
-        title={doc.data?.title ?? 'Document'}
+        title={data ? title : 'Document'}
         actions={
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/docs">
-              <ArrowLeft className="h-4 w-4" aria-hidden />
-              All docs
-            </Link>
-          </Button>
+          data ? (
+            <DocActions
+              doc={data}
+              onOpenClassify={() => setClassifyOpen(true)}
+              onOpenProposal={() => setProposalOpen(true)}
+            />
+          ) : null
         }
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
+          <Link
+            href="/docs"
+            className="-ml-1 inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back to Knowledge
+          </Link>
 
-      {doc.isLoading ? (
-        <p className="text-sm text-muted-foreground italic">Loading doc…</p>
-      ) : doc.error ? (
-        <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4">
-          <p className="text-sm">
-            {doc.error instanceof ApiError && doc.error.code === 'not-found'
-              ? 'Doc not found, or not accessible to your organization.'
-              : 'Something went wrong loading this doc.'}
-          </p>
-        </div>
-      ) : doc.data ? (
-        <article className="space-y-6">
-          <header className="space-y-2">
-            <h1 className="text-2xl font-semibold">
-              {doc.data.title ?? doc.data.docType ?? 'Untitled'}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              {doc.data.venueName ? (
-                <span className="px-1.5 py-0.5 rounded bg-muted">
-                  {doc.data.venueName}
-                </span>
-              ) : (
-                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-900">
-                  Global
-                </span>
-              )}
-              {doc.data.docType ? (
-                <span className="px-1.5 py-0.5 rounded bg-muted font-mono uppercase tracking-wide">
-                  {doc.data.docType}
-                </span>
-              ) : null}
-              <span>
-                Updated {new Date(doc.data.updatedAt).toLocaleString()}
-              </span>
-            </div>
-            {doc.data.summary ? (
-              <p className="text-sm text-muted-foreground">{doc.data.summary}</p>
-            ) : null}
-            {doc.data.tags.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {doc.data.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-                  >
-                    #{t}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </header>
-
-          <section aria-label="Content" className="rounded-md border bg-card p-4">
-            <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed">
-              {doc.data.content}
-            </pre>
-          </section>
-
-          {doc.data.checklist ? (
-            <section
-              aria-labelledby="checklist-heading"
-              className="rounded-md border bg-card p-4 space-y-4"
-            >
-              <h2 id="checklist-heading" className="text-lg font-semibold">
-                Procedural structure
-              </h2>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                  Schedule
-                </p>
-                <p className="text-sm">
-                  {formatScheduleLine(doc.data.checklist.schedule)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Audience
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {(doc.data.checklist.audience.roles ?? []).length > 0 ? (
-                    (doc.data.checklist.audience.roles ?? []).map((r) => (
-                      <RolePill key={r} role={r} />
-                    ))
-                  ) : (
-                    <span className="text-sm text-muted-foreground">
-                      {doc.data.checklist.audience.rawText || 'Unspecified'}
-                    </span>
-                  )}
+          {doc.isLoading ? (
+            <DocSkeleton />
+          ) : doc.error ? (
+            doc.error instanceof ApiError && doc.error.code === 'not-found' ? (
+              <NotFound />
+            ) : (
+              <GenericError />
+            )
+          ) : data ? (
+            <article className="space-y-6">
+              <header className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <CategoryChip doc={data} />
                 </div>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                  Steps ({doc.data.checklist.steps.length})
-                </p>
-                <ol className="list-decimal pl-5 space-y-1.5">
-                  {doc.data.checklist.steps.slice(0, STEP_DISPLAY_CAP).map((s) => (
-                    <li key={s.index} className="text-sm">
-                      <span className="inline-flex items-start gap-2">
-                        <StepKindIcon kind={s.kind} />
-                        <span>
-                          {s.text}
-                          {s.required === false ? (
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              (optional)
-                            </span>
-                          ) : null}
-                        </span>
+                <h1
+                  className={cn(
+                    'text-2xl font-semibold leading-tight tracking-tight sm:text-3xl',
+                    !data.title && 'italic text-muted-foreground',
+                  )}
+                >
+                  {title}
+                </h1>
+                <MetaLine doc={data} />
+                {data.tags.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {data.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                      >
+                        {t}
                       </span>
-                      {s.hint ? (
-                        <div className="ml-5 text-xs text-muted-foreground mt-0.5">
-                          {s.hint}
-                        </div>
-                      ) : null}
-                    </li>
-                  ))}
-                </ol>
-                {doc.data.checklist.steps.length > STEP_DISPLAY_CAP ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Showing first {STEP_DISPLAY_CAP} of{' '}
-                    {doc.data.checklist.steps.length} steps. Remaining steps are
-                    persisted in the database.
-                  </p>
+                    ))}
+                  </div>
                 ) : null}
-              </div>
-            </section>
-          ) : null}
+              </header>
 
-          {Object.keys(doc.data.metadata).length > 0 ? (
-            <details className="rounded-md border bg-card p-4">
-              <summary className="cursor-pointer text-sm font-medium">
-                AI metadata (emergent keys)
-              </summary>
-              <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs text-muted-foreground">
-                {JSON.stringify(doc.data.metadata, null, 2)}
-              </pre>
-            </details>
+              <StatusBanner
+                doc={data}
+                onOpenClassify={() => setClassifyOpen(true)}
+                onOpenProposal={() => setProposalOpen(true)}
+              />
+
+              {data.summary ? (
+                <section
+                  aria-label="Summary"
+                  className="rounded-xl border bg-muted/30 p-4 sm:p-5"
+                >
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Summary
+                  </p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-foreground">
+                    {data.summary}
+                  </p>
+                </section>
+              ) : null}
+
+              <ContentBlock content={data.content} />
+
+              {data.checklist ? (
+                <ChecklistBlock checklist={data.checklist} />
+              ) : null}
+            </article>
           ) : null}
-        </article>
-      ) : null}
         </div>
       </div>
+
+      {data ? (
+        <>
+          {classifyOpen ? (
+            <ClassifyDocModal
+              docId={data.id}
+              open={classifyOpen}
+              onOpenChange={setClassifyOpen}
+            />
+          ) : null}
+          {proposalOpen && data.pendingTypeProposal ? (
+            <DocTypeProposalModal
+              docId={data.id}
+              proposal={data.pendingTypeProposal}
+              open={proposalOpen}
+              onOpenChange={setProposalOpen}
+            />
+          ) : null}
+        </>
+      ) : null}
     </AppShell>
   )
 }

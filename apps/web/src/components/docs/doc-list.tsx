@@ -3,7 +3,16 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { AlertTriangle, CheckSquare, Loader2, Trash2 } from 'lucide-react'
+import {
+  AlertTriangle,
+  BookOpen,
+  ClipboardList,
+  FileQuestion,
+  FileText,
+  Loader2,
+  Sparkles,
+  Trash2,
+} from 'lucide-react'
 import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,8 +25,7 @@ import {
 } from '@/components/ui/dialog'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
-import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
-import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
+import { cn } from '@/lib/utils'
 
 function formatRelative(iso: string): string {
   const ts = new Date(iso).getTime()
@@ -30,6 +38,54 @@ function formatRelative(iso: string): string {
   const days = Math.round(hrs / 24)
   if (days < 30) return `${days}d ago`
   return new Date(iso).toLocaleDateString()
+}
+
+type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
+
+function statusFor(doc: DocListItem): { text: string; tone: StatusTone } {
+  if (doc.processingStatus === 'processing')
+    return { text: 'Reading your document…', tone: 'info' }
+  if (doc.processingStatus === 'failed')
+    return { text: 'Couldn’t read this file', tone: 'danger' }
+  if (doc.documentType)
+    return { text: doc.documentType.name, tone: 'muted' }
+  if (doc.pendingTypeProposal)
+    return { text: 'Awaiting your review', tone: 'warning' }
+  return { text: 'Not categorized yet', tone: 'warning' }
+}
+
+const toneClass: Record<StatusTone, string> = {
+  muted: 'text-muted-foreground',
+  info: 'text-sky-700 dark:text-sky-400',
+  warning: 'text-amber-700 dark:text-amber-400 font-medium',
+  danger: 'text-red-700 dark:text-red-400 font-medium',
+}
+
+function DocIcon({ doc }: { doc: DocListItem }) {
+  if (doc.processingStatus === 'processing')
+    return <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+  if (doc.processingStatus === 'failed')
+    return <AlertTriangle className="h-5 w-5" aria-hidden />
+  if (doc.pendingTypeProposal)
+    return <Sparkles className="h-5 w-5" aria-hidden />
+  if (doc.documentType?.kind === 'procedural' || doc.isProcedural)
+    return <ClipboardList className="h-5 w-5" aria-hidden />
+  if (doc.documentType?.kind === 'reference')
+    return <BookOpen className="h-5 w-5" aria-hidden />
+  if (!doc.documentType) return <FileQuestion className="h-5 w-5" aria-hidden />
+  return <FileText className="h-5 w-5" aria-hidden />
+}
+
+function iconWrapClass(doc: DocListItem): string {
+  if (doc.processingStatus === 'failed')
+    return 'bg-red-500/10 text-red-700 dark:text-red-300'
+  if (doc.processingStatus === 'processing')
+    return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
+  if (doc.pendingTypeProposal)
+    return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
+  if (doc.documentType)
+    return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+  return 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
 }
 
 function DeleteDocButton({ doc }: { doc: DocListItem }) {
@@ -50,19 +106,20 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
     <>
       <button
         type="button"
-        aria-label="Delete doc"
+        aria-label="Delete document"
+        title="Delete document"
         onClick={() => setOpen(true)}
-        className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted/50 transition-colors"
+        className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:opacity-100"
       >
         <Trash2 className="h-4 w-4" aria-hidden />
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete this doc?</DialogTitle>
+            <DialogTitle>Delete this document?</DialogTitle>
             <DialogDescription>
-              This cannot be undone. The knowledge item will be removed from the
-              knowledge base and stop appearing in chat results.
+              This can’t be undone. The document will be removed from your
+              knowledge base and stop showing up in chat answers.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -70,6 +127,7 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={deleteDoc.isPending}
+              className="cursor-pointer"
             >
               Cancel
             </Button>
@@ -77,6 +135,7 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
               variant="destructive"
               onClick={handleConfirm}
               disabled={deleteDoc.isPending}
+              className="cursor-pointer"
             >
               {deleteDoc.isPending ? 'Deleting…' : 'Delete'}
             </Button>
@@ -87,175 +146,100 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
   )
 }
 
-// Processing + failed badges. Rendered on the row header alongside taxonomy
-// while enrichment is in flight or has errored.
-function ProcessingBadge() {
+function DocRow({ doc }: { doc: DocListItem }) {
+  const status = statusFor(doc)
+  const venueLabel = doc.venueName ?? 'All venues'
+  const title = doc.title?.trim() || 'Untitled document'
+
   return (
-    <span
-      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30 font-medium"
-      aria-live="polite"
+    <li
+      className={cn(
+        'group relative flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-foreground/20 hover:bg-accent/40',
+        doc.processingStatus === 'failed' && 'border-red-500/20',
+      )}
     >
-      <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-      Processing…
-    </span>
-  )
-}
-
-function FailedBadge({ error }: { error: string | null }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-destructive/15 text-destructive border border-destructive/30 font-medium"
-      title={error ?? 'Processing failed'}
-    >
-      <AlertTriangle className="h-3 w-3" aria-hidden />
-      Processing failed
-    </span>
-  )
-}
-
-// Plan 04-03 Task 3 — procedural indicator shown alongside the TaxonomyBadge
-// when documentType.kind === 'procedural'. Icon+text per 05-02 WCAG AA decision
-// (never icon-only). Amber hue is distinct from the emerald DocumentType badge.
-function ProceduralIndicator() {
-  return (
-    <span
-      className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-medium"
-      aria-label="Procedural document"
-    >
-      <CheckSquare className="h-3 w-3" aria-hidden />
-      Procedural
-    </span>
-  )
-}
-
-// Plan 04-02 Task 3 — per-row taxonomy state: confirmed type / pending proposal / unclassified.
-function TaxonomyBadge({ doc }: { doc: DocListItem }) {
-  const [open, setOpen] = useState(false)
-
-  if (doc.documentType) {
-    return (
-      <span
-        className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-medium"
-        title={doc.documentType.description ?? undefined}
+      <div
+        className={cn(
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
+          iconWrapClass(doc),
+        )}
       >
-        {doc.documentType.name}
-      </span>
-    )
-  }
-  if (doc.pendingTypeProposal) {
-    return (
-      <>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-medium hover:bg-amber-500/25 transition-colors"
-          aria-label={`Review proposed type "${doc.pendingTypeProposal.name}"`}
+        <DocIcon doc={doc} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <Link
+          href={`/docs/${doc.id}`}
+          className="block rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          Pending: {doc.pendingTypeProposal.name}
-        </button>
-        {open ? (
-          <DocTypeProposalModal
-            docId={doc.id}
-            proposal={doc.pendingTypeProposal}
-            open={open}
-            onOpenChange={setOpen}
-          />
-        ) : null}
-      </>
-    )
-  }
+          <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4 sm:text-[15px]">
+            {title}
+          </p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground sm:text-sm">
+            <span className={toneClass[status.tone]}>{status.text}</span>
+            <span className="mx-1.5 text-muted-foreground/40" aria-hidden>
+              ·
+            </span>
+            <span>{venueLabel}</span>
+            <span className="mx-1.5 text-muted-foreground/40" aria-hidden>
+              ·
+            </span>
+            <span>Updated {formatRelative(doc.updatedAt)}</span>
+          </p>
+        </Link>
+      </div>
+      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+        <DeleteDocButton doc={doc} />
+      </div>
+    </li>
+  )
+}
+
+function DocListSkeleton() {
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border hover:bg-accent hover:text-foreground transition-colors"
-        aria-label="Classify this document"
-      >
-        Unclassified · classify
-      </button>
-      {open ? (
-        <ClassifyDocModal docId={doc.id} open={open} onOpenChange={setOpen} />
-      ) : null}
-    </>
+    <ul className="space-y-2" aria-busy="true" aria-label="Loading documents">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <li
+          key={i}
+          className="flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5"
+        >
+          <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 
 export function DocList({
   docs,
   isLoading,
+  searchQuery,
 }: {
   docs: DocListItem[] | undefined
   isLoading: boolean
+  searchQuery?: string
 }) {
-  if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground italic">Loading docs…</p>
-    )
-  }
+  if (isLoading) return <DocListSkeleton />
+
   if (!docs || docs.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-6 text-center">
+      <div className="rounded-xl border border-dashed bg-card/40 px-6 py-10 text-center">
         <p className="text-sm text-muted-foreground">
-          No docs yet. Add one using the form to seed your knowledge base.
+          {searchQuery
+            ? `No documents match “${searchQuery}”.`
+            : 'No documents yet.'}
         </p>
       </div>
     )
   }
+
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-2">
       {docs.map((d) => (
-        <li
-          key={d.id}
-          className="rounded-md border bg-card p-4 space-y-2 hover:border-foreground/30 transition-colors"
-        >
-          <header className="flex flex-wrap items-baseline gap-2">
-            <h3 className="text-sm font-semibold truncate">
-              <Link href={`/docs/${d.id}`} className="hover:underline underline-offset-4">
-                {d.title ?? d.documentType?.name ?? d.docType ?? 'Untitled'}
-              </Link>
-            </h3>
-            {d.processingStatus === 'processing' ? (
-              <ProcessingBadge />
-            ) : d.processingStatus === 'failed' ? (
-              <FailedBadge error={d.processingError} />
-            ) : (
-              <>
-                <TaxonomyBadge doc={d} />
-                {d.isProcedural ? <ProceduralIndicator /> : null}
-                {d.docType ? (
-                  <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
-                    {d.docType}
-                  </span>
-                ) : null}
-              </>
-            )}
-            <span className="ml-auto text-xs text-muted-foreground">
-              {formatRelative(d.updatedAt)}
-            </span>
-            <DeleteDocButton doc={d} />
-          </header>
-          <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">
-            {d.summary ?? d.contentPreview}
-          </p>
-          <footer className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            {d.venueName ? (
-              <span className="px-1.5 py-0.5 rounded bg-muted">{d.venueName}</span>
-            ) : (
-              <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-900">
-                Global
-              </span>
-            )}
-            {d.tags.slice(0, 5).map((t) => (
-              <span key={t} className="px-1.5 py-0.5 rounded bg-muted">
-                #{t}
-              </span>
-            ))}
-            {d.tags.length > 5 ? (
-              <span>+{d.tags.length - 5} more</span>
-            ) : null}
-          </footer>
-        </li>
+        <DocRow key={d.id} doc={d} />
       ))}
     </ul>
   )
