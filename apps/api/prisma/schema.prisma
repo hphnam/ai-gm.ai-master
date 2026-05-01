@@ -107,13 +107,18 @@ model VerificationToken {
 }
 
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  logo      String?
-  metadata  Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid())
+  name           String
+  slug           String   @unique
+  logo           String?
+  metadata       Json?
+  // Plan 06-01 — per-org chat-v2 feature flag. Default false: all existing orgs stay on chat-v1.
+  // Flips happen via direct SQL with mandatory comment header (audit-S5):
+  //   UPDATE organizations SET "chatV2Enabled" = true WHERE id = '...'; -- chat_v2_flag_flip orgId=... by=... reason=...
+  // Admin endpoint with structured audit log deferred to 06-03 (D-06-01-B).
+  chatV2Enabled  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   members            OrganizationMember[]
   invitations        Invitation[]
@@ -290,6 +295,11 @@ model KnowledgeItem {
   /// for all pre-Phase-C rows). 'pending' = question captured by record_kb_gap,
   /// awaiting GM answer in the dashboard.
   answerStatus        String                       @default("answered")
+  // Plan 06-01 — per-document ingestion USD cost. Sum of: extraction (Claude vision if image)
+  // + embedding (Voyage) + classifier (Haiku). Set at end-of-ingest. Null for pre-06-01 rows.
+  // Backfill of historic rows deferred (column nullable) — first month of forward data validates
+  // the helper math before backfill commits. Decimal(10,6) precision rationale matches ChatMessage.costUsd.
+  ingestionCostUsd    Decimal?                     @db.Decimal(10, 6)
   createdAt           DateTime                     @default(now())
   updatedAt           DateTime                     @updatedAt
 
@@ -594,6 +604,13 @@ model ChatMessage {
   followUps        String[] @default([])
   reasoning        String?
   parts            Json?
+  // Plan 06-01 — per-turn USD cost (chat-v2). Sum of paid external calls inside the turn:
+  // Triage + Researcher(s) + Writer Anthropic spend + any Voyage embeddings during retrieval.
+  // Set at end-of-turn aggregation in ChatV2Service. Null for chat-v1 messages and pre-06-01 rows.
+  // Decimal(10,6) precision: max $9999.999999 (covers 100M-token Opus call ~$7500), min $0.000001
+  // (covers Voyage embed ~$0.00006). 6dp matches Math.round(x*1e6)/1e6 helper output.
+  // Captured for ALL turns including failed (audit-M2): role='turn-failed' rows carry partial spend.
+  costUsd          Decimal? @db.Decimal(10, 6)
   createdAt        DateTime @default(now())
 
   conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
