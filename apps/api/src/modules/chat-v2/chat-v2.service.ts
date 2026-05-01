@@ -68,9 +68,13 @@ export class ChatV2Service {
       ).id
 
     // Persist raw user message (audit trail for audit-M4 — sanitized copy is
-    // what reaches Triage; raw stays in chat_messages.content).
+    // what reaches Triage; raw stays in chat_messages.content). Strip NUL bytes
+    // only — Postgres TEXT columns can't store 0x00, this is an encoding
+    // invariant not a content sanitization. All other content (role markers,
+    // injection clichés, control chars > 0x00) is preserved verbatim.
+    const auditTrailContent = input.userMessage.replace(/\x00/g, '')
     await prisma.chatMessage.create({
-      data: { conversationId, role: 'user', content: input.userMessage },
+      data: { conversationId, role: 'user', content: auditTrailContent },
     })
 
     const sanitized = sanitizeForTriage(input.userMessage)

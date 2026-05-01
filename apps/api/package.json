@@ -19,6 +19,8 @@
     "probe:section": "tsx scripts/probe-section.ts",
     "probe:eval": "tsx scripts/probe-eval.ts",
     "probe:tabular": "tsx scripts/probe-tabular.ts",
+    "probe:chat-v2": "tsx scripts/probe-chat-v2.ts",
+    "probe:chat-v2:real": "PROBE_CHAT_V2_REAL=1 tsx scripts/probe-chat-v2.ts",
     "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts"
   },
   "dependencies": {

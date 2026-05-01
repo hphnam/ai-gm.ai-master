@@ -15,9 +15,11 @@ const CONTROL_CHAR_RE = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g
 // Conversation role markers. Case-insensitive, opening or closing tags.
 const ROLE_MARKER_RE = /<\/?(system|assistant|user|human|ai|tool)>/gi
 
-// Instruction-injection cliches: "ignore (all|previous|prior|the above) instructions/rules/system prompt".
+// Instruction-injection cliches. Allows one or more modifiers between the verb
+// and the noun: "ignore all instructions", "ignore previous instructions",
+// "ignore all previous instructions", "disregard the above rules", etc.
 const INJECTION_RE =
-  /(?:^|\n)\s*(ignore|disregard|forget)\s+(?:all|previous|prior|the above)\s+(?:instructions?|rules?|system\s+prompt)/gi
+  /(?:^|\n)\s*(ignore|disregard|forget)(?:\s+(?:all|previous|prior|the\s+above))+\s+(?:instructions?|rules?|system\s+prompt)/gi
 
 export function sanitizeForTriage(raw: string): string {
   const truncated = raw.length > MAX_USER_MESSAGE_LEN ? raw.slice(0, MAX_USER_MESSAGE_LEN) : raw

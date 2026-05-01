@@ -96,9 +96,27 @@ function numberOr0(v: unknown): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : 0
 }
 
+// Probe-only state captures (audit-M4 V16). Production code path is
+// unaffected — these are touched only inside stubClassify().
+let _probeLastSanitizedInput: string | null = null
+export function _probeGetLastSanitizedInput(): string | null {
+  return _probeLastSanitizedInput
+}
+export function _probeResetLastSanitizedInput(): void {
+  _probeLastSanitizedInput = null
+}
+
 // Stub mode for probe-chat-v2.ts. Substring match → canned TriageOutput.
 // Production code path is unaffected — env check at top of classify().
 function stubClassify(userMessage: string): TriageResult {
+  _probeLastSanitizedInput = userMessage
+
+  // V15 audit-M3 — synthetic per-role timeout. Throw RoleTimeoutError to
+  // exercise the orchestrator's catch-block + turn-failed cost persistence.
+  if (process.env.PROBE_CHAT_V2_FORCE_TRIAGE_TIMEOUT === '1') {
+    throw new RoleTimeoutError('triage', TRIAGE_TIMEOUT_MS)
+  }
+
   const lower = userMessage.toLowerCase()
   const dispatchDocs: ResearcherName[] = ['docs']
   let brief = 'Look up the relevant procedure or fact in the venue knowledge base.'
