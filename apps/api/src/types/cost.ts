@@ -87,13 +87,19 @@ export function calculateVoyageUsd(callCount: number): number {
   return round6(callCount * VOYAGE_DOC_USD_PER_CALL)
 }
 
-// Per-turn cost breakdown captured by CostTracker (Task 3) — total = sum of contributions.
-// Persisted as single Decimal value on chat_messages.costUsd; breakdown is logged via
-// chat_v2.turn_complete event (audit-M5 PII-safe).
+// Per-turn cost breakdown captured by CostTracker. Persisted as single Decimal value
+// on chat_messages.costUsd; breakdown is logged via chat_v2.turn_complete event
+// (audit-M5 PII-safe).
+//
+// Plan 06-02 — extended from 4-stage to 5-stage with Analyser + Critic. Key order
+// matches pipeline order (NOT alphabetical): triage → researchers → analyser →
+// writer → critic → voyage → total. AC-8 + probe V38 enforce serialization order.
 export type CostBreakdown = {
   triage: number
   researchers: number
+  analyser: number
   writer: number
+  critic: number
   voyage: number
   total: number
 }
