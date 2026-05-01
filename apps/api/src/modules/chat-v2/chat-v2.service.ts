@@ -20,15 +20,20 @@
 // audit-M5 — phase events emitted with seq + timestampMs for 06-04 ordering.
 
 import { Injectable } from '@nestjs/common'
+import { createHash } from 'node:crypto'
 import { prisma } from '../../database/prisma'
 import {
   ANALYSER_RERESEARCH_CONFIDENCE_THRESHOLD,
   type AnalyserOutput,
   CRITIC_REASONING_CONFIDENCE_THRESHOLD,
   type ChatMode,
+  MAX_RESEARCHERS_PER_TURN,
   type ResearcherFinding,
+  type ResearcherName,
   RERESEARCH_COST_CEILING_USD,
+  RESEARCHER_PRIORITY_ORDER,
   type StreamPhaseEvent,
+  TOTAL_TURN_TIMEOUT_MS,
   type TriageOutput,
 } from '../../types'
 import type { SendMessageInput, SendMessageResult } from '../chat/chat.service'
@@ -37,7 +42,13 @@ import { CostTracker } from './cost-tracker.service'
 import { CriticService } from './critic.service'
 import { sanitizeForTriage } from './input-sanitizer'
 import { chatV2Logger, hashId, sanitizeError } from './log-helpers'
+import { sanitizeForResearcher } from './researcher-sanitizer'
+import type { Researcher } from './researcher.interface'
 import { DocsResearcher } from './researchers/docs.researcher'
+import { OpsResearcher } from './researchers/ops.researcher'
+import { PeopleResearcher } from './researchers/people.researcher'
+import { TabularResearcher } from './researchers/tabular.researcher'
+import { VenueResearcher } from './researchers/venue.researcher'
 import { TriageService } from './triage.service'
 import { WriterService } from './writer.service'
 
@@ -67,7 +78,33 @@ export class ChatV2Service {
     private readonly writer: WriterService,
     private readonly analyser: AnalyserService,
     private readonly critic: CriticService,
+    private readonly ops: OpsResearcher,
+    private readonly people: PeopleResearcher,
+    private readonly tabular: TabularResearcher,
+    private readonly venue: VenueResearcher,
   ) {}
+
+  // audit-M2 — exhaustive switch returning the discriminated-union interface,
+  // not any/unknown. tsc enforces compile-time type-completeness via the
+  // `never` fallback assertion.
+  private resolveResearcher(name: ResearcherName): Researcher {
+    switch (name) {
+      case 'docs':
+        return this.docs
+      case 'ops':
+        return this.ops
+      case 'people':
+        return this.people
+      case 'tabular':
+        return this.tabular
+      case 'venue':
+        return this.venue
+      default: {
+        const _exhaustive: never = name
+        throw new Error(`unknown researcher: ${String(_exhaustive)}`)
+      }
+    }
+  }
 
   async sendMessage(
     input: SendMessageInput,
@@ -117,6 +154,9 @@ export class ChatV2Service {
 
     let triageOutput: TriageOutput | null = null
     let lowConfidence = false
+    // audit-S6 — capture dispatch metadata for toolCallLog persistence.
+    let dispatchedResearchers: ResearcherName[] = []
+    let briefHashes: string[] = []
 
     try {
       // ───── Triage ─────
@@ -125,16 +165,113 @@ export class ChatV2Service {
       tracker.recordTriage(triageResult.usage)
       triageOutput = triageResult.output
 
-      // ───── Researcher (Docs) ─────
+      // ───── Dispatch validation + cap (audit-S2) ─────
+      // audit-S2: orchestrator re-validates the cap. If Triage somehow exceeds
+      // it, truncate by stable priority order and emit dispatch_capped warn.
+      const requestedDispatch = triageOutput.researchersToDispatch
+      let dispatched: ResearcherName[]
+      if (requestedDispatch.length > MAX_RESEARCHERS_PER_TURN) {
+        // Stable order — keep researchers in priority sequence; truncate tail.
+        const requestedSet = new Set(requestedDispatch)
+        dispatched = RESEARCHER_PRIORITY_ORDER.filter((r) => requestedSet.has(r)).slice(
+          0,
+          MAX_RESEARCHERS_PER_TURN,
+        )
+        chatV2Logger.warn('chat_v2.dispatch_capped', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          requestedCount: requestedDispatch.length,
+          dispatchedCount: dispatched.length,
+          capped: true,
+        })
+      } else {
+        dispatched = [...requestedDispatch]
+      }
+      dispatchedResearchers = dispatched
+
+      // Compose per-researcher briefs (sanitized at the boundary — audit-M4).
+      const briefs: Record<ResearcherName, string> = {
+        docs: '',
+        ops: '',
+        people: '',
+        tabular: '',
+        venue: '',
+      }
+      for (const name of dispatched) {
+        const raw = triageOutput.briefByResearcher[name] ?? sanitized.slice(0, 200)
+        briefs[name] = sanitizeForResearcher(raw)
+      }
+      briefHashes = dispatched.map((name) => sha12(briefs[name]))
+
+      // ───── Researcher fan-out (parallel) ─────
       emitPhase('research', triageOutput.mode)
-      const brief = triageOutput.briefByResearcher.docs ?? sanitized.slice(0, 200)
-      const docsResult = await this.docs.research(brief, {
-        orgId: ctx.orgId,
-        venueId: venue.id,
-        conversationId,
-      })
-      tracker.recordResearcher(docsResult.usage, docsResult.voyageCalls)
-      const findings: ResearcherFinding[] = [docsResult.finding]
+      const t1 = Date.now()
+
+      // audit-S10 — parent AbortController fires at
+      // max(0, TOTAL_TURN_TIMEOUT_MS - elapsed - 1000ms) to keep total turn
+      // wall-clock under TOTAL_TURN_TIMEOUT_MS even with adversarial researcher
+      // slowness. On parent abort, in-flight researchers' AbortSignals will
+      // trigger via their own per-researcher timeout (RESEARCHER_TIMEOUT_MS=15s
+      // is shorter than the typical parent budget so this is belt-and-braces).
+      const parentBudget = Math.max(0, TOTAL_TURN_TIMEOUT_MS - (t1 - t0) - 1000)
+      const parentAbort = new AbortController()
+      let parentBudgetExhausted = false
+      const parentTimer = setTimeout(() => {
+        parentAbort.abort()
+        parentBudgetExhausted = true
+        chatV2Logger.warn('chat_v2.turn_budget_exhausted', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          elapsedMs: Date.now() - t0,
+          dispatched,
+        })
+      }, parentBudget)
+      // Reference parentAbort.signal so future researchers wishing to honor a
+      // parent budget can read it; per-researcher AbortControllers (15s) are
+      // shorter than the typical parent budget so this is belt-and-braces.
+      void parentAbort.signal
+
+      const findings: ResearcherFinding[] = []
+      try {
+        const researcherTasks = dispatched.map((name) => {
+          const researcher = this.resolveResearcher(name)
+          return researcher
+            .research(briefs[name], {
+              orgId: ctx.orgId,
+              venueId: venue.id,
+              conversationId,
+            })
+            .then((result) => ({ status: 'fulfilled' as const, name, result }))
+            .catch((err: unknown) => ({ status: 'rejected' as const, name, err }))
+        })
+        const settled = await Promise.all(researcherTasks)
+        for (const s of settled) {
+          if (s.status === 'fulfilled') {
+            tracker.recordResearcher(s.result.usage, s.result.voyageCalls)
+            findings.push(s.result.finding)
+          } else {
+            chatV2Logger.warn('chat_v2.researcher_failed', {
+              orgId: orgIdHash,
+              conversationIdHash,
+              researcher: s.name,
+              error: sanitizeError(s.err),
+            })
+          }
+        }
+      } finally {
+        clearTimeout(parentTimer)
+      }
+
+      // audit-M6 — V14 split semantics: 1-of-N throws → ship; N-of-N throws →
+      // outer try/catch → turn-failed cost row. Hard guard for the all-fail case.
+      if (findings.length === 0) {
+        throw new Error('all researchers failed for this turn')
+      }
+
+      // The "primary" brief (used by re-research) — keep docs's brief if present,
+      // otherwise fall back to the first dispatched researcher's brief.
+      const primaryBrief = briefs.docs || briefs[dispatched[0]] || sanitized.slice(0, 200)
+      const brief = primaryBrief
 
       let writerText: string
       let analyserOutput: AnalyserOutput | null = null
@@ -286,7 +423,23 @@ export class ChatV2Service {
         new Set(citationsToPersist.map((c) => c.knowledgeItemId)),
       )
 
-      const toolCallLog = lowConfidence ? [LOW_CONFIDENCE_FLAG_ENTRY] : []
+      // audit-S6 — triage_dispatch entry persisted on toolCallLog for SOC-2
+      // incident reconstruction. Brief content is hashed (PII-safe), not raw.
+      const triageDispatchEntry = {
+        round: -2,
+        toolUseId: 'chat-v2-triage-dispatch',
+        tool: 'triage_dispatch',
+        input: {
+          mode: triageOutput.mode,
+          safetySignal: triageOutput.safetySignal,
+        },
+        result: {
+          dispatched: dispatchedResearchers,
+          briefHashes,
+        },
+      }
+      const toolCallLog: object[] = [triageDispatchEntry]
+      if (lowConfidence) toolCallLog.push(LOW_CONFIDENCE_FLAG_ENTRY)
 
       const assistant = await prisma.chatMessage.create({
         data: {
@@ -365,4 +518,10 @@ function composeRefinedBrief(originalBrief: string, openQuestions: string[]): st
     return `${originalBrief} — additional focus: ${openQuestions.join('; ')}`
   }
   return `${originalBrief} — broaden search to neighboring topics; original retrieval was thin`
+}
+
+// audit-S6 — first 12 chars of sha256 hex; matches hashId/hashQuery family in
+// log-helpers.ts (PII-safe, deterministic, length-stable for log payload size).
+function sha12(s: string): string {
+  return createHash('sha256').update(s).digest('hex').slice(0, 12)
 }

@@ -37,14 +37,23 @@ import {
   _probeResetLastSanitizedInput,
 } from '../src/modules/chat-v2/triage.service'
 import { DocsResearcher } from '../src/modules/chat-v2/researchers/docs.researcher'
+import { OpsResearcher } from '../src/modules/chat-v2/researchers/ops.researcher'
+import { PeopleResearcher } from '../src/modules/chat-v2/researchers/people.researcher'
+import { TabularResearcher } from '../src/modules/chat-v2/researchers/tabular.researcher'
+import { VenueResearcher } from '../src/modules/chat-v2/researchers/venue.researcher'
 import { WriterService } from '../src/modules/chat-v2/writer.service'
 import { ChatV2Service } from '../src/modules/chat-v2/chat-v2.service'
 import { AnalyserService } from '../src/modules/chat-v2/analyser.service'
 import { CriticService } from '../src/modules/chat-v2/critic.service'
+import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
+import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import { getChecklist } from '../src/modules/chat-v2/tools/get-checklist.tool'
 import { searchDocs } from '../src/modules/chat-v2/tools/search-docs.tool'
 import { sanitizeForTriage } from '../src/modules/chat-v2/input-sanitizer'
+import { sanitizeForResearcher } from '../src/modules/chat-v2/researcher-sanitizer'
 import { AnalyserOutputSchema } from '../src/types'
+void TabularQueryService
+void sanitizeForResearcher
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('probe-chat-v2 MUST NOT run in production — DB writes seed/cleanup test fixtures.')
@@ -195,17 +204,39 @@ async function ensureOrg(
 // Service construction (no NestJS DI — stub mode bypasses RetrievalService).
 // ──────────────────────────────────────────────────────────────────
 function buildServices() {
-  // RetrievalService is needed by DocsResearcher constructor but never called
-  // in stub mode. A minimal placeholder satisfies the parameter shape.
+  // RetrievalService + TabularQueryService are needed by researcher constructors
+  // but never called in stub mode. Minimal placeholders satisfy the parameter
+  // shapes.
   const retrievalPlaceholder = {} as never
+  const tabularQueryPlaceholder = {} as never
   const triage = new TriageService()
+  const mockOps = new MockOpsService()
   const docs = new DocsResearcher(retrievalPlaceholder)
+  const ops = new OpsResearcher(mockOps)
+  const people = new PeopleResearcher()
+  const tabular = new TabularResearcher(retrievalPlaceholder, tabularQueryPlaceholder)
+  const venue = new VenueResearcher(mockOps)
   const writer = new WriterService()
   const analyser = new AnalyserService()
   const critic = new CriticService()
-  const orchestrator = new ChatV2Service(triage, docs, writer, analyser, critic)
-  return { triage, docs, writer, analyser, critic, orchestrator }
+  const orchestrator = new ChatV2Service(
+    triage,
+    docs,
+    writer,
+    analyser,
+    critic,
+    ops,
+    people,
+    tabular,
+    venue,
+  )
+  return { triage, docs, ops, people, tabular, venue, writer, analyser, critic, orchestrator }
 }
+
+// Suppress unused-import warning for TabularQueryService — referenced via the
+// MockOpsService construction above keeps the import live for Task 5.
+void TabularQueryService
+void sanitizeForResearcher
 
 // ──────────────────────────────────────────────────────────────────
 // Log capture for V17. NestJS Logger writes via process.stdout.write +
