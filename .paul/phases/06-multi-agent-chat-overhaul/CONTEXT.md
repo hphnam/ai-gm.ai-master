@@ -100,7 +100,15 @@ The acute pain driving this phase: today's chat (single ToolLoopAgent + 333-line
   - Per-doc badge in `/knowledge` list view
 - **Rationale:** Operator wants visibility, not analytics. Token/model breakdown is bloat. USD on the existing IDs is enough for "where did the money go?" and rolls forward into v0.4 mid-turn ceilings cleanly.
 
-### D-06-G — Feature-flag cutover with empirical quality gate
+### D-06-G — ⊘ SUPERSEDED 2026-05-01 21:05 — Feature-flag cutover replaced with direct v1 deletion
+
+**Supersession:** User decision "bin the flag, fully migrate" overrides the original flag-based cutover with two-week soak. Phase 6 re-sliced 4→5 plans: new **06-04 (Full chat-v1 deletion)** inserted between 06-03 (breadth) and prior 06-04 (UI surface, renumbered 06-05). `Organization.chatV2Enabled` column dropped in 06-04; chat-v1 module deleted entirely; image/stream/conversation-history endpoints rebuilt on chat-v2; `whatsapp.service.ts` migrated to ChatV2Service. Quality gate (probe-eval ≥80% on 12-query harness + manual UAT ≥18/20 amazing on canary venue with flag still on) becomes a **pre-deletion checkpoint** in 06-04 instead of a pre-flip checkpoint. Rollback path is git revert; user explicitly accepts no-flag-rollback risk.
+
+**Rationale for override:** flag-flip + two-week soak creates extended dual-maintenance burden; image/stream/history paths still on v1 means v2 never gets feature-complete unless we either rebuild on v2 or delete v1 entirely. User chose the latter.
+
+**Original D-06-G text preserved below for traceability:**
+
+### D-06-G [original, superseded] — Feature-flag cutover with empirical quality gate
 - **Module:** `apps/api/src/modules/chat-v2/` — separate NestJS module. Old `chat/` keeps running.
 - **Flag:** per-org boolean (`Organization.chatV2Enabled`) — operator-flippable per tenant for early dogfood. Default `false` until empirical gate met.
 - **Quality gate before default flip:**
