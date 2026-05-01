@@ -7,8 +7,8 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.3 Neural Brain** (v0.3.0)
-Status: 🚧 In Progress (1 of 5 phases complete — Phase 1 Hierarchical Retrieval closed 2026-04-28)
-Phases: 5
+Status: 🚧 In Progress (2 of 6 phases complete — Phase 1 Hierarchical Retrieval + Phase 5 Tabular Query Path closed 2026-04-28)
+Phases: 6
 
 **Theme:** "Per-venue neural brain — the assistant doesn't search docs, it knows the venue. Connections between docs are first-class data, and the WhatsApp channel speaks fluent venue-context."
 
@@ -23,6 +23,7 @@ Phases: 5
 | 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Not started | - |
 | 4 | WhatsApp Procedural Runtime | TBD | Not started | - |
 | 5 | Tabular Query Path | 1 (05-01 schema+ingest+query+tool+probe) | 📋 Planned | - |
+| 6 | Multi-Agent Chat Overhaul | TBD | Not started | - |
 
 ### Phase 1: Hierarchical Retrieval
 
@@ -97,6 +98,26 @@ Phases: 5
 
 **Plans:** TBD (defined during /paul:plan)
 
+### Phase 6: Multi-Agent Chat Overhaul
+
+**Focus:** Replace the single ToolLoopAgent + 333-line god-prompt + regex tier router with a **role-based multi-agent pipeline** that thinks like a human ops team. Today's chat is one Sonnet model following a script; the result is rigid behaviour, mixed-up retrievals, leaked internal reasoning ("⚠️ I wasn't able to retrieve 3 steps"), and headings that violate its own formatting rules. This phase rebuilds the chat surface around discrete cognitive roles — **Triage → Researchers (parallel) → Analyser → Writer → optional Critic** — each with a slim role-specific prompt and shaped tool surface. Built on top of Phases 1-5 (hierarchical retrieval, graph traversal, tabular query, procedural runtime) so each researcher specialist uses the right primitive natively.
+
+**Scope (pre-discuss sketch):**
+- **Triage agent** (Haiku) — classifies intent, drafts a research brief naming which specialists to dispatch with what queries; structured JSON output, not prose
+- **Researcher specialists** (Haiku, parallel) — Docs (graph + section retrieval), Ops (stock/cutoffs/suppliers), People (contacts), Tabular (CSV/XLSX queries via Phase 5 tool), Venue (profile/layout/contacts/policies); each owns a *shaped* tool surface, not the generic `find_knowledge` flat-chunk-search
+- **Shaped tool redesign** — replace the all-purpose `find_knowledge` with verbs that match user intent: `get_checklist(intent)` returns full ordered list (no top-K truncation), `get_person(name)` returns bio+role+contact+mentions, `get_venue_briefing(venueId)` returns profile+contacts+active issues, `search_docs(query, filters)` for genuine open queries
+- **Analyser agent** (Sonnet) — reconciles overlapping retrievals (kills the dual-checklist mixup), dedupes across researcher outputs, decides if one bounded re-research pass is needed, emits `{synthesis, citations, openQuestions}`
+- **Writer agent** (Sonnet) — only role producing user-facing prose; strict format/voice rules in a focused 30-50 line prompt (no headings, no retrieval narration, no "missing 3 steps" disclaimers)
+- **Optional Critic agent** (Haiku) — verifies specifics (numbers, names, codes) against sources before send; bounces back if mismatch; opt-in for high-stakes turns (incidents, compliance, captures)
+- **Parallel tool use enabled** for researchers (drop `disableParallelToolUse: true` for that role)
+- **Streaming role transitions in UI** — "Triaging… Researching docs + contacts… Drafting…" so users feel the research happening (no more silent dead-air → wall of text)
+- **Slim per-role prompts** — each role gets ~30-50 lines focused on its job; replaces the current 333-line `system-prompt.ts` god-prompt; per-role prompt caching stays viable
+- **Feature-flag cutover** — new `chat-v2` module behind a flag, old `chat/` keeps running for safety; flip default + retire v1 after empirical quality verification
+- **Tier routing deleted** — Triage agent decides which model per role per turn; regex `tier-router.ts` removed
+- **Probe coverage** — role pipeline orchestration, parallel researcher fan-out, dedup correctness, streaming transition events, feature-flag cutover
+
+**Plans:** TBD (defined during /paul:plan)
+
 ---
 
 ## Explicitly Deferred to v0.4 (with triggers)
@@ -162,4 +183,4 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-04-28 — Phase 5 (Tabular Query Path) added to v0.3 milestone to close aggregate-query gap on CSV/XLSX docs (e.g. "top 3 selling wines"). Milestone now 5 phases. v0.3 Phase 1 (Hierarchical Retrieval) CLOSED at 3/3 plans; Phase 2 (Graph Layer) ready to plan.*
+*Last updated: 2026-05-01 — Phase 6 (Multi-Agent Chat Overhaul) added to v0.3 milestone. Replaces the single ToolLoopAgent + 333-line god-prompt with a role-based pipeline (Triage → Researchers → Analyser → Writer + optional Critic) and shaped per-domain researcher tools. Built on top of Phases 1-5 so each specialist uses the right primitive natively. Milestone now 6 phases.*

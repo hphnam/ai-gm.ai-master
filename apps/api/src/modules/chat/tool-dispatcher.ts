@@ -87,7 +87,8 @@ export class ToolDispatcher {
             crossVenue: i.crossVenue,
           })
           if (!result.ok) return result
-          return this.applyFindKnowledgeFormat(result.data, ctx.orgId)
+          const expanded = await this.expandChecklistStepHits(result.data, ctx.orgId)
+          return this.applyFindKnowledgeFormat(expanded, ctx.orgId)
         }
         case 'get_stock_below_par':
           return await this.mockOps.getStockBelowPar(
@@ -476,6 +477,113 @@ export class ToolDispatcher {
       )
       return fail('error', message)
     }
+  }
+
+  /**
+   * Tactical fix pass — when find_knowledge surfaces individual checklist_step
+   * hits, top-K truncation drops sibling steps and similarity-ordering across
+   * sibling docs causes two checklists to interleave. Both make the model
+   * hallucinate gaps and mix sources. This collapses step hits into ONE
+   * synthesized "full checklist" hit per turn:
+   *   1. Group step hits by metadata.checklistId
+   *   2. Pick the winning checklist (most hits, tie-break by max score)
+   *   3. Fetch the parent Checklist from DB (org-scoped) for ordered steps
+   *   4. Emit a single knowledge_item-typed hit carrying the whole list
+   *   5. Drop ALL other checklist_step hits (winning + losing)
+   * Non-checklist_step hits pass through untouched.
+   */
+  private async expandChecklistStepHits(
+    hits: RetrievalHit[],
+    orgId: string,
+  ): Promise<RetrievalHit[]> {
+    const stepHits = hits.filter((h) => h.entityType === 'checklist_step')
+    if (stepHits.length === 0) return hits
+
+    const byChecklist = new Map<string, RetrievalHit[]>()
+    for (const h of stepHits) {
+      const cid = h.metadata.checklistId as string | undefined
+      if (!cid) continue
+      const arr = byChecklist.get(cid) ?? []
+      arr.push(h)
+      byChecklist.set(cid, arr)
+    }
+    if (byChecklist.size === 0) return hits
+
+    let winnerId = ''
+    let winnerHits: RetrievalHit[] = []
+    let winnerMaxScore = -Infinity
+    for (const [cid, arr] of byChecklist) {
+      const maxScore = Math.max(...arr.map((h) => h.score))
+      const beats =
+        arr.length > winnerHits.length ||
+        (arr.length === winnerHits.length && maxScore > winnerMaxScore)
+      if (beats) {
+        winnerId = cid
+        winnerHits = arr
+        winnerMaxScore = maxScore
+      }
+    }
+
+    const checklist = await prisma.checklist.findFirst({
+      where: { id: winnerId, organizationId: orgId },
+      select: { id: true, title: true, steps: true, knowledgeItemId: true },
+    })
+    if (!checklist) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'tool_dispatcher.checklist_expand_missing',
+          checklistIdHash: createHash('sha256').update(winnerId).digest('hex').slice(0, 16),
+        }),
+      )
+      return hits.filter((h) => h.entityType !== 'checklist_step')
+    }
+
+    const steps = Array.isArray(checklist.steps) ? (checklist.steps as Array<Record<string, unknown>>) : []
+    const ordered = [...steps].sort(
+      (a, b) => (Number(a.index) || 0) - (Number(b.index) || 0),
+    )
+    const lines = ordered.map((s) => {
+      const idx = Number(s.index) || 0
+      const text = String(s.text ?? '').trim()
+      const hint = typeof s.hint === 'string' && s.hint.trim().length > 0 ? ` (${s.hint.trim()})` : ''
+      return `${idx + 1}. ${text}${hint}`
+    })
+    const content = `${checklist.title}\n\n${lines.join('\n')}`
+
+    const synthesized: RetrievalHit = {
+      id: `synth-checklist-${checklist.id}`,
+      entityType: 'knowledge_item',
+      entityId: checklist.knowledgeItemId,
+      subKey: '',
+      content,
+      title: checklist.title,
+      summary: null,
+      tags: winnerHits[0]?.tags ?? [],
+      kind: 'checklist',
+      metadata: {
+        checklistId: checklist.id,
+        knowledgeItemId: checklist.knowledgeItemId,
+        synthesizedFrom: 'checklist_step',
+        stepCount: ordered.length,
+        contributingHits: winnerHits.length,
+      },
+      aiSummary: null,
+      similarity: Math.max(...winnerHits.map((h) => h.similarity)),
+      score: winnerMaxScore,
+      matchedBy: winnerHits[0]?.matchedBy ?? ['vector'],
+    }
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'tool_dispatcher.checklist_expanded',
+        stepCount: ordered.length,
+        contributingHits: winnerHits.length,
+        droppedSiblingChecklists: byChecklist.size - 1,
+        orgIdHash: createHash('sha256').update(orgId).digest('hex').slice(0, 16),
+      }),
+    )
+
+    return [synthesized, ...hits.filter((h) => h.entityType !== 'checklist_step')]
   }
 
   /**
