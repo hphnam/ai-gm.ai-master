@@ -7,9 +7,9 @@
     "status": "in_progress"
   },
   "phase": {
-    "number": 5,
-    "name": "Tabular Query Path",
-    "status": "complete"
+    "number": 6,
+    "name": "Multi-Agent Chat Overhaul",
+    "status": "in_progress"
   },
   "loop": {
     "plan": null,
@@ -17,7 +17,7 @@
   },
   "timestamps": {
     "created_at": "2026-04-13T21:03:00Z",
-    "updated_at": "2026-04-28T16:15:00+0100"
+    "updated_at": "2026-05-01T17:18:25Z"
   },
   "satellite": {
     "groom": true
