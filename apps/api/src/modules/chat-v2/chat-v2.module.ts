@@ -8,11 +8,13 @@ import { Module } from '@nestjs/common'
 import { IngestModule } from '../ingest/ingest.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { ChatV2Service } from './chat-v2.service'
+import { DocsResearcher } from './researchers/docs.researcher'
 import { TriageService } from './triage.service'
+import { WriterService } from './writer.service'
 
 @Module({
   imports: [RetrievalModule, IngestModule],
-  providers: [ChatV2Service, TriageService],
+  providers: [ChatV2Service, TriageService, DocsResearcher, WriterService],
   exports: [ChatV2Service],
 })
 export class ChatV2Module {}
