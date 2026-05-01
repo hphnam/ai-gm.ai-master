@@ -11,6 +11,7 @@ import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
 import { generateObject, type SystemModelMessage } from 'ai'
 import {
   type AnthropicUsage,
+  MAX_RESEARCHERS_PER_TURN,
   type ResearcherName,
   TRIAGE_TIMEOUT_MS,
   TriageClassificationError,
@@ -111,6 +112,24 @@ export function _probeResetLastSanitizedInput(): void {
 // THEN lookup patterns. Without this priority, generic 'flat pint' regex would
 // catch "pint tasted off and they feel sick" before the safety-signal pattern
 // fires (regression).
+//
+// Plan 06-03 Task 3 — extended for per-mode researcher subset dispatch.
+// Venue always-on for reasoning + incident (CONTEXT.md D-06-B). Lookup picks
+// exactly ONE specialist whose domain matches. audit-S2 — defense-in-depth
+// .slice(0, MAX_RESEARCHERS_PER_TURN) at the makeStubResult boundary.
+//
+// audit-S6 — orchestrator persists triage_dispatch entry on chat_messages.
+// toolCallLog with hash of each brief (first 12 chars sha256). Stub continues
+// to populate briefByResearcher for every dispatched researcher; orchestrator
+// hashes at persist time.
+
+const VENUE_BRIEF =
+  'Briefing for current shift context: profile, layout, active incidents in last 24h, upcoming cutoffs in next 4h.'
+
+// V80.cap synthetic dispatch — when env var is set, force-emit 5 researchers
+// to exercise orchestrator truncation + dispatch_capped warn.
+const FORCE_FIVE_DISPATCH = '__FORCE_FIVE__'
+
 function stubClassify(userMessage: string): TriageResult {
   _probeLastSanitizedInput = userMessage
 
@@ -120,8 +139,25 @@ function stubClassify(userMessage: string): TriageResult {
     throw new RoleTimeoutError('triage', TRIAGE_TIMEOUT_MS)
   }
 
+  // V80.cap — force-five-researcher dispatch for orchestrator cap test.
+  if (process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH === '1' || userMessage.includes(FORCE_FIVE_DISPATCH)) {
+    return makeStubResult(
+      'reasoning',
+      ['venue', 'docs', 'ops', 'people', 'tabular'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch any relevant procedure.',
+        ops: 'Fetch stock state.',
+        people: 'Fetch contacts on duty.',
+        tabular: 'Fetch sales aggregates.',
+      },
+      false,
+      // Skip the cap defense-in-depth so orchestrator sees all 5.
+      true,
+    )
+  }
+
   const lower = userMessage.toLowerCase()
-  const dispatchDocs: ResearcherName[] = ['docs']
 
   // ── Priority 1: SAFETY / INCIDENT patterns (audit-S7) ────────────────────
   // Allergen+illness escalation (boundary case from CONTEXT.md D-06-B).
@@ -132,8 +168,12 @@ function stubClassify(userMessage: string): TriageResult {
   ) {
     return makeStubResult(
       'incident',
-      dispatchDocs,
-      'Fetch allergen handling procedure + emergency contacts + incident logging requirements.',
+      ['venue', 'docs', 'people'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch allergen handling procedure + incident logging requirements.',
+        people: 'Fetch duty manager + GP/A&E emergency contacts.',
+      },
       true,
     )
   }
@@ -141,8 +181,12 @@ function stubClassify(userMessage: string): TriageResult {
   if (/cellar.*flood|flooding|burst pipe/i.test(userMessage)) {
     return makeStubResult(
       'incident',
-      dispatchDocs,
-      'Fetch cellar emergency procedure + power-isolation steps + emergency contacts.',
+      ['venue', 'docs', 'people'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch cellar emergency procedure + power-isolation steps.',
+        people: 'Fetch maintenance + duty manager contacts.',
+      },
       true,
     )
   }
@@ -150,8 +194,12 @@ function stubClassify(userMessage: string): TriageResult {
   if (/\b(fire|fire alarm|alarm went off)\b/i.test(userMessage)) {
     return makeStubResult(
       'incident',
-      dispatchDocs,
-      'Fetch fire evacuation procedure + muster point + 999 protocol.',
+      ['venue', 'docs', 'people'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch fire evacuation procedure + muster point + 999 protocol.',
+        people: 'Fetch duty manager + fire warden contacts.',
+      },
       true,
     )
   }
@@ -159,8 +207,12 @@ function stubClassify(userMessage: string): TriageResult {
   if (/\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(userMessage)) {
     return makeStubResult(
       'incident',
-      dispatchDocs,
-      'Fetch refusal-of-service / injury / safety procedure + escalation contacts.',
+      ['venue', 'docs', 'people'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch refusal-of-service / injury / safety procedure.',
+        people: 'Fetch duty manager + first-aider contacts.',
+      },
       true,
     )
   }
@@ -169,64 +221,129 @@ function stubClassify(userMessage: string): TriageResult {
   if (/flat pint|complaint about/i.test(userMessage)) {
     return makeStubResult(
       'reasoning',
-      dispatchDocs,
-      'Fetch keg/line troubleshooting steps + supplier contacts that inform a multi-path diagnosis.',
+      ['venue', 'docs', 'ops'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch keg/line troubleshooting steps that inform a multi-path diagnosis.',
+        ops: 'Fetch keg + line state + supplier cutoffs that may bear on the diagnosis.',
+      },
       false,
     )
   }
   if (/short[- ]staffed|short staff/i.test(userMessage)) {
     return makeStubResult(
       'reasoning',
-      dispatchDocs,
-      'Fetch operational priority guidance for understaffed shifts + service-level fallbacks.',
+      ['venue', 'ops', 'people'],
+      {
+        venue: VENUE_BRIEF,
+        ops: 'Fetch operational priorities and stock state for understaffed shifts.',
+        people: 'Fetch duty manager + on-call staff contacts.',
+      },
       false,
     )
   }
   if (/group booking|should i take|should i accept/i.test(userMessage)) {
     return makeStubResult(
       'reasoning',
-      dispatchDocs,
-      'Fetch capacity guidance + staffing requirements + branching criteria for the booking decision.',
+      ['venue', 'ops'],
+      {
+        venue: VENUE_BRIEF,
+        ops: 'Fetch capacity + staffing + stock state that affect the booking decision.',
+      },
       false,
     )
   }
   if (/glass.*residue|residue|washer/i.test(userMessage)) {
     return makeStubResult(
       'reasoning',
-      dispatchDocs,
-      'Fetch glass-wash troubleshooting steps + descaler procedure + EHO compliance flags.',
+      ['venue', 'docs', 'ops'],
+      {
+        venue: VENUE_BRIEF,
+        docs: 'Fetch glass-wash troubleshooting + descaler procedure + EHO flags.',
+        ops: 'Fetch detergent stock + last-clean state.',
+      },
       false,
     )
   }
 
-  // ── Priority 3: LOOKUP patterns (existing 06-01 stubs) ────────────────
-  let brief = 'Look up the relevant procedure or fact in the venue knowledge base.'
+  // ── Priority 3: LOOKUP patterns — pick ONE specialist by domain ─────────
   if (lower.includes('below par')) {
-    brief = 'Find current stock levels and which items are at or below par.'
-  } else if (lower.includes('open up') || lower.includes('opening')) {
-    brief = 'Fetch the venue opening checklist and surface its full ordered steps.'
-  } else if (lower.includes('bibendum') || lower.includes('cutoff')) {
-    brief = 'Find the supplier cutoff time for Bibendum.'
-  } else if (lower.includes('heineken')) {
-    brief = 'Look up Heineken sales data over the requested window.'
-  } else if (lower.includes('ice machine')) {
-    brief = 'Look up the ice-machine engineer contact and unit details.'
+    return makeStubResult(
+      'lookup',
+      ['ops'],
+      { ops: 'Find current stock levels and which items are at or below par.' },
+      false,
+    )
+  }
+  if (lower.includes('open up') || lower.includes('opening') || lower.includes('checklist')) {
+    return makeStubResult(
+      'lookup',
+      ['docs'],
+      { docs: 'Fetch the relevant venue checklist and surface its full ordered steps.' },
+      false,
+    )
+  }
+  if (lower.includes('bibendum') || lower.includes('cutoff') || lower.includes('supplier')) {
+    return makeStubResult(
+      'lookup',
+      ['ops'],
+      { ops: 'Find the supplier cutoff time / supplier details.' },
+      false,
+    )
+  }
+  if (
+    lower.includes('top 3') ||
+    lower.includes('top selling') ||
+    lower.includes('total revenue') ||
+    lower.includes('sales last') ||
+    lower.includes('heineken')
+  ) {
+    return makeStubResult(
+      'lookup',
+      ['tabular'],
+      { tabular: 'Run an aggregate query over the relevant tabular doc.' },
+      false,
+    )
+  }
+  if (lower.includes('ice machine') || lower.includes('engineer') || lower.includes('who do i call')) {
+    return makeStubResult(
+      'lookup',
+      ['people'],
+      { people: 'Look up the engineer / contact details.' },
+      false,
+    )
   }
 
-  return makeStubResult('lookup', dispatchDocs, brief, false)
+  // Default fallback: docs.
+  return makeStubResult(
+    'lookup',
+    ['docs'],
+    { docs: 'Look up the relevant procedure or fact in the venue knowledge base.' },
+    false,
+  )
 }
 
 function makeStubResult(
   mode: 'lookup' | 'reasoning' | 'incident',
   dispatch: ResearcherName[],
-  brief: string,
+  briefs: Partial<Record<ResearcherName, string>>,
   safetySignal: boolean,
+  skipCap = false,
 ): TriageResult {
+  // audit-S2 defense-in-depth: stub respects MAX_RESEARCHERS_PER_TURN; the
+  // V80.cap synthetic test path passes skipCap=true so the orchestrator gets
+  // a 5-researcher dispatch to truncate.
+  const cappedDispatch = skipCap ? dispatch : dispatch.slice(0, MAX_RESEARCHERS_PER_TURN)
+  // briefByResearcher is keyed off cappedDispatch only.
+  const briefsOut: Partial<Record<ResearcherName, string>> = {}
+  for (const r of cappedDispatch) {
+    if (briefs[r]) briefsOut[r] = briefs[r]
+  }
   return {
     output: {
       mode,
-      researchersToDispatch: dispatch,
-      briefByResearcher: { docs: brief },
+      researchersToDispatch: cappedDispatch,
+      briefByResearcher: briefsOut,
       safetySignal,
     },
     usage: {
