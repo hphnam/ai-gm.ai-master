@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
+import { ChatV2Module } from '../chat-v2/chat-v2.module'
 import { IngestModule } from '../ingest/ingest.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
@@ -12,7 +13,7 @@ import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
 
 @Module({
-  imports: [RetrievalModule, AdaptationModule, IngestModule, TabularModule],
+  imports: [RetrievalModule, AdaptationModule, IngestModule, TabularModule, ChatV2Module],
   controllers: [ChatController],
   providers: [
     ChatService,

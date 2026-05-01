@@ -5,6 +5,7 @@ import { AdaptationModule } from './modules/adaptation/adaptation.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { OrgContextMiddleware } from './modules/auth/org-context.middleware'
 import { ChatModule } from './modules/chat/chat.module'
+import { ChatV2Module } from './modules/chat-v2/chat-v2.module'
 import { DebugModule } from './modules/debug/debug.module'
 import { DocsModule } from './modules/docs/docs.module'
 import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
@@ -29,6 +30,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     MockOpsModule,
     RetrievalModule,
     AdaptationModule,
+    ChatV2Module,
     ChatModule,
     SuggestionsModule,
     VenuesModule,
