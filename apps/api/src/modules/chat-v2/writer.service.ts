@@ -176,13 +176,16 @@ function stubCompose(input: WriterInput): WriterResult {
   const safety = input.safetySignal === true
   const lines: string[] = []
   lines.push(`${retrySentinel}Right — cut the power at the consumer unit, NOT in the cellar.`)
+  if (safety) {
+    // V48a: 999 directive within first 3 lines (audit-M2 spec — first half OR
+    // first 3 lines). Position by line, not character — incident responses
+    // include verbose late-stage content (don't/empathy lines) that pushes
+    // mid-text past the character midpoint without affecting urgency-first.
+    lines.push(`If anyone's hurt or you smell gas, ring 999 NOW.`)
+  }
   lines.push(`Now: get everyone out and shut the trap door.`)
   lines.push(`Then: ring the cellar emergency number on file.`)
   lines.push(`Don't go back in until power's confirmed off.`)
-  if (safety) {
-    // 999 directive in first half (line 5 of 7 — under 0.5 × length).
-    lines.push(`If you smell gas or anyone's hurt, ring 999 immediately.`)
-  }
   lines.push(`Confirm with the duty manager before re-entry.`)
   lines.push(`You've done the right call moving fast.`)
   return {

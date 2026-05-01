@@ -39,9 +39,12 @@ import {
 import { DocsResearcher } from '../src/modules/chat-v2/researchers/docs.researcher'
 import { WriterService } from '../src/modules/chat-v2/writer.service'
 import { ChatV2Service } from '../src/modules/chat-v2/chat-v2.service'
+import { AnalyserService } from '../src/modules/chat-v2/analyser.service'
+import { CriticService } from '../src/modules/chat-v2/critic.service'
 import { getChecklist } from '../src/modules/chat-v2/tools/get-checklist.tool'
 import { searchDocs } from '../src/modules/chat-v2/tools/search-docs.tool'
 import { sanitizeForTriage } from '../src/modules/chat-v2/input-sanitizer'
+import { AnalyserOutputSchema } from '../src/types'
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('probe-chat-v2 MUST NOT run in production — DB writes seed/cleanup test fixtures.')
@@ -198,8 +201,10 @@ function buildServices() {
   const triage = new TriageService()
   const docs = new DocsResearcher(retrievalPlaceholder)
   const writer = new WriterService()
-  const orchestrator = new ChatV2Service(triage, docs, writer)
-  return { triage, docs, writer, orchestrator }
+  const analyser = new AnalyserService()
+  const critic = new CriticService()
+  const orchestrator = new ChatV2Service(triage, docs, writer, analyser, critic)
+  return { triage, docs, writer, analyser, critic, orchestrator }
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -247,7 +252,7 @@ async function runProbe(iteration: number): Promise<void> {
   await prisma.organization.update({ where: { id: orgA.orgId }, data: { chatV2Enabled: false } })
   await prisma.organization.update({ where: { id: orgB.orgId }, data: { chatV2Enabled: false } })
 
-  const { triage, orchestrator } = buildServices()
+  const { triage, analyser, critic, orchestrator } = buildServices()
 
   // ──────────────────────── V1 — flag-off routes to v1 ────────────────────────
   // We assert the dispatch decision: read the flag; the dispatcher in
@@ -538,6 +543,391 @@ async function runProbe(iteration: number): Promise<void> {
     }
   }
   assertEqual('V19.ban_list_all_caught', v19AllBanned, true)
+
+  // ════════════════════════════════════════════════════════════════════════
+  // Plan 06-02 — V20-V50 (depth: Analyser + Critic + reasoning/incident modes)
+  // ════════════════════════════════════════════════════════════════════════
+
+  // Regex contracts for 06-02 mode shapes.
+  // V21: stub Writer output validates the STUB shape, NOT the real prompt.
+  // Real-Anthropic verification of voice/shape happens via PROBE_CHAT_V2_REAL=1
+  // manual checkpoint (audit-S6 / audit-M6 carry-forward from 06-01).
+  const POSITIVE_REASONING_RE =
+    /first thing —|two paths|quick check:|80% of (it|the|cases)|the move (is|here)|if (it|that|this).*if not/i
+  const URGENCY_FIRST_RE =
+    /^(?:right —|right,? )?\s*(?:get|cut|shut|kill|move|grab|ring|call|999|first[ ,])/i
+
+  const orgA_ctx = {
+    orgId: orgA.orgId,
+    userId: orgA.userId,
+    userRole: 'staff' as const,
+    userIdentity: { name: 'Probe', email: 'probe@local' },
+  }
+
+  // ──────────────────────── V20-V22 — reasoning shape ─────────────────────
+  const v20Conv = await prisma.chatConversation.create({
+    data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+    select: { id: true },
+  })
+  const reasoningTurn = await orchestrator.sendMessage(
+    { venueId: orgA.venueId, userMessage: 'complaint about a flat pint, what do I do?', conversationId: v20Conv.id },
+    orgA_ctx,
+  )
+  const reasoningText = reasoningTurn.assistantMessage.content
+  assertMatchesNone('V20.reasoning_no_preamble', reasoningText, PREAMBLE_BAN_RE)
+  assert('V21.reasoning_positive_marker', POSITIVE_REASONING_RE.test(reasoningText), `text: "${reasoningText.slice(0, 100)}"`)
+  const reasoningLines = reasoningText.split('\n').filter((l) => l.trim().length > 0).length
+  assert(
+    'V22.reasoning_line_count_in_band',
+    reasoningLines >= 4 && reasoningLines <= 12,
+    `lines=${reasoningLines}`,
+  )
+
+  // ──────────────────────── V23-V25 — incident shape ──────────────────────
+  const v23Conv = await prisma.chatConversation.create({
+    data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+    select: { id: true },
+  })
+  const incidentTurn = await orchestrator.sendMessage(
+    { venueId: orgA.venueId, userMessage: "cellar's flooding, what do I do?", conversationId: v23Conv.id },
+    orgA_ctx,
+  )
+  const incidentText = incidentTurn.assistantMessage.content
+  const incidentFirstLine = incidentText.split('\n')[0]
+  assert('V23.incident_urgency_first', URGENCY_FIRST_RE.test(incidentFirstLine), `firstLine="${incidentFirstLine}"`)
+  const hasNowThen = /\bnow\b/i.test(incidentText) && /\bthen\b/i.test(incidentText)
+  const hasNumbered = (incidentText.match(/^[1-9][.)] /gm) ?? []).length >= 2
+  assert('V24.incident_sequence_markers', hasNowThen || hasNumbered)
+  const hasNegInstr = /\b(?:don'?t|do not|avoid|never)\b/i.test(incidentText)
+  assert('V25.incident_negative_instruction', hasNegInstr)
+
+  // ──────────────────────── V26-V28 — Analyser structured output ──────────
+  const sampleFindings = [
+    {
+      researcher: 'docs' as const,
+      summary: 'Stock report: 4 SKUs at or below par — Heineken 8/12, Guinness 5/10.',
+      citations: [{ knowledgeItemId: '00000000-0000-4000-8000-000000000002' }],
+    },
+  ]
+  const analyserDirect = await analyser.analyse({
+    mode: 'reasoning',
+    userMessage: 'complaint about a flat pint',
+    findings: sampleFindings,
+  })
+  const v26Parse = AnalyserOutputSchema.safeParse(analyserDirect.output)
+  assertEqual('V26.analyser_strict_schema_parse', v26Parse.success, true)
+  assert(
+    'V27.analyser_evidence_in_range',
+    analyserDirect.output.evidenceSufficiency >= 0 && analyserDirect.output.evidenceSufficiency <= 1,
+  )
+  const v28Cited = new Set(analyserDirect.output.citations.map((c) => c.knowledgeItemId))
+  const v28Source = new Set(sampleFindings.flatMap((f) => f.citations.map((c) => c.knowledgeItemId)))
+  const v28Subset = [...v28Cited].every((id) => v28Source.has(id))
+  assertEqual('V28.analyser_citations_subset_no_fabrication', v28Subset, true)
+
+  // ──────────────────────── V29-V31 — re-research circuit-breaker ─────────
+  startCapture()
+  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  try {
+    const v29Conv = await prisma.chatConversation.create({
+      data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+      select: { id: true },
+    })
+    await orchestrator.sendMessage(
+      { venueId: orgA.venueId, userMessage: 'flat pint, what to do', conversationId: v29Conv.id },
+      orgA_ctx,
+    )
+  } finally {
+    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+    stopCapture()
+  }
+  const v29Reresearch = captured.filter((l) => l.msg.includes('chat_v2.reresearch_dispatched'))
+  assertGte('V29.reresearch_dispatched_on_low_confidence', v29Reresearch.length, 1)
+
+  // V30 — fake high running cost → re-research SKIPPED.
+  startCapture()
+  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD = '0.06'
+  let v30Result: { assistantMessage: { id: string } } | null = null
+  try {
+    const v30Conv = await prisma.chatConversation.create({
+      data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+      select: { id: true },
+    })
+    v30Result = await orchestrator.sendMessage(
+      { venueId: orgA.venueId, userMessage: 'flat pint diagnosis', conversationId: v30Conv.id },
+      orgA_ctx,
+    )
+  } finally {
+    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD
+    stopCapture()
+  }
+  const v30Skipped = captured.filter((l) => l.msg.includes('chat_v2.reresearch_skipped_cost_ceiling'))
+  assertGte('V30.reresearch_skipped_when_cost_ceiling_breached', v30Skipped.length, 1)
+
+  // V31 — high-confidence reasoning turn → no reresearch dispatched.
+  startCapture()
+  try {
+    const v31Conv = await prisma.chatConversation.create({
+      data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+      select: { id: true },
+    })
+    await orchestrator.sendMessage(
+      { venueId: orgA.venueId, userMessage: 'complaint about a flat pint', conversationId: v31Conv.id },
+      orgA_ctx,
+    )
+  } finally {
+    stopCapture()
+  }
+  const v31NoReresearch = captured.filter((l) => l.msg.includes('chat_v2.reresearch_dispatched')).length === 0
+  assert('V31.no_reresearch_on_high_confidence', v31NoReresearch)
+
+  // ──────────────────────── V32-V34 — Critic gating ───────────────────────
+  // Need a fresh assistant chat_messages row per test to inspect costUsd
+  // breakdown. Easiest: query the most recent assistant row by conversation.
+
+  async function turnAndReadCostBreakdown(userMessage: string) {
+    const conv = await prisma.chatConversation.create({
+      data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+      select: { id: true },
+    })
+    startCapture()
+    let result: { assistantMessage: { id: string } }
+    try {
+      result = await orchestrator.sendMessage(
+        { venueId: orgA.venueId, userMessage, conversationId: conv.id },
+        orgA_ctx,
+      )
+    } finally {
+      stopCapture()
+    }
+    const costLines = captured.filter((l) => l.msg.includes('chat_v2.turn_complete'))
+    const costMatch = costLines[0]?.msg.match(/"breakdown":(\{[^}]+\})/)
+    const breakdown = costMatch ? JSON.parse(costMatch[1]) : null
+    return { result, breakdown, capturedLines: [...captured], conversationId: conv.id }
+  }
+
+  // V32 incident always-on Critic.
+  const v32 = await turnAndReadCostBreakdown("cellar's flooding")
+  assertGt('V32.incident_critic_always_on', Number(v32.breakdown?.critic ?? 0), 0)
+
+  // V33 reasoning + high confidence → no Critic.
+  const v33 = await turnAndReadCostBreakdown('complaint about a flat pint')
+  assertEqual('V33.reasoning_high_conf_no_critic', Number(v33.breakdown?.critic ?? 0), 0)
+
+  // V34 reasoning + low confidence → Critic invoked.
+  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  let v34Breakdown: { critic: number } | null = null
+  try {
+    const v34 = await turnAndReadCostBreakdown('complaint about a flat pint')
+    v34Breakdown = v34.breakdown
+  } finally {
+    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+  }
+  assertGt('V34.reasoning_low_conf_critic_invoked', Number(v34Breakdown?.critic ?? 0), 0)
+
+  // ──────────────────────── V35-V37 — Critic correction loop ──────────────
+  process.env.PROBE_CHAT_V2_FORCE_CRITIC_REJECT = '1'
+  let v35Result: Awaited<ReturnType<typeof turnAndReadCostBreakdown>> | null = null
+  try {
+    v35Result = await turnAndReadCostBreakdown("cellar's flooding")
+  } finally {
+    delete process.env.PROBE_CHAT_V2_FORCE_CRITIC_REJECT
+  }
+  // V35: Writer was invoked twice — observable via [RETRY] sentinel in stub Writer
+  // OR via cost.writer being roughly double the single-call value.
+  const v35Assistant = await prisma.chatMessage.findFirst({
+    where: { id: v35Result!.result.assistantMessage.id },
+    select: { content: true },
+  })
+  assert(
+    'V35.writer_retry_invoked',
+    (v35Assistant?.content ?? '').includes('[RETRY]'),
+    `content="${(v35Assistant?.content ?? '').slice(0, 80)}"`,
+  )
+  // V36: same — assert [RETRY] sentinel explicitly.
+  assertContains('V36.retry_sentinel_present', v35Assistant?.content ?? '', '[RETRY]')
+  // V37: chat_v2.critic_writer_retry_dispatched warn emitted.
+  const v37Warn = v35Result!.capturedLines.filter((l) =>
+    l.msg.includes('chat_v2.critic_writer_retry_dispatched'),
+  )
+  assertGte('V37.critic_writer_retry_dispatched_warn', v37Warn.length, 1)
+
+  // ──────────────────────── V38-V40 — CostBreakdown 5-stage shape ─────────
+  const v38Breakdown = v33.breakdown
+  if (v38Breakdown) {
+    const expectedKeys = ['triage', 'researchers', 'analyser', 'writer', 'critic', 'voyage', 'total']
+    const actualKeys = Object.keys(v38Breakdown)
+    assertEqual(
+      'V38.breakdown_key_order',
+      JSON.stringify(actualKeys),
+      JSON.stringify(expectedKeys),
+    )
+    const sum = ['triage', 'researchers', 'analyser', 'writer', 'critic', 'voyage'].reduce(
+      (acc, k) => acc + Number((v38Breakdown as Record<string, unknown>)[k] ?? 0),
+      0,
+    )
+    const totalDiff = Math.abs(sum - Number(v38Breakdown.total))
+    assert('V39.breakdown_total_eq_sum', totalDiff < 1e-6, `diff=${totalDiff}`)
+  } else {
+    assert('V38.breakdown_key_order', false, 'no breakdown captured')
+    assert('V39.breakdown_total_eq_sum', false, 'no breakdown captured')
+  }
+
+  // V40 — lookup turn analyser=0 + critic=0.
+  const v40 = await turnAndReadCostBreakdown("what's below par?")
+  assertEqual('V40.lookup_analyser_zero', Number(v40.breakdown?.analyser ?? 0), 0)
+  assertEqual('V40.lookup_critic_zero', Number(v40.breakdown?.critic ?? 0), 0)
+
+  // ──────────────────────── V41-V43 — stream phase events ─────────────────
+  // Reasoning turn — phase events fire in order with seq + timestampMs.
+  const reasoningPhases = v33.capturedLines
+    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .map((l) => {
+      const phaseMatch = l.msg.match(/"phase":"(\w+)"/)
+      const seqMatch = l.msg.match(/"seq":(\d+)/)
+      return { phase: phaseMatch?.[1] ?? '', seq: Number(seqMatch?.[1] ?? -1) }
+    })
+  const v41Sequenced = reasoningPhases.every((p, i) => p.seq === i)
+  assert(
+    'V41.phase_events_sequenced',
+    v41Sequenced && reasoningPhases.length > 0,
+    `phases=${JSON.stringify(reasoningPhases.map((p) => p.phase))}`,
+  )
+
+  // V42 — lookup mode skips analyse + critique phases.
+  const lookupPhases = v40.capturedLines
+    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .map((l) => l.msg.match(/"phase":"(\w+)"/)?.[1] ?? '')
+  const v42HasAnalyse = lookupPhases.includes('analyse')
+  const v42HasCritique = lookupPhases.includes('critique')
+  assert('V42.lookup_skips_analyse_critique', !v42HasAnalyse && !v42HasCritique)
+
+  // V43 — incident emits both analyse + critique.
+  const incidentPhases = v32.capturedLines
+    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .map((l) => l.msg.match(/"phase":"(\w+)"/)?.[1] ?? '')
+  assert(
+    'V43.incident_emits_analyse_and_critique',
+    incidentPhases.includes('analyse') && incidentPhases.includes('critique'),
+  )
+
+  // ──────────────────────── V44-V46 — Triage boundary cases ───────────────
+  const triageA = await triage.classify(
+    'someone said the pint tasted off and they feel sick',
+  )
+  assertEqual('V44.triage_pint_sick_incident', triageA.output.mode, 'incident')
+  assertEqual('V44.triage_pint_sick_safety_signal_true', triageA.output.safetySignal, true)
+
+  const triageB = await triage.classify('complaint about a flat pint')
+  assertEqual('V45.triage_flat_pint_reasoning', triageB.output.mode, 'reasoning')
+  assertEqual('V45.triage_flat_pint_safety_signal_false', triageB.output.safetySignal, false)
+
+  const triageC = await triage.classify("cellar's flooding")
+  assertEqual('V46.triage_flooding_incident', triageC.output.mode, 'incident')
+  assertEqual('V46.triage_flooding_safety_signal_true', triageC.output.safetySignal, true)
+
+  // ──────────────────────── V47 — Analyser confidence telemetry ───────────
+  const v47Lines = v33.capturedLines.filter((l) =>
+    l.msg.includes('chat_v2.analyser_confidence_observed'),
+  )
+  assertGte('V47.analyser_confidence_observed_emitted', v47Lines.length, 1)
+  if (v47Lines.length > 0) {
+    const confMatch = v47Lines[0].msg.match(/"evidenceSufficiency":([0-9.]+)/)
+    const confValue = confMatch ? Number(confMatch[1]) : -1
+    assert(
+      'V47.analyser_confidence_in_range',
+      confValue >= 0 && confValue <= 1,
+      `confValue=${confValue}`,
+    )
+  }
+
+  // ──────────────────────── V48 — incident 999 directive (audit-M2) ──────
+  // V48a: incident response includes 999 in first half OR within first 3 lines
+  // (per AC-6 second gherkin — either condition satisfies).
+  const v48Idx = incidentText.indexOf('999')
+  const v48Lines = incidentText.split('\n')
+  const v48LineIdx = v48Lines.findIndex((l) => /\b999\b/.test(l))
+  const v48Pass =
+    v48Idx >= 0 &&
+    (v48Idx < incidentText.length / 2 || (v48LineIdx >= 0 && v48LineIdx < 3))
+  assert(
+    'V48a.incident_999_in_first_half_or_first_3_lines',
+    v48Pass,
+    `charIdx=${v48Idx}/${incidentText.length} lineIdx=${v48LineIdx}`,
+  )
+
+  // V48b: writer received safetySignal=true through orchestrator (verifiable
+  // via 999 presence — only emitted when input.safetySignal === true).
+  // Negative test: turn with safetySignal=false should NOT include 999.
+  const v48Conv = await prisma.chatConversation.create({
+    data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+    select: { id: true },
+  })
+  const reasoningSafe = await orchestrator.sendMessage(
+    { venueId: orgA.venueId, userMessage: 'complaint about a flat pint', conversationId: v48Conv.id },
+    orgA_ctx,
+  )
+  // Reasoning mode (no incident path) shouldn't trigger 999 directive.
+  assert(
+    'V48b.reasoning_no_safety_no_999',
+    !/999/.test(reasoningSafe.assistantMessage.content),
+    `text="${reasoningSafe.assistantMessage.content.slice(0, 80)}"`,
+  )
+
+  // ──────────────────────── V49 — Critic operates on findings (audit-M1) ──
+  // Critic input shape requires `findings: ResearcherFinding[]`. Verify by
+  // calling verify() with a synthetic findings payload — type-checked at
+  // compile time. This is a structural assertion (TS would reject bare
+  // citation IDs).
+  const v49Critic = await critic.verify({
+    writerDraft: 'Right — ring 999 if needed.',
+    findings: sampleFindings,
+  })
+  assert('V49.critic_findings_input_accepted', v49Critic.output.verdict === 'approved' || v49Critic.output.verdict === 'corrections-needed')
+
+  // ──────────────────────── V50 — low_confidence_flag persistence (audit-M6) ──
+  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD = '0.06'
+  let v50AssistantId: string | null = null
+  try {
+    const v50Conv = await prisma.chatConversation.create({
+      data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
+      select: { id: true },
+    })
+    const v50Result = await orchestrator.sendMessage(
+      { venueId: orgA.venueId, userMessage: 'complaint about a flat pint', conversationId: v50Conv.id },
+      orgA_ctx,
+    )
+    v50AssistantId = v50Result.assistantMessage.id
+  } finally {
+    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD
+  }
+  if (v50AssistantId) {
+    const v50Row = await prisma.chatMessage.findFirst({
+      where: { id: v50AssistantId },
+      select: { toolCallLog: true },
+    })
+    const log = Array.isArray(v50Row?.toolCallLog) ? (v50Row!.toolCallLog as Array<{ tool?: string }>) : []
+    const hasFlag = log.some((entry) => entry?.tool === 'low_confidence_flag')
+    assert('V50a.low_confidence_flag_persisted', hasFlag)
+  } else {
+    assert('V50a.low_confidence_flag_persisted', false, 'no assistant id')
+  }
+  // V50b: normal turn does NOT have flag.
+  const v50bAssistantId = v33.result.assistantMessage.id
+  const v50bRow = await prisma.chatMessage.findFirst({
+    where: { id: v50bAssistantId },
+    select: { toolCallLog: true },
+  })
+  const v50bLog = Array.isArray(v50bRow?.toolCallLog) ? (v50bRow!.toolCallLog as Array<{ tool?: string }>) : []
+  const v50bHasFlag = v50bLog.some((entry) => entry?.tool === 'low_confidence_flag')
+  assertEqual('V50b.normal_turn_no_low_confidence_flag', v50bHasFlag, false)
+
+  // unused result references silenced
+  void v30Result
 
   console.log(JSON.stringify({ event: 'probe.iteration.complete', iteration }))
 }
