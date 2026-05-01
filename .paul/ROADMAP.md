@@ -19,11 +19,13 @@ Phases: 6
 | Phase | Name | Plans | Status | Completed |
 |-------|------|-------|--------|-----------|
 | 1 | Hierarchical Retrieval | 3/3 (01-01 schema+ingest, 01-02 backfill+retrieval, 01-03 cache+section-payload+probe-eval) | ✅ Complete | 2026-04-28 |
-| 2 | Graph Layer | TBD | 🔵 Ready to plan | - |
-| 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Not started | - |
-| 4 | WhatsApp Procedural Runtime | TBD | Not started | - |
-| 5 | Tabular Query Path | 1 (05-01 schema+ingest+query+tool+probe) | 📋 Planned | - |
-| 6 | Multi-Agent Chat Overhaul | TBD | Not started | - |
+| 5 | Tabular Query Path | 1/1 (05-01 schema+ingest+query+tool+probe) | ✅ Complete | 2026-04-28 |
+| 6 | Multi-Agent Chat Overhaul | TBD | 🔵 Ready to plan (**next up**) | - |
+| 2 | Graph Layer | TBD | Queued (after Phase 6) | - |
+| 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Queued (after Phase 2) | - |
+| 4 | WhatsApp Procedural Runtime | TBD | Queued (after Phase 3) | - |
+
+**Execution order (resequenced 2026-05-01):** 1 ✅ → 5 ✅ → **6 (next)** → 2 → 3 → 4. Phase 6 pulled forward from end-of-milestone after /paul:discuss surfaced that today's chat failure modes (dual-checklist interleaving, hallucinated steps, meta-narration leakage, generic voice on complex queries) are architectural and need the role-based pipeline to fix structurally — not patchable at the prompt layer. Phases 2/3/4 land additively into the new pipeline (graph traversal as a new Docs-researcher tool; scheduler reuses Researcher pattern; procedural runtime uses chat-v2 as its dialog substrate). No renumbering — phase numbers stay stable, only execution sequence changed. CONTEXT.md decisions D-06-A through D-06-H locked at `.paul/phases/06-multi-agent-chat-overhaul/CONTEXT.md`.
 
 ### Phase 1: Hierarchical Retrieval
 
@@ -183,4 +185,4 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-05-01 — Phase 6 (Multi-Agent Chat Overhaul) added to v0.3 milestone. Replaces the single ToolLoopAgent + 333-line god-prompt with a role-based pipeline (Triage → Researchers → Analyser → Writer + optional Critic) and shaped per-domain researcher tools. Built on top of Phases 1-5 so each specialist uses the right primitive natively. Milestone now 6 phases.*
+*Last updated: 2026-05-01 — Phase 6 resequenced to next-up via /paul:discuss 6. Pulled forward from end-of-milestone after recognising today's chat failure modes are architectural (single agent + 333-line god-prompt + sequential tool use), not patchable at the prompt layer. New execution order: 1 ✅ → 5 ✅ → **6** → 2 → 3 → 4. Phase numbers preserved; only sequence changed. CONTEXT.md locked at `.paul/phases/06-multi-agent-chat-overhaul/CONTEXT.md` with 8 decisions D-06-A through D-06-H covering pipeline shape, mode-classified Triage, shaped tools (`get_checklist` returns full ordered list — eliminates today's interleaving + missing-step class structurally), friendly-GM Writer voice with mode-specific prompts + 8-example calibration anchor, UI-level "general advice" badge + save-CTA (no prose meta-narration), simplified USD-only cost tracking on `chat_messages.costUsd` + `knowledge_items.ingestionCostUsd`, feature-flag cutover with empirical quality gate (probe-eval ≥80% + manual UAT ≥18/20 amazing), and Phase 2 graph-readiness via additive `neighbors` field on `search_docs`.*
