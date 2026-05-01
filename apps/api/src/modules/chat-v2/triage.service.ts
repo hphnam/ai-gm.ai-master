@@ -106,8 +106,11 @@ export function _probeResetLastSanitizedInput(): void {
   _probeLastSanitizedInput = null
 }
 
-// Stub mode for probe-chat-v2.ts. Substring match → canned TriageOutput.
-// Production code path is unaffected — env check at top of classify().
+// Stub mode for probe-chat-v2.ts. Plan 06-02 audit-S7 — explicit priority
+// ordering: SAFETY patterns (incident) check FIRST, THEN reasoning patterns,
+// THEN lookup patterns. Without this priority, generic 'flat pint' regex would
+// catch "pint tasted off and they feel sick" before the safety-signal pattern
+// fires (regression).
 function stubClassify(userMessage: string): TriageResult {
   _probeLastSanitizedInput = userMessage
 
@@ -119,27 +122,110 @@ function stubClassify(userMessage: string): TriageResult {
 
   const lower = userMessage.toLowerCase()
   const dispatchDocs: ResearcherName[] = ['docs']
+
+  // ── Priority 1: SAFETY / INCIDENT patterns (audit-S7) ────────────────────
+  // Allergen+illness escalation (boundary case from CONTEXT.md D-06-B).
+  if (
+    /pint.*sick|sick.*pint|tasted off.*sick|sick.*tasted off|allergen|allergy|allergic reaction/i.test(
+      userMessage,
+    )
+  ) {
+    return makeStubResult(
+      'incident',
+      dispatchDocs,
+      'Fetch allergen handling procedure + emergency contacts + incident logging requirements.',
+      true,
+    )
+  }
+  // Cellar / flooding emergencies.
+  if (/cellar.*flood|flooding|burst pipe/i.test(userMessage)) {
+    return makeStubResult(
+      'incident',
+      dispatchDocs,
+      'Fetch cellar emergency procedure + power-isolation steps + emergency contacts.',
+      true,
+    )
+  }
+  // Fire alarm / fire.
+  if (/\b(fire|fire alarm|alarm went off)\b/i.test(userMessage)) {
+    return makeStubResult(
+      'incident',
+      dispatchDocs,
+      'Fetch fire evacuation procedure + muster point + 999 protocol.',
+      true,
+    )
+  }
+  // Drunk customer / personal safety / injury.
+  if (/\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(userMessage)) {
+    return makeStubResult(
+      'incident',
+      dispatchDocs,
+      'Fetch refusal-of-service / injury / safety procedure + escalation contacts.',
+      true,
+    )
+  }
+
+  // ── Priority 2: REASONING patterns ────────────────────────────────────
+  if (/flat pint|complaint about/i.test(userMessage)) {
+    return makeStubResult(
+      'reasoning',
+      dispatchDocs,
+      'Fetch keg/line troubleshooting steps + supplier contacts that inform a multi-path diagnosis.',
+      false,
+    )
+  }
+  if (/short[- ]staffed|short staff/i.test(userMessage)) {
+    return makeStubResult(
+      'reasoning',
+      dispatchDocs,
+      'Fetch operational priority guidance for understaffed shifts + service-level fallbacks.',
+      false,
+    )
+  }
+  if (/group booking|should i take|should i accept/i.test(userMessage)) {
+    return makeStubResult(
+      'reasoning',
+      dispatchDocs,
+      'Fetch capacity guidance + staffing requirements + branching criteria for the booking decision.',
+      false,
+    )
+  }
+  if (/glass.*residue|residue|washer/i.test(userMessage)) {
+    return makeStubResult(
+      'reasoning',
+      dispatchDocs,
+      'Fetch glass-wash troubleshooting steps + descaler procedure + EHO compliance flags.',
+      false,
+    )
+  }
+
+  // ── Priority 3: LOOKUP patterns (existing 06-01 stubs) ────────────────
   let brief = 'Look up the relevant procedure or fact in the venue knowledge base.'
   if (lower.includes('below par')) {
     brief = 'Find current stock levels and which items are at or below par.'
   } else if (lower.includes('open up') || lower.includes('opening')) {
     brief = 'Fetch the venue opening checklist and surface its full ordered steps.'
-  } else if (lower.includes('flat pint')) {
-    brief = 'Look up keg/line troubleshooting steps for a flat pint.'
   } else if (lower.includes('bibendum') || lower.includes('cutoff')) {
     brief = 'Find the supplier cutoff time for Bibendum.'
   } else if (lower.includes('heineken')) {
     brief = 'Look up Heineken sales data over the requested window.'
+  } else if (lower.includes('ice machine')) {
+    brief = 'Look up the ice-machine engineer contact and unit details.'
   }
 
-  const safetySignal = /\b(fire|flood|injury|unconscious|police|bleeding|allergen)\b/i.test(
-    userMessage,
-  )
+  return makeStubResult('lookup', dispatchDocs, brief, false)
+}
 
+function makeStubResult(
+  mode: 'lookup' | 'reasoning' | 'incident',
+  dispatch: ResearcherName[],
+  brief: string,
+  safetySignal: boolean,
+): TriageResult {
   return {
     output: {
-      mode: 'lookup',
-      researchersToDispatch: dispatchDocs,
+      mode,
+      researchersToDispatch: dispatch,
       briefByResearcher: { docs: brief },
       safetySignal,
     },
