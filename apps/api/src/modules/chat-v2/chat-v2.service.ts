@@ -36,7 +36,7 @@ import {
   TOTAL_TURN_TIMEOUT_MS,
   type TriageOutput,
 } from '../../types'
-import type { SendMessageInput, SendMessageResult } from '../chat/chat.service'
+import type { SendMessageInput, SendMessageResult } from '../../types/chat-message'
 import { AnalyserService } from './analyser.service'
 import { CostTracker } from './cost-tracker.service'
 import { CriticService } from './critic.service'
@@ -129,13 +129,31 @@ export class ChatV2Service {
       ).id
 
     // Persist raw user message (audit trail). Strip NUL only — Postgres TEXT
-    // encoding invariant.
-    const auditTrailContent = input.userMessage.replace(/\x00/g, '')
+    // encoding invariant. When an attachment is present, append a placeholder
+    // sentinel so conversation history shows "user sent image" without storing
+    // base64 in the row body. Phase 6.04 — PII-safe; raw bytes never persisted
+    // to chat_messages.content.
+    let auditTrailContent = input.userMessage.replace(/\x00/g, '')
+    if (input.attachment) {
+      const byteSize = Buffer.from(input.attachment.base64, 'base64').length
+      const sidSuffix = input.attachment.sourceRef
+        ? `, sid:${input.attachment.sourceRef}`
+        : ''
+      auditTrailContent = `${auditTrailContent}\n[image: ${input.attachment.mediaType}, ${byteSize}B${sidSuffix}]`
+    }
     await prisma.chatMessage.create({
       data: { conversationId, role: 'user', content: auditTrailContent },
     })
 
-    const sanitized = sanitizeForTriage(input.userMessage)
+    // Plan 06-04 Task 1 — multimodal-turn brief composition. Triage receives a
+    // text-only synopsis ("user sent an image with text: <userMessage>; please
+    // dispatch researchers"); raw base64 never reaches Triage's prompt. Per
+    // CONTEXT.md, image-bearing turns most commonly need reasoning mode (broken
+    // equipment photos, error codes) — Triage decides routing on the synopsis.
+    const triageInputText = input.attachment
+      ? `[user attached an image: ${input.attachment.mediaType}] ${input.userMessage}`
+      : input.userMessage
+    const sanitized = sanitizeForTriage(triageInputText)
     const tracker = new CostTracker()
     const conversationIdHash = hashId(conversationId)
     const orgIdHash = hashId(ctx.orgId)
@@ -440,6 +458,21 @@ export class ChatV2Service {
       }
       const toolCallLog: object[] = [triageDispatchEntry]
       if (lowConfidence) toolCallLog.push(LOW_CONFIDENCE_FLAG_ENTRY)
+      // Plan 06-04 Task 1 — attachment_received sentinel (PII-safe; metadata only,
+      // never raw base64). Lets SOC-2 audit trail reconstruct multimodal turns.
+      if (input.attachment) {
+        const byteLength = Buffer.from(input.attachment.base64, 'base64').length
+        toolCallLog.push({
+          round: -3,
+          toolUseId: 'chat-v2-attachment-received',
+          tool: 'attachment_received',
+          input: {
+            mediaType: input.attachment.mediaType,
+            byteLength,
+          },
+          result: { ok: true },
+        })
+      }
 
       const assistant = await prisma.chatMessage.create({
         data: {

@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
-import { z } from 'zod'
 import { prisma } from '../../database/prisma'
 import {
   type ImagePart,
@@ -12,6 +11,15 @@ import {
   type ToolSet,
 } from 'ai'
 import { VenueProfileSchema } from '../../types'
+// Plan 06-04 Task 1 — types relocated to apps/api/src/types/chat-message.ts.
+// Re-export shim during transition; deleted with chat-v1 in Task 7.
+import {
+  SendMessageInputSchema,
+  type SendMessageInput,
+  type SendMessageResult,
+  type ToolCallLogEntry,
+} from '../../types/chat-message'
+export type { SendMessageInput, SendMessageResult, ToolCallLogEntry } from '../../types/chat-message'
 import { AdaptationService } from '../adaptation/adaptation.service'
 import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
 import {
@@ -28,10 +36,6 @@ import { ConversationModeService } from './conversation-mode.service'
 import { detectEmergency } from './emergency-detector'
 import { pickTier } from './tier-router'
 import { UserProfileService } from './user-profile.service'
-
-const MAX_USER_MESSAGE_CHARS = 8000
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 type PersistedToolCall = {
   round?: number
@@ -110,38 +114,6 @@ function buildToolCallMap(
     map.set(r.id, r.toolCallLog as PersistedToolCall[])
   }
   return map
-}
-
-const SendMessageInputSchema = z.object({
-  conversationId: z.string().regex(UUID_RE, 'invalid uuid').optional(),
-  venueId: z.string().regex(UUID_RE, 'invalid uuid'),
-  userMessage: z.string().min(1).max(MAX_USER_MESSAGE_CHARS),
-  // 03-03 Task 3: optional image attachment for multimodal inbound (WhatsApp).
-  attachment: z
-    .object({
-      mediaType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
-      base64: z.string().min(1),
-      // audit S2: channel-specific source reference (e.g. Infobip inbound messageId) for forensics.
-      sourceRef: z.string().min(1).max(64).optional(),
-    })
-    .optional(),
-})
-
-export type SendMessageInput = z.infer<typeof SendMessageInputSchema>
-
-export type ToolCallLogEntry = {
-  round: number
-  toolUseId: string
-  tool: string
-  input: unknown
-  result: unknown
-}
-
-export type SendMessageResult = {
-  conversationId: string
-  assistantMessage: { id: string; content: string; followUps: string[] }
-  toolCallLog: ToolCallLogEntry[]
-  retrievedItemIds: string[]
 }
 
 @Injectable()

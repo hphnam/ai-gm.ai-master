@@ -1,30 +1,23 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
-  HttpException,
   Logger,
   NotFoundException,
   Param,
   Post,
   Query,
   Res,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common'
 import {
   ApiTags,
   ApiResponse,
   ApiBearerAuth,
-  ApiConsumes,
-  ApiBody,
 } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
-import { FileInterceptor } from '@nestjs/platform-express'
 import type { Response } from 'express'
 import { prisma } from '../../database/prisma'
 import { type ApiErrorResponse } from '../../types'
@@ -101,100 +94,8 @@ export class ChatController {
     }
   }
 
-  // Phase G1 — multipart endpoint for staff to attach an image (photo of
-  // an error code, blown keg, mystery part) alongside their question. Routes
-  // through the existing non-streaming sendMessage path which already handles
-  // attachments. Web client falls back to this endpoint when the composer has
-  // an image; pure-text messages stay on the streaming endpoint.
-  @Post('messages/with-image')
-  @HttpCode(200)
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        image: { type: 'string', format: 'binary' },
-        venueId: { type: 'string' },
-        userMessage: { type: 'string' },
-        conversationId: { type: 'string' },
-      },
-      required: ['image', 'venueId'],
-    },
-  })
-  @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
-  @UseInterceptors(
-    FileInterceptor('image', {
-      limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-    }),
-  )
-  async sendMessageWithImage(
-    @UploadedFile() file: Express.Multer.File | undefined,
-    @Body()
-    body: {
-      venueId?: string
-      userMessage?: string
-      conversationId?: string
-    },
-    @CurrentOrg() org: { id: string },
-    @CurrentUser() user: { id: string; email: string; name: string | null },
-    @CurrentRole() role: string | undefined,
-  ): Promise<SendChatMessageResponseDto> {
-    if (!file) {
-      throw new BadRequestException({
-        error: 'invalid-input',
-      } satisfies ApiErrorResponse)
-    }
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (!allowed.includes(file.mimetype)) {
-      throw new HttpException(
-        { error: 'unsupported-file-type' } satisfies ApiErrorResponse,
-        415,
-      )
-    }
-    const venueId =
-      typeof body.venueId === 'string' && body.venueId.trim().length > 0
-        ? body.venueId
-        : undefined
-    if (!venueId) {
-      throw new BadRequestException({
-        error: 'invalid-input',
-      } satisfies ApiErrorResponse)
-    }
-    const userMessage =
-      typeof body.userMessage === 'string' && body.userMessage.trim().length > 0
-        ? body.userMessage.trim().slice(0, 8000)
-        : 'What do you make of this?'
-    const conversationId =
-      typeof body.conversationId === 'string' && body.conversationId.trim().length > 0
-        ? body.conversationId
-        : undefined
-
-    try {
-      return (await this.chatService.sendMessage(
-        {
-          venueId,
-          userMessage,
-          conversationId,
-          attachment: {
-            mediaType: file.mimetype as
-              | 'image/jpeg'
-              | 'image/png'
-              | 'image/webp'
-              | 'image/gif',
-            base64: file.buffer.toString('base64'),
-          },
-        },
-        org.id,
-        user.id,
-        role ?? 'staff',
-        { name: user.name, email: user.email },
-      )) as SendChatMessageResponseDto
-    } catch (err) {
-      const translated = translateChatServiceError(err as Error)
-      if (translated) throw translated
-      throw err
-    }
-  }
+  // Plan 06-04 Task 1 — POST /chat/messages/with-image moved to chat-v2.controller.ts.
+  // chat-v1 no longer hosts the multimodal route.
 
   // Streaming endpoint for the web /chat UI. Uses Vercel AI SDK's UI message
   // stream protocol via pipeUIMessageStreamToResponse. The fresh conversation

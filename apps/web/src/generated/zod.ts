@@ -26,6 +26,25 @@ export const FeedbackControllerCaptureFeedbackResponse = zod.object({
 })
 
 
+export const ChatV2ControllerSendMessageWithImageBody = zod.object({
+  "image": zod.instanceof(File),
+  "venueId": zod.string(),
+  "userMessage": zod.string().optional(),
+  "conversationId": zod.string().optional()
+})
+
+export const ChatV2ControllerSendMessageWithImageResponse = zod.object({
+  "conversationId": zod.string(),
+  "assistantMessage": zod.object({
+  "id": zod.string(),
+  "content": zod.string(),
+  "followUps": zod.array(zod.string())
+}),
+  "toolCallLog": zod.array(zod.unknown()),
+  "retrievedItemIds": zod.array(zod.string())
+})
+
+
 export const chatControllerSendMessageBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 export const chatControllerSendMessageBodyUserMessageMax = 8000;
 
@@ -39,25 +58,6 @@ export const ChatControllerSendMessageBody = zod.object({
 })
 
 export const ChatControllerSendMessageResponse = zod.object({
-  "conversationId": zod.string(),
-  "assistantMessage": zod.object({
-  "id": zod.string(),
-  "content": zod.string(),
-  "followUps": zod.array(zod.string())
-}),
-  "toolCallLog": zod.array(zod.unknown()),
-  "retrievedItemIds": zod.array(zod.string())
-})
-
-
-export const ChatControllerSendMessageWithImageBody = zod.object({
-  "image": zod.instanceof(File),
-  "venueId": zod.string(),
-  "userMessage": zod.string().optional(),
-  "conversationId": zod.string().optional()
-})
-
-export const ChatControllerSendMessageWithImageResponse = zod.object({
   "conversationId": zod.string(),
   "assistantMessage": zod.object({
   "id": zod.string(),

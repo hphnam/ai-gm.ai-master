@@ -98,18 +98,6 @@ export interface FeedbackResponseDto {
   exhaustedCount: number;
 }
 
-export interface SendChatMessageRequestDto {
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  venueId: string;
-  /**
-     * @minLength 1
-     * @maxLength 8000
-     */
-  userMessage: string;
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  conversationId?: string;
-}
-
 export type SendChatMessageResponseDtoAssistantMessage = {
   id: string;
   content: string;
@@ -121,6 +109,18 @@ export interface SendChatMessageResponseDto {
   assistantMessage: SendChatMessageResponseDtoAssistantMessage;
   toolCallLog: unknown[];
   retrievedItemIds: string[];
+}
+
+export interface SendChatMessageRequestDto {
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  venueId: string;
+  /**
+     * @minLength 1
+     * @maxLength 8000
+     */
+  userMessage: string;
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  conversationId?: string;
 }
 
 export interface StreamChatMessageRequestDto {
@@ -933,7 +933,7 @@ export interface RunNudgeResponseDto {
   preview?: string;
 }
 
-export type ChatControllerSendMessageWithImageBody = {
+export type ChatV2ControllerSendMessageWithImageBody = {
   image: Blob;
   venueId: string;
   userMessage?: string;
@@ -1195,6 +1195,92 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getFeedbackControllerCaptureFeedbackMutationOptions(options), queryClient);
     }
 
+export type chatV2ControllerSendMessageWithImageResponse200 = {
+  data: SendChatMessageResponseDto
+  status: 200
+}
+
+export type chatV2ControllerSendMessageWithImageResponseSuccess = (chatV2ControllerSendMessageWithImageResponse200) & {
+  headers: Headers;
+};
+;
+
+export type chatV2ControllerSendMessageWithImageResponse = (chatV2ControllerSendMessageWithImageResponseSuccess)
+
+export const getChatV2ControllerSendMessageWithImageUrl = () => {
+
+
+
+
+  return `/chat/messages/with-image`
+}
+
+export const chatV2ControllerSendMessageWithImage = async (chatV2ControllerSendMessageWithImageBody: ChatV2ControllerSendMessageWithImageBody, options?: RequestInit): Promise<chatV2ControllerSendMessageWithImageResponse> => {
+    const formData = new FormData();
+formData.append(`image`, chatV2ControllerSendMessageWithImageBody.image);
+formData.append(`venueId`, chatV2ControllerSendMessageWithImageBody.venueId);
+if(chatV2ControllerSendMessageWithImageBody.userMessage !== undefined) {
+ formData.append(`userMessage`, chatV2ControllerSendMessageWithImageBody.userMessage);
+ }
+if(chatV2ControllerSendMessageWithImageBody.conversationId !== undefined) {
+ formData.append(`conversationId`, chatV2ControllerSendMessageWithImageBody.conversationId);
+ }
+
+  return orvalMutator<chatV2ControllerSendMessageWithImageResponse>(getChatV2ControllerSendMessageWithImageUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body:
+      formData,
+  }
+);}
+
+
+
+
+export const getChatV2ControllerSendMessageWithImageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>, TError,{data: ChatV2ControllerSendMessageWithImageBody}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>, TError,{data: ChatV2ControllerSendMessageWithImageBody}, TContext> => {
+
+const mutationKey = ['chatV2ControllerSendMessageWithImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>, {data: ChatV2ControllerSendMessageWithImageBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  chatV2ControllerSendMessageWithImage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChatV2ControllerSendMessageWithImageMutationResult = NonNullable<Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>>
+    export type ChatV2ControllerSendMessageWithImageMutationBody = ChatV2ControllerSendMessageWithImageBody
+    export type ChatV2ControllerSendMessageWithImageMutationError = unknown
+
+    export const useChatV2ControllerSendMessageWithImage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>, TError,{data: ChatV2ControllerSendMessageWithImageBody}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof chatV2ControllerSendMessageWithImage>>,
+        TError,
+        {data: ChatV2ControllerSendMessageWithImageBody},
+        TContext
+      > => {
+      return useMutation(getChatV2ControllerSendMessageWithImageMutationOptions(options), queryClient);
+    }
+
 export type chatControllerSendMessageResponse200 = {
   data: SendChatMessageResponseDto
   status: 200
@@ -1270,92 +1356,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatControllerSendMessageMutationOptions(options), queryClient);
-    }
-
-export type chatControllerSendMessageWithImageResponse200 = {
-  data: SendChatMessageResponseDto
-  status: 200
-}
-
-export type chatControllerSendMessageWithImageResponseSuccess = (chatControllerSendMessageWithImageResponse200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerSendMessageWithImageResponse = (chatControllerSendMessageWithImageResponseSuccess)
-
-export const getChatControllerSendMessageWithImageUrl = () => {
-
-
-
-
-  return `/chat/messages/with-image`
-}
-
-export const chatControllerSendMessageWithImage = async (chatControllerSendMessageWithImageBody: ChatControllerSendMessageWithImageBody, options?: RequestInit): Promise<chatControllerSendMessageWithImageResponse> => {
-    const formData = new FormData();
-formData.append(`image`, chatControllerSendMessageWithImageBody.image);
-formData.append(`venueId`, chatControllerSendMessageWithImageBody.venueId);
-if(chatControllerSendMessageWithImageBody.userMessage !== undefined) {
- formData.append(`userMessage`, chatControllerSendMessageWithImageBody.userMessage);
- }
-if(chatControllerSendMessageWithImageBody.conversationId !== undefined) {
- formData.append(`conversationId`, chatControllerSendMessageWithImageBody.conversationId);
- }
-
-  return orvalMutator<chatControllerSendMessageWithImageResponse>(getChatControllerSendMessageWithImageUrl(),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body:
-      formData,
-  }
-);}
-
-
-
-
-export const getChatControllerSendMessageWithImageMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>, TError,{data: ChatControllerSendMessageWithImageBody}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>, TError,{data: ChatControllerSendMessageWithImageBody}, TContext> => {
-
-const mutationKey = ['chatControllerSendMessageWithImage'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>, {data: ChatControllerSendMessageWithImageBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  chatControllerSendMessageWithImage(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChatControllerSendMessageWithImageMutationResult = NonNullable<Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>>
-    export type ChatControllerSendMessageWithImageMutationBody = ChatControllerSendMessageWithImageBody
-    export type ChatControllerSendMessageWithImageMutationError = unknown
-
-    export const useChatControllerSendMessageWithImage = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>, TError,{data: ChatControllerSendMessageWithImageBody}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof chatControllerSendMessageWithImage>>,
-        TError,
-        {data: ChatControllerSendMessageWithImageBody},
-        TContext
-      > => {
-      return useMutation(getChatControllerSendMessageWithImageMutationOptions(options), queryClient);
     }
 
 export type chatControllerStreamMessageResponse200 = {

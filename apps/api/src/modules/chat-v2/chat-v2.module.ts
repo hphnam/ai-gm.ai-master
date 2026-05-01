@@ -10,6 +10,7 @@ import { MockOpsModule } from '../mock-ops/mock-ops.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
 import { AnalyserService } from './analyser.service'
+import { ChatV2Controller } from './chat-v2.controller'
 import { ChatV2Service } from './chat-v2.service'
 import { CriticService } from './critic.service'
 import { DocsResearcher } from './researchers/docs.researcher'
@@ -22,6 +23,7 @@ import { WriterService } from './writer.service'
 
 @Module({
   imports: [RetrievalModule, IngestModule, MockOpsModule, TabularModule],
+  controllers: [ChatV2Controller],
   providers: [
     ChatV2Service,
     TriageService,
