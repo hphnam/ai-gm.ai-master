@@ -24,6 +24,8 @@ import { getChecklist } from '../tools/get-checklist.tool'
 import { searchDocs } from '../tools/search-docs.tool'
 import { DOCS_RESEARCHER_PROMPT } from '../prompts/docs-researcher.prompt'
 import { chatV2Logger, hashId } from '../log-helpers'
+import type { Researcher, ResearcherResult } from '../researcher.interface'
+import { sanitizeForResearcher } from '../researcher-sanitizer'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
@@ -41,17 +43,19 @@ export type DocsResearcherResult = {
 }
 
 @Injectable()
-export class DocsResearcher {
+export class DocsResearcher implements Researcher {
   constructor(private readonly retrievalService: RetrievalService) {}
 
-  async research(brief: string, ctx: ResearchContext): Promise<DocsResearcherResult> {
+  async research(brief: string, ctx: ResearchContext): Promise<ResearcherResult> {
+    const t0 = Date.now()
     if (process.env.PROBE_CHAT_V2_STUB === '1') {
-      return stubResearch(brief, ctx)
+      return stubResearch(brief, ctx, t0)
     }
 
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), RESEARCHER_TIMEOUT_MS)
 
+    const sanitizedBrief = sanitizeForResearcher(brief)
     let voyageCalls = 0
     const citations: { knowledgeItemId: string; sectionId?: string }[] = []
     let evidenceSummary = ''
@@ -107,7 +111,7 @@ export class DocsResearcher {
             content: DOCS_RESEARCHER_PROMPT,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
-          { role: 'user', content: brief },
+          { role: 'user', content: sanitizedBrief },
         ],
         tools,
         toolChoice: 'auto',
@@ -123,6 +127,13 @@ export class DocsResearcher {
         researcher: 'docs',
         citationCount: citations.length,
         voyageCalls,
+        latencyMs: Date.now() - t0,
+      })
+      chatV2Logger.info('chat_v2.researcher_cost_observed', {
+        researcher: 'docs',
+        anthropicUsd: 0,
+        voyageUsd: 0,
+        totalUsd: 0,
       })
 
       return {
@@ -135,7 +146,14 @@ export class DocsResearcher {
         voyageCalls,
       }
     } catch (err) {
-      if (controller.signal.aborted) {
+      const aborted = controller.signal.aborted
+      chatV2Logger.warn('chat_v2.researcher_failed', {
+        orgId: hashId(ctx.orgId),
+        researcher: 'docs',
+        error: (err as Error)?.message ?? 'unknown',
+        latencyMs: Date.now() - t0,
+      })
+      if (aborted) {
         throw new RoleTimeoutError('researcher', RESEARCHER_TIMEOUT_MS)
       }
       throw err
@@ -159,10 +177,21 @@ function numberOr0(v: unknown): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : 0
 }
 
-function stubResearch(brief: string, ctx: ResearchContext): DocsResearcherResult {
+function stubResearch(brief: string, ctx: ResearchContext, t0: number): ResearcherResult {
   // Probe-injected failure mode (audit-M2 V14): force the researcher to throw
   // mid-flight after Triage has succeeded. Used to assert turn-failed cost row.
-  if (process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW === '1') {
+  // 06-01 used PROBE_CHAT_V2_FORCE_RESEARCHER_THROW='1' (single bool); 06-03
+  // unifies the contract (audit-S3) — single env var carries researcher name
+  // ('docs' / 'ops' / 'people' / 'tabular' / 'venue' / 'all'). Backward-compat:
+  // the legacy '1' value still triggers the docs researcher.
+  const forceThrow = process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  if (forceThrow === '1' || forceThrow === 'docs' || forceThrow === 'all') {
+    chatV2Logger.warn('chat_v2.researcher_failed', {
+      orgId: hashId(ctx.orgId),
+      researcher: 'docs',
+      error: 'researcher synthetic failure (probe injection)',
+      latencyMs: Date.now() - t0,
+    })
     throw new Error('researcher synthetic failure (probe injection)')
   }
 
@@ -187,8 +216,19 @@ function stubResearch(brief: string, ctx: ResearchContext): DocsResearcherResult
     citations.push({ knowledgeItemId: '00000000-0000-4000-8000-000000000005' })
   }
 
-  // ctx is referenced for parity with the production path; stub does not log.
-  void ctx
+  chatV2Logger.info('chat_v2.researcher_complete', {
+    orgId: hashId(ctx.orgId),
+    researcher: 'docs',
+    citationCount: citations.length,
+    voyageCalls: 0,
+    latencyMs: Date.now() - t0,
+  })
+  chatV2Logger.info('chat_v2.researcher_cost_observed', {
+    researcher: 'docs',
+    anthropicUsd: 0,
+    voyageUsd: 0,
+    totalUsd: 0,
+  })
 
   return {
     finding: { researcher: 'docs', summary, citations },
