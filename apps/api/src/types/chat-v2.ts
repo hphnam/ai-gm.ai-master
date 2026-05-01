@@ -51,6 +51,53 @@ export const CRITIC_REASONING_CONFIDENCE_THRESHOLD = 0.7
 export const CRITIC_MAX_WRITER_RETRIES = 1
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Plan 06-03 — researcher-breadth constants.
+// audit-M1: cap KnowledgeItem.metadata mention scan in get_person to 3 hits;
+// adversarial names cannot trigger full-table scan.
+// audit-S2: orchestrator + Triage prompt cap dispatch list to 4 researchers
+// (defends cost discipline against prompt-confused dispatch).
+// audit-M5: stub-clock anchor for "now-X" boundaries (last 24h / next 4h);
+// stubClock() returns this constant when PROBE_CHAT_V2_STUB=1, otherwise
+// Date.now(). Two probe iterations spaced milliseconds apart produce
+// byte-identical "now-anchored" data.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const MAX_PERSON_MENTIONS_PER_QUERY = 3
+export const MAX_RESEARCHERS_PER_TURN = 4
+export const FROZEN_STUB_NOW_MS = 1782000000000
+
+// Stable order for dispatch truncation when Triage exceeds the cap.
+// First-N wins; venue is highest priority because of the always-on contract for
+// reasoning + incident (CONTEXT.md D-06-B).
+export const RESEARCHER_PRIORITY_ORDER: ResearcherName[] = [
+  'venue',
+  'docs',
+  'ops',
+  'people',
+  'tabular',
+]
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Plan 06-03 — Tool result data shapes for new researcher-owned tools.
+// Re-exported from MockOpsService where applicable (CutoffSummary).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type VenueContactSummary = {
+  name: string
+  role: string
+  phone: string | null
+  email: string | null
+  isEmergencyContact: boolean
+}
+
+export type IncidentSummary = {
+  id: string
+  severity: string
+  summary: string
+  createdAt: Date
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Triage output — Zod schema + inferred type. .strict() rejects unknown keys
 // (audit-S4: emergent attack-surface keys cannot pollute downstream routing).
 // ─────────────────────────────────────────────────────────────────────────────
