@@ -187,6 +187,11 @@ export const SuggestedShapeEnum = z.enum([
 ])
 export type SuggestedShape = z.infer<typeof SuggestedShapeEnum>
 
+// Plan 06-04 hot-fix 2026-05-02 — `z.number().min(0).max(1)` emits JSON
+// schema with `minimum: 0, maximum: 1` which Anthropic's structured-output
+// API rejects ("For 'number' type, properties maximum, minimum are not
+// supported"). Use a plain `z.number()` and clamp post-parse via .transform().
+// Same runtime contract: evidenceSufficiency ∈ [0, 1].
 export const AnalyserOutputSchema = z
   .object({
     synthesis: z.string().min(1),
@@ -198,7 +203,7 @@ export const AnalyserOutputSchema = z
     ),
     openQuestions: z.array(z.string()),
     suggestedShape: SuggestedShapeEnum,
-    evidenceSufficiency: z.number().min(0).max(1),
+    evidenceSufficiency: z.number().transform((v) => Math.max(0, Math.min(1, v))),
   })
   .strict()
 export type AnalyserOutput = z.infer<typeof AnalyserOutputSchema>
