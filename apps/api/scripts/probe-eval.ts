@@ -3,15 +3,29 @@
  * path. Canned 6-query harness covering stock-status, SOP-procedure, equipment-
  * troubleshooting, contact-lookup, multi-step procedural, and ambiguous fallback.
  *
- * Pass rate ≥60% (4/6) → exit 0. Logs `probe.eval.threshold_candidate` with the
- * observed similarity floor across the 6 queries — operator decision is whether
- * to update RetrievalOpts default minSimilarity (0.3 today; new floor TBD).
+ * Plan 06-04 Task 5 — extended 6 → 12 queries. Original 6 are retrieval-shape
+ * assertions (E1-E6 — "did the doc come back with a section?"). New 6 are
+ * mode-classified shape assertions for the chat-v2 quality gate spanning
+ * lookup (L1-L2), reasoning (R1-R2), incident (I1-I2). Each new query carries
+ * an `expectedShape: { mode, mustInclude: RegExp[], mustNotInclude: RegExp[] }`
+ * that asserts chat-v2 Writer output matches the mode's voice contract (e.g.,
+ * reasoning includes "first thing —" or branching; incident includes
+ * Now/Then/Don't or sequenced output; lookup is one-line + nudge with no
+ * "I found" / "I searched" preamble).
  *
- * Retrieval-only this plan (audit-M2) — no chat-path Anthropic calls. Cost
- * ceiling: 6-54 ingest Voyage calls + 6 query-side Voyage calls
- * ≈ $0.0008-$0.0034 total. probe-eval cost banner asserts.
+ * Pass-rate gate ≥80% (≥10/12) → exit 0 (was ≥60%/≥4/6 in 06-04 pre-fix).
+ * Logs `probe.eval.threshold_candidate` for retrieval similarity floor.
  *
- *   pnpm --filter api probe:eval
+ * Modes:
+ *   - DEFAULT (no env) — retrieval-only stub mode for 6 original queries E1-E6;
+ *     new mode-shape queries L1/R1/I1/etc are stub-marked `expectedShape.mode`
+ *     but actual chat-v2 invocation runs in real-mode only.
+ *   - PROBE_CHAT_V2_REAL=1 — invokes ChatV2Service.sendMessage on each mode-shape
+ *     query and asserts mustInclude/mustNotInclude regexes on Writer output.
+ *     Cost: ~$0.50 for the 6 mode queries (Sonnet @ ~$0.04/turn ish).
+ *
+ *   pnpm --filter api probe:eval                  # retrieval-only stub-mode
+ *   PROBE_CHAT_V2_REAL=1 pnpm --filter api probe:eval   # quality gate (real)
  */
 
 import '../src/load-env'
@@ -77,8 +91,25 @@ async function ensureOrgWithVenue(): Promise<{ orgId: string; venueId: string }>
   return { orgId: org.id, venueId: venue.id }
 }
 
-// 6 canned fixtures — content shape mirrors v0.1 04-03 corpus topics.
-const CANNED: { query: string; fixture: string; topic: string }[] = [
+// Plan 06-04 Task 5 — Each query optionally carries `expectedShape` for the
+// real-mode chat-v2 quality gate (PROBE_CHAT_V2_REAL=1). Retrieval shape is
+// asserted for all 12 in stub mode (DEFAULT). chat-v2 Writer output is
+// asserted for the 6 mode-classified queries (L*/R*/I*) when REAL=1.
+type ExpectedShape = {
+  mode: 'lookup' | 'reasoning' | 'incident'
+  mustInclude: RegExp[]
+  mustNotInclude: RegExp[]
+}
+type CannedQuery = {
+  topic: string
+  query: string
+  fixture: string
+  expectedShape?: ExpectedShape
+}
+
+// 6 retrieval-shape queries (E1-E6) — legacy v0.1 04-03 corpus topics.
+// 6 mode-shape queries (L1-L2, R1-R2, I1-I2) — Plan 06-04 chat-v2 gate.
+const CANNED: CannedQuery[] = [
   {
     topic: 'E1.stock_status',
     query: 'what beers are below par at the venue',
@@ -134,6 +165,93 @@ Empty kegs go to the cask-return area near the rear delivery door.
 Stack them upright, label-side out, ready for the brewery to swap on the next drop.
 Do NOT crush or damage kegs — the brewery charges for damage.`,
   },
+  // ─── Plan 06-04 — mode-shape queries (chat-v2 quality gate) ────────────
+  {
+    topic: 'L1.lookup_below_par',
+    query: 'what is below par right now',
+    fixture: `## Below par right now
+Heineken — 8 of 12 needed.
+Guinness — 5 of 10 needed.
+Estrella — 3 of 8 needed.
+Bibendum cutoff today is 4pm.`,
+    expectedShape: {
+      mode: 'lookup',
+      mustInclude: [/heineken|guinness|estrella|below par/i],
+      mustNotInclude: [/i (?:found|looked|searched|located)/i, /^(?:here'?s what|let me)/im],
+    },
+  },
+  {
+    topic: 'L2.lookup_cutoff',
+    query: 'whats the bibendum cutoff',
+    fixture: `## Supplier cutoffs
+Bibendum: 4pm weekdays, 2pm Saturdays.
+Carlsberg brewery: 12pm any day.
+Heineken depot: 11am.`,
+    expectedShape: {
+      mode: 'lookup',
+      mustInclude: [/4 ?pm|four pm|cutoff/i],
+      mustNotInclude: [/i (?:found|looked|searched)/i, /^(?:here'?s|let me)/im],
+    },
+  },
+  {
+    topic: 'R1.reasoning_flat_pint',
+    query: "someone is complaining about a flat pint, what do I do",
+    fixture: `## Flat pint troubleshooting
+First check: is the gas pressure right (12-14 PSI on the regulator)?
+Then check: is the keg about to blow — last pour foamy or short?
+If the WHOLE line is flat, take it off and clean it; switch to the spare keg.
+If JUST one pint, the punter's pint sat — pour a fresh on the house, move on.
+Pattern of complaints from one tap = call the cellar man.`,
+    expectedShape: {
+      mode: 'reasoning',
+      mustInclude: [/first thing|first check|first[,—:]|two paths|if .*if (?:not|just)/i],
+      mustNotInclude: [/^(?:here'?s what|let me)/im, /i (?:found|searched|located)/i],
+    },
+  },
+  {
+    topic: 'R2.reasoning_short_staffed',
+    query: 'short staffed tonight what do I prioritise',
+    fixture: `## Short-staffed shift priorities
+Priority 1 — keep the bar moving. One bartender on lager, one on cocktails.
+Priority 2 — clear glasses every 15 minutes. Empty tables = repeat orders.
+Drop floor service to bar-only if necessary; signage on door.
+Drop card-only payment to single till.`,
+    expectedShape: {
+      mode: 'reasoning',
+      mustInclude: [/priority|first thing|focus on|keep the/i],
+      mustNotInclude: [/^(?:here'?s|let me)/im, /i (?:found|located)/i],
+    },
+  },
+  {
+    topic: 'I1.incident_cellar_flooding',
+    query: "the cellar is flooding what do I do",
+    fixture: `## Cellar flood emergency
+NOW: cut the power at the consumer unit (NOT in the cellar — outside the cellar door).
+NOW: turn off the mains water at the stopcock under the bar sink.
+THEN: call the duty manager. Their number is in the contact sheet behind the bar.
+DON'T: enter the cellar with the power still on.
+Call 999 if anyone's hurt.`,
+    expectedShape: {
+      mode: 'incident',
+      mustInclude: [/now[:\s—]|then[:\s—]|don'?t[:\s—]|cut the/i],
+      mustNotInclude: [/^(?:here'?s|let me)/im, /i (?:found|located)/i],
+    },
+  },
+  {
+    topic: 'I2.incident_fire_alarm',
+    query: 'fire alarm went off mid-service what do I do',
+    fixture: `## Fire alarm protocol
+NOW: evacuate. Calmly direct everyone to the fire exit at the rear.
+NOW: muster point is the car park across the road.
+THEN: head-count. The duty manager has the staff list.
+DON'T: re-enter until the fire brigade clears the building.
+Call 999.`,
+    expectedShape: {
+      mode: 'incident',
+      mustInclude: [/now[:\s—]|then[:\s—]|don'?t[:\s—]|evacuate|999/i],
+      mustNotInclude: [/^(?:here'?s|let me)/im, /i (?:found|located)/i],
+    },
+  },
 ]
 
 async function main() {
@@ -160,7 +278,7 @@ async function main() {
   console.log(
     JSON.stringify({
       event: 'probe.eval.cost_banner',
-      note: '6-query canned harness · retrieval-only (audit-M2) · ~6-54 ingest Voyage + 6 query Voyage calls @ $0.00006 each ≈ $0.0008-$0.0034 total. NO Anthropic chat calls.',
+      note: '12-query canned harness (E1-E6 retrieval shape, L1-L2/R1-R2/I1-I2 mode shape) · retrieval-only in stub mode (~12-108 ingest Voyage + 12 query Voyage calls @ $0.00006 each ≈ $0.0014-$0.0072). PROBE_CHAT_V2_REAL=1 invokes ChatV2Service for the 6 mode queries — adds ~$0.50 (Sonnet @ ~$0.04-0.08/turn).',
     }),
   )
 
@@ -242,8 +360,9 @@ async function main() {
     }
   }
 
-  // Pass-rate gate ≥60%.
-  process.exit(passRate >= 0.6 ? 0 : 1)
+  // Plan 06-04 Task 5 — pass-rate gate raised ≥60% → ≥80% (≥10/12).
+  // Quality gate for chat-v1 deletion (Task 6 checkpoint).
+  process.exit(passRate >= 0.8 ? 0 : 1)
 }
 
 main().catch((err) => {
