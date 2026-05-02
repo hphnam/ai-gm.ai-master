@@ -22,24 +22,28 @@ export type ResearcherName = 'docs' | 'ops' | 'people' | 'tabular' | 'venue'
 // Hard wall-clock timeouts (audit-M3) and input length cap (audit-M4)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Plan 06-04 hot-fix 2026-05-02 — TRIAGE bumped 5s → 12s. First real-Anthropic
-// UAT hit RoleTimeoutError at exactly 5s on a cold-start streaming request.
-// Haiku 4.5 with the extended Triage prompt (mode contract + boundary cases
-// + dispatch rules from 06-02/06-03) plus generateObject's structured-output
-// overhead realistically lands 3-7s on cold start. 12s is generous without
-// being lazy. TOTAL_TURN_TIMEOUT_MS bumped 35s → 45s to stay ahead of the
-// new TRIAGE+RESEARCHER+ANALYSER+WRITER worst-case sum (12 + 15 + 15 + 20
-// = 62s sequential, ~32s with researcher fan-out parallel + Writer streaming).
+// Plan 06-04 hot-fixes 2026-05-02 — real-Anthropic UAT surfaced that
+// generateObject + structured output is genuinely slow on Anthropic
+// (Triage on Haiku ~5-12s, Analyser on Sonnet ~15s+ timed out). Hot-fixes:
+//   1. Triage uses regex fast-path before Anthropic; LLM Triage timeout 5s→12s.
+//   2. Analyser + Critic switched from generateObject to generateText with
+//      manual JSON parse (drops the structured-output overhead).
+//   3. Timeouts bumped: ANALYSER 15s→30s, CRITIC 4s→8s.
+//   4. TOTAL_TURN_TIMEOUT_MS bumped to 60s to stay ahead of worst-case
+//      reasoning turn (Triage 12s + Researchers 15s parallel + Analyser 30s
+//      + Writer 20s streaming + Critic 8s = ~85s sequential, ~50-65s with
+//      parallel researcher fan-out and overlapping Writer streaming).
 export const TRIAGE_TIMEOUT_MS = 12_000
 export const RESEARCHER_TIMEOUT_MS = 15_000
 export const WRITER_TIMEOUT_MS = 20_000
-export const TOTAL_TURN_TIMEOUT_MS = 45_000
+export const TOTAL_TURN_TIMEOUT_MS = 60_000
 export const MAX_USER_MESSAGE_LEN = 4_096
 
-// Plan 06-02 — Analyser + Critic timeouts (audit-S3 — Critic tightened from 8s
-// to 4s; Haiku verification with no tools is 200-500ms typical, 4s is generous).
-export const ANALYSER_TIMEOUT_MS = 15_000
-export const CRITIC_TIMEOUT_MS = 4_000
+// Plan 06-04 hot-fix — Analyser timeout 15s → 30s; Critic 4s → 8s. Real-mode
+// generateText is faster than generateObject but Sonnet on the Analyser
+// prompt + 5 researcher findings still lands 5-15s realistically.
+export const ANALYSER_TIMEOUT_MS = 30_000
+export const CRITIC_TIMEOUT_MS = 8_000
 
 // Plan 06-02 — pipeline thresholds.
 // ANALYSER_RERESEARCH_CONFIDENCE_THRESHOLD: below this, orchestrator triggers a

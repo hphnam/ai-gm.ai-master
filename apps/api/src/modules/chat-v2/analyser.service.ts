@@ -13,7 +13,7 @@
 
 import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateObject } from 'ai'
+import { generateText } from 'ai'
 import {
   ANALYSER_TIMEOUT_MS,
   type AnalyserOutput,
@@ -39,6 +39,13 @@ export type AnalyserResult = {
   usage: AnthropicUsage
 }
 
+// Plan 06-04 hot-fix 2026-05-02 — switched generateObject → generateText
+// with manual JSON parse. Real-Anthropic generateObject on Sonnet was
+// timing out at 15s repeatedly during user UAT. generateText with a
+// "respond with JSON only" instruction is materially faster (no schema
+// enforcement at the API layer). We still validate via AnalyserOutputSchema
+// after parsing the text response, so the type contract is preserved.
+
 @Injectable()
 export class AnalyserService {
   async analyse(input: AnalyserInput): Promise<AnalyserResult> {
@@ -50,13 +57,12 @@ export class AnalyserService {
     const timer = setTimeout(() => controller.abort(), ANALYSER_TIMEOUT_MS)
 
     try {
-      const result = await generateObject({
+      const result = await generateText({
         model: anthropicProvider(SONNET_MODEL),
-        schema: AnalyserOutputSchema,
         messages: [
           {
             role: 'system',
-            content: ANALYSER_PROMPT,
+            content: `${ANALYSER_PROMPT}\n\nRespond with JSON ONLY, matching this shape:\n{"synthesis": string, "citations": Array<{knowledgeItemId: string, sectionId?: string}>, "openQuestions": string[], "suggestedShape": "recommendation"|"diagnosis"|"sequence"|"branching", "evidenceSufficiency": number}\nNo prose. No code fences. No commentary. Pure JSON.`,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
           {
@@ -72,7 +78,8 @@ export class AnalyserService {
         maxRetries: 2,
       })
 
-      const output = AnalyserOutputSchema.parse(result.object)
+      const parsed = parseAnalyserJson(result.text)
+      const output = AnalyserOutputSchema.parse(parsed)
       const usage = extractUsage(result.usage)
       return { output, usage }
     } catch (err) {
@@ -84,6 +91,22 @@ export class AnalyserService {
       clearTimeout(timer)
     }
   }
+}
+
+// Best-effort JSON extractor: strips optional code fences, trims whitespace,
+// then JSON.parse. Throws on unparseable output (caller catches and logs).
+function parseAnalyserJson(text: string): unknown {
+  let body = text.trim()
+  // Strip ```json ... ``` or ``` ... ``` fences if present.
+  const fenceMatch = body.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i)
+  if (fenceMatch) body = fenceMatch[1].trim()
+  // Find the first { and last } to bound the JSON in case the model adds prose.
+  const firstBrace = body.indexOf('{')
+  const lastBrace = body.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    body = body.slice(firstBrace, lastBrace + 1)
+  }
+  return JSON.parse(body)
 }
 
 function extractUsage(usage: unknown): AnthropicUsage {

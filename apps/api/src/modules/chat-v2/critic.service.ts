@@ -14,7 +14,7 @@
 
 import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateObject } from 'ai'
+import { generateText } from 'ai'
 import {
   type AnthropicUsage,
   CRITIC_TIMEOUT_MS,
@@ -39,6 +39,13 @@ export type CriticResult = {
   usage: AnthropicUsage
 }
 
+// Plan 06-04 hot-fix 2026-05-02 — switched generateObject → generateText
+// with manual JSON parse (same family of fix as Analyser). Anthropic's
+// structured-output mode + strict schemas was adding 3-8s of latency on
+// every Critic call. generateText with a "respond with JSON only"
+// directive is faster and the runtime contract is preserved via
+// CriticOutputSchema.parse() after extraction.
+
 @Injectable()
 export class CriticService {
   async verify(input: CriticInput): Promise<CriticResult> {
@@ -50,13 +57,12 @@ export class CriticService {
     const timer = setTimeout(() => controller.abort(), CRITIC_TIMEOUT_MS)
 
     try {
-      const result = await generateObject({
+      const result = await generateText({
         model: anthropicProvider(HAIKU_MODEL),
-        schema: CriticOutputSchema,
         messages: [
           {
             role: 'system',
-            content: CRITIC_PROMPT,
+            content: `${CRITIC_PROMPT}\n\nRespond with JSON ONLY, matching this shape:\n{"verdict": "approved" | "corrections-needed", "corrections"?: string[]}\nNo prose. No code fences. No commentary. Pure JSON.`,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
           {
@@ -71,7 +77,8 @@ export class CriticService {
         maxRetries: 2,
       })
 
-      const output = CriticOutputSchema.parse(result.object)
+      const parsed = parseCriticJson(result.text)
+      const output = CriticOutputSchema.parse(parsed)
       const usage = extractUsage(result.usage)
       return { output, usage }
     } catch (err) {
@@ -83,6 +90,18 @@ export class CriticService {
       clearTimeout(timer)
     }
   }
+}
+
+function parseCriticJson(text: string): unknown {
+  let body = text.trim()
+  const fenceMatch = body.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i)
+  if (fenceMatch) body = fenceMatch[1].trim()
+  const firstBrace = body.indexOf('{')
+  const lastBrace = body.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    body = body.slice(firstBrace, lastBrace + 1)
+  }
+  return JSON.parse(body)
 }
 
 function extractUsage(usage: unknown): AnthropicUsage {
