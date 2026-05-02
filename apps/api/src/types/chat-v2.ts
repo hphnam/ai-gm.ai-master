@@ -105,11 +105,26 @@ export type IncidentSummary = {
 export const ChatModeEnum = z.enum(['lookup', 'reasoning', 'incident'])
 export const ResearcherNameEnum = z.enum(['docs', 'ops', 'people', 'tabular', 'venue'])
 
+// Plan 06-04 hot-fix 2026-05-02 — replaced `z.partialRecord(ResearcherNameEnum,...)`
+// with an explicit-keys object. Anthropic's structured-output API rejects the
+// JSON-schema `propertyNames` constraint that Zod 4 emits for partialRecord
+// over an enum (`output_config.format.schema: For 'object' type, property
+// 'propertyNames' is not supported`). The explicit-keys form serializes to
+// standard JSON-schema `properties` which Anthropic accepts. Same runtime
+// shape: each researcher key carries an optional non-empty string brief.
 export const TriageOutputSchema = z
   .object({
     mode: ChatModeEnum,
     researchersToDispatch: z.array(ResearcherNameEnum),
-    briefByResearcher: z.partialRecord(ResearcherNameEnum, z.string().min(1)),
+    briefByResearcher: z
+      .object({
+        docs: z.string().min(1).optional(),
+        ops: z.string().min(1).optional(),
+        people: z.string().min(1).optional(),
+        tabular: z.string().min(1).optional(),
+        venue: z.string().min(1).optional(),
+      })
+      .strict(),
     safetySignal: z.boolean(),
   })
   .strict()
