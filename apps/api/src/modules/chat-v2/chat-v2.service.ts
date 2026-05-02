@@ -20,7 +20,14 @@
 // audit-M5 — phase events emitted with seq + timestampMs for 06-04 ordering.
 
 import { Injectable } from '@nestjs/common'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
+import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import {
+  createUIMessageStream,
+  streamText,
+  type UIMessageChunk,
+  type UIMessageStreamWriter,
+} from 'ai'
 import { prisma } from '../../database/prisma'
 import {
   ANALYSER_RERESEARCH_CONFIDENCE_THRESHOLD,
@@ -540,6 +547,312 @@ export class ChatV2Service {
       throw err
     }
   }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Plan 06-04 Task 2 — streamMessage: streaming sibling of sendMessage.
+  //
+  // Same orchestration shape (Triage → Researchers → Analyser → Writer) but
+  // streams Writer tokens via AI SDK 6.x streamText. Critic is SKIPPED on
+  // incident streaming (D-06-04-A registered) — streaming + Critic-correction
+  // re-write is incompatible with token streaming and reconciles in v0.4.
+  //
+  // Returns { conversationId, assistantMessageId, result } where `result` is
+  // a streamText result with `.pipeUIMessageStreamToResponse(res, opts)` —
+  // matches chat-v1's prepareStream contract so the UI controller code path
+  // stays unchanged when the route moves to chat-v2.
+  // ─────────────────────────────────────────────────────────────────────────
+  async streamMessage(
+    input: SendMessageInput,
+    ctx: ChatV2DispatchContext,
+    abortSignal?: AbortSignal,
+  ): Promise<{
+    conversationId: string
+    assistantMessageId: string
+    result: ReturnType<WriterService['streamCompose']>
+  }> {
+    const t0 = Date.now()
+
+    // Cross-tenant guard.
+    const venue = await prisma.venue.findFirst({
+      where: { id: input.venueId, organizationId: ctx.orgId },
+      select: { id: true },
+    })
+    if (!venue) throw new Error(`venue ${input.venueId} not found in org ${ctx.orgId}`)
+
+    // Client-first conversationId — mirrors chat-v1.prepareStream behaviour
+    // so the UI's URL/state stays stable from frame 0.
+    const conversationId = input.conversationId ?? randomUUID()
+    const existingConv = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: { id: true, venueId: true, deletedAt: true },
+    })
+    if (existingConv && existingConv.deletedAt !== null) {
+      throw new Error(`conversation ${conversationId} not found`)
+    }
+    if (existingConv) {
+      if (existingConv.venueId !== venue.id) {
+        throw new Error(
+          `conversation ${conversationId} does not belong to venue ${venue.id}`,
+        )
+      }
+    } else {
+      await prisma.chatConversation.create({
+        data: {
+          id: conversationId,
+          venueId: venue.id,
+          channel: 'web',
+          userId: ctx.userId,
+        },
+      })
+    }
+
+    // Pre-allocate assistantMessageId so the streamed UIMessage.id matches the
+    // persisted ChatMessage row id (mirrors chat-v1).
+    const assistantMessageId = randomUUID()
+
+    // Persist user message (audit trail). Strip NUL only.
+    const auditTrailContent = input.userMessage.replace(/\x00/g, '')
+    await prisma.chatMessage.create({
+      data: { conversationId, role: 'user', content: auditTrailContent },
+    })
+
+    const sanitized = sanitizeForTriage(input.userMessage)
+    const tracker = new CostTracker()
+    const conversationIdHash = hashId(conversationId)
+    const orgIdHash = hashId(ctx.orgId)
+
+    let seq = 0
+    const emitPhase = (phase: StreamPhaseEvent, mode: ChatMode | null): void => {
+      chatV2Logger.info('chat_v2.phase_event', {
+        phase,
+        mode,
+        conversationIdHash,
+        seq: seq++,
+        timestampMs: Date.now(),
+        streaming: true,
+      })
+    }
+
+    // ───── Triage ─────
+    emitPhase('triage', null)
+    const triageResult = await this.triage.classify(sanitized)
+    tracker.recordTriage(triageResult.usage)
+    const triageOutput = triageResult.output
+
+    // ───── Dispatch validation + cap ─────
+    const requestedDispatch = triageOutput.researchersToDispatch
+    let dispatched: ResearcherName[]
+    if (requestedDispatch.length > MAX_RESEARCHERS_PER_TURN) {
+      const requestedSet = new Set(requestedDispatch)
+      dispatched = RESEARCHER_PRIORITY_ORDER.filter((r) => requestedSet.has(r)).slice(
+        0,
+        MAX_RESEARCHERS_PER_TURN,
+      )
+      chatV2Logger.warn('chat_v2.dispatch_capped', {
+        orgId: orgIdHash,
+        conversationIdHash,
+        requestedCount: requestedDispatch.length,
+        dispatchedCount: dispatched.length,
+        capped: true,
+      })
+    } else {
+      dispatched = [...requestedDispatch]
+    }
+
+    const briefs: Record<ResearcherName, string> = {
+      docs: '',
+      ops: '',
+      people: '',
+      tabular: '',
+      venue: '',
+    }
+    for (const name of dispatched) {
+      const raw = triageOutput.briefByResearcher[name] ?? sanitized.slice(0, 200)
+      briefs[name] = sanitizeForResearcher(raw)
+    }
+    const briefHashes = dispatched.map((name) => sha12(briefs[name]))
+
+    // ───── Researcher fan-out (parallel) ─────
+    emitPhase('research', triageOutput.mode)
+    const findings: ResearcherFinding[] = []
+    const researcherTasks = dispatched.map((name) => {
+      const researcher = this.resolveResearcher(name)
+      return researcher
+        .research(briefs[name], {
+          orgId: ctx.orgId,
+          venueId: venue.id,
+          conversationId,
+        })
+        .then((result) => ({ status: 'fulfilled' as const, name, result }))
+        .catch((err: unknown) => ({ status: 'rejected' as const, name, err }))
+    })
+    const settled = await Promise.all(researcherTasks)
+    for (const s of settled) {
+      if (s.status === 'fulfilled') {
+        tracker.recordResearcher(s.result.usage, s.result.voyageCalls)
+        findings.push(s.result.finding)
+      } else {
+        chatV2Logger.warn('chat_v2.researcher_failed', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          researcher: s.name,
+          error: sanitizeError(s.err),
+        })
+      }
+    }
+    if (findings.length === 0) {
+      throw new Error('all researchers failed for this turn')
+    }
+
+    // ───── Analyser (reasoning + incident only) ─────
+    let analyserOutput: AnalyserOutput | null = null
+    let citationCount = 0
+    if (triageOutput.mode !== 'lookup') {
+      emitPhase('analyse', triageOutput.mode)
+      const analyserResult = await this.analyser.analyse({
+        mode: triageOutput.mode,
+        userMessage: input.userMessage,
+        findings,
+      })
+      tracker.recordAnalyser(analyserResult.usage)
+      analyserOutput = analyserResult.output
+      citationCount = new Set(
+        analyserResult.output.citations.map((c) => c.knowledgeItemId),
+      ).size
+      chatV2Logger.info('chat_v2.analyser_confidence_observed', {
+        mode: triageOutput.mode,
+        suggestedShape: analyserResult.output.suggestedShape,
+        evidenceSufficiency: analyserResult.output.evidenceSufficiency,
+        conversationIdHash,
+        streaming: true,
+      })
+    }
+
+    // D-06-04-A: incident streaming SKIPS Critic (streaming + Critic-correction
+    // rewrite is incompatible with token-by-token delivery; reconciles v0.4).
+    if (triageOutput.mode === 'incident') {
+      chatV2Logger.warn('chat_v2.critic_skipped_streaming', {
+        mode: 'incident',
+        conversationIdHash,
+        reason: 'streaming-incompatible',
+      })
+    }
+
+    // ───── Writer (streaming) ─────
+    emitPhase('draft', triageOutput.mode)
+    const writerInput = {
+      mode: triageOutput.mode,
+      userMessage: input.userMessage,
+      findings,
+      analyserSynthesis: analyserOutput?.synthesis,
+      safetySignal: triageOutput.safetySignal,
+      citationCount,
+    }
+
+    // Persist + emit complete via streamText's onFinish callback. AI SDK 6.x
+    // calls onFinish exactly once with final text + usage when the stream
+    // completes (or aborts cleanly). Captured costs/IDs persist regardless.
+    const result = this.writer.streamCompose(
+      writerInput,
+      abortSignal,
+    )
+
+    // Wrap an attached async IIFE so the orchestrator can persist after stream
+    // finishes. We don't await it here — the controller pipes the stream to
+    // the response, the SDK resolves result.text + result.usage, then this
+    // IIFE persists the ChatMessage row out-of-band. If the stream aborts,
+    // persist with accumulated partial cost (audit-M2 carry-forward).
+    void (async (): Promise<void> => {
+      try {
+        const writerText = await result.text
+        const writerUsage = await result.usage
+        tracker.recordWriter({
+          inputTokens: numberOr0((writerUsage as Record<string, unknown>).inputTokens),
+          outputTokens: numberOr0((writerUsage as Record<string, unknown>).outputTokens),
+          cacheReadTokens: numberOr0(
+            (writerUsage as Record<string, unknown>).cacheReadInputTokens ??
+              (writerUsage as Record<string, unknown>).cacheReadTokens,
+          ),
+          cacheWriteTokens: numberOr0(
+            (writerUsage as Record<string, unknown>).cacheCreationInputTokens ??
+              (writerUsage as Record<string, unknown>).cacheWriteTokens,
+          ),
+        })
+        const cost = tracker.total()
+        const citationsToPersist =
+          analyserOutput?.citations ?? findings.flatMap((f) => f.citations)
+        const retrievedItemIds = Array.from(
+          new Set(citationsToPersist.map((c) => c.knowledgeItemId)),
+        )
+        const triageDispatchEntry = {
+          round: -2,
+          toolUseId: 'chat-v2-triage-dispatch',
+          tool: 'triage_dispatch',
+          input: {
+            mode: triageOutput.mode,
+            safetySignal: triageOutput.safetySignal,
+          },
+          result: { dispatched, briefHashes },
+        }
+        await prisma.chatMessage.create({
+          data: {
+            id: assistantMessageId,
+            conversationId,
+            role: 'assistant',
+            content: writerText.trim(),
+            retrievedItemIds,
+            costUsd: cost.totalUsd,
+            toolCallLog: [triageDispatchEntry] as unknown as object,
+          },
+        })
+        emitPhase('complete', triageOutput.mode)
+        chatV2Logger.info('chat_v2.turn_complete', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          mode: triageOutput.mode,
+          totalUsd: cost.totalUsd,
+          breakdown: cost.breakdown,
+          latencyMs: Date.now() - t0,
+          streaming: true,
+        })
+      } catch (err: unknown) {
+        // audit-M2 carry-forward — persist partial-cost assistant row even on
+        // stream abort, so cost telemetry is never lost.
+        const cost = tracker.total()
+        const failureContent = sanitizeError(err)
+        try {
+          await prisma.chatMessage.create({
+            data: {
+              id: assistantMessageId,
+              conversationId,
+              role: 'turn-failed',
+              content: failureContent,
+              costUsd: cost.totalUsd,
+            },
+          })
+        } catch {
+          /* swallow — already-failed turn shouldn't fail again on persist */
+        }
+        chatV2Logger.error('chat_v2.stream_turn_failed', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          mode: triageOutput.mode,
+          totalUsd: cost.totalUsd,
+          breakdown: cost.breakdown,
+          failureContent,
+          latencyMs: Date.now() - t0,
+        })
+      }
+    })()
+
+    return { conversationId, assistantMessageId, result }
+  }
+}
+
+// Local helper duplicated from writer.service.ts (kept private to extract from
+// the streaming usage object — Writer's extractUsage is module-private).
+function numberOr0(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : 0
 }
 
 // audit-S5: refined brief composition. When openQuestions has content, use

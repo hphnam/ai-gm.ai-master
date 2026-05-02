@@ -106,6 +106,35 @@
         ]
       }
     },
+    "/chat/stream": {
+      "post": {
+        "operationId": "ChatV2Controller_streamMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StreamChatMessageRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "chat"
+        ]
+      }
+    },
     "/chat/messages": {
       "post": {
         "operationId": "ChatController_sendMessage",
@@ -130,35 +159,6 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "chat"
-        ]
-      }
-    },
-    "/chat/stream": {
-      "post": {
-        "operationId": "ChatController_streamMessage",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StreamChatMessageRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
           }
         },
         "security": [
@@ -1735,7 +1735,7 @@
           "retrievedItemIds"
         ]
       },
-      "SendChatMessageRequestDto": {
+      "StreamChatMessageRequestDto": {
         "type": "object",
         "properties": {
           "venueId": {
@@ -1757,7 +1757,7 @@
           "userMessage"
         ]
       },
-      "StreamChatMessageRequestDto": {
+      "SendChatMessageRequestDto": {
         "type": "object",
         "properties": {
           "venueId": {

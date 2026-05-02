@@ -97,51 +97,8 @@ export class ChatController {
   // Plan 06-04 Task 1 — POST /chat/messages/with-image moved to chat-v2.controller.ts.
   // chat-v1 no longer hosts the multimodal route.
 
-  // Streaming endpoint for the web /chat UI. Uses Vercel AI SDK's UI message
-  // stream protocol via pipeUIMessageStreamToResponse. The fresh conversation
-  // ID is returned in the `x-conversation-id` response header so the client
-  // can update its URL when starting a brand-new thread.
-  @Post('stream')
-  @HttpCode(200)
-  async streamMessage(
-    @Body() body: StreamChatMessageRequestDto,
-    @CurrentOrg() org: { id: string },
-    @CurrentUser() user: { id: string; email: string; name: string | null },
-    @CurrentRole() role: string | undefined,
-    @Res() res: Response,
-  ): Promise<void> {
-    const abortController = new AbortController()
-    res.on('close', () => {
-      if (!abortController.signal.aborted) abortController.abort()
-    })
-
-    try {
-      const { conversationId, assistantMessageId, result } = await this.chatService.prepareStream({
-        venueId: body.venueId,
-        conversationId: body.conversationId,
-        userText: body.userMessage,
-        orgId: org.id,
-        userId: user.id,
-        userRole: role ?? 'staff',
-        userIdentity: { name: user.name, email: user.email },
-        abortSignal: abortController.signal,
-      })
-      result.pipeUIMessageStreamToResponse(res, {
-        generateMessageId: () => assistantMessageId,
-        messageMetadata: ({ part }) => {
-          if (part.type === 'start') {
-            return { conversationId }
-          }
-          return undefined
-        },
-        onError: (err) => (err as Error)?.message ?? 'stream error',
-      })
-    } catch (err) {
-      const translated = translateChatServiceError(err as Error)
-      if (translated) throw translated
-      throw err
-    }
-  }
+  // Plan 06-04 Task 2 — streaming endpoint moved to chat-v2.controller.ts.
+  // chat-v1's prepareStream stays callable until Task 7 module deletion.
 
   @Get('conversations')
   @ApiResponse({ status: 200, type: [ListConversationItemDto] })

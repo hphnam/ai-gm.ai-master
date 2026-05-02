@@ -45,6 +45,19 @@ export const ChatV2ControllerSendMessageWithImageResponse = zod.object({
 })
 
 
+export const chatV2ControllerStreamMessageBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const chatV2ControllerStreamMessageBodyUserMessageMax = 8000;
+
+export const chatV2ControllerStreamMessageBodyConversationIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerStreamMessageBody = zod.object({
+  "venueId": zod.string().regex(chatV2ControllerStreamMessageBodyVenueIdRegExp),
+  "userMessage": zod.string().min(1).max(chatV2ControllerStreamMessageBodyUserMessageMax),
+  "conversationId": zod.string().regex(chatV2ControllerStreamMessageBodyConversationIdRegExp).optional()
+})
+
+
 export const chatControllerSendMessageBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 export const chatControllerSendMessageBodyUserMessageMax = 8000;
 
@@ -66,19 +79,6 @@ export const ChatControllerSendMessageResponse = zod.object({
 }),
   "toolCallLog": zod.array(zod.unknown()),
   "retrievedItemIds": zod.array(zod.string())
-})
-
-
-export const chatControllerStreamMessageBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-export const chatControllerStreamMessageBodyUserMessageMax = 8000;
-
-export const chatControllerStreamMessageBodyConversationIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerStreamMessageBody = zod.object({
-  "venueId": zod.string().regex(chatControllerStreamMessageBodyVenueIdRegExp),
-  "userMessage": zod.string().min(1).max(chatControllerStreamMessageBodyUserMessageMax),
-  "conversationId": zod.string().regex(chatControllerStreamMessageBodyConversationIdRegExp).optional()
 })
 
 

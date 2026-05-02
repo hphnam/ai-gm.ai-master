@@ -14,7 +14,7 @@
 
 import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText } from 'ai'
+import { generateText, streamText } from 'ai'
 import {
   type AnthropicUsage,
   RoleTimeoutError,
@@ -32,6 +32,11 @@ export type WriterResult = {
   text: string
   usage: AnthropicUsage
 }
+
+// Plan 06-04 Task 2 — streaming Writer result. Matches AI SDK 6.x streamText
+// return shape with usage as a Promise. Voice/prompt/AC-7 contract preserved
+// (same prompts, same buildUserContent, same model, same cache control).
+export type WriterStreamResult = ReturnType<typeof streamText>
 
 const PROMPT_BY_MODE: Record<WriterInput['mode'], string> = {
   lookup: WRITER_LOOKUP_PROMPT,
@@ -75,6 +80,28 @@ export class WriterService {
     } finally {
       clearTimeout(timer)
     }
+  }
+
+  // Plan 06-04 Task 2 — streaming variant. Same prompt/model/cache-control as
+  // compose(); returns the AI SDK streamText result so the caller can pipe to
+  // a UI message stream. AC-7 carry-forward — Writer is still tool-less (no
+  // `tools` parameter passed to streamText). Stub mode falls back to compose
+  // for deterministic probe assertions.
+  streamCompose(input: WriterInput, abortSignal?: AbortSignal): WriterStreamResult {
+    const systemPrompt = PROMPT_BY_MODE[input.mode]
+    const userContent = buildUserContent(input)
+    return streamText({
+      model: anthropicProvider(SONNET_MODEL),
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+          providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
+        },
+        { role: 'user', content: userContent },
+      ],
+      abortSignal,
+    })
   }
 }
 

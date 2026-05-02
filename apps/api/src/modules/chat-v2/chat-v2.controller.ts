@@ -18,10 +18,13 @@ import {
   HttpException,
   Logger,
   Post,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import type { Response } from 'express'
+import { StreamChatMessageRequestDto } from '../chat/dto/chat.dto'
 import {
   ApiTags,
   ApiResponse,
@@ -154,6 +157,60 @@ export class ChatV2Controller {
           userIdentity: { name: user.name, email: user.email },
         },
       )) as unknown as SendChatMessageResponseDto
+    } catch (err) {
+      const translated = translateChatServiceError(err as Error)
+      if (translated) throw translated
+      throw err
+    }
+  }
+
+  // Plan 06-04 Task 2 — streaming endpoint on chat-v2. Mirrors chat-v1's
+  // POST /chat/stream contract: returns SSE-style UI message stream via AI SDK
+  // 6.x pipeUIMessageStreamToResponse. The chat-v1 route is removed in the
+  // same commit so NestJS sees no double-mounted /chat/stream.
+  //
+  // D-06-04-A — incident streaming SKIPS Critic (logged inside ChatV2Service);
+  // streaming + Critic-correction rewrite reconciles in v0.4.
+  @Post('stream')
+  @HttpCode(200)
+  async streamMessage(
+    @Body() body: StreamChatMessageRequestDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string; email: string; name: string | null },
+    @CurrentRole() role: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const abortController = new AbortController()
+    res.on('close', () => {
+      if (!abortController.signal.aborted) abortController.abort()
+    })
+
+    try {
+      const { conversationId, assistantMessageId, result } =
+        await this.chatV2Service.streamMessage(
+          {
+            venueId: body.venueId,
+            userMessage: body.userMessage,
+            conversationId: body.conversationId,
+          },
+          {
+            orgId: org.id,
+            userId: user.id,
+            userRole: role ?? 'staff',
+            userIdentity: { name: user.name, email: user.email },
+          },
+          abortController.signal,
+        )
+      result.pipeUIMessageStreamToResponse(res, {
+        generateMessageId: () => assistantMessageId,
+        messageMetadata: ({ part }) => {
+          if (part.type === 'start') {
+            return { conversationId }
+          }
+          return undefined
+        },
+        onError: (err) => (err as Error)?.message ?? 'stream error',
+      })
     } catch (err) {
       const translated = translateChatServiceError(err as Error)
       if (translated) throw translated
