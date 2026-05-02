@@ -98,6 +98,18 @@ export interface FeedbackResponseDto {
   exhaustedCount: number;
 }
 
+export interface SendChatMessageRequestDto {
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  venueId: string;
+  /**
+     * @minLength 1
+     * @maxLength 8000
+     */
+  userMessage: string;
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  conversationId?: string;
+}
+
 export type SendChatMessageResponseDtoAssistantMessage = {
   id: string;
   content: string;
@@ -157,18 +169,6 @@ export interface ConversationResponseDto {
   venueId: string;
   channel: string;
   messages: ConversationResponseDtoMessagesItem[];
-}
-
-export interface SendChatMessageRequestDto {
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  venueId: string;
-  /**
-     * @minLength 1
-     * @maxLength 8000
-     */
-  userMessage: string;
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  conversationId?: string;
 }
 
 export interface SuggestionsOnOpenRequestDto {
@@ -1195,6 +1195,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getFeedbackControllerCaptureFeedbackMutationOptions(options), queryClient);
     }
 
+export type chatV2ControllerSendMessageResponse200 = {
+  data: SendChatMessageResponseDto
+  status: 200
+}
+
+export type chatV2ControllerSendMessageResponseSuccess = (chatV2ControllerSendMessageResponse200) & {
+  headers: Headers;
+};
+;
+
+export type chatV2ControllerSendMessageResponse = (chatV2ControllerSendMessageResponseSuccess)
+
+export const getChatV2ControllerSendMessageUrl = () => {
+
+
+
+
+  return `/chat/messages`
+}
+
+export const chatV2ControllerSendMessage = async (sendChatMessageRequestDto: SendChatMessageRequestDto, options?: RequestInit): Promise<chatV2ControllerSendMessageResponse> => {
+
+  return orvalMutator<chatV2ControllerSendMessageResponse>(getChatV2ControllerSendMessageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      sendChatMessageRequestDto,)
+  }
+);}
+
+
+
+
+export const getChatV2ControllerSendMessageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext> => {
+
+const mutationKey = ['chatV2ControllerSendMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatV2ControllerSendMessage>>, {data: SendChatMessageRequestDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  chatV2ControllerSendMessage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChatV2ControllerSendMessageMutationResult = NonNullable<Awaited<ReturnType<typeof chatV2ControllerSendMessage>>>
+    export type ChatV2ControllerSendMessageMutationBody = SendChatMessageRequestDto
+    export type ChatV2ControllerSendMessageMutationError = unknown
+
+    export const useChatV2ControllerSendMessage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof chatV2ControllerSendMessage>>,
+        TError,
+        {data: SendChatMessageRequestDto},
+        TContext
+      > => {
+      return useMutation(getChatV2ControllerSendMessageMutationOptions(options), queryClient);
+    }
+
 export type chatV2ControllerSendMessageWithImageResponse200 = {
   data: SendChatMessageResponseDto
   status: 200
@@ -1677,83 +1754,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatV2ControllerDeleteConversationMutationOptions(options), queryClient);
-    }
-
-export type chatControllerSendMessageResponse200 = {
-  data: SendChatMessageResponseDto
-  status: 200
-}
-
-export type chatControllerSendMessageResponseSuccess = (chatControllerSendMessageResponse200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerSendMessageResponse = (chatControllerSendMessageResponseSuccess)
-
-export const getChatControllerSendMessageUrl = () => {
-
-
-
-
-  return `/chat/messages`
-}
-
-export const chatControllerSendMessage = async (sendChatMessageRequestDto: SendChatMessageRequestDto, options?: RequestInit): Promise<chatControllerSendMessageResponse> => {
-
-  return orvalMutator<chatControllerSendMessageResponse>(getChatControllerSendMessageUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      sendChatMessageRequestDto,)
-  }
-);}
-
-
-
-
-export const getChatControllerSendMessageMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext> => {
-
-const mutationKey = ['chatControllerSendMessage'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerSendMessage>>, {data: SendChatMessageRequestDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  chatControllerSendMessage(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChatControllerSendMessageMutationResult = NonNullable<Awaited<ReturnType<typeof chatControllerSendMessage>>>
-    export type ChatControllerSendMessageMutationBody = SendChatMessageRequestDto
-    export type ChatControllerSendMessageMutationError = unknown
-
-    export const useChatControllerSendMessage = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerSendMessage>>, TError,{data: SendChatMessageRequestDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof chatControllerSendMessage>>,
-        TError,
-        {data: SendChatMessageRequestDto},
-        TContext
-      > => {
-      return useMutation(getChatControllerSendMessageMutationOptions(options), queryClient);
     }
 
 export type suggestionsControllerOnOpenResponse200 = {

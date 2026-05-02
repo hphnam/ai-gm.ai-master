@@ -34,6 +34,7 @@ import {
   ConversationIdParamDto,
   GetConversationQueryDto,
   ListConversationsQueryDto,
+  SendChatMessageRequestDto,
   StreamChatMessageRequestDto,
   ListConversationItemDto,
   ConversationResponseDto,
@@ -73,6 +74,34 @@ export class ChatV2Controller {
     private readonly chatV2Service: ChatV2Service,
     private readonly conversationService: ConversationService,
   ) {}
+
+  // Plan 06-04 Task 4 — text-message endpoint on chat-v2. Replaces chat-v1's
+  // POST /chat/messages (which has been removed from chat-v1's controller in
+  // the same commit). Pre-06-04: chat-v1's controller dispatched on the
+  // Organization.chatV2Enabled flag; post-cutover the flag check disappears
+  // entirely (Task 5 drops the column). Every text turn flows through chat-v2.
+  @Post('messages')
+  @HttpCode(200)
+  @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
+  async sendMessage(
+    @Body() body: SendChatMessageRequestDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string; email: string; name: string | null },
+    @CurrentRole() role: string | undefined,
+  ): Promise<SendChatMessageResponseDto> {
+    try {
+      return (await this.chatV2Service.sendMessage(body, {
+        orgId: org.id,
+        userId: user.id,
+        userRole: role ?? 'staff',
+        userIdentity: { name: user.name, email: user.email },
+      })) as unknown as SendChatMessageResponseDto
+    } catch (err) {
+      const translated = translateChatServiceError(err as Error)
+      if (translated) throw translated
+      throw err
+    }
+  }
 
   // Plan 06-04 Task 1 — multimodal endpoint on chat-v2. Replaces chat-v1's
   // POST /chat/messages/with-image (which has been removed from chat-v1's

@@ -8,7 +8,7 @@ import {
   type InfobipInboundResult,
   type ProactiveSuggestion,
 } from '../../types'
-import { ChatService } from '../chat/chat.service'
+import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { SuggestionsService } from '../suggestions/suggestions.service'
 import { WhatsAppAdapter } from './whatsapp.adapter'
 import { recordAndCheckOnboardingReply } from './unknown-number-rate-limit'
@@ -80,7 +80,7 @@ export class WhatsappService {
 
   constructor(
     private readonly adapter: WhatsAppAdapter,
-    private readonly chatService: ChatService,
+    private readonly chatV2Service: ChatV2Service,
     private readonly suggestions: SuggestionsService,
   ) {}
 
@@ -363,17 +363,24 @@ export class WhatsappService {
             : attachment
               ? 'User sent an image.'
               : bodyText
+        // Plan 06-04 Task 4 — WhatsApp consumer migrated from chat-v1 to chat-v2.
+        // Same SendMessageInput shape; chat-v2 uses a single ctx-object instead
+        // of positional args. WhatsApp inbound now flows through Triage →
+        // Researchers (with Venue always-on for reasoning + incident) → Writer.
         const chatResult = await Promise.race([
-          this.chatService.sendMessage(
+          this.chatV2Service.sendMessage(
             {
               venueId: venue.id,
               userMessage,
               conversationId: conversation.id,
               attachment,
             },
-            member.organizationId,
-            user.id,
-            member.role,
+            {
+              orgId: member.organizationId,
+              userId: user.id,
+              userRole: member.role,
+              userIdentity: { name: user.name, email: user.email },
+            },
           ),
           new Promise<'__timeout'>((resolve) =>
             setTimeout(() => resolve('__timeout'), CHAT_TIMEOUT_MS),

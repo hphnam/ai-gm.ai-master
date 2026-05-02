@@ -51,6 +51,42 @@
         ]
       }
     },
+    "/chat/messages": {
+      "post": {
+        "operationId": "ChatV2Controller_sendMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendChatMessageRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendChatMessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "chat"
+        ]
+      }
+    },
     "/chat/messages/with-image": {
       "post": {
         "operationId": "ChatV2Controller_sendMessageWithImage",
@@ -243,42 +279,6 @@
         "responses": {
           "204": {
             "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "chat"
-        ]
-      }
-    },
-    "/chat/messages": {
-      "post": {
-        "operationId": "ChatController_sendMessage",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendChatMessageRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SendChatMessageResponseDto"
-                }
-              }
-            }
           }
         },
         "security": [
@@ -1688,6 +1688,28 @@
           "exhaustedCount"
         ]
       },
+      "SendChatMessageRequestDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "userMessage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          },
+          "conversationId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        },
+        "required": [
+          "venueId",
+          "userMessage"
+        ]
+      },
       "SendChatMessageResponseDto": {
         "type": "object",
         "properties": {
@@ -1892,28 +1914,6 @@
           "venueId",
           "channel",
           "messages"
-        ]
-      },
-      "SendChatMessageRequestDto": {
-        "type": "object",
-        "properties": {
-          "venueId": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-          },
-          "userMessage": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 8000
-          },
-          "conversationId": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-          }
-        },
-        "required": [
-          "venueId",
-          "userMessage"
         ]
       },
       "SuggestionsOnOpenRequestDto": {
