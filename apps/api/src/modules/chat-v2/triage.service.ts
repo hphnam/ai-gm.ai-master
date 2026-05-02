@@ -20,6 +20,8 @@ import {
   RoleTimeoutError,
 } from '../../types'
 import { TRIAGE_PROMPT } from './prompts/triage.prompt'
+import { quickClassify } from './triage-quick-classify'
+import { chatV2Logger } from './log-helpers'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
@@ -37,6 +39,25 @@ export class TriageService {
   ): Promise<TriageResult> {
     if (process.env.PROBE_CHAT_V2_STUB === '1') {
       return stubClassify(userMessage)
+    }
+
+    // Plan 06-04 hot-fix 2026-05-02 — fast-path for high-confidence regex
+    // patterns. Real-Anthropic generateObject on Haiku takes 5-15s on cold
+    // start; for "what's below par?" / "Bibendum cutoff?" / "cellar's
+    // flooding" that's wrong. quickClassify returns a synthesized output for
+    // known patterns in <1ms. Genuinely ambiguous queries fall through to
+    // generateObject below.
+    const quick = quickClassify(userMessage)
+    if (quick) {
+      chatV2Logger.info('chat_v2.triage_fast_path', {
+        mode: quick.mode,
+        dispatched: quick.researchersToDispatch,
+        safetySignal: quick.safetySignal,
+      })
+      return {
+        output: quick,
+        usage: { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+      }
     }
 
     const controller = new AbortController()
