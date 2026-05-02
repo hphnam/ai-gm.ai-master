@@ -42,6 +42,8 @@ export class TabularResearcher implements Researcher {
     const timer = setTimeout(() => controller.abort(), RESEARCHER_TIMEOUT_MS)
 
     const sanitizedBrief = sanitizeForResearcher(brief)
+    const sanitizedUserMessage = sanitizeForResearcher(ctx.userMessage)
+    const userContent = `User question: "${sanitizedUserMessage}"\n\nResearch focus: ${sanitizedBrief}`
     let voyageCalls = 0
     let evidenceSummary = ''
     const citations: { knowledgeItemId: string; sectionId?: string }[] = []
@@ -117,7 +119,7 @@ export class TabularResearcher implements Researcher {
             content: TABULAR_RESEARCHER_PROMPT,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
-          { role: 'user', content: sanitizedBrief },
+          { role: 'user', content: userContent },
         ],
         tools,
         toolChoice: 'auto',

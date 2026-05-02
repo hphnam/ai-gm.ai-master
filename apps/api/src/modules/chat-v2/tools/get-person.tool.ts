@@ -51,6 +51,27 @@ export async function getPerson(
 
   // Cross-tenant guard via venue.organizationId === orgId. venueId optional —
   // null means "any venue in this org."
+  //
+  // Plan 06-04 hot-fix 2026-05-02 — tokenize role queries. A role like "cellar
+  // engineer" must match a stored "Gas Engineer" / "Cellar Services" — Prisma
+  // `contains` is substring-only, so the unsplit phrase silently misses. Split
+  // on whitespace, drop tokens ≤2 chars (stop-words), OR-match each remaining
+  // token. Single-token roles fall through to the legacy contains path so we
+  // don't widen the cardinality unnecessarily.
+  const roleTokens = role
+    ? role.split(/\s+/).filter((t) => t.length > 2)
+    : []
+  const roleClause =
+    role && roleTokens.length > 1
+      ? {
+          OR: roleTokens.map((t) => ({
+            role: { contains: t, mode: 'insensitive' as const },
+          })),
+        }
+      : role
+        ? { role: { contains: role, mode: 'insensitive' as const } }
+        : {}
+
   const contacts = await prisma.venueContact.findMany({
     where: {
       venue: {
@@ -58,7 +79,7 @@ export async function getPerson(
         ...(venueId ? { id: venueId } : {}),
       },
       ...(name ? { name: { contains: name, mode: 'insensitive' as const } } : {}),
-      ...(role ? { role: { contains: role, mode: 'insensitive' as const } } : {}),
+      ...roleClause,
     },
     select: {
       name: true,

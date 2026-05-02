@@ -14,6 +14,12 @@ export const TOOL_NAMES = [
   'add_supplier_note',
   // Plan 05-01 — structured-data path over CSV/XLSX docs (aggregate / enumeration).
   'query_document_table',
+  // Plan 06-04 hot-fix 2026-05-02 — fallback escalation tool. Wraps the chat-v2
+  // multi-agent pipeline (Triage → Researchers → Analyser → Writer → Critic)
+  // for genuinely-deep multi-source synthesis. Should fire RARELY — only when
+  // find_knowledge + direct entity tools have all returned thin / no-data and
+  // the question genuinely needs cross-source reasoning.
+  'deep_research',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -138,6 +144,13 @@ export const TOOL_INPUT_SCHEMAS = {
       })
       .optional(),
     limit: z.number().int().min(1).max(1000).optional(),
+  }),
+  // Plan 06-04 hot-fix 2026-05-02 — deep_research escalation. Required:
+  // venueId so the chat-v2 pipeline can scope its researchers; question carries
+  // the full context the agent wants synthesised.
+  deep_research: z.object({
+    venueId: UUID,
+    question: z.string().min(8).max(2000),
   }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
@@ -424,6 +437,23 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
       },
       required: [],
+    },
+  },
+  {
+    name: 'deep_research',
+    description:
+      'Escalate to the multi-agent research pipeline (slow — 15-30s — use sparingly). Triages the question, dispatches up to 3 specialist researchers in parallel, runs an analyser pass to reconcile findings, and returns a fully synthesised answer. Use ONLY when (a) `find_knowledge` and the direct entity tools have all returned no useful data, AND (b) the question genuinely needs cross-source synthesis (multi-doc reasoning, incident triage with multiple data feeds, "compare X across Y"). Returns the synthesised answer as a string — quote it back to the user verbatim or summarise. Do NOT use for plain lookups.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID to scope the research' },
+        question: {
+          type: 'string',
+          description:
+            'The full question to research, ideally restated in your own words with any disambiguating context the user provided. 8-2000 chars.',
+        },
+      },
+      required: ['venueId', 'question'],
     },
   },
 ]

@@ -53,7 +53,7 @@
     },
     "/chat/messages": {
       "post": {
-        "operationId": "ChatV2Controller_sendMessage",
+        "operationId": "ChatController_sendMessage",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -89,7 +89,7 @@
     },
     "/chat/messages/with-image": {
       "post": {
-        "operationId": "ChatV2Controller_sendMessageWithImage",
+        "operationId": "ChatController_sendMessageWithImage",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -144,7 +144,7 @@
     },
     "/chat/stream": {
       "post": {
-        "operationId": "ChatV2Controller_streamMessage",
+        "operationId": "ChatController_streamMessage",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -173,7 +173,7 @@
     },
     "/chat/conversations": {
       "get": {
-        "operationId": "ChatV2Controller_listConversations",
+        "operationId": "ChatController_listConversations",
         "parameters": [
           {
             "name": "venueId",
@@ -212,7 +212,7 @@
     },
     "/chat/conversations/{id}": {
       "get": {
-        "operationId": "ChatV2Controller_getConversation",
+        "operationId": "ChatController_getConversation",
         "parameters": [
           {
             "name": "id",
@@ -255,7 +255,7 @@
         ]
       },
       "delete": {
-        "operationId": "ChatV2Controller_deleteConversation",
+        "operationId": "ChatController_deleteConversation",
         "parameters": [
           {
             "name": "id",

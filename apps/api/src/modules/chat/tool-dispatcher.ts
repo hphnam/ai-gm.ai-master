@@ -14,6 +14,7 @@ import { RetrievalService, type RetrievalHit } from '../retrieval/retrieval.serv
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { QuoteVerifierService } from './quote-verifier.service'
 import { TabularQueryService } from '../tabular/tabular.service'
+import { ChatV2Service } from '../chat-v2/chat-v2.service'
 
 export type DispatchContext = {
   orgId: string
@@ -31,6 +32,7 @@ export class ToolDispatcher {
     private readonly ingest: IngestService,
     private readonly verifier: QuoteVerifierService,
     private readonly tabular: TabularQueryService,
+    private readonly chatV2: ChatV2Service,
   ) {}
 
   async dispatch(
@@ -468,6 +470,63 @@ export class ToolDispatcher {
             }),
           )
           return result
+        }
+        case 'deep_research': {
+          if (!ctx) {
+            return fail('error', 'deep_research requires an authenticated context')
+          }
+          const i = parsed.data as { venueId: string; question: string }
+          // Cross-tenant guard mirrors find_knowledge: confirm venue belongs to ctx.orgId
+          // before invoking the chat-v2 pipeline (it does its own check too).
+          const venue = await prisma.venue.findFirst({
+            where: { id: i.venueId, organizationId: ctx.orgId },
+            select: { id: true },
+          })
+          if (!venue) return fail('error', 'venue not found in your organisation')
+          try {
+            // Use chat-v2's full multi-agent pipeline as a sub-call. We
+            // intentionally don't pass conversationId — the deep_research turn is
+            // ephemeral; its output becomes a tool result the parent agent
+            // composes into its final reply. Persistence + cost tracking happen
+            // inside ChatV2Service against an isolated conversation row.
+            const result = await this.chatV2.sendMessage(
+              { venueId: i.venueId, userMessage: i.question },
+              {
+                orgId: ctx.orgId,
+                userId: ctx.userId,
+                userRole: ctx.userRole,
+                userIdentity: { name: null, email: '' },
+              },
+            )
+            this.logger.log(
+              JSON.stringify({
+                event: 'tool_dispatch.deep_research.complete',
+                orgId: ctx.orgId,
+                venueId: i.venueId,
+                questionLength: i.question.length,
+                contentLength: result.assistantMessage.content.length,
+                retrievedItemCount: result.retrievedItemIds.length,
+              }),
+            )
+            return {
+              ok: true,
+              data: {
+                synthesis: result.assistantMessage.content,
+                retrievedItemIds: result.retrievedItemIds,
+              },
+            }
+          } catch (err) {
+            const message = (err as Error).message ?? 'deep_research pipeline error'
+            this.logger.warn(
+              JSON.stringify({
+                event: 'tool_dispatch.deep_research.failed',
+                orgId: ctx.orgId,
+                venueId: i.venueId,
+                message,
+              }),
+            )
+            return fail('error', `deep_research failed: ${message}`)
+          }
         }
       }
     } catch (err) {

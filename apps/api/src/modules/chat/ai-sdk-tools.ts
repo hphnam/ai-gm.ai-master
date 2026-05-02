@@ -13,9 +13,16 @@ export function buildAiSdkTools(
   // record_kb_gap precondition gate. The system prompt mandates that the model
   // call find_knowledge before recording a gap; this enforces it at runtime so
   // a regressed prompt or pattern-matched few-shot can't silently skip search.
-  // Mirrors the contract documented in record_kb_gap's tool description.
+  //
+  // Plan 06-04 hot-fix 2026-05-02 — the second gate (rejecting record_kb_gap
+  // when the most recent find_knowledge returned ANY hits) was too strict.
+  // BM25 surfaces hits for almost any query; many were entirely irrelevant
+  // (asking "how do I handle a flat pint" surfaced the opening checklist).
+  // Blocking record_kb_gap on those false-positive hits trapped the model
+  // with no path to the lenient no-data flow → it produced wishy-washy meta
+  // answers. We now only require that find_knowledge has been called at
+  // least once this turn; the model uses its own judgement on relevance.
   let findKnowledgeCallCount = 0
-  let lastFindKnowledgeWasNoData = false
 
   const entries = TOOL_DEFINITIONS.map((def) => {
     const schema = TOOL_INPUT_SCHEMAS[def.name]
@@ -29,21 +36,13 @@ export function buildAiSdkTools(
             if (findKnowledgeCallCount === 0) {
               return fail(
                 'error',
-                'record_kb_gap rejected: find_knowledge has not been called this turn. Call find_knowledge first; only record a gap if it returns ok:false reason:no-data.',
-              )
-            }
-            if (!lastFindKnowledgeWasNoData) {
-              return fail(
-                'error',
-                'record_kb_gap rejected: the most recent find_knowledge call returned hits. Answer from those hits instead of recording a gap.',
+                'record_kb_gap rejected: find_knowledge has not been called this turn. Call find_knowledge first; only record a gap if no relevant results came back.',
               )
             }
           }
           const result = await dispatcher.dispatch(def.name, input, ctx)
           if (def.name === 'find_knowledge') {
             findKnowledgeCallCount++
-            lastFindKnowledgeWasNoData =
-              !result.ok && result.reason === 'no-data'
           }
           return result
         },

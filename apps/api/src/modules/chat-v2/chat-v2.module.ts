@@ -10,10 +10,10 @@ import { MockOpsModule } from '../mock-ops/mock-ops.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
 import { AnalyserService } from './analyser.service'
-import { ChatV2Controller } from './chat-v2.controller'
 import { ChatV2Service } from './chat-v2.service'
 import { ConversationService } from './conversation.service'
 import { CriticService } from './critic.service'
+import { FastLookupService } from './fast-lookup.service'
 import { DocsResearcher } from './researchers/docs.researcher'
 import { OpsResearcher } from './researchers/ops.researcher'
 import { PeopleResearcher } from './researchers/people.researcher'
@@ -24,7 +24,11 @@ import { WriterService } from './writer.service'
 
 @Module({
   imports: [RetrievalModule, IngestModule, MockOpsModule, TabularModule],
-  controllers: [ChatV2Controller],
+  // Plan 06-04 hot-fix 2026-05-02 — ChatV2Controller's @Controller decorator
+  // is left in the file but the controller is no longer registered. /chat/*
+  // routes live on chat-v1's ChatController again; chat-v2 is now invoked
+  // only via the `deep_research` tool from ChatService.
+  controllers: [],
   providers: [
     ChatV2Service,
     TriageService,
@@ -37,7 +41,8 @@ import { WriterService } from './writer.service'
     AnalyserService,
     CriticService,
     ConversationService,
+    FastLookupService,
   ],
-  exports: [ChatV2Service],
+  exports: [ChatV2Service, ConversationService],
 })
 export class ChatV2Module {}

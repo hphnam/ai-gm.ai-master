@@ -39,6 +39,8 @@ export class VenueResearcher implements Researcher {
     const timer = setTimeout(() => controller.abort(), RESEARCHER_TIMEOUT_MS)
 
     const sanitizedBrief = sanitizeForResearcher(brief)
+    const sanitizedUserMessage = sanitizeForResearcher(ctx.userMessage)
+    const userContent = `User question: "${sanitizedUserMessage}"\n\nResearch focus: ${sanitizedBrief}`
     let evidenceSummary = ''
 
     const tools: ToolSet = {
@@ -67,7 +69,7 @@ export class VenueResearcher implements Researcher {
             content: VENUE_RESEARCHER_PROMPT,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
-          { role: 'user', content: sanitizedBrief },
+          { role: 'user', content: userContent },
         ],
         tools,
         toolChoice: 'auto',

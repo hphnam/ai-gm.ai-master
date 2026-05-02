@@ -47,6 +47,8 @@ import type { SendMessageInput, SendMessageResult } from '../../types/chat-messa
 import { AnalyserService } from './analyser.service'
 import { CostTracker } from './cost-tracker.service'
 import { CriticService } from './critic.service'
+import { FastLookupService } from './fast-lookup.service'
+import { identifyFastPath } from './fast-lookup-recipes'
 import { sanitizeForTriage } from './input-sanitizer'
 import { chatV2Logger, hashId, sanitizeError } from './log-helpers'
 import { sanitizeForResearcher } from './researcher-sanitizer'
@@ -89,6 +91,7 @@ export class ChatV2Service {
     private readonly people: PeopleResearcher,
     private readonly tabular: TabularResearcher,
     private readonly venue: VenueResearcher,
+    private readonly fastLookup: FastLookupService,
   ) {}
 
   // audit-M2 — exhaustive switch returning the discriminated-union interface,
@@ -184,6 +187,79 @@ export class ChatV2Service {
     let briefHashes: string[] = []
 
     try {
+      // ───── FAST-PATH (Plan 06-04 hot-fix 2026-05-02) ─────
+      // For high-confidence single-tool lookups (contact, stock, supplier
+      // cutoff, checklist) we skip Triage + Researcher LLM calls entirely
+      // and execute the structured query directly. On hit → straight to
+      // Writer. On miss → fall through to the full Triage path below so
+      // ambiguous / multi-source queries still get the multi-agent treatment.
+      const fastRecipe = identifyFastPath(input.userMessage)
+      if (fastRecipe) {
+        emitPhase('research', 'lookup')
+        const fastResult = await this.fastLookup.execute(fastRecipe, {
+          orgId: ctx.orgId,
+          venueId: venue.id,
+        })
+        if (fastResult) {
+          emitPhase('draft', 'lookup')
+          const writerResult = await this.writer.compose({
+            mode: 'lookup',
+            userMessage: input.userMessage,
+            findings: [fastResult.finding],
+          })
+          tracker.recordWriter(writerResult.usage)
+          const writerText = writerResult.text
+          const cost = tracker.total()
+          const retrievedItemIds = Array.from(
+            new Set(fastResult.finding.citations.map((c) => c.knowledgeItemId)),
+          )
+          const fastPathEntry = {
+            round: -2,
+            toolUseId: 'chat-v2-fast-lookup',
+            tool: fastResult.toolName,
+            input: { recipe: fastRecipe.tool },
+            result: { hitCount: fastResult.hitCount },
+          }
+          const assistant = await prisma.chatMessage.create({
+            data: {
+              conversationId,
+              role: 'assistant',
+              content: writerText,
+              retrievedItemIds,
+              costUsd: cost.totalUsd,
+              toolCallLog: [fastPathEntry] as unknown as object,
+            },
+            select: { id: true, content: true, followUps: true },
+          })
+          emitPhase('complete', 'lookup')
+          chatV2Logger.info('chat_v2.turn_complete', {
+            orgId: orgIdHash,
+            conversationIdHash,
+            mode: 'lookup',
+            totalUsd: cost.totalUsd,
+            breakdown: cost.breakdown,
+            latencyMs: Date.now() - t0,
+            fastPath: true,
+            fastPathTool: fastResult.toolName,
+          })
+          return {
+            conversationId,
+            assistantMessage: {
+              id: assistant.id,
+              content: assistant.content,
+              followUps: assistant.followUps,
+            },
+            toolCallLog: [],
+            retrievedItemIds,
+          }
+        }
+        chatV2Logger.info('chat_v2.fast_lookup_fallthrough', {
+          orgId: orgIdHash,
+          conversationIdHash,
+          recipe: fastRecipe.tool,
+        })
+      }
+
       // ───── Triage ─────
       emitPhase('triage', null)
       const triageResult = await this.triage.classify(sanitized)
@@ -265,6 +341,7 @@ export class ChatV2Service {
               orgId: ctx.orgId,
               venueId: venue.id,
               conversationId,
+              userMessage: input.userMessage,
             })
             .then((result) => ({ status: 'fulfilled' as const, name, result }))
             .catch((err: unknown) => ({ status: 'rejected' as const, name, err }))
@@ -351,6 +428,7 @@ export class ChatV2Service {
               orgId: ctx.orgId,
               venueId: venue.id,
               conversationId,
+              userMessage: input.userMessage,
             })
             tracker.recordResearcher(docs2.usage, docs2.voyageCalls)
             findings.push(docs2.finding)
@@ -633,6 +711,110 @@ export class ChatV2Service {
       })
     }
 
+    // ───── FAST-PATH (Plan 06-04 hot-fix 2026-05-02) ─────
+    const fastRecipe = identifyFastPath(input.userMessage)
+    if (fastRecipe) {
+      emitPhase('research', 'lookup')
+      const fastResult = await this.fastLookup.execute(fastRecipe, {
+        orgId: ctx.orgId,
+        venueId: venue.id,
+      })
+      if (fastResult) {
+        emitPhase('draft', 'lookup')
+        const writerInput = {
+          mode: 'lookup' as const,
+          userMessage: input.userMessage,
+          findings: [fastResult.finding],
+        }
+        const result = this.writer.streamCompose(writerInput, abortSignal)
+        const fastPathEntry = {
+          round: -2,
+          toolUseId: 'chat-v2-fast-lookup',
+          tool: fastResult.toolName,
+          input: { recipe: fastRecipe.tool },
+          result: { hitCount: fastResult.hitCount },
+        }
+        const retrievedItemIds = Array.from(
+          new Set(fastResult.finding.citations.map((c) => c.knowledgeItemId)),
+        )
+        void (async (): Promise<void> => {
+          try {
+            const writerText = await result.text
+            const writerUsage = await result.usage
+            tracker.recordWriter({
+              inputTokens: numberOr0((writerUsage as Record<string, unknown>).inputTokens),
+              outputTokens: numberOr0((writerUsage as Record<string, unknown>).outputTokens),
+              cacheReadTokens: numberOr0(
+                (writerUsage as Record<string, unknown>).cacheReadInputTokens ??
+                  (writerUsage as Record<string, unknown>).cacheReadTokens,
+              ),
+              cacheWriteTokens: numberOr0(
+                (writerUsage as Record<string, unknown>).cacheCreationInputTokens ??
+                  (writerUsage as Record<string, unknown>).cacheWriteTokens,
+              ),
+            })
+            const cost = tracker.total()
+            await prisma.chatMessage.create({
+              data: {
+                id: assistantMessageId,
+                conversationId,
+                role: 'assistant',
+                content: writerText.trim(),
+                retrievedItemIds,
+                costUsd: cost.totalUsd,
+                toolCallLog: [fastPathEntry] as unknown as object,
+              },
+            })
+            emitPhase('complete', 'lookup')
+            chatV2Logger.info('chat_v2.turn_complete', {
+              orgId: orgIdHash,
+              conversationIdHash,
+              mode: 'lookup',
+              totalUsd: cost.totalUsd,
+              breakdown: cost.breakdown,
+              latencyMs: Date.now() - t0,
+              streaming: true,
+              fastPath: true,
+              fastPathTool: fastResult.toolName,
+            })
+          } catch (err: unknown) {
+            const cost = tracker.total()
+            const failureContent = sanitizeError(err)
+            try {
+              await prisma.chatMessage.create({
+                data: {
+                  id: assistantMessageId,
+                  conversationId,
+                  role: 'turn-failed',
+                  content: failureContent,
+                  costUsd: cost.totalUsd,
+                },
+              })
+            } catch {
+              /* swallow */
+            }
+            chatV2Logger.error('chat_v2.stream_turn_failed', {
+              orgId: orgIdHash,
+              conversationIdHash,
+              mode: 'lookup',
+              totalUsd: cost.totalUsd,
+              breakdown: cost.breakdown,
+              failureContent,
+              latencyMs: Date.now() - t0,
+              fastPath: true,
+            })
+          }
+        })()
+        return { conversationId, assistantMessageId, result }
+      }
+      chatV2Logger.info('chat_v2.fast_lookup_fallthrough', {
+        orgId: orgIdHash,
+        conversationIdHash,
+        recipe: fastRecipe.tool,
+        streaming: true,
+      })
+    }
+
     // ───── Triage ─────
     emitPhase('triage', null)
     const triageResult = await this.triage.classify(sanitized)
@@ -682,6 +864,7 @@ export class ChatV2Service {
           orgId: ctx.orgId,
           venueId: venue.id,
           conversationId,
+          userMessage: input.userMessage,
         })
         .then((result) => ({ status: 'fulfilled' as const, name, result }))
         .catch((err: unknown) => ({ status: 'rejected' as const, name, err }))

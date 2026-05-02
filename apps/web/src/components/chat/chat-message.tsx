@@ -53,6 +53,16 @@ function toolLabel(name: string): string {
       return 'Querying tabular data'
     case 'record_kb_gap':
       return 'Recording knowledge gap'
+    case 'verify_quote':
+      return 'Verifying source'
+    case 'log_incident':
+      return 'Logging incident'
+    case 'update_stock':
+      return 'Updating stock'
+    case 'add_supplier_note':
+      return 'Updating supplier notes'
+    case 'deep_research':
+      return 'Running deep research'
     default:
       return `Running ${name.replace(/_/g, ' ')}`
   }
@@ -306,12 +316,26 @@ function AssistantBody({
   isStreaming: boolean
 }) {
   const lastIdx = parts.length - 1
-  // Hide narration text between tool calls so the assistant doesn't look line-
-  // by-line. Only render the LAST text part (the real answer); everything
-  // before it gets folded into a single Thought-process block (reasoning +
-  // tool chips together).
+  // Plan 06-04 hot-fix 2026-05-02 — answer = the last text part BEFORE the
+  // terminal tool call (suggest_followups). Anything after suggest_followups
+  // is post-terminal junk Sonnet sometimes emits; ignore it. Any earlier text
+  // is interim narration that the model thought-streamed between tool calls;
+  // fold into the thought-process block so the answer area is stable.
+  //
+  // Mid-stream (no suggest_followups yet): treat the latest text part as the
+  // candidate answer; older text becomes interim. When the followups tool
+  // fires, the candidate "freezes" — later post-terminal text won't replace it.
+  const terminalToolIdx = (() => {
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i]
+      if (!p || !isToolUIPart(p)) continue
+      if (getToolName(p) === 'suggest_followups') return i
+    }
+    return -1
+  })()
+  const consideredEnd = terminalToolIdx >= 0 ? terminalToolIdx : parts.length
   const lastTextIdx = (() => {
-    for (let i = parts.length - 1; i >= 0; i--) {
+    for (let i = consideredEnd - 1; i >= 0; i--) {
       if (parts[i]?.type === 'text') return i
     }
     return -1
@@ -331,12 +355,27 @@ function AssistantBody({
   let reasoningStreaming = false
   const reasoningTextParts: string[] = []
   parts.forEach((p, i) => {
-    if (p.type !== 'reasoning') return
-    const rp = p as ReasoningPart
-    const isLast = i === lastIdx
-    if (isStreaming && isLast && rp.state === 'streaming') reasoningStreaming = true
-    const t = (rp.text ?? '').trim()
-    if (t.length > 0) reasoningTextParts.push(t)
+    // Reasoning parts always go to the thought block.
+    if (p.type === 'reasoning') {
+      const rp = p as ReasoningPart
+      const isLast = i === lastIdx
+      if (isStreaming && isLast && rp.state === 'streaming') reasoningStreaming = true
+      const t = (rp.text ?? '').trim()
+      if (t.length > 0) reasoningTextParts.push(t)
+      return
+    }
+    // Text within the considered range (before suggest_followups, or all parts
+    // if it hasn't fired yet) but NOT the chosen answer = interim narration.
+    // Fold into the thought block so the answer area is stable.
+    if (
+      p.type === 'text' &&
+      i < consideredEnd &&
+      i !== lastTextIdx
+    ) {
+      const t = stripFollowUpTail(p.text).trim()
+      if (t.length > 0) reasoningTextParts.push(t)
+    }
+    // Text AFTER suggest_followups is post-terminal junk; silently discard.
   })
   const mergedReasoningText = reasoningTextParts.join('\n\n')
   const finalTextPart = lastTextIdx >= 0 ? parts[lastTextIdx] : null

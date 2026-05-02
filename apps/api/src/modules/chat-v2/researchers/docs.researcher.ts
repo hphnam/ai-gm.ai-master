@@ -34,6 +34,12 @@ export type ResearchContext = {
   orgId: string
   venueId: string | null
   conversationId: string
+  // Plan 06-04 hot-fix 2026-05-02 — original user message threaded to each
+  // researcher. Triage briefs are intentionally generic ("Look up the engineer
+  // / contact details"); without the original phrasing the researcher can't
+  // disambiguate (e.g. "cellar engineer" vs "ice machine engineer"). audit-M4
+  // boundary: sanitizeForResearcher applied at researcher entry, not here.
+  userMessage: string
 }
 
 export type DocsResearcherResult = {
@@ -56,6 +62,8 @@ export class DocsResearcher implements Researcher {
     const timer = setTimeout(() => controller.abort(), RESEARCHER_TIMEOUT_MS)
 
     const sanitizedBrief = sanitizeForResearcher(brief)
+    const sanitizedUserMessage = sanitizeForResearcher(ctx.userMessage)
+    const userContent = `User question: "${sanitizedUserMessage}"\n\nResearch focus: ${sanitizedBrief}`
     let voyageCalls = 0
     const citations: { knowledgeItemId: string; sectionId?: string }[] = []
     let evidenceSummary = ''
@@ -111,7 +119,7 @@ export class DocsResearcher implements Researcher {
             content: DOCS_RESEARCHER_PROMPT,
             providerOptions: { anthropic: { cacheControl: SYSTEM_CACHE_CONTROL } },
           },
-          { role: 'user', content: sanitizedBrief },
+          { role: 'user', content: userContent },
         ],
         tools,
         toolChoice: 'auto',

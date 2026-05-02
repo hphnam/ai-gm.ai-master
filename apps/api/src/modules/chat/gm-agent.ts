@@ -261,9 +261,17 @@ export function buildGmAgent(params: {
         disableParallelToolUse: true,
       },
     },
-    // 20 steps OR a successful save (destructive terminal). Either satisfies
-    // the stop condition and ends the loop.
-    stopWhen: [stepCountIs(MAX_STEPS), hasToolCall('save_knowledge_doc')],
+    // 20 steps OR a successful save (destructive terminal) OR suggest_followups
+    // (turn-terminal — the model has emitted its answer + follow-up pills, no
+    // more output is needed). Plan 06-04 hot-fix 2026-05-02 — adding
+    // suggest_followups to stopWhen prevents the "post-answer restatement"
+    // bug where Sonnet would call suggest_followups, then continue the loop
+    // and emit a second redundant text part summarising what it just said.
+    stopWhen: [
+      stepCountIs(MAX_STEPS),
+      hasToolCall('save_knowledge_doc'),
+      hasToolCall('suggest_followups'),
+    ],
     onFinish: params.onFinish,
     onStepFinish: params.onStepFinish,
   })
