@@ -135,45 +135,9 @@
         ]
       }
     },
-    "/chat/messages": {
-      "post": {
-        "operationId": "ChatController_sendMessage",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendChatMessageRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SendChatMessageResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "chat"
-        ]
-      }
-    },
     "/chat/conversations": {
       "get": {
-        "operationId": "ChatController_listConversations",
+        "operationId": "ChatV2Controller_listConversations",
         "parameters": [
           {
             "name": "venueId",
@@ -212,7 +176,7 @@
     },
     "/chat/conversations/{id}": {
       "get": {
-        "operationId": "ChatController_getConversation",
+        "operationId": "ChatV2Controller_getConversation",
         "parameters": [
           {
             "name": "id",
@@ -255,7 +219,7 @@
         ]
       },
       "delete": {
-        "operationId": "ChatController_deleteConversation",
+        "operationId": "ChatV2Controller_deleteConversation",
         "parameters": [
           {
             "name": "id",
@@ -279,6 +243,42 @@
         "responses": {
           "204": {
             "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "chat"
+        ]
+      }
+    },
+    "/chat/messages": {
+      "post": {
+        "operationId": "ChatController_sendMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendChatMessageRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendChatMessageResponseDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1757,28 +1757,6 @@
           "userMessage"
         ]
       },
-      "SendChatMessageRequestDto": {
-        "type": "object",
-        "properties": {
-          "venueId": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-          },
-          "userMessage": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 8000
-          },
-          "conversationId": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-          }
-        },
-        "required": [
-          "venueId",
-          "userMessage"
-        ]
-      },
       "ListConversationItemDto": {
         "type": "object",
         "properties": {
@@ -1914,6 +1892,28 @@
           "venueId",
           "channel",
           "messages"
+        ]
+      },
+      "SendChatMessageRequestDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "userMessage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          },
+          "conversationId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        },
+        "required": [
+          "venueId",
+          "userMessage"
         ]
       },
       "SuggestionsOnOpenRequestDto": {

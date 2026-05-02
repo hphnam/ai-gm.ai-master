@@ -123,18 +123,6 @@ export interface StreamChatMessageRequestDto {
   conversationId?: string;
 }
 
-export interface SendChatMessageRequestDto {
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  venueId: string;
-  /**
-     * @minLength 1
-     * @maxLength 8000
-     */
-  userMessage: string;
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
-  conversationId?: string;
-}
-
 export interface ListConversationItemDto {
   id: string;
   venueId: string;
@@ -169,6 +157,18 @@ export interface ConversationResponseDto {
   venueId: string;
   channel: string;
   messages: ConversationResponseDtoMessagesItem[];
+}
+
+export interface SendChatMessageRequestDto {
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  venueId: string;
+  /**
+     * @minLength 1
+     * @maxLength 8000
+     */
+  userMessage: string;
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  conversationId?: string;
 }
 
 export interface SuggestionsOnOpenRequestDto {
@@ -940,21 +940,21 @@ export type ChatV2ControllerSendMessageWithImageBody = {
   conversationId?: string;
 };
 
-export type ChatControllerListConversationsParams = {
+export type ChatV2ControllerListConversationsParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
 venueId?: string;
 };
 
-export type ChatControllerGetConversationParams = {
+export type ChatV2ControllerGetConversationParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
 venueId: string;
 };
 
-export type ChatControllerDeleteConversationParams = {
+export type ChatV2ControllerDeleteConversationParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
@@ -1358,6 +1358,327 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getChatV2ControllerStreamMessageMutationOptions(options), queryClient);
     }
 
+export type chatV2ControllerListConversationsResponse200 = {
+  data: ListConversationItemDto[]
+  status: 200
+}
+
+export type chatV2ControllerListConversationsResponseSuccess = (chatV2ControllerListConversationsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type chatV2ControllerListConversationsResponse = (chatV2ControllerListConversationsResponseSuccess)
+
+export const getChatV2ControllerListConversationsUrl = (params?: ChatV2ControllerListConversationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/chat/conversations?${stringifiedParams}` : `/chat/conversations`
+}
+
+export const chatV2ControllerListConversations = async (params?: ChatV2ControllerListConversationsParams, options?: RequestInit): Promise<chatV2ControllerListConversationsResponse> => {
+
+  return orvalMutator<chatV2ControllerListConversationsResponse>(getChatV2ControllerListConversationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getChatV2ControllerListConversationsQueryKey = (params?: ChatV2ControllerListConversationsParams,) => {
+    return [
+    `/chat/conversations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getChatV2ControllerListConversationsQueryOptions = <TData = Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError = unknown>(params?: ChatV2ControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChatV2ControllerListConversationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatV2ControllerListConversations>>> = ({ signal }) => chatV2ControllerListConversations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChatV2ControllerListConversationsQueryResult = NonNullable<Awaited<ReturnType<typeof chatV2ControllerListConversations>>>
+export type ChatV2ControllerListConversationsQueryError = unknown
+
+
+export function useChatV2ControllerListConversations<TData = Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError = unknown>(
+ params: undefined |  ChatV2ControllerListConversationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatV2ControllerListConversations>>,
+          TError,
+          Awaited<ReturnType<typeof chatV2ControllerListConversations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatV2ControllerListConversations<TData = Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError = unknown>(
+ params?: ChatV2ControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatV2ControllerListConversations>>,
+          TError,
+          Awaited<ReturnType<typeof chatV2ControllerListConversations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatV2ControllerListConversations<TData = Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError = unknown>(
+ params?: ChatV2ControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useChatV2ControllerListConversations<TData = Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError = unknown>(
+ params?: ChatV2ControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChatV2ControllerListConversationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type chatV2ControllerGetConversationResponse200 = {
+  data: ConversationResponseDto
+  status: 200
+}
+
+export type chatV2ControllerGetConversationResponseSuccess = (chatV2ControllerGetConversationResponse200) & {
+  headers: Headers;
+};
+;
+
+export type chatV2ControllerGetConversationResponse = (chatV2ControllerGetConversationResponseSuccess)
+
+export const getChatV2ControllerGetConversationUrl = (id: string,
+    params: ChatV2ControllerGetConversationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/chat/conversations/${id}?${stringifiedParams}` : `/chat/conversations/${id}`
+}
+
+export const chatV2ControllerGetConversation = async (id: string,
+    params: ChatV2ControllerGetConversationParams, options?: RequestInit): Promise<chatV2ControllerGetConversationResponse> => {
+
+  return orvalMutator<chatV2ControllerGetConversationResponse>(getChatV2ControllerGetConversationUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getChatV2ControllerGetConversationQueryKey = (id: string,
+    params?: ChatV2ControllerGetConversationParams,) => {
+    return [
+    `/chat/conversations/${id}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getChatV2ControllerGetConversationQueryOptions = <TData = Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError = unknown>(id: string,
+    params: ChatV2ControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChatV2ControllerGetConversationQueryKey(id,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>> = ({ signal }) => chatV2ControllerGetConversation(id,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChatV2ControllerGetConversationQueryResult = NonNullable<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>>
+export type ChatV2ControllerGetConversationQueryError = unknown
+
+
+export function useChatV2ControllerGetConversation<TData = Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError = unknown>(
+ id: string,
+    params: ChatV2ControllerGetConversationParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatV2ControllerGetConversation>>,
+          TError,
+          Awaited<ReturnType<typeof chatV2ControllerGetConversation>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatV2ControllerGetConversation<TData = Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError = unknown>(
+ id: string,
+    params: ChatV2ControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatV2ControllerGetConversation>>,
+          TError,
+          Awaited<ReturnType<typeof chatV2ControllerGetConversation>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatV2ControllerGetConversation<TData = Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError = unknown>(
+ id: string,
+    params: ChatV2ControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useChatV2ControllerGetConversation<TData = Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError = unknown>(
+ id: string,
+    params: ChatV2ControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatV2ControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChatV2ControllerGetConversationQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type chatV2ControllerDeleteConversationResponse204 = {
+  data: void
+  status: 204
+}
+
+export type chatV2ControllerDeleteConversationResponseSuccess = (chatV2ControllerDeleteConversationResponse204) & {
+  headers: Headers;
+};
+;
+
+export type chatV2ControllerDeleteConversationResponse = (chatV2ControllerDeleteConversationResponseSuccess)
+
+export const getChatV2ControllerDeleteConversationUrl = (id: string,
+    params: ChatV2ControllerDeleteConversationParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/chat/conversations/${id}?${stringifiedParams}` : `/chat/conversations/${id}`
+}
+
+export const chatV2ControllerDeleteConversation = async (id: string,
+    params: ChatV2ControllerDeleteConversationParams, options?: RequestInit): Promise<chatV2ControllerDeleteConversationResponse> => {
+
+  return orvalMutator<chatV2ControllerDeleteConversationResponse>(getChatV2ControllerDeleteConversationUrl(id,params),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getChatV2ControllerDeleteConversationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>, TError,{id: string;params: ChatV2ControllerDeleteConversationParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>, TError,{id: string;params: ChatV2ControllerDeleteConversationParams}, TContext> => {
+
+const mutationKey = ['chatV2ControllerDeleteConversation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>, {id: string;params: ChatV2ControllerDeleteConversationParams}> = (props) => {
+          const {id,params} = props ?? {};
+
+          return  chatV2ControllerDeleteConversation(id,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChatV2ControllerDeleteConversationMutationResult = NonNullable<Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>>
+
+    export type ChatV2ControllerDeleteConversationMutationError = unknown
+
+    export const useChatV2ControllerDeleteConversation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>, TError,{id: string;params: ChatV2ControllerDeleteConversationParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof chatV2ControllerDeleteConversation>>,
+        TError,
+        {id: string;params: ChatV2ControllerDeleteConversationParams},
+        TContext
+      > => {
+      return useMutation(getChatV2ControllerDeleteConversationMutationOptions(options), queryClient);
+    }
+
 export type chatControllerSendMessageResponse200 = {
   data: SendChatMessageResponseDto
   status: 200
@@ -1433,327 +1754,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatControllerSendMessageMutationOptions(options), queryClient);
-    }
-
-export type chatControllerListConversationsResponse200 = {
-  data: ListConversationItemDto[]
-  status: 200
-}
-
-export type chatControllerListConversationsResponseSuccess = (chatControllerListConversationsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerListConversationsResponse = (chatControllerListConversationsResponseSuccess)
-
-export const getChatControllerListConversationsUrl = (params?: ChatControllerListConversationsParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/chat/conversations?${stringifiedParams}` : `/chat/conversations`
-}
-
-export const chatControllerListConversations = async (params?: ChatControllerListConversationsParams, options?: RequestInit): Promise<chatControllerListConversationsResponse> => {
-
-  return orvalMutator<chatControllerListConversationsResponse>(getChatControllerListConversationsUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getChatControllerListConversationsQueryKey = (params?: ChatControllerListConversationsParams,) => {
-    return [
-    `/chat/conversations`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getChatControllerListConversationsQueryOptions = <TData = Awaited<ReturnType<typeof chatControllerListConversations>>, TError = unknown>(params?: ChatControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getChatControllerListConversationsQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerListConversations>>> = ({ signal }) => chatControllerListConversations(params, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ChatControllerListConversationsQueryResult = NonNullable<Awaited<ReturnType<typeof chatControllerListConversations>>>
-export type ChatControllerListConversationsQueryError = unknown
-
-
-export function useChatControllerListConversations<TData = Awaited<ReturnType<typeof chatControllerListConversations>>, TError = unknown>(
- params: undefined |  ChatControllerListConversationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof chatControllerListConversations>>,
-          TError,
-          Awaited<ReturnType<typeof chatControllerListConversations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChatControllerListConversations<TData = Awaited<ReturnType<typeof chatControllerListConversations>>, TError = unknown>(
- params?: ChatControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof chatControllerListConversations>>,
-          TError,
-          Awaited<ReturnType<typeof chatControllerListConversations>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChatControllerListConversations<TData = Awaited<ReturnType<typeof chatControllerListConversations>>, TError = unknown>(
- params?: ChatControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useChatControllerListConversations<TData = Awaited<ReturnType<typeof chatControllerListConversations>>, TError = unknown>(
- params?: ChatControllerListConversationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerListConversations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getChatControllerListConversationsQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type chatControllerGetConversationResponse200 = {
-  data: ConversationResponseDto
-  status: 200
-}
-
-export type chatControllerGetConversationResponseSuccess = (chatControllerGetConversationResponse200) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerGetConversationResponse = (chatControllerGetConversationResponseSuccess)
-
-export const getChatControllerGetConversationUrl = (id: string,
-    params: ChatControllerGetConversationParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/chat/conversations/${id}?${stringifiedParams}` : `/chat/conversations/${id}`
-}
-
-export const chatControllerGetConversation = async (id: string,
-    params: ChatControllerGetConversationParams, options?: RequestInit): Promise<chatControllerGetConversationResponse> => {
-
-  return orvalMutator<chatControllerGetConversationResponse>(getChatControllerGetConversationUrl(id,params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getChatControllerGetConversationQueryKey = (id: string,
-    params?: ChatControllerGetConversationParams,) => {
-    return [
-    `/chat/conversations/${id}`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getChatControllerGetConversationQueryOptions = <TData = Awaited<ReturnType<typeof chatControllerGetConversation>>, TError = unknown>(id: string,
-    params: ChatControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getChatControllerGetConversationQueryKey(id,params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetConversation>>> = ({ signal }) => chatControllerGetConversation(id,params, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ChatControllerGetConversationQueryResult = NonNullable<Awaited<ReturnType<typeof chatControllerGetConversation>>>
-export type ChatControllerGetConversationQueryError = unknown
-
-
-export function useChatControllerGetConversation<TData = Awaited<ReturnType<typeof chatControllerGetConversation>>, TError = unknown>(
- id: string,
-    params: ChatControllerGetConversationParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof chatControllerGetConversation>>,
-          TError,
-          Awaited<ReturnType<typeof chatControllerGetConversation>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChatControllerGetConversation<TData = Awaited<ReturnType<typeof chatControllerGetConversation>>, TError = unknown>(
- id: string,
-    params: ChatControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof chatControllerGetConversation>>,
-          TError,
-          Awaited<ReturnType<typeof chatControllerGetConversation>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useChatControllerGetConversation<TData = Awaited<ReturnType<typeof chatControllerGetConversation>>, TError = unknown>(
- id: string,
-    params: ChatControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useChatControllerGetConversation<TData = Awaited<ReturnType<typeof chatControllerGetConversation>>, TError = unknown>(
- id: string,
-    params: ChatControllerGetConversationParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetConversation>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getChatControllerGetConversationQueryOptions(id,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type chatControllerDeleteConversationResponse204 = {
-  data: void
-  status: 204
-}
-
-export type chatControllerDeleteConversationResponseSuccess = (chatControllerDeleteConversationResponse204) & {
-  headers: Headers;
-};
-;
-
-export type chatControllerDeleteConversationResponse = (chatControllerDeleteConversationResponseSuccess)
-
-export const getChatControllerDeleteConversationUrl = (id: string,
-    params: ChatControllerDeleteConversationParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/chat/conversations/${id}?${stringifiedParams}` : `/chat/conversations/${id}`
-}
-
-export const chatControllerDeleteConversation = async (id: string,
-    params: ChatControllerDeleteConversationParams, options?: RequestInit): Promise<chatControllerDeleteConversationResponse> => {
-
-  return orvalMutator<chatControllerDeleteConversationResponse>(getChatControllerDeleteConversationUrl(id,params),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-export const getChatControllerDeleteConversationMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerDeleteConversation>>, TError,{id: string;params: ChatControllerDeleteConversationParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof chatControllerDeleteConversation>>, TError,{id: string;params: ChatControllerDeleteConversationParams}, TContext> => {
-
-const mutationKey = ['chatControllerDeleteConversation'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerDeleteConversation>>, {id: string;params: ChatControllerDeleteConversationParams}> = (props) => {
-          const {id,params} = props ?? {};
-
-          return  chatControllerDeleteConversation(id,params,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ChatControllerDeleteConversationMutationResult = NonNullable<Awaited<ReturnType<typeof chatControllerDeleteConversation>>>
-
-    export type ChatControllerDeleteConversationMutationError = unknown
-
-    export const useChatControllerDeleteConversation = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerDeleteConversation>>, TError,{id: string;params: ChatControllerDeleteConversationParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof chatControllerDeleteConversation>>,
-        TError,
-        {id: string;params: ChatControllerDeleteConversationParams},
-        TContext
-      > => {
-      return useMutation(getChatControllerDeleteConversationMutationOptions(options), queryClient);
     }
 
 export type suggestionsControllerOnOpenResponse200 = {

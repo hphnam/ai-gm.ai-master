@@ -58,6 +58,71 @@ export const ChatV2ControllerStreamMessageBody = zod.object({
 })
 
 
+export const chatV2ControllerListConversationsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerListConversationsQueryParams = zod.object({
+  "venueId": zod.string().regex(chatV2ControllerListConversationsQueryVenueIdRegExp).optional()
+})
+
+export const ChatV2ControllerListConversationsResponseItem = zod.object({
+  "id": zod.string(),
+  "venueId": zod.string(),
+  "venueName": zod.string(),
+  "lastMessageAt": zod.string(),
+  "preview": zod.union([zod.string(),zod.null()])
+})
+export const ChatV2ControllerListConversationsResponse = zod.array(ChatV2ControllerListConversationsResponseItem)
+
+
+export const chatV2ControllerGetConversationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerGetConversationParams = zod.object({
+  "id": zod.string().regex(chatV2ControllerGetConversationPathIdRegExp)
+})
+
+export const chatV2ControllerGetConversationQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerGetConversationQueryParams = zod.object({
+  "venueId": zod.string().regex(chatV2ControllerGetConversationQueryVenueIdRegExp)
+})
+
+export const ChatV2ControllerGetConversationResponse = zod.object({
+  "id": zod.string(),
+  "venueId": zod.string(),
+  "channel": zod.string(),
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string(),
+  "createdAt": zod.string(),
+  "retrievedItemIds": zod.array(zod.string()),
+  "followUps": zod.array(zod.string()).optional(),
+  "reasoning": zod.union([zod.string(),zod.null()]).optional(),
+  "parts": zod.unknown().optional(),
+  "toolCallLog": zod.array(zod.unknown()).optional(),
+  "feedbackKind": zod.union([zod.enum(['up', 'down', 'regenerate']),zod.null()]).optional()
+}))
+})
+
+
+export const chatV2ControllerDeleteConversationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerDeleteConversationParams = zod.object({
+  "id": zod.string().regex(chatV2ControllerDeleteConversationPathIdRegExp)
+})
+
+export const chatV2ControllerDeleteConversationQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatV2ControllerDeleteConversationQueryParams = zod.object({
+  "venueId": zod.string().regex(chatV2ControllerDeleteConversationQueryVenueIdRegExp)
+})
+
+
 export const chatControllerSendMessageBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 export const chatControllerSendMessageBodyUserMessageMax = 8000;
 
@@ -79,71 +144,6 @@ export const ChatControllerSendMessageResponse = zod.object({
 }),
   "toolCallLog": zod.array(zod.unknown()),
   "retrievedItemIds": zod.array(zod.string())
-})
-
-
-export const chatControllerListConversationsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerListConversationsQueryParams = zod.object({
-  "venueId": zod.string().regex(chatControllerListConversationsQueryVenueIdRegExp).optional()
-})
-
-export const ChatControllerListConversationsResponseItem = zod.object({
-  "id": zod.string(),
-  "venueId": zod.string(),
-  "venueName": zod.string(),
-  "lastMessageAt": zod.string(),
-  "preview": zod.union([zod.string(),zod.null()])
-})
-export const ChatControllerListConversationsResponse = zod.array(ChatControllerListConversationsResponseItem)
-
-
-export const chatControllerGetConversationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerGetConversationParams = zod.object({
-  "id": zod.string().regex(chatControllerGetConversationPathIdRegExp)
-})
-
-export const chatControllerGetConversationQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerGetConversationQueryParams = zod.object({
-  "venueId": zod.string().regex(chatControllerGetConversationQueryVenueIdRegExp)
-})
-
-export const ChatControllerGetConversationResponse = zod.object({
-  "id": zod.string(),
-  "venueId": zod.string(),
-  "channel": zod.string(),
-  "messages": zod.array(zod.object({
-  "id": zod.string(),
-  "role": zod.enum(['user', 'assistant']),
-  "content": zod.string(),
-  "createdAt": zod.string(),
-  "retrievedItemIds": zod.array(zod.string()),
-  "followUps": zod.array(zod.string()).optional(),
-  "reasoning": zod.union([zod.string(),zod.null()]).optional(),
-  "parts": zod.unknown().optional(),
-  "toolCallLog": zod.array(zod.unknown()).optional(),
-  "feedbackKind": zod.union([zod.enum(['up', 'down', 'regenerate']),zod.null()]).optional()
-}))
-})
-
-
-export const chatControllerDeleteConversationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerDeleteConversationParams = zod.object({
-  "id": zod.string().regex(chatControllerDeleteConversationPathIdRegExp)
-})
-
-export const chatControllerDeleteConversationQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
-
-
-export const ChatControllerDeleteConversationQueryParams = zod.object({
-  "venueId": zod.string().regex(chatControllerDeleteConversationQueryVenueIdRegExp)
 })
 
 

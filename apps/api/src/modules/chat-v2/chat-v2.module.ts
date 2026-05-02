@@ -12,6 +12,7 @@ import { TabularModule } from '../tabular/tabular.module'
 import { AnalyserService } from './analyser.service'
 import { ChatV2Controller } from './chat-v2.controller'
 import { ChatV2Service } from './chat-v2.service'
+import { ConversationService } from './conversation.service'
 import { CriticService } from './critic.service'
 import { DocsResearcher } from './researchers/docs.researcher'
 import { OpsResearcher } from './researchers/ops.researcher'
@@ -35,6 +36,7 @@ import { WriterService } from './writer.service'
     WriterService,
     AnalyserService,
     CriticService,
+    ConversationService,
   ],
   exports: [ChatV2Service],
 })

@@ -14,17 +14,30 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpException,
   Logger,
+  NotFoundException,
+  Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import type { Response } from 'express'
-import { StreamChatMessageRequestDto } from '../chat/dto/chat.dto'
+import { ZodValidationPipe } from 'nestjs-zod'
+import {
+  ConversationIdParamDto,
+  GetConversationQueryDto,
+  ListConversationsQueryDto,
+  StreamChatMessageRequestDto,
+  ListConversationItemDto,
+  ConversationResponseDto,
+} from '../chat/dto/chat.dto'
 import {
   ApiTags,
   ApiResponse,
@@ -43,6 +56,7 @@ import {
 } from '../auth/auth.decorators'
 import { RoleGuard } from '../auth/role.guard'
 import { ChatV2Service } from './chat-v2.service'
+import { ConversationService } from './conversation.service'
 import { SendChatMessageResponseDto } from '../chat/dto/chat.dto'
 import { validateMultimodalAttachment } from './multimodal-validator'
 
@@ -55,7 +69,10 @@ const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024 // 15MB outer multer cap
 export class ChatV2Controller {
   private readonly logger = new Logger(ChatV2Controller.name)
 
-  constructor(private readonly chatV2Service: ChatV2Service) {}
+  constructor(
+    private readonly chatV2Service: ChatV2Service,
+    private readonly conversationService: ConversationService,
+  ) {}
 
   // Plan 06-04 Task 1 — multimodal endpoint on chat-v2. Replaces chat-v1's
   // POST /chat/messages/with-image (which has been removed from chat-v1's
@@ -214,6 +231,73 @@ export class ChatV2Controller {
     } catch (err) {
       const translated = translateChatServiceError(err as Error)
       if (translated) throw translated
+      throw err
+    }
+  }
+
+  // Plan 06-04 Task 3 — conversations list/get/delete on chat-v2.
+  // chat-v1 controller's matching routes are removed in the same commit.
+
+  @Get('conversations')
+  @ApiResponse({ status: 200, type: [ListConversationItemDto] })
+  async listConversations(
+    @Query(new ZodValidationPipe(ListConversationsQueryDto))
+    q: ListConversationsQueryDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+  ): Promise<ListConversationItemDto[]> {
+    return (await this.conversationService.listRecent(
+      org.id,
+      user.id,
+      q.venueId,
+    )) as unknown as ListConversationItemDto[]
+  }
+
+  @Get('conversations/:id')
+  @ApiResponse({ status: 200, type: ConversationResponseDto })
+  async getConversation(
+    @Param(new ZodValidationPipe(ConversationIdParamDto))
+    params: ConversationIdParamDto,
+    @Query(new ZodValidationPipe(GetConversationQueryDto))
+    query: GetConversationQueryDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<ConversationResponseDto> {
+    const conv = await this.conversationService.getById(
+      params.id,
+      org.id,
+      query.venueId,
+    )
+    if (!conv) {
+      const notFound: ApiErrorResponse = { error: 'not-found' }
+      throw new NotFoundException(notFound)
+    }
+    return conv as unknown as ConversationResponseDto
+  }
+
+  @Delete('conversations/:id')
+  @HttpCode(204)
+  async deleteConversation(
+    @Param(new ZodValidationPipe(ConversationIdParamDto))
+    params: ConversationIdParamDto,
+    @Query(new ZodValidationPipe(GetConversationQueryDto))
+    query: GetConversationQueryDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+  ): Promise<void> {
+    try {
+      await this.conversationService.softDelete(
+        params.id,
+        org.id,
+        user.id,
+        query.venueId,
+      )
+    } catch (err) {
+      const message = (err as Error).message ?? ''
+      if (message.includes('not found')) {
+        throw new NotFoundException({
+          error: 'not-found',
+        } satisfies ApiErrorResponse)
+      }
       throw err
     }
   }
