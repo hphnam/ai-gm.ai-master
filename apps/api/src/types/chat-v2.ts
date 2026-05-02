@@ -22,10 +22,18 @@ export type ResearcherName = 'docs' | 'ops' | 'people' | 'tabular' | 'venue'
 // Hard wall-clock timeouts (audit-M3) and input length cap (audit-M4)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const TRIAGE_TIMEOUT_MS = 5_000
+// Plan 06-04 hot-fix 2026-05-02 — TRIAGE bumped 5s → 12s. First real-Anthropic
+// UAT hit RoleTimeoutError at exactly 5s on a cold-start streaming request.
+// Haiku 4.5 with the extended Triage prompt (mode contract + boundary cases
+// + dispatch rules from 06-02/06-03) plus generateObject's structured-output
+// overhead realistically lands 3-7s on cold start. 12s is generous without
+// being lazy. TOTAL_TURN_TIMEOUT_MS bumped 35s → 45s to stay ahead of the
+// new TRIAGE+RESEARCHER+ANALYSER+WRITER worst-case sum (12 + 15 + 15 + 20
+// = 62s sequential, ~32s with researcher fan-out parallel + Writer streaming).
+export const TRIAGE_TIMEOUT_MS = 12_000
 export const RESEARCHER_TIMEOUT_MS = 15_000
 export const WRITER_TIMEOUT_MS = 20_000
-export const TOTAL_TURN_TIMEOUT_MS = 35_000
+export const TOTAL_TURN_TIMEOUT_MS = 45_000
 export const MAX_USER_MESSAGE_LEN = 4_096
 
 // Plan 06-02 — Analyser + Critic timeouts (audit-S3 — Critic tightened from 8s
