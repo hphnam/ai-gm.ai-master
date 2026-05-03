@@ -1307,6 +1307,16 @@ export const PhoneControllerStatusResponse = zod.object({
 })
 
 
+export const InviteControllerCreateQueryParams = zod.object({
+  "force": zod.string()
+})
+
+
+export const InviteControllerRevokeParams = zod.object({
+  "id": zod.string()
+})
+
+
 export const nudgeControllerRunNudgePathVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 

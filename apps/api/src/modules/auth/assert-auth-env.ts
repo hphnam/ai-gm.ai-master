@@ -134,6 +134,15 @@ export function assertAuthEnv(): AuthEnv {
     )
   }
 
+  // Phase 03-01 audit-M (closes D-03-04-G): INFOBIP_DRIVER_OVERRIDE=console MUST
+  // NOT ship to production. OTP delivery in 03-01 materially depends on real
+  // Infobip outbound; console-mode in prod = silent OTP loss + locked-out staff.
+  if (isProd && ibOverride === 'console') {
+    errs.push(
+      'INFOBIP_DRIVER_OVERRIDE=console is not allowed in production (closes D-03-04-G — WhatsApp OTP delivery requires live Infobip)',
+    )
+  }
+
   if (ibSender) {
     if (!/^[0-9]{6,20}$/.test(ibSender)) {
       errs.push(

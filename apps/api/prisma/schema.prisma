@@ -53,6 +53,11 @@ model User {
   memberships OrganizationMember[]
   invitesSent Invitation[]         @relation("inviter")
 
+  // Phase 03-01 — WhatsApp Conversational UX
+  whatsappInvitesIssued   WhatsappInvite[]  @relation("WhatsappInviteIssuedBy")
+  whatsappInvitesTargeted WhatsappInvite[]  @relation("WhatsappInviteTargetUser")
+  whatsappSessions        WhatsappSession[]
+
   @@map("users")
 }
 
@@ -131,6 +136,10 @@ model Organization {
   incidentLogs       IncidentLog[]
   searchAnalytics    SearchAnalytics[]
 
+  // Phase 03-01 — WhatsApp Conversational UX
+  whatsappInvites  WhatsappInvite[]
+  whatsappSessions WhatsappSession[]
+
   @@index([slug])
   @@map("organizations")
 }
@@ -167,6 +176,71 @@ model Invitation {
   @@index([email])
   @@index([organizationId])
   @@map("invitations")
+}
+
+/// Phase 03-01 — WhatsApp Conversational UX
+/// Manager-issued onboarding token. 24h TTL. CSPRNG 8-char Crockford base32 code.
+/// Status: pending → redeemed | revoked | exhausted | expired (lazy on touch).
+model WhatsappInvite {
+  id             String    @id @default(uuid())
+  code           String    @unique // CSPRNG 8-char Crockford base32 (no I/L/O/U/0/1)
+  phoneNumber    String // E.164, NOT @unique (re-invite same phone allowed)
+  organizationId String
+  issuedByUserId String
+  targetUserId   String? // optional pre-binding to existing User; null = first match wins on OTP
+  role           String // staff | manager — what membership to grant on redemption
+  note           String?
+  expiresAt      DateTime
+  status         String    @default("pending") // pending | redeemed | revoked | exhausted | expired
+  createdAt      DateTime  @default(now())
+  redeemedAt     DateTime?
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  issuedBy     User                 @relation("WhatsappInviteIssuedBy", fields: [issuedByUserId], references: [id])
+  targetUser   User?                @relation("WhatsappInviteTargetUser", fields: [targetUserId], references: [id])
+  otpAttempts  WhatsappOtpAttempt[]
+
+  @@index([organizationId, status])
+  @@index([phoneNumber, status])
+  @@index([expiresAt])
+  @@index([issuedByUserId, createdAt]) // manager rate-limit lookup
+  @@map("whatsapp_invites")
+}
+
+/// OTP attempt tracker. sha256-hashed 6-digit code, 3-attempts max, 10min TTL.
+/// Status: pending → verified | exhausted | expired | failed_send | expired_replaced.
+model WhatsappOtpAttempt {
+  id                String    @id @default(uuid())
+  inviteId          String
+  hashedOtp         String // sha256(plaintextOtp)
+  attemptsRemaining Int       @default(3)
+  status            String    @default("pending")
+  expiresAt         DateTime
+  createdAt         DateTime  @default(now())
+  verifiedAt        DateTime?
+
+  invite WhatsappInvite @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+
+  @@index([inviteId, status])
+  @@index([expiresAt])
+  @@map("whatsapp_otp_attempts")
+}
+
+/// Per-phone WhatsApp session state — sticky venue, conversation tracking.
+/// Plan 03-01 only sets currentOrganizationId during onboarding welcome.
+/// Plan 03-02 will own subsequent venue switching + conversation boundary.
+model WhatsappSession {
+  phoneNumber           String   @id // E.164, primary key — one session per number
+  userId                String
+  currentOrganizationId String?
+  lastActivityAt        DateTime @default(now())
+  createdAt             DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [currentOrganizationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("whatsapp_sessions")
 }
 
 /// TEMPORARY — replaced by Xero/Square integration in a later milestone

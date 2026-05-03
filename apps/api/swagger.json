@@ -1665,6 +1665,79 @@
         ]
       }
     },
+    "/whatsapp/invites": {
+      "post": {
+        "operationId": "InviteController_create",
+        "parameters": [
+          {
+            "name": "force",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "whatsapp-invites"
+        ]
+      },
+      "get": {
+        "operationId": "InviteController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "whatsapp-invites"
+        ]
+      }
+    },
+    "/whatsapp/invites/{id}": {
+      "delete": {
+        "operationId": "InviteController_revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "whatsapp-invites"
+        ]
+      }
+    },
     "/nudges/{venueId}/run": {
       "post": {
         "operationId": "NudgeController_runNudge",

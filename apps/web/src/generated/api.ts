@@ -1106,6 +1106,10 @@ limit?: number;
 offset?: number;
 };
 
+export type InviteControllerCreateParams = {
+force: string;
+};
+
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
@@ -5091,6 +5095,272 @@ export function usePhoneControllerStatus<TData = Awaited<ReturnType<typeof phone
 
 
 
+
+export type inviteControllerCreateResponse201 = {
+  data: void
+  status: 201
+}
+
+export type inviteControllerCreateResponseSuccess = (inviteControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type inviteControllerCreateResponse = (inviteControllerCreateResponseSuccess)
+
+export const getInviteControllerCreateUrl = (params: InviteControllerCreateParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/whatsapp/invites?${stringifiedParams}` : `/whatsapp/invites`
+}
+
+export const inviteControllerCreate = async (params: InviteControllerCreateParams, options?: RequestInit): Promise<inviteControllerCreateResponse> => {
+
+  return orvalMutator<inviteControllerCreateResponse>(getInviteControllerCreateUrl(params),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getInviteControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteControllerCreate>>, TError,{params: InviteControllerCreateParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof inviteControllerCreate>>, TError,{params: InviteControllerCreateParams}, TContext> => {
+
+const mutationKey = ['inviteControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteControllerCreate>>, {params: InviteControllerCreateParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  inviteControllerCreate(params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InviteControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof inviteControllerCreate>>>
+
+    export type InviteControllerCreateMutationError = unknown
+
+    export const useInviteControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteControllerCreate>>, TError,{params: InviteControllerCreateParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof inviteControllerCreate>>,
+        TError,
+        {params: InviteControllerCreateParams},
+        TContext
+      > => {
+      return useMutation(getInviteControllerCreateMutationOptions(options), queryClient);
+    }
+
+export type inviteControllerListResponse200 = {
+  data: void
+  status: 200
+}
+
+export type inviteControllerListResponseSuccess = (inviteControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type inviteControllerListResponse = (inviteControllerListResponseSuccess)
+
+export const getInviteControllerListUrl = () => {
+
+
+
+
+  return `/whatsapp/invites`
+}
+
+export const inviteControllerList = async ( options?: RequestInit): Promise<inviteControllerListResponse> => {
+
+  return orvalMutator<inviteControllerListResponse>(getInviteControllerListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInviteControllerListQueryKey = () => {
+    return [
+    `/whatsapp/invites`
+    ] as const;
+    }
+
+
+export const getInviteControllerListQueryOptions = <TData = Awaited<ReturnType<typeof inviteControllerList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInviteControllerListQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof inviteControllerList>>> = ({ signal }) => inviteControllerList({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InviteControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof inviteControllerList>>>
+export type InviteControllerListQueryError = unknown
+
+
+export function useInviteControllerList<TData = Awaited<ReturnType<typeof inviteControllerList>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof inviteControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof inviteControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInviteControllerList<TData = Awaited<ReturnType<typeof inviteControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof inviteControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof inviteControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInviteControllerList<TData = Awaited<ReturnType<typeof inviteControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInviteControllerList<TData = Awaited<ReturnType<typeof inviteControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInviteControllerListQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type inviteControllerRevokeResponse204 = {
+  data: void
+  status: 204
+}
+
+export type inviteControllerRevokeResponseSuccess = (inviteControllerRevokeResponse204) & {
+  headers: Headers;
+};
+;
+
+export type inviteControllerRevokeResponse = (inviteControllerRevokeResponseSuccess)
+
+export const getInviteControllerRevokeUrl = (id: string,) => {
+
+
+
+
+  return `/whatsapp/invites/${id}`
+}
+
+export const inviteControllerRevoke = async (id: string, options?: RequestInit): Promise<inviteControllerRevokeResponse> => {
+
+  return orvalMutator<inviteControllerRevokeResponse>(getInviteControllerRevokeUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getInviteControllerRevokeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteControllerRevoke>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof inviteControllerRevoke>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['inviteControllerRevoke'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteControllerRevoke>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  inviteControllerRevoke(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InviteControllerRevokeMutationResult = NonNullable<Awaited<ReturnType<typeof inviteControllerRevoke>>>
+
+    export type InviteControllerRevokeMutationError = unknown
+
+    export const useInviteControllerRevoke = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteControllerRevoke>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof inviteControllerRevoke>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getInviteControllerRevokeMutationOptions(options), queryClient);
+    }
 
 export type nudgeControllerRunNudgeResponse200 = {
   data: RunNudgeResponseDto
