@@ -2,6 +2,19 @@ import { ApiError } from './api-client'
 
 export function mapApiError(err: unknown): string {
   if (err instanceof ApiError) {
+    // Plan 03-01 — codes added to the API surface after the last orval regen
+    // aren't in the generated ApiErrorCode union. Match by string before the
+    // typed switch so they map to user-friendly text.
+    const codeStr = err.code as string
+    if (codeStr === 'phone_linked_other_org') {
+      return 'This number is already registered with another organisation. Confirm with the user before re-issuing.'
+    }
+    if (codeStr === 'manager_invite_rate_limit') {
+      return "You've issued too many WhatsApp invites today (50). Try again tomorrow."
+    }
+    if (codeStr === 'invite_not_found') {
+      return 'That WhatsApp invite no longer exists or has already been actioned.'
+    }
     switch (err.code) {
       case 'invalid-input':
         return 'Message was not accepted — please shorten or rephrase.'
@@ -103,6 +116,9 @@ export function mapApiError(err: unknown): string {
             return "We couldn't read that file — please retry."
         }
       }
+      // Plan 03-01 — WhatsApp invite codes (phone_linked_other_org,
+      // manager_invite_rate_limit, invite_not_found) handled in the
+      // pre-switch string check above.
       default:
         return 'Something went wrong — please retry.'
     }
