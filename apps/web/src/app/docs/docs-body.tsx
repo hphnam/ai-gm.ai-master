@@ -95,12 +95,15 @@ function TabBar({
 }
 
 export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
+  // First-page peek to drive the "no docs at all" empty state. Filters stay
+  // at defaults so `total` reflects the whole org's library, not the
+  // currently-filtered view (the Library tab handles that itself).
   const docs = useDocs()
   const inboxCount = useInboxCount()
   const questionsCount = useQuestionsCount()
   const [uploadOpen, setUploadOpen] = useState(false)
 
-  const totalDocs = docs.data?.length ?? 0
+  const totalDocs = docs.data?.pages[0]?.total ?? 0
   const showFullEmpty = !docs.isLoading && totalDocs === 0
 
   return (

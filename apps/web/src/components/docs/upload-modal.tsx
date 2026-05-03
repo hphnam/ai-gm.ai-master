@@ -1,12 +1,14 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import {
+  AlertCircle,
   ArrowLeft,
+  CheckCircle2,
   FileText,
   Loader2,
   MessageSquareText,
@@ -154,73 +156,157 @@ function IntentCard({
 
 // ─── Document form ────────────────────────────────────────────────────────
 
-const DocumentFormSchema = z.object({
-  title: z.string().trim().min(1, 'Title required').max(200),
-  venueId: z.union([z.string().uuid(), z.null()]),
-  description: z.string().trim().max(1_000),
-})
+const AUTO_VENUE = '__auto__'
 
-type DocumentFormValues = z.infer<typeof DocumentFormSchema>
+// Per-file row in the upload queue. The AI auto-detects category + venue
+// server-side, so the form's job is just to collect files + an optional
+// venue override. Title defaults to the filename.
+type QueueStatus = 'pending' | 'uploading' | 'done' | 'error'
+type QueueItem = {
+  key: string
+  file: File
+  status: QueueStatus
+  error: string | null
+}
+
+const DocumentBatchSchema = z.object({
+  // AUTO → server-side auto-detect. GLOBAL → explicit org-wide. uuid → pinned.
+  venueId: z.union([
+    z.string().uuid(),
+    z.literal(AUTO_VENUE),
+    z.literal(GLOBAL_VENUE),
+  ]),
+})
+type DocumentBatchValues = z.infer<typeof DocumentBatchSchema>
 
 function DocumentForm({ onSaved }: { onSaved: () => void }) {
   const { data: venues } = useVenues()
   const uploadDoc = useUploadDoc()
-  const [file, setFile] = useState<File | null>(null)
+  const [items, setItems] = useState<QueueItem[]>([])
   const [dragOver, setDragOver] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const form = useForm<DocumentFormValues>({
-    resolver: zodResolver(DocumentFormSchema),
-    defaultValues: { title: '', venueId: null, description: '' },
+  const form = useForm<DocumentBatchValues>({
+    resolver: zodResolver(DocumentBatchSchema),
+    defaultValues: { venueId: AUTO_VENUE },
   })
 
-  const attachFile = useCallback(
-    (f: File) => {
-      setFile(f)
-      // Auto-fill title from filename if empty.
-      const current = form.getValues('title').trim()
-      if (!current) {
-        form.setValue('title', f.name.replace(/\.[^.]+$/, ''), {
-          shouldValidate: true,
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const incoming = Array.from(files)
+    if (incoming.length === 0) return
+    setItems((prev) => {
+      const existingKeys = new Set(prev.map((i) => `${i.file.name}:${i.file.size}`))
+      const next: QueueItem[] = [...prev]
+      for (const f of incoming) {
+        const k = `${f.name}:${f.size}`
+        if (existingKeys.has(k)) continue
+        next.push({
+          key: `${k}:${crypto.randomUUID()}`,
+          file: f,
+          status: 'pending',
+          error: null,
         })
       }
-    },
-    [form],
-  )
+      return next
+    })
+  }, [])
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    if (f) attachFile(f)
+    if (e.target.files) addFiles(e.target.files)
     e.target.value = ''
   }
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setDragOver(false)
-    const f = e.dataTransfer.files?.[0]
-    if (f) attachFile(f)
+    if (e.dataTransfer.files) addFiles(e.dataTransfer.files)
   }
 
-  async function onSubmit(values: DocumentFormValues) {
-    if (!file) {
-      toast.error('Attach a file to upload.')
+  const removeItem = (key: string) =>
+    setItems((prev) => prev.filter((i) => i.key !== key))
+
+  const updateItem = useCallback(
+    (key: string, patch: Partial<QueueItem>) =>
+      setItems((prev) => prev.map((i) => (i.key === key ? { ...i, ...patch } : i))),
+    [],
+  )
+
+  const counts = useMemo(() => {
+    return {
+      total: items.length,
+      done: items.filter((i) => i.status === 'done').length,
+      error: items.filter((i) => i.status === 'error').length,
+      pending: items.filter((i) => i.status === 'pending' || i.status === 'uploading').length,
+    }
+  }, [items])
+
+  async function onSubmit(values: DocumentBatchValues) {
+    const queue = items.filter(
+      (i) => i.status === 'pending' || i.status === 'error',
+    )
+    if (queue.length === 0) {
+      toast.error('Add at least one file.')
       return
     }
-    try {
-      await uploadDoc.mutateAsync({
-        file,
-        venueId: values.venueId ?? null,
-        title: values.title,
-        description: values.description || undefined,
-      })
-      toast.success(`Added "${values.title}" — processing in background`)
+    setSubmitting(true)
+    const venueId =
+      values.venueId === AUTO_VENUE || values.venueId === GLOBAL_VENUE
+        ? null
+        : values.venueId
+    const autoDetectVenue = values.venueId === AUTO_VENUE
+
+    // Mark every queued file as uploading immediately so the UI reflects the
+    // batch state before the parallel mutations resolve in any order.
+    setItems((prev) =>
+      prev.map((i) =>
+        i.status === 'pending' || i.status === 'error'
+          ? { ...i, status: 'uploading', error: null }
+          : i,
+      ),
+    )
+
+    const results = await Promise.allSettled(
+      queue.map(async (item) => {
+        try {
+          const titleFromName = item.file.name.replace(/\.[^.]+$/, '')
+          await uploadDoc.mutateAsync({
+            file: item.file,
+            venueId,
+            title: titleFromName,
+            autoDetectVenue,
+          })
+          updateItem(item.key, { status: 'done', error: null })
+          return { key: item.key, ok: true as const }
+        } catch (err) {
+          const msg = mapApiError(err)
+          updateItem(item.key, { status: 'error', error: msg })
+          return { key: item.key, ok: false as const, error: msg }
+        }
+      }),
+    )
+
+    setSubmitting(false)
+    const okCount = results.filter(
+      (r) => r.status === 'fulfilled' && r.value.ok,
+    ).length
+    const failCount = results.length - okCount
+
+    if (okCount > 0 && failCount === 0) {
+      toast.success(
+        okCount === 1
+          ? 'Added 1 document — AI is filing it now'
+          : `Added ${okCount} documents — AI is filing them now`,
+      )
       onSaved()
-    } catch (err) {
-      toast.error(mapApiError(err))
+    } else if (okCount > 0 && failCount > 0) {
+      toast.warning(`${okCount} uploaded, ${failCount} failed — see list.`)
+    } else {
+      toast.error('All uploads failed — see list for details.')
     }
   }
 
-  const submitting = uploadDoc.isPending
+  const hasFiles = items.length > 0
 
   return (
     <Form {...form}>
@@ -230,92 +316,70 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
         noValidate
       >
         <DialogHeader>
-          <DialogTitle>Add a document</DialogTitle>
+          <DialogTitle>Add documents</DialogTitle>
           <DialogDescription>
-            Upload a file. The AI extracts tags and doc type on save.
+            Drop in as many files as you like. The AI auto-detects the category
+            and venue. Anything it&rsquo;s unsure about lands in your inbox to
+            confirm.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Dropzone / file state */}
-        {file ? (
-          <div className="flex items-center justify-between rounded-md border bg-muted/40 px-3 py-2">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{file.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {(file.size / 1024).toFixed(1)} KB · {file.type || 'unknown type'}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Remove file"
-              onClick={() => setFile(null)}
-              disabled={submitting}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <div
-            onDragOver={(e) => {
+        {/* Dropzone — always visible so users can keep adding to the queue */}
+        <div
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragOver(true)
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={onDrop}
+          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
-              setDragOver(true)
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
-            onClick={() => fileInputRef.current?.click()}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                fileInputRef.current?.click()
-              }
-            }}
-            className={cn(
-              'flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed p-6 text-center transition-colors',
-              dragOver
-                ? 'border-foreground bg-accent'
-                : 'border-muted-foreground/30 hover:bg-accent',
-            )}
-          >
-            <UploadIcon className="h-5 w-5 text-muted-foreground" />
-            <p className="text-sm">
-              <span className="font-medium">Drop a file here</span>{' '}
-              <span className="text-muted-foreground">or click to pick</span>
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              PDF · DOCX · XLSX · CSV · PPTX · MD · TXT · JPG · PNG · WEBP
-            </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={FILE_ACCEPT}
-              className="hidden"
-              onChange={onInputChange}
-              disabled={submitting}
-            />
-          </div>
-        )}
-
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Cellar temperature thresholds"
-                  disabled={submitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+              fileInputRef.current?.click()
+            }
+          }}
+          className={cn(
+            'flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed p-5 text-center transition-colors',
+            dragOver
+              ? 'border-foreground bg-accent'
+              : 'border-muted-foreground/30 hover:bg-accent',
+            submitting && 'pointer-events-none opacity-60',
           )}
-        />
+        >
+          <UploadIcon className="h-5 w-5 text-muted-foreground" />
+          <p className="text-sm">
+            <span className="font-medium">Drop files here</span>{' '}
+            <span className="text-muted-foreground">or click to pick</span>
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            PDF · DOCX · XLSX · CSV · PPTX · MD · TXT · JPG · PNG · WEBP — multiple OK
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={FILE_ACCEPT}
+            multiple
+            className="hidden"
+            onChange={onInputChange}
+            disabled={submitting}
+          />
+        </div>
+
+        {hasFiles ? (
+          <div className="max-h-56 space-y-1.5 overflow-y-auto rounded-md border bg-muted/20 p-2">
+            {items.map((item) => (
+              <QueueRow
+                key={item.key}
+                item={item}
+                onRemove={() => removeItem(item.key)}
+                disabled={submitting}
+              />
+            ))}
+          </div>
+        ) : null}
 
         <FormField
           control={form.control}
@@ -324,18 +388,19 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
             <FormItem>
               <FormLabel>Venue</FormLabel>
               <Select
-                value={field.value ?? GLOBAL_VENUE}
-                onValueChange={(v) =>
-                  field.onChange(v === GLOBAL_VENUE ? null : v)
-                }
+                value={field.value}
+                onValueChange={(v) => field.onChange(v)}
                 disabled={submitting}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pick a venue" />
+                    <SelectValue />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  <SelectItem value={AUTO_VENUE}>
+                    Auto (let AI detect from each doc)
+                  </SelectItem>
                   <SelectItem value={GLOBAL_VENUE}>
                     Global (applies to all venues)
                   </SelectItem>
@@ -346,45 +411,31 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                AI brief{' '}
-                <span className="text-xs font-normal text-muted-foreground">
-                  (optional)
-                </span>
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  rows={2}
-                  placeholder="e.g. This is the midweek deep-clean SOP — runs Mondays after the nightly close."
-                  disabled={submitting}
-                />
-              </FormControl>
               <FormDescription>
-                One or two sentences telling the AI what this is and when it applies.
-                Gets prepended to the document so retrieval + classification see it.
+                Auto reads each document and picks the venue if it&rsquo;s
+                clear. Pick one explicitly to pin the whole batch.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button type="submit" disabled={submitting || !file}>
+        <div className="flex items-center justify-between gap-2 pt-2">
+          <p className="text-xs text-muted-foreground">
+            {counts.total === 0
+              ? 'No files yet'
+              : `${counts.total} file${counts.total === 1 ? '' : 's'}` +
+                (counts.done > 0 ? ` · ${counts.done} done` : '') +
+                (counts.error > 0 ? ` · ${counts.error} failed` : '')}
+          </p>
+          <Button type="submit" disabled={submitting || counts.pending === 0}>
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Saving…
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Uploading
+                {counts.total > 1 ? ` ${counts.total}` : ''}…
               </>
+            ) : counts.total > 1 ? (
+              `Upload ${counts.pending} file${counts.pending === 1 ? '' : 's'}`
             ) : (
               'Upload & save'
             )}
@@ -393,6 +444,54 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
       </form>
     </Form>
   )
+}
+
+function QueueRow({
+  item,
+  onRemove,
+  disabled,
+}: {
+  item: QueueItem
+  onRemove: () => void
+  disabled: boolean
+}) {
+  const sizeKb = (item.file.size / 1024).toFixed(0)
+  return (
+    <div className="flex items-center gap-2 rounded-sm bg-background px-2 py-1.5">
+      <StatusIcon status={item.status} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-medium">{item.file.name}</p>
+        <p className="truncate text-[10px] text-muted-foreground">
+          {item.status === 'error' && item.error
+            ? item.error
+            : `${sizeKb} KB`}
+        </p>
+      </div>
+      {item.status === 'pending' || item.status === 'error' ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Remove"
+          onClick={onRemove}
+          disabled={disabled}
+          className="h-6 w-6"
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
+function StatusIcon({ status }: { status: QueueStatus }) {
+  if (status === 'uploading')
+    return <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+  if (status === 'done')
+    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+  if (status === 'error')
+    return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-600" aria-hidden />
+  return <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
 }
 
 // ─── Q&A form ─────────────────────────────────────────────────────────────

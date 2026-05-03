@@ -1,8 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { ArrowDownUp, FilterX, Search } from 'lucide-react'
-import type { DocListItemDto as DocListItem } from '@/generated/api'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowDownUp, FilterX, Loader2, Search } from 'lucide-react'
+import {
+  parseAsString,
+  parseAsStringLiteral,
+  useQueryState,
+  useQueryStates,
+} from 'nuqs'
 import { DocList } from '@/components/docs/doc-list'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,50 +19,60 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useDocs, useDocTypes } from '@/lib/hooks/use-docs'
+import { useVenues } from '@/lib/hooks/use-venues'
 
 type CategoryFilter = 'all' | 'unclassified' | string
 type VenueFilter = 'all' | 'global' | string
 type StatusFilter = 'all' | 'ready' | 'processing' | 'attention'
 type SortKey = 'recent' | 'name' | 'oldest'
 
-function matchesQuery(
-  haystacks: Array<string | null | undefined>,
-  q: string,
-): boolean {
-  const needle = q.toLowerCase()
-  return haystacks.some((h) => (h ?? '').toLowerCase().includes(needle))
-}
+const SEARCH_DEBOUNCE_MS = 250
 
-function statusOf(d: DocListItem): 'ready' | 'processing' | 'attention' {
-  if (d.processingStatus === 'processing') return 'processing'
-  if (d.processingStatus === 'failed') return 'attention'
-  if (!d.documentType) return 'attention' // unclassified or pending proposal
-  return 'ready'
-}
+const STATUS_VALUES = ['all', 'ready', 'processing', 'attention'] as const
+const SORT_VALUES = ['recent', 'oldest', 'name'] as const
 
 export function LibraryTab() {
-  const docs = useDocs()
   const types = useDocTypes()
+  const { data: venues } = useVenues()
 
-  const [query, setQuery] = useState('')
-  const [category, setCategory] = useState<CategoryFilter>('all')
-  const [venue, setVenue] = useState<VenueFilter>('all')
-  const [status, setStatus] = useState<StatusFilter>('all')
-  const [sort, setSort] = useState<SortKey>('recent')
+  // Filter state lives in URL params via nuqs — shareable, refresh-safe, and
+  // persisted across navigation. `q` is throttled separately from typing
+  // (see effect below) so the address bar doesn't flicker on every keystroke.
+  // `useQueryStates` batches the dropdown filters into a single history entry.
+  const [query, setQuery] = useQueryState(
+    'q',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true }),
+  )
+  const [{ category, venue, status, sort }, setFilters] = useQueryStates({
+    category: parseAsString.withDefault('all').withOptions({ clearOnDefault: true }),
+    venue: parseAsString.withDefault('all').withOptions({ clearOnDefault: true }),
+    status: parseAsStringLiteral(STATUS_VALUES)
+      .withDefault('all')
+      .withOptions({ clearOnDefault: true }),
+    sort: parseAsStringLiteral(SORT_VALUES)
+      .withDefault('recent')
+      .withOptions({ clearOnDefault: true }),
+  })
 
-  // Derive venue options from the doc set so filters reflect what you actually have.
-  const venueOptions = useMemo(() => {
-    if (!docs.data) return [] as Array<{ id: string; name: string }>
-    const seen = new Map<string, string>()
-    for (const d of docs.data) {
-      if (d.venueId && d.venueName && !seen.has(d.venueId)) {
-        seen.set(d.venueId, d.venueName)
-      }
-    }
-    return Array.from(seen, ([id, name]) => ({ id, name })).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    )
-  }, [docs.data])
+  // Local mirror so typing feels instant; server search lags behind by ~250ms
+  // to avoid hammering the API on every keystroke.
+  const [debouncedQuery, setDebouncedQuery] = useDebouncedValue(
+    query,
+    SEARCH_DEBOUNCE_MS,
+  )
+  // Keep debounced value synced when query is reset programmatically (e.g.
+  // clearFilters()) — otherwise the stale debounced value lingers.
+  useEffect(() => {
+    if (query === '') setDebouncedQuery('')
+  }, [query, setDebouncedQuery])
+
+  const docs = useDocs({
+    q: debouncedQuery || undefined,
+    category: (category as CategoryFilter) || 'all',
+    venue: (venue as VenueFilter) || 'all',
+    status: status as StatusFilter,
+    sort: sort as SortKey,
+  })
 
   const filtersActive =
     query.trim().length > 0 ||
@@ -65,73 +80,39 @@ export function LibraryTab() {
     venue !== 'all' ||
     status !== 'all'
 
-  const filtered = useMemo(() => {
-    if (!docs.data) return undefined
-    let list = docs.data
+  // Flatten the paginated pages into a single list for rendering.
+  const items = useMemo(
+    () => docs.data?.pages.flatMap((p) => p.items) ?? undefined,
+    [docs.data],
+  )
+  const visible = items?.length ?? 0
+  const total = docs.data?.pages[0]?.total ?? 0
+  const isInitialLoading = docs.isLoading && !docs.data
 
-    if (category === 'unclassified') {
-      list = list.filter((d) => !d.documentType)
-    } else if (category !== 'all') {
-      list = list.filter((d) => d.documentType?.id === category)
-    }
-
-    if (venue === 'global') {
-      list = list.filter((d) => !d.venueId)
-    } else if (venue !== 'all') {
-      list = list.filter((d) => d.venueId === venue)
-    }
-
-    if (status !== 'all') {
-      list = list.filter((d) => statusOf(d) === status)
-    }
-
-    const q = query.trim()
-    if (q) {
-      list = list.filter((d) =>
-        matchesQuery(
-          [
-            d.title,
-            d.summary,
-            d.contentPreview,
-            d.venueName,
-            d.documentType?.name,
-            d.pendingTypeProposal?.name,
-            ...d.tags,
-          ],
-          q,
-        ),
-      )
-    }
-
-    const sorted = [...list]
-    if (sort === 'recent') {
-      sorted.sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      )
-    } else if (sort === 'oldest') {
-      sorted.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      )
-    } else if (sort === 'name') {
-      sorted.sort((a, b) => {
-        const an = (a.title ?? '').trim() || 'Untitled document'
-        const bn = (b.title ?? '').trim() || 'Untitled document'
-        return an.localeCompare(bn)
-      })
-    }
-    return sorted
-  }, [docs.data, query, category, venue, status, sort])
-
-  const total = docs.data?.length ?? 0
-  const visible = filtered?.length ?? 0
+  // Infinite-scroll trigger. Watches a sentinel at the bottom of the list and
+  // calls fetchNextPage when it scrolls into view. Falls back to a button so
+  // keyboard / reduced-motion users can advance explicitly.
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const node = sentinelRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && docs.hasNextPage && !docs.isFetchingNextPage) {
+            void docs.fetchNextPage()
+          }
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [docs.hasNextPage, docs.isFetchingNextPage, docs.fetchNextPage, docs])
 
   function clearFilters() {
-    setQuery('')
-    setCategory('all')
-    setVenue('all')
-    setStatus('all')
+    void setQuery('')
+    void setFilters({ category: 'all', venue: 'all', status: 'all' })
   }
 
   return (
@@ -160,7 +141,7 @@ export function LibraryTab() {
             <Input
               type="search"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => void setQuery(e.target.value)}
               placeholder="Search documents…"
               aria-label="Search documents"
               className="pl-9"
@@ -171,7 +152,7 @@ export function LibraryTab() {
         <div className="flex flex-wrap items-center gap-2">
           <Select
             value={category}
-            onValueChange={(v) => setCategory(v as CategoryFilter)}
+            onValueChange={(v) => void setFilters({ category: v })}
           >
             <SelectTrigger
               aria-label="Filter by category"
@@ -194,7 +175,7 @@ export function LibraryTab() {
 
           <Select
             value={venue}
-            onValueChange={(v) => setVenue(v as VenueFilter)}
+            onValueChange={(v) => void setFilters({ venue: v })}
           >
             <SelectTrigger
               aria-label="Filter by venue"
@@ -205,7 +186,7 @@ export function LibraryTab() {
             <SelectContent>
               <SelectItem value="all">All venues</SelectItem>
               <SelectItem value="global">No venue (global)</SelectItem>
-              {venueOptions.map((v) => (
+              {(venues ?? []).map((v) => (
                 <SelectItem key={v.id} value={v.id}>
                   {v.name}
                 </SelectItem>
@@ -215,7 +196,9 @@ export function LibraryTab() {
 
           <Select
             value={status}
-            onValueChange={(v) => setStatus(v as StatusFilter)}
+            onValueChange={(v) =>
+              void setFilters({ status: v as StatusFilter })
+            }
           >
             <SelectTrigger
               aria-label="Filter by status"
@@ -245,7 +228,9 @@ export function LibraryTab() {
             ) : null}
             <Select
               value={sort}
-              onValueChange={(v) => setSort(v as SortKey)}
+              onValueChange={(v) =>
+                void setFilters({ sort: v as SortKey })
+              }
             >
               <SelectTrigger
                 aria-label="Sort"
@@ -265,12 +250,12 @@ export function LibraryTab() {
       </header>
 
       <DocList
-        docs={filtered}
-        isLoading={docs.isLoading}
+        docs={items}
+        isLoading={isInitialLoading}
         searchQuery={query.trim() || undefined}
       />
 
-      {filtered && filtered.length === 0 && filtersActive && total > 0 ? (
+      {items && items.length === 0 && filtersActive && total > 0 ? (
         <div className="mt-3 flex justify-center">
           <Button
             size="sm"
@@ -283,6 +268,42 @@ export function LibraryTab() {
           </Button>
         </div>
       ) : null}
+
+      {/* Load-more affordance. Sentinel triggers IntersectionObserver; the
+          button is the keyboard / no-IO fallback. Only renders when more
+          pages are available to avoid a sticky empty footer. */}
+      {docs.hasNextPage ? (
+        <div ref={sentinelRef} className="mt-4 flex justify-center">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => void docs.fetchNextPage()}
+            disabled={docs.isFetchingNextPage}
+            className="cursor-pointer gap-1.5"
+          >
+            {docs.isFetchingNextPage ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                Loading more…
+              </>
+            ) : (
+              'Load more'
+            )}
+          </Button>
+        </div>
+      ) : null}
     </section>
   )
+}
+
+// Debounce wrapper that mirrors useState's API but only updates after `delay`
+// of stillness. Returned setter overrides the debounce — callers use it to
+// flush immediately (e.g. on clear).
+function useDebouncedValue<T>(value: T, delay: number) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebounced(value), delay)
+    return () => window.clearTimeout(t)
+  }, [value, delay])
+  return [debounced, setDebounced] as const
 }

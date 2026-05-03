@@ -407,6 +407,64 @@ export interface DebugRetagQueueResponseDto {
   counts: DebugRetagQueueResponseDtoCounts;
 }
 
+export type DocListResponseDtoItemsItemDocumentType = {
+  id: string;
+  name: string;
+  description: string | null;
+  schema: {[key: string]: unknown};
+  kind: 'reference' | 'procedural';
+} | null;
+
+export type DocListResponseDtoItemsItemPendingTypeProposal = {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  name: string;
+  description: string | null;
+  schema?: {[key: string]: unknown};
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
+  confidence: number;
+  kind?: 'reference' | 'procedural';
+  [key: string]: unknown;
+} | null;
+
+export type DocListResponseDtoItemsItemProcessingStatus = typeof DocListResponseDtoItemsItemProcessingStatus[keyof typeof DocListResponseDtoItemsItemProcessingStatus];
+
+
+export const DocListResponseDtoItemsItemProcessingStatus = {
+  processing: 'processing',
+  ready: 'ready',
+  failed: 'failed',
+} as const;
+
+export type DocListResponseDtoItemsItem = {
+  id: string;
+  title: string | null;
+  contentPreview: string;
+  venueId: string | null;
+  venueName: string | null;
+  summary: string | null;
+  tags: string[];
+  docType: string | null;
+  documentType: DocListResponseDtoItemsItemDocumentType;
+  pendingTypeProposal: DocListResponseDtoItemsItemPendingTypeProposal;
+  isProcedural: boolean;
+  processingStatus: DocListResponseDtoItemsItemProcessingStatus;
+  processingError: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface DocListResponseDto {
+  items: DocListResponseDtoItemsItem[];
+  nextCursor: string | null;
+  total: number;
+}
+
 export type DocListItemDtoDocumentType = {
   id: string;
   name: string;
@@ -987,11 +1045,52 @@ venueId: string;
 limit?: number;
 };
 
+export type DocsControllerListParams = {
+/**
+ * @maxLength 200
+ */
+q?: string;
+category?: 'all' | 'unclassified' | string;
+venue?: 'all' | 'global' | string;
+status?: DocsControllerListStatus;
+sort?: DocsControllerListSort;
+/**
+ * @maxLength 500
+ */
+cursor?: string;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+
+export type DocsControllerListStatus = typeof DocsControllerListStatus[keyof typeof DocsControllerListStatus];
+
+
+export const DocsControllerListStatus = {
+  all: 'all',
+  ready: 'ready',
+  processing: 'processing',
+  attention: 'attention',
+} as const;
+
+export type DocsControllerListSort = typeof DocsControllerListSort[keyof typeof DocsControllerListSort];
+
+
+export const DocsControllerListSort = {
+  recent: 'recent',
+  oldest: 'oldest',
+  name: 'name',
+} as const;
+
 export type DocsControllerUploadBody = {
   file: Blob;
   venueId?: string;
   description?: string;
   title?: string;
+  /** "true" to ask the classifier to propose a venue when none is pinned */
+  autoDetectVenue?: string;
 };
 
 export type InvitationsControllerListParams = {
@@ -2638,7 +2737,7 @@ export function useDebugControllerGetRetagQueue<TData = Awaited<ReturnType<typeo
 
 
 export type docsControllerListResponse200 = {
-  data: DocListItemDto[]
+  data: DocListResponseDto
   status: 200
 }
 
@@ -2649,17 +2748,24 @@ export type docsControllerListResponseSuccess = (docsControllerListResponse200) 
 
 export type docsControllerListResponse = (docsControllerListResponseSuccess)
 
-export const getDocsControllerListUrl = () => {
+export const getDocsControllerListUrl = (params?: DocsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/docs`
+  return stringifiedParams.length > 0 ? `/docs?${stringifiedParams}` : `/docs`
 }
 
-export const docsControllerList = async ( options?: RequestInit): Promise<docsControllerListResponse> => {
+export const docsControllerList = async (params?: DocsControllerListParams, options?: RequestInit): Promise<docsControllerListResponse> => {
 
-  return orvalMutator<docsControllerListResponse>(getDocsControllerListUrl(),
+  return orvalMutator<docsControllerListResponse>(getDocsControllerListUrl(params),
   {
     ...options,
     method: 'GET'
@@ -2672,23 +2778,23 @@ export const docsControllerList = async ( options?: RequestInit): Promise<docsCo
 
 
 
-export const getDocsControllerListQueryKey = () => {
+export const getDocsControllerListQueryKey = (params?: DocsControllerListParams,) => {
     return [
-    `/docs`
+    `/docs`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getDocsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+export const getDocsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>(params?: DocsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDocsControllerListQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getDocsControllerListQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof docsControllerList>>> = ({ signal }) => docsControllerList({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof docsControllerList>>> = ({ signal }) => docsControllerList(params, { signal, ...requestOptions });
 
 
 
@@ -2702,7 +2808,7 @@ export type DocsControllerListQueryError = unknown
 
 
 export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>> & Pick<
+ params: undefined |  DocsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof docsControllerList>>,
           TError,
@@ -2712,7 +2818,7 @@ export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsCont
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>> & Pick<
+ params?: DocsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof docsControllerList>>,
           TError,
@@ -2722,16 +2828,16 @@ export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsCont
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ params?: DocsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useDocsControllerList<TData = Awaited<ReturnType<typeof docsControllerList>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ params?: DocsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getDocsControllerListQueryOptions(options)
+  const queryOptions = getDocsControllerListQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -2820,6 +2926,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getDocsControllerCreateMutationOptions(options), queryClient);
     }
+
+export type docsControllerInboxResponse200 = {
+  data: DocListItemDto[]
+  status: 200
+}
+
+export type docsControllerInboxResponseSuccess = (docsControllerInboxResponse200) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerInboxResponse = (docsControllerInboxResponseSuccess)
+
+export const getDocsControllerInboxUrl = () => {
+
+
+
+
+  return `/docs/inbox`
+}
+
+export const docsControllerInbox = async ( options?: RequestInit): Promise<docsControllerInboxResponse> => {
+
+  return orvalMutator<docsControllerInboxResponse>(getDocsControllerInboxUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDocsControllerInboxQueryKey = () => {
+    return [
+    `/docs/inbox`
+    ] as const;
+    }
+
+
+export const getDocsControllerInboxQueryOptions = <TData = Awaited<ReturnType<typeof docsControllerInbox>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDocsControllerInboxQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof docsControllerInbox>>> = ({ signal }) => docsControllerInbox({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DocsControllerInboxQueryResult = NonNullable<Awaited<ReturnType<typeof docsControllerInbox>>>
+export type DocsControllerInboxQueryError = unknown
+
+
+export function useDocsControllerInbox<TData = Awaited<ReturnType<typeof docsControllerInbox>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerInbox>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerInbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerInbox<TData = Awaited<ReturnType<typeof docsControllerInbox>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof docsControllerInbox>>,
+          TError,
+          Awaited<ReturnType<typeof docsControllerInbox>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDocsControllerInbox<TData = Awaited<ReturnType<typeof docsControllerInbox>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDocsControllerInbox<TData = Awaited<ReturnType<typeof docsControllerInbox>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof docsControllerInbox>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDocsControllerInboxQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type docsControllerListTypesResponse200 = {
   data: DocumentTypeDto[]
@@ -3695,6 +3908,9 @@ if(docsControllerUploadBody.description !== undefined) {
  }
 if(docsControllerUploadBody.title !== undefined) {
  formData.append(`title`, docsControllerUploadBody.title);
+ }
+if(docsControllerUploadBody.autoDetectVenue !== undefined) {
+ formData.append(`autoDetectVenue`, docsControllerUploadBody.autoDetectVenue);
  }
 
   return orvalMutator<docsControllerUploadResponse>(getDocsControllerUploadUrl(),

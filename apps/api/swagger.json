@@ -654,17 +654,121 @@
     "/docs": {
       "get": {
         "operationId": "DocsController_list",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-empty-type": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "all"
+                },
+                {
+                  "type": "string",
+                  "const": "unclassified"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "venue",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-empty-type": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "all"
+                },
+                {
+                  "type": "string",
+                  "const": "global"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "ready",
+                "processing",
+                "attention"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "recent",
+                "oldest",
+                "name"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "schema": {
+              "maxLength": 500,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "x-nestjs_zod-has-const": true,
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "type": "integer"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DocListItemDto"
-                  }
+                  "$ref": "#/components/schemas/DocListResponseDto"
                 }
               }
             }
@@ -699,6 +803,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateDocResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
+    "/docs/inbox": {
+      "get": {
+        "operationId": "DocsController_inbox",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocListItemDto"
+                  }
                 }
               }
             }
@@ -1038,6 +1171,10 @@
                   },
                   "title": {
                     "type": "string"
+                  },
+                  "autoDetectVenue": {
+                    "type": "string",
+                    "description": "\"true\" to ask the classifier to propose a venue when none is pinned"
                   }
                 },
                 "required": [
@@ -2691,6 +2828,251 @@
         "required": [
           "items",
           "counts"
+        ]
+      },
+      "DocListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "contentPreview": {
+                  "type": "string"
+                },
+                "venueId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "venueName": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "summary": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "docType": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "documentType": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "schema": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        },
+                        "kind": {
+                          "type": "string",
+                          "enum": [
+                            "reference",
+                            "procedural"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "description",
+                        "schema",
+                        "kind"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pendingTypeProposal": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "description": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "maxLength": 400
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "schema": {
+                          "default": {},
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "kind": {
+                          "default": "reference",
+                          "type": "string",
+                          "enum": [
+                            "reference",
+                            "procedural"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "description",
+                        "confidence"
+                      ],
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "isProcedural": {
+                  "type": "boolean"
+                },
+                "processingStatus": {
+                  "type": "string",
+                  "enum": [
+                    "processing",
+                    "ready",
+                    "failed"
+                  ]
+                },
+                "processingError": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "contentPreview",
+                "venueId",
+                "venueName",
+                "summary",
+                "tags",
+                "docType",
+                "documentType",
+                "pendingTypeProposal",
+                "isProcedural",
+                "processingStatus",
+                "processingError",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "total": {
+            "type": "number",
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor",
+          "total"
         ]
       },
       "DocListItemDto": {

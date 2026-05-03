@@ -27,7 +27,7 @@ import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { ReductoService, type ParsedDocument } from '../reducto/reducto.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
-import { ClassifierService } from './classifier.service'
+import { ClassifierService, VENUE_AUTO_ASSIGN_CONFIDENCE } from './classifier.service'
 
 function composeContent(description: string | undefined, body: string): string {
   const desc = description?.trim()
@@ -54,6 +54,158 @@ function titleFromMetadata(metadata: unknown): string | null {
   if (typeof m.title === 'string' && m.title.trim()) return m.title.trim()
   if (typeof m.docType === 'string' && m.docType.trim()) return m.docType.trim()
   return null
+}
+
+// Library-list helpers. Cursor is base64(JSON({v, id})). `v` is whatever the
+// sort orders by (updatedAt iso for 'recent', createdAt iso for 'oldest',
+// title for 'name'). Decode-then-validate so a tampered cursor is treated as
+// the start of the page, not a 500.
+type Cursor = { v: string; id: string }
+
+function clampLimit(raw: number | undefined): number {
+  if (typeof raw !== 'number' || !Number.isFinite(raw)) return 20
+  if (raw < 1) return 1
+  if (raw > 50) return 50
+  return Math.floor(raw)
+}
+
+function decodeCursor(raw: string | null): Cursor | null {
+  if (!raw) return null
+  try {
+    const json = JSON.parse(Buffer.from(raw, 'base64url').toString('utf8'))
+    if (
+      json &&
+      typeof json === 'object' &&
+      typeof json.v === 'string' &&
+      typeof json.id === 'string'
+    ) {
+      return { v: json.v, id: json.id }
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+function encodeCursor(
+  row: { id: string; updatedAt: Date; createdAt: Date; metadata: unknown },
+  sort: 'recent' | 'oldest' | 'name',
+): string {
+  let v: string
+  if (sort === 'oldest') v = row.createdAt.toISOString()
+  else if (sort === 'name') {
+    const t = titleFromMetadata(row.metadata)
+    v = (t ?? '').trim() || 'zzzz'
+  } else v = row.updatedAt.toISOString()
+  return Buffer.from(JSON.stringify({ v, id: row.id }), 'utf8').toString('base64url')
+}
+
+function buildFiltersSql(args: {
+  q: string | null
+  category: string | null
+  venue: string | null
+  status: 'ready' | 'processing' | 'attention' | 'all'
+}) {
+  const parts: Prisma.Sql[] = [Prisma.sql`TRUE`]
+  if (args.q) {
+    const like = `%${args.q}%`
+    parts.push(Prisma.sql`(
+      ki.metadata->>'title' ILIKE ${like}
+      OR ki."aiSummary" ILIKE ${like}
+      OR ki.content ILIKE ${like}
+      OR v.name ILIKE ${like}
+      OR dt.name ILIKE ${like}
+    )`)
+  }
+  if (args.category) {
+    if (args.category === 'unclassified') {
+      parts.push(Prisma.sql`ki."documentTypeId" IS NULL`)
+    } else {
+      // Prisma maps String columns to TEXT (not UUID) — no cast needed.
+      parts.push(Prisma.sql`ki."documentTypeId" = ${args.category}`)
+    }
+  }
+  if (args.venue) {
+    if (args.venue === 'global') {
+      parts.push(Prisma.sql`ki."venueId" IS NULL`)
+    } else {
+      parts.push(Prisma.sql`ki."venueId" = ${args.venue}`)
+    }
+  }
+  // pendingTypeProposal is JSONB and can hold either SQL NULL (no proposal)
+  // or the literal JSON `null` (proposal explicitly cleared via Prisma.JsonNull
+  // — see acceptProposedType / rejectProposedType / classifyManually). Plain
+  // `IS NOT NULL` returns true for the JSON-null case, which would falsely
+  // mark cleared rows as "has a proposal". jsonb_typeof discriminates.
+  const hasProposal = Prisma.sql`(ki."pendingTypeProposal" IS NOT NULL AND jsonb_typeof(ki."pendingTypeProposal") <> 'null')`
+  const noProposal = Prisma.sql`(ki."pendingTypeProposal" IS NULL OR jsonb_typeof(ki."pendingTypeProposal") = 'null')`
+  if (args.status === 'ready') {
+    parts.push(
+      Prisma.sql`ki."processingStatus" = 'ready' AND ki."documentTypeId" IS NOT NULL AND ${noProposal}`,
+    )
+  } else if (args.status === 'processing') {
+    parts.push(Prisma.sql`ki."processingStatus" = 'processing'`)
+  } else if (args.status === 'attention') {
+    parts.push(
+      Prisma.sql`(ki."processingStatus" = 'failed' OR (ki."processingStatus" = 'ready' AND (ki."documentTypeId" IS NULL OR ${hasProposal})))`,
+    )
+  }
+  return Prisma.join(parts, ' AND ')
+}
+
+function toListItem(r: {
+  id: string
+  venueId: string | null
+  content: string
+  metadata: unknown
+  aiSummary: string | null
+  processingStatus: string
+  processingError: string | null
+  createdAt: Date
+  updatedAt: Date
+  pendingTypeProposal: unknown
+  venue_id: string | null
+  venue_name: string | null
+  dt_id: string | null
+  dt_name: string | null
+  dt_description: string | null
+  dt_schema: unknown
+  dt_kind: string | null
+}): DocListItem {
+  const metadata = (r.metadata ?? {}) as Record<string, unknown>
+  const tags = Array.isArray(metadata.tags)
+    ? (metadata.tags as unknown[]).filter((t): t is string => typeof t === 'string')
+    : []
+  const docType = typeof metadata.docType === 'string' ? metadata.docType : null
+  const title = titleFromMetadata(metadata)
+  const documentType = toDocumentTypeDto(
+    r.dt_id
+      ? {
+          id: r.dt_id,
+          name: r.dt_name ?? '',
+          description: r.dt_description,
+          schema: r.dt_schema,
+          kind: r.dt_kind ?? 'reference',
+        }
+      : null,
+  )
+  return {
+    id: r.id,
+    title,
+    contentPreview: contentPreview(r.content ?? ''),
+    venueId: r.venueId,
+    venueName: r.venue_name,
+    summary: r.aiSummary,
+    tags,
+    docType,
+    documentType,
+    pendingTypeProposal: toPendingProposal(r.pendingTypeProposal),
+    isProcedural: documentType?.kind === 'procedural',
+    processingStatus: coerceProcessingStatus(r.processingStatus),
+    processingError: r.processingError,
+    createdAt: r.createdAt.toISOString(),
+    updatedAt: r.updatedAt.toISOString(),
+  }
 }
 
 export class DocNotFoundOrCrossOrgError extends Error {
@@ -185,64 +337,180 @@ export class DocsService {
     }
   }
 
-  async list(orgId: string): Promise<DocListItem[]> {
-    // Plan 02-01: direct organizationId scope. KnowledgeItem.organizationId
-    // is NOT NULL; global docs (venueId null) still live inside exactly one
-    // org. The former OR-with-null-venue clause leaked cross-org — removed.
-    // Phase C: pending knowledge gaps live in their own /docs/gaps surface;
-    // they're hidden from the main list so the GM doesn't see questions
-    // mixed with answered docs.
-    const rows = await prisma.knowledgeItem.findMany({
-      where: { organizationId: orgId, answerStatus: 'answered' },
-      orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-      select: {
-        id: true,
-        venueId: true,
-        content: true,
-        metadata: true,
-        aiSummary: true,
-        processingStatus: true,
-        processingError: true,
-        createdAt: true,
-        updatedAt: true,
-        venue: { select: { id: true, name: true } },
-        // Plan 04-02 Task 2 — include confirmed DocumentType + pending proposal.
-        // Plan 04-03 Task 1 — + kind for procedural-badge rendering.
-        documentType: {
-          select: { id: true, name: true, description: true, schema: true, kind: true },
-        },
-        pendingTypeProposal: true,
-      },
-      take: 200,
-    })
+  // Paginated library listing. Server-side filters + ILIKE search across
+  // title (metadata->>'title'), summary, content preview, venue name, and
+  // confirmed type name. Cursor pagination keeps shallow scrolls cheap.
+  // Status partition matches the inbox-vs-library mental model:
+  //   'ready'      → indexable, has a confirmed type, no pending proposal
+  //   'processing' → enrichment in flight
+  //   'attention'  → failed, unclassified, or pending proposal review
+  async list(
+    orgId: string,
+    params: {
+      q?: string
+      category?: string
+      venue?: string
+      status?: 'ready' | 'processing' | 'attention' | 'all'
+      sort?: 'recent' | 'oldest' | 'name'
+      cursor?: string | null
+      limit?: number
+    } = {},
+  ): Promise<{ items: DocListItem[]; nextCursor: string | null; total: number }> {
+    const limit = clampLimit(params.limit)
+    const sort = params.sort ?? 'recent'
+    const status = params.status ?? 'all'
+    const q = params.q?.trim() ? params.q.trim() : null
+    const category = params.category && params.category !== 'all' ? params.category : null
+    const venue = params.venue && params.venue !== 'all' ? params.venue : null
+    const cursor = decodeCursor(params.cursor ?? null)
 
-    return rows.map((r) => {
-      const metadata = (r.metadata ?? {}) as Record<string, unknown>
-      const tags = Array.isArray(metadata.tags)
-        ? (metadata.tags as unknown[]).filter((t): t is string => typeof t === 'string')
-        : []
-      const docType = typeof metadata.docType === 'string' ? metadata.docType : null
-      const title = titleFromMetadata(metadata)
-      const documentType = toDocumentTypeDto(r.documentType)
-      return {
-        id: r.id,
-        title,
-        contentPreview: contentPreview(r.content ?? ''),
-        venueId: r.venueId,
-        venueName: r.venue?.name ?? null,
-        summary: r.aiSummary,
-        tags,
-        docType,
-        documentType,
-        pendingTypeProposal: toPendingProposal(r.pendingTypeProposal),
-        // Plan 04-03 Task 1 — explicit convenience flag for UI procedural-badge rendering.
-        isProcedural: documentType?.kind === 'procedural',
-        processingStatus: coerceProcessingStatus(r.processingStatus),
-        processingError: r.processingError,
-        createdAt: r.createdAt.toISOString(),
-        updatedAt: r.updatedAt.toISOString(),
+    type Row = {
+      id: string
+      venueId: string | null
+      content: string
+      metadata: unknown
+      aiSummary: string | null
+      processingStatus: string
+      processingError: string | null
+      createdAt: Date
+      updatedAt: Date
+      pendingTypeProposal: unknown
+      venue_id: string | null
+      venue_name: string | null
+      dt_id: string | null
+      dt_name: string | null
+      dt_description: string | null
+      dt_schema: unknown
+      dt_kind: string | null
+    }
+    type CountRow = { total: bigint }
+
+    const orderBySql = (() => {
+      if (sort === 'oldest') return Prisma.sql`ki."createdAt" ASC, ki.id ASC`
+      if (sort === 'name')
+        return Prisma.sql`COALESCE(NULLIF(TRIM(ki.metadata->>'title'), ''), 'zzzz') ASC, ki.id ASC`
+      return Prisma.sql`ki."updatedAt" DESC, ki.id DESC`
+    })()
+
+    // Cursor predicate. Each sort emits a `(sortKey, id)` tuple cursor; the
+    // predicate uses a row-comparison so it sorts identically to ORDER BY.
+    const cursorSql = (() => {
+      if (!cursor) return Prisma.sql`TRUE`
+      if (sort === 'oldest') {
+        const ts = new Date(cursor.v)
+        return Prisma.sql`(ki."createdAt", ki.id) > (${ts}, ${cursor.id})`
       }
-    })
+      if (sort === 'name') {
+        return Prisma.sql`(COALESCE(NULLIF(TRIM(ki.metadata->>'title'), ''), 'zzzz'), ki.id) > (${cursor.v}, ${cursor.id})`
+      }
+      const ts = new Date(cursor.v)
+      return Prisma.sql`(ki."updatedAt", ki.id) < (${ts}, ${cursor.id})`
+    })()
+
+    const filtersSql = buildFiltersSql({ q, category, venue, status })
+
+    const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
+      SELECT
+        ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
+        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."pendingTypeProposal",
+        v.id AS venue_id, v.name AS venue_name,
+        dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
+        dt.schema AS dt_schema, dt.kind AS dt_kind
+      FROM "knowledge_items" ki
+      LEFT JOIN "Venue" v ON v.id = ki."venueId"
+      LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
+      WHERE ki."organizationId" = ${orgId}
+        AND ki."answerStatus" = 'answered'
+        AND ${filtersSql}
+        AND ${cursorSql}
+      ORDER BY ${orderBySql}
+      LIMIT ${limit + 1}
+    `)
+
+    // Total is computed without the cursor — gives the user the unscoped
+    // result-set size for "n of N shown" UI. Capped result set means this
+    // is cheap; if it gets expensive later we can swap to an estimate.
+    const totalRow = await prisma.$queryRaw<CountRow[]>(Prisma.sql`
+      SELECT COUNT(*)::bigint AS total
+      FROM "knowledge_items" ki
+      LEFT JOIN "Venue" v ON v.id = ki."venueId"
+      LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
+      WHERE ki."organizationId" = ${orgId}
+        AND ki."answerStatus" = 'answered'
+        AND ${filtersSql}
+    `)
+    const total = Number(totalRow[0]?.total ?? 0)
+
+    const hasMore = rows.length > limit
+    const sliced = hasMore ? rows.slice(0, limit) : rows
+    const items = sliced.map((r) => toListItem(r))
+    const last = sliced[sliced.length - 1]
+    const nextCursor = hasMore && last ? encodeCursor(last, sort) : null
+
+    return { items, nextCursor, total }
+  }
+
+  // Inbox surface. Returns failed + pending-proposal + unclassified rows in
+  // one shot — these need an action from the GM, so the list is small by
+  // design. Capped at 200 to bound cost; if a real org hits that, the inbox
+  // is in an emergency state and a count-only headline is more useful anyway.
+  async inbox(orgId: string): Promise<DocListItem[]> {
+    // Raw SQL because Prisma's { not: Prisma.JsonNull } is satisfied by both
+    // SQL NULL and a real JSON value — it can't express "is a real JSON
+    // object, not the JSON-null literal, not SQL NULL". jsonb_typeof <> 'null'
+    // expresses that exactly.
+    const rows = await prisma.$queryRaw<
+      Array<{
+        id: string
+        venueId: string | null
+        content: string
+        metadata: unknown
+        aiSummary: string | null
+        processingStatus: string
+        processingError: string | null
+        createdAt: Date
+        updatedAt: Date
+        pendingTypeProposal: unknown
+        venue_id: string | null
+        venue_name: string | null
+        dt_id: string | null
+        dt_name: string | null
+        dt_description: string | null
+        dt_schema: unknown
+        dt_kind: string | null
+      }>
+    >(Prisma.sql`
+      SELECT
+        ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
+        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."pendingTypeProposal",
+        v.id AS venue_id, v.name AS venue_name,
+        dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
+        dt.schema AS dt_schema, dt.kind AS dt_kind
+      FROM "knowledge_items" ki
+      LEFT JOIN "Venue" v ON v.id = ki."venueId"
+      LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
+      WHERE ki."organizationId" = ${orgId}
+        AND ki."answerStatus" = 'answered'
+        AND (
+          ki."processingStatus" = 'failed'
+          OR (
+            ki."processingStatus" = 'ready'
+            AND (
+              ki."documentTypeId" IS NULL
+              OR (
+                ki."pendingTypeProposal" IS NOT NULL
+                AND jsonb_typeof(ki."pendingTypeProposal") <> 'null'
+              )
+            )
+          )
+        )
+      ORDER BY ki."updatedAt" DESC, ki.id DESC
+      LIMIT 200
+    `)
+
+    return rows.map((r) => toListItem(r))
   }
 
   /// Phase C — list pending knowledge gaps (questions captured by record_kb_gap
@@ -581,6 +849,9 @@ export class DocsService {
       // this category — re-classifying would clobber their decision.
       preserveDocumentTypeId?: string | null
       preservePendingTypeProposal?: Record<string, unknown> | null
+      // When true AND no venueId is set, the classifier is asked to propose a
+      // venue from the org's list. High-confidence proposals are auto-applied.
+      autoDetectVenue?: boolean
     },
     orgId: string,
     userId: string | null = null,
@@ -638,10 +909,33 @@ export class DocsService {
           }),
         )
       } else {
+        // Venue auto-detect: only ask the classifier when the uploader opted
+        // in (autoDetectVenue=true) AND didn't pre-pick a venue. The flag lets
+        // a user explicitly choose "Global" without the AI second-guessing.
+        const askVenue = !!input.autoDetectVenue && !input.venueId
+        const venues = askVenue
+          ? await prisma.venue.findMany({
+              where: { organizationId: orgId },
+              select: { id: true, name: true },
+              take: 50,
+            })
+          : null
+
+        const tableHeaders = (parsed?.tables ?? [])
+          .slice(0, 3)
+          .map((t) => t.columns)
         const classified = await this.classifier.classify({
           content: composedContent,
           title: input.title,
           orgId,
+          venues,
+          structuralHints: parsed
+            ? {
+                pageCount: parsed.pageCount,
+                tableCount: parsed.tables.length,
+                tableHeaders,
+              }
+            : null,
         })
         this.logger.log(
           JSON.stringify({
@@ -650,8 +944,24 @@ export class DocsService {
             knowledgeItemId: id,
             orgId,
             kind: classified.kind,
+            venueGuessConfidence: classified.venueGuess?.confidence ?? null,
+            venueGuessApplied:
+              !!classified.venueGuess &&
+              classified.venueGuess.confidence >= VENUE_AUTO_ASSIGN_CONFIDENCE,
           }),
         )
+
+        // Apply the venue guess only if the uploader didn't pre-pick one and
+        // the confidence clears the auto-assign bar. Persist on the row so
+        // ingest below + retrieval scoping pick it up via input.venueId.
+        if (
+          askVenue &&
+          classified.venueGuess &&
+          classified.venueGuess.confidence >= VENUE_AUTO_ASSIGN_CONFIDENCE
+        ) {
+          input.venueId = classified.venueGuess.venueId
+        }
+
         documentTypeId = classified.kind === 'matched' ? classified.typeId : null
         pendingTypeProposal =
           classified.kind === 'proposal'

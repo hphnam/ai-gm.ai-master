@@ -493,17 +493,38 @@ export const DebugControllerGetRetagQueueResponse = zod.object({
 })
 
 
-export const docsControllerListResponsePendingTypeProposalOneNameMax = 80;
+export const docsControllerListQueryQMax = 200;
 
-export const docsControllerListResponsePendingTypeProposalOneDescriptionOneMax = 400;
+export const docsControllerListQueryCategoryThreeRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const docsControllerListQueryVenueThreeRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const docsControllerListQueryCursorMax = 500;
 
-export const docsControllerListResponsePendingTypeProposalOneSchemaDefault = {  };
-export const docsControllerListResponsePendingTypeProposalOneConfidenceMin = 0;
-export const docsControllerListResponsePendingTypeProposalOneConfidenceMax = 1;
+export const docsControllerListQueryLimitMax = 50;
 
-export const docsControllerListResponsePendingTypeProposalOneKindDefault = `reference`;
 
-export const DocsControllerListResponseItem = zod.object({
+
+export const DocsControllerListQueryParams = zod.object({
+  "q": zod.string().max(docsControllerListQueryQMax).optional(),
+  "category": zod.union([zod.literal("all"),zod.literal("unclassified"),zod.string().regex(docsControllerListQueryCategoryThreeRegExp)]).optional(),
+  "venue": zod.union([zod.literal("all"),zod.literal("global"),zod.string().regex(docsControllerListQueryVenueThreeRegExp)]).optional(),
+  "status": zod.enum(['all', 'ready', 'processing', 'attention']).optional(),
+  "sort": zod.enum(['recent', 'oldest', 'name']).optional(),
+  "cursor": zod.string().max(docsControllerListQueryCursorMax).optional(),
+  "limit": zod.number().min(1).max(docsControllerListQueryLimitMax).optional()
+})
+
+export const docsControllerListResponseItemsItemPendingTypeProposalOneNameMax = 80;
+
+export const docsControllerListResponseItemsItemPendingTypeProposalOneDescriptionOneMax = 400;
+
+export const docsControllerListResponseItemsItemPendingTypeProposalOneSchemaDefault = {  };
+export const docsControllerListResponseItemsItemPendingTypeProposalOneConfidenceMin = 0;
+export const docsControllerListResponseItemsItemPendingTypeProposalOneConfidenceMax = 1;
+
+export const docsControllerListResponseItemsItemPendingTypeProposalOneKindDefault = `reference`;
+
+export const DocsControllerListResponse = zod.object({
+  "items": zod.array(zod.object({
   "id": zod.string(),
   "title": zod.union([zod.string(),zod.null()]),
   "contentPreview": zod.string(),
@@ -520,19 +541,21 @@ export const DocsControllerListResponseItem = zod.object({
   "kind": zod.enum(['reference', 'procedural'])
 }),zod.null()]),
   "pendingTypeProposal": zod.union([zod.object({
-  "name": zod.string().min(1).max(docsControllerListResponsePendingTypeProposalOneNameMax),
-  "description": zod.union([zod.string().max(docsControllerListResponsePendingTypeProposalOneDescriptionOneMax),zod.null()]),
-  "schema": zod.record(zod.string(), zod.unknown()).default(docsControllerListResponsePendingTypeProposalOneSchemaDefault),
-  "confidence": zod.number().min(docsControllerListResponsePendingTypeProposalOneConfidenceMin).max(docsControllerListResponsePendingTypeProposalOneConfidenceMax),
-  "kind": zod.enum(['reference', 'procedural']).default(docsControllerListResponsePendingTypeProposalOneKindDefault)
+  "name": zod.string().min(1).max(docsControllerListResponseItemsItemPendingTypeProposalOneNameMax),
+  "description": zod.union([zod.string().max(docsControllerListResponseItemsItemPendingTypeProposalOneDescriptionOneMax),zod.null()]),
+  "schema": zod.record(zod.string(), zod.unknown()).default(docsControllerListResponseItemsItemPendingTypeProposalOneSchemaDefault),
+  "confidence": zod.number().min(docsControllerListResponseItemsItemPendingTypeProposalOneConfidenceMin).max(docsControllerListResponseItemsItemPendingTypeProposalOneConfidenceMax),
+  "kind": zod.enum(['reference', 'procedural']).default(docsControllerListResponseItemsItemPendingTypeProposalOneKindDefault)
 }),zod.null()]),
   "isProcedural": zod.boolean(),
   "processingStatus": zod.enum(['processing', 'ready', 'failed']),
   "processingError": zod.union([zod.string(),zod.null()]),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
+})),
+  "nextCursor": zod.union([zod.string(),zod.null()]),
+  "total": zod.number()
 })
-export const DocsControllerListResponse = zod.array(DocsControllerListResponseItem)
 
 
 export const docsControllerCreateBodyTitleMax = 200;
@@ -644,6 +667,48 @@ export const DocsControllerCreateResponse = zod.object({
 }),zod.null()]),
   "processingStatus": zod.enum(['processing', 'ready', 'failed'])
 })
+
+
+export const docsControllerInboxResponsePendingTypeProposalOneNameMax = 80;
+
+export const docsControllerInboxResponsePendingTypeProposalOneDescriptionOneMax = 400;
+
+export const docsControllerInboxResponsePendingTypeProposalOneSchemaDefault = {  };
+export const docsControllerInboxResponsePendingTypeProposalOneConfidenceMin = 0;
+export const docsControllerInboxResponsePendingTypeProposalOneConfidenceMax = 1;
+
+export const docsControllerInboxResponsePendingTypeProposalOneKindDefault = `reference`;
+
+export const DocsControllerInboxResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.union([zod.string(),zod.null()]),
+  "contentPreview": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "venueName": zod.union([zod.string(),zod.null()]),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "tags": zod.array(zod.string()),
+  "docType": zod.union([zod.string(),zod.null()]),
+  "documentType": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.union([zod.string(),zod.null()]),
+  "schema": zod.record(zod.string(), zod.unknown()),
+  "kind": zod.enum(['reference', 'procedural'])
+}),zod.null()]),
+  "pendingTypeProposal": zod.union([zod.object({
+  "name": zod.string().min(1).max(docsControllerInboxResponsePendingTypeProposalOneNameMax),
+  "description": zod.union([zod.string().max(docsControllerInboxResponsePendingTypeProposalOneDescriptionOneMax),zod.null()]),
+  "schema": zod.record(zod.string(), zod.unknown()).default(docsControllerInboxResponsePendingTypeProposalOneSchemaDefault),
+  "confidence": zod.number().min(docsControllerInboxResponsePendingTypeProposalOneConfidenceMin).max(docsControllerInboxResponsePendingTypeProposalOneConfidenceMax),
+  "kind": zod.enum(['reference', 'procedural']).default(docsControllerInboxResponsePendingTypeProposalOneKindDefault)
+}),zod.null()]),
+  "isProcedural": zod.boolean(),
+  "processingStatus": zod.enum(['processing', 'ready', 'failed']),
+  "processingError": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const DocsControllerInboxResponse = zod.array(DocsControllerInboxResponseItem)
 
 
 export const DocsControllerListTypesResponseItem = zod.object({
@@ -961,7 +1026,8 @@ export const DocsControllerUploadBody = zod.object({
   "file": zod.instanceof(File),
   "venueId": zod.string().optional(),
   "description": zod.string().optional(),
-  "title": zod.string().optional()
+  "title": zod.string().optional(),
+  "autoDetectVenue": zod.string().optional().describe('\"true\" to ask the classifier to propose a venue when none is pinned')
 })
 
 export const docsControllerUploadResponsePendingTypeProposalOneNameMax = 80;

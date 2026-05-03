@@ -38,31 +38,64 @@ function estimateUsd(inputTokens: number, outputTokens: number): number {
 }
 
 // Wire shape returned by Claude (strict JSON). Validated via Zod before use.
-const ClassifyRawResponseSchema = z.union([
-  z.object({
-    match: z.object({
-      typeId: z.string().uuid(),
-      confidence: z.number().min(0).max(1),
+// Optional venueGuess is asked for when the caller passed `venues` and the
+// uploader did NOT pre-select a venue. Sub-threshold guesses are dropped.
+const ClassifyRawResponseSchema = z.intersection(
+  z.union([
+    z.object({
+      match: z.object({
+        typeId: z.string().uuid(),
+        confidence: z.number().min(0).max(1),
+      }),
     }),
-  }),
+    z.object({
+      proposal: ProposedDocTypeSchema,
+    }),
+    z.object({
+      none: z.literal(true),
+    }),
+  ]),
   z.object({
-    proposal: ProposedDocTypeSchema,
+    venueGuess: z
+      .object({
+        venueId: z.string().uuid(),
+        confidence: z.number().min(0).max(1),
+      })
+      .nullable()
+      .optional(),
   }),
-  z.object({
-    none: z.literal(true),
-  }),
-])
+)
+
+// Threshold above which we auto-apply the classifier's venue guess. Set
+// conservatively — a wrong-venue auto-apply forces the GM to discover-and-fix,
+// which is worse than leaving it global.
+export const VENUE_AUTO_ASSIGN_CONFIDENCE = 0.75
+
+export type ClassifierVenue = { id: string; name: string }
 
 export type ClassifyInput = {
   content: string
   title?: string | null
   orgId: string
+  // When provided AND the uploader did not pre-select a venue, the classifier
+  // is asked to propose one. Pass `null`/omit to skip venue resolution.
+  venues?: ClassifierVenue[] | null
+  // Optional Reducto-derived hints fed into the prompt as additional structural
+  // signal (e.g. "12 pages, 3 tables, headers: Date|Item|Cost"). All values are
+  // safe metadata — no row contents.
+  structuralHints?: {
+    pageCount?: number
+    tableCount?: number
+    tableHeaders?: string[][]
+  } | null
 }
 
 export type ClassifyResult =
-  | { kind: 'matched'; typeId: string; confidence: number }
-  | { kind: 'proposal'; proposal: ProposedDocType }
-  | { kind: 'none' }
+  | { kind: 'matched'; typeId: string; confidence: number; venueGuess: VenueGuess }
+  | { kind: 'proposal'; proposal: ProposedDocType; venueGuess: VenueGuess }
+  | { kind: 'none'; venueGuess: VenueGuess }
+
+export type VenueGuess = { venueId: string; confidence: number } | null
 
 @Injectable()
 export class ClassifierService implements OnModuleInit {
@@ -86,7 +119,15 @@ export class ClassifierService implements OnModuleInit {
 
     const content = input.content.slice(0, CLASSIFIER_MAX_CONTENT_CHARS)
     const title = input.title?.slice(0, 200) ?? '(untitled)'
-    const prompt = buildPrompt(existingTypes, content, title)
+    const venues = input.venues ?? null
+    const askVenue = !!venues && venues.length > 0
+    const prompt = buildPrompt(
+      existingTypes,
+      content,
+      title,
+      askVenue ? venues : null,
+      input.structuralHints ?? null,
+    )
 
     try {
       // Source: https://docs.anthropic.com/en/api/messages · verified 2026-04-21
@@ -118,8 +159,17 @@ export class ClassifierService implements OnModuleInit {
           }),
         )
         this.emitCallLog(input.orgId, response.usage, 'error', existingTypes.length, startedAt)
-        return { kind: 'none' }
+        return { kind: 'none', venueGuess: null }
       }
+
+      // Validate the venue guess against the org's actual venues — drop
+      // hallucinated UUIDs. Caller is responsible for the auto-assign threshold.
+      const venueGuess: VenueGuess = (() => {
+        const g = parsed.venueGuess
+        if (!g || !venues) return null
+        if (!venues.some((v) => v.id === g.venueId)) return null
+        return { venueId: g.venueId, confidence: g.confidence }
+      })()
 
       // Matched branch — only accept above threshold; sub-threshold → treat as no-match.
       if ('match' in parsed) {
@@ -136,11 +186,12 @@ export class ClassifierService implements OnModuleInit {
             kind: 'matched',
             typeId: parsed.match.typeId,
             confidence: parsed.match.confidence,
+            venueGuess,
           }
         }
         // Sub-threshold OR hallucinated typeId — fall through to none.
         this.emitCallLog(input.orgId, response.usage, 'none', existingTypes.length, startedAt)
-        return { kind: 'none' }
+        return { kind: 'none', venueGuess }
       }
 
       if ('proposal' in parsed) {
@@ -151,12 +202,12 @@ export class ClassifierService implements OnModuleInit {
           existingTypes.length,
           startedAt,
         )
-        return { kind: 'proposal', proposal: parsed.proposal }
+        return { kind: 'proposal', proposal: parsed.proposal, venueGuess }
       }
 
       // { none: true }
       this.emitCallLog(input.orgId, response.usage, 'none', existingTypes.length, startedAt)
-      return { kind: 'none' }
+      return { kind: 'none', venueGuess }
     } catch (err) {
       // sanitiseError is the ONLY path fetch/SDK errors enter the log — prevents Authorization
       // header leakage via the default error-serialization path (audit-M2 shared util).
@@ -170,7 +221,7 @@ export class ClassifierService implements OnModuleInit {
           error: sanitiseError(err),
         }),
       )
-      return { kind: 'none' }
+      return { kind: 'none', venueGuess: null }
     }
   }
 
@@ -201,6 +252,8 @@ function buildPrompt(
   existingTypes: Array<{ id: string; name: string; description: string | null }>,
   content: string,
   title: string,
+  venues: ClassifierVenue[] | null,
+  structuralHints: ClassifyInput['structuralHints'],
 ): string {
   const existing =
     existingTypes.length === 0
@@ -209,11 +262,35 @@ function buildPrompt(
           .map((t) => `- id: ${t.id} · name: "${t.name}"${t.description ? ` · description: "${t.description}"` : ''}`)
           .join('\n')
 
+  const venueBlock =
+    venues && venues.length > 0
+      ? `\n## Organization's venues (the uploader did NOT pick one):\n${venues.map((v) => `- id: ${v.id} · name: "${v.name}"`).join('\n')}\n\n## Venue rule\nIf the document content clearly references one of the venues by name (or by an unambiguous nickname / address), include \`"venueGuess":{"venueId":"<id>","confidence":<0..1>}\` alongside the main result. If you can't tell, OR if the document looks like it applies to all venues (org-wide policy, generic SOP), return \`"venueGuess":null\`. Confidence ≥0.75 means we'll auto-assign — be conservative.`
+      : ''
+
+  const structuralBlock = (() => {
+    if (!structuralHints) return ''
+    const parts: string[] = []
+    if (typeof structuralHints.pageCount === 'number' && structuralHints.pageCount > 0) {
+      parts.push(`pages: ${structuralHints.pageCount}`)
+    }
+    if (typeof structuralHints.tableCount === 'number' && structuralHints.tableCount > 0) {
+      parts.push(`tables: ${structuralHints.tableCount}`)
+    }
+    if (structuralHints.tableHeaders && structuralHints.tableHeaders.length > 0) {
+      const headers = structuralHints.tableHeaders
+        .slice(0, 3)
+        .map((h, i) => `  table ${i + 1} headers: ${h.slice(0, 12).join(' | ')}`)
+        .join('\n')
+      parts.push(`table headers:\n${headers}`)
+    }
+    return parts.length > 0 ? `\n## Structural hints (from parser):\n${parts.join('\n')}\n` : ''
+  })()
+
   return `You are a document-intelligence classifier for a hospitality operations assistant. Your job: figure out what KIND of document this is, in the context of this organization's existing taxonomy.
 
 ## Organization's existing document types:
 ${existing}
-
+${venueBlock}${structuralBlock}
 ## Rules
 1. If the document fits an existing type with high confidence, return \`{"match":{"typeId":"<id>","confidence":<0..1>}}\`.
 2. If it's genuinely a new kind of document not represented in the existing types, return \`{"proposal":{"name":"<short label>","description":"<one-liner>","schema":{...},"confidence":<0..1>,"kind":"reference"|"procedural"}}\`.
@@ -224,10 +301,11 @@ ${existing}
    - "kind":
      - "procedural" ONLY if the doc describes an ordered set of tasks with some cadence (e.g. checklists, SOPs with numbered steps, daily routines, opening/closing procedures).
      - "reference" for prose, policies, menus, contact lists, price sheets, training materials.
-3. If the document is genuinely low-signal (empty, garbage, single-line, or you can't tell anything useful), return \`{"none":true}\`.
+3. Short docs are still classifiable. A single Q&A, a one-paragraph note, a brief troubleshooting tip, or a short reference card should produce a \`proposal\` (e.g. "FAQ", "Troubleshooting Note", "Quick Reference", "Staff Note"). Length alone is not a reason to bail.
+4. Return \`{"none":true}\` ONLY as a last resort — when the content is empty, pure garbage (random characters, OCR noise), or has no discernible topic at all. If you can name what the doc is about in a few words, propose a category instead.
 
 ## Output
-Return STRICT JSON. No markdown fences. No commentary. One of the three shapes above.
+Return STRICT JSON. No markdown fences. No commentary. The object has the main result key (\`match\`, \`proposal\`, or \`none\`) and ${venues && venues.length > 0 ? 'optionally a top-level `venueGuess` (or null)' : 'no other keys'}.
 
 ## Document
 Title: ${title}

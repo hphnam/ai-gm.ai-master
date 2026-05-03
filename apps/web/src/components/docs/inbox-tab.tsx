@@ -7,7 +7,7 @@ import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
-import { useDocs } from '@/lib/hooks/use-docs'
+import { useInbox } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 
 type Tone = 'amber' | 'blue' | 'red'
@@ -205,7 +205,7 @@ function partition(docs: DocListItem[] | undefined) {
 }
 
 export function useInboxCount(): number {
-  const docs = useDocs()
+  const docs = useInbox()
   const { failed, proposals, unclassified } = useMemo(
     () => partition(docs.data),
     [docs.data],
@@ -250,7 +250,7 @@ function EmptyInbox() {
 }
 
 export function InboxTab() {
-  const docs = useDocs()
+  const docs = useInbox()
   const { failed, proposals, unclassified } = useMemo(
     () => partition(docs.data),
     [docs.data],

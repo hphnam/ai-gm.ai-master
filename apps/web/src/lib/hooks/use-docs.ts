@@ -1,6 +1,12 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query'
 import type {
   CreateDocRequestDto as CreateDocRequest,
   CreateDocResponseDto as CreateDocResponse,
@@ -12,6 +18,52 @@ import type {
 } from '@/generated/api'
 import type { ApiErrorResponse } from '@/lib/api-errors'
 
+// Server-driven library filters. Keep in sync with apps/api DocListQuerySchema.
+export type DocsFilters = {
+  q?: string
+  category?: 'all' | 'unclassified' | string
+  venue?: 'all' | 'global' | string
+  status?: 'all' | 'ready' | 'processing' | 'attention'
+  sort?: 'recent' | 'oldest' | 'name'
+}
+
+export type DocListPage = {
+  items: DocListItem[]
+  nextCursor: string | null
+  total: number
+}
+
+const DEFAULT_FILTERS: Required<Omit<DocsFilters, 'q'>> & { q: string } = {
+  q: '',
+  category: 'all',
+  venue: 'all',
+  status: 'all',
+  sort: 'recent',
+}
+
+function normaliseFilters(f: DocsFilters | undefined) {
+  return {
+    q: (f?.q ?? '').trim(),
+    category: f?.category ?? DEFAULT_FILTERS.category,
+    venue: f?.venue ?? DEFAULT_FILTERS.venue,
+    status: f?.status ?? DEFAULT_FILTERS.status,
+    sort: f?.sort ?? DEFAULT_FILTERS.sort,
+  }
+}
+
+function buildDocsQs(filters: ReturnType<typeof normaliseFilters>, cursor: string | null) {
+  const sp = new URLSearchParams()
+  if (filters.q) sp.set('q', filters.q)
+  if (filters.category !== 'all') sp.set('category', filters.category)
+  if (filters.venue !== 'all') sp.set('venue', filters.venue)
+  if (filters.status !== 'all') sp.set('status', filters.status)
+  if (filters.sort !== 'recent') sp.set('sort', filters.sort)
+  if (cursor) sp.set('cursor', cursor)
+  sp.set('limit', '20')
+  const s = sp.toString()
+  return s ? `?${s}` : ''
+}
+
 // Body types not regenerated as standalone (the classify endpoint uses a
 // z.union body, the accept-type endpoint shares DocumentTypeDto for output).
 type AcceptTypeResponse = DocumentTypeDto
@@ -21,15 +73,37 @@ type ClassifyDocRequest =
   | { name: string; kind: DocumentTypeKind }
 import { API_URL, ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
-export function useDocs() {
-  return useQuery<DocListItem[]>({
-    queryKey: ['docs'],
-    queryFn: ({ signal }) => apiFetch<DocListItem[]>('/docs', { signal }),
+// Paginated server-side library list. Filters / search / sort all live in
+// the query key so React Query caches each combination separately. Realtime
+// (useKbSocket) invalidates the entire ['docs'] prefix, so cross-filter
+// caches refresh on doc.updated without needing a single shared cache.
+export function useDocs(filters?: DocsFilters) {
+  const norm = normaliseFilters(filters)
+  return useInfiniteQuery<
+    DocListPage,
+    Error,
+    InfiniteData<DocListPage>,
+    readonly unknown[],
+    string | null
+  >({
+    queryKey: ['docs', 'list', norm] as const,
+    queryFn: ({ signal, pageParam }) =>
+      apiFetch<DocListPage>('/docs' + buildDocsQs(norm, pageParam ?? null), {
+        signal,
+      }),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
     staleTime: 30_000,
-    // Live updates arrive over the realtime socket (see useKbSocket). The
-    // socket invalidates this query when the API emits doc.updated, so we
-    // don't poll. If the socket is disconnected, the user will get fresh
-    // data on the next route mount via React Query's standard staleTime.
+  })
+}
+
+// Inbox: small flat list of attention-needed rows. Not paginated — capped
+// server-side. Used by the Inbox tab + the inbox count badge.
+export function useInbox() {
+  return useQuery<DocListItem[]>({
+    queryKey: ['docs', 'inbox'],
+    queryFn: ({ signal }) => apiFetch<DocListItem[]>('/docs/inbox', { signal }),
+    staleTime: 30_000,
   })
 }
 
@@ -61,6 +135,9 @@ export function useUploadDoc() {
       venueId: string | null
       title?: string
       description?: string
+      // When true AND no venueId is set, the server runs the classifier with
+      // the org's venue list and auto-assigns above the confidence threshold.
+      autoDetectVenue?: boolean
     }): Promise<CreateDocResponse> => {
       const requestId = crypto.randomUUID()
       const form = new FormData()
@@ -69,6 +146,7 @@ export function useUploadDoc() {
       if (args.title && args.title.trim()) form.append('title', args.title.trim())
       if (args.description && args.description.trim())
         form.append('description', args.description.trim())
+      if (args.autoDetectVenue) form.append('autoDetectVenue', 'true')
       const res = await fetch(API_URL + '/docs/upload', {
         method: 'POST',
         credentials: 'include',
@@ -114,36 +192,18 @@ export function useAcceptDocType() {
       if (name) body.name = name
       return apiPost<AcceptTypeResponse>(`/docs/${docId}/accept-type`, body)
     },
-    // Optimistic clear of pendingTypeProposal so the inbox card disappears
-    // immediately. The actual documentType + status flip arrives via the
-    // realtime socket once the AI work completes.
-    onMutate: async ({ docId, kind, name }) => {
-      await queryClient.cancelQueries({ queryKey: ['docs'] })
-      const prev = queryClient.getQueryData<DocListItem[]>(['docs'])
-      queryClient.setQueryData<DocListItem[]>(['docs'], (rows) =>
-        rows?.map((d) =>
-          d.id === docId
-            ? {
-                ...d,
-                pendingTypeProposal: null,
-                processingStatus: kind === 'procedural' ? 'processing' : d.processingStatus,
-                documentType:
-                  d.documentType ??
-                  ({
-                    id: 'optimistic',
-                    name: name ?? d.pendingTypeProposal?.name ?? 'Saving…',
-                    description: null,
-                    schema: {},
-                    kind: kind ?? d.pendingTypeProposal?.kind ?? 'reference',
-                  } as DocListItem['documentType']),
-              }
-            : d,
-        ),
+    // Optimistic clear on the inbox cache so the card disappears immediately.
+    // The library list invalidates on settle — no per-page mutation needed.
+    onMutate: async ({ docId }) => {
+      await queryClient.cancelQueries({ queryKey: ['docs', 'inbox'] })
+      const prev = queryClient.getQueryData<DocListItem[]>(['docs', 'inbox'])
+      queryClient.setQueryData<DocListItem[]>(['docs', 'inbox'], (rows) =>
+        rows?.filter((d) => d.id !== docId),
       )
       return { prev }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['docs'], ctx.prev)
+      if (ctx?.prev) queryClient.setQueryData(['docs', 'inbox'], ctx.prev)
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
@@ -176,15 +236,17 @@ export function useRejectDocType() {
       }
     },
     onMutate: async (docId) => {
-      await queryClient.cancelQueries({ queryKey: ['docs'] })
-      const prev = queryClient.getQueryData<DocListItem[]>(['docs'])
-      queryClient.setQueryData<DocListItem[]>(['docs'], (rows) =>
+      // Reject leaves the row in the inbox under "Need a category" — clear
+      // the proposal optimistically so the AI-suggestion card disappears.
+      await queryClient.cancelQueries({ queryKey: ['docs', 'inbox'] })
+      const prev = queryClient.getQueryData<DocListItem[]>(['docs', 'inbox'])
+      queryClient.setQueryData<DocListItem[]>(['docs', 'inbox'], (rows) =>
         rows?.map((d) => (d.id === docId ? { ...d, pendingTypeProposal: null } : d)),
       )
       return { prev }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['docs'], ctx.prev)
+      if (ctx?.prev) queryClient.setQueryData(['docs', 'inbox'], ctx.prev)
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
@@ -239,40 +301,18 @@ export function useClassifyDoc() {
   return useMutation({
     mutationFn: ({ docId, body }: { docId: string; body: ClassifyDocRequest }) =>
       apiPost<ClassifyDocResponse>(`/docs/${docId}/classify`, body),
-    // Optimistic placeholder so the inbox card disappears immediately. The
-    // realtime socket pushes the canonical state once the API write lands.
-    onMutate: async ({ docId, body }) => {
-      await queryClient.cancelQueries({ queryKey: ['docs'] })
-      const prev = queryClient.getQueryData<DocListItem[]>(['docs'])
-      const isCreate = !('typeId' in body)
-      const optimisticKind: DocumentTypeKind = isCreate
-        ? body.kind
-        : 'reference'
-      queryClient.setQueryData<DocListItem[]>(['docs'], (rows) =>
-        rows?.map((d) =>
-          d.id === docId
-            ? {
-                ...d,
-                pendingTypeProposal: null,
-                processingStatus:
-                  optimisticKind === 'procedural' ? 'processing' : d.processingStatus,
-                documentType:
-                  d.documentType ??
-                  ({
-                    id: 'optimistic',
-                    name: isCreate ? body.name : 'Saving…',
-                    description: null,
-                    schema: {},
-                    kind: optimisticKind,
-                  } as DocListItem['documentType']),
-              }
-            : d,
-        ),
+    // Optimistic removal from the inbox — manual-classify always resolves the
+    // "needs a category" state. Library cache invalidates on settle.
+    onMutate: async ({ docId }) => {
+      await queryClient.cancelQueries({ queryKey: ['docs', 'inbox'] })
+      const prev = queryClient.getQueryData<DocListItem[]>(['docs', 'inbox'])
+      queryClient.setQueryData<DocListItem[]>(['docs', 'inbox'], (rows) =>
+        rows?.filter((d) => d.id !== docId),
       )
       return { prev }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['docs'], ctx.prev)
+      if (ctx?.prev) queryClient.setQueryData(['docs', 'inbox'], ctx.prev)
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
@@ -379,15 +419,41 @@ export function useDeleteDoc() {
       }
     },
     onMutate: async (id) => {
+      // Cancel both inbox + every cached library page, snapshot, then strip
+      // the row from each cache. setQueriesData with a queryKey prefix hits
+      // every filter combination the user has visited this session.
       await queryClient.cancelQueries({ queryKey: ['docs'] })
-      const prev = queryClient.getQueryData<DocListItem[]>(['docs'])
-      queryClient.setQueryData<DocListItem[]>(['docs'], (rows) =>
+      const prevInbox = queryClient.getQueryData<DocListItem[]>(['docs', 'inbox'])
+      const prevLibrary = queryClient.getQueriesData<InfiniteData<DocListPage>>({
+        queryKey: ['docs', 'list'],
+      })
+      queryClient.setQueryData<DocListItem[]>(['docs', 'inbox'], (rows) =>
         rows?.filter((d) => d.id !== id),
       )
-      return { prev }
+      queryClient.setQueriesData<InfiniteData<DocListPage>>(
+        { queryKey: ['docs', 'list'] },
+        (data) =>
+          data
+            ? {
+                ...data,
+                pages: data.pages.map((p) => ({
+                  ...p,
+                  items: p.items.filter((d) => d.id !== id),
+                  total: Math.max(0, p.total - (p.items.some((d) => d.id === id) ? 1 : 0)),
+                })),
+              }
+            : data,
+      )
+      return { prevInbox, prevLibrary }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(['docs'], ctx.prev)
+      if (ctx?.prevInbox)
+        queryClient.setQueryData(['docs', 'inbox'], ctx.prevInbox)
+      if (ctx?.prevLibrary) {
+        for (const [key, data] of ctx.prevLibrary) {
+          queryClient.setQueryData(key, data)
+        }
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })

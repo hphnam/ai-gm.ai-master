@@ -12,6 +12,7 @@ import {
   Patch,
   PayloadTooLargeException,
   Post,
+  Query,
   UploadedFile,
   UseFilters,
   UseGuards,
@@ -62,6 +63,9 @@ import {
   DocDetailDto,
   DocIdParamDto,
   DocListItemDto,
+  DocListQueryDto,
+  DocListQuerySchema,
+  DocListResponseDto,
   DocumentTypeDto,
   GapKbMatchDto,
   KbGapDto,
@@ -81,10 +85,33 @@ export class DocsController {
     private readonly reducto: ReductoService,
   ) {}
 
+  // Paginated library list. All filter/sort/search runs server-side; cursor
+  // round-trips opaquely. The unpaginated 200-doc dump is gone — clients now
+  // page in 20-doc bites.
   @Get()
+  @ApiResponse({ status: 200, type: DocListResponseDto })
+  list(
+    @Query(new ZodValidationPipe(DocListQuerySchema)) query: DocListQueryDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<DocListResponseDto> {
+    return this.docsService.list(org.id, {
+      q: query.q,
+      category: query.category,
+      venue: query.venue,
+      status: query.status,
+      sort: query.sort,
+      cursor: query.cursor ?? null,
+      limit: query.limit,
+    }) as Promise<DocListResponseDto>
+  }
+
+  // Inbox: failed + unclassified + pending-proposal rows. Returned as a flat
+  // list (no pagination) — the inbox is small by design and the UI partitions
+  // the rows into three sections client-side.
+  @Get('inbox')
   @ApiResponse({ status: 200, type: [DocListItemDto] })
-  list(@CurrentOrg() org: { id: string }): Promise<DocListItemDto[]> {
-    return this.docsService.list(org.id) as Promise<DocListItemDto[]>
+  inbox(@CurrentOrg() org: { id: string }): Promise<DocListItemDto[]> {
+    return this.docsService.inbox(org.id) as Promise<DocListItemDto[]>
   }
 
   // Lists confirmed DocumentTypes for the org — used by the classify-manually
@@ -241,6 +268,7 @@ export class DocsController {
         venueId: { type: 'string' },
         description: { type: 'string' },
         title: { type: 'string' },
+        autoDetectVenue: { type: 'string', description: '"true" to ask the classifier to propose a venue when none is pinned' },
       },
       required: ['file'],
     },
@@ -248,7 +276,7 @@ export class DocsController {
   @ApiResponse({ status: 200, type: CreateDocResponseDto })
   async upload(
     @UploadedFile() file: Express.Multer.File | undefined,
-    @Body() body: { venueId?: string; description?: string; title?: string },
+    @Body() body: { venueId?: string; description?: string; title?: string; autoDetectVenue?: string },
     @CurrentOrg() org: { id: string },
     // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
     @CurrentUser() user: { id: string } | null,
@@ -329,6 +357,10 @@ export class DocsController {
         ? body.description.trim().slice(0, 1_000)
         : undefined
 
+    const autoDetectVenue =
+      typeof body?.autoDetectVenue === 'string' &&
+      body.autoDetectVenue.toLowerCase() === 'true'
+
     let result: CreateDocResponseDto
     try {
       const enrichInput = {
@@ -340,6 +372,7 @@ export class DocsController {
         reductoFileId,
         description,
         mimeType: file.mimetype,
+        autoDetectVenue,
       }
       result = (await this.docsService.createStub(enrichInput, org.id)) as CreateDocResponseDto
       setImmediate(() => {

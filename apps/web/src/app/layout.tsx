@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
@@ -24,15 +25,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${jakarta.variable} light`} style={{ colorScheme: 'light' }}>
       <body className="font-sans">
-        <QueryProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            visibleToasts={3}
-          />
-        </QueryProvider>
+        <NuqsAdapter>
+          <QueryProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              visibleToasts={3}
+            />
+          </QueryProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )

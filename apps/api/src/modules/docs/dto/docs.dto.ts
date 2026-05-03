@@ -144,3 +144,37 @@ const GapKbMatchSchema = z.object({
   similarity: z.number(),
 })
 export class GapKbMatchDto extends createZodDto(GapKbMatchSchema) {}
+
+// Library list pagination + server-side filters. Cursor is opaque base64; the
+// service decodes it. Limit is clamped server-side (default 20, max 50).
+export const DocListQuerySchema = z.object({
+  q: z.string().trim().max(200).optional(),
+  category: z
+    .union([
+      z.literal('all'),
+      z.literal('unclassified'),
+      z.string().regex(UUID_RE),
+    ])
+    .optional(),
+  venue: z
+    .union([
+      z.literal('all'),
+      z.literal('global'),
+      z.string().regex(UUID_RE),
+    ])
+    .optional(),
+  status: z
+    .enum(['all', 'ready', 'processing', 'attention'])
+    .optional(),
+  sort: z.enum(['recent', 'oldest', 'name']).optional(),
+  cursor: z.string().max(500).optional(),
+  limit: z.coerce.number().int().min(1).max(50).optional(),
+})
+export class DocListQueryDto extends createZodDto(DocListQuerySchema) {}
+
+export const DocListResponseSchema = z.object({
+  items: z.array(DocListItemSchema),
+  nextCursor: z.string().nullable(),
+  total: z.number(),
+})
+export class DocListResponseDto extends createZodDto(DocListResponseSchema) {}
