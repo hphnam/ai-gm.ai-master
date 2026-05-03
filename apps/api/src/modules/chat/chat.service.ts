@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash } from 'node:crypto'
+import Anthropic from '@anthropic-ai/sdk'
 import { prisma } from '../../database/prisma'
 import {
   type ImagePart,
@@ -27,14 +28,13 @@ import {
   type AgentMode,
   type VenueContactSummary,
   type VenueProfileContext,
+  type VenueSnapshot,
 } from './gm-agent'
 import {
   ConversationCompactorService,
   type CompactableMessage,
 } from './conversation-compactor.service'
 import { ConversationModeService } from './conversation-mode.service'
-import { detectEmergency } from './emergency-detector'
-import { pickTier } from './tier-router'
 import { UserProfileService } from './user-profile.service'
 
 type PersistedToolCall = {
@@ -117,8 +117,10 @@ function buildToolCallMap(
 }
 
 @Injectable()
-export class ChatService {
+export class ChatService implements OnModuleInit {
   private readonly logger = new Logger(ChatService.name)
+
+  private anthropic!: Anthropic
 
   constructor(
     private readonly dispatcher: ToolDispatcher,
@@ -127,6 +129,12 @@ export class ChatService {
     private readonly userProfile: UserProfileService,
     private readonly compactor: ConversationCompactorService,
   ) {}
+
+  onModuleInit(): void {
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set')
+    this.anthropic = new Anthropic({ apiKey })
+  }
 
   /// Phase F — fetch (and lazily refresh) the user's GM profile summary for
   /// injection into prompt context. Soft-fails to null so chat never blocks.
@@ -152,10 +160,11 @@ export class ChatService {
     }
   }
 
-  /// Phase E — resolve the conversation mode. Persisted on ChatConversation.
-  /// Hot path: stored mode if non-default, else regex-only sync classifier.
-  /// Haiku fallback runs in the background (fire-and-forget) — its result
-  /// persists for the NEXT turn so we never block a user-perceived send.
+  /// Resolve the conversation mode for THIS turn. If the conversation already
+  /// has a non-default mode stored, reuse it. Otherwise return 'default' for
+  /// this turn and fire the Haiku classifier in the background — the result
+  /// persists on the conversation row, so subsequent turns see the right mode.
+  /// We never block the user-perceived turn on a Haiku call.
   private async resolveConversationMode(
     conversationId: string,
     firstUserMessage: string | null,
@@ -170,17 +179,6 @@ export class ChatService {
     }
     if (!firstUserMessage) return (stored as AgentMode) ?? 'default'
 
-    // Fast path: regex-only.
-    const syncMatch = this.modeClassifier.classifySync(firstUserMessage)
-    if (syncMatch && syncMatch !== 'default') {
-      await prisma.chatConversation
-        .update({ where: { id: conversationId }, data: { mode: syncMatch } })
-        .catch(() => undefined)
-      return syncMatch
-    }
-
-    // No sync match → default for this turn, but fire Haiku classification in
-    // the background so the persisted mode is correct on subsequent turns.
     void this.modeClassifier
       .classify(firstUserMessage)
       .then((classified) => {
@@ -191,6 +189,150 @@ export class ChatService {
       })
       .catch(() => undefined)
     return 'default'
+  }
+
+  /// Build the venue snapshot — top knowledge items + recently-answered KB
+  /// gaps + tabular doc inventory. Injected into the system prompt so the
+  /// agent can answer most lookups directly without a find_knowledge round-trip.
+  ///
+  /// Notes:
+  ///  - KnowledgeItems with metadata.isGap=true AND answerStatus='answered' are
+  ///    surfaced as recentlyAnswered. Pending gaps (no answer yet) are filtered.
+  ///  - Tabular docs are detected via metadata.docType='tabular' (the same flag
+  ///    the dispatcher uses for query_document_table routing).
+  ///  - Soft-fails to an empty snapshot — the agent falls back to find_knowledge.
+  private async buildVenueSnapshot(
+    orgId: string,
+    venueId: string,
+  ): Promise<VenueSnapshot> {
+    try {
+      const rows = await prisma.knowledgeItem.findMany({
+        where: {
+          organizationId: orgId,
+          OR: [{ venueId }, { venueId: null }],
+          answerStatus: 'answered',
+        },
+        orderBy: [{ updatedAt: 'desc' }],
+        take: 24,
+        select: {
+          id: true,
+          content: true,
+          aiSummary: true,
+          metadata: true,
+        },
+      })
+
+      const topKnowledge: VenueSnapshot['topKnowledge'] = []
+      const recentlyAnswered: VenueSnapshot['recentlyAnswered'] = []
+      const tabularDocs: VenueSnapshot['tabularDocs'] = []
+
+      for (const r of rows) {
+        const meta = (r.metadata ?? {}) as Record<string, unknown>
+        const docType = typeof meta.docType === 'string' ? meta.docType : null
+        const title =
+          typeof meta.title === 'string' && meta.title.trim().length > 0
+            ? meta.title.trim()
+            : r.content.replace(/\s+/g, ' ').trim().slice(0, 60)
+        const summary = (r.aiSummary ?? r.content)
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 140)
+
+        if (docType === 'tabular') {
+          if (tabularDocs.length < 8) tabularDocs.push({ id: r.id, title })
+          continue
+        }
+
+        if (meta.isGap === true) {
+          const tentative = typeof meta.tentativeAnswer === 'string' ? meta.tentativeAnswer : null
+          const answer = (r.aiSummary && r.aiSummary.trim().length > 0)
+            ? r.aiSummary
+            : tentative
+          if (answer && recentlyAnswered.length < 6) {
+            recentlyAnswered.push({
+              question: r.content.replace(/\s+/g, ' ').trim().slice(0, 160),
+              answer: answer.replace(/\s+/g, ' ').trim().slice(0, 200),
+            })
+          }
+          continue
+        }
+
+        if (topKnowledge.length < 10) {
+          topKnowledge.push({ id: r.id, title, summary })
+        }
+      }
+
+      return { topKnowledge, recentlyAnswered, tabularDocs }
+    } catch (err) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'chat.snapshot_build_failed',
+          message: (err as Error).message,
+        }),
+      )
+      return {}
+    }
+  }
+
+  /// Generate 0-3 follow-up suggestions via Haiku from the user message + final
+  /// assistant text. Decoupled from the main agent loop — fires after the
+  /// answer is ready, so it adds latency only to the post-answer pills, not
+  /// to TTFB. Soft-fails to []. Hard cap on time so a slow Haiku call never
+  /// holds up persistence.
+  private async generateFollowUps(
+    userMessage: string,
+    assistantText: string,
+  ): Promise<string[]> {
+    if (!assistantText.trim()) return []
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 2500)
+    try {
+      const response = await this.anthropic.messages.create(
+        {
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 200,
+          messages: [
+            {
+              role: 'user',
+              content: `You are generating 0-3 follow-up question pills for a hospitality-staff chat. Given the user's question and the assistant's answer, suggest the most likely next questions the user would tap.
+
+Rules:
+- 0 to 3 entries.
+- Each ≤120 chars, first-person natural voice ("How do I…", "Who do I call for…", "What's the…").
+- Prefer follow-ups that reference artifacts named in the answer (procedures, SOPs, suppliers, contacts).
+- Skip if nothing sensible — return [].
+- Return ONLY a JSON array of strings, no commentary, no code fences.
+
+User: ${userMessage}
+
+Assistant answer: ${assistantText}`,
+            },
+          ],
+        },
+        { signal: controller.signal },
+      )
+      const raw = response.content
+        .filter((b) => b.type === 'text')
+        .map((b) => (b as { text: string }).text)
+        .join('')
+        .trim()
+      // Strip code fences if Haiku ignored the no-fences rule.
+      const cleaned = raw
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/, '')
+        .trim()
+      const parsedJson: unknown = JSON.parse(cleaned)
+      if (!Array.isArray(parsedJson)) return []
+      return parsedJson
+        .filter((s): s is string => typeof s === 'string')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0 && s.length <= 120)
+        .slice(0, 3)
+    } catch {
+      return []
+    } finally {
+      clearTimeout(timer)
+    }
   }
 
   /// Phase D — hydrate venue profile + emergency-flagged contacts so the
@@ -398,7 +540,17 @@ export class ChatService {
     }))
     const toolCallsByMessageId = buildToolCallMap(filteredRaw)
 
-    const compaction = await this.compactor.compactIfNeeded(conversationId, history)
+    // Pre-amble — fan out everything the agent needs into one Promise.all so
+    // TTFB isn't paying for sequential awaits. Mode resolution stays in here
+    // (it's quick — just a DB read; the Haiku classifier fires in the background).
+    const [compaction, agentMode, venueContext, profileSummary, venueSnapshot] =
+      await Promise.all([
+        this.compactor.compactIfNeeded(conversationId, history),
+        this.resolveConversationMode(conversationId, input.userMessage),
+        this.buildVenueContext(venue),
+        this.getUserProfileSummary(userId, orgId),
+        this.buildVenueSnapshot(orgId, venue.id),
+      ])
     const messages: ModelMessage[] = expandRecentToModelMessages(
       compaction.recent,
       toolCallsByMessageId,
@@ -424,28 +576,20 @@ export class ChatService {
 
     const toolCallLog: ToolCallLogEntry[] = []
     const retrievedItemIds = new Set<string>()
-    let followUps: string[] = []
     let round = 0
     const startedAt = Date.now()
-
-    const agentMode = await this.resolveConversationMode(conversationId, input.userMessage)
-    const tierForLog = pickTier(input.userMessage, agentMode)
 
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       ctx: { orgId, userId, userRole },
-      venueContext: await this.buildVenueContext(venue),
+      venueContext,
       mode: agentMode,
-      tier: tierForLog,
       priorSummary: compaction.summary,
-      emergencyAdvisory: (() => {
-        const e = detectEmergency(input.userMessage)
-        return e.triggered ? { matched: e.matched ?? '' } : null
-      })(),
+      venueSnapshot,
       userContext: {
         name: userIdentity.name,
         email: userIdentity.email,
-        profileSummary: await this.getUserProfileSummary(userId, orgId),
+        profileSummary,
       },
       onStepFinish: (step) => {
         round++
@@ -472,16 +616,6 @@ export class ChatService {
               }
             }
           }
-
-          if (tr.toolName === 'suggest_followups') {
-            const output = tr.output as {
-              ok?: boolean
-              data?: { followUps?: string[] }
-            } | null
-            if (output?.ok && Array.isArray(output.data?.followUps)) {
-              followUps = output.data!.followUps!.slice(0, 3)
-            }
-          }
         }
       },
     })
@@ -502,8 +636,8 @@ export class ChatService {
       // Plan 01-03 audit-AC4 — observe Anthropic prompt-cache hit on the
       // turn's response.usage. AI SDK 6.x unified usage shape:
       // result.usage.inputTokenDetails.{cacheReadTokens,cacheWriteTokens}.
-      // PII boundary: counts + tier + conversationIdHash only — no message
-      // body, no retrieved content. `tier` is operator-only observability.
+      // PII boundary: counts + conversationIdHash only — no message body, no
+      // retrieved content.
       try {
         const usage = result.usage as {
           inputTokens?: number
@@ -524,7 +658,6 @@ export class ChatService {
               cache_creation_input_tokens: cacheWrite ?? 0,
               input_tokens: usage?.inputTokens ?? 0,
               output_tokens: usage?.outputTokens ?? 0,
-              tier: tierForLog,
               conversationIdHash,
             }),
           )
@@ -554,6 +687,12 @@ export class ChatService {
       )
       finalText = 'I hit an error calling the model — please retry.'
     }
+
+    // Generate follow-up pills via Haiku from (user msg, final answer). Decoupled
+    // from the agent loop so it doesn't add to the agent's perceived latency in
+    // the streaming path; here in the non-streaming path we await it because
+    // the response shape requires followUps on the persisted row. Soft-fails to [].
+    const followUps = await this.generateFollowUps(input.userMessage, finalText)
 
     this.logger.log(
       JSON.stringify({
@@ -781,14 +920,6 @@ export class ChatService {
       content: m.content,
     }))
     const streamToolCallsByMessageId = buildToolCallMap(filteredStreamRaw)
-    const streamCompaction = await this.compactor.compactIfNeeded(
-      conversationId,
-      streamHistory,
-    )
-    const modelMessages: ModelMessage[] = expandRecentToModelMessages(
-      streamCompaction.recent,
-      streamToolCallsByMessageId,
-    )
 
     const ctx: DispatchContext = {
       orgId: params.orgId,
@@ -798,39 +929,38 @@ export class ChatService {
 
     // First user message in this thread for mode classification (if not already set).
     const firstUserMessage =
-      modelMessages.find((m) => m.role === 'user' && typeof m.content === 'string')?.content ??
-      null
-    const agentMode = await this.resolveConversationMode(
-      conversationId,
-      typeof firstUserMessage === 'string' ? firstUserMessage : null,
+      streamHistory.find((m) => m.role === 'user')?.content ?? params.userText
+
+    // Pre-amble — fan out everything in parallel to minimise TTFB.
+    const [streamCompaction, agentMode, venueContext, profileSummary, venueSnapshot] =
+      await Promise.all([
+        this.compactor.compactIfNeeded(conversationId, streamHistory),
+        this.resolveConversationMode(conversationId, firstUserMessage),
+        this.buildVenueContext(venue),
+        this.getUserProfileSummary(params.userId, params.orgId),
+        this.buildVenueSnapshot(params.orgId, venue.id),
+      ])
+    const modelMessages: ModelMessage[] = expandRecentToModelMessages(
+      streamCompaction.recent,
+      streamToolCallsByMessageId,
     )
 
     const retrievedItemIds = new Set<string>()
-    // Captured follow-ups from the terminal `suggest_followups` tool. The
-    // tool's execute() returns the input so we can observe it here.
-    let followUps: string[] = []
     // Full tool call log for persistence + adaptation loop.
     const toolCallLog: ToolCallLogEntry[] = []
     let round = 0
     const startedAt = Date.now()
 
-    // Agentic primary: ToolLoopAgent with adaptive reasoning + sequential
-    // tool use + terminal suggest_followups tool. Stop conditions: 20 steps or
-    // a successful save_knowledge_doc (destructive terminal).
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       ctx,
-      venueContext: await this.buildVenueContext(venue),
+      venueContext,
       mode: agentMode,
-      tier: pickTier(params.userText, agentMode),
       priorSummary: streamCompaction.summary,
-      emergencyAdvisory: (() => {
-        const e = detectEmergency(params.userText)
-        return e.triggered ? { matched: e.matched ?? '' } : null
-      })(),
+      venueSnapshot,
       userContext: {
         ...(params.userIdentity ?? { name: null, email: '' }),
-        profileSummary: await this.getUserProfileSummary(params.userId, params.orgId),
+        profileSummary,
       },
       onStepFinish: (step) => {
         round++
@@ -857,16 +987,6 @@ export class ChatService {
               for (const hit of output.data as Array<{ id?: string }>) {
                 if (hit?.id) retrievedItemIds.add(hit.id)
               }
-            }
-          }
-
-          if (tr.toolName === 'suggest_followups') {
-            const output = tr.output as {
-              ok?: boolean
-              data?: { followUps?: string[] }
-            } | null
-            if (output?.ok && Array.isArray(output.data?.followUps)) {
-              followUps = output.data!.followUps!.slice(0, 3)
             }
           }
         }
@@ -903,6 +1023,11 @@ export class ChatService {
           ? (lastAssistant.content as unknown as object)
           : null
 
+        // Generate follow-up pills via Haiku from (user msg, final answer).
+        // The user has already seen the answer streamed, so this latency only
+        // delays when the pills appear — not when the message arrives.
+        const followUps = await this.generateFollowUps(params.userText, storedContent)
+
         const assistantMessage = await prisma.chatMessage.create({
           data: {
             id: assistantMessageId,
@@ -935,6 +1060,11 @@ export class ChatService {
             hasReasoning: Boolean(reasoningText),
           }),
         )
+
+        // Push followUps onto the stream as a separate persistent UIMessage
+        // metadata event so the client renders the pills after the text settles.
+        // (Stream-side: handled via assistantMessage.followUps in the DB read
+        //  on the next /messages fetch. The web UI already binds to that field.)
       },
     })
 

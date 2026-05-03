@@ -2,13 +2,11 @@ import {
   ToolLoopAgent,
   stepCountIs,
   hasToolCall,
-  tool,
   type ToolSet,
   type OnFinishEvent,
   type SystemModelMessage,
 } from 'ai'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { z } from 'zod'
 import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
 import { buildAiSdkTools } from './ai-sdk-tools'
 import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
@@ -26,44 +24,19 @@ import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
 
 export type AgentMode = 'default' | 'incident' | 'handover' | 'training'
-export type AgentTier = 'haiku' | 'sonnet'
 
-const MODEL_BY_TIER: Record<AgentTier, string> = {
-  haiku: 'claude-haiku-4-5-20251001',
-  sonnet: 'claude-sonnet-4-6',
-}
+const MODEL_ID = 'claude-sonnet-4-6'
 
-// Default tier when caller doesn't specify; Sonnet covers anything non-trivial.
-const DEFAULT_TIER: AgentTier = 'sonnet'
-
-// Upper loop budget. 20 is the AI SDK default and gives ample room for
-// retrieve → cross-check → draft → save sequences without runaway risk.
-const MAX_STEPS = 20
-
-// Returned by the terminal `suggest_followups` tool. Parsed + persisted on
-// onFinish.
-export type SuggestFollowUpsOutput = { followUps: string[] }
-
-const SuggestFollowUpsInputSchema = z.object({
-  followUps: z
-    .array(z.string().min(1).max(120))
-    .max(3)
-    .describe(
-      'Between 0 and 3 natural-voice follow-up questions the user might want to tap next. First person, ≤120 chars.',
-    ),
-})
+// Loop budget. 8 keeps the agent decisive — a real employee answers in
+// 1-4 tool calls; 8 is generous headroom. After step 5, prepareStep below
+// switches toolChoice to 'none' so the model MUST finalise.
+const MAX_STEPS = 8
+const FORCE_FINALISE_AFTER_STEP = 5
 
 /**
  * Builds the per-request GM agent. Tools are per-request because the dispatcher
  * closes over {orgId, userId, userRole} for tenant isolation, and we prefer
  * closure-based context over threading `experimental_context` through callers.
- *
- * Agentic surface:
- *  - adaptive thinking (reasoning parts streamed to the UI)
- *  - sequential tool use (retrieval-then-grounding is deterministic)
- *  - stopWhen: 20 steps OR `save_knowledge_doc` fired (destructive writes are
- *    terminal — no more tool calls after a successful write)
- *  - terminal `suggest_followups` tool replaces the `---FOLLOWUPS---` delimiter
  */
 export type VenueProfileContext = {
   layoutNotes?: string | null
@@ -83,6 +56,21 @@ export type VenueContactSummary = {
   phone: string | null
   email: string | null
   isEmergencyContact: boolean
+}
+
+/// Working-memory snapshot of frequently-asked-about items, injected into the
+/// stable system prompt so the agent answers most lookups without spending a
+/// find_knowledge round-trip.
+export type VenueSnapshot = {
+  /// Top knowledge items (SOPs / Q&As) the model should know off the top of
+  /// its head — title + 1-line summary + entityId for citation.
+  topKnowledge?: Array<{ id: string; title: string; summary: string }>
+  /// Recently-answered KB gaps (manager has confirmed answers to questions
+  /// staff have asked). Surface as authoritative.
+  recentlyAnswered?: Array<{ question: string; answer: string }>
+  /// Tabular doc names the model should know exist (so it knows what
+  /// query_document_table can search across).
+  tabularDocs?: Array<{ id: string; title: string }>
 }
 
 export function buildGmAgent(params: {
@@ -107,16 +95,12 @@ export function buildGmAgent(params: {
   }
   /// Conversation mode classified per-conversation. Default falls through to the base prompt.
   mode?: AgentMode
-  /// Reasoning-effort tier. Heuristic router picks Haiku for short factual
-  /// lookups, Sonnet for capture / incident / handover / multi-step.
-  tier?: AgentTier
   /// Phase F — compact summary of older turns when the conversation has been
   /// truncated. Injected into prompt context so the agent retains continuity.
   priorSummary?: string | null
-  /// Phase G3 — when set, a critical emergency phrase was detected pre-agent.
-  /// An advisory block is prepended to instructions forcing 999 / emergency
-  /// contact behaviour ahead of any other rules.
-  emergencyAdvisory?: { matched: string } | null
+  /// Working-memory snapshot — top KB items + recently-answered gaps + tabular
+  /// docs. Lets the agent answer lookups directly without a find_knowledge call.
+  venueSnapshot?: VenueSnapshot | null
   onFinish?: (event: OnFinishEvent<ToolSet>) => void | Promise<void>
   onStepFinish?: (step: {
     toolCalls?: ReadonlyArray<{
@@ -131,25 +115,7 @@ export function buildGmAgent(params: {
     }>
   }) => void
 }) {
-  const baseTools = buildAiSdkTools(params.dispatcher, params.ctx)
-
-  // Terminal tool: model calls this as its final step to register follow-up
-  // suggestions. Input is validated + typed; the output is trivially the
-  // same array so onStepFinish can pluck it out.
-  const suggest_followups = tool({
-    description:
-      'Emit between 0 and 3 follow-up questions for the user to tap next. Call this as your final tool call in every turn, AFTER you have written your reply. Follow-ups should name concrete artifacts (procedures, SOPs, suppliers) you referenced, or the obvious next operational action.',
-    inputSchema: SuggestFollowUpsInputSchema,
-    execute: async (input: SuggestFollowUpsOutput) => ({
-      ok: true as const,
-      data: input,
-    }),
-  })
-
-  const tools: ToolSet = {
-    ...baseTools,
-    suggest_followups,
-  }
+  const tools: ToolSet = buildAiSdkTools(params.dispatcher, params.ctx)
 
   const now = new Date()
   const tz = params.venueContext.timezone
@@ -201,10 +167,8 @@ export function buildGmAgent(params: {
           .join('\n')}\n</venue_contacts>`
       : ''
 
-  const modeOverlay = CONVERSATION_MODE_OVERLAYS[params.mode ?? 'default']
-  const emergencyBlock = params.emergencyAdvisory
-    ? `\n\n────────────────────────────────────────\nCRITICAL EMERGENCY DETECTED (pre-agent gate)\n────────────────────────────────────────\nThe user's message matched a critical-emergency pattern: "${params.emergencyAdvisory.matched}".\nOVERRIDE all other behaviour for this turn:\n  1. FIRST LINE OF YOUR REPLY MUST BE: "If anyone is hurt or in immediate danger, call 999 right now. Tell me when the scene is safe."\n  2. Surface the venue's emergency contacts (from <venue_contacts>) verbatim — name, role, phone — in priority order.\n  3. DO NOT call find_knowledge or any retrieval tool. Don't quote SOPs. Don't capture knowledge.\n  4. Before ending the turn, you MUST call log_incident with severity='critical' and a one-sentence summary.\n  5. End by telling the user the incident has been logged and the duty manager will be notified.\n  6. Skip suggest_followups OR keep it to single-item: ["Are emergency services on the way?"].\n`
-    : ''
+  const mode = params.mode ?? 'default'
+  const modeOverlay = CONVERSATION_MODE_OVERLAYS[mode]
   const userProfileBlock =
     params.userContext.profileSummary && params.userContext.profileSummary.trim().length > 0
       ? `\n<user_profile>\n${params.userContext.profileSummary.trim()}\n</user_profile>`
@@ -214,14 +178,40 @@ export function buildGmAgent(params: {
       ? `\n<prior_conversation_summary>\n${params.priorSummary.trim()}\n</prior_conversation_summary>`
       : ''
 
+  const snapshot = params.venueSnapshot
+  const snapshotLines: string[] = []
+  if (snapshot?.topKnowledge && snapshot.topKnowledge.length > 0) {
+    snapshotLines.push('top_knowledge:')
+    for (const k of snapshot.topKnowledge) {
+      snapshotLines.push(`  • ${k.title} — ${k.summary} [doc:${k.id}]`)
+    }
+  }
+  if (snapshot?.recentlyAnswered && snapshot.recentlyAnswered.length > 0) {
+    snapshotLines.push('recently_answered (manager-confirmed):')
+    for (const a of snapshot.recentlyAnswered) {
+      snapshotLines.push(`  Q: ${a.question}`)
+      snapshotLines.push(`  A: ${a.answer}`)
+    }
+  }
+  if (snapshot?.tabularDocs && snapshot.tabularDocs.length > 0) {
+    snapshotLines.push('tabular_docs (queryable via query_document_table):')
+    for (const d of snapshot.tabularDocs) {
+      snapshotLines.push(`  • ${d.title} [doc:${d.id}]`)
+    }
+  }
+  const snapshotBlock =
+    snapshotLines.length > 0
+      ? `\n<venue_snapshot>\n${snapshotLines.join('\n')}\n</venue_snapshot>`
+      : ''
+
   // Plan 01-03 — split system message into stable (cache-marked) + dynamic (no marker).
   // Stable goes FIRST so the cached prefix `[tools + stable_system]` is byte-stable
   // across turns. Per-turn dynamic context comes AFTER, unmarked, so it never breaks
   // the cache. See SYSTEM_CACHE_CONTROL comment for Anthropic semantic citation.
   const stableSystemBody = `${CHAT_SYSTEM_PROMPT}${modeOverlay}`
   const dynamicSystemBody = [
-    emergencyBlock,
-    `\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${params.mode ?? 'default'}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>`,
+    `\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${mode}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>`,
+    snapshotBlock,
     profileBlock,
     contactBlock,
     userProfileBlock,
@@ -243,35 +233,33 @@ export function buildGmAgent(params: {
       : []),
   ]
 
-  const tier = params.tier ?? DEFAULT_TIER
-  const modelId = MODEL_BY_TIER[tier]
+  // Adaptive thinking only when it earns its latency: incident mode (model has
+  // to plan a careful protocol) and training mode (interactive teaching needs
+  // step-by-step reasoning). Default + handover are fast snap-answer paths.
+  const wantsThinking = mode === 'incident' || mode === 'training'
 
   return new ToolLoopAgent({
     id: 'gm-chat-agent',
-    model: anthropicProvider(modelId),
+    model: anthropicProvider(MODEL_ID),
     instructions: systemMessages,
     tools,
     toolChoice: 'auto',
-    // Sequential tool use + adaptive thinking on Sonnet/Opus only. Haiku
-    // (4.5) rejects `thinking: 'adaptive'` with HTTP 400, so we skip the
-    // option for that tier — the simple lookups Haiku handles don't need it.
     providerOptions: {
       anthropic: {
-        ...(tier !== 'haiku' ? { thinking: { type: 'adaptive' as const } } : {}),
-        disableParallelToolUse: true,
+        ...(wantsThinking ? { thinking: { type: 'adaptive' as const } } : {}),
       },
     },
-    // 20 steps OR a successful save (destructive terminal) OR suggest_followups
-    // (turn-terminal — the model has emitted its answer + follow-up pills, no
-    // more output is needed). Plan 06-04 hot-fix 2026-05-02 — adding
-    // suggest_followups to stopWhen prevents the "post-answer restatement"
-    // bug where Sonnet would call suggest_followups, then continue the loop
-    // and emit a second redundant text part summarising what it just said.
-    stopWhen: [
-      stepCountIs(MAX_STEPS),
-      hasToolCall('save_knowledge_doc'),
-      hasToolCall('suggest_followups'),
-    ],
+    // After FORCE_FINALISE_AFTER_STEP tool steps, force the model to answer
+    // with what it has — no more tool calls. This is the "don't stand there
+    // for 20 seconds" guard: a real employee doesn't keep searching forever.
+    prepareStep: async ({ stepNumber }) => {
+      if (stepNumber >= FORCE_FINALISE_AFTER_STEP) {
+        return { toolChoice: 'none' as const }
+      }
+      return {}
+    },
+    // Stop after MAX_STEPS or on a successful destructive save.
+    stopWhen: [stepCountIs(MAX_STEPS), hasToolCall('save_knowledge_doc')],
     onFinish: params.onFinish,
     onStepFinish: params.onStepFinish,
   })

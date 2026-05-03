@@ -316,26 +316,11 @@ function AssistantBody({
   isStreaming: boolean
 }) {
   const lastIdx = parts.length - 1
-  // Plan 06-04 hot-fix 2026-05-02 — answer = the last text part BEFORE the
-  // terminal tool call (suggest_followups). Anything after suggest_followups
-  // is post-terminal junk Sonnet sometimes emits; ignore it. Any earlier text
-  // is interim narration that the model thought-streamed between tool calls;
-  // fold into the thought-process block so the answer area is stable.
-  //
-  // Mid-stream (no suggest_followups yet): treat the latest text part as the
-  // candidate answer; older text becomes interim. When the followups tool
-  // fires, the candidate "freezes" — later post-terminal text won't replace it.
-  const terminalToolIdx = (() => {
-    for (let i = 0; i < parts.length; i++) {
-      const p = parts[i]
-      if (!p || !isToolUIPart(p)) continue
-      if (getToolName(p) === 'suggest_followups') return i
-    }
-    return -1
-  })()
-  const consideredEnd = terminalToolIdx >= 0 ? terminalToolIdx : parts.length
+  // Answer = the last text part. Any earlier text parts are interim narration
+  // the model emits between tool calls; fold them into the thought-process
+  // block so the answer area stays stable as later parts stream in.
   const lastTextIdx = (() => {
-    for (let i = consideredEnd - 1; i >= 0; i--) {
+    for (let i = parts.length - 1; i >= 0; i--) {
       if (parts[i]?.type === 'text') return i
     }
     return -1
@@ -344,7 +329,6 @@ function AssistantBody({
   parts.forEach((p, i) => {
     if (!isToolUIPart(p)) return
     const name = getToolName(p)
-    if (name === 'suggest_followups') return
     toolChips.push({
       id: (p as { toolCallId?: string }).toolCallId ?? `tool-${i}`,
       label: toolLabel(name),
@@ -364,18 +348,13 @@ function AssistantBody({
       if (t.length > 0) reasoningTextParts.push(t)
       return
     }
-    // Text within the considered range (before suggest_followups, or all parts
-    // if it hasn't fired yet) but NOT the chosen answer = interim narration.
-    // Fold into the thought block so the answer area is stable.
-    if (
-      p.type === 'text' &&
-      i < consideredEnd &&
-      i !== lastTextIdx
-    ) {
+    // Text parts other than the final one = interim narration the model
+    // emitted between tool calls. Fold into the thought block so the answer
+    // area stays stable.
+    if (p.type === 'text' && i !== lastTextIdx) {
       const t = stripFollowUpTail(p.text).trim()
       if (t.length > 0) reasoningTextParts.push(t)
     }
-    // Text AFTER suggest_followups is post-terminal junk; silently discard.
   })
   const mergedReasoningText = reasoningTextParts.join('\n\n')
   const finalTextPart = lastTextIdx >= 0 ? parts[lastTextIdx] : null

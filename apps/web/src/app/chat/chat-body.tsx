@@ -310,6 +310,9 @@ function ChatCore({
           })),
         }
         queryClient.setQueryData(['conversation', cid, venue], seeded)
+        // Refetch the conversation so server-generated followUps (produced
+        // post-stream by Haiku) replace the empty seed and the pills appear.
+        queryClient.invalidateQueries({ queryKey: ['conversation', cid, venue] })
       }
       queryClient.invalidateQueries({ queryKey: ['chat-conversations'] })
     },

@@ -810,7 +810,6 @@ async function W24_chatCacheReadObservable(
       ctx,
       venueContext,
       userContext,
-      tier: 'sonnet', // audit-M1: probe pinned to Sonnet for usage-shape stability
     })
 
   const message = 'What does the cellar setup procedure say?'

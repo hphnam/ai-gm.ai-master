@@ -46,6 +46,27 @@ export function buildAiSdkTools(
           }
           return result
         },
+        // deep_research wraps the chat-v2 multi-agent pipeline. Its dispatcher
+        // result is { ok, data: { synthesis, retrievedItemIds } }. The
+        // `synthesis` is already the final answer text — pass that to the
+        // parent model verbatim so it composes its reply from a clean string
+        // instead of re-parsing the wrapper. Keeps the parent's context tight.
+        ...(def.name === 'deep_research'
+          ? {
+              toModelOutput: ({ output }: { output: unknown }) => {
+                const o = output as
+                  | { ok?: boolean; data?: { synthesis?: string }; detail?: string }
+                  | null
+                if (o?.ok && typeof o.data?.synthesis === 'string') {
+                  return { type: 'text' as const, value: o.data.synthesis }
+                }
+                return {
+                  type: 'text' as const,
+                  value: `deep_research returned no usable synthesis (${o?.detail ?? 'unknown'}).`,
+                }
+              },
+            }
+          : {}),
       }),
     ] as const
   })
