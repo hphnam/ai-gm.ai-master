@@ -204,5 +204,17 @@ Carry-forward from 06-01 / 06-02 / 06-03: D-06-01-A through N (excl. closed); D-
 **Skill audit:** No `.paul/SPECIAL-FLOWS.md` present — skill audit not applicable.
 
 ---
+
+## Post-summary fold (2026-05-03)
+
+Two follow-on commits landed after this SUMMARY was written. Folded into Phase 6 closure rather than spawning new plans, per user direction "fold it, call any of the chat stuff done too":
+
+- **f124697** — chat agent: rebuild loop for snap-answer agentic behaviour. Tightened ToolLoopAgent stop conditions and tool-pick heuristics on the now-default chat-v1 path. Behavioural tuning, no architectural change.
+- **d752a0b** — multi-file upload with venue auto-detection + paginated library with URL-state filters. Adds batch upload UI, ClassifierService venue auto-detection (≥0.75 confidence), cursor-based pagination on `/documents` API with server-side filtering, JSONB `pendingTypeProposal` null-handling fix via `jsonb_typeof`, nuqs URL-state filters in LibraryTab. Adjacent to chat work; v0.2 Phase 4 (Dynamic Document Intelligence) is already closed so this rolls into Phase 6 close rather than retroactively re-opening it.
+
+**Phase 6 status: CLOSED.** 06-05 (UI surface — streaming role transitions / general-advice badge / /debug/costs) deferred to v0.4 with trigger: "deep_research path graduates from rare-fallback to common-path, OR operator demand for cost telemetry surfaces." Role-transition events still emit on the deep_research code path but the UI for them is not load-bearing on the chat-v1 default surface.
+
+---
 *Phase: 06-multi-agent-chat-overhaul, Plan: 04*
 *Closed: 2026-05-02 — phase ends with architectural pivot; multi-agent preserved as `deep_research` tool, chat-v1 ToolLoopAgent restored as default*
+*Folded: 2026-05-03 — f124697 + d752a0b absorbed; 06-05 deferred to v0.4*

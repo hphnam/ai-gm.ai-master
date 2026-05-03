@@ -503,6 +503,7 @@ function DocSkeleton() {
 }
 
 export function DocDetailBody({ id }: { id: string }) {
+  const router = useRouter()
   const doc = useDoc(id)
   const [classifyOpen, setClassifyOpen] = useState(false)
   const [proposalOpen, setProposalOpen] = useState(false)
@@ -528,13 +529,23 @@ export function DocDetailBody({ id }: { id: string }) {
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
-          <Link
-            href="/docs"
+          {/* router.back() preserves the previous URL exactly — including any
+              ?q=, ?status=, etc. set via nuqs in the library tab. Falls back
+              to a plain push when there's no history (cold-loaded detail). */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back()
+              } else {
+                router.push('/docs')
+              }
+            }}
             className="-ml-1 inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Back to Knowledge
-          </Link>
+          </button>
 
           {doc.isLoading ? (
             <DocSkeleton />

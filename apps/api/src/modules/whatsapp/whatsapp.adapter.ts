@@ -115,6 +115,17 @@ export class WhatsAppAdapter {
         body: JSON.stringify(requestBody),
         signal: AbortSignal.timeout(INFOBIP_API_TIMEOUT_MS),
       })
+      const rawBody = await res.text()
+      // TEMP DEBUG — full Infobip response body so we can see why messages
+      // don't arrive despite 2xx. Remove once shape is locked.
+      this.logger.log('whatsapp.infobip_raw_response', {
+        to: sha256Prefix(to),
+        status: res.status,
+        contentType: res.headers.get('content-type'),
+        body: rawBody.slice(0, 2000),
+        latencyMs: Date.now() - startedAt,
+      })
+
       if (!res.ok) {
         this.logger.warn('whatsapp.infobip_error', {
           to: sha256Prefix(to),
@@ -123,16 +134,21 @@ export class WhatsAppAdapter {
         })
         return { ok: false, reason: 'whatsapp-service-unavailable' }
       }
+
       // Infobip success response shape: { messages: [{ messageId, status: {...} }] }.
-      // UAT-VERIFY: exact field names confirmed on first live send.
-      const json = (await res.json()) as {
-        messages?: Array<{ messageId?: string }>
+      let json: { messages?: Array<{ messageId?: string; status?: unknown }>; messageId?: string } = {}
+      try {
+        json = JSON.parse(rawBody)
+      } catch {
+        /* leave json empty — log already captured raw body */
       }
-      const messageId = json.messages?.[0]?.messageId
+      const messageId = json.messages?.[0]?.messageId ?? json.messageId
+      const messageStatus = json.messages?.[0]?.status
       this.logger.log('whatsapp.outbound', {
         to: sha256Prefix(to),
         mode: 'live',
         messageId,
+        messageStatus,
         latencyMs: Date.now() - startedAt,
       })
       return { ok: true, mode: 'live', messageId }

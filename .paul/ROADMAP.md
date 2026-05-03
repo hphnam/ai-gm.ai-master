@@ -7,12 +7,12 @@ Build the AI/API layer for a multi-venue hospitality operations assistant. v0.1 
 ## Current Milestone
 
 **v0.3 Neural Brain** (v0.3.0)
-Status: 🚧 In Progress (2 of 6 phases complete — Phase 1 Hierarchical Retrieval + Phase 5 Tabular Query Path closed 2026-04-28)
-Phases: 6
+Status: 🚧 In Progress (3 of 4 phases complete — Phase 1 Hierarchical Retrieval + Phase 5 Tabular Query Path closed 2026-04-28; Phase 6 Multi-Agent Chat Overhaul closed 2026-05-02 with post-fold 2026-05-03)
+Phases: 4 (re-shaped 2026-05-03 — old Phase 3 Scheduler + Phase 4 Procedural Runtime deferred to v0.4; new Phase 3 WhatsApp Conversational UX added; Phase 2 Graph Layer remains queued)
 
 **Theme:** "Per-venue neural brain — the assistant doesn't search docs, it knows the venue. Connections between docs are first-class data, and the WhatsApp channel speaks fluent venue-context."
 
-**Vision:** Pivot from flat RAG to a per-tenant **Obsidian-style knowledge graph**. Every doc is a node, every `[[wikilink]]` is a synapse, the agent walks associations the way a real GM does. Builds on the Phase 4 foundation (DocumentType taxonomy, Checklist entity, broadened extraction) and absorbs the unshipped 04-04/05 scope so notifications + procedural walkthroughs are graph-aware from launch.
+**Vision (revised 2026-05-03):** v0.3 originally scoped a graph-first WhatsApp story (scheduled notifications + procedural walkthroughs both graph-aware from day one). Real-Anthropic UAT during Phase 6 surfaced that the multi-agent default was wrong-shaped for hospitality realtime use; the architectural pivot landed chat-v1 as default with multi-agent preserved as a `deep_research` tool. With chat now stable but still web-only, the missing primitive isn't outbound automation or graph enrichment — it's getting the existing chatbot to behave correctly inside a single WhatsApp thread (identity → venue → conversation boundaries). Outbound scheduler + procedural-runtime work moves to v0.4 where they can stack on a working WhatsApp inbound surface.
 
 ### Phase Overview
 
@@ -20,12 +20,11 @@ Phases: 6
 |-------|------|-------|--------|-----------|
 | 1 | Hierarchical Retrieval | 3/3 (01-01 schema+ingest, 01-02 backfill+retrieval, 01-03 cache+section-payload+probe-eval) | ✅ Complete | 2026-04-28 |
 | 5 | Tabular Query Path | 1/1 (05-01 schema+ingest+query+tool+probe) | ✅ Complete | 2026-04-28 |
-| 6 | Multi-Agent Chat Overhaul | 5 | 🟡 In progress (06-01 + 06-02 SHIPPED 2026-05-01; 06-03 PLAN created; 06-04 NEW v1-deletion plan; 06-05 UI surface) | 06-01 ✅ 06-02 ✅ |
-| 2 | Graph Layer | TBD | Queued (after Phase 6) | - |
-| 3 | Scheduler + Graph-Aware WhatsApp Notifications | TBD | Queued (after Phase 2) | - |
-| 4 | WhatsApp Procedural Runtime | TBD | Queued (after Phase 3) | - |
+| 6 | Multi-Agent Chat Overhaul | 4/4 shipped (06-01, 06-02, 06-03, 06-04); 06-05 UI surface deferred to v0.4 | ✅ Complete (with post-fold) | 2026-05-02 (folded 2026-05-03) |
+| 3 | WhatsApp Conversational UX | TBD | 🔜 Next (in /paul:discuss) | - |
+| 2 | Graph Layer | TBD | Queued (after Phase 3) | - |
 
-**Execution order (resequenced 2026-05-01):** 1 ✅ → 5 ✅ → **6 (next)** → 2 → 3 → 4. Phase 6 pulled forward from end-of-milestone after /paul:discuss surfaced that today's chat failure modes (dual-checklist interleaving, hallucinated steps, meta-narration leakage, generic voice on complex queries) are architectural and need the role-based pipeline to fix structurally — not patchable at the prompt layer. Phases 2/3/4 land additively into the new pipeline (graph traversal as a new Docs-researcher tool; scheduler reuses Researcher pattern; procedural runtime uses chat-v2 as its dialog substrate). No renumbering — phase numbers stay stable, only execution sequence changed. CONTEXT.md decisions D-06-A through D-06-H locked at `.paul/phases/06-multi-agent-chat-overhaul/CONTEXT.md`.
+**Execution order (re-shaped 2026-05-03):** 1 ✅ → 5 ✅ → 6 ✅ → **3 (next — new scope)** → 2. Old Phase 3 (Scheduler + Graph-Aware Notifications) and old Phase 4 (Procedural Runtime) removed from v0.3 — both were graph-dependent outbound surfaces; v0.4 picks them up after the WhatsApp inbound primitive is proven. New Phase 3 owns the question "how does the existing chatbot work inside a WhatsApp thread?" — identity binding (phone → user → venue), venue switching when a user belongs to multiple venues, conversation boundaries inside a single infinite WhatsApp thread, onboarding flow. Existing wiring (06-04 Task 4) already routes WhatsApp inbound through ChatV2Service; pivot reverted that asymmetry — current WhatsApp consumer state is the open D-06-04-A. New Phase 3 entry-condition is /paul:discuss to lock conversational protocol decisions before /paul:plan.
 
 ### Phase 1: Hierarchical Retrieval
 
@@ -57,33 +56,28 @@ Phases: 6
 
 **Plans:** TBD (defined during /paul:plan)
 
-### Phase 3: Scheduler + Graph-Aware WhatsApp Notifications
+### Phase 3: WhatsApp Conversational UX (re-scoped 2026-05-03)
 
-**Focus:** Absorbed from v0.2's unshipped 04-04. Cron-ish firing layer over `Checklist.schedule` cadence + `@@unique([checklistId, instanceKey])` dedup surface (already shipped in 04-03). Outbound via the existing Infobip WhatsApp adapter. **Notifications are graph-aware** — a delivery reminder can pull adjacent context (related supplier docs, recent issues with this vendor) without a separate retrieval call.
+**Focus:** Get the existing chatbot — chat-v1's `ChatService` ToolLoopAgent (post-Phase-6) — working *correctly* inside a single WhatsApp thread. The plumbing is shipped (Infobip inbound webhook + signature guard + outbound REST + media download from v0.2 Phase 3, ChatV2Service consumer wiring from 06-04 Task 4 — currently asymmetric per D-06-04-A). The missing layer is the **conversational protocol** on top: how does a regional manager who works at three venues say "ask Beerhall Brixton about ice machine engineer"? When does a long-running thread become a fresh conversation? Who is this WhatsApp number bound to, and how do they prove it?
 
-**Scope (pre-discuss sketch):**
-- Scheduler service consuming `Checklist.schedule` + dedup on `@@unique([checklistId, instanceKey])`
-- Notification composer that walks the graph from the firing checklist (1-hop neighbors) to enrich the WhatsApp message with relevant adjacent context
-- Outbound via existing Infobip adapter (no new provider work)
-- Idempotency on retries (notification fired exactly once per `instanceKey`)
-- Operator visibility: scheduled-fire log + delivery audit
-- Probe assertions covering schedule firing, dedup, graph-context enrichment, and Infobip outbound
+**Replaces:** old Phase 3 (Scheduler + Graph-Aware Notifications) and old Phase 4 (Procedural Runtime), both deferred to v0.4. Both were graph-dependent outbound surfaces; v0.4 picks them up after the inbound primitive is proven.
 
-**Plans:** TBD (defined during /paul:plan)
+**Scope (pre-discuss sketch — to be locked in /paul:discuss):**
+- **Identity binding** — phone number ↔ user account ↔ organization membership. Phone OTP infrastructure already exists (v0.2 Plan 01-03). Open question: how does a fresh phone number bootstrap (admin-issued invite link with token? Self-DM the bot for OTP? First-message captures phone → asks for org code?)
+- **Venue context resolution** — when a user belongs to multiple venues, how does each turn know which venue to scope retrieval against? Candidates: explicit command (`/venue beerhall`); auto-infer from question content; sticky-per-conversation with confirmation on switch; per-thread default with override; pinned-venue per user. Single-venue users should never see this surface.
+- **Conversation boundaries** — WhatsApp is a single infinite thread per contact, but chat-v2 has discrete `Conversation` rows with their own message history scoped to LLM context windows. Mapping options: idle-timeout boundary (e.g. >30min silence → new conversation); explicit `/new` slash command; topic-shift heuristic (LLM judges); fixed-window-of-N-messages. History injection question: per-turn LLM context = current conversation only, or last conversation as warm priors, or sliding window across boundaries.
+- **Slash-command surface** — minimal command vocabulary inside WhatsApp (`/venue`, `/new`, `/help`, possibly `/whoami`). Decide what's a command vs. a natural-language intent the bot should detect.
+- **Message routing on the chat-v1 default path** — currently WhatsApp inbound goes through ChatV2Service (per 06-04 Task 4), but the architectural pivot reverted web /chat to chat-v1. Phase 3 must resolve this asymmetry: route WhatsApp through `ChatService.sendMessage` to match web behavior. D-06-04-A closes here.
+- **Onboarding flow** — first-message-from-unknown-number behavior. Options: silent reject; reply with onboarding prompt; gated by allowlist; admin-issued invite token verification.
+- **Probe coverage** — identity-binding flows, venue-switch correctness across turns, conversation-boundary behavior under various timing/topic patterns, asymmetry-revert verification (WhatsApp ↔ web parity on the default path).
 
-### Phase 4: WhatsApp Procedural Runtime
+**Existing wiring to leverage:**
+- Infobip adapter + HMAC-SHA256 signature guard + outbound REST + 5MB media download w/ magic-byte validation (v0.2 Plan 03-04)
+- Phone OTP via Twilio Verify (v0.2 Plan 01-03) — re-usable for WhatsApp identity binding
+- `ChatService.sendMessage` (chat-v1 default, post-Phase-6) — accepts `(orgId, userId, conversationId, text, attachments?)`; returns `{ assistantMessage, conversationId }`
+- `ConversationService` exported from chat-v2 module per 06-04 — handles list/fetch/delete; conversation row creation; history truncation
 
-**Focus:** Absorbed from v0.2's unshipped 04-05. Closes the original v0.2 milestone theme — staff can run procedural docs (opening checklist, closing routine, weekly stocktake) interactively over WhatsApp with completion tracking. **Walkthrough mode** steps users through Checklist entities; **ad-hoc mode** answers spontaneous questions; **completion** persists across sessions. All retrieval flows through the graph layer from Phase 2.
-
-**Scope (pre-discuss sketch):**
-- Walkthrough flow: present step → wait for user reply → record completion → next step; resumable across WhatsApp turns
-- Ad-hoc retrieval interleaved with walkthroughs (user can ask a side question mid-checklist, then resume)
-- Completion persistence on `ChecklistInstance` + per-step completion state
-- WhatsApp UX: numbered steps, clear progress indicators, graceful re-prompt on ambiguous reply
-- Operator dashboard surface (read-only): which checklists ran today, which are stuck, which completed
-- Probe assertions covering walkthrough state machine, mid-flow ad-hoc retrieval, completion persistence, and re-prompt behavior
-
-**Plans:** TBD (defined during /paul:plan)
+**Plans:** TBD (defined during /paul:plan after /paul:discuss locks the protocol decisions)
 
 ### Phase 5: Tabular Query Path
 
@@ -137,6 +131,9 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 | Item | Trigger |
 |------|---------|
+| Scheduler + Graph-Aware WhatsApp Notifications (was v0.3 Phase 3, removed 2026-05-03) | v0.3 Phase 3 (WhatsApp Conversational UX) ships and operates without UX regressions for 2+ weeks. Outbound automation needs a working inbound surface as its substrate — schedulers that fire into a broken thread protocol just amplify the breakage. |
+| WhatsApp Procedural Runtime — walkthrough mode + completion tracking (was v0.3 Phase 4, removed 2026-05-03) | Same trigger as Scheduler above. Procedural walkthrough is a multi-turn pattern; it depends on conversation-boundary semantics being settled by Phase 3 first. |
+| 06-05 UI surface — streaming role transitions / general-advice badge / `/debug/costs` (deferred from v0.3 Phase 6 close) | `deep_research` tool path graduates from rare-fallback to common path, OR operator demand for cost telemetry surfaces. Role-transition stream events still emit on the deep_research code path; UI is not load-bearing on the chat-v1 default. |
 | Write-back proposals from chat (agent extracts new facts → review queue in /docs) | v0.3 graph proves stable + trusted; operator demand surfaces. Live mutation is too risky before the graph itself is reliable — proposal-queue-first when we get there. |
 | Obsidian vault zip import/export | Customer asks for it, or graph stabilizes enough that interop becomes a sales/migration argument. Nice-to-have, not load-bearing. |
 | Visual graph view in /docs (force-directed graph visualization) | Wikilink autocomplete shipped + used; customer feedback indicates spatial overview helps. Autocomplete is what makes authoring work; the visual is eye-candy. |
@@ -194,4 +191,4 @@ These came up during v0.3 discussion and have specific revisit conditions, not a
 
 ---
 *Roadmap created: 2026-04-13*
-*Last updated: 2026-05-01 17:25 — Plan 06-01 SHIPPED 2026-05-01. Phase 6 re-sliced from 3 → 4 plans via /paul:discuss 06-02 (CONTEXT.md at `.paul/phases/06-multi-agent-chat-overhaul/06-02-CONTEXT.md` locks D-06-02-A through E: re-research confidence threshold 0.6 + cost ceiling $0.05/turn; Critic threshold-on-reasoning at 0.7; streaming named role transitions with /debug tool-call panel opt-in; minimum-viable 12-example voice corpus 4+4+4 for lookup/reasoning/incident; depth-before-breadth re-slicing — 06-02 ships Analyser+Critic+reasoning/incident, 06-03 ships 4 new researchers, 06-04 ships UI surface + cutover gate). PRIOR: 2026-05-01 — Phase 6 resequenced to next-up via /paul:discuss 6. Pulled forward from end-of-milestone after recognising today's chat failure modes are architectural (single agent + 333-line god-prompt + sequential tool use), not patchable at the prompt layer. New execution order: 1 ✅ → 5 ✅ → **6** → 2 → 3 → 4. Phase numbers preserved; only sequence changed. CONTEXT.md locked at `.paul/phases/06-multi-agent-chat-overhaul/CONTEXT.md` with 8 decisions D-06-A through D-06-H covering pipeline shape, mode-classified Triage, shaped tools (`get_checklist` returns full ordered list — eliminates today's interleaving + missing-step class structurally), friendly-GM Writer voice with mode-specific prompts + 8-example calibration anchor, UI-level "general advice" badge + save-CTA (no prose meta-narration), simplified USD-only cost tracking on `chat_messages.costUsd` + `knowledge_items.ingestionCostUsd`, feature-flag cutover with empirical quality gate (probe-eval ≥80% + manual UAT ≥18/20 amazing), and Phase 2 graph-readiness via additive `neighbors` field on `search_docs`.*
+*Last updated: 2026-05-03 — Phase 6 CLOSED with post-fold (f124697 chat-loop tuning + d752a0b multi-file upload + paginated library folded into 06-04 SUMMARY). Old Phase 3 (Scheduler + Graph-Aware Notifications) and old Phase 4 (Procedural Runtime) REMOVED from v0.3 — both deferred to v0.4 with explicit triggers. New Phase 3 (WhatsApp Conversational UX) added — re-thinks the WhatsApp integration around inbound conversational protocol (identity binding, venue switching, conversation boundaries) before any outbound automation. Execution order: 1 ✅ → 5 ✅ → 6 ✅ → **3 NEW (next — /paul:discuss)** → 2. PRIOR: 2026-05-01 17:25 — Plan 06-01 SHIPPED 2026-05-01. Phase 6 re-sliced from 3 → 4 plans via /paul:discuss 06-02 (CONTEXT.md at `.paul/phases/06-multi-agent-chat-overhaul/06-02-CONTEXT.md` locks D-06-02-A through E: re-research confidence threshold 0.6 + cost ceiling $0.05/turn; Critic threshold-on-reasoning at 0.7; streaming named role transitions with /debug tool-call panel opt-in; minimum-viable 12-example voice corpus 4+4+4 for lookup/reasoning/incident; depth-before-breadth re-slicing — 06-02 ships Analyser+Critic+reasoning/incident, 06-03 ships 4 new researchers, 06-04 ships UI surface + cutover gate). PRIOR: 2026-05-01 — Phase 6 resequenced to next-up via /paul:discuss 6. Pulled forward from end-of-milestone after recognising today's chat failure modes are architectural (single agent + 333-line god-prompt + sequential tool use), not patchable at the prompt layer.*

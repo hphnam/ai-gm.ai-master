@@ -41,15 +41,6 @@ export class WhatsappSignatureGuard implements CanActivate {
 
     const env = assertAuthEnv()
     const secret = env.infobip?.webhookSecret
-    const allowDevBypass = env.infobip?.allowDevBypass === true
-
-    // D-03-04-H: dev-bypass retained for manual curl testing during UAT.
-    // Gated on NODE_ENV !== production + ALLOW_WEBHOOK_DEV_BYPASS=true + no secret configured
-    // + literal signature value 'probe-console'. Remove post-UAT.
-    if (allowDevBypass && !secret && signaturePresent && rawSig === 'probe-console') {
-      this.logger.warn('whatsapp.signature_dev_bypass', { nodeEnv: process.env.NODE_ENV })
-      return true
-    }
 
     if (!secret) this.reject('config-missing', signaturePresent, bodyLen)
     if (!signaturePresent) this.reject('missing-signature', signaturePresent, bodyLen)

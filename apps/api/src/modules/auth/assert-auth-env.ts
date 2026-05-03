@@ -11,7 +11,6 @@ export type AuthEnv = {
     sender: string
     webhookSecret: string
     driverOverride: 'live' | 'console' | 'disabled' | undefined
-    allowDevBypass: boolean
   }
   // 03-05: Infobip 2FA SMS OTP config (shares baseUrl + apiKey with whatsapp `infobip` block above).
   // Undefined when PHONE_VERIFY_DRIVER_OVERRIDE=console OR when the 2FA env block is absent.
@@ -120,7 +119,6 @@ export function assertAuthEnv(): AuthEnv {
   const ibSender = process.env.INFOBIP_WHATSAPP_SENDER
   const ibSecret = process.env.INFOBIP_WEBHOOK_SECRET
   const ibOverrideRaw = process.env.INFOBIP_DRIVER_OVERRIDE
-  const ibAllowDevBypassRaw = process.env.ALLOW_WEBHOOK_DEV_BYPASS
   const isProd = process.env.NODE_ENV === 'production'
 
   const ibOverride: 'live' | 'console' | 'disabled' | undefined =
@@ -181,13 +179,6 @@ export function assertAuthEnv(): AuthEnv {
   if (ibSecret && ibSecret.length < 32) {
     errs.push(
       `INFOBIP_WEBHOOK_SECRET too short (${ibSecret.length} chars) — min 32 chars required for HMAC-SHA256 strength; ≥64 recommended`,
-    )
-  }
-
-  // Dev-bypass MUST NOT be enabled in production (unchanged gate from 03-01, retained for D-03-04-H).
-  if (isProd && ibAllowDevBypassRaw === 'true') {
-    errs.push(
-      'ALLOW_WEBHOOK_DEV_BYPASS must not be set to "true" in production — remove before deploying',
     )
   }
 
@@ -268,7 +259,6 @@ export function assertAuthEnv(): AuthEnv {
         sender: ibSender ?? '',
         webhookSecret: ibSecret ?? '',
         driverOverride: ibOverride,
-        allowDevBypass: !isProd && ibAllowDevBypassRaw === 'true',
       }
     : undefined
 

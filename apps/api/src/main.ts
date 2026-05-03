@@ -100,9 +100,8 @@ async function bootstrap() {
   //   VERIFY BEFORE DEPLOY:
   //     grep -n "webhooks/infobip/whatsapp" apps/api/src/main.ts  → must return 1 hit
   //     grep -n "req.rawBody = " apps/api/src/main.ts             → must return 1 hit
-  //     `curl -X POST .../webhooks/infobip/whatsapp -H 'x-callback-signature: probe-console' \
-  //        -d '{}' -H 'content-type: application/json'` → expect 200 with ALLOW_WEBHOOK_DEV_BYPASS=true
-  //        (curl-bypass validates the raw-body middleware actually fired; 403 "no-raw-body" = broken).
+  //     End-to-end check: send a real Infobip Portal trial inbound; expect 200 + payload
+  //     reaches the controller. 403 "no-raw-body" = middleware order broken.
 
   // Swagger / OpenAPI — served at /api-docs in dev for browsing, the same
   // document is emitted to swagger.json by `pnpm swagger:generate` for orval
