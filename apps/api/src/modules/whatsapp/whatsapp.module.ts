@@ -13,6 +13,7 @@ import { WhatsappSignatureGuard } from './whatsapp-signature.guard'
 import { InviteService } from './invite.service'
 import { WhatsappOtpService } from './whatsapp-otp.service'
 import { InviteController } from './invite.controller'
+import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 
 @Module({
   imports: [ChatV2Module, SuggestionsModule, AuthModule],
@@ -22,8 +23,9 @@ import { InviteController } from './invite.controller'
     WhatsappSignatureGuard,
     InviteService,
     WhatsappOtpService,
+    WhatsappOnboardingService,
   ],
   controllers: [WhatsappController, InviteController],
-  exports: [WhatsAppAdapter, InviteService, WhatsappOtpService],
+  exports: [WhatsAppAdapter, InviteService, WhatsappOtpService, WhatsappOnboardingService],
 })
 export class WhatsappModule {}

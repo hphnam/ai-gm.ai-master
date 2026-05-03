@@ -16,6 +16,7 @@ import { recordAndCheckVerifiedSender } from './verified-sender-rate-limit'
 import { markAndCheckSid } from './seen-message-sids'
 import { clearTypingRefire, startTypingRefire } from './typing-indicator-timers'
 import { downloadWhatsappMedia } from './whatsapp-media-download'
+import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 
 const WA_CONVERSATION_IDLE_MS = 2 * 60 * 60 * 1000
 const WA_CHANNEL = 'whatsapp'
@@ -82,6 +83,7 @@ export class WhatsappService {
     private readonly adapter: WhatsAppAdapter,
     private readonly chatV2Service: ChatV2Service,
     private readonly suggestions: SuggestionsService,
+    private readonly onboarding: WhatsappOnboardingService,
   ) {}
 
   async handleInbound(result: InfobipInboundResult): Promise<void> {
@@ -125,11 +127,52 @@ export class WhatsappService {
       // Infobip delivers bare digits — prepend `+` so the lookup matches.
       const phoneNumber = '+' + result.from
 
-      // Sender resolution — verified users only pass.
+      // Plan 03-01 — onboarding state machine. Before chat dispatch, resolve
+      // the phone's onboarding state. Unknown / otp_pending / linked_no_venue
+      // are handled inline by the state machine; only fully-linked phones fall
+      // through to chat. Plan 03-02 will close D-06-04-A by routing the linked
+      // path through chat-v1 ChatService instead of ChatV2Service.
+      const onboardingState = await this.onboarding.loadState(phoneNumber)
+
+      if (onboardingState.kind !== 'linked') {
+        // Apply unknown-number reply rate-limit only when the phone is still
+        // in `unknown` — mid-flow states (otp_pending, linked_no_venue) are
+        // intentionally responsive so users aren't stuck after a typo.
+        if (onboardingState.kind === 'unknown') {
+          const { shouldReply } = recordAndCheckOnboardingReply(fromHash)
+          if (!shouldReply) {
+            this.logger.log('whatsapp.unknown_number', {
+              from: fromHash,
+              replied: false,
+              reason: 'rate-limited',
+            })
+            return
+          }
+        }
+
+        const raw = result.message.text ?? ''
+        const out = await this.onboarding.runTransition(onboardingState, raw)
+        this.logger.log('whatsapp.onboarding_handled', {
+          from: fromHash,
+          fromStateKind: onboardingState.kind,
+          toStateKind: out.nextStateKind,
+          replied: out.outboundText !== null,
+        })
+        return
+      }
+
+      // Linked path — resolve User by phone (session has userId, but downstream
+      // code uses the User object). Verified phone is implied by linked state.
       const user = await prisma.user.findFirst({
-        where: { phoneNumber, phoneVerifiedAt: { not: null } },
+        where: { id: onboardingState.userId },
       })
       if (!user) {
+        // Session row references a user that has since been deleted. Treat as
+        // unknown and prompt — onboarding will re-create on next valid invite.
+        this.logger.warn('whatsapp.session_user_missing', {
+          userId: onboardingState.userId,
+          from: fromHash,
+        })
         await this.handleUnknownNumber(result, fromHash)
         return
       }
@@ -152,27 +195,22 @@ export class WhatsappService {
       }
 
       try {
-        // Org resolution.
+        // Org resolution — Plan 03-01 binds via WhatsappSession.currentOrganizationId
+        // (sticky venue from onboarding). Multi-org users picked their org during
+        // onboarding; subsequent venue switching is Plan 03-02's job.
         const member = await prisma.organizationMember.findFirst({
-          where: { userId: user.id },
-          orderBy: { createdAt: 'asc' },
+          where: { userId: user.id, organizationId: onboardingState.organizationId },
         })
         if (!member) {
-          this.logger.warn('whatsapp.orphan_user', { userId: user.id })
-          await this.handleUnknownNumber(result, fromHash)
-          return
-        }
-
-        // 03-01 S8: multi-org routing transparency.
-        const orgCount = await prisma.organizationMember.count({
-          where: { userId: user.id },
-        })
-        if (orgCount > 1) {
-          this.logger.warn('whatsapp.multi_org_user', {
+          this.logger.warn('whatsapp.session_membership_revoked', {
             userId: user.id,
-            chosenOrgId: member.organizationId,
-            totalOrgs: orgCount,
+            organizationId: onboardingState.organizationId,
           })
+          await this.adapter.sendText(
+            result.from,
+            'Your access to that venue was changed. Ask your manager to re-invite.',
+          )
+          return
         }
 
         // Venue resolution — default to oldest venue in org.
