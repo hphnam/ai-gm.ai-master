@@ -143,6 +143,14 @@ export interface ListConversationItemDto {
   preview: string | null;
 }
 
+export type ConversationResponseDtoVisibility = typeof ConversationResponseDtoVisibility[keyof typeof ConversationResponseDtoVisibility];
+
+
+export const ConversationResponseDtoVisibility = {
+  private: 'private',
+  org: 'org',
+} as const;
+
 export type ConversationResponseDtoMessagesItemRole = typeof ConversationResponseDtoMessagesItemRole[keyof typeof ConversationResponseDtoMessagesItemRole];
 
 
@@ -167,8 +175,35 @@ export type ConversationResponseDtoMessagesItem = {
 export interface ConversationResponseDto {
   id: string;
   venueId: string;
+  userId: string | null;
   channel: string;
+  visibility: ConversationResponseDtoVisibility;
   messages: ConversationResponseDtoMessagesItem[];
+}
+
+export type UpdateConversationVisibilityDtoVisibility = typeof UpdateConversationVisibilityDtoVisibility[keyof typeof UpdateConversationVisibilityDtoVisibility];
+
+
+export const UpdateConversationVisibilityDtoVisibility = {
+  private: 'private',
+  org: 'org',
+} as const;
+
+export interface UpdateConversationVisibilityDto {
+  visibility: UpdateConversationVisibilityDtoVisibility;
+}
+
+export type UpdateConversationVisibilityResponseDtoVisibility = typeof UpdateConversationVisibilityResponseDtoVisibility[keyof typeof UpdateConversationVisibilityResponseDtoVisibility];
+
+
+export const UpdateConversationVisibilityResponseDtoVisibility = {
+  private: 'private',
+  org: 'org',
+} as const;
+
+export interface UpdateConversationVisibilityResponseDto {
+  id: string;
+  visibility: UpdateConversationVisibilityResponseDtoVisibility;
 }
 
 export interface SuggestionsOnOpenRequestDto {
@@ -1019,6 +1054,13 @@ export type ChatControllerDeleteConversationParams = {
 venueId: string;
 };
 
+export type ChatControllerUpdateVisibilityParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId: string;
+};
+
 export type DebugControllerGetConversationParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
@@ -1857,6 +1899,93 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatControllerDeleteConversationMutationOptions(options), queryClient);
+    }
+
+export type chatControllerUpdateVisibilityResponse200 = {
+  data: UpdateConversationVisibilityResponseDto
+  status: 200
+}
+
+export type chatControllerUpdateVisibilityResponseSuccess = (chatControllerUpdateVisibilityResponse200) & {
+  headers: Headers;
+};
+;
+
+export type chatControllerUpdateVisibilityResponse = (chatControllerUpdateVisibilityResponseSuccess)
+
+export const getChatControllerUpdateVisibilityUrl = (id: string,
+    params: ChatControllerUpdateVisibilityParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/chat/conversations/${id}/visibility?${stringifiedParams}` : `/chat/conversations/${id}/visibility`
+}
+
+export const chatControllerUpdateVisibility = async (id: string,
+    updateConversationVisibilityDto: UpdateConversationVisibilityDto,
+    params: ChatControllerUpdateVisibilityParams, options?: RequestInit): Promise<chatControllerUpdateVisibilityResponse> => {
+
+  return orvalMutator<chatControllerUpdateVisibilityResponse>(getChatControllerUpdateVisibilityUrl(id,params),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateConversationVisibilityDto,)
+  }
+);}
+
+
+
+
+export const getChatControllerUpdateVisibilityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerUpdateVisibility>>, TError,{id: string;data: UpdateConversationVisibilityDto;params: ChatControllerUpdateVisibilityParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof chatControllerUpdateVisibility>>, TError,{id: string;data: UpdateConversationVisibilityDto;params: ChatControllerUpdateVisibilityParams}, TContext> => {
+
+const mutationKey = ['chatControllerUpdateVisibility'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatControllerUpdateVisibility>>, {id: string;data: UpdateConversationVisibilityDto;params: ChatControllerUpdateVisibilityParams}> = (props) => {
+          const {id,data,params} = props ?? {};
+
+          return  chatControllerUpdateVisibility(id,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChatControllerUpdateVisibilityMutationResult = NonNullable<Awaited<ReturnType<typeof chatControllerUpdateVisibility>>>
+    export type ChatControllerUpdateVisibilityMutationBody = UpdateConversationVisibilityDto
+    export type ChatControllerUpdateVisibilityMutationError = unknown
+
+    export const useChatControllerUpdateVisibility = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatControllerUpdateVisibility>>, TError,{id: string;data: UpdateConversationVisibilityDto;params: ChatControllerUpdateVisibilityParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof chatControllerUpdateVisibility>>,
+        TError,
+        {id: string;data: UpdateConversationVisibilityDto;params: ChatControllerUpdateVisibilityParams},
+        TContext
+      > => {
+      return useMutation(getChatControllerUpdateVisibilityMutationOptions(options), queryClient);
     }
 
 export type suggestionsControllerOnOpenResponse200 = {

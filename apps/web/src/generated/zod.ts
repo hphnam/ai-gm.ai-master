@@ -116,7 +116,9 @@ export const ChatControllerGetConversationQueryParams = zod.object({
 export const ChatControllerGetConversationResponse = zod.object({
   "id": zod.string(),
   "venueId": zod.string(),
+  "userId": zod.union([zod.string(),zod.null()]),
   "channel": zod.string(),
+  "visibility": zod.enum(['private', 'org']),
   "messages": zod.array(zod.object({
   "id": zod.string(),
   "role": zod.enum(['user', 'assistant']),
@@ -144,6 +146,30 @@ export const chatControllerDeleteConversationQueryVenueIdRegExp = new RegExp('^[
 
 export const ChatControllerDeleteConversationQueryParams = zod.object({
   "venueId": zod.string().regex(chatControllerDeleteConversationQueryVenueIdRegExp)
+})
+
+
+export const chatControllerUpdateVisibilityPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatControllerUpdateVisibilityParams = zod.object({
+  "id": zod.string().regex(chatControllerUpdateVisibilityPathIdRegExp)
+})
+
+export const chatControllerUpdateVisibilityQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ChatControllerUpdateVisibilityQueryParams = zod.object({
+  "venueId": zod.string().regex(chatControllerUpdateVisibilityQueryVenueIdRegExp)
+})
+
+export const ChatControllerUpdateVisibilityBody = zod.object({
+  "visibility": zod.enum(['private', 'org'])
+})
+
+export const ChatControllerUpdateVisibilityResponse = zod.object({
+  "id": zod.string(),
+  "visibility": zod.enum(['private', 'org'])
 })
 
 

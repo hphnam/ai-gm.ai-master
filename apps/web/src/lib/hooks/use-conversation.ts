@@ -22,10 +22,16 @@ export function useConversation(
         // 404 just means "blank chat" — return an empty shell so the UI can
         // render instantly.
         if (err instanceof ApiError && err.status === 404) {
+          // Fresh thread — userId/visibility null/undefined means "row doesn't
+          // exist yet"; the chat UI treats `visibility === null` as the
+          // not-yet-created sentinel and assumes the current user will own it
+          // once the first turn writes the row.
           return {
             id: conversationId!,
             venueId: venueId!,
+            userId: null,
             channel: 'web',
+            visibility: null as unknown as ConversationResponse['visibility'],
             messages: [],
           }
         }

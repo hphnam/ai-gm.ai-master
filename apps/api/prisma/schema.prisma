@@ -653,6 +653,13 @@ model ChatConversation {
   /// (those <= this id by createdAt order) are dropped from the model context
   /// and replaced by the summary. New messages after this id stay verbatim.
   compactionUpToMessageId String?
+  /// Share visibility. 'private' (default) — only the creator (userId) can
+  /// read; org membership alone is not enough. 'org' — any user with an
+  /// active session in the conversation's organization can read via the
+  /// link. Sends/deletes/visibility-toggle are always owner-only regardless
+  /// of value. Legacy WhatsApp threads (userId IS NULL) treat 'private' as
+  /// "any org member" since there is no human owner to gate against.
+  visibility              String    @default("private")
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
   /// Soft-delete marker — set when a user "deletes" a conversation. Reads

@@ -14,14 +14,16 @@ import { useQueryClient, type QueryClient as RqClient } from '@tanstack/react-qu
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { toast } from 'sonner'
-import { Sparkles } from 'lucide-react'
+import { Check, Link2, Loader2, Lock, Sparkles } from 'lucide-react'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { SuggestionsSurface } from '@/components/chat/suggestions-surface'
 import { VenueStrip } from '@/components/chat/venue-strip'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
+import { useSession } from '@/lib/auth-client'
 import { useConversation } from '@/lib/hooks/use-conversation'
+import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
 import {
   useConversationsList,
   type ConvListItem,
@@ -33,6 +35,7 @@ import {
 } from '@/lib/hooks/use-suggestions'
 import { mapApiError } from '@/lib/map-api-error'
 import { API_URL } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
 import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
 import type { ChatMessageDto } from '@/lib/api-types'
@@ -220,6 +223,8 @@ function ChatSession({
       conversationId={conversationId}
       initialMessages={initialMessages}
       historyMessages={historyMessages}
+      ownerUserId={conversation.data?.userId ?? null}
+      visibility={conversation.data?.visibility ?? null}
       queryClient={queryClient}
       openSuggestions={openSuggestions.data}
       turnSuggestions={turnSuggestions}
@@ -232,6 +237,8 @@ function ChatCore({
   conversationId,
   initialMessages,
   historyMessages,
+  ownerUserId,
+  visibility,
   queryClient,
   openSuggestions,
   turnSuggestions,
@@ -240,6 +247,12 @@ function ChatCore({
   conversationId: string | null
   initialMessages: GmUIMessage[]
   historyMessages: ConversationResponse['messages'] | undefined
+  /// null when the conversation row hasn't been created yet (locally-minted
+  /// UUID before first send) OR when it's a legacy WhatsApp thread with no
+  /// human owner. Both cases hide the Share button.
+  ownerUserId: string | null
+  /// null until the row exists. After that: 'private' (default) or 'org'.
+  visibility: 'private' | 'org' | null
   queryClient: RqClient
   openSuggestions: ReturnType<typeof useOnOpenSuggestions>['data']
   turnSuggestions: ReturnType<typeof useOnTurnSuggestions>
@@ -247,6 +260,19 @@ function ChatCore({
   const router = useRouter()
   const { data: venues } = useVenues()
   const conversationsList = useConversationsList(null)
+  const { data: session } = useSession()
+  const sessionUserId = session?.user?.id ?? null
+
+  // Owner test: a fresh chat with no row yet (ownerUserId === null AND
+  // visibility === null) is implicitly owned by the current user — they're
+  // about to create it. Once the row exists, ownership is the userId on the
+  // row. Legacy WhatsApp threads (ownerUserId === null but visibility set)
+  // have no human owner and stay read-only on web.
+  const conversationExists = visibility !== null
+  const isOwner = !conversationExists
+    ? true
+    : ownerUserId !== null && ownerUserId === sessionUserId
+  const updateVisibility = useUpdateConversationVisibility()
 
   // The transport closure captures these via refs — useChat freezes the
   // transport at construction.
@@ -299,7 +325,9 @@ function ChatCore({
         const seeded: ConversationResponse = {
           id: cid,
           venueId: venue,
+          userId: sessionUserId,
           channel: 'web',
+          visibility: 'private',
           messages: allMessages.map((m) => ({
             id: m.id,
             role: m.role === 'assistant' ? 'assistant' : 'user',
@@ -529,13 +557,58 @@ function ChatCore({
     router.replace(`/chat?venue=${id}&conv=${freshId}`)
   }
 
+  // Show the share button only when the row exists, the current user owns
+  // it, and a venue is selected (the PATCH endpoint requires venueId). For
+  // fresh client-minted threads (no row yet) the button stays hidden — there
+  // is nothing to share until the first send creates the row.
+  const showShareButton = isOwner && conversationExists && Boolean(venueId)
+  const isShared = visibility === 'org'
+  const shareActions =
+    showShareButton && conversationId && venueId ? (
+      <ShareButton
+        conversationId={conversationId}
+        venueId={venueId}
+        isShared={isShared}
+        isPending={updateVisibility.isPending}
+        onToggle={async (next) => {
+          try {
+            await updateVisibility.mutateAsync({
+              conversationId,
+              venueId,
+              visibility: next,
+            })
+            if (next === 'org' && typeof window !== 'undefined') {
+              const url = `${window.location.origin}/chat?venue=${venueId}&conv=${conversationId}`
+              try {
+                await navigator.clipboard.writeText(url)
+                toast.success('Share link copied — anyone in your org can view')
+              } catch {
+                toast.success('Sharing on — copy the URL from your address bar')
+              }
+            } else {
+              toast.success('Sharing off — only you can view this chat')
+            }
+          } catch (err) {
+            toast.error(mapApiError(err))
+          }
+        }}
+      />
+    ) : null
+
   return (
     <>
-      <PageHeader title={titleFor(displayMessages) ?? 'Chat'} />
+      <PageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={shareActions} />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="scrollbar-thin flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 sm:px-6">
+            {!isOwner ? (
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                <Lock className="h-3.5 w-3.5" aria-hidden />
+                <span>Read-only — this chat was shared with you.</span>
+              </div>
+            ) : null}
+
             {activeSuggestions && activeSuggestions.length > 0 ? (
               <SuggestionsSurface suggestions={activeSuggestions} isLoading={false} />
             ) : null}
@@ -559,9 +632,9 @@ function ChatCore({
               <ChatThread
                 messages={displayMessages}
                 status={status}
-                onFollowUpSelect={submit}
-                latestFollowUps={lastAssistantFollowUps}
-                onRegenerate={() => regenerate()}
+                onFollowUpSelect={isOwner ? submit : undefined}
+                latestFollowUps={isOwner ? lastAssistantFollowUps : []}
+                onRegenerate={isOwner ? () => regenerate() : undefined}
                 feedbackByMessageId={feedbackByMessageId}
               />
             )}
@@ -570,18 +643,20 @@ function ChatCore({
 
         <div className="border-t border-border bg-background/80 px-4 py-3 backdrop-blur-sm sm:px-6">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
-            <VenueStrip venueId={venueId} onChange={onPickVenue} />
+            {isOwner ? <VenueStrip venueId={venueId} onChange={onPickVenue} /> : null}
             <ChatComposer
               onSubmit={submit}
               onSubmitWithImage={submitWithImage}
               isPending={isPending}
-              disabled={!venueId || !conversationId}
+              disabled={!isOwner || !venueId || !conversationId}
               disabledReason={
-                !venueId
-                  ? 'Pick a venue to start'
-                  : !conversationId
-                    ? 'Start a new chat'
-                    : undefined
+                !isOwner
+                  ? 'Read-only — shared by another user'
+                  : !venueId
+                    ? 'Pick a venue to start'
+                    : !conversationId
+                      ? 'Start a new chat'
+                      : undefined
               }
             />
           </div>
@@ -660,6 +735,57 @@ function EmptyState({
         </ul>
       ) : null}
     </div>
+  )
+}
+
+function ShareButton({
+  isShared,
+  isPending,
+  onToggle,
+}: {
+  conversationId: string
+  venueId: string
+  isShared: boolean
+  isPending: boolean
+  onToggle: (next: 'private' | 'org') => Promise<void>
+}) {
+  const [justCopied, setJustCopied] = useState(false)
+  const next = isShared ? 'private' : 'org'
+  const Icon = isPending ? Loader2 : isShared ? Check : Link2
+  const label = isPending
+    ? isShared
+      ? 'Unsharing…'
+      : 'Sharing…'
+    : isShared
+      ? 'Shared'
+      : 'Share'
+  return (
+    <button
+      type="button"
+      disabled={isPending}
+      onClick={async () => {
+        await onToggle(next)
+        if (next === 'org') {
+          setJustCopied(true)
+          setTimeout(() => setJustCopied(false), 1500)
+        }
+      }}
+      title={
+        isShared
+          ? 'Sharing is on — anyone in your org with the link can view. Click to make private.'
+          : 'Make this chat viewable by anyone in your org with the link.'
+      }
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors',
+        isShared
+          ? 'border-brand/30 bg-brand/10 text-brand hover:bg-brand/15'
+          : 'border-border bg-card text-foreground/80 hover:bg-accent',
+        isPending && 'opacity-70',
+      )}
+    >
+      <Icon className={cn('h-3.5 w-3.5', isPending && 'animate-spin')} aria-hidden />
+      <span>{justCopied ? 'Link copied' : label}</span>
+    </button>
   )
 }
 

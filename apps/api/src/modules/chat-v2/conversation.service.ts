@@ -32,7 +32,9 @@ export type ConversationMessage = {
 export type ConversationDetail = {
   id: string
   venueId: string
+  userId: string | null
   channel: string
+  visibility: 'private' | 'org'
   messages: ConversationMessage[]
 }
 
@@ -86,10 +88,15 @@ export class ConversationService {
   }
 
   // Cross-tenant 404-not-403: return null when foreign tenant or soft-deleted;
-  // controller maps null → 404 NotFoundException.
+  // controller maps null → 404 NotFoundException. Owner gating: when
+  // visibility='private' the requester must be the original creator (or the
+  // row must be a legacy WhatsApp thread with userId=null). When
+  // visibility='org' any caller in the same org can read — that's the share
+  // link case. The cross-org check above is unchanged.
   async getById(
     conversationId: string,
     orgId: string,
+    userId: string,
     venueId: string,
   ): Promise<ConversationDetail | null> {
     const conv = await prisma.chatConversation.findUnique({
@@ -97,7 +104,9 @@ export class ConversationService {
       select: {
         id: true,
         venueId: true,
+        userId: true,
         channel: true,
+        visibility: true,
         deletedAt: true,
         venue: { select: { organizationId: true } },
         messages: {
@@ -125,10 +134,20 @@ export class ConversationService {
     ) {
       return null
     }
+    // Private rows: only the creator can read. Legacy WhatsApp threads have
+    // userId=null and stay readable by any org member (no human owner to gate
+    // on). 'org' rows are open to anyone passing the cross-org check above.
+    const ownerOrLegacy = conv.userId === null || conv.userId === userId
+    if (conv.visibility !== 'org' && !ownerOrLegacy) {
+      return null
+    }
+    const visibility = conv.visibility === 'org' ? 'org' : 'private'
     return {
       id: conv.id,
       venueId: conv.venueId,
+      userId: conv.userId,
       channel: conv.channel,
+      visibility,
       messages: conv.messages.map((m) => ({
         id: m.id,
         role: m.role === 'assistant' ? 'assistant' : 'user',

@@ -479,7 +479,7 @@ Assistant answer: ${assistantText}`,
     if (input.conversationId) {
       const existing = await prisma.chatConversation.findUnique({
         where: { id: input.conversationId },
-        select: { id: true, venueId: true, deletedAt: true },
+        select: { id: true, venueId: true, userId: true, deletedAt: true },
       })
       if (!existing || existing.deletedAt !== null)
         throw new Error(`conversation ${input.conversationId} not found`)
@@ -487,6 +487,12 @@ Assistant answer: ${assistantText}`,
         throw new Error(
           `conversation ${input.conversationId} does not belong to venue ${venue.id}`,
         )
+      }
+      // Share-chat: only the original creator can post into a thread. Legacy
+      // WhatsApp threads (userId=null) skip this gate — they predate user
+      // binding. Visibility doesn't matter here: 'org' opens reads, never writes.
+      if (existing.userId !== null && existing.userId !== userId) {
+        throw new Error(`conversation ${input.conversationId} not found`)
       }
     }
 
@@ -762,6 +768,44 @@ Assistant answer: ${assistantText}`,
       where: { id: conversationId },
       data: { deletedAt: new Date() },
     })
+  }
+
+  // Owner-only visibility flip. Mirrors the cross-tenant 404-not-403 contract:
+  // if anything is off (foreign org, foreign venue, soft-deleted, not the
+  // creator) we throw a not-found-shaped error and the controller maps to 404.
+  // Legacy WhatsApp threads (userId=null) currently can't be shared from the
+  // web — they have no human owner to authorise the flip.
+  async setVisibility(
+    conversationId: string,
+    orgId: string,
+    userId: string,
+    venueId: string,
+    visibility: 'private' | 'org',
+  ): Promise<{ id: string; visibility: 'private' | 'org' }> {
+    const conv = await prisma.chatConversation.findUnique({
+      where: { id: conversationId },
+      select: {
+        id: true,
+        venueId: true,
+        userId: true,
+        deletedAt: true,
+        venue: { select: { organizationId: true } },
+      },
+    })
+    if (
+      !conv ||
+      conv.deletedAt !== null ||
+      conv.venueId !== venueId ||
+      conv.venue.organizationId !== orgId ||
+      conv.userId !== userId
+    ) {
+      throw new Error(`conversation ${conversationId} not found`)
+    }
+    await prisma.chatConversation.update({
+      where: { id: conversationId },
+      data: { visibility },
+    })
+    return { id: conversationId, visibility }
   }
 
   async listRecent(

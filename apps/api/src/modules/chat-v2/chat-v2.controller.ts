@@ -290,10 +290,12 @@ export class ChatV2Controller {
     @Query(new ZodValidationPipe(GetConversationQueryDto))
     query: GetConversationQueryDto,
     @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
   ): Promise<ConversationResponseDto> {
     const conv = await this.conversationService.getById(
       params.id,
       org.id,
+      user.id,
       query.venueId,
     )
     if (!conv) {

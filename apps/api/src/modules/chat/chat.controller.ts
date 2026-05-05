@@ -20,6 +20,7 @@ import {
   Logger,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   Res,
@@ -58,6 +59,8 @@ import {
   SendChatMessageRequestDto,
   SendChatMessageResponseDto,
   StreamChatMessageRequestDto,
+  UpdateConversationVisibilityDto,
+  UpdateConversationVisibilityResponseDto,
 } from './dto/chat.dto'
 
 const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024
@@ -265,10 +268,12 @@ export class ChatController {
     @Query(new ZodValidationPipe(GetConversationQueryDto))
     query: GetConversationQueryDto,
     @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
   ): Promise<ConversationResponseDto> {
     const conv = await this.conversationService.getById(
       params.id,
       org.id,
+      user.id,
       query.venueId,
     )
     if (!conv) {
@@ -276,6 +281,44 @@ export class ChatController {
       throw new NotFoundException(notFound)
     }
     return conv as unknown as ConversationResponseDto
+  }
+
+  @Patch('conversations/:id/visibility')
+  @ApiResponse({ status: 200, type: UpdateConversationVisibilityResponseDto })
+  async updateVisibility(
+    @Param(new ZodValidationPipe(ConversationIdParamDto))
+    params: ConversationIdParamDto,
+    @Query(new ZodValidationPipe(GetConversationQueryDto))
+    query: GetConversationQueryDto,
+    @Body(new ZodValidationPipe(UpdateConversationVisibilityDto))
+    body: UpdateConversationVisibilityDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+  ): Promise<UpdateConversationVisibilityResponseDto> {
+    if (!query.venueId) {
+      throw new BadRequestException({
+        error: 'invalid-input',
+        details: 'venueId required',
+      } satisfies ApiErrorResponse)
+    }
+    try {
+      const result = await this.chatService.setVisibility(
+        params.id,
+        org.id,
+        user.id,
+        query.venueId,
+        body.visibility,
+      )
+      return result as unknown as UpdateConversationVisibilityResponseDto
+    } catch (err) {
+      const message = (err as Error).message ?? ''
+      if (message.includes('not found')) {
+        throw new NotFoundException({
+          error: 'not-found',
+        } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
   }
 
   @Delete('conversations/:id')

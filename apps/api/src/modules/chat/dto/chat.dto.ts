@@ -38,10 +38,27 @@ export class ChatMessageDto extends createZodDto(ChatMessageSchema) {}
 export const ConversationResponseSchema = z.object({
   id: z.string(),
   venueId: z.string(),
+  userId: z.string().nullable(),
   channel: z.string(),
+  visibility: z.enum(['private', 'org']),
   messages: z.array(ChatMessageSchema),
 })
 export class ConversationResponseDto extends createZodDto(ConversationResponseSchema) {}
+
+export const UpdateConversationVisibilitySchema = z.object({
+  visibility: z.enum(['private', 'org']),
+})
+export class UpdateConversationVisibilityDto extends createZodDto(
+  UpdateConversationVisibilitySchema,
+) {}
+
+export const UpdateConversationVisibilityResponseSchema = z.object({
+  id: z.string(),
+  visibility: z.enum(['private', 'org']),
+})
+export class UpdateConversationVisibilityResponseDto extends createZodDto(
+  UpdateConversationVisibilityResponseSchema,
+) {}
 
 export const SendChatMessageResponseSchema = z.object({
   conversationId: z.string(),
