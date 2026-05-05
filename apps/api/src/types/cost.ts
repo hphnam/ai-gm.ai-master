@@ -82,7 +82,7 @@ export function calculateAnthropicUsd(
 }
 
 // Voyage cost calculation. Per-call rate is documented as flat $0.00006/call regardless of token
-// count for voyage-3 document mode (see VOYAGE_DOC_USD_PER_CALL definition in section.ts).
+// count for voyage-3.5 document mode (see VOYAGE_DOC_USD_PER_CALL definition in section.ts).
 export function calculateVoyageUsd(callCount: number): number {
   return round6(callCount * VOYAGE_DOC_USD_PER_CALL)
 }

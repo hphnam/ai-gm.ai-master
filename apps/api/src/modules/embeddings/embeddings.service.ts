@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { VoyageAIClient } from 'voyageai'
+import { VOYAGE_EMBED_MODEL } from '../../types/section'
 
 @Injectable()
 export class EmbeddingsService implements OnModuleInit {
@@ -16,7 +17,7 @@ export class EmbeddingsService implements OnModuleInit {
 
   async embedText(text: string): Promise<number[]> {
     const response = await this.client.embed({
-      model: 'voyage-3',
+      model: VOYAGE_EMBED_MODEL,
       input: text,
       inputType: 'query',
     })
@@ -33,7 +34,7 @@ export class EmbeddingsService implements OnModuleInit {
       }
     }
     const response = await this.client.embed({
-      model: 'voyage-3',
+      model: VOYAGE_EMBED_MODEL,
       input: text,
       inputType: 'document',
     })
@@ -42,7 +43,7 @@ export class EmbeddingsService implements OnModuleInit {
 
   async embedDocuments(texts: string[]): Promise<number[][]> {
     const response = await this.client.embed({
-      model: 'voyage-3',
+      model: VOYAGE_EMBED_MODEL,
       input: texts,
       inputType: 'document',
     })

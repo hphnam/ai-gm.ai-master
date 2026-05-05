@@ -16,6 +16,7 @@
 import '../src/load-env'
 import { prisma } from '../src/database/prisma'
 import { VoyageAIClient } from 'voyageai'
+import { VOYAGE_EMBED_MODEL } from '../src/types/section'
 
 const BATCH_SIZE = 32
 
@@ -33,7 +34,7 @@ const voyage = new VoyageAIClient({ apiKey: requireEnv('VOYAGE_API_KEY') })
 async function embedDocuments(texts: string[]): Promise<number[][]> {
   if (texts.length === 0) return []
   const response = await voyage.embed({
-    model: 'voyage-3',
+    model: VOYAGE_EMBED_MODEL,
     input: texts,
     inputType: 'document',
   })

@@ -23,7 +23,8 @@
     "probe:chat-v2:real": "PROBE_CHAT_V2_REAL=1 tsx scripts/probe-chat-v2.ts",
     "probe:whatsapp-onboarding": "PROBE_INFOBIP_STUB=1 tsx scripts/probe-whatsapp-onboarding.ts",
     "test:cost-tracker": "node --import tsx --test src/modules/chat-v2/cost-tracker.service.spec.ts",
-    "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts"
+    "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts",
+    "reembed:corpus": "tsx scripts/reembed-corpus.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",

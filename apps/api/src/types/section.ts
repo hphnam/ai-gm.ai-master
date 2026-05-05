@@ -49,9 +49,16 @@ export const CURRENT_SECTION_VERSION = 1
 /// assertAuthEnv prod-fail backstop).
 export const BACKFILL_TENANT_COST_CEILING_USD = 5
 
+/// Single source of truth for the Voyage embedding model. voyage-3.5 is the
+/// drop-in successor to voyage-3 (same 1024-dim output, same $0.06/1M-token
+/// price, retrieval-quality bump per Voyage's own benchmarks). Bumping this
+/// constant and re-running the cold-cut re-embed script reprocesses every
+/// embedded row in place — no schema change needed while we stay at 1024 dims.
+export const VOYAGE_EMBED_MODEL = 'voyage-3.5'
+
 /// Plan 01-02 — cost-per-Voyage-document-call for spend estimation.
 /// Source: https://www.voyageai.com/pricing · verified 2026-04-28
-/// voyage-3 document-input pricing: $0.06 / 1M tokens. At ~1024 tokens/chunk
+/// voyage-3.5 document-input pricing: $0.06 / 1M tokens. At ~1024 tokens/chunk
 /// the per-call cost is ≈ $0.00006. Constant kept dimensionless ($ per call)
 /// so backfill spend math is `voyageCallCount × VOYAGE_DOC_USD_PER_CALL`.
 export const VOYAGE_DOC_USD_PER_CALL = 0.00006
