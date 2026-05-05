@@ -30,7 +30,7 @@ export type RetrievalHit = {
   /// Reciprocal-rank-fusion score combining vector + BM25. Higher = better.
   /// Roughly bounded by 0–0.034 for the top hit (1/60 + 1/60 ≈ 0.0333).
   score: number
-  /// Voyage rerank-lite-1 relevance score, when rerank=true. 0–1ish.
+  /// Voyage rerank-2 relevance score, when rerank=true. 0–1ish.
   relevanceScore?: number
   /// Match channels that produced this hit. For UI / debugging.
   matchedBy: ('vector' | 'lexical')[]
@@ -51,7 +51,7 @@ export type RetrievalOpts = {
   recencyDays?: number
   /// Restrict to a specific kind (e.g. docType slug, contact role).
   kinds?: string[]
-  /// Default: true. Set false to skip Voyage rerank-lite-1 pass on the candidate set.
+  /// Default: true. Set false to skip Voyage rerank-2 pass on the candidate set.
   rerank?: boolean
   /// Default: true. Set false to skip Claude reformulation when initial query returns empty.
   reformulateOnEmpty?: boolean
