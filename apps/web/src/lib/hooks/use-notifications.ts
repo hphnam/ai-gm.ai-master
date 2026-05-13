@@ -43,12 +43,15 @@ export function useNotifications(opts?: { enabled?: boolean }) {
 }
 
 export function useUnreadNotificationsCount() {
+  // Polling-free — the realtime socket pushes notification.created /
+  // notification.updated events to invalidate this query. We still refetch
+  // on window focus as a belt-and-braces safety net for missed events
+  // (e.g. brief socket disconnect during a deploy).
   return useQuery<{ count: number }>({
     queryKey: COUNT_KEY,
     queryFn: ({ signal }) => apiFetch<{ count: number }>('/notifications/unread-count', { signal }),
-    refetchInterval: 30_000,
     refetchOnWindowFocus: true,
-    staleTime: 10_000,
+    staleTime: 30_000,
   })
 }
 

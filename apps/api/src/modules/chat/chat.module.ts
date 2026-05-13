@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
 import { IngestModule } from '../ingest/ingest.module'
+import { RealtimeModule } from '../realtime/realtime.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
 import { ChatController } from './chat.controller'
@@ -18,7 +19,14 @@ import { UserProfileService } from './user-profile.service'
 // @Controller registration is removed in lockstep — only one controller may
 // own @Controller('chat') at a time or NestJS errors at startup.
 @Module({
-  imports: [RetrievalModule, AdaptationModule, IngestModule, TabularModule, ChatV2Module],
+  imports: [
+    RetrievalModule,
+    AdaptationModule,
+    IngestModule,
+    TabularModule,
+    ChatV2Module,
+    RealtimeModule,
+  ],
   controllers: [ChatController],
   providers: [
     ChatService,

@@ -9,6 +9,7 @@ import {
   type WhatsappInboundResult,
 } from '../../types'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { SuggestionsService } from '../suggestions/suggestions.service'
 import { markAndCheckSid } from './seen-message-sids'
 import { clearTypingRefire, startTypingRefire } from './typing-indicator-timers'
@@ -82,6 +83,7 @@ export class WhatsappService {
     private readonly chatV2Service: ChatV2Service,
     private readonly suggestions: SuggestionsService,
     private readonly onboarding: WhatsappOnboardingService,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   async handleInbound(result: WhatsappInboundResult): Promise<void> {
@@ -293,6 +295,11 @@ export class WhatsappService {
               userId: user.id,
               channel: WA_CHANNEL,
             },
+          })
+          this.realtime.emitChatConversationUpserted(user.id, {
+            id: conversation.id,
+            venueId: venue.id,
+            channel: WA_CHANNEL,
           })
         }
 

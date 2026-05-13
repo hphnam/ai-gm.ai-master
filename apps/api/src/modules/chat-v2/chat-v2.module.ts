@@ -7,6 +7,7 @@
 import { Module } from '@nestjs/common'
 import { IngestModule } from '../ingest/ingest.module'
 import { MockOpsModule } from '../mock-ops/mock-ops.module'
+import { RealtimeModule } from '../realtime/realtime.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
 import { AnalyserService } from './analyser.service'
@@ -23,7 +24,7 @@ import { TriageService } from './triage.service'
 import { WriterService } from './writer.service'
 
 @Module({
-  imports: [RetrievalModule, IngestModule, MockOpsModule, TabularModule],
+  imports: [RetrievalModule, IngestModule, MockOpsModule, TabularModule, RealtimeModule],
   // Plan 06-04 hot-fix 2026-05-02 — ChatV2Controller's @Controller decorator
   // is left in the file but the controller is no longer registered. /chat/*
   // routes live on chat-v1's ChatController again; chat-v2 is now invoked

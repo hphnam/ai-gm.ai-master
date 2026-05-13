@@ -12,6 +12,7 @@ import {
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { IngestService } from '../ingest/ingest.service'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { RetrievalHit } from '../retrieval/retrieval.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { TabularQueryService } from '../tabular/tabular.service'
@@ -67,6 +68,7 @@ export class ToolDispatcher {
     private readonly verifier: QuoteVerifierService,
     private readonly tabular: TabularQueryService,
     private readonly chatV2: ChatV2Service,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   async dispatch(
@@ -635,15 +637,20 @@ export class ToolDispatcher {
               'cannot leave a note for yourself — confirm the intended recipient',
             )
           }
+          const source = ctx.source ?? 'chat'
           const created = await prisma.notification.create({
             data: {
               organizationId: ctx.orgId,
               recipientUserId: target.userId,
               authorUserId: ctx.userId,
-              source: ctx.source ?? 'chat',
+              source,
               body: i.body,
             },
-            select: { id: true, createdAt: true },
+            select: {
+              id: true,
+              createdAt: true,
+              author: { select: { id: true, name: true, email: true } },
+            },
           })
           this.logger.log(
             JSON.stringify({
@@ -655,6 +662,19 @@ export class ToolDispatcher {
               bodyLength: i.body.length,
             }),
           )
+          this.realtime.emitNotificationCreated(target.userId, {
+            id: created.id,
+            body: i.body,
+            source,
+            createdAt: created.createdAt.toISOString(),
+            author: created.author
+              ? {
+                  id: created.author.id,
+                  name: created.author.name,
+                  email: created.author.email,
+                }
+              : null,
+          })
           return {
             ok: true,
             data: {

@@ -37,6 +37,7 @@ import {
   type TriageOutput,
 } from '../../types'
 import type { SendMessageInput, SendMessageResult } from '../../types/chat-message'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { AnalyserService } from './analyser.service'
 import { CostTracker } from './cost-tracker.service'
 import { CriticService } from './critic.service'
@@ -85,6 +86,7 @@ export class ChatV2Service {
     private readonly tabular: TabularResearcher,
     private readonly venue: VenueResearcher,
     private readonly fastLookup: FastLookupService,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   // audit-M2 — exhaustive switch returning the discriminated-union interface,
@@ -122,14 +124,19 @@ export class ChatV2Service {
     })
     if (!venue) throw new Error(`venue ${input.venueId} not found in org ${ctx.orgId}`)
 
-    const conversationId =
-      input.conversationId ??
-      (
-        await prisma.chatConversation.create({
-          data: { venueId: venue.id, userId: ctx.userId, channel: 'web' },
-          select: { id: true },
-        })
-      ).id
+    let conversationId = input.conversationId
+    if (!conversationId) {
+      const created = await prisma.chatConversation.create({
+        data: { venueId: venue.id, userId: ctx.userId, channel: 'web' },
+        select: { id: true },
+      })
+      conversationId = created.id
+      this.realtime.emitChatConversationUpserted(ctx.userId, {
+        id: created.id,
+        venueId: venue.id,
+        channel: 'web',
+      })
+    }
 
     // Persist raw user message (audit trail). Strip NUL only — Postgres TEXT
     // encoding invariant. When an attachment is present, append a placeholder
@@ -666,6 +673,11 @@ export class ChatV2Service {
           channel: 'web',
           userId: ctx.userId,
         },
+      })
+      this.realtime.emitChatConversationUpserted(ctx.userId, {
+        id: conversationId,
+        venueId: venue.id,
+        channel: 'web',
       })
     }
 

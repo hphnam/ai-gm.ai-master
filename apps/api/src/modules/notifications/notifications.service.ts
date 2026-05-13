@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 
 export type NotificationRow = {
   id: string
@@ -17,6 +18,8 @@ const KNOWN_STATUSES = new Set(['unread', 'read'])
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name)
+
+  constructor(private readonly realtime: RealtimeGateway) {}
 
   async list(
     orgId: string,
@@ -89,14 +92,29 @@ export class NotificationsService {
         author: { select: { id: true, name: true, email: true } },
       },
     })
-    return this.toRow(row)
+    const mapped = this.toRow(row)
+    if (mapped.readAt) {
+      this.realtime.emitNotificationUpdated(userId, {
+        kind: 'read',
+        id: mapped.id,
+        readAt: mapped.readAt,
+      })
+    }
+    return mapped
   }
 
   async markAllRead(orgId: string, userId: string): Promise<number> {
+    const now = new Date()
     const result = await prisma.notification.updateMany({
       where: { organizationId: orgId, recipientUserId: userId, status: 'unread' },
-      data: { status: 'read', readAt: new Date() },
+      data: { status: 'read', readAt: now },
     })
+    if (result.count > 0) {
+      this.realtime.emitNotificationUpdated(userId, {
+        kind: 'all-read',
+        readAt: now.toISOString(),
+      })
+    }
     return result.count
   }
 
@@ -136,6 +154,7 @@ export class NotificationsService {
         author: { select: { id: true, name: true, email: true } },
       },
     })
+    const row = this.toRow(created)
     this.logger.log(
       JSON.stringify({
         event: 'notifications.compose',
@@ -146,7 +165,14 @@ export class NotificationsService {
         bodyLength: body.length,
       }),
     )
-    return this.toRow(created)
+    this.realtime.emitNotificationCreated(recipientUserId, {
+      id: row.id,
+      body: row.body,
+      source: row.source,
+      createdAt: row.createdAt,
+      author: row.author,
+    })
+    return row
   }
 
   async listOrgMembers(

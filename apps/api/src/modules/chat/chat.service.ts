@@ -28,6 +28,7 @@ export type {
 } from '../../types/chat-message'
 
 import { AdaptationService } from '../adaptation/adaptation.service'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
 import { ConversationModeService } from './conversation-mode.service'
@@ -182,6 +183,7 @@ export class ChatService implements OnModuleInit {
     private readonly userProfile: UserProfileService,
     private readonly compactor: ConversationCompactorService,
     private readonly verifier: QuoteVerifierService,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   onModuleInit(): void {
@@ -626,14 +628,19 @@ Assistant answer: ${assistantText}`,
       }
     }
 
-    const conversationId =
-      input.conversationId ??
-      (
-        await prisma.chatConversation.create({
-          data: { venueId: input.venueId, channel: 'web', userId },
-          select: { id: true },
-        })
-      ).id
+    let conversationId = input.conversationId
+    if (!conversationId) {
+      const created = await prisma.chatConversation.create({
+        data: { venueId: input.venueId, channel: 'web', userId },
+        select: { id: true },
+      })
+      conversationId = created.id
+      this.realtime.emitChatConversationUpserted(userId, {
+        id: created.id,
+        venueId: input.venueId,
+        channel: 'web',
+      })
+    }
 
     // 03-03 Task 3: when an image attachment is present, persist a placeholder into
     // ChatMessage.content (schema has no image column) so conversation history shows
@@ -1060,6 +1067,11 @@ Assistant answer: ${assistantText}`,
           channel: 'web',
           userId: params.userId,
         },
+      })
+      this.realtime.emitChatConversationUpserted(params.userId, {
+        id: conversationId,
+        venueId: venue.id,
+        channel: 'web',
       })
     }
 

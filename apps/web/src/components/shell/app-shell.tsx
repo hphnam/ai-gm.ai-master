@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, type ReactNode, useContext, useState } from 'react'
+import { useAppRealtime } from '@/lib/hooks/use-app-realtime'
 import { useKbSocket } from '@/lib/hooks/use-kb-socket'
 import { Sidebar } from './sidebar'
 
@@ -15,9 +16,11 @@ export function useAppShell(): ShellCtx {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  // One global KB socket per session. Pushes status flips into React Query
-  // caches so we don't have to poll for live updates on the docs list.
+  // Realtime listeners. All share one socket via acquireSocket() so we don't
+  // multi-connect. Each hook subscribes to its domain's events and invalidates
+  // the matching React Query keys — no polling anywhere in the app.
   useKbSocket()
+  useAppRealtime()
   return (
     <Ctx.Provider value={{ openMobileSidebar: () => setMobileOpen(true) }}>
       <div className="flex h-dvh w-full bg-background">

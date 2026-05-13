@@ -9,6 +9,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../database/prisma'
 import { maskPhone } from '../../types/auth'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { InviteService } from './invite.service'
 import { WhatsAppAdapter } from './whatsapp.adapter'
 import {
@@ -36,6 +37,7 @@ export class WhatsappOnboardingService {
     private readonly invites: InviteService,
     private readonly otps: WhatsappOtpService,
     private readonly adapter: WhatsAppAdapter,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   // ─── State hydration ────────────────────────────────────────────────
@@ -371,6 +373,8 @@ export class WhatsappOnboardingService {
         userName: user.name,
         memberships: richMemberships,
         isSingle,
+        userId: user.id,
+        phoneVerifiedAt: (user.phoneVerifiedAt ?? new Date()).toISOString(),
       }
     })
 
@@ -378,6 +382,18 @@ export class WhatsappOnboardingService {
       // Another inbound already redeemed this invite. Acknowledge gracefully.
       return this.replyOnly(phoneNumber, REPLIES.linked_no_venue_unexpected, 'linked_no_venue')
     }
+
+    // Post-commit fanout. Issuer's invites list (org-scoped) sees the row
+    // flip to redeemed; the newly-linked user's own tabs see the phone
+    // verified flag flip so their settings page updates without a refresh.
+    this.realtime.emitWhatsappInviteUpdated(invite.organizationId, {
+      id: invite.id,
+      status: 'redeemed',
+    })
+    this.realtime.emitPhoneStatusChanged(result.userId, {
+      phoneNumber,
+      phoneVerifiedAt: result.phoneVerifiedAt,
+    })
 
     const welcome = composeWelcomeText(result.userName, result.memberships)
     await this.sendOutbound(phoneNumber, welcome)

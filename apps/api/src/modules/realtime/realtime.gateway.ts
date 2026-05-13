@@ -66,7 +66,8 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       }
 
       const orgRoom = roomFor(membership.organizationId)
-      await socket.join(orgRoom)
+      const userRoom = userRoomFor(session.user.id)
+      await socket.join([orgRoom, userRoom])
       socket.data.orgId = membership.organizationId
       socket.data.userId = session.user.id
 
@@ -119,8 +120,66 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   ): void {
     this.server?.to(roomFor(orgId)).emit('gap.updated', payload)
   }
+
+  // Per-recipient notifications. Targeted to the user's private room so other
+  // org members never see another user's inbox events. Payload mirrors the
+  // NotificationRow shape from notifications.service so the client can render
+  // optimistically without an extra fetch.
+  emitNotificationCreated(
+    recipientUserId: string,
+    payload: {
+      id: string
+      body: string
+      source: 'chat' | 'whatsapp' | 'manual'
+      createdAt: string
+      author: { id: string; name: string | null; email: string } | null
+    },
+  ): void {
+    this.server?.to(userRoomFor(recipientUserId)).emit('notification.created', payload)
+  }
+
+  // Fires on mark-read / mark-all-read so other tabs of the same user sync.
+  emitNotificationUpdated(
+    recipientUserId: string,
+    payload: { kind: 'read'; id: string; readAt: string } | { kind: 'all-read'; readAt: string },
+  ): void {
+    this.server?.to(userRoomFor(recipientUserId)).emit('notification.updated', payload)
+  }
+
+  // A new chat conversation row was created (or first-message-on-existing).
+  // User-scoped because the conversations sidebar is per-user; WhatsApp inbound
+  // creates a conversation for the matched user, and this event lets their
+  // open web tab populate the sidebar in real time without polling.
+  emitChatConversationUpserted(
+    userId: string,
+    payload: { id: string; venueId: string; channel: string },
+  ): void {
+    this.server?.to(userRoomFor(userId)).emit('chat.conversation.upserted', payload)
+  }
+
+  // WhatsApp invite status changed (pending → redeemed | revoked | exhausted | expired).
+  // Org-scoped — any manager/owner watching the invites list should see it.
+  emitWhatsappInviteUpdated(
+    orgId: string,
+    payload: { id: string; status: 'redeemed' | 'revoked' | 'exhausted' | 'expired' },
+  ): void {
+    this.server?.to(roomFor(orgId)).emit('whatsapp.invite.updated', payload)
+  }
+
+  // Phone verification status flipped for the given user. User-scoped so
+  // other tabs of the same user (e.g. settings open) update without a refresh.
+  emitPhoneStatusChanged(
+    userId: string,
+    payload: { phoneNumber: string; phoneVerifiedAt: string },
+  ): void {
+    this.server?.to(userRoomFor(userId)).emit('phone.status.changed', payload)
+  }
 }
 
 function roomFor(orgId: string): string {
   return `org:${orgId}`
+}
+
+function userRoomFor(userId: string): string {
+  return `user:${userId}`
 }

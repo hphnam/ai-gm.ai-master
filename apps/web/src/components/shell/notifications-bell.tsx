@@ -1,7 +1,7 @@
 'use client'
 
 import { Bell, CheckCheck, MessageSquarePlus, Search, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -23,7 +23,10 @@ import {
   useNotifications,
   useUnreadNotificationsCount,
 } from '@/lib/hooks/use-notifications'
+import { useNotificationsSocket } from '@/lib/hooks/use-notifications-socket'
 import { cn } from '@/lib/utils'
+
+const TOAST_BODY_PREVIEW_CHARS = 140
 
 const RELATIVE_FORMAT_MS_PER_MINUTE = 60_000
 const RELATIVE_FORMAT_MS_PER_HOUR = 60 * RELATIVE_FORMAT_MS_PER_MINUTE
@@ -82,29 +85,63 @@ function apiErrorLabel(err: unknown): string {
 export function NotificationsBell() {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [composeOpen, setComposeOpen] = useState(false)
-
+  const [openNote, setOpenNote] = useState<Notification | null>(null)
+  const [focusId, setFocusId] = useState<string | null>(null)
+  // Always-listen to the list query so the socket invalidation hydrates it
+  // even when the popover is closed (so the toast can find the full row).
+  const { data, isLoading } = useNotifications({ enabled: true })
   const { data: countData } = useUnreadNotificationsCount()
-  const { data, isLoading } = useNotifications({ enabled: popoverOpen })
   const markRead = useMarkNotificationRead()
   const markAllRead = useMarkAllNotificationsRead()
 
   const unread = countData?.count ?? 0
   const notifications = data?.notifications ?? []
 
-  // Toast when unread count increases since last render — surfaces inbound
-  // notifications without forcing the user to watch the bell. Initial value
-  // is null so first render doesn't fire a toast on existing unreads.
-  const lastUnreadRef = useRef<number | null>(null)
+  // Open popover scrolled to a specific note id. Sets focusId so the row
+  // briefly flashes; popover open triggers the existing list render.
+  const openPopoverFor = useCallback((id: string) => {
+    setFocusId(id)
+    setPopoverOpen(true)
+  }, [])
+
+  // Realtime socket — fires on inbound notification.created and
+  // mark-read events. The hook also invalidates the list + unread-count
+  // queries so the bell badge updates without polling.
+  useNotificationsSocket({
+    onCreated: useCallback(
+      (payload) => {
+        const who = payload.author?.name ?? payload.author?.email ?? 'New note'
+        const preview =
+          payload.body.length > TOAST_BODY_PREVIEW_CHARS
+            ? `${payload.body.slice(0, TOAST_BODY_PREVIEW_CHARS).trimEnd()}…`
+            : payload.body
+        toast.message(who, {
+          description: preview,
+          action: {
+            label: 'View',
+            onClick: () => openPopoverFor(payload.id),
+          },
+        })
+      },
+      [openPopoverFor],
+    ),
+  })
+
+  // Clear focusId after the popover closes so re-opening doesn't re-flash.
   useEffect(() => {
-    const prev = lastUnreadRef.current
-    if (prev !== null && unread > prev) {
-      const delta = unread - prev
-      toast.message(delta === 1 ? 'New note for you' : `${delta} new notes for you`, {
-        description: 'Open the bell to read.',
-      })
+    if (!popoverOpen) {
+      const t = setTimeout(() => setFocusId(null), 200)
+      return () => clearTimeout(t)
     }
-    lastUnreadRef.current = unread
-  }, [unread])
+  }, [popoverOpen])
+
+  // Scroll the focused row into view when popover opens.
+  const focusedRowRef = useRef<HTMLLIElement>(null)
+  useEffect(() => {
+    if (popoverOpen && focusId && focusedRowRef.current) {
+      focusedRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  }, [popoverOpen, focusId])
 
   return (
     <>
@@ -134,7 +171,7 @@ export function NotificationsBell() {
           </button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="end">
+        <PopoverContent className="w-[340px] p-0" align="start" side="bottom">
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <span className="text-sm font-semibold">Notifications</span>
             <div className="flex items-center gap-1">
@@ -191,59 +228,63 @@ export function NotificationsBell() {
               </div>
             ) : (
               <ul className="flex flex-col">
-                {notifications.map((n) => (
-                  <li
-                    key={n.id}
-                    className={cn(
-                      'group flex items-start gap-2 border-b border-border/40 px-3 py-2.5 last:border-b-0',
-                      n.status === 'unread' && 'bg-amber-50/50 dark:bg-amber-500/5',
-                    )}
-                  >
-                    <span
+                {notifications.map((n) => {
+                  const isFocused = focusId === n.id
+                  return (
+                    <li
+                      key={n.id}
+                      ref={isFocused ? focusedRowRef : undefined}
                       className={cn(
-                        'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full',
-                        n.status === 'unread' ? 'bg-amber-500' : 'bg-transparent',
+                        'group border-b border-border/40 last:border-b-0',
+                        n.status === 'unread' && 'bg-amber-50/50 dark:bg-amber-500/5',
+                        isFocused && 'ring-2 ring-amber-500/40 ring-inset',
                       )}
-                      aria-hidden
-                    />
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="flex min-w-0 items-baseline gap-1.5">
-                          <span className="truncate text-xs font-medium text-foreground/80">
-                            {authorLabel(n)}
-                          </span>
-                          <span className="shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] uppercase tracking-wider text-foreground/55">
-                            {SOURCE_LABELS[n.source]}
-                          </span>
-                        </span>
-                        <time
-                          dateTime={n.createdAt}
-                          className="shrink-0 text-[10px] text-foreground/50"
-                        >
-                          {formatRelative(n.createdAt)}
-                        </time>
-                      </div>
-                      <p className="whitespace-pre-wrap break-words text-sm text-foreground">
-                        {n.body}
-                      </p>
-                      {n.status === 'unread' ? (
-                        <button
-                          type="button"
-                          onClick={() =>
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenNote(n)
+                          if (n.status === 'unread') {
                             markRead.mutate(n.id, {
                               onError: (err) =>
                                 toast.error(`Couldn't mark read: ${apiErrorLabel(err)}`),
                             })
                           }
-                          className="self-start text-[11px] text-brand hover:underline disabled:opacity-50"
-                          disabled={markRead.isPending}
-                        >
-                          Mark read
-                        </button>
-                      ) : null}
-                    </div>
-                  </li>
-                ))}
+                        }}
+                        className="flex w-full items-start gap-2 px-3 py-2.5 text-left transition-colors hover:bg-accent/40"
+                      >
+                        <span
+                          className={cn(
+                            'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full',
+                            n.status === 'unread' ? 'bg-amber-500' : 'bg-transparent',
+                          )}
+                          aria-hidden
+                        />
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="flex min-w-0 items-baseline gap-1.5">
+                              <span className="truncate text-xs font-medium text-foreground/80">
+                                {authorLabel(n)}
+                              </span>
+                              <span className="shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] uppercase tracking-wider text-foreground/55">
+                                {SOURCE_LABELS[n.source]}
+                              </span>
+                            </span>
+                            <time
+                              dateTime={n.createdAt}
+                              className="shrink-0 text-[10px] text-foreground/50"
+                            >
+                              {formatRelative(n.createdAt)}
+                            </time>
+                          </div>
+                          <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm text-foreground">
+                            {n.body}
+                          </p>
+                        </div>
+                      </button>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>
@@ -251,7 +292,46 @@ export function NotificationsBell() {
       </Popover>
 
       <ComposeNoteDialog open={composeOpen} onOpenChange={setComposeOpen} />
+      <NotePreviewDialog
+        note={openNote}
+        onOpenChange={(next) => {
+          if (!next) setOpenNote(null)
+        }}
+      />
     </>
+  )
+}
+
+function NotePreviewDialog({
+  note,
+  onOpenChange,
+}: {
+  note: Notification | null
+  onOpenChange: (open: boolean) => void
+}) {
+  return (
+    <Dialog open={!!note} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[520px] gap-3 p-5">
+        {note ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <span>{authorLabel(note)}</span>
+                <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-normal uppercase tracking-wider text-foreground/60">
+                  {SOURCE_LABELS[note.source]}
+                </span>
+              </DialogTitle>
+              <DialogDescription>
+                <time dateTime={note.createdAt}>{new Date(note.createdAt).toLocaleString()}</time>
+              </DialogDescription>
+            </DialogHeader>
+            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
+              {note.body}
+            </p>
+          </>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   )
 }
 

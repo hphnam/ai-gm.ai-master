@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import { PENDING_VERIFICATION_TTL_MS, PhoneRateLimit, type PhoneStatusResponse } from '../../types'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 
 export type PhoneErrorCode =
   | 'phone-already-linked'
@@ -51,6 +52,8 @@ export class PhoneService {
   private readonly sendsPerNumber = new Map<string, Bucket>()
   private readonly sendsPerIp = new Map<string, Bucket>()
   private readonly pendingVerifications = new Map<string, PendingEntry>()
+
+  constructor(private readonly realtime: RealtimeGateway) {}
 
   private checkBucket(
     map: Map<string, Bucket>,
@@ -205,9 +208,14 @@ export class PhoneService {
           select: { phoneNumber: true, phoneVerifiedAt: true },
         })
         this.logger.log(JSON.stringify({ event: 'phone.verified', userId, phoneHash }))
+        const verifiedAt = updated.phoneVerifiedAt!
+        this.realtime.emitPhoneStatusChanged(userId, {
+          phoneNumber: updated.phoneNumber!,
+          phoneVerifiedAt: verifiedAt.toISOString(),
+        })
         return {
           phoneNumber: updated.phoneNumber!,
-          phoneVerifiedAt: updated.phoneVerifiedAt!,
+          phoneVerifiedAt: verifiedAt,
         }
       } catch (err) {
         // P2002 unique-constraint race — the findFirst above can miss a concurrent insert.

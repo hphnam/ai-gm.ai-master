@@ -4,6 +4,7 @@ import { AuthModule } from '../auth/auth.module'
 // ChatV2Module. Inbound WhatsApp turns now flow through the multi-agent
 // pipeline (Triage → Researchers → Analyser → Writer + optional Critic).
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
+import { RealtimeModule } from '../realtime/realtime.module'
 import { SuggestionsModule } from '../suggestions/suggestions.module'
 import { InviteController, InviteRedeemController } from './invite.controller'
 // Phase 03-01 — identity binding + onboarding flow services + manager API.
@@ -16,7 +17,7 @@ import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 import { WhatsappOtpService } from './whatsapp-otp.service'
 
 @Module({
-  imports: [ChatV2Module, SuggestionsModule, AuthModule],
+  imports: [ChatV2Module, SuggestionsModule, AuthModule, RealtimeModule],
   providers: [
     WhatsAppAdapter,
     WhatsappService,
