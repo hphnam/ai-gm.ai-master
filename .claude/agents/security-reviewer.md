@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Reviews code changes for security vulnerabilities. Use for PR review, pre-deploy verification, or audit of recently changed files.
+description: Reviews code changes for security vulnerabilities. Use proactively after changes to auth, webhooks, signature verification, token handling, public endpoints, SQL/Prisma writes, file uploads, or any input-handling surface. Also use for explicit PR review, pre-deploy verification, or audit of recently changed files.
 tools:
   - Read
   - Grep

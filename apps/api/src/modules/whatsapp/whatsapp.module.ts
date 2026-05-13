@@ -5,27 +5,27 @@ import { AuthModule } from '../auth/auth.module'
 // pipeline (Triage → Researchers → Analyser → Writer + optional Critic).
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
 import { SuggestionsModule } from '../suggestions/suggestions.module'
-import { InviteController } from './invite.controller'
+import { InviteController, InviteRedeemController } from './invite.controller'
 // Phase 03-01 — identity binding + onboarding flow services + manager API.
 import { InviteService } from './invite.service'
+import { TwilioController } from './twilio.controller'
+import { TwilioSignatureGuard } from './twilio-signature.guard'
 import { WhatsAppAdapter } from './whatsapp.adapter'
-import { WhatsappController } from './whatsapp.controller'
 import { WhatsappService } from './whatsapp.service'
 import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 import { WhatsappOtpService } from './whatsapp-otp.service'
-import { WhatsappSignatureGuard } from './whatsapp-signature.guard'
 
 @Module({
   imports: [ChatV2Module, SuggestionsModule, AuthModule],
   providers: [
     WhatsAppAdapter,
     WhatsappService,
-    WhatsappSignatureGuard,
+    TwilioSignatureGuard,
     InviteService,
     WhatsappOtpService,
     WhatsappOnboardingService,
   ],
-  controllers: [WhatsappController, InviteController],
+  controllers: [TwilioController, InviteController, InviteRedeemController],
   exports: [WhatsAppAdapter, InviteService, WhatsappOtpService, WhatsappOnboardingService],
 })
 export class WhatsappModule {}

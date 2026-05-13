@@ -27,8 +27,8 @@ import {
   VerifyPhoneCodeBodyDto,
   VerifyPhoneCodeResponseDto,
 } from './dto/phone.dto'
-import { InfobipVerifyService } from './infobip-verify.service'
 import { PhoneError, PhoneService } from './phone.service'
+import { WhatsappVerifyService } from './whatsapp-verify.service'
 
 function mapPhoneError(code: PhoneError['code'], details?: unknown): HttpException {
   const body: ApiErrorResponse = { error: code, details }
@@ -59,7 +59,7 @@ export class PhoneController {
 
   constructor(
     private readonly service: PhoneService,
-    private readonly verifier: InfobipVerifyService,
+    private readonly verifier: WhatsappVerifyService,
   ) {}
 
   @Post('send')

@@ -1,6 +1,6 @@
 ---
 name: doc-reviewer
-description: Reviews documentation for accuracy, completeness, and clarity. Cross-references docs against the actual source code.
+description: Reviews documentation for accuracy, completeness, and clarity. Use proactively after changes that touch documented surfaces — README, CLAUDE.md, API contracts, env vars, or planning docs in .paul/phases/. Cross-references docs against the actual source code.
 tools:
   - Read
   - Grep

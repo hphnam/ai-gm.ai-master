@@ -1,65 +1,11 @@
 import { z } from 'zod'
 
-// 03-04 Infobip migration (2026-04-20). Replaces 03-01/02/03 Twilio contract.
-// Source: Infobip WhatsApp API community patterns + https://www.infobip.com/docs/whatsapp
-// UAT-VERIFY: signature header name + encoding + exact field presence confirmed at APPLY-time UAT.
-// The plan's <output> section enumerates the 12-step Portal UAT runbook used to validate these assumptions.
+// 03-06 Twilio Conversations API contract.
+// Webhook delivery: POST /webhooks/twilio/conversations
+// Content-Type: application/x-www-form-urlencoded
+// Twilio fires one event per request; signature is HMAC-SHA1(URL + sorted form params).
 
-// Infobip inbound webhook payload — `results[]` array pattern used across Infobip channels.
-// Expected delivery: POST /webhooks/infobip/whatsapp with Content-Type: application/json
-// and a single result per inbound (batching empirically rare on WhatsApp channel but schema
-// tolerates multiple via InfobipInboundWebhookSchema.results array).
-const InfobipInboundMessageSchema = z
-  .object({
-    // Message type enum — Infobip WhatsApp documented types.
-    // UAT-VERIFY: expand/tighten after first inbound sample if enum values differ.
-    type: z.enum([
-      'TEXT',
-      'IMAGE',
-      'AUDIO',
-      'VIDEO',
-      'DOCUMENT',
-      'LOCATION',
-      'STICKER',
-      'CONTACT',
-      'UNSUPPORTED',
-    ]),
-    text: z.string().max(8000).optional(),
-    caption: z.string().max(8000).optional(),
-    // Present when type is IMAGE / AUDIO / VIDEO / DOCUMENT / STICKER — authenticated media URL.
-    url: z.string().url().optional(),
-  })
-  .passthrough()
-
-const InfobipInboundResultSchema = z
-  .object({
-    messageId: z.string().min(1).max(128),
-    // Bare E.164 — Infobip delivers digits only (no `whatsapp:` or `+` prefix).
-    from: z.string().regex(/^[0-9]{6,20}$/),
-    to: z.string().regex(/^[0-9]{6,20}$/),
-    receivedAt: z.string().min(1),
-    integrationType: z.string().optional(),
-    // Contact block — `name` is low-entropy PII; see whatsapp.service.ts audit M5 (contact name
-    // NEVER logged). Schema tolerates presence but service-layer drops it from all log lines.
-    contact: z.object({ name: z.string().optional() }).passthrough().optional(),
-    message: InfobipInboundMessageSchema,
-  })
-  .passthrough()
-
-export const InfobipInboundWebhookSchema = z
-  .object({
-    results: z.array(InfobipInboundResultSchema).min(1),
-    messageCount: z.number().int().nonnegative().optional(),
-    pendingMessageCount: z.number().int().nonnegative().optional(),
-  })
-  .passthrough()
-
-export type InfobipInboundWebhook = z.infer<typeof InfobipInboundWebhookSchema>
-export type InfobipInboundResult = z.infer<typeof InfobipInboundResultSchema>
-export type InfobipInboundMessage = z.infer<typeof InfobipInboundMessageSchema>
-
-// Outbound result contract — shape unchanged from Twilio era so whatsapp.service.ts
-// consumer paths don't need updates beyond constructor/config swaps.
+// Outbound result contract — provider-agnostic.
 export type WhatsAppOutboundResult =
   | { ok: true; mode: 'live' | 'console' | 'disabled'; messageId?: string }
   | {
@@ -100,7 +46,59 @@ export type AllowedImageMimeType = (typeof ALLOWED_IMAGE_MIME_TYPES)[number]
 // with its messageId; the controller still returns 200 (partial-success > full-retry).
 export const BATCH_DEADLINE_MS = 12_000
 
-// 03-04 provider-neutral media host allowlist (renamed from DEFAULT_TWILIO_MEDIA_HOST_ALLOWLIST).
+// 03-06 provider-neutral media host allowlist — Twilio media CDN.
 // Production-safe default; override via WHATSAPP_MEDIA_HOST_ALLOWLIST env.
-// UAT-VERIFY: confirm Infobip's actual media CDN hostnames during first-image UAT and tighten.
-export const DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST = ['*.infobip.com']
+// Twilio Conversations media is served from mcs.<region>.twilio.com (us1, ie1,
+// au1, sg1, br1, jp1). `*.twilio.com` covers the entire surface; we used to
+// also list *.media.twiliocdn.com but that's the SDK CDN, not the media path,
+// and including it widened SSRF risk without functional benefit.
+export const DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST = ['*.twilio.com']
+
+// 03-06 Twilio Conversations webhook — fired on every Conversation event
+// (onMessageAdded, onConversationAdded, onParticipantAdded, deliveryReceipts).
+// We only act on onMessageAdded; others 200-ack and drop.
+//
+// Body is application/x-www-form-urlencoded; NestJS surfaces it as a flat
+// Record after urlencoded parser middleware. Keys are case-sensitive PascalCase.
+//
+// Media: when NumMedia > 0, MediaUrl0/MediaContentType0, MediaUrl1/MediaContentType1, …
+//   The URLs require Basic-auth (account SID + auth token) to fetch.
+const NumericString = z
+  .string()
+  .regex(/^[0-9]+$/)
+  .transform((s) => Number.parseInt(s, 10))
+
+export const TwilioConversationsEventSchema = z
+  .object({
+    EventType: z.string().min(1).max(64),
+    ConversationSid: z.string().regex(/^CH[0-9a-fA-F]{32}$/),
+    MessageSid: z
+      .string()
+      .regex(/^IM[0-9a-fA-F]{32}$/)
+      .optional(),
+    // Author is whatsapp:+E164 for inbound from the participant, "system" for our own sends.
+    Author: z.string().min(1).max(128).optional(),
+    Body: z.string().max(8000).optional(),
+    Source: z.string().optional(),
+    ParticipantSid: z.string().optional(),
+    NumMedia: NumericString.optional(),
+    DateCreated: z.string().optional(),
+  })
+  .passthrough()
+
+export type TwilioConversationsEvent = z.infer<typeof TwilioConversationsEventSchema>
+
+// Normalized inbound message that the existing whatsapp.service handler consumes.
+// Shape mirrors the previous InfobipInboundResult so the service body needs minimal change.
+export type WhatsappInboundResult = {
+  messageId: string
+  conversationSid: string
+  // E.164 with leading "+" (normalized from Twilio's "whatsapp:+…" Author).
+  from: string
+  message: {
+    type: 'TEXT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'DOCUMENT' | 'UNSUPPORTED'
+    text?: string
+    url?: string
+    mediaContentType?: string
+  }
+}

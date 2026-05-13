@@ -664,29 +664,49 @@ export class ToolDispatcher {
     let sectionInjectedHits = 0
     let kiContentFallbackHits = 0
     let aggregateSectionTokens = 0
+    let droppedForBudget = 0
 
-    const formatted: RetrievalHit[] = sorted.map((hit) => {
+    // Walk hits in relevance order and enforce AGGREGATE_SECTION_TOKEN_BUDGET.
+    // Drop the lowest-ranked sections that would push the running total over
+    // budget — keeps the model's input window predictable even when
+    // TOP_SECTIONS_PER_KI=2 surfaces multiple long sections per doc. We always
+    // keep at least one hit even if it busts the budget alone (better partial
+    // context than none). Non-section hits (contacts, steps) cost a rough
+    // content-length/4 token estimate.
+    const formatted: RetrievalHit[] = []
+    for (const hit of sorted) {
       const sectionId = hit.metadata.sectionId as string | undefined | null
       const sectionTitle = hit.metadata.sectionTitle as string | undefined | null
       const sectionTokenCount =
         typeof hit.metadata.sectionTokenCount === 'number' ? hit.metadata.sectionTokenCount : 0
+      const estimatedCost = sectionId
+        ? sectionTokenCount
+        : Math.ceil((hit.content?.length ?? 0) / 4)
 
+      const wouldExceed =
+        formatted.length > 0 &&
+        aggregateSectionTokens + estimatedCost > AGGREGATE_SECTION_TOKEN_BUDGET
+      if (wouldExceed) {
+        droppedForBudget++
+        continue
+      }
+
+      aggregateSectionTokens += estimatedCost
       if (sectionId) {
         sectionInjectedHits++
-        aggregateSectionTokens += sectionTokenCount
-        return {
+        formatted.push({
           ...hit,
           content: formatSectionPayload({
             sectionId,
             sectionTitle: sectionTitle ?? null,
             content: hit.content,
           }),
-        }
-      } else if (hit.entityType === 'knowledge_item') {
-        kiContentFallbackHits++
+        })
+      } else {
+        if (hit.entityType === 'knowledge_item') kiContentFallbackHits++
+        formatted.push(hit)
       }
-      return hit
-    })
+    }
 
     const orgIdHash = createHash('sha256').update(orgId).digest('hex').slice(0, 16)
 
@@ -697,18 +717,21 @@ export class ToolDispatcher {
         sectionInjectedHits,
         kiContentFallbackHits,
         aggregateSectionTokens,
+        droppedForBudget,
+        budget: AGGREGATE_SECTION_TOKEN_BUDGET,
         deterministicSortKey: 'similarity_desc_sectionId_asc',
         orgIdHash,
       }),
     )
 
-    if (aggregateSectionTokens > AGGREGATE_SECTION_TOKEN_BUDGET) {
+    if (droppedForBudget > 0) {
       this.logger.warn(
         JSON.stringify({
-          event: 'tool_dispatcher.section_budget_exceeded',
+          event: 'tool_dispatcher.section_budget_enforced',
+          droppedForBudget,
           aggregateSectionTokens,
           budget: AGGREGATE_SECTION_TOKEN_BUDGET,
-          hitCount: formatted.length,
+          keptHits: formatted.length,
           orgIdHash,
         }),
       )

@@ -2,7 +2,7 @@ import './load-env'
 
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { json, type NextFunction, type Request, type Response, raw as rawParser } from 'express'
+import { json, type NextFunction, type Request, type Response, urlencoded } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
@@ -52,56 +52,28 @@ async function bootstrap() {
   // 02-02 audit-added M5/S4: path-filtered 32 KB json parser; /docs/upload must reach multer
   // with its multipart body intact. Hoisted jsonDefault avoids per-request middleware construction.
   //
-  // 03-04 audit-added M6 (G6) — Middleware order contract: webhook-path branches MUST run
-  // BEFORE jsonDefault. Drift = 403 on every inbound because req.rawBody would be missing.
-  // Do NOT reorder without re-validating the HMAC flow end-to-end against Infobip.
-  //
-  // Infobip posts application/json; we use express.raw() to preserve the raw body bytes on
-  // req.rawBody so the HMAC-SHA256 guard can verify the signature, then we JSON.parse
-  // ourselves into req.body so the controller sees a parsed payload. The Content-Type
-  // allowlist tolerates parameterized variants (e.g. "application/json; charset=utf-8").
+  // 03-06 Body-parser routing:
+  //   - /docs/upload: passthrough so multer sees multipart intact.
+  //   - /webhooks/twilio/conversations: application/x-www-form-urlencoded.
+  //     Twilio's signature algorithm signs the URL + sorted form params, so we
+  //     don't need raw-body retention — the guard reads the parsed body.
+  //   - Everything else: json({ limit: '32kb' }).
   const jsonDefault = json({ limit: '32kb' })
-  const webhookRaw = rawParser({
-    limit: '32kb',
-    type: ['application/json', 'application/*+json'],
-  })
+  const twilioUrlencoded = urlencoded({ extended: false, limit: '32kb' })
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path === '/docs/upload') return next()
-    if (req.path === '/webhooks/infobip/whatsapp') {
-      return webhookRaw(req, res, (err) => {
-        if (err) return next(err)
-        const buf: Buffer | undefined = req.body instanceof Buffer ? req.body : undefined
-        if (!buf || buf.length === 0) {
-          req.rawBody = Buffer.alloc(0)
-          req.body = {}
-          return next()
-        }
-        req.rawBody = buf
-        try {
-          req.body = JSON.parse(buf.toString('utf8'))
-        } catch {
-          req.body = {}
-        }
-        next()
-      })
+    if (req.path === '/webhooks/twilio/conversations') {
+      return twilioUrlencoded(req, res, next)
     }
     return jsonDefault(req, res, next)
   })
 
-  // 03-04 audit-added M6 (G6) — middleware-order contract enforcement:
-  //   The /webhooks/infobip/whatsapp branch above MUST run before jsonDefault to populate
-  //   req.rawBody for HMAC verification. Drift = 403 on every inbound.
-  //
-  //   Original audit recommended runtime Express router introspection but it's brittle
-  //   across Express 4/5 (_router vs router lazy-init semantics) and SWC-compiled source.
-  //   Fallback per the audit's own note: rely on this comment + a grep-based verification
-  //   step. The contract is enforced by reading this file, not by runtime assertion.
-  //
+  // 03-06 middleware-order contract:
+  //   /webhooks/twilio/conversations MUST be parsed as urlencoded BEFORE
+  //   jsonDefault sees it. Drift = empty req.body → signature mismatch.
   //   VERIFY BEFORE DEPLOY:
-  //     grep -n "webhooks/infobip/whatsapp" apps/api/src/main.ts  → must return 1 hit
-  //     grep -n "req.rawBody = " apps/api/src/main.ts             → must return 1 hit
-  //     End-to-end check: send a real Infobip Portal trial inbound; expect 200 + payload
-  //     reaches the controller. 403 "no-raw-body" = middleware order broken.
+  //     grep -n "webhooks/twilio/conversations" apps/api/src/main.ts   → must return 1 hit
+  //     End-to-end: post a Twilio test event; expect 200 (or debug "event_skipped" log).
 
   // Swagger / OpenAPI — served at /api-docs in dev for browsing, the same
   // document is emitted to swagger.json by `npm run swagger:generate --workspace=api` for orval

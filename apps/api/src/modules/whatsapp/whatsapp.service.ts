@@ -3,10 +3,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   CHAT_TIMEOUT_MS,
-  type InfobipInboundResult,
   PROACTIVE_SESSION_WINDOW_MS,
   type ProactiveSuggestion,
   VERIFIED_SENDER_LIMIT_PER_HOUR,
+  type WhatsappInboundResult,
 } from '../../types'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { SuggestionsService } from '../suggestions/suggestions.service'
@@ -25,13 +25,13 @@ function sha256Prefix(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
 }
 
-// 03-04 Infobip migration — media type classification from Infobip's message.type enum.
-function classifyInfobipMedia(result: InfobipInboundResult): 'none' | 'image' | 'audio' | 'other' {
+// Provider-agnostic media classifier. Both Infobip + Twilio inbound paths
+// normalize into WhatsappInboundResult whose message.type enum drives this.
+function classifyInboundMedia(result: WhatsappInboundResult): 'none' | 'image' | 'audio' | 'other' {
   const t = result.message.type
   if (t === 'TEXT') return 'none'
   if (t === 'IMAGE') return 'image'
   if (t === 'AUDIO') return 'audio'
-  // VIDEO | DOCUMENT | LOCATION | STICKER | CONTACT | UNSUPPORTED
   return 'other'
 }
 
@@ -84,21 +84,24 @@ export class WhatsappService {
     private readonly onboarding: WhatsappOnboardingService,
   ) {}
 
-  async handleInbound(result: InfobipInboundResult): Promise<void> {
+  async handleInbound(result: WhatsappInboundResult): Promise<void> {
     // 03-03 Task 1: typing indicator fires IMMEDIATELY (before any DB / sender resolution).
+    // 03-06 fix: pass conversationSid (Twilio Typing endpoint is per-Conversation),
+    // not messageId — earlier code passed MessageSid which gated to console-mode.
     this.adapter
-      .sendTypingIndicator(result.messageId)
+      .sendTypingIndicator(result.conversationSid)
       .then((r) => {
         if (r.ok) {
           this.logger.log('whatsapp.typing_indicator_sent', {
             from: sha256Prefix(result.from),
             messageId: result.messageId,
+            conversationSid: result.conversationSid,
             mode: r.mode,
           })
         }
       })
       .catch(() => {})
-    startTypingRefire(result.messageId, this.adapter, this.logger)
+    startTypingRefire(result.messageId, result.conversationSid, this.adapter, this.logger)
 
     try {
       // 03-01 M3: messageId idempotency — dedupe Infobip retries + replay attacks.
@@ -113,7 +116,7 @@ export class WhatsappService {
 
       // 03-03 Task 3: audio/video still reject. Image now flows through (after
       // sender resolution) via the dedicated image handler below.
-      const mediaKind = classifyInfobipMedia(result)
+      const mediaKind = classifyInboundMedia(result)
       if (mediaKind === 'audio' || mediaKind === 'other') {
         await this.handleUnsupportedMedia(result, mediaKind)
         return
@@ -121,9 +124,11 @@ export class WhatsappService {
       // mediaKind === 'none' or 'image' — continue to sender resolution.
 
       const fromHash = sha256Prefix(result.from)
-      // Phase 1 Plan 01-03 stores User.phoneNumber in E.164 WITH `+` prefix.
-      // Infobip delivers bare digits — prepend `+` so the lookup matches.
-      const phoneNumber = `+${result.from}`
+      // 03-06: both controllers normalize `from` to E.164 WITH leading `+` so
+      // the User.phoneNumber lookup matches directly. Twilio's Author was
+      // "whatsapp:+E164"; Infobip's was bare digits — normalization is handled
+      // at the controller boundary.
+      const phoneNumber = result.from
 
       // Plan 03-01 — onboarding state machine. Before chat dispatch, resolve
       // the phone's onboarding state. Unknown / otp_pending / linked_no_venue
@@ -332,19 +337,23 @@ export class WhatsappService {
             })
             return
           }
-          const apiKey = process.env.INFOBIP_API_KEY
-          if (!apiKey) {
+          // 03-06: Twilio media is Basic-auth protected with account-SID:auth-token.
+          // The downloader accepts the precomputed base64-encoded credential.
+          const acct = process.env.TWILIO_ACCOUNT_SID
+          const tok = process.env.TWILIO_AUTH_TOKEN
+          if (!acct || !tok) {
             await this.adapter.sendText(
               result.from,
               "Image support isn't configured — send text instead.",
             )
             this.logger.warn('whatsapp.image_download_failed', {
               status: 0,
-              errorKind: 'no-infobip-api-key',
+              errorKind: 'no-twilio-credentials',
             })
             return
           }
-          const dl = await downloadWhatsappMedia(result.message.url, apiKey)
+          const basicAuth = Buffer.from(`${acct}:${tok}`).toString('base64')
+          const dl = await downloadWhatsappMedia(result.message.url, basicAuth)
           if (!dl.ok) {
             const friendly =
               dl.reason === 'unsupported-mime'
@@ -463,7 +472,10 @@ export class WhatsappService {
     }
   }
 
-  private async handleUnknownNumber(result: InfobipInboundResult, fromHash: string): Promise<void> {
+  private async handleUnknownNumber(
+    result: WhatsappInboundResult,
+    fromHash: string,
+  ): Promise<void> {
     const { shouldReply } = recordAndCheckOnboardingReply(fromHash)
     if (shouldReply) {
       await this.adapter.sendText(
@@ -481,7 +493,7 @@ export class WhatsappService {
   }
 
   private async handleUnsupportedMedia(
-    result: InfobipInboundResult,
+    result: WhatsappInboundResult,
     mediaKind: 'image' | 'audio' | 'other',
   ): Promise<void> {
     await this.adapter.sendText(

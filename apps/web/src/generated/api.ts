@@ -1152,6 +1152,10 @@ export type InviteControllerCreateParams = {
 force: string;
 };
 
+export type InviteRedeemControllerPreviewParams = {
+t: string;
+};
+
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
@@ -5472,6 +5476,196 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getInviteControllerRevokeMutationOptions(options), queryClient);
+    }
+
+export type inviteRedeemControllerPreviewResponse200 = {
+  data: void
+  status: 200
+}
+
+export type inviteRedeemControllerPreviewResponseSuccess = (inviteRedeemControllerPreviewResponse200) & {
+  headers: Headers;
+};
+;
+
+export type inviteRedeemControllerPreviewResponse = (inviteRedeemControllerPreviewResponseSuccess)
+
+export const getInviteRedeemControllerPreviewUrl = (params: InviteRedeemControllerPreviewParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/whatsapp/invites/redeem/preview?${stringifiedParams}` : `/whatsapp/invites/redeem/preview`
+}
+
+export const inviteRedeemControllerPreview = async (params: InviteRedeemControllerPreviewParams, options?: RequestInit): Promise<inviteRedeemControllerPreviewResponse> => {
+
+  return orvalMutator<inviteRedeemControllerPreviewResponse>(getInviteRedeemControllerPreviewUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInviteRedeemControllerPreviewQueryKey = (params?: InviteRedeemControllerPreviewParams,) => {
+    return [
+    `/whatsapp/invites/redeem/preview`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInviteRedeemControllerPreviewQueryOptions = <TData = Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError = unknown>(params: InviteRedeemControllerPreviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInviteRedeemControllerPreviewQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>> = ({ signal }) => inviteRedeemControllerPreview(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InviteRedeemControllerPreviewQueryResult = NonNullable<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>>
+export type InviteRedeemControllerPreviewQueryError = unknown
+
+
+export function useInviteRedeemControllerPreview<TData = Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError = unknown>(
+ params: InviteRedeemControllerPreviewParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof inviteRedeemControllerPreview>>,
+          TError,
+          Awaited<ReturnType<typeof inviteRedeemControllerPreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInviteRedeemControllerPreview<TData = Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError = unknown>(
+ params: InviteRedeemControllerPreviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof inviteRedeemControllerPreview>>,
+          TError,
+          Awaited<ReturnType<typeof inviteRedeemControllerPreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInviteRedeemControllerPreview<TData = Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError = unknown>(
+ params: InviteRedeemControllerPreviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInviteRedeemControllerPreview<TData = Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError = unknown>(
+ params: InviteRedeemControllerPreviewParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof inviteRedeemControllerPreview>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInviteRedeemControllerPreviewQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type inviteRedeemControllerCompleteResponse200 = {
+  data: void
+  status: 200
+}
+
+export type inviteRedeemControllerCompleteResponseSuccess = (inviteRedeemControllerCompleteResponse200) & {
+  headers: Headers;
+};
+;
+
+export type inviteRedeemControllerCompleteResponse = (inviteRedeemControllerCompleteResponseSuccess)
+
+export const getInviteRedeemControllerCompleteUrl = () => {
+
+
+
+
+  return `/whatsapp/invites/redeem/complete`
+}
+
+export const inviteRedeemControllerComplete = async ( options?: RequestInit): Promise<inviteRedeemControllerCompleteResponse> => {
+
+  return orvalMutator<inviteRedeemControllerCompleteResponse>(getInviteRedeemControllerCompleteUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getInviteRedeemControllerCompleteMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext> => {
+
+const mutationKey = ['inviteRedeemControllerComplete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, void> = () => {
+
+
+          return  inviteRedeemControllerComplete(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InviteRedeemControllerCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>>
+
+    export type InviteRedeemControllerCompleteMutationError = unknown
+
+    export const useInviteRedeemControllerComplete = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof inviteRedeemControllerComplete>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getInviteRedeemControllerCompleteMutationOptions(options), queryClient);
     }
 
 export type nudgeControllerRunNudgeResponse200 = {

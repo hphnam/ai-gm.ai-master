@@ -61,51 +61,32 @@ function isAllowedMime(mime: string): mime is AllowedImageMimeType {
   return (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(mime)
 }
 
-// 03-04 audit-added S3 (G10): auth trial matrix for Infobip media URLs.
-// Infobip docs don't clearly document whether media URLs are pre-signed (no auth) or
-// require the App apiKey. This function tries App-header first; on 401/403 retries with
-// no auth; if both fail returns media-download-failed with errorKind signaling the gap.
-// Total wall-clock stays bounded by MEDIA_DOWNLOAD_TIMEOUT_MS shared across attempts.
-async function fetchWithAuthTrial(
+// 03-06 Twilio media auth: media URLs returned by Twilio webhook
+// (MediaUrl{N}) require Basic auth = base64(accountSid:authToken). The first
+// request returns a redirect to a signed S3 URL which does NOT require auth.
+// Manual redirect handling preserves SSRF allowlist re-validation; we only
+// send the Authorization header on the first hop to avoid leaking creds to S3.
+async function fetchWithBasicAuthFirstHop(
   url: string,
-  apiKey: string,
+  basicAuth: string,
   deadline: number,
-): Promise<{
-  res: Response | null
-  authMode: 'app-key' | 'no-auth' | 'unknown'
-  errorKind?: string
-}> {
-  const tryFetch = async (mode: 'app-key' | 'no-auth'): Promise<Response> => {
-    const headers: Record<string, string> =
-      mode === 'app-key' ? { Authorization: `App ${apiKey}` } : {}
+  isFirstHop: boolean,
+): Promise<{ res: Response | null; errorKind?: string }> {
+  try {
+    const headers: Record<string, string> = isFirstHop
+      ? { Authorization: `Basic ${basicAuth}` }
+      : {}
     const remaining = Math.max(100, deadline - Date.now())
-    return fetch(url, {
+    const res = await fetch(url, {
       method: 'GET',
       headers,
       redirect: 'manual',
       signal: AbortSignal.timeout(remaining),
     })
-  }
-
-  try {
-    const first = await tryFetch('app-key')
-    if (first.status !== 401 && first.status !== 403) {
-      return { res: first, authMode: 'app-key' }
-    }
-    // 401/403 on App apiKey → retry without auth (Infobip may use pre-signed URLs).
-    const second = await tryFetch('no-auth')
-    if (second.status !== 401 && second.status !== 403) {
-      return { res: second, authMode: 'no-auth' }
-    }
-    return {
-      res: null,
-      authMode: 'unknown',
-      errorKind: `auth-trial-exhausted-app=${first.status}-noauth=${second.status}`,
-    }
+    return { res }
   } catch (err) {
     return {
       res: null,
-      authMode: 'unknown',
       errorKind: (err as Error)?.constructor?.name ?? 'unknown',
     }
   }
@@ -113,7 +94,7 @@ async function fetchWithAuthTrial(
 
 export async function downloadWhatsappMedia(
   url: string,
-  apiKey: string,
+  basicAuth: string,
 ): Promise<MediaDownloadResult> {
   // 03-03 audit M1: SSRF gate BEFORE any fetch.
   const initial = isHostAllowed(url)
@@ -124,16 +105,13 @@ export async function downloadWhatsappMedia(
   const deadline = Date.now() + MEDIA_DOWNLOAD_TIMEOUT_MS
 
   try {
-    // Manual redirect follow with allowlist re-validation on every hop.
     let currentUrl = url
     let res: Response | null = null
-    let authMode: 'app-key' | 'no-auth' | 'unknown' = 'unknown'
     let trialErrorKind: string | undefined
 
     for (let hop = 0; hop < 5; hop++) {
-      const attempt = await fetchWithAuthTrial(currentUrl, apiKey, deadline)
+      const attempt = await fetchWithBasicAuthFirstHop(currentUrl, basicAuth, deadline, hop === 0)
       res = attempt.res
-      authMode = attempt.authMode
       trialErrorKind = attempt.errorKind
       if (!res) break
 
@@ -170,7 +148,7 @@ export async function downloadWhatsappMedia(
         ok: false,
         reason: 'media-download-failed',
         status: res.status,
-        errorKind: `http-${res.status}-via-${authMode}`,
+        errorKind: `http-${res.status}`,
       }
     }
 

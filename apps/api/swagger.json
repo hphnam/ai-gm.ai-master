@@ -1793,6 +1793,43 @@
         ]
       }
     },
+    "/whatsapp/invites/redeem/preview": {
+      "get": {
+        "operationId": "InviteRedeemController_preview",
+        "parameters": [
+          {
+            "name": "t",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "whatsapp-invites"
+        ]
+      }
+    },
+    "/whatsapp/invites/redeem/complete": {
+      "post": {
+        "operationId": "InviteRedeemController_complete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "whatsapp-invites"
+        ]
+      }
+    },
     "/nudges/{venueId}/run": {
       "post": {
         "operationId": "NudgeController_runNudge",

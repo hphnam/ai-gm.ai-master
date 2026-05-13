@@ -252,6 +252,69 @@ Call 999.`,
       mustNotInclude: [/^(?:here'?s|let me)/im, /i (?:found|located)/i],
     },
   },
+  // ─── Chat-overhaul Wave A/B — new path coverage ────────────────────────
+  // N1: narrow question that targets a single sentence deep inside a
+  // multi-section doc. Vec recall on the KI-level embedding alone wouldn't
+  // surface this for such a specific question — chunk-level recall is what
+  // makes it findable.
+  {
+    topic: 'N1.narrow_question_chunk_recall',
+    query: 'what is the gas pressure target after a keg change',
+    fixture: `## Cellar opening
+1. Turn on lights at the panel by the door.
+2. Check the cellar temperature is between 4°C and 6°C.
+3. Verify the line cleaner reservoir is full.
+
+## Cellar mid-shift
+1. Every 90 minutes: walk the cellar, listen for hissing.
+2. Spot-check tap heads for crystallisation.
+
+## Cellar keg change
+1. Disconnect the spent keg using the line-tap.
+2. Spray sanitiser on the connector.
+3. Replace the keg, prime the line.
+4. Wait 30 seconds; the gas pressure regulator should read 12 PSI after the change.
+5. Pull a half pint to verify flow.
+
+## Cellar closing
+1. Lock the cellar door.
+2. Log the day's keg movements in the sheet.`,
+  },
+  // N2: two distinct sections of the same doc are both relevant. With
+  // TOP_SECTIONS_PER_KI=2 the model should now see both passages, not just
+  // the single best chunk's parent section.
+  {
+    topic: 'N2.multi_section_per_doc',
+    query: 'cleaning the beer lines and the safety gear needed',
+    fixture: `## Line cleaning procedure
+1. Disconnect all kegs from the system.
+2. Connect the line-cleaner reservoir of 3% caustic solution.
+3. Pump through for 15 minutes minimum.
+4. Rinse with fresh water until pH neutral.
+5. Reconnect kegs and prime each line.
+
+## Line cleaning safety
+Wear nitrile gloves AND safety goggles before handling caustic solution.
+Caustic burns are immediate — keep eyewash on the cellar door.
+Do not mix caustic with acid cleaners — toxic chlorine gas results.
+
+## Other procedures
+The fire-extinguisher is in the corridor. Check pressure monthly.`,
+  },
+  // B1: BM25-specific keyword (an exact error code) that wouldn't rank well
+  // by pure semantic similarity. Exercises the bm25_resolved subquery which
+  // pulls a focused section even when vec_hits didn't surface the KI.
+  {
+    topic: 'B1.bm25_specific_keyword',
+    query: 'F23-A error',
+    fixture: `## Coffee machine — La Cimbali daily
+Daily clean: pull the group head, run espresso through a blank.
+
+## Coffee machine errors
+F12-A: water inlet sensor failure. Reset by holding the power button 10s.
+F23-A: temperature probe out of range. Call the supplier — code on the warranty sheet.
+F35-B: pump pressure low. Descale.`,
+  },
 ]
 
 async function main() {
@@ -278,7 +341,7 @@ async function main() {
   console.log(
     JSON.stringify({
       event: 'probe.eval.cost_banner',
-      note: '12-query canned harness (E1-E6 retrieval shape, L1-L2/R1-R2/I1-I2 mode shape) · retrieval-only in stub mode (~12-108 ingest Voyage + 12 query Voyage calls @ $0.00006 each ≈ $0.0014-$0.0072). PROBE_CHAT_V2_REAL=1 invokes ChatV2Service for the 6 mode queries — adds ~$0.50 (Sonnet @ ~$0.04-0.08/turn).',
+      note: '15-query canned harness (E1-E6 retrieval shape, L1-L2/R1-R2/I1-I2 mode shape, N1-N2/B1 chat-overhaul Wave A/B path coverage) · retrieval-only in stub mode (~15-135 ingest Voyage + 15 query Voyage calls @ $0.00006 each ≈ $0.0018-$0.009). PROBE_CHAT_V2_REAL=1 invokes ChatV2Service for the 6 mode queries — adds ~$0.50 (Sonnet @ ~$0.04-0.08/turn).',
     }),
   )
 
@@ -308,12 +371,34 @@ async function main() {
       similarities.push({ topic: c.topic, topSim: null })
       continue
     }
-    const hits = r.data as Array<{ similarity: number; metadata: { sectionId?: string | null } }>
+    const hits = r.data as Array<{
+      entityId: string
+      similarity: number
+      metadata: { sectionId?: string | null }
+    }>
     const top = hits[0] ?? null
     const topSim = top?.similarity ?? null
     const hasSection = top?.metadata?.sectionId != null
-    const pass = hits.length >= 1 && hasSection
-    record(c.topic, pass, topSim, `hits=${hits.length} sectionInjected=${hasSection}`)
+    let pass = hits.length >= 1 && hasSection
+    let detail = `hits=${hits.length} sectionInjected=${hasSection}`
+
+    // N2 has an extra-strict assertion: TOP_SECTIONS_PER_KI=2 should yield
+    // at least 2 hits with the same entityId for a multi-section doc, since
+    // both the procedure and safety sections are relevant to the query.
+    // NOTE: brittle if a future change drops the find_knowledge limit below
+    // 2 or adds a cross-doc rerank step that demotes the second section
+    // past the per-call limit. If this flakes, raise `limit` in the
+    // dispatch call above to 8+ and dedup post-hoc.
+    if (c.topic === 'N2.multi_section_per_doc') {
+      const idCounts = new Map<string, number>()
+      for (const h of hits) idCounts.set(h.entityId, (idCounts.get(h.entityId) ?? 0) + 1)
+      const maxFromOneDoc = [...idCounts.values()].reduce((a, b) => Math.max(a, b), 0)
+      const multiSectionOk = maxFromOneDoc >= 2
+      pass = pass && multiSectionOk
+      detail = `${detail} maxSectionsPerDoc=${maxFromOneDoc}`
+    }
+
+    record(c.topic, pass, topSim, detail)
     similarities.push({ topic: c.topic, topSim })
   }
 
@@ -360,8 +445,9 @@ async function main() {
     }
   }
 
-  // Plan 06-04 Task 5 — pass-rate gate raised ≥60% → ≥80% (≥10/12).
-  // Quality gate for chat-v1 deletion (Task 6 checkpoint).
+  // Plan 06-04 Task 5 — pass-rate gate ≥80%. Chat-overhaul Wave C raised
+  // canned set from 12 → 15 (added N1/N2/B1 for chunk-recall, multi-section,
+  // and BM25-specific paths). Gate stays at ≥80% (≥12/15).
   process.exit(passRate >= 0.8 ? 0 : 1)
 }
 

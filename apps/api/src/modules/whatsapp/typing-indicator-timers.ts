@@ -2,7 +2,7 @@ import type { Logger } from '@nestjs/common'
 import { TYPING_MAX_REFIRES, TYPING_REFIRE_MS } from '../../types'
 
 type TypingSender = {
-  sendTypingIndicator: (inboundMessageSid: string) => Promise<unknown>
+  sendTypingIndicator: (conversationSid: string) => Promise<unknown>
 }
 
 type Entry = {
@@ -10,6 +10,7 @@ type Entry = {
   refireCount: number
   startedAt: number
   status: 'active' | 'exhausted'
+  conversationSid: string
 }
 
 const MAP_CAP = 1_000
@@ -28,9 +29,20 @@ function capMap(): void {
   }
 }
 
-export function startTypingRefire(messageSid: string, adapter: TypingSender, logger: Logger): void {
+export function startTypingRefire(
+  messageSid: string,
+  conversationSid: string,
+  adapter: TypingSender,
+  logger: Logger,
+): void {
   if (timers.has(messageSid)) return // idempotent
-  const entry: Entry = { timer: null, refireCount: 0, startedAt: Date.now(), status: 'active' }
+  const entry: Entry = {
+    timer: null,
+    refireCount: 0,
+    startedAt: Date.now(),
+    status: 'active',
+    conversationSid,
+  }
   timers.set(messageSid, entry)
   capMap()
 
@@ -52,8 +64,12 @@ export function startTypingRefire(messageSid: string, adapter: TypingSender, log
         round: cur.refireCount,
       })
       // Best-effort: errors are swallowed; the refire itself is fire-and-forget.
-      // Previous Twilio implementation keyed typing on the inbound MessageSid (not phone); Infobip has no public typing endpoint for WhatsApp so the adapter runs in console-mode unconditionally (D-03-03-F / D-03-04-F).
-      adapter.sendTypingIndicator(messageSid).catch(() => {})
+      // 03-06: typing indicator hits Twilio's Conversations Typing endpoint
+      // which is per-Conversation, not per-Message. We keep the timer keyed by
+      // MessageSid (so concurrent inbound messages from the same phone don't
+      // collide on clear) but the API call uses the conversationSid stashed
+      // on the entry.
+      adapter.sendTypingIndicator(cur.conversationSid).catch(() => {})
 
       if (cur.refireCount >= TYPING_MAX_REFIRES) {
         // audit-added AC-16/M6: retain the entry with status='exhausted' so clearTypingRefire

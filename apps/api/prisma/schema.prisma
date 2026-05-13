@@ -243,6 +243,21 @@ model WhatsappSession {
   @@map("whatsapp_sessions")
 }
 
+/// Plan 03-06 — Twilio Conversations API mapping.
+/// One Conversation resource per phone number; the SID is required for every
+/// outbound send + typing indicator. Adapter does find-or-create against this
+/// table; webhook can upsert on onConversationAdded. @unique on both ends so
+/// races resolve via P2002 catch.
+model WhatsappConversation {
+  id              String   @id @default(cuid())
+  phoneNumber     String   @unique // E.164 with leading +
+  conversationSid String   @unique // Twilio CH… SID
+  lastEventAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@map("whatsapp_conversations")
+}
+
 /// TEMPORARY — replaced by Xero/Square integration in a later milestone
 model MockSupplier {
   id           String   @id @default(uuid())

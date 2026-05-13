@@ -13,10 +13,15 @@ export type CompactionResult = {
   recent: CompactableMessage[]
 }
 
-const COMPACT_THRESHOLD = 20
-const KEEP_RECENT = 10
-const REGEN_AFTER_NEW_MESSAGES = 10
+// Compaction is lossy by design — Haiku summarises older turns into a synopsis,
+// which means specific doc ids, supplier names, error codes referenced earlier
+// can blur. We compact later (40 turns vs 20) and keep more recent turns
+// verbatim (20 vs 10) so the agent retains real continuity across long shifts.
+const COMPACT_THRESHOLD = 40
+const KEEP_RECENT = 20
+const REGEN_AFTER_NEW_MESSAGES = 15
 const CALL_TIMEOUT_MS = 8000
+const MAX_MESSAGE_CHARS_IN_SUMMARY = 2400
 
 /// Phase F (Task #15) — long-thread summariser. When a conversation exceeds
 /// COMPACT_THRESHOLD turns, the older portion gets compressed into a Haiku-
@@ -95,7 +100,10 @@ export class ConversationCompactorService implements OnModuleInit {
     priorSummary: string | null,
   ): Promise<string | null> {
     const transcript = older
-      .map((m) => `${m.role === 'user' ? 'USER' : 'GM'}: ${m.content.slice(0, 1200)}`)
+      .map(
+        (m) =>
+          `${m.role === 'user' ? 'USER' : 'GM'}: ${m.content.slice(0, MAX_MESSAGE_CHARS_IN_SUMMARY)}`,
+      )
       .join('\n\n')
 
     const priorBlock = priorSummary

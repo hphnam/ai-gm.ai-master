@@ -1209,7 +1209,7 @@ async function W27_findKnowledgeAggregateTokenBudget(
       l.includes('"aggregateSectionTokens":'),
   )
   const noBudgetWarn = !warnsBefore.some((w) =>
-    w.includes('"event":"tool_dispatcher.section_budget_exceeded"'),
+    w.includes('"event":"tool_dispatcher.section_budget_enforced"'),
   )
 
   // Synthetically inflate section token counts to force budget breach.
@@ -1233,10 +1233,15 @@ async function W27_findKnowledgeAggregateTokenBudget(
     Logger.prototype.warn = origLogWarn2
   }
 
+  // Plan chat-overhaul wave A — budget is now actively enforced. The
+  // dispatcher drops the lowest-relevance sections when their token cost
+  // would push aggregate over budget, and logs `section_budget_enforced`
+  // with `droppedForBudget` ≥ 1. Old behaviour only warned without dropping.
   const sawBudgetWarn = warnsAfter.some(
     (w) =>
-      w.includes('"event":"tool_dispatcher.section_budget_exceeded"') &&
-      w.includes('"budget":24000'),
+      w.includes('"event":"tool_dispatcher.section_budget_enforced"') &&
+      w.includes('"budget":24000') &&
+      /"droppedForBudget":\s*[1-9]/.test(w),
   )
 
   const ok = sawFormattedLog && noBudgetWarn && sawBudgetWarn

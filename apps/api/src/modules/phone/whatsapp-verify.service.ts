@@ -64,8 +64,8 @@ function generatePin(): string {
 }
 
 @Injectable()
-export class InfobipVerifyService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(InfobipVerifyService.name)
+export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(WhatsappVerifyService.name)
   private readonly baseMode: 'console' | 'live'
   private readonly pinCache = new Map<string /* phoneHash */, PinEntry>()
   private sweepHandle?: NodeJS.Timeout

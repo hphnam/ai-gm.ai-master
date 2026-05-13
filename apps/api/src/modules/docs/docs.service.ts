@@ -1623,7 +1623,9 @@ export class DocsService {
     const result = await this.retrieval.find(gap.content, {
       orgId,
       venueId: gap.venueId ?? undefined,
-      limit: 3,
+      // Over-fetch so multi-section hits for the same doc don't collapse the
+      // final list under 3 entries after entityId dedup.
+      limit: 6,
       minSimilarity: 0.6,
       entityTypes: ['knowledge_item'],
       // Multi-venue groups often share answers (e.g. "where do we keep X?");
@@ -1631,12 +1633,25 @@ export class DocsService {
       crossVenue: true,
     })
     if (!result.ok) return []
-    return result.data.map((hit) => ({
-      docId: hit.entityId,
-      title: hit.title,
-      snippet: contentPreview(hit.content ?? '', 240),
-      similarity: hit.similarity,
-    }))
+    const seen = new Set<string>()
+    const deduped: Array<{
+      docId: string
+      title: string | null
+      snippet: string
+      similarity: number
+    }> = []
+    for (const hit of result.data) {
+      if (seen.has(hit.entityId)) continue
+      seen.add(hit.entityId)
+      deduped.push({
+        docId: hit.entityId,
+        title: hit.title,
+        snippet: contentPreview(hit.content ?? '', 240),
+        similarity: hit.similarity,
+      })
+      if (deduped.length >= 3) break
+    }
+    return deduped
   }
 
   // Delete a pending knowledge gap. Hardened: only removes rows where

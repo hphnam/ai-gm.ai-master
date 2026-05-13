@@ -29,7 +29,7 @@ node --import tsx --test path/to/file.spec.ts
 - Monorepo: `apps/api` (NestJS) and `apps/web` (Next.js App Router). npm workspaces + Turborepo.
 - API modules are feature-based under `apps/api/src/modules/<domain>`. One module per domain (auth, chat, embeddings, indexer, whatsapp, etc.).
 - Knowledge pipeline: Reducto extracts documents → Voyage embeds (`voyage-3.5`) and reranks (`rerank-2`) → stored in Postgres via Prisma.
-- WhatsApp integration via Infobip (inbound webhook, OTP for phone verification, signed-link onboarding).
+- WhatsApp integration via Twilio Conversations API. Webhook at `/webhooks/twilio/conversations` (urlencoded, X-Twilio-Signature HMAC-SHA1). New users onboard via signed-link DM; existing users link a phone with a web-entered confirmation code.
 - Realtime via Socket.io with Redis adapter; background jobs via BullMQ.
 
 ## Key Decisions
@@ -38,6 +38,12 @@ node --import tsx --test path/to/file.spec.ts
 - Phone verification uses WhatsApp OTP (not SMS) — see `apps/api/src/modules/phone`.
 - Embeddings stay on Voyage (not OpenAI). Don't swap without re-embedding the corpus.
 - Probes (`probe:eval`, `probe:section`) are the quality gate after any retrieval/embedding change.
+
+## Review Gate
+
+Before declaring any code-edit task complete in `apps/api/src/` or `apps/web/src/`, spawn `code-reviewer` and `security-reviewer` (parallel — one message with multiple Agent tool blocks). For doc or API-contract changes, also spawn `doc-reviewer`. Surface every HIGH/MEDIUM finding before closing the work.
+
+Skip only for: pure doc edits, formatting-only changes, dependency bumps with no code impact, single-line config knob changes.
 
 ## Don'ts
 

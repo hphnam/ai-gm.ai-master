@@ -102,6 +102,11 @@ export function buildGmAgent(params: {
   /// Working-memory snapshot — top KB items + recently-answered gaps + tabular
   /// docs. Lets the agent answer lookups directly without a find_knowledge call.
   venueSnapshot?: VenueSnapshot | null
+  /// Optional one-shot routing hint injected as a system block for THIS turn
+  /// only — e.g. "this looks like a tabular query, call query_document_table
+  /// first". Computed deterministically by chat.service.ts via cheap regex
+  /// heuristics, so no extra LLM latency is paid to set it.
+  routingHint?: string | null
   onFinish?: (event: OnFinishEvent<ToolSet>) => void | Promise<void>
   onStepFinish?: (step: {
     toolCalls?: ReadonlyArray<{
@@ -208,8 +213,13 @@ export function buildGmAgent(params: {
   // across turns. Per-turn dynamic context comes AFTER, unmarked, so it never breaks
   // the cache. See SYSTEM_CACHE_CONTROL comment for Anthropic semantic citation.
   const stableSystemBody = `${CHAT_SYSTEM_PROMPT}${modeOverlay}`
+  const routingHintBlock =
+    params.routingHint && params.routingHint.trim().length > 0
+      ? `\n<routing_hint>\n${params.routingHint.trim()}\n</routing_hint>`
+      : ''
   const dynamicSystemBody = [
     `\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${mode}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>`,
+    routingHintBlock,
     snapshotBlock,
     profileBlock,
     contactBlock,

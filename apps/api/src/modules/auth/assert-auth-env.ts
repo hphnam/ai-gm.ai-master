@@ -4,21 +4,17 @@ export type AuthEnv = {
   webOrigins: string[]
   // 01-02 audit-added: Resend config; undefined when dev console fallback is used
   resend?: { apiKey: string; mailFrom: string }
-  // 03-04 Infobip WhatsApp + 03-05 Infobip 2FA — Twilio fully removed.
-  infobip?: {
-    baseUrl: string
-    apiKey: string
-    sender: string
-    webhookSecret: string
+  // 03-06 Twilio Conversations API. Auth token doubles as webhook signing key
+  // (HMAC-SHA1 over PUBLIC_WEBHOOK_URL + sorted form params). publicWebhookUrl
+  // must match the URL configured in the Twilio console — Twilio signs the
+  // URL it was given, not the inbound URL we see (proxies can rewrite host).
+  twilio?: {
+    accountSid: string
+    authToken: string
+    conversationsServiceSid: string
+    sender: string // "whatsapp:+E164"
+    publicWebhookUrl: string
     driverOverride: 'live' | 'console' | 'disabled' | undefined
-  }
-  // 03-05: Infobip 2FA SMS OTP config (shares baseUrl + apiKey with whatsapp `infobip` block above).
-  // Undefined when PHONE_VERIFY_DRIVER_OVERRIDE=console OR when the 2FA env block is absent.
-  infobip2fa?: {
-    baseUrl: string
-    apiKey: string
-    applicationId: string
-    messageId: string
   }
   // Phase 6 — Reducto extraction layer. Required for any document upload other
   // than image MIMEs (which still go through Claude vision). REDUCTO_BASE_URL
@@ -38,10 +34,9 @@ export function assertAuthEnv(): AuthEnv {
   const webOriginRaw = process.env.WEB_ORIGIN
   const resendKey = process.env.RESEND_API_KEY
   const mailFrom = process.env.MAIL_FROM
-  // 03-05: Infobip 2FA SMS OTP config — all-or-nothing on the two IDs.
-  // Reuses INFOBIP_BASE_URL + INFOBIP_API_KEY read in the 03-04 block below.
-  const ib2faAppId = process.env.INFOBIP_2FA_APPLICATION_ID
-  const ib2faMsgId = process.env.INFOBIP_2FA_MESSAGE_ID
+  // 03-06: phone-verify driver override stays — gates console-mode vs live in
+  // WhatsappVerifyService independently of TWILIO_DRIVER_OVERRIDE so the OTP
+  // path can be kill-switched without disabling chat send.
   const phoneVerifyOverrideRaw = process.env.PHONE_VERIFY_DRIVER_OVERRIDE
 
   const errs: string[] = []
@@ -62,41 +57,6 @@ export function assertAuthEnv(): AuthEnv {
     errs.push(`MAIL_FROM has invalid format: got "${mailFrom}". Expected: "Name <addr@domain>"`)
   }
 
-  // 03-05: Infobip 2FA all-or-nothing — both IDs set or both absent.
-  // audit-S5: Infobip does not document a fixed shape for these IDs (they appear as
-  // 32-char hex strings in the customer portal, but this is not API-contracted).
-  // Minimum-length floor only (id.length >= 16) — catches obvious typos without
-  // over-specifying a shape Infobip may change.
-  // Source: https://github.com/infobip/infobip-api-java-client/blob/master/src/main/java/com/infobip/model/TfaApplicationResponse.java · verified 2026-04-20 (applicationId typed as String without length/pattern annotations)
-  const ib2faPresentCount = (ib2faAppId ? 1 : 0) + (ib2faMsgId ? 1 : 0)
-  if (ib2faPresentCount === 1) {
-    errs.push(
-      `Infobip 2FA config is all-or-nothing: got [applicationId?: ${!!ib2faAppId}, messageId?: ${!!ib2faMsgId}] — set both or neither`,
-    )
-  }
-  if (ib2faAppId && ib2faAppId.length < 16) {
-    errs.push(
-      `INFOBIP_2FA_APPLICATION_ID too short (${ib2faAppId.length} chars) — Infobip IDs are typically ≥16 chars; likely a typo`,
-    )
-  }
-  if (ib2faMsgId && ib2faMsgId.length < 16) {
-    errs.push(
-      `INFOBIP_2FA_MESSAGE_ID too short (${ib2faMsgId.length} chars) — Infobip IDs are typically ≥16 chars; likely a typo`,
-    )
-  }
-  // When live 2FA is configured, INFOBIP_API_KEY + INFOBIP_BASE_URL must also be set.
-  if (ib2faPresentCount === 2) {
-    if (!process.env.INFOBIP_API_KEY) {
-      errs.push(
-        'INFOBIP_API_KEY required when INFOBIP_2FA_APPLICATION_ID + INFOBIP_2FA_MESSAGE_ID are set',
-      )
-    }
-    if (!process.env.INFOBIP_BASE_URL) {
-      errs.push(
-        'INFOBIP_BASE_URL required when INFOBIP_2FA_APPLICATION_ID + INFOBIP_2FA_MESSAGE_ID are set',
-      )
-    }
-  }
   const phoneVerifyOverride: 'live' | 'console' | 'disabled' | undefined =
     phoneVerifyOverrideRaw === 'live' ||
     phoneVerifyOverrideRaw === 'console' ||
@@ -109,73 +69,57 @@ export function assertAuthEnv(): AuthEnv {
     )
   }
 
-  // 03-04: Infobip WhatsApp env block.
-  const ibBase = process.env.INFOBIP_BASE_URL
-  const ibApiKey = process.env.INFOBIP_API_KEY
-  const ibSender = process.env.INFOBIP_WHATSAPP_SENDER
-  const ibSecret = process.env.INFOBIP_WEBHOOK_SECRET
-  const ibOverrideRaw = process.env.INFOBIP_DRIVER_OVERRIDE
   const isProd = process.env.NODE_ENV === 'production'
 
-  const ibOverride: 'live' | 'console' | 'disabled' | undefined =
-    ibOverrideRaw === 'live' || ibOverrideRaw === 'console' || ibOverrideRaw === 'disabled'
-      ? ibOverrideRaw
+  // 03-06 Twilio Conversations env block — runs alongside Infobip during the
+  // migration window. Cutover commit removes Infobip; this block becomes the
+  // sole WhatsApp transport config.
+  const twAcct = process.env.TWILIO_ACCOUNT_SID
+  const twToken = process.env.TWILIO_AUTH_TOKEN
+  const twServiceSid = process.env.TWILIO_CONVERSATIONS_SERVICE_SID
+  const twSender = process.env.TWILIO_WHATSAPP_SENDER
+  const twPublicUrl = process.env.PUBLIC_WEBHOOK_URL
+  const twOverrideRaw = process.env.TWILIO_DRIVER_OVERRIDE
+  const twOverride: 'live' | 'console' | 'disabled' | undefined =
+    twOverrideRaw === 'live' || twOverrideRaw === 'console' || twOverrideRaw === 'disabled'
+      ? twOverrideRaw
       : undefined
-
-  if (ibOverrideRaw && !ibOverride) {
+  if (twOverrideRaw && !twOverride) {
+    errs.push(`TWILIO_DRIVER_OVERRIDE must be one of live|console|disabled, got "${twOverrideRaw}"`)
+  }
+  if (isProd && twOverride === 'console') {
     errs.push(
-      `INFOBIP_DRIVER_OVERRIDE must be one of live|console|disabled, got "${ibOverrideRaw}"`,
+      'TWILIO_DRIVER_OVERRIDE=console is not allowed in production (WhatsApp OTP + invite delivery requires live Twilio)',
     )
   }
-
-  // Phase 03-01 audit-M (closes D-03-04-G): INFOBIP_DRIVER_OVERRIDE=console MUST
-  // NOT ship to production. OTP delivery in 03-01 materially depends on real
-  // Infobip outbound; console-mode in prod = silent OTP loss + locked-out staff.
-  if (isProd && ibOverride === 'console') {
-    errs.push(
-      'INFOBIP_DRIVER_OVERRIDE=console is not allowed in production (closes D-03-04-G — WhatsApp OTP delivery requires live Infobip)',
-    )
-  }
-
-  if (ibSender) {
-    if (!/^[0-9]{6,20}$/.test(ibSender)) {
+  // Twilio block validates when SENDER is set; matches Infobip's gating pattern.
+  const twCredsOptional = twOverride === 'console' || twOverride === 'disabled'
+  if (twSender) {
+    if (!/^whatsapp:\+[0-9]{6,20}$/.test(twSender)) {
       errs.push(
-        'INFOBIP_WHATSAPP_SENDER must be bare E.164 digits only (e.g. 447860088970 — no + or whatsapp: prefix)',
+        `TWILIO_WHATSAPP_SENDER must be "whatsapp:+E164" (e.g. whatsapp:+14155238886), got "${twSender}"`,
       )
     }
-    // Allow boot in console OR disabled mode without creds.
-    const credsOptional = ibOverride === 'console' || ibOverride === 'disabled'
-    if (!credsOptional) {
-      if (!ibBase) {
+    if (!twCredsOptional) {
+      if (!twAcct || !/^AC[0-9a-fA-F]{32}$/.test(twAcct)) {
         errs.push(
-          'INFOBIP_BASE_URL required when INFOBIP_WHATSAPP_SENDER set and driver override != console|disabled',
+          'TWILIO_ACCOUNT_SID must be set (AC + 32 hex chars) when TWILIO_WHATSAPP_SENDER is set',
         )
       }
-      if (!ibApiKey) {
+      if (!twToken || twToken.length < 32) {
+        errs.push('TWILIO_AUTH_TOKEN must be set (≥32 chars) when TWILIO_WHATSAPP_SENDER is set')
+      }
+      if (!twServiceSid || !/^IS[0-9a-fA-F]{32}$/.test(twServiceSid)) {
         errs.push(
-          'INFOBIP_API_KEY required when INFOBIP_WHATSAPP_SENDER set and driver override != console|disabled',
+          'TWILIO_CONVERSATIONS_SERVICE_SID must be set (IS + 32 hex chars) when TWILIO_WHATSAPP_SENDER is set',
         )
       }
-      if (!ibSecret) {
+      if (!twPublicUrl || !/^https:\/\/.+/.test(twPublicUrl)) {
         errs.push(
-          'INFOBIP_WEBHOOK_SECRET required when INFOBIP_WHATSAPP_SENDER set and driver override != console|disabled (HMAC-SHA256 signing key for inbound webhooks)',
+          'PUBLIC_WEBHOOK_URL must be set to the https URL configured in Twilio console (signature validation rebuilds the signing string from this URL, not req.url)',
         )
       }
     }
-  }
-
-  // 03-04 audit-added S5 (G12): accept apex `https://api.infobip.com` AND tenant-subdomain forms.
-  if (ibBase && !/^https:\/\/([a-z0-9-]+\.)*(api\.)?infobip\.com(\/.*)?$/.test(ibBase)) {
-    errs.push(
-      `INFOBIP_BASE_URL must be https://api.infobip.com or https://<tenant>.api.infobip.com or https://<tenant>.infobip.com, got "${ibBase}"`,
-    )
-  }
-
-  // 03-04 audit-added M2 (G2): HMAC-SHA256 key strength floor — ≥32 chars; ≥64 recommended.
-  if (ibSecret && ibSecret.length < 32) {
-    errs.push(
-      `INFOBIP_WEBHOOK_SECRET too short (${ibSecret.length} chars) — min 32 chars required for HMAC-SHA256 strength; ≥64 recommended`,
-    )
   }
 
   // 03-02 audit-added: ChatService test-mode knobs — probe-only, production-forbidden.
@@ -250,32 +194,21 @@ export function assertAuthEnv(): AuthEnv {
     .map((s) => s.trim())
     .filter(Boolean)
 
-  // 03-04: infobip block populated when SENDER is set or console override is explicit.
-  const ibPopulated = !!ibSender || ibOverride === 'console'
-  const infobip = ibPopulated
-    ? {
-        baseUrl: ibBase ?? '',
-        apiKey: ibApiKey ?? '',
-        sender: ibSender ?? '',
-        webhookSecret: ibSecret ?? '',
-        driverOverride: ibOverride,
-      }
-    : undefined
+  // 03-06: phoneVerifyOverride feeds WhatsappVerifyService; consumed via
+  // process.env at call-time, but referenced here to keep the validator above
+  // active. Marking unused void to satisfy lint without disabling the rule.
+  void phoneVerifyOverride
 
-  // 03-05: infobip2fa populated only when both IDs + key + baseUrl are present AND
-  // PHONE_VERIFY_DRIVER_OVERRIDE !== 'console'. Console override forces console-mode
-  // at the service layer regardless of real creds.
-  const ib2faPopulated =
-    ib2faPresentCount === 2 &&
-    !!process.env.INFOBIP_API_KEY &&
-    !!process.env.INFOBIP_BASE_URL &&
-    phoneVerifyOverride !== 'console'
-  const infobip2fa = ib2faPopulated
+  // 03-06: twilio block populated when SENDER is set or console override is explicit.
+  const twPopulated = !!twSender || twOverride === 'console'
+  const twilio = twPopulated
     ? {
-        baseUrl: process.env.INFOBIP_BASE_URL!,
-        apiKey: process.env.INFOBIP_API_KEY!,
-        applicationId: ib2faAppId!,
-        messageId: ib2faMsgId!,
+        accountSid: twAcct ?? '',
+        authToken: twToken ?? '',
+        conversationsServiceSid: twServiceSid ?? '',
+        sender: twSender ?? '',
+        publicWebhookUrl: twPublicUrl ?? '',
+        driverOverride: twOverride,
       }
     : undefined
 
@@ -296,8 +229,7 @@ export function assertAuthEnv(): AuthEnv {
     baseURL: baseURL!,
     webOrigins,
     resend: resendKey ? { apiKey: resendKey, mailFrom: mailFrom! } : undefined,
-    infobip,
-    infobip2fa,
+    twilio,
     reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey ?? '' },
   }
 }

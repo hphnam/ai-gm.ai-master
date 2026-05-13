@@ -38,6 +38,7 @@ import {
   type VenueProfileContext,
   type VenueSnapshot,
 } from './gm-agent'
+import { QuoteVerifierService } from './quote-verifier.service'
 import type { DispatchContext } from './tool-dispatcher'
 import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
@@ -121,6 +122,53 @@ function buildToolCallMap(
   return map
 }
 
+// Deterministic intent classifier — zero LLM calls, zero added latency.
+// Detects list/count/aggregate intent that should route directly to
+// query_document_table rather than burning a find_knowledge round-trip
+// on text retrieval. Returns null when no tabular intent detected OR
+// when the venue has no tabular docs to query against.
+// Tightened to high-signal tabular verbs only. Dropped `across|every|each|report`
+// (high-frequency English words that false-positive in conversational text) and
+// `show me|show all` (too strict for natural phrasings like "show stock levels").
+// A false positive here costs one wasted query_document_table call before the
+// agent falls back to find_knowledge — small but contradicts the punchy-latency
+// goal, so keep precision high.
+const TABULAR_VERB_RE =
+  /\b(list|count|how many|how much|total|sum|average|avg|breakdown|tally|enumerate)\b/i
+const TABULAR_DOMAIN_RE =
+  /\b(items?|products?|stock|inventory|orders?|sales|suppliers?|deliveries|staff|shifts|prices?|rota|menu)\b/i
+// Pattern set for "factual specifics" the auto-verifier cares about.
+// Conservative on purpose — we only want to spend a Haiku call when the
+// assistant text contains something a hallucination would distort:
+//   • phone-like number sequences (7+ digits, optional + / spaces / -)
+//   • email addresses
+//   • hyphen/underscore-separated alphanumeric codes (e.g. ABC-123, F23-A,
+//     E12-AB). Separator is mandatory so we don't false-fire on common
+//     English compounds like iso8601, covid19, 5G, B2B. Unseparated short
+//     codes (F07) are missed but those typically co-occur with other
+//     specifics in the same draft and get caught by the other branches.
+//   • currency (£99, $1.20)
+//   • quantity + unit (3kg, 5°C, 2 bar, 200ml, 45 minutes, etc.)
+// Pure regex; no LLM. Returns true → auto-verify worth firing.
+const FACTUAL_SPECIFIC_RE = new RegExp(
+  [
+    String.raw`\+?\d[\d\s().-]{7,}`,
+    String.raw`[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}`,
+    String.raw`\b(?=[A-Za-z0-9-]*[A-Za-z])(?=[A-Za-z0-9-]*\d)[A-Za-z0-9]{2,}[-_][A-Za-z0-9]+\b`,
+    String.raw`[£$€]\d+(?:\.\d{1,2})?`,
+    String.raw`\b\d+(?:\.\d+)?\s?(?:kg|kilo|g|cl|ml|l|°c|°f|bar|psi|min|minute|hour|day|week|second|sec)s?\b`,
+  ].join('|'),
+  'i',
+)
+
+function classifyTabularIntent(userMessage: string, tabularDocCount: number): string | null {
+  if (tabularDocCount === 0) return null
+  const msg = userMessage.trim()
+  if (msg.length < 4 || msg.length > 280) return null
+  if (!TABULAR_VERB_RE.test(msg) || !TABULAR_DOMAIN_RE.test(msg)) return null
+  return 'This message looks like a list/count/aggregate query. Call query_document_table FIRST (skip find_knowledge unless the tabular tool returns no rows). Tabular docs available are listed in <venue_snapshot>.tabular_docs.'
+}
+
 @Injectable()
 export class ChatService implements OnModuleInit {
   private readonly logger = new Logger(ChatService.name)
@@ -133,12 +181,73 @@ export class ChatService implements OnModuleInit {
     private readonly modeClassifier: ConversationModeService,
     private readonly userProfile: UserProfileService,
     private readonly compactor: ConversationCompactorService,
+    private readonly verifier: QuoteVerifierService,
   ) {}
 
   onModuleInit(): void {
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set')
     this.anthropic = new Anthropic({ apiKey })
+  }
+
+  /// Post-response auto-verify. Fires the QuoteVerifier in the background
+  /// against retrieved knowledge_item sources WHEN the assistant text
+  /// contains factual specifics (numbers, codes, contacts, money, quantity
+  /// + unit). Latency-safe — runs after persistence as a floating promise,
+  /// so the user has already seen the answer. Issues are logged for the
+  /// adaptation loop; not written back into the assistant message in this
+  /// pass (avoids a Prisma round-trip and schema change). Soft-fails on
+  /// verifier errors.
+  private triggerAutoVerify(params: {
+    draft: string
+    retrievedItemIds: string[]
+    orgId: string
+    assistantMessageId: string
+  }): void {
+    if (params.retrievedItemIds.length === 0) return
+    if (!FACTUAL_SPECIFIC_RE.test(params.draft)) return
+    // Fire-and-forget. Caller never awaits.
+    void this.verifier
+      .verify(params.draft, params.retrievedItemIds, params.orgId)
+      .then((result) => {
+        if (result.ok) {
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.auto_verify.clean',
+              assistantMessageId: params.assistantMessageId,
+              orgId: params.orgId,
+              checked: result.checked,
+            }),
+          )
+          return
+        }
+        // PII-clean: log issue COUNT only, never claim/expected content.
+        // Issue payloads can echo user data (contact names, supplier names,
+        // numbers) and we don't want those on the log line.
+        this.logger.warn(
+          JSON.stringify({
+            event: 'chat.auto_verify.issues',
+            assistantMessageId: params.assistantMessageId,
+            orgId: params.orgId,
+            checked: result.checked,
+            issueCount: result.issues.length,
+          }),
+        )
+      })
+      .catch((err: unknown) => {
+        // Don't log raw error message — Anthropic SDK and Prisma errors can
+        // echo the request body (which contains the draft assistant text) on
+        // certain failures. Project security.md forbids logging PII.
+        const name = err instanceof Error ? err.name : 'UnknownError'
+        this.logger.warn(
+          JSON.stringify({
+            event: 'chat.auto_verify.error',
+            assistantMessageId: params.assistantMessageId,
+            orgId: params.orgId,
+            errorName: name,
+          }),
+        )
+      })
   }
 
   /// Phase F — fetch (and lazily refresh) the user's GM profile summary for
@@ -212,7 +321,7 @@ export class ChatService implements OnModuleInit {
           answerStatus: 'answered',
         },
         orderBy: [{ updatedAt: 'desc' }],
-        take: 24,
+        take: 48,
         select: {
           id: true,
           content: true,
@@ -231,27 +340,27 @@ export class ChatService implements OnModuleInit {
         const title =
           typeof meta.title === 'string' && meta.title.trim().length > 0
             ? meta.title.trim()
-            : r.content.replace(/\s+/g, ' ').trim().slice(0, 60)
-        const summary = (r.aiSummary ?? r.content).replace(/\s+/g, ' ').trim().slice(0, 140)
+            : r.content.replace(/\s+/g, ' ').trim().slice(0, 80)
+        const summary = (r.aiSummary ?? r.content).replace(/\s+/g, ' ').trim().slice(0, 240)
 
         if (docType === 'tabular') {
-          if (tabularDocs.length < 8) tabularDocs.push({ id: r.id, title })
+          if (tabularDocs.length < 16) tabularDocs.push({ id: r.id, title })
           continue
         }
 
         if (meta.isGap === true) {
           const tentative = typeof meta.tentativeAnswer === 'string' ? meta.tentativeAnswer : null
           const answer = r.aiSummary && r.aiSummary.trim().length > 0 ? r.aiSummary : tentative
-          if (answer && recentlyAnswered.length < 6) {
+          if (answer && recentlyAnswered.length < 10) {
             recentlyAnswered.push({
-              question: r.content.replace(/\s+/g, ' ').trim().slice(0, 160),
-              answer: answer.replace(/\s+/g, ' ').trim().slice(0, 200),
+              question: r.content.replace(/\s+/g, ' ').trim().slice(0, 200),
+              answer: answer.replace(/\s+/g, ' ').trim().slice(0, 320),
             })
           }
           continue
         }
 
-        if (topKnowledge.length < 10) {
+        if (topKnowledge.length < 20) {
           topKnowledge.push({ id: r.id, title, summary })
         }
       }
@@ -569,6 +678,11 @@ Assistant answer: ${assistantText}`,
     let round = 0
     const startedAt = Date.now()
 
+    const routingHint = classifyTabularIntent(
+      input.userMessage,
+      venueSnapshot.tabularDocs?.length ?? 0,
+    )
+
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       ctx: { orgId, userId, userRole },
@@ -576,6 +690,7 @@ Assistant answer: ${assistantText}`,
       mode: agentMode,
       priorSummary: compaction.summary,
       venueSnapshot,
+      routingHint,
       userContext: {
         name: userIdentity.name,
         email: userIdentity.email,
@@ -713,6 +828,14 @@ Assistant answer: ${assistantText}`,
       assistantMessageId: assistantMessage.id,
       toolCallLog,
       retrievedItemIds: Array.from(retrievedItemIds),
+    })
+
+    // Auto-verify floats after persistence — user has the answer already.
+    this.triggerAutoVerify({
+      draft: finalText,
+      retrievedItemIds: Array.from(retrievedItemIds),
+      orgId,
+      assistantMessageId: assistantMessage.id,
     })
 
     return {
@@ -977,6 +1100,11 @@ Assistant answer: ${assistantText}`,
     let round = 0
     const startedAt = Date.now()
 
+    const routingHint = classifyTabularIntent(
+      params.userText,
+      venueSnapshot.tabularDocs?.length ?? 0,
+    )
+
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       ctx,
@@ -984,6 +1112,7 @@ Assistant answer: ${assistantText}`,
       mode: agentMode,
       priorSummary: streamCompaction.summary,
       venueSnapshot,
+      routingHint,
       userContext: {
         ...(params.userIdentity ?? { name: null, email: '' }),
         profileSummary,
@@ -1069,6 +1198,14 @@ Assistant answer: ${assistantText}`,
           assistantMessageId: assistantMessage.id,
           toolCallLog,
           retrievedItemIds: Array.from(retrievedItemIds),
+        })
+
+        // Auto-verify after stream completes — user has the answer already.
+        this.triggerAutoVerify({
+          draft: storedContent,
+          retrievedItemIds: Array.from(retrievedItemIds),
+          orgId: params.orgId,
+          assistantMessageId: assistantMessage.id,
         })
 
         this.logger.log(

@@ -1343,6 +1343,11 @@ export const InviteControllerRevokeParams = zod.object({
 })
 
 
+export const InviteRedeemControllerPreviewQueryParams = zod.object({
+  "t": zod.string()
+})
+
+
 export const nudgeControllerRunNudgePathVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 

@@ -400,9 +400,9 @@ export class WhatsappOnboardingService {
   }
 
   private async sendOutbound(phoneNumber: string, text: string): Promise<void> {
-    // Infobip wants bare digits (no `+`).
-    const to = phoneNumber.replace(/^\+/, '')
-    await this.adapter.sendText(to, text)
+    // 03-06: Twilio adapter normalizes E.164 with or without leading `+`. Pass
+    // through as-is — phoneNumber is canonical (User.phoneNumber stores with `+`).
+    await this.adapter.sendText(phoneNumber, text)
   }
 
   private async replyOnly(
