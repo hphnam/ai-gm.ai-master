@@ -12,13 +12,8 @@
 // organizationId === orgId. Foreign-tenant venues / KIs cannot leak.
 
 import type { PrismaClient } from '@prisma/client'
-import {
-  fail,
-  ok,
-  type ToolResult,
-  MAX_PERSON_MENTIONS_PER_QUERY,
-} from '../../../types'
-import { hashId, hashQuery, chatV2Logger } from '../log-helpers'
+import { fail, MAX_PERSON_MENTIONS_PER_QUERY, ok, type ToolResult } from '../../../types'
+import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
 
 export type PersonMention = {
   knowledgeItemId: string
@@ -58,9 +53,7 @@ export async function getPerson(
   // on whitespace, drop tokens ≤2 chars (stop-words), OR-match each remaining
   // token. Single-token roles fall through to the legacy contains path so we
   // don't widen the cardinality unnecessarily.
-  const roleTokens = role
-    ? role.split(/\s+/).filter((t) => t.length > 2)
-    : []
+  const roleTokens = role ? role.split(/\s+/).filter((t) => t.length > 2) : []
   const roleClause =
     role && roleTokens.length > 1
       ? {
@@ -95,22 +88,22 @@ export async function getPerson(
   // audit-M1: parameterized via Prisma's metadata path filters. Hard LIMIT 3.
   let mentions: { knowledgeItemId: string; content: string }[] = []
   if (name) {
-    mentions = await prisma.knowledgeItem.findMany({
-      where: {
-        organizationId: orgId,
-        OR: [
-          // contactNames metadata path holding an array of names; array_contains
-          // matches when array contains the given string verbatim.
-          { metadata: { path: ['contactNames'], array_contains: name } },
-          // mentions metadata path holding a single string with a contains match.
-          { metadata: { path: ['mentions'], string_contains: name } },
-        ],
-      },
-      select: { id: true, content: true },
-      take: MAX_PERSON_MENTIONS_PER_QUERY,
-    }).then((rows) =>
-      rows.map((r) => ({ knowledgeItemId: r.id, content: r.content })),
-    )
+    mentions = await prisma.knowledgeItem
+      .findMany({
+        where: {
+          organizationId: orgId,
+          OR: [
+            // contactNames metadata path holding an array of names; array_contains
+            // matches when array contains the given string verbatim.
+            { metadata: { path: ['contactNames'], array_contains: name } },
+            // mentions metadata path holding a single string with a contains match.
+            { metadata: { path: ['mentions'], string_contains: name } },
+          ],
+        },
+        select: { id: true, content: true },
+        take: MAX_PERSON_MENTIONS_PER_QUERY,
+      })
+      .then((rows) => rows.map((r) => ({ knowledgeItemId: r.id, content: r.content })))
   }
 
   const mentionsByItemId = new Map<string, PersonMention>()

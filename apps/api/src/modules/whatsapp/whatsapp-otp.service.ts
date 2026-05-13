@@ -3,8 +3,8 @@
 // WhatsAppAdapter.sendText, timing-safe verification, in-memory per-phone
 // rate-limit (3/hour) with TTL sweep, re-issuance debounce (30s).
 
-import { createHash, randomInt } from 'crypto'
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
+import { createHash, randomInt } from 'node:crypto'
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common'
 import type { WhatsappInvite, WhatsappOtpAttempt } from '@prisma/client'
 import { prisma } from '../../database/prisma'
 import {
@@ -23,7 +23,11 @@ const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1h, matches WHATSAPP_OTP_RATE_LIM
 
 export type RequestOtpResult =
   | { ok: true; attempt: WhatsappOtpAttempt }
-  | { ok: false; reason: 'rate_limited' | 'send_failed' | 'debounced'; attempt?: WhatsappOtpAttempt }
+  | {
+      ok: false
+      reason: 'rate_limited' | 'send_failed' | 'debounced'
+      attempt?: WhatsappOtpAttempt
+    }
 
 export type VerifyOtpResult =
   | { ok: true; attempt: WhatsappOtpAttempt }
@@ -68,10 +72,7 @@ export class WhatsappOtpService implements OnModuleInit, OnModuleDestroy {
    * Rate-limit accounting increments BEFORE the send attempt — failed sends still
    * count, so an attacker can't induce send failures to bypass rate-limit.
    */
-  async requestOtp(
-    invite: WhatsappInvite,
-    phoneNumber: string,
-  ): Promise<RequestOtpResult> {
+  async requestOtp(invite: WhatsappInvite, phoneNumber: string): Promise<RequestOtpResult> {
     // Rate-limit gate (M4 — count BEFORE sending).
     const ts = this.rateLimitMap.get(phoneNumber) ?? []
     const fresh = ts.filter((t) => t > Date.now() - RATE_LIMIT_WINDOW_MS)
@@ -130,7 +131,13 @@ export class WhatsappOtpService implements OnModuleInit, OnModuleDestroy {
     const body = `Your verification code is ${plaintext}. It expires in 10 minutes.`
 
     const startedAt = Date.now()
-    let sendResult
+    let sendResult:
+      | Awaited<ReturnType<typeof this.adapter.sendText>>
+      | {
+          ok: false
+          reason: 'whatsapp-service-unavailable'
+          thrown: string
+        }
     try {
       sendResult = await this.adapter.sendText(to, body)
     } catch (err) {

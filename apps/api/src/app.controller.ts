@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiExtraModels } from '@nestjs/swagger'
-import { type HealthCheck } from './types'
 import { ApiErrorResponseDto } from './common/dto/api-error.dto'
+import type { HealthCheck } from './types'
 
 // ApiExtraModels registers DTOs with swagger that aren't directly used
 // in @ApiResponse decorators — the error envelope is the single source

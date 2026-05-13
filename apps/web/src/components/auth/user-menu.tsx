@@ -1,8 +1,8 @@
 'use client'
 
+import { Building2, LogOut, Phone, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Building2, LogOut, Phone, User as UserIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -17,12 +17,14 @@ import {
 import { authClient, useSession } from '@/lib/auth-client'
 
 function initials(name: string | null | undefined, email: string): string {
-  const source = (name && name.trim()) || email.split('@')[0] || '?'
-  return source
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('') || '?'
+  const source = name?.trim() || email.split('@')[0] || '?'
+  return (
+    source
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? '')
+      .join('') || '?'
+  )
 }
 
 export function UserMenu() {
@@ -59,9 +61,7 @@ export function UserMenu() {
           <p className="text-sm font-medium leading-none">
             {user.name ?? user.email.split('@')[0]}
           </p>
-          <p className="text-xs leading-none text-muted-foreground">
-            {user.email}
-          </p>
+          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

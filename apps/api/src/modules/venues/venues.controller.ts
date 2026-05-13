@@ -10,12 +10,11 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
-import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
+import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
-import { VenuesService } from './venues.service'
 import {
   CreateVenueBodyDto,
   UpdateVenueProfileDto,
@@ -23,6 +22,7 @@ import {
   VenueIdParamDto,
   VenueListItemDto,
 } from './dto/venues.dto'
+import { VenuesService } from './venues.service'
 
 @ApiTags('venues')
 @ApiBearerAuth()

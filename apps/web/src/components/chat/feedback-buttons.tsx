@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { ThumbsDown, ThumbsUp } from 'lucide-react'
-import type { CaptureFeedbackInputDtoKind as FeedbackKind } from '@/generated/api'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import type { CaptureFeedbackInputDtoKind as FeedbackKind } from '@/generated/api'
 import { useFeedback } from '@/lib/hooks/use-feedback'
 
 export function FeedbackButtons({

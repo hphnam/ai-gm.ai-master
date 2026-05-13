@@ -1,7 +1,7 @@
-import { createHmac, timingSafeEqual } from 'crypto'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 import {
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   ForbiddenException,
   Injectable,
   Logger,
@@ -47,8 +47,9 @@ export class WhatsappSignatureGuard implements CanActivate {
     if (!rawBody) this.reject('no-raw-body', signaturePresent, bodyLen)
 
     // Strip optional "sha256=" prefix (GitHub-style format; Infobip MAY use it).
-    const received =
-      (rawSig as string).startsWith('sha256=') ? (rawSig as string).slice(7) : (rawSig as string)
+    const received = (rawSig as string).startsWith('sha256=')
+      ? (rawSig as string).slice(7)
+      : (rawSig as string)
 
     // 03-04 audit M3: format regex BEFORE Buffer.from. A malformed hex string would silently
     // produce a truncated buffer and rely on length-check / timingSafeEqual to catch it —

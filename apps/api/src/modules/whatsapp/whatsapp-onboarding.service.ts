@@ -10,16 +10,16 @@ import type { Prisma } from '@prisma/client'
 import { prisma } from '../../database/prisma'
 import { maskPhone } from '../../types/auth'
 import { InviteService } from './invite.service'
-import { WhatsappOtpService } from './whatsapp-otp.service'
 import { WhatsAppAdapter } from './whatsapp.adapter'
 import {
   classifyInbound,
   composeWelcomeText,
-  REPLIES,
-  transition,
   type InboundIntent,
   type OnboardingState,
+  REPLIES,
+  transition,
 } from './whatsapp-onboarding-state'
+import { WhatsappOtpService } from './whatsapp-otp.service'
 
 export type RunTransitionResult = {
   outboundText: string | null
@@ -55,7 +55,7 @@ export class WhatsappOnboardingService {
       select: { id: true, phoneVerifiedAt: true },
     })
 
-    if (user && user.phoneVerifiedAt) {
+    if (user?.phoneVerifiedAt) {
       const session = await prisma.whatsappSession.findUnique({
         where: { phoneNumber },
         select: { currentOrganizationId: true },
@@ -197,11 +197,7 @@ export class WhatsappOnboardingService {
       switch (verify.reason) {
         case 'wrong': {
           const remaining = await this.peekRemainingAttempts(invite.id)
-          return this.replyOnly(
-            state.phoneNumber,
-            REPLIES.otp_wrong(remaining),
-            'otp_pending',
-          )
+          return this.replyOnly(state.phoneNumber, REPLIES.otp_wrong(remaining), 'otp_pending')
         }
         case 'exhausted':
           await this.invites.markExhausted(invite.id)
@@ -258,12 +254,22 @@ export class WhatsappOnboardingService {
   // ─── Atomic linkage on successful OTP verify ─────────────────────────
 
   private async linkUserAndWelcome(
-    invite: { id: string; organizationId: string; phoneNumber: string; role: string; targetUserId: string | null },
+    invite: {
+      id: string
+      organizationId: string
+      phoneNumber: string
+      role: string
+      targetUserId: string | null
+    },
     phoneNumber: string,
   ): Promise<RunTransitionResult> {
     const result = await prisma.$transaction(async (txn: Prisma.TransactionClient) => {
       // Redeem first — short-circuits the race winner.
-      const redemption = await this.invites.markRedeemed(invite.id, invite.targetUserId ?? '__self__', txn)
+      const redemption = await this.invites.markRedeemed(
+        invite.id,
+        invite.targetUserId ?? '__self__',
+        txn,
+      )
       if (!redemption.redeemed) {
         return { kind: 'race_lost' as const }
       }

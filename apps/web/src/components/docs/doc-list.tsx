@@ -1,8 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { toast } from 'sonner'
 import {
   AlertTriangle,
   BookOpen,
@@ -13,7 +10,9 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react'
-import type { DocListItemDto as DocListItem } from '@/generated/api'
+import Link from 'next/link'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
@@ -43,14 +43,10 @@ function formatRelative(iso: string): string {
 type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
 
 function statusFor(doc: DocListItem): { text: string; tone: StatusTone } {
-  if (doc.processingStatus === 'processing')
-    return { text: 'Reading your document…', tone: 'info' }
-  if (doc.processingStatus === 'failed')
-    return { text: 'Couldn’t read this file', tone: 'danger' }
-  if (doc.documentType)
-    return { text: doc.documentType.name, tone: 'muted' }
-  if (doc.pendingTypeProposal)
-    return { text: 'Awaiting your review', tone: 'warning' }
+  if (doc.processingStatus === 'processing') return { text: 'Reading your document…', tone: 'info' }
+  if (doc.processingStatus === 'failed') return { text: 'Couldn’t read this file', tone: 'danger' }
+  if (doc.documentType) return { text: doc.documentType.name, tone: 'muted' }
+  if (doc.pendingTypeProposal) return { text: 'Awaiting your review', tone: 'warning' }
   return { text: 'Not categorized yet', tone: 'warning' }
 }
 
@@ -64,27 +60,20 @@ const toneClass: Record<StatusTone, string> = {
 function DocIcon({ doc }: { doc: DocListItem }) {
   if (doc.processingStatus === 'processing')
     return <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-  if (doc.processingStatus === 'failed')
-    return <AlertTriangle className="h-5 w-5" aria-hidden />
-  if (doc.pendingTypeProposal)
-    return <Sparkles className="h-5 w-5" aria-hidden />
+  if (doc.processingStatus === 'failed') return <AlertTriangle className="h-5 w-5" aria-hidden />
+  if (doc.pendingTypeProposal) return <Sparkles className="h-5 w-5" aria-hidden />
   if (doc.documentType?.kind === 'procedural' || doc.isProcedural)
     return <ClipboardList className="h-5 w-5" aria-hidden />
-  if (doc.documentType?.kind === 'reference')
-    return <BookOpen className="h-5 w-5" aria-hidden />
+  if (doc.documentType?.kind === 'reference') return <BookOpen className="h-5 w-5" aria-hidden />
   if (!doc.documentType) return <FileQuestion className="h-5 w-5" aria-hidden />
   return <FileText className="h-5 w-5" aria-hidden />
 }
 
 function iconWrapClass(doc: DocListItem): string {
-  if (doc.processingStatus === 'failed')
-    return 'bg-red-500/10 text-red-700 dark:text-red-300'
-  if (doc.processingStatus === 'processing')
-    return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
-  if (doc.pendingTypeProposal)
-    return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
-  if (doc.documentType)
-    return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+  if (doc.processingStatus === 'failed') return 'bg-red-500/10 text-red-700 dark:text-red-300'
+  if (doc.processingStatus === 'processing') return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
+  if (doc.pendingTypeProposal) return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
+  if (doc.documentType) return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
   return 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
 }
 
@@ -118,8 +107,8 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
           <DialogHeader>
             <DialogTitle>Delete this document?</DialogTitle>
             <DialogDescription>
-              This can’t be undone. The document will be removed from your
-              knowledge base and stop showing up in chat answers.
+              This can’t be undone. The document will be removed from your knowledge base and stop
+              showing up in chat answers.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -198,10 +187,8 @@ function DocListSkeleton() {
   return (
     <ul className="space-y-2" aria-busy="true" aria-label="Loading documents">
       {Array.from({ length: 4 }).map((_, i) => (
-        <li
-          key={i}
-          className="flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5"
-        >
+        // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholder, no real data
+        <li key={i} className="flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5">
           <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
@@ -228,9 +215,7 @@ export function DocList({
     return (
       <div className="rounded-xl border border-dashed bg-card/40 px-6 py-10 text-center">
         <p className="text-sm text-muted-foreground">
-          {searchQuery
-            ? `No documents match “${searchQuery}”.`
-            : 'No documents yet.'}
+          {searchQuery ? `No documents match “${searchQuery}”.` : 'No documents yet.'}
         </p>
       </div>
     )

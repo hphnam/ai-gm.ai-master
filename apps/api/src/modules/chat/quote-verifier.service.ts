@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 
 export type QuoteVerifyIssue = {
@@ -29,11 +29,7 @@ export class QuoteVerifierService implements OnModuleInit {
     this.client = new Anthropic({ apiKey })
   }
 
-  async verify(
-    draft: string,
-    sourceIds: string[],
-    orgId: string,
-  ): Promise<QuoteVerifyResult> {
+  async verify(draft: string, sourceIds: string[], orgId: string): Promise<QuoteVerifyResult> {
     const sources = await prisma.knowledgeItem.findMany({
       where: { id: { in: sourceIds }, organizationId: orgId },
       select: { id: true, content: true, aiSummary: true, metadata: true },
@@ -46,10 +42,7 @@ export class QuoteVerifierService implements OnModuleInit {
     }
 
     const sourceBlock = sources
-      .map(
-        (s, i) =>
-          `[Source ${i + 1} | id=${s.id}]\n${s.content.slice(0, MAX_SOURCE_CHARS)}`,
-      )
+      .map((s, i) => `[Source ${i + 1} | id=${s.id}]\n${s.content.slice(0, MAX_SOURCE_CHARS)}`)
       .join('\n\n---\n\n')
 
     const prompt = `You audit AI-drafted answers for hospitality staff against retrieved source documents. Check the DRAFT against each SOURCE for FIDELITY.

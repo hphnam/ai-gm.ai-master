@@ -38,29 +38,19 @@ export async function apiFetch<T>(path: string, init?: FetchOpts): Promise<T> {
       body = null
     }
     const serverRequestId = res.headers.get('x-request-id') ?? requestId
-    throw new ApiError(
-      res.status,
-      body?.error ?? 'unknown',
-      body?.details,
-      serverRequestId,
-    )
+    throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
   }
 
   return (await res.json()) as T
 }
 
-export function apiPost<T>(
-  path: string,
-  body: unknown,
-  signal?: AbortSignal,
-): Promise<T> {
+export function apiPost<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {
   return apiFetch<T>(path, {
     method: 'POST',
     body: JSON.stringify(body),
     signal,
   })
 }
-
 
 export async function apiFetchWithMeta<T>(
   path: string,
@@ -88,12 +78,7 @@ export async function apiFetchWithMeta<T>(
     } catch {
       body = null
     }
-    throw new ApiError(
-      res.status,
-      body?.error ?? 'unknown',
-      body?.details,
-      serverRequestId,
-    )
+    throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
   }
 
   const data = (await res.json()) as T

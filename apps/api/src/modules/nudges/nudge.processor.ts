@@ -1,9 +1,7 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq'
-import { Logger, OnApplicationBootstrap } from '@nestjs/common'
-import { InjectQueue } from '@nestjs/bullmq'
+import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq'
+import { Logger, type OnApplicationBootstrap } from '@nestjs/common'
 import type { Job, Queue } from 'bullmq'
 import { prisma } from '../../database/prisma'
-import { NudgeService } from './nudge.service'
 import {
   NUDGE_JOB_FANOUT,
   NUDGE_JOB_PER_VENUE,
@@ -12,6 +10,7 @@ import {
   type NudgeFanoutJobData,
   type NudgePerVenueJobData,
 } from './nudge.queue'
+import { NudgeService } from './nudge.service'
 
 /// Worker for the nudges queue. Two job kinds:
 ///
@@ -65,18 +64,24 @@ export class NudgeProcessor extends WorkerHost implements OnApplicationBootstrap
     let enqueued = 0
     for (const v of venues) {
       if (!isWithinShoppingWindow(v.timezone)) continue
-      await this.queue.add(NUDGE_JOB_PER_VENUE, {
-        orgId: v.organizationId,
-        venueId: v.id,
-      } satisfies NudgePerVenueJobData, {
-        attempts: 2,
-        backoff: { type: 'exponential', delay: 30_000 },
-        removeOnComplete: { age: 3600, count: 200 },
-        removeOnFail: { age: 86400, count: 500 },
-      })
+      await this.queue.add(
+        NUDGE_JOB_PER_VENUE,
+        {
+          orgId: v.organizationId,
+          venueId: v.id,
+        } satisfies NudgePerVenueJobData,
+        {
+          attempts: 2,
+          backoff: { type: 'exponential', delay: 30_000 },
+          removeOnComplete: { age: 3600, count: 200 },
+          removeOnFail: { age: 86400, count: 500 },
+        },
+      )
       enqueued++
     }
-    this.logger.log(JSON.stringify({ event: 'nudge.fanout', enqueued, venuesScanned: venues.length }))
+    this.logger.log(
+      JSON.stringify({ event: 'nudge.fanout', enqueued, venuesScanned: venues.length }),
+    )
     return { enqueued }
   }
 

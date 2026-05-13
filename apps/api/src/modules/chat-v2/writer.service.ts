@@ -12,18 +12,18 @@
 // audit-S4 — input.citationCount (number) only; raw citation IDs/content NOT
 // passed to Writer (prevents leaking IDs in prose as meta-narration).
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { Injectable } from '@nestjs/common'
 import { generateText, streamText } from 'ai'
 import {
   type AnthropicUsage,
   RoleTimeoutError,
-  type WriterInput,
   WRITER_TIMEOUT_MS,
+  type WriterInput,
 } from '../../types'
+import { WRITER_INCIDENT_PROMPT } from './prompts/writer-incident.prompt'
 import { WRITER_LOOKUP_PROMPT } from './prompts/writer-lookup.prompt'
 import { WRITER_REASONING_PROMPT } from './prompts/writer-reasoning.prompt'
-import { WRITER_INCIDENT_PROMPT } from './prompts/writer-incident.prompt'
 
 const SONNET_MODEL = 'claude-sonnet-4-6'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
@@ -125,7 +125,9 @@ function buildUserContent(input: WriterInput): string {
   }
 
   if (typeof input.citationCount === 'number') {
-    sections.push(`Citations available: ${input.citationCount} (count only — used by 06-04 for general-advice badge logic)`)
+    sections.push(
+      `Citations available: ${input.citationCount} (count only — used by 06-04 for general-advice badge logic)`,
+    )
   }
 
   if (input.mode === 'incident' && input.safetySignal === true) {
@@ -142,8 +144,10 @@ function buildUserContent(input: WriterInput): string {
 
   const closingDirective: Record<WriterInput['mode'], string> = {
     lookup: 'Write the answer in lookup voice. Lead with the fact, ≤3 short lines, no preamble.',
-    reasoning: 'Write the answer in reasoning voice. Branch when paths exist, opinionated, 4-12 short lines, no preamble.',
-    incident: 'Write the answer in incident voice. Urgency-first, Now/Then/Don\'t structure where it fits, empathy at end only.',
+    reasoning:
+      'Write the answer in reasoning voice. Branch when paths exist, opinionated, 4-12 short lines, no preamble.',
+    incident:
+      "Write the answer in incident voice. Urgency-first, Now/Then/Don't structure where it fits, empathy at end only.",
   }
   sections.push(closingDirective[input.mode])
 

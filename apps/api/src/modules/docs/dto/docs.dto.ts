@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
+import { z } from 'zod'
 import {
   AcceptTypeRequestSchema,
   AnswerGapRequestSchema,
@@ -150,22 +150,10 @@ export class GapKbMatchDto extends createZodDto(GapKbMatchSchema) {}
 export const DocListQuerySchema = z.object({
   q: z.string().trim().max(200).optional(),
   category: z
-    .union([
-      z.literal('all'),
-      z.literal('unclassified'),
-      z.string().regex(UUID_RE),
-    ])
+    .union([z.literal('all'), z.literal('unclassified'), z.string().regex(UUID_RE)])
     .optional(),
-  venue: z
-    .union([
-      z.literal('all'),
-      z.literal('global'),
-      z.string().regex(UUID_RE),
-    ])
-    .optional(),
-  status: z
-    .enum(['all', 'ready', 'processing', 'attention'])
-    .optional(),
+  venue: z.union([z.literal('all'), z.literal('global'), z.string().regex(UUID_RE)]).optional(),
+  status: z.enum(['all', 'ready', 'processing', 'attention']).optional(),
   sort: z.enum(['recent', 'oldest', 'name']).optional(),
   cursor: z.string().max(500).optional(),
   limit: z.coerce.number().int().min(1).max(50).optional(),

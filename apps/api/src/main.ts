@@ -2,7 +2,7 @@ import './load-env'
 
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { json, raw as rawParser, type NextFunction, type Request, type Response } from 'express'
+import { json, type NextFunction, type Request, type Response, raw as rawParser } from 'express'
 import { AppModule } from './app.module'
 import { httpLoggerMiddleware } from './common/http-logger.middleware'
 import { requestIdMiddleware } from './common/request-id.middleware'
@@ -104,21 +104,15 @@ async function bootstrap() {
   //     reaches the controller. 403 "no-raw-body" = middleware order broken.
 
   // Swagger / OpenAPI — served at /api-docs in dev for browsing, the same
-  // document is emitted to swagger.json by `pnpm swagger:generate` for orval
+  // document is emitted to swagger.json by `npm run swagger:generate --workspace=api` for orval
   // codegen on the web side.
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('GM AI API')
-    .setVersion('1.0')
-    .build()
+  const swaggerConfig = new DocumentBuilder().setTitle('GM AI API').setVersion('1.0').build()
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup('api-docs', app, swaggerDoc)
 
   // Realtime fan-out across replicas. Same Redis instance BullMQ uses, no
   // extra infra dep. Done after createDocument so swagger setup is unaffected.
-  const redisAdapter = new RedisIoAdapter(
-    app,
-    process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
-  )
+  const redisAdapter = new RedisIoAdapter(app, process.env.REDIS_URL ?? 'redis://127.0.0.1:6379')
   await redisAdapter.connectToRedis()
   app.useWebSocketAdapter(redisAdapter)
 

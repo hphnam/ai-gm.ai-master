@@ -1,15 +1,12 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { authClient, useSession } from '@/lib/auth-client'
+import { useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  useAcceptInvitation,
-  useInvitationPreview,
-} from '@/lib/hooks/use-invitations'
+import { authClient, useSession } from '@/lib/auth-client'
+import { useAcceptInvitation, useInvitationPreview } from '@/lib/hooks/use-invitations'
 import { isTerminalInvitationError, mapApiError } from '@/lib/map-api-error'
 import { isSafeRedirect } from '@/lib/safe-redirect'
 
@@ -83,7 +80,8 @@ export function AcceptInvitationBody({ id }: { id: string }) {
           Role: <span className="font-medium">{invPreview.role}</span>
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign in (or sign up) with <span className="font-medium">{invPreview.email}</span> to accept.
+          Sign in (or sign up) with <span className="font-medium">{invPreview.email}</span> to
+          accept.
         </p>
         <div className="mt-4">
           <Button asChild>

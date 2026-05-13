@@ -15,8 +15,8 @@
  */
 
 import '../src/load-env'
-import { prisma } from '../src/database/prisma'
 import { VoyageAIClient } from 'voyageai'
+import { prisma } from '../src/database/prisma'
 import { VOYAGE_EMBED_MODEL } from '../src/types/section'
 
 const BATCH_SIZE = 32

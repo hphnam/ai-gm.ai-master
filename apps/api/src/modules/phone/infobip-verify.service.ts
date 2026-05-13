@@ -9,13 +9,8 @@
 // the platform has one channel for verification + chat + invites — no separate
 // Portal setup required.
 
-import { createHash, randomInt } from 'crypto'
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common'
+import { createHash, randomInt } from 'node:crypto'
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common'
 import { safeBufferEqual } from '../whatsapp/safe-equal'
 import { WhatsAppAdapter } from '../whatsapp/whatsapp.adapter'
 
@@ -121,7 +116,13 @@ export class InfobipVerifyService implements OnModuleInit, OnModuleDestroy {
     const to = phoneNumber.replace(/^\+/, '')
     const body = `Your GM AI verification code is ${code}. It expires in 10 minutes.`
 
-    let sendResult
+    let sendResult:
+      | Awaited<ReturnType<typeof this.adapter.sendText>>
+      | {
+          ok: false
+          reason: 'whatsapp-service-unavailable'
+          thrown: string
+        }
     try {
       sendResult = await this.adapter.sendText(to, body)
     } catch (err) {
@@ -160,11 +161,7 @@ export class InfobipVerifyService implements OnModuleInit, OnModuleDestroy {
     return { ok: true, mode: 'live' }
   }
 
-  async checkVerification(
-    phoneNumber: string,
-    code: string,
-    opts?: LogOpts,
-  ): Promise<CheckResult> {
+  async checkVerification(phoneNumber: string, code: string, opts?: LogOpts): Promise<CheckResult> {
     const phoneHash = hashPhone(phoneNumber)
     const requestId = opts?.requestId ?? null
 

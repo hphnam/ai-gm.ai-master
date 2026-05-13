@@ -16,11 +16,7 @@
 // completeness. Unknown queries fall through to the LLM, which is the right
 // place for genuine classification.
 
-import {
-  MAX_RESEARCHERS_PER_TURN,
-  type ResearcherName,
-  type TriageOutput,
-} from '../../types'
+import { MAX_RESEARCHERS_PER_TURN, type ResearcherName, type TriageOutput } from '../../types'
 
 const VENUE_BRIEF =
   'Briefing for current shift context: profile, layout, active incidents in last 24h, upcoming cutoffs in next 4h.'
@@ -90,7 +86,11 @@ export function quickClassify(userMessage: string): TriageOutput | null {
       true,
     )
   }
-  if (/\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(userMessage)) {
+  if (
+    /\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(
+      userMessage,
+    )
+  ) {
     return build(
       'incident',
       ['venue', 'docs', 'people'],
@@ -191,13 +191,12 @@ export function quickClassify(userMessage: string): TriageOutput | null {
       false,
     )
   }
-  if (lower.includes('ice machine') || lower.includes('engineer') || lower.includes('who do i call')) {
-    return build(
-      'lookup',
-      ['people'],
-      { people: 'Look up the engineer / contact details.' },
-      false,
-    )
+  if (
+    lower.includes('ice machine') ||
+    lower.includes('engineer') ||
+    lower.includes('who do i call')
+  ) {
+    return build('lookup', ['people'], { people: 'Look up the engineer / contact details.' }, false)
   }
 
   // Genuinely ambiguous — caller falls back to LLM Triage.

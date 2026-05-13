@@ -1,44 +1,31 @@
 'use client'
 
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { useQueryClient, type QueryClient as RqClient } from '@tanstack/react-query'
 import { useChat } from '@ai-sdk/react'
+import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
 import { DefaultChatTransport, type UIMessage } from 'ai'
-import { toast } from 'sonner'
 import { Check, Link2, Loader2, Lock, Sparkles } from 'lucide-react'
-import { ChatThread } from '@/components/chat/chat-thread'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { ChatComposer } from '@/components/chat/chat-composer'
+import { ChatThread } from '@/components/chat/chat-thread'
 import { SuggestionsSurface } from '@/components/chat/suggestions-surface'
 import { VenueStrip } from '@/components/chat/venue-strip'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
+import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
+import { API_URL } from '@/lib/api-client'
+import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
 import { useConversation } from '@/lib/hooks/use-conversation'
+import { type ConvListItem, useConversationsList } from '@/lib/hooks/use-conversations-list'
+import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
 import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
-import {
-  useConversationsList,
-  type ConvListItem,
-} from '@/lib/hooks/use-conversations-list'
 import { useVenues } from '@/lib/hooks/use-venues'
-import {
-  useOnOpenSuggestions,
-  useOnTurnSuggestions,
-} from '@/lib/hooks/use-suggestions'
 import { mapApiError } from '@/lib/map-api-error'
-import { API_URL } from '@/lib/api-client'
-import { cn } from '@/lib/utils'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
-import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
-import type { ChatMessageDto } from '@/lib/api-types'
+import { cn } from '@/lib/utils'
 
 type GmUIMessage = UIMessage
 
@@ -117,17 +104,11 @@ function prependOptimisticThread(qc: RqClient, entry: ConvListItem) {
   })
 }
 
-function bumpOptimisticThread(
-  qc: RqClient,
-  conversationId: string,
-  preview: string,
-) {
+function bumpOptimisticThread(qc: RqClient, conversationId: string, preview: string) {
   qc.setQueryData<ConvListItem[]>(['chat-conversations', '__all__'], (prev) => {
     if (!prev) return prev
     return prev.map((c) =>
-      c.id === conversationId
-        ? { ...c, preview, lastMessageAt: new Date().toISOString() }
-        : c,
+      c.id === conversationId ? { ...c, preview, lastMessageAt: new Date().toISOString() } : c,
     )
   })
 }
@@ -259,7 +240,7 @@ function ChatCore({
 }) {
   const router = useRouter()
   const { data: venues } = useVenues()
-  const conversationsList = useConversationsList(null)
+  const _conversationsList = useConversationsList(null)
   const { data: session } = useSession()
   const sessionUserId = session?.user?.id ?? null
 
@@ -269,9 +250,7 @@ function ChatCore({
   // row. Legacy WhatsApp threads (ownerUserId === null but visibility set)
   // have no human owner and stay read-only on web.
   const conversationExists = visibility !== null
-  const isOwner = !conversationExists
-    ? true
-    : ownerUserId !== null && ownerUserId === sessionUserId
+  const isOwner = !conversationExists ? true : ownerUserId !== null && ownerUserId === sessionUserId
   const updateVisibility = useUpdateConversationVisibility()
 
   // The transport closure captures these via refs — useChat freezes the
@@ -367,12 +346,9 @@ function ChatCore({
 
       // 2. Sidebar: first message → prepend a new row at the conv UUID (server
       //    will upsert with the same id). Subsequent messages → bump + preview.
-      const list = queryClient.getQueryData<ConvListItem[]>([
-        'chat-conversations',
-        '__all__',
-      ])
+      const list = queryClient.getQueryData<ConvListItem[]>(['chat-conversations', '__all__'])
       const existsInSidebar = list?.some((c) => c.id === conv)
-      const preview = text.length > 80 ? text.slice(0, 79) + '…' : text
+      const preview = text.length > 80 ? `${text.slice(0, 79)}…` : text
       if (!existsInSidebar) {
         const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
         prependOptimisticThread(queryClient, {
@@ -419,13 +395,9 @@ function ChatCore({
       const previewText = text.trim().length > 0 ? text : '[image attached]'
       setPendingUserTexts((prev) => [...prev, previewText])
 
-      const list = queryClient.getQueryData<ConvListItem[]>([
-        'chat-conversations',
-        '__all__',
-      ])
+      const list = queryClient.getQueryData<ConvListItem[]>(['chat-conversations', '__all__'])
       const existsInSidebar = list?.some((c) => c.id === conv)
-      const preview =
-        previewText.length > 80 ? previewText.slice(0, 79) + '…' : previewText
+      const preview = previewText.length > 80 ? `${previewText.slice(0, 79)}…` : previewText
       if (!existsInSidebar) {
         const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
         prependOptimisticThread(queryClient, {
@@ -530,10 +502,7 @@ function ChatCore({
   }, [messages, pendingUserTexts.length])
 
   const activeSuggestions = turnSuggestions.data ?? openSuggestions ?? undefined
-  const isPending =
-    status === 'submitted' ||
-    status === 'streaming' ||
-    pendingUserTexts.length > 0
+  const isPending = status === 'submitted' || status === 'streaming' || pendingUserTexts.length > 0
   const isEmpty = displayMessages.length === 0
 
   const onPickVenue = (id: string) => {
@@ -675,7 +644,7 @@ function titleFor(messages: GmUIMessage[]): string | undefined {
     .join('')
     .trim()
   if (!text) return undefined
-  return text.length > 80 ? text.slice(0, 79) + '…' : text
+  return text.length > 80 ? `${text.slice(0, 79)}…` : text
 }
 
 function EmptyState({
@@ -712,8 +681,8 @@ function EmptyState({
             </>
           ) : (
             <>
-              Ask about stock, ordering, SOPs, or suppliers — I&apos;ll pull from
-              your knowledge base and venue data.
+              Ask about stock, ordering, SOPs, or suppliers — I&apos;ll pull from your knowledge
+              base and venue data.
             </>
           )}
         </p>
@@ -752,13 +721,7 @@ function ShareButton({
   const [justCopied, setJustCopied] = useState(false)
   const next = isShared ? 'private' : 'org'
   const Icon = isPending ? Loader2 : isShared ? Check : Link2
-  const label = isPending
-    ? isShared
-      ? 'Unsharing…'
-      : 'Sharing…'
-    : isShared
-      ? 'Shared'
-      : 'Share'
+  const label = isPending ? (isShared ? 'Unsharing…' : 'Sharing…') : isShared ? 'Shared' : 'Share'
   return (
     <button
       type="button"

@@ -1,30 +1,31 @@
-import { Injectable, Logger } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
+import { Injectable, Logger } from '@nestjs/common'
 import { Prisma, prisma } from '../../database/prisma'
 import {
-  AudienceSchema,
-  ChecklistStepSchema,
-  DocumentTypeKindSchema,
-  ProposedDocTypeSchema,
-  ScheduleSchema,
   type Audience,
-  type ChecklistDto,
+  AudienceSchema,
+  type CategorySuggestionResponse,
+  ChecklistDto,
   type ChecklistStep,
+  ChecklistStepSchema,
   type CreateDocRequest,
   type CreateDocResponse,
   type DocDetail,
   type DocListItem,
-  type DocumentTypeDto,
+  DocumentTypeDto,
   type DocumentTypeKind,
+  DocumentTypeKindSchema,
   type ProcessingStatus,
-  type CategorySuggestionResponse,
   type ProposedDocType,
+  ProposedDocTypeSchema,
   type Schedule,
+  ScheduleSchema,
   type UpdateDocRequest,
 } from '../../types'
 import { IngestService } from '../ingest/ingest.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
-import { ReductoService, type ParsedDocument } from '../reducto/reducto.service'
+import type { ParsedDocument } from '../reducto/reducto.service'
+import { ReductoService } from '../reducto/reducto.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService, VENUE_AUTO_ASSIGN_CONFIDENCE } from './classifier.service'
@@ -45,7 +46,7 @@ function contentPreview(raw: string, len = 160): string {
   if (cleaned.length <= len) return cleaned
   const cut = cleaned.lastIndexOf(' ', len - 1)
   const boundary = cut > 0 ? cut : len - 1
-  return cleaned.slice(0, boundary).trimEnd() + '…'
+  return `${cleaned.slice(0, boundary).trimEnd()}…`
 }
 
 function titleFromMetadata(metadata: unknown): string | null {
@@ -239,7 +240,13 @@ export class CategorySuggestionUnavailableError extends Error {
 // Plan 04-03 Task 1 — `kind` threaded through. DocumentTypeKindSchema.safeParse on read guards
 // against stored bad values (shouldn't happen — DB column is TEXT NOT NULL DEFAULT 'reference').
 function toDocumentTypeDto(
-  dt: { id: string; name: string; description: string | null; schema: unknown; kind: string } | null,
+  dt: {
+    id: string
+    name: string
+    description: string | null
+    schema: unknown
+    kind: string
+  } | null,
 ): DocumentTypeDto | null {
   if (!dt) return null
   const parsedKind = DocumentTypeKindSchema.safeParse(dt.kind)
@@ -549,11 +556,9 @@ export class DocsService {
     const perRowAskerIds: string[][] = rows.map((r) => {
       const meta = (r.metadata ?? {}) as Record<string, unknown>
       const ids = Array.isArray(meta.askedByUserIds)
-        ? (meta.askedByUserIds as unknown[]).filter(
-            (v): v is string => typeof v === 'string',
-          )
+        ? (meta.askedByUserIds as unknown[]).filter((v): v is string => typeof v === 'string')
         : []
-      ids.forEach((id) => allAskerIds.add(id))
+      for (const id of ids) allAskerIds.add(id)
       return ids
     })
 
@@ -581,8 +586,7 @@ export class DocsService {
         typeof meta.tentativeAnswer === 'string' && meta.tentativeAnswer.length > 0
           ? meta.tentativeAnswer
           : null
-      const lastAskedAt =
-        typeof meta.lastAskedAt === 'string' ? meta.lastAskedAt : null
+      const lastAskedAt = typeof meta.lastAskedAt === 'string' ? meta.lastAskedAt : null
       return {
         id: r.id,
         question: r.content,
@@ -809,9 +813,7 @@ export class DocsService {
         aiSummary: null,
         // Bytes handled by IngestService on enrichment. For images we stash the
         // source on the stub so enrichment doesn't need the buffer re-passed.
-        sourceImageBytes: input.sourceImageBytes
-          ? new Uint8Array(input.sourceImageBytes)
-          : null,
+        sourceImageBytes: input.sourceImageBytes ? new Uint8Array(input.sourceImageBytes) : null,
         sourceImageMime: input.sourceImageMime ?? null,
         processingStatus: 'processing',
       },
@@ -875,15 +877,8 @@ export class DocsService {
       let parsed: ParsedDocument | null = null
       let composedContent = input.content
       if (input.reductoFileId) {
-        try {
-          parsed = await this.reducto.parse(input.reductoFileId)
-          composedContent = composeContent(input.description, parsed.text)
-        } catch (err) {
-          // Reducto parse failures are surfaced as enrichment failures — same
-          // posture as classifier/ingest failures below: row stays in DB with
-          // status='failed', error string visible in the UI for retry.
-          throw err
-        }
+        parsed = await this.reducto.parse(input.reductoFileId)
+        composedContent = composeContent(input.description, parsed.text)
       }
 
       // Re-ingest path: caller passed the existing user-confirmed type. Skip the
@@ -921,9 +916,7 @@ export class DocsService {
             })
           : null
 
-        const tableHeaders = (parsed?.tables ?? [])
-          .slice(0, 3)
-          .map((t) => t.columns)
+        const tableHeaders = (parsed?.tables ?? []).slice(0, 3).map((t) => t.columns)
         const classified = await this.classifier.classify({
           content: composedContent,
           title: input.title,
@@ -966,7 +959,7 @@ export class DocsService {
         pendingTypeProposal =
           classified.kind === 'proposal'
             ? (classified.proposal as unknown as Record<string, unknown>)
-            : input.preservePendingTypeProposal ?? null
+            : (input.preservePendingTypeProposal ?? null)
         if (classified.kind === 'matched') {
           const t = await prisma.documentType.findUnique({
             where: { id: classified.typeId },
@@ -1216,7 +1209,13 @@ export class DocsService {
   ): Promise<DocumentTypeDto> {
     const row = await prisma.knowledgeItem.findUnique({
       where: { id: knowledgeItemId },
-      select: { id: true, organizationId: true, documentTypeId: true, content: true, metadata: true },
+      select: {
+        id: true,
+        organizationId: true,
+        documentTypeId: true,
+        content: true,
+        metadata: true,
+      },
     })
     if (!row || row.organizationId !== orgId) {
       if (row && row.organizationId !== orgId) {
@@ -1367,17 +1366,16 @@ export class DocsService {
     let nextContent = row.content
     if (input.description !== undefined) {
       const trimmed = input.description.trim()
-      nextContent = trimmed.length > 0
-        ? `Context from uploader: ${trimmed}\n\n---\n\n${bodyContent}`
-        : bodyContent
+      nextContent =
+        trimmed.length > 0
+          ? `Context from uploader: ${trimmed}\n\n---\n\n${bodyContent}`
+          : bodyContent
     }
 
     const existingMeta = (row.metadata ?? {}) as Record<string, unknown>
-    const existingTitle =
-      typeof existingMeta.title === 'string' ? existingMeta.title : null
+    const existingTitle = typeof existingMeta.title === 'string' ? existingMeta.title : null
     const nextTitle = input.title ?? existingTitle
-    const nextVenueId =
-      input.venueId !== undefined ? input.venueId : row.venueId
+    const nextVenueId = input.venueId !== undefined ? input.venueId : row.venueId
 
     await prisma.knowledgeItem.update({
       where: { id },
@@ -1413,9 +1411,10 @@ export class DocsService {
           ? input.description.trim()
           : undefined,
       preserveDocumentTypeId: row.documentTypeId,
-      preservePendingTypeProposal: (row.pendingTypeProposal ?? null) as
-        | Record<string, unknown>
-        | null,
+      preservePendingTypeProposal: (row.pendingTypeProposal ?? null) as Record<
+        string,
+        unknown
+      > | null,
     }
 
     setImmediate(() => {
@@ -1460,9 +1459,7 @@ export class DocsService {
 
     const metadata = (row.metadata ?? {}) as Record<string, unknown>
     const title =
-      typeof metadata.title === 'string' && metadata.title.trim()
-        ? metadata.title.trim()
-        : null
+      typeof metadata.title === 'string' && metadata.title.trim() ? metadata.title.trim() : null
 
     const result = await this.classifier.classify({
       content: row.content,
@@ -1523,9 +1520,7 @@ export class DocsService {
       select: { id: true, name: true, description: true, schema: true, kind: true },
       orderBy: { name: 'asc' },
     })
-    return rows
-      .map((r) => toDocumentTypeDto(r))
-      .filter((d): d is DocumentTypeDto => d !== null)
+    return rows.map((r) => toDocumentTypeDto(r)).filter((d): d is DocumentTypeDto => d !== null)
   }
 
   // Plan 04-02 Task 3 — owner rejects a pending proposal → clear proposal, leave unclassified.

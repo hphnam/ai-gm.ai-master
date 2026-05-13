@@ -1,14 +1,14 @@
 import {
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   ForbiddenException,
   Injectable,
   Logger,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import type { ApiErrorResponse, Role } from '../../types'
-import type { AuthedRequest } from './auth.guard'
 import { REQUIRE_ROLE_KEY } from './auth.decorators'
+import type { AuthedRequest } from './auth.guard'
 
 @Injectable()
 export class RoleGuard implements CanActivate {

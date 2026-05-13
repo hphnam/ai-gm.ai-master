@@ -1,11 +1,7 @@
 import * as chardet from 'chardet'
 import iconv from 'iconv-lite'
 
-export type ExtractErrorReason =
-  | 'unsupported-mime'
-  | 'corrupt-bytes'
-  | 'timeout'
-  | 'empty-result'
+export type ExtractErrorReason = 'unsupported-mime' | 'corrupt-bytes' | 'timeout' | 'empty-result'
 
 export class ExtractError extends Error {
   constructor(
@@ -32,10 +28,7 @@ const TITLE_MAX = 200
 export function sanitizeUploadTitle(originalname: string): string {
   // Plan 04-01: extended extension set (XLSX/CSV/PPTX/image formats).
   // HEIC omitted — see D-04-01-J in 04-01-SUMMARY (Anthropic SDK media_type union excludes heic).
-  const withoutExt = originalname.replace(
-    /\.(pdf|docx|md|txt|xlsx|csv|pptx|jpe?g|png|webp)$/i,
-    '',
-  )
+  const withoutExt = originalname.replace(/\.(pdf|docx|md|txt|xlsx|csv|pptx|jpe?g|png|webp)$/i, '')
   const noSeparators = withoutExt.replace(/[\\/]/g, ' ')
   // eslint-disable-next-line no-control-regex
   const noControl = noSeparators.replace(/[\x00-\x1f\x7f]/g, '')
@@ -103,11 +96,7 @@ export function isTextLikeUpload(mime: string, filename: string): boolean {
 // text. POS exports are commonly UTF-16 LE (Square), Windows-1252 (legacy
 // Excel on Windows), or MacRoman; chardet covers all of these plus the
 // long tail. UTF-8 input passes through unchanged.
-export function normalizeTextBufferEncoding(
-  buf: Buffer,
-  mime: string,
-  filename = '',
-): Buffer {
+export function normalizeTextBufferEncoding(buf: Buffer, mime: string, filename = ''): Buffer {
   if (!isTextLikeUpload(mime, filename) || buf.length < 2) return buf
 
   // BOM fast-path — explicit BOMs are authoritative, skip chardet.
@@ -148,7 +137,10 @@ export function normalizeDelimiter(buf: Buffer, mime: string, filename = ''): Bu
   // Sample first ~16 lines to decide. CSV files have stable structure so this
   // is enough to disambiguate without scanning the whole file.
   const sampleText = buf.subarray(0, Math.min(buf.length, 8_192)).toString('utf8')
-  const sampleLines = sampleText.split(/\r?\n/).slice(0, 16).filter((l) => l.length > 0)
+  const sampleLines = sampleText
+    .split(/\r?\n/)
+    .slice(0, 16)
+    .filter((l) => l.length > 0)
   if (sampleLines.length < 2) return buf
 
   let tabs = 0

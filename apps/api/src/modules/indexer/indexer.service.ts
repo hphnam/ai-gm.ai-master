@@ -36,13 +36,10 @@ export class IndexerService {
   async upsert(input: IndexUpsertInput): Promise<void> {
     const subKey = input.subKey ?? ''
     const vec =
-      input.precomputedEmbedding ??
-      (await this.embeddings.embedDocument(input.embeddingText))
+      input.precomputedEmbedding ?? (await this.embeddings.embedDocument(input.embeddingText))
 
     if (vec.length !== 1024) {
-      throw new Error(
-        `indexer.upsert: expected 1024-dim embedding, got ${vec.length}`,
-      )
+      throw new Error(`indexer.upsert: expected 1024-dim embedding, got ${vec.length}`)
     }
 
     await prisma.$transaction(async (tx) => {
@@ -117,11 +114,7 @@ export class IndexerService {
     return result.count
   }
 
-  async deleteOne(
-    entityType: EntityType,
-    entityId: string,
-    subKey: string,
-  ): Promise<number> {
+  async deleteOne(entityType: EntityType, entityId: string, subKey: string): Promise<number> {
     const result = await prisma.searchableEntity.deleteMany({
       where: { entityType, entityId, subKey },
     })

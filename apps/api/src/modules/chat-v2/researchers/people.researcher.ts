@@ -1,20 +1,17 @@
 // Plan 06-03 Task 2 — People researcher.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText, stepCountIs, tool, type ToolSet } from 'ai'
+import { Injectable } from '@nestjs/common'
+import { generateText, stepCountIs, type ToolSet, tool } from 'ai'
 import { z } from 'zod'
 import { prisma } from '../../../database/prisma'
-import {
-  RESEARCHER_TIMEOUT_MS,
-  RoleTimeoutError,
-  type AnthropicUsage,
-} from '../../../types'
-import { getPerson } from '../tools/get-person.tool'
-import { PEOPLE_RESEARCHER_PROMPT } from '../prompts/people-researcher.prompt'
+import { type AnthropicUsage, RESEARCHER_TIMEOUT_MS, RoleTimeoutError } from '../../../types'
 import { chatV2Logger, hashId } from '../log-helpers'
-import type { Researcher, ResearcherResult } from '../researcher.interface'
+import { PEOPLE_RESEARCHER_PROMPT } from '../prompts/people-researcher.prompt'
+import type { ResearcherResult } from '../researcher.interface'
+import { Researcher } from '../researcher.interface'
 import { sanitizeForResearcher } from '../researcher-sanitizer'
+import { getPerson } from '../tools/get-person.tool'
 import type { ResearchContext } from './docs.researcher'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
@@ -39,7 +36,8 @@ export class PeopleResearcher implements Researcher {
 
     const tools: ToolSet = {
       get_person: tool({
-        description: 'Match a venue contact by name or role; returns role, contact details, and document mentions.',
+        description:
+          'Match a venue contact by name or role; returns role, contact details, and document mentions.',
         inputSchema: z.object({
           name: z.string().min(1).optional(),
           role: z.string().min(1).optional(),
@@ -77,7 +75,8 @@ export class PeopleResearcher implements Researcher {
       })
 
       const usage = extractUsage(result.usage)
-      const summary = evidenceSummary || result.text.slice(0, 200) || 'no people data needed for this turn.'
+      const summary =
+        evidenceSummary || result.text.slice(0, 200) || 'no people data needed for this turn.'
 
       chatV2Logger.info('chat_v2.researcher_complete', {
         orgId: hashId(ctx.orgId),
@@ -154,7 +153,8 @@ function stubResearch(brief: string, ctx: ResearchContext, t0: number): Research
   } else if (lower.includes('gas safe') || lower.includes('gas')) {
     summary = 'Gas Safe engineer: Tom Reilly 07700 900 077, Gas Safe ID 654321.'
   } else if (lower.includes('contact') || lower.includes('emergency')) {
-    summary = 'Emergency contacts: GM Sarah Cleary 07700 900 200; Maintenance Tom Reilly 07700 900 077.'
+    summary =
+      'Emergency contacts: GM Sarah Cleary 07700 900 200; Maintenance Tom Reilly 07700 900 077.'
   }
 
   chatV2Logger.info('chat_v2.researcher_complete', {

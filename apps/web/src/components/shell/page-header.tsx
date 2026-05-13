@@ -1,8 +1,8 @@
 'use client'
 
 import { Menu } from 'lucide-react'
-import { useAppShell } from './app-shell'
 import { cn } from '@/lib/utils'
+import { useAppShell } from './app-shell'
 
 type Props = {
   title: string

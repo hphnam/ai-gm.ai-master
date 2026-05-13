@@ -1,5 +1,5 @@
-import { config } from 'dotenv'
 import { resolve } from 'node:path'
+import { config } from 'dotenv'
 import { defineConfig, env } from 'prisma/config'
 
 // Run from apps/api/. DATABASE_URL lives in the local .env in dev;

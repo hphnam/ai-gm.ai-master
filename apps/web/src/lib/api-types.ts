@@ -5,17 +5,17 @@
 export type {
   // chat
   ConversationResponseDtoMessagesItem as ChatMessageDto,
-  // invitations
-  ListInvitationsResponseDtoInvitationsItem as InvitationDto,
-  // docs
-  DocListItemDtoDocumentType as DocumentTypeDtoNullable,
-  KbGapDtoAskedByItem as KbGapAskerDto,
   // debug
   DebugConversationResponseDtoMessagesItem as DebugMessageDto,
   DebugConversationResponseDtoMessagesItemFeedback as DebugFeedbackDto,
   DebugRetagQueueResponseDtoItemsItem as DebugRetagQueueItemDto,
-  // venues
-  VenueDetailDtoProfile as VenueProfileDto,
+  // docs
+  DocListItemDtoDocumentType as DocumentTypeDtoNullable,
+  KbGapDtoAskedByItem as KbGapAskerDto,
+  // invitations
+  ListInvitationsResponseDtoInvitationsItem as InvitationDto,
   // proactive suggestions
   ProactiveSuggestionDtoKind as ProactiveSuggestionKind,
+  // venues
+  VenueDetailDtoProfile as VenueProfileDto,
 } from '@/generated/api'

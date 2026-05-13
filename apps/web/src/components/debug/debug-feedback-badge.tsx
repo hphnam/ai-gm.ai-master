@@ -44,10 +44,7 @@ export function DebugFeedbackBadge({ feedback }: { feedback: DebugFeedback | nul
   const Icon = style.icon
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 rounded border text-xs',
-        style.cls,
-      )}
+      className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded border text-xs', style.cls)}
     >
       <Icon className="h-3 w-3" aria-hidden="true" />
       <span>{style.label}</span>

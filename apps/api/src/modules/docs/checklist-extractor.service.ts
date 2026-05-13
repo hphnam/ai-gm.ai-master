@@ -11,20 +11,20 @@
 // audit-M1 boundary: logger payloads carry tokens/USD/duration/counts/ids ONLY.
 //   NEVER: step text, schedule rawText, audience rawText, document content, base64, API key.
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
-import { prisma } from '../../database/prisma'
-import {
-  AudienceSchema,
-  ChecklistStepSchema,
-  ScheduleSchema,
-  type Audience,
-  type ChecklistDto,
-  type ChecklistStep,
-  type Schedule,
-} from '../../types'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { z } from 'zod'
 import { sanitiseError } from '../../common/sanitise-error'
+import { prisma } from '../../database/prisma'
+import {
+  type Audience,
+  AudienceSchema,
+  ChecklistDto,
+  type ChecklistStep,
+  ChecklistStepSchema,
+  type Schedule,
+  ScheduleSchema,
+} from '../../types'
 import { IndexerService } from '../indexer/indexer.service'
 
 const EXTRACTOR_MAX_CONTENT_CHARS = 30_000

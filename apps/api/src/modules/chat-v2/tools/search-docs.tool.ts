@@ -12,8 +12,8 @@
 // public find() entry point; section injection byte-stable).
 
 import { fail, ok, type ToolResult } from '../../../types'
-import { type RetrievalService } from '../../retrieval/retrieval.service'
-import { hashId, hashQuery, chatV2Logger } from '../log-helpers'
+import { RetrievalService } from '../../retrieval/retrieval.service'
+import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
 
 export type SearchDocsHit = {
   knowledgeItemId: string
@@ -65,14 +65,9 @@ export async function searchDocs(
 
   const hits: SearchDocsHit[] = result.data.map((h) => ({
     knowledgeItemId: h.entityId,
-    sectionId:
-      typeof h.metadata?.['sectionId'] === 'string'
-        ? (h.metadata['sectionId'] as string)
-        : null,
+    sectionId: typeof h.metadata?.sectionId === 'string' ? (h.metadata.sectionId as string) : null,
     sectionTitle:
-      typeof h.metadata?.['sectionTitle'] === 'string'
-        ? (h.metadata['sectionTitle'] as string)
-        : h.title,
+      typeof h.metadata?.sectionTitle === 'string' ? (h.metadata.sectionTitle as string) : h.title,
     content: h.content,
     similarity: h.similarity,
   }))

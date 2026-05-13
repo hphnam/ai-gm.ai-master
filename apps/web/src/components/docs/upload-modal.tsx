@@ -1,10 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { toast } from 'sonner'
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,6 +11,10 @@ import {
   Upload as UploadIcon,
   X,
 } from 'lucide-react'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -33,7 +33,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -41,8 +40,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useVenues } from '@/lib/hooks/use-venues'
+import { Textarea } from '@/components/ui/textarea'
 import { useCreateDoc, useUploadDoc } from '@/lib/hooks/use-docs'
+import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
 
@@ -50,8 +50,7 @@ const GLOBAL_VENUE = '__global__'
 
 // Accept list mirrors the backend's UPLOAD_MIME_ALLOWLIST. Kept loose (extensions)
 // because browsers don't always report correct MIME types for office files.
-const FILE_ACCEPT =
-  '.md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,.jpg,.jpeg,.png,.webp'
+const FILE_ACCEPT = '.md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,.jpg,.jpeg,.png,.webp'
 
 type Intent = 'choose' | 'document' | 'qa'
 
@@ -171,11 +170,7 @@ type QueueItem = {
 
 const DocumentBatchSchema = z.object({
   // AUTO → server-side auto-detect. GLOBAL → explicit org-wide. uuid → pinned.
-  venueId: z.union([
-    z.string().uuid(),
-    z.literal(AUTO_VENUE),
-    z.literal(GLOBAL_VENUE),
-  ]),
+  venueId: z.union([z.string().uuid(), z.literal(AUTO_VENUE), z.literal(GLOBAL_VENUE)]),
 })
 type DocumentBatchValues = z.infer<typeof DocumentBatchSchema>
 
@@ -223,8 +218,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
     if (e.dataTransfer.files) addFiles(e.dataTransfer.files)
   }
 
-  const removeItem = (key: string) =>
-    setItems((prev) => prev.filter((i) => i.key !== key))
+  const removeItem = (key: string) => setItems((prev) => prev.filter((i) => i.key !== key))
 
   const updateItem = useCallback(
     (key: string, patch: Partial<QueueItem>) =>
@@ -242,18 +236,14 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
   }, [items])
 
   async function onSubmit(values: DocumentBatchValues) {
-    const queue = items.filter(
-      (i) => i.status === 'pending' || i.status === 'error',
-    )
+    const queue = items.filter((i) => i.status === 'pending' || i.status === 'error')
     if (queue.length === 0) {
       toast.error('Add at least one file.')
       return
     }
     setSubmitting(true)
     const venueId =
-      values.venueId === AUTO_VENUE || values.venueId === GLOBAL_VENUE
-        ? null
-        : values.venueId
+      values.venueId === AUTO_VENUE || values.venueId === GLOBAL_VENUE ? null : values.venueId
     const autoDetectVenue = values.venueId === AUTO_VENUE
 
     // Mark every queued file as uploading immediately so the UI reflects the
@@ -287,9 +277,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
     )
 
     setSubmitting(false)
-    const okCount = results.filter(
-      (r) => r.status === 'fulfilled' && r.value.ok,
-    ).length
+    const okCount = results.filter((r) => r.status === 'fulfilled' && r.value.ok).length
     const failCount = results.length - okCount
 
     if (okCount > 0 && failCount === 0) {
@@ -310,21 +298,17 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-        noValidate
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <DialogHeader>
           <DialogTitle>Add documents</DialogTitle>
           <DialogDescription>
-            Drop in as many files as you like. The AI auto-detects the category
-            and venue. Anything it&rsquo;s unsure about lands in your inbox to
-            confirm.
+            Drop in as many files as you like. The AI auto-detects the category and venue. Anything
+            it&rsquo;s unsure about lands in your inbox to confirm.
           </DialogDescription>
         </DialogHeader>
 
         {/* Dropzone — always visible so users can keep adding to the queue */}
+        {/* biome-ignore lint/a11y/useSemanticElements: drag-and-drop zone needs div for native DnD events */}
         <div
           onDragOver={(e) => {
             e.preventDefault()
@@ -343,9 +327,7 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
           }}
           className={cn(
             'flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed p-5 text-center transition-colors',
-            dragOver
-              ? 'border-foreground bg-accent'
-              : 'border-muted-foreground/30 hover:bg-accent',
+            dragOver ? 'border-foreground bg-accent' : 'border-muted-foreground/30 hover:bg-accent',
             submitting && 'pointer-events-none opacity-60',
           )}
         >
@@ -398,12 +380,8 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value={AUTO_VENUE}>
-                    Auto (let AI detect from each doc)
-                  </SelectItem>
-                  <SelectItem value={GLOBAL_VENUE}>
-                    Global (applies to all venues)
-                  </SelectItem>
+                  <SelectItem value={AUTO_VENUE}>Auto (let AI detect from each doc)</SelectItem>
+                  <SelectItem value={GLOBAL_VENUE}>Global (applies to all venues)</SelectItem>
                   {(venues ?? []).map((v) => (
                     <SelectItem key={v.id} value={v.id}>
                       {v.name}
@@ -412,8 +390,8 @@ function DocumentForm({ onSaved }: { onSaved: () => void }) {
                 </SelectContent>
               </Select>
               <FormDescription>
-                Auto reads each document and picks the venue if it&rsquo;s
-                clear. Pick one explicitly to pin the whole batch.
+                Auto reads each document and picks the venue if it&rsquo;s clear. Pick one
+                explicitly to pin the whole batch.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -462,9 +440,7 @@ function QueueRow({
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs font-medium">{item.file.name}</p>
         <p className="truncate text-[10px] text-muted-foreground">
-          {item.status === 'error' && item.error
-            ? item.error
-            : `${sizeKb} KB`}
+          {item.status === 'error' && item.error ? item.error : `${sizeKb} KB`}
         </p>
       </div>
       {item.status === 'pending' || item.status === 'error' ? (
@@ -486,7 +462,9 @@ function QueueRow({
 
 function StatusIcon({ status }: { status: QueueStatus }) {
   if (status === 'uploading')
-    return <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+    return (
+      <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+    )
   if (status === 'done')
     return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
   if (status === 'error')
@@ -582,9 +560,7 @@ function QaForm({ onSaved }: { onSaved: () => void }) {
               <FormLabel>Venue</FormLabel>
               <Select
                 value={field.value ?? GLOBAL_VENUE}
-                onValueChange={(v) =>
-                  field.onChange(v === GLOBAL_VENUE ? null : v)
-                }
+                onValueChange={(v) => field.onChange(v === GLOBAL_VENUE ? null : v)}
                 disabled={submitting}
               >
                 <FormControl>
@@ -593,9 +569,7 @@ function QaForm({ onSaved }: { onSaved: () => void }) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value={GLOBAL_VENUE}>
-                    Global (applies to all venues)
-                  </SelectItem>
+                  <SelectItem value={GLOBAL_VENUE}>Global (applies to all venues)</SelectItem>
                   {(venues ?? []).map((v) => (
                     <SelectItem key={v.id} value={v.id}>
                       {v.name}

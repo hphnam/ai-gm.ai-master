@@ -18,35 +18,27 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import {
-  ApiTags,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiBody,
-} from '@nestjs/swagger'
-import { ZodValidationPipe } from 'nestjs-zod'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ZodValidationPipe } from 'nestjs-zod'
+import { zodPipe } from '../../common/zod-pipe'
 import {
-  ClassifyDocRequestSchema,
   type ApiErrorResponse,
   type ClassifyDocRequest,
+  ClassifyDocRequestSchema,
 } from '../../types'
-import { zodPipe } from '../../common/zod-pipe'
-import { AuthGuard } from '../auth/auth.guard'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
+import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
-  UPLOAD_MAX_BYTES,
-  UPLOAD_MAX_BYTES_BY_MIME,
-  UPLOAD_MIME_ALLOWLIST,
   normalizeDelimiter,
   normalizeTextBufferEncoding,
   sanitizeUploadTitle,
+  UPLOAD_MAX_BYTES,
+  UPLOAD_MAX_BYTES_BY_MIME,
+  UPLOAD_MIME_ALLOWLIST,
 } from './doc-extract'
-import { extractImage, isDocsImageMime } from './extractors/image-extractor'
-import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
   CategorySuggestionUnavailableError,
   DocNotFoundOrCrossOrgError,
@@ -72,6 +64,8 @@ import {
   NoDataQueryDto,
   UpdateDocRequestDto,
 } from './dto/docs.dto'
+import { extractImage, isDocsImageMime } from './extractors/image-extractor'
+import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
 
 @ApiTags('docs')
 @ApiBearerAuth()
@@ -133,9 +127,7 @@ export class DocsController {
   // can't be answered). Surfaces gaps the agent didn't proactively capture.
   @Get('analytics/no-data-queries')
   @ApiResponse({ status: 200, type: [NoDataQueryDto] })
-  listNoDataQueries(
-    @CurrentOrg() org: { id: string },
-  ): Promise<NoDataQueryDto[]> {
+  listNoDataQueries(@CurrentOrg() org: { id: string }): Promise<NoDataQueryDto[]> {
     return this.docsService.listNoDataQueries(org.id) as Promise<NoDataQueryDto[]>
   }
 
@@ -174,10 +166,7 @@ export class DocsController {
     @CurrentOrg() org: { id: string },
   ): Promise<GapKbMatchDto[]> {
     try {
-      return (await this.docsService.findKbMatchesForGap(
-        params.id,
-        org.id,
-      )) as GapKbMatchDto[]
+      return (await this.docsService.findKbMatchesForGap(params.id, org.id)) as GapKbMatchDto[]
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -238,12 +227,7 @@ export class DocsController {
       // Fire-and-forget enrichment. setImmediate lets us flush the response
       // before the classifier + Claude calls run.
       setImmediate(() => {
-        void this.docsService.enrichInBackground(
-          stub.id,
-          enrichInput,
-          org.id,
-          user?.id ?? null,
-        )
+        void this.docsService.enrichInBackground(stub.id, enrichInput, org.id, user?.id ?? null)
       })
       return stub as CreateDocResponseDto
     } catch (err) {
@@ -268,7 +252,10 @@ export class DocsController {
         venueId: { type: 'string' },
         description: { type: 'string' },
         title: { type: 'string' },
-        autoDetectVenue: { type: 'string', description: '"true" to ask the classifier to propose a venue when none is pinned' },
+        autoDetectVenue: {
+          type: 'string',
+          description: '"true" to ask the classifier to propose a venue when none is pinned',
+        },
       },
       required: ['file'],
     },
@@ -276,7 +263,12 @@ export class DocsController {
   @ApiResponse({ status: 200, type: CreateDocResponseDto })
   async upload(
     @UploadedFile() file: Express.Multer.File | undefined,
-    @Body() body: { venueId?: string; description?: string; title?: string; autoDetectVenue?: string },
+    @Body() body: {
+      venueId?: string
+      description?: string
+      title?: string
+      autoDetectVenue?: string
+    },
     @CurrentOrg() org: { id: string },
     // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
     @CurrentUser() user: { id: string } | null,
@@ -285,10 +277,7 @@ export class DocsController {
       throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
     }
     if (!UPLOAD_MIME_ALLOWLIST.includes(file.mimetype as (typeof UPLOAD_MIME_ALLOWLIST)[number])) {
-      throw new HttpException(
-        { error: 'unsupported-file-type' } satisfies ApiErrorResponse,
-        415,
-      )
+      throw new HttpException({ error: 'unsupported-file-type' } satisfies ApiErrorResponse, 415)
     }
     const perMimeCap = UPLOAD_MAX_BYTES_BY_MIME[file.mimetype]
     if (perMimeCap !== undefined && file.size > perMimeCap) {
@@ -321,11 +310,7 @@ export class DocsController {
           }),
         )
       } else {
-        const decoded = normalizeTextBufferEncoding(
-          file.buffer,
-          file.mimetype,
-          file.originalname,
-        )
+        const decoded = normalizeTextBufferEncoding(file.buffer, file.mimetype, file.originalname)
         const buffer = normalizeDelimiter(decoded, file.mimetype, file.originalname)
         reductoFileId = await this.reducto.upload(buffer, file.originalname, file.mimetype)
       }
@@ -345,21 +330,16 @@ export class DocsController {
 
     const rawOverride = typeof body?.title === 'string' ? body.title.trim() : ''
     const title =
-      rawOverride.length > 0
-        ? rawOverride.slice(0, 200)
-        : sanitizeUploadTitle(file.originalname)
+      rawOverride.length > 0 ? rawOverride.slice(0, 200) : sanitizeUploadTitle(file.originalname)
     const venueId =
-      typeof body?.venueId === 'string' && body.venueId.trim().length > 0
-        ? body.venueId
-        : null
+      typeof body?.venueId === 'string' && body.venueId.trim().length > 0 ? body.venueId : null
     const description =
       typeof body?.description === 'string' && body.description.trim().length > 0
         ? body.description.trim().slice(0, 1_000)
         : undefined
 
     const autoDetectVenue =
-      typeof body?.autoDetectVenue === 'string' &&
-      body.autoDetectVenue.toLowerCase() === 'true'
+      typeof body?.autoDetectVenue === 'string' && body.autoDetectVenue.toLowerCase() === 'true'
 
     let result: CreateDocResponseDto
     try {
@@ -376,12 +356,7 @@ export class DocsController {
       }
       result = (await this.docsService.createStub(enrichInput, org.id)) as CreateDocResponseDto
       setImmediate(() => {
-        void this.docsService.enrichInBackground(
-          result.id,
-          enrichInput,
-          org.id,
-          user?.id ?? null,
-        )
+        void this.docsService.enrichInBackground(result.id, enrichInput, org.id, user?.id ?? null)
       })
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
@@ -454,10 +429,7 @@ export class DocsController {
     @CurrentOrg() org: { id: string },
   ): Promise<CategorySuggestionDto> {
     try {
-      return (await this.docsService.suggestCategory(
-        params.id,
-        org.id,
-      )) as CategorySuggestionDto
+      return (await this.docsService.suggestCategory(params.id, org.id)) as CategorySuggestionDto
     } catch (err) {
       if (err instanceof DocNotFoundOrCrossOrgError) {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
@@ -495,16 +467,10 @@ export class DocsController {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
       }
       if (err instanceof TypeProposalMissingError) {
-        throw new HttpException(
-          { error: 'type-proposal-missing' } satisfies ApiErrorResponse,
-          422,
-        )
+        throw new HttpException({ error: 'type-proposal-missing' } satisfies ApiErrorResponse, 422)
       }
       if (err instanceof TypeNameConflictError) {
-        throw new HttpException(
-          { error: 'type-name-conflict' } satisfies ApiErrorResponse,
-          422,
-        )
+        throw new HttpException({ error: 'type-name-conflict' } satisfies ApiErrorResponse, 422)
       }
       throw err
     }
@@ -554,10 +520,7 @@ export class DocsController {
         throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
       }
       if (err instanceof TypeProposalMissingError) {
-        throw new HttpException(
-          { error: 'type-proposal-missing' } satisfies ApiErrorResponse,
-          422,
-        )
+        throw new HttpException({ error: 'type-proposal-missing' } satisfies ApiErrorResponse, 422)
       }
       throw err
     }

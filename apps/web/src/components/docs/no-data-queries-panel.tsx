@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { ChevronDown, ChevronRight, Search } from 'lucide-react'
+import { useState } from 'react'
 import type { NoDataQuery } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 
@@ -23,10 +23,7 @@ export function NoDataQueriesPanel({ queries }: { queries: NoDataQuery[] }) {
   if (queries.length === 0) return null
   const total = queries.reduce((s, q) => s + q.askCount, 0)
   return (
-    <section
-      aria-label="What staff couldn't find"
-      className="rounded-lg border bg-card shadow-sm"
-    >
+    <section aria-label="What staff couldn't find" className="rounded-lg border bg-card shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

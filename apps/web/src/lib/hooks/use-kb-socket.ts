@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import { API_URL } from '@/lib/api-client'
 
@@ -15,7 +15,7 @@ let sharedSocket: Socket | null = null
 let listenerCount = 0
 
 function getSocket(): Socket {
-  if (sharedSocket && sharedSocket.connected) return sharedSocket
+  if (sharedSocket?.connected) return sharedSocket
   if (sharedSocket) return sharedSocket
 
   sharedSocket = io(API_URL, {

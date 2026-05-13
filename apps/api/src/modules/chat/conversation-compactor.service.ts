@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 
 export type CompactableMessage = {

@@ -4,10 +4,7 @@ import { apiFetch, type FetchOpts } from './api-client'
 // (url, RequestInit) — same shape as fetch — so we forward straight to
 // apiFetch which already handles credentials, x-request-id, and ApiError
 // translation.
-export const orvalMutator = async <T>(
-  url: string,
-  init?: FetchOpts,
-): Promise<T> => {
+export const orvalMutator = async <T>(url: string, init?: FetchOpts): Promise<T> => {
   return apiFetch<T>(url, init)
 }
 

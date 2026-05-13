@@ -1,7 +1,7 @@
-import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
-import { getServerSession } from '@/lib/server-session'
+import { Suspense } from 'react'
 import { SignInForm } from '@/components/auth/sign-in-form'
+import { getServerSession } from '@/lib/server-session'
 
 export const dynamic = 'force-dynamic'
 

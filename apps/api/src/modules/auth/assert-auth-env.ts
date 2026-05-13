@@ -46,9 +46,7 @@ export function assertAuthEnv(): AuthEnv {
 
   const errs: string[] = []
   if (!secret || !/^[0-9a-f]{64}$/i.test(secret)) {
-    errs.push(
-      'BETTER_AUTH_SECRET must be 64 hex chars (32 bytes). Generate: openssl rand -hex 32',
-    )
+    errs.push('BETTER_AUTH_SECRET must be 64 hex chars (32 bytes). Generate: openssl rand -hex 32')
   }
   if (!baseURL) errs.push('BETTER_AUTH_URL missing (e.g. http://localhost:3001)')
   if (!webOriginRaw) {
@@ -58,14 +56,10 @@ export function assertAuthEnv(): AuthEnv {
   }
   // 01-02 audit-added: MAIL_FROM required when RESEND_API_KEY is set
   if (resendKey && !mailFrom) {
-    errs.push(
-      'MAIL_FROM is required when RESEND_API_KEY is set (format: "Name <addr@domain>")',
-    )
+    errs.push('MAIL_FROM is required when RESEND_API_KEY is set (format: "Name <addr@domain>")')
   }
   if (resendKey && mailFrom && !MAIL_FROM_RE.test(mailFrom)) {
-    errs.push(
-      `MAIL_FROM has invalid format: got "${mailFrom}". Expected: "Name <addr@domain>"`,
-    )
+    errs.push(`MAIL_FROM has invalid format: got "${mailFrom}". Expected: "Name <addr@domain>"`)
   }
 
   // 03-05: Infobip 2FA all-or-nothing — both IDs set or both absent.
@@ -104,7 +98,9 @@ export function assertAuthEnv(): AuthEnv {
     }
   }
   const phoneVerifyOverride: 'live' | 'console' | 'disabled' | undefined =
-    phoneVerifyOverrideRaw === 'live' || phoneVerifyOverrideRaw === 'console' || phoneVerifyOverrideRaw === 'disabled'
+    phoneVerifyOverrideRaw === 'live' ||
+    phoneVerifyOverrideRaw === 'console' ||
+    phoneVerifyOverrideRaw === 'disabled'
       ? phoneVerifyOverrideRaw
       : undefined
   if (phoneVerifyOverrideRaw && !phoneVerifyOverride) {
@@ -187,7 +183,11 @@ export function assertAuthEnv(): AuthEnv {
   const probeDelayParsed = probeDelayRaw !== undefined ? Number(probeDelayRaw) : 0
   const probeStubRaw = process.env.PROBE_CHAT_SERVICE_STUB
   if (probeDelayRaw !== undefined) {
-    if (!Number.isFinite(probeDelayParsed) || probeDelayParsed < 0 || !/^\d+$/.test(probeDelayRaw)) {
+    if (
+      !Number.isFinite(probeDelayParsed) ||
+      probeDelayParsed < 0 ||
+      !/^\d+$/.test(probeDelayRaw)
+    ) {
       errs.push(
         `PROBE_CHAT_SERVICE_DELAY_MS must be a non-negative integer (milliseconds), got "${probeDelayRaw}"`,
       )

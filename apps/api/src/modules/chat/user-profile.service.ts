@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 
 export type GmUserProfile = {
@@ -44,16 +44,12 @@ export class UserProfileService implements OnModuleInit {
 
     const meta = (member.metadata ?? {}) as Record<string, unknown>
     const cached = meta.gmProfile as GmUserProfile | undefined
-    const refreshedAt = cached?.refreshedAt
-      ? new Date(cached.refreshedAt).getTime()
-      : 0
+    const refreshedAt = cached?.refreshedAt ? new Date(cached.refreshedAt).getTime() : 0
     const isFresh = refreshedAt > 0 && Date.now() - refreshedAt < REFRESH_TTL_MS
 
     if (!isFresh) {
       // Fire-and-forget refresh; result lands on the next turn.
-      void this.refreshInBackground(member.id, member.role, userId, meta).catch(
-        () => undefined,
-      )
+      void this.refreshInBackground(member.id, member.role, userId, meta).catch(() => undefined)
     }
     return cached ?? null
   }
@@ -75,10 +71,7 @@ export class UserProfileService implements OnModuleInit {
     })
     if (messages.length < MIN_MESSAGES_FOR_PROFILE) return
 
-    const summary = await this.summarise(
-      role,
-      messages.map((m) => m.content).reverse(),
-    )
+    const summary = await this.summarise(role, messages.map((m) => m.content).reverse())
     if (!summary) return
 
     const newProfile: GmUserProfile = {
@@ -101,9 +94,7 @@ export class UserProfileService implements OnModuleInit {
     commonTopics: string[]
     languageHints: string | null
   } | null> {
-    const flattened = messages
-      .map((m, i) => `${i + 1}. ${m.slice(0, 280)}`)
-      .join('\n')
+    const flattened = messages.map((m, i) => `${i + 1}. ${m.slice(0, 280)}`).join('\n')
 
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS)
@@ -147,15 +138,13 @@ Return STRICT JSON only.`,
       const parsed = JSON.parse(stripped) as Record<string, unknown>
       return {
         summary: typeof parsed.summary === 'string' ? parsed.summary.slice(0, 400) : '',
-        likelyShiftRole:
-          typeof parsed.likelyShiftRole === 'string' ? parsed.likelyShiftRole : null,
+        likelyShiftRole: typeof parsed.likelyShiftRole === 'string' ? parsed.likelyShiftRole : null,
         commonTopics: Array.isArray(parsed.commonTopics)
           ? (parsed.commonTopics as unknown[])
               .filter((v): v is string => typeof v === 'string')
               .slice(0, 5)
           : [],
-        languageHints:
-          typeof parsed.languageHints === 'string' ? parsed.languageHints : null,
+        languageHints: typeof parsed.languageHints === 'string' ? parsed.languageHints : null,
       }
     } catch (err) {
       this.logger.warn(

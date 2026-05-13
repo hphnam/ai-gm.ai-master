@@ -89,21 +89,15 @@ export class MockOpsService {
           reorderQty: Number(s.reorderQty),
           supplierName: s.supplier?.name ?? null,
           categoryName: s.category.name,
-          _depletionRatio:
-            (Number(s.parLevel) - Number(s.currentQty)) / Number(s.parLevel),
+          _depletionRatio: (Number(s.parLevel) - Number(s.currentQty)) / Number(s.parLevel),
         }))
-        .sort(
-          (a, b) => b._depletionRatio - a._depletionRatio || a.name.localeCompare(b.name),
-        )
+        .sort((a, b) => b._depletionRatio - a._depletionRatio || a.name.localeCompare(b.name))
         .map(({ _depletionRatio, ...rest }) => rest)
       return ok(mapped)
     })
   }
 
-  async getStockByName(
-    venueId: string,
-    name: string,
-  ): Promise<ToolResult<MockStockMatch[]>> {
+  async getStockByName(venueId: string, name: string): Promise<ToolResult<MockStockMatch[]>> {
     const bad = assertVenueId(venueId)
     if (bad) return bad
     if (!name || name.trim().length === 0) return fail('error', 'empty name')
@@ -180,10 +174,7 @@ export class MockOpsService {
         }))
         .filter((r) => r.estimatedDeliveryHours <= withinHours)
       if (filtered.length === 0) {
-        return fail(
-          'no-data',
-          `no suppliers within ${withinHours}h for venueId=${venueId}`,
-        )
+        return fail('no-data', `no suppliers within ${withinHours}h for venueId=${venueId}`)
       }
       return ok(filtered)
     })

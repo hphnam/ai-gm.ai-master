@@ -1,26 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { ExternalLink, HelpCircle, Loader2, Search, Sparkles, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  ExternalLink,
-  HelpCircle,
-  Loader2,
-  Search,
-  Sparkles,
-  Trash2,
-} from 'lucide-react'
-import type { KbGapDto } from '@/generated/api'
-import type { KbGapAskerDto as KbGapAsker } from '@/lib/api-types'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  useAnswerGap,
-  useDeleteGap,
-  useGapKbMatches,
-  type GapKbMatch,
-} from '@/lib/hooks/use-docs'
+import type { KbGapDto } from '@/generated/api'
+import type { KbGapAskerDto as KbGapAsker } from '@/lib/api-types'
+import { type GapKbMatch, useAnswerGap, useDeleteGap, useGapKbMatches } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
 
@@ -32,10 +20,7 @@ function formatAskedBy(askers: KbGapAsker[]): { primary: string; title: string }
   if (!askers.length) return null
   const labels = askers.map(askerLabel)
   const title = askers
-    .map(
-      (a) =>
-        `${askerLabel(a)}${a.email && a.email !== askerLabel(a) ? ` <${a.email}>` : ''}`,
-    )
+    .map((a) => `${askerLabel(a)}${a.email && a.email !== askerLabel(a) ? ` <${a.email}>` : ''}`)
     .join('\n')
   if (labels.length === 1) return { primary: labels[0], title }
   if (labels.length === 2) return { primary: `${labels[0]}, ${labels[1]}`, title }
@@ -81,10 +66,7 @@ function GapCard({ gap }: { gap: KbGapDto }) {
   }
 
   async function handleDelete() {
-    if (
-      !window.confirm('Delete this question? It will no longer appear in the queue.')
-    )
-      return
+    if (!window.confirm('Delete this question? It will no longer appear in the queue.')) return
     try {
       await deleteGap.mutateAsync(gap.id)
       toast.success('Question deleted')
@@ -129,18 +111,14 @@ function GapCard({ gap }: { gap: KbGapDto }) {
 
         <div className="min-w-0 flex-1 space-y-2">
           <div>
-            <p className="text-sm font-semibold leading-snug sm:text-base">
-              {gap.question}
-            </p>
+            <p className="text-sm font-semibold leading-snug sm:text-base">{gap.question}</p>
             <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
               {gap.askCount > 1 ? (
                 <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
                   asked {gap.askCount}×
                 </span>
               ) : null}
-              {askedBy ? (
-                <span title={askedBy.title}>by {askedBy.primary}</span>
-              ) : null}
+              {askedBy ? <span title={askedBy.title}>by {askedBy.primary}</span> : null}
               <span className="text-muted-foreground/40" aria-hidden>
                 ·
               </span>
@@ -164,11 +142,7 @@ function GapCard({ gap }: { gap: KbGapDto }) {
 
           {!open ? (
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <Button
-                size="sm"
-                onClick={() => setOpen(true)}
-                className="cursor-pointer"
-              >
+              <Button size="sm" onClick={() => setOpen(true)} className="cursor-pointer">
                 Answer
               </Button>
               <Button
@@ -312,12 +286,8 @@ export function GapList({ gaps }: { gaps: KbGapDto[] }) {
   return (
     <section aria-label="Pending answers" className="space-y-2">
       <header className="flex items-baseline gap-2 px-1">
-        <h3 className="text-sm font-semibold tracking-tight">
-          Questions waiting on you
-        </h3>
-        <span className="text-xs text-muted-foreground">
-          {gaps.length} from staff
-        </span>
+        <h3 className="text-sm font-semibold tracking-tight">Questions waiting on you</h3>
+        <span className="text-xs text-muted-foreground">{gaps.length} from staff</span>
       </header>
       <div className="space-y-3">
         {gaps.map((g) => (

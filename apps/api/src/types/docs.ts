@@ -18,18 +18,12 @@ export type CreateDocRequest = z.infer<typeof CreateDocRequestSchema>
 export const UpdateDocRequestSchema = z
   .object({
     title: z.string().trim().min(1, 'title required').max(200).optional(),
-    venueId: z
-      .union([z.string().regex(UUID_RE, 'invalid uuid'), z.null()])
-      .optional(),
+    venueId: z.union([z.string().regex(UUID_RE, 'invalid uuid'), z.null()]).optional(),
     description: z.string().trim().max(1_000).optional(),
   })
-  .refine(
-    (v) =>
-      v.title !== undefined ||
-      v.venueId !== undefined ||
-      v.description !== undefined,
-    { message: 'at least one field required' },
-  )
+  .refine((v) => v.title !== undefined || v.venueId !== undefined || v.description !== undefined, {
+    message: 'at least one field required',
+  })
 export type UpdateDocRequest = z.infer<typeof UpdateDocRequestSchema>
 
 // Plan 04-03 Task 1 — DocumentType kind enum (shipped as TEXT + Zod; native enum

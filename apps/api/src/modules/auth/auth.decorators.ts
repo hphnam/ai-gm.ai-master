@@ -1,10 +1,9 @@
-import { ExecutionContext, SetMetadata, createParamDecorator } from '@nestjs/common'
+import { createParamDecorator, type ExecutionContext, SetMetadata } from '@nestjs/common'
 import type { Role } from '../../types'
 import type { AuthedRequest } from './auth.guard'
 
 export const CurrentUser = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext) =>
-    ctx.switchToHttp().getRequest<AuthedRequest>().user,
+  (_data: unknown, ctx: ExecutionContext) => ctx.switchToHttp().getRequest<AuthedRequest>().user,
 )
 
 export const CurrentOrg = createParamDecorator(

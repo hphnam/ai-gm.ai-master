@@ -16,8 +16,7 @@ const ROLE_MARKER_RE = /<\/?(system|assistant|user|human|ai|tool)>/gi
 // Multi-line role-marker pattern catches "\nAssistant:" injection — distinct
 // from the bracketed form above. This is the dominant brief-injection vector
 // since briefs flow through Triage prose, not raw user XML.
-const NEWLINE_ROLE_MARKER_RE =
-  /(?:^|\n)\s*(assistant|user|human|system|tool)\s*:/gi
+const NEWLINE_ROLE_MARKER_RE = /(?:^|\n)\s*(assistant|user|human|system|tool)\s*:/gi
 const INJECTION_RE =
   /(?:^|\n)\s*(ignore|disregard|forget)(?:\s+(?:all|previous|prior|the\s+above))+\s+(?:instructions?|rules?|system\s+prompt)/gi
 

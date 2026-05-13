@@ -3,14 +3,14 @@
 // Uses Node 22+ built-in `node:test` runner — no new test framework introduced
 // (project has no existing Jest/Vitest setup; per Task 5 contract we don't
 // add infrastructure). Run via:
-//   pnpm --filter api test:cost-tracker
+//   npm run test:cost-tracker --workspace=api
 // or directly:
 //   node --import tsx --test apps/api/src/modules/chat-v2/cost-tracker.service.spec.ts
 
-import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { CostTracker } from './cost-tracker.service'
+import { describe, it } from 'node:test'
 import type { AnthropicUsage } from '../../types/cost'
+import { CostTracker } from './cost-tracker.service'
 
 const synth = (input: number, output: number): AnthropicUsage => ({
   inputTokens: input,

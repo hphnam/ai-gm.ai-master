@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, NotFoundException } from '@nestjs/common'
+import { BadRequestException, type HttpException, NotFoundException } from '@nestjs/common'
 import type { ApiErrorResponse } from '../types'
 
 export function translateChatServiceError(err: Error): HttpException | null {

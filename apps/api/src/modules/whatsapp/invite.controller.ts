@@ -13,20 +13,19 @@ import {
   Delete,
   Get,
   HttpCode,
-  Logger,
   Param,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common'
-import { Post } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { zodPipe } from '../../common/zod-pipe'
 import {
-  CreateInviteInputSchema,
   type CreateInviteInput,
+  CreateInviteInputSchema,
   type CreateInviteResponse,
   type ListInvitesResponse,
 } from '../../types'
-import { zodPipe } from '../../common/zod-pipe'
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
@@ -37,8 +36,6 @@ import { InviteService } from './invite.service'
 @Controller('whatsapp/invites')
 @UseGuards(AuthGuard, RoleGuard)
 export class InviteController {
-  private readonly logger = new Logger(InviteController.name)
-
   constructor(private readonly invites: InviteService) {}
 
   @Post()

@@ -1,12 +1,12 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import Link from 'next/link'
 import { AlertTriangle, Inbox, Sparkles, Tag } from 'lucide-react'
-import type { DocListItemDto as DocListItem } from '@/generated/api'
-import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
+import { Button } from '@/components/ui/button'
+import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { useInbox } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 
@@ -44,28 +44,16 @@ function InboxCard({
 }) {
   const t = toneStyles[tone]
   return (
-    <div
-      className={cn(
-        'rounded-xl border bg-card p-4 shadow-sm ring-1 sm:p-5',
-        t.ring,
-      )}
-    >
+    <div className={cn('rounded-xl border bg-card p-4 shadow-sm ring-1 sm:p-5', t.ring)}>
       <div className="flex items-start gap-3 sm:gap-4">
         <div
-          className={cn(
-            'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-            t.icon,
-          )}
+          className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-full', t.icon)}
         >
           {icon}
         </div>
         <div className="min-w-0 flex-1 space-y-1.5">
-          <p className="text-sm font-semibold leading-snug sm:text-base">
-            {title}
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {body}
-          </p>
+          <p className="text-sm font-semibold leading-snug sm:text-base">{title}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
           <div className="flex flex-wrap gap-2 pt-2">
             {primary}
             {secondary}
@@ -91,8 +79,8 @@ function ProposalCard({ doc }: { doc: DocListItem }) {
         icon={<Sparkles className="h-4 w-4" aria-hidden />}
         title={
           <>
-            Is <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span>{' '}
-            a {proposal.name.toLowerCase()}?
+            Is <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span> a{' '}
+            {proposal.name.toLowerCase()}?
           </>
         }
         body={
@@ -101,11 +89,7 @@ function ProposalCard({ doc }: { doc: DocListItem }) {
             : 'Our AI thinks so. Confirm and we’ll file similar docs the same way next time.'
         }
         primary={
-          <Button
-            size="sm"
-            onClick={() => setOpen(true)}
-            className="cursor-pointer"
-          >
+          <Button size="sm" onClick={() => setOpen(true)} className="cursor-pointer">
             Review &amp; confirm
           </Button>
         }
@@ -142,11 +126,7 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
         }
         body="Pick a category so the AI and your team know how to use it. Takes about ten seconds."
         primary={
-          <Button
-            size="sm"
-            onClick={() => setOpen(true)}
-            className="cursor-pointer"
-          >
+          <Button size="sm" onClick={() => setOpen(true)} className="cursor-pointer">
             Pick a category
           </Button>
         }
@@ -156,9 +136,7 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
           </Button>
         }
       />
-      {open ? (
-        <ClassifyDocModal docId={doc.id} open={open} onOpenChange={setOpen} />
-      ) : null}
+      {open ? <ClassifyDocModal docId={doc.id} open={open} onOpenChange={setOpen} /> : null}
     </>
   )
 }
@@ -170,8 +148,7 @@ function FailedCard({ doc }: { doc: DocListItem }) {
       icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
       title={
         <>
-          We couldn’t read{' '}
-          <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span>
+          We couldn’t read <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span>
         </>
       }
       body={
@@ -192,24 +169,16 @@ function partition(docs: DocListItem[] | undefined) {
   const safe = docs ?? []
   return {
     failed: safe.filter((d) => d.processingStatus === 'failed'),
-    proposals: safe.filter(
-      (d) => d.processingStatus === 'ready' && d.pendingTypeProposal,
-    ),
+    proposals: safe.filter((d) => d.processingStatus === 'ready' && d.pendingTypeProposal),
     unclassified: safe.filter(
-      (d) =>
-        d.processingStatus === 'ready' &&
-        !d.documentType &&
-        !d.pendingTypeProposal,
+      (d) => d.processingStatus === 'ready' && !d.documentType && !d.pendingTypeProposal,
     ),
   }
 }
 
 export function useInboxCount(): number {
   const docs = useInbox()
-  const { failed, proposals, unclassified } = useMemo(
-    () => partition(docs.data),
-    [docs.data],
-  )
+  const { failed, proposals, unclassified } = useMemo(() => partition(docs.data), [docs.data])
   return failed.length + proposals.length + unclassified.length
 }
 
@@ -226,9 +195,7 @@ function Section({
     <section className="space-y-2">
       <header className="flex items-baseline gap-2 px-1">
         <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
-        {hint ? (
-          <span className="text-xs text-muted-foreground">{hint}</span>
-        ) : null}
+        {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
       </header>
       <div className="space-y-3">{children}</div>
     </section>
@@ -251,17 +218,10 @@ function EmptyInbox() {
 
 export function InboxTab() {
   const docs = useInbox()
-  const { failed, proposals, unclassified } = useMemo(
-    () => partition(docs.data),
-    [docs.data],
-  )
+  const { failed, proposals, unclassified } = useMemo(() => partition(docs.data), [docs.data])
 
   if (docs.isLoading) {
-    return (
-      <p className="px-1 text-sm italic text-muted-foreground">
-        Loading inbox…
-      </p>
-    )
+    return <p className="px-1 text-sm italic text-muted-foreground">Loading inbox…</p>
   }
 
   const total = failed.length + proposals.length + unclassified.length

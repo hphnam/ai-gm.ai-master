@@ -11,8 +11,8 @@
 // audit-M3 — wraps generateObject in AbortController + setTimeout per
 // ANALYSER_TIMEOUT_MS. On timeout: throw RoleTimeoutError('analyser', ...).
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { Injectable } from '@nestjs/common'
 import { generateText } from 'ai'
 import {
   ANALYSER_TIMEOUT_MS,
@@ -157,9 +157,10 @@ function stubAnalyse(input: AnalyserInput): AnalyserResult {
     })),
   )
 
-  const synthesis = input.findings.length > 0
-    ? input.findings.map((f) => f.summary).join(' ')
-    : 'No researcher findings; unable to synthesize.'
+  const synthesis =
+    input.findings.length > 0
+      ? input.findings.map((f) => f.summary).join(' ')
+      : 'No researcher findings; unable to synthesize.'
 
   return {
     output: {

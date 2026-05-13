@@ -1,25 +1,25 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash, randomUUID } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { Prisma, prisma } from '../../database/prisma'
 import {
   CURRENT_SECTION_VERSION,
   EMBED_QUALITY_DEGRADED_THRESHOLD,
   EMBED_QUEUE_TIMEOUT_MS,
   INGEST_EMBED_PHASE_TIMEOUT_MS,
+  type KnowledgeMetadata,
   KnowledgeMetadataSchema,
   MAX_CONCURRENT_CHUNK_EMBEDS,
   MAX_EMBEDS_PER_DOCUMENT,
   MAX_TABULAR_ROWS_PER_DOC,
-  UUID_RE,
-  type KnowledgeMetadata,
   type SectionDetectionResult,
   type TabularExtractionResult,
+  UUID_RE,
 } from '../../types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
-import { SectionDetector } from './section-detector'
 import { inferColumnTypes } from '../tabular/infer-column-types'
+import { SectionDetector } from './section-detector'
 
 function hashOrgId(orgId: string): string {
   // PII-safe correlation id for log search; sha-256 truncated to 12 hex chars.
@@ -28,7 +28,9 @@ function hashOrgId(orgId: string): string {
 
 // Plan 04-02 Task 2 — Prisma 7 Json columns reject raw `null`; must use Prisma.JsonNull
 // sentinel for explicit-null writes. Helper keeps upsert sites readable.
-function proposalToJsonInput(p: Record<string, unknown> | null | undefined): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+function proposalToJsonInput(
+  p: Record<string, unknown> | null | undefined,
+): Prisma.InputJsonValue | typeof Prisma.JsonNull {
   return p ? (p as Prisma.InputJsonValue) : Prisma.JsonNull
 }
 
@@ -97,7 +99,10 @@ export class IngestService implements OnModuleInit {
       input.title ?? '',
       parsed.summary ?? '',
       (parsed.tags ?? []).join(', '),
-      (parsed.crossRefs ?? []).map((r) => r.ref).filter((r): r is string => !!r).join(', '),
+      (parsed.crossRefs ?? [])
+        .map((r) => r.ref)
+        .filter((r): r is string => !!r)
+        .join(', '),
       input.content,
     ]
       .filter((s) => s.length > 0)
@@ -127,9 +132,7 @@ export class IngestService implements OnModuleInit {
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
           // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
-          sourceImageBytes: input.sourceImageBytes
-            ? new Uint8Array(input.sourceImageBytes)
-            : null,
+          sourceImageBytes: input.sourceImageBytes ? new Uint8Array(input.sourceImageBytes) : null,
           sourceImageMime: input.sourceImageMime ?? null,
           documentTypeId: input.documentTypeId ?? null,
           pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
@@ -143,9 +146,7 @@ export class IngestService implements OnModuleInit {
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
           // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
-          sourceImageBytes: input.sourceImageBytes
-            ? new Uint8Array(input.sourceImageBytes)
-            : null,
+          sourceImageBytes: input.sourceImageBytes ? new Uint8Array(input.sourceImageBytes) : null,
           sourceImageMime: input.sourceImageMime ?? null,
           documentTypeId: input.documentTypeId ?? null,
           pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
@@ -284,9 +285,7 @@ ${input.content}`
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
           // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
-          sourceImageBytes: input.sourceImageBytes
-            ? new Uint8Array(input.sourceImageBytes)
-            : null,
+          sourceImageBytes: input.sourceImageBytes ? new Uint8Array(input.sourceImageBytes) : null,
           sourceImageMime: input.sourceImageMime ?? null,
           documentTypeId: input.documentTypeId ?? null,
           pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
@@ -300,9 +299,7 @@ ${input.content}`
           embeddingText,
           // Prisma 7 Bytes column expects Uint8Array<ArrayBuffer>; Node's Buffer is
           // Uint8Array<ArrayBufferLike>. new Uint8Array(buf) normalizes at the boundary.
-          sourceImageBytes: input.sourceImageBytes
-            ? new Uint8Array(input.sourceImageBytes)
-            : null,
+          sourceImageBytes: input.sourceImageBytes ? new Uint8Array(input.sourceImageBytes) : null,
           sourceImageMime: input.sourceImageMime ?? null,
           documentTypeId: input.documentTypeId ?? null,
           pendingTypeProposal: proposalToJsonInput(input.pendingTypeProposal),
@@ -389,8 +386,7 @@ ${input.content}`
     if (top && Number(top.similarity) >= 0.85) {
       // Bump existing pending gap.
       const existingMeta = (top.metadata ?? {}) as Record<string, unknown>
-      const askCount =
-        (typeof existingMeta.askCount === 'number' ? existingMeta.askCount : 1) + 1
+      const askCount = (typeof existingMeta.askCount === 'number' ? existingMeta.askCount : 1) + 1
       const askedByList = Array.isArray(existingMeta.askedByUserIds)
         ? (existingMeta.askedByUserIds as unknown[]).filter(
             (v): v is string => typeof v === 'string',
@@ -550,7 +546,12 @@ ${input.content}`
       embeddingText: string
       tokenCount: number
     }[] = []
-    const persistedChunkIds: { id: string; sectionIndex: number; chunkIndex: number; text: string }[] = []
+    const persistedChunkIds: {
+      id: string
+      sectionIndex: number
+      chunkIndex: number
+      text: string
+    }[] = []
     for (let sIdx = 0; sIdx < detection.sections.length; sIdx++) {
       const section = detection.sections[sIdx]
       const sectionId = sectionRows[sIdx].id
@@ -566,7 +567,12 @@ ${input.content}`
           embeddingText: chunk.content,
           tokenCount: chunk.tokenCount,
         })
-        persistedChunkIds.push({ id: chunkId, sectionIndex: sIdx, chunkIndex: cIdx, text: chunk.content })
+        persistedChunkIds.push({
+          id: chunkId,
+          sectionIndex: sIdx,
+          chunkIndex: cIdx,
+          text: chunk.content,
+        })
       }
     }
     await prisma.$transaction(
@@ -768,7 +774,8 @@ ${input.content}`
 
     let embedPhaseTimeoutCount = 0
     if (controller.signal.aborted) {
-      embedPhaseTimeoutCount = eligible.length - embeddedCount - embedFailedCount - embedQueueTimeoutCount
+      embedPhaseTimeoutCount =
+        eligible.length - embeddedCount - embedFailedCount - embedQueueTimeoutCount
       if (embedPhaseTimeoutCount < 0) embedPhaseTimeoutCount = 0
       this.logger.warn(
         JSON.stringify({
@@ -848,7 +855,9 @@ ${input.content}`
     try {
       const totalRows = result.rows.length
       const capExceeded = totalRows > MAX_TABULAR_ROWS_PER_DOC
-      const persistedRows = capExceeded ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC) : result.rows
+      const persistedRows = capExceeded
+        ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC)
+        : result.rows
 
       const inferred = inferColumnTypes(persistedRows, result.columns)
 
@@ -954,6 +963,6 @@ function sanitiseEmbedError(msg: string): string {
   // Strip URLs / keys / long token-like strings; keep first 120 chars.
   return msg
     .replace(/https?:\/\/\S+/g, '<url>')
-    .replace(/[A-Za-z0-9_\-]{32,}/g, '<token>')
+    .replace(/[A-Za-z0-9_-]{32,}/g, '<token>')
     .slice(0, 120)
 }

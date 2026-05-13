@@ -18,7 +18,6 @@ import {
   Get,
   HttpCode,
   HttpException,
-  Logger,
   NotFoundException,
   Param,
   Post,
@@ -28,37 +27,27 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Response } from 'express'
 import { ZodValidationPipe } from 'nestjs-zod'
+import { translateChatServiceError } from '../../common/translate-chat-error'
+import type { ApiErrorResponse } from '../../types'
+import { CurrentOrg, CurrentRole, CurrentUser } from '../auth/auth.decorators'
+import { AuthGuard } from '../auth/auth.guard'
+import { RoleGuard } from '../auth/role.guard'
 import {
   ConversationIdParamDto,
+  ConversationResponseDto,
   GetConversationQueryDto,
+  ListConversationItemDto,
   ListConversationsQueryDto,
   SendChatMessageRequestDto,
+  SendChatMessageResponseDto,
   StreamChatMessageRequestDto,
-  ListConversationItemDto,
-  ConversationResponseDto,
 } from '../chat/dto/chat.dto'
-import {
-  ApiTags,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiBody,
-} from '@nestjs/swagger'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { type ApiErrorResponse } from '../../types'
-import { translateChatServiceError } from '../../common/translate-chat-error'
-import { AuthGuard } from '../auth/auth.guard'
-import {
-  CurrentOrg,
-  CurrentRole,
-  CurrentUser,
-} from '../auth/auth.decorators'
-import { RoleGuard } from '../auth/role.guard'
 import { ChatV2Service } from './chat-v2.service'
 import { ConversationService } from './conversation.service'
-import { SendChatMessageResponseDto } from '../chat/dto/chat.dto'
 import { validateMultimodalAttachment } from './multimodal-validator'
 
 const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024 // 15MB outer multer cap
@@ -68,8 +57,6 @@ const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024 // 15MB outer multer cap
 @Controller('chat')
 @UseGuards(AuthGuard, RoleGuard)
 export class ChatV2Controller {
-  private readonly logger = new Logger(ChatV2Controller.name)
-
   constructor(
     private readonly chatV2Service: ChatV2Service,
     private readonly conversationService: ConversationService,
@@ -152,10 +139,7 @@ export class ChatV2Controller {
             415,
           )
         case 'payload-too-large':
-          throw new HttpException(
-            { error: 'payload-too-large' } satisfies ApiErrorResponse,
-            413,
-          )
+          throw new HttpException({ error: 'payload-too-large' } satisfies ApiErrorResponse, 413)
         case 'corrupt-bytes':
           throw new BadRequestException({
             error: 'invalid-input',
@@ -167,9 +151,7 @@ export class ChatV2Controller {
     }
 
     const venueId =
-      typeof body.venueId === 'string' && body.venueId.trim().length > 0
-        ? body.venueId
-        : undefined
+      typeof body.venueId === 'string' && body.venueId.trim().length > 0 ? body.venueId : undefined
     if (!venueId) {
       throw new BadRequestException({
         error: 'invalid-input',
@@ -180,8 +162,7 @@ export class ChatV2Controller {
         ? body.userMessage.trim().slice(0, 8000)
         : 'What do you make of this?'
     const conversationId =
-      typeof body.conversationId === 'string' &&
-      body.conversationId.trim().length > 0
+      typeof body.conversationId === 'string' && body.conversationId.trim().length > 0
         ? body.conversationId
         : undefined
 
@@ -232,21 +213,20 @@ export class ChatV2Controller {
     })
 
     try {
-      const { conversationId, assistantMessageId, result } =
-        await this.chatV2Service.streamMessage(
-          {
-            venueId: body.venueId,
-            userMessage: body.userMessage,
-            conversationId: body.conversationId,
-          },
-          {
-            orgId: org.id,
-            userId: user.id,
-            userRole: role ?? 'staff',
-            userIdentity: { name: user.name, email: user.email },
-          },
-          abortController.signal,
-        )
+      const { conversationId, assistantMessageId, result } = await this.chatV2Service.streamMessage(
+        {
+          venueId: body.venueId,
+          userMessage: body.userMessage,
+          conversationId: body.conversationId,
+        },
+        {
+          orgId: org.id,
+          userId: user.id,
+          userRole: role ?? 'staff',
+          userIdentity: { name: user.name, email: user.email },
+        },
+        abortController.signal,
+      )
       result.pipeUIMessageStreamToResponse(res, {
         generateMessageId: () => assistantMessageId,
         messageMetadata: ({ part }) => {
@@ -292,12 +272,7 @@ export class ChatV2Controller {
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
   ): Promise<ConversationResponseDto> {
-    const conv = await this.conversationService.getById(
-      params.id,
-      org.id,
-      user.id,
-      query.venueId,
-    )
+    const conv = await this.conversationService.getById(params.id, org.id, user.id, query.venueId)
     if (!conv) {
       const notFound: ApiErrorResponse = { error: 'not-found' }
       throw new NotFoundException(notFound)
@@ -316,12 +291,7 @@ export class ChatV2Controller {
     @CurrentUser() user: { id: string },
   ): Promise<void> {
     try {
-      await this.conversationService.softDelete(
-        params.id,
-        org.id,
-        user.id,
-        query.venueId,
-      )
+      await this.conversationService.softDelete(params.id, org.id, user.id, query.venueId)
     } catch (err) {
       const message = (err as Error).message ?? ''
       if (message.includes('not found')) {

@@ -1,11 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { Check, Phone } from 'lucide-react'
-import { maskPhone } from '@/lib/format'
-import { ApiError } from '@/lib/api-client'
-import { mapApiError } from '@/lib/map-api-error'
-import { usePhoneStatus, useUnlinkPhone } from '@/lib/hooks/use-phone'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,6 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { ApiError } from '@/lib/api-client'
+import { maskPhone } from '@/lib/format'
+import { usePhoneStatus, useUnlinkPhone } from '@/lib/hooks/use-phone'
+import { mapApiError } from '@/lib/map-api-error'
 import { PhoneLinkForm } from './phone-link-form'
 
 export function PhoneStatusCard() {
@@ -58,14 +58,9 @@ export function PhoneStatusCard() {
         <header className="flex items-center gap-3">
           <Phone className="h-5 w-5 text-muted-foreground" aria-hidden />
           <div className="flex-1">
-            <p className="text-base font-medium">
-              {maskPhone(data!.phoneNumber!)}
-            </p>
+            <p className="text-base font-medium">{maskPhone(data!.phoneNumber!)}</p>
             <p className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Check
-                className="h-4 w-4 text-emerald-600"
-                aria-hidden
-              />
+              <Check className="h-4 w-4 text-emerald-600" aria-hidden />
               <span>Verified</span>
             </p>
           </div>

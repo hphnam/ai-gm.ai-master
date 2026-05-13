@@ -1,12 +1,12 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
-  VenueProfileSchema,
   type CreateVenueBody,
   type UpdateVenueProfile,
   type VenueDetail,
   type VenueListItem,
   type VenueProfile,
+  VenueProfileSchema,
 } from '../../types'
 import { IndexerService } from '../indexer/indexer.service'
 
@@ -63,11 +63,7 @@ export class VenuesService {
   /// Phase D — patch the venue profile. Merges over the existing profile JSON,
   /// re-validates the full shape, and re-indexes into SearchableEntity so the
   /// agent can find profile contents semantically (fire escapes, hours, etc.).
-  async updateProfile(
-    id: string,
-    orgId: string,
-    patch: UpdateVenueProfile,
-  ): Promise<VenueDetail> {
+  async updateProfile(id: string, orgId: string, patch: UpdateVenueProfile): Promise<VenueDetail> {
     const existing = await prisma.venue.findFirst({
       where: { id, organizationId: orgId },
       select: {

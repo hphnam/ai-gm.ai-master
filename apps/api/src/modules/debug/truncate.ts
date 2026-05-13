@@ -6,7 +6,7 @@ export function truncateAtWord(s: string, max = 160): string {
   const slice = s.slice(0, max)
   const lastSpace = slice.lastIndexOf(' ')
   const cut = lastSpace > max * 0.6 ? lastSpace : max
-  return slice.slice(0, cut).trimEnd() + '…'
+  return `${slice.slice(0, cut).trimEnd()}…`
 }
 
 type ToolCallResult = {
@@ -73,7 +73,7 @@ export function mapStatusCount(
   }
   for (const row of rows) {
     const key = row.status as keyof DebugRetagQueueCounts
-    if (KNOWN_STATUSES.includes(row.status as typeof KNOWN_STATUSES[number])) {
+    if (KNOWN_STATUSES.includes(row.status as (typeof KNOWN_STATUSES)[number])) {
       counts[key] = (counts[key] ?? 0) + row._count.status
     } else {
       log('debug.unknown_status', { status: row.status, count: row._count.status })

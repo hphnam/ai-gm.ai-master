@@ -331,7 +331,7 @@ export class EmbeddingsService {
 The seeder is a NestJS Commander command (`nest-commander`). Run it with:
 
 ```bash
-pnpm seed
+npm run seed
 ```
 
 ### 7.1 What the seeder does

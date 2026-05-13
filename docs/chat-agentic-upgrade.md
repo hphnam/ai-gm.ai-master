@@ -2,7 +2,7 @@
 
 Upgrade the streaming chat path from a manual `streamText` loop with parsed delimiters to a first-class `ToolLoopAgent` with reasoning, structured follow-ups, abort handling, and full part persistence.
 
-Against AI SDK 6.0.168 + @ai-sdk/anthropic 3.0.71. Docs bundled under `node_modules/.pnpm/ai@6.0.168*/node_modules/ai/docs/`.
+Against AI SDK 6.0.168 + @ai-sdk/anthropic 3.0.71. Docs bundled under `node_modules/ai/docs/`.
 
 ## Items
 
@@ -38,8 +38,8 @@ Against AI SDK 6.0.168 + @ai-sdk/anthropic 3.0.71. Docs bundled under `node_modu
 
 ## Verification
 
-- `pnpm --filter api exec tsc --noEmit` — clean.
-- `pnpm --filter web exec tsc --noEmit` — clean.
+- `npm exec --workspace=api tsc -- --noEmit` — clean.
+- `npm exec --workspace=web tsc -- --noEmit` — clean.
 - Migration is additive-only; rolling deploy safe.
 
 ## Outstanding / Follow-ups
@@ -63,7 +63,7 @@ Against AI SDK 6.0.168 + @ai-sdk/anthropic 3.0.71. Docs bundled under `node_modu
 
 ### Build / deploy gate
 
-- [ ] Apply migration: `pnpm --filter @gm-ai/database exec prisma migrate deploy`.
+- [ ] Apply migration: `npm exec --workspace=api prisma -- migrate deploy`.
 - [ ] Restart API dev server so `nest --watch` picks up the `chat.service.ts` import graph change (Anthropic SDK no longer imported in that file).
 - [ ] Walk the happy path: new chat → send → see reasoning block + tool chips + follow-up pills + copy/regenerate actions.
 - [ ] Walk the capture path: manager asks to save an SOP → draft appears → confirm in reply → save_knowledge_doc fires → loop terminates.

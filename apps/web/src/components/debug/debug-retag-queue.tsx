@@ -1,17 +1,10 @@
 'use client'
 
-import {
-  AlertCircle,
-  CheckCircle2,
-  CircleDashed,
-  Hourglass,
-  Loader2,
-  XCircle,
-} from 'lucide-react'
+import { AlertCircle, CheckCircle2, CircleDashed, Hourglass, Loader2, XCircle } from 'lucide-react'
 import type { DebugRetagQueueResponseDto as DebugRetagQueueResponse } from '@/generated/api'
 import type { DebugRetagQueueItemDto as DebugRetagQueueItem } from '@/lib/api-types'
-import { cn } from '@/lib/utils'
 import { mapApiError } from '@/lib/map-api-error'
+import { cn } from '@/lib/utils'
 
 type Props = {
   data: DebugRetagQueueResponse | undefined
@@ -31,10 +24,7 @@ function relativeTime(iso: string): string {
   return `${Math.floor(diffHr / 24)}d ago`
 }
 
-const STATUS_STYLE: Record<
-  string,
-  { icon: typeof CheckCircle2; cls: string; label: string }
-> = {
+const STATUS_STYLE: Record<string, { icon: typeof CheckCircle2; cls: string; label: string }> = {
   queued: { icon: Hourglass, cls: 'bg-sky-500/20 text-sky-900 border-sky-500/40', label: 'queued' },
   processing: {
     icon: Loader2,
@@ -87,7 +77,7 @@ function CountsStrip({ counts }: { counts: DebugRetagQueueResponse['counts'] }) 
     ['exhausted', counts.exhausted],
   ]
   return (
-    <div className="flex flex-wrap gap-2" aria-label="Queue status counts">
+    <section className="flex flex-wrap gap-2" aria-label="Queue status counts">
       {entries.map(([k, n]) => {
         const style = STATUS_STYLE[k]
         const Icon = style.icon
@@ -105,7 +95,7 @@ function CountsStrip({ counts }: { counts: DebugRetagQueueResponse['counts'] }) 
           </span>
         )
       })}
-    </div>
+    </section>
   )
 }
 
@@ -135,9 +125,7 @@ function QueueItem({
       </div>
 
       {item.lastError ? (
-        <div className="text-[11px] text-red-700 line-clamp-2 break-words">
-          {item.lastError}
-        </div>
+        <div className="text-[11px] text-red-700 line-clamp-2 break-words">{item.lastError}</div>
       ) : null}
 
       {item.sourceMessageId ? (

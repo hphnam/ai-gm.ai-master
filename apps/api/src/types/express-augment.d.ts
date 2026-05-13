@@ -19,5 +19,3 @@ declare module 'express' {
     rawBody?: Buffer
   }
 }
-
-export {}

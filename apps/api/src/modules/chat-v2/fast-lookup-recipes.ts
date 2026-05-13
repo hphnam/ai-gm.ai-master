@@ -88,10 +88,18 @@ export function identifyFastPath(userMessage: string): FastPathRecipe | null {
   }
 
   // ── Checklists ──────────────────────────────────────────────────────────
-  if (/\b(open(?:ing)? checklist|how (?:do|to) (?:we |i )?open|opening procedure|opening up)\b/i.test(lower)) {
+  if (
+    /\b(open(?:ing)? checklist|how (?:do|to) (?:we |i )?open|opening procedure|opening up)\b/i.test(
+      lower,
+    )
+  ) {
     return { tool: 'get_checklist', intent: 'opening' }
   }
-  if (/\b(clos(?:ing)? checklist|how (?:do|to) (?:we |i )?close|closing procedure|closing up|locking up)\b/i.test(lower)) {
+  if (
+    /\b(clos(?:ing)? checklist|how (?:do|to) (?:we |i )?close|closing procedure|closing up|locking up)\b/i.test(
+      lower,
+    )
+  ) {
     return { tool: 'get_checklist', intent: 'closing' }
   }
 

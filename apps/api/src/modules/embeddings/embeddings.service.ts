@@ -1,10 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
+import { Injectable, type OnModuleInit } from '@nestjs/common'
 import { VoyageAIClient } from 'voyageai'
 import { VOYAGE_EMBED_MODEL } from '../../types/section'
 
 @Injectable()
 export class EmbeddingsService implements OnModuleInit {
-  private readonly logger = new Logger(EmbeddingsService.name)
   private client!: VoyageAIClient
 
   onModuleInit() {

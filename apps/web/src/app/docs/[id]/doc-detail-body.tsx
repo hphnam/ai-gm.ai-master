@@ -1,9 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 import {
   AlertTriangle,
   ArrowLeft,
@@ -20,7 +16,13 @@ import {
   Tag,
   Trash2,
 } from 'lucide-react'
-import type { DocDetailDto } from '@/generated/api'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
+import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
+import { EditDocModal } from '@/components/docs/edit-doc-modal'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
@@ -32,11 +34,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
-import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
-import { EditDocModal } from '@/components/docs/edit-doc-modal'
-import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
+import type { DocDetailDto } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
+import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
 
@@ -88,7 +88,6 @@ function StepKindIcon({ kind }: { kind: ChecklistStep['kind'] }) {
       return <Hash className={common} aria-hidden />
     case 'photo':
       return <Camera className={common} aria-hidden />
-    case 'text':
     default:
       return <FileText className={common} aria-hidden />
   }
@@ -112,8 +111,7 @@ function CategoryChip({ doc }: { doc: DocDetailDto }) {
     )
   }
   if (doc.documentType) {
-    const Icon =
-      doc.documentType.kind === 'procedural' ? ClipboardList : BookOpen
+    const Icon = doc.documentType.kind === 'procedural' ? ClipboardList : BookOpen
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
         <Icon className="h-3.5 w-3.5" aria-hidden />
@@ -174,19 +172,12 @@ function StatusBanner({
             <Sparkles className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-sm font-semibold">
-              Is this a {proposal.name.toLowerCase()}?
-            </p>
+            <p className="text-sm font-semibold">Is this a {proposal.name.toLowerCase()}?</p>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Our AI thinks so. Confirm and we’ll file similar docs the same
-              way next time.
+              Our AI thinks so. Confirm and we’ll file similar docs the same way next time.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button
-                size="sm"
-                onClick={onOpenProposal}
-                className="cursor-pointer"
-              >
+              <Button size="sm" onClick={onOpenProposal} className="cursor-pointer">
                 Review &amp; confirm
               </Button>
             </div>
@@ -205,15 +196,11 @@ function StatusBanner({
           <div className="min-w-0 flex-1 space-y-1.5">
             <p className="text-sm font-semibold">Pick a category</p>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Categorising this document helps the AI and your team know how
-              to use it. Takes about ten seconds.
+              Categorising this document helps the AI and your team know how to use it. Takes about
+              ten seconds.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button
-                size="sm"
-                onClick={onOpenClassify}
-                className="cursor-pointer"
-              >
+              <Button size="sm" onClick={onOpenClassify} className="cursor-pointer">
                 Pick a category
               </Button>
             </div>
@@ -254,8 +241,8 @@ function DeleteDocDialog({
         <DialogHeader>
           <DialogTitle>Delete this document?</DialogTitle>
           <DialogDescription>
-            This can’t be undone. The document will be removed from your
-            knowledge base and stop showing up in chat answers.
+            This can’t be undone. The document will be removed from your knowledge base and stop
+            showing up in chat answers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -306,9 +293,7 @@ function DocActions({
         <Button
           size="sm"
           variant="outline"
-          onClick={
-            doc.pendingTypeProposal ? onOpenProposal : onOpenClassify
-          }
+          onClick={doc.pendingTypeProposal ? onOpenProposal : onOpenClassify}
           className="cursor-pointer"
         >
           {reclassifyLabel}
@@ -334,11 +319,7 @@ function DocActions({
       >
         <Trash2 className="h-4 w-4" aria-hidden />
       </Button>
-      <DeleteDocDialog
-        docId={doc.id}
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-      />
+      <DeleteDocDialog docId={doc.id} open={deleteOpen} onOpenChange={setDeleteOpen} />
     </div>
   )
 }
@@ -395,9 +376,7 @@ function ChecklistBlock({ checklist }: { checklist: Checklist }) {
     >
       <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <ClipboardList className="h-3.5 w-3.5" aria-hidden />
-        <span id="checklist-heading">
-          Steps to follow ({stepCount})
-        </span>
+        <span id="checklist-heading">Steps to follow ({stepCount})</span>
       </header>
 
       <div className="space-y-5 px-4 py-5 sm:px-6">
@@ -439,16 +418,12 @@ function ChecklistBlock({ checklist }: { checklist: Checklist }) {
                   <span className="break-words">
                     {s.text}
                     {s.required === false ? (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        (optional)
-                      </span>
+                      <span className="ml-2 text-xs text-muted-foreground">(optional)</span>
                     ) : null}
                   </span>
                 </div>
                 {s.hint ? (
-                  <p className="mt-1 break-words text-xs text-muted-foreground">
-                    {s.hint}
-                  </p>
+                  <p className="mt-1 break-words text-xs text-muted-foreground">{s.hint}</p>
                 ) : null}
               </div>
             </li>
@@ -470,8 +445,7 @@ function NotFound() {
     <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
       <p className="text-sm font-medium">Document not found</p>
       <p className="mt-1 text-sm text-muted-foreground">
-        It may have been deleted, or you don’t have access. Head back to the
-        knowledge library.
+        It may have been deleted, or you don’t have access. Head back to the knowledge library.
       </p>
       <Button asChild variant="outline" size="sm" className="mt-4 cursor-pointer">
         <Link href="/docs">Back to Knowledge</Link>
@@ -484,16 +458,14 @@ function GenericError() {
   return (
     <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
       <p className="text-sm font-medium">Couldn’t load this document</p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Try refreshing the page in a moment.
-      </p>
+      <p className="mt-1 text-sm text-muted-foreground">Try refreshing the page in a moment.</p>
     </div>
   )
 }
 
 function DocSkeleton() {
   return (
-    <div className="space-y-4" aria-busy="true" aria-label="Loading document">
+    <div role="status" className="space-y-4" aria-busy="true" aria-label="Loading document">
       <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
       <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
       <div className="h-32 w-full animate-pulse rounded-xl bg-muted/60" />
@@ -597,9 +569,7 @@ export function DocDetailBody({ id }: { id: string }) {
 
               <ContentBlock content={data.content} />
 
-              {data.checklist ? (
-                <ChecklistBlock checklist={data.checklist} />
-              ) : null}
+              {data.checklist ? <ChecklistBlock checklist={data.checklist} /> : null}
             </article>
           ) : null}
         </div>
@@ -608,11 +578,7 @@ export function DocDetailBody({ id }: { id: string }) {
       {data ? (
         <>
           {classifyOpen ? (
-            <ClassifyDocModal
-              docId={data.id}
-              open={classifyOpen}
-              onOpenChange={setClassifyOpen}
-            />
+            <ClassifyDocModal docId={data.id} open={classifyOpen} onOpenChange={setClassifyOpen} />
           ) : null}
           {proposalOpen && data.pendingTypeProposal ? (
             <DocTypeProposalModal
@@ -622,13 +588,7 @@ export function DocDetailBody({ id }: { id: string }) {
               onOpenChange={setProposalOpen}
             />
           ) : null}
-          {editOpen ? (
-            <EditDocModal
-              doc={data}
-              open={editOpen}
-              onOpenChange={setEditOpen}
-            />
-          ) : null}
+          {editOpen ? <EditDocModal doc={data} open={editOpen} onOpenChange={setEditOpen} /> : null}
         </>
       ) : null}
     </AppShell>

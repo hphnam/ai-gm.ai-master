@@ -1,20 +1,8 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { maskPhone } from '@/lib/format'
-import {
-  PhoneControllerSendBody as SendPhoneCodeBodySchema,
-  PhoneControllerVerifyBody as VerifyPhoneCodeBodySchema,
-} from '@/generated/zod'
-import type {
-  SendPhoneCodeBodyDto as SendPhoneCodeBody,
-  VerifyPhoneCodeBodyDto as VerifyPhoneCodeBody,
-} from '@/generated/api'
-import { ApiError } from '@/lib/api-client'
-import { mapApiError } from '@/lib/map-api-error'
-import { useSendPhoneCode, useVerifyPhoneCode } from '@/lib/hooks/use-phone'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -25,6 +13,18 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import type {
+  SendPhoneCodeBodyDto as SendPhoneCodeBody,
+  VerifyPhoneCodeBodyDto as VerifyPhoneCodeBody,
+} from '@/generated/api'
+import {
+  PhoneControllerSendBody as SendPhoneCodeBodySchema,
+  PhoneControllerVerifyBody as VerifyPhoneCodeBodySchema,
+} from '@/generated/zod'
+import { ApiError } from '@/lib/api-client'
+import { maskPhone } from '@/lib/format'
+import { useSendPhoneCode, useVerifyPhoneCode } from '@/lib/hooks/use-phone'
+import { mapApiError } from '@/lib/map-api-error'
 
 const RESEND_COOLDOWN_MS = 30_000
 
@@ -90,9 +90,7 @@ export function PhoneLinkForm() {
 
   if (step.kind === 'enter-number') {
     const sendError =
-      sendMutation.error instanceof ApiError
-        ? mapApiError(sendMutation.error)
-        : null
+      sendMutation.error instanceof ApiError ? mapApiError(sendMutation.error) : null
     return (
       <Form {...numberForm}>
         <form onSubmit={onSendSubmit} className="space-y-4">
@@ -129,9 +127,7 @@ export function PhoneLinkForm() {
   }
 
   const verifyError =
-    verifyMutation.error instanceof ApiError
-      ? mapApiError(verifyMutation.error)
-      : null
+    verifyMutation.error instanceof ApiError ? mapApiError(verifyMutation.error) : null
   const remainingMs = step.lastSentAt + RESEND_COOLDOWN_MS - now
   const canResend = remainingMs <= 0 && !sendMutation.isPending
   const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000))
@@ -141,9 +137,7 @@ export function PhoneLinkForm() {
       <form onSubmit={onVerifySubmit} className="space-y-4">
         <p className="text-sm text-muted-foreground">
           Code sent to{' '}
-          <span className="font-medium text-foreground">
-            {maskPhone(step.phoneNumber)}
-          </span>
+          <span className="font-medium text-foreground">{maskPhone(step.phoneNumber)}</span>
         </p>
         <FormField
           control={codeForm.control}
@@ -191,9 +185,7 @@ export function PhoneLinkForm() {
             disabled={!canResend}
             className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:no-underline disabled:opacity-60"
           >
-            {canResend
-              ? 'Send code again'
-              : `Send code again (${secondsLeft}s)`}
+            {canResend ? 'Send code again' : `Send code again (${secondsLeft}s)`}
           </button>
         </div>
       </form>

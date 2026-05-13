@@ -4,10 +4,7 @@
 // messages), and transitions returning declarative outbound + side-effect tags.
 // The DB-shaped wrapper is whatsapp-onboarding.service.ts.
 
-import {
-  WHATSAPP_INVITE_CODE_REGEX,
-  WHATSAPP_OTP_REGEX,
-} from '../../types'
+import { WHATSAPP_INVITE_CODE_REGEX, WHATSAPP_OTP_REGEX } from '../../types'
 
 // ─── State shape ─────────────────────────────────────────────────────────
 
@@ -27,15 +24,9 @@ export type InboundIntent =
 
 // ─── Outbound + side-effect shape ────────────────────────────────────────
 
-export type OnboardingSideEffect =
-  | 'lookup_invite'
-  | 'verify_otp'
-  | 'select_venue'
-  | null
+export type OnboardingSideEffect = 'lookup_invite' | 'verify_otp' | 'select_venue' | null
 
-export type OnboardingOutbound =
-  | { kind: 'reply'; text: string }
-  | null
+export type OnboardingOutbound = { kind: 'reply'; text: string } | null
 
 export type Transition = {
   nextState: OnboardingState
@@ -47,7 +38,10 @@ export type Transition = {
 
 /** Normalise an invite-code submission: trim, strip whitespace/hyphens/dots/underscores, upper. */
 export function normalizeInviteCode(raw: string): string {
-  return raw.trim().replace(/[\s\-_.]/g, '').toUpperCase()
+  return raw
+    .trim()
+    .replace(/[\s\-_.]/g, '')
+    .toUpperCase()
 }
 
 /** Normalise an OTP submission: digits-only. */
@@ -107,28 +101,20 @@ export function classifyInbound(raw: string, expectingOtp: boolean): InboundInte
 export const REPLIES = {
   unknown_prompt:
     "Welcome to GM AI. Reply with the 8-character invite code your manager sent you. If you don't have one, ask them to invite you from the team page.",
-  unknown_received_otp:
-    "I haven't sent you a code yet. Reply with your invite code first.",
+  unknown_received_otp: "I haven't sent you a code yet. Reply with your invite code first.",
   invite_invalid:
     "That code didn't match. Check it with your manager — codes are 8 characters and expire after 24 hours.",
-  invite_expired:
-    'That invite has expired. Ask your manager to issue a new one.',
-  invite_revoked:
-    'That invite is no longer active. Ask your manager to issue a new one.',
+  invite_expired: 'That invite has expired. Ask your manager to issue a new one.',
+  invite_revoked: 'That invite is no longer active. Ask your manager to issue a new one.',
   otp_pending_invite_resubmitted:
     'Please enter the 6-digit code from the message above. If you want to use a different invite, wait 10 minutes for this one to expire.',
   otp_wrong: (remaining: number) =>
     `That code didn't match. ${remaining} attempt${remaining === 1 ? '' : 's'} left.`,
-  otp_exhausted:
-    'Too many wrong codes. Ask your manager to issue a new invite.',
-  otp_expired:
-    'That code has expired. Ask your manager to issue a new invite.',
-  otp_send_failed:
-    "Couldn't send the verification code right now. Try again in a minute.",
-  otp_rate_limited:
-    "You've requested too many codes. Try again in an hour.",
-  otp_debounced:
-    'I just sent you a code. Check your messages.',
+  otp_exhausted: 'Too many wrong codes. Ask your manager to issue a new invite.',
+  otp_expired: 'That code has expired. Ask your manager to issue a new invite.',
+  otp_send_failed: "Couldn't send the verification code right now. Try again in a minute.",
+  otp_rate_limited: "You've requested too many codes. Try again in an hour.",
+  otp_debounced: 'I just sent you a code. Check your messages.',
   linked_no_venue_unexpected:
     "You're already verified. Reply with the venue number from the list to continue.",
   invalid_venue_index:

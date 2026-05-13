@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { MAIL_SEND_TIMEOUT_MS } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'

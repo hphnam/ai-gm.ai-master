@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
-  Logger,
   NotFoundException,
   Param,
   Post,
@@ -17,16 +16,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger'
-import { ZodValidationPipe } from 'nestjs-zod'
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
+import { ZodValidationPipe } from 'nestjs-zod'
 import { type ApiErrorResponse, InvitationIdParamSchema } from '../../types'
-import { AuthGuard, type AuthedRequest } from '../auth/auth.guard'
-import { RoleGuard } from '../auth/role.guard'
-import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { assertAuthEnv } from '../auth/assert-auth-env'
-import { InvitationError, InvitationsService } from './invitations.service'
-import { MailService } from './mail.service'
+import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
+import { type AuthedRequest, AuthGuard } from '../auth/auth.guard'
+import { RoleGuard } from '../auth/role.guard'
 import {
   AcceptInvitationResponseDto,
   CreateInvitationResponseDto,
@@ -36,6 +33,8 @@ import {
   ListInvitationsResponseDto,
   RevokeInvitationResponseDto,
 } from './dto/invitations.dto'
+import { InvitationError, InvitationsService } from './invitations.service'
+import { MailService } from './mail.service'
 
 // 01-02 audit-added S2: in-memory per-IP throttler for unauth preview endpoint.
 // Single-node POC; swap for Redis at multi-instance scale (D-01-02-G).
@@ -85,7 +84,6 @@ function mapInvitationError(code: InvitationError['code'], details?: unknown): H
 @ApiBearerAuth()
 @Controller('org/invitations')
 export class InvitationsController {
-  private readonly logger = new Logger(InvitationsController.name)
   private readonly webOrigin: string
 
   constructor(
@@ -149,7 +147,10 @@ export class InvitationsController {
   @Get(':id/preview')
   @ApiParam({ name: 'id', type: 'string' })
   @ApiResponse({ status: 200, type: InvitationPreviewDto })
-  async preview(@Param() params: { id: string }, @Req() req: Request): Promise<InvitationPreviewDto> {
+  async preview(
+    @Param() params: { id: string },
+    @Req() req: Request,
+  ): Promise<InvitationPreviewDto> {
     // Unauth endpoint; throttle by IP to blunt a crawl/scrape.
     const ip = req.ip ?? req.socket?.remoteAddress ?? 'unknown'
     if (!previewThrottleOk(ip)) {

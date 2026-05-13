@@ -1,11 +1,11 @@
+import { magicByteMatchesMime } from '../../common/image-magic-bytes'
 import {
   ALLOWED_IMAGE_MIME_TYPES,
+  type AllowedImageMimeType,
   DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST,
   MAX_IMAGE_DOWNLOAD_BYTES,
   MEDIA_DOWNLOAD_TIMEOUT_MS,
-  type AllowedImageMimeType,
 } from '../../types'
-import { magicByteMatchesMime } from '../../common/image-magic-bytes'
 
 export type MediaDownloadResult =
   | { ok: true; base64: string; mediaType: AllowedImageMimeType; byteSize: number }
@@ -37,7 +37,10 @@ export function isHostAllowed(urlString: string): { allowed: boolean; host: stri
   const envProd = process.env.WHATSAPP_MEDIA_HOST_ALLOWLIST
   const prod =
     envProd !== undefined && envProd.length > 0
-      ? envProd.split(',').map((s) => s.trim()).filter(Boolean)
+      ? envProd
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
       : DEFAULT_WHATSAPP_MEDIA_HOST_ALLOWLIST
   const probe =
     process.env.NODE_ENV !== 'production'
@@ -67,7 +70,11 @@ async function fetchWithAuthTrial(
   url: string,
   apiKey: string,
   deadline: number,
-): Promise<{ res: Response | null; authMode: 'app-key' | 'no-auth' | 'unknown'; errorKind?: string }> {
+): Promise<{
+  res: Response | null
+  authMode: 'app-key' | 'no-auth' | 'unknown'
+  errorKind?: string
+}> {
   const tryFetch = async (mode: 'app-key' | 'no-auth'): Promise<Response> => {
     const headers: Record<string, string> =
       mode === 'app-key' ? { Authorization: `App ${apiKey}` } : {}

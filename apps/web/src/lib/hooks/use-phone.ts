@@ -23,8 +23,7 @@ export function usePhoneStatus() {
 
 export function useSendPhoneCode() {
   return useMutation<SendPhoneCodeResponse, Error, SendPhoneCodeBody>({
-    mutationFn: (body) =>
-      apiPost<SendPhoneCodeResponse>('/auth/phone/send', body),
+    mutationFn: (body) => apiPost<SendPhoneCodeResponse>('/auth/phone/send', body),
     onError: (err) => toast.error(mapApiError(err)),
   })
 }
@@ -32,8 +31,7 @@ export function useSendPhoneCode() {
 export function useVerifyPhoneCode() {
   const queryClient = useQueryClient()
   return useMutation<VerifyPhoneCodeResponse, Error, VerifyPhoneCodeBody>({
-    mutationFn: (body) =>
-      apiPost<VerifyPhoneCodeResponse>('/auth/phone/verify', body),
+    mutationFn: (body) => apiPost<VerifyPhoneCodeResponse>('/auth/phone/verify', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phone', 'status'] })
       toast.success('Phone number verified')
@@ -45,8 +43,7 @@ export function useVerifyPhoneCode() {
 export function useUnlinkPhone() {
   const queryClient = useQueryClient()
   return useMutation<{ ok: true }, Error, void>({
-    mutationFn: () =>
-      apiFetch<{ ok: true }>('/auth/phone', { method: 'DELETE' }),
+    mutationFn: () => apiFetch<{ ok: true }>('/auth/phone', { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phone', 'status'] })
       toast.success('Phone number unlinked')

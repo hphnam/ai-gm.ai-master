@@ -1,7 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   BookOpen,
   Building2,
@@ -14,10 +12,12 @@ import {
   SquarePen,
   X,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { markMinted } from '@/lib/minted-conv-ids'
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useInboxCount } from '@/components/docs/inbox-tab'
 import { useQuestionsCount } from '@/components/docs/questions-tab'
+import { markMinted } from '@/lib/minted-conv-ids'
+import { cn } from '@/lib/utils'
 import { SidebarThreads } from './sidebar-threads'
 import { SidebarUser } from './sidebar-user'
 
@@ -115,8 +115,7 @@ function KnowledgeSubNav({ pathname }: { pathname: string }) {
   return (
     <ul className="ml-3 mt-0.5 flex flex-col gap-0.5 border-l border-sidebar-border/60 pl-2">
       {items.map(({ label, href, Icon, count, urgent }, idx) => {
-        const active =
-          idx === 0 ? libraryActive : idx === 1 ? onInbox : onQuestions
+        const active = idx === 0 ? libraryActive : idx === 1 ? onInbox : onQuestions
         return (
           <li key={label}>
             <Link
@@ -175,9 +174,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         ? crypto.randomUUID()
         : `c-${Date.now()}-${Math.random().toString(36).slice(2)}`
     markMinted(conv)
-    const url = activeVenue
-      ? `/chat?venue=${activeVenue}&conv=${conv}`
-      : `/chat?conv=${conv}`
+    const url = activeVenue ? `/chat?venue=${activeVenue}&conv=${conv}` : `/chat?conv=${conv}`
     router.push(url)
     onMobileClose?.()
   }

@@ -183,12 +183,7 @@ export type WriterInput = {
 // shape, self-rates evidence sufficiency (drives re-research circuit-breaker).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const SuggestedShapeEnum = z.enum([
-  'recommendation',
-  'diagnosis',
-  'sequence',
-  'branching',
-])
+export const SuggestedShapeEnum = z.enum(['recommendation', 'diagnosis', 'sequence', 'branching'])
 export type SuggestedShape = z.infer<typeof SuggestedShapeEnum>
 
 // Plan 06-04 hot-fix 2026-05-02 — `z.number().min(0).max(1)` emits JSON
@@ -255,10 +250,7 @@ export class TriageClassificationError extends Error {
 
 export class RoleTimeoutError extends Error {
   readonly role: 'triage' | 'researcher' | 'writer' | 'analyser' | 'critic'
-  constructor(
-    role: 'triage' | 'researcher' | 'writer' | 'analyser' | 'critic',
-    timeoutMs: number,
-  ) {
+  constructor(role: 'triage' | 'researcher' | 'writer' | 'analyser' | 'critic', timeoutMs: number) {
     super(`${role} exceeded ${timeoutMs}ms hard timeout`)
     this.name = 'RoleTimeoutError'
     this.role = role

@@ -10,16 +10,7 @@
 // Source: https://en.wikipedia.org/wiki/List_of_file_signatures · verified 2026-04-21
 // Source: https://nokiatech.github.io/heif/technical.html (ftyp box + HEIF brand codes) · verified 2026-04-21
 
-const HEIF_BRANDS = new Set([
-  'heic',
-  'heix',
-  'heim',
-  'heis',
-  'hevc',
-  'hevx',
-  'mif1',
-  'msf1',
-])
+const HEIF_BRANDS = new Set(['heic', 'heix', 'heim', 'heis', 'hevc', 'hevx', 'mif1', 'msf1'])
 
 function readAscii(bytes: Uint8Array, offset: number, length: number): string {
   if (bytes.length < offset + length) return ''

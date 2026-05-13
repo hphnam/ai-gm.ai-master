@@ -18,8 +18,7 @@ function EmptyQuestions() {
       </div>
       <p className="text-sm font-medium">Nothing to answer right now</p>
       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-        When staff ask the AI something it can’t find, it’ll show up here for
-        you to weigh in on.
+        When staff ask the AI something it can’t find, it’ll show up here for you to weigh in on.
       </p>
     </div>
   )
@@ -30,11 +29,7 @@ export function QuestionsTab() {
   const noData = useNoDataQueries()
 
   if (gaps.isLoading && noData.isLoading) {
-    return (
-      <p className="px-1 text-sm italic text-muted-foreground">
-        Loading questions…
-      </p>
-    )
+    return <p className="px-1 text-sm italic text-muted-foreground">Loading questions…</p>
   }
 
   const gapsList = gaps.data ?? []
@@ -49,12 +44,9 @@ export function QuestionsTab() {
       {noDataList.length > 0 ? (
         <section className="space-y-2">
           <header className="flex items-baseline gap-2 px-1">
-            <h3 className="text-sm font-semibold tracking-tight">
-              What staff couldn’t find
-            </h3>
+            <h3 className="text-sm font-semibold tracking-tight">What staff couldn’t find</h3>
             <span className="text-xs text-muted-foreground">
-              Searches that returned nothing — useful for spotting gaps in your
-              knowledge base
+              Searches that returned nothing — useful for spotting gaps in your knowledge base
             </span>
           </header>
           <NoDataQueriesPanel queries={noDataList} />

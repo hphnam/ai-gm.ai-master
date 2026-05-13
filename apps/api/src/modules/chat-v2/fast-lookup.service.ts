@@ -10,10 +10,10 @@ import { Injectable } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import type { ResearcherFinding } from '../../types'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
+import type { FastPathRecipe } from './fast-lookup-recipes'
 import { chatV2Logger, hashId } from './log-helpers'
 import { getChecklist } from './tools/get-checklist.tool'
 import { getPerson } from './tools/get-person.tool'
-import type { FastPathRecipe } from './fast-lookup-recipes'
 
 export type FastLookupContext = {
   orgId: string
@@ -30,10 +30,7 @@ export type FastLookupResult = {
 export class FastLookupService {
   constructor(private readonly mockOps: MockOpsService) {}
 
-  async execute(
-    recipe: FastPathRecipe,
-    ctx: FastLookupContext,
-  ): Promise<FastLookupResult | null> {
+  async execute(recipe: FastPathRecipe, ctx: FastLookupContext): Promise<FastLookupResult | null> {
     const t0 = Date.now()
     try {
       switch (recipe.tool) {
@@ -127,12 +124,14 @@ export class FastLookupService {
       this.logMiss('get_supplier_by_name', ctx, t0)
       return null
     }
-    const lines = r.data.slice(0, 3).map(
-      (s) =>
-        `${s.name}${s.contactName ? ` — ${s.contactName}` : ''}${
-          s.phone ? ` ${s.phone}` : ''
-        }${s.email ? ` ${s.email}` : ''} (lead ${s.leadTimeDays}d)`,
-    )
+    const lines = r.data
+      .slice(0, 3)
+      .map(
+        (s) =>
+          `${s.name}${s.contactName ? ` — ${s.contactName}` : ''}${
+            s.phone ? ` ${s.phone}` : ''
+          }${s.email ? ` ${s.email}` : ''} (lead ${s.leadTimeDays}d)`,
+      )
     const summary = lines.join('\n')
     this.logHit('get_supplier_by_name', r.data.length, ctx, t0)
     return {
@@ -152,12 +151,14 @@ export class FastLookupService {
       this.logMiss('get_upcoming_cutoffs', ctx, t0)
       return null
     }
-    const lines = r.data.slice(0, 5).map(
-      (c) =>
-        `${c.supplierName}${c.contactName ? ` (${c.contactName}` : ''}${
-          c.phone ? ` ${c.phone}` : ''
-        }${c.contactName ? ')' : ''} — lead ${c.leadTimeDays}d, ${c.stockCount} SKU(s) tracked`,
-    )
+    const lines = r.data
+      .slice(0, 5)
+      .map(
+        (c) =>
+          `${c.supplierName}${c.contactName ? ` (${c.contactName}` : ''}${
+            c.phone ? ` ${c.phone}` : ''
+          }${c.contactName ? ')' : ''} — lead ${c.leadTimeDays}d, ${c.stockCount} SKU(s) tracked`,
+      )
     const summary = `${r.data.length} cutoff(s) in next 4h:\n${lines.join('\n')}`
     this.logHit('get_upcoming_cutoffs', r.data.length, ctx, t0)
     return {
@@ -177,9 +178,7 @@ export class FastLookupService {
       this.logMiss('get_checklist', ctx, t0)
       return null
     }
-    const stepsBlock = r.data.steps
-      .map((s) => `${s.index}. ${s.content}`)
-      .join('\n')
+    const stepsBlock = r.data.steps.map((s) => `${s.index}. ${s.content}`).join('\n')
     const summary = `${r.data.title} (${r.data.steps.length} steps):\n${stepsBlock}`
     this.logHit('get_checklist', 1, ctx, t0)
     return {
@@ -193,12 +192,7 @@ export class FastLookupService {
     }
   }
 
-  private logHit(
-    tool: string,
-    hitCount: number,
-    ctx: FastLookupContext,
-    t0: number,
-  ): void {
+  private logHit(tool: string, hitCount: number, ctx: FastLookupContext, t0: number): void {
     chatV2Logger.info('chat_v2.fast_lookup_hit', {
       orgId: hashId(ctx.orgId),
       tool,

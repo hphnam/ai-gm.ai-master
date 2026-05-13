@@ -2,13 +2,14 @@
   "name": "api",
   "private": true,
   "version": "0.0.0",
-  "packageManager": "pnpm@10.4.1",
   "engines": {
     "node": ">=22.12"
   },
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
     "start": "node dist/src/main",
     "start:prod": "prisma migrate deploy && node dist/src/main",
     "swagger:generate": "nest build && node dist/src/generate-swagger.js",

@@ -1,13 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDownUp, FilterX, Loader2, Search } from 'lucide-react'
-import {
-  parseAsString,
-  parseAsStringLiteral,
-  useQueryState,
-  useQueryStates,
-} from 'nuqs'
+import { parseAsString, parseAsStringLiteral, useQueryState, useQueryStates } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { DocList } from '@/components/docs/doc-list'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -56,10 +51,7 @@ export function LibraryTab() {
 
   // Local mirror so typing feels instant; server search lags behind by ~250ms
   // to avoid hammering the API on every keystroke.
-  const [debouncedQuery, setDebouncedQuery] = useDebouncedValue(
-    query,
-    SEARCH_DEBOUNCE_MS,
-  )
+  const [debouncedQuery, setDebouncedQuery] = useDebouncedValue(query, SEARCH_DEBOUNCE_MS)
   // Keep debounced value synced when query is reset programmatically (e.g.
   // clearFilters()) — otherwise the stale debounced value lingers.
   useEffect(() => {
@@ -75,16 +67,10 @@ export function LibraryTab() {
   })
 
   const filtersActive =
-    query.trim().length > 0 ||
-    category !== 'all' ||
-    venue !== 'all' ||
-    status !== 'all'
+    query.trim().length > 0 || category !== 'all' || venue !== 'all' || status !== 'all'
 
   // Flatten the paginated pages into a single list for rendering.
-  const items = useMemo(
-    () => docs.data?.pages.flatMap((p) => p.items) ?? undefined,
-    [docs.data],
-  )
+  const items = useMemo(() => docs.data?.pages.flatMap((p) => p.items) ?? undefined, [docs.data])
   const visible = items?.length ?? 0
   const total = docs.data?.pages[0]?.total ?? 0
   const isInitialLoading = docs.isLoading && !docs.data
@@ -120,9 +106,7 @@ export function LibraryTab() {
       <header className="mb-4 space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-base font-semibold tracking-tight">
-              All documents
-            </h2>
+            <h2 className="text-base font-semibold tracking-tight">All documents</h2>
             <p className="text-xs text-muted-foreground">
               {docs.isLoading
                 ? 'Loading…'
@@ -150,10 +134,7 @@ export function LibraryTab() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Select
-            value={category}
-            onValueChange={(v) => void setFilters({ category: v })}
-          >
+          <Select value={category} onValueChange={(v) => void setFilters({ category: v })}>
             <SelectTrigger
               aria-label="Filter by category"
               className="h-8 w-auto min-w-[10rem] cursor-pointer"
@@ -163,20 +144,17 @@ export function LibraryTab() {
             <SelectContent>
               <SelectItem value="all">All categories</SelectItem>
               <SelectItem value="unclassified">Not categorized</SelectItem>
-              {types.data && types.data.length > 0 ? (
-                types.data.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.name}
-                  </SelectItem>
-                ))
-              ) : null}
+              {types.data && types.data.length > 0
+                ? types.data.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name}
+                    </SelectItem>
+                  ))
+                : null}
             </SelectContent>
           </Select>
 
-          <Select
-            value={venue}
-            onValueChange={(v) => void setFilters({ venue: v })}
-          >
+          <Select value={venue} onValueChange={(v) => void setFilters({ venue: v })}>
             <SelectTrigger
               aria-label="Filter by venue"
               className="h-8 w-auto min-w-[8rem] cursor-pointer"
@@ -196,9 +174,7 @@ export function LibraryTab() {
 
           <Select
             value={status}
-            onValueChange={(v) =>
-              void setFilters({ status: v as StatusFilter })
-            }
+            onValueChange={(v) => void setFilters({ status: v as StatusFilter })}
           >
             <SelectTrigger
               aria-label="Filter by status"
@@ -226,16 +202,8 @@ export function LibraryTab() {
                 Clear
               </Button>
             ) : null}
-            <Select
-              value={sort}
-              onValueChange={(v) =>
-                void setFilters({ sort: v as SortKey })
-              }
-            >
-              <SelectTrigger
-                aria-label="Sort"
-                className="h-8 w-auto min-w-[9rem] cursor-pointer"
-              >
+            <Select value={sort} onValueChange={(v) => void setFilters({ sort: v as SortKey })}>
+              <SelectTrigger aria-label="Sort" className="h-8 w-auto min-w-[9rem] cursor-pointer">
                 <ArrowDownUp className="mr-1 h-3.5 w-3.5 text-muted-foreground" aria-hidden />
                 <SelectValue />
               </SelectTrigger>
@@ -249,11 +217,7 @@ export function LibraryTab() {
         </div>
       </header>
 
-      <DocList
-        docs={items}
-        isLoading={isInitialLoading}
-        searchQuery={query.trim() || undefined}
-      />
+      <DocList docs={items} isLoading={isInitialLoading} searchQuery={query.trim() || undefined} />
 
       {items && items.length === 0 && filtersActive && total > 0 ? (
         <div className="mt-3 flex justify-center">

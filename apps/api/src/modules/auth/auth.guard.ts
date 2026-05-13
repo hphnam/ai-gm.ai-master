@@ -1,12 +1,11 @@
 import {
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   Injectable,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { Request } from 'express'
 import { fromNodeHeaders } from 'better-auth/node'
+import type { Request } from 'express'
 import type { ApiErrorResponse } from '../../types'
 import { auth } from './auth.config'
 
@@ -20,8 +19,6 @@ export type AuthedRequest = Request & {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private readonly logger = new Logger(AuthGuard.name)
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AuthedRequest>()
     const headers = fromNodeHeaders(req.headers)

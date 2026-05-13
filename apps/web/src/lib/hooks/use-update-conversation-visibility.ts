@@ -1,12 +1,12 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '../api-client'
 import type {
   ConversationResponseDto,
   UpdateConversationVisibilityDtoVisibility,
   UpdateConversationVisibilityResponseDto,
 } from '@/generated/api'
+import { apiFetch } from '../api-client'
 
 type Vars = {
   conversationId: string

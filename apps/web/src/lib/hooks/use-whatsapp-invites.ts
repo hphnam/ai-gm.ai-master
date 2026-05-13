@@ -11,12 +11,7 @@ import { mapApiError } from '@/lib/map-api-error'
 
 export type WhatsappInviteRole = 'staff' | 'manager'
 
-export type WhatsappInviteStatus =
-  | 'pending'
-  | 'redeemed'
-  | 'revoked'
-  | 'exhausted'
-  | 'expired'
+export type WhatsappInviteStatus = 'pending' | 'redeemed' | 'revoked' | 'exhausted' | 'expired'
 
 export type CreateWhatsappInviteInput = {
   phoneNumber: string
@@ -79,8 +74,7 @@ export function useCreateWhatsappInvite() {
 export function useRevokeWhatsappInvite() {
   const queryClient = useQueryClient()
   return useMutation<void, Error, string>({
-    mutationFn: (id) =>
-      apiFetch<void>(`/whatsapp/invites/${id}`, { method: 'DELETE' }),
+    mutationFn: (id) => apiFetch<void>(`/whatsapp/invites/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
       toast.success('WhatsApp invite revoked')

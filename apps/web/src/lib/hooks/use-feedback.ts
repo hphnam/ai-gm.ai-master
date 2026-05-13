@@ -11,8 +11,7 @@ import { mapApiError } from '../map-api-error'
 
 export function useFeedback() {
   return useMutation({
-    mutationFn: (body: CaptureFeedbackInput) =>
-      apiPost<FeedbackResponse>('/feedback', body),
+    mutationFn: (body: CaptureFeedbackInput) => apiPost<FeedbackResponse>('/feedback', body),
     onSuccess: () => toast.success('Thanks for the feedback'),
     onError: (err) => toast.error(mapApiError(err)),
   })

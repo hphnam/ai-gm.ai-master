@@ -12,15 +12,15 @@
 // | expired     | 410 expired          | 410 expired          | 404 not-found        |
 // | not-found   | 404 not-found        | 404 not-found        | 404 not-found        |
 
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
-  MAX_PENDING_INVITATIONS_PER_ORG,
   type InvitationDTO,
   type InvitationPreview,
   type InvitationStatus,
   type InviteRoleType,
+  MAX_PENDING_INVITATIONS_PER_ORG,
 } from '../../types'
 export type InvitationErrorCode =
   | 'invitation-not-found'
@@ -213,11 +213,7 @@ export class InvitationsService {
     return { row: toDTO(row), reissued: false }
   }
 
-  async listInvitations(input: {
-    organizationId: string
-    limit: number
-    offset: number
-  }): Promise<{
+  async listInvitations(input: { organizationId: string; limit: number; offset: number }): Promise<{
     invitations: InvitationDTO[]
     total: number
     limit: number

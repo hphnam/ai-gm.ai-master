@@ -11,16 +11,16 @@
  *
  * Cost: ~$0 — no Anthropic chat calls, no Voyage calls. Pure DB + extractor.
  *
- *   pnpm --filter api probe:tabular
+ *   npm run probe:tabular --workspace=api
  */
 
 import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../src/database/prisma'
-import { MAX_TABULAR_ROWS_PER_DOC, type TabularExtractionResult } from '../src/types'
-import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import { inferColumnTypes } from '../src/modules/tabular/infer-column-types'
+import { TabularQueryService } from '../src/modules/tabular/tabular.service'
+import { MAX_TABULAR_ROWS_PER_DOC, type TabularExtractionResult } from '../src/types'
 
 // Phase 6 — extractTabular() was retired with the move to Reducto. The probe
 // now seeds rows directly from in-test fixtures (no buffer parse step) and
@@ -52,7 +52,9 @@ function fixtureToTable(csvLikeText: string): TabularExtractionResult {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  throw new Error('probe-tabular MUST NOT run in production — DB writes seed/cleanup test fixtures.')
+  throw new Error(
+    'probe-tabular MUST NOT run in production — DB writes seed/cleanup test fixtures.',
+  )
 }
 
 const PROBE_ORG_SLUG = 'probe-tabular-org'
@@ -77,7 +79,7 @@ function assertEqual<T>(name: string, actual: T, expected: T, detail?: string) {
   )
 }
 
-function assertGte(name: string, actual: number, min: number, detail?: string) {
+function _assertGte(name: string, actual: number, min: number, detail?: string) {
   const ok = actual >= min
   assert(name, ok, ok ? detail : `expected >= ${min}, got ${actual}${detail ? ` (${detail})` : ''}`)
 }
@@ -199,11 +201,11 @@ async function seedTabular(args: {
 
   const result = fixtureToTable(args.csv)
   const totalRows = result.rows.length
-  const capExceeded =
-    args.capExceededOverride ?? totalRows > MAX_TABULAR_ROWS_PER_DOC
-  const persistedRows = totalRows > MAX_TABULAR_ROWS_PER_DOC
-    ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC)
-    : result.rows
+  const capExceeded = args.capExceededOverride ?? totalRows > MAX_TABULAR_ROWS_PER_DOC
+  const persistedRows =
+    totalRows > MAX_TABULAR_ROWS_PER_DOC
+      ? result.rows.slice(0, MAX_TABULAR_ROWS_PER_DOC)
+      : result.rows
 
   const inferred = inferColumnTypes(persistedRows, result.columns)
 
@@ -274,8 +276,7 @@ async function W3_ingestFidelityRowIndexSequence(docId: string): Promise<void> {
     orderBy: { rowIndex: 'asc' },
     select: { rowIndex: true },
   })
-  const sequenceOk =
-    rows.length === 100 && rows.every((r, i) => r.rowIndex === i)
+  const sequenceOk = rows.length === 100 && rows.every((r, i) => r.rowIndex === i)
   assert('w3.ingest_fidelity_row_index_sequence_0_to_99', sequenceOk, `gotLen=${rows.length}`)
 }
 
@@ -356,12 +357,16 @@ async function W9_aggregateCountAvgMinMax(
     Number(min.data.rows[0]?._aggregate) === 15 &&
     max.ok &&
     Number(max.data.rows[0]?._aggregate) === 22
-  assert('w9.aggregate_count_avg_min_max', ok, JSON.stringify({
-    count: count.ok ? count.data.rows[0]?._aggregate : count.reason,
-    avg: avg.ok ? avg.data.rows[0]?._aggregate : avg.reason,
-    min: min.ok ? min.data.rows[0]?._aggregate : min.reason,
-    max: max.ok ? max.data.rows[0]?._aggregate : max.reason,
-  }))
+  assert(
+    'w9.aggregate_count_avg_min_max',
+    ok,
+    JSON.stringify({
+      count: count.ok ? count.data.rows[0]?._aggregate : count.reason,
+      avg: avg.ok ? avg.data.rows[0]?._aggregate : avg.reason,
+      min: min.ok ? min.data.rows[0]?._aggregate : min.reason,
+      max: max.ok ? max.data.rows[0]?._aggregate : max.reason,
+    }),
+  )
 }
 
 async function W10_filterContains(
@@ -378,9 +383,7 @@ async function W10_filterContains(
     assert('w10.filter_contains', false, `query failed: ${result.reason}`)
     return
   }
-  const allPinot = result.data.rows.every((r) =>
-    String(r.name).toLowerCase().includes('noir'),
-  )
+  const allPinot = result.data.rows.every((r) => String(r.name).toLowerCase().includes('noir'))
   assert(
     'w10.filter_contains',
     result.data.rows.length === 3 && allPinot,

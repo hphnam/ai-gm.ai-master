@@ -7,15 +7,18 @@
 // Schema / confidence numbers / internal proposal fields stay out of sight —
 // they're server signals, not end-user decisions.
 
+import { BookOpen, ClipboardList, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { BookOpen, ClipboardList, Sparkles } from 'lucide-react'
 import type {
-  DocumentTypeDtoKind as DocumentTypeKind,
   DocListItemDtoPendingTypeProposal,
+  DocumentTypeDtoKind as DocumentTypeKind,
 } from '@/generated/api'
 
 type ProposedDocType = NonNullable<DocListItemDtoPendingTypeProposal>
+
+import { DocPreview } from '@/components/docs/doc-preview'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -24,13 +27,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAcceptDocType, useRejectDocType } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
-import { DocPreview } from '@/components/docs/doc-preview'
 
 export function DocTypeProposalModal({
   docId,
@@ -95,9 +96,8 @@ export function DocTypeProposalModal({
           </div>
           <DialogTitle>Save this as a category?</DialogTitle>
           <DialogDescription>
-            Check the preview on the left, give it a short name, and pick how
-            staff will use it. Similar docs will be filed automatically next
-            time.
+            Check the preview on the left, give it a short name, and pick how staff will use it.
+            Similar docs will be filed automatically next time.
           </DialogDescription>
         </DialogHeader>
 
@@ -128,11 +128,7 @@ export function DocTypeProposalModal({
 
             <div className="space-y-2">
               <Label className="text-sm">How will staff use it?</Label>
-              <div
-                role="radiogroup"
-                aria-label="Document type"
-                className="flex flex-col gap-2"
-              >
+              <div role="radiogroup" aria-label="Document type" className="flex flex-col gap-2">
                 <KindOption
                   selected={selectedKind === 'reference'}
                   disabled={busy}
@@ -155,19 +151,10 @@ export function DocTypeProposalModal({
         </div>
 
         <DialogFooter className="shrink-0 gap-2 border-t px-6 py-3 sm:gap-2">
-          <Button
-            variant="ghost"
-            onClick={handleReject}
-            disabled={busy}
-            className="cursor-pointer"
-          >
+          <Button variant="ghost" onClick={handleReject} disabled={busy} className="cursor-pointer">
             {rejectMut.isPending ? 'Skipping…' : 'Skip'}
           </Button>
-          <Button
-            onClick={handleAccept}
-            disabled={busy || !canAccept}
-            className="cursor-pointer"
-          >
+          <Button onClick={handleAccept} disabled={busy || !canAccept} className="cursor-pointer">
             {acceptMut.isPending ? 'Saving…' : 'Save category'}
           </Button>
         </DialogFooter>
@@ -192,6 +179,7 @@ function KindOption({
   blurb: string
 }) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: radio-styled button is intentional UI pattern
     <button
       type="button"
       role="radio"

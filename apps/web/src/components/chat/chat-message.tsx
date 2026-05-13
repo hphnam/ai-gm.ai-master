@@ -1,18 +1,10 @@
 'use client'
 
+import { getToolName, isToolUIPart, type UIMessage } from 'ai'
+import { Brain, Check, ChevronDown, ChevronRight, Copy, RefreshCcw, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { getToolName, isToolUIPart, type UIMessage } from 'ai'
-import {
-  Brain,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Copy,
-  RefreshCcw,
-  Sparkles,
-} from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { FeedbackButtons } from './feedback-buttons'
@@ -217,9 +209,7 @@ function AssistantMarkdown({ text }: { text: string }) {
         remarkPlugins={[remarkGfm]}
         components={{
           p: ({ children }) => (
-            <p className="mb-2 whitespace-pre-wrap break-words last:mb-0">
-              {children}
-            </p>
+            <p className="mb-2 whitespace-pre-wrap break-words last:mb-0">{children}</p>
           ),
           ul: ({ children }) => (
             <ul className="mb-2 ml-5 list-disc space-y-1 last:mb-0">{children}</ul>
@@ -228,14 +218,10 @@ function AssistantMarkdown({ text }: { text: string }) {
             <ol className="mb-2 ml-5 list-decimal space-y-1 last:mb-0">{children}</ol>
           ),
           li: ({ children }) => <li className="break-words">{children}</li>,
-          strong: ({ children }) => (
-            <strong className="font-semibold">{children}</strong>
-          ),
+          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           em: ({ children }) => <em className="italic">{children}</em>,
           code: ({ children }) => (
-            <code className="rounded bg-muted px-1 py-0.5 text-[13px] font-mono">
-              {children}
-            </code>
+            <code className="rounded bg-muted px-1 py-0.5 text-[13px] font-mono">{children}</code>
           ),
           a: ({ href, children }) => {
             const isInternalDoc = typeof href === 'string' && href.startsWith('/docs/')
@@ -365,11 +351,7 @@ function AssistantBody({
 
   return (
     <div className="flex flex-col gap-2.5">
-      <ReasoningBlock
-        text={mergedReasoningText}
-        streaming={reasoningStreaming}
-        chips={toolChips}
-      />
+      <ReasoningBlock text={mergedReasoningText} streaming={reasoningStreaming} chips={toolChips} />
       {finalText ? (
         <div className="relative">
           <AssistantMarkdown text={finalText} />

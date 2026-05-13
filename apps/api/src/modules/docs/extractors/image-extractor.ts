@@ -7,8 +7,8 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import type { Logger } from '@nestjs/common'
-import { sanitiseError } from '../../../common/sanitise-error'
 import { magicByteMatchesMime } from '../../../common/image-magic-bytes'
+import { sanitiseError } from '../../../common/sanitise-error'
 import { ExtractError, MAX_EXTRACT_CHARS } from '../doc-extract'
 
 // audit-M1 boundary: raw image buffers, base64 strings, extracted text, and Anthropic API keys
@@ -20,11 +20,7 @@ import { ExtractError, MAX_EXTRACT_CHARS } from '../doc-extract'
 // intent (non-goal). HEIC support deferred as D-04-01-J — trigger = first real HEIC
 // upload + scope adds server-side HEIC→JPEG conversion (sharp or heic-convert).
 // Source: @anthropic-ai/sdk ImageBlockParam['source']['media_type'] type union · verified 2026-04-21
-export const DOCS_IMAGE_MIME_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-] as const
+export const DOCS_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
 export type DocsImageMime = (typeof DOCS_IMAGE_MIME_TYPES)[number]
 
 export function isDocsImageMime(mime: string): mime is DocsImageMime {

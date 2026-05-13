@@ -13,12 +13,12 @@
 // audit-M1 boundary: logger payloads carry metadata ONLY (tokens/USD/mime/counts).
 //   NEVER: document content, proposal schema body, base64, Anthropic API key.
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import Anthropic from '@anthropic-ai/sdk'
-import { prisma } from '../../database/prisma'
-import { ProposedDocTypeSchema, type ProposedDocType } from '../../types'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { z } from 'zod'
 import { sanitiseError } from '../../common/sanitise-error'
+import { prisma } from '../../database/prisma'
+import { type ProposedDocType, ProposedDocTypeSchema } from '../../types'
 
 // Project-wide constant — D-04-02-C registered for per-tenant tuning.
 export const CLASSIFIER_AUTO_ACCEPT_CONFIDENCE = 0.7
@@ -175,13 +175,7 @@ export class ClassifierService implements OnModuleInit {
       if ('match' in parsed) {
         const matchedTypeExists = existingTypes.some((t) => t.id === parsed.match.typeId)
         if (matchedTypeExists && parsed.match.confidence >= CLASSIFIER_AUTO_ACCEPT_CONFIDENCE) {
-          this.emitCallLog(
-            input.orgId,
-            response.usage,
-            'matched',
-            existingTypes.length,
-            startedAt,
-          )
+          this.emitCallLog(input.orgId, response.usage, 'matched', existingTypes.length, startedAt)
           return {
             kind: 'matched',
             typeId: parsed.match.typeId,
@@ -195,13 +189,7 @@ export class ClassifierService implements OnModuleInit {
       }
 
       if ('proposal' in parsed) {
-        this.emitCallLog(
-          input.orgId,
-          response.usage,
-          'proposal',
-          existingTypes.length,
-          startedAt,
-        )
+        this.emitCallLog(input.orgId, response.usage, 'proposal', existingTypes.length, startedAt)
         return { kind: 'proposal', proposal: parsed.proposal, venueGuess }
       }
 
@@ -257,9 +245,12 @@ function buildPrompt(
 ): string {
   const existing =
     existingTypes.length === 0
-      ? '(none — this is the organization\'s first document type)'
+      ? "(none — this is the organization's first document type)"
       : existingTypes
-          .map((t) => `- id: ${t.id} · name: "${t.name}"${t.description ? ` · description: "${t.description}"` : ''}`)
+          .map(
+            (t) =>
+              `- id: ${t.id} · name: "${t.name}"${t.description ? ` · description: "${t.description}"` : ''}`,
+          )
           .join('\n')
 
   const venueBlock =

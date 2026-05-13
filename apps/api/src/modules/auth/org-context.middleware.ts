@@ -1,6 +1,6 @@
-import { Injectable, Logger, NestMiddleware, NotFoundException } from '@nestjs/common'
-import type { NextFunction, Response } from 'express'
+import { Injectable, Logger, type NestMiddleware, NotFoundException } from '@nestjs/common'
 import { fromNodeHeaders } from 'better-auth/node'
+import type { NextFunction, Response } from 'express'
 import { prisma } from '../../database/prisma'
 import type { ApiErrorResponse } from '../../types'
 import { auth } from './auth.config'

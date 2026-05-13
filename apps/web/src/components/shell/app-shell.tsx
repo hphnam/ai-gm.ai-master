@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, type ReactNode, useContext, useState } from 'react'
 import { useKbSocket } from '@/lib/hooks/use-kb-socket'
 import { Sidebar } from './sidebar'
 
@@ -21,10 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{ openMobileSidebar: () => setMobileOpen(true) }}>
       <div className="flex h-dvh w-full bg-background">
-        <Sidebar
-          mobileOpen={mobileOpen}
-          onMobileClose={() => setMobileOpen(false)}
-        />
+        <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
       </div>
     </Ctx.Provider>

@@ -1,7 +1,7 @@
 import { defineConfig } from 'orval'
 
 // Codegen against ../api/swagger.json (gitignored — regenerate with
-// `pnpm --filter api swagger:generate` first).
+// `npm run swagger:generate --workspace=api` first).
 //
 // Two outputs:
 //   - api    : react-query hooks + TS types using existing apiFetch mutator

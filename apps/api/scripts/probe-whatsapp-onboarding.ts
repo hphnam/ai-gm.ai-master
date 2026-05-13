@@ -14,7 +14,7 @@
  *
  * Cost: ~$0 — no Anthropic chat calls, no Voyage calls. Pure DB + adapter stub.
  *
- *   PROBE_INFOBIP_STUB=1 pnpm --filter api probe:whatsapp-onboarding
+ *   PROBE_INFOBIP_STUB=1 npm run probe:whatsapp-onboarding --workspace=api
  */
 
 import '../src/load-env'
@@ -24,15 +24,15 @@ import { readFileSync } from 'node:fs'
 import { Logger } from '@nestjs/common'
 import { prisma } from '../src/database/prisma'
 import { InviteService } from '../src/modules/whatsapp/invite.service'
-import { WhatsappOtpService } from '../src/modules/whatsapp/whatsapp-otp.service'
-import { WhatsappOnboardingService } from '../src/modules/whatsapp/whatsapp-onboarding.service'
 import { WhatsAppAdapter } from '../src/modules/whatsapp/whatsapp.adapter'
+import { WhatsappOnboardingService } from '../src/modules/whatsapp/whatsapp-onboarding.service'
 import {
   classifyInbound,
   composeWelcomeText,
   normalizeInviteCode,
   normalizeOtp,
 } from '../src/modules/whatsapp/whatsapp-onboarding-state'
+import { WhatsappOtpService } from '../src/modules/whatsapp/whatsapp-otp.service'
 import {
   MAX_INVITES_PER_MANAGER_PER_DAY,
   WHATSAPP_INVITE_CODE_REGEX,
@@ -41,7 +41,9 @@ import {
 } from '../src/types'
 
 if (process.env.NODE_ENV === 'production') {
-  throw new Error('probe-whatsapp-onboarding MUST NOT run in production — DB writes seed/cleanup test fixtures.')
+  throw new Error(
+    'probe-whatsapp-onboarding MUST NOT run in production — DB writes seed/cleanup test fixtures.',
+  )
 }
 
 // Force console-mode adapter so OTP "delivery" doesn't actually hit Infobip.
@@ -60,8 +62,14 @@ const PROBE_PHONE_S8 = '+447700900008' // normalization
 const PROBE_PHONE_S9 = '+447700900009' // E.164 / inbound bare-digits
 
 const ALL_PROBE_PHONES = [
-  PROBE_PHONE_S1, PROBE_PHONE_S2, PROBE_PHONE_S3, PROBE_PHONE_S4,
-  PROBE_PHONE_S5, PROBE_PHONE_S6, PROBE_PHONE_S7, PROBE_PHONE_S8,
+  PROBE_PHONE_S1,
+  PROBE_PHONE_S2,
+  PROBE_PHONE_S3,
+  PROBE_PHONE_S4,
+  PROBE_PHONE_S5,
+  PROBE_PHONE_S6,
+  PROBE_PHONE_S7,
+  PROBE_PHONE_S8,
   PROBE_PHONE_S9,
 ]
 
@@ -76,7 +84,13 @@ function assert(name: string, ok: boolean, detail?: string) {
 }
 function assertEq<T>(name: string, actual: T, expected: T, detail?: string) {
   const ok = actual === expected
-  assert(name, ok, ok ? detail : `expected ${String(expected)}, got ${String(actual)}${detail ? ` (${detail})` : ''}`)
+  assert(
+    name,
+    ok,
+    ok
+      ? detail
+      : `expected ${String(expected)}, got ${String(actual)}${detail ? ` (${detail})` : ''}`,
+  )
 }
 function assertGte(name: string, actual: number, min: number, detail?: string) {
   const ok = actual >= min
@@ -107,7 +121,13 @@ function patchAdapter(adapter: WhatsAppAdapter): void {
       throw e
     }
     const r = await orig(to, body)
-    outboundLog.push({ to, body, mode: r.ok ? r.mode : 'console', ok: r.ok, reason: r.ok ? undefined : r.reason })
+    outboundLog.push({
+      to,
+      body,
+      mode: r.ok ? r.mode : 'console',
+      ok: r.ok,
+      reason: r.ok ? undefined : r.reason,
+    })
     return r
   }
 }
@@ -122,11 +142,21 @@ function patchLogger(): void {
   const origWarn = Logger.prototype.warn
   // The 1st arg is the event-name string; the 2nd is the payload object.
   // Some call sites pass 1 arg only — payload undefined.
-  Logger.prototype.log = function (this: Logger, msg: unknown, payload?: unknown, ...rest: unknown[]) {
+  Logger.prototype.log = function (
+    this: Logger,
+    msg: unknown,
+    payload?: unknown,
+    ...rest: unknown[]
+  ) {
     if (typeof msg === 'string') logBuffer.push({ level: 'log', event: msg, payload })
     return origLog.apply(this, [msg, payload, ...rest] as Parameters<typeof origLog>)
   }
-  Logger.prototype.warn = function (this: Logger, msg: unknown, payload?: unknown, ...rest: unknown[]) {
+  Logger.prototype.warn = function (
+    this: Logger,
+    msg: unknown,
+    payload?: unknown,
+    ...rest: unknown[]
+  ) {
     if (typeof msg === 'string') logBuffer.push({ level: 'warn', event: msg, payload })
     return origWarn.apply(this, [msg, payload, ...rest] as Parameters<typeof origWarn>)
   }
@@ -140,19 +170,27 @@ function logCount(event: string): number {
 
 async function pnpCleanup(): Promise<void> {
   // 1. Delete sessions for probe phones (by phoneNumber PK).
-  await prisma.whatsappSession.deleteMany({ where: { phoneNumber: { in: ALL_PROBE_PHONES } } }).catch(() => {})
+  await prisma.whatsappSession
+    .deleteMany({ where: { phoneNumber: { in: ALL_PROBE_PHONES } } })
+    .catch(() => {})
 
   // 2. Delete invites + OTP attempts for probe orgs.
   for (const slug of [PROBE_ORG_A, PROBE_ORG_B]) {
     const org = await prisma.organization.findUnique({ where: { slug }, select: { id: true } })
     if (!org) continue
-    await prisma.whatsappOtpAttempt.deleteMany({ where: { invite: { organizationId: org.id } } }).catch(() => {})
+    await prisma.whatsappOtpAttempt
+      .deleteMany({ where: { invite: { organizationId: org.id } } })
+      .catch(() => {})
     await prisma.whatsappInvite.deleteMany({ where: { organizationId: org.id } }).catch(() => {})
   }
 
   // 3. Also delete invites by probe phone numbers (cross-org cleanup safety).
-  await prisma.whatsappOtpAttempt.deleteMany({ where: { invite: { phoneNumber: { in: ALL_PROBE_PHONES } } } }).catch(() => {})
-  await prisma.whatsappInvite.deleteMany({ where: { phoneNumber: { in: ALL_PROBE_PHONES } } }).catch(() => {})
+  await prisma.whatsappOtpAttempt
+    .deleteMany({ where: { invite: { phoneNumber: { in: ALL_PROBE_PHONES } } } })
+    .catch(() => {})
+  await prisma.whatsappInvite
+    .deleteMany({ where: { phoneNumber: { in: ALL_PROBE_PHONES } } })
+    .catch(() => {})
 
   // 4. Delete probe users (by phone or synthetic email pattern).
   const probeUsers = await prisma.user.findMany({
@@ -167,7 +205,9 @@ async function pnpCleanup(): Promise<void> {
   })
   const probeUserIds = probeUsers.map((u) => u.id)
   if (probeUserIds.length > 0) {
-    await prisma.organizationMember.deleteMany({ where: { userId: { in: probeUserIds } } }).catch(() => {})
+    await prisma.organizationMember
+      .deleteMany({ where: { userId: { in: probeUserIds } } })
+      .catch(() => {})
     await prisma.user.deleteMany({ where: { id: { in: probeUserIds } } }).catch(() => {})
   }
 
@@ -175,7 +215,9 @@ async function pnpCleanup(): Promise<void> {
   for (const slug of [PROBE_ORG_A, PROBE_ORG_B]) {
     const org = await prisma.organization.findUnique({ where: { slug }, select: { id: true } })
     if (!org) continue
-    await prisma.organizationMember.deleteMany({ where: { organizationId: org.id } }).catch(() => {})
+    await prisma.organizationMember
+      .deleteMany({ where: { organizationId: org.id } })
+      .catch(() => {})
     await prisma.venue.deleteMany({ where: { organizationId: org.id } }).catch(() => {})
     await prisma.organization.delete({ where: { id: org.id } }).catch(() => {})
   }
@@ -257,7 +299,11 @@ async function main() {
   // W1 — normalizeInviteCode strips whitespace + hyphens + dots + underscores + uppers.
   assertEq('W1.normalize_invite_strip_hyphen', normalizeInviteCode('abcd-efgh'), 'ABCDEFGH')
   assertEq('W1.normalize_invite_strip_space', normalizeInviteCode('  ab cd efgh  '), 'ABCDEFGH')
-  assertEq('W1.normalize_invite_strip_dot_underscore', normalizeInviteCode('ab.cd_efgh'), 'ABCDEFGH')
+  assertEq(
+    'W1.normalize_invite_strip_dot_underscore',
+    normalizeInviteCode('ab.cd_efgh'),
+    'ABCDEFGH',
+  )
 
   // W2 — normalizeOtp drops non-digits.
   assertEq('W2.normalize_otp_strip_dash', normalizeOtp('123-456'), '123456')
@@ -304,14 +350,21 @@ async function main() {
   assert('W11.otp_outbound_sent', otpSendOutbound !== undefined)
   // V40 — Infobip wants bare digits (no `+`)
   if (otpSendOutbound) {
-    assertEq('V40.otp_outbound_to_bare_digits', otpSendOutbound.to, PROBE_PHONE_S1.replace(/^\+/, ''))
+    assertEq(
+      'V40.otp_outbound_to_bare_digits',
+      otpSendOutbound.to,
+      PROBE_PHONE_S1.replace(/^\+/, ''),
+    )
   }
 
   // Extract the actual OTP plaintext from the captured outbound (the only place
   // where it's visible — in production it would only ever exist in-flight to Infobip).
   const otpMatch = otpSendOutbound?.body.match(/code is (\d{6})/)
   const otpPlain = otpMatch?.[1]
-  assert('W12.otp_extractable_from_outbound', otpPlain !== undefined && otpPlain.length === WHATSAPP_OTP_LENGTH)
+  assert(
+    'W12.otp_extractable_from_outbound',
+    otpPlain !== undefined && otpPlain.length === WHATSAPP_OTP_LENGTH,
+  )
 
   // ─── W13-W15: wrong OTP × MAX → exhaustion + invite-exhausted ─────
 
@@ -323,13 +376,17 @@ async function main() {
     await onboarding.runTransition(otpPendingState, '000000')
   }
   // W14 — last wrong-attempt exhausts; reply says "Too many"
-  const exhaustionInvite = await prisma.whatsappInvite.findUnique({ where: { id: created.invite.id } })
+  const exhaustionInvite = await prisma.whatsappInvite.findUnique({
+    where: { id: created.invite.id },
+  })
   // 2 wrong attempts so far; 3rd will exhaust. Run it.
   await onboarding.runTransition(otpPendingState, '000000')
   const exhaustionReply = outboundLog[outboundLog.length - 1]
   assertContains('W14.exhausted_reply_text', exhaustionReply?.body ?? null, 'Too many')
   // W15 — invite flipped to exhausted
-  const inviteExhausted = await prisma.whatsappInvite.findUnique({ where: { id: created.invite.id } })
+  const inviteExhausted = await prisma.whatsappInvite.findUnique({
+    where: { id: created.invite.id },
+  })
   assertEq('W15.invite_status_exhausted', inviteExhausted?.status, 'exhausted')
   void exhaustionInvite
   // W16 — `whatsapp_invite.exhausted` log emitted
@@ -346,13 +403,17 @@ async function main() {
   })
   const stateS2_unknown = await onboarding.loadState(PROBE_PHONE_S2)
   await onboarding.runTransition(stateS2_unknown, inviteS2.code)
-  const otpForS2 = outboundLog.find((o) => o.body.includes('verification code'))?.body.match(/code is (\d{6})/)?.[1]
+  const otpForS2 = outboundLog
+    .find((o) => o.body.includes('verification code'))
+    ?.body.match(/code is (\d{6})/)?.[1]
   outboundLog.length = 0
   const stateS2_otpPending = await onboarding.loadState(PROBE_PHONE_S2)
   await onboarding.runTransition(stateS2_otpPending, otpForS2 ?? '000000')
 
   // W18 — invite redeemed
-  const inviteS2After = await prisma.whatsappInvite.findUnique({ where: { id: inviteS2.invite.id } })
+  const inviteS2After = await prisma.whatsappInvite.findUnique({
+    where: { id: inviteS2.invite.id },
+  })
   assertEq('W18.invite_status_redeemed', inviteS2After?.status, 'redeemed')
   // W19 — User created with verified phone
   const userS2 = await prisma.user.findUnique({ where: { phoneNumber: PROBE_PHONE_S2 } })
@@ -364,10 +425,14 @@ async function main() {
   })
   assert('W20.membership_created', membershipS2 !== null)
   // W21 — Session created with currentOrganizationId set (single-venue auto)
-  const sessionS2 = await prisma.whatsappSession.findUnique({ where: { phoneNumber: PROBE_PHONE_S2 } })
+  const sessionS2 = await prisma.whatsappSession.findUnique({
+    where: { phoneNumber: PROBE_PHONE_S2 },
+  })
   assertEq('W21.session_org_set_single_venue', sessionS2?.currentOrganizationId, ctx.orgA.id)
   // W22 — Welcome reply contains the venue name
-  const welcomeReply = outboundLog.find((o) => o.body.includes(ctx.orgA.venueName) || o.body.includes('Probe Org A'))
+  const welcomeReply = outboundLog.find(
+    (o) => o.body.includes(ctx.orgA.venueName) || o.body.includes('Probe Org A'),
+  )
   assert('W22.welcome_text_mentions_venue', welcomeReply !== undefined)
   // W23 — Lifecycle: redeemed + linked_user logs emitted
   assertGte('W23.lifecycle_log_redeemed', logCount('whatsapp_invite.redeemed'), 1)
@@ -426,14 +491,18 @@ async function main() {
   outboundLog.length = 0
   const stateRace_unknown = await onboarding.loadState(PROBE_PHONE_S5)
   await onboarding.runTransition(stateRace_unknown, inviteRace.code)
-  const otpRace = outboundLog.find((o) => o.body.includes('verification code'))?.body.match(/code is (\d{6})/)?.[1]
+  const otpRace = outboundLog
+    .find((o) => o.body.includes('verification code'))
+    ?.body.match(/code is (\d{6})/)?.[1]
   // Two concurrent verifications — only one redemption should succeed.
   const stateRace_otp = await onboarding.loadState(PROBE_PHONE_S5)
   const [r1res, r2res] = await Promise.all([
     onboarding.runTransition(stateRace_otp, otpRace ?? '000000'),
     onboarding.runTransition(stateRace_otp, otpRace ?? '000000'),
   ])
-  const inviteRaceAfter = await prisma.whatsappInvite.findUnique({ where: { id: inviteRace.invite.id } })
+  const inviteRaceAfter = await prisma.whatsappInvite.findUnique({
+    where: { id: inviteRace.invite.id },
+  })
   assertEq('V31.race_only_one_redeemed', inviteRaceAfter?.status, 'redeemed')
   // Race semantics: exactly ONE User row exists for this phone — the redemption
   // path is atomic (markRedeemed conditional UPDATE + user.create inside one txn),
@@ -443,7 +512,8 @@ async function main() {
   // OTP attempt — we don't assert on it.
   const racedUserCount = await prisma.user.count({ where: { phoneNumber: PROBE_PHONE_S5 } })
   assertEq('V31.race_one_user_created', racedUserCount, 1)
-  void r1res; void r2res
+  void r1res
+  void r2res
 
   // ─── V32: delivery failure → status='failed_send' + log ───────────
 
@@ -477,7 +547,8 @@ async function main() {
       role: 'staff',
     })
   } catch (err) {
-    crossOrgRejected = (err as { response?: { error?: string } })?.response?.error === 'phone_linked_other_org'
+    crossOrgRejected =
+      (err as { response?: { error?: string } })?.response?.error === 'phone_linked_other_org'
   }
   assert('V33.cross_org_create_blocked', crossOrgRejected)
   // Force=true succeeds + emits cross_org_create log
@@ -518,7 +589,8 @@ async function main() {
       role: 'staff',
     })
   } catch (err) {
-    rateLimitHit = (err as { response?: { error?: string } })?.response?.error === 'manager_invite_rate_limit'
+    rateLimitHit =
+      (err as { response?: { error?: string } })?.response?.error === 'manager_invite_rate_limit'
   }
   assert('V34.manager_rate_limit_blocks_51st', rateLimitHit)
   assertGte('V34.rate_limited_log', logCount('whatsapp_invite.rate_limited'), 1)
@@ -541,7 +613,9 @@ async function main() {
   // We don't know the OTP plaintext for a normalized OTP test in isolation;
   // instead assert the normalizer directly (already W2). Here we exercise the
   // service path — submit with-space form of the actual OTP from above.
-  const otpNorm = outboundLog.find((o) => o.body.includes('verification code'))?.body.match(/code is (\d{6})/)?.[1]
+  const otpNorm = outboundLog
+    .find((o) => o.body.includes('verification code'))
+    ?.body.match(/code is (\d{6})/)?.[1]
   if (otpNorm) {
     outboundLog.length = 0
     await onboarding.runTransition(stateNorm2, `${otpNorm.slice(0, 3)} ${otpNorm.slice(3)}`)
@@ -552,7 +626,10 @@ async function main() {
   // ─── V36: out-of-state OTP shape in unknown state ─────────────────
 
   outboundLog.length = 0
-  const oosState: { kind: 'unknown'; phoneNumber: string } = { kind: 'unknown', phoneNumber: '+447700999777' }
+  const oosState: { kind: 'unknown'; phoneNumber: string } = {
+    kind: 'unknown',
+    phoneNumber: '+447700999777',
+  }
   await onboarding.runTransition(oosState, '999888')
   const oosReply = outboundLog[outboundLog.length - 1]
   assertContains('V36.unknown_otp_shape_corrective_reply', oosReply?.body ?? null, "haven't sent")
@@ -576,8 +653,9 @@ async function main() {
   // told to use the existing code instead. Either reply is acceptable proof
   // that no second OTP was sent in the same window.
   const debReply = outboundLog[outboundLog.length - 1]
-  const debOk = (debReply?.body.includes('6-digit code') ?? false) ||
-                (debReply?.body.includes('just sent') ?? false)
+  const debOk =
+    (debReply?.body.includes('6-digit code') ?? false) ||
+    (debReply?.body.includes('just sent') ?? false)
   assert('V37.reissuance_no_second_otp_within_window', debOk)
   // Also verify only ONE OTP was actually sent (not two).
   const otpAttemptsForDebounceInvite = await prisma.whatsappOtpAttempt.count({
@@ -609,13 +687,18 @@ async function main() {
 
   // ─── V40: E.164 storage shape ────────────────────────────────────
 
-  const userS2Stored = await prisma.user.findUnique({ where: { id: userS2!.id }, select: { phoneNumber: true } })
+  const userS2Stored = await prisma.user.findUnique({
+    where: { id: userS2!.id },
+    select: { phoneNumber: true },
+  })
   assert('V40.user_phone_stored_e164', userS2Stored?.phoneNumber?.startsWith('+') ?? false)
 
   // ─── V41: WhatsappSession TTL/inactivity row exists per linkage ──
 
   // Bonus: V41 uniqueness — single session row per phone.
-  const sessionCount = await prisma.whatsappSession.count({ where: { phoneNumber: PROBE_PHONE_S2 } })
+  const sessionCount = await prisma.whatsappSession.count({
+    where: { phoneNumber: PROBE_PHONE_S2 },
+  })
   assertEq('V41.session_one_row_per_phone', sessionCount, 1)
 
   // ─── composeWelcomeText pure-function coverage ───────────────────

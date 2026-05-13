@@ -4,11 +4,7 @@ import { DocDetailBody } from './doc-detail-body'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DocDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function DocDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession()
   if (!session) {
     const { id } = await params

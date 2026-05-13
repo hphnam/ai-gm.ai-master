@@ -168,7 +168,10 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
     input_schema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Natural-language query — user intent, not keywords' },
+        query: {
+          type: 'string',
+          description: 'Natural-language query — user intent, not keywords',
+        },
         venueId: {
           type: 'string',
           description: 'Optional venue UUID to scope results; omit for cross-venue (shared SOPs)',
@@ -246,7 +249,7 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
   {
     name: 'get_supplier_by_name',
     description:
-      "Find suppliers by name (ILIKE contains), across all venues (suppliers are shared). Returns contact details + lead time. Use when the user asks \"who supplies X\" or \"what's Matthew Clark's number\".",
+      'Find suppliers by name (ILIKE contains), across all venues (suppliers are shared). Returns contact details + lead time. Use when the user asks "who supplies X" or "what\'s Matthew Clark\'s number".',
     input_schema: {
       type: 'object',
       properties: {
@@ -308,7 +311,7 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         details: {
           type: 'object',
           description:
-            "Optional structured fields: peopleInvolved, time, location, escalatedTo, etc.",
+            'Optional structured fields: peopleInvolved, time, location, escalatedTo, etc.',
         },
       },
       required: ['venueId', 'summary'],

@@ -1,8 +1,8 @@
 'use client'
 
 import { AlertTriangle, Info } from 'lucide-react'
-import type { ProactiveSuggestionDto as ProactiveSuggestion } from '@/generated/api'
 import { Card, CardContent } from '@/components/ui/card'
+import type { ProactiveSuggestionDto as ProactiveSuggestion } from '@/generated/api'
 import { cn } from '@/lib/utils'
 
 type Props = {

@@ -1,5 +1,5 @@
 import { BullModule } from '@nestjs/bullmq'
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
+import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AdaptationModule } from './modules/adaptation/adaptation.module'
 import { AuthModule } from './modules/auth/auth.module'

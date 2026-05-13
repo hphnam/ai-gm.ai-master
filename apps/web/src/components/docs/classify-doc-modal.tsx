@@ -6,10 +6,11 @@
 // Kept simple: no schema, no description, no confidence — a duty manager can
 // get through this without thinking.
 
+import { BookOpen, ClipboardList, Loader2, Plus, Sparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { BookOpen, ClipboardList, Loader2, Plus, Sparkles } from 'lucide-react'
-import type { DocumentTypeDto, DocumentTypeDtoKind as DocumentTypeKind } from '@/generated/api'
+import { DocPreview } from '@/components/docs/doc-preview'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -18,18 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  useClassifyDoc,
-  useDocTypes,
-  useSuggestCategory,
-} from '@/lib/hooks/use-docs'
+import type { DocumentTypeDto, DocumentTypeDtoKind as DocumentTypeKind } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
+import { useClassifyDoc, useDocTypes, useSuggestCategory } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
-import { DocPreview } from '@/components/docs/doc-preview'
 
 type Mode = 'pick' | 'create'
 
@@ -45,9 +41,7 @@ function levenshtein(a: string, b: string): number {
     curr[0] = i
     for (let j = 1; j <= n; j++) {
       curr[j] =
-        a[i - 1] === b[j - 1]
-          ? prev[j - 1]
-          : Math.min(prev[j - 1], prev[j], curr[j - 1]) + 1
+        a[i - 1] === b[j - 1] ? prev[j - 1] : Math.min(prev[j - 1], prev[j], curr[j - 1]) + 1
     }
     ;[prev, curr] = [curr, prev]
   }
@@ -59,10 +53,7 @@ function levenshtein(a: string, b: string): number {
 // Order: token-prefix (handles "Sta Note" → "Staff Note"), then Levenshtein
 // (handles "Stff Note" → "Staff Note"). Only fires once the user has typed
 // at least 3 characters.
-function fuzzyFindCategory<T extends { name: string }>(
-  input: string,
-  candidates: T[],
-): T | null {
+function fuzzyFindCategory<T extends { name: string }>(input: string, candidates: T[]): T | null {
   const q = input.trim().toLowerCase()
   if (q.length < 3 || candidates.length === 0) return null
   if (candidates.some((c) => c.name.toLowerCase() === q)) return null
@@ -177,16 +168,13 @@ export function ClassifyDocModal({
   function createNew() {
     const trimmed = name.trim()
     if (!trimmed || busy) return
-    const matchedExisting =
-      suggestionMatchesExisting && trimmed === name.trim()
+    const matchedExisting = suggestionMatchesExisting && trimmed === name.trim()
     classifyMut.mutate(
       { docId, body: { name: trimmed, kind } },
       {
         onSuccess: (created) => {
           toast.success(
-            matchedExisting
-              ? `Added to "${created.name}"`
-              : `Filed as "${created.name}"`,
+            matchedExisting ? `Added to "${created.name}"` : `Filed as "${created.name}"`,
             {
               description:
                 kind === 'procedural'
@@ -207,9 +195,8 @@ export function ClassifyDocModal({
         <DialogHeader className="shrink-0 space-y-1 border-b px-6 py-4 text-left">
           <DialogTitle>Classify this document</DialogTitle>
           <DialogDescription>
-            Check the preview on the left, then pick a category it belongs to —
-            or create a new one. Staff will find it by that category from now
-            on.
+            Check the preview on the left, then pick a category it belongs to — or create a new one.
+            Staff will find it by that category from now on.
           </DialogDescription>
         </DialogHeader>
 
@@ -219,170 +206,158 @@ export function ClassifyDocModal({
           </div>
 
           <div className="scrollbar-thin flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-5">
-        {hasExisting ? (
-          <div className="flex gap-1 border-b pb-2">
-            <TabButton
-              active={effectiveMode === 'pick'}
-              onClick={() => setMode('pick')}
-              label="Pick existing"
-            />
-            <TabButton
-              active={effectiveMode === 'create'}
-              onClick={() => setMode('create')}
-              label="Create new"
-            />
-          </div>
-        ) : null}
+            {hasExisting ? (
+              <div className="flex gap-1 border-b pb-2">
+                <TabButton
+                  active={effectiveMode === 'pick'}
+                  onClick={() => setMode('pick')}
+                  label="Pick existing"
+                />
+                <TabButton
+                  active={effectiveMode === 'create'}
+                  onClick={() => setMode('create')}
+                  label="Create new"
+                />
+              </div>
+            ) : null}
 
-        {effectiveMode === 'pick' ? (
-          <div className="min-w-0 space-y-2 py-2">
-            {isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading categories…</p>
-            ) : !types || types.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No categories yet — create one below.
-              </p>
+            {effectiveMode === 'pick' ? (
+              <div className="min-w-0 space-y-2 py-2">
+                {isLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading categories…</p>
+                ) : !types || types.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No categories yet — create one below.
+                  </p>
+                ) : (
+                  <ul className="min-w-0 space-y-1.5">
+                    {types.map((t) => (
+                      <li key={t.id} className="min-w-0">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => assignExisting(t)}
+                          className={cn(
+                            'flex w-full min-w-0 items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors',
+                            picking === t.id ? 'border-primary bg-primary/5' : 'hover:bg-accent',
+                            busy ? 'cursor-not-allowed opacity-60' : '',
+                          )}
+                        >
+                          {t.kind === 'procedural' ? (
+                            <ClipboardList className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                          ) : (
+                            <BookOpen className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium break-words">{t.name}</div>
+                            {t.description ? (
+                              <div className="text-xs text-muted-foreground break-words">
+                                {t.description}
+                              </div>
+                            ) : null}
+                          </div>
+                          <span className="shrink-0 mt-0.5 text-[11px] text-muted-foreground">
+                            {t.kind === 'procedural' ? 'Routine' : 'Reference'}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             ) : (
-              <ul className="min-w-0 space-y-1.5">
-                {types.map((t) => (
-                  <li key={t.id} className="min-w-0">
+              <div className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
+                    <Label htmlFor="classify-name" className="text-sm">
+                      Category name
+                    </Label>
                     <button
                       type="button"
-                      disabled={busy}
-                      onClick={() => assignExisting(t)}
+                      onClick={suggestName}
+                      disabled={busy || suggesting}
                       className={cn(
-                        'flex w-full min-w-0 items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors',
-                        picking === t.id
-                          ? 'border-primary bg-primary/5'
-                          : 'hover:bg-accent',
+                        'inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
+                        suggesting
+                          ? 'cursor-wait text-muted-foreground'
+                          : 'cursor-pointer text-sky-700 hover:bg-sky-500/10 dark:text-sky-300',
                         busy ? 'cursor-not-allowed opacity-60' : '',
                       )}
                     >
-                      {t.kind === 'procedural' ? (
-                        <ClipboardList className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                      {suggesting ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                          Thinking…
+                        </>
                       ) : (
-                        <BookOpen className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                        <>
+                          <Sparkles className="h-3.5 w-3.5" aria-hidden />
+                          Suggest with AI
+                        </>
                       )}
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium break-words">{t.name}</div>
-                        {t.description ? (
-                          <div className="text-xs text-muted-foreground break-words">
-                            {t.description}
-                          </div>
-                        ) : null}
-                      </div>
-                      <span className="shrink-0 mt-0.5 text-[11px] text-muted-foreground">
-                        {t.kind === 'procedural' ? 'Routine' : 'Reference'}
-                      </span>
                     </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <div className="flex items-baseline justify-between">
-                <Label htmlFor="classify-name" className="text-sm">
-                  Category name
-                </Label>
-                <button
-                  type="button"
-                  onClick={suggestName}
-                  disabled={busy || suggesting}
-                  className={cn(
-                    'inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
-                    suggesting
-                      ? 'cursor-wait text-muted-foreground'
-                      : 'cursor-pointer text-sky-700 hover:bg-sky-500/10 dark:text-sky-300',
-                    busy ? 'cursor-not-allowed opacity-60' : '',
-                  )}
-                >
-                  {suggesting ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                      Thinking…
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden />
-                      Suggest with AI
-                    </>
-                  )}
-                </button>
-              </div>
-              <Input
-                id="classify-name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value.slice(0, 80))
-                  if (suggestionHint) setSuggestionHint(null)
-                  if (suggestionMatchesExisting) setSuggestionMatchesExisting(false)
-                }}
-                placeholder="e.g. Cellar log, Supplier contacts, Closing checklist"
-                disabled={busy}
-                autoFocus
-              />
-              {suggestionHint ? (
-                <p className="text-xs text-amber-700 dark:text-amber-400">
-                  {suggestionHint}
-                </p>
-              ) : fuzzyMatch ? (
-                <p className="text-xs text-muted-foreground">
-                  Did you mean{' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setName(fuzzyMatch.name)
-                      setKind(fuzzyMatch.kind)
-                      setSuggestionMatchesExisting(true)
+                  </div>
+                  <Input
+                    id="classify-name"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value.slice(0, 80))
+                      if (suggestionHint) setSuggestionHint(null)
+                      if (suggestionMatchesExisting) setSuggestionMatchesExisting(false)
                     }}
-                    className="cursor-pointer font-medium text-foreground underline underline-offset-2 hover:text-primary"
-                  >
-                    “{fuzzyMatch.name}”
-                  </button>
-                  ? Saving will add this document to it.
-                </p>
-              ) : null}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm">How will staff use it?</Label>
-              <div
-                role="radiogroup"
-                aria-label="Document type"
-                className="flex flex-col gap-2"
-              >
-                <KindOption
-                  selected={kind === 'reference'}
-                  onSelect={() => setKind('reference')}
-                  disabled={busy}
-                  icon={<BookOpen className="h-4 w-4" />}
-                  title="Look it up"
-                  blurb="Menus, policies, contacts — staff find it when they need it."
-                />
-                <KindOption
-                  selected={kind === 'procedural'}
-                  onSelect={() => setKind('procedural')}
-                  disabled={busy}
-                  icon={<ClipboardList className="h-4 w-4" />}
-                  title="Follow on a schedule"
-                  blurb="Steps to tick off daily, weekly, or at shift change."
-                />
+                    placeholder="e.g. Cellar log, Supplier contacts, Closing checklist"
+                    disabled={busy}
+                    autoFocus
+                  />
+                  {suggestionHint ? (
+                    <p className="text-xs text-amber-700 dark:text-amber-400">{suggestionHint}</p>
+                  ) : fuzzyMatch ? (
+                    <p className="text-xs text-muted-foreground">
+                      Did you mean{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setName(fuzzyMatch.name)
+                          setKind(fuzzyMatch.kind)
+                          setSuggestionMatchesExisting(true)
+                        }}
+                        className="cursor-pointer font-medium text-foreground underline underline-offset-2 hover:text-primary"
+                      >
+                        “{fuzzyMatch.name}”
+                      </button>
+                      ? Saving will add this document to it.
+                    </p>
+                  ) : null}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">How will staff use it?</Label>
+                  <div role="radiogroup" aria-label="Document type" className="flex flex-col gap-2">
+                    <KindOption
+                      selected={kind === 'reference'}
+                      onSelect={() => setKind('reference')}
+                      disabled={busy}
+                      icon={<BookOpen className="h-4 w-4" />}
+                      title="Look it up"
+                      blurb="Menus, policies, contacts — staff find it when they need it."
+                    />
+                    <KindOption
+                      selected={kind === 'procedural'}
+                      onSelect={() => setKind('procedural')}
+                      disabled={busy}
+                      icon={<ClipboardList className="h-4 w-4" />}
+                      title="Follow on a schedule"
+                      blurb="Steps to tick off daily, weekly, or at shift change."
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            )}
           </div>
         </div>
 
         <DialogFooter className="shrink-0 gap-2 border-t px-6 py-3 sm:gap-2">
           {effectiveMode === 'create' ? (
-            <Button
-              onClick={createNew}
-              disabled={busy || !name.trim()}
-              className="cursor-pointer"
-            >
+            <Button onClick={createNew} disabled={busy || !name.trim()} className="cursor-pointer">
               {busy ? (
                 'Saving…'
               ) : (
@@ -439,6 +414,7 @@ function KindOption({
   blurb: string
 }) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: radio-styled button is intentional UI pattern
     <button
       type="button"
       role="radio"

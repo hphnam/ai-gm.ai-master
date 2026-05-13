@@ -22,19 +22,19 @@
 // NEVER row content, NEVER raw column names (column ordinal index used as proxy
 // when columns are referenced in cross-org-denied logs).
 
-import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
+import { Injectable, Logger } from '@nestjs/common'
 import { Prisma, prisma } from '../../database/prisma'
 import {
+  fail,
+  type InferredColumnType,
+  ok,
   TABULAR_QUERY_DEFAULT_LIMIT,
   TABULAR_QUERY_MAX_LIMIT,
-  TabularQueryInputSchema,
-  fail,
-  ok,
-  type InferredColumnType,
   type TabularAggregateFn,
   type TabularFilterOp,
   type TabularQueryInput,
+  TabularQueryInputSchema,
   type TabularQueryResult,
   type ToolResult,
 } from '../../types'
@@ -56,12 +56,7 @@ const AGGREGATE_FN_SQL: Readonly<Record<TabularAggregateFn, string>> = {
   max: 'MAX',
 }
 
-const NUMERIC_AGGREGATES: ReadonlySet<TabularAggregateFn> = new Set([
-  'sum',
-  'avg',
-  'min',
-  'max',
-])
+const NUMERIC_AGGREGATES: ReadonlySet<TabularAggregateFn> = new Set(['sum', 'avg', 'min', 'max'])
 
 function hashOrgId(orgId: string): string {
   return createHash('sha256').update(orgId).digest('hex').slice(0, 12)
@@ -144,7 +139,10 @@ export class TabularQueryService {
     // before any validation runs, then rewrite input.* in place to canonical
     // names so downstream SQL composition uses the real column.
     const normaliseColumnKey = (s: string) =>
-      s.toLowerCase().replace(/[_\s]+/g, ' ').trim()
+      s
+        .toLowerCase()
+        .replace(/[_\s]+/g, ' ')
+        .trim()
     const canonicalByNormalised = new Map<string, string>()
     for (const c of columnRows) {
       const key = normaliseColumnKey(c.name)
@@ -237,29 +235,29 @@ export class TabularQueryService {
     // 6. Compose SQL. All column names are interpolated via Prisma.raw AFTER
     // whitelist validation; all user-supplied values flow through Prisma.sql binds.
     const direction = input.sort?.direction ?? 'asc'
-    const directionFragment =
-      direction === 'desc' ? Prisma.sql`DESC` : Prisma.sql`ASC`
+    const directionFragment = direction === 'desc' ? Prisma.sql`DESC` : Prisma.sql`ASC`
 
     const limit = Math.min(input.limit ?? TABULAR_QUERY_DEFAULT_LIMIT, TABULAR_QUERY_MAX_LIMIT)
     const fetchLimit = limit + 1 // Probe for truncated flag without a 2nd query.
 
-    const filterFragments: Prisma.Sql[] = input.filters?.map((f) => {
-      const col = f.column
-      const colType = typeByName.get(col) ?? 'string'
-      const opSql = FILTER_OP_SQL[f.op]
-      if (f.op === 'contains') {
-        return Prisma.sql`(data->>${col}) ILIKE ${'%' + String(f.value) + '%'}`
-      }
-      // Numeric ops on numeric columns get JSONB→numeric cast (currency-stripped);
-      // otherwise text comparison.
-      if (
-        colType === 'number' &&
-        (f.op === 'gt' || f.op === 'lt' || f.op === 'gte' || f.op === 'lte' || f.op === 'eq')
-      ) {
-        return Prisma.sql`${castJsonbToNumeric(col)} ${Prisma.raw(opSql)} ${Number(f.value)}`
-      }
-      return Prisma.sql`(data->>${col}) ${Prisma.raw(opSql)} ${String(f.value)}`
-    }) ?? []
+    const filterFragments: Prisma.Sql[] =
+      input.filters?.map((f) => {
+        const col = f.column
+        const colType = typeByName.get(col) ?? 'string'
+        const opSql = FILTER_OP_SQL[f.op]
+        if (f.op === 'contains') {
+          return Prisma.sql`(data->>${col}) ILIKE ${`%${String(f.value)}%`}`
+        }
+        // Numeric ops on numeric columns get JSONB→numeric cast (currency-stripped);
+        // otherwise text comparison.
+        if (
+          colType === 'number' &&
+          (f.op === 'gt' || f.op === 'lt' || f.op === 'gte' || f.op === 'lte' || f.op === 'eq')
+        ) {
+          return Prisma.sql`${castJsonbToNumeric(col)} ${Prisma.raw(opSql)} ${Number(f.value)}`
+        }
+        return Prisma.sql`(data->>${col}) ${Prisma.raw(opSql)} ${String(f.value)}`
+      }) ?? []
     const filterClause =
       filterFragments.length > 0
         ? Prisma.sql` AND ${Prisma.join(filterFragments, ' AND ')}`
@@ -325,9 +323,9 @@ export class TabularQueryService {
           ? Prisma.sql`tr."rowIndex" ${directionFragment}`
           : input.sort.column === '_aggregate'
             ? Prisma.sql`tr."rowIndex" ASC` // unreachable per validation, but keep deterministic
-            : (typeByName.get(input.sort.column) === 'number'
-                ? Prisma.sql`(data->>${input.sort.column})::numeric ${directionFragment}, tr."rowIndex" ASC`
-                : Prisma.sql`(data->>${input.sort.column}) ${directionFragment}, tr."rowIndex" ASC`)
+            : typeByName.get(input.sort.column) === 'number'
+              ? Prisma.sql`(data->>${input.sort.column})::numeric ${directionFragment}, tr."rowIndex" ASC`
+              : Prisma.sql`(data->>${input.sort.column}) ${directionFragment}, tr."rowIndex" ASC`
         : Prisma.sql`tr."rowIndex" ASC`
 
       queryRows = await prisma.$queryRaw<Array<Record<string, unknown>>>(

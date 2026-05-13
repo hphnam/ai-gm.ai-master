@@ -6,11 +6,10 @@ import {
   CHUNK_OVERLAP_TOKENS,
   CHUNK_TARGET_TOKENS,
   CSV_ROW_BATCH_SIZE,
-  MAX_HEADING_RECURSION_DEPTH,
-  SECTION_HARD_CAP_TOKENS,
-  SECTION_SOFT_CAP_TOKENS,
   type DetectedChunk,
   type DetectedSection,
+  MAX_HEADING_RECURSION_DEPTH,
+  SECTION_SOFT_CAP_TOKENS,
   type SectionDetectionResult,
 } from '../../types'
 import { estimateTokens, slidingWindowChunks, splitByHeadings } from './section-tokens'
@@ -149,11 +148,7 @@ export class SectionDetector {
   // Cap policy (AC-4). Recursion-bound at MAX_HEADING_RECURSION_DEPTH (audit-M5).
   // ──────────────────────────────────────────────────────────────────
 
-  private applyCapPolicy(
-    title: string | null,
-    body: string,
-    depth: number = 0,
-  ): DetectedSection[] {
+  private applyCapPolicy(title: string | null, body: string, depth: number = 0): DetectedSection[] {
     const tokenCount = estimateTokens(body)
 
     if (tokenCount <= SECTION_SOFT_CAP_TOKENS) {

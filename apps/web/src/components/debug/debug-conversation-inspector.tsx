@@ -2,8 +2,8 @@
 
 import type { DebugConversationResponseDto as DebugConversationResponse } from '@/generated/api'
 import type { DebugMessageDto as DebugMessage } from '@/lib/api-types'
-import { cn } from '@/lib/utils'
 import { mapApiError } from '@/lib/map-api-error'
+import { cn } from '@/lib/utils'
 import { DebugFeedbackBadge } from './debug-feedback-badge'
 import { DebugJsonViewer } from './debug-json-viewer'
 import { DebugToolCallCard } from './debug-tool-call-card'
@@ -55,7 +55,11 @@ function MessageCard({ message }: { message: DebugMessage }) {
       {toolCallLog.length > 0 ? (
         <div className="space-y-2">
           {toolCallLog.map((e, i) => (
-            <DebugToolCallCard key={i} entry={e as Parameters<typeof DebugToolCallCard>[0]['entry']} />
+            <DebugToolCallCard
+              // biome-ignore lint/suspicious/noArrayIndexKey: debug log entries have no stable id and order is fixed
+              key={i}
+              entry={e as Parameters<typeof DebugToolCallCard>[0]['entry']}
+            />
           ))}
         </div>
       ) : null}
@@ -86,18 +90,17 @@ export function DebugConversationInspector({ data, isLoading, error }: Props) {
 
   if (error) {
     return (
-      <div role="alert" className="border border-destructive/40 bg-destructive/10 text-sm rounded-md p-4">
+      <div
+        role="alert"
+        className="border border-destructive/40 bg-destructive/10 text-sm rounded-md p-4"
+      >
         Failed to load conversation. {mapApiError(error)}
       </div>
     )
   }
 
   if (!data) {
-    return (
-      <div className="text-sm text-muted-foreground italic">
-        No conversation loaded.
-      </div>
-    )
+    return <div className="text-sm text-muted-foreground italic">No conversation loaded.</div>
   }
 
   return (

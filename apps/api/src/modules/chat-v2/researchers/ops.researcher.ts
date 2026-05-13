@@ -10,19 +10,16 @@
 // audit-S3: single PROBE_CHAT_V2_FORCE_RESEARCHER_THROW env contract.
 // audit-S8: per-researcher cost log.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText, stepCountIs, tool, type ToolSet } from 'ai'
+import { Injectable } from '@nestjs/common'
+import { generateText, stepCountIs, type ToolSet, tool } from 'ai'
 import { z } from 'zod'
-import {
-  RESEARCHER_TIMEOUT_MS,
-  RoleTimeoutError,
-  type AnthropicUsage,
-} from '../../../types'
+import { type AnthropicUsage, RESEARCHER_TIMEOUT_MS, RoleTimeoutError } from '../../../types'
 import { MockOpsService } from '../../mock-ops/mock-ops.service'
-import { OPS_RESEARCHER_PROMPT } from '../prompts/ops-researcher.prompt'
 import { chatV2Logger, hashId } from '../log-helpers'
-import type { Researcher, ResearcherResult } from '../researcher.interface'
+import { OPS_RESEARCHER_PROMPT } from '../prompts/ops-researcher.prompt'
+import type { ResearcherResult } from '../researcher.interface'
+import { Researcher } from '../researcher.interface'
 import { sanitizeForResearcher } from '../researcher-sanitizer'
 import type { ResearchContext } from './docs.researcher'
 
@@ -52,7 +49,8 @@ export class OpsResearcher implements Researcher {
         description: 'Stock items at or below par for the venue.',
         inputSchema: z.object({}),
         execute: async () => {
-          if (!ctx.venueId) return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
+          if (!ctx.venueId)
+            return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
           const r = await this.mockOps.getStockBelowPar(ctx.venueId)
           if (r.ok) evidenceSummary = `${r.data.length} SKUs below par`
           return r
@@ -62,7 +60,8 @@ export class OpsResearcher implements Researcher {
         description: 'Match a stock item by name (case-insensitive contains).',
         inputSchema: z.object({ name: z.string().min(1) }),
         execute: async ({ name }) => {
-          if (!ctx.venueId) return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
+          if (!ctx.venueId)
+            return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
           const r = await this.mockOps.getStockByName(ctx.venueId, name)
           if (r.ok) evidenceSummary = `${r.data.length} matches for "${name}"`
           return r
@@ -81,7 +80,8 @@ export class OpsResearcher implements Researcher {
         description: 'Suppliers whose order cutoff lands within hoursAhead.',
         inputSchema: z.object({ hoursAhead: z.number().min(1).max(48).optional() }),
         execute: async ({ hoursAhead }) => {
-          if (!ctx.venueId) return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
+          if (!ctx.venueId)
+            return { ok: false, reason: 'invalid-input' as const, detail: 'venueId required' }
           const r = await this.mockOps.getUpcomingCutoffs(ctx.venueId, hoursAhead ?? 4)
           if (r.ok) evidenceSummary = `${r.data.length} upcoming cutoffs`
           return r
@@ -107,7 +107,8 @@ export class OpsResearcher implements Researcher {
       })
 
       const usage = extractUsage(result.usage)
-      const summary = evidenceSummary || result.text.slice(0, 200) || 'no ops data needed for this turn.'
+      const summary =
+        evidenceSummary || result.text.slice(0, 200) || 'no ops data needed for this turn.'
 
       chatV2Logger.info('chat_v2.researcher_complete', {
         orgId: hashId(ctx.orgId),
@@ -177,11 +178,13 @@ function stubResearch(brief: string, ctx: ResearchContext, t0: number): Research
   let summary = 'no ops data needed for this turn.'
 
   if (lower.includes('below par')) {
-    summary = 'Stock report: 4 SKUs at or below par — Heineken 8/12, Guinness 5/10, Estrella 3/8, Aperol 1/4.'
+    summary =
+      'Stock report: 4 SKUs at or below par — Heineken 8/12, Guinness 5/10, Estrella 3/8, Aperol 1/4.'
   } else if (lower.includes('cutoff') || lower.includes('bibendum')) {
     summary = 'Bibendum cutoff: 16:00 weekdays. Matthew Clark 14:00.'
   } else if (lower.includes('supplier')) {
-    summary = 'Supplier: Bibendum 020 7434 1100, lead 1 day. Matthew Clark 0117 922 6500, lead 2 days.'
+    summary =
+      'Supplier: Bibendum 020 7434 1100, lead 1 day. Matthew Clark 0117 922 6500, lead 2 days.'
   } else if (lower.includes('stock') || lower.includes('keg') || lower.includes('line')) {
     summary = 'Stock state: kegs Heineken 8, Guinness 5; lines clean last 18h.'
   }

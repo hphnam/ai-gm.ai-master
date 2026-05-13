@@ -1,40 +1,45 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
-import { prisma } from '../../database/prisma'
-import {
-  type ImagePart,
-  type ModelMessage,
-  type StreamTextResult,
-  type TextPart,
-  type ToolCallPart,
-  type ToolResultPart,
-  type ToolSet,
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
+import type {
+  ImagePart,
+  ModelMessage,
+  StreamTextResult,
+  TextPart,
+  ToolCallPart,
+  ToolResultPart,
+  ToolSet,
 } from 'ai'
+import { prisma } from '../../database/prisma'
 import { VenueProfileSchema } from '../../types'
 // Plan 06-04 Task 1 — types relocated to apps/api/src/types/chat-message.ts.
 // Re-export shim during transition; deleted with chat-v1 in Task 7.
 import {
-  SendMessageInputSchema,
   type SendMessageInput,
+  SendMessageInputSchema,
   type SendMessageResult,
   type ToolCallLogEntry,
 } from '../../types/chat-message'
-export type { SendMessageInput, SendMessageResult, ToolCallLogEntry } from '../../types/chat-message'
+
+export type {
+  SendMessageInput,
+  SendMessageResult,
+  ToolCallLogEntry,
+} from '../../types/chat-message'
+
 import { AdaptationService } from '../adaptation/adaptation.service'
-import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
+import type { CompactableMessage } from './conversation-compactor.service'
+import { ConversationCompactorService } from './conversation-compactor.service'
+import { ConversationModeService } from './conversation-mode.service'
 import {
-  buildGmAgent,
   type AgentMode,
+  buildGmAgent,
   type VenueContactSummary,
   type VenueProfileContext,
   type VenueSnapshot,
 } from './gm-agent'
-import {
-  ConversationCompactorService,
-  type CompactableMessage,
-} from './conversation-compactor.service'
-import { ConversationModeService } from './conversation-mode.service'
+import type { DispatchContext } from './tool-dispatcher'
+import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
 
 type PersistedToolCall = {
@@ -138,10 +143,7 @@ export class ChatService implements OnModuleInit {
 
   /// Phase F — fetch (and lazily refresh) the user's GM profile summary for
   /// injection into prompt context. Soft-fails to null so chat never blocks.
-  private async getUserProfileSummary(
-    userId: string,
-    orgId: string,
-  ): Promise<string | null> {
+  private async getUserProfileSummary(userId: string, orgId: string): Promise<string | null> {
     try {
       const profile = await this.userProfile.getOrRefresh(userId, orgId)
       if (!profile) return null
@@ -201,10 +203,7 @@ export class ChatService implements OnModuleInit {
   ///  - Tabular docs are detected via metadata.docType='tabular' (the same flag
   ///    the dispatcher uses for query_document_table routing).
   ///  - Soft-fails to an empty snapshot — the agent falls back to find_knowledge.
-  private async buildVenueSnapshot(
-    orgId: string,
-    venueId: string,
-  ): Promise<VenueSnapshot> {
+  private async buildVenueSnapshot(orgId: string, venueId: string): Promise<VenueSnapshot> {
     try {
       const rows = await prisma.knowledgeItem.findMany({
         where: {
@@ -233,10 +232,7 @@ export class ChatService implements OnModuleInit {
           typeof meta.title === 'string' && meta.title.trim().length > 0
             ? meta.title.trim()
             : r.content.replace(/\s+/g, ' ').trim().slice(0, 60)
-        const summary = (r.aiSummary ?? r.content)
-          .replace(/\s+/g, ' ')
-          .trim()
-          .slice(0, 140)
+        const summary = (r.aiSummary ?? r.content).replace(/\s+/g, ' ').trim().slice(0, 140)
 
         if (docType === 'tabular') {
           if (tabularDocs.length < 8) tabularDocs.push({ id: r.id, title })
@@ -245,9 +241,7 @@ export class ChatService implements OnModuleInit {
 
         if (meta.isGap === true) {
           const tentative = typeof meta.tentativeAnswer === 'string' ? meta.tentativeAnswer : null
-          const answer = (r.aiSummary && r.aiSummary.trim().length > 0)
-            ? r.aiSummary
-            : tentative
+          const answer = r.aiSummary && r.aiSummary.trim().length > 0 ? r.aiSummary : tentative
           if (answer && recentlyAnswered.length < 6) {
             recentlyAnswered.push({
               question: r.content.replace(/\s+/g, ' ').trim().slice(0, 160),
@@ -279,10 +273,7 @@ export class ChatService implements OnModuleInit {
   /// answer is ready, so it adds latency only to the post-answer pills, not
   /// to TTFB. Soft-fails to []. Hard cap on time so a slow Haiku call never
   /// holds up persistence.
-  private async generateFollowUps(
-    userMessage: string,
-    assistantText: string,
-  ): Promise<string[]> {
+  private async generateFollowUps(userMessage: string, assistantText: string): Promise<string[]> {
     if (!assistantText.trim()) return []
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 2500)
@@ -484,9 +475,7 @@ Assistant answer: ${assistantText}`,
       if (!existing || existing.deletedAt !== null)
         throw new Error(`conversation ${input.conversationId} not found`)
       if (existing.venueId !== venue.id) {
-        throw new Error(
-          `conversation ${input.conversationId} does not belong to venue ${venue.id}`,
-        )
+        throw new Error(`conversation ${input.conversationId} does not belong to venue ${venue.id}`)
       }
       // Share-chat: only the original creator can post into a thread. Legacy
       // WhatsApp threads (userId=null) skip this gate — they predate user
@@ -512,9 +501,7 @@ Assistant answer: ${assistantText}`,
     const userContent = input.attachment
       ? (() => {
           const byteSize = Buffer.from(input.attachment.base64, 'base64').length
-          const sidSuffix = input.attachment.sourceRef
-            ? `, sid:${input.attachment.sourceRef}`
-            : ''
+          const sidSuffix = input.attachment.sourceRef ? `, sid:${input.attachment.sourceRef}` : ''
           return `${input.userMessage}\n[image: ${input.attachment.mediaType}, ${byteSize}B${sidSuffix}]`
         })()
       : input.userMessage
@@ -536,9 +523,7 @@ Assistant answer: ${assistantText}`,
     })
     // Anthropic rejects empty text blocks with 400. Aborted or failed prior
     // turns can leave assistant rows with empty content — filter them out.
-    const filteredRaw = historyRaw.filter(
-      (m) => m.content && m.content.trim().length > 0,
-    )
+    const filteredRaw = historyRaw.filter((m) => m.content && m.content.trim().length > 0)
     const history: CompactableMessage[] = filteredRaw.map((m) => ({
       id: m.id,
       role: m.role === 'assistant' ? 'assistant' : ('user' as const),
@@ -549,14 +534,13 @@ Assistant answer: ${assistantText}`,
     // Pre-amble — fan out everything the agent needs into one Promise.all so
     // TTFB isn't paying for sequential awaits. Mode resolution stays in here
     // (it's quick — just a DB read; the Haiku classifier fires in the background).
-    const [compaction, agentMode, venueContext, profileSummary, venueSnapshot] =
-      await Promise.all([
-        this.compactor.compactIfNeeded(conversationId, history),
-        this.resolveConversationMode(conversationId, input.userMessage),
-        this.buildVenueContext(venue),
-        this.getUserProfileSummary(userId, orgId),
-        this.buildVenueSnapshot(orgId, venue.id),
-      ])
+    const [compaction, agentMode, venueContext, profileSummary, venueSnapshot] = await Promise.all([
+      this.compactor.compactIfNeeded(conversationId, history),
+      this.resolveConversationMode(conversationId, input.userMessage),
+      this.buildVenueContext(venue),
+      this.getUserProfileSummary(userId, orgId),
+      this.buildVenueSnapshot(orgId, venue.id),
+    ])
     const messages: ModelMessage[] = expandRecentToModelMessages(
       compaction.recent,
       toolCallsByMessageId,
@@ -609,9 +593,7 @@ Assistant answer: ${assistantText}`,
           })
         }
         for (const tr of step.toolResults ?? []) {
-          const entry = toolCallLog.find(
-            (l) => l.toolUseId === tr.toolCallId && l.result === null,
-          )
+          const entry = toolCallLog.find((l) => l.toolUseId === tr.toolCallId && l.result === null)
           if (entry) entry.result = tr.output
 
           if (tr.toolName === 'find_knowledge') {
@@ -645,11 +627,13 @@ Assistant answer: ${assistantText}`,
       // PII boundary: counts + conversationIdHash only — no message body, no
       // retrieved content.
       try {
-        const usage = result.usage as {
-          inputTokens?: number
-          outputTokens?: number
-          inputTokenDetails?: { cacheReadTokens?: number; cacheWriteTokens?: number }
-        } | undefined
+        const usage = result.usage as
+          | {
+              inputTokens?: number
+              outputTokens?: number
+              inputTokenDetails?: { cacheReadTokens?: number; cacheWriteTokens?: number }
+            }
+          | undefined
         const cacheRead = usage?.inputTokenDetails?.cacheReadTokens
         const cacheWrite = usage?.inputTokenDetails?.cacheWriteTokens
         if (cacheRead !== undefined || cacheWrite !== undefined) {
@@ -870,7 +854,7 @@ Assistant answer: ${assistantText}`,
   }): Promise<{
     conversationId: string
     assistantMessageId: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any output schema
     result: StreamTextResult<ToolSet, any>
   }> {
     const venue = await prisma.venue.findFirst({
@@ -908,9 +892,7 @@ Assistant answer: ${assistantText}`,
     )
     if (existingConv) {
       if (existingConv.venueId !== venue.id) {
-        throw new Error(
-          `conversation ${conversationId} does not belong to venue ${venue.id}`,
-        )
+        throw new Error(`conversation ${conversationId} does not belong to venue ${venue.id}`)
       }
       if (existingConv.userId && existingConv.userId !== params.userId) {
         throw new Error(`conversation ${conversationId} belongs to another user`)
@@ -1020,9 +1002,7 @@ Assistant answer: ${assistantText}`,
         for (const tr of step.toolResults ?? []) {
           // Backfill the matching log entry with the tool result so
           // persistence carries input + output together.
-          const entry = toolCallLog.find(
-            (l) => l.toolUseId === tr.toolCallId && l.result === null,
-          )
+          const entry = toolCallLog.find((l) => l.toolUseId === tr.toolCallId && l.result === null)
           if (entry) entry.result = tr.output
 
           if (tr.toolName === 'find_knowledge') {
@@ -1063,9 +1043,7 @@ Assistant answer: ${assistantText}`,
         const lastAssistant = [...event.response.messages]
           .reverse()
           .find((m) => m.role === 'assistant')
-        const partsJson = lastAssistant
-          ? (lastAssistant.content as unknown as object)
-          : null
+        const partsJson = lastAssistant ? (lastAssistant.content as unknown as object) : null
 
         // Generate follow-up pills via Haiku from (user msg, final answer).
         // The user has already seen the answer streamed, so this latency only
@@ -1123,5 +1101,5 @@ Assistant answer: ${assistantText}`,
 
 function truncate(s: string, max: number): string {
   const trimmed = s.trim().replace(/\s+/g, ' ')
-  return trimmed.length > max ? trimmed.slice(0, max - 1) + '…' : trimmed
+  return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed
 }

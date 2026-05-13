@@ -7,9 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             G
           </div>
           <h1 className="text-lg font-semibold tracking-tight">GM AI</h1>
-          <p className="text-sm text-muted-foreground">
-            Hospitality ops + knowledge chat
-          </p>
+          <p className="text-sm text-muted-foreground">Hospitality ops + knowledge chat</p>
         </div>
         {children}
       </div>

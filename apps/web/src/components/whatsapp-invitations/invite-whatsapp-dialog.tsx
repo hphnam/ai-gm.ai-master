@@ -1,17 +1,11 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Copy, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Copy, MessageCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import { ApiError } from '@/lib/api-client'
-import { mapApiError } from '@/lib/map-api-error'
-import {
-  useCreateWhatsappInvite,
-  type CreateWhatsappInviteResponse,
-} from '@/lib/hooks/use-whatsapp-invites'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -41,12 +35,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { ApiError } from '@/lib/api-client'
+import {
+  type CreateWhatsappInviteResponse,
+  useCreateWhatsappInvite,
+} from '@/lib/hooks/use-whatsapp-invites'
+import { mapApiError } from '@/lib/map-api-error'
 
 // Mirror the API contract — z.regex enforces E.164.
 const FormSchema = z.object({
-  phoneNumber: z
-    .string()
-    .regex(/^\+[1-9]\d{6,14}$/, 'Use E.164 format (e.g. +447700900001)'),
+  phoneNumber: z.string().regex(/^\+[1-9]\d{6,14}$/, 'Use E.164 format (e.g. +447700900001)'),
   role: z.enum(['staff', 'manager']),
   note: z.string().max(120).optional(),
 })
@@ -154,9 +152,8 @@ export function InviteWhatsappDialog() {
             <DialogHeader>
               <DialogTitle>Invite via WhatsApp</DialogTitle>
               <DialogDescription>
-                Generates an 8-character code valid for 24 hours. Share it with the staff
-                member directly — they reply to the GM AI WhatsApp number with the code to
-                verify.
+                Generates an 8-character code valid for 24 hours. Share it with the staff member
+                directly — they reply to the GM AI WhatsApp number with the code to verify.
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -244,17 +241,13 @@ export function InviteWhatsappDialog() {
             <DialogHeader>
               <DialogTitle>Number registered elsewhere</DialogTitle>
               <DialogDescription>
-                {stage.values.phoneNumber} is already linked to another organisation.
-                Confirm with the user before issuing this invite — they&rsquo;ll appear in
-                both organisations after redemption.
+                {stage.values.phoneNumber} is already linked to another organisation. Confirm with
+                the user before issuing this invite — they&rsquo;ll appear in both organisations
+                after redemption.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setStage({ kind: 'form' })}
-              >
+              <Button type="button" variant="outline" onClick={() => setStage({ kind: 'form' })}>
                 Back
               </Button>
               <Button
@@ -274,14 +267,11 @@ export function InviteWhatsappDialog() {
             <DialogHeader>
               <DialogTitle>Code ready — share it now</DialogTitle>
               <DialogDescription>
-                Copy this code and send it to the staff member. We&rsquo;ll only show it
-                once — closing this dialog clears it.
+                Copy this code and send it to the staff member. We&rsquo;ll only show it once —
+                closing this dialog clears it.
               </DialogDescription>
             </DialogHeader>
-            <div
-              aria-live="polite"
-              className="rounded-md border bg-muted/40 p-4 text-center"
-            >
+            <div aria-live="polite" className="rounded-md border bg-muted/40 p-4 text-center">
               <p className="font-mono text-3xl font-bold tracking-[0.4em]">
                 {stage.response.invite.code}
               </p>

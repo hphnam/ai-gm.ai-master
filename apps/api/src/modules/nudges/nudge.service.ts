@@ -46,11 +46,10 @@ export class NudgeService {
     const recipient = await this.resolveRecipient(venueId)
     if (!recipient) return { sent: false, reason: 'no contactable duty manager' }
 
-    const message = this.composeMessage(
-      venue.name,
-      belowPar.data,
-      cutoffs.data,
-    ).slice(0, NUDGE_PREVIEW_LIMIT)
+    const message = this.composeMessage(venue.name, belowPar.data, cutoffs.data).slice(
+      0,
+      NUDGE_PREVIEW_LIMIT,
+    )
 
     try {
       await this.whatsapp.sendText(recipient.phone, message)
@@ -83,9 +82,7 @@ export class NudgeService {
     }
   }
 
-  private async resolveRecipient(
-    venueId: string,
-  ): Promise<{ name: string; phone: string } | null> {
+  private async resolveRecipient(venueId: string): Promise<{ name: string; phone: string } | null> {
     // Priority: emergency contact → owner role → manager role → first phone-bearing contact.
     const contacts = await prisma.venueContact.findMany({
       where: { venueId, phone: { not: null } },
@@ -113,19 +110,12 @@ export class NudgeService {
   ): string {
     const items = belowPar
       .slice(0, 6)
-      .map(
-        (i) =>
-          `${i.name} (${formatNum(i.currentQty)}/${formatNum(i.parLevel)} ${i.unit})`,
-      )
+      .map((i) => `${i.name} (${formatNum(i.currentQty)}/${formatNum(i.parLevel)} ${i.unit})`)
       .join(', ')
     const moreSuffix = belowPar.length > 6 ? ` +${belowPar.length - 6} more` : ''
     const supplierLine = cutoffs
       .slice(0, 3)
-      .map((c) =>
-        c.supplierNotes
-          ? `${c.supplierName} — ${c.supplierNotes}`
-          : c.supplierName,
-      )
+      .map((c) => (c.supplierNotes ? `${c.supplierName} — ${c.supplierNotes}` : c.supplierName))
       .join('; ')
 
     return `Heads up at ${venueName}: ${belowPar.length} below par — ${items}${moreSuffix}. Cutoffs nearing: ${supplierLine}. Want me to draft the order? Reply yes.`

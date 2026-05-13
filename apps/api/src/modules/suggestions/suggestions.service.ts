@@ -36,10 +36,6 @@ type CutoffItem = {
   supplierNotes: string | null
 }
 
-type BranchOutcome =
-  | { tool: ToolName; input: Record<string, unknown>; result: ToolResult<unknown> }
-  | null
-
 @Injectable()
 export class SuggestionsService {
   private readonly logger = new Logger(SuggestionsService.name)
@@ -152,22 +148,18 @@ export class SuggestionsService {
 
     if (stockMatched) {
       invoked.push(
-        this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId).then(
-          (r) => {
-            belowParResult = r
-            return r
-          },
-        ),
+        this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId).then((r) => {
+          belowParResult = r
+          return r
+        }),
       )
     }
     if (cutoffMatched) {
       invoked.push(
-        this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId).then(
-          (r) => {
-            cutoffResult = r
-            return r
-          },
-        ),
+        this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId).then((r) => {
+          cutoffResult = r
+          return r
+        }),
       )
     }
     await Promise.all(invoked)
@@ -188,10 +180,8 @@ export class SuggestionsService {
     }
 
     const branches: Array<{ tool: ToolName; result: ToolResult<unknown> }> = []
-    if (stockMatched)
-      branches.push({ tool: 'get_stock_below_par', result: belowParResult })
-    if (cutoffMatched)
-      branches.push({ tool: 'get_upcoming_cutoffs', result: cutoffResult })
+    if (stockMatched) branches.push({ tool: 'get_stock_below_par', result: belowParResult })
+    if (cutoffMatched) branches.push({ tool: 'get_upcoming_cutoffs', result: cutoffResult })
 
     this.emitLogs({
       venueId,
@@ -255,7 +245,7 @@ export class SuggestionsService {
       const items = (belowPar.result.data as BelowParItem[]).slice(0, TOP_BELOW_PAR)
       for (const it of items) {
         const severity: SuggestionSeverity = it.currentQty === 0 ? 'warn' : 'info'
-        const raw = `${it.name} is at ${it.currentQty}${it.unit} (par ${it.parLevel}${it.unit})${it.supplierName ? ' — order from ' + it.supplierName : ''}`
+        const raw = `${it.name} is at ${it.currentQty}${it.unit} (par ${it.parLevel}${it.unit})${it.supplierName ? ` — order from ${it.supplierName}` : ''}`
         out.push({
           kind: 'below-par',
           severity,
@@ -270,9 +260,8 @@ export class SuggestionsService {
     if (cutoff.result.ok) {
       const items = (cutoff.result.data as CutoffItem[]).slice(0, TOP_CUTOFFS)
       for (const it of items) {
-        const severity: SuggestionSeverity =
-          it.estimatedDeliveryHours < 6 ? 'warn' : 'info'
-        const raw = `${it.supplierName} order cutoff in ~${it.estimatedDeliveryHours}h (${it.stockCount} items)${it.supplierNotes ? ' — ' + it.supplierNotes : ''}`
+        const severity: SuggestionSeverity = it.estimatedDeliveryHours < 6 ? 'warn' : 'info'
+        const raw = `${it.supplierName} order cutoff in ~${it.estimatedDeliveryHours}h (${it.stockCount} items)${it.supplierNotes ? ` — ${it.supplierNotes}` : ''}`
         out.push({
           kind: 'cutoff',
           severity,
@@ -292,7 +281,7 @@ export class SuggestionsService {
     if (cleaned.length <= MAX_TEXT_LEN) return cleaned
     const cut = cleaned.lastIndexOf(' ', MAX_TEXT_LEN - 1)
     const boundary = cut > 0 ? cut : MAX_TEXT_LEN - 1
-    return cleaned.slice(0, boundary).trimEnd() + '…'
+    return `${cleaned.slice(0, boundary).trimEnd()}…`
   }
 
   private emitLogs(args: {

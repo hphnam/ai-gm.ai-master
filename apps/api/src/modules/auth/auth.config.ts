@@ -32,9 +32,7 @@ export const auth = betterAuth({
     // bounces back to /sign-in. Widening to the parent domain fixes it.
     // Pair with sameSite:'none'+secure:true (required for cross-site
     // cookies in modern browsers).
-    crossSubDomainCookies: isProd
-      ? { enabled: true, domain: '.ai-gm.ai' }
-      : { enabled: false },
+    crossSubDomainCookies: isProd ? { enabled: true, domain: '.ai-gm.ai' } : { enabled: false },
     defaultCookieAttributes: {
       httpOnly: true,
       sameSite: isProd ? 'none' : 'lax',
@@ -74,9 +72,7 @@ export const auth = betterAuth({
           } catch (err) {
             // audit-added M2: atomic rollback — delete the just-created User so
             // no zombie auth rows exist without an Organization/Membership.
-            await prisma.user
-              .delete({ where: { id: user.id } })
-              .catch(() => undefined)
+            await prisma.user.delete({ where: { id: user.id } }).catch(() => undefined)
             if (err instanceof OrgSlugConflictError) throw err
             throw err
           }

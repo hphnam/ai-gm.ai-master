@@ -6,22 +6,22 @@
 // Stub mode (PROBE_CHAT_V2_STUB=1): returns deterministic canned output keyed
 // by userMessage substring. No network call.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { Injectable } from '@nestjs/common'
 import { generateObject, type SystemModelMessage } from 'ai'
 import {
   type AnthropicUsage,
   MAX_RESEARCHERS_PER_TURN,
   type ResearcherName,
+  RoleTimeoutError,
   TRIAGE_TIMEOUT_MS,
   TriageClassificationError,
   type TriageOutput,
   TriageOutputSchema,
-  RoleTimeoutError,
 } from '../../types'
+import { chatV2Logger } from './log-helpers'
 import { TRIAGE_PROMPT } from './prompts/triage.prompt'
 import { quickClassify } from './triage-quick-classify'
-import { chatV2Logger } from './log-helpers'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
@@ -77,10 +77,7 @@ export class TriageService {
       const result = await generateObject({
         model: anthropicProvider(HAIKU_MODEL),
         schema: TriageOutputSchema,
-        messages: [
-          ...systemMessages,
-          { role: 'user', content: userMessage },
-        ],
+        messages: [...systemMessages, { role: 'user', content: userMessage }],
         abortSignal: controller.signal,
         maxRetries: 2,
       })
@@ -92,9 +89,7 @@ export class TriageService {
       if (controller.signal.aborted) {
         throw new RoleTimeoutError('triage', TRIAGE_TIMEOUT_MS)
       }
-      throw new TriageClassificationError(
-        (err as Error)?.message ?? 'triage classification failed',
-      )
+      throw new TriageClassificationError((err as Error)?.message ?? 'triage classification failed')
     } finally {
       clearTimeout(timer)
     }
@@ -161,7 +156,10 @@ function stubClassify(userMessage: string): TriageResult {
   }
 
   // V80.cap — force-five-researcher dispatch for orchestrator cap test.
-  if (process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH === '1' || userMessage.includes(FORCE_FIVE_DISPATCH)) {
+  if (
+    process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH === '1' ||
+    userMessage.includes(FORCE_FIVE_DISPATCH)
+  ) {
     return makeStubResult(
       'reasoning',
       ['venue', 'docs', 'ops', 'people', 'tabular'],
@@ -225,7 +223,11 @@ function stubClassify(userMessage: string): TriageResult {
     )
   }
   // Drunk customer / personal safety / injury.
-  if (/\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(userMessage)) {
+  if (
+    /\b(drunk customer|drunk patron|unconscious|bleeding|injury|fainting|choking)\b/i.test(
+      userMessage,
+    )
+  ) {
     return makeStubResult(
       'incident',
       ['venue', 'docs', 'people'],
@@ -326,7 +328,11 @@ function stubClassify(userMessage: string): TriageResult {
       false,
     )
   }
-  if (lower.includes('ice machine') || lower.includes('engineer') || lower.includes('who do i call')) {
+  if (
+    lower.includes('ice machine') ||
+    lower.includes('engineer') ||
+    lower.includes('who do i call')
+  ) {
     return makeStubResult(
       'lookup',
       ['people'],

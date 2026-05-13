@@ -17,23 +17,19 @@ export const metadata: Metadata = {
   description: 'General Manager AI for hospitality operations',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${jakarta.variable} light`} style={{ colorScheme: 'light' }}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${jakarta.variable} light`}
+      style={{ colorScheme: 'light' }}
+    >
       <body className="font-sans">
         <NuqsAdapter>
           <QueryProvider>
             {children}
-            <Toaster
-              position="top-right"
-              richColors
-              closeButton
-              visibleToasts={3}
-            />
+            <Toaster position="top-right" richColors closeButton visibleToasts={3} />
           </QueryProvider>
         </NuqsAdapter>
       </body>

@@ -14,15 +14,16 @@
 import type { PrismaClient } from '@prisma/client'
 import {
   fail,
-  ok,
   type IncidentSummary,
+  ok,
   type ToolResult,
   type VenueContactSummary,
   type VenueProfile,
 } from '../../../types'
 import { VenueProfileSchema } from '../../../types/api'
-import type { MockOpsService, MockUpcomingCutoff } from '../../mock-ops/mock-ops.service'
-import { hashId, chatV2Logger } from '../log-helpers'
+import type { MockUpcomingCutoff } from '../../mock-ops/mock-ops.service'
+import { MockOpsService } from '../../mock-ops/mock-ops.service'
+import { chatV2Logger, hashId } from '../log-helpers'
 import { stubClock } from '../stub-clock'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

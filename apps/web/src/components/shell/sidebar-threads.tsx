@@ -1,12 +1,9 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
 import { MessagesSquare, Store, Trash2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import {
-  useConversationsList,
-  useDeleteConversation,
-} from '@/lib/hooks/use-conversations-list'
+import { useConversationsList, useDeleteConversation } from '@/lib/hooks/use-conversations-list'
 import { cn } from '@/lib/utils'
 
 function formatRelative(iso: string): string {
@@ -68,9 +65,7 @@ export function SidebarThreads() {
             >
               <button
                 type="button"
-                onClick={() =>
-                  router.push(`/chat?venue=${c.venueId}&conv=${c.id}`)
-                }
+                onClick={() => router.push(`/chat?venue=${c.venueId}&conv=${c.id}`)}
                 className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
               >
                 <span

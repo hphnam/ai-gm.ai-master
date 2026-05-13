@@ -31,10 +31,7 @@ export function VenueSelector({ targetRoute = '/chat' }: VenueSelectorProps = {}
   }
 
   return (
-    <Select
-      value={currentVenue}
-      onValueChange={(id) => router.push(`${targetRoute}?venue=${id}`)}
-    >
+    <Select value={currentVenue} onValueChange={(id) => router.push(`${targetRoute}?venue=${id}`)}>
       <SelectTrigger className="w-[280px]" aria-label="Select venue">
         <SelectValue placeholder="Choose a venue…" />
       </SelectTrigger>

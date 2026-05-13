@@ -1,12 +1,12 @@
 import { Logger } from '@nestjs/common'
 import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
+  type OnGatewayConnection,
+  type OnGatewayDisconnect,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
-import type { Server, Socket } from 'socket.io'
 import { fromNodeHeaders } from 'better-auth/node'
+import type { Server, Socket } from 'socket.io'
 import { prisma } from '../../database/prisma'
 import { auth } from '../auth/auth.config'
 
@@ -113,7 +113,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   // Hook for future events (gaps, chat, nudges) — same room semantics.
-  emitGapUpdated(orgId: string, payload: { id: string; status: 'created' | 'answered' | 'deleted' }): void {
+  emitGapUpdated(
+    orgId: string,
+    payload: { id: string; status: 'created' | 'answered' | 'deleted' },
+  ): void {
     this.server?.to(roomFor(orgId)).emit('gap.updated', payload)
   }
 }

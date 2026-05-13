@@ -2,10 +2,7 @@ import { SEEN_SID_MAX_ENTRIES, SEEN_SID_TTL_MS } from '../../types'
 
 const seen = new Map<string, number>()
 
-export function markAndCheckSid(
-  messageSid: string,
-  nowMs: number = Date.now(),
-): { seen: boolean } {
+export function markAndCheckSid(messageSid: string, nowMs: number = Date.now()): { seen: boolean } {
   const prev = seen.get(messageSid)
   if (prev !== undefined && nowMs - prev < SEEN_SID_TTL_MS) {
     return { seen: true }

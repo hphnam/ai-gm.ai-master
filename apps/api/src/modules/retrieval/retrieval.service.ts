@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { createHash } from 'node:crypto'
 import Anthropic from '@anthropic-ai/sdk'
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import { fail, ok, type ToolResult } from '../../types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
@@ -218,8 +218,7 @@ export class RetrievalService implements OnModuleInit {
     candidateLimit: number,
     minSim: number,
   ): Promise<RetrievalHit[]> {
-    const entityTypes =
-      opts.entityTypes && opts.entityTypes.length > 0 ? opts.entityTypes : null
+    const entityTypes = opts.entityTypes && opts.entityTypes.length > 0 ? opts.entityTypes : null
     const tagFilter = opts.tags && opts.tags.length > 0 ? opts.tags : null
     const kindFilter = opts.kinds && opts.kinds.length > 0 ? opts.kinds : null
     const recencyDays =

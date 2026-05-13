@@ -1,16 +1,6 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Logger,
-  Post,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, HttpCode, Logger, Post, UseGuards } from '@nestjs/common'
 import { ApiExcludeController } from '@nestjs/swagger'
-import {
-  BATCH_DEADLINE_MS,
-  InfobipInboundWebhookSchema,
-} from '../../types'
+import { BATCH_DEADLINE_MS, InfobipInboundWebhookSchema } from '../../types'
 import { WhatsappService } from './whatsapp.service'
 import { WhatsappSignatureGuard } from './whatsapp-signature.guard'
 

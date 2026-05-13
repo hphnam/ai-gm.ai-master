@@ -15,10 +15,8 @@
 const SLIDE_MARKER_RE = /^##\s+Slide\s+\d+/m
 const SHEET_MARKER_RE = /^#\s+Sheet:/m
 
-const PPTX_MIME =
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-const XLSX_MIME =
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+const PPTX_MIME = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 const CSV_MIME = 'text/csv'
 
 export function detectMimeFromContent(content: string): string | null {

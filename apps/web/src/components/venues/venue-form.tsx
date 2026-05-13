@@ -1,12 +1,10 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
-import { VenuesControllerCreateBody as CreateVenueBodySchema } from '@/generated/zod'
-import type { CreateVenueBodyDto as CreateVenueBody } from '@/generated/api'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -18,6 +16,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import type { CreateVenueBodyDto as CreateVenueBody } from '@/generated/api'
+import { VenuesControllerCreateBody as CreateVenueBodySchema } from '@/generated/zod'
 import { useCreateVenue } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
@@ -67,9 +67,7 @@ export function VenueForm() {
               <FormControl>
                 <Input {...field} placeholder="pub, restaurant, bar, cafe…" disabled={submitting} />
               </FormControl>
-              <FormDescription>
-                Free-form. Used as context for the AI.
-              </FormDescription>
+              <FormDescription>Free-form. Used as context for the AI.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -101,7 +99,9 @@ export function VenueForm() {
               <FormControl>
                 <Input {...field} placeholder="Europe/London" disabled={submitting} />
               </FormControl>
-              <FormDescription>IANA timezone (e.g. Europe/London, America/New_York).</FormDescription>
+              <FormDescription>
+                IANA timezone (e.g. Europe/London, America/New_York).
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

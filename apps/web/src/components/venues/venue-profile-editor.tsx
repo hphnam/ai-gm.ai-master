@@ -1,16 +1,16 @@
 'use client'
 
+import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
 import { toast } from 'sonner'
-import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
-import type { VenueDetailDto as VenueDetail } from '@/generated/api'
-import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import type { VenueDetailDto as VenueDetail } from '@/generated/api'
+import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
+import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
 import { useRunNudge, useUpdateVenueProfile } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
@@ -123,10 +123,7 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
           label="Opening hours"
           hint="Plain English. Example: Mon–Thu 12:00–23:00, Fri/Sat 12:00–01:00, Sun 12:00–22:00"
         >
-          <Input
-            {...form.register('openingHours')}
-            placeholder="Mon–Sun 12:00–23:00"
-          />
+          <Input {...form.register('openingHours')} placeholder="Mon–Sun 12:00–23:00" />
         </Field>
         <Field
           label="Layout notes"
@@ -139,10 +136,7 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
           />
         </Field>
         <Field label="What3Words" hint="Useful for delivery drivers and emergency services.">
-          <Input
-            {...form.register('what3words')}
-            placeholder="///filled.count.soap"
-          />
+          <Input {...form.register('what3words')} placeholder="///filled.count.soap" />
         </Field>
         <Field
           label="Delivery notes"
@@ -157,14 +151,13 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
       </Section>
 
       <Section title="Safety" icon={<ShieldAlert className="h-3.5 w-3.5" />}>
-        <Field
-          label="Fire escape locations"
-          hint="One per line."
-        >
+        <Field label="Fire escape locations" hint="One per line.">
           <Textarea
             {...form.register('fireEscapesText')}
             rows={3}
-            placeholder={'Rear of bar past cellar door\nFire door beside the gents\nKitchen back door'}
+            placeholder={
+              'Rear of bar past cellar door\nFire door beside the gents\nKitchen back door'
+            }
           />
         </Field>
         <Field label="First-aid points" hint="One per line.">

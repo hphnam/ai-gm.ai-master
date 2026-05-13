@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common'
-import type { Request, Response, NextFunction } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 const logger = new Logger('http')
 

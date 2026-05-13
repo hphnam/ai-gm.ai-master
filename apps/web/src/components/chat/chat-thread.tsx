@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import type { UIMessage } from 'ai'
 import { Sparkles } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 import { ChatMessage } from './chat-message'
 
 type Props = {

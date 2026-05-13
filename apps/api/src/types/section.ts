@@ -38,7 +38,7 @@ export const EMBED_QUALITY_DEGRADED_THRESHOLD = 0.5
 
 /// Plan 01-02 — heuristic version stamp on every KnowledgeSection row.
 /// Replaces the magic-number `1` previously hardcoded inside IngestService.
-/// Bumping this constant + re-running `pnpm backfill:sections` reprocesses
+/// Bumping this constant + re-running `npm run backfill:sections --workspace=api` reprocesses
 /// every KI whose MAX(KnowledgeSection.sectionVersion) < CURRENT_SECTION_VERSION.
 /// Manual ops procedure (audit-S9 deferred): (1) deploy, (2) backfill, (3) verify.
 export const CURRENT_SECTION_VERSION = 1

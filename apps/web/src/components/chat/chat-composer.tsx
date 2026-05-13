@@ -1,19 +1,16 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowUp, ImagePlus, Loader2, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { ArrowUp, ImagePlus, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { z } from 'zod'
 import { cn } from '@/lib/utils'
 
 const ComposerSchema = z.object({
   // Allow empty when an image is attached; we add a stand-in question on send.
-  userMessage: z
-    .string()
-    .trim()
-    .max(8000, 'Message too long (max 8000 characters)'),
+  userMessage: z.string().trim().max(8000, 'Message too long (max 8000 characters)'),
 })
 type ComposerInput = z.infer<typeof ComposerSchema>
 
@@ -100,7 +97,7 @@ export function ChatComposer({
     if (!el) return
     el.style.height = 'auto'
     const max = 220
-    el.style.height = Math.min(el.scrollHeight, max) + 'px'
+    el.style.height = `${Math.min(el.scrollHeight, max)}px`
   }, [value])
 
   const submit = handleSubmit(async (data) => {
@@ -171,9 +168,7 @@ export function ChatComposer({
           aria-describedby="composer-hint"
           aria-invalid={Boolean(errors.userMessage)}
           placeholder={
-            disabled && disabledReason
-              ? disabledReason
-              : 'Ask about stock, ordering, SOPs…'
+            disabled && disabledReason ? disabledReason : 'Ask about stock, ordering, SOPs…'
           }
           disabled={inputDisabled}
           onKeyDown={onKeyDown}
@@ -209,11 +204,7 @@ export function ChatComposer({
       {imagePreview && attachedImage ? (
         <div className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted/40 p-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={imagePreview}
-            alt="Attached"
-            className="h-12 w-12 rounded object-cover"
-          />
+          <img src={imagePreview} alt="Attached" className="h-12 w-12 rounded object-cover" />
           <span className="max-w-[180px] truncate text-xs text-muted-foreground">
             {attachedImage.name}
           </span>

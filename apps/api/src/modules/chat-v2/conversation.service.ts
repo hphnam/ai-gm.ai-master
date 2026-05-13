@@ -81,9 +81,7 @@ export class ConversationService {
       venueId: r.venueId,
       venueName: r.venue.name,
       lastMessageAt: r.updatedAt.toISOString(),
-      preview: r.messages[0]?.content
-        ? truncate(r.messages[0].content, PREVIEW_MAX)
-        : null,
+      preview: r.messages[0]?.content ? truncate(r.messages[0].content, PREVIEW_MAX) : null,
     }))
   }
 
@@ -157,9 +155,7 @@ export class ConversationService {
         followUps: m.followUps,
         reasoning: m.reasoning,
         parts: m.parts ?? undefined,
-        toolCallLog: Array.isArray(m.toolCallLog)
-          ? (m.toolCallLog as unknown[])
-          : undefined,
+        toolCallLog: Array.isArray(m.toolCallLog) ? (m.toolCallLog as unknown[]) : undefined,
         feedbackKind: (m.feedback?.kind ?? null) as string | null,
       })),
     }

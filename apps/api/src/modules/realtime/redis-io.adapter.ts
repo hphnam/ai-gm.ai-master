@@ -1,6 +1,6 @@
-import { IoAdapter } from '@nestjs/platform-socket.io'
 import type { INestApplicationContext } from '@nestjs/common'
 import { Logger } from '@nestjs/common'
+import { IoAdapter } from '@nestjs/platform-socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
 import Redis from 'ioredis'
 import type { ServerOptions } from 'socket.io'
@@ -37,12 +37,8 @@ export class RedisIoAdapter extends IoAdapter {
     this.pubClient = new Redis(this.redisUrl, redisOptions)
     this.subClient = this.pubClient.duplicate()
 
-    this.pubClient.on('error', (err) =>
-      this.logger.error(`redis pub error: ${err.message}`),
-    )
-    this.subClient.on('error', (err) =>
-      this.logger.error(`redis sub error: ${err.message}`),
-    )
+    this.pubClient.on('error', (err) => this.logger.error(`redis pub error: ${err.message}`))
+    this.subClient.on('error', (err) => this.logger.error(`redis sub error: ${err.message}`))
 
     // Wait for both clients to be ready so we don't race the first emit.
     await Promise.all([
@@ -65,10 +61,7 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   async dispose(): Promise<void> {
-    await Promise.allSettled([
-      this.pubClient?.quit(),
-      this.subClient?.quit(),
-    ])
+    await Promise.allSettled([this.pubClient?.quit(), this.subClient?.quit()])
     this.pubClient = null
     this.subClient = null
     this.adapter = null

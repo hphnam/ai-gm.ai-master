@@ -12,8 +12,8 @@
 // Haiku 4.5 via generateObject with CriticOutputSchema. AbortController +
 // setTimeout per CRITIC_TIMEOUT_MS (4s — audit-S3 tightened from 8s).
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { Injectable } from '@nestjs/common'
 import { generateText } from 'ai'
 import {
   type AnthropicUsage,

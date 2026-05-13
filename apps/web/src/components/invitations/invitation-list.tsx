@@ -1,10 +1,8 @@
 'use client'
 
+import { CheckCircle2, Clock, Copy, Trash2, UserPlus, XCircle } from 'lucide-react'
 import { useState } from 'react'
-import { Clock, Copy, Trash2, UserPlus, CheckCircle2, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import type { ListInvitationsResponseDto as ListInvitationsResponse } from '@/generated/api'
-import type { InvitationDto as InvitationDTO } from '@/lib/api-types'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -15,6 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { ListInvitationsResponseDto as ListInvitationsResponse } from '@/generated/api'
+import type { InvitationDto as InvitationDTO } from '@/lib/api-types'
 import { useRevokeInvitation } from '@/lib/hooks/use-invitations'
 
 function formatRelative(iso: string): string {
@@ -25,8 +25,10 @@ function formatRelative(iso: string): string {
   const day = 86400000
   const hr = 3600000
   const min = 60000
-  if (abs > day) return `${diffMs >= 0 ? 'in ' : ''}${Math.round(abs / day)}d${diffMs < 0 ? ' ago' : ''}`
-  if (abs > hr) return `${diffMs >= 0 ? 'in ' : ''}${Math.round(abs / hr)}h${diffMs < 0 ? ' ago' : ''}`
+  if (abs > day)
+    return `${diffMs >= 0 ? 'in ' : ''}${Math.round(abs / day)}d${diffMs < 0 ? ' ago' : ''}`
+  if (abs > hr)
+    return `${diffMs >= 0 ? 'in ' : ''}${Math.round(abs / hr)}h${diffMs < 0 ? ' ago' : ''}`
   return `${diffMs >= 0 ? 'in ' : ''}${Math.max(1, Math.round(abs / min))}m${diffMs < 0 ? ' ago' : ''}`
 }
 
@@ -110,9 +112,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
   const pending = data.invitations.filter((i) => i.status === 'pending')
   const accepted = data.invitations.filter((i) => i.status === 'accepted')
-  const dead = data.invitations.filter(
-    (i) => i.status === 'revoked' || i.status === 'expired',
-  )
+  const dead = data.invitations.filter((i) => i.status === 'revoked' || i.status === 'expired')
 
   return (
     <section className="space-y-4">
@@ -122,7 +122,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
         {pending.length === 0 ? (
           <p className="text-sm text-muted-foreground">No pending invitations.</p>
         ) : (
-          <ul className="divide-y rounded-md border" role="list">
+          <ul className="divide-y rounded-md border">
             {pending.map((inv) => (
               <li
                 key={inv.id}
@@ -171,12 +171,9 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
       {accepted.length > 0 && (
         <Group title="Accepted" items={accepted} collapsed>
-          <ul className="divide-y rounded-md border" role="list">
+          <ul className="divide-y rounded-md border">
             {accepted.map((inv) => (
-              <li
-                key={inv.id}
-                className="flex items-center justify-between px-3 py-2 text-sm"
-              >
+              <li key={inv.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium">{inv.email}</p>
                   <p className="text-xs text-muted-foreground">{inv.role}</p>
@@ -190,12 +187,9 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
       {dead.length > 0 && (
         <Group title="Expired or revoked" items={dead} collapsed>
-          <ul className="divide-y rounded-md border" role="list">
+          <ul className="divide-y rounded-md border">
             {dead.map((inv) => (
-              <li
-                key={inv.id}
-                className="flex items-center justify-between px-3 py-2 text-sm"
-              >
+              <li key={inv.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium">{inv.email}</p>
                   <p className="text-xs text-muted-foreground">{inv.role}</p>
@@ -207,10 +201,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
         </Group>
       )}
 
-      <Dialog
-        open={!!confirmRevoke}
-        onOpenChange={(v) => !v && setConfirmRevoke(null)}
-      >
+      <Dialog open={!!confirmRevoke} onOpenChange={(v) => !v && setConfirmRevoke(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Revoke invitation?</DialogTitle>

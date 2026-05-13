@@ -8,10 +8,7 @@
 // each `*.researcher.ts` to `implements Researcher` — tsc errors at compile
 // time if the contract drifts.
 
-import type {
-  AnthropicUsage,
-  ResearcherFinding,
-} from '../../types'
+import type { AnthropicUsage, ResearcherFinding } from '../../types'
 import type { ResearchContext } from './researchers/docs.researcher'
 
 export type ResearcherResult = {

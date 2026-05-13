@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common'
+import type { Logger } from '@nestjs/common'
 import { TYPING_MAX_REFIRES, TYPING_REFIRE_MS } from '../../types'
 
 type TypingSender = {
@@ -28,11 +28,7 @@ function capMap(): void {
   }
 }
 
-export function startTypingRefire(
-  messageSid: string,
-  adapter: TypingSender,
-  logger: Logger,
-): void {
+export function startTypingRefire(messageSid: string, adapter: TypingSender, logger: Logger): void {
   if (timers.has(messageSid)) return // idempotent
   const entry: Entry = { timer: null, refireCount: 0, startedAt: Date.now(), status: 'active' }
   timers.set(messageSid, entry)

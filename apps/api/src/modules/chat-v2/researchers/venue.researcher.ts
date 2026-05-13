@@ -4,22 +4,19 @@
 // context: profile, contacts, recent incidents (last 24h), upcoming cutoffs
 // (next 4h). The structural source of "proactive" reasoning.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText, stepCountIs, tool, type ToolSet } from 'ai'
+import { Injectable } from '@nestjs/common'
+import { generateText, stepCountIs, type ToolSet, tool } from 'ai'
 import { z } from 'zod'
 import { prisma } from '../../../database/prisma'
-import {
-  RESEARCHER_TIMEOUT_MS,
-  RoleTimeoutError,
-  type AnthropicUsage,
-} from '../../../types'
+import { type AnthropicUsage, RESEARCHER_TIMEOUT_MS, RoleTimeoutError } from '../../../types'
 import { MockOpsService } from '../../mock-ops/mock-ops.service'
-import { getVenueBriefing } from '../tools/get-venue-briefing.tool'
-import { VENUE_RESEARCHER_PROMPT } from '../prompts/venue-researcher.prompt'
 import { chatV2Logger, hashId } from '../log-helpers'
-import type { Researcher, ResearcherResult } from '../researcher.interface'
+import { VENUE_RESEARCHER_PROMPT } from '../prompts/venue-researcher.prompt'
+import type { ResearcherResult } from '../researcher.interface'
+import { Researcher } from '../researcher.interface'
 import { sanitizeForResearcher } from '../researcher-sanitizer'
+import { getVenueBriefing } from '../tools/get-venue-briefing.tool'
 import type { ResearchContext } from './docs.researcher'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
@@ -45,7 +42,8 @@ export class VenueResearcher implements Researcher {
 
     const tools: ToolSet = {
       get_venue_briefing: tool({
-        description: 'Fetch venue profile + contacts + recent incidents (24h) + upcoming cutoffs (4h).',
+        description:
+          'Fetch venue profile + contacts + recent incidents (24h) + upcoming cutoffs (4h).',
         inputSchema: z.object({}),
         execute: async () => {
           if (!ctx.venueId) {
@@ -78,7 +76,10 @@ export class VenueResearcher implements Researcher {
       })
 
       const usage = extractUsage(result.usage)
-      const summary = evidenceSummary || result.text.slice(0, 200) || 'venue clean — no active incidents, no imminent cutoffs.'
+      const summary =
+        evidenceSummary ||
+        result.text.slice(0, 200) ||
+        'venue clean — no active incidents, no imminent cutoffs.'
 
       chatV2Logger.info('chat_v2.researcher_complete', {
         orgId: hashId(ctx.orgId),

@@ -1,8 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight } from 'lucide-react'
+import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const DropdownMenu = DropdownMenuPrimitive.Root
@@ -73,16 +73,16 @@ const DropdownMenuSeparator = React.forwardRef<
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
+// re-exports used by plugins (kept lightweight)
 export {
+  Check,
+  ChevronRight,
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
   DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 }
-
-// re-exports used by plugins (kept lightweight)
-export { Check, ChevronRight }

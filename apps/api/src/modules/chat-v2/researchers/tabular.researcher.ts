@@ -4,22 +4,19 @@
 // docId, then query_document_table runs the aggregate. Stub-mode produces
 // canned aggregate summaries keyed on brief substrings.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText, stepCountIs, tool, type ToolSet } from 'ai'
+import { Injectable } from '@nestjs/common'
+import { generateText, stepCountIs, type ToolSet, tool } from 'ai'
 import { z } from 'zod'
-import {
-  RESEARCHER_TIMEOUT_MS,
-  RoleTimeoutError,
-  type AnthropicUsage,
-} from '../../../types'
+import { type AnthropicUsage, RESEARCHER_TIMEOUT_MS, RoleTimeoutError } from '../../../types'
 import { RetrievalService } from '../../retrieval/retrieval.service'
 import { TabularQueryService } from '../../tabular/tabular.service'
-import { searchDocs } from '../tools/search-docs.tool'
-import { TABULAR_RESEARCHER_PROMPT } from '../prompts/tabular-researcher.prompt'
 import { chatV2Logger, hashId } from '../log-helpers'
-import type { Researcher, ResearcherResult } from '../researcher.interface'
+import { TABULAR_RESEARCHER_PROMPT } from '../prompts/tabular-researcher.prompt'
+import type { ResearcherResult } from '../researcher.interface'
+import { Researcher } from '../researcher.interface'
 import { sanitizeForResearcher } from '../researcher-sanitizer'
+import { searchDocs } from '../tools/search-docs.tool'
 import type { ResearchContext } from './docs.researcher'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
@@ -50,7 +47,8 @@ export class TabularResearcher implements Researcher {
 
     const tools: ToolSet = {
       search_docs: tool({
-        description: 'Discover the docId of a tabular document matching the brief. Always pass docType="tabular".',
+        description:
+          'Discover the docId of a tabular document matching the brief. Always pass docType="tabular".',
         inputSchema: z.object({
           query: z.string().min(1),
           docType: z.string().optional(),
@@ -128,7 +126,8 @@ export class TabularResearcher implements Researcher {
       })
 
       const usage = extractUsage(result.usage)
-      const summary = evidenceSummary || result.text.slice(0, 200) || 'no tabular data needed for this turn.'
+      const summary =
+        evidenceSummary || result.text.slice(0, 200) || 'no tabular data needed for this turn.'
 
       chatV2Logger.info('chat_v2.researcher_complete', {
         orgId: hashId(ctx.orgId),

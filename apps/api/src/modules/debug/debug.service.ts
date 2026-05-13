@@ -1,18 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
-  RETENTION_90D_MS,
   type DebugConversationResponse,
   type DebugMessage,
   type DebugMessageResponse,
   type DebugRetagQueueItem,
   type DebugRetagQueueResponse,
+  RETENTION_90D_MS,
 } from '../../types'
-import {
-  mapStatusCount,
-  truncateAtWord,
-  truncateToolCallLog,
-} from './truncate'
+import { mapStatusCount, truncateAtWord, truncateToolCallLog } from './truncate'
 
 type AccessLogContext = {
   requestId?: string

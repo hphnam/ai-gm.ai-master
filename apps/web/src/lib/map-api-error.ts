@@ -77,7 +77,8 @@ export function mapApiError(err: unknown): string {
       case 'phone-verification-failed':
         return 'That code is incorrect or has expired. Request a new code.'
       case 'phone-rate-limited': {
-        const retryRaw = (err.details as { retryAfterSeconds?: number } | undefined)?.retryAfterSeconds
+        const retryRaw = (err.details as { retryAfterSeconds?: number } | undefined)
+          ?.retryAfterSeconds
         if (typeof retryRaw === 'number' && retryRaw > 0) {
           const minutes = Math.max(1, Math.ceil(retryRaw / 60))
           return `Too many attempts. Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`

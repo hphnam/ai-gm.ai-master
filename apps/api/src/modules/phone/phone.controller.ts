@@ -14,16 +14,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
-import {
-  type ApiErrorResponse,
-  VERIFY_CODE_TTL_SECONDS,
-} from '../../types'
-import { AuthGuard } from '../auth/auth.guard'
+import { type ApiErrorResponse, VERIFY_CODE_TTL_SECONDS } from '../../types'
 import { CurrentUser } from '../auth/auth.decorators'
-import { PhoneError, PhoneService } from './phone.service'
-import { InfobipVerifyService } from './infobip-verify.service'
+import { AuthGuard } from '../auth/auth.guard'
 import {
   PhoneStatusResponseDto,
   SendPhoneCodeBodyDto,
@@ -32,11 +27,10 @@ import {
   VerifyPhoneCodeBodyDto,
   VerifyPhoneCodeResponseDto,
 } from './dto/phone.dto'
+import { InfobipVerifyService } from './infobip-verify.service'
+import { PhoneError, PhoneService } from './phone.service'
 
-function mapPhoneError(
-  code: PhoneError['code'],
-  details?: unknown,
-): HttpException {
+function mapPhoneError(code: PhoneError['code'], details?: unknown): HttpException {
   const body: ApiErrorResponse = { error: code, details }
   switch (code) {
     case 'phone-already-linked':
@@ -52,10 +46,7 @@ function mapPhoneError(
     default: {
       const _exhaustive: never = code
       void _exhaustive
-      return new HttpException(
-        { error: 'not-found' } as ApiErrorResponse,
-        HttpStatus.NOT_FOUND,
-      )
+      return new HttpException({ error: 'not-found' } as ApiErrorResponse, HttpStatus.NOT_FOUND)
     }
   }
 }
@@ -117,8 +108,7 @@ export class PhoneController {
       if (err instanceof PhoneError) {
         // audit-added M8: Retry-After header on 429
         if (err.code === 'phone-rate-limited') {
-          const retry =
-            (err.details?.retryAfterSeconds as number | undefined) ?? 60
+          const retry = (err.details?.retryAfterSeconds as number | undefined) ?? 60
           res.setHeader('Retry-After', String(retry))
         }
         throw mapPhoneError(err.code, err.details)
@@ -150,11 +140,9 @@ export class PhoneController {
       }
       // audit-added M1: cross-session code-claim guard — requires pending entry for THIS user.
       this.service.assertPendingVerificationMatches(user.id, body.phoneNumber)
-      const check = await this.verifier.checkVerification(
-        body.phoneNumber,
-        body.code,
-        { requestId },
-      )
+      const check = await this.verifier.checkVerification(body.phoneNumber, body.code, {
+        requestId,
+      })
       if (!check.ok) {
         const errBody: ApiErrorResponse = {
           error: 'phone-service-unavailable',
@@ -165,10 +153,7 @@ export class PhoneController {
       if (!check.approved) {
         throw new PhoneError('phone-verification-failed')
       }
-      const linked = await this.service.linkVerifiedNumber(
-        user.id,
-        body.phoneNumber,
-      )
+      const linked = await this.service.linkVerifiedNumber(user.id, body.phoneNumber)
       this.service.consumePendingVerification(user.id)
       return {
         ok: true,
@@ -194,9 +179,7 @@ export class PhoneController {
   @Get('status')
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 200, type: PhoneStatusResponseDto })
-  async status(
-    @CurrentUser() user: { id: string },
-  ): Promise<PhoneStatusResponseDto> {
+  async status(@CurrentUser() user: { id: string }): Promise<PhoneStatusResponseDto> {
     return this.service.getStatus(user.id) as Promise<PhoneStatusResponseDto>
   }
 }

@@ -32,13 +32,7 @@ export const E164_PHONE_REGEX = /^\+[1-9]\d{6,14}$/
 export const InviteWhatsappRoleSchema = z.enum(['staff', 'manager'])
 export type InviteWhatsappRole = z.infer<typeof InviteWhatsappRoleSchema>
 
-export const InviteStatusSchema = z.enum([
-  'pending',
-  'redeemed',
-  'revoked',
-  'exhausted',
-  'expired',
-])
+export const InviteStatusSchema = z.enum(['pending', 'redeemed', 'revoked', 'exhausted', 'expired'])
 export type InviteStatus = z.infer<typeof InviteStatusSchema>
 
 export const CreateInviteInputSchema = z.object({

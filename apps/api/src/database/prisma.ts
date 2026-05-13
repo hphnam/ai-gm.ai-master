@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
@@ -34,7 +34,9 @@ export const prisma = new Proxy({} as PrismaClient, {
   get(_t, prop) {
     const client = getClient()
     const value = Reflect.get(client, prop, client)
-    return typeof value === 'function' ? (value as Function).bind(client) : value
+    return typeof value === 'function'
+      ? (value as (...args: never[]) => unknown).bind(client)
+      : value
   },
 })
 

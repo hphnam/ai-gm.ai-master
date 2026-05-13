@@ -1,12 +1,11 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
-import type { DocDetailDto } from '@/generated/api'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,7 +25,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -34,8 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useVenues } from '@/lib/hooks/use-venues'
+import { Textarea } from '@/components/ui/textarea'
+import type { DocDetailDto } from '@/generated/api'
 import { useUpdateDoc } from '@/lib/hooks/use-docs'
+import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
 const GLOBAL_VENUE = '__global__'
@@ -116,8 +116,8 @@ export function EditDocModal({
         <DialogHeader>
           <DialogTitle>Edit document</DialogTitle>
           <DialogDescription>
-            Save your changes and the AI will re-process this doc with the new
-            details. Your category stays the same.
+            Save your changes and the AI will re-process this doc with the new details. Your
+            category stays the same.
           </DialogDescription>
         </DialogHeader>
 
@@ -145,9 +145,7 @@ export function EditDocModal({
                   <FormLabel>Venue</FormLabel>
                   <Select
                     value={field.value ?? GLOBAL_VENUE}
-                    onValueChange={(v) =>
-                      field.onChange(v === GLOBAL_VENUE ? null : v)
-                    }
+                    onValueChange={(v) => field.onChange(v === GLOBAL_VENUE ? null : v)}
                     disabled={submitting}
                   >
                     <FormControl>
@@ -156,9 +154,7 @@ export function EditDocModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={GLOBAL_VENUE}>
-                        Global (applies to all venues)
-                      </SelectItem>
+                      <SelectItem value={GLOBAL_VENUE}>Global (applies to all venues)</SelectItem>
                       {(venues ?? []).map((v) => (
                         <SelectItem key={v.id} value={v.id}>
                           {v.name}
@@ -178,9 +174,7 @@ export function EditDocModal({
                 <FormItem>
                   <FormLabel>
                     AI brief{' '}
-                    <span className="text-xs font-normal text-muted-foreground">
-                      (optional)
-                    </span>
+                    <span className="text-xs font-normal text-muted-foreground">(optional)</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -191,8 +185,8 @@ export function EditDocModal({
                     />
                   </FormControl>
                   <FormDescription>
-                    Prepended to the document content so retrieval and
-                    classification see your intent hint.
+                    Prepended to the document content so retrieval and classification see your
+                    intent hint.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

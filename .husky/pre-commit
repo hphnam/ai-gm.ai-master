@@ -1,3 +1,6 @@
+# Lint + format staged files via Biome (fast — only touches what's staged).
+npx lint-staged || exit 1
+
 # Auto-regenerate the OpenAPI spec + orval client when API surface
 # changes. Skips entirely when no relevant file is staged so most
 # commits incur zero cost.
@@ -24,11 +27,11 @@ if ! needs_regen; then
 fi
 
 echo "▶ API surface changed — regenerating swagger.json + orval client…"
-pnpm --filter api swagger:generate > /dev/null || {
+npm run swagger:generate --workspace=api > /dev/null || {
   echo "✗ swagger:generate failed — fix the API build before committing." >&2
   exit 1
 }
-pnpm --filter web api:generate > /dev/null || {
+npm run api:generate --workspace=web > /dev/null || {
   echo "✗ orval failed — check apps/web/orval.config.ts." >&2
   exit 1
 }

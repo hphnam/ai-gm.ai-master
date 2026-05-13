@@ -23,7 +23,12 @@ export function DocPreview({ docId }: { docId: string }) {
 
   if (isLoading) {
     return (
-      <div className="space-y-3" aria-busy="true" aria-label="Loading document preview">
+      <div
+        role="status"
+        className="space-y-3"
+        aria-busy="true"
+        aria-label="Loading document preview"
+      >
         <div className="h-3 w-20 animate-pulse rounded bg-muted" />
         <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
         <div className="space-y-2">
@@ -36,19 +41,13 @@ export function DocPreview({ docId }: { docId: string }) {
   }
 
   if (isError || !data) {
-    return (
-      <p className="text-sm italic text-muted-foreground">
-        Couldn’t load preview.
-      </p>
-    )
+    return <p className="text-sm italic text-muted-foreground">Couldn’t load preview.</p>
   }
 
   const title = data.title?.trim() || 'Untitled document'
   const content = data.content?.trim() ?? ''
   const truncated = content.length > PREVIEW_CHAR_LIMIT
-  const excerpt = truncated
-    ? `${content.slice(0, PREVIEW_CHAR_LIMIT)}…`
-    : content
+  const excerpt = truncated ? `${content.slice(0, PREVIEW_CHAR_LIMIT)}…` : content
 
   return (
     <div className="flex min-w-0 flex-col gap-3">
@@ -56,13 +55,9 @@ export function DocPreview({ docId }: { docId: string }) {
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Document preview
         </p>
-        <p className="break-words text-sm font-semibold leading-snug sm:text-base">
-          {title}
-        </p>
+        <p className="break-words text-sm font-semibold leading-snug sm:text-base">{title}</p>
         {data.summary ? (
-          <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            {data.summary}
-          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{data.summary}</p>
         ) : null}
       </div>
 
@@ -79,9 +74,7 @@ export function DocPreview({ docId }: { docId: string }) {
           </span>
         ))}
         {data.tags.length > 4 ? (
-          <span className="text-muted-foreground/70">
-            +{data.tags.length - 4} more
-          </span>
+          <span className="text-muted-foreground/70">+{data.tags.length - 4} more</span>
         ) : null}
       </div>
 

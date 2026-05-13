@@ -5,20 +5,18 @@ import { RefreshCw } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
+import { UserMenu } from '@/components/auth/user-menu'
 import { VenueSelector } from '@/components/chat/venue-selector'
 import { DebugConversationInspector } from '@/components/debug/debug-conversation-inspector'
 import { DebugRequestIdBadge } from '@/components/debug/debug-request-id-badge'
 import { DebugRetagQueue } from '@/components/debug/debug-retag-queue'
-import { UserMenu } from '@/components/auth/user-menu'
+import { Button } from '@/components/ui/button'
 import { useDebugConversation } from '@/lib/hooks/use-debug-conversation'
 import { useDebugRetagQueue } from '@/lib/hooks/use-debug-retag-queue'
 import { useVenues } from '@/lib/hooks/use-venues'
 
 function DebugSkeleton() {
-  return (
-    <div className="max-w-6xl mx-auto p-6 text-sm text-muted-foreground">Loading…</div>
-  )
+  return <div className="max-w-6xl mx-auto p-6 text-sm text-muted-foreground">Loading…</div>
 }
 
 function NoVenue() {
@@ -42,10 +40,7 @@ function DebugInner() {
   const queryClient = useQueryClient()
 
   const { data: venues } = useVenues()
-  const venue = useMemo(
-    () => venues?.find((v) => v.id === venueId),
-    [venues, venueId],
-  )
+  const venue = useMemo(() => venues?.find((v) => v.id === venueId), [venues, venueId])
 
   const convQuery = useDebugConversation(conversationId, venueId)
   const retagQuery = useDebugRetagQueue(venueId)
@@ -61,8 +56,7 @@ function DebugInner() {
     return <NoVenue />
   }
 
-  const requestId =
-    convQuery.data?.requestId ?? retagQuery.data?.requestId ?? undefined
+  const requestId = convQuery.data?.requestId ?? retagQuery.data?.requestId ?? undefined
 
   function handleRefresh() {
     queryClient.invalidateQueries({ queryKey: ['debug'] })
@@ -85,9 +79,7 @@ function DebugInner() {
             Mode
           </span>
         </div>
-        {venue ? (
-          <span className="text-sm text-muted-foreground">· {venue.name}</span>
-        ) : null}
+        {venue ? <span className="text-sm text-muted-foreground">· {venue.name}</span> : null}
         <div className="ml-auto flex items-center gap-2">
           <DebugRequestIdBadge requestId={requestId} />
           <Button
@@ -115,8 +107,8 @@ function DebugInner() {
             />
           ) : (
             <div className="text-sm text-muted-foreground italic border border-dashed rounded-md p-6 text-center">
-              Paste a conversation ID in the URL (<code>?conv=&lt;uuid&gt;</code>),
-              or open a conversation from the chat page first.
+              Paste a conversation ID in the URL (<code>?conv=&lt;uuid&gt;</code>), or open a
+              conversation from the chat page first.
             </div>
           )}
         </div>

@@ -84,9 +84,6 @@ export function useUpdateVenueProfile() {
 export function useRunNudge() {
   return useMutation({
     mutationFn: (venueId: string) =>
-      apiPost<{ sent: boolean; reason?: string; preview?: string }>(
-        `/nudges/${venueId}/run`,
-        {},
-      ),
+      apiPost<{ sent: boolean; reason?: string; preview?: string }>(`/nudges/${venueId}/run`, {}),
   })
 }

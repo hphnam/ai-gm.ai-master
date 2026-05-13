@@ -3,7 +3,7 @@
 // these helpers to avoid timing-attack side channels. Plain `===` on user-supplied
 // strings reveals position-of-first-mismatch via response-time correlation.
 
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual } from 'node:crypto'
 
 /**
  * Constant-time string comparison. Returns false on length mismatch (no early-out

@@ -24,22 +24,22 @@
  *     query and asserts mustInclude/mustNotInclude regexes on Writer output.
  *     Cost: ~$0.50 for the 6 mode queries (Sonnet @ ~$0.04/turn ish).
  *
- *   pnpm --filter api probe:eval                  # retrieval-only stub-mode
- *   PROBE_CHAT_V2_REAL=1 pnpm --filter api probe:eval   # quality gate (real)
+ *   npm run probe:eval --workspace=api                       # retrieval-only stub-mode
+ *   PROBE_CHAT_V2_REAL=1 npm run probe:eval --workspace=api   # quality gate (real)
  */
 
 import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../src/database/prisma'
+import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
+import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
 import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
 import { IndexerService } from '../src/modules/indexer/indexer.service'
 import { IngestService } from '../src/modules/ingest/ingest.service'
 import { SectionDetector } from '../src/modules/ingest/section-detector'
-import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
-import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
 import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
-import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
+import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
 import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 
 const PROBE_ORG_SLUG = 'probe-eval-org'
@@ -195,7 +195,7 @@ Heineken depot: 11am.`,
   },
   {
     topic: 'R1.reasoning_flat_pint',
-    query: "someone is complaining about a flat pint, what do I do",
+    query: 'someone is complaining about a flat pint, what do I do',
     fixture: `## Flat pint troubleshooting
 First check: is the gas pressure right (12-14 PSI on the regulator)?
 Then check: is the keg about to blow — last pour foamy or short?
@@ -224,7 +224,7 @@ Drop card-only payment to single till.`,
   },
   {
     topic: 'I1.incident_cellar_flooding',
-    query: "the cellar is flooding what do I do",
+    query: 'the cellar is flooding what do I do',
     fixture: `## Cellar flood emergency
 NOW: cut the power at the consumer unit (NOT in the cellar — outside the cellar door).
 NOW: turn off the mains water at the stopcock under the bar sink.

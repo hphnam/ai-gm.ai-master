@@ -1,10 +1,10 @@
 'use client'
 
 import { ApiError } from '@/lib/api-client'
-import { mapApiError } from '@/lib/map-api-error'
 import { useInvitations } from '@/lib/hooks/use-invitations'
-import { InviteForm } from './invite-form'
+import { mapApiError } from '@/lib/map-api-error'
 import { InvitationList } from './invitation-list'
+import { InviteForm } from './invite-form'
 
 export function OrganizationSettingsBody() {
   const query = useInvitations()

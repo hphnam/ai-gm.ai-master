@@ -1,20 +1,20 @@
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   CHAT_TIMEOUT_MS,
-  PROACTIVE_SESSION_WINDOW_MS,
-  VERIFIED_SENDER_LIMIT_PER_HOUR,
   type InfobipInboundResult,
+  PROACTIVE_SESSION_WINDOW_MS,
   type ProactiveSuggestion,
+  VERIFIED_SENDER_LIMIT_PER_HOUR,
 } from '../../types'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { SuggestionsService } from '../suggestions/suggestions.service'
-import { WhatsAppAdapter } from './whatsapp.adapter'
-import { recordAndCheckOnboardingReply } from './unknown-number-rate-limit'
-import { recordAndCheckVerifiedSender } from './verified-sender-rate-limit'
 import { markAndCheckSid } from './seen-message-sids'
 import { clearTypingRefire, startTypingRefire } from './typing-indicator-timers'
+import { recordAndCheckOnboardingReply } from './unknown-number-rate-limit'
+import { recordAndCheckVerifiedSender } from './verified-sender-rate-limit'
+import { WhatsAppAdapter } from './whatsapp.adapter'
 import { downloadWhatsappMedia } from './whatsapp-media-download'
 import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 
@@ -26,9 +26,7 @@ function sha256Prefix(s: string): string {
 }
 
 // 03-04 Infobip migration — media type classification from Infobip's message.type enum.
-function classifyInfobipMedia(
-  result: InfobipInboundResult,
-): 'none' | 'image' | 'audio' | 'other' {
+function classifyInfobipMedia(result: InfobipInboundResult): 'none' | 'image' | 'audio' | 'other' {
   const t = result.message.type
   if (t === 'TEXT') return 'none'
   if (t === 'IMAGE') return 'image'
@@ -44,7 +42,7 @@ function sanitizeOpenerLine(raw: string): string {
   let out = raw.replace(/[\x00-\x09\x0B-\x1F\x7F]/g, '')
   out = out.normalize('NFC')
   out = out.replace(/[*_~`]/g, '')
-  if (out.length > 200) out = out.slice(0, 199) + '\u2026'
+  if (out.length > 200) out = `${out.slice(0, 199)}\u2026`
   return out
 }
 
@@ -71,7 +69,7 @@ function composeOpenerText(suggestions: ProactiveSuggestion[]): string {
     lines.push(prefix + clean)
   }
   let body = lines.join('\n')
-  if (body.length > 400) body = body.slice(0, 399) + '\u2026'
+  if (body.length > 400) body = `${body.slice(0, 399)}\u2026`
   return body
 }
 
@@ -125,7 +123,7 @@ export class WhatsappService {
       const fromHash = sha256Prefix(result.from)
       // Phase 1 Plan 01-03 stores User.phoneNumber in E.164 WITH `+` prefix.
       // Infobip delivers bare digits — prepend `+` so the lookup matches.
-      const phoneNumber = '+' + result.from
+      const phoneNumber = `+${result.from}`
 
       // Plan 03-01 — onboarding state machine. Before chat dispatch, resolve
       // the phone's onboarding state. Unknown / otp_pending / linked_no_venue
@@ -321,7 +319,7 @@ export class WhatsappService {
               base64: string
               sourceRef: string
             }
-          | undefined = undefined
+          | undefined
         if (mediaKind === 'image') {
           if (!result.message.url) {
             await this.adapter.sendText(
@@ -396,11 +394,7 @@ export class WhatsappService {
         // 03-01 M3/AC-10: hard 12s timeout on ChatService call.
         const startedAt = Date.now()
         const userMessage =
-          bodyText.length > 0
-            ? bodyText
-            : attachment
-              ? 'User sent an image.'
-              : bodyText
+          bodyText.length > 0 ? bodyText : attachment ? 'User sent an image.' : bodyText
         // Plan 06-04 Task 4 — WhatsApp consumer migrated from chat-v1 to chat-v2.
         // Same SendMessageInput shape; chat-v2 uses a single ctx-object instead
         // of positional args. WhatsApp inbound now flows through Triage →
@@ -431,10 +425,7 @@ export class WhatsappService {
             conversationId: conversation.id,
             elapsedMs: Date.now() - startedAt,
           })
-          await this.adapter.sendText(
-            result.from,
-            "I'm still thinking — I'll follow up shortly.",
-          )
+          await this.adapter.sendText(result.from, "I'm still thinking — I'll follow up shortly.")
           return
         }
 
@@ -472,10 +463,7 @@ export class WhatsappService {
     }
   }
 
-  private async handleUnknownNumber(
-    result: InfobipInboundResult,
-    fromHash: string,
-  ): Promise<void> {
+  private async handleUnknownNumber(result: InfobipInboundResult, fromHash: string): Promise<void> {
     const { shouldReply } = recordAndCheckOnboardingReply(fromHash)
     if (shouldReply) {
       await this.adapter.sendText(

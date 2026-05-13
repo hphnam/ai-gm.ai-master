@@ -1,8 +1,8 @@
 import {
-  ArgumentsHost,
+  type ArgumentsHost,
   Catch,
-  ExceptionFilter,
-  HttpException,
+  type ExceptionFilter,
+  type HttpException,
   PayloadTooLargeException,
 } from '@nestjs/common'
 import type { Response } from 'express'

@@ -1,12 +1,7 @@
 'use client'
 
+import { CheckCircle2, Clock, MessageCircle, Trash2, XCircle } from 'lucide-react'
 import { useState } from 'react'
-import { Clock, MessageCircle, Trash2, CheckCircle2, XCircle } from 'lucide-react'
-import {
-  useRevokeWhatsappInvite,
-  type ListWhatsappInvitesResponse,
-  type WhatsappInvitePublic,
-} from '@/lib/hooks/use-whatsapp-invites'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,6 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  type ListWhatsappInvitesResponse,
+  useRevokeWhatsappInvite,
+  type WhatsappInvitePublic,
+} from '@/lib/hooks/use-whatsapp-invites'
 
 function formatRelative(iso: string): string {
   const now = Date.now()
@@ -85,8 +85,7 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
       <section className="rounded-md border p-6 text-center">
         <MessageCircle className="mx-auto mb-2 h-6 w-6 text-muted-foreground" aria-hidden />
         <p className="text-sm text-muted-foreground">
-          No WhatsApp invites yet. Click &ldquo;Invite via WhatsApp&rdquo; to send your first
-          one.
+          No WhatsApp invites yet. Click &ldquo;Invite via WhatsApp&rdquo; to send your first one.
         </p>
       </section>
     )
@@ -102,7 +101,7 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
       {pending.length === 0 ? (
         <p className="text-sm text-muted-foreground">No pending invites.</p>
       ) : (
-        <ul className="divide-y rounded-md border" role="list">
+        <ul className="divide-y rounded-md border">
           {pending.map((inv) => (
             <li
               key={inv.id}
@@ -138,12 +137,9 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
           <summary className="cursor-pointer text-sm font-medium">
             Recently transitioned ({recent.length})
           </summary>
-          <ul className="mt-3 divide-y rounded-md border" role="list">
+          <ul className="mt-3 divide-y rounded-md border">
             {recent.map((inv) => (
-              <li
-                key={inv.id}
-                className="flex items-center justify-between px-3 py-2 text-sm"
-              >
+              <li key={inv.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium">{inv.phoneNumberMasked}</p>
                   <p className="text-xs text-muted-foreground">
@@ -157,10 +153,7 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
         </details>
       )}
 
-      <Dialog
-        open={!!confirmRevoke}
-        onOpenChange={(v) => !v && setConfirmRevoke(null)}
-      >
+      <Dialog open={!!confirmRevoke} onOpenChange={(v) => !v && setConfirmRevoke(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Revoke WhatsApp invite?</DialogTitle>

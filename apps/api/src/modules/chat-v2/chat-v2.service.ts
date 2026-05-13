@@ -19,26 +19,19 @@
 // reaching Triage; raw audit trail preserved in chat_messages.content.
 // audit-M5 — phase events emitted with seq + timestampMs for 06-04 ordering.
 
-import { Injectable } from '@nestjs/common'
 import { createHash, randomUUID } from 'node:crypto'
-import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import {
-  createUIMessageStream,
-  streamText,
-  type UIMessageChunk,
-  type UIMessageStreamWriter,
-} from 'ai'
+import { Injectable } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   ANALYSER_RERESEARCH_CONFIDENCE_THRESHOLD,
   type AnalyserOutput,
-  CRITIC_REASONING_CONFIDENCE_THRESHOLD,
   type ChatMode,
+  CRITIC_REASONING_CONFIDENCE_THRESHOLD,
   MAX_RESEARCHERS_PER_TURN,
-  type ResearcherFinding,
-  type ResearcherName,
   RERESEARCH_COST_CEILING_USD,
   RESEARCHER_PRIORITY_ORDER,
+  type ResearcherFinding,
+  type ResearcherName,
   type StreamPhaseEvent,
   TOTAL_TURN_TIMEOUT_MS,
   type TriageOutput,
@@ -51,8 +44,8 @@ import { FastLookupService } from './fast-lookup.service'
 import { identifyFastPath } from './fast-lookup-recipes'
 import { sanitizeForTriage } from './input-sanitizer'
 import { chatV2Logger, hashId, sanitizeError } from './log-helpers'
+import { Researcher } from './researcher.interface'
 import { sanitizeForResearcher } from './researcher-sanitizer'
-import type { Researcher } from './researcher.interface'
 import { DocsResearcher } from './researchers/docs.researcher'
 import { OpsResearcher } from './researchers/ops.researcher'
 import { PeopleResearcher } from './researchers/people.researcher'
@@ -146,9 +139,7 @@ export class ChatV2Service {
     let auditTrailContent = input.userMessage.replace(/\x00/g, '')
     if (input.attachment) {
       const byteSize = Buffer.from(input.attachment.base64, 'base64').length
-      const sidSuffix = input.attachment.sourceRef
-        ? `, sid:${input.attachment.sourceRef}`
-        : ''
+      const sidSuffix = input.attachment.sourceRef ? `, sid:${input.attachment.sourceRef}` : ''
       auditTrailContent = `${auditTrailContent}\n[image: ${input.attachment.mediaType}, ${byteSize}B${sidSuffix}]`
     }
     await prisma.chatMessage.create({
@@ -316,10 +307,10 @@ export class ChatV2Service {
       // is shorter than the typical parent budget so this is belt-and-braces).
       const parentBudget = Math.max(0, TOTAL_TURN_TIMEOUT_MS - (t1 - t0) - 1000)
       const parentAbort = new AbortController()
-      let parentBudgetExhausted = false
+      let _parentBudgetExhausted = false
       const parentTimer = setTimeout(() => {
         parentAbort.abort()
-        parentBudgetExhausted = true
+        _parentBudgetExhausted = true
         chatV2Logger.warn('chat_v2.turn_budget_exhausted', {
           orgId: orgIdHash,
           conversationIdHash,
@@ -462,9 +453,8 @@ export class ChatV2Service {
 
         // ───── Writer ─────
         emitPhase('draft', triageOutput.mode)
-        const citationCount = new Set(
-          analyserResult.output.citations.map((c) => c.knowledgeItemId),
-        ).size
+        const citationCount = new Set(analyserResult.output.citations.map((c) => c.knowledgeItemId))
+          .size
         const writerResult = await this.writer.compose({
           mode: triageOutput.mode,
           userMessage: input.userMessage,
@@ -520,11 +510,8 @@ export class ChatV2Service {
 
       // ───── Persist assistant message ─────
       const cost = tracker.total()
-      const citationsToPersist =
-        analyserOutput?.citations ?? findings.flatMap((f) => f.citations)
-      const retrievedItemIds = Array.from(
-        new Set(citationsToPersist.map((c) => c.knowledgeItemId)),
-      )
+      const citationsToPersist = analyserOutput?.citations ?? findings.flatMap((f) => f.citations)
+      const retrievedItemIds = Array.from(new Set(citationsToPersist.map((c) => c.knowledgeItemId)))
 
       // audit-S6 — triage_dispatch entry persisted on toolCallLog for SOC-2
       // incident reconstruction. Brief content is hashed (PII-safe), not raw.
@@ -669,9 +656,7 @@ export class ChatV2Service {
     }
     if (existingConv) {
       if (existingConv.venueId !== venue.id) {
-        throw new Error(
-          `conversation ${conversationId} does not belong to venue ${venue.id}`,
-        )
+        throw new Error(`conversation ${conversationId} does not belong to venue ${venue.id}`)
       }
     } else {
       await prisma.chatConversation.create({
@@ -899,9 +884,7 @@ export class ChatV2Service {
       })
       tracker.recordAnalyser(analyserResult.usage)
       analyserOutput = analyserResult.output
-      citationCount = new Set(
-        analyserResult.output.citations.map((c) => c.knowledgeItemId),
-      ).size
+      citationCount = new Set(analyserResult.output.citations.map((c) => c.knowledgeItemId)).size
       chatV2Logger.info('chat_v2.analyser_confidence_observed', {
         mode: triageOutput.mode,
         suggestedShape: analyserResult.output.suggestedShape,
@@ -935,10 +918,7 @@ export class ChatV2Service {
     // Persist + emit complete via streamText's onFinish callback. AI SDK 6.x
     // calls onFinish exactly once with final text + usage when the stream
     // completes (or aborts cleanly). Captured costs/IDs persist regardless.
-    const result = this.writer.streamCompose(
-      writerInput,
-      abortSignal,
-    )
+    const result = this.writer.streamCompose(writerInput, abortSignal)
 
     // Wrap an attached async IIFE so the orchestrator can persist after stream
     // finishes. We don't await it here — the controller pipes the stream to
@@ -962,8 +942,7 @@ export class ChatV2Service {
           ),
         })
         const cost = tracker.total()
-        const citationsToPersist =
-          analyserOutput?.citations ?? findings.flatMap((f) => f.citations)
+        const citationsToPersist = analyserOutput?.citations ?? findings.flatMap((f) => f.citations)
         const retrievedItemIds = Array.from(
           new Set(citationsToPersist.map((c) => c.knowledgeItemId)),
         )

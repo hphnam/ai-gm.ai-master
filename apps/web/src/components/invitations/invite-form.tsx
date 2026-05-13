@@ -1,9 +1,7 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { InvitationsControllerCreateBody as InviteBodySchema } from '@/generated/zod'
-import type { InviteBodyDto as InviteBody } from '@/generated/api'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -21,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { InviteBodyDto as InviteBody } from '@/generated/api'
+import { InvitationsControllerCreateBody as InviteBodySchema } from '@/generated/zod'
 import { useCreateInvitation } from '@/lib/hooks/use-invitations'
 
 export function InviteForm() {

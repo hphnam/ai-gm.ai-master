@@ -1,10 +1,6 @@
-import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
-import {
-  DebugIdParamSchema,
-  DebugQuerySchema,
-  DebugRetagQueueQuerySchema,
-} from '../../../types'
+import { z } from 'zod'
+import { DebugIdParamSchema, DebugQuerySchema, DebugRetagQueueQuerySchema } from '../../../types'
 
 export class DebugIdParamDto extends createZodDto(DebugIdParamSchema) {}
 export class DebugQueryDto extends createZodDto(DebugQuerySchema) {}

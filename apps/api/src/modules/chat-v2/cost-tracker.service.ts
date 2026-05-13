@@ -77,9 +77,7 @@ export class CostTracker {
 }
 
 function sumEntries(entries: RoleEntry[]): number {
-  return round6(
-    entries.reduce((acc, e) => acc + calculateAnthropicUsd(e.usage, e.model), 0),
-  )
+  return round6(entries.reduce((acc, e) => acc + calculateAnthropicUsd(e.usage, e.model), 0))
 }
 
 const round6 = (n: number): number => Math.round(n * 1e6) / 1e6

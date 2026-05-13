@@ -4,7 +4,7 @@
 // revocation, lazy expiry, list-for-org. All log emissions PII-safe (maskPhone,
 // never code/OTP plaintext).
 
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
 import {
   ConflictException,
   HttpException,
@@ -16,15 +16,15 @@ import {
 import type { Prisma, WhatsappInvite } from '@prisma/client'
 import { prisma } from '../../database/prisma'
 import {
+  type CreateInviteInput,
   E164_PHONE_REGEX,
+  type InvitePublic,
+  type InviteStatus,
   MAX_INVITES_PER_MANAGER_PER_DAY,
   WHATSAPP_INVITE_CODE_ALPHABET,
   WHATSAPP_INVITE_CODE_LENGTH,
   WHATSAPP_INVITE_ERROR_CODES,
   WHATSAPP_INVITE_TTL_MS,
-  type CreateInviteInput,
-  type InvitePublic,
-  type InviteStatus,
 } from '../../types'
 import { maskPhone } from '../../types/auth'
 import { safeStringEqual } from './safe-equal'
@@ -115,9 +115,7 @@ export class InviteService {
       },
     })
     if (linkedUser) {
-      const inIssuingOrg = linkedUser.memberships.some(
-        (m) => m.organizationId === organizationId,
-      )
+      const inIssuingOrg = linkedUser.memberships.some((m) => m.organizationId === organizationId)
       if (!inIssuingOrg) {
         if (!options.force) {
           throw new ConflictException({
@@ -320,7 +318,10 @@ export class InviteService {
         organizationId,
         OR: [
           { status: 'pending' },
-          { status: { in: ['redeemed', 'revoked', 'exhausted', 'expired'] }, createdAt: { gte: recentCutoff } },
+          {
+            status: { in: ['redeemed', 'revoked', 'exhausted', 'expired'] },
+            createdAt: { gte: recentCutoff },
+          },
         ],
       },
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],

@@ -7,34 +7,30 @@
  * fallback + EXPLAIN-uses-index + advisory-lock + cost-ceiling-halt (W18-W23).
  * Idempotent: pre-cleanup + post-cleanup symmetric.
  *
- *   PROBE_VOYAGE_FAIL_RATIO=0.5 pnpm --filter api probe:section
- *   pnpm --filter api probe:section
+ *   PROBE_VOYAGE_FAIL_RATIO=0.5 npm run probe:section --workspace=api
+ *   npm run probe:section --workspace=api
  */
 
 import '../src/load-env'
 import 'reflect-metadata'
-import { Logger } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
+import { Logger } from '@nestjs/common'
 import { prisma } from '../src/database/prisma'
-import {
-  CHUNK_TARGET_TOKENS,
-  CSV_ROW_BATCH_SIZE,
-  MAX_EMBEDS_PER_DOCUMENT,
-} from '../src/types'
-import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
-import { IndexerService } from '../src/modules/indexer/indexer.service'
-import { IngestService } from '../src/modules/ingest/ingest.service'
-import { SectionDetector } from '../src/modules/ingest/section-detector'
-import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
-import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
-import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
-import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
-import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import {
   buildGmAgent,
   buildSystemMessagesForInspection,
   inspectAgentProviderOptions,
 } from '../src/modules/chat/gm-agent'
+import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
+import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
+import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
+import { IndexerService } from '../src/modules/indexer/indexer.service'
+import { IngestService } from '../src/modules/ingest/ingest.service'
+import { SectionDetector } from '../src/modules/ingest/section-detector'
+import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
+import { RetrievalService } from '../src/modules/retrieval/retrieval.service'
+import { TabularQueryService } from '../src/modules/tabular/tabular.service'
+import { CHUNK_TARGET_TOKENS, CSV_ROW_BATCH_SIZE, MAX_EMBEDS_PER_DOCUMENT } from '../src/types'
 import { runBackfill } from './backfill-knowledge-sections'
 
 const PROBE_ORG_SLUG = 'probe-section-org'
@@ -50,7 +46,13 @@ function assert(name: string, ok: boolean, detail?: string) {
 
 function assertEqual<T>(name: string, actual: T, expected: T, detail?: string) {
   const ok = actual === expected
-  assert(name, ok, ok ? detail : `expected ${String(expected)}, got ${String(actual)}${detail ? ` (${detail})` : ''}`)
+  assert(
+    name,
+    ok,
+    ok
+      ? detail
+      : `expected ${String(expected)}, got ${String(actual)}${detail ? ` (${detail})` : ''}`,
+  )
 }
 
 function assertGte(name: string, actual: number, min: number, detail?: string) {
@@ -83,7 +85,10 @@ async function pnpCleanup(): Promise<void> {
   }
 }
 
-async function ensureOrgWithVenue(slug: string, name: string): Promise<{ orgId: string; venueId: string }> {
+async function ensureOrgWithVenue(
+  slug: string,
+  name: string,
+): Promise<{ orgId: string; venueId: string }> {
   const org = await prisma.organization.create({
     data: { id: randomUUID(), name, slug },
     select: { id: true },
@@ -135,7 +140,8 @@ function fixtureFlatNoHeadings(): string {
 function fixtureOversizedNoSubheadings(approxTokens: number): string {
   // ~4 chars/token. Build large body with no heading lines.
   const charBudget = approxTokens * 4
-  const sentence = 'The cellar temperature must remain between four and six degrees celsius at all times. '
+  const sentence =
+    'The cellar temperature must remain between four and six degrees celsius at all times. '
   let buf = ''
   while (buf.length < charBudget) buf += sentence
   return buf
@@ -175,15 +181,42 @@ async function W1_schemaShape(): Promise<void> {
   )
   const sectionNames = new Set(sectionCols.map((c) => c.column_name))
   const chunkNames = new Set(chunkCols.map((c) => c.column_name))
-  const sReq = ['id','knowledgeItemId','organizationId','sectionIndex','title','content','tokenCount','sectionVersion','truncated','createdAt','updatedAt']
-  const cReq = ['id','sectionId','organizationId','chunkIndex','content','embedding','embeddingText','tokenCount','createdAt']
-  assert('w1.schema_shape',
+  const sReq = [
+    'id',
+    'knowledgeItemId',
+    'organizationId',
+    'sectionIndex',
+    'title',
+    'content',
+    'tokenCount',
+    'sectionVersion',
+    'truncated',
+    'createdAt',
+    'updatedAt',
+  ]
+  const cReq = [
+    'id',
+    'sectionId',
+    'organizationId',
+    'chunkIndex',
+    'content',
+    'embedding',
+    'embeddingText',
+    'tokenCount',
+    'createdAt',
+  ]
+  assert(
+    'w1.schema_shape',
     sReq.every((c) => sectionNames.has(c)) && cReq.every((c) => chunkNames.has(c)),
     `sections=${[...sectionNames].length} chunks=${[...chunkNames].length}`,
   )
 }
 
-async function W2_schemaFkCascade(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W2_schemaFkCascade(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   const kiId = randomUUID()
   await ingest.ingest({
     id: kiId,
@@ -192,29 +225,55 @@ async function W2_schemaFkCascade(orgId: string, venueId: string, ingest: Ingest
     organizationId: orgId,
     venueId,
   })
-  const sections = await prisma.knowledgeSection.findMany({ where: { knowledgeItemId: kiId }, select: { id: true } })
+  const sections = await prisma.knowledgeSection.findMany({
+    where: { knowledgeItemId: kiId },
+    select: { id: true },
+  })
   await prisma.knowledgeItem.delete({ where: { id: kiId } })
   const remaining = await prisma.knowledgeSection.count({ where: { knowledgeItemId: kiId } })
-  const chunks = await prisma.knowledgeChunk.count({ where: { sectionId: { in: sections.map((s) => s.id) } } })
-  assert('w2.schema_fk_cascade', remaining === 0 && chunks === 0, `remainingSections=${remaining} remainingChunks=${chunks}`)
+  const chunks = await prisma.knowledgeChunk.count({
+    where: { sectionId: { in: sections.map((s) => s.id) } },
+  })
+  assert(
+    'w2.schema_fk_cascade',
+    remaining === 0 && chunks === 0,
+    `remainingSections=${remaining} remainingChunks=${chunks}`,
+  )
 }
 
 function W3_detectMd(detector: SectionDetector): void {
   const result = detector.detect(fixtureMd(), 'text/markdown')
   const titles = result.sections.map((s) => s.title)
-  assert('w3.detect_md', result.sections.length === 2 && titles[0] === 'Heading A' && titles[1] === 'Heading B', `titles=${JSON.stringify(titles)}`)
+  assert(
+    'w3.detect_md',
+    result.sections.length === 2 && titles[0] === 'Heading A' && titles[1] === 'Heading B',
+    `titles=${JSON.stringify(titles)}`,
+  )
 }
 
 function W4_detectPptx(detector: SectionDetector): void {
-  const result = detector.detect(fixturePptx(), 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
-  assertEqual('w4.detect_pptx', result.sections.length, 3, `titles=${JSON.stringify(result.sections.map((s) => s.title))}`)
+  const result = detector.detect(
+    fixturePptx(),
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  )
+  assertEqual(
+    'w4.detect_pptx',
+    result.sections.length,
+    3,
+    `titles=${JSON.stringify(result.sections.map((s) => s.title))}`,
+  )
 }
 
 function W5_detectCsv(detector: SectionDetector): void {
   // 120-row CSV → ceil(120/50) = 3 batches. Per audit-M4 row-batch policy.
   const result = detector.detect(fixtureCsv(120), 'text/csv')
   const expected = Math.ceil(120 / CSV_ROW_BATCH_SIZE)
-  assertEqual('w5.detect_csv', result.sections.length, expected, `titles=${JSON.stringify(result.sections.map((s) => s.title))}`)
+  assertEqual(
+    'w5.detect_csv',
+    result.sections.length,
+    expected,
+    `titles=${JSON.stringify(result.sections.map((s) => s.title))}`,
+  )
 }
 
 function W6_detectFlat(detector: SectionDetector): void {
@@ -226,7 +285,11 @@ function W7_capSoft(detector: SectionDetector): void {
   // ~1024-token section: well under soft cap. truncated:false, single section.
   const text = fixtureOversizedNoSubheadings(1024)
   const result = detector.detect(text, null)
-  assert('w7.cap_soft', result.sections.length === 1 && result.sections[0].truncated === false, `truncated=${result.sections[0]?.truncated}`)
+  assert(
+    'w7.cap_soft',
+    result.sections.length === 1 && result.sections[0].truncated === false,
+    `truncated=${result.sections[0]?.truncated}`,
+  )
 }
 
 function W8_capSplit(detector: SectionDetector): void {
@@ -240,8 +303,15 @@ function W9_capDegrade(detector: SectionDetector): void {
   // ~10K-token flat block: no sub-headings → 1 section truncated:true with chunks spanning content.
   const text = fixtureOversizedNoSubheadings(10_000)
   const result = detector.detect(text, null)
-  const ok = result.sections.length === 1 && result.sections[0].truncated === true && result.sections[0].chunks.length >= 2
-  assert('w9.cap_degrade', ok, `sections=${result.sections.length} truncated=${result.sections[0]?.truncated} chunks=${result.sections[0]?.chunks.length}`)
+  const ok =
+    result.sections.length === 1 &&
+    result.sections[0].truncated === true &&
+    result.sections[0].chunks.length >= 2
+  assert(
+    'w9.cap_degrade',
+    ok,
+    `sections=${result.sections.length} truncated=${result.sections[0]?.truncated} chunks=${result.sections[0]?.chunks.length}`,
+  )
 }
 
 function W10_chunkCreate(detector: SectionDetector): void {
@@ -251,24 +321,74 @@ function W10_chunkCreate(detector: SectionDetector): void {
   assertGte('w10.chunk_create', chunks.length, 2, `chunks=${chunks.length}`)
 }
 
-async function W11_crossOrg(orgA: string, venueA: string, orgB: string, venueB: string, ingest: IngestService): Promise<void> {
+async function W11_crossOrg(
+  orgA: string,
+  venueA: string,
+  orgB: string,
+  venueB: string,
+  ingest: IngestService,
+): Promise<void> {
   const idA = randomUUID()
   const idB = randomUUID()
-  await ingest.ingest({ id: idA, title: 'orgA-doc', content: fixtureMd(), organizationId: orgA, venueId: venueA })
-  await ingest.ingest({ id: idB, title: 'orgB-doc', content: fixtureMd(), organizationId: orgB, venueId: venueB })
+  await ingest.ingest({
+    id: idA,
+    title: 'orgA-doc',
+    content: fixtureMd(),
+    organizationId: orgA,
+    venueId: venueA,
+  })
+  await ingest.ingest({
+    id: idB,
+    title: 'orgB-doc',
+    content: fixtureMd(),
+    organizationId: orgB,
+    venueId: venueB,
+  })
   const orgBSections = await prisma.knowledgeSection.count({ where: { organizationId: orgB } })
   const orgBChunks = await prisma.knowledgeChunk.count({ where: { organizationId: orgB } })
-  const orgBSectionsOnA = await prisma.knowledgeSection.count({ where: { organizationId: orgB, knowledgeItem: { organizationId: orgA } } })
-  assert('w11.cross_org_isolation', orgBSections >= 2 && orgBChunks >= 2 && orgBSectionsOnA === 0, `B.sections=${orgBSections} B.chunks=${orgBChunks} leak=${orgBSectionsOnA}`)
+  const orgBSectionsOnA = await prisma.knowledgeSection.count({
+    where: { organizationId: orgB, knowledgeItem: { organizationId: orgA } },
+  })
+  assert(
+    'w11.cross_org_isolation',
+    orgBSections >= 2 && orgBChunks >= 2 && orgBSectionsOnA === 0,
+    `B.sections=${orgBSections} B.chunks=${orgBChunks} leak=${orgBSectionsOnA}`,
+  )
 }
 
-async function W12_idempotent(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W12_idempotent(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   const kiId = randomUUID()
-  await ingest.ingest({ id: kiId, title: 'idem-1', content: fixturePptx(), organizationId: orgId, venueId })
-  const first = await prisma.knowledgeSection.findMany({ where: { knowledgeItemId: kiId }, orderBy: { sectionIndex: 'asc' }, select: { sectionIndex: true, title: true } })
-  await ingest.ingest({ id: kiId, title: 'idem-2', content: fixturePptx(), organizationId: orgId, venueId })
-  const second = await prisma.knowledgeSection.findMany({ where: { knowledgeItemId: kiId }, orderBy: { sectionIndex: 'asc' }, select: { sectionIndex: true, title: true } })
-  const same = first.length === second.length && first.every((s, i) => s.sectionIndex === second[i].sectionIndex && s.title === second[i].title)
+  await ingest.ingest({
+    id: kiId,
+    title: 'idem-1',
+    content: fixturePptx(),
+    organizationId: orgId,
+    venueId,
+  })
+  const first = await prisma.knowledgeSection.findMany({
+    where: { knowledgeItemId: kiId },
+    orderBy: { sectionIndex: 'asc' },
+    select: { sectionIndex: true, title: true },
+  })
+  await ingest.ingest({
+    id: kiId,
+    title: 'idem-2',
+    content: fixturePptx(),
+    organizationId: orgId,
+    venueId,
+  })
+  const second = await prisma.knowledgeSection.findMany({
+    where: { knowledgeItemId: kiId },
+    orderBy: { sectionIndex: 'asc' },
+    select: { sectionIndex: true, title: true },
+  })
+  const same =
+    first.length === second.length &&
+    first.every((s, i) => s.sectionIndex === second[i].sectionIndex && s.title === second[i].title)
   assert('w12.idempotent', same, `first=${first.length} second=${second.length}`)
 }
 
@@ -283,9 +403,9 @@ function W13_chunkOverlap(detector: SectionDetector): void {
   const tail = chunks[0].content.slice(-128)
   const head = chunks[1].content.slice(0, 128)
   // Allow ±32 char drift from word-boundary back-up.
-  let matchLen = 0
+  let _matchLen = 0
   for (let i = 0; i < Math.min(tail.length, head.length); i++) {
-    if (tail[tail.length - 1 - i] === head[head.length - 1 - i]) matchLen++
+    if (tail[tail.length - 1 - i] === head[head.length - 1 - i]) _matchLen++
   }
   // Find any 64-char substring of tail present in head.
   let overlapFound = false
@@ -295,12 +415,26 @@ function W13_chunkOverlap(detector: SectionDetector): void {
       break
     }
   }
-  assert('w13.chunk_overlap', overlapFound, `tail-end-32=${tail.slice(-32)} head-start-32=${head.slice(0, 32)}`)
+  assert(
+    'w13.chunk_overlap',
+    overlapFound,
+    `tail-end-32=${tail.slice(-32)} head-start-32=${head.slice(0, 32)}`,
+  )
 }
 
-async function W14_embeddingDim(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W14_embeddingDim(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   const kiId = randomUUID()
-  await ingest.ingest({ id: kiId, title: 'embed-dim', content: fixtureMd(), organizationId: orgId, venueId })
+  await ingest.ingest({
+    id: kiId,
+    title: 'embed-dim',
+    content: fixtureMd(),
+    organizationId: orgId,
+    venueId,
+  })
   const dims = await prisma.$queryRawUnsafe<{ d: number | null }[]>(
     `SELECT vector_dims(c.embedding) AS d FROM knowledge_chunks c JOIN knowledge_sections s ON s.id = c."sectionId" WHERE s."knowledgeItemId" = $1 AND c.embedding IS NOT NULL LIMIT 1`,
     kiId,
@@ -309,7 +443,11 @@ async function W14_embeddingDim(orgId: string, venueId: string, ingest: IngestSe
   assertEqual('w14.embedding_dim', d, 1024, `dim=${d}`)
 }
 
-async function W15_costCeiling(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W15_costCeiling(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   // Six small markdown docs (≤5 chunks each ⇒ ≤30 voyage calls total).
   let voyageCalls = 0
   // Hook into the global Logger output via a capture wrapper isn't trivial here;
@@ -318,14 +456,26 @@ async function W15_costCeiling(orgId: string, venueId: string, ingest: IngestSer
   for (let i = 0; i < 6; i++) {
     const id = randomUUID()
     ids.push(id)
-    await ingest.ingest({ id, title: `cost-${i}`, content: fixtureMd(), organizationId: orgId, venueId })
+    await ingest.ingest({
+      id,
+      title: `cost-${i}`,
+      content: fixtureMd(),
+      organizationId: orgId,
+      venueId,
+    })
   }
-  const chunkCount = await prisma.knowledgeChunk.count({ where: { section: { knowledgeItemId: { in: ids } } } })
+  const chunkCount = await prisma.knowledgeChunk.count({
+    where: { section: { knowledgeItemId: { in: ids } } },
+  })
   voyageCalls = chunkCount // each chunk = at most 1 voyage call (no batches)
   assertLt('w15.cost_ceiling', voyageCalls, 30, `voyageCalls=${voyageCalls}`)
 }
 
-async function W16_embedCapTrigger(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W16_embedCapTrigger(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   // Synthetic 250-chunk fixture: oversized flat content forces many chunks via slidingWindowChunks.
   // ~250 chunks × CHUNK_TARGET_TOKENS = ~250 * 1024 = ~256K tokens budget.
   // 4 chars/token → ~1.024M chars. That's a lot of bytes; build one big block.
@@ -340,12 +490,20 @@ async function W16_embedCapTrigger(orgId: string, venueId: string, ingest: Inges
     return origLogWarn.call(this, message)
   } as typeof Logger.prototype.warn
   try {
-    await ingest.ingest({ id: kiId, title: 'cap-trigger', content: text, organizationId: orgId, venueId })
+    await ingest.ingest({
+      id: kiId,
+      title: 'cap-trigger',
+      content: text,
+      organizationId: orgId,
+      venueId,
+    })
   } finally {
     Logger.prototype.warn = origLogWarn
     void origWarn
   }
-  const totalChunks = await prisma.knowledgeChunk.count({ where: { section: { knowledgeItemId: kiId } } })
+  const totalChunks = await prisma.knowledgeChunk.count({
+    where: { section: { knowledgeItemId: kiId } },
+  })
   // embedding is `Unsupported("vector(1024)")` — must use raw SQL.
   const embeddedRows = await prisma.$queryRawUnsafe<{ n: bigint | number }[]>(
     `SELECT count(*)::int AS n FROM knowledge_chunks c JOIN knowledge_sections s ON s.id = c."sectionId" WHERE s."knowledgeItemId" = $1 AND c.embedding IS NOT NULL`,
@@ -357,28 +515,36 @@ async function W16_embedCapTrigger(orgId: string, venueId: string, ingest: Inges
   // can split that 200 between actually-embedded and queue-timeout (15s wait). The
   // sections_persisted log carries voyageCallCount + embedQueueTimeoutCount whose sum
   // equals MAX_EMBEDS_PER_DOCUMENT. AC-5 is satisfied as long as cap held + log fired.
-  const persistedLog = warns
-    .concat([])
-    .find((w) => w.includes('"event":"ingest.sections_persisted"') && w.includes(kiId))
-    || ''
+  const persistedLog =
+    warns
+      .concat([])
+      .find((w) => w.includes('"event":"ingest.sections_persisted"') && w.includes(kiId)) || ''
   const allWarns = warns.join('\n')
-  const persistedFromLog = (allWarns.match(/"event":"ingest.sections_persisted"[^}]+/g) ?? []).find((m) => m.includes(kiId))
+  const persistedFromLog = (allWarns.match(/"event":"ingest.sections_persisted"[^}]+/g) ?? []).find(
+    (m) => m.includes(kiId),
+  )
   // Fall back to grepping the captured log lines if Logger.log (info) wasn't proxied.
   const overflowFromCap = totalChunks - MAX_EMBEDS_PER_DOCUMENT
-  const ok = totalChunks > MAX_EMBEDS_PER_DOCUMENT
-    && embedded > 0
-    && embedded <= MAX_EMBEDS_PER_DOCUMENT
-    && sawCapLog
-    && overflowFromCap === totalChunks - MAX_EMBEDS_PER_DOCUMENT
+  const ok =
+    totalChunks > MAX_EMBEDS_PER_DOCUMENT &&
+    embedded > 0 &&
+    embedded <= MAX_EMBEDS_PER_DOCUMENT &&
+    sawCapLog &&
+    overflowFromCap === totalChunks - MAX_EMBEDS_PER_DOCUMENT
   assert(
     'w16.embed_cap_trigger',
     ok,
     `totalChunks=${totalChunks} embedded=${embedded} cap=${MAX_EMBEDS_PER_DOCUMENT} overflow=${overflowFromCap} sawCapLog=${sawCapLog}`,
   )
-  void persistedLog; void persistedFromLog
+  void persistedLog
+  void persistedFromLog
 }
 
-async function W17_embedQualityDegraded(orgId: string, venueId: string, ingest: IngestService): Promise<void> {
+async function W17_embedQualityDegraded(
+  orgId: string,
+  venueId: string,
+  ingest: IngestService,
+): Promise<void> {
   // PROBE_VOYAGE_FAIL_RATIO=0.5 must be set for the duration of this assertion only.
   const original = process.env.PROBE_VOYAGE_FAIL_RATIO
   process.env.PROBE_VOYAGE_FAIL_RATIO = '0.7' // bias toward >0.5 ratio so the warn fires deterministically
@@ -392,7 +558,13 @@ async function W17_embedQualityDegraded(orgId: string, venueId: string, ingest: 
   } as typeof Logger.prototype.warn
   const kiId = randomUUID()
   try {
-    await ingest.ingest({ id: kiId, title: 'quality-degraded', content: text, organizationId: orgId, venueId })
+    await ingest.ingest({
+      id: kiId,
+      title: 'quality-degraded',
+      content: text,
+      organizationId: orgId,
+      venueId,
+    })
   } finally {
     Logger.prototype.warn = origLogWarn
     if (original === undefined) delete process.env.PROBE_VOYAGE_FAIL_RATIO
@@ -425,14 +597,19 @@ async function W18_backfillIdempotency(orgA: string, _venueA: string): Promise<v
 
   const first = await runBackfill([orgA])
   const sectionsAfter1 = await prisma.knowledgeSection.count({ where: { knowledgeItemId: kiId } })
-  const chunksAfter1 = await prisma.knowledgeChunk.count({ where: { section: { knowledgeItemId: kiId } } })
+  const chunksAfter1 = await prisma.knowledgeChunk.count({
+    where: { section: { knowledgeItemId: kiId } },
+  })
 
   const second = await runBackfill([orgA])
   const sectionsAfter2 = await prisma.knowledgeSection.count({ where: { knowledgeItemId: kiId } })
-  const chunksAfter2 = await prisma.knowledgeChunk.count({ where: { section: { knowledgeItemId: kiId } } })
+  const chunksAfter2 = await prisma.knowledgeChunk.count({
+    where: { section: { knowledgeItemId: kiId } },
+  })
 
   const okFirst = first.kiProcessed >= 1 && sectionsAfter1 >= 1 && chunksAfter1 >= 1
-  const okIdempotent = sectionsAfter2 === sectionsAfter1 && chunksAfter2 === chunksAfter1 && second.kiProcessed === 0
+  const okIdempotent =
+    sectionsAfter2 === sectionsAfter1 && chunksAfter2 === chunksAfter1 && second.kiProcessed === 0
 
   assert(
     'w18.backfill_idempotency',
@@ -469,7 +646,11 @@ async function W19_retrievalSectionInjection(
     reformulateOnEmpty: false,
   })
   if (!result.ok || result.data.length === 0) {
-    assert('w19.retrieval_section_injection', false, `ok=${result.ok} hits=${result.ok ? result.data.length : 'n/a'}`)
+    assert(
+      'w19.retrieval_section_injection',
+      false,
+      `ok=${result.ok} hits=${result.ok ? result.data.length : 'n/a'}`,
+    )
     await prisma.knowledgeItem.delete({ where: { id: kiId } }).catch(() => undefined)
     return
   }
@@ -489,13 +670,15 @@ async function W19_retrievalSectionInjection(
 
   let sectionExists = false
   if (sectionId) {
-    const sec = await prisma.knowledgeSection.findUnique({ where: { id: sectionId }, select: { id: true } })
+    const sec = await prisma.knowledgeSection.findUnique({
+      where: { id: sectionId },
+      select: { id: true },
+    })
     sectionExists = !!sec
   }
 
   // audit-S6 — assertContains rather than strict equality on title.
-  const titleLooksLikeSlide =
-    typeof sectionTitle === 'string' && /Slide\s+\d+/.test(sectionTitle)
+  const titleLooksLikeSlide = typeof sectionTitle === 'string' && /Slide\s+\d+/.test(sectionTitle)
   // Content should be one section, not the whole multi-slide document.
   const fullContent = fixturePptx()
   const ok =
@@ -551,7 +734,11 @@ async function W20_retrievalFallbackNoSections(
     content,
   )
 
-  const result = await retrieval.find('brand-new policy', { orgId: orgA, venueId: venueA, limit: 5 })
+  const result = await retrieval.find('brand-new policy', {
+    orgId: orgA,
+    venueId: venueA,
+    limit: 5,
+  })
   if (!result.ok || result.data.length === 0) {
     assert('w20.retrieval_fallback_no_sections', false, `ok=${result.ok}`)
     await cleanupW20(seId, kiId)
@@ -560,7 +747,11 @@ async function W20_retrievalFallbackNoSections(
 
   const hit = result.data.find((h) => h.entityId === kiId)
   if (!hit) {
-    assert('w20.retrieval_fallback_no_sections', false, `KI not in hits (got ${result.data.length} hits)`)
+    assert(
+      'w20.retrieval_fallback_no_sections',
+      false,
+      `KI not in hits (got ${result.data.length} hits)`,
+    )
     await cleanupW20(seId, kiId)
     return
   }
@@ -681,7 +872,9 @@ async function W22_backfillAdvisoryLockPreventsConcurrent(orgA: string): Promise
       try {
         stats = await runBackfill([orgA])
       } finally {
-        await tx.$queryRawUnsafe(`SELECT pg_advisory_unlock(hashtext($1)::int)`, lockKey).catch(() => undefined)
+        await tx
+          .$queryRawUnsafe(`SELECT pg_advisory_unlock(hashtext($1)::int)`, lockKey)
+          .catch(() => undefined)
       }
     },
     { timeout: 30_000 },
@@ -743,7 +936,8 @@ async function W23_backfillCostCeilingHaltLeavesPartialState(orgA: string): Prom
 
   const sawCeiling = warns.some((w) => w.includes('"event":"backfill.tenant_cost_ceiling_reached"'))
   const partialEntry = stats.partialTenantList.find((p) => p.orgId === orgA)
-  const ok = sawCeiling && !!partialEntry && partialEntry.kiRemaining > 0 && stats.tenantsPartial >= 1
+  const ok =
+    sawCeiling && !!partialEntry && partialEntry.kiRemaining > 0 && stats.tenantsPartial >= 1
 
   assert(
     'w23.backfill_cost_ceiling_halt_leaves_partial_state',
@@ -794,7 +988,10 @@ async function W24_chatCacheReadObservable(
   // (audit-S1 — distinguish "not wired" from "TTL expired").
   const inspectorMessages = buildSystemMessagesForInspection('default')
   const inspection = inspectAgentProviderOptions(inspectorMessages)
-  if (inspection.systemCacheControl !== 'ephemeral' || inspection.toolsCacheControl !== 'ephemeral') {
+  if (
+    inspection.systemCacheControl !== 'ephemeral' ||
+    inspection.toolsCacheControl !== 'ephemeral'
+  ) {
     assert(
       'w24.chat_cache_read_observable',
       false,
@@ -826,7 +1023,11 @@ async function W24_chatCacheReadObservable(
     await new Promise((r) => setTimeout(r, 1000))
     turn2Result = await buildAgent().generate({ messages })
   } catch (err) {
-    assert('w24.chat_cache_read_observable', false, `agent.generate threw: ${(err as Error).message}`)
+    assert(
+      'w24.chat_cache_read_observable',
+      false,
+      `agent.generate threw: ${(err as Error).message}`,
+    )
     await prisma.knowledgeItem.delete({ where: { id: kiId } }).catch(() => undefined)
     return
   }
@@ -1002,9 +1203,10 @@ async function W27_findKnowledgeAggregateTokenBudget(
     Logger.prototype.log = origLogLog
   }
 
-  const sawFormattedLog = logsBefore.some((l) =>
-    l.includes('"event":"tool_dispatcher.find_knowledge_formatted"') &&
-    l.includes('"aggregateSectionTokens":'),
+  const sawFormattedLog = logsBefore.some(
+    (l) =>
+      l.includes('"event":"tool_dispatcher.find_knowledge_formatted"') &&
+      l.includes('"aggregateSectionTokens":'),
   )
   const noBudgetWarn = !warnsBefore.some((w) =>
     w.includes('"event":"tool_dispatcher.section_budget_exceeded"'),
@@ -1032,7 +1234,9 @@ async function W27_findKnowledgeAggregateTokenBudget(
   }
 
   const sawBudgetWarn = warnsAfter.some(
-    (w) => w.includes('"event":"tool_dispatcher.section_budget_exceeded"') && w.includes('"budget":24000'),
+    (w) =>
+      w.includes('"event":"tool_dispatcher.section_budget_exceeded"') &&
+      w.includes('"budget":24000'),
   )
 
   const ok = sawFormattedLog && noBudgetWarn && sawBudgetWarn
@@ -1075,11 +1279,22 @@ async function main() {
   const tabular = new TabularQueryService()
   const dispatcher = new ToolDispatcher(retrieval, mockOps, ingest, verifier, tabular)
 
-  console.log(JSON.stringify({ event: 'probe.section.cost_banner', note: '27 assertions (W1-W27). ~16 small markdown ingests + 1 synthetic 200-chunk doc + 1 quality-degraded doc + W18-W23 backfill/retrieval probes + W24 chat cache (2 Sonnet 4.6 turns ~$0.010) + W25/W26/W27 retrieval + budget probes. Approx 50-70 voyage calls + 2 Sonnet turns @ ~$0.005 each (~$0.013 ceiling).' }))
+  console.log(
+    JSON.stringify({
+      event: 'probe.section.cost_banner',
+      note: '27 assertions (W1-W27). ~16 small markdown ingests + 1 synthetic 200-chunk doc + 1 quality-degraded doc + W18-W23 backfill/retrieval probes + W24 chat cache (2 Sonnet 4.6 turns ~$0.010) + W25/W26/W27 retrieval + budget probes. Approx 50-70 voyage calls + 2 Sonnet turns @ ~$0.005 each (~$0.013 ceiling).',
+    }),
+  )
 
   await pnpCleanup()
-  const { orgId: orgA, venueId: venueA } = await ensureOrgWithVenue(PROBE_ORG_SLUG, 'Probe Section Org A')
-  const { orgId: orgB, venueId: venueB } = await ensureOrgWithVenue(PROBE_ORG_B_SLUG, 'Probe Section Org B')
+  const { orgId: orgA, venueId: venueA } = await ensureOrgWithVenue(
+    PROBE_ORG_SLUG,
+    'Probe Section Org A',
+  )
+  const { orgId: orgB, venueId: venueB } = await ensureOrgWithVenue(
+    PROBE_ORG_B_SLUG,
+    'Probe Section Org B',
+  )
 
   await W1_schemaShape()
   await W2_schemaFkCascade(orgA, venueA, ingest)

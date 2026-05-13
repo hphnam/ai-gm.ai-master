@@ -3,14 +3,10 @@
 // contract drift BEFORE merging — plugin's default user-update semantics conflict
 // with the linkVerifiedNumber transaction (uniqueness check + single transaction).
 
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
-import {
-  PENDING_VERIFICATION_TTL_MS,
-  PhoneRateLimit,
-  type PhoneStatusResponse,
-} from '../../types'
+import { PENDING_VERIFICATION_TTL_MS, PhoneRateLimit, type PhoneStatusResponse } from '../../types'
 
 export type PhoneErrorCode =
   | 'phone-already-linked'
@@ -56,7 +52,11 @@ export class PhoneService {
   private readonly sendsPerIp = new Map<string, Bucket>()
   private readonly pendingVerifications = new Map<string, PendingEntry>()
 
-  private checkBucket(map: Map<string, Bucket>, key: string, max: number): {
+  private checkBucket(
+    map: Map<string, Bucket>,
+    key: string,
+    max: number,
+  ): {
     ok: boolean
     retryAfterSeconds: number
   } {
@@ -70,9 +70,7 @@ export class PhoneService {
     if (bucket.count > max) {
       const retryAfterSeconds = Math.max(
         1,
-        Math.ceil(
-          (bucket.windowStart + PhoneRateLimit.WINDOW_MS - now) / 1000,
-        ),
+        Math.ceil((bucket.windowStart + PhoneRateLimit.WINDOW_MS - now) / 1000),
       )
       return { ok: false, retryAfterSeconds }
     }
@@ -80,11 +78,7 @@ export class PhoneService {
   }
 
   assertSendRateLimit(userId: string, phoneHash: string, ipHash: string): void {
-    const user = this.checkBucket(
-      this.sendsPerUser,
-      userId,
-      PhoneRateLimit.MAX_SENDS_PER_USER,
-    )
+    const user = this.checkBucket(this.sendsPerUser, userId, PhoneRateLimit.MAX_SENDS_PER_USER)
     if (!user.ok) {
       this.logger.warn(
         JSON.stringify({
@@ -116,11 +110,7 @@ export class PhoneService {
         window: 'number-send-15m',
       })
     }
-    const ip = this.checkBucket(
-      this.sendsPerIp,
-      ipHash,
-      PhoneRateLimit.MAX_SENDS_PER_IP,
-    )
+    const ip = this.checkBucket(this.sendsPerIp, ipHash, PhoneRateLimit.MAX_SENDS_PER_IP)
     if (!ip.ok) {
       this.logger.warn(
         JSON.stringify({
@@ -214,9 +204,7 @@ export class PhoneService {
           data: { phoneNumber, phoneVerifiedAt: new Date() },
           select: { phoneNumber: true, phoneVerifiedAt: true },
         })
-        this.logger.log(
-          JSON.stringify({ event: 'phone.verified', userId, phoneHash }),
-        )
+        this.logger.log(JSON.stringify({ event: 'phone.verified', userId, phoneHash }))
         return {
           phoneNumber: updated.phoneNumber!,
           phoneVerifiedAt: updated.phoneVerifiedAt!,
@@ -252,9 +240,7 @@ export class PhoneService {
       where: { id: userId },
       data: { phoneNumber: null, phoneVerifiedAt: null },
     })
-    this.logger.log(
-      JSON.stringify({ event: 'phone.unlinked', userId, priorPhoneHash }),
-    )
+    this.logger.log(JSON.stringify({ event: 'phone.unlinked', userId, priorPhoneHash }))
     return { wasLinked: true }
   }
 

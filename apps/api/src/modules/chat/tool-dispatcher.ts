@@ -1,20 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
+import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   AGGREGATE_SECTION_TOKEN_BUDGET,
-  TOOL_INPUT_SCHEMAS,
   fail,
   formatSectionPayload,
+  TOOL_INPUT_SCHEMAS,
   type ToolName,
   type ToolResult,
 } from '../../types'
-import { IngestService } from '../ingest/ingest.service'
-import { RetrievalService, type RetrievalHit } from '../retrieval/retrieval.service'
-import { MockOpsService } from '../mock-ops/mock-ops.service'
-import { QuoteVerifierService } from './quote-verifier.service'
-import { TabularQueryService } from '../tabular/tabular.service'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
+import { IngestService } from '../ingest/ingest.service'
+import { MockOpsService } from '../mock-ops/mock-ops.service'
+import type { RetrievalHit } from '../retrieval/retrieval.service'
+import { RetrievalService } from '../retrieval/retrieval.service'
+import { TabularQueryService } from '../tabular/tabular.service'
+import { QuoteVerifierService } from './quote-verifier.service'
 
 export type DispatchContext = {
   orgId: string
@@ -93,17 +94,13 @@ export class ToolDispatcher {
           return this.applyFindKnowledgeFormat(expanded, ctx.orgId)
         }
         case 'get_stock_below_par':
-          return await this.mockOps.getStockBelowPar(
-            (parsed.data as { venueId: string }).venueId,
-          )
+          return await this.mockOps.getStockBelowPar((parsed.data as { venueId: string }).venueId)
         case 'get_stock_by_name': {
           const i = parsed.data as { venueId: string; name: string }
           return await this.mockOps.getStockByName(i.venueId, i.name)
         }
         case 'get_supplier_by_name':
-          return await this.mockOps.getSupplierByName(
-            (parsed.data as { name: string }).name,
-          )
+          return await this.mockOps.getSupplierByName((parsed.data as { name: string }).name)
         case 'get_upcoming_cutoffs': {
           const i = parsed.data as { venueId: string; withinHours?: number }
           return await this.mockOps.getUpcomingCutoffs(i.venueId, i.withinHours)
@@ -239,19 +236,15 @@ export class ToolDispatcher {
             select: { id: true, name: true, notes: true },
             take: 2,
           })
-          if (matches.length === 0) return fail('no-data', `no supplier matching "${i.supplierName}"`)
+          if (matches.length === 0)
+            return fail('no-data', `no supplier matching "${i.supplierName}"`)
           if (matches.length > 1) {
-            return fail(
-              'no-data',
-              `ambiguous match for "${i.supplierName}" — be more specific`,
-            )
+            return fail('no-data', `ambiguous match for "${i.supplierName}" — be more specific`)
           }
           const target = matches[0]
           const stamp = new Date().toISOString().slice(0, 10)
           const appended = `[${stamp}] ${i.note.trim()}`
-          const newNotes = target.notes
-            ? `${target.notes}\n${appended}`
-            : appended
+          const newNotes = target.notes ? `${target.notes}\n${appended}` : appended
           await prisma.mockSupplier.update({
             where: { id: target.id },
             data: { notes: newNotes },
@@ -345,9 +338,7 @@ export class ToolDispatcher {
             venueId: i.venueId,
           })
           const tags = Array.isArray(result.metadata.tags)
-            ? (result.metadata.tags as unknown[]).filter(
-                (t): t is string => typeof t === 'string',
-              )
+            ? (result.metadata.tags as unknown[]).filter((t): t is string => typeof t === 'string')
             : []
           const docType =
             typeof result.metadata.docType === 'string' ? result.metadata.docType : null
@@ -531,9 +522,7 @@ export class ToolDispatcher {
       }
     } catch (err) {
       const message = (err as Error).message ?? 'unknown dispatcher error'
-      this.logger.error(
-        JSON.stringify({ event: 'tool_dispatch.error', tool: toolName, message }),
-      )
+      this.logger.error(JSON.stringify({ event: 'tool_dispatch.error', tool: toolName, message }))
       return fail('error', message)
     }
   }
@@ -597,14 +586,15 @@ export class ToolDispatcher {
       return hits.filter((h) => h.entityType !== 'checklist_step')
     }
 
-    const steps = Array.isArray(checklist.steps) ? (checklist.steps as Array<Record<string, unknown>>) : []
-    const ordered = [...steps].sort(
-      (a, b) => (Number(a.index) || 0) - (Number(b.index) || 0),
-    )
+    const steps = Array.isArray(checklist.steps)
+      ? (checklist.steps as Array<Record<string, unknown>>)
+      : []
+    const ordered = [...steps].sort((a, b) => (Number(a.index) || 0) - (Number(b.index) || 0))
     const lines = ordered.map((s) => {
       const idx = Number(s.index) || 0
       const text = String(s.text ?? '').trim()
-      const hint = typeof s.hint === 'string' && s.hint.trim().length > 0 ? ` (${s.hint.trim()})` : ''
+      const hint =
+        typeof s.hint === 'string' && s.hint.trim().length > 0 ? ` (${s.hint.trim()})` : ''
       return `${idx + 1}. ${text}${hint}`
     })
     const content = `${checklist.title}\n\n${lines.join('\n')}`
@@ -679,9 +669,7 @@ export class ToolDispatcher {
       const sectionId = hit.metadata.sectionId as string | undefined | null
       const sectionTitle = hit.metadata.sectionTitle as string | undefined | null
       const sectionTokenCount =
-        typeof hit.metadata.sectionTokenCount === 'number'
-          ? hit.metadata.sectionTokenCount
-          : 0
+        typeof hit.metadata.sectionTokenCount === 'number' ? hit.metadata.sectionTokenCount : 0
 
       if (sectionId) {
         sectionInjectedHits++

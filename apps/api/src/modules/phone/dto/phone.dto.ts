@@ -1,9 +1,6 @@
-import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
-import {
-  SendPhoneCodeBodySchema,
-  VerifyPhoneCodeBodySchema,
-} from '../../../types'
+import { z } from 'zod'
+import { SendPhoneCodeBodySchema, VerifyPhoneCodeBodySchema } from '../../../types'
 
 export class SendPhoneCodeBodyDto extends createZodDto(SendPhoneCodeBodySchema) {}
 export class VerifyPhoneCodeBodyDto extends createZodDto(VerifyPhoneCodeBodySchema) {}

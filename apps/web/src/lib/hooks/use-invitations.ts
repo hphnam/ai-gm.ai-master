@@ -5,11 +5,11 @@ import { toast } from 'sonner'
 import type {
   AcceptInvitationResponseDto as AcceptInvitationResponse,
   CreateInvitationResponseDto as CreateInvitationResponse,
-  InviteBodyDto as InviteBody,
   InvitationPreviewDto as InvitationPreview,
+  InviteBodyDto as InviteBody,
   ListInvitationsResponseDto as ListInvitationsResponse,
 } from '@/generated/api'
-import { ApiError, apiFetch, apiPost } from '@/lib/api-client'
+import { type ApiError, apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
 
 export function useInvitations() {
@@ -42,8 +42,7 @@ export function useCreateInvitation() {
 export function useRevokeInvitation() {
   const queryClient = useQueryClient()
   return useMutation<{ ok: true }, Error, string>({
-    mutationFn: (id) =>
-      apiFetch<{ ok: true }>(`/org/invitations/${id}`, { method: 'DELETE' }),
+    mutationFn: (id) => apiFetch<{ ok: true }>(`/org/invitations/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invitations'] })
       toast.success('Invitation revoked')
@@ -65,8 +64,7 @@ export function useInvitationPreview(id: string | undefined) {
 export function useAcceptInvitation() {
   const queryClient = useQueryClient()
   return useMutation<AcceptInvitationResponse, Error, string>({
-    mutationFn: (id) =>
-      apiPost<AcceptInvitationResponse>(`/org/invitations/${id}/accept`, {}),
+    mutationFn: (id) => apiPost<AcceptInvitationResponse>(`/org/invitations/${id}/accept`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invitations'] })
       queryClient.invalidateQueries({ queryKey: ['venues'] })

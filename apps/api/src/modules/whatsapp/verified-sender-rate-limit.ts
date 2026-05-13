@@ -1,7 +1,4 @@
-import {
-  VERIFIED_SENDER_LIMIT_PER_HOUR,
-  VERIFIED_SENDER_WINDOW_MS,
-} from '../../types'
+import { VERIFIED_SENDER_LIMIT_PER_HOUR, VERIFIED_SENDER_WINDOW_MS } from '../../types'
 
 type Bucket = { timestamps: number[]; throttleReplyAt?: number }
 

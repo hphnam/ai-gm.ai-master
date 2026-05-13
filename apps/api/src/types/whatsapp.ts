@@ -41,10 +41,7 @@ const InfobipInboundResultSchema = z
     integrationType: z.string().optional(),
     // Contact block — `name` is low-entropy PII; see whatsapp.service.ts audit M5 (contact name
     // NEVER logged). Schema tolerates presence but service-layer drops it from all log lines.
-    contact: z
-      .object({ name: z.string().optional() })
-      .passthrough()
-      .optional(),
+    contact: z.object({ name: z.string().optional() }).passthrough().optional(),
     message: InfobipInboundMessageSchema,
   })
   .passthrough()
@@ -67,10 +64,7 @@ export type WhatsAppOutboundResult =
   | { ok: true; mode: 'live' | 'console' | 'disabled'; messageId?: string }
   | {
       ok: false
-      reason:
-        | 'whatsapp-driver-disabled'
-        | 'whatsapp-service-unavailable'
-        | 'whatsapp-invalid-to'
+      reason: 'whatsapp-driver-disabled' | 'whatsapp-service-unavailable' | 'whatsapp-invalid-to'
     }
 
 // --- Operational constants (unchanged from 03-03 unless noted) ---

@@ -8,9 +8,9 @@
 // audit-M3 — wraps the AI SDK call in AbortController + setTimeout per
 // RESEARCHER_TIMEOUT_MS. On timeout: throw RoleTimeoutError.
 
-import { Injectable } from '@nestjs/common'
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { generateText, stepCountIs, tool, type ToolSet } from 'ai'
+import { Injectable } from '@nestjs/common'
+import { generateText, stepCountIs, type ToolSet, tool } from 'ai'
 import { z } from 'zod'
 import { prisma } from '../../../database/prisma'
 import {
@@ -20,12 +20,13 @@ import {
   RoleTimeoutError,
 } from '../../../types'
 import { RetrievalService } from '../../retrieval/retrieval.service'
+import { chatV2Logger, hashId } from '../log-helpers'
+import { DOCS_RESEARCHER_PROMPT } from '../prompts/docs-researcher.prompt'
+import type { ResearcherResult } from '../researcher.interface'
+import { Researcher } from '../researcher.interface'
+import { sanitizeForResearcher } from '../researcher-sanitizer'
 import { getChecklist } from '../tools/get-checklist.tool'
 import { searchDocs } from '../tools/search-docs.tool'
-import { DOCS_RESEARCHER_PROMPT } from '../prompts/docs-researcher.prompt'
-import { chatV2Logger, hashId } from '../log-helpers'
-import type { Researcher, ResearcherResult } from '../researcher.interface'
-import { sanitizeForResearcher } from '../researcher-sanitizer'
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
@@ -82,7 +83,8 @@ export class DocsResearcher implements Researcher {
         },
       }),
       search_docs: tool({
-        description: 'Search documents for facts, policies, supplier info — anything not procedural.',
+        description:
+          'Search documents for facts, policies, supplier info — anything not procedural.',
         inputSchema: z.object({
           query: z.string().min(1),
           docType: z.string().optional(),
@@ -103,7 +105,8 @@ export class DocsResearcher implements Researcher {
               })
             }
             const top = result.data.hits[0]
-            if (top) evidenceSummary = `${top.sectionTitle ?? 'doc hit'} (+${result.data.hits.length - 1} more)`
+            if (top)
+              evidenceSummary = `${top.sectionTitle ?? 'doc hit'} (+${result.data.hits.length - 1} more)`
           }
           return result
         },
@@ -208,13 +211,16 @@ function stubResearch(brief: string, ctx: ResearchContext, t0: number): Research
   const citations: { knowledgeItemId: string; sectionId?: string }[] = []
 
   if (lower.includes('opening') || lower.includes('open')) {
-    summary = 'Beer Hall Opening Checklist (7 steps): unlock + alarm off, fridges + lines on, glass-wash cycle, float count, board pricing, doors at 11:45, music up.'
+    summary =
+      'Beer Hall Opening Checklist (7 steps): unlock + alarm off, fridges + lines on, glass-wash cycle, float count, board pricing, doors at 11:45, music up.'
     citations.push({ knowledgeItemId: '00000000-0000-4000-8000-000000000001' })
   } else if (lower.includes('below par') || lower.includes('stock')) {
-    summary = 'Stock report: 4 SKUs at or below par — Heineken 8/12, Guinness 5/10, Estrella 3/8, Aperol 1/4. Bibendum cutoff 16:00.'
+    summary =
+      'Stock report: 4 SKUs at or below par — Heineken 8/12, Guinness 5/10, Estrella 3/8, Aperol 1/4. Bibendum cutoff 16:00.'
     citations.push({ knowledgeItemId: '00000000-0000-4000-8000-000000000002' })
   } else if (lower.includes('ice machine')) {
-    summary = 'Ice machine engineer: Hoshizaki — Dave Mahon 07700 900 134. Manitowoc unit on back bar.'
+    summary =
+      'Ice machine engineer: Hoshizaki — Dave Mahon 07700 900 134. Manitowoc unit on back bar.'
     citations.push({ knowledgeItemId: '00000000-0000-4000-8000-000000000003' })
   } else if (lower.includes('bibendum') || lower.includes('cutoff')) {
     summary = 'Bibendum cutoff: 16:00 weekdays, 14:00 Saturdays.'

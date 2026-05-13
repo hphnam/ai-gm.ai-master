@@ -30,14 +30,10 @@ export function DebugToolCallCard({ entry }: { entry: ToolCallEntry }) {
   const round = typeof entry.round === 'number' ? entry.round : '?'
   const tool = entry.tool ?? 'unknown'
   const ok = entry.result?.ok === true
-  const statusText = ok
-    ? 'ok'
-    : `fail:${entry.result?.reason ?? 'unknown'}`
+  const statusText = ok ? 'ok' : `fail:${entry.result?.reason ?? 'unknown'}`
 
   const similarityHits =
-    tool === 'find_knowledge' &&
-    ok &&
-    Array.isArray(entry.result?.data)
+    tool === 'find_knowledge' && ok && Array.isArray(entry.result?.data)
       ? (entry.result!.data as Array<{ similarity?: unknown }>)
           .map((h) => (typeof h?.similarity === 'number' ? h.similarity : null))
           .filter((s): s is number => s !== null)
@@ -67,6 +63,7 @@ export function DebugToolCallCard({ entry }: { entry: ToolCallEntry }) {
             const band = similarityBand(sim)
             return (
               <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: similarity scores can duplicate, list is read-only
                 key={i}
                 className={cn(
                   'inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-mono',

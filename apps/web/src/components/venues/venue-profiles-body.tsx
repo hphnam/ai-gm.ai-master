@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 import { VenueProfileEditor } from './venue-profile-editor'

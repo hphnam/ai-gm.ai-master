@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
 import { Inbox, Library, MessageCircleQuestion, Upload } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { KnowledgeEmptyState } from '@/components/docs/empty-state'
 import { InboxTab, useInboxCount } from '@/components/docs/inbox-tab'
 import { LibraryTab } from '@/components/docs/library-tab'
 import { QuestionsTab, useQuestionsCount } from '@/components/docs/questions-tab'
-import { KnowledgeEmptyState } from '@/components/docs/empty-state'
 import { UploadModal } from '@/components/docs/upload-modal'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
@@ -112,11 +112,7 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
         title="Knowledge"
         description="Everything your AI assistant can answer about your venues."
         actions={
-          <Button
-            size="sm"
-            onClick={() => setUploadOpen(true)}
-            className="cursor-pointer gap-1.5"
-          >
+          <Button size="sm" onClick={() => setUploadOpen(true)} className="cursor-pointer gap-1.5">
             <Upload className="h-4 w-4" />
             Add document
           </Button>
@@ -129,11 +125,7 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
             <KnowledgeEmptyState onUploadClick={() => setUploadOpen(true)} />
           ) : (
             <>
-              <TabBar
-                active={tab}
-                inboxCount={inboxCount}
-                questionsCount={questionsCount}
-              />
+              <TabBar active={tab} inboxCount={inboxCount} questionsCount={questionsCount} />
 
               {TABS.map((id) => (
                 <div

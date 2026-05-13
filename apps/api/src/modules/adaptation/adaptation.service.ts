@@ -1,23 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
+  type CaptureFeedbackInput,
   CaptureFeedbackInputSchema,
+  DRAIN_SOFT_DEADLINE_MS,
+  type EnqueueReTagInput,
   EnqueueReTagInputSchema,
+  type FeedbackKind,
   LOW_SIM_THRESHOLD,
   MAX_DRAIN_LIMIT,
   MAX_ENQUEUE_PER_FEEDBACK,
   MAX_RETAG_ATTEMPTS,
-  DRAIN_SOFT_DEADLINE_MS,
-  type CaptureFeedbackInput,
-  type EnqueueReTagInput,
-  type FeedbackKind,
 } from '../../types'
 import { IngestService } from '../ingest/ingest.service'
 
 const ACTIVE_STATUSES = ['queued', 'processing'] as const
 
 export type CaptureFeedbackResult =
-  | { ok: true; feedbackId: string; enqueuedCount: number; dedupedCount: number; exhaustedCount: number }
+  | {
+      ok: true
+      feedbackId: string
+      enqueuedCount: number
+      dedupedCount: number
+      exhaustedCount: number
+    }
   | { ok: false; reason: 'invalid-input' | 'message-not-found' | 'not-assistant-message' }
 
 export type EnqueueReTagResult =

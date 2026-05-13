@@ -1,9 +1,6 @@
-import { z } from 'zod'
 import { createZodDto } from 'nestjs-zod'
-import {
-  SuggestionsOnOpenRequestSchema,
-  SuggestionsOnTurnRequestSchema,
-} from '../../../types'
+import { z } from 'zod'
+import { SuggestionsOnOpenRequestSchema, SuggestionsOnTurnRequestSchema } from '../../../types'
 
 export class SuggestionsOnOpenRequestDto extends createZodDto(SuggestionsOnOpenRequestSchema) {}
 export class SuggestionsOnTurnRequestDto extends createZodDto(SuggestionsOnTurnRequestSchema) {}

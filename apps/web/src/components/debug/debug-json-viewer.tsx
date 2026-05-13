@@ -2,12 +2,8 @@
 
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { DEBUG_JSON_UI_CAP } from '@/lib/format'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import { cn } from '@/lib/utils'
 
 type DebugJsonViewerProps = {
@@ -42,11 +38,7 @@ export function DebugJsonViewer({
         className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left py-1"
         aria-label={`${title}, ${open ? 'expanded' : 'collapsed'}, ${formatBytes(totalBytes)}${truncated ? ' truncated' : ''}`}
       >
-        {open ? (
-          <ChevronDown className="h-3 w-3" />
-        ) : (
-          <ChevronRight className="h-3 w-3" />
-        )}
+        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         <span>{title}</span>
         <span className="text-[10px] text-muted-foreground/70">
           ({formatBytes(totalBytes)}
@@ -65,8 +57,8 @@ export function DebugJsonViewer({
         {truncated ? (
           <div role="status" className="text-xs text-muted-foreground italic mt-1">
             Content truncated — {omitted.toLocaleString()} bytes omitted (
-            {raw.length.toLocaleString()} total). Full payload available via direct
-            API: /debug/messages/:id
+            {raw.length.toLocaleString()} total). Full payload available via direct API:
+            /debug/messages/:id
           </div>
         ) : null}
       </CollapsibleContent>

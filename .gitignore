@@ -43,3 +43,4 @@ Thumbs.db
 npm-debug.log*
 pnpm-debug.log*
 .paul/automation-logs/
+CLAUDE.local.md

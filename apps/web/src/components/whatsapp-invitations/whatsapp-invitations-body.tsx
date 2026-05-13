@@ -1,8 +1,8 @@
 'use client'
 
 import { ApiError } from '@/lib/api-client'
-import { mapApiError } from '@/lib/map-api-error'
 import { useWhatsappInvites } from '@/lib/hooks/use-whatsapp-invites'
+import { mapApiError } from '@/lib/map-api-error'
 import { InviteWhatsappDialog } from './invite-whatsapp-dialog'
 import { WhatsappInviteList } from './whatsapp-invite-list'
 
@@ -34,8 +34,8 @@ export function WhatsappInvitationsBody() {
         <div>
           <h2 className="text-base font-semibold">Invite a teammate via WhatsApp</h2>
           <p className="text-sm text-muted-foreground">
-            Generate a one-time code that the staff member sends to GM AI on WhatsApp to
-            verify their phone and start chatting.
+            Generate a one-time code that the staff member sends to GM AI on WhatsApp to verify
+            their phone and start chatting.
           </p>
         </div>
         <InviteWhatsappDialog />

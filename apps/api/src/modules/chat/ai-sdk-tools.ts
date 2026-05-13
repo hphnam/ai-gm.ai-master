@@ -1,15 +1,13 @@
-import { tool, type ToolSet } from 'ai'
+import { type ToolSet, tool } from 'ai'
 import { fail, TOOL_DEFINITIONS, TOOL_INPUT_SCHEMAS } from '../../types'
-import type { ToolDispatcher, DispatchContext } from './tool-dispatcher'
+import type { DispatchContext } from './tool-dispatcher'
+import { ToolDispatcher } from './tool-dispatcher'
 
 // Builds AI SDK tool objects that route through our existing ToolDispatcher.
 // Built per-request so each tool closes over {orgId, userId, userRole} without
 // needing to plumb context through AI SDK's execute signature. The dispatcher
 // still owns input validation + cross-tenant enforcement + audit logging.
-export function buildAiSdkTools(
-  dispatcher: ToolDispatcher,
-  ctx: DispatchContext,
-): ToolSet {
+export function buildAiSdkTools(dispatcher: ToolDispatcher, ctx: DispatchContext): ToolSet {
   // record_kb_gap precondition gate. The system prompt mandates that the model
   // call find_knowledge before recording a gap; this enforces it at runtime so
   // a regressed prompt or pattern-matched few-shot can't silently skip search.
@@ -54,9 +52,11 @@ export function buildAiSdkTools(
         ...(def.name === 'deep_research'
           ? {
               toModelOutput: ({ output }: { output: unknown }) => {
-                const o = output as
-                  | { ok?: boolean; data?: { synthesis?: string }; detail?: string }
-                  | null
+                const o = output as {
+                  ok?: boolean
+                  data?: { synthesis?: string }
+                  detail?: string
+                } | null
                 if (o?.ok && typeof o.data?.synthesis === 'string') {
                   return { type: 'text' as const, value: o.data.synthesis }
                 }

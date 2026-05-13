@@ -13,7 +13,7 @@
 
 import type { PrismaClient } from '@prisma/client'
 import { fail, ok, type ToolResult } from '../../../types'
-import { hashId, hashQuery, chatV2Logger } from '../log-helpers'
+import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
 
 export type ChecklistStepLite = { index: number; content: string }
 
@@ -85,7 +85,8 @@ export async function getChecklist(
   const steps: ChecklistStepLite[] = rawSteps.map((s, i) => {
     const obj = (s ?? {}) as Record<string, unknown>
     const idx = typeof obj.index === 'number' ? obj.index : i
-    const text = typeof obj.text === 'string' ? obj.text : typeof obj.content === 'string' ? obj.content : ''
+    const text =
+      typeof obj.text === 'string' ? obj.text : typeof obj.content === 'string' ? obj.content : ''
     return { index: idx, content: text }
   })
 

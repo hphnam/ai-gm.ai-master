@@ -1,11 +1,11 @@
 'use client'
 
 import {
+  type InfiniteData,
   useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
-  type InfiniteData,
 } from '@tanstack/react-query'
 import type {
   CreateDocRequestDto as CreateDocRequest,
@@ -68,9 +68,8 @@ function buildDocsQs(filters: ReturnType<typeof normaliseFilters>, cursor: strin
 // z.union body, the accept-type endpoint shares DocumentTypeDto for output).
 type AcceptTypeResponse = DocumentTypeDto
 type ClassifyDocResponse = DocumentTypeDto
-type ClassifyDocRequest =
-  | { typeId: string }
-  | { name: string; kind: DocumentTypeKind }
+type ClassifyDocRequest = { typeId: string } | { name: string; kind: DocumentTypeKind }
+
 import { API_URL, ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
 // Paginated server-side library list. Filters / search / sort all live in
@@ -88,7 +87,7 @@ export function useDocs(filters?: DocsFilters) {
   >({
     queryKey: ['docs', 'list', norm] as const,
     queryFn: ({ signal, pageParam }) =>
-      apiFetch<DocListPage>('/docs' + buildDocsQs(norm, pageParam ?? null), {
+      apiFetch<DocListPage>(`/docs${buildDocsQs(norm, pageParam ?? null)}`, {
         signal,
       }),
     initialPageParam: null,
@@ -119,8 +118,7 @@ export function useDoc(id: string | null) {
 export function useCreateDoc() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (body: CreateDocRequest) =>
-      apiPost<CreateDocResponse>('/docs', body),
+    mutationFn: (body: CreateDocRequest) => apiPost<CreateDocResponse>('/docs', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
     },
@@ -143,11 +141,10 @@ export function useUploadDoc() {
       const form = new FormData()
       form.append('file', args.file)
       if (args.venueId) form.append('venueId', args.venueId)
-      if (args.title && args.title.trim()) form.append('title', args.title.trim())
-      if (args.description && args.description.trim())
-        form.append('description', args.description.trim())
+      if (args.title?.trim()) form.append('title', args.title.trim())
+      if (args.description?.trim()) form.append('description', args.description.trim())
       if (args.autoDetectVenue) form.append('autoDetectVenue', 'true')
-      const res = await fetch(API_URL + '/docs/upload', {
+      const res = await fetch(`${API_URL}/docs/upload`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'x-request-id': requestId },
@@ -217,7 +214,7 @@ export function useRejectDocType() {
   return useMutation({
     mutationFn: async (docId: string): Promise<void> => {
       const requestId = crypto.randomUUID()
-      const res = await fetch(API_URL + `/docs/${docId}/reject-type`, {
+      const res = await fetch(`${API_URL}/docs/${docId}/reject-type`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'x-request-id': requestId, 'content-type': 'application/json' },
@@ -289,8 +286,7 @@ export type GapKbMatch = {
 
 export function useGapKbMatches() {
   return useMutation({
-    mutationFn: (gapId: string) =>
-      apiFetch<GapKbMatch[]>(`/docs/gaps/${gapId}/kb-matches`),
+    mutationFn: (gapId: string) => apiFetch<GapKbMatch[]>(`/docs/gaps/${gapId}/kb-matches`),
   })
 }
 
@@ -339,8 +335,7 @@ export type NoDataQuery = {
 export function useNoDataQueries() {
   return useQuery<NoDataQuery[]>({
     queryKey: ['docs', 'analytics', 'no-data'],
-    queryFn: ({ signal }) =>
-      apiFetch<NoDataQuery[]>('/docs/analytics/no-data-queries', { signal }),
+    queryFn: ({ signal }) => apiFetch<NoDataQuery[]>('/docs/analytics/no-data-queries', { signal }),
     staleTime: 60_000,
   })
 }
@@ -362,7 +357,7 @@ export function useDeleteGap() {
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
       const requestId = crypto.randomUUID()
-      const res = await fetch(API_URL + `/docs/gaps/${id}`, {
+      const res = await fetch(`${API_URL}/docs/gaps/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'x-request-id': requestId },
@@ -401,7 +396,7 @@ export function useDeleteDoc() {
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
       const requestId = crypto.randomUUID()
-      const res = await fetch(API_URL + `/docs/${id}`, {
+      const res = await fetch(`${API_URL}/docs/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'x-request-id': requestId },
@@ -447,8 +442,7 @@ export function useDeleteDoc() {
       return { prevInbox, prevLibrary }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prevInbox)
-        queryClient.setQueryData(['docs', 'inbox'], ctx.prevInbox)
+      if (ctx?.prevInbox) queryClient.setQueryData(['docs', 'inbox'], ctx.prevInbox)
       if (ctx?.prevLibrary) {
         for (const [key, data] of ctx.prevLibrary) {
           queryClient.setQueryData(key, data)
@@ -472,7 +466,7 @@ export function useUpdateDoc() {
   return useMutation({
     mutationFn: async (args: { id: string; body: UpdateDocBody }): Promise<void> => {
       const requestId = crypto.randomUUID()
-      const res = await fetch(API_URL + `/docs/${args.id}`, {
+      const res = await fetch(`${API_URL}/docs/${args.id}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {

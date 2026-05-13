@@ -1,11 +1,7 @@
 // Plan 01-01 — pure-code utilities for section detection. No external deps.
 // All knobs come from @gm-ai/types so consumers grep one source.
 
-import {
-  CHUNK_OVERLAP_TOKENS,
-  CHUNK_TARGET_TOKENS,
-  MAX_HEADING_RECURSION_DEPTH,
-} from '../../types'
+import { CHUNK_OVERLAP_TOKENS, CHUNK_TARGET_TOKENS, MAX_HEADING_RECURSION_DEPTH } from '../../types'
 
 /**
  * Token estimator. Latin-script-biased — over-counts CJK ~4x and under-counts
@@ -105,7 +101,7 @@ export function slidingWindowChunks(
 
   const chunks: SlidingChunk[] = []
   let start = 0
-  const stride = Math.max(1, targetChars - overlapChars)
+  const _stride = Math.max(1, targetChars - overlapChars)
 
   while (start < content.length) {
     let end = Math.min(content.length, start + targetChars)

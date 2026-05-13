@@ -7,8 +7,8 @@
 // Direct NestJS Logger.log/info/warn/error calls inside chat-v2 are forbidden
 // (grep-gated by Task 3 verify + repo-level verification table).
 
-import { Logger } from '@nestjs/common'
 import { createHash } from 'node:crypto'
+import { Logger } from '@nestjs/common'
 
 const SENSITIVE_KEYS = new Set([
   'userMessage',

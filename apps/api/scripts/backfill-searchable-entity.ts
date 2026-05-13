@@ -14,8 +14,8 @@
  */
 
 import '../src/load-env'
-import { prisma } from '../src/database/prisma'
 import { VoyageAIClient } from 'voyageai'
+import { prisma } from '../src/database/prisma'
 import { VOYAGE_EMBED_MODEL } from '../src/types/section'
 
 const BATCH_SIZE = 32
@@ -108,13 +108,11 @@ async function backfillChecklistSteps(): Promise<number> {
   for (const checklist of checklists) {
     const steps = (checklist.steps as unknown as Step[]) ?? []
     if (steps.length === 0) continue
-    const cadence = ((checklist.schedule as Schedule) ?? {}).cadence ?? null
+    const cadence = (checklist.schedule as Schedule)?.cadence ?? null
 
     for (let i = 0; i < steps.length; i += BATCH_SIZE) {
       const batch = steps.slice(i, i + BATCH_SIZE)
-      const texts = batch.map(
-        (s) => `${checklist.title} — step ${s.index + 1}: ${s.text}`,
-      )
+      const texts = batch.map((s) => `${checklist.title} — step ${s.index + 1}: ${s.text}`)
       const vectors = await embedDocuments(texts)
 
       for (let j = 0; j < batch.length; j++) {

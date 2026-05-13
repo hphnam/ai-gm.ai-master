@@ -37,16 +37,11 @@ export function KnowledgeEmptyState({ onUploadClick }: { onUploadClick: () => vo
           Teach your assistant about your venue
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Your AI answers staff questions using only what you upload here. The
-          more it knows, the more useful it gets. Start with one or two of the
-          things below.
+          Your AI answers staff questions using only what you upload here. The more it knows, the
+          more useful it gets. Start with one or two of the things below.
         </p>
         <div className="mt-6">
-          <Button
-            size="lg"
-            onClick={onUploadClick}
-            className="cursor-pointer gap-2"
-          >
+          <Button size="lg" onClick={onUploadClick} className="cursor-pointer gap-2">
             <Upload className="h-4 w-4" />
             Add your first document
           </Button>
@@ -54,10 +49,7 @@ export function KnowledgeEmptyState({ onUploadClick }: { onUploadClick: () => vo
       </div>
       <ul className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
         {examples.map(({ Icon, title, desc }) => (
-          <li
-            key={title}
-            className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
-          >
+          <li key={title} className="flex items-start gap-3 rounded-lg border bg-background/40 p-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
               <Icon className="h-4 w-4" aria-hidden />
             </div>

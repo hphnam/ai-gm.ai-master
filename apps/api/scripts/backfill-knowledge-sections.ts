@@ -2,7 +2,7 @@
  * Plan 01-02 — backfill KnowledgeSection + KnowledgeChunk rows for every
  * existing KnowledgeItem that doesn't yet have them (idempotent).
  *
- *   pnpm --filter api backfill:sections
+ *   npm run backfill:sections --workspace=api
  *
  * Per-tenant safety:
  *   - pg_try_advisory_lock per organizationId prevents concurrent runs on the
@@ -22,16 +22,16 @@ import '../src/load-env'
 import 'reflect-metadata'
 import { Logger } from '@nestjs/common'
 import { prisma } from '../src/database/prisma'
+import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
+import { IndexerService } from '../src/modules/indexer/indexer.service'
+import { IngestService } from '../src/modules/ingest/ingest.service'
+import { SectionDetector } from '../src/modules/ingest/section-detector'
 import {
   BACKFILL_TENANT_COST_CEILING_USD,
   BACKFILL_VOYAGE_BACKOFF_MS,
   CURRENT_SECTION_VERSION,
   VOYAGE_DOC_USD_PER_CALL,
 } from '../src/types'
-import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
-import { IndexerService } from '../src/modules/indexer/indexer.service'
-import { IngestService } from '../src/modules/ingest/ingest.service'
-import { SectionDetector } from '../src/modules/ingest/section-detector'
 import { detectMimeFromContent } from './detect-mime-from-content'
 
 const logger = new Logger('Backfill')
@@ -50,7 +50,12 @@ export type BackfillStats = {
   docsWithNoEmbeddings: number
   totalVoyageCalls: number
   estUsdSpend: number
-  partialTenantList: { orgId: string; kiProcessed: number; kiRemaining: number; estUsdSpend: number }[]
+  partialTenantList: {
+    orgId: string
+    kiProcessed: number
+    kiRemaining: number
+    estUsdSpend: number
+  }[]
 }
 
 type TargetKi = { id: string; content: string; organizationId: string }
@@ -80,7 +85,10 @@ async function listOrgsForBackfill(orgIdsFilter: string[] | null): Promise<strin
     })
     return rows.map((r) => r.id)
   }
-  const rows = await prisma.organization.findMany({ select: { id: true }, orderBy: { createdAt: 'asc' } })
+  const rows = await prisma.organization.findMany({
+    select: { id: true },
+    orderBy: { createdAt: 'asc' },
+  })
   return rows.map((r) => r.id)
 }
 
@@ -354,7 +362,10 @@ async function main(): Promise<void> {
 // main() is skipped.
 const invokedDirectly = (() => {
   const argv1 = process.argv[1] ?? ''
-  return argv1.endsWith('backfill-knowledge-sections.ts') || argv1.endsWith('backfill-knowledge-sections.js')
+  return (
+    argv1.endsWith('backfill-knowledge-sections.ts') ||
+    argv1.endsWith('backfill-knowledge-sections.js')
+  )
 })()
 if (invokedDirectly) {
   void main()

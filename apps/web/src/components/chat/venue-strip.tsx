@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { Check, ChevronDown, Plus, Store } from 'lucide-react'
+import Link from 'next/link'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,9 +37,7 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
     <div
       className={cn(
         'flex items-center gap-2 rounded-xl border px-3 py-2',
-        needsPick
-          ? 'border-brand/40 bg-brand/5'
-          : 'border-border bg-muted/40',
+        needsPick ? 'border-brand/40 bg-brand/5' : 'border-border bg-muted/40',
       )}
     >
       {children}
@@ -50,9 +48,7 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
     <span
       className={cn(
         'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
-        needsPick
-          ? 'bg-brand text-brand-foreground'
-          : 'bg-background text-brand',
+        needsPick ? 'bg-brand text-brand-foreground' : 'bg-background text-brand',
       )}
     >
       <Store className="h-3.5 w-3.5" aria-hidden />
@@ -71,9 +67,7 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
         {LeadingIcon}
         <span className="flex min-w-0 flex-col leading-tight">
           {Prefix}
-          <span className="truncate text-sm font-semibold text-foreground">
-            {label}
-          </span>
+          <span className="truncate text-sm font-semibold text-foreground">{label}</span>
         </span>
       </Wrapper>
     )
@@ -105,15 +99,15 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
             </span>
           </span>
           <ChevronDown
-            className={cn(
-              'h-4 w-4',
-              needsPick ? 'text-brand' : 'text-muted-foreground',
-            )}
+            className={cn('h-4 w-4', needsPick ? 'text-brand' : 'text-muted-foreground')}
             aria-hidden
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[240px]">
+      <DropdownMenuContent
+        align="start"
+        className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[240px]"
+      >
         <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
           Venue for this chat
         </DropdownMenuLabel>
@@ -131,9 +125,7 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm font-medium">{v.name}</span>
                 {v.address ? (
-                  <span className="truncate text-xs text-muted-foreground">
-                    {v.address}
-                  </span>
+                  <span className="truncate text-xs text-muted-foreground">{v.address}</span>
                 ) : null}
               </span>
               {v.id === venueId ? (
@@ -142,9 +134,7 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
             </DropdownMenuItem>
           ))
         ) : (
-          <div className="px-2 py-3 text-sm text-muted-foreground">
-            No venues yet.
-          </div>
+          <div className="px-2 py-3 text-sm text-muted-foreground">No venues yet.</div>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

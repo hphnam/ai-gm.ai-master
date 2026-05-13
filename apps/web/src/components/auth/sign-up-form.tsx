@@ -1,18 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import {
-  EmailSchema,
-  NameSchema,
-  PasswordSchema,
-} from '@/lib/auth-schemas'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -22,8 +18,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
+import { EmailSchema, NameSchema, PasswordSchema } from '@/lib/auth-schemas'
 import { safeRedirectOr } from '@/lib/safe-redirect'
 
 const schema = z.object({

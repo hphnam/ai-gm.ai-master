@@ -68,10 +68,7 @@ const round6 = (n: number): number => Math.round(n * PRECISION) / PRECISION
 // Cache-aware Anthropic cost calculation. cacheRead tokens cost less than fresh input;
 // cacheWrite tokens cost more than fresh input. Total = sum across all four channels.
 // AC-6 contract: every Anthropic call's cost reflects observed cache hit/miss split.
-export function calculateAnthropicUsd(
-  usage: AnthropicUsage,
-  model: AnthropicModelTier,
-): number {
+export function calculateAnthropicUsd(usage: AnthropicUsage, model: AnthropicModelTier): number {
   const rate = RATES_BY_TIER[model]
   const usd =
     (usage.inputTokens * rate.input) / MTOK +

@@ -1,5 +1,5 @@
-import { VenueProfilesBody } from '@/components/venues/venue-profiles-body'
 import { PageHeader } from '@/components/shell/page-header'
+import { VenueProfilesBody } from '@/components/venues/venue-profiles-body'
 
 export default function VenueProfilesPage() {
   return (

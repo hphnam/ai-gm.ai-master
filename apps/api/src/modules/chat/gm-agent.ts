@@ -1,15 +1,16 @@
+import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
 import {
-  ToolLoopAgent,
-  stepCountIs,
   hasToolCall,
-  type ToolSet,
   type OnFinishEvent,
   type SystemModelMessage,
+  stepCountIs,
+  ToolLoopAgent,
+  type ToolSet,
 } from 'ai'
-import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
-import { ToolDispatcher, type DispatchContext } from './tool-dispatcher'
 import { buildAiSdkTools } from './ai-sdk-tools'
 import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
+import type { DispatchContext } from './tool-dispatcher'
+import { ToolDispatcher } from './tool-dispatcher'
 
 // Plan 01-03 — Anthropic prompt-cache wiring via AI SDK 6.x ToolLoopAgent.
 // Source: https://platform.claude.com/docs/en/build-with-claude/prompt-caching · verified 2026-04-28
@@ -150,9 +151,7 @@ export function buildGmAgent(params: {
   if (p?.accessibilityNotes) profileLines.push(`accessibility: ${p.accessibilityNotes}`)
   if (p?.deliveryNotes) profileLines.push(`deliveries: ${p.deliveryNotes}`)
   const profileBlock =
-    profileLines.length > 0
-      ? `\n<venue_profile>\n${profileLines.join('\n')}\n</venue_profile>`
-      : ''
+    profileLines.length > 0 ? `\n<venue_profile>\n${profileLines.join('\n')}\n</venue_profile>` : ''
 
   const contacts = params.venueContext.contacts ?? []
   const contactBlock =
@@ -284,9 +283,7 @@ export function inspectAgentProviderOptions(messages: SystemModelMessage[]): {
 } {
   const stable = messages[0]
   const cc = (
-    stable?.providerOptions?.anthropic as
-      | { cacheControl?: { type?: string } }
-      | undefined
+    stable?.providerOptions?.anthropic as { cacheControl?: { type?: string } } | undefined
   )?.cacheControl
   const isEphemeral: 'ephemeral' | null = cc?.type === 'ephemeral' ? 'ephemeral' : null
   return { systemCacheControl: isEphemeral, toolsCacheControl: isEphemeral }

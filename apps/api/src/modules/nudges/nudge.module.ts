@@ -11,11 +11,7 @@ import { NudgeService } from './nudge.service'
 /// MockOpsModule (stock + cutoffs) + WhatsappModule (sendText). Owns its own
 /// BullMQ queue (REDIS_URL must be configured in .env).
 @Module({
-  imports: [
-    BullModule.registerQueue({ name: NUDGE_QUEUE_NAME }),
-    MockOpsModule,
-    WhatsappModule,
-  ],
+  imports: [BullModule.registerQueue({ name: NUDGE_QUEUE_NAME }), MockOpsModule, WhatsappModule],
   controllers: [NudgeController],
   providers: [NudgeService, NudgeProcessor],
   exports: [NudgeService],

@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import type { WhatsAppOutboundResult } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
@@ -136,7 +136,8 @@ export class WhatsAppAdapter {
       }
 
       // Infobip success response shape: { messages: [{ messageId, status: {...} }] }.
-      let json: { messages?: Array<{ messageId?: string; status?: unknown }>; messageId?: string } = {}
+      let json: { messages?: Array<{ messageId?: string; status?: unknown }>; messageId?: string } =
+        {}
       try {
         json = JSON.parse(rawBody)
       } catch {
