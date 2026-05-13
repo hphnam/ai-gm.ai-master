@@ -12,6 +12,7 @@ import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
 import { IngestModule } from './modules/ingest/ingest.module'
 import { InvitationsModule } from './modules/invitations/invitations.module'
 import { MockOpsModule } from './modules/mock-ops/mock-ops.module'
+import { NotificationsModule } from './modules/notifications/notifications.module'
 import { NudgeModule } from './modules/nudges/nudge.module'
 import { PhoneModule } from './modules/phone/phone.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
@@ -40,6 +41,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     PhoneModule,
     WhatsappModule,
     NudgeModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
 })

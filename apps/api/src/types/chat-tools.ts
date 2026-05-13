@@ -20,6 +20,9 @@ export const TOOL_NAMES = [
   // find_knowledge + direct entity tools have all returned thin / no-data and
   // the question genuinely needs cross-source reasoning.
   'deep_research',
+  // "Note for <person>" — creates an in-app notification for an org member.
+  // Resolve by name fragment OR explicit recipientUserId (after disambiguation).
+  'leave_note_for_user',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -152,6 +155,28 @@ export const TOOL_INPUT_SCHEMAS = {
     venueId: UUID,
     question: z.string().min(8).max(2000),
   }),
+  leave_note_for_user: z
+    .object({
+      /// Name fragment ("Ryan") or email substring to look up an org member.
+      /// Matched ILIKE against User.name AND User.email. Mutually exclusive
+      /// with recipientUserId. Min 2 chars to avoid surfacing every member.
+      recipientNameQuery: z.string().trim().min(2).max(120).optional(),
+      /// Exact recipient User.id — pass this on the SECOND call after the user
+      /// disambiguates a multi-match result. Mutually exclusive with name query.
+      /// Length-bounded only: better-auth User.ids are not strict UUIDs.
+      recipientUserId: z.string().min(1).max(64).optional(),
+      /// The note body, captured verbatim from the user's request. Will be the
+      /// text the recipient sees in their inbox. 3-2000 chars.
+      body: z.string().trim().min(3).max(2000),
+    })
+    .refine(
+      (v) =>
+        (v.recipientNameQuery && !v.recipientUserId) ||
+        (!v.recipientNameQuery && v.recipientUserId),
+      {
+        message: 'exactly one of recipientNameQuery or recipientUserId must be provided',
+      },
+    ),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
 export type ToolInput<T extends ToolName> = z.infer<(typeof TOOL_INPUT_SCHEMAS)[T]>
@@ -457,6 +482,30 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
       },
       required: ['venueId', 'question'],
+    },
+  },
+  {
+    name: 'leave_note_for_user',
+    description:
+      'Leave an in-app note for another member of the org — fires when the user says "note for <name>", "tell <name>", "leave a note for <name>", "let <name> know", "remind <name>", etc. Pass `recipientNameQuery` with the name OR email fragment (>=2 chars) AND `body` with the note text (verbatim, cleaned of the routing preamble). The dispatcher resolves the query ILIKE against User.name AND User.email across org members. ALWAYS returns ok:true with a tagged `data.status`: (a) `status:"created"` with `{ id, recipientName }` — exactly one match, note saved, confirm to the user; (b) `status:"needs-disambiguation"` with `candidates: [{userId,name,role}]` — multiple matches, ASK the user which one (number them in your reply by name + role), then re-call this tool with `recipientUserId` (omit recipientNameQuery) + the same body; (c) `status:"no-match"` with empty candidates — apologise and ask the user to clarify. ok:false with reason:"error" or "invalid-input" indicates a tool failure — surface the detail to the user. Do NOT save the note as a knowledge doc. Do NOT call record_kb_gap for it. After a successful save, confirm to the user with the recipient name and a short echo of the body.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        recipientNameQuery: {
+          type: 'string',
+          description: 'Name fragment to match against org members (e.g. "Ryan"). 1-120 chars.',
+        },
+        recipientUserId: {
+          type: 'string',
+          description: 'Exact recipient User.id — pass this on the disambiguation follow-up call.',
+        },
+        body: {
+          type: 'string',
+          description:
+            'The note content the recipient will see. Strip the routing preamble ("note for Ryan, ") and keep only the actual content. 3-2000 chars.',
+        },
+      },
+      required: ['body'],
     },
   },
 ]

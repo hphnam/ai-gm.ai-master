@@ -18,6 +18,7 @@ import { useInboxCount } from '@/components/docs/inbox-tab'
 import { useQuestionsCount } from '@/components/docs/questions-tab'
 import { markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
+import { NotificationsBell } from './notifications-bell'
 import { SidebarThreads } from './sidebar-threads'
 import { SidebarUser } from './sidebar-user'
 
@@ -208,14 +209,17 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
               AI-GM
             </span>
           </Link>
-          <button
-            type="button"
-            onClick={onMobileClose}
-            className="ml-auto rounded-md p-1.5 text-sidebar-muted hover:bg-sidebar-accent md:hidden"
-            aria-label="Close sidebar"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="ml-auto flex items-center gap-1">
+            <NotificationsBell />
+            <button
+              type="button"
+              onClick={onMobileClose}
+              className="rounded-md p-1.5 text-sidebar-muted hover:bg-sidebar-accent md:hidden"
+              aria-label="Close sidebar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         <button

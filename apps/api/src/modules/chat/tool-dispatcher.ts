@@ -21,7 +21,40 @@ export type DispatchContext = {
   orgId: string
   userId: string
   userRole: string
+  /// Where the turn originated. Threaded through to Notification.source on
+  /// any rows we write from tool calls (currently leave_note_for_user). Defaults
+  /// to 'chat' when the caller omits it — only WhatsApp-originated turns should
+  /// override to 'whatsapp'. NOTE 2026-05-13: WhatsApp inbound currently flows
+  /// through ChatV2Service, which uses its own tool pipeline — it never reaches
+  /// this dispatcher today. Field kept so the contract is correct when/if a
+  /// WhatsApp turn does route through chat-v1, and so the type forces future
+  /// integrators to think about provenance.
+  source?: 'chat' | 'whatsapp'
 }
+
+// In-memory sliding-window throttle for the leave_note_for_user tool. Single
+// process / single node — sufficient for the current Nest server. If we scale
+// horizontally swap this for a Redis token bucket. Kept module-scoped so the
+// state survives request lifecycles.
+const LEAVE_NOTE_WINDOW_MS = 60_000
+const LEAVE_NOTE_LIMIT_PER_WINDOW = 5
+const leaveNoteRateLimit = (() => {
+  const buckets = new Map<string, number[]>()
+  return {
+    allow(authorUserId: string): boolean {
+      const now = Date.now()
+      const cutoff = now - LEAVE_NOTE_WINDOW_MS
+      const recent = (buckets.get(authorUserId) ?? []).filter((t) => t > cutoff)
+      if (recent.length >= LEAVE_NOTE_LIMIT_PER_WINDOW) {
+        buckets.set(authorUserId, recent)
+        return false
+      }
+      recent.push(now)
+      buckets.set(authorUserId, recent)
+      return true
+    },
+  }
+})()
 
 @Injectable()
 export class ToolDispatcher {
@@ -517,6 +550,120 @@ export class ToolDispatcher {
               }),
             )
             return fail('error', `deep_research failed: ${message}`)
+          }
+        }
+        case 'leave_note_for_user': {
+          if (!ctx) {
+            return fail('error', 'leave_note_for_user requires an authenticated context')
+          }
+          const i = parsed.data as {
+            recipientNameQuery?: string
+            recipientUserId?: string
+            body: string
+          }
+          // Per-author throttle. Prompt-injection from indexed knowledge could
+          // otherwise drive the agent to mass-spam managers from a single
+          // chat turn. Cap CREATE attempts (not lookups) at 5/min/author.
+          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+            return fail(
+              'error',
+              'too many notes in a short window — slow down or compose from the bell menu',
+            )
+          }
+          // Org-scoped member lookup. We resolve through OrganizationMember so a
+          // cross-org User.id can't be addressed even if guessed. Name query
+          // matches BOTH name and email so emails / last-name tokens work.
+          const members = i.recipientUserId
+            ? await prisma.organizationMember.findMany({
+                where: { organizationId: ctx.orgId, userId: i.recipientUserId },
+                select: {
+                  userId: true,
+                  role: true,
+                  user: { select: { name: true, email: true } },
+                },
+                take: 1,
+              })
+            : await prisma.organizationMember.findMany({
+                where: {
+                  organizationId: ctx.orgId,
+                  user: {
+                    OR: [
+                      { name: { contains: i.recipientNameQuery, mode: 'insensitive' } },
+                      { email: { contains: i.recipientNameQuery, mode: 'insensitive' } },
+                    ],
+                  },
+                },
+                select: {
+                  userId: true,
+                  role: true,
+                  user: { select: { name: true, email: true } },
+                },
+                take: 6,
+              })
+          if (members.length === 0) {
+            return {
+              ok: true,
+              data: {
+                status: 'no-match' as const,
+                candidates: [] as Array<{ userId: string; name: string | null; role: string }>,
+              },
+            }
+          }
+          if (members.length > 1) {
+            // Email intentionally NOT returned to the model: keeps the directory
+            // enumeration primitive minimal. Name + role is enough for the user
+            // to disambiguate; the agent re-calls with userId.
+            return {
+              ok: true,
+              data: {
+                status: 'needs-disambiguation' as const,
+                candidates: members.map((m) => ({
+                  userId: m.userId,
+                  name: m.user.name,
+                  role: m.role,
+                })),
+              },
+            }
+          }
+          const target = members[0]
+          // Don't let users leave notes for themselves via the agent — almost
+          // always a misroute (the model misread "note to self" or echoed back
+          // the speaker's own name).
+          if (target.userId === ctx.userId) {
+            return fail(
+              'invalid-input',
+              'cannot leave a note for yourself — confirm the intended recipient',
+            )
+          }
+          const created = await prisma.notification.create({
+            data: {
+              organizationId: ctx.orgId,
+              recipientUserId: target.userId,
+              authorUserId: ctx.userId,
+              source: ctx.source ?? 'chat',
+              body: i.body,
+            },
+            select: { id: true, createdAt: true },
+          })
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.leave_note_for_user',
+              orgId: ctx.orgId,
+              authorUserId: ctx.userId,
+              recipientUserId: target.userId,
+              notificationId: created.id,
+              bodyLength: i.body.length,
+            }),
+          )
+          return {
+            ok: true,
+            data: {
+              status: 'created' as const,
+              id: created.id,
+              recipientName: target.user.name ?? target.user.email,
+              recipientUserId: target.userId,
+              createdAt: created.createdAt.toISOString(),
+            },
           }
         }
       }
