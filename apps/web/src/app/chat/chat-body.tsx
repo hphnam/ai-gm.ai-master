@@ -293,7 +293,7 @@ function ChatCore({
     [],
   )
 
-  const { messages, sendMessage, status, error, regenerate } = useChat<GmUIMessage>({
+  const { messages, sendMessage, status, error, regenerate, stop } = useChat<GmUIMessage>({
     id: conversationId ?? undefined,
     messages: initialMessages,
     transport,
@@ -461,6 +461,26 @@ function ChatCore({
     return map
   }, [historyMessages])
 
+  // Wave-C auto-verify state, indexed by assistant messageId. Drives the
+  // small "verified" / "couldn't verify" badge under each answer.
+  type VerifyEntry = {
+    status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
+    issueCount: number | null
+  }
+  const verifyByMessageId = useMemo<Record<string, VerifyEntry>>(() => {
+    if (!historyMessages) return {}
+    const map: Record<string, VerifyEntry> = {}
+    for (const m of historyMessages) {
+      if (m.role === 'assistant' && m.verifyStatus) {
+        map[m.id] = {
+          status: m.verifyStatus,
+          issueCount: m.verifyIssueCount ?? null,
+        }
+      }
+    }
+    return map
+  }, [historyMessages])
+
   // Merge pending-user with useChat messages, deduping by text.
   const displayMessages = useMemo<GmUIMessage[]>(() => {
     if (pendingUserTexts.length === 0) return messages
@@ -605,6 +625,7 @@ function ChatCore({
                 latestFollowUps={isOwner ? lastAssistantFollowUps : []}
                 onRegenerate={isOwner ? () => regenerate() : undefined}
                 feedbackByMessageId={feedbackByMessageId}
+                verifyByMessageId={verifyByMessageId}
               />
             )}
           </div>
@@ -617,6 +638,7 @@ function ChatCore({
               onSubmit={submit}
               onSubmitWithImage={submitWithImage}
               isPending={isPending}
+              onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
               disabled={!isOwner || !venueId || !conversationId}
               disabledReason={
                 !isOwner

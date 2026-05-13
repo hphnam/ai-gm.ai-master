@@ -170,6 +170,8 @@ export type ConversationResponseDtoMessagesItem = {
   parts?: unknown;
   toolCallLog?: unknown[];
   feedbackKind?: 'up' | 'down' | 'regenerate' | null;
+  verifyStatus?: 'pending' | 'clean' | 'issues' | 'skipped' | 'error' | null;
+  verifyIssueCount?: number | null;
 };
 
 export interface ConversationResponseDto {
@@ -1026,6 +1028,113 @@ export interface RunNudgeResponseDto {
   preview?: string;
 }
 
+export type ListNotificationsResponseDtoNotificationsItemSource = typeof ListNotificationsResponseDtoNotificationsItemSource[keyof typeof ListNotificationsResponseDtoNotificationsItemSource];
+
+
+export const ListNotificationsResponseDtoNotificationsItemSource = {
+  chat: 'chat',
+  whatsapp: 'whatsapp',
+  manual: 'manual',
+} as const;
+
+export type ListNotificationsResponseDtoNotificationsItemStatus = typeof ListNotificationsResponseDtoNotificationsItemStatus[keyof typeof ListNotificationsResponseDtoNotificationsItemStatus];
+
+
+export const ListNotificationsResponseDtoNotificationsItemStatus = {
+  unread: 'unread',
+  read: 'read',
+} as const;
+
+export type ListNotificationsResponseDtoNotificationsItemAuthor = {
+  id: string;
+  name: string | null;
+  email: string;
+} | null;
+
+export type ListNotificationsResponseDtoNotificationsItem = {
+  id: string;
+  body: string;
+  source: ListNotificationsResponseDtoNotificationsItemSource;
+  status: ListNotificationsResponseDtoNotificationsItemStatus;
+  createdAt: string;
+  readAt: string | null;
+  author: ListNotificationsResponseDtoNotificationsItemAuthor;
+};
+
+export interface ListNotificationsResponseDto {
+  notifications: ListNotificationsResponseDtoNotificationsItem[];
+  unreadCount: number;
+}
+
+export interface UnreadCountResponseDto {
+  count: number;
+}
+
+export type ListRecipientsResponseDtoMembersItem = {
+  userId: string;
+  name: string | null;
+  email: string;
+  role: string;
+};
+
+export interface ListRecipientsResponseDto {
+  members: ListRecipientsResponseDtoMembersItem[];
+}
+
+export type SimpleNotificationResponseDtoNotificationSource = typeof SimpleNotificationResponseDtoNotificationSource[keyof typeof SimpleNotificationResponseDtoNotificationSource];
+
+
+export const SimpleNotificationResponseDtoNotificationSource = {
+  chat: 'chat',
+  whatsapp: 'whatsapp',
+  manual: 'manual',
+} as const;
+
+export type SimpleNotificationResponseDtoNotificationStatus = typeof SimpleNotificationResponseDtoNotificationStatus[keyof typeof SimpleNotificationResponseDtoNotificationStatus];
+
+
+export const SimpleNotificationResponseDtoNotificationStatus = {
+  unread: 'unread',
+  read: 'read',
+} as const;
+
+export type SimpleNotificationResponseDtoNotificationAuthor = {
+  id: string;
+  name: string | null;
+  email: string;
+} | null;
+
+export type SimpleNotificationResponseDtoNotification = {
+  id: string;
+  body: string;
+  source: SimpleNotificationResponseDtoNotificationSource;
+  status: SimpleNotificationResponseDtoNotificationStatus;
+  createdAt: string;
+  readAt: string | null;
+  author: SimpleNotificationResponseDtoNotificationAuthor;
+};
+
+export interface SimpleNotificationResponseDto {
+  notification: SimpleNotificationResponseDtoNotification;
+}
+
+export interface MarkAllReadResponseDto {
+  updated: number;
+}
+
+export interface ComposeNotificationBodyDto {
+  /**
+     * @minLength 1
+     * @maxLength 64
+     */
+  recipientUserId: string;
+  /**
+     * @minLength 3
+     * @maxLength 2000
+     */
+  body: string;
+}
+
 export type ChatControllerSendMessageWithImageBody = {
   image: Blob;
   venueId: string;
@@ -1155,6 +1264,24 @@ force: string;
 export type InviteRedeemControllerPreviewParams = {
 t: string;
 };
+
+export type NotificationsControllerListParams = {
+status?: NotificationsControllerListStatus;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};
+
+export type NotificationsControllerListStatus = typeof NotificationsControllerListStatus[keyof typeof NotificationsControllerListStatus];
+
+
+export const NotificationsControllerListStatus = {
+  unread: 'unread',
+  read: 'read',
+  all: 'all',
+} as const;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -5742,4 +5869,560 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getNudgeControllerRunNudgeMutationOptions(options), queryClient);
+    }
+
+export type notificationsControllerListResponse200 = {
+  data: ListNotificationsResponseDto
+  status: 200
+}
+
+export type notificationsControllerListResponseSuccess = (notificationsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerListResponse = (notificationsControllerListResponseSuccess)
+
+export const getNotificationsControllerListUrl = (params?: NotificationsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/notifications?${stringifiedParams}` : `/notifications`
+}
+
+export const notificationsControllerList = async (params?: NotificationsControllerListParams, options?: RequestInit): Promise<notificationsControllerListResponse> => {
+
+  return orvalMutator<notificationsControllerListResponse>(getNotificationsControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNotificationsControllerListQueryKey = (params?: NotificationsControllerListParams,) => {
+    return [
+    `/notifications`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getNotificationsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerList>>, TError = unknown>(params?: NotificationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerList>>> = ({ signal }) => notificationsControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NotificationsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerList>>>
+export type NotificationsControllerListQueryError = unknown
+
+
+export function useNotificationsControllerList<TData = Awaited<ReturnType<typeof notificationsControllerList>>, TError = unknown>(
+ params: undefined |  NotificationsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerList<TData = Awaited<ReturnType<typeof notificationsControllerList>>, TError = unknown>(
+ params?: NotificationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerList<TData = Awaited<ReturnType<typeof notificationsControllerList>>, TError = unknown>(
+ params?: NotificationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNotificationsControllerList<TData = Awaited<ReturnType<typeof notificationsControllerList>>, TError = unknown>(
+ params?: NotificationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNotificationsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type notificationsControllerComposeResponse201 = {
+  data: SimpleNotificationResponseDto
+  status: 201
+}
+
+export type notificationsControllerComposeResponseSuccess = (notificationsControllerComposeResponse201) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerComposeResponse = (notificationsControllerComposeResponseSuccess)
+
+export const getNotificationsControllerComposeUrl = () => {
+
+
+
+
+  return `/notifications`
+}
+
+export const notificationsControllerCompose = async (composeNotificationBodyDto: ComposeNotificationBodyDto, options?: RequestInit): Promise<notificationsControllerComposeResponse> => {
+
+  return orvalMutator<notificationsControllerComposeResponse>(getNotificationsControllerComposeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(composeNotificationBodyDto)
+  }
+);}
+
+
+
+
+export const getNotificationsControllerComposeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerCompose>>, TError,{data: ComposeNotificationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerCompose>>, TError,{data: ComposeNotificationBodyDto}, TContext> => {
+
+const mutationKey = ['notificationsControllerCompose'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerCompose>>, {data: ComposeNotificationBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  notificationsControllerCompose(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NotificationsControllerComposeMutationResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerCompose>>>
+    export type NotificationsControllerComposeMutationBody = ComposeNotificationBodyDto
+    export type NotificationsControllerComposeMutationError = unknown
+
+    export const useNotificationsControllerCompose = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerCompose>>, TError,{data: ComposeNotificationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof notificationsControllerCompose>>,
+        TError,
+        {data: ComposeNotificationBodyDto},
+        TContext
+      > => {
+      return useMutation(getNotificationsControllerComposeMutationOptions(options), queryClient);
+    }
+
+export type notificationsControllerUnreadCountResponse200 = {
+  data: UnreadCountResponseDto
+  status: 200
+}
+
+export type notificationsControllerUnreadCountResponseSuccess = (notificationsControllerUnreadCountResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerUnreadCountResponse = (notificationsControllerUnreadCountResponseSuccess)
+
+export const getNotificationsControllerUnreadCountUrl = () => {
+
+
+
+
+  return `/notifications/unread-count`
+}
+
+export const notificationsControllerUnreadCount = async ( options?: RequestInit): Promise<notificationsControllerUnreadCountResponse> => {
+
+  return orvalMutator<notificationsControllerUnreadCountResponse>(getNotificationsControllerUnreadCountUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNotificationsControllerUnreadCountQueryKey = () => {
+    return [
+    `/notifications/unread-count`
+    ] as const;
+    }
+
+
+export const getNotificationsControllerUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerUnreadCountQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>> = ({ signal }) => notificationsControllerUnreadCount({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NotificationsControllerUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>>
+export type NotificationsControllerUnreadCountQueryError = unknown
+
+
+export function useNotificationsControllerUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerUnreadCount>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerUnreadCount>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNotificationsControllerUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadCount>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNotificationsControllerUnreadCountQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type notificationsControllerRecipientsResponse200 = {
+  data: ListRecipientsResponseDto
+  status: 200
+}
+
+export type notificationsControllerRecipientsResponseSuccess = (notificationsControllerRecipientsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerRecipientsResponse = (notificationsControllerRecipientsResponseSuccess)
+
+export const getNotificationsControllerRecipientsUrl = () => {
+
+
+
+
+  return `/notifications/recipients`
+}
+
+export const notificationsControllerRecipients = async ( options?: RequestInit): Promise<notificationsControllerRecipientsResponse> => {
+
+  return orvalMutator<notificationsControllerRecipientsResponse>(getNotificationsControllerRecipientsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNotificationsControllerRecipientsQueryKey = () => {
+    return [
+    `/notifications/recipients`
+    ] as const;
+    }
+
+
+export const getNotificationsControllerRecipientsQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerRecipientsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerRecipients>>> = ({ signal }) => notificationsControllerRecipients({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NotificationsControllerRecipientsQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerRecipients>>>
+export type NotificationsControllerRecipientsQueryError = unknown
+
+
+export function useNotificationsControllerRecipients<TData = Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerRecipients>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerRecipients>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerRecipients<TData = Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerRecipients>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerRecipients>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerRecipients<TData = Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNotificationsControllerRecipients<TData = Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerRecipients>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNotificationsControllerRecipientsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type notificationsControllerMarkReadResponse200 = {
+  data: SimpleNotificationResponseDto
+  status: 200
+}
+
+export type notificationsControllerMarkReadResponseSuccess = (notificationsControllerMarkReadResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerMarkReadResponse = (notificationsControllerMarkReadResponseSuccess)
+
+export const getNotificationsControllerMarkReadUrl = (id: string,) => {
+
+
+
+
+  return `/notifications/${id}/read`
+}
+
+export const notificationsControllerMarkRead = async (id: string, options?: RequestInit): Promise<notificationsControllerMarkReadResponse> => {
+
+  return orvalMutator<notificationsControllerMarkReadResponse>(getNotificationsControllerMarkReadUrl(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getNotificationsControllerMarkReadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkRead>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkRead>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['notificationsControllerMarkRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerMarkRead>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  notificationsControllerMarkRead(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NotificationsControllerMarkReadMutationResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerMarkRead>>>
+
+    export type NotificationsControllerMarkReadMutationError = unknown
+
+    export const useNotificationsControllerMarkRead = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkRead>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof notificationsControllerMarkRead>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getNotificationsControllerMarkReadMutationOptions(options), queryClient);
+    }
+
+export type notificationsControllerMarkAllReadResponse200 = {
+  data: MarkAllReadResponseDto
+  status: 200
+}
+
+export type notificationsControllerMarkAllReadResponseSuccess = (notificationsControllerMarkAllReadResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerMarkAllReadResponse = (notificationsControllerMarkAllReadResponseSuccess)
+
+export const getNotificationsControllerMarkAllReadUrl = () => {
+
+
+
+
+  return `/notifications/read-all`
+}
+
+export const notificationsControllerMarkAllRead = async ( options?: RequestInit): Promise<notificationsControllerMarkAllReadResponse> => {
+
+  return orvalMutator<notificationsControllerMarkAllReadResponse>(getNotificationsControllerMarkAllReadUrl(),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getNotificationsControllerMarkAllReadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>, TError,void, TContext> => {
+
+const mutationKey = ['notificationsControllerMarkAllRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>, void> = () => {
+
+
+          return  notificationsControllerMarkAllRead(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NotificationsControllerMarkAllReadMutationResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>>
+
+    export type NotificationsControllerMarkAllReadMutationError = unknown
+
+    export const useNotificationsControllerMarkAllRead = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof notificationsControllerMarkAllRead>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getNotificationsControllerMarkAllReadMutationOptions(options), queryClient);
     }

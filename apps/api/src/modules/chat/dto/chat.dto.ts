@@ -32,6 +32,11 @@ export const ChatMessageSchema = z.object({
   parts: z.unknown().optional(),
   toolCallLog: z.array(z.unknown()).optional(),
   feedbackKind: z.enum(['up', 'down', 'regenerate']).nullable().optional(),
+  /// Wave-C auto-verify state. NULL on user rows and pre-Wave-C assistant
+  /// rows. UI renders a small "verified" or "couldn't verify N specifics"
+  /// badge based on the status; hides for null/skipped/pending/error.
+  verifyStatus: z.enum(['pending', 'clean', 'issues', 'skipped', 'error']).nullable().optional(),
+  verifyIssueCount: z.number().int().nullable().optional(),
 })
 export class ChatMessageDto extends createZodDto(ChatMessageSchema) {}
 

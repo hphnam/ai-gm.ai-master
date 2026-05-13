@@ -1,14 +1,79 @@
 'use client'
 
 import { getToolName, isToolUIPart, type UIMessage } from 'ai'
-import { Brain, Check, ChevronDown, ChevronRight, Copy, RefreshCcw, Sparkles } from 'lucide-react'
+import {
+  AlertTriangle,
+  Brain,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  RefreshCcw,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
+import { DocPreview } from '@/components/docs/doc-preview'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
+
+// Citation chip — replaces the previous new-tab anchor with an inline Dialog
+// that mounts DocPreview, so users can verify a source without losing their
+// chat scroll position. The DocPreview component does its own lazy fetch via
+// useDoc(); we mount it only when the dialog opens to avoid eager loads.
+function CitationChip({ docId, children }: { docId: string; children: React.ReactNode }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label="View source document"
+          className="ml-0.5 inline-flex cursor-pointer items-baseline rounded-sm bg-brand/10 px-1 align-baseline text-[10px] font-medium text-brand no-underline hover:bg-brand/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          {children}
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Source document</DialogTitle>
+          <DialogDescription className="sr-only">
+            Preview of the knowledge document cited by the assistant.
+          </DialogDescription>
+        </DialogHeader>
+        {/* Radix unmounts DialogContent children when closed, so DocPreview
+            only fires its useDoc fetch when the user actually opens it. */}
+        <DocPreview docId={docId} />
+        <a
+          href={`/docs/${docId}`}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="self-end text-xs text-muted-foreground hover:text-brand"
+        >
+          Open full document →
+        </a>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Tight UUID gate before the chip mounts. Belt-and-braces for defense-in-depth:
+// rewriteCitations only emits valid UUIDs into /docs/, but the link renderer
+// also matches any markdown link with that prefix. If the model ever emits a
+// raw [text](/docs/anything-else) we fall through to the external-link branch
+// instead of passing unvalidated text to useDoc.
+const DOC_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 type Props = {
   message: UIMessage
@@ -17,6 +82,10 @@ type Props = {
   followUps?: string[]
   onRegenerate?: () => void
   initialFeedback?: 'up' | 'down' | 'regenerate' | null
+  verify?: {
+    status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
+    issueCount: number | null
+  } | null
 }
 
 const FOLLOWUP_DELIMITER = '---FOLLOWUPS---'
@@ -224,19 +293,11 @@ function AssistantMarkdown({ text }: { text: string }) {
             <code className="rounded bg-muted px-1 py-0.5 text-[13px] font-mono">{children}</code>
           ),
           a: ({ href, children }) => {
-            const isInternalDoc = typeof href === 'string' && href.startsWith('/docs/')
-            if (isInternalDoc) {
-              return (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="ml-0.5 inline-flex items-baseline rounded-sm bg-brand/10 px-1 align-baseline text-[10px] font-medium text-brand no-underline hover:bg-brand/20"
-                  aria-label="View source document"
-                >
-                  {children}
-                </a>
-              )
+            if (typeof href === 'string' && href.startsWith('/docs/')) {
+              const docId = href.slice('/docs/'.length)
+              if (DOC_ID_RE.test(docId)) {
+                return <CitationChip docId={docId}>{children}</CitationChip>
+              }
             }
             return (
               <a
@@ -427,6 +488,52 @@ function AssistantActions({
   )
 }
 
+// Wave-C auto-verify badge. Renders for 'clean', 'issues', and 'error'.
+// Pending / skipped / null all suppress the badge so it never adds noise to
+// a normal answer. Error state surfaces "verification unavailable" so users
+// don't assume the answer was silently checked when it wasn't.
+function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
+  if (verify.status === 'clean') {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400"
+        title="Specifics in this answer were checked against the cited sources."
+      >
+        <ShieldCheck className="h-3 w-3" aria-hidden />
+        <span>Verified</span>
+      </span>
+    )
+  }
+  if (verify.status === 'issues') {
+    // The API guarantees issueCount >= 1 whenever status === 'issues'
+    // (QuoteVerifierService only emits ok:false when at least one issue is
+    // produced). The ?? 1 fallback handles legacy rows that pre-date the
+    // column without breaking the badge.
+    const n = verify.issueCount ?? 1
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400"
+        title="The verifier flagged specifics in this answer that may not match the cited sources. Double-check before acting."
+      >
+        <AlertTriangle className="h-3 w-3" aria-hidden />
+        <span>Couldn't verify {n}</span>
+      </span>
+    )
+  }
+  if (verify.status === 'error') {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+        title="Auto-verification didn't complete for this answer. Double-check anything specific before acting."
+      >
+        <AlertTriangle className="h-3 w-3" aria-hidden />
+        <span>Verification unavailable</span>
+      </span>
+    )
+  }
+  return null
+}
+
 export function ChatMessage({
   message,
   isStreaming,
@@ -434,6 +541,7 @@ export function ChatMessage({
   followUps,
   onRegenerate,
   initialFeedback,
+  verify,
 }: Props) {
   const isUser = message.role === 'user'
 
@@ -465,12 +573,15 @@ export function ChatMessage({
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AssistantBody parts={message.parts} isStreaming={Boolean(isStreaming)} />
         {!isStreaming ? (
-          <AssistantActions
-            messageId={message.id}
-            text={plainText}
-            onRegenerate={onRegenerate}
-            initialFeedback={initialFeedback}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <AssistantActions
+              messageId={message.id}
+              text={plainText}
+              onRegenerate={onRegenerate}
+              initialFeedback={initialFeedback}
+            />
+            {verify ? <VerifyBadge verify={verify} /> : null}
+          </div>
         ) : null}
         {!isStreaming && followUps && onFollowUpSelect ? (
           <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />

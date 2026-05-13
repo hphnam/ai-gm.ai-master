@@ -113,6 +113,11 @@ export const ChatControllerGetConversationQueryParams = zod.object({
   "venueId": zod.string().regex(chatControllerGetConversationQueryVenueIdRegExp)
 })
 
+export const chatControllerGetConversationResponseMessagesItemVerifyIssueCountOneMin = -9007199254740991;
+export const chatControllerGetConversationResponseMessagesItemVerifyIssueCountOneMax = 9007199254740991;
+
+
+
 export const ChatControllerGetConversationResponse = zod.object({
   "id": zod.string(),
   "venueId": zod.string(),
@@ -129,7 +134,9 @@ export const ChatControllerGetConversationResponse = zod.object({
   "reasoning": zod.union([zod.string(),zod.null()]).optional(),
   "parts": zod.unknown().optional(),
   "toolCallLog": zod.array(zod.unknown()).optional(),
-  "feedbackKind": zod.union([zod.enum(['up', 'down', 'regenerate']),zod.null()]).optional()
+  "feedbackKind": zod.union([zod.enum(['up', 'down', 'regenerate']),zod.null()]).optional(),
+  "verifyStatus": zod.union([zod.enum(['pending', 'clean', 'issues', 'skipped', 'error']),zod.null()]).optional(),
+  "verifyIssueCount": zod.union([zod.number().min(chatControllerGetConversationResponseMessagesItemVerifyIssueCountOneMin).max(chatControllerGetConversationResponseMessagesItemVerifyIssueCountOneMax),zod.null()]).optional()
 }))
 })
 
@@ -1359,4 +1366,91 @@ export const NudgeControllerRunNudgeResponse = zod.object({
   "sent": zod.boolean(),
   "reason": zod.string().optional(),
   "preview": zod.string().optional()
+})
+
+
+export const notificationsControllerListQueryStatusDefault = `all`;
+export const notificationsControllerListQueryLimitDefault = 30;
+export const notificationsControllerListQueryLimitMax = 100;
+
+
+
+export const NotificationsControllerListQueryParams = zod.object({
+  "status": zod.enum(['unread', 'read', 'all']).default(notificationsControllerListQueryStatusDefault),
+  "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault)
+})
+
+export const NotificationsControllerListResponse = zod.object({
+  "notifications": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "status": zod.enum(['unread', 'read']),
+  "createdAt": zod.string(),
+  "readAt": zod.union([zod.string(),zod.null()]),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()])
+})),
+  "unreadCount": zod.number()
+})
+
+
+export const notificationsControllerComposeBodyRecipientUserIdMax = 64;
+
+export const notificationsControllerComposeBodyBodyMin = 3;
+export const notificationsControllerComposeBodyBodyMax = 2000;
+
+
+
+export const NotificationsControllerComposeBody = zod.object({
+  "recipientUserId": zod.string().min(1).max(notificationsControllerComposeBodyRecipientUserIdMax),
+  "body": zod.string().min(notificationsControllerComposeBodyBodyMin).max(notificationsControllerComposeBodyBodyMax)
+})
+
+
+export const NotificationsControllerUnreadCountResponse = zod.object({
+  "count": zod.number()
+})
+
+
+export const NotificationsControllerRecipientsResponse = zod.object({
+  "members": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string(),
+  "role": zod.string()
+}))
+})
+
+
+export const notificationsControllerMarkReadPathIdMax = 64;
+
+
+
+export const NotificationsControllerMarkReadParams = zod.object({
+  "id": zod.string().min(1).max(notificationsControllerMarkReadPathIdMax)
+})
+
+export const NotificationsControllerMarkReadResponse = zod.object({
+  "notification": zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "status": zod.enum(['unread', 'read']),
+  "createdAt": zod.string(),
+  "readAt": zod.union([zod.string(),zod.null()]),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()])
+})
+})
+
+
+export const NotificationsControllerMarkAllReadResponse = zod.object({
+  "updated": zod.number()
 })

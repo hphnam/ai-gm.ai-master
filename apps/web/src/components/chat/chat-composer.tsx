@@ -1,12 +1,22 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowUp, ImagePlus, Loader2, X } from 'lucide-react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { ArrowUp, ImagePlus, Loader2, Mic, Square, X } from 'lucide-react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+
+const VOICE_CONSENT_KEY = 'gm.voice.consent.v1'
 
 const ComposerSchema = z.object({
   // Allow empty when an image is attached; we add a stand-in question on send.
@@ -24,15 +34,34 @@ type Props = {
   /// continue through the streaming useChat path.
   onSubmitWithImage?: (userMessage: string, file: File) => Promise<void>
   isPending: boolean
+  /// When defined, the assistant is mid-stream and pressing the send button
+  /// aborts the in-flight turn instead of being disabled.
+  onStop?: () => void
   initialValue?: string
   disabled?: boolean
   disabledReason?: string
 }
 
+// Web Speech API typing — DOM lib doesn't expose SpeechRecognition globally
+// in every TS setup, so we declare just what we need.
+type SpeechRecognitionLike = EventTarget & {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  start: () => void
+  stop: () => void
+  abort: () => void
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
+  onerror: ((event: { error: string }) => void) | null
+  onend: (() => void) | null
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike
+
 export function ChatComposer({
   onSubmit,
   onSubmitWithImage,
   isPending,
+  onStop,
   initialValue,
   disabled = false,
   disabledReason,
@@ -54,8 +83,122 @@ export function ChatComposer({
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [attachedImage, setAttachedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'unsupported'>('idle')
+  const [voiceConsentOpen, setVoiceConsentOpen] = useState(false)
+  const [voiceConsentGranted, setVoiceConsentGranted] = useState(false)
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+  const transcriptBaseRef = useRef('')
+
+  // Read prior consent on mount. Stored locally per browser/device, not synced
+  // server-side — this is a one-time UX nudge, not auth.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      setVoiceConsentGranted(window.localStorage.getItem(VOICE_CONSENT_KEY) === 'granted')
+    } catch {
+      // localStorage blocked (private mode) — treat as un-granted; user will be re-asked.
+    }
+  }, [])
   const { ref: formRef, ...rest } = register('userMessage')
   const value = watch('userMessage')
+
+  // Detect Web Speech API support once on mount. SSR-safe: window is gated.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const Ctor =
+      (window as unknown as { SpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor })
+        .webkitSpeechRecognition
+    if (!Ctor) {
+      setVoiceState('unsupported')
+      return
+    }
+    const rec = new Ctor()
+    rec.continuous = false
+    rec.interimResults = true
+    rec.lang = typeof navigator !== 'undefined' ? navigator.language || 'en-GB' : 'en-GB'
+    rec.onresult = (event) => {
+      let transcript = ''
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0]?.transcript ?? ''
+      }
+      const combined = `${transcriptBaseRef.current}${transcript}`.trimStart()
+      setValue('userMessage', combined, { shouldDirty: true })
+    }
+    rec.onerror = (event) => {
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        toast.error('Microphone permission denied')
+      } else if (event.error === 'no-speech') {
+        // benign — user didn't speak; quietly end
+      } else {
+        toast.error(`Voice input error (${event.error})`)
+      }
+      setVoiceState('idle')
+    }
+    rec.onend = () => setVoiceState('idle')
+    recognitionRef.current = rec
+    return () => {
+      try {
+        rec.abort()
+      } catch {
+        // ignore abort errors on teardown
+      }
+      recognitionRef.current = null
+    }
+  }, [setValue])
+
+  const startListening = useCallback(() => {
+    const rec = recognitionRef.current
+    if (!rec) return
+    transcriptBaseRef.current = value ? `${value.trimEnd()} ` : ''
+    try {
+      rec.start()
+      setVoiceState('listening')
+    } catch {
+      try {
+        rec.abort()
+      } catch {
+        // best-effort
+      }
+      setVoiceState('idle')
+    }
+  }, [value])
+
+  const grantConsent = useCallback(() => {
+    try {
+      window.localStorage.setItem(VOICE_CONSENT_KEY, 'granted')
+    } catch {
+      // best-effort persistence
+    }
+    setVoiceConsentGranted(true)
+    setVoiceConsentOpen(false)
+    startListening()
+  }, [startListening])
+
+  const toggleVoice = useCallback(() => {
+    const rec = recognitionRef.current
+    if (!rec) return
+    if (voiceState === 'listening') {
+      rec.stop()
+      setVoiceState('idle')
+      return
+    }
+    if (!voiceConsentGranted) {
+      setVoiceConsentOpen(true)
+      return
+    }
+    startListening()
+  }, [voiceState, voiceConsentGranted, startListening])
+
+  // Stop listening if the parent disables the composer (venue switch,
+  // conversation flip to read-only, etc.) or while a turn is in flight.
+  // Without this the mic keeps recording into a textarea the user can no
+  // longer send from.
+  useEffect(() => {
+    if ((disabled || isPending) && voiceState === 'listening') {
+      recognitionRef.current?.stop()
+    }
+  }, [disabled, isPending, voiceState])
 
   useEffect(() => {
     if (!attachedImage) {
@@ -130,7 +273,13 @@ export function ChatComposer({
   const hasText = value?.trim().length > 0
   const hasImage = !!attachedImage
   const canSend = !isPending && !disabled && (hasText || hasImage)
-  const inputDisabled = isPending || disabled
+  const canStop = isPending && typeof onStop === 'function'
+  const voiceSupported = voiceState !== 'unsupported'
+  const voiceListening = voiceState === 'listening'
+  // Lock the textarea while voice is active — without it, anything the user
+  // types is silently overwritten on the next interim-result tick because
+  // transcriptBaseRef was snapshotted when listening started.
+  const inputDisabled = isPending || disabled || voiceListening
 
   return (
     <form onSubmit={submit} className="w-full">
@@ -162,6 +311,24 @@ export function ChatComposer({
             <ImagePlus className="h-4 w-4" aria-hidden />
           </button>
         ) : null}
+        {voiceSupported ? (
+          <button
+            type="button"
+            onClick={toggleVoice}
+            disabled={disabled || isPending}
+            aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
+            aria-pressed={voiceListening}
+            title={voiceListening ? 'Listening — tap to stop' : 'Voice input'}
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-colors disabled:opacity-50',
+              voiceListening
+                ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+            )}
+          >
+            <Mic className={cn('h-4 w-4', voiceListening && 'animate-pulse')} aria-hidden />
+          </button>
+        ) : null}
         <textarea
           id="composer-input"
           rows={1}
@@ -183,23 +350,35 @@ export function ChatComposer({
             'min-h-[24px] max-h-[220px]',
           )}
         />
-        <button
-          type="submit"
-          disabled={!canSend}
-          aria-label={isPending ? 'Sending' : 'Send'}
-          className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all',
-            canSend
-              ? 'bg-brand text-brand-foreground hover:brightness-110 cursor-pointer'
-              : 'bg-muted text-muted-foreground cursor-not-allowed',
-          )}
-        >
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          ) : (
-            <ArrowUp className="h-4 w-4" aria-hidden />
-          )}
-        </button>
+        {canStop ? (
+          <button
+            type="button"
+            onClick={() => onStop?.()}
+            aria-label="Stop generating"
+            title="Stop"
+            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110"
+          >
+            <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!canSend}
+            aria-label={isPending ? 'Sending' : 'Send'}
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-all',
+              canSend
+                ? 'bg-brand text-brand-foreground hover:brightness-110 cursor-pointer'
+                : 'bg-muted text-muted-foreground cursor-not-allowed',
+            )}
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            ) : (
+              <ArrowUp className="h-4 w-4" aria-hidden />
+            )}
+          </button>
+        )}
       </div>
       {imagePreview && attachedImage ? (
         <div className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted/40 p-1.5">
@@ -229,6 +408,35 @@ export function ChatComposer({
           </span>
         ) : null}
       </div>
+      <Dialog open={voiceConsentOpen} onOpenChange={setVoiceConsentOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Enable voice input?</DialogTitle>
+            <DialogDescription className="text-left">
+              In Chromium-based browsers (Chrome, Edge), voice input streams microphone audio to
+              Google's transcription service. Audio doesn't pass through our servers. Don't use
+              voice for sensitive customer details, supplier prices, payment data, or incident
+              specifics — type those instead.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <button
+              type="button"
+              onClick={() => setVoiceConsentOpen(false)}
+              className="rounded-md border border-border bg-background px-3 py-1.5 text-sm hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={grantConsent}
+              className="rounded-md bg-brand px-3 py-1.5 text-sm text-brand-foreground hover:brightness-110"
+            >
+              Enable voice
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   )
 }

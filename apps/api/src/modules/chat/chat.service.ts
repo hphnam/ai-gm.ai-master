@@ -194,22 +194,29 @@ export class ChatService implements OnModuleInit {
   /// against retrieved knowledge_item sources WHEN the assistant text
   /// contains factual specifics (numbers, codes, contacts, money, quantity
   /// + unit). Latency-safe — runs after persistence as a floating promise,
-  /// so the user has already seen the answer. Issues are logged for the
-  /// adaptation loop; not written back into the assistant message in this
-  /// pass (avoids a Prisma round-trip and schema change). Soft-fails on
-  /// verifier errors.
+  /// so the user has already seen the answer. Wave C: persists final state
+  /// onto the assistant ChatMessage row (verifyStatus + verifyIssueCount)
+  /// so the web UI can render a small "couldn't verify N specifics" badge
+  /// without polling a separate endpoint.
   private triggerAutoVerify(params: {
     draft: string
     retrievedItemIds: string[]
     orgId: string
     assistantMessageId: string
   }): void {
+    // Skip path stays as NULL in the DB — VerifyBadge already treats null
+    // and 'skipped' identically (no badge). Persisting 'skipped' would only
+    // burn an extra Prisma update per turn with no observable effect.
     if (params.retrievedItemIds.length === 0) return
     if (!FACTUAL_SPECIFIC_RE.test(params.draft)) return
-    // Fire-and-forget. Caller never awaits.
+    // No 'pending' pre-write: the UI suppresses pending and writing it
+    // un-awaited from the same call site as the terminal status races with
+    // it on Prisma's connection pool. If the terminal write arrives first,
+    // the row would be pinned to 'pending' forever. Final-status writes are
+    // single, ordered, awaited inside the .then chain.
     void this.verifier
       .verify(params.draft, params.retrievedItemIds, params.orgId)
-      .then((result) => {
+      .then(async (result) => {
         if (result.ok) {
           this.logger.log(
             JSON.stringify({
@@ -219,11 +226,10 @@ export class ChatService implements OnModuleInit {
               checked: result.checked,
             }),
           )
+          await this.persistVerifyStatus(params.assistantMessageId, 'clean', 0)
           return
         }
         // PII-clean: log issue COUNT only, never claim/expected content.
-        // Issue payloads can echo user data (contact names, supplier names,
-        // numbers) and we don't want those on the log line.
         this.logger.warn(
           JSON.stringify({
             event: 'chat.auto_verify.issues',
@@ -233,8 +239,9 @@ export class ChatService implements OnModuleInit {
             issueCount: result.issues.length,
           }),
         )
+        await this.persistVerifyStatus(params.assistantMessageId, 'issues', result.issues.length)
       })
-      .catch((err: unknown) => {
+      .catch(async (err: unknown) => {
         // Don't log raw error message — Anthropic SDK and Prisma errors can
         // echo the request body (which contains the draft assistant text) on
         // certain failures. Project security.md forbids logging PII.
@@ -247,7 +254,32 @@ export class ChatService implements OnModuleInit {
             errorName: name,
           }),
         )
+        await this.persistVerifyStatus(params.assistantMessageId, 'error', null)
       })
+  }
+
+  private async persistVerifyStatus(
+    messageId: string,
+    status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error',
+    issueCount: number | null,
+  ): Promise<void> {
+    try {
+      await prisma.chatMessage.update({
+        where: { id: messageId },
+        data: { verifyStatus: status, verifyIssueCount: issueCount },
+      })
+    } catch (err) {
+      // Best-effort. A persistence miss only loses the badge for this turn —
+      // the user already has the answer.
+      const name = err instanceof Error ? err.name : 'UnknownError'
+      this.logger.warn(
+        JSON.stringify({
+          event: 'chat.auto_verify.persist_failed',
+          assistantMessageId: messageId,
+          errorName: name,
+        }),
+      )
+    }
   }
 
   /// Phase F — fetch (and lazily refresh) the user's GM profile summary for

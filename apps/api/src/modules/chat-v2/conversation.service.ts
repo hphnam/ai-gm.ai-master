@@ -27,6 +27,9 @@ export type ConversationMessage = {
   parts?: unknown
   toolCallLog?: unknown[]
   feedbackKind: string | null
+  /// Wave-C auto-verify state — see ChatMessageSchema for value semantics.
+  verifyStatus: 'pending' | 'clean' | 'issues' | 'skipped' | 'error' | null
+  verifyIssueCount: number | null
 }
 
 export type ConversationDetail = {
@@ -39,6 +42,20 @@ export type ConversationDetail = {
 }
 
 const PREVIEW_MAX = 80
+
+// Boundary check on the verifyStatus column. The only writer today is the
+// typed `persistVerifyStatus` helper, but a future migration backfill or
+// stray code path could leave junk in the column — and the client zod schema
+// rejects unexpected enum values, which would break the whole conversation
+// load. Drop unknown values to null so the badge just hides instead.
+const KNOWN_VERIFY_STATUSES: ReadonlySet<NonNullable<ConversationMessage['verifyStatus']>> =
+  new Set(['pending', 'clean', 'issues', 'skipped', 'error'])
+function normaliseVerifyStatus(raw: string | null): ConversationMessage['verifyStatus'] {
+  if (raw === null) return null
+  return KNOWN_VERIFY_STATUSES.has(raw as NonNullable<ConversationMessage['verifyStatus']>)
+    ? (raw as NonNullable<ConversationMessage['verifyStatus']>)
+    : null
+}
 
 function truncate(text: string, max: number): string {
   if (text.length <= max) return text
@@ -119,6 +136,8 @@ export class ConversationService {
             reasoning: true,
             parts: true,
             toolCallLog: true,
+            verifyStatus: true,
+            verifyIssueCount: true,
             feedback: { select: { kind: true } },
           },
         },
@@ -157,6 +176,8 @@ export class ConversationService {
         parts: m.parts ?? undefined,
         toolCallLog: Array.isArray(m.toolCallLog) ? (m.toolCallLog as unknown[]) : undefined,
         feedbackKind: (m.feedback?.kind ?? null) as string | null,
+        verifyStatus: normaliseVerifyStatus(m.verifyStatus),
+        verifyIssueCount: m.verifyIssueCount,
       })),
     }
   }

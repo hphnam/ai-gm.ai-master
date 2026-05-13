@@ -706,6 +706,18 @@ model ChatMessage {
   // (covers Voyage embed ~$0.00006). 6dp matches Math.round(x*1e6)/1e6 helper output.
   // Captured for ALL turns including failed (audit-M2): role='turn-failed' rows carry partial spend.
   costUsd          Decimal? @db.Decimal(10, 6)
+  /// Auto-verify outcome for the assistant turn — fires post-stream against
+  /// retrieved sources when the answer contains factual specifics. Values:
+  /// 'pending'  — auto-verify has been scheduled but not completed yet
+  /// 'clean'    — verifier ran and found no fidelity issues
+  /// 'issues'   — verifier flagged misquoted brands / numbers / contacts
+  /// 'skipped'  — gating regex didn't match (no specifics) or no sources
+  /// 'error'    — verifier threw (network / Haiku failure)
+  /// Null for user rows and pre-Wave-C assistant rows.
+  verifyStatus     String?
+  /// Count of issues found when verifyStatus='issues'. Used by the UI badge
+  /// to render "checked N · 1 issue" style copy without re-fetching detail.
+  verifyIssueCount Int?
   createdAt        DateTime @default(now())
 
   conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)

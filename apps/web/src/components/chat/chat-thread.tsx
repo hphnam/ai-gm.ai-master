@@ -5,6 +5,11 @@ import { Sparkles } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { ChatMessage } from './chat-message'
 
+export type VerifyEntry = {
+  status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
+  issueCount: number | null
+}
+
 type Props = {
   messages: UIMessage[]
   status: 'submitted' | 'streaming' | 'ready' | 'error'
@@ -12,6 +17,7 @@ type Props = {
   latestFollowUps: string[]
   onRegenerate?: () => void
   feedbackByMessageId?: Record<string, 'up' | 'down' | 'regenerate'>
+  verifyByMessageId?: Record<string, VerifyEntry>
 }
 
 export function ChatThread({
@@ -21,6 +27,7 @@ export function ChatThread({
   latestFollowUps,
   onRegenerate,
   feedbackByMessageId,
+  verifyByMessageId,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -56,6 +63,7 @@ export function ChatThread({
             followUps={i === lastAssistantIdx ? latestFollowUps : undefined}
             onRegenerate={i === lastAssistantIdx ? onRegenerate : undefined}
             initialFeedback={feedbackByMessageId?.[m.id] ?? null}
+            verify={verifyByMessageId?.[m.id] ?? null}
           />
         </li>
       ))}
