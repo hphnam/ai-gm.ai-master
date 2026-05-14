@@ -1,15 +1,15 @@
 import { PhoneStatusCard } from '@/components/phone/phone-status-card'
-import { PageHeader } from '@/components/shell/page-header'
 
 export default function PhonePage() {
   return (
-    <>
-      <PageHeader title="Phone number" description="Link your phone to use WhatsApp with GM AI." />
-      <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
-          <PhoneStatusCard />
-        </div>
-      </div>
-    </>
+    <section aria-labelledby="phone-settings-title">
+      <header className="mb-4">
+        <h2 id="phone-settings-title" className="text-base font-semibold tracking-tight">
+          Phone number
+        </h2>
+        <p className="text-xs text-muted-foreground">Link your phone to use WhatsApp with GM AI.</p>
+      </header>
+      <PhoneStatusCard />
+    </section>
   )
 }

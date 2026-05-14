@@ -3,6 +3,7 @@
 import { Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAppShell } from './app-shell'
+import { NotificationsBell } from './notifications-bell'
 
 type Props = {
   title: string
@@ -36,7 +37,10 @@ export function PageHeader({ title, description, actions, border = true }: Props
           <p className="truncate text-xs text-muted-foreground">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+      <div className="flex items-center gap-2">
+        {actions}
+        <NotificationsBell />
+      </div>
     </header>
   )
 }

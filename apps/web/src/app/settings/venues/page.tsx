@@ -1,18 +1,17 @@
-import { PageHeader } from '@/components/shell/page-header'
 import { VenueProfilesBody } from '@/components/venues/venue-profiles-body'
 
 export default function VenueProfilesPage() {
   return (
-    <>
-      <PageHeader
-        title="Venue profiles"
-        description="Layout, safety, opening hours, deliveries — context the chat reads on every reply."
-      />
-      <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
-          <VenueProfilesBody />
-        </div>
-      </div>
-    </>
+    <section aria-labelledby="venues-settings-title">
+      <header className="mb-4">
+        <h2 id="venues-settings-title" className="text-base font-semibold tracking-tight">
+          Venue profiles
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Layout, safety, opening hours, deliveries — context the chat reads on every reply.
+        </p>
+      </header>
+      <VenueProfilesBody />
+    </section>
   )
 }

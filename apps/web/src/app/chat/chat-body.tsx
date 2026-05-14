@@ -11,7 +11,7 @@ import { toast } from 'sonner'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { SuggestionsSurface } from '@/components/chat/suggestions-surface'
-import { VenueStrip } from '@/components/chat/venue-strip'
+import { VenueChip } from '@/components/chat/venue-chip'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
@@ -552,41 +552,45 @@ function ChatCore({
   // is nothing to share until the first send creates the row.
   const showShareButton = isOwner && conversationExists && Boolean(venueId)
   const isShared = visibility === 'org'
-  const shareActions =
-    showShareButton && conversationId && venueId ? (
-      <ShareButton
-        conversationId={conversationId}
-        venueId={venueId}
-        isShared={isShared}
-        isPending={updateVisibility.isPending}
-        onToggle={async (next) => {
-          try {
-            await updateVisibility.mutateAsync({
-              conversationId,
-              venueId,
-              visibility: next,
-            })
-            if (next === 'org' && typeof window !== 'undefined') {
-              const url = `${window.location.origin}/chat?venue=${venueId}&conv=${conversationId}`
-              try {
-                await navigator.clipboard.writeText(url)
-                toast.success('Share link copied — anyone in your org can view')
-              } catch {
-                toast.success('Sharing on — copy the URL from your address bar')
+  const headerActions = (
+    <>
+      <VenueChip venueId={venueId} onChange={isOwner ? onPickVenue : undefined} />
+      {showShareButton && conversationId && venueId ? (
+        <ShareButton
+          conversationId={conversationId}
+          venueId={venueId}
+          isShared={isShared}
+          isPending={updateVisibility.isPending}
+          onToggle={async (next) => {
+            try {
+              await updateVisibility.mutateAsync({
+                conversationId,
+                venueId,
+                visibility: next,
+              })
+              if (next === 'org' && typeof window !== 'undefined') {
+                const url = `${window.location.origin}/chat?venue=${venueId}&conv=${conversationId}`
+                try {
+                  await navigator.clipboard.writeText(url)
+                  toast.success('Share link copied — anyone in your org can view')
+                } catch {
+                  toast.success('Sharing on — copy the URL from your address bar')
+                }
+              } else {
+                toast.success('Sharing off — only you can view this chat')
               }
-            } else {
-              toast.success('Sharing off — only you can view this chat')
+            } catch (err) {
+              toast.error(mapApiError(err))
             }
-          } catch (err) {
-            toast.error(mapApiError(err))
-          }
-        }}
-      />
-    ) : null
+          }}
+        />
+      ) : null}
+    </>
+  )
 
   return (
     <>
-      <PageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={shareActions} />
+      <PageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={headerActions} />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="scrollbar-thin flex-1 overflow-y-auto">
@@ -633,7 +637,6 @@ function ChatCore({
 
         <div className="border-t border-border bg-background/80 px-4 py-3 backdrop-blur-sm sm:px-6">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
-            {isOwner ? <VenueStrip venueId={venueId} onChange={onPickVenue} /> : null}
             <ChatComposer
               onSubmit={submit}
               onSubmitWithImage={submitWithImage}

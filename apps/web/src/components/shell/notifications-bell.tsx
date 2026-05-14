@@ -150,9 +150,9 @@ export function NotificationsBell() {
           <button
             type="button"
             className={cn(
-              'relative inline-flex items-center justify-center rounded-md p-1.5 transition-colors',
-              'text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
-              'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground',
+              'relative inline-flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors',
+              'text-muted-foreground hover:bg-muted hover:text-foreground',
+              'data-[state=open]:bg-muted data-[state=open]:text-foreground',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
             )}
             aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
@@ -171,7 +171,7 @@ export function NotificationsBell() {
           </button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="start" side="bottom">
+        <PopoverContent className="w-[340px] p-0" align="end" side="bottom">
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <span className="text-sm font-semibold">Notifications</span>
             <div className="flex items-center gap-1">

@@ -1,11 +1,12 @@
 'use client'
 
-import { ArrowDownUp, FilterX, Loader2, Search } from 'lucide-react'
+import { ArrowDownUp, FilterX, Loader2, Search, SlidersHorizontal } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DocList } from '@/components/docs/doc-list'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -15,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { useDocs, useDocTypes } from '@/lib/hooks/use-docs'
 import { useVenues } from '@/lib/hooks/use-venues'
+import { cn } from '@/lib/utils'
 
 type CategoryFilter = 'all' | 'unclassified' | string
 type VenueFilter = 'all' | 'global' | string
@@ -68,6 +70,10 @@ export function LibraryTab() {
 
   const filtersActive =
     query.trim().length > 0 || category !== 'all' || venue !== 'all' || status !== 'all'
+  // Count only the dropdown filters (search and sort are inline, so they don't
+  // count toward the popover's "active" badge).
+  const activeDropdownCount =
+    (category !== 'all' ? 1 : 0) + (venue !== 'all' ? 1 : 0) + (status !== 'all' ? 1 : 0)
 
   // Flatten the paginated pages into a single list for rendering.
   const items = useMemo(() => docs.data?.pages.flatMap((p) => p.items) ?? undefined, [docs.data])
@@ -134,74 +140,125 @@ export function LibraryTab() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Select value={category} onValueChange={(v) => void setFilters({ category: v })}>
-            <SelectTrigger
-              aria-label="Filter by category"
-              className="h-8 w-auto min-w-[10rem] cursor-pointer"
-            >
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              <SelectItem value="unclassified">Not categorized</SelectItem>
-              {types.data && types.data.length > 0
-                ? types.data.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      {t.name}
-                    </SelectItem>
-                  ))
-                : null}
-            </SelectContent>
-          </Select>
-
-          <Select value={venue} onValueChange={(v) => void setFilters({ venue: v })}>
-            <SelectTrigger
-              aria-label="Filter by venue"
-              className="h-8 w-auto min-w-[8rem] cursor-pointer"
-            >
-              <SelectValue placeholder="Venue" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All venues</SelectItem>
-              <SelectItem value="global">No venue (global)</SelectItem>
-              {(venues ?? []).map((v) => (
-                <SelectItem key={v.id} value={v.id}>
-                  {v.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={status}
-            onValueChange={(v) => void setFilters({ status: v as StatusFilter })}
-          >
-            <SelectTrigger
-              aria-label="Filter by status"
-              className="h-8 w-auto min-w-[8rem] cursor-pointer"
-            >
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="ready">Ready</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="attention">Needs attention</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="ml-auto flex items-center gap-2">
-            {filtersActive ? (
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 size="sm"
-                variant="ghost"
-                onClick={clearFilters}
-                className="h-8 cursor-pointer gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                variant="outline"
+                className={cn(
+                  'h-8 cursor-pointer gap-1.5',
+                  activeDropdownCount > 0 && 'border-foreground/30',
+                )}
+                aria-label="Filters"
               >
-                <FilterX className="h-3.5 w-3.5" aria-hidden />
-                Clear
+                <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden />
+                Filters
+                {activeDropdownCount > 0 ? (
+                  <span className="ml-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-foreground/10 px-1 text-[10px] font-medium tabular-nums">
+                    {activeDropdownCount}
+                  </span>
+                ) : null}
               </Button>
-            ) : null}
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-[260px] space-y-3 p-3">
+              <div className="space-y-1">
+                <label
+                  htmlFor="filter-category"
+                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                >
+                  Category
+                </label>
+                <Select value={category} onValueChange={(v) => void setFilters({ category: v })}>
+                  <SelectTrigger
+                    id="filter-category"
+                    aria-label="Filter by category"
+                    className="h-8 w-full cursor-pointer"
+                  >
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    <SelectItem value="unclassified">Not categorized</SelectItem>
+                    {types.data && types.data.length > 0
+                      ? types.data.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.name}
+                          </SelectItem>
+                        ))
+                      : null}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label
+                  htmlFor="filter-venue"
+                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                >
+                  Venue
+                </label>
+                <Select value={venue} onValueChange={(v) => void setFilters({ venue: v })}>
+                  <SelectTrigger
+                    id="filter-venue"
+                    aria-label="Filter by venue"
+                    className="h-8 w-full cursor-pointer"
+                  >
+                    <SelectValue placeholder="Venue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All venues</SelectItem>
+                    <SelectItem value="global">No venue (global)</SelectItem>
+                    {(venues ?? []).map((v) => (
+                      <SelectItem key={v.id} value={v.id}>
+                        {v.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <label
+                  htmlFor="filter-status"
+                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                >
+                  Status
+                </label>
+                <Select
+                  value={status}
+                  onValueChange={(v) => void setFilters({ status: v as StatusFilter })}
+                >
+                  <SelectTrigger
+                    id="filter-status"
+                    aria-label="Filter by status"
+                    className="h-8 w-full cursor-pointer"
+                  >
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="ready">Ready</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="attention">Needs attention</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {filtersActive ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={clearFilters}
+              className="h-8 cursor-pointer gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <FilterX className="h-3.5 w-3.5" aria-hidden />
+              Clear
+            </Button>
+          ) : null}
+
+          <div className="ml-auto">
             <Select value={sort} onValueChange={(v) => void setFilters({ sort: v as SortKey })}>
               <SelectTrigger aria-label="Sort" className="h-8 w-auto min-w-[9rem] cursor-pointer">
                 <ArrowDownUp className="mr-1 h-3.5 w-3.5 text-muted-foreground" aria-hidden />

@@ -4,10 +4,10 @@ import { getToolName, isToolUIPart, type UIMessage } from 'ai'
 import {
   AlertTriangle,
   Brain,
-  Check,
   ChevronDown,
   ChevronRight,
   Copy,
+  MoreHorizontal,
   RefreshCcw,
   ShieldCheck,
   Sparkles,
@@ -25,6 +25,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
@@ -447,13 +453,10 @@ function AssistantActions({
   onRegenerate?: () => void
   initialFeedback?: 'up' | 'down' | 'regenerate' | null
 }) {
-  const [copied, setCopied] = useState(false)
-
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1600)
+      toast.success('Copied to clipboard')
     } catch {
       toast.error("Couldn't copy — your browser blocked clipboard access.")
     }
@@ -462,28 +465,29 @@ function AssistantActions({
   return (
     <div className="mt-1 flex items-center gap-1">
       <FeedbackButtons messageId={messageId} initial={initialFeedback ?? null} />
-      <button
-        type="button"
-        onClick={copy}
-        aria-label={copied ? 'Copied' : 'Copy reply'}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        {copied ? (
-          <Check className="h-4 w-4" aria-hidden />
-        ) : (
-          <Copy className="h-4 w-4" aria-hidden />
-        )}
-      </button>
-      {onRegenerate ? (
-        <button
-          type="button"
-          onClick={onRegenerate}
-          aria-label="Regenerate reply"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-        >
-          <RefreshCcw className="h-4 w-4" aria-hidden />
-        </button>
-      ) : null}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label="More actions"
+            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <MoreHorizontal className="h-4 w-4" aria-hidden />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-[160px]">
+          <DropdownMenuItem onSelect={copy} className="cursor-pointer gap-2">
+            <Copy className="h-4 w-4" aria-hidden />
+            Copy reply
+          </DropdownMenuItem>
+          {onRegenerate ? (
+            <DropdownMenuItem onSelect={onRegenerate} className="cursor-pointer gap-2">
+              <RefreshCcw className="h-4 w-4" aria-hidden />
+              Regenerate
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

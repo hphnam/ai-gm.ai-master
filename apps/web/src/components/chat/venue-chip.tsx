@@ -15,61 +15,58 @@ import { cn } from '@/lib/utils'
 
 type Props = {
   venueId: string | null
-  /** true → read-only (existing thread, venue locked). */
-  locked?: boolean
+  /** When undefined, the chip renders as a read-only label (shared chats). */
   onChange?: (venueId: string) => void
 }
 
-export function VenueStrip({ venueId, locked = false, onChange }: Props) {
+// Compact venue switcher that lives in the chat PageHeader. Replaces the
+// full-width VenueStrip that used to sit above the composer.
+export function VenueChip({ venueId, onChange }: Props) {
   const { data: venues, isLoading } = useVenues()
   const current = venues?.find((v) => v.id === venueId) ?? null
-  const needsPick = !locked && !current
+  const needsPick = Boolean(onChange) && !current
+  const readOnly = !onChange
 
   const label = isLoading
     ? 'Loading…'
     : current
       ? current.name
-      : locked
+      : readOnly
         ? 'Unknown venue'
         : 'Pick a venue'
 
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <div
-      className={cn(
-        'flex items-center gap-2 rounded-xl border px-3 py-2',
-        needsPick ? 'border-brand/40 bg-brand/5' : 'border-border bg-muted/40',
-      )}
-    >
-      {children}
-    </div>
+  const Inner = (
+    <>
+      <Store
+        className={cn('h-3.5 w-3.5', needsPick ? 'text-brand' : 'text-muted-foreground')}
+        aria-hidden
+      />
+      <span
+        className={cn(
+          'max-w-[140px] truncate sm:max-w-[200px]',
+          needsPick ? 'text-brand' : 'text-foreground',
+        )}
+      >
+        {label}
+      </span>
+      {!readOnly ? (
+        <ChevronDown
+          className={cn('h-3.5 w-3.5', needsPick ? 'text-brand' : 'text-muted-foreground')}
+          aria-hidden
+        />
+      ) : null}
+    </>
   )
 
-  const LeadingIcon = (
-    <span
-      className={cn(
-        'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
-        needsPick ? 'bg-brand text-brand-foreground' : 'bg-background text-brand',
-      )}
-    >
-      <Store className="h-3.5 w-3.5" aria-hidden />
-    </span>
-  )
-
-  const Prefix = (
-    <span className="text-xs font-medium text-muted-foreground">
-      {locked ? 'Chatting about' : needsPick ? 'Before we start' : 'Chatting about'}
-    </span>
-  )
-
-  if (locked) {
+  if (readOnly) {
     return (
-      <Wrapper>
-        {LeadingIcon}
-        <span className="flex min-w-0 flex-col leading-tight">
-          {Prefix}
-          <span className="truncate text-sm font-semibold text-foreground">{label}</span>
-        </span>
-      </Wrapper>
+      <span
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium',
+        )}
+      >
+        {Inner}
+      </span>
     )
   }
 
@@ -80,34 +77,16 @@ export function VenueStrip({ venueId, locked = false, onChange }: Props) {
           type="button"
           aria-label="Pick venue for this chat"
           className={cn(
-            'flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-left transition-colors cursor-pointer',
+            'inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors',
             needsPick
-              ? 'border-brand/50 bg-brand/5 hover:bg-brand/10 shadow-sm'
-              : 'border-border bg-muted/40 hover:bg-muted/70',
+              ? 'border-brand/50 bg-brand/5 hover:bg-brand/10'
+              : 'border-border bg-card hover:bg-accent',
           )}
         >
-          {LeadingIcon}
-          <span className="flex min-w-0 flex-1 flex-col leading-tight">
-            {Prefix}
-            <span
-              className={cn(
-                'truncate text-sm font-semibold',
-                needsPick ? 'text-brand' : 'text-foreground',
-              )}
-            >
-              {label}
-            </span>
-          </span>
-          <ChevronDown
-            className={cn('h-4 w-4', needsPick ? 'text-brand' : 'text-muted-foreground')}
-            aria-hidden
-          />
+          {Inner}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[240px]"
-      >
+      <DropdownMenuContent align="end" className="min-w-[240px]">
         <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
           Venue for this chat
         </DropdownMenuLabel>

@@ -332,7 +332,6 @@ export function ChatComposer({
         <textarea
           id="composer-input"
           rows={1}
-          aria-describedby="composer-hint"
           aria-invalid={Boolean(errors.userMessage)}
           placeholder={
             disabled && disabledReason ? disabledReason : 'Ask about stock, ordering, SOPs…'
@@ -397,17 +396,13 @@ export function ChatComposer({
           </button>
         </div>
       ) : null}
-      <div className="mt-1.5 flex items-center justify-between gap-3 px-2">
-        <span id="composer-hint" className="text-[11px] text-muted-foreground">
-          Enter to send · Shift+Enter for newline
-          {onSubmitWithImage ? ' · attach a photo for visual help' : ''}
-        </span>
-        {errors.userMessage ? (
+      {errors.userMessage ? (
+        <div className="mt-1.5 px-2">
           <span className="text-[11px] text-destructive" role="alert">
             {errors.userMessage.message}
           </span>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
       <Dialog open={voiceConsentOpen} onOpenChange={setVoiceConsentOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
