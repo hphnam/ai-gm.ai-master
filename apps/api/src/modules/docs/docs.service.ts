@@ -12,6 +12,7 @@ import {
   type CreateDocResponse,
   type DocDetail,
   type DocListItem,
+  DocPurposeSchema,
   DocumentTypeDto,
   type DocumentTypeKind,
   DocumentTypeKindSchema,
@@ -764,6 +765,7 @@ export class DocsService {
       ? (metadata.tags as unknown[]).filter((t): t is string => typeof t === 'string')
       : []
     const docType = typeof metadata.docType === 'string' ? metadata.docType : null
+    const docPurpose = DocPurposeSchema.safeParse(metadata.docPurpose)
     return {
       id: row.id,
       title: titleFromMetadata(metadata),
@@ -777,6 +779,7 @@ export class DocsService {
       pendingTypeProposal: toPendingProposal(row.pendingTypeProposal),
       checklist: toChecklistDto(row.checklist),
       metadata,
+      docPurpose: docPurpose.success ? docPurpose.data : null,
       processingStatus: coerceProcessingStatus(row.processingStatus),
       processingError: row.processingError,
       createdAt: row.createdAt.toISOString(),
@@ -1377,15 +1380,41 @@ export class DocsService {
     const nextTitle = input.title ?? existingTitle
     const nextVenueId = input.venueId !== undefined ? input.venueId : row.venueId
 
-    await prisma.knowledgeItem.update({
-      where: { id },
-      data: {
-        venueId: nextVenueId,
-        content: nextContent,
-        metadata: { ...existingMeta, title: nextTitle } as object,
-        processingStatus: 'processing',
-        processingError: null,
-      },
+    // docPurpose: undefined → leave existing untouched; null → clear; value → set
+    // (and clear any other doc holding the same purpose in the same scope so the
+    // "one org-chart per venue" invariant holds without a DB constraint).
+    const nextMeta: Record<string, unknown> = { ...existingMeta, title: nextTitle }
+    if (input.docPurpose === null) {
+      delete nextMeta.docPurpose
+    } else if (input.docPurpose !== undefined) {
+      nextMeta.docPurpose = input.docPurpose
+    }
+
+    await prisma.$transaction(async (tx) => {
+      if (input.docPurpose !== undefined && input.docPurpose !== null) {
+        // Enforce "one doc per purpose per (orgId, venueId) scope" by stripping the
+        // key from any other doc currently holding it. Raw SQL because Prisma JSON
+        // mutation lacks a portable "delete key" op; `jsonb - 'key'` is Postgres-native.
+        // Treat null and non-null venueId symmetrically (IS NOT DISTINCT FROM).
+        await tx.$executeRaw`
+          UPDATE knowledge_items
+          SET metadata = metadata - 'docPurpose'
+          WHERE organization_id = ${orgId}
+            AND (venue_id IS NOT DISTINCT FROM ${nextVenueId})
+            AND id <> ${id}::uuid
+            AND metadata->>'docPurpose' = ${input.docPurpose}
+        `
+      }
+      await tx.knowledgeItem.update({
+        where: { id },
+        data: {
+          venueId: nextVenueId,
+          content: nextContent,
+          metadata: nextMeta as object,
+          processingStatus: 'processing',
+          processingError: null,
+        },
+      })
     })
 
     this.logger.log(
@@ -1398,6 +1427,7 @@ export class DocsService {
         titleChanged: input.title !== undefined,
         venueChanged: input.venueId !== undefined,
         descriptionChanged: input.description !== undefined,
+        docPurposeChanged: input.docPurpose !== undefined,
         preservedDocumentTypeId: row.documentTypeId,
       }),
     )

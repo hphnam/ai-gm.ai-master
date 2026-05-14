@@ -405,7 +405,7 @@ export class DocsController {
   @RequireRole('owner', 'manager')
   async update(
     @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
-    @Body() body: UpdateDocRequestDto,
+    @Body(new ZodValidationPipe(UpdateDocRequestDto)) body: UpdateDocRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string } | null,
   ): Promise<void> {

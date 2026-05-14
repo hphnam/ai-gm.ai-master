@@ -8,6 +8,7 @@ import {
   FileText,
   Loader2,
   MessageSquareText,
+  NotebookPen,
   Upload as UploadIcon,
   X,
 } from 'lucide-react'
@@ -52,7 +53,7 @@ const GLOBAL_VENUE = '__global__'
 // because browsers don't always report correct MIME types for office files.
 const FILE_ACCEPT = '.md,.txt,.pdf,.docx,.xlsx,.csv,.pptx,.jpg,.jpeg,.png,.webp'
 
-type Intent = 'choose' | 'document' | 'qa'
+type Intent = 'choose' | 'document' | 'qa' | 'text'
 
 export function UploadModal({
   open,
@@ -90,8 +91,10 @@ export function UploadModal({
             </button>
             {intent === 'document' ? (
               <DocumentForm onSaved={handleSaved} />
-            ) : (
+            ) : intent === 'qa' ? (
               <QaForm onSaved={handleSaved} />
+            ) : (
+              <TextForm onSaved={handleSaved} />
             )}
           </div>
         )}
@@ -109,12 +112,18 @@ function IntentPicker({ onPick }: { onPick: (i: Intent) => void }) {
           What are you adding? This affects how the AI files and retrieves it later.
         </DialogDescription>
       </DialogHeader>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <IntentCard
           icon={<FileText className="h-5 w-5" />}
           title="Document"
           description="Upload a file — PDF, spreadsheet, Word doc, or image."
           onClick={() => onPick('document')}
+        />
+        <IntentCard
+          icon={<NotebookPen className="h-5 w-5" />}
+          title="Note"
+          description="Paste or type text directly — SOPs, lists, anything you'd otherwise paste into a doc."
+          onClick={() => onPick('text')}
         />
         <IntentCard
           icon={<MessageSquareText className="h-5 w-5" />}
@@ -470,6 +479,157 @@ function StatusIcon({ status }: { status: QueueStatus }) {
   if (status === 'error')
     return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-600" aria-hidden />
   return <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+}
+
+// ─── Note (paste-text) form ───────────────────────────────────────────────
+
+const TextSchema = z.object({
+  title: z.string().trim().min(1, 'Title required').max(200),
+  // Mirrors backend CreateDocRequestSchema.content cap (50_000).
+  content: z.string().trim().min(1, 'Content required').max(50_000),
+  venueId: z.union([z.string().uuid(), z.null()]),
+  description: z.string().trim().max(1_000),
+})
+type TextValues = z.infer<typeof TextSchema>
+
+function TextForm({ onSaved }: { onSaved: () => void }) {
+  const { data: venues } = useVenues()
+  const createDoc = useCreateDoc()
+
+  const form = useForm<TextValues>({
+    resolver: zodResolver(TextSchema),
+    defaultValues: { title: '', content: '', venueId: null, description: '' },
+  })
+
+  async function onSubmit(values: TextValues) {
+    try {
+      await createDoc.mutateAsync({
+        title: values.title,
+        content: values.content,
+        venueId: values.venueId ?? null,
+        description: values.description.length > 0 ? values.description : undefined,
+      })
+      toast.success('Added — AI is filing it now')
+      onSaved()
+    } catch (err) {
+      toast.error(mapApiError(err))
+    }
+  }
+
+  const submitting = createDoc.isPending
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <DialogHeader>
+          <DialogTitle>Add a note</DialogTitle>
+          <DialogDescription>
+            Paste or type the text directly. The AI classifies it the same way as an uploaded file.
+          </DialogDescription>
+        </DialogHeader>
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="e.g. Cellar opening checklist"
+                  disabled={submitting}
+                  autoFocus
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Content</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  rows={10}
+                  placeholder="Paste the text here…"
+                  disabled={submitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="venueId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Venue</FormLabel>
+              <Select
+                value={field.value ?? GLOBAL_VENUE}
+                onValueChange={(v) => field.onChange(v === GLOBAL_VENUE ? null : v)}
+                disabled={submitting}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pick a venue" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={GLOBAL_VENUE}>Global (applies to all venues)</SelectItem>
+                  {(venues ?? []).map((v) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                AI brief{' '}
+                <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  rows={2}
+                  placeholder="One sentence telling the AI what this is and when it applies."
+                  disabled={submitting}
+                />
+              </FormControl>
+              <FormDescription>
+                Prepended to the content so retrieval and classification see your intent hint.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="submit" disabled={submitting}>
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Saving…
+              </>
+            ) : (
+              'Save note'
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  )
 }
 
 // ─── Q&A form ─────────────────────────────────────────────────────────────

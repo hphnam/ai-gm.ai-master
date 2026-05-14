@@ -39,11 +39,13 @@ import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
 const GLOBAL_VENUE = '__global__'
+const NO_PURPOSE = '__none__'
 
 const Schema = z.object({
   title: z.string().trim().min(1, 'Title required').max(200),
   venueId: z.union([z.string().uuid(), z.null()]),
   description: z.string().trim().max(1_000),
+  docPurpose: z.union([z.literal('org_chart'), z.null()]),
 })
 type Values = z.infer<typeof Schema>
 
@@ -70,12 +72,15 @@ export function EditDocModal({
 
   const initialDescription = extractDescription(doc.content)
 
+  const initialPurpose = doc.docPurpose ?? null
+
   const form = useForm<Values>({
     resolver: zodResolver(Schema),
     defaultValues: {
       title: doc.title ?? '',
       venueId: doc.venueId,
       description: initialDescription,
+      docPurpose: initialPurpose,
     },
   })
 
@@ -86,15 +91,22 @@ export function EditDocModal({
         title: doc.title ?? '',
         venueId: doc.venueId,
         description: initialDescription,
+        docPurpose: initialPurpose,
       })
     }
-  }, [open, doc.id, doc.title, doc.venueId, initialDescription, form])
+  }, [open, doc.id, doc.title, doc.venueId, initialDescription, initialPurpose, form])
 
   async function onSubmit(values: Values) {
-    const body: { title?: string; venueId?: string | null; description?: string } = {}
+    const body: {
+      title?: string
+      venueId?: string | null
+      description?: string
+      docPurpose?: 'org_chart' | null
+    } = {}
     if (values.title !== (doc.title ?? '')) body.title = values.title
     if (values.venueId !== doc.venueId) body.venueId = values.venueId
     if (values.description !== initialDescription) body.description = values.description
+    if (values.docPurpose !== initialPurpose) body.docPurpose = values.docPurpose
     if (Object.keys(body).length === 0) {
       onOpenChange(false)
       return
@@ -162,6 +174,39 @@ export function EditDocModal({
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="docPurpose"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Role{' '}
+                    <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  </FormLabel>
+                  <Select
+                    value={field.value ?? NO_PURPOSE}
+                    onValueChange={(v) => field.onChange(v === NO_PURPOSE ? null : 'org_chart')}
+                    disabled={submitting}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_PURPOSE}>None</SelectItem>
+                      <SelectItem value="org_chart">Org chart</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Pin this doc as the org chart so chat answers about reporting and escalation
+                    pull from it directly. Replaces any other org chart on the same venue.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

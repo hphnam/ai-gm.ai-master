@@ -72,6 +72,10 @@ export type VenueSnapshot = {
   /// Tabular doc names the model should know exist (so it knows what
   /// query_document_table can search across).
   tabularDocs?: Array<{ id: string; title: string }>
+  /// The doc tagged as the venue's org chart (docPurpose='org_chart'). Content
+  /// is inlined (capped) so the agent can answer reporting/escalation questions
+  /// without a separate retrieval round-trip.
+  orgChartDoc?: { id: string; title: string; content: string }
 }
 
 export function buildGmAgent(params: {
@@ -202,6 +206,12 @@ export function buildGmAgent(params: {
     for (const d of snapshot.tabularDocs) {
       snapshotLines.push(`  • ${d.title} [doc:${d.id}]`)
     }
+  }
+  if (snapshot?.orgChartDoc) {
+    snapshotLines.push(
+      `org_chart [doc:${snapshot.orgChartDoc.id}] — ${snapshot.orgChartDoc.title}:`,
+    )
+    snapshotLines.push(snapshot.orgChartDoc.content)
   }
   const snapshotBlock =
     snapshotLines.length > 0

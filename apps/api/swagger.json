@@ -4791,6 +4791,21 @@
             "x-nestjs_zod-has-null": true,
             "x-nestjs_zod-self-required": true
           },
+          "docPurpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "org_chart"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
+          },
           "processingStatus": {
             "type": "string",
             "enum": [
@@ -4834,6 +4849,7 @@
           "pendingTypeProposal",
           "checklist",
           "metadata",
+          "docPurpose",
           "processingStatus",
           "processingError",
           "createdAt",
@@ -4906,6 +4922,21 @@
             "type": "string",
             "maxLength": 1000,
             "x-nestjs_zod-has-null": true
+          },
+          "docPurpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "org_chart"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-empty-type": true
           }
         }
       },

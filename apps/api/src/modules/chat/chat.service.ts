@@ -367,15 +367,30 @@ export class ChatService implements OnModuleInit {
       const topKnowledge: VenueSnapshot['topKnowledge'] = []
       const recentlyAnswered: VenueSnapshot['recentlyAnswered'] = []
       const tabularDocs: VenueSnapshot['tabularDocs'] = []
+      let orgChartDoc: VenueSnapshot['orgChartDoc']
 
       for (const r of rows) {
         const meta = (r.metadata ?? {}) as Record<string, unknown>
         const docType = typeof meta.docType === 'string' ? meta.docType : null
+        const docPurpose = typeof meta.docPurpose === 'string' ? meta.docPurpose : null
         const title =
           typeof meta.title === 'string' && meta.title.trim().length > 0
             ? meta.title.trim()
             : r.content.replace(/\s+/g, ' ').trim().slice(0, 80)
         const summary = (r.aiSummary ?? r.content).replace(/\s+/g, ' ').trim().slice(0, 240)
+
+        // Org chart: inline the content (capped) so the agent doesn't need a
+        // separate retrieval round-trip. PREFIX_RE strips the uploader brief.
+        // Cap is chars not tokens — 2000 chars ≈ 500 tokens, fine for a typical
+        // chart of 5-20 people. Longer charts get truncated; agent falls back to
+        // find_knowledge by title. Skip topKnowledge for this row — surfacing it
+        // twice would dilute the "authoritative source" instruction.
+        if (docPurpose === 'org_chart' && !orgChartDoc) {
+          const stripped = r.content.replace(/^Context from uploader: [\s\S]*?\n\n---\n\n/, '')
+          const content = stripped.trim().slice(0, 2000)
+          orgChartDoc = { id: r.id, title, content }
+          continue
+        }
 
         if (docType === 'tabular') {
           if (tabularDocs.length < 16) tabularDocs.push({ id: r.id, title })
@@ -399,7 +414,7 @@ export class ChatService implements OnModuleInit {
         }
       }
 
-      return { topKnowledge, recentlyAnswered, tabularDocs }
+      return { topKnowledge, recentlyAnswered, tabularDocs, orgChartDoc }
     } catch (err) {
       this.logger.warn(
         JSON.stringify({

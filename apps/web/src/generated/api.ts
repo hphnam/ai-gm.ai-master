@@ -790,6 +790,7 @@ export interface DocDetailDto {
   pendingTypeProposal: DocDetailDtoPendingTypeProposal;
   checklist: DocDetailDtoChecklist;
   metadata: DocDetailDtoMetadata;
+  docPurpose: 'org_chart' | null;
   processingStatus: DocDetailDtoProcessingStatus;
   processingError: string | null;
   createdAt: string;
@@ -821,6 +822,7 @@ export interface UpdateDocRequestDto {
   venueId?: string | null;
   /** @maxLength 1000 */
   description?: string;
+  docPurpose?: 'org_chart' | null;
 }
 
 export type CategorySuggestionDtoKind = typeof CategorySuggestionDtoKind[keyof typeof CategorySuggestionDtoKind];

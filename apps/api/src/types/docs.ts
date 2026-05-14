@@ -11,19 +11,32 @@ export const CreateDocRequestSchema = z.object({
 })
 export type CreateDocRequest = z.infer<typeof CreateDocRequestSchema>
 
+// Special role a doc plays for the chat agent. Open union — add purposes here
+// when a new in-context shortcut earns its place. Each purpose is enforced
+// unique per (orgId, venueId) scope in DocsService.updateDoc.
+export const DocPurposeSchema = z.enum(['org_chart'])
+export type DocPurpose = z.infer<typeof DocPurposeSchema>
+
 // Edit-and-re-ingest. All fields optional, but at least one required so the
 // endpoint is never a no-op. Title and venue are cheap edits; description
 // triggers a full re-enrich because it's prepended to content (signal for the
-// classifier + embedder).
+// classifier + embedder). docPurpose=null clears the purpose; omitting it leaves
+// the existing purpose untouched.
 export const UpdateDocRequestSchema = z
   .object({
     title: z.string().trim().min(1, 'title required').max(200).optional(),
     venueId: z.union([z.string().regex(UUID_RE, 'invalid uuid'), z.null()]).optional(),
     description: z.string().trim().max(1_000).optional(),
+    docPurpose: DocPurposeSchema.nullable().optional(),
   })
-  .refine((v) => v.title !== undefined || v.venueId !== undefined || v.description !== undefined, {
-    message: 'at least one field required',
-  })
+  .refine(
+    (v) =>
+      v.title !== undefined ||
+      v.venueId !== undefined ||
+      v.description !== undefined ||
+      v.docPurpose !== undefined,
+    { message: 'at least one field required' },
+  )
 export type UpdateDocRequest = z.infer<typeof UpdateDocRequestSchema>
 
 // Plan 04-03 Task 1 — DocumentType kind enum (shipped as TEXT + Zod; native enum
@@ -226,6 +239,7 @@ export type DocDetail = {
   pendingTypeProposal: ProposedDocType | null
   checklist: ChecklistDto | null
   metadata: Record<string, unknown>
+  docPurpose: DocPurpose | null
   processingStatus: ProcessingStatus
   processingError: string | null
   createdAt: string

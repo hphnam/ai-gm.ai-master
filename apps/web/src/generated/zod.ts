@@ -1019,6 +1019,7 @@ export const DocsControllerGetResponse = zod.object({
   "extractedAt": zod.string()
 }),zod.null()]),
   "metadata": zod.record(zod.string(), zod.unknown()),
+  "docPurpose": zod.union([zod.enum(['org_chart']),zod.null()]),
   "processingStatus": zod.enum(['processing', 'ready', 'failed']),
   "processingError": zod.union([zod.string(),zod.null()]),
   "createdAt": zod.string(),
@@ -1051,7 +1052,8 @@ export const docsControllerUpdateBodyDescriptionMax = 1000;
 export const DocsControllerUpdateBody = zod.object({
   "title": zod.string().min(1).max(docsControllerUpdateBodyTitleMax).optional(),
   "venueId": zod.union([zod.string().regex(docsControllerUpdateBodyVenueIdOneRegExp),zod.null()]).optional(),
-  "description": zod.string().max(docsControllerUpdateBodyDescriptionMax).optional()
+  "description": zod.string().max(docsControllerUpdateBodyDescriptionMax).optional(),
+  "docPurpose": zod.union([zod.enum(['org_chart']),zod.null()]).optional()
 })
 
 
