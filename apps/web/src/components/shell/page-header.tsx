@@ -30,11 +30,11 @@ export function PageHeader({ title, description, actions, border = true }: Props
         <Menu className="h-4 w-4" />
       </button>
       <div className="flex min-w-0 flex-1 flex-col">
-        <h1 className="truncate text-sm font-semibold tracking-tight text-foreground sm:text-base">
+        <h1 className="truncate font-display text-lg leading-none tracking-tight text-foreground sm:text-xl">
           {title}
         </h1>
         {description ? (
-          <p className="truncate text-xs text-muted-foreground">{description}</p>
+          <p className="mt-1 truncate text-xs text-muted-foreground">{description}</p>
         ) : null}
       </div>
       <div className="flex items-center gap-2">

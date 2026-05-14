@@ -39,9 +39,7 @@ export function FeedbackButtons({
         disabled={isPending}
         onClick={() => onClick('up')}
         className={
-          selected === 'up'
-            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-700'
-            : ''
+          selected === 'up' ? 'bg-foreground/10 text-foreground hover:bg-foreground/10' : ''
         }
       >
         <ThumbsUp />
@@ -54,9 +52,7 @@ export function FeedbackButtons({
         disabled={isPending}
         onClick={() => onClick('down')}
         className={
-          selected === 'down'
-            ? 'bg-rose-100 text-rose-700 hover:bg-rose-100 hover:text-rose-700'
-            : ''
+          selected === 'down' ? 'bg-foreground/10 text-foreground hover:bg-foreground/10' : ''
         }
       >
         <ThumbsDown />

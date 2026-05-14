@@ -162,7 +162,7 @@ export function NotificationsBell() {
               <span
                 className={cn(
                   'absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center',
-                  'rounded-full bg-amber-500 px-1 text-[10px] font-semibold leading-none text-white',
+                  'rounded-full bg-foreground px-1 text-[10px] font-semibold leading-none text-background',
                 )}
               >
                 {unread > 99 ? '99+' : unread}
@@ -236,8 +236,8 @@ export function NotificationsBell() {
                       ref={isFocused ? focusedRowRef : undefined}
                       className={cn(
                         'group border-b border-border/40 last:border-b-0',
-                        n.status === 'unread' && 'bg-amber-50/50 dark:bg-amber-500/5',
-                        isFocused && 'ring-2 ring-amber-500/40 ring-inset',
+                        n.status === 'unread' && 'bg-muted/40',
+                        isFocused && 'ring-2 ring-foreground/20 ring-inset',
                       )}
                     >
                       <button

@@ -27,7 +27,7 @@ export function PhoneStatusCard() {
   if (status.isLoading) {
     return (
       <div className="space-y-3">
-        <div className="h-20 w-full animate-pulse rounded-md bg-muted" />
+        <div className="h-20 w-full animate-pulse rounded-lg bg-muted" />
       </div>
     )
   }
@@ -35,7 +35,7 @@ export function PhoneStatusCard() {
   if (status.isError) {
     const err = status.error
     return (
-      <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive shadow-sm">
         {err instanceof ApiError ? mapApiError(err) : mapApiError(err)}
       </div>
     )
@@ -54,13 +54,19 @@ export function PhoneStatusCard() {
     }
 
     return (
-      <section className="rounded-md border p-4">
+      <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-5">
         <header className="flex items-center gap-3">
-          <Phone className="h-5 w-5 text-muted-foreground" aria-hidden />
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+            aria-hidden
+          >
+            <Phone className="h-4 w-4" />
+          </div>
           <div className="flex-1">
             <p className="text-base font-medium">{maskPhone(data!.phoneNumber!)}</p>
-            <p className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Check className="h-4 w-4 text-emerald-600" aria-hidden />
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600" aria-hidden />
+              <Check className="h-3 w-3" aria-hidden />
               <span>Verified</span>
             </p>
           </div>
@@ -97,7 +103,7 @@ export function PhoneStatusCard() {
   }
 
   return (
-    <section className="rounded-md border p-4">
+    <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-5">
       <PhoneLinkForm />
     </section>
   )

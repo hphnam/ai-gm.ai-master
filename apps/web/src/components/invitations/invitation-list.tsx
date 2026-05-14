@@ -62,33 +62,37 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 function StatusBadge({ status }: { status: InvitationDTO['status'] }) {
-  const map: Record<InvitationDTO['status'], { label: string; cls: string; Icon: typeof Clock }> = {
-    pending: {
-      label: 'Pending',
-      cls: 'border-amber-200 bg-amber-50 text-amber-900',
-      Icon: Clock,
-    },
+  // Quiet status pill. Pending earns an amber dot (operator scan signal);
+  // accepted is muted because it's a settled state; revoked/expired are
+  // muted past-tense.
+  const map: Record<
+    InvitationDTO['status'],
+    { label: string; dot: string; text: string; Icon: typeof Clock }
+  > = {
+    pending: { label: 'Pending', dot: 'bg-amber-500', text: 'text-foreground/80', Icon: Clock },
     accepted: {
       label: 'Accepted',
-      cls: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+      dot: 'bg-emerald-600',
+      text: 'text-muted-foreground',
       Icon: CheckCircle2,
     },
     revoked: {
       label: 'Revoked',
-      cls: 'border-slate-200 bg-slate-50 text-slate-900',
+      dot: 'bg-muted-foreground/50',
+      text: 'text-muted-foreground',
       Icon: XCircle,
     },
     expired: {
       label: 'Expired',
-      cls: 'border-slate-200 bg-slate-50 text-slate-900',
+      dot: 'bg-muted-foreground/50',
+      text: 'text-muted-foreground',
       Icon: XCircle,
     },
   }
-  const { label, cls, Icon } = map[status]
+  const { label, dot, text, Icon } = map[status]
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${text}`}>
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
       <Icon className="h-3 w-3" aria-hidden />
       {label}
     </span>
@@ -101,7 +105,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
   if (!data || data.invitations.length === 0) {
     return (
-      <section className="rounded-md border p-6 text-center">
+      <section className="rounded-lg border bg-card p-6 text-center shadow-sm">
         <UserPlus className="mx-auto mb-2 h-6 w-6 text-muted-foreground" aria-hidden />
         <p className="text-sm text-muted-foreground">
           No invitations yet. Use the form above to invite a teammate.
@@ -115,14 +119,16 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
   const dead = data.invitations.filter((i) => i.status === 'revoked' || i.status === 'expired')
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-base font-semibold">Invitations</h2>
+    <section className="space-y-4 rounded-lg border bg-card p-4 shadow-sm sm:p-5">
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Invitations
+      </h2>
 
       <Group title="Pending" items={pending}>
         {pending.length === 0 ? (
           <p className="text-sm text-muted-foreground">No pending invitations.</p>
         ) : (
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y">
             {pending.map((inv) => (
               <li
                 key={inv.id}
@@ -171,7 +177,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
       {accepted.length > 0 && (
         <Group title="Accepted" items={accepted} collapsed>
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y">
             {accepted.map((inv) => (
               <li key={inv.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <div className="min-w-0">
@@ -187,7 +193,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
       {dead.length > 0 && (
         <Group title="Expired or revoked" items={dead} collapsed>
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y">
             {dead.map((inv) => (
               <li key={inv.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <div className="min-w-0">
@@ -252,9 +258,9 @@ function Group({
     <details
       open={open}
       onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
-      className="rounded-md border p-3"
+      className="border-t pt-3 first:border-t-0 first:pt-0"
     >
-      <summary className="cursor-pointer text-sm font-medium">
+      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground">
         {title} ({items.length})
       </summary>
       <div className="mt-3">{children}</div>

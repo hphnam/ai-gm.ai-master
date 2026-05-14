@@ -76,14 +76,13 @@ function TabBar({
             {count > 0 ? (
               <span
                 className={cn(
-                  'rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
-                  selected
-                    ? 'bg-foreground/10 text-foreground'
-                    : urgent
-                      ? 'bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
-                      : 'bg-muted text-muted-foreground',
+                  'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
+                  selected ? 'bg-foreground/10 text-foreground' : 'bg-muted text-muted-foreground',
                 )}
               >
+                {urgent ? (
+                  <span className="inline-block h-1 w-1 rounded-full bg-amber-500" aria-hidden />
+                ) : null}
                 {count}
               </span>
             ) : null}

@@ -991,6 +991,19 @@ export const RevokeInvitationResponseDtoValue = {
 } as const;
 export type RevokeInvitationResponseDto = typeof RevokeInvitationResponseDtoValue;
 
+export type ListOrgMembersResponseDtoMembersItem = {
+  userId: string;
+  name: string | null;
+  email: string;
+  role: string;
+  isSelf: boolean;
+  joinedAt: string;
+};
+
+export interface ListOrgMembersResponseDto {
+  members: ListOrgMembersResponseDtoMembersItem[];
+}
+
 export interface SendPhoneCodeBodyDto {
   phoneNumber: string;
 }
@@ -5003,6 +5016,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getInvitationsControllerRevokeMutationOptions(options), queryClient);
     }
+
+export type orgMembersControllerListResponse200 = {
+  data: ListOrgMembersResponseDto
+  status: 200
+}
+
+export type orgMembersControllerListResponseSuccess = (orgMembersControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type orgMembersControllerListResponse = (orgMembersControllerListResponseSuccess)
+
+export const getOrgMembersControllerListUrl = () => {
+
+
+
+
+  return `/org/members`
+}
+
+export const orgMembersControllerList = async ( options?: RequestInit): Promise<orgMembersControllerListResponse> => {
+
+  return orvalMutator<orgMembersControllerListResponse>(getOrgMembersControllerListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrgMembersControllerListQueryKey = () => {
+    return [
+    `/org/members`
+    ] as const;
+    }
+
+
+export const getOrgMembersControllerListQueryOptions = <TData = Awaited<ReturnType<typeof orgMembersControllerList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOrgMembersControllerListQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof orgMembersControllerList>>> = ({ signal }) => orgMembersControllerList({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OrgMembersControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof orgMembersControllerList>>>
+export type OrgMembersControllerListQueryError = unknown
+
+
+export function useOrgMembersControllerList<TData = Awaited<ReturnType<typeof orgMembersControllerList>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof orgMembersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof orgMembersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOrgMembersControllerList<TData = Awaited<ReturnType<typeof orgMembersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof orgMembersControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof orgMembersControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOrgMembersControllerList<TData = Awaited<ReturnType<typeof orgMembersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useOrgMembersControllerList<TData = Awaited<ReturnType<typeof orgMembersControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof orgMembersControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOrgMembersControllerListQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type phoneControllerSendResponse200 = {
   data: SendPhoneCodeResponseDto

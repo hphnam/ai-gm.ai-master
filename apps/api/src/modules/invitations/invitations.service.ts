@@ -252,6 +252,57 @@ export class InvitationsService {
     }
   }
 
+  /**
+   * Surface every accepted member of the active org. Used by /org/members so
+   * the Organisation settings page can show the actual team — not just
+   * pending invitations. Owners + managers only (gated at the controller).
+   */
+  async listMembers(input: { organizationId: string; currentUserId: string }): Promise<{
+    members: Array<{
+      userId: string
+      name: string | null
+      email: string
+      role: string
+      isSelf: boolean
+      joinedAt: string
+    }>
+  }> {
+    // Sort by role in the DB so the take-cap doesn't truncate owners/managers
+    // when an org grows past the limit. The JS sort below reorders within each
+    // role bucket and resolves the role-string ordering (manager < owner
+    // alphabetically) to the operator-meaningful one (owner > manager > staff).
+    // For v1 a hard cap is acceptable; if a single org passes ~800 members,
+    // add cursor pagination mirroring listInvitations.
+    const rows = await prisma.organizationMember.findMany({
+      where: { organizationId: input.organizationId },
+      select: {
+        userId: true,
+        role: true,
+        createdAt: true,
+        user: { select: { name: true, email: true } },
+      },
+      orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
+      take: 1000,
+    })
+    const ROLE_ORDER: Record<string, number> = { owner: 0, manager: 1, staff: 2 }
+    const members = rows
+      .map((m) => ({
+        userId: m.userId,
+        name: m.user.name,
+        email: m.user.email,
+        role: m.role,
+        isSelf: m.userId === input.currentUserId,
+        joinedAt: m.createdAt.toISOString(),
+      }))
+      .sort((a, b) => {
+        const ra = ROLE_ORDER[a.role] ?? 99
+        const rb = ROLE_ORDER[b.role] ?? 99
+        if (ra !== rb) return ra - rb
+        return (a.name ?? a.email).localeCompare(b.name ?? b.email)
+      })
+    return { members }
+  }
+
   async getInvitationPreview(id: string): Promise<InvitationPreview> {
     const row = await prisma.invitation.findUnique({
       where: { id },

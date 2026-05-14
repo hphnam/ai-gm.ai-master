@@ -24,6 +24,7 @@
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-slot": "latest",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-query": "latest",
     "ai": "^6.0.168",
     "better-auth": "^1.6.5",

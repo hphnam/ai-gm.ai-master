@@ -1,7 +1,6 @@
 'use client'
 
 import type { UIMessage } from 'ai'
-import { Sparkles } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { ChatMessage } from './chat-message'
 
@@ -69,13 +68,15 @@ export function ChatThread({
       ))}
       {isPendingAssistant ? (
         <li className="flex gap-3">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground/75">
+            <span className="font-display text-[11px] font-semibold leading-none tracking-[-0.02em]">
+              gm
+            </span>
           </div>
           <div className="flex items-center gap-2 pt-1.5 text-sm text-muted-foreground">
-            <span className="relative inline-flex h-2 w-2">
-              <span className="absolute inset-0 animate-ping rounded-full bg-brand/60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
+            <span className="relative inline-flex h-1.5 w-1.5">
+              <span className="absolute inset-0 rounded-full bg-foreground/25" />
+              <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" />
             </span>
             Thinking
           </div>

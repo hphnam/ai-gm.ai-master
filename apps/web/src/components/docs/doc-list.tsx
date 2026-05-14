@@ -52,9 +52,9 @@ function statusFor(doc: DocListItem): { text: string; tone: StatusTone } {
 
 const toneClass: Record<StatusTone, string> = {
   muted: 'text-muted-foreground',
-  info: 'text-sky-700 dark:text-sky-400',
-  warning: 'text-amber-700 dark:text-amber-400 font-medium',
-  danger: 'text-red-700 dark:text-red-400 font-medium',
+  info: 'text-muted-foreground',
+  warning: 'text-foreground/80 font-medium',
+  danger: 'text-destructive font-medium',
 }
 
 function DocIcon({ doc }: { doc: DocListItem }) {
@@ -70,11 +70,11 @@ function DocIcon({ doc }: { doc: DocListItem }) {
 }
 
 function iconWrapClass(doc: DocListItem): string {
-  if (doc.processingStatus === 'failed') return 'bg-red-500/10 text-red-700 dark:text-red-300'
-  if (doc.processingStatus === 'processing') return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
-  if (doc.pendingTypeProposal) return 'bg-sky-500/10 text-sky-700 dark:text-sky-300'
-  if (doc.documentType) return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-  return 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+  // One restrained wrap; severity comes from the glyph + status text, not
+  // from tinted backgrounds. Destructive earns its color because it's a
+  // true failure state.
+  if (doc.processingStatus === 'failed') return 'bg-destructive/10 text-destructive'
+  return 'bg-muted text-muted-foreground'
 }
 
 function DeleteDocButton({ doc }: { doc: DocListItem }) {

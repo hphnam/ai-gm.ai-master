@@ -290,7 +290,7 @@ export function ChatComposer({
         className={cn(
           'relative flex items-end gap-2 rounded-2xl border border-border bg-background',
           'px-3 py-2.5 shadow-sm transition-all',
-          'focus-within:border-brand/60 focus-within:ring-2 focus-within:ring-brand/15',
+          'focus-within:border-foreground/40 focus-within:ring-2 focus-within:ring-foreground/10',
         )}
       >
         <input
@@ -344,9 +344,14 @@ export function ChatComposer({
             textareaRef.current = el
           }}
           className={cn(
-            'flex-1 resize-none bg-transparent text-[15px] leading-6',
+            'flex-1 resize-none self-center bg-transparent text-[15px] leading-6',
             'placeholder:text-muted-foreground/70 focus:outline-none',
-            'min-h-[24px] max-h-[220px]',
+            // min-h matches the h-8 (32px) of the side buttons; py-1 centres
+            // the single-line text vertically in that 32px box so its baseline
+            // sits on the same line as the icon centres. As the textarea grows
+            // multi-line it expands downward and the parent's items-end keeps
+            // the buttons aligned to the new bottom edge.
+            'min-h-8 max-h-[220px] py-1',
           )}
         />
         {canStop ? (

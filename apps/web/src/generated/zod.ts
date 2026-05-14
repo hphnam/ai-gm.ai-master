@@ -1304,6 +1304,18 @@ export const InvitationsControllerRevokeResponse = zod.object({
 })
 
 
+export const OrgMembersControllerListResponse = zod.object({
+  "members": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string(),
+  "role": zod.string(),
+  "isSelf": zod.boolean(),
+  "joinedAt": zod.string()
+}))
+})
+
+
 export const PhoneControllerSendBody = zod.object({
   "phoneNumber": zod.string()
 })

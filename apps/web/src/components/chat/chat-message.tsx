@@ -9,8 +9,6 @@ import {
   Copy,
   MoreHorizontal,
   RefreshCcw,
-  ShieldCheck,
-  Sparkles,
 } from 'lucide-react'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -31,26 +29,36 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useDoc } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
 
-// Citation chip — replaces the previous new-tab anchor with an inline Dialog
-// that mounts DocPreview, so users can verify a source without losing their
-// chat scroll position. The DocPreview component does its own lazy fetch via
-// useDoc(); we mount it only when the dialog opens to avoid eager loads.
+// Citation chip — a small numbered pill that sits inline with prose. The
+// Tooltip exposes the source title on hover so the number reads as a real
+// citation rather than an opaque marker. Clicking opens a Dialog with the
+// full DocPreview. Both the tooltip preview and the dialog body share the
+// same Radix trigger (the chip button).
 function CitationChip({ docId, children }: { docId: string; children: React.ReactNode }) {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label="View source document"
-          className="ml-0.5 inline-flex cursor-pointer items-baseline rounded-sm bg-brand/10 px-1 align-baseline text-[10px] font-medium text-brand no-underline hover:bg-brand/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-        >
-          {children}
-        </button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              aria-label="View source document"
+              className="mx-0.5 inline-flex h-[18px] min-w-[18px] cursor-pointer items-center justify-center rounded-md bg-muted px-1 align-[-0.15em] text-[11px] font-semibold leading-none tracking-tight text-foreground/75 transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+            >
+              {children}
+            </button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="top" align="start" className="max-w-[300px]">
+          <CitationTooltipBody docId={docId} index={children} />
+        </TooltipContent>
+      </Tooltip>
       <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="sr-only">Source document</DialogTitle>
@@ -65,12 +73,38 @@ function CitationChip({ docId, children }: { docId: string; children: React.Reac
           href={`/docs/${docId}`}
           target="_blank"
           rel="noreferrer noopener"
-          className="self-end text-xs text-muted-foreground hover:text-brand"
+          className="self-end text-xs text-muted-foreground hover:text-foreground"
         >
           Open full document →
         </a>
       </DialogContent>
     </Dialog>
+  )
+}
+
+// Tooltip body for a citation chip. The useDoc call only fires when the
+// TooltipContent actually mounts (Radix portal stays unmounted until the
+// trigger opens), and React Query dedupes/caches it for 30s so hovering
+// multiple chips referencing the same doc is cheap.
+function CitationTooltipBody({ docId, index }: { docId: string; index: React.ReactNode }) {
+  const { data, isLoading, isError } = useDoc(docId)
+  const title = data?.title?.trim() || null
+  const description = (() => {
+    if (isLoading) return 'Loading source…'
+    if (isError) return 'Source unavailable'
+    if (title) return title
+    return 'Untitled document'
+  })()
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        Source {index}
+      </span>
+      <span className="line-clamp-2 text-[12.5px] font-medium leading-snug text-foreground">
+        {description}
+      </span>
+      <span className="text-[11px] text-muted-foreground">Click to preview</span>
+    </div>
   )
 }
 
@@ -135,19 +169,23 @@ function toolLabel(name: string): string {
   }
 }
 
+// Quiet monogram avatar — a thin-ringed circle with a small "gm" wordmark.
+// Replaces the Sparkles glyph so the AI doesn't read as a generic chatbot.
 function AssistantAvatar() {
   return (
-    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm">
-      <Sparkles className="h-3.5 w-3.5" aria-hidden />
+    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground/75">
+      <span className="font-display text-[11px] font-semibold leading-none tracking-[-0.02em]">
+        gm
+      </span>
     </div>
   )
 }
 
 function BrandDot() {
   return (
-    <span className="relative inline-flex h-2 w-2">
-      <span className="absolute inset-0 animate-ping rounded-full bg-brand/60" />
-      <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
+    <span className="relative inline-flex h-1.5 w-1.5">
+      <span className="absolute inset-0 rounded-full bg-foreground/30" />
+      <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" />
     </span>
   )
 }
@@ -179,14 +217,14 @@ function ReasoningBlock({
       ? 'Thinking…'
       : 'Thought process'
   return (
-    <div className="rounded-lg border border-border bg-muted/40">
+    <div className="rounded-lg border border-border bg-muted">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] font-medium text-muted-foreground hover:text-foreground"
         aria-expanded={open}
       >
-        <Brain className="h-3.5 w-3.5 text-brand" aria-hidden />
+        <Brain className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
         <span>{headerLabel}</span>
         {hasChips && !inFlightChip ? (
           <span className="text-[11px] font-normal text-muted-foreground/80">
@@ -215,7 +253,7 @@ function ReasoningBlock({
                     c.errored
                       ? 'border-destructive/30 bg-destructive/5 text-destructive'
                       : !c.done
-                        ? 'border-brand/30 bg-brand/5 text-brand'
+                        ? 'border-foreground/20 bg-foreground/5 text-foreground'
                         : 'border-border bg-background text-muted-foreground',
                   )}
                 >
@@ -225,7 +263,7 @@ function ReasoningBlock({
                       c.errored
                         ? 'bg-destructive'
                         : !c.done
-                          ? 'bg-brand'
+                          ? 'bg-foreground'
                           : 'bg-muted-foreground/60',
                     )}
                   />
@@ -246,18 +284,11 @@ function ReasoningBlock({
 }
 
 // Phase E1 — citation chips. The agent emits `[doc:<uuid>]` markers when
-// quoting from a knowledge_item. We rewrite each marker to a numbered
-// superscript markdown link `[¹](/docs/<uuid>)`, dedupe by id (same doc cited
-// twice → same number), and let the custom <a> renderer style internal
-// /docs/ links as small chips without underlines.
+// quoting from a knowledge_item. We rewrite each marker to a numbered markdown
+// link `[1](/docs/<uuid>)`, dedupe by id (same doc cited twice → same number),
+// and let the custom <a> renderer style internal /docs/ links as the
+// CitationChip pill (numbered, tappable, visually distinct from prose).
 const DOC_CITATION_RE = /\[doc:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\]/gi
-const SUPERSCRIPT_DIGITS = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
-function toSuperscript(n: number): string {
-  return String(n)
-    .split('')
-    .map((d) => SUPERSCRIPT_DIGITS[Number(d)] ?? d)
-    .join('')
-}
 
 function rewriteCitations(raw: string): string {
   const seen = new Map<string, number>()
@@ -268,7 +299,7 @@ function rewriteCitations(raw: string): string {
       n = seen.size + 1
       seen.set(lower, n)
     }
-    return `[${toSuperscript(n)}](/docs/${lower})`
+    return `[${n}](/docs/${lower})`
   })
 }
 
@@ -310,7 +341,7 @@ function AssistantMarkdown({ text }: { text: string }) {
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="text-brand underline underline-offset-2"
+                className="text-foreground underline decoration-foreground/40 underline-offset-2 hover:decoration-foreground"
               >
                 {children}
               </a>
@@ -416,19 +447,40 @@ function AssistantBody({
       ? stripFollowUpTail(finalTextPart.text).trim()
       : ''
 
+  // Continuity bridge — useChat pushes an empty assistant message the moment
+  // the stream opens, before any reasoning / tool / text deltas arrive. Without
+  // this, ReasoningBlock returns null (nothing to show), the answer block is
+  // empty, and the bare cursor bar flashes — creating a "Thinking → blank →
+  // Thinking" flicker between ChatThread's submitted-state fallback and the
+  // reasoning block. Render a single Thinking status while streaming and
+  // nothing visible has arrived yet.
+  const hasReasoning = mergedReasoningText.trim().length > 0
+  const hasChips = toolChips.length > 0
+  const hasFinal = finalText.length > 0
+  const showThinkingBridge = isStreaming && !hasReasoning && !hasChips && !hasFinal
+
+  if (showThinkingBridge) {
+    return (
+      <div className="flex items-center gap-2 pt-1.5 text-sm text-muted-foreground">
+        <span className="relative inline-flex h-1.5 w-1.5" aria-hidden>
+          <span className="absolute inset-0 rounded-full bg-foreground/25" />
+          <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" />
+        </span>
+        Thinking
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-2.5">
       <ReasoningBlock text={mergedReasoningText} streaming={reasoningStreaming} chips={toolChips} />
-      {finalText ? (
+      {hasFinal ? (
         <div className="relative">
           <AssistantMarkdown text={finalText} />
           {isStreaming && lastTextIdx === lastIdx ? (
             <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
           ) : null}
         </div>
-      ) : null}
-      {isStreaming && parts.length === 0 ? (
-        <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
       ) : null}
     </div>
   )
@@ -492,19 +544,21 @@ function AssistantActions({
   )
 }
 
-// Wave-C auto-verify badge. Renders for 'clean', 'issues', and 'error'.
-// Pending / skipped / null all suppress the badge so it never adds noise to
-// a normal answer. Error state surfaces "verification unavailable" so users
-// don't assume the answer was silently checked when it wasn't.
+// Wave-C auto-verify status. Quiet inline strip — a small dot + grey text.
+// Color is reserved for true alarms (the "issues" state uses destructive); a
+// clean check is just a muted dot, so a successful answer stays calm.
 function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
   if (verify.status === 'clean') {
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400"
+        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
         title="Specifics in this answer were checked against the cited sources."
       >
-        <ShieldCheck className="h-3 w-3" aria-hidden />
-        <span>Verified</span>
+        <span
+          className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-500"
+          aria-hidden
+        />
+        <span>Checked against sources</span>
       </span>
     )
   }
@@ -516,21 +570,23 @@ function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
     const n = verify.issueCount ?? 1
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400"
+        className="inline-flex items-center gap-1.5 text-[11px] text-destructive"
         title="The verifier flagged specifics in this answer that may not match the cited sources. Double-check before acting."
       >
         <AlertTriangle className="h-3 w-3" aria-hidden />
-        <span>Couldn't verify {n}</span>
+        <span>
+          Couldn't verify {n} {n === 1 ? 'claim' : 'claims'}
+        </span>
       </span>
     )
   }
   if (verify.status === 'error') {
     return (
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+        className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
         title="Auto-verification didn't complete for this answer. Double-check anything specific before acting."
       >
-        <AlertTriangle className="h-3 w-3" aria-hidden />
+        <span className="inline-block h-1 w-1 rounded-full bg-muted-foreground/50" aria-hidden />
         <span>Verification unavailable</span>
       </span>
     )
@@ -558,7 +614,7 @@ export function ChatMessage({
     )
     return (
       <article aria-label="Your message" className="flex w-full justify-end">
-        <div className="max-w-[80%] rounded-2xl rounded-tr-md bg-primary px-4 py-2.5 text-sm leading-relaxed text-primary-foreground shadow-sm">
+        <div className="max-w-[85%] rounded-2xl bg-muted px-4 py-2.5 text-[15px] leading-relaxed text-foreground">
           <div className="whitespace-pre-wrap break-words">{text}</div>
         </div>
       </article>

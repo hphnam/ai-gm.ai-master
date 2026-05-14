@@ -84,13 +84,19 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         )}
         aria-label="Primary"
       >
-        <div className="flex items-center gap-2 px-1 pt-1 pb-1">
+        <div className="flex items-center gap-2 px-2 pt-1 pb-1">
           <Link
             href="/chat"
-            className="flex items-center gap-2 text-sm font-semibold tracking-tight"
+            aria-label="GM AI — go to chat"
+            className="group inline-flex items-baseline gap-1.5 font-display text-foreground transition-opacity hover:opacity-80"
           >
-            <span className="flex px-3 py-1.5 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
-              AI-GM
+            <span className="text-lg font-semibold leading-none tracking-[-0.02em]">gm</span>
+            <span
+              aria-hidden
+              className="inline-block h-1 w-1 translate-y-[-0.15em] rounded-full bg-foreground/40"
+            />
+            <span className="text-[10px] font-medium uppercase leading-none tracking-[0.22em] text-foreground/55">
+              ai
             </span>
           </Link>
           <button
@@ -140,13 +146,17 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                   <>
                     <span
                       className={cn(
-                        'rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
+                        'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
                         active
                           ? 'bg-sidebar-foreground/15 text-sidebar-accent-foreground'
-                          : 'bg-amber-500/20 text-amber-700 dark:bg-amber-500/25 dark:text-amber-300',
+                          : 'bg-sidebar-accent text-sidebar-foreground/85',
                       )}
                       aria-hidden
                     >
+                      <span
+                        className="inline-block h-1 w-1 rounded-full bg-amber-500"
+                        aria-hidden
+                      />
                       {knowledgeUrgentCount}
                     </span>
                     <span className="sr-only">{knowledgeUrgentCount} needing attention</span>

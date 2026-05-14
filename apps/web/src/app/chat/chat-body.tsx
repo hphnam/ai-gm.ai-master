@@ -3,7 +3,7 @@
 import { useChat } from '@ai-sdk/react'
 import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
 import { DefaultChatTransport, type UIMessage } from 'ai'
-import { Check, Link2, Loader2, Lock, Sparkles } from 'lucide-react'
+import { Check, Link2, Loader2, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -686,19 +686,20 @@ function EmptyState({
     "Walk me through tonight's opening checklist.",
   ]
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 py-10 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-        <Sparkles className="h-6 w-6" aria-hidden />
-      </div>
-      <div className="space-y-2">
-        <h2 className="text-xl font-semibold tracking-tight">How can I help?</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-10 py-16">
+      <header className="space-y-3">
+        <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl">
+          How would you like
+          <br />
+          <span className="text-foreground/50">to start?</span>
+        </h2>
+        <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
           {needsVenue ? (
             <>
-              Start by picking a venue below. No venues yet?{' '}
+              Pick a venue below to get started. No venues yet?{' '}
               <Link
                 href="/venues/new"
-                className="font-medium text-brand underline-offset-4 hover:underline"
+                className="font-medium text-foreground underline decoration-foreground/40 underline-offset-4 hover:decoration-foreground"
               >
                 Create one
               </Link>
@@ -706,23 +707,29 @@ function EmptyState({
             </>
           ) : (
             <>
-              Ask about stock, ordering, SOPs, or suppliers — I&apos;ll pull from your knowledge
-              base and venue data.
+              Ask about stock, ordering, SOPs, or suppliers. I&apos;ll pull from your knowledge base
+              and venue data.
             </>
           )}
         </p>
-      </div>
+      </header>
       {!needsVenue ? (
-        <ul className="grid w-full gap-2 sm:grid-cols-2">
+        <ul className="flex flex-col divide-y divide-border border-y border-border">
           {prompts.map((p) => (
             <li key={p}>
               <button
                 type="button"
                 onClick={() => onPick?.(p)}
                 disabled={!onPick}
-                className="block w-full rounded-lg border border-border bg-card px-3 py-2.5 text-left text-sm text-foreground/90 transition-colors hover:border-brand/40 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-70"
+                className="group flex w-full items-center justify-between gap-4 py-3 text-left text-[15px] text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {p}
+                <span>{p}</span>
+                <span
+                  aria-hidden
+                  className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                >
+                  →
+                </span>
               </button>
             </li>
           ))}
@@ -766,7 +773,7 @@ function ShareButton({
       className={cn(
         'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors',
         isShared
-          ? 'border-brand/30 bg-brand/10 text-brand hover:bg-brand/15'
+          ? 'border-foreground/20 bg-foreground/[0.06] text-foreground hover:bg-foreground/10'
           : 'border-border bg-card text-foreground/80 hover:bg-accent',
         isPending && 'opacity-70',
       )}

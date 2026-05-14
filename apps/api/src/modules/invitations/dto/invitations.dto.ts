@@ -64,3 +64,21 @@ export class AcceptInvitationResponseDto extends createZodDto(AcceptInvitationRe
 
 export const RevokeInvitationResponseSchema = z.object({ ok: z.literal(true) })
 export class RevokeInvitationResponseDto extends createZodDto(RevokeInvitationResponseSchema) {}
+
+// Member directory — surfaces every accepted member of the active org. Used by
+// the Organisation settings page so managers can see who's actually in their
+// team, not just pending invitations.
+export const OrgMemberSchema = z.object({
+  userId: z.string(),
+  name: z.string().nullable(),
+  email: z.string(),
+  role: z.string(),
+  isSelf: z.boolean(),
+  joinedAt: z.string(),
+})
+export class OrgMemberDto extends createZodDto(OrgMemberSchema) {}
+
+export const ListOrgMembersResponseSchema = z.object({
+  members: z.array(OrgMemberSchema),
+})
+export class ListOrgMembersResponseDto extends createZodDto(ListOrgMembersResponseSchema) {}

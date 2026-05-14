@@ -10,22 +10,7 @@ import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { useInbox } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 
-type Tone = 'amber' | 'blue' | 'red'
-
-const toneStyles: Record<Tone, { icon: string; ring: string }> = {
-  amber: {
-    icon: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
-    ring: 'ring-amber-500/15',
-  },
-  blue: {
-    icon: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
-    ring: 'ring-sky-500/15',
-  },
-  red: {
-    icon: 'bg-red-500/15 text-red-700 dark:text-red-300',
-    ring: 'ring-red-500/15',
-  },
-}
+type Tone = 'attention' | 'suggestion' | 'failed'
 
 function InboxCard({
   tone,
@@ -42,17 +27,28 @@ function InboxCard({
   primary: React.ReactNode
   secondary?: React.ReactNode
 }) {
-  const t = toneStyles[tone]
+  // Single restrained card style. Severity is communicated via icon glyph
+  // and copy — not via tinted backgrounds. The destructive tone earns a
+  // colored left-rule because it represents a true alarm; the other tones
+  // stay neutral.
   return (
-    <div className={cn('rounded-xl border bg-card p-4 shadow-sm ring-1 sm:p-5', t.ring)}>
-      <div className="flex items-start gap-3 sm:gap-4">
+    <div
+      className={cn(
+        'rounded-2xl border border-border bg-card p-5',
+        tone === 'failed' && 'border-l-2 border-l-destructive',
+      )}
+    >
+      <div className="flex items-start gap-4">
         <div
-          className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-full', t.icon)}
+          className={cn(
+            'flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground',
+            tone === 'failed' && 'text-destructive',
+          )}
         >
           {icon}
         </div>
         <div className="min-w-0 flex-1 space-y-1.5">
-          <p className="text-sm font-semibold leading-snug sm:text-base">{title}</p>
+          <p className="text-[15px] font-medium leading-snug text-foreground">{title}</p>
           <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
           <div className="flex flex-wrap gap-2 pt-2">
             {primary}
@@ -75,7 +71,7 @@ function ProposalCard({ doc }: { doc: DocListItem }) {
   return (
     <>
       <InboxCard
-        tone="blue"
+        tone="suggestion"
         icon={<Sparkles className="h-4 w-4" aria-hidden />}
         title={
           <>
@@ -116,7 +112,7 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
   return (
     <>
       <InboxCard
-        tone="amber"
+        tone="attention"
         icon={<Tag className="h-4 w-4" aria-hidden />}
         title={
           <>
@@ -144,7 +140,7 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
 function FailedCard({ doc }: { doc: DocListItem }) {
   return (
     <InboxCard
-      tone="red"
+      tone="failed"
       icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
       title={
         <>
@@ -204,12 +200,12 @@ function Section({
 
 function EmptyInbox() {
   return (
-    <div className="rounded-xl border border-dashed bg-card/40 px-6 py-12 text-center">
-      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-        <Inbox className="h-5 w-5" aria-hidden />
-      </div>
-      <p className="text-sm font-medium">Inbox is clear</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+    <div className="rounded-2xl border border-dashed border-border bg-transparent px-6 py-12 text-center">
+      <Inbox className="mx-auto mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
+      <p className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground">
+        Inbox is clear
+      </p>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
         New uploads needing your review will show up here.
       </p>
     </div>

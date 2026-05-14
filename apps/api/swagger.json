@@ -1596,6 +1596,32 @@
         ]
       }
     },
+    "/org/members": {
+      "get": {
+        "operationId": "OrgMembersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListOrgMembersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "org-members"
+        ]
+      }
+    },
     "/auth/phone/send": {
       "post": {
         "operationId": "PhoneController_send",
@@ -5229,6 +5255,56 @@
         },
         "required": [
           "ok"
+        ]
+      },
+      "ListOrgMembersResponseDto": {
+        "type": "object",
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "email": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "isSelf": {
+                  "type": "boolean"
+                },
+                "joinedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "userId",
+                "name",
+                "email",
+                "role",
+                "isSelf",
+                "joinedAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "members"
         ]
       },
       "SendPhoneCodeBodyDto": {

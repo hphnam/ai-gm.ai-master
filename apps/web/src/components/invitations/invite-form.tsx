@@ -38,8 +38,10 @@ export function InviteForm() {
   })
 
   return (
-    <section className="rounded-md border p-4">
-      <h2 className="mb-3 text-base font-semibold">Invite a teammate</h2>
+    <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-5">
+      <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Invite a teammate
+      </h2>
       <Form {...form}>
         <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-start">
           <FormField
