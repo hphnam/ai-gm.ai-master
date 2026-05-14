@@ -28,6 +28,7 @@ export type {
 } from '../../types/chat-message'
 
 import { AdaptationService } from '../adaptation/adaptation.service'
+import { IntegrationRegistry } from '../integrations/integration-registry'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -184,6 +185,7 @@ export class ChatService implements OnModuleInit {
     private readonly compactor: ConversationCompactorService,
     private readonly verifier: QuoteVerifierService,
     private readonly realtime: RealtimeGateway,
+    private readonly integrations: IntegrationRegistry,
   ) {}
 
   onModuleInit(): void {
@@ -739,6 +741,7 @@ Assistant answer: ${assistantText}`,
 
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
+      integrations: this.integrations,
       ctx: { orgId, userId, userRole },
       venueContext,
       mode: agentMode,
@@ -1166,6 +1169,7 @@ Assistant answer: ${assistantText}`,
 
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
+      integrations: this.integrations,
       ctx,
       venueContext,
       mode: agentMode,

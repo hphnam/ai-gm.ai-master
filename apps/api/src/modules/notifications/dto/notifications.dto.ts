@@ -67,3 +67,33 @@ export class SimpleNotificationResponseDto extends createZodDto(SimpleNotificati
 
 export const MarkAllReadResponseSchema = z.object({ updated: z.number() })
 export class MarkAllReadResponseDto extends createZodDto(MarkAllReadResponseSchema) {}
+
+/// Wave 4 — flat reply thread on a Notification. Authored by either the
+/// recipient or the original author of the parent note.
+export const NotificationReplySchema = z.object({
+  id: z.string(),
+  notificationId: z.string(),
+  body: z.string(),
+  createdAt: z.string(),
+  author: z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    email: z.string(),
+  }),
+})
+export class NotificationReplyDto extends createZodDto(NotificationReplySchema) {}
+
+export const ListNotificationRepliesResponseSchema = z.object({
+  replies: z.array(NotificationReplySchema),
+})
+export class ListNotificationRepliesResponseDto extends createZodDto(
+  ListNotificationRepliesResponseSchema,
+) {}
+
+export const ComposeReplyBodySchema = z.object({
+  body: z.string().trim().min(1).max(2000),
+})
+export class ComposeReplyBodyDto extends createZodDto(ComposeReplyBodySchema) {}
+
+export const SingleReplyResponseSchema = z.object({ reply: NotificationReplySchema })
+export class SingleReplyResponseDto extends createZodDto(SingleReplyResponseSchema) {}

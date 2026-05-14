@@ -14,6 +14,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
+import { MentionedText } from '@/components/chat/mention-picker'
 import { DocPreview } from '@/components/docs/doc-preview'
 import {
   Dialog,
@@ -34,11 +35,13 @@ import { useDoc } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
+import { hasToolCard, ToolCard } from './tool-cards/tool-card-router'
+import type { ToolCardCtx, ToolPart } from './tool-cards/types'
 
 // Citation chip — a small numbered pill that sits inline with prose. The
 // Tooltip exposes the source title on hover so the number reads as a real
-// citation rather than an opaque marker. Clicking opens a Dialog with the
-// full DocPreview. Both the tooltip preview and the dialog body share the
+// citation rather than an opaque marker. Clicking opens a Dialogue with the
+// full DocPreview. Both the tooltip preview and the dialogue body share the
 // same Radix trigger (the chip button).
 function CitationChip({ docId, children }: { docId: string; children: React.ReactNode }) {
   return (
@@ -108,9 +111,9 @@ function CitationTooltipBody({ docId, index }: { docId: string; index: React.Rea
   )
 }
 
-// Tight UUID gate before the chip mounts. Belt-and-braces for defense-in-depth:
+// Tight UUID gate before the chip mounts. Belt-and-braces for defence-in-depth:
 // rewriteCitations only emits valid UUIDs into /docs/, but the link renderer
-// also matches any markdown link with that prefix. If the model ever emits a
+// also matches any Markdown link with that prefix. If the model ever emits a
 // raw [text](/docs/anything-else) we fall through to the external-link branch
 // instead of passing unvalidated text to useDoc.
 const DOC_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -126,6 +129,11 @@ type Props = {
     status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
     issueCount: number | null
   } | null
+  /// Lets generative-UI cards re-prompt the agent (disambiguation picks,
+  /// "draft order", refine actions). Falls back to onFollowUpSelect when the
+  /// caller doesn't pass a dedicated handler.
+  onPrompt?: (text: string) => void | Promise<void>
+  venueId?: string | null
 }
 
 const FOLLOWUP_DELIMITER = '---FOLLOWUPS---'
@@ -284,7 +292,7 @@ function ReasoningBlock({
 }
 
 // Phase E1 — citation chips. The agent emits `[doc:<uuid>]` markers when
-// quoting from a knowledge_item. We rewrite each marker to a numbered markdown
+// quoting from a knowledge_item. We rewrite each marker to a numbered Markdown
 // link `[1](/docs/<uuid>)`, dedupe by id (same doc cited twice → same number),
 // and let the custom <a> renderer style internal /docs/ links as the
 // CitationChip pill (numbered, tappable, visually distinct from prose).
@@ -304,7 +312,7 @@ function rewriteCitations(raw: string): string {
 }
 
 function AssistantMarkdown({ text }: { text: string }) {
-  // Scoped markdown styling — we only opt in to the inline formatting that
+  // Scoped Markdown styling — we only opt in to the inline formatting that
   // the system prompt actually uses (bold/italic/lists/inline code). Headings,
   // blockquotes, tables and hr are intentionally not styled — the prompt tells
   // the model not to emit them.
@@ -395,9 +403,11 @@ type ToolChip = {
 function AssistantBody({
   parts,
   isStreaming,
+  ctx,
 }: {
   parts: UIMessage['parts']
   isStreaming: boolean
+  ctx: ToolCardCtx
 }) {
   const lastIdx = parts.length - 1
   // Answer = the last text part. Any earlier text parts are interim narration
@@ -471,9 +481,30 @@ function AssistantBody({
     )
   }
 
+  // Generative-UI tool cards — render any tool part with a registered renderer
+  // and a final output, in the same order the agent emitted them. Live in-flight
+  // tool calls stay as chips inside ReasoningBlock; the card shows up once the
+  // output lands.
+  const toolCardParts: ToolPart[] = []
+  parts.forEach((p) => {
+    if (!isToolUIPart(p)) return
+    const name = getToolName(p)
+    if (!hasToolCard(name)) return
+    const tp = p as unknown as ToolPart
+    if (tp.state !== 'output-available' && tp.state !== 'output-error') return
+    toolCardParts.push(tp)
+  })
+
   return (
     <div className="flex flex-col gap-2.5">
       <ReasoningBlock text={mergedReasoningText} streaming={reasoningStreaming} chips={toolChips} />
+      {toolCardParts.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          {toolCardParts.map((p, i) => (
+            <ToolCard key={p.toolCallId ?? `tool-card-${i}`} part={p} ctx={ctx} />
+          ))}
+        </div>
+      ) : null}
       {hasFinal ? (
         <div className="relative">
           <AssistantMarkdown text={finalText} />
@@ -545,7 +576,7 @@ function AssistantActions({
 }
 
 // Wave-C auto-verify status. Quiet inline strip — a small dot + grey text.
-// Color is reserved for true alarms (the "issues" state uses destructive); a
+// Colour is reserved for true alarms (the "issues" state uses destructive); a
 // clean check is just a muted dot, so a successful answer stays calm.
 function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
   if (verify.status === 'clean') {
@@ -564,7 +595,7 @@ function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
   }
   if (verify.status === 'issues') {
     // The API guarantees issueCount >= 1 whenever status === 'issues'
-    // (QuoteVerifierService only emits ok:false when at least one issue is
+    // (QuoteVerifierService only emits OK:false when at least one issue is
     // produced). The ?? 1 fallback handles legacy rows that pre-date the
     // column without breaking the badge.
     const n = verify.issueCount ?? 1
@@ -602,7 +633,13 @@ export function ChatMessage({
   onRegenerate,
   initialFeedback,
   verify,
+  onPrompt,
+  venueId,
 }: Props) {
+  const cardCtx: ToolCardCtx = {
+    onPrompt: onPrompt ?? onFollowUpSelect,
+    venueId: venueId ?? null,
+  }
   const isUser = message.role === 'user'
 
   if (isUser) {
@@ -615,7 +652,7 @@ export function ChatMessage({
     return (
       <article aria-label="Your message" className="flex w-full justify-end">
         <div className="max-w-[85%] rounded-2xl bg-muted px-4 py-2.5 text-[15px] leading-relaxed text-foreground">
-          <div className="whitespace-pre-wrap break-words">{text}</div>
+          <MentionedText text={text} className="whitespace-pre-wrap break-words" />
         </div>
       </article>
     )
@@ -631,7 +668,7 @@ export function ChatMessage({
     >
       <AssistantAvatar />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <AssistantBody parts={message.parts} isStreaming={Boolean(isStreaming)} />
+        <AssistantBody parts={message.parts} isStreaming={Boolean(isStreaming)} ctx={cardCtx} />
         {!isStreaming ? (
           <div className="flex flex-wrap items-center gap-2">
             <AssistantActions

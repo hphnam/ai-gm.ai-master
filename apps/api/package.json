@@ -57,6 +57,7 @@
     "reflect-metadata": "latest",
     "rxjs": "latest",
     "socket.io": "^4.8.3",
+    "square": "^44.0.1",
     "voyageai": "latest",
     "zod": "latest"
   },

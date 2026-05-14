@@ -1,5 +1,6 @@
 import { type ToolSet, tool } from 'ai'
 import { fail, TOOL_DEFINITIONS, TOOL_INPUT_SCHEMAS } from '../../types'
+import { IntegrationRegistry } from '../integrations/integration-registry'
 import type { DispatchContext } from './tool-dispatcher'
 import { ToolDispatcher } from './tool-dispatcher'
 
@@ -7,7 +8,16 @@ import { ToolDispatcher } from './tool-dispatcher'
 // Built per-request so each tool closes over {orgId, userId, userRole} without
 // needing to plumb context through AI SDK's execute signature. The dispatcher
 // still owns input validation + cross-tenant enforcement + audit logging.
-export function buildAiSdkTools(dispatcher: ToolDispatcher, ctx: DispatchContext): ToolSet {
+//
+// Integration provider tools (Square + future) are concatenated onto the
+// built-in TOOL_DEFINITIONS list at build time. New providers self-register
+// on module init, so the model's tool surface grows automatically without
+// edits to chat-tools.ts.
+export function buildAiSdkTools(
+  dispatcher: ToolDispatcher,
+  integrations: IntegrationRegistry,
+  ctx: DispatchContext,
+): ToolSet {
   // record_kb_gap precondition gate. The system prompt mandates that the model
   // call find_knowledge before recording a gap; this enforces it at runtime so
   // a regressed prompt or pattern-matched few-shot can't silently skip search.
@@ -22,7 +32,7 @@ export function buildAiSdkTools(dispatcher: ToolDispatcher, ctx: DispatchContext
   // least once this turn; the model uses its own judgement on relevance.
   let findKnowledgeCallCount = 0
 
-  const entries = TOOL_DEFINITIONS.map((def) => {
+  const builtinEntries = TOOL_DEFINITIONS.map((def) => {
     const schema = TOOL_INPUT_SCHEMAS[def.name]
     return [
       def.name,
@@ -70,5 +80,19 @@ export function buildAiSdkTools(dispatcher: ToolDispatcher, ctx: DispatchContext
       }),
     ] as const
   })
-  return Object.fromEntries(entries) as ToolSet
+
+  const integrationSchemas = integrations.getAllToolSchemas()
+  const integrationEntries = integrations.getAllToolDefinitions().map((def) => {
+    const schema = integrationSchemas[def.name]
+    return [
+      def.name,
+      tool({
+        description: def.description,
+        inputSchema: schema,
+        execute: async (input: unknown) => dispatcher.dispatch(def.name, input, ctx),
+      }),
+    ] as const
+  })
+
+  return Object.fromEntries([...builtinEntries, ...integrationEntries]) as ToolSet
 }

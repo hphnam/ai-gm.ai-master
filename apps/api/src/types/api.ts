@@ -140,6 +140,9 @@ export type UpdateVenueProfile = z.infer<typeof UpdateVenueProfileSchema>
 
 export type VenueDetail = VenueListItem & {
   profile: VenueProfile
+  /// Mapping to the connected POS integration's location (Square Location.id).
+  /// Null when no POS is connected or no mapping has been assigned yet.
+  squareLocationId: string | null
 }
 
 export type ChatMessageDto = {

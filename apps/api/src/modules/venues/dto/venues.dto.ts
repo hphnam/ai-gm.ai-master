@@ -28,5 +28,18 @@ export class VenueListItemDto extends createZodDto(VenueListItemSchema) {}
 
 export const VenueDetailSchema = VenueListItemSchema.extend({
   profile: VenueProfileSchema,
+  squareLocationId: z.string().nullable(),
 })
 export class VenueDetailDto extends createZodDto(VenueDetailSchema) {}
+
+/// Manager-only endpoint payload — maps a venue to a Square location id (or
+/// clears the mapping with null). The id is intentionally typed as a free
+/// string because Square location ids are 16-char base32 without dashes; we
+/// don't enforce a regex here so a Square format change doesn't break the
+/// product. Length cap is defensive.
+export const UpdateVenueSquareLocationBodySchema = z.object({
+  squareLocationId: z.string().min(1).max(64).nullable(),
+})
+export class UpdateVenueSquareLocationBodyDto extends createZodDto(
+  UpdateVenueSquareLocationBodySchema,
+) {}

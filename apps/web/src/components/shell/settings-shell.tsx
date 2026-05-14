@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, MapPinned, Phone, Users } from 'lucide-react'
+import { Building2, MapPinned, Phone, Plug, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PageHeader } from '@/components/shell/page-header'
@@ -37,6 +37,12 @@ const TABS: SettingsTab[] = [
     href: '/settings/phone',
     icon: Phone,
     match: (p) => p.startsWith('/settings/phone'),
+  },
+  {
+    label: 'Integrations',
+    href: '/settings/integrations',
+    icon: Plug,
+    match: (p) => p.startsWith('/settings/integrations'),
   },
 ]
 

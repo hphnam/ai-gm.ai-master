@@ -105,3 +105,48 @@ export function useComposeNotification() {
     },
   })
 }
+
+export type NotificationReply = {
+  id: string
+  notificationId: string
+  body: string
+  createdAt: string
+  author: { id: string; name: string | null; email: string }
+}
+
+const REPLIES_KEY = (notificationId: string) =>
+  ['notifications', 'replies', notificationId] as const
+
+/// Reply thread for a single notification. Server enforces participation —
+/// non-participants get 403 and react-query stores it as an error. The UI
+/// keeps the thread closed in that case (the bell row only opens on click,
+/// which we gate on participant status client-side too).
+export function useNotificationReplies(
+  notificationId: string | null,
+  opts?: { enabled?: boolean },
+) {
+  return useQuery<{ replies: NotificationReply[] }>({
+    queryKey: notificationId ? REPLIES_KEY(notificationId) : ['notifications', 'replies', 'none'],
+    queryFn: ({ signal }) =>
+      apiFetch<{ replies: NotificationReply[] }>(`/notifications/${notificationId}/replies`, {
+        signal,
+      }),
+    enabled: Boolean(notificationId) && (opts?.enabled ?? true),
+    staleTime: 10_000,
+  })
+}
+
+export function useComposeReply() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { notificationId: string; body: string }) => {
+      return apiPost<{ reply: NotificationReply }>(
+        `/notifications/${input.notificationId}/replies`,
+        { body: input.body },
+      )
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: REPLIES_KEY(vars.notificationId) })
+    },
+  })
+}

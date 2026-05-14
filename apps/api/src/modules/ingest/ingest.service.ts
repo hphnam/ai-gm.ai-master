@@ -16,6 +16,7 @@ import {
   type TabularExtractionResult,
   UUID_RE,
 } from '../../types'
+import { ExpiryExtractorService } from '../compliance/expiry-extractor.service'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 import { IndexerService } from '../indexer/indexer.service'
 import { inferColumnTypes } from '../tabular/infer-column-types'
@@ -74,6 +75,7 @@ export class IngestService implements OnModuleInit {
     private readonly embeddings: EmbeddingsService,
     private readonly indexer: IndexerService,
     private readonly sectionDetector: SectionDetector,
+    private readonly expiryExtractor: ExpiryExtractorService,
   ) {}
 
   onModuleInit() {
@@ -189,6 +191,23 @@ export class IngestService implements OnModuleInit {
         contentLength: input.content.length,
       },
     })
+
+    // Wave 2 — compliance / expiry extractor runs once per new doc. Soft-fails
+    // (try/catch + the service's own internal error handling): the doc still
+    // indexes even if the Haiku classifier hiccups, and a non-compliance doc
+    // returns null silently.
+    try {
+      await this.expiryExtractor.extractAndStore(id, input.organizationId)
+    } catch (err) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'ingest.expiry_extractor_failed',
+          knowledgeItemId: id,
+          orgId: hashOrgId(input.organizationId),
+          message: (err as Error)?.message ?? 'unknown',
+        }),
+      )
+    }
 
     return { id, metadata: parsed, aiSummary: parsed.summary ?? null }
   }

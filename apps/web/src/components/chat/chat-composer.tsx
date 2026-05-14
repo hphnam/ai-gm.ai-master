@@ -14,7 +14,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { Recipient } from '@/lib/hooks/use-notifications'
 import { cn } from '@/lib/utils'
+import {
+  type ChipMention,
+  detectMentionTrigger,
+  insertMention,
+  MentionPicker,
+  pruneMissingMentions,
+  serializeMentions,
+} from './mention-picker'
 
 const VOICE_CONSENT_KEY = 'gm.voice.consent.v1'
 
@@ -99,8 +108,70 @@ export function ChatComposer({
       // localStorage blocked (private mode) — treat as un-granted; user will be re-asked.
     }
   }, [])
-  const { ref: formRef, ...rest } = register('userMessage')
+  const { ref: formRef, onBlur: rhfOnBlur, ...rest } = register('userMessage')
   const value = watch('userMessage')
+
+  // @-mention picker — opens whenever the caret sits inside an active "@..."
+  // fragment in the textarea. Trigger detection runs on every keystroke + on
+  // every selection change; the picker reads the same `mentionQuery` to
+  // render itself. The recipientsList query is enabled lazily by the picker
+  // so we don't fan out a fetch until someone actually types '@'.
+  const [mentionState, setMentionState] = useState<{
+    query: string
+    triggerStart: number
+  } | null>(null)
+  // Picker-inserted chips. Visible text holds `@Name`; we keep the userId
+  // mapping here and reattach it at submit time via serializeMentions. A
+  // value-change effect drops entries whose `@Name` no longer appears in the
+  // text (user backspaced the chip) so this list never grows unbounded.
+  const [chipMentions, setChipMentions] = useState<ChipMention[]>([])
+  const recomputeMention = useCallback(() => {
+    const el = textareaRef.current
+    if (!el) {
+      setMentionState(null)
+      return
+    }
+    const caret = el.selectionStart ?? 0
+    const trigger = detectMentionTrigger(el.value, caret)
+    setMentionState(trigger)
+  }, [])
+  const onMentionPick = useCallback(
+    (member: Recipient) => {
+      const el = textareaRef.current
+      if (!el || !mentionState) return
+      const caret = el.selectionStart ?? mentionState.triggerStart
+      const {
+        value: nextValue,
+        nextCaret,
+        mention,
+      } = insertMention(el.value, mentionState.triggerStart, caret, member)
+      setValue('userMessage', nextValue, { shouldDirty: true })
+      setChipMentions((prev) => [...prev, mention])
+      setMentionState(null)
+      // Restore caret position on the next frame — RHF's controlled-ish flow
+      // re-renders the textarea, so we can't set selection synchronously.
+      requestAnimationFrame(() => {
+        const elNow = textareaRef.current
+        if (!elNow) return
+        elNow.focus()
+        elNow.setSelectionRange(nextCaret, nextCaret)
+      })
+    },
+    [mentionState, setValue],
+  )
+  // Cover the voice-transcription path: `setValue` doesn't fire DOM input
+  // events, so onInput-driven recomputeMention never sees voice-dictated
+  // "@...". Re-run trigger detection whenever the watched form value
+  // changes — picks up programmatic setValue calls from anywhere. Same
+  // effect prunes the chipMentions list so stale entries (user deleted the
+  // chip) don't leak userIds at submit time.
+  useEffect(() => {
+    recomputeMention()
+    setChipMentions((prev) => {
+      const pruned = pruneMissingMentions(value ?? '', prev)
+      return pruned.length === prev.length ? prev : pruned
+    })
+  }, [value, recomputeMention])
 
   // Detect Web Speech API support once on mount. SSR-safe: window is gated.
   useEffect(() => {
@@ -251,19 +322,34 @@ export function ChatComposer({
       toast.error('Image upload is unavailable here.')
       return
     }
+    // Reattach userIds to mention chips before sending — the textarea only
+    // ever holds `@Name`, but the agent's tool dispatchers expect the full
+    // `@[Name](userId)` wire format so it can pass canonical assigneeUserId /
+    // recipientUserId without a disambiguation round-trip.
+    const sendText = serializeMentions(text, chipMentions)
     // Clear + refocus synchronously so pressing enter feels instant; the send
     // happens in the background. Any error is surfaced by the parent via toast.
     reset({ userMessage: '' })
     setAttachedImage(null)
+    setChipMentions([])
     setFocus('userMessage')
     if (image && onSubmitWithImage) {
-      onSubmitWithImage(text, image).catch(() => undefined)
+      onSubmitWithImage(sendText, image).catch(() => undefined)
     } else {
-      onSubmit(text).catch(() => undefined)
+      onSubmit(sendText).catch(() => undefined)
     }
   })
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // When the mention picker is open it owns Enter / Tab / Escape / arrows.
+    // The picker's document-level keydown listener will preventDefault and
+    // handle the keystroke before this React handler runs — but we ALSO need
+    // to skip the submit branch so a closed picker that just opened on this
+    // very Enter doesn't double-fire.
+    if (mentionState && (e.key === 'Enter' || e.key === 'Tab')) {
+      // Picker takes priority; don't submit.
+      return
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       submit()
@@ -338,7 +424,22 @@ export function ChatComposer({
           }
           disabled={inputDisabled}
           onKeyDown={onKeyDown}
+          // Recompute the mention trigger on every input + selection change.
+          // RHF owns onChange via {...rest}; we layer onInput / onSelect /
+          // onClick on top — React fires onInput AFTER RHF's onChange so the
+          // caret value is up-to-date here. Voice-driven setValue() still
+          // works because the effect on `value` below covers that path.
+          onInput={recomputeMention}
+          onSelect={recomputeMention}
+          onClick={recomputeMention}
           {...rest}
+          // Wrap RHF's onBlur so we close the picker on focus loss without
+          // losing the validation hook. Spread order matters: this onBlur
+          // must come AFTER {...rest} to override RHF's.
+          onBlur={(e) => {
+            setMentionState(null)
+            rhfOnBlur(e)
+          }}
           ref={(el) => {
             formRef(el)
             textareaRef.current = el
@@ -437,6 +538,12 @@ export function ChatComposer({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <MentionPicker
+        anchor={textareaRef.current}
+        query={mentionState ? mentionState.query : null}
+        onSelect={onMentionPick}
+        onClose={() => setMentionState(null)}
+      />
     </form>
   )
 }

@@ -2,9 +2,13 @@ import { Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
 import { IngestModule } from '../ingest/ingest.module'
+// IntegrationsModule is @Global — no import needed for the registry, but we
+// keep one here for explicitness around the chat → integrations dependency.
+import { IntegrationsModule } from '../integrations/integrations.module'
 import { RealtimeModule } from '../realtime/realtime.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
 import { TabularModule } from '../tabular/tabular.module'
+import { TasksModule } from '../tasks/tasks.module'
 import { ChatController } from './chat.controller'
 import { ChatService } from './chat.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -26,6 +30,8 @@ import { UserProfileService } from './user-profile.service'
     TabularModule,
     ChatV2Module,
     RealtimeModule,
+    TasksModule,
+    IntegrationsModule,
   ],
   controllers: [ChatController],
   providers: [

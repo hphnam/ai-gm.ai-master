@@ -23,6 +23,17 @@ export const TOOL_NAMES = [
   // "Note for <person>" — creates an in-app notification for an org member.
   // Resolve by name fragment OR explicit recipientUserId (after disambiguation).
   'leave_note_for_user',
+  // Wave 1 — Tasks & Reminders. Durable action items with optional due date.
+  // create_task creates one (default assignee = author); complete_task marks
+  // an existing task done; list_my_tasks summarises the user's open inbox.
+  'create_task',
+  'complete_task',
+  'list_my_tasks',
+  // Generative-UI surface — renders the matched checklist as an interactive
+  // tickable walkthrough on the client. Use AFTER the user asks for a procedure
+  // ("what's the opening checklist", "walk me through closing") instead of
+  // pasting the steps into the reply as markdown.
+  'present_checklist',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -177,6 +188,52 @@ export const TOOL_INPUT_SCHEMAS = {
         message: 'exactly one of recipientNameQuery or recipientUserId must be provided',
       },
     ),
+  create_task: z
+    .object({
+      /// The task body — what needs to be done. Captured verbatim from the
+      /// user's request after stripping the "remind me to / follow up on /
+      /// before Friday" preamble. 3-2000 chars.
+      body: z.string().trim().min(3).max(2000),
+      /// ISO 8601 datetime in UTC. Compute from the user's phrasing using
+      /// <current_context>.now — e.g. "before Friday" with a Tuesday context →
+      /// Friday 17:00 in the venue's timezone, expressed as UTC. Omit if the
+      /// user gave no deadline ("follow up with the brewery" with no date).
+      dueAt: z.string().datetime().optional(),
+      /// Defaults to the current user. Pass either assigneeNameQuery (name or
+      /// email fragment ≥2 chars) OR assigneeUserId (the canonical id after
+      /// a needs-disambiguation result). Omit BOTH for a self-task.
+      assigneeNameQuery: z.string().trim().min(2).max(120).optional(),
+      assigneeUserId: z.string().min(1).max(64).optional(),
+      /// Free-form tag — `follow_up`, `compliance`, `briefing`, `ops`, etc.
+      /// Optional; defaults to null.
+      category: z.string().trim().min(1).max(64).optional(),
+    })
+    .refine((v) => !(v.assigneeNameQuery && v.assigneeUserId), {
+      message: 'pass at most one of assigneeNameQuery or assigneeUserId',
+    }),
+  complete_task: z.object({
+    taskId: UUID,
+  }),
+  list_my_tasks: z.object({
+    /// Default 'open' for the inbox surface; 'overdue' filters to tasks past
+    /// dueAt; 'this_week' returns open tasks due in the next 7 days
+    /// (including overdue); 'all' includes done + cancelled.
+    scope: z.enum(['open', 'overdue', 'this_week', 'all']).optional(),
+    limit: z.number().int().min(1).max(50).optional(),
+  }),
+  present_checklist: z
+    .object({
+      /// Direct id (preferred when you already have it from a find_knowledge
+      /// hit's metadata.checklistId).
+      checklistId: UUID.optional(),
+      /// Free-text intent — the dispatcher matches it against checklist titles
+      /// in the org. Use when you don't have the id yet ("opening checklist",
+      /// "closing procedure", "cellar checks").
+      intent: z.string().trim().min(2).max(120).optional(),
+    })
+    .refine((v) => Boolean(v.checklistId) || Boolean(v.intent), {
+      message: 'pass one of checklistId or intent',
+    }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
 export type ToolInput<T extends ToolName> = z.infer<(typeof TOOL_INPUT_SCHEMAS)[T]>
@@ -485,9 +542,93 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
     },
   },
   {
+    name: 'create_task',
+    description:
+      'Create a durable task / reminder for an org member. FIRES on "remind me to…", "remind <name> to…", "follow up with…", "before Friday…", "next week…", "by the end of the day…", "make sure to…" — anything that captures a future action with or without a deadline. Defaults assignee to the CURRENT USER when the phrasing is reflexive ("remind me", "I need to") or omits a recipient. For a NAMED recipient, pass `assigneeNameQuery` with the name or email fragment OR `assigneeUserId` directly when the user\'s message contains an @[Name](userId) mention chip — use the userId verbatim and skip the name lookup entirely. ROLE GATE: only managers and owners can assign tasks to OTHER users. If <current_context>.userRole is "staff" and the user asks to assign someone else, DON\'T call the tool — refuse politely with "Only managers and owners can set tasks for other people — I can add this to your own list instead, or you can ask your manager to assign it." Self-tasks for staff are fine. ALWAYS returns ok:true with `data.status`: (a) `status:"created"` with `{ id, body, dueAt, assigneeName }` — saved, confirm in one line with the assignee name + a short echo + the parsed due date; (b) `status:"needs-disambiguation"` with `candidates: [{userId,name,role}]` — multiple matches on assigneeNameQuery, ASK the user which one (numbered by name + role), then re-call with `assigneeUserId` + the same body/dueAt; (c) `status:"no-match"` — apologise and ask the user to clarify. ok:false with reason:"invalid-input" and message "staff can only set tasks for themselves…" means the server enforced the role gate — relay the error to the user. dueAt MUST be ISO 8601 in UTC; compute it from <current_context>.now (the user\'s today + their timezone) — e.g. on a Tuesday at 14:00 GMT, "before Friday" → Friday 17:00 local = the UTC equivalent. Skip dueAt for open-ended tasks ("follow up with the brewery"). Do NOT call leave_note_for_user for tasks — tasks have a status and due date; notes do not. Do NOT call record_kb_gap for tasks. After a successful save, confirm with one line: e.g. "Got it — I\'ll remind you Thursday evening to call the brewery."',
+    input_schema: {
+      type: 'object',
+      properties: {
+        body: {
+          type: 'string',
+          description:
+            'The task content (3-2000 chars). Strip the routing preamble ("remind me to", "follow up on"). Keep specifics: who, what, why.',
+        },
+        dueAt: {
+          type: 'string',
+          description:
+            'ISO 8601 UTC datetime. Compute from <current_context>.now + timezone. Omit if no deadline was given.',
+        },
+        assigneeNameQuery: {
+          type: 'string',
+          description:
+            'Name or email fragment of an org member (≥2 chars). Omit for a SELF task ("remind me to…"). Use this for "remind <name> to…".',
+        },
+        assigneeUserId: {
+          type: 'string',
+          description: 'Canonical org member id — pass on the disambiguation follow-up call.',
+        },
+        category: {
+          type: 'string',
+          description: 'Free-form tag: follow_up, compliance, briefing, ops, etc. Optional.',
+        },
+      },
+      required: ['body'],
+    },
+  },
+  {
+    name: 'complete_task',
+    description:
+      'Mark a task done. FIRES when the user says "done with…", "finished the…", "ticked off the brewery", "task <id> is complete", or otherwise references a specific task they want to close. Requires the task UUID — get it from list_my_tasks (or the surfaced id in your own prior turn). Returns { ok: true, data: { id, status: \'done\', completedAt } } on success, ok:false reason:\'not-found\' if the id doesn\'t exist in this org, ok:false reason:\'invalid-input\' if the caller isn\'t the assignee or creator. NEVER guess a taskId — list first.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string', description: 'UUID of the task to mark done.' },
+      },
+      required: ['taskId'],
+    },
+  },
+  {
+    name: 'list_my_tasks',
+    description:
+      'List the current user\'s tasks. FIRES on "what\'s on my list?", "what tasks do I have?", "what\'s due this week?", "anything overdue?". `scope` defaults to "open" (everything not done/cancelled); use "overdue" for past-due-only; "this_week" for the next 7 days INCLUDING overdue; "all" for the full history including done + cancelled. Returns { ok: true, data: { tasks: [{ id, body, dueAt, status, category, assigneeName, creatorName, createdAt }], openCount, overdueCount, scope } }. Each task carries `assigneeName` and `creatorName` — when `creatorName` is non-null and the user appears as the creator of a task whose `assigneeName` is someone else, group those separately as "tasks you set for X". Otherwise summarise tightly by due window (overdue / due-soon / no-date). Include each task\'s id parenthetically only if the user is likely to act on it next ("the brewery call (task xyz…) is overdue") — otherwise omit ids to keep the reply tight.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        scope: {
+          type: 'string',
+          enum: ['open', 'overdue', 'this_week', 'all'],
+          description: 'Filter window. Defaults to "open".',
+        },
+        limit: { type: 'integer', description: 'Max rows (1-50, default 25).' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'present_checklist',
+    description:
+      'Surface an INTERACTIVE checklist UI on the user\'s screen — the steps render as a tickable walkthrough they can complete one by one, not a wall of markdown. FIRES when the user wants a procedure walked through: "what\'s the opening checklist", "walk me through closing", "the cellar checks", "how do I open up", "what do I need to do at the end of the night". Call AFTER (or in parallel with) find_knowledge so the user gets both the citation and the live tickable list. If you already have a checklistId from a find_knowledge hit\'s metadata.checklistId, pass it directly. Otherwise pass a short `intent` string (the user\'s phrasing minus the question words — "opening", "closing procedure", "cellar prep") and the dispatcher resolves it. Returns { ok: true, data: { checklistId, title, steps: [{ index, content }], stepCount } } on success — the frontend renders the live walkthrough. On ok:false reason:"no-data" tell the user that procedure isn\'t recorded yet and offer to capture it (save_knowledge_doc flow). DO NOT call this tool for ad-hoc lists ("things I need to do today" — that\'s list_my_tasks). DO NOT also paste the steps in your reply — once the card renders, your reply should be a brief one-liner like "Here\'s the opening run — tick each step as you go."',
+    input_schema: {
+      type: 'object',
+      properties: {
+        checklistId: {
+          type: 'string',
+          description:
+            "UUID of the Checklist row. Pull from a find_knowledge hit's metadata.checklistId when available.",
+        },
+        intent: {
+          type: 'string',
+          description:
+            'Short phrase describing what kind of checklist the user wants ("opening", "closing", "cellar prep"). The dispatcher matches it against checklist titles.',
+        },
+      },
+      required: [],
+    },
+  },
+  {
     name: 'leave_note_for_user',
     description:
-      'Leave an in-app note for another member of the org — fires when the user says "note for <name>", "tell <name>", "leave a note for <name>", "let <name> know", "remind <name>", etc. Pass `recipientNameQuery` with the name OR email fragment (>=2 chars) AND `body` with the note text (verbatim, cleaned of the routing preamble). The dispatcher resolves the query ILIKE against User.name AND User.email across org members. ALWAYS returns ok:true with a tagged `data.status`: (a) `status:"created"` with `{ id, recipientName }` — exactly one match, note saved, confirm to the user; (b) `status:"needs-disambiguation"` with `candidates: [{userId,name,role}]` — multiple matches, ASK the user which one (number them in your reply by name + role), then re-call this tool with `recipientUserId` (omit recipientNameQuery) + the same body; (c) `status:"no-match"` with empty candidates — apologise and ask the user to clarify. ok:false with reason:"error" or "invalid-input" indicates a tool failure — surface the detail to the user. Do NOT save the note as a knowledge doc. Do NOT call record_kb_gap for it. After a successful save, confirm to the user with the recipient name and a short echo of the body.',
+      'Leave an in-app note (passive message, no due date) for another member of the org — fires when the user says "note for <name>", "tell <name>", "leave a note for <name>", "let <name> know", "ping <name>", etc. Do NOT use for tasks / reminders / future actions with a deadline — those route to create_task. Recipient resolution: if the user\'s message contains an `@[Name](userId)` mention chip, pass `recipientUserId` from the parens verbatim and OMIT `recipientNameQuery` — chips are unambiguous, no lookup needed. Otherwise pass `recipientNameQuery` with the name OR email fragment (>=2 chars). Always pass `body` with the note text (verbatim, cleaned of the routing preamble). The dispatcher resolves the query ILIKE against User.name AND User.email across org members. ALWAYS returns ok:true with a tagged `data.status`: (a) `status:"created"` with `{ id, recipientName }` — exactly one match, note saved, confirm to the user; (b) `status:"needs-disambiguation"` with `candidates: [{userId,name,role}]` — multiple matches, ASK the user which one (number them in your reply by name + role), then re-call this tool with `recipientUserId` (omit recipientNameQuery) + the same body; (c) `status:"no-match"` with empty candidates — apologise and ask the user to clarify. ok:false with reason:"error" or "invalid-input" indicates a tool failure — surface the detail to the user. Do NOT save the note as a knowledge doc. Do NOT call record_kb_gap for it. After a successful save, confirm to the user with the recipient name and a short echo of the body.',
     input_schema: {
       type: 'object',
       properties: {

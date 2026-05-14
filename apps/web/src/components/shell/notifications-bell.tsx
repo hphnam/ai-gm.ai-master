@@ -17,9 +17,11 @@ import {
   type Notification,
   type Recipient,
   useComposeNotification,
+  useComposeReply,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationRecipients,
+  useNotificationReplies,
   useNotifications,
   useUnreadNotificationsCount,
 } from '@/lib/hooks/use-notifications'
@@ -311,7 +313,7 @@ function NotePreviewDialog({
 }) {
   return (
     <Dialog open={!!note} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[520px] gap-3 p-5">
+      <DialogContent className="max-w-[560px] gap-3 p-5">
         {note ? (
           <>
             <DialogHeader>
@@ -328,10 +330,86 @@ function NotePreviewDialog({
             <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
               {note.body}
             </p>
+            <NoteReplyThread note={note} />
           </>
         ) : null}
       </DialogContent>
     </Dialog>
+  )
+}
+
+function NoteReplyThread({ note }: { note: Notification }) {
+  // System notes (author === null) have no reply path on the server. Skip the
+  // GET entirely — both to avoid a wasted RTT per dialog open and because the
+  // server explicitly rejects /replies on system notes (the response is 400
+  // not an empty list).
+  const isSystemNote = note.author === null
+  const replies = useNotificationReplies(note.id, { enabled: !isSystemNote })
+  const compose = useComposeReply()
+  const [body, setBody] = useState('')
+  const rows = replies.data?.replies ?? []
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = body.trim()
+    if (trimmed.length === 0 || compose.isPending) return
+    try {
+      await compose.mutateAsync({ notificationId: note.id, body: trimmed })
+      setBody('')
+    } catch (err) {
+      toast.error(`Couldn't send reply: ${composeErrorMessage(err)}`)
+    }
+  }
+
+  // Render nothing for system notes — no thread to show, no reply path.
+  if (isSystemNote) return null
+
+  return (
+    <div className="mt-1 flex flex-col gap-2 border-t border-border pt-3">
+      {replies.isLoading && rows.length === 0 ? (
+        <p className="text-[11px] italic text-muted-foreground">Loading replies…</p>
+      ) : rows.length > 0 ? (
+        <ul className="flex flex-col gap-2">
+          {rows.map((r) => (
+            <li
+              key={r.id}
+              className="flex flex-col gap-0.5 rounded-md bg-muted/40 px-3 py-2 text-sm"
+            >
+              <div className="flex items-baseline justify-between gap-2 text-[11px] text-foreground/60">
+                <span className="font-medium text-foreground/80">
+                  {r.author.name ?? r.author.email}
+                </span>
+                <time dateTime={r.createdAt}>{formatRelative(r.createdAt)}</time>
+              </div>
+              <p className="whitespace-pre-wrap break-words text-sm leading-snug text-foreground">
+                {r.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-[11px] italic text-muted-foreground">No replies yet.</p>
+      )}
+
+      <form className="mt-1 flex items-end gap-2" onSubmit={onSubmit}>
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Reply…"
+          rows={1}
+          maxLength={2000}
+          disabled={compose.isPending}
+          className="min-h-9 max-h-32 flex-1 resize-none rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-foreground/15"
+        />
+        <button
+          type="submit"
+          disabled={compose.isPending || body.trim().length === 0}
+          className="shrink-0 rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background hover:brightness-110 disabled:opacity-50"
+        >
+          {compose.isPending ? 'Sending…' : 'Send'}
+        </button>
+      </form>
+    </div>
   )
 }
 

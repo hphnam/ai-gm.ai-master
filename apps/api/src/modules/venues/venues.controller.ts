@@ -18,6 +18,7 @@ import { RoleGuard } from '../auth/role.guard'
 import {
   CreateVenueBodyDto,
   UpdateVenueProfileDto,
+  UpdateVenueSquareLocationBodyDto,
   VenueDetailDto,
   VenueIdParamDto,
   VenueListItemDto,
@@ -69,5 +70,24 @@ export class VenuesController {
     @CurrentOrg() org: { id: string },
   ): Promise<VenueDetailDto> {
     return this.venuesService.updateProfile(params.id, org.id, body) as Promise<VenueDetailDto>
+  }
+
+  /// Map (or unmap) a venue to a Square location id. Manager-only.
+  /// Body: { squareLocationId: string | null }.
+  @Patch(':id/square-location')
+  @HttpCode(HttpStatus.OK)
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: VenueDetailDto })
+  updateSquareLocation(
+    @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
+    @Body(new ZodValidationPipe(UpdateVenueSquareLocationBodyDto))
+    body: UpdateVenueSquareLocationBodyDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<VenueDetailDto> {
+    return this.venuesService.updateSquareLocation(
+      params.id,
+      org.id,
+      body.squareLocationId,
+    ) as Promise<VenueDetailDto>
   }
 }

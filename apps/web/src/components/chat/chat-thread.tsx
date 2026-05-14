@@ -17,6 +17,10 @@ type Props = {
   onRegenerate?: () => void
   feedbackByMessageId?: Record<string, 'up' | 'down' | 'regenerate'>
   verifyByMessageId?: Record<string, VerifyEntry>
+  /// Re-prompt the agent — used by generative-UI cards (disambiguation
+  /// picks, "draft order", refine actions). Defaults to onFollowUpSelect.
+  onPrompt?: (text: string) => void | Promise<void>
+  venueId?: string | null
 }
 
 export function ChatThread({
@@ -27,6 +31,8 @@ export function ChatThread({
   onRegenerate,
   feedbackByMessageId,
   verifyByMessageId,
+  onPrompt,
+  venueId,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -63,6 +69,8 @@ export function ChatThread({
             onRegenerate={i === lastAssistantIdx ? onRegenerate : undefined}
             initialFeedback={feedbackByMessageId?.[m.id] ?? null}
             verify={verifyByMessageId?.[m.id] ?? null}
+            onPrompt={onPrompt ?? onFollowUpSelect}
+            venueId={venueId}
           />
         </li>
       ))}

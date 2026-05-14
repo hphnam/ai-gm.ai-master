@@ -15,12 +15,15 @@ import { CurrentOrg, CurrentUser } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import {
   ComposeNotificationBodyDto,
+  ComposeReplyBodyDto,
+  ListNotificationRepliesResponseDto,
   ListNotificationsQueryDto,
   ListNotificationsResponseDto,
   ListRecipientsResponseDto,
   MarkAllReadResponseDto,
   NotificationIdParamDto,
   SimpleNotificationResponseDto,
+  SingleReplyResponseDto,
   UnreadCountResponseDto,
 } from './dto/notifications.dto'
 import { NotificationsService } from './notifications.service'
@@ -103,5 +106,29 @@ export class NotificationsController {
       body.body,
     )
     return { notification }
+  }
+
+  @Get(':id/replies')
+  @ApiResponse({ status: 200, type: ListNotificationRepliesResponseDto })
+  async listReplies(
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @Param(new ZodValidationPipe(NotificationIdParamDto)) params: NotificationIdParamDto,
+  ): Promise<ListNotificationRepliesResponseDto> {
+    const replies = await this.service.listReplies(org.id, user.id, params.id)
+    return { replies }
+  }
+
+  @Post(':id/replies')
+  @HttpCode(201)
+  @ApiResponse({ status: 201, type: SingleReplyResponseDto })
+  async composeReply(
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @Param(new ZodValidationPipe(NotificationIdParamDto)) params: NotificationIdParamDto,
+    @Body(new ZodValidationPipe(ComposeReplyBodyDto)) body: ComposeReplyBodyDto,
+  ): Promise<SingleReplyResponseDto> {
+    const { reply } = await this.service.composeReply(org.id, user.id, params.id, body.body)
+    return { reply }
   }
 }

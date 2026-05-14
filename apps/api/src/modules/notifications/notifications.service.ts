@@ -1,6 +1,39 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
+
+// Per-author per-thread sliding-window throttle for reply writes. Single
+// process — sufficient for the current Nest server; swap for a Redis token
+// bucket when we scale horizontally. Reply spam is the obvious DoS vector
+// here (a participant could otherwise flood another participant's bell), so
+// we cap at 8 replies/minute per (author, thread) pair.
+const REPLY_WINDOW_MS = 60_000
+const REPLY_LIMIT_PER_WINDOW = 8
+const replyRateLimit = (() => {
+  const buckets = new Map<string, number[]>()
+  return {
+    allow(authorUserId: string, notificationId: string): boolean {
+      const key = `${authorUserId}:${notificationId}`
+      const now = Date.now()
+      const cutoff = now - REPLY_WINDOW_MS
+      const recent = (buckets.get(key) ?? []).filter((t) => t > cutoff)
+      if (recent.length >= REPLY_LIMIT_PER_WINDOW) {
+        buckets.set(key, recent)
+        return false
+      }
+      recent.push(now)
+      buckets.set(key, recent)
+      return true
+    },
+  }
+})()
 
 export type NotificationRow = {
   id: string
@@ -10,6 +43,14 @@ export type NotificationRow = {
   createdAt: string
   readAt: string | null
   author: { id: string; name: string | null; email: string } | null
+}
+
+export type NotificationReplyRow = {
+  id: string
+  notificationId: string
+  body: string
+  createdAt: string
+  author: { id: string; name: string | null; email: string }
 }
 
 const KNOWN_SOURCES = new Set(['chat', 'whatsapp', 'manual'])
@@ -175,6 +216,153 @@ export class NotificationsService {
     return row
   }
 
+  /// System-authored notification — no human author, no self-recipient guard,
+  /// no org-member resolution. Used by background jobs (task reminders, expiry
+  /// scheduler, briefings) that need to put a row in someone's inbox without
+  /// pretending to be another user. Caller is responsible for scoping orgId
+  /// and recipientUserId; we still emit the realtime event so the bell badge
+  /// updates without a refresh.
+  async composeSystem(
+    orgId: string,
+    recipientUserId: string,
+    body: string,
+  ): Promise<NotificationRow> {
+    const created = await prisma.notification.create({
+      data: {
+        organizationId: orgId,
+        recipientUserId,
+        authorUserId: null,
+        source: 'chat',
+        body,
+      },
+      select: {
+        id: true,
+        body: true,
+        source: true,
+        status: true,
+        createdAt: true,
+        readAt: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
+    })
+    const row = this.toRow(created)
+    this.realtime.emitNotificationCreated(recipientUserId, {
+      id: row.id,
+      body: row.body,
+      source: row.source,
+      createdAt: row.createdAt,
+      author: row.author,
+    })
+    return row
+  }
+
+  /// Wave 4 — reply thread on a Notification. Only participants (recipient
+  /// or author of the parent note) may read or write replies. System notes
+  /// (authorUserId: null) have no reply path — return early so an attacker
+  /// can't keep a thread "open" by replying to compliance reminders.
+  async listReplies(
+    orgId: string,
+    userId: string,
+    notificationId: string,
+  ): Promise<NotificationReplyRow[]> {
+    const parent = await prisma.notification.findFirst({
+      where: { id: notificationId, organizationId: orgId },
+      select: { recipientUserId: true, authorUserId: true },
+    })
+    // Collapse "not found" and "not a participant" into a single 404 — surfacing
+    // a 403 for the latter would let an attacker enumerate notification ids by
+    // comparing status codes. Notification UUIDs are v4 (high entropy) but the
+    // oracle is trivial to remove and there's no legitimate reason to
+    // distinguish here.
+    if (!parent) throw new NotFoundException({ error: 'notification-not-found' })
+    if (parent.recipientUserId !== userId && parent.authorUserId !== userId) {
+      throw new NotFoundException({ error: 'notification-not-found' })
+    }
+    const replies = await prisma.notificationReply.findMany({
+      where: { notificationId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        notificationId: true,
+        body: true,
+        createdAt: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
+    })
+    return replies.map((r) => this.toReplyRow(r))
+  }
+
+  async composeReply(
+    orgId: string,
+    authorUserId: string,
+    notificationId: string,
+    body: string,
+  ): Promise<{ reply: NotificationReplyRow; participants: string[] }> {
+    const parent = await prisma.notification.findFirst({
+      where: { id: notificationId, organizationId: orgId },
+      select: { id: true, recipientUserId: true, authorUserId: true },
+    })
+    if (!parent) throw new NotFoundException({ error: 'notification-not-found' })
+    // System notes (authorUserId null) cannot be replied to — the system has
+    // no inbox to receive the reply, and a one-sided thread is a footgun
+    // ("why didn't anyone respond?"). Match the UI which hides the composer
+    // entirely on system notes.
+    if (parent.authorUserId === null) {
+      throw new BadRequestException({ error: 'notification-not-repliable' })
+    }
+    // Participation gate — only the recipient or the original author can post
+    // a reply. Collapse the 403 into 404 to avoid the same id-existence oracle
+    // the read path already closes.
+    const isParticipant =
+      parent.recipientUserId === authorUserId || parent.authorUserId === authorUserId
+    if (!isParticipant) {
+      throw new NotFoundException({ error: 'notification-not-found' })
+    }
+    // Throttle reply writes per (author, thread). Caps spam at 8/min — well
+    // above any human pace but tight enough that a scripted client can't
+    // saturate another participant's realtime channel.
+    if (!replyRateLimit.allow(authorUserId, notificationId)) {
+      throw new HttpException({ error: 'reply-rate-limit' }, HttpStatus.TOO_MANY_REQUESTS)
+    }
+
+    const created = await prisma.notificationReply.create({
+      data: { notificationId, authorUserId, body },
+      select: {
+        id: true,
+        notificationId: true,
+        body: true,
+        createdAt: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
+    })
+    const reply = this.toReplyRow(created)
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'notifications.reply',
+        orgId,
+        notificationId,
+        replyId: reply.id,
+        authorUserId,
+        bodyLength: body.length,
+      }),
+    )
+
+    const participants = [parent.recipientUserId, parent.authorUserId].filter(
+      (x): x is string => !!x,
+    )
+    this.realtime.emitNotificationReplyCreated(participants, {
+      notificationId,
+      reply: {
+        id: reply.id,
+        body: reply.body,
+        createdAt: reply.createdAt,
+        author: reply.author,
+      },
+    })
+    return { reply, participants }
+  }
+
   async listOrgMembers(
     orgId: string,
     excludeUserId: string,
@@ -220,6 +408,22 @@ export class NotificationsService {
       createdAt: r.createdAt.toISOString(),
       readAt: r.readAt?.toISOString() ?? null,
       author: r.author ? { id: r.author.id, name: r.author.name, email: r.author.email } : null,
+    }
+  }
+
+  private toReplyRow(r: {
+    id: string
+    notificationId: string
+    body: string
+    createdAt: Date
+    author: { id: string; name: string | null; email: string }
+  }): NotificationReplyRow {
+    return {
+      id: r.id,
+      notificationId: r.notificationId,
+      body: r.body,
+      createdAt: r.createdAt.toISOString(),
+      author: { id: r.author.id, name: r.author.name, email: r.author.email },
     }
   }
 }

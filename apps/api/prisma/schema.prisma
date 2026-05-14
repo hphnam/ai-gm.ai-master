@@ -19,6 +19,13 @@ model Venue {
   /// SearchableEntity on every write so the agent can retrieve "where's the
   /// fire escape" or "what's the alarm code policy" semantically.
   profile        Json     @default("{}")
+  /// External POS location identifier, scoped to whichever Integration the org
+  /// has connected. Currently set when the org connects Square — this is the
+  /// Square Location.id mapped to this venue. Future POS integrations
+  /// (Toast / Lightspeed / Clover) re-use the same column; only one POS is
+  /// expected per org at a time. Null when no POS is connected or no mapping
+  /// has been set yet.
+  squareLocationId String?
   organizationId String
   createdAt      DateTime @default(now())
 
@@ -29,6 +36,8 @@ model Venue {
   contacts           VenueContact[]
   chatConversations  ChatConversation[]
   incidentLogs       IncidentLog[]
+  tasks              Task[]
+  expiryRecords      ExpiryRecord[]
 
   @@index([organizationId])
 }
@@ -60,6 +69,12 @@ model User {
 
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsAuthored Notification[] @relation("NotificationAuthor")
+  notificationRepliesAuthored NotificationReply[] @relation("NotificationReplyAuthor")
+
+  tasksAssigned Task[] @relation("TaskAssignee")
+  tasksCreated  Task[] @relation("TaskCreator")
+
+  expiryRecords ExpiryRecord[] @relation("ExpiryRecordPerson")
 
   @@map("users")
 }
@@ -143,7 +158,10 @@ model Organization {
   whatsappInvites  WhatsappInvite[]
   whatsappSessions WhatsappSession[]
 
-  notifications Notification[]
+  notifications  Notification[]
+  tasks          Task[]
+  expiryRecords  ExpiryRecord[]
+  integrations   Integration[]
 
   @@index([slug])
   @@map("organizations")
@@ -404,6 +422,7 @@ model KnowledgeItem {
   sections        KnowledgeSection[]
   tabularRows     TabularRow[]
   tabularColumns  TabularColumn[]
+  expiryRecords   ExpiryRecord[]
 
   @@index([organizationId])
   @@index([venueId])
@@ -820,12 +839,201 @@ model Notification {
   createdAt      DateTime  @default(now())
   readAt         DateTime?
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  recipient    User         @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
-  author       User?        @relation("NotificationAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recipient    User                @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  author       User?               @relation("NotificationAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  replies      NotificationReply[]
 
   @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)])
   @@index([organizationId, recipientUserId, createdAt(sort: Desc)])
   @@map("notifications")
 }
 
+/// Wave 4 — flat reply thread on a Notification. Only the original recipient
+/// and the original author can post replies; staff vs. manager doesn't gate
+/// here (you're already a participant). Replies inherit the parent's org
+/// scope via FK cascade — deleting the parent notification cascades the
+/// thread. authorUserId is required (system-attributed notes have no
+/// downstream reply path today — the scheduler / system posts only).
+model NotificationReply {
+  id             String   @id @default(uuid())
+  notificationId String
+  authorUserId   String
+  body           String
+  createdAt      DateTime @default(now())
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  author       User         @relation("NotificationReplyAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  /// Primary thread query — list replies for one notification ordered oldest
+  /// first (matches how the UI renders).
+  @@index([notificationId, createdAt])
+  @@map("notification_replies")
+}
+
+/// Wave 1 — Tasks & Reminders. Durable action items owned by a specific org
+/// member, optionally venue-scoped and optionally tied to a chat turn that
+/// spawned them (sourceConversationId / sourceMessageId — loose references,
+/// no FK, to avoid ChatConversation back-relation churn). status:
+/// open → done | cancelled. dueAt nullable — agent may create a task without
+/// a deadline ("follow up with the brewery"). The scheduler scans tasks
+/// whose dueAt is within the reminder window AND remindedAt is null, emits a
+/// Notification to the assignee, and stamps remindedAt to avoid duplicates.
+model Task {
+  id                   String    @id @default(uuid())
+  organizationId       String
+  venueId              String?
+  assigneeUserId       String
+  /// Nullable: system-created tasks (compliance scheduler in Wave 2) have no
+  /// human creator. Agent-created tasks set this to the authoring user.
+  creatorUserId        String?
+  body                 String
+  dueAt                DateTime?
+  /// open | done | cancelled. Lifecycle is open → done (user ticks off) or
+  /// open → cancelled (user dismisses without completing).
+  status               String    @default("open")
+  /// Free-form tag (e.g. 'follow_up', 'compliance', 'briefing'). Indexed via
+  /// composite key with status for cheap inbox filters.
+  category             String?
+  /// Loose pointers to the chat turn that spawned the task. Not FKs —
+  /// keep ChatConversation/ChatMessage isolated from this surface.
+  sourceConversationId String?
+  sourceMessageId      String?
+  /// Stamp of the last reminder notification sent. Scheduler reads this to
+  /// avoid duplicate pings; reset to null on snooze (post-Wave 1).
+  remindedAt           DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  venue        Venue?       @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  assignee     User         @relation("TaskAssignee", fields: [assigneeUserId], references: [id], onDelete: Cascade)
+  creator      User?        @relation("TaskCreator", fields: [creatorUserId], references: [id], onDelete: SetNull)
+
+  /// Primary inbox query: list a user's tasks ordered by due date.
+  @@index([organizationId, assigneeUserId, status, dueAt])
+  /// Scheduler scan: open tasks with a due date in the reminder window.
+  @@index([status, dueAt])
+  @@map("tasks")
+}
+
+/// Wave 2 — Compliance & Expiry Radar. A single dated obligation: a cert that
+/// expires, a service interval that lapses, an insurance renewal date. Source
+/// is either a classified KnowledgeItem (auto-extracted on upload) or a manual
+/// entry from the owner/manager dashboard. The daily scheduler scans active
+/// records and fires a Task into the Wave 1 inbox at the 30/7/1-day windows
+/// (and on the expiry date itself), with escalating tone.
+///
+/// Category is open-text rather than an enum so the extractor can surface new
+/// kinds (e.g. boiler service, lift LOLER) without a migration. The list is
+/// surfaced through CATEGORIES in compliance.dto.ts which is the canonical
+/// public contract — keep these in sync.
+model ExpiryRecord {
+  id              String    @id @default(uuid())
+  organizationId  String
+  /// Most certs are venue-scoped (food hygiene per-venue, premises licence).
+  /// Org-wide kinds (group public liability insurance, owner's personal
+  /// licence) leave venueId null.
+  venueId         String?
+  /// Source KnowledgeItem when auto-extracted. Null for manual entries.
+  /// SET NULL on doc delete — the obligation outlives the source doc.
+  knowledgeItemId String?
+  title           String
+  /// Free-form category slug (food_hygiene, personal_licence, premises_licence,
+  /// pat, gas_safety, fire_risk, insurance, equipment_service). See CATEGORIES.
+  category        String
+  expiresAt       DateTime
+  /// Staff-cert link to an org member when we can resolve their name. Falls
+  /// back to personName (free text) for staff who aren't users in the system.
+  personUserId    String?
+  personName      String?
+  /// "Beer line", "Extractor fan #2", etc. — for equipment_service kind.
+  assetName       String?
+  renewalCostGbp  Decimal?  @db.Decimal(10, 2)
+  /// active → renewed | expired | dismissed.
+  ///   active   default; scheduler fires reminders.
+  ///   renewed  closed because a new cert was uploaded / dates were rolled
+  ///            forward (UI patches expiresAt; status flips back to active).
+  ///   expired  expiresAt passed AND no renewal; scheduler can keep nudging
+  ///            depending on category (food hygiene = closure risk → keep
+  ///            nudging; minor equipment = stop after grace window).
+  ///   dismissed manually closed by the user — scheduler never touches again.
+  status          String    @default("active")
+  /// Per-window CAS stamps so the scheduler emits each reminder exactly once.
+  /// 30/7/1-day windows + overdue (set when expiresAt < now). NULL = not yet
+  /// reminded; updating expiresAt forward (renewal) MUST reset all four to
+  /// reopen the reminder window.
+  reminded30At    DateTime?
+  reminded7At     DateTime?
+  reminded1At     DateTime?
+  remindedOverdueAt DateTime?
+  /// Extractor confidence (0.00–1.00). NULL for manual entries. Low confidence
+  /// (<0.6) surfaces a "verify before relying on it" banner in the UI.
+  extractionConfidence Decimal? @db.Decimal(3, 2)
+  /// Optional notes appended in the dashboard.
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  venue         Venue?         @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  knowledgeItem KnowledgeItem? @relation(fields: [knowledgeItemId], references: [id], onDelete: SetNull)
+  person        User?          @relation("ExpiryRecordPerson", fields: [personUserId], references: [id], onDelete: SetNull)
+
+  /// Primary list query: dashboard "Expiring Soon" panel per org.
+  @@index([organizationId, status, expiresAt])
+  /// Scheduler scan — active records ordered by expiry. Hits the same composite
+  /// covering index as the list query.
+  @@index([status, expiresAt])
+  /// Per-doc reverse lookup so reingest can update the existing record instead
+  /// of creating a duplicate.
+  @@index([knowledgeItemId])
+  @@map("expiry_records")
+}
+
+
+/// Third-party integrations connected per organization (Square, Xero, Toast, …).
+/// One row per (org, provider). Holds whichever credentials the connection needs:
+/// PAT (paste-in, current default) stores a single encrypted access token; OAuth
+/// (future) re-uses the same row + extends with refreshToken + tokenExpiresAt.
+/// accessToken / refreshToken are AES-256-GCM ciphertext with the auth tag and
+/// IV embedded — never write plaintext tokens to this table.
+model Integration {
+  id                String   @id @default(uuid())
+  organizationId    String
+  /// Provider slug: 'square' (others land here as we add them).
+  provider          String
+  /// active | disconnected | error. Disconnected rows are kept around so we
+  /// can show "you previously connected X" in the UI; tools refuse them.
+  status            String   @default("active")
+  /// 'pat' | 'oauth'. PAT path stores accessToken only; OAuth additionally
+  /// uses refreshToken + tokenExpiresAt + externalAccountId.
+  authMode          String
+  /// AES-256-GCM ciphertext (base64). Decrypted at use-time inside the
+  /// IntegrationsService; never returned through the API.
+  accessTokenCipher String
+  refreshTokenCipher String?
+  tokenExpiresAt    DateTime?
+  /// Scopes granted at connect time (OAuth) or hand-entered (PAT). String[]
+  /// because Postgres array is fine for short lists.
+  scopes            String[] @default([])
+  /// Square merchant_id / Xero tenant_id / etc. — provider's own account
+  /// identifier. Used for sanity-checking the connection didn't get swapped.
+  externalAccountId String?
+  /// 'production' | 'sandbox'. Square ships separate hosts per environment.
+  environment       String   @default("production")
+  /// Provider-specific bag (rate-limit hints, last-error detail, etc.). Never
+  /// secrets — they go in *Cipher columns.
+  metadata          Json     @default("{}")
+  lastError         String?
+  lastSyncedAt      DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+  @@map("integrations")
+}

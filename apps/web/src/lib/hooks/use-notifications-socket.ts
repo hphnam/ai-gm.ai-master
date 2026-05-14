@@ -16,6 +16,16 @@ type NotificationUpdatedPayload =
   | { kind: 'read'; id: string; readAt: string }
   | { kind: 'all-read'; readAt: string }
 
+type NotificationReplyPayload = {
+  notificationId: string
+  reply: {
+    id: string
+    body: string
+    createdAt: string
+    author: { id: string; name: string | null; email: string }
+  }
+}
+
 export function useNotificationsSocket(opts: {
   onCreated?: (payload: NotificationCreatedPayload) => void
 }): void {
@@ -36,12 +46,20 @@ export function useNotificationsSocket(opts: {
       queryClient.invalidateQueries({ queryKey: ['notifications', 'unread-count'] })
     }
 
+    const handleReply = (payload: NotificationReplyPayload) => {
+      queryClient.invalidateQueries({
+        queryKey: ['notifications', 'replies', payload.notificationId],
+      })
+    }
+
     socket.on('notification.created', handleCreated)
     socket.on('notification.updated', handleUpdated)
+    socket.on('notification.reply.created', handleReply)
 
     return () => {
       socket.off('notification.created', handleCreated)
       socket.off('notification.updated', handleUpdated)
+      socket.off('notification.reply.created', handleReply)
       releaseSocket()
     }
   }, [queryClient, onCreated])

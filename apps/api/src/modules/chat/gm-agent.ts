@@ -7,6 +7,7 @@ import {
   ToolLoopAgent,
   type ToolSet,
 } from 'ai'
+import { IntegrationRegistry } from '../integrations/integration-registry'
 import { buildAiSdkTools } from './ai-sdk-tools'
 import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
 import type { DispatchContext } from './tool-dispatcher'
@@ -80,6 +81,7 @@ export type VenueSnapshot = {
 
 export function buildGmAgent(params: {
   dispatcher: ToolDispatcher
+  integrations: IntegrationRegistry
   ctx: DispatchContext
   venueContext: {
     id: string
@@ -125,7 +127,7 @@ export function buildGmAgent(params: {
     }>
   }) => void
 }) {
-  const tools: ToolSet = buildAiSdkTools(params.dispatcher, params.ctx)
+  const tools: ToolSet = buildAiSdkTools(params.dispatcher, params.integrations, params.ctx)
 
   const now = new Date()
   const tz = params.venueContext.timezone

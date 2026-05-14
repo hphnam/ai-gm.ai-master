@@ -5,17 +5,20 @@ import {
   AGGREGATE_SECTION_TOKEN_BUDGET,
   fail,
   formatSectionPayload,
+  ok,
   TOOL_INPUT_SCHEMAS,
   type ToolName,
   type ToolResult,
 } from '../../types'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { IngestService } from '../ingest/ingest.service'
+import { IntegrationRegistry } from '../integrations/integration-registry'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { RetrievalHit } from '../retrieval/retrieval.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { TabularQueryService } from '../tabular/tabular.service'
+import { TasksService } from '../tasks/tasks.service'
 import { QuoteVerifierService } from './quote-verifier.service'
 
 export type DispatchContext = {
@@ -69,6 +72,8 @@ export class ToolDispatcher {
     private readonly tabular: TabularQueryService,
     private readonly chatV2: ChatV2Service,
     private readonly realtime: RealtimeGateway,
+    private readonly tasks: TasksService,
+    private readonly integrations: IntegrationRegistry,
   ) {}
 
   async dispatch(
@@ -76,7 +81,17 @@ export class ToolDispatcher {
     input: unknown,
     ctx?: DispatchContext,
   ): Promise<ToolResult<unknown>> {
+    // Built-in tools live in the TOOL_INPUT_SCHEMAS map. Integration provider
+    // tools (Square / future) live in IntegrationRegistry and require an
+    // authenticated DispatchContext — they all read org-scoped data and we
+    // never want a provider tool to slip through without an orgId.
     if (!(toolName in TOOL_INPUT_SCHEMAS)) {
+      if (this.integrations.hasTool(toolName)) {
+        if (!ctx) {
+          return fail('error', `${toolName} requires an authenticated context`)
+        }
+        return this.integrations.dispatch(toolName, input, ctx)
+      }
       return fail('not-supported', `tool: ${toolName}`)
     }
     const schema = TOOL_INPUT_SCHEMAS[toolName as ToolName]
@@ -686,6 +701,244 @@ export class ToolDispatcher {
             },
           }
         }
+        case 'create_task': {
+          if (!ctx) {
+            return fail('error', 'create_task requires an authenticated context')
+          }
+          const i = parsed.data as {
+            body: string
+            dueAt?: string
+            assigneeNameQuery?: string
+            assigneeUserId?: string
+            category?: string
+          }
+          // Per-author throttle reuse — same window covers leave_note + tasks
+          // since both are "agent writes a row addressed at another user". A
+          // jailbroken prompt could otherwise drive the agent to spam tasks.
+          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+            return fail(
+              'error',
+              'too many tasks in a short window — slow down or compose from the dashboard',
+            )
+          }
+          // Role gate runs BEFORE the assignee membership lookup. Otherwise a
+          // staff caller could probe membership by varying `assigneeUserId` and
+          // comparing "not-a-member" (lookup fails) vs "staff-cannot-assign"
+          // (role gate fails after a successful lookup). Wave 4 review-gate
+          // fix. Self-assignment is the only allowed write for staff.
+          const requestsCrossAssign =
+            (i.assigneeUserId && i.assigneeUserId !== ctx.userId) ||
+            i.assigneeNameQuery !== undefined
+          if (requestsCrossAssign && ctx.userRole === 'staff') {
+            return fail(
+              'invalid-input',
+              'staff can only set tasks for themselves — ask a manager or owner to assign someone else',
+            )
+          }
+          // Resolve assignee. Default = self. Name-query may need disambiguation.
+          let assigneeUserId = ctx.userId
+          if (i.assigneeUserId) {
+            const member = await prisma.organizationMember.findFirst({
+              where: { organizationId: ctx.orgId, userId: i.assigneeUserId },
+              select: { userId: true },
+            })
+            if (!member) {
+              return fail('invalid-input', 'assigneeUserId is not a member of this organisation')
+            }
+            assigneeUserId = member.userId
+          } else if (i.assigneeNameQuery) {
+            const members = await prisma.organizationMember.findMany({
+              where: {
+                organizationId: ctx.orgId,
+                user: {
+                  OR: [
+                    { name: { contains: i.assigneeNameQuery, mode: 'insensitive' } },
+                    { email: { contains: i.assigneeNameQuery, mode: 'insensitive' } },
+                  ],
+                },
+              },
+              select: {
+                userId: true,
+                role: true,
+                user: { select: { name: true, email: true } },
+              },
+              take: 6,
+            })
+            if (members.length === 0) {
+              return {
+                ok: true,
+                data: {
+                  status: 'no-match' as const,
+                  candidates: [] as Array<{ userId: string; name: string | null; role: string }>,
+                },
+              }
+            }
+            if (members.length > 1) {
+              return {
+                ok: true,
+                data: {
+                  status: 'needs-disambiguation' as const,
+                  candidates: members.map((m) => ({
+                    userId: m.userId,
+                    name: m.user.name,
+                    role: m.role,
+                  })),
+                },
+              }
+            }
+            assigneeUserId = members[0].userId
+          }
+
+          try {
+            const row = await this.tasks.create(ctx.orgId, ctx.userId, {
+              body: i.body,
+              assigneeUserId,
+              dueAt: i.dueAt ?? null,
+              category: i.category ?? null,
+              creatorRole:
+                ctx.userRole === 'owner' || ctx.userRole === 'manager' || ctx.userRole === 'staff'
+                  ? ctx.userRole
+                  : null,
+            })
+            return {
+              ok: true,
+              data: {
+                status: 'created' as const,
+                id: row.id,
+                body: row.body,
+                dueAt: row.dueAt,
+                status_value: row.status,
+                assigneeName: row.assignee.name ?? row.assignee.email,
+                assigneeUserId: row.assignee.userId,
+              },
+            }
+          } catch (err) {
+            const message = (err as Error).message ?? 'create_task failed'
+            // Surface the role-gate failure as invalid-input with a clear
+            // string so the agent can phrase it back: "you can only set
+            // tasks for yourself — ask your manager to assign someone else".
+            if (/staff-cannot-assign-to-others/.test(message)) {
+              return fail(
+                'invalid-input',
+                'staff can only set tasks for themselves — ask a manager or owner to assign someone else',
+              )
+            }
+            return fail('error', `create_task failed: ${message}`)
+          }
+        }
+        case 'complete_task': {
+          if (!ctx) {
+            return fail('error', 'complete_task requires an authenticated context')
+          }
+          const i = parsed.data as { taskId: string }
+          try {
+            const row = await this.tasks.update(ctx.orgId, ctx.userId, i.taskId, {
+              status: 'done',
+            })
+            return {
+              ok: true,
+              data: {
+                id: row.id,
+                status: row.status,
+                completedAt: row.completedAt,
+                body: row.body,
+              },
+            }
+          } catch (err) {
+            const message = (err as Error).message ?? 'unknown error'
+            if (/task-not-found/.test(message)) return fail('not-found', 'task not found')
+            if (/task-not-completable-by-creator/.test(message)) {
+              return fail(
+                'invalid-input',
+                'only the assignee can mark a task done — you created it for someone else',
+              )
+            }
+            if (/task-not-editable|task-not-visible/.test(message)) {
+              return fail(
+                'invalid-input',
+                'you can only complete tasks assigned to you or that you created',
+              )
+            }
+            return fail('error', `complete_task failed: ${message}`)
+          }
+        }
+        case 'list_my_tasks': {
+          if (!ctx) {
+            return fail('error', 'list_my_tasks requires an authenticated context')
+          }
+          const i = parsed.data as {
+            scope?: 'open' | 'overdue' | 'this_week' | 'all'
+            limit?: number
+          }
+          const scope = i.scope ?? 'open'
+          const limit = i.limit ?? 25
+          // Pull the inbox via the service, then post-filter for overdue /
+          // this_week so the service stays scope-agnostic.
+          const result = await this.tasks.list(ctx.orgId, ctx.userId, {
+            status: scope === 'all' ? 'all' : 'open',
+            scope: 'mine',
+            limit: 200,
+          })
+          const now = Date.now()
+          const filtered = result.tasks.filter((t) => {
+            if (scope === 'overdue') {
+              return t.dueAt !== null && new Date(t.dueAt).getTime() < now
+            }
+            if (scope === 'this_week') {
+              if (!t.dueAt) return false
+              const due = new Date(t.dueAt).getTime()
+              return due < now + 7 * 24 * 60 * 60 * 1000
+            }
+            return true
+          })
+          return {
+            ok: true,
+            data: {
+              tasks: filtered.slice(0, limit).map((t) => ({
+                id: t.id,
+                body: t.body,
+                dueAt: t.dueAt,
+                status: t.status,
+                category: t.category,
+                assigneeName: t.assignee.name ?? t.assignee.email,
+                creatorName: t.creator?.name ?? t.creator?.email ?? null,
+                createdAt: t.createdAt,
+              })),
+              openCount: result.openCount,
+              overdueCount: result.overdueCount,
+              scope,
+            },
+          }
+        }
+        case 'present_checklist': {
+          if (!ctx) {
+            return fail('error', 'present_checklist requires an authenticated context')
+          }
+          const i = parsed.data as { checklistId?: string; intent?: string }
+          if (i.checklistId) {
+            const row = await prisma.checklist.findFirst({
+              where: { id: i.checklistId, organizationId: ctx.orgId },
+              select: { id: true, title: true, steps: true, knowledgeItemId: true },
+            })
+            if (!row) return fail('not-found', 'checklist not found in this org')
+            return ok({
+              checklistId: row.id,
+              knowledgeItemId: row.knowledgeItemId,
+              title: row.title,
+              steps: normaliseChecklistSteps(row.steps),
+            })
+          }
+          // Intent fallback — reuse the chat-v2 fuzzy matcher.
+          const { getChecklist } = await import('../chat-v2/tools/get-checklist.tool')
+          const result = await getChecklist(i.intent ?? '', ctx.orgId, null, prisma)
+          if (!result.ok) return result
+          return ok({
+            checklistId: result.data.checklistId,
+            knowledgeItemId: result.data.knowledgeItemId,
+            title: result.data.title,
+            steps: result.data.steps.map((s) => ({ index: s.index, content: s.content })),
+          })
+        }
       }
     } catch (err) {
       const message = (err as Error).message ?? 'unknown dispatcher error'
@@ -906,4 +1159,21 @@ export class ToolDispatcher {
 
     return { ok: true, data: formatted }
   }
+}
+
+// Mirror of the step normalisation in chat-v2/tools/get-checklist — the JSON
+// blob on Checklist.steps may use { index, text } or { index, content }; we
+// surface { index, content } to the client.
+function normaliseChecklistSteps(raw: unknown): Array<{ index: number; content: string }> {
+  if (!Array.isArray(raw)) return []
+  return raw
+    .map((s, i) => {
+      const obj = (s ?? {}) as Record<string, unknown>
+      const index = typeof obj.index === 'number' ? obj.index : i
+      const content =
+        typeof obj.text === 'string' ? obj.text : typeof obj.content === 'string' ? obj.content : ''
+      return { index, content }
+    })
+    .filter((s) => s.content.trim().length > 0)
+    .sort((a, b) => a.index - b.index)
 }

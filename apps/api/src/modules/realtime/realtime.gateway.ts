@@ -138,6 +138,30 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     this.server?.to(userRoomFor(recipientUserId)).emit('notification.created', payload)
   }
 
+  // Wave 4 — a reply was posted on a notification. We fan out to BOTH
+  // participants (original recipient + original author of the parent note)
+  // so each side's bell/thread surfaces the new line in real time. The
+  // emitting service is responsible for deduping if a single user happens
+  // to play both roles (system-authored notes have no human author, so
+  // recipient is the only participant).
+  emitNotificationReplyCreated(
+    userIds: ReadonlyArray<string>,
+    payload: {
+      notificationId: string
+      reply: {
+        id: string
+        body: string
+        createdAt: string
+        author: { id: string; name: string | null; email: string }
+      }
+    },
+  ): void {
+    const unique = [...new Set(userIds.filter(Boolean))]
+    for (const uid of unique) {
+      this.server?.to(userRoomFor(uid)).emit('notification.reply.created', payload)
+    }
+  }
+
   // Fires on mark-read / mark-all-read so other tabs of the same user sync.
   emitNotificationUpdated(
     recipientUserId: string,
@@ -164,6 +188,43 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     payload: { id: string; status: 'redeemed' | 'revoked' | 'exhausted' | 'expired' },
   ): void {
     this.server?.to(roomFor(orgId)).emit('whatsapp.invite.updated', payload)
+  }
+
+  // Expiry record lifecycle. Org-scoped because the "Expiring Soon" panel is
+  // shared (manager + owner both want the same view). Payload mirrors a
+  // narrowed ExpiryRecordRow — the client refetches the row to get full data.
+  emitExpiryRecordUpserted(
+    orgId: string,
+    payload: {
+      kind: 'created' | 'updated'
+      id: string
+      status: string
+      expiresAt: string
+      category: string
+    },
+  ): void {
+    this.server?.to(roomFor(orgId)).emit('expiry.upserted', payload)
+  }
+
+  // Task lifecycle events. Per-user surface: tasks live in the assignee's
+  // "My Tasks" inbox, and creators sometimes want to see status changes too.
+  // We fan out to BOTH the assignee and (if different) the creator so optimistic
+  // UI updates on either end stay in sync. Payload mirrors the TaskRow shape.
+  emitTaskUpserted(
+    userIds: ReadonlyArray<string>,
+    payload: {
+      kind: 'created' | 'updated'
+      id: string
+      assigneeUserId: string
+      status: string
+      dueAt: string | null
+      remindedAt: string | null
+    },
+  ): void {
+    const unique = [...new Set(userIds.filter(Boolean))]
+    for (const uid of unique) {
+      this.server?.to(userRoomFor(uid)).emit('task.upserted', payload)
+    }
   }
 
   // Phone verification status flipped for the given user. User-scoped so

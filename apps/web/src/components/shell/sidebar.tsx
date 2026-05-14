@@ -1,10 +1,20 @@
 'use client'
 
-import { BookOpen, MessageSquarePlus, Settings, SquarePen, X } from 'lucide-react'
+import {
+  BookOpen,
+  CheckSquare,
+  MessageSquarePlus,
+  Settings,
+  ShieldCheck,
+  SquarePen,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useInboxCount } from '@/components/docs/inbox-tab'
 import { useQuestionsCount } from '@/components/docs/questions-tab'
+import { useExpiryCounts } from '@/lib/hooks/use-compliance'
+import { useOpenTasksCount } from '@/lib/hooks/use-tasks'
 import { markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
 import { SidebarThreads } from './sidebar-threads'
@@ -23,6 +33,18 @@ const primaryNav: NavItem[] = [
     href: '/chat',
     icon: SquarePen,
     match: (p) => p.startsWith('/chat'),
+  },
+  {
+    label: 'Tasks',
+    href: '/tasks',
+    icon: CheckSquare,
+    match: (p) => p.startsWith('/tasks'),
+  },
+  {
+    label: 'Compliance',
+    href: '/compliance',
+    icon: ShieldCheck,
+    match: (p) => p.startsWith('/compliance'),
   },
   {
     label: 'Knowledge',
@@ -47,6 +69,13 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
   // the Knowledge page tabs use; React Query caches them so this isn't a
   // double fetch.
   const knowledgeUrgentCount = useInboxCount() + useQuestionsCount()
+  const tasksCounts = useOpenTasksCount().data
+  const tasksOpenCount = tasksCounts?.openCount ?? 0
+  const tasksOverdueCount = tasksCounts?.overdueCount ?? 0
+  const expiryCounts = useExpiryCounts().data
+  const expiryActiveCount = expiryCounts?.activeCount ?? 0
+  const expiryOverdueCount = expiryCounts?.overdueCount ?? 0
+  const expiryWithin30Count = expiryCounts?.within30dCount ?? 0
   const settingsActive = pathname.startsWith('/settings')
 
   // Client-first thread ids: the new chat's UUID is generated here and carried
@@ -127,7 +156,21 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
             const active = item.match(pathname)
             const Icon = item.icon
             const isKnowledge = item.href === '/docs'
-            const showBadge = isKnowledge && knowledgeUrgentCount > 0
+            const isTasks = item.href === '/tasks'
+            const isCompliance = item.href === '/compliance'
+            const badgeCount = isKnowledge
+              ? knowledgeUrgentCount
+              : isTasks
+                ? tasksOpenCount
+                : isCompliance
+                  ? expiryActiveCount
+                  : 0
+            const badgeUrgent = isTasks
+              ? tasksOverdueCount > 0
+              : isCompliance
+                ? expiryOverdueCount > 0 || expiryWithin30Count > 0
+                : isKnowledge
+            const showBadge = (isKnowledge || isTasks || isCompliance) && badgeCount > 0
             return (
               <Link
                 key={item.label}
@@ -153,13 +196,15 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                       )}
                       aria-hidden
                     >
-                      <span
-                        className="inline-block h-1 w-1 rounded-full bg-amber-500"
-                        aria-hidden
-                      />
-                      {knowledgeUrgentCount}
+                      {badgeUrgent ? (
+                        <span
+                          className="inline-block h-1 w-1 rounded-full bg-amber-500"
+                          aria-hidden
+                        />
+                      ) : null}
+                      {badgeCount}
                     </span>
-                    <span className="sr-only">{knowledgeUrgentCount} needing attention</span>
+                    <span className="sr-only">{badgeCount} needing attention</span>
                   </>
                 ) : null}
               </Link>

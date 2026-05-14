@@ -34,6 +34,7 @@ export class VenuesService {
         type: true,
         timezone: true,
         profile: true,
+        squareLocationId: true,
       },
     })
     if (!row) return null
@@ -44,7 +45,37 @@ export class VenuesService {
       type: row.type,
       timezone: row.timezone,
       profile: VenueProfileSchema.parse(row.profile ?? {}),
+      squareLocationId: row.squareLocationId,
     }
+  }
+
+  /// Manager-only — assign or clear the Square location mapping for a venue.
+  /// Returns the updated detail so the caller can refresh local state.
+  async updateSquareLocation(
+    id: string,
+    orgId: string,
+    squareLocationId: string | null,
+  ): Promise<VenueDetail> {
+    const existing = await prisma.venue.findFirst({
+      where: { id, organizationId: orgId },
+      select: { id: true },
+    })
+    if (!existing) throw new NotFoundException({ error: 'venue-not-found' })
+    await prisma.venue.update({
+      where: { id },
+      data: { squareLocationId },
+    })
+    this.logger.log(
+      JSON.stringify({
+        event: 'venue.update_square_location',
+        venueId: id,
+        orgId,
+        mapped: squareLocationId !== null,
+      }),
+    )
+    const updated = await this.getById(id, orgId)
+    if (!updated) throw new NotFoundException({ error: 'venue-not-found' })
+    return updated
   }
 
   async create(orgId: string, input: CreateVenueBody): Promise<VenueListItem> {
@@ -73,6 +104,7 @@ export class VenuesService {
         type: true,
         timezone: true,
         profile: true,
+        squareLocationId: true,
       },
     })
     if (!existing) throw new NotFoundException({ error: 'venue-not-found' })
@@ -90,6 +122,7 @@ export class VenuesService {
         type: true,
         timezone: true,
         profile: true,
+        squareLocationId: true,
       },
     })
 
@@ -110,6 +143,7 @@ export class VenuesService {
       type: updated.type,
       timezone: updated.timezone,
       profile: merged,
+      squareLocationId: updated.squareLocationId,
     }
   }
 

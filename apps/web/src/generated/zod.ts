@@ -6,6 +6,466 @@
  */
 import * as zod from 'zod';
 
+export const complianceControllerListQueryStatusDefault = `active`;
+export const complianceControllerListQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const complianceControllerListQueryCategoryMax = 64;
+
+export const complianceControllerListQueryWithinDaysMax = 3650;
+
+export const complianceControllerListQueryLimitDefault = 100;
+export const complianceControllerListQueryLimitMax = 200;
+
+
+
+export const ComplianceControllerListQueryParams = zod.object({
+  "status": zod.enum(['active', 'renewed', 'expired', 'dismissed', 'all']).default(complianceControllerListQueryStatusDefault),
+  "venueId": zod.string().regex(complianceControllerListQueryVenueIdRegExp).optional(),
+  "category": zod.string().min(1).max(complianceControllerListQueryCategoryMax).optional(),
+  "withinDays": zod.number().min(1).max(complianceControllerListQueryWithinDaysMax).optional(),
+  "limit": zod.number().min(1).max(complianceControllerListQueryLimitMax).default(complianceControllerListQueryLimitDefault)
+})
+
+export const ComplianceControllerListResponse = zod.object({
+  "records": zod.array(zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "knowledgeItemId": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "category": zod.string(),
+  "expiresAt": zod.string(),
+  "personUserId": zod.union([zod.string(),zod.null()]),
+  "personName": zod.union([zod.string(),zod.null()]),
+  "assetName": zod.union([zod.string(),zod.null()]),
+  "renewalCostGbp": zod.union([zod.number(),zod.null()]),
+  "status": zod.enum(['active', 'renewed', 'expired', 'dismissed']),
+  "reminded30At": zod.union([zod.string(),zod.null()]),
+  "reminded7At": zod.union([zod.string(),zod.null()]),
+  "reminded1At": zod.union([zod.string(),zod.null()]),
+  "remindedOverdueAt": zod.union([zod.string(),zod.null()]),
+  "extractionConfidence": zod.union([zod.number(),zod.null()]),
+  "notes": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "activeCount": zod.number(),
+  "overdueCount": zod.number(),
+  "within30dCount": zod.number()
+})
+
+
+export const complianceControllerCreateBodyTitleMin = 2;
+export const complianceControllerCreateBodyTitleMax = 200;
+
+export const complianceControllerCreateBodyCategoryMax = 64;
+
+export const complianceControllerCreateBodyExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const complianceControllerCreateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const complianceControllerCreateBodyPersonUserIdOneMax = 64;
+
+export const complianceControllerCreateBodyPersonNameOneMax = 120;
+
+export const complianceControllerCreateBodyAssetNameOneMax = 120;
+
+export const complianceControllerCreateBodyRenewalCostGbpOneMin = 0;
+export const complianceControllerCreateBodyRenewalCostGbpOneMax = 1000000;
+
+export const complianceControllerCreateBodyNotesOneMax = 2000;
+
+
+
+export const ComplianceControllerCreateBody = zod.object({
+  "title": zod.string().min(complianceControllerCreateBodyTitleMin).max(complianceControllerCreateBodyTitleMax),
+  "category": zod.string().min(1).max(complianceControllerCreateBodyCategoryMax),
+  "expiresAt": zod.iso.datetime({"offset":true}).regex(complianceControllerCreateBodyExpiresAtRegExp),
+  "venueId": zod.union([zod.string().regex(complianceControllerCreateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "personUserId": zod.union([zod.string().min(1).max(complianceControllerCreateBodyPersonUserIdOneMax),zod.null()]).optional(),
+  "personName": zod.union([zod.string().min(1).max(complianceControllerCreateBodyPersonNameOneMax),zod.null()]).optional(),
+  "assetName": zod.union([zod.string().min(1).max(complianceControllerCreateBodyAssetNameOneMax),zod.null()]).optional(),
+  "renewalCostGbp": zod.union([zod.number().min(complianceControllerCreateBodyRenewalCostGbpOneMin).max(complianceControllerCreateBodyRenewalCostGbpOneMax),zod.null()]).optional(),
+  "notes": zod.union([zod.string().max(complianceControllerCreateBodyNotesOneMax),zod.null()]).optional()
+})
+
+
+export const complianceControllerGetPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ComplianceControllerGetParams = zod.object({
+  "id": zod.string().regex(complianceControllerGetPathIdRegExp)
+})
+
+export const ComplianceControllerGetResponse = zod.object({
+  "record": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "knowledgeItemId": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "category": zod.string(),
+  "expiresAt": zod.string(),
+  "personUserId": zod.union([zod.string(),zod.null()]),
+  "personName": zod.union([zod.string(),zod.null()]),
+  "assetName": zod.union([zod.string(),zod.null()]),
+  "renewalCostGbp": zod.union([zod.number(),zod.null()]),
+  "status": zod.enum(['active', 'renewed', 'expired', 'dismissed']),
+  "reminded30At": zod.union([zod.string(),zod.null()]),
+  "reminded7At": zod.union([zod.string(),zod.null()]),
+  "reminded1At": zod.union([zod.string(),zod.null()]),
+  "remindedOverdueAt": zod.union([zod.string(),zod.null()]),
+  "extractionConfidence": zod.union([zod.number(),zod.null()]),
+  "notes": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const complianceControllerUpdatePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ComplianceControllerUpdateParams = zod.object({
+  "id": zod.string().regex(complianceControllerUpdatePathIdRegExp)
+})
+
+export const complianceControllerUpdateBodyTitleMin = 2;
+export const complianceControllerUpdateBodyTitleMax = 200;
+
+export const complianceControllerUpdateBodyCategoryMax = 64;
+
+export const complianceControllerUpdateBodyExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const complianceControllerUpdateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const complianceControllerUpdateBodyPersonUserIdOneMax = 64;
+
+export const complianceControllerUpdateBodyPersonNameOneMax = 120;
+
+export const complianceControllerUpdateBodyAssetNameOneMax = 120;
+
+export const complianceControllerUpdateBodyRenewalCostGbpOneMin = 0;
+export const complianceControllerUpdateBodyRenewalCostGbpOneMax = 1000000;
+
+export const complianceControllerUpdateBodyNotesOneMax = 2000;
+
+
+
+export const ComplianceControllerUpdateBody = zod.object({
+  "title": zod.string().min(complianceControllerUpdateBodyTitleMin).max(complianceControllerUpdateBodyTitleMax).optional(),
+  "category": zod.string().min(1).max(complianceControllerUpdateBodyCategoryMax).optional(),
+  "expiresAt": zod.iso.datetime({"offset":true}).regex(complianceControllerUpdateBodyExpiresAtRegExp).optional(),
+  "venueId": zod.union([zod.string().regex(complianceControllerUpdateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "personUserId": zod.union([zod.string().min(1).max(complianceControllerUpdateBodyPersonUserIdOneMax),zod.null()]).optional(),
+  "personName": zod.union([zod.string().min(1).max(complianceControllerUpdateBodyPersonNameOneMax),zod.null()]).optional(),
+  "assetName": zod.union([zod.string().min(1).max(complianceControllerUpdateBodyAssetNameOneMax),zod.null()]).optional(),
+  "renewalCostGbp": zod.union([zod.number().min(complianceControllerUpdateBodyRenewalCostGbpOneMin).max(complianceControllerUpdateBodyRenewalCostGbpOneMax),zod.null()]).optional(),
+  "status": zod.enum(['active', 'renewed', 'expired', 'dismissed']).optional(),
+  "notes": zod.union([zod.string().max(complianceControllerUpdateBodyNotesOneMax),zod.null()]).optional()
+})
+
+export const ComplianceControllerUpdateResponse = zod.object({
+  "record": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "knowledgeItemId": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "category": zod.string(),
+  "expiresAt": zod.string(),
+  "personUserId": zod.union([zod.string(),zod.null()]),
+  "personName": zod.union([zod.string(),zod.null()]),
+  "assetName": zod.union([zod.string(),zod.null()]),
+  "renewalCostGbp": zod.union([zod.number(),zod.null()]),
+  "status": zod.enum(['active', 'renewed', 'expired', 'dismissed']),
+  "reminded30At": zod.union([zod.string(),zod.null()]),
+  "reminded7At": zod.union([zod.string(),zod.null()]),
+  "reminded1At": zod.union([zod.string(),zod.null()]),
+  "remindedOverdueAt": zod.union([zod.string(),zod.null()]),
+  "extractionConfidence": zod.union([zod.number(),zod.null()]),
+  "notes": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const tasksControllerListQueryStatusDefault = `open`;
+export const tasksControllerListQueryScopeDefault = `mine`;
+export const tasksControllerListQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const tasksControllerListQueryLimitDefault = 100;
+export const tasksControllerListQueryLimitMax = 200;
+
+
+
+export const TasksControllerListQueryParams = zod.object({
+  "status": zod.enum(['open', 'done', 'cancelled', 'all']).default(tasksControllerListQueryStatusDefault),
+  "scope": zod.enum(['mine', 'authored', 'all']).default(tasksControllerListQueryScopeDefault),
+  "venueId": zod.string().regex(tasksControllerListQueryVenueIdRegExp).optional(),
+  "limit": zod.number().min(1).max(tasksControllerListQueryLimitMax).default(tasksControllerListQueryLimitDefault)
+})
+
+export const TasksControllerListResponse = zod.object({
+  "tasks": zod.array(zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "assignee": zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),
+  "creator": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()]),
+  "body": zod.string(),
+  "dueAt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['open', 'done', 'cancelled']),
+  "category": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "remindedAt": zod.union([zod.string(),zod.null()]),
+  "completedAt": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "openCount": zod.number(),
+  "overdueCount": zod.number()
+})
+
+
+export const tasksControllerCreateBodyBodyMin = 3;
+export const tasksControllerCreateBodyBodyMax = 2000;
+
+export const tasksControllerCreateBodyAssigneeUserIdOneMax = 64;
+
+export const tasksControllerCreateBodyDueAtOneRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const tasksControllerCreateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const tasksControllerCreateBodyCategoryOneMax = 64;
+
+
+
+export const TasksControllerCreateBody = zod.object({
+  "body": zod.string().min(tasksControllerCreateBodyBodyMin).max(tasksControllerCreateBodyBodyMax),
+  "assigneeUserId": zod.union([zod.string().min(1).max(tasksControllerCreateBodyAssigneeUserIdOneMax),zod.null()]).optional(),
+  "dueAt": zod.union([zod.iso.datetime({"offset":true}).regex(tasksControllerCreateBodyDueAtOneRegExp),zod.null()]).optional(),
+  "venueId": zod.union([zod.string().regex(tasksControllerCreateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "category": zod.union([zod.string().min(1).max(tasksControllerCreateBodyCategoryOneMax),zod.null()]).optional()
+})
+
+
+export const tasksControllerGetPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const TasksControllerGetParams = zod.object({
+  "id": zod.string().regex(tasksControllerGetPathIdRegExp)
+})
+
+export const TasksControllerGetResponse = zod.object({
+  "task": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "assignee": zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),
+  "creator": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()]),
+  "body": zod.string(),
+  "dueAt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['open', 'done', 'cancelled']),
+  "category": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "remindedAt": zod.union([zod.string(),zod.null()]),
+  "completedAt": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const tasksControllerUpdatePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const TasksControllerUpdateParams = zod.object({
+  "id": zod.string().regex(tasksControllerUpdatePathIdRegExp)
+})
+
+export const tasksControllerUpdateBodyBodyMin = 3;
+export const tasksControllerUpdateBodyBodyMax = 2000;
+
+export const tasksControllerUpdateBodyDueAtOneRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const tasksControllerUpdateBodyCategoryOneMax = 64;
+
+
+
+export const TasksControllerUpdateBody = zod.object({
+  "body": zod.string().min(tasksControllerUpdateBodyBodyMin).max(tasksControllerUpdateBodyBodyMax).optional(),
+  "dueAt": zod.union([zod.iso.datetime({"offset":true}).regex(tasksControllerUpdateBodyDueAtOneRegExp),zod.null()]).optional(),
+  "status": zod.enum(['open', 'done', 'cancelled']).optional(),
+  "category": zod.union([zod.string().min(1).max(tasksControllerUpdateBodyCategoryOneMax),zod.null()]).optional()
+})
+
+export const TasksControllerUpdateResponse = zod.object({
+  "task": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "assignee": zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),
+  "creator": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()]),
+  "body": zod.string(),
+  "dueAt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['open', 'done', 'cancelled']),
+  "category": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "remindedAt": zod.union([zod.string(),zod.null()]),
+  "completedAt": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const notificationsControllerListQueryStatusDefault = `all`;
+export const notificationsControllerListQueryLimitDefault = 30;
+export const notificationsControllerListQueryLimitMax = 100;
+
+
+
+export const NotificationsControllerListQueryParams = zod.object({
+  "status": zod.enum(['unread', 'read', 'all']).default(notificationsControllerListQueryStatusDefault),
+  "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault)
+})
+
+export const NotificationsControllerListResponse = zod.object({
+  "notifications": zod.array(zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "status": zod.enum(['unread', 'read']),
+  "createdAt": zod.string(),
+  "readAt": zod.union([zod.string(),zod.null()]),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()])
+})),
+  "unreadCount": zod.number()
+})
+
+
+export const notificationsControllerComposeBodyRecipientUserIdMax = 64;
+
+export const notificationsControllerComposeBodyBodyMin = 3;
+export const notificationsControllerComposeBodyBodyMax = 2000;
+
+
+
+export const NotificationsControllerComposeBody = zod.object({
+  "recipientUserId": zod.string().min(1).max(notificationsControllerComposeBodyRecipientUserIdMax),
+  "body": zod.string().min(notificationsControllerComposeBodyBodyMin).max(notificationsControllerComposeBodyBodyMax)
+})
+
+
+export const NotificationsControllerUnreadCountResponse = zod.object({
+  "count": zod.number()
+})
+
+
+export const NotificationsControllerRecipientsResponse = zod.object({
+  "members": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string(),
+  "role": zod.string()
+}))
+})
+
+
+export const notificationsControllerMarkReadPathIdMax = 64;
+
+
+
+export const NotificationsControllerMarkReadParams = zod.object({
+  "id": zod.string().min(1).max(notificationsControllerMarkReadPathIdMax)
+})
+
+export const NotificationsControllerMarkReadResponse = zod.object({
+  "notification": zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "status": zod.enum(['unread', 'read']),
+  "createdAt": zod.string(),
+  "readAt": zod.union([zod.string(),zod.null()]),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()])
+})
+})
+
+
+export const NotificationsControllerMarkAllReadResponse = zod.object({
+  "updated": zod.number()
+})
+
+
+export const notificationsControllerListRepliesPathIdMax = 64;
+
+
+
+export const NotificationsControllerListRepliesParams = zod.object({
+  "id": zod.string().min(1).max(notificationsControllerListRepliesPathIdMax)
+})
+
+export const NotificationsControllerListRepliesResponse = zod.object({
+  "replies": zod.array(zod.object({
+  "id": zod.string(),
+  "notificationId": zod.string(),
+  "body": zod.string(),
+  "createdAt": zod.string(),
+  "author": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+})
+}))
+})
+
+
+export const notificationsControllerComposeReplyPathIdMax = 64;
+
+
+
+export const NotificationsControllerComposeReplyParams = zod.object({
+  "id": zod.string().min(1).max(notificationsControllerComposeReplyPathIdMax)
+})
+
+export const notificationsControllerComposeReplyBodyBodyMax = 2000;
+
+
+
+export const NotificationsControllerComposeReplyBody = zod.object({
+  "body": zod.string().min(1).max(notificationsControllerComposeReplyBodyBodyMax)
+})
+
+
 export const feedbackControllerCaptureFeedbackBodyMessageIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 export const feedbackControllerCaptureFeedbackBodyUserFeedbackMax = 2000;
 
@@ -180,6 +640,61 @@ export const ChatControllerUpdateVisibilityResponse = zod.object({
 })
 
 
+export const IntegrationsControllerListResponse = zod.object({
+  "integrations": zod.array(zod.object({
+  "provider": zod.string(),
+  "status": zod.enum(['active', 'disconnected', 'error']),
+  "authMode": zod.enum(['pat', 'oauth']),
+  "environment": zod.string(),
+  "scopes": zod.array(zod.string()),
+  "externalAccountId": zod.union([zod.string(),zod.null()]),
+  "lastError": zod.union([zod.string(),zod.null()]),
+  "lastSyncedAt": zod.union([zod.string(),zod.null()]),
+  "connectedAt": zod.string()
+}))
+})
+
+
+export const integrationsControllerConnectPatPathProviderMax = 40;
+
+
+export const integrationsControllerConnectPatPathProviderRegExp = new RegExp('^[a-z][a-z0-9_]\*$');
+
+
+export const IntegrationsControllerConnectPatParams = zod.object({
+  "provider": zod.string().min(1).max(integrationsControllerConnectPatPathProviderMax).regex(integrationsControllerConnectPatPathProviderRegExp)
+})
+
+export const integrationsControllerConnectPatBodyAccessTokenMin = 8;
+export const integrationsControllerConnectPatBodyAccessTokenMax = 2048;
+
+export const integrationsControllerConnectPatBodyScopesItemMax = 120;
+
+export const integrationsControllerConnectPatBodyScopesMax = 40;
+
+export const integrationsControllerConnectPatBodyExternalAccountIdMax = 200;
+
+
+
+export const IntegrationsControllerConnectPatBody = zod.object({
+  "accessToken": zod.string().min(integrationsControllerConnectPatBodyAccessTokenMin).max(integrationsControllerConnectPatBodyAccessTokenMax),
+  "environment": zod.enum(['production', 'sandbox']).optional(),
+  "scopes": zod.array(zod.string().min(1).max(integrationsControllerConnectPatBodyScopesItemMax)).max(integrationsControllerConnectPatBodyScopesMax).optional(),
+  "externalAccountId": zod.string().min(1).max(integrationsControllerConnectPatBodyExternalAccountIdMax).optional()
+})
+
+
+export const integrationsControllerDisconnectPathProviderMax = 40;
+
+
+export const integrationsControllerDisconnectPathProviderRegExp = new RegExp('^[a-z][a-z0-9_]\*$');
+
+
+export const IntegrationsControllerDisconnectParams = zod.object({
+  "provider": zod.string().min(1).max(integrationsControllerDisconnectPathProviderMax).regex(integrationsControllerDisconnectPathProviderRegExp)
+})
+
+
 export const suggestionsControllerOnOpenBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 
@@ -304,7 +819,8 @@ export const VenuesControllerGetResponse = zod.object({
   "accessibilityNotes": zod.string().max(venuesControllerGetResponseProfileAccessibilityNotesMax).optional(),
   "deliveryNotes": zod.string().max(venuesControllerGetResponseProfileDeliveryNotesMax).optional(),
   "floorPlanKnowledgeItemId": zod.union([zod.string().regex(venuesControllerGetResponseProfileFloorPlanKnowledgeItemIdOneRegExp),zod.null()]).optional()
-})
+}),
+  "squareLocationId": zod.union([zod.string(),zod.null()])
 })
 
 
@@ -395,7 +911,70 @@ export const VenuesControllerUpdateProfileResponse = zod.object({
   "accessibilityNotes": zod.string().max(venuesControllerUpdateProfileResponseProfileAccessibilityNotesMax).optional(),
   "deliveryNotes": zod.string().max(venuesControllerUpdateProfileResponseProfileDeliveryNotesMax).optional(),
   "floorPlanKnowledgeItemId": zod.union([zod.string().regex(venuesControllerUpdateProfileResponseProfileFloorPlanKnowledgeItemIdOneRegExp),zod.null()]).optional()
+}),
+  "squareLocationId": zod.union([zod.string(),zod.null()])
 })
+
+
+export const venuesControllerUpdateSquareLocationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const VenuesControllerUpdateSquareLocationParams = zod.object({
+  "id": zod.string().regex(venuesControllerUpdateSquareLocationPathIdRegExp)
+})
+
+export const venuesControllerUpdateSquareLocationBodySquareLocationIdOneMax = 64;
+
+
+
+export const VenuesControllerUpdateSquareLocationBody = zod.object({
+  "squareLocationId": zod.union([zod.string().min(1).max(venuesControllerUpdateSquareLocationBodySquareLocationIdOneMax),zod.null()])
+})
+
+export const venuesControllerUpdateSquareLocationResponseProfileLayoutNotesMax = 2000;
+
+export const venuesControllerUpdateSquareLocationResponseProfileFireEscapesItemMax = 240;
+
+export const venuesControllerUpdateSquareLocationResponseProfileFireEscapesMax = 10;
+
+export const venuesControllerUpdateSquareLocationResponseProfileFirstAidPointsItemMax = 240;
+
+export const venuesControllerUpdateSquareLocationResponseProfileFirstAidPointsMax = 10;
+
+export const venuesControllerUpdateSquareLocationResponseProfileKeySafePolicyMax = 500;
+
+export const venuesControllerUpdateSquareLocationResponseProfileAlarmPolicyMax = 500;
+
+export const venuesControllerUpdateSquareLocationResponseProfileOpeningHoursMax = 500;
+
+export const venuesControllerUpdateSquareLocationResponseProfileWhat3wordsMax = 60;
+
+export const venuesControllerUpdateSquareLocationResponseProfileAccessibilityNotesMax = 500;
+
+export const venuesControllerUpdateSquareLocationResponseProfileDeliveryNotesMax = 500;
+
+export const venuesControllerUpdateSquareLocationResponseProfileFloorPlanKnowledgeItemIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const VenuesControllerUpdateSquareLocationResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "address": zod.union([zod.string(),zod.null()]),
+  "type": zod.string(),
+  "timezone": zod.string(),
+  "profile": zod.object({
+  "layoutNotes": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileLayoutNotesMax).optional(),
+  "fireEscapes": zod.array(zod.string().min(1).max(venuesControllerUpdateSquareLocationResponseProfileFireEscapesItemMax)).max(venuesControllerUpdateSquareLocationResponseProfileFireEscapesMax).optional(),
+  "firstAidPoints": zod.array(zod.string().min(1).max(venuesControllerUpdateSquareLocationResponseProfileFirstAidPointsItemMax)).max(venuesControllerUpdateSquareLocationResponseProfileFirstAidPointsMax).optional(),
+  "keySafePolicy": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileKeySafePolicyMax).optional(),
+  "alarmPolicy": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileAlarmPolicyMax).optional(),
+  "openingHours": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileOpeningHoursMax).optional(),
+  "what3words": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileWhat3wordsMax).optional(),
+  "accessibilityNotes": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileAccessibilityNotesMax).optional(),
+  "deliveryNotes": zod.string().max(venuesControllerUpdateSquareLocationResponseProfileDeliveryNotesMax).optional(),
+  "floorPlanKnowledgeItemId": zod.union([zod.string().regex(venuesControllerUpdateSquareLocationResponseProfileFloorPlanKnowledgeItemIdOneRegExp),zod.null()]).optional()
+}),
+  "squareLocationId": zod.union([zod.string(),zod.null()])
 })
 
 
@@ -1383,88 +1962,42 @@ export const NudgeControllerRunNudgeResponse = zod.object({
 })
 
 
-export const notificationsControllerListQueryStatusDefault = `all`;
-export const notificationsControllerListQueryLimitDefault = 30;
-export const notificationsControllerListQueryLimitMax = 100;
+export const chatStartersControllerGetQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 
-
-export const NotificationsControllerListQueryParams = zod.object({
-  "status": zod.enum(['unread', 'read', 'all']).default(notificationsControllerListQueryStatusDefault),
-  "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault)
+export const ChatStartersControllerGetQueryParams = zod.object({
+  "venueId": zod.string().regex(chatStartersControllerGetQueryVenueIdRegExp)
 })
 
-export const NotificationsControllerListResponse = zod.object({
-  "notifications": zod.array(zod.object({
-  "id": zod.string(),
-  "body": zod.string(),
-  "source": zod.enum(['chat', 'whatsapp', 'manual']),
-  "status": zod.enum(['unread', 'read']),
-  "createdAt": zod.string(),
-  "readAt": zod.union([zod.string(),zod.null()]),
-  "author": zod.union([zod.object({
+export const chatStartersControllerGetResponseQuestionsItemTextMin = 6;
+export const chatStartersControllerGetResponseQuestionsItemTextMax = 160;
+
+export const chatStartersControllerGetResponseQuestionsItemCategoryMax = 32;
+
+export const chatStartersControllerGetResponseQuestionsMax = 8;
+
+
+
+export const ChatStartersControllerGetResponse = zod.object({
+  "venueId": zod.string(),
+  "questions": zod.array(zod.object({
+  "text": zod.string().min(chatStartersControllerGetResponseQuestionsItemTextMin).max(chatStartersControllerGetResponseQuestionsItemTextMax),
+  "category": zod.string().min(1).max(chatStartersControllerGetResponseQuestionsItemCategoryMax).optional()
+})).min(1).max(chatStartersControllerGetResponseQuestionsMax),
+  "source": zod.enum(['generated', 'fallback']),
+  "generatedAt": zod.union([zod.string(),zod.null()])
+})
+
+
+export const SquareControllerListLocationsResponse = zod.object({
+  "locations": zod.array(zod.object({
   "id": zod.string(),
   "name": zod.union([zod.string(),zod.null()]),
-  "email": zod.string()
-}),zod.null()])
+  "status": zod.union([zod.string(),zod.null()]),
+  "type": zod.union([zod.string(),zod.null()]),
+  "currency": zod.union([zod.string(),zod.null()]),
+  "timezone": zod.union([zod.string(),zod.null()]),
+  "address": zod.union([zod.string(),zod.null()])
 })),
-  "unreadCount": zod.number()
-})
-
-
-export const notificationsControllerComposeBodyRecipientUserIdMax = 64;
-
-export const notificationsControllerComposeBodyBodyMin = 3;
-export const notificationsControllerComposeBodyBodyMax = 2000;
-
-
-
-export const NotificationsControllerComposeBody = zod.object({
-  "recipientUserId": zod.string().min(1).max(notificationsControllerComposeBodyRecipientUserIdMax),
-  "body": zod.string().min(notificationsControllerComposeBodyBodyMin).max(notificationsControllerComposeBodyBodyMax)
-})
-
-
-export const NotificationsControllerUnreadCountResponse = zod.object({
-  "count": zod.number()
-})
-
-
-export const NotificationsControllerRecipientsResponse = zod.object({
-  "members": zod.array(zod.object({
-  "userId": zod.string(),
-  "name": zod.union([zod.string(),zod.null()]),
-  "email": zod.string(),
-  "role": zod.string()
-}))
-})
-
-
-export const notificationsControllerMarkReadPathIdMax = 64;
-
-
-
-export const NotificationsControllerMarkReadParams = zod.object({
-  "id": zod.string().min(1).max(notificationsControllerMarkReadPathIdMax)
-})
-
-export const NotificationsControllerMarkReadResponse = zod.object({
-  "notification": zod.object({
-  "id": zod.string(),
-  "body": zod.string(),
-  "source": zod.enum(['chat', 'whatsapp', 'manual']),
-  "status": zod.enum(['unread', 'read']),
-  "createdAt": zod.string(),
-  "readAt": zod.union([zod.string(),zod.null()]),
-  "author": zod.union([zod.object({
-  "id": zod.string(),
-  "name": zod.union([zod.string(),zod.null()]),
-  "email": zod.string()
-}),zod.null()])
-})
-})
-
-
-export const NotificationsControllerMarkAllReadResponse = zod.object({
-  "updated": zod.number()
+  "error": zod.union([zod.string(),zod.null()])
 })

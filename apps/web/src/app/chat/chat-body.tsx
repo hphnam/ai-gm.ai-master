@@ -18,6 +18,7 @@ import type { ConversationResponseDto as ConversationResponse } from '@/generate
 import { API_URL } from '@/lib/api-client'
 import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
+import { useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
 import { type ConvListItem, useConversationsList } from '@/lib/hooks/use-conversations-list'
 import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
@@ -37,12 +38,22 @@ type LegacyToolCallEntry = {
   result?: unknown
 }
 
-// Legacy assistant rows (pre-agentic path) stored text-only `content` with a
-// flat `toolCallLog` JSON array. No `parts` snapshot, no reasoning. Synthesise
-// tool-call UI parts from the log so old turns still render tool chips on
-// replay — otherwise the thread loses all visible tool history.
-function legacyPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
+// Rebuild an assistant turn's UI parts from the DB row. The persisted `parts`
+// snapshot is just the final text part (the AI SDK ModelMessage→DB shape drops
+// the rich UI-message tool entries), so we rehydrate the interactive surface
+// from the columns that DO hold the history: `reasoning` (text) and
+// `toolCallLog` (array of {tool, toolUseId, input, result}). Order matters —
+// AssistantBody reads parts and renders reasoning → tool cards → final text.
+function assistantPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
   const parts: GmUIMessage['parts'] = []
+  const reasoning = (m as unknown as { reasoning?: string | null }).reasoning
+  if (typeof reasoning === 'string' && reasoning.trim().length > 0) {
+    parts.push({
+      type: 'reasoning',
+      text: reasoning,
+      state: 'done',
+    } as unknown as GmUIMessage['parts'][number])
+  }
   const log = (m as unknown as { toolCallLog?: LegacyToolCallEntry[] }).toolCallLog
   if (Array.isArray(log)) {
     for (const entry of log) {
@@ -61,18 +72,8 @@ function legacyPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
 }
 
 function dbToUIMessage(m: ChatMessageDto): GmUIMessage {
-  // Prefer the persisted `parts` snapshot if the server stored it (assistant
-  // turns from the agentic path carry reasoning + tool-call chips).
-  if (m.role === 'assistant' && m.parts) {
-    const parts = m.parts as GmUIMessage['parts']
-    if (Array.isArray(parts) && parts.length > 0) {
-      return { id: m.id, role: m.role, parts }
-    }
-  }
-  // Assistant fall-through: legacy row with no parts JSON — rebuild from
-  // toolCallLog + content so tool chips still appear.
   if (m.role === 'assistant') {
-    return { id: m.id, role: m.role, parts: legacyPartsFromDto(m) }
+    return { id: m.id, role: m.role, parts: assistantPartsFromDto(m) }
   }
   return {
     id: m.id,
@@ -120,28 +121,21 @@ function ChatInner() {
 
   const venueId = params.get('venue')
   const conversationId = params.get('conv')
-  const conversationsList = useConversationsList(null)
 
   // Landing on /chat (no conv):
-  //   • no venue in the URL → drop into the most recent thread (handy for a
-  //     fresh tab — same as hitting the top chat in the sidebar).
+  //   • no venue in the URL → stay on the empty landing surface. Clicking the
+  //     sidebar Chat link should NOT silently resume an old thread; resuming
+  //     is a deliberate sidebar action (Recent → pick a thread).
   //   • venue pinned in the URL → mint a fresh chat for that venue. Do NOT
   //     surface an old thread behind the user's back; resuming is a sidebar
   //     action, not a side-effect of visiting a venue URL.
   useEffect(() => {
     if (conversationId) return
-    if (!conversationsList.data) return
-    if (venueId) {
-      const freshId = crypto.randomUUID()
-      markMinted(freshId)
-      router.replace(`/chat?venue=${venueId}&conv=${freshId}`)
-      return
-    }
-    const latest = conversationsList.data[0]
-    if (latest) {
-      router.replace(`/chat?venue=${latest.venueId}&conv=${latest.id}`)
-    }
-  }, [venueId, conversationId, conversationsList.data, router])
+    if (!venueId) return
+    const freshId = crypto.randomUUID()
+    markMinted(freshId)
+    router.replace(`/chat?venue=${venueId}&conv=${freshId}`)
+  }, [venueId, conversationId, router])
 
   return (
     <AppShell>
@@ -620,7 +614,7 @@ function ChatCore({
             ) : null}
 
             {isEmpty && !isPending ? (
-              <EmptyState needsVenue={!venueId} onPick={submit} />
+              <EmptyState needsVenue={!venueId} venueId={venueId} onPick={submit} />
             ) : (
               <ChatThread
                 messages={displayMessages}
@@ -630,6 +624,8 @@ function ChatCore({
                 onRegenerate={isOwner ? () => regenerate() : undefined}
                 feedbackByMessageId={feedbackByMessageId}
                 verifyByMessageId={verifyByMessageId}
+                onPrompt={isOwner ? submit : undefined}
+                venueId={venueId}
               />
             )}
           </div>
@@ -672,19 +668,31 @@ function titleFor(messages: GmUIMessage[]): string | undefined {
   return text.length > 80 ? `${text.slice(0, 79)}…` : text
 }
 
+// Fallback prompts shown while the AI-rotated starters haven't loaded yet OR
+// when the API call fails. The server has its own fallback too — this is a
+// belt-and-braces second layer so the empty state never flashes blank.
+const FALLBACK_PROMPTS: ReadonlyArray<{ text: string }> = [
+  { text: 'Which stock items are below par today?' },
+  { text: "What's on my list this week?" },
+  { text: 'Any certs expiring in the next 30 days?' },
+  { text: "Walk me through tonight's opening checklist." },
+]
+
 function EmptyState({
   needsVenue,
+  venueId,
   onPick,
 }: {
   needsVenue: boolean
+  venueId: string | null
   onPick?: (text: string) => void | Promise<void>
 }) {
-  const prompts = [
-    'Which stock items are below par today?',
-    'Who supplies our house red wine?',
-    'What are the upcoming order cut-offs?',
-    "Walk me through tonight's opening checklist.",
-  ]
+  const starters = useChatStarters(venueId)
+  // Prefer the server's payload (generated or its own fallback) when we have
+  // one. Only fall back to the static client list while the request is in
+  // flight, OR if the request errored — keeps the surface populated even when
+  // /chat-starters returns 500.
+  const prompts = starters.data?.questions ?? FALLBACK_PROMPTS
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-10 py-16">
       <header className="space-y-3">
@@ -716,14 +724,14 @@ function EmptyState({
       {!needsVenue ? (
         <ul className="flex flex-col divide-y divide-border border-y border-border">
           {prompts.map((p) => (
-            <li key={p}>
+            <li key={p.text}>
               <button
                 type="button"
-                onClick={() => onPick?.(p)}
+                onClick={() => onPick?.(p.text)}
                 disabled={!onPick}
                 className="group flex w-full items-center justify-between gap-4 py-3 text-left text-[15px] text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span>{p}</span>
+                <span>{p.text}</span>
                 <span
                   aria-hidden
                   className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
