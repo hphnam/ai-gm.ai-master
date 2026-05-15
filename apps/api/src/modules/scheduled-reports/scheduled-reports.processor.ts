@@ -266,17 +266,31 @@ export class ScheduledReportsProcessor extends WorkerHost implements OnApplicati
           authorUserId: null,
           source: 'manual',
           category: 'report',
+          // System-authored is automated by definition.
+          automated: true,
           body: notifBody,
         },
-        select: { id: true, createdAt: true },
+        select: {
+          id: true,
+          createdAt: true,
+          recipient: { select: { id: true, name: true, email: true } },
+        },
       })
+      // System-authored: only the recipient gets the event.
       this.realtime.emitNotificationCreated(schedule.createdByUserId, {
+        kind: 'received',
         id: notif.id,
         body: notifBody,
         source: 'manual',
         category: 'report',
+        automated: true,
         createdAt: notif.createdAt.toISOString(),
         author: null,
+        recipient: {
+          id: notif.recipient.id,
+          name: notif.recipient.name,
+          email: notif.recipient.email,
+        },
       })
     } catch (err) {
       this.logger.error(

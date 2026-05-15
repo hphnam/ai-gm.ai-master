@@ -340,6 +340,7 @@ export const TasksControllerUpdateResponse = zod.object({
 
 
 export const notificationsControllerListQueryStatusDefault = `all`;
+export const notificationsControllerListQueryDirectionDefault = `inbox`;
 export const notificationsControllerListQueryLimitDefault = 30;
 export const notificationsControllerListQueryLimitMax = 50;
 
@@ -353,6 +354,7 @@ export const notificationsControllerListQueryCategoryMax = 128;
 
 export const NotificationsControllerListQueryParams = zod.object({
   "status": zod.enum(['unread', 'read', 'all']).default(notificationsControllerListQueryStatusDefault),
+  "direction": zod.enum(['inbox', 'sent']).default(notificationsControllerListQueryDirectionDefault),
   "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault),
   "cursor": zod.string().max(notificationsControllerListQueryCursorMax).optional(),
   "q": zod.string().max(notificationsControllerListQueryQMax).optional(),
@@ -365,6 +367,7 @@ export const NotificationsControllerListResponse = zod.object({
   "body": zod.string(),
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
   "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
+  "automated": zod.boolean(),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),
@@ -372,7 +375,12 @@ export const NotificationsControllerListResponse = zod.object({
   "id": zod.string(),
   "name": zod.union([zod.string(),zod.null()]),
   "email": zod.string()
-}),zod.null()])
+}),zod.null()]),
+  "recipient": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+})
 })),
   "unreadCount": zod.number(),
   "nextCursor": zod.union([zod.string(),zod.null()]),
@@ -422,6 +430,7 @@ export const NotificationsControllerMarkReadResponse = zod.object({
   "body": zod.string(),
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
   "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
+  "automated": zod.boolean(),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),
@@ -429,7 +438,12 @@ export const NotificationsControllerMarkReadResponse = zod.object({
   "id": zod.string(),
   "name": zod.union([zod.string(),zod.null()]),
   "email": zod.string()
-}),zod.null()])
+}),zod.null()]),
+  "recipient": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+})
 })
 })
 
@@ -476,6 +490,136 @@ export const notificationsControllerComposeReplyBodyBodyMax = 2000;
 
 export const NotificationsControllerComposeReplyBody = zod.object({
   "body": zod.string().min(1).max(notificationsControllerComposeReplyBodyBodyMax)
+})
+
+
+export const conversationsControllerListResponseConversationsItemUnreadCountMin = 0;
+export const conversationsControllerListResponseConversationsItemUnreadCountMax = 9007199254740991;
+
+
+
+export const ConversationsControllerListResponse = zod.object({
+  "conversations": zod.array(zod.object({
+  "otherParty": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),
+  "latestPreview": zod.string(),
+  "latestAt": zod.string(),
+  "latestFromMe": zod.boolean(),
+  "latestViaAi": zod.boolean(),
+  "unreadCount": zod.number().min(conversationsControllerListResponseConversationsItemUnreadCountMin).max(conversationsControllerListResponseConversationsItemUnreadCountMax)
+}))
+})
+
+
+export const conversationsControllerMessagesPathOtherUserIdMax = 64;
+
+
+
+export const ConversationsControllerMessagesParams = zod.object({
+  "otherUserId": zod.string().min(1).max(conversationsControllerMessagesPathOtherUserIdMax)
+})
+
+export const conversationsControllerMessagesQueryLimitDefault = 50;
+export const conversationsControllerMessagesQueryLimitMax = 100;
+
+export const conversationsControllerMessagesQueryCursorMax = 256;
+
+
+
+export const ConversationsControllerMessagesQueryParams = zod.object({
+  "limit": zod.number().min(1).max(conversationsControllerMessagesQueryLimitMax).default(conversationsControllerMessagesQueryLimitDefault),
+  "cursor": zod.string().max(conversationsControllerMessagesQueryCursorMax).optional()
+})
+
+export const ConversationsControllerMessagesResponse = zod.object({
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['note', 'reply']),
+  "body": zod.string(),
+  "sentAt": zod.string(),
+  "fromMe": zod.boolean(),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()]),
+  "viaAi": zod.boolean(),
+  "status": zod.enum(['unread', 'read']),
+  "canDeleteForAll": zod.boolean()
+})),
+  "otherParty": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),
+  "nextCursor": zod.union([zod.string(),zod.null()]),
+  "hasMore": zod.boolean()
+})
+
+
+export const conversationsControllerSendPathOtherUserIdMax = 64;
+
+
+
+export const ConversationsControllerSendParams = zod.object({
+  "otherUserId": zod.string().min(1).max(conversationsControllerSendPathOtherUserIdMax)
+})
+
+export const conversationsControllerSendBodyBodyMax = 2000;
+
+
+
+export const ConversationsControllerSendBody = zod.object({
+  "body": zod.string().min(1).max(conversationsControllerSendBodyBodyMax)
+})
+
+
+export const conversationsControllerMarkReadPathOtherUserIdMax = 64;
+
+
+
+export const ConversationsControllerMarkReadParams = zod.object({
+  "otherUserId": zod.string().min(1).max(conversationsControllerMarkReadPathOtherUserIdMax)
+})
+
+export const conversationsControllerMarkReadResponseUpdatedMin = 0;
+export const conversationsControllerMarkReadResponseUpdatedMax = 9007199254740991;
+
+
+
+export const ConversationsControllerMarkReadResponse = zod.object({
+  "updated": zod.number().min(conversationsControllerMarkReadResponseUpdatedMin).max(conversationsControllerMarkReadResponseUpdatedMax)
+})
+
+
+export const conversationsControllerHideConversationPathOtherUserIdMax = 64;
+
+
+
+export const ConversationsControllerHideConversationParams = zod.object({
+  "otherUserId": zod.string().min(1).max(conversationsControllerHideConversationPathOtherUserIdMax)
+})
+
+
+export const conversationsControllerDeleteMessagePathOtherUserIdMax = 64;
+
+export const conversationsControllerDeleteMessagePathMessageIdMax = 64;
+
+
+
+export const ConversationsControllerDeleteMessageParams = zod.object({
+  "otherUserId": zod.string().min(1).max(conversationsControllerDeleteMessagePathOtherUserIdMax),
+  "kind": zod.enum(['note', 'reply']),
+  "messageId": zod.string().min(1).max(conversationsControllerDeleteMessagePathMessageIdMax)
+})
+
+export const conversationsControllerDeleteMessageQueryScopeDefault = `self`;
+
+export const ConversationsControllerDeleteMessageQueryParams = zod.object({
+  "scope": zod.enum(['self', 'all']).default(conversationsControllerDeleteMessageQueryScopeDefault)
 })
 
 

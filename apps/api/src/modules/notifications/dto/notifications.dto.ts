@@ -6,32 +6,74 @@ import { z } from 'zod'
 // length range only — the FK / not-found check on the server is the real guard.
 const ID = z.string().min(1).max(64)
 
+export const NotificationCategorySchema = z.enum(['chat', 'report', 'compliance', 'task', 'system'])
+export type NotificationCategoryDto = z.infer<typeof NotificationCategorySchema>
+
+const PartySchema = z.object({
+  id: z.string(),
+  name: z.string().nullable(),
+  email: z.string(),
+})
+
 export const NotificationSchema = z.object({
   id: z.string(),
   body: z.string(),
   source: z.enum(['chat', 'whatsapp', 'manual']),
+  category: NotificationCategorySchema,
+  // True for background-job-composed rows (task reminders, scheduled reports,
+  // compliance). UI renders these with the gm assistant treatment rather
+  // than attributing the message to `author` (which, for reminders, is the
+  // task creator — kept for context, not as the speaker).
+  automated: z.boolean(),
   status: z.enum(['unread', 'read']),
   createdAt: z.string(),
   readAt: z.string().nullable(),
-  author: z
-    .object({
-      id: z.string(),
-      name: z.string().nullable(),
-      email: z.string(),
-    })
-    .nullable(),
+  // Author is null for system-authored notifications (compliance, scheduled
+  // reports). Recipient is always present — it's a not-null FK.
+  author: PartySchema.nullable(),
+  recipient: PartySchema,
 })
 export class NotificationDto extends createZodDto(NotificationSchema) {}
 
+// Optional CSV of category values, deduped + length-capped. Capped at 16 chars
+// per item so a malicious client can't push a huge IN-list through Prisma.
+const CategoryCsv = z
+  .string()
+  .max(128)
+  .optional()
+  .transform((raw) => {
+    if (!raw) return undefined
+    const seen = new Set<NotificationCategoryDto>()
+    for (const part of raw.split(',')) {
+      const trimmed = part.trim()
+      if (!trimmed || trimmed.length > 16) continue
+      const parsed = NotificationCategorySchema.safeParse(trimmed)
+      if (parsed.success) seen.add(parsed.data)
+    }
+    return seen.size > 0 ? Array.from(seen) : undefined
+  })
+
 export const ListNotificationsQuerySchema = z.object({
   status: z.enum(['unread', 'read', 'all']).optional().default('all'),
-  limit: z.coerce.number().int().min(1).max(100).optional().default(30),
+  // direction:
+  //   inbox  — notifications you received (recipientUserId = me)
+  //   sent   — notifications you authored (authorUserId = me, system-authored
+  //            rows never match because they have null authorUserId)
+  direction: z.enum(['inbox', 'sent']).optional().default('inbox'),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(30),
+  // Opaque base64-encoded `<createdAtIso>|<id>` cursor. Server rejects malformed
+  // input with 400 invalid-cursor; the client clears its cache and restarts.
+  cursor: z.string().max(256).optional(),
+  q: z.string().trim().max(200).optional(),
+  category: CategoryCsv,
 })
 export class ListNotificationsQueryDto extends createZodDto(ListNotificationsQuerySchema) {}
 
 export const ListNotificationsResponseSchema = z.object({
   notifications: z.array(NotificationSchema),
   unreadCount: z.number(),
+  nextCursor: z.string().nullable(),
+  hasMore: z.boolean(),
 })
 export class ListNotificationsResponseDto extends createZodDto(ListNotificationsResponseSchema) {}
 

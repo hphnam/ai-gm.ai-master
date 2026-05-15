@@ -692,12 +692,18 @@ export class ToolDispatcher {
               authorUserId: ctx.userId,
               source,
               category: 'chat',
+              // Not automated — the user explicitly asked the assistant to
+              // send this note on their behalf. The gm monogram in the
+              // conversation view comes from `source === 'chat'` (viaAi),
+              // not from this flag.
+              automated: false,
               body: i.body,
             },
             select: {
               id: true,
               createdAt: true,
               author: { select: { id: true, name: true, email: true } },
+              recipient: { select: { id: true, name: true, email: true } },
             },
           })
           this.logger.log(
@@ -710,19 +716,37 @@ export class ToolDispatcher {
               bodyLength: i.body.length,
             }),
           )
-          this.realtime.emitNotificationCreated(target.userId, {
+          const authorParty = created.author
+            ? {
+                id: created.author.id,
+                name: created.author.name,
+                email: created.author.email,
+              }
+            : null
+          const recipientParty = {
+            id: created.recipient.id,
+            name: created.recipient.name,
+            email: created.recipient.email,
+          }
+          const basePayload = {
             id: created.id,
             body: i.body,
             source,
-            category: 'chat',
+            category: 'chat' as const,
+            automated: false,
             createdAt: created.createdAt.toISOString(),
-            author: created.author
-              ? {
-                  id: created.author.id,
-                  name: created.author.name,
-                  email: created.author.email,
-                }
-              : null,
+            author: authorParty,
+            recipient: recipientParty,
+          }
+          // Recipient gets the toast; author's other tabs/devices get a
+          // silent refresh of their Sent view.
+          this.realtime.emitNotificationCreated(target.userId, {
+            ...basePayload,
+            kind: 'received',
+          })
+          this.realtime.emitNotificationCreated(ctx.userId, {
+            ...basePayload,
+            kind: 'sent-confirmation',
           })
           return {
             ok: true,

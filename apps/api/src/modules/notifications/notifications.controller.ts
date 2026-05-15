@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -26,7 +27,7 @@ import {
   SingleReplyResponseDto,
   UnreadCountResponseDto,
 } from './dto/notifications.dto'
-import { NotificationsService } from './notifications.service'
+import { InvalidCursorError, NotificationsService } from './notifications.service'
 
 @ApiTags('notifications')
 @ApiBearerAuth()
@@ -42,10 +43,21 @@ export class NotificationsController {
     @CurrentUser() user: { id: string },
     @Query(new ZodValidationPipe(ListNotificationsQueryDto)) query: ListNotificationsQueryDto,
   ): Promise<ListNotificationsResponseDto> {
-    return this.service.list(org.id, user.id, {
-      status: query.status ?? 'all',
-      limit: query.limit ?? 30,
-    })
+    try {
+      return await this.service.list(org.id, user.id, {
+        status: query.status ?? 'all',
+        direction: query.direction ?? 'inbox',
+        limit: query.limit ?? 30,
+        cursor: query.cursor,
+        q: query.q,
+        category: query.category,
+      })
+    } catch (err) {
+      if (err instanceof InvalidCursorError) {
+        throw new BadRequestException({ error: 'invalid-cursor' })
+      }
+      throw err
+    }
   }
 
   @Get('unread-count')

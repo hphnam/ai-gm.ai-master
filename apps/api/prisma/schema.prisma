@@ -9,16 +9,16 @@ datasource db {
 }
 
 model Venue {
-  id             String   @id @default(uuid())
-  name           String
-  address        String?
-  type           String
-  timezone       String   @default("Europe/London")
+  id               String   @id @default(uuid())
+  name             String
+  address          String?
+  type             String
+  timezone         String   @default("Europe/London")
   /// Phase D — structured operational context (layout, fire safety, hours, etc.).
   /// Shape contracted via VenueProfileSchema in @gm-ai/types. Indexed into
   /// SearchableEntity on every write so the agent can retrieve "where's the
   /// fire escape" or "what's the alarm code policy" semantically.
-  profile        Json     @default("{}")
+  profile          Json     @default("{}")
   /// External POS location identifier, scoped to whichever Integration the org
   /// has connected. Currently set when the org connects Square — this is the
   /// Square Location.id mapped to this venue. Future POS integrations
@@ -26,8 +26,8 @@ model Venue {
   /// expected per org at a time. Null when no POS is connected or no mapping
   /// has been set yet.
   squareLocationId String?
-  organizationId String
-  createdAt      DateTime @default(now())
+  organizationId   String
+  createdAt        DateTime @default(now())
 
   organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   mockStock          MockStock[]
@@ -67,16 +67,19 @@ model User {
   whatsappInvitesTargeted WhatsappInvite[]  @relation("WhatsappInviteTargetUser")
   whatsappSessions        WhatsappSession[]
 
-  notificationsReceived Notification[] @relation("NotificationRecipient")
-  notificationsAuthored Notification[] @relation("NotificationAuthor")
-  notificationRepliesAuthored NotificationReply[] @relation("NotificationReplyAuthor")
+  notificationsReceived       Notification[]       @relation("NotificationRecipient")
+  notificationsAuthored       Notification[]       @relation("NotificationAuthor")
+  notificationRepliesAuthored NotificationReply[]  @relation("NotificationReplyAuthor")
+  hiddenConversations         ConversationHidden[] @relation("ConversationHiddenByUser")
+  conversationsHiddenAgainst  ConversationHidden[] @relation("ConversationHiddenOtherUser")
+  hiddenMessages              HiddenMessage[]      @relation("HiddenMessageUser")
 
   tasksAssigned Task[] @relation("TaskAssignee")
   tasksCreated  Task[] @relation("TaskCreator")
 
   expiryRecords ExpiryRecord[] @relation("ExpiryRecordPerson")
 
-  reportsCreated Report[] @relation("ReportCreator")
+  reportsCreated          Report[]          @relation("ReportCreator")
   scheduledReportsCreated ScheduledReport[] @relation("ScheduledReportCreator")
 
   @@map("users")
@@ -161,12 +164,13 @@ model Organization {
   whatsappInvites  WhatsappInvite[]
   whatsappSessions WhatsappSession[]
 
-  notifications  Notification[]
-  tasks          Task[]
-  expiryRecords  ExpiryRecord[]
-  integrations   Integration[]
-  reports        Report[]
-  scheduledReports ScheduledReport[]
+  notifications       Notification[]
+  tasks               Task[]
+  expiryRecords       ExpiryRecord[]
+  integrations        Integration[]
+  reports             Report[]
+  scheduledReports    ScheduledReport[]
+  hiddenConversations ConversationHidden[]
 
   @@index([slug])
   @@map("organizations")
@@ -834,21 +838,29 @@ model ReTagQueueItem {
 /// unread (default) → read. authorUserId is nullable for system-originated
 /// notes; recipient + org are required so the inbox query is always scoped.
 model Notification {
-  id             String    @id @default(uuid())
-  organizationId String
+  id              String    @id @default(uuid())
+  organizationId  String
   recipientUserId String
-  authorUserId   String?
-  source         String    @default("chat") // chat | whatsapp | manual
-  category       String    @default("chat") // chat | report | compliance | task | system
-  body           String
-  status         String    @default("unread") // unread | read
-  createdAt      DateTime  @default(now())
-  readAt         DateTime?
+  authorUserId    String?
+  source          String    @default("chat") // chat | whatsapp | manual
+  category        String    @default("chat") // chat | report | compliance | task | system
+  /// True when the notification was composed by a background job (e.g. task
+  /// reminders, expiry scheduler) rather than typed by a human or invoked via
+  /// the AI chat tool. UI uses this to render with the "gm" assistant
+  /// monogram instead of attributing the message to the listed `author`
+  /// (which, for reminders, is the task *creator* — kept for context but
+  /// not the actual speaker).
+  automated       Boolean   @default(false)
+  body            String
+  status          String    @default("unread") // unread | read
+  createdAt       DateTime  @default(now())
+  readAt          DateTime?
 
   organization Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   recipient    User                @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
   author       User?               @relation("NotificationAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
   replies      NotificationReply[]
+  hiddenBy     HiddenMessage[]     @relation("HiddenMessageNotification")
 
   @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)])
   @@index([organizationId, recipientUserId, createdAt(sort: Desc)])
@@ -869,13 +881,58 @@ model NotificationReply {
   body           String
   createdAt      DateTime @default(now())
 
-  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-  author       User         @relation("NotificationReplyAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  notification Notification    @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  author       User            @relation("NotificationReplyAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  hiddenBy     HiddenMessage[] @relation("HiddenMessageReply")
 
   /// Primary thread query — list replies for one notification ordered oldest
   /// first (matches how the UI renders).
   @@index([notificationId, createdAt])
   @@map("notification_replies")
+}
+
+/// Wave 6 — "delete chat" support. WhatsApp-style: hiding a conversation
+/// removes it from the user's list only; the other party still sees their
+/// own copy. The (userId, otherUserId, organizationId) triple is unique;
+/// composite primary key avoids the extra surrogate id. A new chat message
+/// between the same pair deletes the matching row server-side so the
+/// conversation resurfaces — handled in the compose paths, not the query.
+model ConversationHidden {
+  userId         String
+  otherUserId    String
+  organizationId String
+  hiddenAt       DateTime @default(now())
+
+  user         User         @relation("ConversationHiddenByUser", fields: [userId], references: [id], onDelete: Cascade)
+  otherUser    User         @relation("ConversationHiddenOtherUser", fields: [otherUserId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, otherUserId, organizationId])
+  @@index([userId, organizationId])
+  @@map("conversation_hidden")
+}
+
+/// Wave 6 — "delete for me" support on individual messages. Polymorphic-ish:
+/// exactly one of notificationId / replyId is set. The unique constraints on
+/// (userId, notificationId) and (userId, replyId) prevent dupes. List/query
+/// paths filter rows where the requesting user appears here. "Delete for
+/// everyone" doesn't write here — it hard-deletes the underlying row, which
+/// cascades these rows automatically.
+model HiddenMessage {
+  id             String   @id @default(uuid())
+  userId         String
+  notificationId String?
+  replyId        String?
+  hiddenAt       DateTime @default(now())
+
+  user         User               @relation("HiddenMessageUser", fields: [userId], references: [id], onDelete: Cascade)
+  notification Notification?      @relation("HiddenMessageNotification", fields: [notificationId], references: [id], onDelete: Cascade)
+  reply        NotificationReply? @relation("HiddenMessageReply", fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+  @@unique([userId, replyId])
+  @@index([userId])
+  @@map("hidden_messages")
 }
 
 /// Wave 1 — Tasks & Reminders. Durable action items owned by a specific org
@@ -937,27 +994,27 @@ model Task {
 /// surfaced through CATEGORIES in compliance.dto.ts which is the canonical
 /// public contract — keep these in sync.
 model ExpiryRecord {
-  id              String    @id @default(uuid())
-  organizationId  String
+  id                   String    @id @default(uuid())
+  organizationId       String
   /// Most certs are venue-scoped (food hygiene per-venue, premises licence).
   /// Org-wide kinds (group public liability insurance, owner's personal
   /// licence) leave venueId null.
-  venueId         String?
+  venueId              String?
   /// Source KnowledgeItem when auto-extracted. Null for manual entries.
   /// SET NULL on doc delete — the obligation outlives the source doc.
-  knowledgeItemId String?
-  title           String
+  knowledgeItemId      String?
+  title                String
   /// Free-form category slug (food_hygiene, personal_licence, premises_licence,
   /// pat, gas_safety, fire_risk, insurance, equipment_service). See CATEGORIES.
-  category        String
-  expiresAt       DateTime
+  category             String
+  expiresAt            DateTime
   /// Staff-cert link to an org member when we can resolve their name. Falls
   /// back to personName (free text) for staff who aren't users in the system.
-  personUserId    String?
-  personName      String?
+  personUserId         String?
+  personName           String?
   /// "Beer line", "Extractor fan #2", etc. — for equipment_service kind.
-  assetName       String?
-  renewalCostGbp  Decimal?  @db.Decimal(10, 2)
+  assetName            String?
+  renewalCostGbp       Decimal?  @db.Decimal(10, 2)
   /// active → renewed | expired | dismissed.
   ///   active   default; scheduler fires reminders.
   ///   renewed  closed because a new cert was uploaded / dates were rolled
@@ -966,22 +1023,22 @@ model ExpiryRecord {
   ///            depending on category (food hygiene = closure risk → keep
   ///            nudging; minor equipment = stop after grace window).
   ///   dismissed manually closed by the user — scheduler never touches again.
-  status          String    @default("active")
+  status               String    @default("active")
   /// Per-window CAS stamps so the scheduler emits each reminder exactly once.
   /// 30/7/1-day windows + overdue (set when expiresAt < now). NULL = not yet
   /// reminded; updating expiresAt forward (renewal) MUST reset all four to
   /// reopen the reminder window.
-  reminded30At    DateTime?
-  reminded7At     DateTime?
-  reminded1At     DateTime?
-  remindedOverdueAt DateTime?
+  reminded30At         DateTime?
+  reminded7At          DateTime?
+  reminded1At          DateTime?
+  remindedOverdueAt    DateTime?
   /// Extractor confidence (0.00–1.00). NULL for manual entries. Low confidence
   /// (<0.6) surfaces a "verify before relying on it" banner in the UI.
-  extractionConfidence Decimal? @db.Decimal(3, 2)
+  extractionConfidence Decimal?  @db.Decimal(3, 2)
   /// Optional notes appended in the dashboard.
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  notes                String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   venue         Venue?         @relation(fields: [venueId], references: [id], onDelete: SetNull)
@@ -999,7 +1056,6 @@ model ExpiryRecord {
   @@map("expiry_records")
 }
 
-
 /// Third-party integrations connected per organization (Square, Xero, Toast, …).
 /// One row per (org, provider). Holds whichever credentials the connection needs:
 /// PAT (paste-in, current default) stores a single encrypted access token; OAuth
@@ -1007,36 +1063,36 @@ model ExpiryRecord {
 /// accessToken / refreshToken are AES-256-GCM ciphertext with the auth tag and
 /// IV embedded — never write plaintext tokens to this table.
 model Integration {
-  id                String   @id @default(uuid())
-  organizationId    String
+  id                 String    @id @default(uuid())
+  organizationId     String
   /// Provider slug: 'square' (others land here as we add them).
-  provider          String
+  provider           String
   /// active | disconnected | error. Disconnected rows are kept around so we
   /// can show "you previously connected X" in the UI; tools refuse them.
-  status            String   @default("active")
+  status             String    @default("active")
   /// 'pat' | 'oauth'. PAT path stores accessToken only; OAuth additionally
   /// uses refreshToken + tokenExpiresAt + externalAccountId.
-  authMode          String
+  authMode           String
   /// AES-256-GCM ciphertext (base64). Decrypted at use-time inside the
   /// IntegrationsService; never returned through the API.
-  accessTokenCipher String
+  accessTokenCipher  String
   refreshTokenCipher String?
-  tokenExpiresAt    DateTime?
+  tokenExpiresAt     DateTime?
   /// Scopes granted at connect time (OAuth) or hand-entered (PAT). String[]
   /// because Postgres array is fine for short lists.
-  scopes            String[] @default([])
+  scopes             String[]  @default([])
   /// Square merchant_id / Xero tenant_id / etc. — provider's own account
   /// identifier. Used for sanity-checking the connection didn't get swapped.
-  externalAccountId String?
+  externalAccountId  String?
   /// 'production' | 'sandbox'. Square ships separate hosts per environment.
-  environment       String   @default("production")
+  environment        String    @default("production")
   /// Provider-specific bag (rate-limit hints, last-error detail, etc.). Never
   /// secrets — they go in *Cipher columns.
-  metadata          Json     @default("{}")
-  lastError         String?
-  lastSyncedAt      DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  metadata           Json      @default("{}")
+  lastError          String?
+  lastSyncedAt       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -1051,25 +1107,25 @@ model Integration {
 /// a JSON ReportSpec (text / kpi / kpiGroup / bar / table / divider sections).
 /// The web /reports/:id page renders the same spec the chat card uses.
 model Report {
-  id             String    @id @default(uuid())
-  organizationId String
+  id              String   @id @default(uuid())
+  organizationId  String
   /// Optional venue scope. Org-wide reports leave this null (e.g. multi-venue
   /// roll-up). The card title surfaces venue.name when set.
-  venueId        String?
+  venueId         String?
   /// User who triggered generation. Nullable so a leaver's account deletion
   /// can SetNull this column without taking the report row with it (the
   /// content is org-owned; we only lose the "Created by" attribution).
   /// Always populated on insert by the controller / agent dispatch.
   createdByUserId String?
-  title          String
+  title           String
   /// One-line plain-text summary surfaced under the title. Optional — the
   /// agent may pass empty for terse reports.
-  summary        String?
+  summary         String?
   /// ReportSpec JSON. Validated on read by the controller via the shared Zod
   /// schema in apps/api/src/types/reports.ts so a malformed legacy row
   /// doesn't crash the renderer.
-  spec           Json
-  createdAt      DateTime @default(now())
+  spec            Json
+  createdAt       DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   /// Set-null on user delete so a leaver doesn't cascade-delete the org's
@@ -1088,7 +1144,7 @@ model Report {
 /// Notification to the creator; future work plugs the agent in to
 /// pre-compute the spec from the prompt hint.
 model ScheduledReport {
-  id              String   @id @default(uuid())
+  id              String  @id @default(uuid())
   organizationId  String
   venueId         String?
   /// Nullable: SetNull on user delete keeps the org's recurring schedule
@@ -1096,46 +1152,46 @@ model ScheduledReport {
   /// rows whose creator is gone (no-one to notify).
   createdByUserId String?
 
-  title           String
+  title   String
   /// One-line description for the manage UI; not used by the worker.
-  summary         String?
+  summary String?
 
   /// 'daily' | 'weekly' | 'monthly'. Drives the nextRunAt advance after
   /// each fire. Stored as string so future kinds (biweekly, quarterly)
   /// can be added without an enum migration.
-  frequency       String
+  frequency  String
   /// Hour of day in `timezone`, 0-23. Send window is the first minute of
   /// the hour (e.g. 09:00 sharp).
-  hourOfDay       Int      @default(9)
+  hourOfDay  Int    @default(9)
   /// 1-7 (Mon=1) for weekly schedules; null otherwise.
-  dayOfWeek       Int?
+  dayOfWeek  Int?
   /// 1-28 for monthly schedules (capped to 28 so February is always safe);
   /// null otherwise.
-  dayOfMonth      Int?
+  dayOfMonth Int?
   /// IANA timezone — venues can span tz boundaries so we store explicitly.
-  timezone        String   @default("UTC")
+  timezone   String @default("UTC")
 
   /// Free-form natural-language hint the worker will eventually feed to the
   /// agent ("focus on stock + labor, last 7 days"). Phase C foundation
   /// persists but doesn't act on it.
-  prompt          String?
+  prompt String?
 
   /// 'active' | 'paused' | 'cancelled'. Only 'active' rows are picked up
   /// by the tick worker.
-  status          String   @default("active")
+  status String @default("active")
 
   /// Next UTC fire time. Computed at insert time AND after each successful
   /// fire. The worker filters on this column so it's the hot index path.
-  nextRunAt       DateTime
-  lastRunAt       DateTime?
+  nextRunAt    DateTime
+  lastRunAt    DateTime?
   /// Loose pointer to the most recent Report this schedule produced. Not a
   /// FK — Reports may be deleted independently and we'd rather show a
   /// dangling id than cascade-block the schedule.
-  lastReportId    String?
-  runCount        Int      @default(0)
+  lastReportId String?
+  runCount     Int       @default(0)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   creator      User?        @relation("ScheduledReportCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)

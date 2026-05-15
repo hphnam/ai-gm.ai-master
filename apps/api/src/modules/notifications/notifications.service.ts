@@ -35,14 +35,21 @@ const replyRateLimit = (() => {
   }
 })()
 
+export type NotificationCategory = 'chat' | 'report' | 'compliance' | 'task' | 'system'
+
+export type NotificationParty = { id: string; name: string | null; email: string }
+
 export type NotificationRow = {
   id: string
   body: string
   source: 'chat' | 'whatsapp' | 'manual'
+  category: NotificationCategory
+  automated: boolean
   status: 'unread' | 'read'
   createdAt: string
   readAt: string | null
-  author: { id: string; name: string | null; email: string } | null
+  author: NotificationParty | null
+  recipient: NotificationParty
 }
 
 export type NotificationReplyRow = {
@@ -55,6 +62,53 @@ export type NotificationReplyRow = {
 
 const KNOWN_SOURCES = new Set(['chat', 'whatsapp', 'manual'])
 const KNOWN_STATUSES = new Set(['unread', 'read'])
+const KNOWN_CATEGORIES = new Set<NotificationCategory>([
+  'chat',
+  'report',
+  'compliance',
+  'task',
+  'system',
+])
+
+// Opaque cursor: `base64url(createdAtIso|id)`. The pipe is forbidden in ISO 8601
+// timestamps, so splitting on the last occurrence is unambiguous. Assumes
+// millisecond precision on `createdAt`; if the column ever moves to
+// timestamp(6), cursors at microsecond boundaries can skip rows.
+function encodeCursor(createdAt: Date, id: string): string {
+  return Buffer.from(`${createdAt.toISOString()}|${id}`, 'utf8').toString('base64url')
+}
+
+class InvalidCursorError extends Error {
+  constructor() {
+    super('invalid-cursor')
+    this.name = 'InvalidCursorError'
+  }
+}
+
+// Throws on malformed input rather than silently restarting from the top.
+// Silent restart causes UI duplicates (the client thinks it advanced; the
+// server returns page 1 again) and surfaces no signal that the cursor is
+// stale across a deploy. Controller catches and returns 400 invalid-cursor;
+// the client can react by clearing its infinite-query cache.
+function decodeCursor(raw: string | undefined): { createdAt: Date; id: string } | null {
+  if (!raw) return null
+  let decoded: string
+  try {
+    decoded = Buffer.from(raw, 'base64url').toString('utf8')
+  } catch {
+    throw new InvalidCursorError()
+  }
+  const sep = decoded.lastIndexOf('|')
+  if (sep <= 0 || sep === decoded.length - 1) throw new InvalidCursorError()
+  const iso = decoded.slice(0, sep)
+  const id = decoded.slice(sep + 1)
+  if (id.length === 0 || id.length > 64) throw new InvalidCursorError()
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) throw new InvalidCursorError()
+  return { createdAt: date, id }
+}
+
+export { InvalidCursorError }
 
 @Injectable()
 export class NotificationsService {
@@ -65,34 +119,90 @@ export class NotificationsService {
   async list(
     orgId: string,
     userId: string,
-    opts: { status: 'unread' | 'read' | 'all'; limit: number },
-  ): Promise<{ notifications: NotificationRow[]; unreadCount: number }> {
+    opts: {
+      status: 'unread' | 'read' | 'all'
+      direction: 'inbox' | 'sent'
+      limit: number
+      cursor?: string
+      q?: string
+      category?: NotificationCategory[]
+    },
+  ): Promise<{
+    notifications: NotificationRow[]
+    unreadCount: number
+    nextCursor: string | null
+    hasMore: boolean
+  }> {
+    const cursor = decodeCursor(opts.cursor)
+    // Keystone tuple: (createdAt DESC, id DESC). The (createdAt < cursor) OR
+    // (createdAt = cursor AND id < cursorId) clause guarantees a strict
+    // monotonic walk even when two notifications share createdAt to the
+    // millisecond (common in batch jobs that fire reminders in a tight loop).
+    const cursorClause = cursor
+      ? {
+          OR: [
+            { createdAt: { lt: cursor.createdAt } },
+            { createdAt: cursor.createdAt, id: { lt: cursor.id } },
+          ],
+        }
+      : {}
+    const searchClause = opts.q ? { body: { contains: opts.q, mode: 'insensitive' as const } } : {}
+    const categoryClause = opts.category?.length ? { category: { in: opts.category } } : {}
+    // Direction picks which FK to scope on. `sent` deliberately excludes
+    // system-authored rows because their authorUserId is null — the user
+    // didn't send them, and surfacing them here would conflate "things I
+    // sent" with "things the system sent on behalf of nobody".
+    const directionClause =
+      opts.direction === 'sent' ? { authorUserId: userId } : { recipientUserId: userId }
+    // Status filter only makes sense on the inbox — `unread`/`read` is the
+    // *recipient's* state. In Sent view the sender hasn't got an unread/read
+    // state on their own outgoing messages, so we ignore it.
+    const statusClause =
+      opts.direction === 'inbox' && opts.status !== 'all' ? { status: opts.status } : {}
+    const where = {
+      organizationId: orgId,
+      ...directionClause,
+      ...statusClause,
+      ...cursorClause,
+      ...searchClause,
+      ...categoryClause,
+    }
+    const take = opts.limit + 1 // fetch one extra row to determine hasMore without a count()
     const [rows, unreadCount] = await Promise.all([
       prisma.notification.findMany({
-        where: {
-          organizationId: orgId,
-          recipientUserId: userId,
-          ...(opts.status === 'all' ? {} : { status: opts.status }),
-        },
-        orderBy: { createdAt: 'desc' },
-        take: opts.limit,
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take,
         select: {
           id: true,
           body: true,
           source: true,
+          category: true,
+          automated: true,
           status: true,
           createdAt: true,
           readAt: true,
           author: { select: { id: true, name: true, email: true } },
+          recipient: { select: { id: true, name: true, email: true } },
         },
       }),
+      // The unread count is always the inbox unread count, regardless of
+      // which view is open — the bell badge should reflect a global "you have
+      // unread mail" signal, not "you have unread items in the Sent view"
+      // (which doesn't exist).
       prisma.notification.count({
         where: { organizationId: orgId, recipientUserId: userId, status: 'unread' },
       }),
     ])
+    const hasMore = rows.length > opts.limit
+    const page = hasMore ? rows.slice(0, opts.limit) : rows
+    const last = page[page.length - 1]
+    const nextCursor = hasMore && last ? encodeCursor(last.createdAt, last.id) : null
     return {
-      notifications: rows.map((r) => this.toRow(r)),
+      notifications: page.map((r) => this.toRow(r)),
       unreadCount,
+      nextCursor,
+      hasMore,
     }
   }
 
@@ -127,10 +237,13 @@ export class NotificationsService {
         id: true,
         body: true,
         source: true,
+        category: true,
+        automated: true,
         status: true,
         createdAt: true,
         readAt: true,
         author: { select: { id: true, name: true, email: true } },
+        recipient: { select: { id: true, name: true, email: true } },
       },
     })
     const mapped = this.toRow(row)
@@ -164,7 +277,11 @@ export class NotificationsService {
     authorUserId: string,
     recipientUserId: string,
     body: string,
+    opts?: { category?: NotificationCategory; automated?: boolean },
   ): Promise<NotificationRow> {
+    const category: NotificationCategory =
+      opts?.category && KNOWN_CATEGORIES.has(opts.category) ? opts.category : 'chat'
+    const automated = opts?.automated === true
     // Recipient must be a member of the same org. Reject self-notes — almost
     // always an unintended action from the UI.
     if (recipientUserId === authorUserId) {
@@ -183,16 +300,21 @@ export class NotificationsService {
         recipientUserId,
         authorUserId,
         source: 'manual',
+        category,
+        automated,
         body,
       },
       select: {
         id: true,
         body: true,
         source: true,
+        category: true,
+        automated: true,
         status: true,
         createdAt: true,
         readAt: true,
         author: { select: { id: true, name: true, email: true } },
+        recipient: { select: { id: true, name: true, email: true } },
       },
     })
     const row = this.toRow(created)
@@ -204,14 +326,31 @@ export class NotificationsService {
         recipientUserId,
         notificationId: created.id,
         bodyLength: body.length,
+        automated,
       }),
     )
-    this.realtime.emitNotificationCreated(recipientUserId, {
+    // Two-room fan-out: the recipient gets `received` (toasts in their UI, bell
+    // badge increments); the author gets `sent-confirmation` so their own
+    // Sent view in another tab/device updates without polling. The author's
+    // current tab also runs the mutation onSuccess invalidation; the socket
+    // event is only load-bearing for cross-tab / cross-device.
+    const basePayload = {
       id: row.id,
       body: row.body,
       source: row.source,
+      category: row.category,
+      automated: row.automated,
       createdAt: row.createdAt,
       author: row.author,
+      recipient: row.recipient,
+    }
+    this.realtime.emitNotificationCreated(recipientUserId, {
+      ...basePayload,
+      kind: 'received',
+    })
+    this.realtime.emitNotificationCreated(authorUserId, {
+      ...basePayload,
+      kind: 'sent-confirmation',
     })
     return row
   }
@@ -226,32 +365,46 @@ export class NotificationsService {
     orgId: string,
     recipientUserId: string,
     body: string,
+    opts?: { category?: NotificationCategory },
   ): Promise<NotificationRow> {
+    const category: NotificationCategory =
+      opts?.category && KNOWN_CATEGORIES.has(opts.category) ? opts.category : 'system'
     const created = await prisma.notification.create({
       data: {
         organizationId: orgId,
         recipientUserId,
         authorUserId: null,
         source: 'chat',
+        category,
+        // System-composed by definition; no human author, no chat-tool route.
+        automated: true,
         body,
       },
       select: {
         id: true,
         body: true,
         source: true,
+        category: true,
+        automated: true,
         status: true,
         createdAt: true,
         readAt: true,
         author: { select: { id: true, name: true, email: true } },
+        recipient: { select: { id: true, name: true, email: true } },
       },
     })
     const row = this.toRow(created)
+    // System-authored: no author to notify, only the recipient sees this.
     this.realtime.emitNotificationCreated(recipientUserId, {
+      kind: 'received',
       id: row.id,
       body: row.body,
       source: row.source,
+      category: row.category,
+      automated: row.automated,
       createdAt: row.createdAt,
       author: row.author,
+      recipient: row.recipient,
     })
     return row
   }
@@ -348,10 +501,17 @@ export class NotificationsService {
       }),
     )
 
-    const participants = [parent.recipientUserId, parent.authorUserId].filter(
+    const participantIds = [parent.recipientUserId, parent.authorUserId].filter(
       (x): x is string => !!x,
     )
-    this.realtime.emitNotificationReplyCreated(participants, {
+    // Build per-user payloads so each side's chat client can pinpoint the
+    // conversation cache to bust. The other user is whichever participant
+    // isn't the current target.
+    const participantsForEvent = participantIds.map((uid) => ({
+      userId: uid,
+      otherUserId: participantIds.find((other) => other !== uid) ?? null,
+    }))
+    this.realtime.emitNotificationReplyCreated(participantsForEvent, {
       notificationId,
       reply: {
         id: reply.id,
@@ -360,7 +520,7 @@ export class NotificationsService {
         author: reply.author,
       },
     })
-    return { reply, participants }
+    return { reply, participants: participantIds }
   }
 
   async listOrgMembers(
@@ -389,10 +549,13 @@ export class NotificationsService {
     id: string
     body: string
     source: string
+    category: string
+    automated: boolean
     status: string
     createdAt: Date
     readAt: Date | null
-    author: { id: string; name: string | null; email: string } | null
+    author: NotificationParty | null
+    recipient: NotificationParty
   }): NotificationRow {
     // Defensive narrowing — DB columns are TEXT and could be widened by future
     // migrations or direct SQL inserts. Clamp to known values so the API
@@ -400,14 +563,24 @@ export class NotificationsService {
     // page load on an unexpected string.
     const source = KNOWN_SOURCES.has(r.source) ? (r.source as NotificationRow['source']) : 'chat'
     const status = KNOWN_STATUSES.has(r.status) ? (r.status as NotificationRow['status']) : 'unread'
+    const category = KNOWN_CATEGORIES.has(r.category as NotificationCategory)
+      ? (r.category as NotificationCategory)
+      : 'chat'
     return {
       id: r.id,
       body: r.body,
       source,
+      category,
+      automated: r.automated === true,
       status,
       createdAt: r.createdAt.toISOString(),
       readAt: r.readAt?.toISOString() ?? null,
       author: r.author ? { id: r.author.id, name: r.author.name, email: r.author.email } : null,
+      recipient: {
+        id: r.recipient.id,
+        name: r.recipient.name,
+        email: r.recipient.email,
+      },
     }
   }
 

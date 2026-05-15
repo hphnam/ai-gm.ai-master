@@ -357,15 +357,23 @@ export type ListNotificationsResponseDtoNotificationsItemAuthor = {
   email: string;
 } | null;
 
+export type ListNotificationsResponseDtoNotificationsItemRecipient = {
+  id: string;
+  name: string | null;
+  email: string;
+};
+
 export type ListNotificationsResponseDtoNotificationsItem = {
   id: string;
   body: string;
   source: ListNotificationsResponseDtoNotificationsItemSource;
   category: ListNotificationsResponseDtoNotificationsItemCategory;
+  automated: boolean;
   status: ListNotificationsResponseDtoNotificationsItemStatus;
   createdAt: string;
   readAt: string | null;
   author: ListNotificationsResponseDtoNotificationsItemAuthor;
+  recipient: ListNotificationsResponseDtoNotificationsItemRecipient;
 };
 
 export interface ListNotificationsResponseDto {
@@ -424,15 +432,23 @@ export type SimpleNotificationResponseDtoNotificationAuthor = {
   email: string;
 } | null;
 
+export type SimpleNotificationResponseDtoNotificationRecipient = {
+  id: string;
+  name: string | null;
+  email: string;
+};
+
 export type SimpleNotificationResponseDtoNotification = {
   id: string;
   body: string;
   source: SimpleNotificationResponseDtoNotificationSource;
   category: SimpleNotificationResponseDtoNotificationCategory;
+  automated: boolean;
   status: SimpleNotificationResponseDtoNotificationStatus;
   createdAt: string;
   readAt: string | null;
   author: SimpleNotificationResponseDtoNotificationAuthor;
+  recipient: SimpleNotificationResponseDtoNotificationRecipient;
 };
 
 export interface SimpleNotificationResponseDto {
@@ -498,6 +514,130 @@ export type SingleReplyResponseDtoReply = {
 
 export interface SingleReplyResponseDto {
   reply: SingleReplyResponseDtoReply;
+}
+
+export type ListConversationsResponseDtoConversationsItemOtherParty = {
+  id: string;
+  name: string | null;
+  email: string;
+};
+
+export type ListConversationsResponseDtoConversationsItem = {
+  otherParty: ListConversationsResponseDtoConversationsItemOtherParty;
+  latestPreview: string;
+  latestAt: string;
+  latestFromMe: boolean;
+  latestViaAi: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  unreadCount: number;
+};
+
+export interface ListConversationsResponseDto {
+  conversations: ListConversationsResponseDtoConversationsItem[];
+}
+
+export type ListConversationMessagesResponseDtoMessagesItemKind = typeof ListConversationMessagesResponseDtoMessagesItemKind[keyof typeof ListConversationMessagesResponseDtoMessagesItemKind];
+
+
+export const ListConversationMessagesResponseDtoMessagesItemKind = {
+  note: 'note',
+  reply: 'reply',
+} as const;
+
+export type ListConversationMessagesResponseDtoMessagesItemAuthor = {
+  id: string;
+  name: string | null;
+  email: string;
+} | null;
+
+export type ListConversationMessagesResponseDtoMessagesItemStatus = typeof ListConversationMessagesResponseDtoMessagesItemStatus[keyof typeof ListConversationMessagesResponseDtoMessagesItemStatus];
+
+
+export const ListConversationMessagesResponseDtoMessagesItemStatus = {
+  unread: 'unread',
+  read: 'read',
+} as const;
+
+export type ListConversationMessagesResponseDtoMessagesItem = {
+  id: string;
+  kind: ListConversationMessagesResponseDtoMessagesItemKind;
+  body: string;
+  sentAt: string;
+  fromMe: boolean;
+  author: ListConversationMessagesResponseDtoMessagesItemAuthor;
+  viaAi: boolean;
+  status: ListConversationMessagesResponseDtoMessagesItemStatus;
+  canDeleteForAll: boolean;
+};
+
+export type ListConversationMessagesResponseDtoOtherParty = {
+  id: string;
+  name: string | null;
+  email: string;
+};
+
+export interface ListConversationMessagesResponseDto {
+  messages: ListConversationMessagesResponseDtoMessagesItem[];
+  otherParty: ListConversationMessagesResponseDtoOtherParty;
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
+export interface SendMessageBodyDto {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  body: string;
+}
+
+export type SendMessageResponseDtoMessageKind = typeof SendMessageResponseDtoMessageKind[keyof typeof SendMessageResponseDtoMessageKind];
+
+
+export const SendMessageResponseDtoMessageKind = {
+  note: 'note',
+  reply: 'reply',
+} as const;
+
+export type SendMessageResponseDtoMessageAuthor = {
+  id: string;
+  name: string | null;
+  email: string;
+} | null;
+
+export type SendMessageResponseDtoMessageStatus = typeof SendMessageResponseDtoMessageStatus[keyof typeof SendMessageResponseDtoMessageStatus];
+
+
+export const SendMessageResponseDtoMessageStatus = {
+  unread: 'unread',
+  read: 'read',
+} as const;
+
+export type SendMessageResponseDtoMessage = {
+  id: string;
+  kind: SendMessageResponseDtoMessageKind;
+  body: string;
+  sentAt: string;
+  fromMe: boolean;
+  author: SendMessageResponseDtoMessageAuthor;
+  viaAi: boolean;
+  status: SendMessageResponseDtoMessageStatus;
+  canDeleteForAll: boolean;
+};
+
+export interface SendMessageResponseDto {
+  message: SendMessageResponseDtoMessage;
+}
+
+export interface MarkConversationReadResponseDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  updated: number;
 }
 
 export type CaptureFeedbackInputDtoKind = typeof CaptureFeedbackInputDtoKind[keyof typeof CaptureFeedbackInputDtoKind];
@@ -2132,6 +2272,7 @@ export const TasksControllerListScope = {
 
 export type NotificationsControllerListParams = {
 status?: NotificationsControllerListStatus;
+direction?: NotificationsControllerListDirection;
 /**
  * @minimum 1
  * @maximum 50
@@ -2157,6 +2298,38 @@ export type NotificationsControllerListStatus = typeof NotificationsControllerLi
 export const NotificationsControllerListStatus = {
   unread: 'unread',
   read: 'read',
+  all: 'all',
+} as const;
+
+export type NotificationsControllerListDirection = typeof NotificationsControllerListDirection[keyof typeof NotificationsControllerListDirection];
+
+
+export const NotificationsControllerListDirection = {
+  inbox: 'inbox',
+  sent: 'sent',
+} as const;
+
+export type ConversationsControllerMessagesParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @maxLength 256
+ */
+cursor?: string;
+};
+
+export type ConversationsControllerDeleteMessageParams = {
+scope?: ConversationsControllerDeleteMessageScope;
+};
+
+export type ConversationsControllerDeleteMessageScope = typeof ConversationsControllerDeleteMessageScope[keyof typeof ConversationsControllerDeleteMessageScope];
+
+
+export const ConversationsControllerDeleteMessageScope = {
+  self: 'self',
   all: 'all',
 } as const;
 
@@ -3925,6 +4098,553 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getNotificationsControllerComposeReplyMutationOptions(options), queryClient);
+    }
+
+export type conversationsControllerListResponse200 = {
+  data: ListConversationsResponseDto
+  status: 200
+}
+
+export type conversationsControllerListResponseSuccess = (conversationsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerListResponse = (conversationsControllerListResponseSuccess)
+
+export const getConversationsControllerListUrl = () => {
+
+
+
+
+  return `/notifications/conversations`
+}
+
+export const conversationsControllerList = async ( options?: RequestInit): Promise<conversationsControllerListResponse> => {
+
+  return orvalMutator<conversationsControllerListResponse>(getConversationsControllerListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getConversationsControllerListQueryKey = () => {
+    return [
+    `/notifications/conversations`
+    ] as const;
+    }
+
+
+export const getConversationsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof conversationsControllerList>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getConversationsControllerListQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof conversationsControllerList>>> = ({ signal }) => conversationsControllerList({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ConversationsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerList>>>
+export type ConversationsControllerListQueryError = unknown
+
+
+export function useConversationsControllerList<TData = Awaited<ReturnType<typeof conversationsControllerList>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof conversationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof conversationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useConversationsControllerList<TData = Awaited<ReturnType<typeof conversationsControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof conversationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof conversationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useConversationsControllerList<TData = Awaited<ReturnType<typeof conversationsControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useConversationsControllerList<TData = Awaited<ReturnType<typeof conversationsControllerList>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getConversationsControllerListQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type conversationsControllerMessagesResponse200 = {
+  data: ListConversationMessagesResponseDto
+  status: 200
+}
+
+export type conversationsControllerMessagesResponseSuccess = (conversationsControllerMessagesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerMessagesResponse = (conversationsControllerMessagesResponseSuccess)
+
+export const getConversationsControllerMessagesUrl = (otherUserId: string,
+    params?: ConversationsControllerMessagesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/notifications/conversations/${otherUserId}/messages?${stringifiedParams}` : `/notifications/conversations/${otherUserId}/messages`
+}
+
+export const conversationsControllerMessages = async (otherUserId: string,
+    params?: ConversationsControllerMessagesParams, options?: RequestInit): Promise<conversationsControllerMessagesResponse> => {
+
+  return orvalMutator<conversationsControllerMessagesResponse>(getConversationsControllerMessagesUrl(otherUserId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getConversationsControllerMessagesQueryKey = (otherUserId: string,
+    params?: ConversationsControllerMessagesParams,) => {
+    return [
+    `/notifications/conversations/${otherUserId}/messages`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getConversationsControllerMessagesQueryOptions = <TData = Awaited<ReturnType<typeof conversationsControllerMessages>>, TError = unknown>(otherUserId: string,
+    params?: ConversationsControllerMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getConversationsControllerMessagesQueryKey(otherUserId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof conversationsControllerMessages>>> = ({ signal }) => conversationsControllerMessages(otherUserId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: otherUserId !== null && otherUserId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ConversationsControllerMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerMessages>>>
+export type ConversationsControllerMessagesQueryError = unknown
+
+
+export function useConversationsControllerMessages<TData = Awaited<ReturnType<typeof conversationsControllerMessages>>, TError = unknown>(
+ otherUserId: string,
+    params: undefined |  ConversationsControllerMessagesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof conversationsControllerMessages>>,
+          TError,
+          Awaited<ReturnType<typeof conversationsControllerMessages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useConversationsControllerMessages<TData = Awaited<ReturnType<typeof conversationsControllerMessages>>, TError = unknown>(
+ otherUserId: string,
+    params?: ConversationsControllerMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof conversationsControllerMessages>>,
+          TError,
+          Awaited<ReturnType<typeof conversationsControllerMessages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useConversationsControllerMessages<TData = Awaited<ReturnType<typeof conversationsControllerMessages>>, TError = unknown>(
+ otherUserId: string,
+    params?: ConversationsControllerMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useConversationsControllerMessages<TData = Awaited<ReturnType<typeof conversationsControllerMessages>>, TError = unknown>(
+ otherUserId: string,
+    params?: ConversationsControllerMessagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof conversationsControllerMessages>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getConversationsControllerMessagesQueryOptions(otherUserId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type conversationsControllerSendResponse201 = {
+  data: SendMessageResponseDto
+  status: 201
+}
+
+export type conversationsControllerSendResponseSuccess = (conversationsControllerSendResponse201) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerSendResponse = (conversationsControllerSendResponseSuccess)
+
+export const getConversationsControllerSendUrl = (otherUserId: string,) => {
+
+
+
+
+  return `/notifications/conversations/${otherUserId}/messages`
+}
+
+export const conversationsControllerSend = async (otherUserId: string,
+    sendMessageBodyDto: SendMessageBodyDto, options?: RequestInit): Promise<conversationsControllerSendResponse> => {
+
+  return orvalMutator<conversationsControllerSendResponse>(getConversationsControllerSendUrl(otherUserId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(sendMessageBodyDto)
+  }
+);}
+
+
+
+
+export const getConversationsControllerSendMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerSend>>, TError,{otherUserId: string;data: SendMessageBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerSend>>, TError,{otherUserId: string;data: SendMessageBodyDto}, TContext> => {
+
+const mutationKey = ['conversationsControllerSend'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof conversationsControllerSend>>, {otherUserId: string;data: SendMessageBodyDto}> = (props) => {
+          const {otherUserId,data} = props ?? {};
+
+          return  conversationsControllerSend(otherUserId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConversationsControllerSendMutationResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerSend>>>
+    export type ConversationsControllerSendMutationBody = SendMessageBodyDto
+    export type ConversationsControllerSendMutationError = unknown
+
+    export const useConversationsControllerSend = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerSend>>, TError,{otherUserId: string;data: SendMessageBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof conversationsControllerSend>>,
+        TError,
+        {otherUserId: string;data: SendMessageBodyDto},
+        TContext
+      > => {
+      return useMutation(getConversationsControllerSendMutationOptions(options), queryClient);
+    }
+
+export type conversationsControllerMarkReadResponse200 = {
+  data: MarkConversationReadResponseDto
+  status: 200
+}
+
+export type conversationsControllerMarkReadResponseSuccess = (conversationsControllerMarkReadResponse200) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerMarkReadResponse = (conversationsControllerMarkReadResponseSuccess)
+
+export const getConversationsControllerMarkReadUrl = (otherUserId: string,) => {
+
+
+
+
+  return `/notifications/conversations/${otherUserId}/read`
+}
+
+export const conversationsControllerMarkRead = async (otherUserId: string, options?: RequestInit): Promise<conversationsControllerMarkReadResponse> => {
+
+  return orvalMutator<conversationsControllerMarkReadResponse>(getConversationsControllerMarkReadUrl(otherUserId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getConversationsControllerMarkReadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerMarkRead>>, TError,{otherUserId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerMarkRead>>, TError,{otherUserId: string}, TContext> => {
+
+const mutationKey = ['conversationsControllerMarkRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof conversationsControllerMarkRead>>, {otherUserId: string}> = (props) => {
+          const {otherUserId} = props ?? {};
+
+          return  conversationsControllerMarkRead(otherUserId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConversationsControllerMarkReadMutationResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerMarkRead>>>
+
+    export type ConversationsControllerMarkReadMutationError = unknown
+
+    export const useConversationsControllerMarkRead = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerMarkRead>>, TError,{otherUserId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof conversationsControllerMarkRead>>,
+        TError,
+        {otherUserId: string},
+        TContext
+      > => {
+      return useMutation(getConversationsControllerMarkReadMutationOptions(options), queryClient);
+    }
+
+export type conversationsControllerHideConversationResponse204 = {
+  data: void
+  status: 204
+}
+
+export type conversationsControllerHideConversationResponseSuccess = (conversationsControllerHideConversationResponse204) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerHideConversationResponse = (conversationsControllerHideConversationResponseSuccess)
+
+export const getConversationsControllerHideConversationUrl = (otherUserId: string,) => {
+
+
+
+
+  return `/notifications/conversations/${otherUserId}`
+}
+
+export const conversationsControllerHideConversation = async (otherUserId: string, options?: RequestInit): Promise<conversationsControllerHideConversationResponse> => {
+
+  return orvalMutator<conversationsControllerHideConversationResponse>(getConversationsControllerHideConversationUrl(otherUserId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getConversationsControllerHideConversationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerHideConversation>>, TError,{otherUserId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerHideConversation>>, TError,{otherUserId: string}, TContext> => {
+
+const mutationKey = ['conversationsControllerHideConversation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof conversationsControllerHideConversation>>, {otherUserId: string}> = (props) => {
+          const {otherUserId} = props ?? {};
+
+          return  conversationsControllerHideConversation(otherUserId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConversationsControllerHideConversationMutationResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerHideConversation>>>
+
+    export type ConversationsControllerHideConversationMutationError = unknown
+
+    export const useConversationsControllerHideConversation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerHideConversation>>, TError,{otherUserId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof conversationsControllerHideConversation>>,
+        TError,
+        {otherUserId: string},
+        TContext
+      > => {
+      return useMutation(getConversationsControllerHideConversationMutationOptions(options), queryClient);
+    }
+
+export type conversationsControllerDeleteMessageResponse204 = {
+  data: void
+  status: 204
+}
+
+export type conversationsControllerDeleteMessageResponseSuccess = (conversationsControllerDeleteMessageResponse204) & {
+  headers: Headers;
+};
+;
+
+export type conversationsControllerDeleteMessageResponse = (conversationsControllerDeleteMessageResponseSuccess)
+
+export const getConversationsControllerDeleteMessageUrl = (otherUserId: string,
+    kind: 'note' | 'reply',
+    messageId: string,
+    params?: ConversationsControllerDeleteMessageParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/notifications/conversations/${otherUserId}/messages/${kind}/${messageId}?${stringifiedParams}` : `/notifications/conversations/${otherUserId}/messages/${kind}/${messageId}`
+}
+
+export const conversationsControllerDeleteMessage = async (otherUserId: string,
+    kind: 'note' | 'reply',
+    messageId: string,
+    params?: ConversationsControllerDeleteMessageParams, options?: RequestInit): Promise<conversationsControllerDeleteMessageResponse> => {
+
+  return orvalMutator<conversationsControllerDeleteMessageResponse>(getConversationsControllerDeleteMessageUrl(otherUserId,kind,messageId,params),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getConversationsControllerDeleteMessageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>, TError,{otherUserId: string;kind: 'note' | 'reply';messageId: string;params?: ConversationsControllerDeleteMessageParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>, TError,{otherUserId: string;kind: 'note' | 'reply';messageId: string;params?: ConversationsControllerDeleteMessageParams}, TContext> => {
+
+const mutationKey = ['conversationsControllerDeleteMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>, {otherUserId: string;kind: 'note' | 'reply';messageId: string;params?: ConversationsControllerDeleteMessageParams}> = (props) => {
+          const {otherUserId,kind,messageId,params} = props ?? {};
+
+          return  conversationsControllerDeleteMessage(otherUserId,kind,messageId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConversationsControllerDeleteMessageMutationResult = NonNullable<Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>>
+
+    export type ConversationsControllerDeleteMessageMutationError = unknown
+
+    export const useConversationsControllerDeleteMessage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>, TError,{otherUserId: string;kind: 'note' | 'reply';messageId: string;params?: ConversationsControllerDeleteMessageParams}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof conversationsControllerDeleteMessage>>,
+        TError,
+        {otherUserId: string;kind: 'note' | 'reply';messageId: string;params?: ConversationsControllerDeleteMessageParams},
+        TContext
+      > => {
+      return useMutation(getConversationsControllerDeleteMessageMutationOptions(options), queryClient);
     }
 
 export type feedbackControllerCaptureFeedbackResponse200 = {

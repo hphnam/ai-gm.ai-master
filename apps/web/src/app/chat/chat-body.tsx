@@ -263,6 +263,24 @@ function ChatCore({
   // regardless of useChat's internal timing.
   const [pendingUserTexts, setPendingUserTexts] = useState<string[]>([])
 
+  // One-shot prefill from sessionStorage. Used by entry points like the
+  // report detail page's "Re-run with AI" button — they stash the message
+  // there and navigate to /chat. We read once on mount, hand it to the
+  // composer as initialValue, and clear so a refresh doesn't replay it.
+  const [composerPrefill, setComposerPrefill] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const stash = window.sessionStorage.getItem('chat:prefill')
+      if (stash) {
+        setComposerPrefill(stash)
+        window.sessionStorage.removeItem('chat:prefill')
+      }
+    } catch {
+      // sessionStorage blocked — skip; the button just loses prefill silently.
+    }
+  }, [])
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport<GmUIMessage>({
@@ -638,6 +656,7 @@ function ChatCore({
               onSubmitWithImage={submitWithImage}
               isPending={isPending}
               onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
+              initialValue={composerPrefill}
               disabled={!isOwner || !venueId || !conversationId}
               disabledReason={
                 !isOwner

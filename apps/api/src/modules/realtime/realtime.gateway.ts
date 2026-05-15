@@ -125,17 +125,26 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   // org members never see another user's inbox events. Payload mirrors the
   // NotificationRow shape from notifications.service so the client can render
   // optimistically without an extra fetch.
+  // `kind` lets the client tell apart "you received a note" (toast + bell
+  // badge increment) from "your own note landed for the recipient" (silent
+  // cache refresh for any open Sent view in another tab). Compose paths fan
+  // out twice: once to the recipient with kind='received', once to the
+  // author with kind='sent-confirmation'.
   emitNotificationCreated(
-    recipientUserId: string,
+    targetUserId: string,
     payload: {
+      kind: 'received' | 'sent-confirmation'
       id: string
       body: string
       source: 'chat' | 'whatsapp' | 'manual'
+      category: 'chat' | 'report' | 'compliance' | 'task' | 'system'
+      automated: boolean
       createdAt: string
       author: { id: string; name: string | null; email: string } | null
+      recipient: { id: string; name: string | null; email: string }
     },
   ): void {
-    this.server?.to(userRoomFor(recipientUserId)).emit('notification.created', payload)
+    this.server?.to(userRoomFor(targetUserId)).emit('notification.created', payload)
   }
 
   // Wave 4 — a reply was posted on a notification. We fan out to BOTH
@@ -145,7 +154,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   // to play both roles (system-authored notes have no human author, so
   // recipient is the only participant).
   emitNotificationReplyCreated(
-    userIds: ReadonlyArray<string>,
+    participants: ReadonlyArray<{ userId: string; otherUserId: string | null }>,
     payload: {
       notificationId: string
       reply: {
@@ -156,10 +165,32 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       }
     },
   ): void {
-    const unique = [...new Set(userIds.filter(Boolean))]
-    for (const uid of unique) {
-      this.server?.to(userRoomFor(uid)).emit('notification.reply.created', payload)
+    // Dedupe by userId; per-user payload carries `otherUserId` so each
+    // recipient's chat client can target the right conversation cache. A
+    // null otherUserId means the user is on both ends (compose() blocks
+    // this but the field stays nullable to avoid a type-system foot-gun).
+    const seen = new Set<string>()
+    for (const p of participants) {
+      if (!p.userId || seen.has(p.userId)) continue
+      seen.add(p.userId)
+      this.server?.to(userRoomFor(p.userId)).emit('notification.reply.created', {
+        ...payload,
+        otherUserId: p.otherUserId,
+      })
     }
+  }
+
+  // Fires when a message is hard-deleted ("delete for everyone"). Targets
+  // both conversation participants; each gets the otherUserId of the OTHER
+  // party so their open chat view can drop the bubble. The optimistic path
+  // is for the user who triggered the delete — their mutation onSuccess
+  // already invalidates the cache; this event covers their other tabs +
+  // the other participant.
+  emitNotificationDeleted(
+    targetUserId: string,
+    payload: { kind: 'note' | 'reply'; messageId: string; otherUserId: string | null },
+  ): void {
+    this.server?.to(userRoomFor(targetUserId)).emit('notification.deleted', payload)
   }
 
   // Fires on mark-read / mark-all-read so other tabs of the same user sync.

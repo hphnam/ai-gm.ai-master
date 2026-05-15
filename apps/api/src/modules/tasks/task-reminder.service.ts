@@ -109,14 +109,22 @@ export class TaskReminderService {
     // guard, which our scan filter already prevents (creator==assignee falls
     // through to composeSystem below).
     if (t.creatorUserId && t.creatorUserId !== t.assigneeUserId) {
+      // Attribute to the task creator so the recipient can see WHO set this
+      // up, but flag as `automated` so the UI renders it with the gm
+      // assistant treatment instead of "Elliot sent you a message."
       await this.notifications.compose(
         t.organizationId,
         t.creatorUserId,
         t.assigneeUserId,
         noteBody,
+        { category: 'task', automated: true },
       )
     } else {
-      await this.notifications.composeSystem(t.organizationId, t.assigneeUserId, noteBody)
+      // Self-created task reminder — no human author. composeSystem already
+      // marks `automated: true` by default.
+      await this.notifications.composeSystem(t.organizationId, t.assigneeUserId, noteBody, {
+        category: 'task',
+      })
     }
 
     // Refresh the assignee's My Tasks badge so remindedAt shows immediately
