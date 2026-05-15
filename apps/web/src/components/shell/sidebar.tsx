@@ -2,7 +2,9 @@
 
 import {
   BookOpen,
+  CalendarClock,
   CheckSquare,
+  FileBarChart,
   MessageSquarePlus,
   Settings,
   ShieldCheck,
@@ -20,11 +22,17 @@ import { cn } from '@/lib/utils'
 import { SidebarThreads } from './sidebar-threads'
 import { SidebarUser } from './sidebar-user'
 
-type NavItem = {
+type NavChild = {
   label: string
   href: string
   icon: React.ComponentType<{ className?: string }>
   match: (pathname: string) => boolean
+}
+
+type NavItem = NavChild & {
+  /// Sub-items rendered indented underneath the parent when the parent
+  /// section is active. Keeps the flat-nav feel for everything else.
+  children?: NavChild[]
 }
 
 const primaryNav: NavItem[] = [
@@ -51,6 +59,23 @@ const primaryNav: NavItem[] = [
     href: '/docs',
     icon: BookOpen,
     match: (p) => p.startsWith('/docs'),
+  },
+  {
+    label: 'Reports',
+    href: '/reports',
+    icon: FileBarChart,
+    // Reports parent stays active for the index + detail pages but NOT for
+    // /reports/schedules — that child gets its own active state.
+    match: (p) =>
+      (p === '/reports' || p.startsWith('/reports/')) && !p.startsWith('/reports/schedules'),
+    children: [
+      {
+        label: 'Schedules',
+        href: '/reports/schedules',
+        icon: CalendarClock,
+        match: (p) => p.startsWith('/reports/schedules'),
+      },
+    ],
   },
 ]
 
@@ -171,43 +196,72 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                 ? expiryOverdueCount > 0 || expiryWithin30Count > 0
                 : isKnowledge
             const showBadge = (isKnowledge || isTasks || isCompliance) && badgeCount > 0
+            // Expand child links when the section (parent or any child) is
+            // active.
+            const sectionActive = active || (item.children?.some((c) => c.match(pathname)) ?? false)
             return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors',
-                  active
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
-                )}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon className="h-4 w-4" aria-hidden />
-                <span className="flex-1">{item.label}</span>
-                {showBadge ? (
-                  <>
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
-                        active
-                          ? 'bg-sidebar-foreground/15 text-sidebar-accent-foreground'
-                          : 'bg-sidebar-accent text-sidebar-foreground/85',
-                      )}
-                      aria-hidden
-                    >
-                      {badgeUrgent ? (
-                        <span
-                          className="inline-block h-1 w-1 rounded-full bg-amber-500"
-                          aria-hidden
-                        />
-                      ) : null}
-                      {badgeCount}
-                    </span>
-                    <span className="sr-only">{badgeCount} needing attention</span>
-                  </>
+              <div key={item.label}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors',
+                    active
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
+                  )}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <Icon className="h-4 w-4" aria-hidden />
+                  <span className="flex-1">{item.label}</span>
+                  {showBadge ? (
+                    <>
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
+                          active
+                            ? 'bg-sidebar-foreground/15 text-sidebar-accent-foreground'
+                            : 'bg-sidebar-accent text-sidebar-foreground/85',
+                        )}
+                        aria-hidden
+                      >
+                        {badgeUrgent ? (
+                          <span
+                            className="inline-block h-1 w-1 rounded-full bg-amber-500"
+                            aria-hidden
+                          />
+                        ) : null}
+                        {badgeCount}
+                      </span>
+                      <span className="sr-only">{badgeCount} needing attention</span>
+                    </>
+                  ) : null}
+                </Link>
+                {item.children && sectionActive ? (
+                  <ul className="mt-0.5 ml-5 flex flex-col gap-0.5 border-l border-sidebar-border/60 pl-2">
+                    {item.children.map((child) => {
+                      const childActive = child.match(pathname)
+                      const ChildIcon = child.icon
+                      return (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            className={cn(
+                              'flex items-center gap-2 rounded-md px-2 py-1 text-[13px] transition-colors',
+                              childActive
+                                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                                : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
+                            )}
+                            aria-current={childActive ? 'page' : undefined}
+                          >
+                            <ChildIcon className="h-3.5 w-3.5" aria-hidden />
+                            <span>{child.label}</span>
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 ) : null}
-              </Link>
+              </div>
             )
           })}
         </nav>

@@ -144,37 +144,79 @@ function stripFollowUpTail(raw: string): string {
   return raw.slice(0, idx).trimEnd()
 }
 
-function toolLabel(name: string): string {
-  switch (name) {
-    case 'find_knowledge':
-      return 'Searching knowledge'
-    case 'get_stock_below_par':
-      return 'Checking stock levels'
-    case 'get_stock_by_name':
-      return 'Looking up stock'
-    case 'get_supplier_by_name':
-      return 'Looking up supplier'
-    case 'get_upcoming_cutoffs':
-      return 'Checking order cutoffs'
-    case 'save_knowledge_doc':
-      return 'Saving to knowledge base'
-    case 'query_document_table':
-      return 'Querying tabular data'
-    case 'record_kb_gap':
-      return 'Recording knowledge gap'
-    case 'verify_quote':
-      return 'Verifying source'
-    case 'log_incident':
-      return 'Logging incident'
-    case 'update_stock':
-      return 'Updating stock'
-    case 'add_supplier_note':
-      return 'Updating supplier notes'
-    case 'deep_research':
-      return 'Running deep research'
-    default:
-      return `Running ${name.replace(/_/g, ' ')}`
-  }
+/// Friendly labels for every tool the agent can call. Two forms:
+///   - active  : present-progressive, shown WHILE the tool is running. The
+///               UI appends an ellipsis ("Pulling sales numbers…") so it
+///               reads as activity, not a noun.
+///   - settled : past tense, shown after the tool completes in the expanded
+///               thought-process chip strip ("Pulled sales numbers").
+/// New tools default to a humanised version of the snake-cased name — adding
+/// a proper entry here is one line and worth doing whenever the agent gains
+/// a new capability.
+type ToolLabel = { active: string; settled: string }
+const TOOL_LABELS: Record<string, ToolLabel> = {
+  // Knowledge + retrieval
+  find_knowledge: {
+    active: 'Searching the knowledge base',
+    settled: 'Searched the knowledge base',
+  },
+  query_document_table: { active: 'Reading a document', settled: 'Read a document' },
+  save_knowledge_doc: {
+    active: 'Saving to the knowledge base',
+    settled: 'Saved to the knowledge base',
+  },
+  record_kb_gap: { active: 'Logging the question', settled: 'Logged the question' },
+  verify_quote: { active: 'Verifying the source', settled: 'Verified the source' },
+  deep_research: { active: 'Researching in depth', settled: 'Researched in depth' },
+  // Stock + suppliers (mock + integration)
+  get_stock_below_par: { active: 'Checking stock levels', settled: 'Checked stock levels' },
+  get_stock_by_name: { active: 'Looking up that item', settled: 'Looked up that item' },
+  get_supplier_by_name: { active: 'Looking up the supplier', settled: 'Looked up the supplier' },
+  get_upcoming_cutoffs: { active: 'Checking order cutoffs', settled: 'Checked order cutoffs' },
+  update_stock: { active: 'Updating stock', settled: 'Updated stock' },
+  add_supplier_note: { active: 'Updating supplier notes', settled: 'Updated supplier notes' },
+  // Incident + ops
+  log_incident: { active: 'Logging the incident', settled: 'Logged the incident' },
+  leave_note_for_user: { active: 'Leaving a note', settled: 'Left a note' },
+  // Tasks
+  create_task: { active: 'Adding a task', settled: 'Added a task' },
+  complete_task: { active: 'Marking the task done', settled: 'Marked the task done' },
+  list_my_tasks: { active: 'Pulling your tasks', settled: 'Pulled your tasks' },
+  // Checklists
+  present_checklist: { active: 'Pulling up the walkthrough', settled: 'Pulled up the walkthrough' },
+  // Reports
+  generate_report: { active: 'Putting the report together', settled: 'Put the report together' },
+  schedule_report: { active: 'Scheduling the report', settled: 'Scheduled the report' },
+  list_scheduled_reports: { active: 'Pulling your schedules', settled: 'Pulled your schedules' },
+  pause_scheduled_report: { active: 'Pausing the schedule', settled: 'Paused the schedule' },
+  resume_scheduled_report: { active: 'Resuming the schedule', settled: 'Resumed the schedule' },
+  cancel_scheduled_report: { active: 'Cancelling the schedule', settled: 'Cancelled the schedule' },
+  // POS (Square + future providers)
+  pos_search_items: { active: 'Searching the menu', settled: 'Searched the menu' },
+  pos_get_item_inventory: { active: 'Checking inventory', settled: 'Checked inventory' },
+  pos_list_recent_orders: { active: 'Pulling recent orders', settled: 'Pulled recent orders' },
+  pos_get_sales_summary: { active: 'Pulling sales numbers', settled: 'Pulled sales numbers' },
+  pos_list_locations: { active: 'Listing POS locations', settled: 'Listed POS locations' },
+  pos_list_recent_shifts: { active: 'Pulling recent shifts', settled: 'Pulled recent shifts' },
+  pos_get_active_shifts: { active: 'Checking who is on', settled: 'Checked who is on' },
+  pos_get_labor_summary: { active: 'Pulling labour numbers', settled: 'Pulled labour numbers' },
+  pos_compare_periods: { active: 'Comparing to last period', settled: 'Compared to last period' },
+  pos_get_top_items: { active: 'Pulling top items', settled: 'Pulled top items' },
+  pos_get_payment_breakdown: { active: 'Pulling payment mix', settled: 'Pulled payment mix' },
+  pos_list_refunds: { active: 'Pulling recent refunds', settled: 'Pulled recent refunds' },
+  pos_get_refund_summary: { active: 'Pulling refund totals', settled: 'Pulled refund totals' },
+  pos_get_hourly_breakdown: { active: 'Pulling hour-by-hour', settled: 'Pulled hour-by-hour' },
+  pos_list_team_members: { active: 'Listing team members', settled: 'Listed team members' },
+}
+
+function toolLabel(name: string, state: 'active' | 'settled' = 'active'): string {
+  const entry = TOOL_LABELS[name]
+  if (entry) return entry[state]
+  // Fallback for tools without a dedicated label — capitalise the first word
+  // and snake → space the rest. Reads OK ("Running pos get sales summary")
+  // but every tool deserves a proper entry above.
+  const humanised = name.replace(/_/g, ' ')
+  return state === 'active' ? `Running ${humanised}` : `Ran ${humanised}`
 }
 
 // Quiet monogram avatar — a thin-ringed circle with a small "gm" wordmark.
@@ -211,16 +253,23 @@ function ReasoningBlock({
 }) {
   const [open, setOpen] = useState(streaming)
   const hasText = text.trim().length > 0
-  const hasChips = chips.length > 0
-  if (!hasText && !hasChips) return null
   const inFlightChip = chips.find((c) => !c.done)
+  // Settled chips only show in the expanded view for tools that DON'T have
+  // their own rich card. The card itself is the visual marker — doubling up
+  // (chip + card) reads as noise to a non-technical user.
+  const settledChipsForStrip = chips.filter((c) => c.done && !hasToolCard(c.name))
   const erroredCount = chips.filter((c) => c.errored).length
+  const hasChips = chips.length > 0
+  const hasStripContent = settledChipsForStrip.length > 0
+  if (!hasText && !hasChips) return null
 
-  // Header summary: while a tool is running, show its label; otherwise the
-  // standard Thinking… / Thought process state. Chips render as a compact
-  // row inside the expanded body, alongside the reasoning text.
+  // Header summary: while a tool is running, show its active label with an
+  // ellipsis so it reads as activity ("Pulling sales numbers…"); otherwise
+  // the standard Thinking… / Thought process state. Chip pluraliser counts
+  // ALL settled chips (including ones whose cards are showing below) so the
+  // user gets an honest "5 tools" tally.
   const headerLabel = inFlightChip
-    ? inFlightChip.label
+    ? `${inFlightChip.activeLabel}…`
     : streaming
       ? 'Thinking…'
       : 'Thought process'
@@ -236,7 +285,7 @@ function ReasoningBlock({
         <span>{headerLabel}</span>
         {hasChips && !inFlightChip ? (
           <span className="text-[11px] font-normal text-muted-foreground/80">
-            · {chips.length} {chips.length === 1 ? 'tool' : 'tools'}
+            · {chips.length} {chips.length === 1 ? 'step' : 'steps'}
             {erroredCount ? ` · ${erroredCount} failed` : ''}
           </span>
         ) : null}
@@ -251,31 +300,25 @@ function ReasoningBlock({
       </button>
       {open ? (
         <div className="space-y-2 border-t border-border px-3 py-2">
-          {hasChips ? (
+          {hasStripContent ? (
             <div className="flex flex-wrap gap-1.5">
-              {chips.map((c) => (
+              {settledChipsForStrip.map((c) => (
                 <div
                   key={c.id}
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px]',
                     c.errored
                       ? 'border-destructive/30 bg-destructive/5 text-destructive'
-                      : !c.done
-                        ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                        : 'border-border bg-background text-muted-foreground',
+                      : 'border-border bg-background text-muted-foreground',
                   )}
                 >
                   <span
                     className={cn(
                       'inline-block h-1 w-1 rounded-full',
-                      c.errored
-                        ? 'bg-destructive'
-                        : !c.done
-                          ? 'bg-foreground'
-                          : 'bg-muted-foreground/60',
+                      c.errored ? 'bg-destructive' : 'bg-muted-foreground/60',
                     )}
                   />
-                  {c.label}
+                  {c.settledLabel}
                 </div>
               ))}
             </div>
@@ -283,6 +326,11 @@ function ReasoningBlock({
           {hasText ? (
             <div className="text-[13px] italic leading-relaxed text-muted-foreground whitespace-pre-wrap break-words">
               {text}
+            </div>
+          ) : null}
+          {!hasStripContent && !hasText ? (
+            <div className="text-[11.5px] text-muted-foreground/70">
+              No prose this turn — the cards below are the answer.
             </div>
           ) : null}
         </div>
@@ -395,7 +443,12 @@ function AssistantMarkdown({ text }: { text: string }) {
  */
 type ToolChip = {
   id: string
-  label: string
+  name: string
+  /// Active label ("Pulling sales numbers") shown while the tool is in
+  /// flight; the renderer appends an ellipsis. Settled state swaps in the
+  /// past-tense ("Pulled sales numbers").
+  activeLabel: string
+  settledLabel: string
   done: boolean
   errored: boolean
 }
@@ -425,7 +478,9 @@ function AssistantBody({
     const name = getToolName(p)
     toolChips.push({
       id: (p as { toolCallId?: string }).toolCallId ?? `tool-${i}`,
-      label: toolLabel(name),
+      name,
+      activeLabel: toolLabel(name, 'active'),
+      settledLabel: toolLabel(name, 'settled'),
       done: p.state === 'output-available' || p.state === 'output-error',
       errored: p.state === 'output-error',
     })

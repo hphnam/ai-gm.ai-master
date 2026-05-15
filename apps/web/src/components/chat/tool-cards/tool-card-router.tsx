@@ -4,6 +4,7 @@ import { getToolName, isToolUIPart } from 'ai'
 import { ChecklistCard } from './checklist-card'
 import { CutoffsCard } from './cutoffs-card'
 import { NoteCard } from './note-card'
+import { ReportCard } from './report-card'
 import { StockBelowParCard, StockByNameCard } from './stock-card'
 import { SupplierCard } from './supplier-card'
 import { TaskCompletedCard, TaskCreatedCard } from './task-action-card'
@@ -15,6 +16,7 @@ import type { ToolCardCtx, ToolCardRenderer, ToolPart } from './types'
 // surface as inline citation chips in the assistant text, where they belong.
 const RENDERERS: Record<string, ToolCardRenderer> = {
   present_checklist: ChecklistCard,
+  generate_report: ReportCard,
   list_my_tasks: TasksListCard,
   create_task: TaskCreatedCard,
   complete_task: TaskCompletedCard,

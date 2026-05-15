@@ -279,8 +279,15 @@ export function buildGmAgent(params: {
       }
       return {}
     },
-    // Stop after MAX_STEPS or on a successful destructive save.
-    stopWhen: [stepCountIs(MAX_STEPS), hasToolCall('save_knowledge_doc')],
+    // Stop after MAX_STEPS, on a successful destructive save, or once a
+    // report has been written. generate_report is a single-shot create — a
+    // second call would orphan the first row, and the headless scheduled-
+    // report path relies on first-wins capture in onStepFinish.
+    stopWhen: [
+      stepCountIs(MAX_STEPS),
+      hasToolCall('save_knowledge_doc'),
+      hasToolCall('generate_report'),
+    ],
     onFinish: params.onFinish,
     onStepFinish: params.onStepFinish,
   })

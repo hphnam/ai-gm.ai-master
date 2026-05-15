@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
 import { IngestModule } from '../ingest/ingest.module'
@@ -6,9 +6,15 @@ import { IngestModule } from '../ingest/ingest.module'
 // keep one here for explicitness around the chat → integrations dependency.
 import { IntegrationsModule } from '../integrations/integrations.module'
 import { RealtimeModule } from '../realtime/realtime.module'
+import { ReportsModule } from '../reports/reports.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
+import { ScheduledReportsModule } from '../scheduled-reports/scheduled-reports.module'
 import { TabularModule } from '../tabular/tabular.module'
 import { TasksModule } from '../tasks/tasks.module'
+
+// ScheduledReportsModule's ReportGeneratorService injects ToolDispatcher (this
+// module). ToolDispatcher injects ScheduledReportsService (the other module).
+// Bidirectional cycle → forwardRef on both sides.
 import { ChatController } from './chat.controller'
 import { ChatService } from './chat.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -31,6 +37,8 @@ import { UserProfileService } from './user-profile.service'
     ChatV2Module,
     RealtimeModule,
     TasksModule,
+    ReportsModule,
+    forwardRef(() => ScheduledReportsModule),
     IntegrationsModule,
   ],
   controllers: [ChatController],

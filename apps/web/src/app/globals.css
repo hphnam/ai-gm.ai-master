@@ -171,3 +171,35 @@
     background: transparent;
   }
 }
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+  body {
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    background: white !important;
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    color: black !important;
+  }
+  /* When the report detail page is being printed, hide everything else.
+     The detail page tags its content with id="report-print-root"; any
+     ancestor or sibling outside that subtree (sidebar, page header,
+     action buttons) is hidden. `body:has()` keeps this scoped so the
+     rule doesn't fire on pages that don't include the print root. */
+  body:has(#report-print-root) > *:not(:has(#report-print-root)) {
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    display: none !important;
+  }
+  #report-print-root {
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    padding: 0 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    max-width: none !important;
+  }
+  #report-print-root a {
+    /* biome-ignore lint/complexity/noImportantStyles: print override must beat utility classes */
+    color: black !important;
+    text-decoration: underline;
+  }
+}

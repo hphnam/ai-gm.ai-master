@@ -55,6 +55,7 @@ export function CutoffsCard({ part, ctx }: ToolCardRendererProps) {
     >
       <ul className="-mx-1 -my-1 divide-y divide-border/60">
         {rows.map((r, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: supplier+index is stable for one tool result; rows never reorder mid-render
           <li key={`${r.supplierName}-${i}`} className="px-1 py-2">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">

@@ -76,6 +76,9 @@ model User {
 
   expiryRecords ExpiryRecord[] @relation("ExpiryRecordPerson")
 
+  reportsCreated Report[] @relation("ReportCreator")
+  scheduledReportsCreated ScheduledReport[] @relation("ScheduledReportCreator")
+
   @@map("users")
 }
 
@@ -162,6 +165,8 @@ model Organization {
   tasks          Task[]
   expiryRecords  ExpiryRecord[]
   integrations   Integration[]
+  reports        Report[]
+  scheduledReports ScheduledReport[]
 
   @@index([slug])
   @@map("organizations")
@@ -834,6 +839,7 @@ model Notification {
   recipientUserId String
   authorUserId   String?
   source         String    @default("chat") // chat | whatsapp | manual
+  category       String    @default("chat") // chat | report | compliance | task | system
   body           String
   status         String    @default("unread") // unread | read
   createdAt      DateTime  @default(now())
@@ -846,6 +852,7 @@ model Notification {
 
   @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)])
   @@index([organizationId, recipientUserId, createdAt(sort: Desc)])
+  @@index([organizationId, recipientUserId, category, createdAt(sort: Desc)], map: "notifications_org_recipient_category_createdAt_idx")
   @@map("notifications")
 }
 
@@ -1036,4 +1043,104 @@ model Integration {
   @@unique([organizationId, provider])
   @@index([organizationId])
   @@map("integrations")
+}
+
+/// Phase B Reports — agent-generated one-shot reports persisted so a chat
+/// turn's findings can be re-opened, shared, or revisited later. The agent
+/// pre-computes section data via existing tools and packages it into `spec`,
+/// a JSON ReportSpec (text / kpi / kpiGroup / bar / table / divider sections).
+/// The web /reports/:id page renders the same spec the chat card uses.
+model Report {
+  id             String    @id @default(uuid())
+  organizationId String
+  /// Optional venue scope. Org-wide reports leave this null (e.g. multi-venue
+  /// roll-up). The card title surfaces venue.name when set.
+  venueId        String?
+  /// User who triggered generation. Nullable so a leaver's account deletion
+  /// can SetNull this column without taking the report row with it (the
+  /// content is org-owned; we only lose the "Created by" attribution).
+  /// Always populated on insert by the controller / agent dispatch.
+  createdByUserId String?
+  title          String
+  /// One-line plain-text summary surfaced under the title. Optional — the
+  /// agent may pass empty for terse reports.
+  summary        String?
+  /// ReportSpec JSON. Validated on read by the controller via the shared Zod
+  /// schema in apps/api/src/types/reports.ts so a malformed legacy row
+  /// doesn't crash the renderer.
+  spec           Json
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// Set-null on user delete so a leaver doesn't cascade-delete the org's
+  /// historical reports — they keep their text + spec, just lose the
+  /// "Created by" attribution.
+  creator      User?        @relation("ReportCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([venueId])
+  @@map("reports")
+}
+
+/// Phase C foundation — recurring report definitions. A BullMQ tick scans
+/// rows where status='active' AND nextRunAt <= now() and fires each one.
+/// The Phase C foundation worker writes a placeholder Report row + a
+/// Notification to the creator; future work plugs the agent in to
+/// pre-compute the spec from the prompt hint.
+model ScheduledReport {
+  id              String   @id @default(uuid())
+  organizationId  String
+  venueId         String?
+  /// Nullable: SetNull on user delete keeps the org's recurring schedule
+  /// alive after a leaver is removed. The cron worker silently skips
+  /// rows whose creator is gone (no-one to notify).
+  createdByUserId String?
+
+  title           String
+  /// One-line description for the manage UI; not used by the worker.
+  summary         String?
+
+  /// 'daily' | 'weekly' | 'monthly'. Drives the nextRunAt advance after
+  /// each fire. Stored as string so future kinds (biweekly, quarterly)
+  /// can be added without an enum migration.
+  frequency       String
+  /// Hour of day in `timezone`, 0-23. Send window is the first minute of
+  /// the hour (e.g. 09:00 sharp).
+  hourOfDay       Int      @default(9)
+  /// 1-7 (Mon=1) for weekly schedules; null otherwise.
+  dayOfWeek       Int?
+  /// 1-28 for monthly schedules (capped to 28 so February is always safe);
+  /// null otherwise.
+  dayOfMonth      Int?
+  /// IANA timezone — venues can span tz boundaries so we store explicitly.
+  timezone        String   @default("UTC")
+
+  /// Free-form natural-language hint the worker will eventually feed to the
+  /// agent ("focus on stock + labor, last 7 days"). Phase C foundation
+  /// persists but doesn't act on it.
+  prompt          String?
+
+  /// 'active' | 'paused' | 'cancelled'. Only 'active' rows are picked up
+  /// by the tick worker.
+  status          String   @default("active")
+
+  /// Next UTC fire time. Computed at insert time AND after each successful
+  /// fire. The worker filters on this column so it's the hot index path.
+  nextRunAt       DateTime
+  lastRunAt       DateTime?
+  /// Loose pointer to the most recent Report this schedule produced. Not a
+  /// FK — Reports may be deleted independently and we'd rather show a
+  /// dangling id than cascade-block the schedule.
+  lastReportId    String?
+  runCount        Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  creator      User?        @relation("ScheduledReportCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([nextRunAt])
+  @@map("scheduled_reports")
 }

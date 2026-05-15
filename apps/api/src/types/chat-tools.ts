@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ReportSpecSchema } from './reports'
 
 export const TOOL_NAMES = [
   'find_knowledge',
@@ -34,6 +35,17 @@ export const TOOL_NAMES = [
   // ("what's the opening checklist", "walk me through closing") instead of
   // pasting the steps into the reply as markdown.
   'present_checklist',
+  // Phase B reports — packages a multi-tool answer into a persisted, sharable
+  // report (KPI cards, bar charts, tables, text). The frontend renders the
+  // report inline in the chat AND exposes /reports/:id for permalink access.
+  'generate_report',
+  // Phase C scheduled reports — recurring report definitions. A BullMQ tick
+  // fires each row at its local-time slot and writes a Report + Notification.
+  'schedule_report',
+  'list_scheduled_reports',
+  'pause_scheduled_report',
+  'resume_scheduled_report',
+  'cancel_scheduled_report',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -234,6 +246,56 @@ export const TOOL_INPUT_SCHEMAS = {
     .refine((v) => Boolean(v.checklistId) || Boolean(v.intent), {
       message: 'pass one of checklistId or intent',
     }),
+  generate_report: z.object({
+    /// Optional venue scope. Pass when the report is venue-specific (most
+    /// will be). Omit for org-wide / multi-venue roll-ups.
+    venueId: UUID.nullable().optional(),
+    title: z.string().trim().min(3).max(200),
+    /// One-line summary surfaced under the title. Optional but recommended —
+    /// makes /reports list scannable.
+    summary: z.string().trim().max(500).optional(),
+    /// The full ReportSpec. Build it from the data you've already fetched
+    /// via prior tool calls (pos_get_sales_summary, pos_get_top_items, etc.)
+    /// — never make up numbers. See the spec schema for the section types.
+    spec: ReportSpecSchema,
+  }),
+  schedule_report: z
+    .object({
+      /// Optional venue scope. Same semantics as generate_report.venueId.
+      venueId: UUID.nullable().optional(),
+      /// Human-readable name shown in the manage UI + the produced report title.
+      title: z.string().trim().min(3).max(200),
+      /// One-liner shown under the title.
+      summary: z.string().trim().max(500).optional(),
+      frequency: z.enum(['daily', 'weekly', 'monthly']),
+      /// Hour of day in `timezone`, 0-23. Defaults to 9.
+      hourOfDay: z.number().int().min(0).max(23).optional(),
+      /// Required for weekly. 1=Mon..7=Sun.
+      dayOfWeek: z.number().int().min(1).max(7).nullable().optional(),
+      /// Required for monthly. 1-28 (capped so February is always safe).
+      dayOfMonth: z.number().int().min(1).max(28).nullable().optional(),
+      /// IANA timezone, e.g. "Europe/London". Defaults to UTC.
+      timezone: z.string().trim().min(1).max(64).optional(),
+      /// Natural-language hint describing what the recurring report should
+      /// cover — e.g. "weekly sales recap with top items and labour".
+      prompt: z.string().trim().max(1000).optional(),
+    })
+    .refine((v) => v.frequency !== 'weekly' || typeof v.dayOfWeek === 'number', {
+      message: 'weekly schedule requires dayOfWeek (1=Mon..7=Sun)',
+      path: ['dayOfWeek'],
+    })
+    .refine((v) => v.frequency !== 'monthly' || typeof v.dayOfMonth === 'number', {
+      message: 'monthly schedule requires dayOfMonth (1-28)',
+      path: ['dayOfMonth'],
+    }),
+  list_scheduled_reports: z.object({
+    /// 'active' (default), 'paused', 'cancelled', or 'all'.
+    status: z.enum(['active', 'paused', 'cancelled', 'all']).optional(),
+    limit: z.number().int().min(1).max(50).optional(),
+  }),
+  pause_scheduled_report: z.object({ scheduleId: UUID }),
+  resume_scheduled_report: z.object({ scheduleId: UUID }),
+  cancel_scheduled_report: z.object({ scheduleId: UUID }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
 export type ToolInput<T extends ToolName> = z.infer<(typeof TOOL_INPUT_SCHEMAS)[T]>
@@ -623,6 +685,119 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
       },
       required: [],
+    },
+  },
+  {
+    name: 'generate_report',
+    description:
+      'Package the answer to a multi-part question into a sharable, persisted REPORT — KPI cards, bar charts, tables, and short text — instead of (just) writing it out as prose. FIRES when the user asks for a "report", "summary", "breakdown", "weekly numbers", "monthly recap", "show me X with charts", or anything where the natural reply has 3+ data points the user will want to keep / share. Build the spec from numbers you have ALREADY fetched via prior tool calls (pos_get_sales_summary, pos_get_top_items, pos_get_payment_breakdown, pos_compare_periods, pos_get_labor_summary, etc.) — never invent values. Section kinds: `text` (markdown body), `kpi` (single big number with optional trend), `kpiGroup` (row of up to 6 kpis), `bar` (horizontal bar chart up to 50 rows, with neutral/positive/warning/negative tones), `table` (up to 8 columns × 100 rows), `divider`. After the tool succeeds the chat surfaces the report inline as a card AND a /reports/<id> permalink — your reply should be a single sentence (e.g. "Here\'s the weekly recap — full breakdown above."). DO NOT also paste the numbers in your reply. ok:false reason:"invalid-input" with detail "venue-not-in-org" means a wrong venueId — strip and retry without venueId.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: {
+          type: ['string', 'null'],
+          description: 'Venue UUID for venue-scoped reports; null for org-wide.',
+        },
+        title: { type: 'string', description: '3-200 chars. e.g. "Weekly numbers — w/c 12 May".' },
+        summary: {
+          type: 'string',
+          description: 'Optional ≤500-char one-liner shown under the title.',
+        },
+        spec: {
+          type: 'object',
+          description:
+            'ReportSpec. Required: { sections: Section[] }. Section kinds: text { body }, kpi { kpi }, kpiGroup { kpis[] }, bar { rows[] }, table { columns[], rows[] }, divider. See the Zod schema for full shapes.',
+        },
+      },
+      required: ['title', 'spec'],
+    },
+  },
+  {
+    name: 'schedule_report',
+    description:
+      'Set up a RECURRING report that fires on a schedule — daily, weekly, or monthly. FIRES when the user says "send me a weekly report", "every Monday morning give me", "set up a daily sales summary", "schedule a monthly recap", or any phrasing that pairs report intent with cadence. Each fire writes a Report row (currently a placeholder; content generation lands in a follow-up phase) and an in-app notification to the creator. Pass: frequency ("daily"|"weekly"|"monthly"); hourOfDay (0-23, defaults 9); for weekly also dayOfWeek (1=Mon..7=Sun); for monthly also dayOfMonth (1-28); timezone (IANA, e.g. "Europe/London", defaults UTC); a short prompt describing what the report should focus on ("weekly sales recap with top items and labour"). Title is required; summary recommended. On ok:false reason:"invalid-input" with detail "venue-not-in-org" strip venueId and retry. After success your reply should confirm the next fire time in plain language (e.g. "Locked in — your weekly recap will land Monday at 09:00 London time.").',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: {
+          type: ['string', 'null'],
+          description: 'Venue UUID for venue-scoped recurring reports; null for org-wide.',
+        },
+        title: { type: 'string', description: '3-200 chars. e.g. "Weekly sales recap".' },
+        summary: { type: 'string', description: 'Optional ≤500-char one-liner.' },
+        frequency: { type: 'string', enum: ['daily', 'weekly', 'monthly'] },
+        hourOfDay: { type: 'integer', description: '0-23, defaults to 9.' },
+        dayOfWeek: {
+          type: ['integer', 'null'],
+          description: 'Required when frequency=weekly. 1=Mon..7=Sun.',
+        },
+        dayOfMonth: {
+          type: ['integer', 'null'],
+          description: 'Required when frequency=monthly. 1-28.',
+        },
+        timezone: {
+          type: 'string',
+          description: 'IANA timezone, e.g. "Europe/London". Defaults to UTC.',
+        },
+        prompt: {
+          type: 'string',
+          description: 'Natural-language hint of what to include in each run.',
+        },
+      },
+      required: ['title', 'frequency'],
+    },
+  },
+  {
+    name: 'list_scheduled_reports',
+    description:
+      'List the org\'s recurring report schedules — fires when the user asks "what reports are scheduled", "show my recurring reports", "what\'s coming up", etc. Default status filter is "active". Each row carries `id`, `title`, `frequency`, `nextRunAt` (ISO UTC), `status`, plus timing fields (hourOfDay, dayOfWeek, dayOfMonth, timezone). When the user wants to modify a schedule, list first to grab the `id` then call pause/resume/cancel_scheduled_report.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['active', 'paused', 'cancelled', 'all'],
+          description: 'Defaults to "active".',
+        },
+        limit: { type: 'integer', description: '1-50, defaults to 25.' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'pause_scheduled_report',
+    description:
+      'Pause an active recurring report — the row stays in the DB but the cron skips it until resumed. Fires on "pause my weekly recap", "stop sending the daily summary for now", "hold the monthly report". Pass the `scheduleId` from list_scheduled_reports. After success confirm to the user.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        scheduleId: { type: 'string', description: 'Schedule UUID from list_scheduled_reports.' },
+      },
+      required: ['scheduleId'],
+    },
+  },
+  {
+    name: 'resume_scheduled_report',
+    description:
+      'Resume a paused recurring report. Recomputes nextRunAt so it doesn\'t fire immediately with a stale timestamp. Fires on "resume the weekly report", "turn the daily summary back on". Pass the `scheduleId` from list_scheduled_reports.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        scheduleId: { type: 'string', description: 'Schedule UUID from list_scheduled_reports.' },
+      },
+      required: ['scheduleId'],
+    },
+  },
+  {
+    name: 'cancel_scheduled_report',
+    description:
+      'Permanently cancel a recurring report (soft-cancel — the row stays for history but status flips to "cancelled" and the cron never picks it up again). Fires on "cancel the weekly report", "stop the daily summary for good", "remove that schedule". Pass the `scheduleId` from list_scheduled_reports.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        scheduleId: { type: 'string', description: 'Schedule UUID from list_scheduled_reports.' },
+      },
+      required: ['scheduleId'],
     },
   },
   {

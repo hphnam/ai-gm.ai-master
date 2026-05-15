@@ -1,11 +1,12 @@
 import { createHash } from 'node:crypto'
-import { Injectable, Logger } from '@nestjs/common'
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   AGGREGATE_SECTION_TOKEN_BUDGET,
   fail,
   formatSectionPayload,
   ok,
+  type ReportSpec,
   TOOL_INPUT_SCHEMAS,
   type ToolName,
   type ToolResult,
@@ -15,8 +16,10 @@ import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
+import { ReportsService } from '../reports/reports.service'
 import type { RetrievalHit } from '../retrieval/retrieval.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
+import { ScheduledReportsService } from '../scheduled-reports/scheduled-reports.service'
 import { TabularQueryService } from '../tabular/tabular.service'
 import { TasksService } from '../tasks/tasks.service'
 import { QuoteVerifierService } from './quote-verifier.service'
@@ -60,6 +63,28 @@ const leaveNoteRateLimit = (() => {
   }
 })()
 
+// Mirror of the controller-level throttle for the agent tool path so a
+// jailbroken model can't bypass it by going through chat.
+const SCHEDULE_REPORT_WINDOW_MS = 60_000
+const SCHEDULE_REPORT_LIMIT_PER_WINDOW = 5
+const scheduleReportRateLimit = (() => {
+  const buckets = new Map<string, number[]>()
+  return {
+    allow(userId: string): boolean {
+      const now = Date.now()
+      const cutoff = now - SCHEDULE_REPORT_WINDOW_MS
+      const recent = (buckets.get(userId) ?? []).filter((t) => t > cutoff)
+      if (recent.length >= SCHEDULE_REPORT_LIMIT_PER_WINDOW) {
+        buckets.set(userId, recent)
+        return false
+      }
+      recent.push(now)
+      buckets.set(userId, recent)
+      return true
+    },
+  }
+})()
+
 @Injectable()
 export class ToolDispatcher {
   private readonly logger = new Logger(ToolDispatcher.name)
@@ -74,6 +99,13 @@ export class ToolDispatcher {
     private readonly realtime: RealtimeGateway,
     private readonly tasks: TasksService,
     private readonly integrations: IntegrationRegistry,
+    private readonly reports: ReportsService,
+    // forwardRef breaks the chat ↔ scheduled-reports module cycle:
+    // ScheduledReportsModule's ReportGeneratorService injects ToolDispatcher,
+    // and ToolDispatcher injects ScheduledReportsService. Both module imports
+    // also use forwardRef.
+    @Inject(forwardRef(() => ScheduledReportsService))
+    private readonly scheduledReports: ScheduledReportsService,
   ) {}
 
   async dispatch(
@@ -659,6 +691,7 @@ export class ToolDispatcher {
               recipientUserId: target.userId,
               authorUserId: ctx.userId,
               source,
+              category: 'chat',
               body: i.body,
             },
             select: {
@@ -681,6 +714,7 @@ export class ToolDispatcher {
             id: created.id,
             body: i.body,
             source,
+            category: 'chat',
             createdAt: created.createdAt.toISOString(),
             author: created.author
               ? {
@@ -908,6 +942,162 @@ export class ToolDispatcher {
               overdueCount: result.overdueCount,
               scope,
             },
+          }
+        }
+        case 'generate_report': {
+          if (!ctx) {
+            return fail('error', 'generate_report requires an authenticated context')
+          }
+          const i = parsed.data as {
+            venueId?: string | null
+            title: string
+            summary?: string
+            spec: ReportSpec
+          }
+          try {
+            const row = await this.reports.create({
+              orgId: ctx.orgId,
+              userId: ctx.userId,
+              venueId: i.venueId ?? null,
+              title: i.title,
+              summary: i.summary ?? null,
+              spec: i.spec,
+            })
+            return ok({
+              id: row.id,
+              title: row.title,
+              summary: row.summary,
+              venueId: row.venueId,
+              spec: row.spec,
+              createdAt: row.createdAt,
+              url: `/reports/${row.id}`,
+            })
+          } catch (err) {
+            const message = (err as Error).message ?? 'unknown'
+            if (message === 'venue-not-in-org') {
+              return fail('invalid-input', 'venue-not-in-org')
+            }
+            return fail('error', `generate_report failed: ${message}`)
+          }
+        }
+        case 'schedule_report': {
+          if (!ctx) {
+            return fail('error', 'schedule_report requires an authenticated context')
+          }
+          if (!scheduleReportRateLimit.allow(ctx.userId)) {
+            return fail('error', 'rate-limited: too many schedule creations — try again shortly')
+          }
+          const i = parsed.data as {
+            venueId?: string | null
+            title: string
+            summary?: string
+            frequency: 'daily' | 'weekly' | 'monthly'
+            hourOfDay?: number
+            dayOfWeek?: number | null
+            dayOfMonth?: number | null
+            timezone?: string
+            prompt?: string
+          }
+          try {
+            const row = await this.scheduledReports.create({
+              orgId: ctx.orgId,
+              userId: ctx.userId,
+              venueId: i.venueId ?? null,
+              title: i.title,
+              summary: i.summary ?? null,
+              frequency: i.frequency,
+              hourOfDay: i.hourOfDay,
+              dayOfWeek: i.dayOfWeek ?? null,
+              dayOfMonth: i.dayOfMonth ?? null,
+              timezone: i.timezone,
+              prompt: i.prompt ?? null,
+            })
+            return ok({
+              id: row.id,
+              title: row.title,
+              frequency: row.frequency,
+              nextRunAt: row.nextRunAt,
+              hourOfDay: row.hourOfDay,
+              dayOfWeek: row.dayOfWeek,
+              dayOfMonth: row.dayOfMonth,
+              timezone: row.timezone,
+              status: row.status,
+            })
+          } catch (err) {
+            const message = (err as Error).message ?? 'unknown'
+            if (message === 'venue-not-in-org' || message === 'invalid-timezone') {
+              return fail('invalid-input', message)
+            }
+            if (message === 'schedule-cap-reached') {
+              return fail(
+                'invalid-input',
+                'schedule-cap-reached: org has hit the 50 live-schedule limit — cancel one before adding another',
+              )
+            }
+            // Log internally; the model should not see Prisma / driver text.
+            this.logger.error(
+              JSON.stringify({ event: 'schedule_report.error', message, orgId: ctx.orgId }),
+            )
+            return fail('error', 'schedule_report failed — please retry shortly')
+          }
+        }
+        case 'list_scheduled_reports': {
+          if (!ctx) {
+            return fail('error', 'list_scheduled_reports requires an authenticated context')
+          }
+          const i = parsed.data as {
+            status?: 'active' | 'paused' | 'cancelled' | 'all'
+            limit?: number
+          }
+          const { items: rows } = await this.scheduledReports.list(ctx.orgId, {
+            status: i.status ?? 'active',
+            limit: i.limit ?? 25,
+          })
+          return ok({
+            schedules: rows.map((r) => ({
+              id: r.id,
+              title: r.title,
+              summary: r.summary,
+              frequency: r.frequency,
+              hourOfDay: r.hourOfDay,
+              dayOfWeek: r.dayOfWeek,
+              dayOfMonth: r.dayOfMonth,
+              timezone: r.timezone,
+              status: r.status,
+              nextRunAt: r.nextRunAt,
+              lastRunAt: r.lastRunAt,
+              runCount: r.runCount,
+              venueId: r.venueId,
+            })),
+          })
+        }
+        case 'pause_scheduled_report':
+        case 'resume_scheduled_report':
+        case 'cancel_scheduled_report': {
+          if (!ctx) {
+            return fail('error', `${toolName} requires an authenticated context`)
+          }
+          const i = parsed.data as { scheduleId: string }
+          try {
+            const row =
+              toolName === 'pause_scheduled_report'
+                ? await this.scheduledReports.pause(ctx.orgId, i.scheduleId)
+                : toolName === 'resume_scheduled_report'
+                  ? await this.scheduledReports.resume(ctx.orgId, i.scheduleId)
+                  : await this.scheduledReports.cancel(ctx.orgId, i.scheduleId)
+            return ok({
+              id: row.id,
+              title: row.title,
+              status: row.status,
+              nextRunAt: row.nextRunAt,
+            })
+          } catch (err) {
+            const message = (err as Error).message ?? 'unknown'
+            if (message === 'not-found') return fail('not-found', message)
+            this.logger.error(
+              JSON.stringify({ event: `${toolName}.error`, message, orgId: ctx.orgId }),
+            )
+            return fail('error', `${toolName} failed — please retry shortly`)
           }
         }
         case 'present_checklist': {

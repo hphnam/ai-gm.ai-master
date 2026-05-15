@@ -341,13 +341,22 @@ export const TasksControllerUpdateResponse = zod.object({
 
 export const notificationsControllerListQueryStatusDefault = `all`;
 export const notificationsControllerListQueryLimitDefault = 30;
-export const notificationsControllerListQueryLimitMax = 100;
+export const notificationsControllerListQueryLimitMax = 50;
+
+export const notificationsControllerListQueryCursorMax = 256;
+
+export const notificationsControllerListQueryQMax = 200;
+
+export const notificationsControllerListQueryCategoryMax = 128;
 
 
 
 export const NotificationsControllerListQueryParams = zod.object({
   "status": zod.enum(['unread', 'read', 'all']).default(notificationsControllerListQueryStatusDefault),
-  "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault)
+  "limit": zod.number().min(1).max(notificationsControllerListQueryLimitMax).default(notificationsControllerListQueryLimitDefault),
+  "cursor": zod.string().max(notificationsControllerListQueryCursorMax).optional(),
+  "q": zod.string().max(notificationsControllerListQueryQMax).optional(),
+  "category": zod.string().max(notificationsControllerListQueryCategoryMax).optional()
 })
 
 export const NotificationsControllerListResponse = zod.object({
@@ -355,6 +364,7 @@ export const NotificationsControllerListResponse = zod.object({
   "id": zod.string(),
   "body": zod.string(),
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),
@@ -364,7 +374,9 @@ export const NotificationsControllerListResponse = zod.object({
   "email": zod.string()
 }),zod.null()])
 })),
-  "unreadCount": zod.number()
+  "unreadCount": zod.number(),
+  "nextCursor": zod.union([zod.string(),zod.null()]),
+  "hasMore": zod.boolean()
 })
 
 
@@ -409,6 +421,7 @@ export const NotificationsControllerMarkReadResponse = zod.object({
   "id": zod.string(),
   "body": zod.string(),
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),
@@ -637,6 +650,596 @@ export const ChatControllerUpdateVisibilityBody = zod.object({
 export const ChatControllerUpdateVisibilityResponse = zod.object({
   "id": zod.string(),
   "visibility": zod.enum(['private', 'org'])
+})
+
+
+export const reportsControllerListQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const reportsControllerListQueryLimitMax = 100;
+
+export const reportsControllerListQueryOffsetMin = 0;
+export const reportsControllerListQueryOffsetMax = 10000;
+
+
+
+export const ReportsControllerListQueryParams = zod.object({
+  "venueId": zod.string().regex(reportsControllerListQueryVenueIdRegExp).optional(),
+  "limit": zod.number().min(1).max(reportsControllerListQueryLimitMax).optional(),
+  "offset": zod.number().min(reportsControllerListQueryOffsetMin).max(reportsControllerListQueryOffsetMax).optional()
+})
+
+export const reportsControllerListResponseTotalMin = 0;
+export const reportsControllerListResponseTotalMax = 9007199254740991;
+
+export const reportsControllerListResponseNextOffsetOneMin = 0;
+export const reportsControllerListResponseNextOffsetOneMax = 9007199254740991;
+
+
+
+export const ReportsControllerListResponse = zod.object({
+  "reports": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdAt": zod.string()
+})),
+  "total": zod.number().min(reportsControllerListResponseTotalMin).max(reportsControllerListResponseTotalMax),
+  "hasMore": zod.boolean(),
+  "nextOffset": zod.union([zod.number().min(reportsControllerListResponseNextOffsetOneMin).max(reportsControllerListResponseNextOffsetOneMax),zod.null()])
+})
+
+
+export const reportsControllerCreateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const reportsControllerCreateBodyTitleMin = 3;
+export const reportsControllerCreateBodyTitleMax = 200;
+
+export const reportsControllerCreateBodySummaryMax = 500;
+
+export const reportsControllerCreateBodySpecVersionDefault = 1;
+export const reportsControllerCreateBodySpecRangeFromIsoRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const reportsControllerCreateBodySpecRangeToIsoRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const reportsControllerCreateBodySpecSectionsItemOneBodyMax = 8000;
+
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiLabelMax = 80;
+
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiValueOneMax = 80;
+
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiValueTwoCurrencyOneMin = 3;
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiValueTwoCurrencyOneMax = 8;
+
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiSublabelMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemTwoKpiTrendLabelMax = 60;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeTitleMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemLabelMax = 80;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueOneMax = 80;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueTwoCurrencyOneMin = 3;
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueTwoCurrencyOneMax = 8;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemSublabelMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisItemTrendLabelMax = 60;
+
+export const reportsControllerCreateBodySpecSectionsItemThreeKpisMax = 6;
+
+export const reportsControllerCreateBodySpecSectionsItemFourTitleMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemFourCaptionMax = 200;
+
+export const reportsControllerCreateBodySpecSectionsItemFourRowsItemLabelMax = 80;
+
+export const reportsControllerCreateBodySpecSectionsItemFourRowsItemSublabelMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemFourRowsMax = 50;
+
+export const reportsControllerCreateBodySpecSectionsItemFourUnitMax = 16;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveTitleMax = 120;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveColumnsItemMax = 60;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveColumnsMax = 8;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveRowsItemItemOneMax = 200;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveRowsItemMax = 8;
+
+export const reportsControllerCreateBodySpecSectionsItemFiveRowsMax = 100;
+
+export const reportsControllerCreateBodySpecSectionsItemSixLabelMax = 60;
+
+export const reportsControllerCreateBodySpecSectionsMax = 40;
+
+
+
+export const ReportsControllerCreateBody = zod.object({
+  "venueId": zod.union([zod.string().regex(reportsControllerCreateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "title": zod.string().min(reportsControllerCreateBodyTitleMin).max(reportsControllerCreateBodyTitleMax),
+  "summary": zod.string().max(reportsControllerCreateBodySummaryMax).optional(),
+  "spec": zod.object({
+  "version": zod.number().default(reportsControllerCreateBodySpecVersionDefault),
+  "rangeFromIso": zod.iso.datetime({"offset":true}).regex(reportsControllerCreateBodySpecRangeFromIsoRegExp).optional(),
+  "rangeToIso": zod.iso.datetime({"offset":true}).regex(reportsControllerCreateBodySpecRangeToIsoRegExp).optional(),
+  "sections": zod.array(zod.union([zod.object({
+  "type": zod.literal("text"),
+  "body": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemOneBodyMax)
+}),zod.object({
+  "type": zod.literal("kpi"),
+  "kpi": zod.object({
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemTwoKpiLabelMax),
+  "value": zod.union([zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemTwoKpiValueOneMax),zod.object({
+  "value": zod.number(),
+  "currency": zod.union([zod.string().min(reportsControllerCreateBodySpecSectionsItemTwoKpiValueTwoCurrencyOneMin).max(reportsControllerCreateBodySpecSectionsItemTwoKpiValueTwoCurrencyOneMax),zod.null()])
+}),zod.number()]),
+  "sublabel": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemTwoKpiSublabelMax).optional(),
+  "trend": zod.object({
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "percent": zod.union([zod.number(),zod.null()]).optional(),
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemTwoKpiTrendLabelMax).optional()
+}).optional()
+})
+}),zod.object({
+  "type": zod.literal("kpiGroup"),
+  "title": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemThreeTitleMax).optional(),
+  "kpis": zod.array(zod.object({
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemThreeKpisItemLabelMax),
+  "value": zod.union([zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueOneMax),zod.object({
+  "value": zod.number(),
+  "currency": zod.union([zod.string().min(reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueTwoCurrencyOneMin).max(reportsControllerCreateBodySpecSectionsItemThreeKpisItemValueTwoCurrencyOneMax),zod.null()])
+}),zod.number()]),
+  "sublabel": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemThreeKpisItemSublabelMax).optional(),
+  "trend": zod.object({
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "percent": zod.union([zod.number(),zod.null()]).optional(),
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemThreeKpisItemTrendLabelMax).optional()
+}).optional()
+})).min(1).max(reportsControllerCreateBodySpecSectionsItemThreeKpisMax)
+}),zod.object({
+  "type": zod.literal("bar"),
+  "title": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemFourTitleMax).optional(),
+  "caption": zod.string().max(reportsControllerCreateBodySpecSectionsItemFourCaptionMax).optional(),
+  "rows": zod.array(zod.object({
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemFourRowsItemLabelMax),
+  "value": zod.number(),
+  "sublabel": zod.string().max(reportsControllerCreateBodySpecSectionsItemFourRowsItemSublabelMax).optional(),
+  "tone": zod.enum(['neutral', 'positive', 'warning', 'negative']).optional()
+})).min(1).max(reportsControllerCreateBodySpecSectionsItemFourRowsMax),
+  "unit": zod.string().max(reportsControllerCreateBodySpecSectionsItemFourUnitMax).optional()
+}),zod.object({
+  "type": zod.literal("table"),
+  "title": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemFiveTitleMax).optional(),
+  "columns": zod.array(zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemFiveColumnsItemMax)).min(1).max(reportsControllerCreateBodySpecSectionsItemFiveColumnsMax),
+  "rows": zod.array(zod.array(zod.union([zod.string().max(reportsControllerCreateBodySpecSectionsItemFiveRowsItemItemOneMax),zod.number(),zod.null()])).min(1).max(reportsControllerCreateBodySpecSectionsItemFiveRowsItemMax)).max(reportsControllerCreateBodySpecSectionsItemFiveRowsMax)
+}),zod.object({
+  "type": zod.literal("divider"),
+  "label": zod.string().min(1).max(reportsControllerCreateBodySpecSectionsItemSixLabelMax).optional()
+})])).min(1).max(reportsControllerCreateBodySpecSectionsMax)
+})
+})
+
+
+export const reportsControllerGetOnePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ReportsControllerGetOneParams = zod.object({
+  "id": zod.string().regex(reportsControllerGetOnePathIdRegExp)
+})
+
+export const reportsControllerGetOneResponseSpecVersionDefault = 1;
+export const reportsControllerGetOneResponseSpecRangeFromIsoRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const reportsControllerGetOneResponseSpecRangeToIsoRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$');
+export const reportsControllerGetOneResponseSpecSectionsItemOneBodyMax = 8000;
+
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiLabelMax = 80;
+
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueOneMax = 80;
+
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueTwoCurrencyOneMin = 3;
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueTwoCurrencyOneMax = 8;
+
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiSublabelMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemTwoKpiTrendLabelMax = 60;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeTitleMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemLabelMax = 80;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueOneMax = 80;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueTwoCurrencyOneMin = 3;
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueTwoCurrencyOneMax = 8;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemSublabelMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemTrendLabelMax = 60;
+
+export const reportsControllerGetOneResponseSpecSectionsItemThreeKpisMax = 6;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourTitleMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourCaptionMax = 200;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourRowsItemLabelMax = 80;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourRowsItemSublabelMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourRowsMax = 50;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFourUnitMax = 16;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveTitleMax = 120;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveColumnsItemMax = 60;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveColumnsMax = 8;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveRowsItemItemOneMax = 200;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveRowsItemMax = 8;
+
+export const reportsControllerGetOneResponseSpecSectionsItemFiveRowsMax = 100;
+
+export const reportsControllerGetOneResponseSpecSectionsItemSixLabelMax = 60;
+
+export const reportsControllerGetOneResponseSpecSectionsMax = 40;
+
+
+
+export const ReportsControllerGetOneResponse = zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "spec": zod.object({
+  "version": zod.number().default(reportsControllerGetOneResponseSpecVersionDefault),
+  "rangeFromIso": zod.iso.datetime({"offset":true}).regex(reportsControllerGetOneResponseSpecRangeFromIsoRegExp).optional(),
+  "rangeToIso": zod.iso.datetime({"offset":true}).regex(reportsControllerGetOneResponseSpecRangeToIsoRegExp).optional(),
+  "sections": zod.array(zod.union([zod.object({
+  "type": zod.literal("text"),
+  "body": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemOneBodyMax)
+}),zod.object({
+  "type": zod.literal("kpi"),
+  "kpi": zod.object({
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemTwoKpiLabelMax),
+  "value": zod.union([zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueOneMax),zod.object({
+  "value": zod.number(),
+  "currency": zod.union([zod.string().min(reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueTwoCurrencyOneMin).max(reportsControllerGetOneResponseSpecSectionsItemTwoKpiValueTwoCurrencyOneMax),zod.null()])
+}),zod.number()]),
+  "sublabel": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemTwoKpiSublabelMax).optional(),
+  "trend": zod.object({
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "percent": zod.union([zod.number(),zod.null()]).optional(),
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemTwoKpiTrendLabelMax).optional()
+}).optional()
+})
+}),zod.object({
+  "type": zod.literal("kpiGroup"),
+  "title": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeTitleMax).optional(),
+  "kpis": zod.array(zod.object({
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemLabelMax),
+  "value": zod.union([zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueOneMax),zod.object({
+  "value": zod.number(),
+  "currency": zod.union([zod.string().min(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueTwoCurrencyOneMin).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemValueTwoCurrencyOneMax),zod.null()])
+}),zod.number()]),
+  "sublabel": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemSublabelMax).optional(),
+  "trend": zod.object({
+  "direction": zod.enum(['up', 'down', 'flat']),
+  "percent": zod.union([zod.number(),zod.null()]).optional(),
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisItemTrendLabelMax).optional()
+}).optional()
+})).min(1).max(reportsControllerGetOneResponseSpecSectionsItemThreeKpisMax)
+}),zod.object({
+  "type": zod.literal("bar"),
+  "title": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemFourTitleMax).optional(),
+  "caption": zod.string().max(reportsControllerGetOneResponseSpecSectionsItemFourCaptionMax).optional(),
+  "rows": zod.array(zod.object({
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemFourRowsItemLabelMax),
+  "value": zod.number(),
+  "sublabel": zod.string().max(reportsControllerGetOneResponseSpecSectionsItemFourRowsItemSublabelMax).optional(),
+  "tone": zod.enum(['neutral', 'positive', 'warning', 'negative']).optional()
+})).min(1).max(reportsControllerGetOneResponseSpecSectionsItemFourRowsMax),
+  "unit": zod.string().max(reportsControllerGetOneResponseSpecSectionsItemFourUnitMax).optional()
+}),zod.object({
+  "type": zod.literal("table"),
+  "title": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemFiveTitleMax).optional(),
+  "columns": zod.array(zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemFiveColumnsItemMax)).min(1).max(reportsControllerGetOneResponseSpecSectionsItemFiveColumnsMax),
+  "rows": zod.array(zod.array(zod.union([zod.string().max(reportsControllerGetOneResponseSpecSectionsItemFiveRowsItemItemOneMax),zod.number(),zod.null()])).min(1).max(reportsControllerGetOneResponseSpecSectionsItemFiveRowsItemMax)).max(reportsControllerGetOneResponseSpecSectionsItemFiveRowsMax)
+}),zod.object({
+  "type": zod.literal("divider"),
+  "label": zod.string().min(1).max(reportsControllerGetOneResponseSpecSectionsItemSixLabelMax).optional()
+})])).min(1).max(reportsControllerGetOneResponseSpecSectionsMax)
+}),
+  "createdAt": zod.string()
+})
+
+
+export const reportsControllerRemovePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ReportsControllerRemoveParams = zod.object({
+  "id": zod.string().regex(reportsControllerRemovePathIdRegExp)
+})
+
+
+export const scheduledReportsControllerListQueryLimitMax = 200;
+
+export const scheduledReportsControllerListQueryOffsetMin = 0;
+export const scheduledReportsControllerListQueryOffsetMax = 10000;
+
+
+
+export const ScheduledReportsControllerListQueryParams = zod.object({
+  "status": zod.union([zod.enum(['active', 'paused', 'cancelled']),zod.literal("all")]).optional(),
+  "limit": zod.number().min(1).max(scheduledReportsControllerListQueryLimitMax).optional(),
+  "offset": zod.number().min(scheduledReportsControllerListQueryOffsetMin).max(scheduledReportsControllerListQueryOffsetMax).optional()
+})
+
+export const scheduledReportsControllerListResponseSchedulesItemHourOfDayMin = -9007199254740991;
+export const scheduledReportsControllerListResponseSchedulesItemHourOfDayMax = 9007199254740991;
+
+export const scheduledReportsControllerListResponseSchedulesItemDayOfWeekOneMin = -9007199254740991;
+export const scheduledReportsControllerListResponseSchedulesItemDayOfWeekOneMax = 9007199254740991;
+
+export const scheduledReportsControllerListResponseSchedulesItemDayOfMonthOneMin = -9007199254740991;
+export const scheduledReportsControllerListResponseSchedulesItemDayOfMonthOneMax = 9007199254740991;
+
+export const scheduledReportsControllerListResponseSchedulesItemRunCountMin = -9007199254740991;
+export const scheduledReportsControllerListResponseSchedulesItemRunCountMax = 9007199254740991;
+
+export const scheduledReportsControllerListResponseTotalMin = 0;
+export const scheduledReportsControllerListResponseTotalMax = 9007199254740991;
+
+export const scheduledReportsControllerListResponseNextOffsetOneMin = 0;
+export const scheduledReportsControllerListResponseNextOffsetOneMax = 9007199254740991;
+
+
+
+export const ScheduledReportsControllerListResponse = zod.object({
+  "schedules": zod.array(zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerListResponseSchedulesItemHourOfDayMin).max(scheduledReportsControllerListResponseSchedulesItemHourOfDayMax),
+  "dayOfWeek": zod.union([zod.number().min(scheduledReportsControllerListResponseSchedulesItemDayOfWeekOneMin).max(scheduledReportsControllerListResponseSchedulesItemDayOfWeekOneMax),zod.null()]),
+  "dayOfMonth": zod.union([zod.number().min(scheduledReportsControllerListResponseSchedulesItemDayOfMonthOneMin).max(scheduledReportsControllerListResponseSchedulesItemDayOfMonthOneMax),zod.null()]),
+  "timezone": zod.string(),
+  "prompt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['active', 'paused', 'cancelled']),
+  "nextRunAt": zod.string(),
+  "lastRunAt": zod.union([zod.string(),zod.null()]),
+  "lastReportId": zod.union([zod.string(),zod.null()]),
+  "runCount": zod.number().min(scheduledReportsControllerListResponseSchedulesItemRunCountMin).max(scheduledReportsControllerListResponseSchedulesItemRunCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number().min(scheduledReportsControllerListResponseTotalMin).max(scheduledReportsControllerListResponseTotalMax),
+  "hasMore": zod.boolean(),
+  "nextOffset": zod.union([zod.number().min(scheduledReportsControllerListResponseNextOffsetOneMin).max(scheduledReportsControllerListResponseNextOffsetOneMax),zod.null()])
+})
+
+
+export const scheduledReportsControllerCreateBodyVenueIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const scheduledReportsControllerCreateBodyTitleMin = 3;
+export const scheduledReportsControllerCreateBodyTitleMax = 200;
+
+export const scheduledReportsControllerCreateBodySummaryMax = 500;
+
+export const scheduledReportsControllerCreateBodyHourOfDayMin = 0;
+export const scheduledReportsControllerCreateBodyHourOfDayMax = 23;
+
+export const scheduledReportsControllerCreateBodyDayOfWeekOneMax = 7;
+
+export const scheduledReportsControllerCreateBodyDayOfMonthOneMax = 28;
+
+export const scheduledReportsControllerCreateBodyTimezoneMax = 64;
+
+export const scheduledReportsControllerCreateBodyPromptMax = 1000;
+
+
+
+export const ScheduledReportsControllerCreateBody = zod.object({
+  "venueId": zod.union([zod.string().regex(scheduledReportsControllerCreateBodyVenueIdOneRegExp),zod.null()]).optional(),
+  "title": zod.string().min(scheduledReportsControllerCreateBodyTitleMin).max(scheduledReportsControllerCreateBodyTitleMax),
+  "summary": zod.string().max(scheduledReportsControllerCreateBodySummaryMax).optional(),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerCreateBodyHourOfDayMin).max(scheduledReportsControllerCreateBodyHourOfDayMax).optional(),
+  "dayOfWeek": zod.union([zod.number().min(1).max(scheduledReportsControllerCreateBodyDayOfWeekOneMax),zod.null()]).optional(),
+  "dayOfMonth": zod.union([zod.number().min(1).max(scheduledReportsControllerCreateBodyDayOfMonthOneMax),zod.null()]).optional(),
+  "timezone": zod.string().min(1).max(scheduledReportsControllerCreateBodyTimezoneMax).optional(),
+  "prompt": zod.string().max(scheduledReportsControllerCreateBodyPromptMax).optional()
+})
+
+
+export const scheduledReportsControllerGetOnePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ScheduledReportsControllerGetOneParams = zod.object({
+  "id": zod.string().regex(scheduledReportsControllerGetOnePathIdRegExp)
+})
+
+export const scheduledReportsControllerGetOneResponseHourOfDayMin = -9007199254740991;
+export const scheduledReportsControllerGetOneResponseHourOfDayMax = 9007199254740991;
+
+export const scheduledReportsControllerGetOneResponseDayOfWeekOneMin = -9007199254740991;
+export const scheduledReportsControllerGetOneResponseDayOfWeekOneMax = 9007199254740991;
+
+export const scheduledReportsControllerGetOneResponseDayOfMonthOneMin = -9007199254740991;
+export const scheduledReportsControllerGetOneResponseDayOfMonthOneMax = 9007199254740991;
+
+export const scheduledReportsControllerGetOneResponseRunCountMin = -9007199254740991;
+export const scheduledReportsControllerGetOneResponseRunCountMax = 9007199254740991;
+
+
+
+export const ScheduledReportsControllerGetOneResponse = zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerGetOneResponseHourOfDayMin).max(scheduledReportsControllerGetOneResponseHourOfDayMax),
+  "dayOfWeek": zod.union([zod.number().min(scheduledReportsControllerGetOneResponseDayOfWeekOneMin).max(scheduledReportsControllerGetOneResponseDayOfWeekOneMax),zod.null()]),
+  "dayOfMonth": zod.union([zod.number().min(scheduledReportsControllerGetOneResponseDayOfMonthOneMin).max(scheduledReportsControllerGetOneResponseDayOfMonthOneMax),zod.null()]),
+  "timezone": zod.string(),
+  "prompt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['active', 'paused', 'cancelled']),
+  "nextRunAt": zod.string(),
+  "lastRunAt": zod.union([zod.string(),zod.null()]),
+  "lastReportId": zod.union([zod.string(),zod.null()]),
+  "runCount": zod.number().min(scheduledReportsControllerGetOneResponseRunCountMin).max(scheduledReportsControllerGetOneResponseRunCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+export const scheduledReportsControllerPausePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ScheduledReportsControllerPauseParams = zod.object({
+  "id": zod.string().regex(scheduledReportsControllerPausePathIdRegExp)
+})
+
+export const scheduledReportsControllerPauseResponseHourOfDayMin = -9007199254740991;
+export const scheduledReportsControllerPauseResponseHourOfDayMax = 9007199254740991;
+
+export const scheduledReportsControllerPauseResponseDayOfWeekOneMin = -9007199254740991;
+export const scheduledReportsControllerPauseResponseDayOfWeekOneMax = 9007199254740991;
+
+export const scheduledReportsControllerPauseResponseDayOfMonthOneMin = -9007199254740991;
+export const scheduledReportsControllerPauseResponseDayOfMonthOneMax = 9007199254740991;
+
+export const scheduledReportsControllerPauseResponseRunCountMin = -9007199254740991;
+export const scheduledReportsControllerPauseResponseRunCountMax = 9007199254740991;
+
+
+
+export const ScheduledReportsControllerPauseResponse = zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerPauseResponseHourOfDayMin).max(scheduledReportsControllerPauseResponseHourOfDayMax),
+  "dayOfWeek": zod.union([zod.number().min(scheduledReportsControllerPauseResponseDayOfWeekOneMin).max(scheduledReportsControllerPauseResponseDayOfWeekOneMax),zod.null()]),
+  "dayOfMonth": zod.union([zod.number().min(scheduledReportsControllerPauseResponseDayOfMonthOneMin).max(scheduledReportsControllerPauseResponseDayOfMonthOneMax),zod.null()]),
+  "timezone": zod.string(),
+  "prompt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['active', 'paused', 'cancelled']),
+  "nextRunAt": zod.string(),
+  "lastRunAt": zod.union([zod.string(),zod.null()]),
+  "lastReportId": zod.union([zod.string(),zod.null()]),
+  "runCount": zod.number().min(scheduledReportsControllerPauseResponseRunCountMin).max(scheduledReportsControllerPauseResponseRunCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+export const scheduledReportsControllerResumePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ScheduledReportsControllerResumeParams = zod.object({
+  "id": zod.string().regex(scheduledReportsControllerResumePathIdRegExp)
+})
+
+export const scheduledReportsControllerResumeResponseHourOfDayMin = -9007199254740991;
+export const scheduledReportsControllerResumeResponseHourOfDayMax = 9007199254740991;
+
+export const scheduledReportsControllerResumeResponseDayOfWeekOneMin = -9007199254740991;
+export const scheduledReportsControllerResumeResponseDayOfWeekOneMax = 9007199254740991;
+
+export const scheduledReportsControllerResumeResponseDayOfMonthOneMin = -9007199254740991;
+export const scheduledReportsControllerResumeResponseDayOfMonthOneMax = 9007199254740991;
+
+export const scheduledReportsControllerResumeResponseRunCountMin = -9007199254740991;
+export const scheduledReportsControllerResumeResponseRunCountMax = 9007199254740991;
+
+
+
+export const ScheduledReportsControllerResumeResponse = zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerResumeResponseHourOfDayMin).max(scheduledReportsControllerResumeResponseHourOfDayMax),
+  "dayOfWeek": zod.union([zod.number().min(scheduledReportsControllerResumeResponseDayOfWeekOneMin).max(scheduledReportsControllerResumeResponseDayOfWeekOneMax),zod.null()]),
+  "dayOfMonth": zod.union([zod.number().min(scheduledReportsControllerResumeResponseDayOfMonthOneMin).max(scheduledReportsControllerResumeResponseDayOfMonthOneMax),zod.null()]),
+  "timezone": zod.string(),
+  "prompt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['active', 'paused', 'cancelled']),
+  "nextRunAt": zod.string(),
+  "lastRunAt": zod.union([zod.string(),zod.null()]),
+  "lastReportId": zod.union([zod.string(),zod.null()]),
+  "runCount": zod.number().min(scheduledReportsControllerResumeResponseRunCountMin).max(scheduledReportsControllerResumeResponseRunCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+export const scheduledReportsControllerCancelPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ScheduledReportsControllerCancelParams = zod.object({
+  "id": zod.string().regex(scheduledReportsControllerCancelPathIdRegExp)
+})
+
+export const scheduledReportsControllerCancelResponseHourOfDayMin = -9007199254740991;
+export const scheduledReportsControllerCancelResponseHourOfDayMax = 9007199254740991;
+
+export const scheduledReportsControllerCancelResponseDayOfWeekOneMin = -9007199254740991;
+export const scheduledReportsControllerCancelResponseDayOfWeekOneMax = 9007199254740991;
+
+export const scheduledReportsControllerCancelResponseDayOfMonthOneMin = -9007199254740991;
+export const scheduledReportsControllerCancelResponseDayOfMonthOneMax = 9007199254740991;
+
+export const scheduledReportsControllerCancelResponseRunCountMin = -9007199254740991;
+export const scheduledReportsControllerCancelResponseRunCountMax = 9007199254740991;
+
+
+
+export const ScheduledReportsControllerCancelResponse = zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()]),
+  "createdByUserId": zod.union([zod.string(),zod.null()]),
+  "createdByName": zod.union([zod.string(),zod.null()]),
+  "title": zod.string(),
+  "summary": zod.union([zod.string(),zod.null()]),
+  "frequency": zod.enum(['daily', 'weekly', 'monthly']),
+  "hourOfDay": zod.number().min(scheduledReportsControllerCancelResponseHourOfDayMin).max(scheduledReportsControllerCancelResponseHourOfDayMax),
+  "dayOfWeek": zod.union([zod.number().min(scheduledReportsControllerCancelResponseDayOfWeekOneMin).max(scheduledReportsControllerCancelResponseDayOfWeekOneMax),zod.null()]),
+  "dayOfMonth": zod.union([zod.number().min(scheduledReportsControllerCancelResponseDayOfMonthOneMin).max(scheduledReportsControllerCancelResponseDayOfMonthOneMax),zod.null()]),
+  "timezone": zod.string(),
+  "prompt": zod.union([zod.string(),zod.null()]),
+  "status": zod.enum(['active', 'paused', 'cancelled']),
+  "nextRunAt": zod.string(),
+  "lastRunAt": zod.union([zod.string(),zod.null()]),
+  "lastReportId": zod.union([zod.string(),zod.null()]),
+  "runCount": zod.number().min(scheduledReportsControllerCancelResponseRunCountMin).max(scheduledReportsControllerCancelResponseRunCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })
 
 

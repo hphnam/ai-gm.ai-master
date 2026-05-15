@@ -19,7 +19,9 @@ import { MockOpsModule } from './modules/mock-ops/mock-ops.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
 import { NudgeModule } from './modules/nudges/nudge.module'
 import { PhoneModule } from './modules/phone/phone.module'
+import { ReportsModule } from './modules/reports/reports.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
+import { ScheduledReportsModule } from './modules/scheduled-reports/scheduled-reports.module'
 import { SuggestionsModule } from './modules/suggestions/suggestions.module'
 import { TasksModule } from './modules/tasks/tasks.module'
 import { VenuesModule } from './modules/venues/venues.module'
@@ -48,6 +50,8 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     NudgeModule,
     NotificationsModule,
     TasksModule,
+    ReportsModule,
+    ScheduledReportsModule,
     ComplianceModule,
     ChatStartersModule,
     IntegrationsModule,

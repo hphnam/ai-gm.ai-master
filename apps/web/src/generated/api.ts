@@ -332,6 +332,17 @@ export const ListNotificationsResponseDtoNotificationsItemSource = {
   manual: 'manual',
 } as const;
 
+export type ListNotificationsResponseDtoNotificationsItemCategory = typeof ListNotificationsResponseDtoNotificationsItemCategory[keyof typeof ListNotificationsResponseDtoNotificationsItemCategory];
+
+
+export const ListNotificationsResponseDtoNotificationsItemCategory = {
+  chat: 'chat',
+  report: 'report',
+  compliance: 'compliance',
+  task: 'task',
+  system: 'system',
+} as const;
+
 export type ListNotificationsResponseDtoNotificationsItemStatus = typeof ListNotificationsResponseDtoNotificationsItemStatus[keyof typeof ListNotificationsResponseDtoNotificationsItemStatus];
 
 
@@ -350,6 +361,7 @@ export type ListNotificationsResponseDtoNotificationsItem = {
   id: string;
   body: string;
   source: ListNotificationsResponseDtoNotificationsItemSource;
+  category: ListNotificationsResponseDtoNotificationsItemCategory;
   status: ListNotificationsResponseDtoNotificationsItemStatus;
   createdAt: string;
   readAt: string | null;
@@ -359,6 +371,8 @@ export type ListNotificationsResponseDtoNotificationsItem = {
 export interface ListNotificationsResponseDto {
   notifications: ListNotificationsResponseDtoNotificationsItem[];
   unreadCount: number;
+  nextCursor: string | null;
+  hasMore: boolean;
 }
 
 export interface UnreadCountResponseDto {
@@ -385,6 +399,17 @@ export const SimpleNotificationResponseDtoNotificationSource = {
   manual: 'manual',
 } as const;
 
+export type SimpleNotificationResponseDtoNotificationCategory = typeof SimpleNotificationResponseDtoNotificationCategory[keyof typeof SimpleNotificationResponseDtoNotificationCategory];
+
+
+export const SimpleNotificationResponseDtoNotificationCategory = {
+  chat: 'chat',
+  report: 'report',
+  compliance: 'compliance',
+  task: 'task',
+  system: 'system',
+} as const;
+
 export type SimpleNotificationResponseDtoNotificationStatus = typeof SimpleNotificationResponseDtoNotificationStatus[keyof typeof SimpleNotificationResponseDtoNotificationStatus];
 
 
@@ -403,6 +428,7 @@ export type SimpleNotificationResponseDtoNotification = {
   id: string;
   body: string;
   source: SimpleNotificationResponseDtoNotificationSource;
+  category: SimpleNotificationResponseDtoNotificationCategory;
   status: SimpleNotificationResponseDtoNotificationStatus;
   createdAt: string;
   readAt: string | null;
@@ -607,6 +633,457 @@ export const UpdateConversationVisibilityResponseDtoVisibility = {
 export interface UpdateConversationVisibilityResponseDto {
   id: string;
   visibility: UpdateConversationVisibilityResponseDtoVisibility;
+}
+
+export type ReportListResponseDtoReportsItem = {
+  id: string;
+  title: string;
+  summary: string | null;
+  venueId: string | null;
+  createdAt: string;
+};
+
+export interface ReportListResponseDto {
+  reports: ReportListResponseDtoReportsItem[];
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+  hasMore: boolean;
+  nextOffset: number | null;
+}
+
+export type ReportDtoSpecSectionsItem = {
+  type: 'text';
+  /**
+     * @minLength 1
+     * @maxLength 8000
+     */
+  body: string;
+} | {
+  type: 'kpi';
+  kpi: {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: string | {
+  value: number;
+  currency: string | null;
+} | number;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  sublabel?: string;
+  trend?: {
+  direction: 'up' | 'down' | 'flat';
+  percent?: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+};
+} | {
+  type: 'kpiGroup';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /**
+     * @minItems 1
+     * @maxItems 6
+     */
+  kpis: ({
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: string | {
+  value: number;
+  currency: string | null;
+} | number;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  sublabel?: string;
+  trend?: {
+  direction: 'up' | 'down' | 'flat';
+  percent?: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+})[];
+} | {
+  type: 'bar';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /** @maxLength 200 */
+  caption?: string;
+  /**
+     * @minItems 1
+     * @maxItems 50
+     */
+  rows: ({
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: number;
+  /** @maxLength 120 */
+  sublabel?: string;
+  tone?: 'neutral' | 'positive' | 'warning' | 'negative';
+})[];
+  /** @maxLength 16 */
+  unit?: string;
+} | {
+  type: 'table';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /**
+     * @minItems 1
+     * @maxItems 8
+     */
+  columns: string[];
+  /** @maxItems 100 */
+  rows: ((string | number | null)[])[];
+} | {
+  type: 'divider';
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+
+export type ReportDtoSpec = {
+  version?: 1;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  rangeFromIso?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  rangeToIso?: string;
+  /**
+     * @minItems 1
+     * @maxItems 40
+     */
+  sections: ReportDtoSpecSectionsItem[];
+};
+
+export interface ReportDto {
+  id: string;
+  organizationId: string;
+  venueId: string | null;
+  createdByUserId: string | null;
+  createdByName: string | null;
+  title: string;
+  summary: string | null;
+  spec: ReportDtoSpec;
+  createdAt: string;
+}
+
+export type CreateReportBodyDtoSpecSectionsItem = {
+  type: 'text';
+  /**
+     * @minLength 1
+     * @maxLength 8000
+     */
+  body: string;
+} | {
+  type: 'kpi';
+  kpi: {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: string | {
+  value: number;
+  currency: string | null;
+} | number;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  sublabel?: string;
+  trend?: {
+  direction: 'up' | 'down' | 'flat';
+  percent?: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+};
+} | {
+  type: 'kpiGroup';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /**
+     * @minItems 1
+     * @maxItems 6
+     */
+  kpis: ({
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: string | {
+  value: number;
+  currency: string | null;
+} | number;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  sublabel?: string;
+  trend?: {
+  direction: 'up' | 'down' | 'flat';
+  percent?: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+})[];
+} | {
+  type: 'bar';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /** @maxLength 200 */
+  caption?: string;
+  /**
+     * @minItems 1
+     * @maxItems 50
+     */
+  rows: ({
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  value: number;
+  /** @maxLength 120 */
+  sublabel?: string;
+  tone?: 'neutral' | 'positive' | 'warning' | 'negative';
+})[];
+  /** @maxLength 16 */
+  unit?: string;
+} | {
+  type: 'table';
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  title?: string;
+  /**
+     * @minItems 1
+     * @maxItems 8
+     */
+  columns: string[];
+  /** @maxItems 100 */
+  rows: ((string | number | null)[])[];
+} | {
+  type: 'divider';
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label?: string;
+};
+
+export type CreateReportBodyDtoSpec = {
+  version?: 1;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  rangeFromIso?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  rangeToIso?: string;
+  /**
+     * @minItems 1
+     * @maxItems 40
+     */
+  sections: CreateReportBodyDtoSpecSectionsItem[];
+};
+
+export interface CreateReportBodyDto {
+  venueId?: string | null;
+  /**
+     * @minLength 3
+     * @maxLength 200
+     */
+  title: string;
+  /** @maxLength 500 */
+  summary?: string;
+  spec: CreateReportBodyDtoSpec;
+}
+
+export type ScheduledReportListResponseDtoSchedulesItemFrequency = typeof ScheduledReportListResponseDtoSchedulesItemFrequency[keyof typeof ScheduledReportListResponseDtoSchedulesItemFrequency];
+
+
+export const ScheduledReportListResponseDtoSchedulesItemFrequency = {
+  daily: 'daily',
+  weekly: 'weekly',
+  monthly: 'monthly',
+} as const;
+
+export type ScheduledReportListResponseDtoSchedulesItemStatus = typeof ScheduledReportListResponseDtoSchedulesItemStatus[keyof typeof ScheduledReportListResponseDtoSchedulesItemStatus];
+
+
+export const ScheduledReportListResponseDtoSchedulesItemStatus = {
+  active: 'active',
+  paused: 'paused',
+  cancelled: 'cancelled',
+} as const;
+
+export type ScheduledReportListResponseDtoSchedulesItem = {
+  id: string;
+  organizationId: string;
+  venueId: string | null;
+  createdByUserId: string | null;
+  createdByName: string | null;
+  title: string;
+  summary: string | null;
+  frequency: ScheduledReportListResponseDtoSchedulesItemFrequency;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  hourOfDay: number;
+  dayOfWeek: number | null;
+  dayOfMonth: number | null;
+  timezone: string;
+  prompt: string | null;
+  status: ScheduledReportListResponseDtoSchedulesItemStatus;
+  nextRunAt: string;
+  lastRunAt: string | null;
+  lastReportId: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  runCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface ScheduledReportListResponseDto {
+  schedules: ScheduledReportListResponseDtoSchedulesItem[];
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+  hasMore: boolean;
+  nextOffset: number | null;
+}
+
+export type ScheduledReportDtoFrequency = typeof ScheduledReportDtoFrequency[keyof typeof ScheduledReportDtoFrequency];
+
+
+export const ScheduledReportDtoFrequency = {
+  daily: 'daily',
+  weekly: 'weekly',
+  monthly: 'monthly',
+} as const;
+
+export type ScheduledReportDtoStatus = typeof ScheduledReportDtoStatus[keyof typeof ScheduledReportDtoStatus];
+
+
+export const ScheduledReportDtoStatus = {
+  active: 'active',
+  paused: 'paused',
+  cancelled: 'cancelled',
+} as const;
+
+export interface ScheduledReportDto {
+  id: string;
+  organizationId: string;
+  venueId: string | null;
+  createdByUserId: string | null;
+  createdByName: string | null;
+  title: string;
+  summary: string | null;
+  frequency: ScheduledReportDtoFrequency;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  hourOfDay: number;
+  dayOfWeek: number | null;
+  dayOfMonth: number | null;
+  timezone: string;
+  prompt: string | null;
+  status: ScheduledReportDtoStatus;
+  nextRunAt: string;
+  lastRunAt: string | null;
+  lastReportId: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  runCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CreateScheduledReportBodyDtoFrequency = typeof CreateScheduledReportBodyDtoFrequency[keyof typeof CreateScheduledReportBodyDtoFrequency];
+
+
+export const CreateScheduledReportBodyDtoFrequency = {
+  daily: 'daily',
+  weekly: 'weekly',
+  monthly: 'monthly',
+} as const;
+
+export interface CreateScheduledReportBodyDto {
+  venueId?: string | null;
+  /**
+     * @minLength 3
+     * @maxLength 200
+     */
+  title: string;
+  /** @maxLength 500 */
+  summary?: string;
+  frequency: CreateScheduledReportBodyDtoFrequency;
+  /**
+     * @minimum 0
+     * @maximum 23
+     */
+  hourOfDay?: number;
+  dayOfWeek?: number | null;
+  dayOfMonth?: number | null;
+  /**
+     * @minLength 1
+     * @maxLength 64
+     */
+  timezone?: string;
+  /** @maxLength 1000 */
+  prompt?: string;
 }
 
 export type ListIntegrationsResponseDtoIntegrationsItemStatus = typeof ListIntegrationsResponseDtoIntegrationsItemStatus[keyof typeof ListIntegrationsResponseDtoIntegrationsItemStatus];
@@ -1657,9 +2134,21 @@ export type NotificationsControllerListParams = {
 status?: NotificationsControllerListStatus;
 /**
  * @minimum 1
- * @maximum 100
+ * @maximum 50
  */
 limit?: number;
+/**
+ * @maxLength 256
+ */
+cursor?: string;
+/**
+ * @maxLength 200
+ */
+q?: string;
+/**
+ * @maxLength 128
+ */
+category?: string;
 };
 
 export type NotificationsControllerListStatus = typeof NotificationsControllerListStatus[keyof typeof NotificationsControllerListStatus];
@@ -1704,6 +2193,37 @@ export type ChatControllerUpdateVisibilityParams = {
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
 venueId: string;
+};
+
+export type ReportsControllerListParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 10000
+ */
+offset?: number;
+};
+
+export type ScheduledReportsControllerListParams = {
+status?: 'active' | 'paused' | 'cancelled' | 'all';
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+/**
+ * @minimum 0
+ * @maximum 10000
+ */
+offset?: number;
 };
 
 export type DebugControllerGetConversationParams = {
@@ -4125,6 +4645,904 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatControllerUpdateVisibilityMutationOptions(options), queryClient);
+    }
+
+export type reportsControllerListResponse200 = {
+  data: ReportListResponseDto
+  status: 200
+}
+
+export type reportsControllerListResponseSuccess = (reportsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type reportsControllerListResponse = (reportsControllerListResponseSuccess)
+
+export const getReportsControllerListUrl = (params?: ReportsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/reports?${stringifiedParams}` : `/reports`
+}
+
+export const reportsControllerList = async (params?: ReportsControllerListParams, options?: RequestInit): Promise<reportsControllerListResponse> => {
+
+  return orvalMutator<reportsControllerListResponse>(getReportsControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getReportsControllerListQueryKey = (params?: ReportsControllerListParams,) => {
+    return [
+    `/reports`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getReportsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof reportsControllerList>>, TError = unknown>(params?: ReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReportsControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof reportsControllerList>>> = ({ signal }) => reportsControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReportsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof reportsControllerList>>>
+export type ReportsControllerListQueryError = unknown
+
+
+export function useReportsControllerList<TData = Awaited<ReturnType<typeof reportsControllerList>>, TError = unknown>(
+ params: undefined |  ReportsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reportsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof reportsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReportsControllerList<TData = Awaited<ReturnType<typeof reportsControllerList>>, TError = unknown>(
+ params?: ReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reportsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof reportsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReportsControllerList<TData = Awaited<ReturnType<typeof reportsControllerList>>, TError = unknown>(
+ params?: ReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useReportsControllerList<TData = Awaited<ReturnType<typeof reportsControllerList>>, TError = unknown>(
+ params?: ReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReportsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type reportsControllerCreateResponse201 = {
+  data: ReportDto
+  status: 201
+}
+
+export type reportsControllerCreateResponseSuccess = (reportsControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type reportsControllerCreateResponse = (reportsControllerCreateResponseSuccess)
+
+export const getReportsControllerCreateUrl = () => {
+
+
+
+
+  return `/reports`
+}
+
+export const reportsControllerCreate = async (createReportBodyDto: CreateReportBodyDto, options?: RequestInit): Promise<reportsControllerCreateResponse> => {
+
+  return orvalMutator<reportsControllerCreateResponse>(getReportsControllerCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createReportBodyDto)
+  }
+);}
+
+
+
+
+export const getReportsControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreate>>, TError,{data: CreateReportBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreate>>, TError,{data: CreateReportBodyDto}, TContext> => {
+
+const mutationKey = ['reportsControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerCreate>>, {data: CreateReportBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  reportsControllerCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof reportsControllerCreate>>>
+    export type ReportsControllerCreateMutationBody = CreateReportBodyDto
+    export type ReportsControllerCreateMutationError = unknown
+
+    export const useReportsControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreate>>, TError,{data: CreateReportBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reportsControllerCreate>>,
+        TError,
+        {data: CreateReportBodyDto},
+        TContext
+      > => {
+      return useMutation(getReportsControllerCreateMutationOptions(options), queryClient);
+    }
+
+export type reportsControllerGetOneResponse200 = {
+  data: ReportDto
+  status: 200
+}
+
+export type reportsControllerGetOneResponseSuccess = (reportsControllerGetOneResponse200) & {
+  headers: Headers;
+};
+;
+
+export type reportsControllerGetOneResponse = (reportsControllerGetOneResponseSuccess)
+
+export const getReportsControllerGetOneUrl = (id: string,) => {
+
+
+
+
+  return `/reports/${id}`
+}
+
+export const reportsControllerGetOne = async (id: string, options?: RequestInit): Promise<reportsControllerGetOneResponse> => {
+
+  return orvalMutator<reportsControllerGetOneResponse>(getReportsControllerGetOneUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getReportsControllerGetOneQueryKey = (id: string,) => {
+    return [
+    `/reports/${id}`
+    ] as const;
+    }
+
+
+export const getReportsControllerGetOneQueryOptions = <TData = Awaited<ReturnType<typeof reportsControllerGetOne>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReportsControllerGetOneQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof reportsControllerGetOne>>> = ({ signal }) => reportsControllerGetOne(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReportsControllerGetOneQueryResult = NonNullable<Awaited<ReturnType<typeof reportsControllerGetOne>>>
+export type ReportsControllerGetOneQueryError = unknown
+
+
+export function useReportsControllerGetOne<TData = Awaited<ReturnType<typeof reportsControllerGetOne>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reportsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof reportsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReportsControllerGetOne<TData = Awaited<ReturnType<typeof reportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reportsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof reportsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReportsControllerGetOne<TData = Awaited<ReturnType<typeof reportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useReportsControllerGetOne<TData = Awaited<ReturnType<typeof reportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReportsControllerGetOneQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type reportsControllerRemoveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type reportsControllerRemoveResponseSuccess = (reportsControllerRemoveResponse204) & {
+  headers: Headers;
+};
+;
+
+export type reportsControllerRemoveResponse = (reportsControllerRemoveResponseSuccess)
+
+export const getReportsControllerRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/reports/${id}`
+}
+
+export const reportsControllerRemove = async (id: string, options?: RequestInit): Promise<reportsControllerRemoveResponse> => {
+
+  return orvalMutator<reportsControllerRemoveResponse>(getReportsControllerRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getReportsControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof reportsControllerRemove>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['reportsControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerRemove>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  reportsControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportsControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof reportsControllerRemove>>>
+
+    export type ReportsControllerRemoveMutationError = unknown
+
+    export const useReportsControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reportsControllerRemove>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getReportsControllerRemoveMutationOptions(options), queryClient);
+    }
+
+export type scheduledReportsControllerListResponse200 = {
+  data: ScheduledReportListResponseDto
+  status: 200
+}
+
+export type scheduledReportsControllerListResponseSuccess = (scheduledReportsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerListResponse = (scheduledReportsControllerListResponseSuccess)
+
+export const getScheduledReportsControllerListUrl = (params?: ScheduledReportsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/scheduled-reports?${stringifiedParams}` : `/scheduled-reports`
+}
+
+export const scheduledReportsControllerList = async (params?: ScheduledReportsControllerListParams, options?: RequestInit): Promise<scheduledReportsControllerListResponse> => {
+
+  return orvalMutator<scheduledReportsControllerListResponse>(getScheduledReportsControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getScheduledReportsControllerListQueryKey = (params?: ScheduledReportsControllerListParams,) => {
+    return [
+    `/scheduled-reports`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getScheduledReportsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError = unknown>(params?: ScheduledReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScheduledReportsControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof scheduledReportsControllerList>>> = ({ signal }) => scheduledReportsControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScheduledReportsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerList>>>
+export type ScheduledReportsControllerListQueryError = unknown
+
+
+export function useScheduledReportsControllerList<TData = Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError = unknown>(
+ params: undefined |  ScheduledReportsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scheduledReportsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof scheduledReportsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScheduledReportsControllerList<TData = Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError = unknown>(
+ params?: ScheduledReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scheduledReportsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof scheduledReportsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScheduledReportsControllerList<TData = Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError = unknown>(
+ params?: ScheduledReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useScheduledReportsControllerList<TData = Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError = unknown>(
+ params?: ScheduledReportsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScheduledReportsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type scheduledReportsControllerCreateResponse201 = {
+  data: ScheduledReportDto
+  status: 201
+}
+
+export type scheduledReportsControllerCreateResponseSuccess = (scheduledReportsControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerCreateResponse = (scheduledReportsControllerCreateResponseSuccess)
+
+export const getScheduledReportsControllerCreateUrl = () => {
+
+
+
+
+  return `/scheduled-reports`
+}
+
+export const scheduledReportsControllerCreate = async (createScheduledReportBodyDto: CreateScheduledReportBodyDto, options?: RequestInit): Promise<scheduledReportsControllerCreateResponse> => {
+
+  return orvalMutator<scheduledReportsControllerCreateResponse>(getScheduledReportsControllerCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createScheduledReportBodyDto)
+  }
+);}
+
+
+
+
+export const getScheduledReportsControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCreate>>, TError,{data: CreateScheduledReportBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCreate>>, TError,{data: CreateScheduledReportBodyDto}, TContext> => {
+
+const mutationKey = ['scheduledReportsControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduledReportsControllerCreate>>, {data: CreateScheduledReportBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  scheduledReportsControllerCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduledReportsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerCreate>>>
+    export type ScheduledReportsControllerCreateMutationBody = CreateScheduledReportBodyDto
+    export type ScheduledReportsControllerCreateMutationError = unknown
+
+    export const useScheduledReportsControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCreate>>, TError,{data: CreateScheduledReportBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduledReportsControllerCreate>>,
+        TError,
+        {data: CreateScheduledReportBodyDto},
+        TContext
+      > => {
+      return useMutation(getScheduledReportsControllerCreateMutationOptions(options), queryClient);
+    }
+
+export type scheduledReportsControllerGetOneResponse200 = {
+  data: ScheduledReportDto
+  status: 200
+}
+
+export type scheduledReportsControllerGetOneResponseSuccess = (scheduledReportsControllerGetOneResponse200) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerGetOneResponse = (scheduledReportsControllerGetOneResponseSuccess)
+
+export const getScheduledReportsControllerGetOneUrl = (id: string,) => {
+
+
+
+
+  return `/scheduled-reports/${id}`
+}
+
+export const scheduledReportsControllerGetOne = async (id: string, options?: RequestInit): Promise<scheduledReportsControllerGetOneResponse> => {
+
+  return orvalMutator<scheduledReportsControllerGetOneResponse>(getScheduledReportsControllerGetOneUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getScheduledReportsControllerGetOneQueryKey = (id: string,) => {
+    return [
+    `/scheduled-reports/${id}`
+    ] as const;
+    }
+
+
+export const getScheduledReportsControllerGetOneQueryOptions = <TData = Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScheduledReportsControllerGetOneQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>> = ({ signal }) => scheduledReportsControllerGetOne(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScheduledReportsControllerGetOneQueryResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>>
+export type ScheduledReportsControllerGetOneQueryError = unknown
+
+
+export function useScheduledReportsControllerGetOne<TData = Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScheduledReportsControllerGetOne<TData = Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScheduledReportsControllerGetOne<TData = Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useScheduledReportsControllerGetOne<TData = Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scheduledReportsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScheduledReportsControllerGetOneQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type scheduledReportsControllerPauseResponse200 = {
+  data: ScheduledReportDto
+  status: 200
+}
+
+export type scheduledReportsControllerPauseResponseSuccess = (scheduledReportsControllerPauseResponse200) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerPauseResponse = (scheduledReportsControllerPauseResponseSuccess)
+
+export const getScheduledReportsControllerPauseUrl = (id: string,) => {
+
+
+
+
+  return `/scheduled-reports/${id}/pause`
+}
+
+export const scheduledReportsControllerPause = async (id: string, options?: RequestInit): Promise<scheduledReportsControllerPauseResponse> => {
+
+  return orvalMutator<scheduledReportsControllerPauseResponse>(getScheduledReportsControllerPauseUrl(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getScheduledReportsControllerPauseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerPause>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerPause>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['scheduledReportsControllerPause'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduledReportsControllerPause>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  scheduledReportsControllerPause(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduledReportsControllerPauseMutationResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerPause>>>
+
+    export type ScheduledReportsControllerPauseMutationError = unknown
+
+    export const useScheduledReportsControllerPause = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerPause>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduledReportsControllerPause>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getScheduledReportsControllerPauseMutationOptions(options), queryClient);
+    }
+
+export type scheduledReportsControllerResumeResponse200 = {
+  data: ScheduledReportDto
+  status: 200
+}
+
+export type scheduledReportsControllerResumeResponseSuccess = (scheduledReportsControllerResumeResponse200) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerResumeResponse = (scheduledReportsControllerResumeResponseSuccess)
+
+export const getScheduledReportsControllerResumeUrl = (id: string,) => {
+
+
+
+
+  return `/scheduled-reports/${id}/resume`
+}
+
+export const scheduledReportsControllerResume = async (id: string, options?: RequestInit): Promise<scheduledReportsControllerResumeResponse> => {
+
+  return orvalMutator<scheduledReportsControllerResumeResponse>(getScheduledReportsControllerResumeUrl(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getScheduledReportsControllerResumeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerResume>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerResume>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['scheduledReportsControllerResume'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduledReportsControllerResume>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  scheduledReportsControllerResume(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduledReportsControllerResumeMutationResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerResume>>>
+
+    export type ScheduledReportsControllerResumeMutationError = unknown
+
+    export const useScheduledReportsControllerResume = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerResume>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduledReportsControllerResume>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getScheduledReportsControllerResumeMutationOptions(options), queryClient);
+    }
+
+export type scheduledReportsControllerCancelResponse200 = {
+  data: ScheduledReportDto
+  status: 200
+}
+
+export type scheduledReportsControllerCancelResponseSuccess = (scheduledReportsControllerCancelResponse200) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerCancelResponse = (scheduledReportsControllerCancelResponseSuccess)
+
+export const getScheduledReportsControllerCancelUrl = (id: string,) => {
+
+
+
+
+  return `/scheduled-reports/${id}/cancel`
+}
+
+export const scheduledReportsControllerCancel = async (id: string, options?: RequestInit): Promise<scheduledReportsControllerCancelResponse> => {
+
+  return orvalMutator<scheduledReportsControllerCancelResponse>(getScheduledReportsControllerCancelUrl(id),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getScheduledReportsControllerCancelMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCancel>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCancel>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['scheduledReportsControllerCancel'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduledReportsControllerCancel>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  scheduledReportsControllerCancel(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduledReportsControllerCancelMutationResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerCancel>>>
+
+    export type ScheduledReportsControllerCancelMutationError = unknown
+
+    export const useScheduledReportsControllerCancel = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerCancel>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduledReportsControllerCancel>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getScheduledReportsControllerCancelMutationOptions(options), queryClient);
     }
 
 export type integrationsControllerListResponse200 = {
