@@ -159,6 +159,13 @@ export class ToolDispatcher {
             includePending?: boolean
             crossVenue?: boolean
           }
+          // Telemetry only — surface a warning when the model fires find_knowledge
+          // for a query that looks operational AND the org has at least one
+          // active integration. The system prompt + tool description already
+          // route those to pos_* tools; this log lets us track residual misroutes
+          // without changing tool behaviour. No PII: orgId is hashed, query is
+          // length-only.
+          void this.flagPossibleIntegrationMisroute(i.query, ctx.orgId)
           const result = await this.retrieval.find(i.query, {
             orgId: ctx.orgId,
             venueId: i.venueId,
@@ -1159,6 +1166,60 @@ export class ToolDispatcher {
       const message = (err as Error).message ?? 'unknown dispatcher error'
       this.logger.error(JSON.stringify({ event: 'tool_dispatch.error', tool: toolName, message }))
       return fail('error', message)
+    }
+  }
+
+  /**
+   * Surfaces residual integration-misroutes — when the agent fires
+   * find_knowledge for a query that overlaps with what a connected integration
+   * (Square / accounting / etc) could answer authoritatively. Telemetry-only:
+   * the system prompt + tool description already steer toward pos_* tools, so
+   * this never rewrites the call — it just logs so we can spot regressions in
+   * source priority. PII-safe: org hashed, query length only. Fire-and-forget;
+   * never blocks the user-facing tool.
+   */
+  private async flagPossibleIntegrationMisroute(query: string, orgId: string): Promise<void> {
+    // Multi-word / high-signal phrases only. Bare single words like "stock"
+    // ("stock take SOP"), "shift" ("shift handover"), "refund" ("refund
+    // policy"), "gross" ("gross misconduct"), or "payment" ("card payment
+    // SOP") all false-positive against legitimate KB intents — those drown
+    // the warning channel. The phrases below are the ones a numeric/live
+    // question actually uses; policy/procedure questions phrase differently.
+    const OPS_PATTERN =
+      /\b(takings|revenue|cogs|cost of goods|gross sales|net sales|order count|best ?sellers?|top items?|tender mix|cash vs card|average ticket|tips? (?:this|today|yesterday|last)|refund rate|refund total|labou?r cost|payroll|wages? (?:this|today|yesterday|last)|hourly breakdown|busiest hour|who(?:'?s| is) (?:on shift|working|clocked)|active shifts|stock (?:count|level|on hand|left)|inventory (?:count|level|on hand)|how much .{1,30} (?:do we have|left|in stock))\b/i
+    if (!OPS_PATTERN.test(query)) return
+    try {
+      // Only POS-domain providers cover the keywords above today. When an
+      // accounting / CRM domain provider lands with its own ops surface (Xero
+      // for COGS, etc), extend the domain list. Without this filter, "stock"
+      // queries on a Xero-only org would log a false misroute.
+      const posProviderIds = this.integrations.listProviderIdsByDomain('pos')
+      if (posProviderIds.length === 0) return
+      const hit = await prisma.integration.findFirst({
+        where: {
+          organizationId: orgId,
+          status: 'active',
+          provider: { in: posProviderIds },
+        },
+        select: { provider: true },
+      })
+      if (!hit) return
+      this.logger.warn(
+        JSON.stringify({
+          event: 'tool_dispatcher.integration_misroute_candidate',
+          tool: 'find_knowledge',
+          orgIdHash: createHash('sha256').update(orgId).digest('hex').slice(0, 16),
+          activeProvider: hit.provider,
+          queryLength: query.length,
+        }),
+      )
+    } catch (err) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'tool_dispatcher.misroute_check_failed',
+          message: (err as Error).message,
+        }),
+      )
     }
   }
 

@@ -36,6 +36,7 @@ import { ConversationModeService } from './conversation-mode.service'
 import {
   type AgentMode,
   buildGmAgent,
+  synthesizeTerminalToolReply,
   type VenueContactSummary,
   type VenueProfileContext,
   type VenueSnapshot,
@@ -786,6 +787,9 @@ Assistant answer: ${assistantText}`,
 
     try {
       const result = await agent.generate({ messages })
+      // Trim before the !finalText check below — a whitespace-only response
+      // should fall through to the terminal-tool reply / generic fallback, not
+      // be persisted as a blank-looking assistant message.
       finalText = (result.text ?? '').trim()
       reasoningText = result.reasoningText ?? undefined
       const lastAssistant = [...result.response.messages]
@@ -829,14 +833,16 @@ Assistant answer: ${assistantText}`,
       }
 
       if (!finalText) {
-        this.logger.warn(
+        const terminalReply = synthesizeTerminalToolReply(toolCallLog)
+        this.logger.log(
           JSON.stringify({
             event: 'chat.empty_assistant_text',
             conversationId,
             finishReason: result.finishReason,
+            terminalToolStop: terminalReply !== null,
           }),
         )
-        finalText = "I couldn't produce an answer — please retry or rephrase."
+        finalText = terminalReply ?? "I couldn't produce an answer — please retry or rephrase."
       }
     } catch (err) {
       this.logger.error(
@@ -1226,9 +1232,26 @@ Assistant answer: ${assistantText}`,
         const text = event.text ?? ''
         const reasoningText = (event as { reasoningText?: string }).reasoningText
         // Never persist an empty assistant row — Anthropic rejects those as
-        // history on the next turn. Fall back to a visible placeholder.
-        const storedContent =
-          text.trim() || "I couldn't produce an answer — please retry or rephrase."
+        // history on the next turn. Prefer a brief terminal-tool confirmation
+        // when the loop ended on generate_report / save_knowledge_doc; fall
+        // back to the generic error string otherwise.
+        const trimmed = text.trim()
+        let storedContent: string
+        if (trimmed) {
+          storedContent = trimmed
+        } else {
+          const terminalReply = synthesizeTerminalToolReply(toolCallLog)
+          this.logger.log(
+            JSON.stringify({
+              event: 'chat.empty_assistant_text',
+              conversationId,
+              finishReason: event.finishReason,
+              terminalToolStop: terminalReply !== null,
+            }),
+          )
+          storedContent =
+            terminalReply ?? "I couldn't produce an answer — please retry or rephrase."
+        }
 
         // Persist the full UIMessage-shaped parts snapshot for faithful replay
         // (reasoning blocks, tool chips, streaming caret, etc).

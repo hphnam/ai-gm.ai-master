@@ -125,6 +125,13 @@ export class IntegrationRegistry {
       .map((p) => p.id)
   }
 
+  /// All provider ids registered in `domain`. Used by the dispatcher's
+  /// integration-misroute telemetry so a "stock query came in but only Xero
+  /// is connected" doesn't get logged as a POS misroute candidate.
+  listProviderIdsByDomain(domain: import('./integration-provider').IntegrationDomain): string[] {
+    return [...this.providers.values()].filter((p) => p.domain === domain).map((p) => p.id)
+  }
+
   async dispatch(
     toolName: string,
     input: unknown,

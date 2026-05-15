@@ -35,6 +35,63 @@ const MODEL_ID = 'claude-sonnet-4-6'
 const MAX_STEPS = 8
 const FORCE_FINALISE_AFTER_STEP = 5
 
+// Tools whose call ends the agent loop immediately (see stopWhen below). Each
+// renders its own tool card in the UI, so the agent doesn't (and can't) emit a
+// closing text turn — synthesizeTerminalToolReply provides the brief
+// confirmation that becomes the persisted assistant message body.
+export const TERMINAL_STOP_TOOLS = ['save_knowledge_doc', 'generate_report'] as const
+type TerminalStopTool = (typeof TERMINAL_STOP_TOOLS)[number]
+
+function isTerminalStopTool(name: string): name is TerminalStopTool {
+  return (TERMINAL_STOP_TOOLS as readonly string[]).includes(name)
+}
+
+type TerminalToolLogEntry = {
+  tool: string
+  result: unknown
+}
+
+/**
+ * Maps a completed terminal-stop tool call to a brief assistant confirmation.
+ *
+ * Why this exists: `stopWhen: hasToolCall(t)` halts the loop the instant the
+ * tool resolves — there's no follow-up text turn, so `event.text` is empty.
+ * Without this, the persisted assistant row falls through to the generic
+ * "couldn't produce an answer" error fallback even though the report/save
+ * actually succeeded and rendered its own tool card above.
+ *
+ * Returns null when the last call wasn't a terminal-stop tool (e.g. the loop
+ * exited via MAX_STEPS), letting the caller fall through to its error path.
+ */
+export function synthesizeTerminalToolReply(
+  toolCallLog: ReadonlyArray<TerminalToolLogEntry>,
+): string | null {
+  const last = toolCallLog[toolCallLog.length - 1]
+  if (!last || !isTerminalStopTool(last.tool)) return null
+  // Relies on the dispatcher's ToolResult<T> envelope (apps/api/src/types/tool-result.ts):
+  // `{ ok: true, data }` on success, `{ ok: false, reason, detail? }` on failure.
+  // A missing / malformed envelope is treated as failure — never as success.
+  const result = last.result as { ok?: boolean } | null
+  const succeeded = result?.ok === true
+  switch (last.tool) {
+    case 'generate_report':
+      return succeeded
+        ? "Report's ready — opened it above."
+        : "I couldn't build that report — details are in the card above."
+    case 'save_knowledge_doc':
+      return succeeded
+        ? 'Saved that to your knowledge base.'
+        : "I couldn't save that — details are in the card above."
+    default: {
+      // Exhaustiveness guard: adding a new entry to TERMINAL_STOP_TOOLS without
+      // a matching case here becomes a compile-time error rather than a silent
+      // `undefined` return at runtime.
+      const _exhaustive: never = last.tool
+      return _exhaustive
+    }
+  }
+}
+
 /**
  * Builds the per-request GM agent. Tools are per-request because the dispatcher
  * closes over {orgId, userId, userRole} for tenant isolation, and we prefer
@@ -283,11 +340,7 @@ export function buildGmAgent(params: {
     // report has been written. generate_report is a single-shot create — a
     // second call would orphan the first row, and the headless scheduled-
     // report path relies on first-wins capture in onStepFinish.
-    stopWhen: [
-      stepCountIs(MAX_STEPS),
-      hasToolCall('save_knowledge_doc'),
-      hasToolCall('generate_report'),
-    ],
+    stopWhen: [stepCountIs(MAX_STEPS), ...TERMINAL_STOP_TOOLS.map((t) => hasToolCall(t))],
     onFinish: params.onFinish,
     onStepFinish: params.onStepFinish,
   })
