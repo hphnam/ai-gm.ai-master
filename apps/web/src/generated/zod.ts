@@ -368,6 +368,10 @@ export const NotificationsControllerListResponse = zod.object({
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
   "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
   "automated": zod.boolean(),
+  "reference": zod.union([zod.object({
+  "kind": zod.string(),
+  "id": zod.string()
+}),zod.null()]),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),
@@ -431,6 +435,10 @@ export const NotificationsControllerMarkReadResponse = zod.object({
   "source": zod.enum(['chat', 'whatsapp', 'manual']),
   "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
   "automated": zod.boolean(),
+  "reference": zod.union([zod.object({
+  "kind": zod.string(),
+  "id": zod.string()
+}),zod.null()]),
   "status": zod.enum(['unread', 'read']),
   "createdAt": zod.string(),
   "readAt": zod.union([zod.string(),zod.null()]),

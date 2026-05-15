@@ -139,6 +139,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
       source: 'chat' | 'whatsapp' | 'manual'
       category: 'chat' | 'report' | 'compliance' | 'task' | 'system'
       automated: boolean
+      reference: { kind: string; id: string } | null
       createdAt: string
       author: { id: string; name: string | null; email: string } | null
       recipient: { id: string; name: string | null; email: string }

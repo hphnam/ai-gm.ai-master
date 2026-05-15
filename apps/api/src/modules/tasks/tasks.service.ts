@@ -253,6 +253,7 @@ export class TasksService {
         assigneeUserId: true,
         creatorUserId: true,
         status: true,
+        dueAt: true,
       },
     })
     if (!existing) throw new NotFoundException('task-not-found')
@@ -275,10 +276,20 @@ export class TasksService {
     const data: Record<string, unknown> = {}
     if (patch.body !== undefined) data.body = patch.body
     if (patch.dueAt !== undefined) {
-      data.dueAt = patch.dueAt === null ? null : new Date(patch.dueAt)
-      // Clearing or moving the due date reopens the reminder window — the
-      // scheduler can ping again at the new dueAt.
-      data.remindedAt = null
+      const newDueAt = patch.dueAt === null ? null : new Date(patch.dueAt)
+      data.dueAt = newDueAt
+      // Only clear the reminder stamp when the due date actually MOVED.
+      // The AI's update_task tool sometimes re-sends the existing dueAt
+      // as part of a no-op update; without this guard, every such call
+      // resets remindedAt and the reminder cron fires the same task again
+      // on its next tick. Compare by epoch ms so identical timestamps from
+      // different Date instances still match.
+      const sameDate =
+        (newDueAt === null && existing.dueAt === null) ||
+        (newDueAt !== null &&
+          existing.dueAt !== null &&
+          newDueAt.getTime() === existing.dueAt.getTime())
+      if (!sameDate) data.remindedAt = null
     }
     if (patch.category !== undefined) data.category = patch.category
     if (patch.status !== undefined) {

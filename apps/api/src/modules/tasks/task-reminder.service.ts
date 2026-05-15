@@ -108,6 +108,9 @@ export class TaskReminderService {
     // else originated them). Compose() also enforces a recipient !== author
     // guard, which our scan filter already prevents (creator==assignee falls
     // through to composeSystem below).
+    // Reference lets the alerts row offer "Open task" + "Mark complete"
+    // action buttons without parsing the task id out of the body.
+    const reference = { kind: 'task' as const, id: t.id }
     if (t.creatorUserId && t.creatorUserId !== t.assigneeUserId) {
       // Attribute to the task creator so the recipient can see WHO set this
       // up, but flag as `automated` so the UI renders it with the gm
@@ -117,13 +120,14 @@ export class TaskReminderService {
         t.creatorUserId,
         t.assigneeUserId,
         noteBody,
-        { category: 'task', automated: true },
+        { category: 'task', automated: true, reference },
       )
     } else {
       // Self-created task reminder — no human author. composeSystem already
       // marks `automated: true` by default.
       await this.notifications.composeSystem(t.organizationId, t.assigneeUserId, noteBody, {
         category: 'task',
+        reference,
       })
     }
 

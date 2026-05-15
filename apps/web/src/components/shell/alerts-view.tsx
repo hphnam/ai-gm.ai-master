@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCheck, Inbox, Loader2, Search, X } from 'lucide-react'
+import { Check, CheckCheck, Inbox, Loader2, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import {
   useMarkNotificationRead,
   useNotificationReplies,
 } from '@/lib/hooks/use-notifications'
+import { useUpdateTask } from '@/lib/hooks/use-tasks'
 import { cn } from '@/lib/utils'
 import {
   ALERT_CATEGORY_ORDER,
@@ -412,19 +413,88 @@ function AlertRow({
           >
             {bodyPreview}
           </p>
-          {action ? (
-            <Link
-              href={action.href}
-              onClick={(e) => e.stopPropagation()}
-              className="mt-1 inline-flex w-fit cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 font-medium text-[11px] text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-            >
-              {note.category === 'report' ? 'Open report' : 'Open task'}
-            </Link>
-          ) : null}
         </div>
       </button>
+      {/* Interactive controls (Link, Mark complete) live OUTSIDE the toggle */}
+      {/* button to keep the DOM valid — HTML5 forbids interactive descendants */}
+      {/* inside <button>. ActionRow returns null when there's nothing to show, */}
+      {/* so the row stays tight when no actions apply. */}
+      <ActionRow note={note} bodyAction={action} />
       {expanded && note.author ? <AlertReplyThread note={note} /> : null}
     </li>
+  )
+}
+
+/// Renders the row's action buttons. Two sources:
+///   - structured `note.reference` (preferred — survives body edits)
+///   - markdown link in the body (legacy path for rows that pre-date the
+///     reference column; gracefully falls through)
+/// For `reference.kind === 'task'` we also surface a "Mark complete"
+/// mutation alongside the "Open task" link.
+function ActionRow({
+  note,
+  bodyAction,
+}: {
+  note: Notification
+  bodyAction: { label: string; href: string } | null
+}) {
+  const updateTask = useUpdateTask()
+  // Reference takes precedence; bodyAction only fills the gap for old rows
+  // that don't have one (backfill from before this column existed).
+  const ref = note.reference
+  const refHref =
+    ref?.kind === 'task'
+      ? `/tasks/${encodeURIComponent(ref.id)}`
+      : ref?.kind === 'report'
+        ? `/reports/${encodeURIComponent(ref.id)}`
+        : null
+  const href = refHref ?? bodyAction?.href ?? null
+  const openLabel =
+    ref?.kind === 'task'
+      ? 'Open task'
+      : ref?.kind === 'report'
+        ? 'Open report'
+        : (bodyAction?.label ?? null)
+
+  if (!href && ref?.kind !== 'task') return null
+
+  return (
+    // Rendered as a sibling of the row's toggle button (not a child) so the
+    // Link + button below sit in valid DOM. Padding mirrors the toggle
+    // button's so the action chips align with the body text above.
+    <div className="-mt-1 flex flex-wrap items-center gap-1.5 px-4 pb-2.5 pl-[3.25rem]">
+      {href ? (
+        <Link
+          href={href}
+          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 font-medium text-[11px] text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+        >
+          {openLabel ?? 'Open'}
+        </Link>
+      ) : null}
+      {ref?.kind === 'task' ? (
+        <button
+          type="button"
+          disabled={updateTask.isPending}
+          onClick={() => {
+            updateTask.mutate(
+              { id: ref.id, status: 'done' },
+              {
+                onSuccess: () => toast.success('Task marked complete'),
+                onError: (err) => toast.error(`Couldn't mark complete: ${apiErrorLabel(err)}`),
+              },
+            )
+          }}
+          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 font-medium text-[11px] text-foreground/80 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {updateTask.isPending ? (
+            <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+          ) : (
+            <Check className="h-3 w-3" aria-hidden />
+          )}
+          Mark complete
+        </button>
+      ) : null}
+    </div>
   )
 }
 
@@ -445,9 +515,23 @@ function AlertReplyThread({ note }: { note: Notification }) {
     }
   }
 
+  // Replies route to the original author of the parent notification — for
+  // an automated gm reminder, that's the task creator. Surface their name in
+  // the placeholder so the user knows their reply isn't going "to gm".
+  const replyTarget =
+    note.author && (note.author.name ?? note.author.email)
+      ? (note.author.name ?? note.author.email)
+      : null
+  const placeholder = replyTarget ? `Reply to ${replyTarget}…` : 'Reply…'
+
   const rows = replies.data?.replies ?? []
   return (
     <div className="border-t border-border/40 bg-muted/15 px-4 py-3">
+      {note.automated && replyTarget ? (
+        <p className="mb-2 text-[10px] text-foreground/55">
+          Replies go to <span className="font-medium text-foreground/75">{replyTarget}</span>
+        </p>
+      ) : null}
       {replies.isLoading && rows.length === 0 ? (
         <p className="text-[11px] text-foreground/50 italic">Loading replies…</p>
       ) : rows.length > 0 ? (
@@ -477,7 +561,7 @@ function AlertReplyThread({ note }: { note: Notification }) {
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Reply…"
+          placeholder={placeholder}
           rows={1}
           maxLength={2000}
           disabled={compose.isPending}

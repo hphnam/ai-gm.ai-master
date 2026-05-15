@@ -16,6 +16,8 @@ export type NotificationDirection = 'inbox' | 'sent'
 
 export type NotificationParty = { id: string; name: string | null; email: string }
 
+export type NotificationReference = { kind: string; id: string } | null
+
 export type Notification = {
   id: string
   body: string
@@ -25,6 +27,9 @@ export type Notification = {
   // ready). Drives the gm assistant treatment in the row UI; `author` is
   // still surfaced as secondary context.
   automated: boolean
+  // Loose pointer to the entity this notification is about — drives the
+  // "Open task" / "Mark complete" action buttons on the alerts row.
+  reference: NotificationReference
   status: NotificationStatus
   createdAt: string
   readAt: string | null

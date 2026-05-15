@@ -343,6 +343,11 @@ export const ListNotificationsResponseDtoNotificationsItemCategory = {
   system: 'system',
 } as const;
 
+export type ListNotificationsResponseDtoNotificationsItemReference = {
+  kind: string;
+  id: string;
+} | null;
+
 export type ListNotificationsResponseDtoNotificationsItemStatus = typeof ListNotificationsResponseDtoNotificationsItemStatus[keyof typeof ListNotificationsResponseDtoNotificationsItemStatus];
 
 
@@ -369,6 +374,7 @@ export type ListNotificationsResponseDtoNotificationsItem = {
   source: ListNotificationsResponseDtoNotificationsItemSource;
   category: ListNotificationsResponseDtoNotificationsItemCategory;
   automated: boolean;
+  reference: ListNotificationsResponseDtoNotificationsItemReference;
   status: ListNotificationsResponseDtoNotificationsItemStatus;
   createdAt: string;
   readAt: string | null;
@@ -418,6 +424,11 @@ export const SimpleNotificationResponseDtoNotificationCategory = {
   system: 'system',
 } as const;
 
+export type SimpleNotificationResponseDtoNotificationReference = {
+  kind: string;
+  id: string;
+} | null;
+
 export type SimpleNotificationResponseDtoNotificationStatus = typeof SimpleNotificationResponseDtoNotificationStatus[keyof typeof SimpleNotificationResponseDtoNotificationStatus];
 
 
@@ -444,6 +455,7 @@ export type SimpleNotificationResponseDtoNotification = {
   source: SimpleNotificationResponseDtoNotificationSource;
   category: SimpleNotificationResponseDtoNotificationCategory;
   automated: boolean;
+  reference: SimpleNotificationResponseDtoNotificationReference;
   status: SimpleNotificationResponseDtoNotificationStatus;
   createdAt: string;
   readAt: string | null;

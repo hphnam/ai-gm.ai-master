@@ -268,6 +268,11 @@ export class ScheduledReportsProcessor extends WorkerHost implements OnApplicati
           category: 'report',
           // System-authored is automated by definition.
           automated: true,
+          // Reference lets the alerts row offer "Open report" without parsing
+          // the markdown link out of the body (which is also kept for older
+          // clients that pre-date the structured field).
+          referenceKind: reportId ? 'report' : null,
+          referenceId: reportId,
           body: notifBody,
         },
         select: {
@@ -284,6 +289,7 @@ export class ScheduledReportsProcessor extends WorkerHost implements OnApplicati
         source: 'manual',
         category: 'report',
         automated: true,
+        reference: reportId ? { kind: 'report', id: reportId } : null,
         createdAt: notif.createdAt.toISOString(),
         author: null,
         recipient: {

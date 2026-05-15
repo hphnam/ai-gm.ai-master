@@ -734,6 +734,7 @@ export class ToolDispatcher {
             source,
             category: 'chat' as const,
             automated: false,
+            reference: null,
             createdAt: created.createdAt.toISOString(),
             author: authorParty,
             recipient: recipientParty,

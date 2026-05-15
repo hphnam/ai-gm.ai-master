@@ -15,6 +15,13 @@ const PartySchema = z.object({
   email: z.string(),
 })
 
+const ReferenceSchema = z
+  .object({
+    kind: z.string(),
+    id: z.string(),
+  })
+  .nullable()
+
 export const NotificationSchema = z.object({
   id: z.string(),
   body: z.string(),
@@ -25,6 +32,10 @@ export const NotificationSchema = z.object({
   // than attributing the message to `author` (which, for reminders, is the
   // task creator — kept for context, not as the speaker).
   automated: z.boolean(),
+  // Loose entity reference for the alerts row to surface action buttons
+  // ("Open task" / "Mark complete" / "Open report"). kind is an open enum
+  // — the renderer only special-cases values it knows.
+  reference: ReferenceSchema,
   status: z.enum(['unread', 'read']),
   createdAt: z.string(),
   readAt: z.string().nullable(),

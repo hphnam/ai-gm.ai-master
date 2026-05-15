@@ -851,6 +851,13 @@ model Notification {
   /// (which, for reminders, is the task *creator* — kept for context but
   /// not the actual speaker).
   automated       Boolean   @default(false)
+  /// Loose reference to the underlying entity the notification is ABOUT.
+  /// Lets the UI surface action buttons ("Open task", "Mark complete",
+  /// "Open report") without parsing entity IDs out of the body string.
+  /// kind: 'task' | 'report' | 'compliance' | 'document' | etc. (open set;
+  /// the renderer ignores unknown values).
+  referenceKind   String?
+  referenceId     String?
   body            String
   status          String    @default("unread") // unread | read
   createdAt       DateTime  @default(now())

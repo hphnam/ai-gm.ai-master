@@ -39,12 +39,23 @@ export type NotificationCategory = 'chat' | 'report' | 'compliance' | 'task' | '
 
 export type NotificationParty = { id: string; name: string | null; email: string }
 
+/// Open enum — the alerts renderer only special-cases known kinds (task,
+/// report) but stores whatever upstream services set, so adding a new
+/// reference type doesn't need a migration.
+export type NotificationReferenceKind = 'task' | 'report' | 'compliance' | string
+
+export type NotificationReference = {
+  kind: NotificationReferenceKind
+  id: string
+} | null
+
 export type NotificationRow = {
   id: string
   body: string
   source: 'chat' | 'whatsapp' | 'manual'
   category: NotificationCategory
   automated: boolean
+  reference: NotificationReference
   status: 'unread' | 'read'
   createdAt: string
   readAt: string | null
@@ -179,6 +190,8 @@ export class NotificationsService {
           source: true,
           category: true,
           automated: true,
+          referenceKind: true,
+          referenceId: true,
           status: true,
           createdAt: true,
           readAt: true,
@@ -239,6 +252,8 @@ export class NotificationsService {
         source: true,
         category: true,
         automated: true,
+        referenceKind: true,
+        referenceId: true,
         status: true,
         createdAt: true,
         readAt: true,
@@ -277,11 +292,17 @@ export class NotificationsService {
     authorUserId: string,
     recipientUserId: string,
     body: string,
-    opts?: { category?: NotificationCategory; automated?: boolean },
+    opts?: {
+      category?: NotificationCategory
+      automated?: boolean
+      reference?: { kind: string; id: string } | null
+    },
   ): Promise<NotificationRow> {
     const category: NotificationCategory =
       opts?.category && KNOWN_CATEGORIES.has(opts.category) ? opts.category : 'chat'
     const automated = opts?.automated === true
+    const referenceKind = opts?.reference?.kind ?? null
+    const referenceId = opts?.reference?.id ?? null
     // Recipient must be a member of the same org. Reject self-notes — almost
     // always an unintended action from the UI.
     if (recipientUserId === authorUserId) {
@@ -302,6 +323,8 @@ export class NotificationsService {
         source: 'manual',
         category,
         automated,
+        referenceKind,
+        referenceId,
         body,
       },
       select: {
@@ -310,6 +333,8 @@ export class NotificationsService {
         source: true,
         category: true,
         automated: true,
+        referenceKind: true,
+        referenceId: true,
         status: true,
         createdAt: true,
         readAt: true,
@@ -327,6 +352,7 @@ export class NotificationsService {
         notificationId: created.id,
         bodyLength: body.length,
         automated,
+        referenceKind,
       }),
     )
     // Two-room fan-out: the recipient gets `received` (toasts in their UI, bell
@@ -340,6 +366,7 @@ export class NotificationsService {
       source: row.source,
       category: row.category,
       automated: row.automated,
+      reference: row.reference,
       createdAt: row.createdAt,
       author: row.author,
       recipient: row.recipient,
@@ -365,10 +392,15 @@ export class NotificationsService {
     orgId: string,
     recipientUserId: string,
     body: string,
-    opts?: { category?: NotificationCategory },
+    opts?: {
+      category?: NotificationCategory
+      reference?: { kind: string; id: string } | null
+    },
   ): Promise<NotificationRow> {
     const category: NotificationCategory =
       opts?.category && KNOWN_CATEGORIES.has(opts.category) ? opts.category : 'system'
+    const referenceKind = opts?.reference?.kind ?? null
+    const referenceId = opts?.reference?.id ?? null
     const created = await prisma.notification.create({
       data: {
         organizationId: orgId,
@@ -378,6 +410,8 @@ export class NotificationsService {
         category,
         // System-composed by definition; no human author, no chat-tool route.
         automated: true,
+        referenceKind,
+        referenceId,
         body,
       },
       select: {
@@ -386,6 +420,8 @@ export class NotificationsService {
         source: true,
         category: true,
         automated: true,
+        referenceKind: true,
+        referenceId: true,
         status: true,
         createdAt: true,
         readAt: true,
@@ -402,6 +438,7 @@ export class NotificationsService {
       source: row.source,
       category: row.category,
       automated: row.automated,
+      reference: row.reference,
       createdAt: row.createdAt,
       author: row.author,
       recipient: row.recipient,
@@ -551,6 +588,8 @@ export class NotificationsService {
     source: string
     category: string
     automated: boolean
+    referenceKind: string | null
+    referenceId: string | null
     status: string
     createdAt: Date
     readAt: Date | null
@@ -566,12 +605,15 @@ export class NotificationsService {
     const category = KNOWN_CATEGORIES.has(r.category as NotificationCategory)
       ? (r.category as NotificationCategory)
       : 'chat'
+    const reference: NotificationReference =
+      r.referenceKind && r.referenceId ? { kind: r.referenceKind, id: r.referenceId } : null
     return {
       id: r.id,
       body: r.body,
       source,
       category,
       automated: r.automated === true,
+      reference,
       status,
       createdAt: r.createdAt.toISOString(),
       readAt: r.readAt?.toISOString() ?? null,
