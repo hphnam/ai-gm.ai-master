@@ -35,6 +35,35 @@ export const POS_GET_REFUND_SUMMARY = 'pos_get_refund_summary'
 export const POS_GET_HOURLY_BREAKDOWN = 'pos_get_hourly_breakdown'
 export const POS_LIST_TEAM_MEMBERS = 'pos_list_team_members'
 
+// COGS + cost-coverage tools (Phase: full Square sweep)
+export const POS_GET_ITEM_COSTS = 'pos_get_item_costs'
+export const POS_GET_COGS_SUMMARY = 'pos_get_cogs_summary'
+export const POS_COMPUTE_COGS_FROM_PERCENT = 'pos_compute_cogs_from_percent'
+
+// Commerce / risk
+export const POS_LIST_DISPUTES = 'pos_list_disputes'
+export const POS_GET_DISPUTE_SUMMARY = 'pos_get_dispute_summary'
+export const POS_GET_CASH_DRAWER_SUMMARY = 'pos_get_cash_drawer_summary'
+export const POS_LIST_GIFT_CARDS = 'pos_list_gift_cards'
+export const POS_GET_GIFT_CARD_LIABILITY = 'pos_get_gift_card_liability'
+export const POS_LIST_INVOICES = 'pos_list_invoices'
+export const POS_GET_INVOICE_SUMMARY = 'pos_get_invoice_summary'
+export const POS_LIST_PAYOUTS = 'pos_list_payouts'
+
+// Catalog organisation
+export const POS_LIST_VENDORS = 'pos_list_vendors'
+export const POS_GET_CATEGORY_SALES = 'pos_get_category_sales'
+export const POS_GET_MODIFIER_POPULARITY = 'pos_get_modifier_popularity'
+export const POS_GET_DISCOUNT_USAGE = 'pos_get_discount_usage'
+
+// CRM / loyalty / bookings / devices
+export const POS_SEARCH_CUSTOMERS = 'pos_search_customers'
+export const POS_GET_CUSTOMER_SUMMARY = 'pos_get_customer_summary'
+export const POS_GET_LOYALTY_SUMMARY = 'pos_get_loyalty_summary'
+export const POS_LIST_BOOKINGS = 'pos_list_bookings'
+export const POS_GET_BOOKING_SUMMARY = 'pos_get_booking_summary'
+export const POS_LIST_DEVICES = 'pos_list_devices'
+
 export const SQUARE_TOOL_SCHEMAS = {
   [POS_SEARCH_ITEMS]: z.object({
     query: z.string().trim().min(1).max(200),
@@ -139,6 +168,131 @@ export const SQUARE_TOOL_SCHEMAS = {
   [POS_LIST_TEAM_MEMBERS]: z.object({
     /// Optional filter — defaults to ACTIVE only.
     status: z.enum(['ACTIVE', 'INACTIVE', 'ALL']).optional(),
+    venueId: UUID.optional(),
+    limit: z.number().int().min(1).max(200).optional(),
+  }),
+
+  // ─── COGS ────────────────────────────────────────────────────────────────
+  [POS_GET_ITEM_COSTS]: z.object({
+    venueId: UUID,
+    catalogObjectIds: z.array(SQUARE_ID).max(200).optional(),
+    lookbackDays: z.number().int().min(1).max(365).optional(),
+  }),
+  [POS_GET_COGS_SUMMARY]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      lookbackDays: z.number().int().min(1).max(365).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+  [POS_COMPUTE_COGS_FROM_PERCENT]: z.object({
+    grossAmount: z.number().min(0),
+    costPercent: z.number().min(0).max(100),
+    currency: z.string().min(3).max(8).optional(),
+  }),
+
+  // ─── Commerce / risk ─────────────────────────────────────────────────────
+  [POS_LIST_DISPUTES]: z.object({
+    venueId: UUID,
+    limit: z.number().int().min(1).max(200).optional(),
+    states: z.array(z.string().min(2).max(40)).max(10).optional(),
+  }),
+  [POS_GET_DISPUTE_SUMMARY]: z.object({ venueId: UUID }),
+  [POS_GET_CASH_DRAWER_SUMMARY]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(200).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+  [POS_LIST_GIFT_CARDS]: z.object({
+    limit: z.number().int().min(1).max(200).optional(),
+    state: z.string().min(2).max(40).optional(),
+  }),
+  [POS_GET_GIFT_CARD_LIABILITY]: z.object({}).strict(),
+  [POS_LIST_INVOICES]: z.object({
+    venueId: UUID,
+    limit: z.number().int().min(1).max(200).optional(),
+    status: z.array(z.string().min(2).max(40)).max(10).optional(),
+  }),
+  [POS_GET_INVOICE_SUMMARY]: z.object({ venueId: UUID }),
+  [POS_LIST_PAYOUTS]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(100).optional(),
+      status: z.enum(['SENT', 'PAID', 'FAILED']).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+
+  // ─── Catalog organisation ────────────────────────────────────────────────
+  [POS_LIST_VENDORS]: z.object({
+    limit: z.number().int().min(1).max(200).optional(),
+    status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+  }),
+  [POS_GET_CATEGORY_SALES]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(50).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+  [POS_GET_MODIFIER_POPULARITY]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(50).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+  [POS_GET_DISCOUNT_USAGE]: applyWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(50).optional(),
+      ...WindowInputShape,
+    }),
+  ),
+
+  // ─── CRM / loyalty / bookings / devices ──────────────────────────────────
+  [POS_SEARCH_CUSTOMERS]: z
+    .object({
+      query: z.string().trim().min(1).max(120).optional(),
+      email: z.string().email().optional(),
+      phone: z.string().min(4).max(40).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+    })
+    .refine((v) => v.query || v.email || v.phone, {
+      message: 'pass at least one of query, email, or phone',
+    }),
+  [POS_GET_CUSTOMER_SUMMARY]: z.object({}).strict(),
+  [POS_GET_LOYALTY_SUMMARY]: z.object({}).strict(),
+  [POS_LIST_BOOKINGS]: z.object({
+    venueId: UUID,
+    limit: z.number().int().min(1).max(200).optional(),
+    /// Hours back from now (default 0 = future-only). Cap 90 days.
+    sinceHours: z
+      .number()
+      .int()
+      .min(0)
+      .max(24 * 90)
+      .optional(),
+    /// Hours forward from now (default 168 = next 7 days). Cap 90 days.
+    aheadHours: z
+      .number()
+      .int()
+      .min(1)
+      .max(24 * 90)
+      .optional(),
+  }),
+  [POS_GET_BOOKING_SUMMARY]: z.object({
+    venueId: UUID,
+    aheadHours: z
+      .number()
+      .int()
+      .min(1)
+      .max(24 * 90)
+      .optional(),
+  }),
+  [POS_LIST_DEVICES]: z.object({
     venueId: UUID.optional(),
     limit: z.number().int().min(1).max(200).optional(),
   }),
@@ -408,6 +562,329 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
             "Optional venue UUID. When set, only team members assigned to the venue's mapped Square location surface.",
         },
         limit: { type: 'integer', description: 'Max members (1-200, default 100)' },
+      },
+      required: [],
+    },
+  },
+
+  // ─── COGS ───────────────────────────────────────────────────────────────
+  {
+    name: POS_GET_ITEM_COSTS,
+    description:
+      'Weighted-average unit cost per catalog variation, derived from Square inventory RECEIVE adjustments at the venue. FIRES when the agent needs per-item COGS inputs — typically called by pos_get_cogs_summary internally, but exposed directly so the agent can answer "what does X cost us" / "what\'s our cost on the house red". Pass an optional `catalogObjectIds` list to scope; otherwise returns all variations with any receive history. lookbackDays defaults to 90 (more receives → more stable weighted average). Returns unitCost, quantityReceived, receiveEvents per variation. unitCost is null when the variation has no priced receive on file (operator likely doesn\'t use Square for purchasing).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        catalogObjectIds: {
+          type: 'array',
+          items: { type: 'string' },
+          description:
+            'Optional list of catalog variation ids to scope to (up to 200). Omit to fetch every variation with receive history.',
+        },
+        lookbackDays: {
+          type: 'integer',
+          description: 'Days of receive history to weight the average over (1-365, default 90).',
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_COGS_SUMMARY,
+    description:
+      'Compute COGS + gross margin for a sales window by joining order line items to per-variation receive costs from Square. FIRES on "what\'s our COGS today", "calculate GP", "what\'s the gross margin this week", "how much did we spend on stock", "P&L numbers". Returns cogsAmount, grossSales, netSales, grossMarginPct, coverageRate (% of line items we could price), topUncostedItems (top items by revenue we couldn\'t cost), and recommendManualCostPercent (true when coverageRate<50 — agent should then ASK the user for a manual cost % and call pos_compute_cogs_from_percent). Window: rolling sinceHours OR fixed fromIso/toIso. lookbackDays defaults to 90 (how far back to derive unit cost from receive events). When coverage is high (>=50%) the GP is reliable; when low, present the numbers with explicit caveat then offer the manual-cost-percent path.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        lookbackDays: {
+          type: 'integer',
+          description:
+            'Days of receive history to derive unit costs from (1-365, default 90). Longer = more coverage but stale prices; shorter = recent prices but thinner coverage.',
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_COMPUTE_COGS_FROM_PERCENT,
+    description:
+      'Pure calculator — given a gross revenue figure and an operator-supplied cost %, return computed COGS + grossMarginPct. NO Square call. FIRES after pos_get_cogs_summary returns recommendManualCostPercent=true AND the user has supplied a typical cost % in the next turn (e.g. "use 32%"). Lets the agent close the loop on GP for venues that don\'t use Square for purchasing. Skip when you already have a reliable COGS from pos_get_cogs_summary.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        grossAmount: {
+          type: 'number',
+          description: 'Gross revenue in major units (e.g. 2714.53 for £2,714.53).',
+        },
+        costPercent: {
+          type: 'number',
+          description: 'Cost as percent of revenue (0-100, e.g. 32 for "products cost ~32%").',
+        },
+        currency: {
+          type: 'string',
+          description: 'ISO 4217 code (e.g. GBP, USD). Defaults to GBP if omitted.',
+        },
+      },
+      required: ['grossAmount', 'costPercent'],
+    },
+  },
+
+  // ─── Commerce / risk ────────────────────────────────────────────────────
+  {
+    name: POS_LIST_DISPUTES,
+    description:
+      'List card disputes / chargebacks at a venue. FIRES on "any chargebacks", "show me disputes", "what\'s being contested", "outstanding disputes". Returns id, state (e.g. INQUIRY_EVIDENCE_REQUIRED, CHARGEBACK_EVIDENCE_REQUIRED, WON, LOST), reason, amount, cardBrand, reportedAt, dueAt. Pass `states` to filter (e.g. only currently-actionable). For totals + counts use pos_get_dispute_summary.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        limit: { type: 'integer', description: 'Max disputes (1-200, default 50)' },
+        states: {
+          type: 'array',
+          items: { type: 'string' },
+          description:
+            'Optional list of Square DisputeState filters (e.g. ["INQUIRY_EVIDENCE_REQUIRED","CHARGEBACK_EVIDENCE_REQUIRED"]). Case-insensitive.',
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_DISPUTE_SUMMARY,
+    description:
+      'Aggregate dispute counts + outstanding amount + earliest evidence deadline at a venue. FIRES on "how many disputes do we have", "what\'s exposed to chargebacks", "anything urgent on disputes". Returns openCount, totalCount, openAmount, byState breakdown, nextDueAt (earliest deadline across open disputes — agent should flag if soon). Use to prioritise; use pos_list_disputes for per-row drill-down.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_CASH_DRAWER_SUMMARY,
+    description:
+      'Cash-drawer shift summary + cashier discrepancies at a venue. FIRES on "any cash discrepancies", "what was the drawer short this week", "cash drawer report", "till differences". Returns shifts[] (openedAt/closedAt/openingCash/expectedCash/closingCash/discrepancy/description) plus shiftCount and totalDiscrepancy across the window. Negative discrepancy = drawer short (cash missing); positive = drawer over. Window: rolling sinceHours OR fixed fromIso/toIso (cap 365 days).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        limit: { type: 'integer', description: 'Max shifts to return (1-200, default 50)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_LIST_GIFT_CARDS,
+    description:
+      'List gift cards on the seller account. FIRES on "what gift cards do we have", "show me active gift cards", "list gift cards". GANs (gift account numbers) are returned masked (last 4 only) — full numbers are never echoed into the agent context. For total outstanding balance use pos_get_gift_card_liability.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', description: 'Max cards (1-200, default 50)' },
+        state: {
+          type: 'string',
+          description: 'Optional state filter (ACTIVE, BLOCKED, DEACTIVATED, PENDING).',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: POS_GET_GIFT_CARD_LIABILITY,
+    description:
+      'Total outstanding gift-card liability — sum of balances across all ACTIVE gift cards on the account. FIRES on "what\'s our gift card liability", "how much do we owe in gift cards", "gift card balance total". Returns activeCount + totalLiability. Useful for monthly accruals or knowing the cash exposure if every cardholder redeemed tomorrow.',
+    input_schema: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: POS_LIST_INVOICES,
+    description:
+      'List invoices at a venue. FIRES on "what invoices are open", "show overdue invoices", "list recent invoices". Returns id, invoiceNumber, title, status (DRAFT/UNPAID/SCHEDULED/PARTIALLY_PAID/PAID/CANCELED/FAILED), amount, dueAt, recipientName. Pass `status` array to filter (e.g. ["UNPAID","PARTIALLY_PAID"]). For aggregate "what\'s outstanding" use pos_get_invoice_summary.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        limit: { type: 'integer', description: 'Max invoices (1-200, default 50)' },
+        status: {
+          type: 'array',
+          items: { type: 'string' },
+          description:
+            'Optional Square InvoiceStatus filters (e.g. ["UNPAID","PARTIALLY_PAID"]). Case-insensitive.',
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_INVOICE_SUMMARY,
+    description:
+      'Aggregate invoice exposure at a venue. FIRES on "what\'s outstanding on invoices", "how much money is in invoices", "any overdue invoices", "AR balance". Returns totalCount, openCount, overdueCount, outstandingAmount (sum of next-payment amounts across open invoices), nextDueAt (earliest dueDate among open). Use to flag cashflow risk; use pos_list_invoices for per-row drill-down.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_LIST_PAYOUTS,
+    description:
+      'List Square bank-account payouts at a venue. FIRES on "when did we last get paid out", "show recent payouts", "what\'s pending settlement", "Square deposit history". Returns id, status (SENT/PAID/FAILED), amount, arrivalDate, destinationType (BANK_ACCOUNT / CARD), createdAt. Window default 30 days. Pass `status: "FAILED"` to surface only problem payouts. NEVER returns bank account numbers.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        status: { type: 'string', enum: ['SENT', 'PAID', 'FAILED'] },
+        limit: { type: 'integer', description: 'Max payouts (1-100, default 25)' },
+      },
+      required: ['venueId'],
+    },
+  },
+
+  // ─── Catalog organisation ───────────────────────────────────────────────
+  {
+    name: POS_LIST_VENDORS,
+    description:
+      'Supplier roster from Square Vendors. FIRES on "who are our suppliers", "list vendors", "supplier contact for X", "what suppliers are on Square". Returns id, name, status, primary contact (name/email/phone), accountNumber, note. Default status ACTIVE — pass status=INACTIVE to see archived suppliers. Useful before pos_get_item_costs (vendors set up = receive events recorded = COGS coverage).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', description: 'Max vendors (1-200, default 100)' },
+        status: { type: 'string', enum: ['ACTIVE', 'INACTIVE'] },
+      },
+      required: [],
+    },
+  },
+  {
+    name: POS_GET_CATEGORY_SALES,
+    description:
+      'Sales bucketed by catalog category at a venue. FIRES on "sales by category", "how much did wine make this week", "category breakdown", "what % of sales are food vs drink". Returns top categories ranked by gross revenue with quantitySold, grossSales, orderCount. Items without a category roll into "Uncategorised". Window: rolling or fixed (cap 365 days). For per-item drill-down use pos_get_top_items.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        limit: { type: 'integer', description: 'Top N (1-50, default 25)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_MODIFIER_POPULARITY,
+    description:
+      'Most-selected modifiers / add-ons at a venue inside a window. FIRES on "what modifiers sell", "top add-ons", "most popular extras", "do customers actually order the extra shot". Returns modifiers ranked by selection count with name, selections (qty), addedRevenue (sum of priceMoney). Window: rolling or fixed. Useful for menu engineering — surface low-value modifiers eating prep time.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        limit: { type: 'integer', description: 'Top N (1-50, default 20)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_DISCOUNT_USAGE,
+    description:
+      'Most-applied discounts at a venue with revenue impact. FIRES on "what discounts are we giving", "comp report", "how much did we discount this week", "is staff using the friends-and-family discount too much". Returns discounts ranked by amountDiscounted (money given away) with applications count. Use to flag discount leakage; cross-reference with pos_list_team_members + shifts when investigating staff abuse.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...salesWindowProps,
+        limit: { type: 'integer', description: 'Top N (1-50, default 20)' },
+      },
+      required: ['venueId'],
+    },
+  },
+
+  // ─── CRM / loyalty / bookings / devices ─────────────────────────────────
+  {
+    name: POS_SEARCH_CUSTOMERS,
+    description:
+      'Search Square Customers by name (fuzzy), exact email, or exact phone. FIRES on "find customer X", "is John Smith in the system", "customer with email Y". Returns id, givenName, familyName, companyName, email, phone, createdAt. Pass ANY of query / email / phone (at least one is required). For aggregate stats use pos_get_customer_summary.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Fuzzy name search (matches given OR family name).',
+        },
+        email: { type: 'string', description: 'Exact email match.' },
+        phone: { type: 'string', description: 'Exact phone match (E.164 format works best).' },
+        limit: { type: 'integer', description: 'Max results (1-100, default 25)' },
+      },
+      required: [],
+    },
+  },
+  {
+    name: POS_GET_CUSTOMER_SUMMARY,
+    description:
+      'Aggregate CRM stats across all Square customers on the seller account. FIRES on "how big is our customer list", "how many customers do we have", "how many new customers this month". Returns totalCount, withEmail (marketable), withPhone (textable), createdLast30Days. Use to size the audience before suggesting a campaign.',
+    input_schema: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: POS_GET_LOYALTY_SUMMARY,
+    description:
+      'Loyalty program status + enrolment + outstanding points liability. FIRES on "is loyalty turned on", "how many loyalty members", "what\'s our points liability", "loyalty stats". Returns programId, status (ACTIVE/INACTIVE/NO_PROGRAM), pointsName (program-defined), enrolledAccounts, totalPointsOutstanding. status: "NO_PROGRAM" when the seller has no loyalty configured.',
+    input_schema: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: POS_LIST_BOOKINGS,
+    description:
+      'List Appointments / Bookings at a venue inside a window. FIRES on "what bookings do we have", "show today\'s appointments", "next week\'s diary". Returns id, status (PENDING/ACCEPTED/DECLINED/CANCELLED_*), startAt, durationMinutes, customerId. Default window: now → +7d. Pass sinceHours for retrospective ("yesterday\'s no-shows") and aheadHours to extend forward.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        sinceHours: {
+          type: 'integer',
+          description: 'Hours back from now to include past bookings (0-2160, default 0).',
+        },
+        aheadHours: {
+          type: 'integer',
+          description: 'Hours forward from now (1-2160, default 168 = 7 days).',
+        },
+        limit: { type: 'integer', description: 'Max bookings (1-200, default 50)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_BOOKING_SUMMARY,
+    description:
+      'Aggregate upcoming bookings at a venue. FIRES on "how many bookings ahead", "what\'s the diary looking like", "any pending bookings". Returns upcomingCount, acceptedCount, pendingCount, cancelledCount, nextStartAt. Use for diary health check; use pos_list_bookings for per-row drill-down.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        aheadHours: {
+          type: 'integer',
+          description: 'Hours forward from now to summarise (1-2160, default 168 = 7 days).',
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_LIST_DEVICES,
+    description:
+      'List Square terminals / devices, optionally scoped to a venue. FIRES on "are all terminals online", "what devices are paired", "show me the tills", "any device offline". Returns id, name, status (the SDK\'s status enum), productType, deviceCode. Pass venueId to scope to that venue\'s mapped location; omit for the whole account.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: {
+          type: 'string',
+          description:
+            "Optional venue UUID — scopes to that venue's mapped Square location. Omit for account-wide.",
+        },
+        limit: { type: 'integer', description: 'Max devices (1-200, default 50)' },
       },
       required: [],
     },

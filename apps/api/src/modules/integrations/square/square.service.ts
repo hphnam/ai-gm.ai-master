@@ -144,10 +144,20 @@ export class SquareService {
 
   constructor(private readonly integrations: IntegrationsService) {}
 
+  /// Delegate so sibling services can bump the last-synced timestamp via
+  /// SquareService without taking a direct IntegrationsService dependency.
+  async touchSync(orgId: string): Promise<void> {
+    await this.integrations.touchLastSynced(orgId, SQUARE_PROVIDER_ID)
+  }
+
   /// Returns the active Square client + the venue's locationId for a tool
   /// call, OR a ToolResult fail() the caller can return verbatim. Centralised
   /// so every tool gets identical not-connected / not-mapped UX.
-  private async resolveForVenue(
+  ///
+  /// Public so sibling services in this module (square-cogs / square-commerce /
+  /// square-catalog-extras / square-crm) can reuse the credential + venue
+  /// plumbing without duplicating it.
+  async resolveForVenue(
     orgId: string,
     venueId: string,
   ): Promise<
@@ -201,8 +211,8 @@ export class SquareService {
   }
 
   /// Helper for tools that don't need a venue (listLocations) — just need an
-  /// authenticated client.
-  private async resolveClient(
+  /// authenticated client. Public for sibling-service reuse.
+  async resolveClient(
     orgId: string,
   ): Promise<{ ok: true; client: ReturnType<typeof getSquareClient> } | ToolResult<never>> {
     const creds = await this.integrations.getActiveCredentials(orgId, SQUARE_PROVIDER_ID)
@@ -1351,11 +1361,9 @@ export class SquareService {
     }
   }
 
-  private async handleApiError(
-    orgId: string,
-    op: string,
-    err: unknown,
-  ): Promise<ToolResult<never>> {
+  /// Public so sibling services route their SDK errors through the same
+  /// auth-failure / 404 / 429 / 5xx UX without copy-pasting the mapping.
+  async handleApiError(orgId: string, op: string, err: unknown): Promise<ToolResult<never>> {
     const e = err as {
       statusCode?: number
       message?: string

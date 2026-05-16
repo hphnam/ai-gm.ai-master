@@ -1,8 +1,56 @@
+import { Logger } from '@nestjs/common'
 import { type ToolSet, tool } from 'ai'
 import { fail, TOOL_DEFINITIONS, TOOL_INPUT_SCHEMAS } from '../../types'
 import { IntegrationRegistry } from '../integrations/integration-registry'
 import type { DispatchContext } from './tool-dispatcher'
 import { ToolDispatcher } from './tool-dispatcher'
+
+const toolLogger = new Logger('ChatToolDispatch')
+
+/// Wraps a tool execute in start/end logging with latency + ok/fail status.
+/// Built-in and integration tools both flow through this, so a single log
+/// stream covers every dispatch. Kept here (rather than inside the registry
+/// or built-in dispatcher) so per-turn correlation by orgId is consistent.
+async function withDispatchLogging<T>(
+  toolName: string,
+  ctx: DispatchContext,
+  exec: () => Promise<T>,
+): Promise<T> {
+  const startedAt = Date.now()
+  toolLogger.log(
+    JSON.stringify({
+      event: 'tool.dispatch.start',
+      tool: toolName,
+      orgId: ctx.orgId,
+      userId: ctx.userId,
+    }),
+  )
+  try {
+    const result = await exec()
+    const ok = (result as { ok?: boolean } | null)?.ok === true
+    toolLogger.log(
+      JSON.stringify({
+        event: 'tool.dispatch.end',
+        tool: toolName,
+        orgId: ctx.orgId,
+        ok,
+        latency_ms: Date.now() - startedAt,
+      }),
+    )
+    return result
+  } catch (err) {
+    toolLogger.error(
+      JSON.stringify({
+        event: 'tool.dispatch.threw',
+        tool: toolName,
+        orgId: ctx.orgId,
+        latency_ms: Date.now() - startedAt,
+        message: (err as Error).message,
+      }),
+    )
+    throw err
+  }
+}
 
 // Builds AI SDK tool objects that route through our existing ToolDispatcher.
 // Built per-request so each tool closes over {orgId, userId, userRole} without
@@ -48,7 +96,9 @@ export function buildAiSdkTools(
               )
             }
           }
-          const result = await dispatcher.dispatch(def.name, input, ctx)
+          const result = await withDispatchLogging(def.name, ctx, () =>
+            dispatcher.dispatch(def.name, input, ctx),
+          )
           if (def.name === 'find_knowledge') {
             findKnowledgeCallCount++
           }
@@ -89,7 +139,8 @@ export function buildAiSdkTools(
       tool({
         description: def.description,
         inputSchema: schema,
-        execute: async (input: unknown) => dispatcher.dispatch(def.name, input, ctx),
+        execute: async (input: unknown) =>
+          withDispatchLogging(def.name, ctx, () => dispatcher.dispatch(def.name, input, ctx)),
       }),
     ] as const
   })

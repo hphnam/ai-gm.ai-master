@@ -131,6 +131,22 @@ POS / BUSINESS DATA (live from connected integrations — Square today, more lat
     • Historical shift detail ("who worked yesterday", "Sarah's shifts last week") → pos_list_recent_shifts (filter with teamMemberId from pos_list_team_members)
     • "Who works here", "list all staff", "team roster" → pos_list_team_members
     • Setup / "what locations does Square have" → pos_list_locations (mostly for managers)
+    • "COGS", "cost of goods", "GP", "gross margin", "P&L", "profitability" → pos_get_cogs_summary FIRST. It already returns grossSales/netSales for the same window, so DO NOT also call pos_get_sales_summary for that window — it's duplicate work that slows the answer. It also returns recommendManualCostPercent + coverageRate: if coverageRate >= 50, present the GP with the coverage figure as caveat; if coverageRate < 50 OR recommendManualCostPercent=true, present what we DO know and then ASK the user for a typical cost % — when they reply with one, call pos_compute_cogs_from_percent(grossAmount, costPercent) to finish the calculation. NEVER refuse and say "Square doesn't have cost data" without trying pos_get_cogs_summary first.
+    • Cost of a specific item ("what does X cost us", "how much do we pay for the house red") → pos_search_items to get the variation id, then pos_get_item_costs with that id list
+    • "Chargebacks", "disputes", "anything contested" → pos_get_dispute_summary for aggregate / pos_list_disputes for per-row
+    • "Till short", "cash drawer discrepancy", "drawer differences" → pos_get_cash_drawer_summary
+    • "Gift card liability", "how much do we owe in gift cards" → pos_get_gift_card_liability; per-card list → pos_list_gift_cards
+    • "Outstanding invoices", "AR", "overdue invoices" → pos_get_invoice_summary; drill-down → pos_list_invoices
+    • "Last payout", "when did we get paid", "Square deposits" → pos_list_payouts
+    • "Suppliers", "vendors", "who supplies X" → pos_list_vendors
+    • "Sales by category", "food vs drink split", "category breakdown" → pos_get_category_sales
+    • "Top modifiers", "what add-ons sell" → pos_get_modifier_popularity
+    • "Discount usage", "comp report", "how much did we discount" → pos_get_discount_usage
+    • "Find customer X", "is Y in our CRM" → pos_search_customers; aggregate ("how many customers") → pos_get_customer_summary
+    • "Loyalty stats", "points liability" → pos_get_loyalty_summary
+    • "Bookings", "what's the diary", "today's appointments" → pos_get_booking_summary (aggregate) or pos_list_bookings (rows)
+    • "Are tills online", "device status" → pos_list_devices
+  CHAIN PATTERNS — fire multiple POS tools in PARALLEL only when each one contributes data the others DON'T. The agent harness runs parallel tool calls in a single step, so for "full daily recap" emit sales_summary + payment_breakdown + top_items + refund_summary + labor_summary in parallel; for "P&L today" emit pos_get_cogs_summary + pos_get_labor_summary (cogs_summary already returns gross+net sales — adding sales_summary alongside it is duplicate work). Sequential chains (output-of-A feeds-input-of-B) stay sequential — e.g. pos_search_items → pos_get_item_costs needs the variation ids first. Don't fire >5 tools in one step (token bloat), and skip tools whose result you won't actually reference in your reply.
   Window inputs on every time-windowed POS tool:
     • Rolling: pass sinceHours (e.g. 24 for today, 168 for this week, 720 for this month). Cap is 365d for sales tools, 90d for labor.
     • Fixed: pass fromIso (and optionally toIso, defaults to now) — required for named ranges like "April" or "Q1". Compute from <current_context>.now.

@@ -10,7 +10,7 @@ import {
   MoreHorizontal,
   RefreshCcw,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
@@ -242,6 +242,83 @@ function BrandDot() {
 
 type ReasoningPart = { type: 'reasoning'; text: string; state?: string }
 
+/// Live status line — replaces the tucked-away accordion header while a tool
+/// is in flight. One borderless row under the gm avatar with a pulsing dot,
+/// the human-readable active label, a typing ellipsis, and an elapsed time
+/// counter once we're past two seconds. The whole line unmounts the moment
+/// every tool in the chain settles, so it reads as "happening now" rather
+/// than "happened". Respects prefers-reduced-motion: the ellipsis freezes
+/// to a static three-dot and the dot pulse falls back to its non-animated
+/// rest state (BrandDot already uses Tailwind's animate-pulse which the
+/// reduced-motion media query disables at the OS level).
+///
+/// Implementation note: the elapsed timer starts on mount and the ellipsis
+/// cycles on a 400ms JS interval, but we use `useRef` for the start time so
+/// React state churn doesn't reset it when parent re-renders for unrelated
+/// streaming deltas. The label prop changes as the agent moves between
+/// tools mid-chain — that's a content swap on the same line, not a remount,
+/// so the timer keeps running across the whole chain rather than resetting
+/// per tool.
+function LiveStatusLine({ label }: { label: string }) {
+  const startedAtRef = useRef<number>(Date.now())
+  const [tick, setTick] = useState(0)
+  const [elapsedSec, setElapsedSec] = useState(0)
+  const reduceMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true
+
+  useEffect(() => {
+    if (reduceMotion) return
+    const id = setInterval(() => setTick((t) => (t + 1) % 4), 400)
+    return () => clearInterval(id)
+  }, [reduceMotion])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setElapsedSec(Math.floor((Date.now() - startedAtRef.current) / 1000))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Fixed-width three-character slot so the label text doesn't shift left/right
+  // as the dot count changes. We use regular spaces here; the consumer renders
+  // them inside `font-mono tabular-nums` so width stays predictable enough at
+  // 13px display sizes, but accept that HTML collapses runs of spaces so the
+  // visual is "label . / .. / ..." not three padded widths. Acceptable since
+  // the trailing right-aligned elapsed counter has its own ml-auto anchor.
+  const dotCount = reduceMotion ? 3 : Math.max(1, tick)
+  const dotsText = '.'.repeat(dotCount) + ' '.repeat(3 - dotCount)
+  const showElapsed = elapsedSec >= 2
+  const elapsedText =
+    elapsedSec < 60 ? `${elapsedSec}s` : `${Math.floor(elapsedSec / 60)}m ${elapsedSec % 60}s`
+
+  // role="status" rather than aria-live: the parent <ol role="log"> in
+  // chat-thread already declares a polite live region for the whole assistant
+  // stream, so nesting another one risks double-announcement on some screen
+  // readers. role="status" still surfaces this as a status node. The elapsed
+  // timer span is aria-hidden so its per-second tick doesn't re-announce the
+  // full row each second — the label is the only thing worth announcing.
+  return (
+    <div className="flex items-center gap-2.5 py-1 text-[13px] text-muted-foreground" role="status">
+      <BrandDot />
+      <span className="italic">
+        {label}
+        <span className="ml-0.5 font-mono tabular-nums" aria-hidden>
+          {dotsText}
+        </span>
+      </span>
+      {showElapsed ? (
+        <span
+          className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground/55"
+          aria-hidden
+        >
+          {elapsedText}
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
 function ReasoningBlock({
   text,
   streaming,
@@ -263,16 +340,25 @@ function ReasoningBlock({
   const hasStripContent = settledChipsForStrip.length > 0
   if (!hasText && !hasChips) return null
 
-  // Header summary: while a tool is running, show its active label with an
-  // ellipsis so it reads as activity ("Pulling sales numbers…"); otherwise
-  // the standard Thinking… / Thought process state. Chip pluraliser counts
-  // ALL settled chips (including ones whose cards are showing below) so the
-  // user gets an honest "5 tools" tally.
-  const headerLabel = inFlightChip
-    ? `${inFlightChip.activeLabel}…`
-    : streaming
-      ? 'Thinking…'
-      : 'Thought process'
+  // While ANY tool is in flight, drop the accordion shell entirely and show
+  // a single borderless live status line under the avatar — the user needs
+  // to feel things happening, not hunt for it inside a collapsed pill. When
+  // there's no in-flight tool but the model is still streaming reasoning
+  // text, fall through to the same live line with a generic "Thinking" label
+  // so the empty assistant turn doesn't sit silently. Once everything settles
+  // we render the existing accordion so the user can drill back into the
+  // chain if they want.
+  if (inFlightChip) {
+    return <LiveStatusLine label={inFlightChip.activeLabel} />
+  }
+  // All tools settled but the model is still streaming its final reply text —
+  // keep a live line up so the turn doesn't sit visibly idle while the model
+  // composes. Suppressed once the first reply token lands (hasText becomes
+  // true), so the live line cleanly hands off to the streaming markdown.
+  if (streaming && !hasText) {
+    return <LiveStatusLine label="Thinking" />
+  }
+  const headerLabel = 'Thought process'
   return (
     <div className="rounded-lg border border-border bg-muted">
       <button
@@ -283,14 +369,13 @@ function ReasoningBlock({
       >
         <Brain className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
         <span>{headerLabel}</span>
-        {hasChips && !inFlightChip ? (
+        {hasChips ? (
           <span className="text-[11px] font-normal text-muted-foreground/80">
             · {chips.length} {chips.length === 1 ? 'step' : 'steps'}
             {erroredCount ? ` · ${erroredCount} failed` : ''}
           </span>
         ) : null}
         <span className="ml-auto flex items-center gap-1">
-          {streaming || inFlightChip ? <BrandDot /> : null}
           {open ? (
             <ChevronDown className="h-3.5 w-3.5" aria-hidden />
           ) : (
