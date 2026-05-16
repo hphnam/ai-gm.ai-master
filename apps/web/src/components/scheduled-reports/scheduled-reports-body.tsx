@@ -11,23 +11,27 @@ import {
   Plus,
   Sparkles,
   Sun,
-  X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
+import { type TabItem, Tabs } from '@/components/ui/tabs'
 import { ApiError } from '@/lib/api-client'
 import {
   type ScheduledReport,
   type ScheduleFrequency,
   type ScheduleStatus,
-  useCancelScheduledReport,
+  useDeleteScheduledReport,
   usePauseScheduledReport,
   useResumeScheduledReport,
   useScheduledReports,
@@ -37,11 +41,11 @@ import { ScheduleCreateDialog } from './schedule-create-dialog'
 
 type Filter = 'active' | 'paused' | 'cancelled' | 'all'
 
-const FILTERS: Array<{ key: Filter; label: string }> = [
-  { key: 'active', label: 'Active' },
-  { key: 'paused', label: 'Paused' },
-  { key: 'cancelled', label: 'Cancelled' },
-  { key: 'all', label: 'All' },
+const FILTERS: TabItem<Filter>[] = [
+  { id: 'active', label: 'Active' },
+  { id: 'paused', label: 'Paused' },
+  { id: 'cancelled', label: 'Cancelled' },
+  { id: 'all', label: 'All' },
 ]
 
 export function ScheduledReportsBody() {
@@ -52,51 +56,26 @@ export function ScheduledReportsBody() {
   const total = list.data?.pages[0]?.total ?? rows.length
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav
-          aria-label="Filter schedules by status"
-          className="inline-flex items-center gap-1 rounded-md border bg-card p-0.5"
-        >
-          {FILTERS.map((f) => {
-            const selected = f.key === filter
-            return (
-              <button
-                key={f.key}
-                type="button"
-                onClick={() => setFilter(f.key)}
-                aria-pressed={selected}
-                className={cn(
-                  'cursor-pointer rounded-[5px] px-2.5 py-1 text-xs transition-colors',
-                  selected
-                    ? 'bg-foreground text-background'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {f.label}
-              </button>
-            )
-          })}
-        </nav>
-        <button
-          type="button"
-          onClick={() => setCreateOpen(true)}
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-[filter] hover:brightness-110"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden />
-          New schedule
-        </button>
-      </div>
+    <div>
+      <Tabs
+        items={FILTERS}
+        value={filter}
+        onValueChange={setFilter}
+        ariaLabel="Filter schedules by status"
+        trailing={
+          <Button size="sm" onClick={() => setCreateOpen(true)} className="cursor-pointer gap-1.5">
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+            New schedule
+          </Button>
+        }
+      />
 
       {list.isLoading ? (
-        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-          Pulling your schedules…
-        </div>
+        <SchedulesLoading />
       ) : list.isError ? (
         <ErrorState err={list.error} />
       ) : !rows.length ? (
-        <EmptyState filter={filter} onCreate={() => setCreateOpen(true)} />
+        <SchedulesEmpty filter={filter} onCreate={() => setCreateOpen(true)} />
       ) : (
         <>
           <ul className="space-y-2.5">
@@ -135,8 +114,9 @@ export function ScheduledReportsBody() {
 function ScheduleRow({ schedule }: { schedule: ScheduledReport }) {
   const pause = usePauseScheduledReport()
   const resume = useResumeScheduledReport()
-  const cancel = useCancelScheduledReport()
-  const busy = pause.isPending || resume.isPending || cancel.isPending
+  const del = useDeleteScheduledReport()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const busy = pause.isPending || resume.isPending || del.isPending
 
   return (
     <article
@@ -184,54 +164,64 @@ function ScheduleRow({ schedule }: { schedule: ScheduledReport }) {
             ) : null}
           </dl>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label="Schedule actions"
-              disabled={busy}
-              className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {busy ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              ) : (
-                <MoreHorizontal className="h-4 w-4" aria-hidden />
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            {schedule.status === 'active' ? (
-              <DropdownMenuItem onClick={() => pause.mutate(schedule.id)} className="text-xs">
-                <Pause className="mr-2 h-3.5 w-3.5" aria-hidden />
-                Pause
-              </DropdownMenuItem>
-            ) : null}
-            {schedule.status === 'paused' ? (
-              <DropdownMenuItem onClick={() => resume.mutate(schedule.id)} className="text-xs">
-                <Play className="mr-2 h-3.5 w-3.5" aria-hidden />
-                Resume
-              </DropdownMenuItem>
-            ) : null}
-            {schedule.lastReportId ? (
-              <DropdownMenuItem asChild className="text-xs">
-                <Link href={`/reports/${schedule.lastReportId}`}>View last run</Link>
-              </DropdownMenuItem>
-            ) : null}
-            {schedule.status !== 'cancelled' ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => cancel.mutate(schedule.id)}
-                  className="text-xs text-destructive focus:bg-destructive/10 focus:text-destructive"
+        <div className="flex shrink-0 items-center gap-1">
+          {schedule.status === 'active' || schedule.status === 'paused' || schedule.lastReportId ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Schedule actions"
+                  disabled={busy}
+                  className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <X className="mr-2 h-3.5 w-3.5" aria-hidden />
-                  Cancel schedule
-                </DropdownMenuItem>
-              </>
-            ) : null}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  ) : (
+                    <MoreHorizontal className="h-4 w-4" aria-hidden />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {schedule.status === 'active' ? (
+                  <DropdownMenuItem onClick={() => pause.mutate(schedule.id)} className="text-xs">
+                    <Pause className="mr-2 h-3.5 w-3.5" aria-hidden />
+                    Pause
+                  </DropdownMenuItem>
+                ) : null}
+                {schedule.status === 'paused' ? (
+                  <DropdownMenuItem onClick={() => resume.mutate(schedule.id)} className="text-xs">
+                    <Play className="mr-2 h-3.5 w-3.5" aria-hidden />
+                    Resume
+                  </DropdownMenuItem>
+                ) : null}
+                {schedule.lastReportId ? (
+                  <DropdownMenuItem asChild className="text-xs">
+                    <Link href={`/reports/${schedule.lastReportId}`}>View last run</Link>
+                  </DropdownMenuItem>
+                ) : null}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          <DeleteButton
+            onClick={() => setConfirmOpen(true)}
+            disabled={busy}
+            aria-label={`Delete schedule: ${schedule.title}`}
+          />
+        </div>
       </div>
+      <ConfirmDeleteDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete this schedule?"
+        description={
+          <>
+            &ldquo;{schedule.title}&rdquo; will stop running and be permanently removed. Past report
+            runs it generated stay in your library.
+          </>
+        }
+        onConfirm={() => del.mutateAsync(schedule.id)}
+        isPending={del.isPending}
+      />
     </article>
   )
 }
@@ -264,7 +254,7 @@ function StatusPill({ status }: { status: ScheduleStatus }) {
   )
 }
 
-function EmptyState({ filter, onCreate }: { filter: Filter; onCreate: () => void }) {
+function SchedulesEmpty({ filter, onCreate }: { filter: Filter; onCreate: () => void }) {
   const copy = useMemo(() => {
     if (filter === 'active') {
       return {
@@ -295,21 +285,38 @@ function EmptyState({ filter, onCreate }: { filter: Filter; onCreate: () => void
   }, [filter])
 
   return (
-    <div className="rounded-lg border bg-card p-8 text-center shadow-sm">
-      <CalendarClock className="mx-auto mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
-      <p className="font-display text-base text-foreground">{copy.title}</p>
-      <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">{copy.body}</p>
-      {copy.showCta ? (
-        <button
-          type="button"
-          onClick={onCreate}
-          className="mt-4 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-[filter] hover:brightness-110"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden />
-          New schedule
-        </button>
-      ) : null}
-    </div>
+    <EmptyState
+      icon={CalendarClock}
+      title={copy.title}
+      description={copy.body}
+      action={
+        copy.showCta ? (
+          <Button size="sm" onClick={onCreate} className="cursor-pointer gap-1.5">
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+            New schedule
+          </Button>
+        ) : undefined
+      }
+    />
+  )
+}
+
+const SCHEDULES_SKELETON_KEYS = ['a', 'b', 'c']
+
+function SchedulesLoading() {
+  return (
+    <ul className="space-y-2.5">
+      {SCHEDULES_SKELETON_KEYS.map((k) => (
+        <li key={k} className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm">
+          <Skeleton className="h-9 w-9 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-2/5" />
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -318,14 +325,7 @@ function ErrorState({ err }: { err: unknown }) {
     err instanceof ApiError && err.status === 401
       ? 'You need to sign in to see schedules.'
       : "Couldn't load schedules."
-  return (
-    <div
-      role="alert"
-      className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive"
-    >
-      {msg}
-    </div>
-  )
+  return <Alert variant="destructive">{msg}</Alert>
 }
 
 const WEEKDAY_LABELS = [

@@ -82,6 +82,8 @@ model User {
   reportsCreated          Report[]          @relation("ReportCreator")
   scheduledReportsCreated ScheduledReport[] @relation("ScheduledReportCreator")
 
+  dismissedNoDataQueries DismissedNoDataQuery[] @relation("DismissedNoDataQueryUser")
+
   @@map("users")
 }
 
@@ -171,6 +173,7 @@ model Organization {
   reports             Report[]
   scheduledReports    ScheduledReport[]
   hiddenConversations ConversationHidden[]
+  dismissedNoDataQueries DismissedNoDataQuery[]
 
   @@index([slug])
   @@map("organizations")
@@ -228,8 +231,8 @@ model WhatsappInvite {
   redeemedAt     DateTime?
 
   organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  issuedBy     User                 @relation("WhatsappInviteIssuedBy", fields: [issuedByUserId], references: [id])
-  targetUser   User?                @relation("WhatsappInviteTargetUser", fields: [targetUserId], references: [id])
+  issuedBy     User                 @relation("WhatsappInviteIssuedBy", fields: [issuedByUserId], references: [id], onDelete: NoAction)
+  targetUser   User?                @relation("WhatsappInviteTargetUser", fields: [targetUserId], references: [id], onDelete: NoAction)
   otpAttempts  WhatsappOtpAttempt[]
 
   @@index([organizationId, status])
@@ -436,6 +439,7 @@ model KnowledgeItem {
   @@index([organizationId])
   @@index([venueId])
   @@index([documentTypeId])
+  @@index([organizationId, answerStatus], map: "knowledge_items_answerStatus_idx")
   @@map("knowledge_items")
 }
 
@@ -646,6 +650,26 @@ model SearchAnalytics {
   @@map("search_analytics")
 }
 
+/// Per-org dismissal list for the "what staff couldn't find" panel — suppresses
+/// a no-data query (matched by LOWER(query)) after the owner either promotes
+/// it to a KB gap or hides it as noise. promotedGapId is set when the dismissal
+/// happened via "Add to questions" so we can trace back to the resulting gap.
+model DismissedNoDataQuery {
+  id                String   @id @default(uuid())
+  organizationId    String
+  queryLower        String
+  dismissedByUserId String?
+  promotedGapId     String?
+  createdAt         DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  dismissedBy  User?        @relation("DismissedNoDataQueryUser", fields: [dismissedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, queryLower], map: "dismissed_no_data_queries_org_query_unique")
+  @@index([organizationId])
+  @@map("dismissed_no_data_queries")
+}
+
 /// Phase G — agent-driven incident captures. Created by log_incident tool
 /// from incident-mode conversations; visible in the GM dashboard as a triage
 /// surface. Severity comes from the agent's classification or user input.
@@ -790,6 +814,14 @@ model SearchableEntity {
   embedding     Unsupported("vector(1024)")?
   embeddingText String
 
+  /// Postgres-side GENERATED ALWAYS AS ... STORED tsvector for BM25 retrieval.
+  /// Defined in migration 20260427210000_searchable_bm25. Declared here as
+  /// Unsupported so Prisma stops treating the column as drift on `migrate dev`.
+  /// The dbgenerated() default captures the STORED expression so Prisma's
+  /// drift detector sees a matching default on both sides. Never write to this
+  /// field from app code — Postgres maintains it from title/summary/embeddingText.
+  searchVector Unsupported("tsvector")? @default(dbgenerated("((setweight(to_tsvector('english'::regconfig, COALESCE(title, ''::text)), 'A'::\"char\") || setweight(to_tsvector('english'::regconfig, COALESCE(summary, ''::text)), 'B'::\"char\")) || setweight(to_tsvector('english'::regconfig, COALESCE(\"embeddingText\", ''::text)), 'C'::\"char\"))"))
+
   /// GIN-indexed for tag filtering at retrieval time.
   tags    String[] @default([])
   /// Entity-specific subkind: docType.kind, contact.role, supplier category, etc.
@@ -869,7 +901,7 @@ model Notification {
   replies      NotificationReply[]
   hiddenBy     HiddenMessage[]     @relation("HiddenMessageNotification")
 
-  @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)])
+  @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)], map: "notifications_organizationId_recipientUserId_status_createdAt_i")
   @@index([organizationId, recipientUserId, createdAt(sort: Desc)])
   @@index([organizationId, recipientUserId, category, createdAt(sort: Desc)], map: "notifications_org_recipient_category_createdAt_idx")
   @@map("notifications")
@@ -910,9 +942,9 @@ model ConversationHidden {
   organizationId String
   hiddenAt       DateTime @default(now())
 
-  user         User         @relation("ConversationHiddenByUser", fields: [userId], references: [id], onDelete: Cascade)
-  otherUser    User         @relation("ConversationHiddenOtherUser", fields: [otherUserId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation("ConversationHiddenByUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  otherUser    User         @relation("ConversationHiddenOtherUser", fields: [otherUserId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([userId, otherUserId, organizationId])
   @@index([userId, organizationId])
@@ -932,9 +964,9 @@ model HiddenMessage {
   replyId        String?
   hiddenAt       DateTime @default(now())
 
-  user         User               @relation("HiddenMessageUser", fields: [userId], references: [id], onDelete: Cascade)
-  notification Notification?      @relation("HiddenMessageNotification", fields: [notificationId], references: [id], onDelete: Cascade)
-  reply        NotificationReply? @relation("HiddenMessageReply", fields: [replyId], references: [id], onDelete: Cascade)
+  user         User               @relation("HiddenMessageUser", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  notification Notification?      @relation("HiddenMessageNotification", fields: [notificationId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reply        NotificationReply? @relation("HiddenMessageReply", fields: [replyId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, notificationId])
   @@unique([userId, replyId])

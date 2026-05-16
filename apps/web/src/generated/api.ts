@@ -1723,6 +1723,20 @@ export interface NoDataQueryDto {
   lastAskedAt: string;
 }
 
+export interface NoDataQueryActionDto {
+  /**
+     * @minLength 5
+     * @maxLength 500
+     */
+  query: string;
+}
+
+export interface NoDataQueryPromoteResponseDto {
+  gapId: string;
+  askCount: number;
+  dedupedFromExisting: boolean;
+}
+
 export interface AnswerGapRequestDto {
   /**
      * @minLength 5
@@ -3370,6 +3384,82 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getTasksControllerUpdateMutationOptions(options), queryClient);
+    }
+
+export type tasksControllerRemoveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type tasksControllerRemoveResponseSuccess = (tasksControllerRemoveResponse204) & {
+  headers: Headers;
+};
+;
+
+export type tasksControllerRemoveResponse = (tasksControllerRemoveResponseSuccess)
+
+export const getTasksControllerRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/tasks/${id}`
+}
+
+export const tasksControllerRemove = async (id: string, options?: RequestInit): Promise<tasksControllerRemoveResponse> => {
+
+  return orvalMutator<tasksControllerRemoveResponse>(getTasksControllerRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getTasksControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tasksControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof tasksControllerRemove>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['tasksControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tasksControllerRemove>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  tasksControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TasksControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof tasksControllerRemove>>>
+
+    export type TasksControllerRemoveMutationError = unknown
+
+    export const useTasksControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tasksControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof tasksControllerRemove>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getTasksControllerRemoveMutationOptions(options), queryClient);
     }
 
 export type notificationsControllerListResponse200 = {
@@ -6049,6 +6139,82 @@ export function useScheduledReportsControllerGetOne<TData = Awaited<ReturnType<t
 
 
 
+export type scheduledReportsControllerRemoveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type scheduledReportsControllerRemoveResponseSuccess = (scheduledReportsControllerRemoveResponse204) & {
+  headers: Headers;
+};
+;
+
+export type scheduledReportsControllerRemoveResponse = (scheduledReportsControllerRemoveResponseSuccess)
+
+export const getScheduledReportsControllerRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/scheduled-reports/${id}`
+}
+
+export const scheduledReportsControllerRemove = async (id: string, options?: RequestInit): Promise<scheduledReportsControllerRemoveResponse> => {
+
+  return orvalMutator<scheduledReportsControllerRemoveResponse>(getScheduledReportsControllerRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getScheduledReportsControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerRemove>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['scheduledReportsControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduledReportsControllerRemove>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  scheduledReportsControllerRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduledReportsControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof scheduledReportsControllerRemove>>>
+
+    export type ScheduledReportsControllerRemoveMutationError = unknown
+
+    export const useScheduledReportsControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduledReportsControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduledReportsControllerRemove>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getScheduledReportsControllerRemoveMutationOptions(options), queryClient);
+    }
+
 export type scheduledReportsControllerPauseResponse200 = {
   data: ScheduledReportDto
   status: 200
@@ -8108,6 +8274,158 @@ export function useDocsControllerListNoDataQueries<TData = Awaited<ReturnType<ty
 
 
 
+
+export type docsControllerPromoteNoDataQueryResponse200 = {
+  data: NoDataQueryPromoteResponseDto
+  status: 200
+}
+
+export type docsControllerPromoteNoDataQueryResponseSuccess = (docsControllerPromoteNoDataQueryResponse200) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerPromoteNoDataQueryResponse = (docsControllerPromoteNoDataQueryResponseSuccess)
+
+export const getDocsControllerPromoteNoDataQueryUrl = () => {
+
+
+
+
+  return `/docs/analytics/no-data-queries/promote`
+}
+
+export const docsControllerPromoteNoDataQuery = async (noDataQueryActionDto: NoDataQueryActionDto, options?: RequestInit): Promise<docsControllerPromoteNoDataQueryResponse> => {
+
+  return orvalMutator<docsControllerPromoteNoDataQueryResponse>(getDocsControllerPromoteNoDataQueryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(noDataQueryActionDto)
+  }
+);}
+
+
+
+
+export const getDocsControllerPromoteNoDataQueryMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext> => {
+
+const mutationKey = ['docsControllerPromoteNoDataQuery'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>, {data: NoDataQueryActionDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  docsControllerPromoteNoDataQuery(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DocsControllerPromoteNoDataQueryMutationResult = NonNullable<Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>>
+    export type DocsControllerPromoteNoDataQueryMutationBody = NoDataQueryActionDto
+    export type DocsControllerPromoteNoDataQueryMutationError = unknown
+
+    export const useDocsControllerPromoteNoDataQuery = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof docsControllerPromoteNoDataQuery>>,
+        TError,
+        {data: NoDataQueryActionDto},
+        TContext
+      > => {
+      return useMutation(getDocsControllerPromoteNoDataQueryMutationOptions(options), queryClient);
+    }
+
+export type docsControllerDismissNoDataQueryResponse204 = {
+  data: void
+  status: 204
+}
+
+export type docsControllerDismissNoDataQueryResponseSuccess = (docsControllerDismissNoDataQueryResponse204) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerDismissNoDataQueryResponse = (docsControllerDismissNoDataQueryResponseSuccess)
+
+export const getDocsControllerDismissNoDataQueryUrl = () => {
+
+
+
+
+  return `/docs/analytics/no-data-queries/dismiss`
+}
+
+export const docsControllerDismissNoDataQuery = async (noDataQueryActionDto: NoDataQueryActionDto, options?: RequestInit): Promise<docsControllerDismissNoDataQueryResponse> => {
+
+  return orvalMutator<docsControllerDismissNoDataQueryResponse>(getDocsControllerDismissNoDataQueryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(noDataQueryActionDto)
+  }
+);}
+
+
+
+
+export const getDocsControllerDismissNoDataQueryMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext> => {
+
+const mutationKey = ['docsControllerDismissNoDataQuery'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>, {data: NoDataQueryActionDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  docsControllerDismissNoDataQuery(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DocsControllerDismissNoDataQueryMutationResult = NonNullable<Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>>
+    export type DocsControllerDismissNoDataQueryMutationBody = NoDataQueryActionDto
+    export type DocsControllerDismissNoDataQueryMutationError = unknown
+
+    export const useDocsControllerDismissNoDataQuery = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>, TError,{data: NoDataQueryActionDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof docsControllerDismissNoDataQuery>>,
+        TError,
+        {data: NoDataQueryActionDto},
+        TContext
+      > => {
+      return useMutation(getDocsControllerDismissNoDataQueryMutationOptions(options), queryClient);
+    }
 
 export type docsControllerAnswerGapResponse200 = {
   data: CreateDocResponseDto

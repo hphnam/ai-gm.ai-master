@@ -3,7 +3,7 @@
 import { useChat } from '@ai-sdk/react'
 import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
 import { DefaultChatTransport, type UIMessage } from 'ai'
-import { Check, Link2, Loader2, Lock } from 'lucide-react'
+import { ArrowRight, Check, Link2, Loader2, Lock, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -14,7 +14,10 @@ import { SuggestionsSurface } from '@/components/chat/suggestions-surface'
 import { VenueChip } from '@/components/chat/venue-chip'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
-import type { ConversationResponseDto as ConversationResponse } from '@/generated/api'
+import type {
+  ConversationResponseDto as ConversationResponse,
+  VenueListItemDto as VenueListItem,
+} from '@/generated/api'
 import { API_URL } from '@/lib/api-client'
 import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
@@ -632,7 +635,13 @@ function ChatCore({
             ) : null}
 
             {isEmpty && !isPending ? (
-              <EmptyState needsVenue={!venueId} venueId={venueId} onPick={submit} />
+              <EmptyState
+                needsVenue={!venueId}
+                venueId={venueId}
+                onPick={submit}
+                venues={venues}
+                onPickVenue={isOwner ? onPickVenue : undefined}
+              />
             ) : (
               <ChatThread
                 messages={displayMessages}
@@ -662,7 +671,7 @@ function ChatCore({
                 !isOwner
                   ? 'Read-only — shared by another user'
                   : !venueId
-                    ? 'Pick a venue to start'
+                    ? 'Pick a venue above to start'
                     : !conversationId
                       ? 'Start a new chat'
                       : undefined
@@ -701,10 +710,14 @@ function EmptyState({
   needsVenue,
   venueId,
   onPick,
+  venues,
+  onPickVenue,
 }: {
   needsVenue: boolean
   venueId: string | null
   onPick?: (text: string) => void | Promise<void>
+  venues: VenueListItem[] | undefined
+  onPickVenue?: (id: string) => void
 }) {
   const starters = useChatStarters(venueId)
   // Prefer the server's payload (generated or its own fallback) when we have
@@ -712,6 +725,23 @@ function EmptyState({
   // flight, OR if the request errored — keeps the surface populated even when
   // /chat-starters returns 500.
   const prompts = starters.data?.questions ?? FALLBACK_PROMPTS
+
+  if (needsVenue) {
+    return (
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-16">
+        <header className="space-y-3">
+          <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl">
+            Start a chat
+          </h2>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+            Pick a venue to ground this conversation in its docs, stock, and SOPs.
+          </p>
+        </header>
+        <VenuePickerList venues={venues} onPickVenue={onPickVenue} />
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-10 py-16">
       <header className="space-y-3">
@@ -721,47 +751,117 @@ function EmptyState({
           <span className="text-foreground/50">to start?</span>
         </h2>
         <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-          {needsVenue ? (
-            <>
-              Pick a venue below to get started. No venues yet?{' '}
-              <Link
-                href="/venues/new"
-                className="font-medium text-foreground underline decoration-foreground/40 underline-offset-4 hover:decoration-foreground"
-              >
-                Create one
-              </Link>
-              .
-            </>
-          ) : (
-            <>
-              Ask about stock, ordering, SOPs, or suppliers. I&apos;ll pull from your knowledge base
-              and venue data.
-            </>
-          )}
+          Ask about stock, ordering, SOPs, or suppliers. I&apos;ll pull from your knowledge base and
+          venue data.
         </p>
       </header>
-      {!needsVenue ? (
-        <ul className="flex flex-col divide-y divide-border border-y border-border">
-          {prompts.map((p) => (
-            <li key={p.text}>
-              <button
-                type="button"
-                onClick={() => onPick?.(p.text)}
-                disabled={!onPick}
-                className="group flex w-full items-center justify-between gap-4 py-3 text-left text-[15px] text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+      <ul className="flex flex-col divide-y divide-border border-y border-border">
+        {prompts.map((p) => (
+          <li key={p.text}>
+            <button
+              type="button"
+              onClick={() => onPick?.(p.text)}
+              disabled={!onPick}
+              className="group flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left text-[15px] text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span>{p.text}</span>
+              <span
+                aria-hidden
+                className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
               >
-                <span>{p.text}</span>
-                <span
-                  aria-hidden
-                  className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
-                >
-                  →
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+                →
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function VenuePickerList({
+  venues,
+  onPickVenue,
+}: {
+  venues: VenueListItem[] | undefined
+  onPickVenue?: (id: string) => void
+}) {
+  // A shared chat viewer should never see the no-venue empty state, but if a
+  // malformed URL drops them here without ownership, hide the picker entirely
+  // rather than render a confusing disabled list.
+  if (!onPickVenue) return null
+
+  if (!venues) {
+    return (
+      <div className="rounded-xl border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+        Loading venues…
+      </div>
+    )
+  }
+
+  if (venues.length === 0) {
+    return (
+      <div className="flex flex-col gap-3 rounded-xl border border-dashed border-border bg-card/50 px-4 py-6 text-sm">
+        <p className="text-muted-foreground">
+          You don&apos;t have any venues yet. Create one to start chatting.
+        </p>
+        <Link
+          href="/venues/new"
+          className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+        >
+          <Plus className="h-3.5 w-3.5" aria-hidden />
+          New venue
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <ul aria-label="Pick a venue for this chat" className="flex flex-col gap-2">
+        {venues.map((v) => (
+          <li key={v.id}>
+            <button
+              type="button"
+              onClick={() => onPickVenue(v.id)}
+              className={cn(
+                'group flex w-full cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left transition-colors',
+                'hover:border-foreground/20 hover:bg-accent',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
+              )}
+            >
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-background group-hover:text-foreground"
+                aria-hidden
+              >
+                <Store className="h-4 w-4" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium text-foreground">{v.name}</span>
+                {v.address ? (
+                  <span className="truncate text-xs text-muted-foreground">{v.address}</span>
+                ) : null}
+              </span>
+              <ArrowRight
+                className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                aria-hidden
+              />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/venues/new"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-accent hover:text-foreground"
+      >
+        <span
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-background group-hover:text-foreground"
+          aria-hidden
+        >
+          <Plus className="h-4 w-4" />
+        </span>
+        <span className="font-medium">New venue</span>
+      </Link>
     </div>
   )
 }

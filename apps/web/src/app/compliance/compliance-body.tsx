@@ -5,6 +5,9 @@ import { useMemo, useState } from 'react'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
+import { type TabItem, Tabs } from '@/components/ui/tabs'
 import {
   CATEGORY_LABELS,
   COMPLIANCE_CATEGORIES,
@@ -19,7 +22,7 @@ import { AddExpiryDialog } from './add-expiry-dialog'
 
 type Filter = 'active' | 'all' | 'dismissed'
 
-const FILTERS: Array<{ id: Filter; label: string }> = [
+const FILTERS: TabItem<Filter>[] = [
   { id: 'active', label: 'Active' },
   { id: 'all', label: 'All' },
   { id: 'dismissed', label: 'Dismissed' },
@@ -48,45 +51,30 @@ export function ComplianceBody() {
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
-            {FILTERS.map((f) => {
-              const active = filter === f.id
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFilter(f.id)}
-                  className={cn(
-                    'rounded-full px-3 py-1 text-sm font-medium transition-colors',
-                    active
-                      ? 'bg-foreground text-background'
-                      : 'text-muted-foreground hover:bg-muted',
-                  )}
-                  aria-pressed={active}
-                >
-                  {f.label}
-                </button>
-              )
-            })}
-            {records.data ? (
-              <span className="ml-auto text-xs text-muted-foreground">
-                {records.data.activeCount} active
-                {records.data.overdueCount > 0 ? ` · ${records.data.overdueCount} overdue` : ''}
-                {records.data.within30dCount > 0
-                  ? ` · ${records.data.within30dCount} in next 30d`
-                  : ''}
-              </span>
-            ) : null}
-          </div>
+          <Tabs
+            items={FILTERS}
+            value={filter}
+            onValueChange={setFilter}
+            ariaLabel="Filter compliance records"
+            trailing={
+              records.data ? (
+                <span className="text-xs text-muted-foreground">
+                  {records.data.activeCount} active
+                  {records.data.overdueCount > 0 ? ` · ${records.data.overdueCount} overdue` : ''}
+                  {records.data.within30dCount > 0
+                    ? ` · ${records.data.within30dCount} in next 30d`
+                    : ''}
+                </span>
+              ) : null
+            }
+          />
 
           {records.isLoading ? (
-            <p className="px-1 py-6 text-sm italic text-muted-foreground">
-              Loading expiry records…
-            </p>
+            <ComplianceLoading />
           ) : records.data && records.data.records.length === 0 ? (
-            <EmptyState onAdd={() => setAddOpen(true)} />
+            <ComplianceEmpty onAdd={() => setAddOpen(true)} />
           ) : (
-            <div className="mt-4 flex flex-col gap-6">
+            <div className="flex flex-col gap-6">
               {grouped.overdue.length > 0 ? (
                 <RecordGroup label="Overdue" tone="danger" records={grouped.overdue} />
               ) : null}
@@ -115,17 +103,38 @@ export function ComplianceBody() {
   )
 }
 
-function EmptyState({ onAdd }: { onAdd: () => void }) {
+function ComplianceEmpty({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="mt-12 flex flex-col items-center gap-3 text-center text-muted-foreground">
-      <ShieldCheck className="h-7 w-7" aria-hidden />
-      <p className="max-w-md text-sm">
-        Nothing on the radar yet. Upload a hygiene cert, gas safety report, or insurance renewal —
-        the agent extracts the expiry date automatically. Or add one manually.
-      </p>
-      <Button size="sm" variant="outline" onClick={onAdd} className="gap-1.5">
-        <Plus className="h-4 w-4" /> Add an expiry
-      </Button>
+    <EmptyState
+      icon={ShieldCheck}
+      title="Nothing on the radar yet"
+      description="Upload a hygiene cert, gas safety report, or insurance renewal — the agent extracts the expiry date automatically. Or add one manually."
+      action={
+        <Button size="sm" onClick={onAdd} className="cursor-pointer gap-1.5">
+          <Plus className="h-4 w-4" /> Add an expiry
+        </Button>
+      }
+    />
+  )
+}
+
+const COMPLIANCE_SKELETON_KEYS = ['a', 'b', 'c', 'd']
+
+function ComplianceLoading() {
+  return (
+    <div className="flex flex-col gap-3">
+      {COMPLIANCE_SKELETON_KEYS.map((k) => (
+        <div
+          key={k}
+          className="flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm"
+        >
+          <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

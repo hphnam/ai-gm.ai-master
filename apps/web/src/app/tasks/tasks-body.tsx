@@ -4,14 +4,17 @@ import { Check, CircleAlert, Inbox } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
-import { Button } from '@/components/ui/button'
-import { type Task, useTasks, useUpdateTask } from '@/lib/hooks/use-tasks'
+import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
+import { type TabItem, Tabs } from '@/components/ui/tabs'
+import { type Task, useDeleteTask, useTasks, useUpdateTask } from '@/lib/hooks/use-tasks'
 import { useTasksSocket } from '@/lib/hooks/use-tasks-socket'
 import { cn } from '@/lib/utils'
 
 type Filter = 'open' | 'done' | 'all'
 
-const FILTERS: Array<{ id: Filter; label: string }> = [
+const FILTERS: TabItem<Filter>[] = [
   { id: 'open', label: 'Open' },
   { id: 'done', label: 'Done' },
   { id: 'all', label: 'All' },
@@ -35,40 +38,27 @@ export function TasksBody() {
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-          <div className="flex items-center gap-2 border-b border-border pb-3">
-            {FILTERS.map((f) => {
-              const active = filter === f.id
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFilter(f.id)}
-                  className={cn(
-                    'rounded-full px-3 py-1 text-sm font-medium transition-colors',
-                    active
-                      ? 'bg-foreground text-background'
-                      : 'text-muted-foreground hover:bg-muted',
-                  )}
-                  aria-pressed={active}
-                >
-                  {f.label}
-                </button>
-              )
-            })}
-            {tasks.data ? (
-              <span className="ml-auto text-xs text-muted-foreground">
-                {tasks.data.openCount} open
-                {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
-              </span>
-            ) : null}
-          </div>
+          <Tabs
+            items={FILTERS}
+            value={filter}
+            onValueChange={setFilter}
+            ariaLabel="Filter tasks"
+            trailing={
+              tasks.data ? (
+                <span className="text-xs text-muted-foreground">
+                  {tasks.data.openCount} open
+                  {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
+                </span>
+              ) : null
+            }
+          />
 
           {tasks.isLoading ? (
-            <p className="px-1 py-6 text-sm italic text-muted-foreground">Loading tasks…</p>
+            <TasksLoading />
           ) : tasks.data && tasks.data.tasks.length === 0 ? (
-            <EmptyState filter={filter} />
+            <TasksEmpty filter={filter} />
           ) : (
-            <div className="mt-4 flex flex-col gap-6">
+            <div className="flex flex-col gap-6">
               {grouped.overdue.length > 0 ? (
                 <TaskGroup label="Overdue" tone="warn" tasks={grouped.overdue} />
               ) : null}
@@ -90,17 +80,39 @@ export function TasksBody() {
   )
 }
 
-function EmptyState({ filter }: { filter: Filter }) {
-  const msg =
+function TasksEmpty({ filter }: { filter: Filter }) {
+  const title =
     filter === 'open'
-      ? 'Nothing on your list. Ask the agent to "remind me to…" and tasks land here.'
+      ? 'Nothing on your list'
       : filter === 'done'
-        ? 'Nothing completed yet.'
-        : 'No tasks yet.'
+        ? 'Nothing completed yet'
+        : 'No tasks yet'
+  const description =
+    filter === 'open'
+      ? 'Ask the agent to "remind me to…" and tasks land here.'
+      : filter === 'done'
+        ? 'Tasks you finish will appear here.'
+        : 'Your tasks will show up here once the agent captures them.'
+  return <EmptyState icon={Inbox} title={title} description={description} />
+}
+
+const TASK_SKELETON_KEYS = ['a', 'b', 'c', 'd']
+
+function TasksLoading() {
   return (
-    <div className="mt-10 flex flex-col items-center gap-2 text-center text-muted-foreground">
-      <Inbox className="h-6 w-6" aria-hidden />
-      <p className="max-w-sm text-sm">{msg}</p>
+    <div className="flex flex-col gap-3">
+      {TASK_SKELETON_KEYS.map((k) => (
+        <div
+          key={k}
+          className="flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm"
+        >
+          <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -137,6 +149,8 @@ function TaskGroup({
 
 function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'warn' }) {
   const update = useUpdateTask()
+  const del = useDeleteTask()
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const isDone = task.status === 'done'
   const isCancelled = task.status === 'cancelled'
 
@@ -184,17 +198,19 @@ function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'w
           ) : null}
         </div>
       </div>
-      {!isDone && !isCancelled ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => update.mutate({ id: task.id, status: 'cancelled' })}
-          disabled={update.isPending}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          Dismiss
-        </Button>
-      ) : null}
+      <DeleteButton
+        onClick={() => setConfirmOpen(true)}
+        disabled={del.isPending}
+        aria-label={`Delete task: ${task.body}`}
+      />
+      <ConfirmDeleteDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete this task?"
+        description="The task will be permanently removed. This can't be undone."
+        onConfirm={() => del.mutateAsync(task.id)}
+        isPending={del.isPending}
+      />
     </li>
   )
 }

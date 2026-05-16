@@ -30,6 +30,7 @@ import {
 import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import { createRateLimiter } from '../integrations/rate-limit'
 import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
   normalizeDelimiter,
@@ -43,6 +44,7 @@ import {
   CategorySuggestionUnavailableError,
   DocNotFoundOrCrossOrgError,
   DocsService,
+  PromoteNoDataQueryInvalidError,
   TypeNameConflictError,
   TypeProposalMissingError,
 } from './docs.service'
@@ -61,11 +63,22 @@ import {
   DocumentTypeDto,
   GapKbMatchDto,
   KbGapDto,
+  NoDataQueryActionDto,
+  NoDataQueryActionSchema,
   NoDataQueryDto,
+  NoDataQueryPromoteResponseDto,
   UpdateDocRequestDto,
 } from './dto/docs.dto'
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
 import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
+
+// Per-org sliding-window throttle for the no-data-queries promote/dismiss
+// endpoints. Manager-only routes — the limit guards against a buggy UI or a
+// compromised manager session hammering the dismissal table, not against
+// abuse from regular use. 60/min matches the relative cost of these writes
+// (single Prisma upsert; promote additionally calls recordGap which is more
+// expensive but already has embedding-side caching upstream).
+const NO_DATA_QUERY_ACTION_LIMITER = createRateLimiter(60_000, 60)
 
 @ApiTags('docs')
 @ApiBearerAuth()
@@ -129,6 +142,58 @@ export class DocsController {
   @ApiResponse({ status: 200, type: [NoDataQueryDto] })
   listNoDataQueries(@CurrentOrg() org: { id: string }): Promise<NoDataQueryDto[]> {
     return this.docsService.listNoDataQueries(org.id) as Promise<NoDataQueryDto[]>
+  }
+
+  // "Add to questions" on a no-data query — promotes it into the formal gap
+  // queue (recordGap dedupes by embedding similarity) and dismisses the
+  // analytics row so the panel doesn't keep showing it.
+  @Post('analytics/no-data-queries/promote')
+  @HttpCode(200)
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: NoDataQueryPromoteResponseDto })
+  async promoteNoDataQuery(
+    @Body(new ZodValidationPipe(NoDataQueryActionSchema)) body: NoDataQueryActionDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<NoDataQueryPromoteResponseDto> {
+    if (!user?.id) {
+      throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
+    }
+    if (!NO_DATA_QUERY_ACTION_LIMITER.allow(org.id)) {
+      throw new HttpException({ error: 'rate-limited' }, 429)
+    }
+    try {
+      return (await this.docsService.promoteNoDataQuery(
+        org.id,
+        body.query,
+        user.id,
+      )) as NoDataQueryPromoteResponseDto
+    } catch (err) {
+      if (err instanceof PromoteNoDataQueryInvalidError) {
+        throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
+  // "Dismiss" on a no-data query — hides it from the panel without creating
+  // a gap. Idempotent so a double-click is harmless.
+  @Post('analytics/no-data-queries/dismiss')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 204 })
+  async dismissNoDataQuery(
+    @Body(new ZodValidationPipe(NoDataQueryActionSchema)) body: NoDataQueryActionDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<void> {
+    if (!user?.id) {
+      throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
+    }
+    if (!NO_DATA_QUERY_ACTION_LIMITER.allow(org.id)) {
+      throw new HttpException({ error: 'rate-limited' }, 429)
+    }
+    await this.docsService.dismissNoDataQuery(org.id, body.query, user.id)
   }
 
   @Post('gaps/:id/answer')

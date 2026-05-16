@@ -237,6 +237,13 @@ export class CategorySuggestionUnavailableError extends Error {
   }
 }
 
+export class PromoteNoDataQueryInvalidError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PromoteNoDataQueryInvalidError'
+  }
+}
+
 // Plan 04-02 Task 2 — helper: hydrate DocumentType + pendingTypeProposal onto API responses.
 // Plan 04-03 Task 1 — `kind` threaded through. DocumentTypeKindSchema.safeParse on read guards
 // against stored bad values (shouldn't happen — DB column is TEXT NOT NULL DEFAULT 'reference').
@@ -679,7 +686,9 @@ export class DocsService {
 
   /// Phase H (Task #22) — top no-data queries from the last N days. Groups
   /// by lower-cased query so "where do empty kegs go" + "Where do empty kegs go"
-  /// dedupe; returns count desc, then most-recent-first.
+  /// dedupe; returns count desc, then most-recent-first. Anything in
+  /// dismissed_no_data_queries for the org is filtered out (the owner either
+  /// promoted it to a gap or marked it noise).
   async listNoDataQueries(
     orgId: string,
     days = 30,
@@ -694,14 +703,18 @@ export class DocsService {
     type Row = { query: string; ask_count: bigint; last_asked: Date }
     const rows = await prisma.$queryRaw<Row[]>`
       SELECT
-        LOWER(query) AS query,
+        LOWER(sa.query) AS query,
         COUNT(*) AS ask_count,
-        MAX("createdAt") AS last_asked
-      FROM "search_analytics"
-      WHERE "organizationId" = ${orgId}
-        AND outcome = 'no-data'
-        AND "createdAt" > NOW() - (${days} || ' days')::interval
-      GROUP BY LOWER(query)
+        MAX(sa."createdAt") AS last_asked
+      FROM "search_analytics" sa
+      LEFT JOIN "dismissed_no_data_queries" d
+        ON d."organizationId" = sa."organizationId"
+        AND d."queryLower" = LOWER(sa.query)
+      WHERE sa."organizationId" = ${orgId}
+        AND sa.outcome = 'no-data'
+        AND sa."createdAt" > NOW() - (${days} || ' days')::interval
+        AND d.id IS NULL
+      GROUP BY LOWER(sa.query)
       ORDER BY ask_count DESC, last_asked DESC
       LIMIT ${limit}
     `
@@ -710,6 +723,91 @@ export class DocsService {
       askCount: Number(r.ask_count),
       lastAskedAt: r.last_asked.toISOString(),
     }))
+  }
+
+  /// Promote a no-data analytics query into a pending KB gap so it joins the
+  /// formal "questions waiting on you" queue. Also dismisses the query so it
+  /// drops out of the no-data panel on next refetch.
+  ///
+  /// Not wrapped in a $transaction by design: recordGap uses its own raw-SQL
+  /// path and embedding writes that don't participate in an interactive tx.
+  /// Both writes are idempotent — recordGap dedupes by embedding similarity
+  /// (≥0.85) and dismissed_no_data_queries upserts by (orgId, queryLower) —
+  /// so a partial failure followed by retry converges to the correct state.
+  async promoteNoDataQuery(
+    orgId: string,
+    rawQuery: string,
+    userId: string,
+  ): Promise<{ gapId: string; askCount: number; dedupedFromExisting: boolean }> {
+    const queryLower = rawQuery.trim().toLowerCase()
+    if (queryLower.length < 5) {
+      throw new PromoteNoDataQueryInvalidError('query too short')
+    }
+    const gap = await this.ingestService.recordGap({
+      question: rawQuery.trim(),
+      tentativeAnswer: null,
+      organizationId: orgId,
+      venueId: null,
+      askedByUserId: userId,
+      sourceMessageId: null,
+    })
+    await prisma.dismissedNoDataQuery.upsert({
+      where: {
+        organizationId_queryLower: { organizationId: orgId, queryLower },
+      },
+      update: {
+        promotedGapId: gap.id,
+        dismissedByUserId: userId,
+      },
+      create: {
+        organizationId: orgId,
+        queryLower,
+        dismissedByUserId: userId,
+        promotedGapId: gap.id,
+      },
+    })
+    this.realtime.emitGapUpdated(orgId, { id: gap.id, status: 'created' })
+    this.logger.log(
+      JSON.stringify({
+        event: 'docs.no_data_query.promoted',
+        orgId,
+        userId,
+        gapId: gap.id,
+        dedupedFromExisting: gap.dedupedFromExisting,
+      }),
+    )
+    return {
+      gapId: gap.id,
+      askCount: gap.askCount,
+      dedupedFromExisting: gap.dedupedFromExisting,
+    }
+  }
+
+  /// Dismiss a no-data analytics query as noise — hides it from the panel
+  /// without creating a gap. Upsert keeps the call idempotent.
+  async dismissNoDataQuery(orgId: string, rawQuery: string, userId: string): Promise<void> {
+    const queryLower = rawQuery.trim().toLowerCase()
+    if (queryLower.length === 0) {
+      throw new Error('dismissNoDataQuery: query required')
+    }
+    await prisma.dismissedNoDataQuery.upsert({
+      where: {
+        organizationId_queryLower: { organizationId: orgId, queryLower },
+      },
+      update: { dismissedByUserId: userId },
+      create: {
+        organizationId: orgId,
+        queryLower,
+        dismissedByUserId: userId,
+      },
+    })
+    this.logger.log(
+      JSON.stringify({
+        event: 'docs.no_data_query.dismissed',
+        orgId,
+        userId,
+      }),
+    )
   }
 
   async getById(id: string, orgId: string): Promise<DocDetail | null> {

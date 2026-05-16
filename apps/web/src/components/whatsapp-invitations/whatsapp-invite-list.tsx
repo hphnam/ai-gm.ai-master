@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
   type ListWhatsappInvitesResponse,
   useRevokeWhatsappInvite,
@@ -81,12 +82,12 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
 
   if (!data || data.invites.length === 0) {
     return (
-      <section className="rounded-lg border bg-card p-6 text-center shadow-sm">
-        <MessageCircle className="mx-auto mb-2 h-6 w-6 text-muted-foreground" aria-hidden />
-        <p className="text-sm text-muted-foreground">
-          No WhatsApp invites yet. Click &ldquo;Invite via WhatsApp&rdquo; to send your first one.
-        </p>
-      </section>
+      <EmptyState
+        icon={MessageCircle}
+        size="compact"
+        title="No WhatsApp invites yet"
+        description={'Click "Invite via WhatsApp" to send your first one.'}
+      />
     )
   }
 

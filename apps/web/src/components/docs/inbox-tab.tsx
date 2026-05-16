@@ -6,6 +6,8 @@ import { useMemo, useState } from 'react'
 import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { useInbox } from '@/lib/hooks/use-docs'
 import { cn } from '@/lib/utils'
@@ -198,17 +200,15 @@ function Section({
   )
 }
 
+const INBOX_SKELETON_KEYS = ['a', 'b', 'c']
+
 function EmptyInbox() {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-transparent px-6 py-12 text-center">
-      <Inbox className="mx-auto mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
-      <p className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground">
-        Inbox is clear
-      </p>
-      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-        New uploads needing your review will show up here.
-      </p>
-    </div>
+    <EmptyState
+      icon={Inbox}
+      title="Inbox is clear"
+      description="New uploads needing your review will show up here."
+    />
   )
 }
 
@@ -217,7 +217,13 @@ export function InboxTab() {
   const { failed, proposals, unclassified } = useMemo(() => partition(docs.data), [docs.data])
 
   if (docs.isLoading) {
-    return <p className="px-1 text-sm italic text-muted-foreground">Loading inbox…</p>
+    return (
+      <div className="space-y-3">
+        {INBOX_SKELETON_KEYS.map((k) => (
+          <Skeleton key={k} className="h-24 w-full rounded-2xl" />
+        ))}
+      </div>
+    )
   }
 
   const total = failed.length + proposals.length + unclassified.length

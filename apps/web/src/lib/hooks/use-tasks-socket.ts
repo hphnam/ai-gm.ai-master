@@ -13,11 +13,17 @@ type TaskUpsertedPayload = {
   remindedAt: string | null
 }
 
+type TaskDeletedPayload = {
+  id: string
+}
+
 export function useTasksSocket(opts?: {
   onUpserted?: (payload: TaskUpsertedPayload) => void
+  onDeleted?: (payload: TaskDeletedPayload) => void
 }): void {
   const queryClient = useQueryClient()
   const onUpserted = opts?.onUpserted
+  const onDeleted = opts?.onDeleted
 
   useEffect(() => {
     const socket = acquireSocket()
@@ -26,12 +32,18 @@ export function useTasksSocket(opts?: {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       onUpserted?.(payload)
     }
+    const handleDeleted = (payload: TaskDeletedPayload) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      onDeleted?.(payload)
+    }
 
     socket.on('task.upserted', handleUpserted)
+    socket.on('task.deleted', handleDeleted)
 
     return () => {
       socket.off('task.upserted', handleUpserted)
+      socket.off('task.deleted', handleDeleted)
       releaseSocket()
     }
-  }, [queryClient, onUpserted])
+  }, [queryClient, onUpserted, onDeleted])
 }

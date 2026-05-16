@@ -1,5 +1,7 @@
 'use client'
 
+import { Alert } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { useWhatsappInvites } from '@/lib/hooks/use-whatsapp-invites'
 import { mapApiError } from '@/lib/map-api-error'
@@ -15,17 +17,9 @@ export function WhatsappInvitationsBody() {
   if (query.isError) {
     const err = query.error
     if (err instanceof ApiError && err.code === 'forbidden') {
-      return (
-        <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground shadow-sm">
-          Only owners and managers can manage WhatsApp invites.
-        </div>
-      )
+      return <Alert>Only owners and managers can manage WhatsApp invites.</Alert>
     }
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive shadow-sm">
-        {mapApiError(err)}
-      </div>
-    )
+    return <Alert variant="destructive">{mapApiError(err)}</Alert>
   }
 
   return (
@@ -45,8 +39,8 @@ export function WhatsappInvitationsBody() {
 
       {query.isLoading ? (
         <div className="space-y-3">
-          <div className="h-6 w-32 animate-pulse rounded bg-muted" />
-          <div className="h-24 w-full animate-pulse rounded-lg bg-muted" />
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-24 w-full rounded-lg" />
         </div>
       ) : (
         <WhatsappInviteList data={query.data} />

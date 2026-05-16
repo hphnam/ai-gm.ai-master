@@ -4,6 +4,10 @@ import { CalendarClock, FileBarChart, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { PageHeader } from '@/components/shell/page-header'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { useReports } from '@/lib/hooks/use-reports'
 
@@ -19,28 +23,23 @@ export function ReportsListBody() {
       <PageHeader
         title="Reports"
         description="Saved reports the chat agent has generated for your org."
-      />
-      <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
-          <div className="mb-4 flex items-center justify-end">
-            <Link
-              href="/reports/schedules"
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-accent"
-            >
+        actions={
+          <Button asChild size="sm" variant="outline" className="cursor-pointer gap-1.5">
+            <Link href="/reports/schedules">
               <CalendarClock className="h-3.5 w-3.5" aria-hidden />
               Scheduled reports
             </Link>
-          </div>
-
+          </Button>
+        }
+      />
+      <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
           {list.isLoading ? (
-            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-              Pulling your reports…
-            </div>
+            <ReportsLoading />
           ) : list.isError ? (
             <ErrorState err={list.error} />
           ) : !rows.length ? (
-            <EmptyState />
+            <ReportsEmpty />
           ) : (
             <>
               <ul className="space-y-2.5">
@@ -126,31 +125,45 @@ function PagerFooter({
   )
 }
 
-function EmptyState() {
+function ReportsEmpty() {
   return (
-    <div className="rounded-lg border bg-card p-8 text-center shadow-sm">
-      <FileBarChart className="mx-auto mb-3 h-5 w-5 text-muted-foreground" aria-hidden />
-      <p className="font-display text-base text-foreground">No reports yet</p>
-      <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-        Ask the chat for a weekly recap, monthly P&amp;L, or any breakdown — it'll save here with a
-        permalink.
-      </p>
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <Link
-          href="/chat"
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-[filter] hover:brightness-110"
-        >
-          Open chat
-        </Link>
-        <Link
-          href="/reports/schedules"
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:bg-accent"
-        >
-          <CalendarClock className="h-3.5 w-3.5" aria-hidden />
-          Or schedule one automatically
-        </Link>
-      </div>
-    </div>
+    <EmptyState
+      icon={FileBarChart}
+      title="No reports yet"
+      description="Ask the chat for a weekly recap, monthly P&L, or any breakdown — it'll save here with a permalink."
+      action={
+        <>
+          <Button asChild size="sm" className="cursor-pointer">
+            <Link href="/chat">Open chat</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline" className="cursor-pointer gap-1.5">
+            <Link href="/reports/schedules">
+              <CalendarClock className="h-3.5 w-3.5" aria-hidden />
+              Or schedule one automatically
+            </Link>
+          </Button>
+        </>
+      }
+    />
+  )
+}
+
+const REPORTS_SKELETON_KEYS = ['a', 'b', 'c', 'd']
+
+function ReportsLoading() {
+  return (
+    <ul className="space-y-2.5">
+      {REPORTS_SKELETON_KEYS.map((k) => (
+        <li key={k} className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm">
+          <Skeleton className="h-9 w-9 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -159,12 +172,5 @@ function ErrorState({ err }: { err: unknown }) {
     err instanceof ApiError && err.status === 401
       ? 'You need to sign in to see reports.'
       : "Couldn't load reports."
-  return (
-    <div
-      role="alert"
-      className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive"
-    >
-      {msg}
-    </div>
-  )
+  return <Alert variant="destructive">{msg}</Alert>
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -93,5 +94,16 @@ export class TasksController {
       category: body.category,
     })
     return { task }
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiResponse({ status: 204 })
+  async remove(
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @Param(new ZodValidationPipe(TaskIdParamDto)) params: TaskIdParamDto,
+  ): Promise<void> {
+    await this.service.remove(org.id, user.id, params.id)
   }
 }

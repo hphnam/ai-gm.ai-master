@@ -400,6 +400,33 @@
         "tags": [
           "tasks"
         ]
+      },
+      "delete": {
+        "operationId": "TasksController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "tasks"
+        ]
       }
     },
     "/notifications": {
@@ -1609,6 +1636,33 @@
         "tags": [
           "scheduled-reports"
         ]
+      },
+      "delete": {
+        "operationId": "ScheduledReportsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "scheduled-reports"
+        ]
       }
     },
     "/scheduled-reports/{id}/pause": {
@@ -2501,6 +2555,71 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
+    "/docs/analytics/no-data-queries/promote": {
+      "post": {
+        "operationId": "DocsController_promoteNoDataQuery",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoDataQueryActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDataQueryPromoteResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
+    "/docs/analytics/no-data-queries/dismiss": {
+      "post": {
+        "operationId": "DocsController_dismissNoDataQuery",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoDataQueryActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
           }
         },
         "security": [
@@ -9106,6 +9225,38 @@
           "query",
           "askCount",
           "lastAskedAt"
+        ]
+      },
+      "NoDataQueryActionDto": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "NoDataQueryPromoteResponseDto": {
+        "type": "object",
+        "properties": {
+          "gapId": {
+            "type": "string"
+          },
+          "askCount": {
+            "type": "number"
+          },
+          "dedupedFromExisting": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "gapId",
+          "askCount",
+          "dedupedFromExisting"
         ]
       },
       "AnswerGapRequestDto": {

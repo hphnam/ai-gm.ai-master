@@ -1,7 +1,8 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiFetch, apiPost } from '@/lib/api-client'
+import { toast } from 'sonner'
+import { ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
 export type TaskStatus = 'open' | 'done' | 'cancelled'
 
@@ -105,6 +106,29 @@ export function useUpdateTask() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['tasks'] })
+    },
+  })
+}
+
+export function useDeleteTask() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiFetch<void>(`/tasks/${id}`, { method: 'DELETE' })
+      return id
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('Task deleted.')
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof ApiError && err.status === 404
+          ? 'Task already removed.'
+          : err instanceof ApiError && err.status === 403
+            ? "You don't have permission to delete this task."
+            : "Couldn't delete the task."
+      toast.error(msg)
     },
   })
 }

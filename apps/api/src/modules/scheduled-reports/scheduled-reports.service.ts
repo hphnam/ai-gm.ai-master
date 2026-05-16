@@ -167,6 +167,16 @@ export class ScheduledReportsService {
     return this.transition(orgId, id, 'cancelled')
   }
 
+  async remove(orgId: string, id: string): Promise<void> {
+    const existing = await prisma.scheduledReport.findFirst({
+      where: { id, organizationId: orgId },
+      select: { id: true },
+    })
+    if (!existing) throw new Error('not-found')
+    await prisma.scheduledReport.delete({ where: { id } })
+    this.logger.log(JSON.stringify({ event: 'scheduled-reports.deleted', orgId, id }))
+  }
+
   /// Worker-only: atomically claim every active row whose nextRunAt is in the
   /// past. Inside a single transaction we read the due batch AND advance each
   /// row's nextRunAt to its next computed slot. After this returns the rows

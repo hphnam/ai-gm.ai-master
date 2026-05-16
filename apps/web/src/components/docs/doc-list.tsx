@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
@@ -189,10 +190,10 @@ function DocListSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholder, no real data
         <li key={i} className="flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5">
-          <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted" />
+          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1 space-y-2">
-            <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-3 w-2/3" />
           </div>
         </li>
       ))}

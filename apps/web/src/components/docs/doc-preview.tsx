@@ -1,6 +1,7 @@
 'use client'
 
 import { FileText, MapPin, Tag } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useDoc } from '@/lib/hooks/use-docs'
 
 const PREVIEW_CHAR_LIMIT = 1500
@@ -29,12 +30,12 @@ export function DocPreview({ docId }: { docId: string }) {
         aria-busy="true"
         aria-label="Loading document preview"
       >
-        <div className="h-3 w-20 animate-pulse rounded bg-muted" />
-        <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-5 w-3/4" />
         <div className="space-y-2">
-          <div className="h-3 w-full animate-pulse rounded bg-muted" />
-          <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
-          <div className="h-3 w-4/6 animate-pulse rounded bg-muted" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-5/6" />
+          <Skeleton className="h-3 w-4/6" />
         </div>
       </div>
     )

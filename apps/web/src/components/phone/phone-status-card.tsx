@@ -2,6 +2,7 @@
 
 import { Check, Phone } from 'lucide-react'
 import { useState } from 'react'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -13,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { ApiError } from '@/lib/api-client'
+import { Skeleton } from '@/components/ui/skeleton'
 import { maskPhone } from '@/lib/format'
 import { usePhoneStatus, useUnlinkPhone } from '@/lib/hooks/use-phone'
 import { mapApiError } from '@/lib/map-api-error'
@@ -25,20 +26,12 @@ export function PhoneStatusCard() {
   const [open, setOpen] = useState(false)
 
   if (status.isLoading) {
-    return (
-      <div className="space-y-3">
-        <div className="h-20 w-full animate-pulse rounded-lg bg-muted" />
-      </div>
-    )
+    return <Skeleton className="h-20 w-full rounded-lg" />
   }
 
   if (status.isError) {
     const err = status.error
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive shadow-sm">
-        {err instanceof ApiError ? mapApiError(err) : mapApiError(err)}
-      </div>
-    )
+    return <Alert variant="destructive">{mapApiError(err)}</Alert>
   }
 
   const data = status.data

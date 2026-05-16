@@ -1,20 +1,14 @@
 'use client'
 
-import { ArrowLeft, Copy, Download, Loader2, Printer, RefreshCcw, Trash2 } from 'lucide-react'
-import Link from 'next/link'
+import { Copy, Download, Loader2, Printer, RefreshCcw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ReportSurface } from '@/components/chat/tool-cards/report-card'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Alert } from '@/components/ui/alert'
+import { BackLink } from '@/components/ui/back-link'
+import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
 import { ApiError } from '@/lib/api-client'
 import { type Report, useDeleteReport, useReport } from '@/lib/hooks/use-reports'
 import { cn } from '@/lib/utils'
@@ -35,30 +29,20 @@ export function ReportDetailBody({ id }: { id: string }) {
     <AppShell>
       <PageHeader
         title={data?.title ?? 'Report'}
-        actions={
-          <div className="flex items-center gap-1.5">
-            {data ? <ExportMenu report={data} /> : null}
-            <Link
-              href="/reports"
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 transition-colors hover:bg-accent"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-              All reports
-            </Link>
-          </div>
-        }
+        actions={data ? <ExportMenu report={data} /> : null}
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div id="report-print-root" className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+        <div id="report-print-root" className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+          <BackLink href="/reports" className="mb-4 print:hidden">
+            All reports
+          </BackLink>
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
               Pulling the report…
             </div>
           ) : isError ? (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
-              {errorCopy(error)}
-            </div>
+            <Alert variant="destructive">{errorCopy(error)}</Alert>
           ) : data ? (
             <>
               <ReportSurface
@@ -111,23 +95,6 @@ function ReportFooterActions({ report }: { report: Report }) {
     router.push(`/chat${venueQs}`)
   }
 
-  const handleConfirmDelete = async () => {
-    try {
-      await del.mutateAsync(report.id)
-      setConfirmOpen(false)
-      router.push('/reports')
-    } catch {
-      // useDeleteReport's mutateAsync surfaces ApiError; the dialog stays
-      // open so the user can retry. Inline error renders below.
-    }
-  }
-
-  const deleteError = del.error
-    ? del.error instanceof ApiError && del.error.status === 404
-      ? 'Report already removed.'
-      : "Couldn't delete the report — try again."
-    : null
-
   return (
     <>
       {/* The print stylesheet hides the wrapping flex container so these
@@ -142,58 +109,29 @@ function ReportFooterActions({ report }: { report: Report }) {
           <RefreshCcw className="h-3.5 w-3.5" aria-hidden />
           Re-run in chat
         </button>
-        <button
-          type="button"
+        <DeleteButton
+          variant="destructive"
           onClick={() => setConfirmOpen(true)}
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-1.5 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
-        >
-          <Trash2 className="h-3.5 w-3.5" aria-hidden />
-          Delete report
-        </button>
+          label="Delete report"
+        />
       </div>
 
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-display text-lg">Delete this report?</DialogTitle>
-            <DialogDescription className="text-left">
-              "{report.title}" will be permanently removed. The permalink will stop working and
-              anyone with the link will see a not-found page.
-            </DialogDescription>
-          </DialogHeader>
-          {deleteError ? (
-            <p
-              role="alert"
-              className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive"
-            >
-              {deleteError}
-            </p>
-          ) : null}
-          <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              type="button"
-              onClick={() => setConfirmOpen(false)}
-              disabled={del.isPending}
-              className="cursor-pointer rounded-md border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmDelete}
-              disabled={del.isPending}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {del.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-              ) : (
-                <Trash2 className="h-3.5 w-3.5" aria-hidden />
-              )}
-              Delete
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDeleteDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete this report?"
+        description={
+          <>
+            &ldquo;{report.title}&rdquo; will be permanently removed. The permalink will stop
+            working and anyone with the link will see a not-found page.
+          </>
+        }
+        onConfirm={async () => {
+          await del.mutateAsync(report.id)
+          router.push('/reports')
+        }}
+        isPending={del.isPending}
+      />
     </>
   )
 }

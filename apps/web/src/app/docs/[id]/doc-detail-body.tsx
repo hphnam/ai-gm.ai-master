@@ -2,7 +2,6 @@
 
 import {
   AlertTriangle,
-  ArrowLeft,
   BookOpen,
   Camera,
   CheckSquare,
@@ -25,6 +24,8 @@ import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 import { EditDocModal } from '@/components/docs/edit-doc-modal'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { BackButton } from '@/components/ui/back-button'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,6 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { DocDetailDto } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
 import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
@@ -442,40 +444,39 @@ function ChecklistBlock({ checklist }: { checklist: Checklist }) {
 
 function NotFound() {
   return (
-    <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
-      <p className="text-sm font-medium">Document not found</p>
-      <p className="mt-1 text-sm text-muted-foreground">
+    <Alert variant="destructive">
+      <AlertTitle>Document not found</AlertTitle>
+      <AlertDescription>
         It may have been deleted, or you don’t have access. Head back to the knowledge library.
-      </p>
-      <Button asChild variant="outline" size="sm" className="mt-4 cursor-pointer">
-        <Link href="/docs">Back to Knowledge</Link>
-      </Button>
-    </div>
+        <Button asChild variant="outline" size="sm" className="mt-3 cursor-pointer">
+          <Link href="/docs">Back to Knowledge</Link>
+        </Button>
+      </AlertDescription>
+    </Alert>
   )
 }
 
 function GenericError() {
   return (
-    <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
-      <p className="text-sm font-medium">Couldn’t load this document</p>
-      <p className="mt-1 text-sm text-muted-foreground">Try refreshing the page in a moment.</p>
-    </div>
+    <Alert variant="destructive">
+      <AlertTitle>Couldn’t load this document</AlertTitle>
+      <AlertDescription>Try refreshing the page in a moment.</AlertDescription>
+    </Alert>
   )
 }
 
 function DocSkeleton() {
   return (
     <div role="status" className="space-y-4" aria-busy="true" aria-label="Loading document">
-      <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
-      <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-      <div className="h-32 w-full animate-pulse rounded-xl bg-muted/60" />
-      <div className="h-64 w-full animate-pulse rounded-xl bg-muted/60" />
+      <Skeleton className="h-6 w-1/2" />
+      <Skeleton className="h-4 w-1/3" />
+      <Skeleton className="h-32 w-full rounded-xl" />
+      <Skeleton className="h-64 w-full rounded-xl" />
     </div>
   )
 }
 
 export function DocDetailBody({ id }: { id: string }) {
-  const router = useRouter()
   const doc = useDoc(id)
   const [classifyOpen, setClassifyOpen] = useState(false)
   const [proposalOpen, setProposalOpen] = useState(false)
@@ -501,23 +502,10 @@ export function DocDetailBody({ id }: { id: string }) {
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
-          {/* router.back() preserves the previous URL exactly — including any
-              ?q=, ?status=, etc. set via nuqs in the library tab. Falls back
-              to a plain push when there's no history (cold-loaded detail). */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined' && window.history.length > 1) {
-                router.back()
-              } else {
-                router.push('/docs')
-              }
-            }}
-            className="-ml-1 inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            Back to Knowledge
-          </button>
+          {/* No href so router.back() preserves any ?q=/?status= filters set
+              via nuqs in the library tab. Falls back to /docs when there's no
+              history (cold-loaded detail). */}
+          <BackButton fallbackHref="/docs">Back to Knowledge</BackButton>
 
           {doc.isLoading ? (
             <DocSkeleton />

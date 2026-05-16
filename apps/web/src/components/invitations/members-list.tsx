@@ -1,6 +1,8 @@
 'use client'
 
 import { Users } from 'lucide-react'
+import { Alert } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { type OrgMember, useOrgMembers } from '@/lib/hooks/use-org-members'
 import { cn } from '@/lib/utils'
@@ -20,6 +22,8 @@ const ROLE_LABEL: Record<string, string> = {
   staff: 'Staff',
 }
 
+const MEMBERS_SKELETON_KEYS = ['a', 'b', 'c']
+
 export function MembersList() {
   const query = useOrgMembers()
 
@@ -27,12 +31,8 @@ export function MembersList() {
     return (
       <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-5">
         <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: skeleton rows are positional
-              key={i}
-              className="h-12 w-full animate-pulse rounded-md bg-muted"
-            />
+          {MEMBERS_SKELETON_KEYS.map((k) => (
+            <Skeleton key={k} className="h-12 w-full" />
           ))}
         </div>
       </section>
@@ -45,11 +45,7 @@ export function MembersList() {
       // anyone who hits this page despite role gating server-side.
       return null
     }
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive shadow-sm">
-        Couldn&apos;t load team members.
-      </div>
-    )
+    return <Alert variant="destructive">Couldn&apos;t load team members.</Alert>
   }
 
   const members = query.data?.members ?? []

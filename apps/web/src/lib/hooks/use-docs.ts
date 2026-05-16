@@ -340,6 +340,89 @@ export function useNoDataQueries() {
   })
 }
 
+// Drop a query from the no-data panel optimistically — used by both promote
+// and dismiss so a row vanishes immediately without waiting for the refetch.
+function removeNoDataQuery(
+  queryClient: ReturnType<typeof useQueryClient>,
+  query: string,
+): NoDataQuery[] | undefined {
+  const key = ['docs', 'analytics', 'no-data']
+  const prev = queryClient.getQueryData<NoDataQuery[]>(key)
+  if (prev) {
+    queryClient.setQueryData<NoDataQuery[]>(
+      key,
+      prev.filter((q) => q.query !== query),
+    )
+  }
+  return prev
+}
+
+export function usePromoteNoDataQuery() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (query: string) =>
+      apiPost<{ gapId: string; askCount: number; dedupedFromExisting: boolean }>(
+        '/docs/analytics/no-data-queries/promote',
+        { query },
+      ),
+    onMutate: async (query) => {
+      await queryClient.cancelQueries({ queryKey: ['docs', 'analytics', 'no-data'] })
+      const prev = removeNoDataQuery(queryClient, query)
+      return { prev }
+    },
+    onError: (_err, _query, ctx) => {
+      if (ctx?.prev) {
+        queryClient.setQueryData(['docs', 'analytics', 'no-data'], ctx.prev)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['docs', 'gaps'] })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['docs', 'analytics', 'no-data'] })
+    },
+  })
+}
+
+export function useDismissNoDataQuery() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (query: string): Promise<void> => {
+      const requestId = crypto.randomUUID()
+      const res = await fetch(`${API_URL}/docs/analytics/no-data-queries/dismiss`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json', 'x-request-id': requestId },
+        body: JSON.stringify({ query }),
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        let body: ApiErrorResponse | null = null
+        try {
+          body = text ? (JSON.parse(text) as ApiErrorResponse) : null
+        } catch {
+          body = null
+        }
+        const serverRequestId = res.headers.get('x-request-id') ?? requestId
+        throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
+      }
+    },
+    onMutate: async (query) => {
+      await queryClient.cancelQueries({ queryKey: ['docs', 'analytics', 'no-data'] })
+      const prev = removeNoDataQuery(queryClient, query)
+      return { prev }
+    },
+    onError: (_err, _query, ctx) => {
+      if (ctx?.prev) {
+        queryClient.setQueryData(['docs', 'analytics', 'no-data'], ctx.prev)
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['docs', 'analytics', 'no-data'] })
+    },
+  })
+}
+
 export function useAnswerGap() {
   const queryClient = useQueryClient()
   return useMutation({

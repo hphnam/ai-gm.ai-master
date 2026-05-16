@@ -259,6 +259,13 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
+  emitTaskDeleted(userIds: ReadonlyArray<string>, payload: { id: string }): void {
+    const unique = [...new Set(userIds.filter(Boolean))]
+    for (const uid of unique) {
+      this.server?.to(userRoomFor(uid)).emit('task.deleted', payload)
+    }
+  }
+
   // Phone verification status flipped for the given user. User-scoped so
   // other tabs of the same user (e.g. settings open) update without a refresh.
   emitPhoneStatusChanged(

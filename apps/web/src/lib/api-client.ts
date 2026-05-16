@@ -41,6 +41,13 @@ export async function apiFetch<T>(path: string, init?: FetchOpts): Promise<T> {
     throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
   }
 
+  // 204 No Content (and 205 Reset Content) carry no body — calling res.json()
+  // would throw SyntaxError. Callers that type the response as `void` rely on
+  // us short-circuiting here.
+  if (res.status === 204 || res.status === 205) {
+    return undefined as T
+  }
+
   return (await res.json()) as T
 }
 
@@ -79,6 +86,10 @@ export async function apiFetchWithMeta<T>(
       body = null
     }
     throw new ApiError(res.status, body?.error ?? 'unknown', body?.details, serverRequestId)
+  }
+
+  if (res.status === 204 || res.status === 205) {
+    return { data: undefined as T, requestId: serverRequestId }
   }
 
   const data = (await res.json()) as T

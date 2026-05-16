@@ -131,6 +131,22 @@ export const NoDataQuerySchema = z.object({
 })
 export class NoDataQueryDto extends createZodDto(NoDataQuerySchema) {}
 
+// Body for promote + dismiss endpoints. We pass the verbatim query string —
+// the service lower-cases it for matching against `dismissed_no_data_queries`.
+// Min length 5 mirrors recordGap's floor so the promote path can't 500 on a
+// service-level validation that the DTO would have caught.
+export const NoDataQueryActionSchema = z.object({
+  query: z.string().trim().min(5, 'query too short').max(500),
+})
+export class NoDataQueryActionDto extends createZodDto(NoDataQueryActionSchema) {}
+
+export const NoDataQueryPromoteResponseSchema = z.object({
+  gapId: z.string(),
+  askCount: z.number(),
+  dedupedFromExisting: z.boolean(),
+})
+export class NoDataQueryPromoteResponseDto extends createZodDto(NoDataQueryPromoteResponseSchema) {}
+
 export const CategorySuggestionSchema = z.object({
   name: z.string(),
   kind: DocumentTypeKindSchema,

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { authClient, useSession } from '@/lib/auth-client'
 import { useAcceptInvitation, useInvitationPreview } from '@/lib/hooks/use-invitations'
 import { isTerminalInvitationError, mapApiError } from '@/lib/map-api-error'
@@ -45,7 +46,7 @@ export function AcceptInvitationBody({ id }: { id: string }) {
   if (preview.isLoading) {
     return (
       <Wrapper>
-        <div className="h-24 w-full animate-pulse rounded-md bg-muted" />
+        <Skeleton className="h-24 w-full" />
       </Wrapper>
     )
   }

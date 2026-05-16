@@ -7,6 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { API_URL, ApiError, apiFetch } from '@/lib/api-client'
 
 const REPORTS_PAGE_SIZE = 20
@@ -137,6 +138,14 @@ export function useDeleteReport() {
       // show a "ghost" report after the optimistic redirect.
       queryClient.removeQueries({ queryKey: ['reports', 'one', id] })
       queryClient.invalidateQueries({ queryKey: ['reports', 'list'] })
+      toast.success('Report deleted.')
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof ApiError && err.status === 404
+          ? 'Report already removed.'
+          : "Couldn't delete the report."
+      toast.error(msg)
     },
   })
 }

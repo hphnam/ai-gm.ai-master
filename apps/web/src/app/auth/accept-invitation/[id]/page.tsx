@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { AcceptInvitationBody } from './accept-invitation-body'
 
 export default async function AcceptInvitationPage({
@@ -11,7 +12,7 @@ export default async function AcceptInvitationPage({
     <Suspense
       fallback={
         <div className="mx-auto mt-16 max-w-md space-y-3">
-          <div className="h-24 w-full animate-pulse rounded-md bg-muted" />
+          <Skeleton className="h-24 w-full" />
         </div>
       }
     >

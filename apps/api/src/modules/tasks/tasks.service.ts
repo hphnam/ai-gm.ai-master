@@ -327,6 +327,23 @@ export class TasksService {
     return row
   }
 
+  async remove(orgId: string, userId: string, taskId: string): Promise<void> {
+    const existing = await prisma.task.findFirst({
+      where: { id: taskId, organizationId: orgId },
+      select: { id: true, assigneeUserId: true, creatorUserId: true },
+    })
+    if (!existing) throw new NotFoundException('task-not-found')
+    if (existing.assigneeUserId !== userId && existing.creatorUserId !== userId) {
+      throw new ForbiddenException('task-not-deletable')
+    }
+    await prisma.task.delete({ where: { id: taskId } })
+    this.logger.log(JSON.stringify({ event: 'tasks.deleted', orgId, actorUserId: userId, taskId }))
+    const recipients = [existing.assigneeUserId, existing.creatorUserId, userId].filter(
+      (x): x is string => !!x,
+    )
+    this.realtime.emitTaskDeleted(recipients, { id: taskId })
+  }
+
   private emitUpserted(kind: 'created' | 'updated', row: TaskRow, actorUserId: string): void {
     const recipients = [row.assignee.userId, row.creator?.userId, actorUserId].filter(
       (x): x is string => !!x,

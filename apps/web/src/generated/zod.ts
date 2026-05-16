@@ -339,6 +339,14 @@ export const TasksControllerUpdateResponse = zod.object({
 })
 
 
+export const tasksControllerRemovePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const TasksControllerRemoveParams = zod.object({
+  "id": zod.string().regex(tasksControllerRemovePathIdRegExp)
+})
+
+
 export const notificationsControllerListQueryStatusDefault = `all`;
 export const notificationsControllerListQueryDirectionDefault = `inbox`;
 export const notificationsControllerListQueryLimitDefault = 30;
@@ -1260,6 +1268,14 @@ export const ScheduledReportsControllerGetOneResponse = zod.object({
 })
 
 
+export const scheduledReportsControllerRemovePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const ScheduledReportsControllerRemoveParams = zod.object({
+  "id": zod.string().regex(scheduledReportsControllerRemovePathIdRegExp)
+})
+
+
 export const scheduledReportsControllerPausePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 
@@ -2114,6 +2130,32 @@ export const DocsControllerListNoDataQueriesResponseItem = zod.object({
   "lastAskedAt": zod.string()
 })
 export const DocsControllerListNoDataQueriesResponse = zod.array(DocsControllerListNoDataQueriesResponseItem)
+
+
+export const docsControllerPromoteNoDataQueryBodyQueryMin = 5;
+export const docsControllerPromoteNoDataQueryBodyQueryMax = 500;
+
+
+
+export const DocsControllerPromoteNoDataQueryBody = zod.object({
+  "query": zod.string().min(docsControllerPromoteNoDataQueryBodyQueryMin).max(docsControllerPromoteNoDataQueryBodyQueryMax)
+})
+
+export const DocsControllerPromoteNoDataQueryResponse = zod.object({
+  "gapId": zod.string(),
+  "askCount": zod.number(),
+  "dedupedFromExisting": zod.boolean()
+})
+
+
+export const docsControllerDismissNoDataQueryBodyQueryMin = 5;
+export const docsControllerDismissNoDataQueryBodyQueryMax = 500;
+
+
+
+export const DocsControllerDismissNoDataQueryBody = zod.object({
+  "query": zod.string().min(docsControllerDismissNoDataQueryBodyQueryMin).max(docsControllerDismissNoDataQueryBodyQueryMax)
+})
 
 
 export const docsControllerAnswerGapPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');

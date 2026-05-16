@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
@@ -170,6 +172,21 @@ export class ScheduledReportsController {
   ): Promise<ScheduledReportDto> {
     try {
       return await this.service.cancel(org.id, params.id)
+    } catch (err) {
+      throw this.toHttp(err)
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @ApiResponse({ status: 204 })
+  async remove(
+    @CurrentOrg() org: { id: string },
+    @Param(new ZodValidationPipe(ScheduledReportIdParamDto))
+    params: ScheduledReportIdParamDto,
+  ): Promise<void> {
+    try {
+      await this.service.remove(org.id, params.id)
     } catch (err) {
       throw this.toHttp(err)
     }

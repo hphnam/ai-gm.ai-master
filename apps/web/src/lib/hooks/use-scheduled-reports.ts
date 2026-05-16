@@ -133,6 +133,27 @@ export const usePauseScheduledReport = () => useStatusMutation('pause')
 export const useResumeScheduledReport = () => useStatusMutation('resume')
 export const useCancelScheduledReport = () => useStatusMutation('cancel')
 
+export function useDeleteScheduledReport() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiFetch<void>(`/scheduled-reports/${id}`, { method: 'DELETE' })
+      return id
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: KEY })
+      toast.success('Schedule deleted.')
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof ApiError && err.status === 404
+          ? 'Schedule no longer exists.'
+          : "Couldn't delete the schedule."
+      toast.error(msg)
+    },
+  })
+}
+
 function formatNextRunForToast(iso: string, timezone: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return 'soon'

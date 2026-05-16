@@ -538,25 +538,27 @@ type ToolChip = {
   errored: boolean
 }
 
-function AssistantBody({
-  parts,
-  isStreaming,
-  ctx,
-}: {
-  parts: UIMessage['parts']
-  isStreaming: boolean
-  ctx: ToolCardCtx
-}) {
+type AssistantClassification = {
+  reasoningText: string
+  reasoningStreaming: boolean
+  toolChips: ToolChip[]
+  toolCardParts: ToolPart[]
+  /// One entry per text part the model emitted, in emission order. Each
+  /// becomes its own bubble. We deliberately do NOT fold any text into
+  /// reasoning — the model's spoken output stays visible even when more tool
+  /// calls fire after the answer (e.g. record_kb_gap firing post-answer).
+  answerChunks: string[]
+  /// True when the very last part in the message is a text part — used to
+  /// decide whether the streaming cursor renders at the end of the last chunk.
+  lastPartIsText: boolean
+}
+
+function classifyAssistantParts(
+  parts: UIMessage['parts'],
+  isStreaming: boolean,
+): AssistantClassification {
   const lastIdx = parts.length - 1
-  // Answer = the last text part. Any earlier text parts are interim narration
-  // the model emits between tool calls; fold them into the thought-process
-  // block so the answer area stays stable as later parts stream in.
-  const lastTextIdx = (() => {
-    for (let i = parts.length - 1; i >= 0; i--) {
-      if (parts[i]?.type === 'text') return i
-    }
-    return -1
-  })()
+
   const toolChips: ToolChip[] = []
   parts.forEach((p, i) => {
     if (!isToolUIPart(p)) return
@@ -570,10 +572,16 @@ function AssistantBody({
       errored: p.state === 'output-error',
     })
   })
+
   let reasoningStreaming = false
   const reasoningTextParts: string[] = []
+  const answerChunks: string[] = []
+  // Every text part is its own answer bubble. We don't try to be clever about
+  // "interim narration" vs "answer" — that heuristic kept misclassifying real
+  // answers as narration when the agent called another tool (e.g. logging a
+  // KB gap) AFTER answering. Reasoning bucket only holds `reasoning`-typed
+  // parts now.
   parts.forEach((p, i) => {
-    // Reasoning parts always go to the thought block.
     if (p.type === 'reasoning') {
       const rp = p as ReasoningPart
       const isLast = i === lastIdx
@@ -582,49 +590,13 @@ function AssistantBody({
       if (t.length > 0) reasoningTextParts.push(t)
       return
     }
-    // Text parts other than the final one = interim narration the model
-    // emitted between tool calls. Fold into the thought block so the answer
-    // area stays stable.
-    if (p.type === 'text' && i !== lastTextIdx) {
+    if (p.type === 'text') {
       const t = stripFollowUpTail(p.text).trim()
-      if (t.length > 0) reasoningTextParts.push(t)
+      if (t.length === 0) return
+      answerChunks.push(t)
     }
   })
-  const mergedReasoningText = reasoningTextParts.join('\n\n')
-  const finalTextPart = lastTextIdx >= 0 ? parts[lastTextIdx] : null
-  const finalText =
-    finalTextPart && finalTextPart.type === 'text'
-      ? stripFollowUpTail(finalTextPart.text).trim()
-      : ''
 
-  // Continuity bridge — useChat pushes an empty assistant message the moment
-  // the stream opens, before any reasoning / tool / text deltas arrive. Without
-  // this, ReasoningBlock returns null (nothing to show), the answer block is
-  // empty, and the bare cursor bar flashes — creating a "Thinking → blank →
-  // Thinking" flicker between ChatThread's submitted-state fallback and the
-  // reasoning block. Render a single Thinking status while streaming and
-  // nothing visible has arrived yet.
-  const hasReasoning = mergedReasoningText.trim().length > 0
-  const hasChips = toolChips.length > 0
-  const hasFinal = finalText.length > 0
-  const showThinkingBridge = isStreaming && !hasReasoning && !hasChips && !hasFinal
-
-  if (showThinkingBridge) {
-    return (
-      <div className="flex items-center gap-2 pt-1.5 text-sm text-muted-foreground">
-        <span className="relative inline-flex h-1.5 w-1.5" aria-hidden>
-          <span className="absolute inset-0 rounded-full bg-foreground/25" />
-          <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" />
-        </span>
-        Thinking
-      </div>
-    )
-  }
-
-  // Generative-UI tool cards — render any tool part with a registered renderer
-  // and a final output, in the same order the agent emitted them. Live in-flight
-  // tool calls stay as chips inside ReasoningBlock; the card shows up once the
-  // output lands.
   const toolCardParts: ToolPart[] = []
   parts.forEach((p) => {
     if (!isToolUIPart(p)) return
@@ -635,9 +607,33 @@ function AssistantBody({
     toolCardParts.push(tp)
   })
 
+  return {
+    reasoningText: reasoningTextParts.join('\n\n'),
+    reasoningStreaming,
+    toolChips,
+    toolCardParts,
+    answerChunks,
+    lastPartIsText: lastIdx >= 0 && parts[lastIdx]?.type === 'text',
+  }
+}
+
+/// Renders the reasoning + tool-card header for a single assistant turn. The
+/// answer text itself is rendered separately by ChatMessage so that
+/// multi-chunk turns can split into multiple bubbles.
+function AssistantTurnHeader({
+  classification,
+  ctx,
+}: {
+  classification: AssistantClassification
+  ctx: ToolCardCtx
+}) {
+  const { reasoningText, reasoningStreaming, toolChips, toolCardParts } = classification
+  const hasReasoning = reasoningText.trim().length > 0
+  const hasChips = toolChips.length > 0
+  if (!hasReasoning && !hasChips && toolCardParts.length === 0) return null
   return (
     <div className="flex flex-col gap-2.5">
-      <ReasoningBlock text={mergedReasoningText} streaming={reasoningStreaming} chips={toolChips} />
+      <ReasoningBlock text={reasoningText} streaming={reasoningStreaming} chips={toolChips} />
       {toolCardParts.length > 0 ? (
         <div className="flex flex-col gap-2">
           {toolCardParts.map((p, i) => (
@@ -645,24 +641,43 @@ function AssistantBody({
           ))}
         </div>
       ) : null}
-      {hasFinal ? (
-        <div className="relative">
-          <AssistantMarkdown text={finalText} />
-          {isStreaming && lastTextIdx === lastIdx ? (
-            <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
-          ) : null}
-        </div>
+    </div>
+  )
+}
+
+function AssistantAnswer({ text, showCursor }: { text: string; showCursor: boolean }) {
+  return (
+    <div className="relative">
+      <AssistantMarkdown text={text} />
+      {showCursor ? (
+        <span className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 animate-pulse rounded-sm bg-foreground/70 align-middle" />
       ) : null}
     </div>
   )
 }
 
+function AssistantThinkingBridge() {
+  return (
+    <div className="flex items-center gap-2 pt-1.5 text-sm text-muted-foreground">
+      <span className="relative inline-flex h-1.5 w-1.5" aria-hidden>
+        <span className="absolute inset-0 rounded-full bg-foreground/25" />
+        <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" />
+      </span>
+      Thinking
+    </div>
+  )
+}
+
 function assistantPlainText(parts: UIMessage['parts']): string {
-  return parts
-    .filter((p) => p.type === 'text')
-    .map((p) => (p.type === 'text' ? stripFollowUpTail(p.text) : ''))
-    .join('\n')
-    .trim()
+  // Every text part is part of the visible answer. Copy/feedback ships the
+  // concatenation of all bubbles so it matches what the user sees.
+  const chunks: string[] = []
+  parts.forEach((p) => {
+    if (p.type !== 'text') return
+    const t = stripFollowUpTail(p.text).trim()
+    if (t.length > 0) chunks.push(t)
+  })
+  return chunks.join('\n\n')
 }
 
 function AssistantActions({
@@ -799,31 +814,84 @@ export function ChatMessage({
   }
 
   const plainText = assistantPlainText(message.parts)
+  const classification = classifyAssistantParts(message.parts, Boolean(isStreaming))
+  const { answerChunks, toolChips, reasoningText, toolCardParts, lastPartIsText } = classification
+
+  // Continuity bridge — useChat pushes an empty assistant message the moment
+  // the stream opens, before any reasoning / tool / text deltas arrive. Render
+  // a single "Thinking" status while nothing visible has arrived yet.
+  const showThinkingBridge =
+    isStreaming &&
+    reasoningText.trim().length === 0 &&
+    toolChips.length === 0 &&
+    toolCardParts.length === 0 &&
+    answerChunks.length === 0
+
+  // Unified structure across all states: an outer flex-col wrapper containing
+  // 1+ <article>s. Bridge mode is its own article with its own key (one-time
+  // remount when first content arrives — same as before). Otherwise we render
+  // one article per answer chunk, with at least one article rendered (an
+  // empty-text bubble shows reasoning/tool cards mid-stream before any text).
+  // Stable keys mean a 1-chunk → 2-chunk transition appends a new article
+  // without remounting the first one.
+  const renderedChunks = showThinkingBridge ? [] : answerChunks.length > 0 ? answerChunks : ['']
+  const lastChunkIdx = renderedChunks.length - 1
 
   return (
-    <article
-      aria-label="Assistant message"
-      aria-busy={isStreaming ? 'true' : undefined}
-      className="flex w-full gap-3"
-    >
-      <AssistantAvatar />
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <AssistantBody parts={message.parts} isStreaming={Boolean(isStreaming)} ctx={cardCtx} />
-        {!isStreaming ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <AssistantActions
-              messageId={message.id}
-              text={plainText}
-              onRegenerate={onRegenerate}
-              initialFeedback={initialFeedback}
-            />
-            {verify ? <VerifyBadge verify={verify} /> : null}
+    <div className="flex flex-col gap-6">
+      {showThinkingBridge ? (
+        <article
+          key={`${message.id}:bridge`}
+          aria-label="Assistant message"
+          aria-busy="true"
+          className="flex w-full gap-3"
+        >
+          <AssistantAvatar />
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <AssistantThinkingBridge />
           </div>
-        ) : null}
-        {!isStreaming && followUps && onFollowUpSelect ? (
-          <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
-        ) : null}
-      </div>
-    </article>
+        </article>
+      ) : null}
+      {renderedChunks.map((chunk, i) => {
+        const isFirst = i === 0
+        const isLast = i === lastChunkIdx
+        return (
+          <article
+            // biome-ignore lint/suspicious/noArrayIndexKey: chunks mirror model emission order and never reorder within a turn; index is the stable identity here.
+            key={`${message.id}:chunk-${i}`}
+            aria-label="Assistant message"
+            aria-busy={isStreaming && isLast ? 'true' : undefined}
+            className="flex w-full gap-3"
+          >
+            <AssistantAvatar />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              {isFirst ? (
+                <AssistantTurnHeader classification={classification} ctx={cardCtx} />
+              ) : null}
+              {chunk.length > 0 ? (
+                <AssistantAnswer
+                  text={chunk}
+                  showCursor={Boolean(isStreaming) && isLast && lastPartIsText}
+                />
+              ) : null}
+              {isLast && !isStreaming ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <AssistantActions
+                    messageId={message.id}
+                    text={plainText}
+                    onRegenerate={onRegenerate}
+                    initialFeedback={initialFeedback}
+                  />
+                  {verify ? <VerifyBadge verify={verify} /> : null}
+                </div>
+              ) : null}
+              {isLast && !isStreaming && followUps && onFollowUpSelect ? (
+                <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
+              ) : null}
+            </div>
+          </article>
+        )
+      })}
+    </div>
   )
 }

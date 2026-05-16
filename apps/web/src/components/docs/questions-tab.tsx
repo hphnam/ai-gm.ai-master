@@ -3,6 +3,8 @@
 import { MessageCircleQuestion } from 'lucide-react'
 import { GapList } from '@/components/docs/gap-list'
 import { NoDataQueriesPanel } from '@/components/docs/no-data-queries-panel'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useGaps, useNoDataQueries } from '@/lib/hooks/use-docs'
 
 export function useQuestionsCount(): number {
@@ -10,17 +12,15 @@ export function useQuestionsCount(): number {
   return gaps.data?.length ?? 0
 }
 
+const QUESTIONS_SKELETON_KEYS = ['a', 'b', 'c']
+
 function EmptyQuestions() {
   return (
-    <div className="rounded-xl border border-dashed bg-card/40 px-6 py-12 text-center">
-      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-        <MessageCircleQuestion className="h-5 w-5" aria-hidden />
-      </div>
-      <p className="text-sm font-medium">Nothing to answer right now</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-        When staff ask the AI something it can’t find, it’ll show up here for you to weigh in on.
-      </p>
-    </div>
+    <EmptyState
+      icon={MessageCircleQuestion}
+      title="Nothing to answer right now"
+      description="When staff ask the AI something it can’t find, it’ll show up here for you to weigh in on."
+    />
   )
 }
 
@@ -29,7 +29,13 @@ export function QuestionsTab() {
   const noData = useNoDataQueries()
 
   if (gaps.isLoading && noData.isLoading) {
-    return <p className="px-1 text-sm italic text-muted-foreground">Loading questions…</p>
+    return (
+      <div className="space-y-3">
+        {QUESTIONS_SKELETON_KEYS.map((k) => (
+          <Skeleton key={k} className="h-20 w-full rounded-2xl" />
+        ))}
+      </div>
+    )
   }
 
   const gapsList = gaps.data ?? []
@@ -42,11 +48,13 @@ export function QuestionsTab() {
     <div className="space-y-6">
       {gapsList.length > 0 ? <GapList gaps={gapsList} /> : null}
       {noDataList.length > 0 ? (
-        <section className="space-y-2">
-          <header className="flex items-baseline gap-2 px-1">
-            <h3 className="text-sm font-semibold tracking-tight">What staff couldn’t find</h3>
+        <section aria-labelledby="no-data-heading" className="space-y-2">
+          <header className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-1">
+            <h3 id="no-data-heading" className="text-sm font-semibold tracking-tight">
+              Searches with no results
+            </h3>
             <span className="text-xs text-muted-foreground">
-              Searches that returned nothing — useful for spotting gaps in your knowledge base
+              {noDataList.length} unique · last 30 days · add the useful ones to your questions
             </span>
           </header>
           <NoDataQueriesPanel queries={noDataList} />

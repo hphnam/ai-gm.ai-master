@@ -1,7 +1,6 @@
 'use client'
 
 import { Inbox, Library, MessageCircleQuestion, Upload } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { KnowledgeEmptyState } from '@/components/docs/empty-state'
 import { InboxTab, useInboxCount } from '@/components/docs/inbox-tab'
@@ -11,8 +10,8 @@ import { UploadModal } from '@/components/docs/upload-modal'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
+import { type TabItem, TabPanel, Tabs } from '@/components/ui/tabs'
 import { useDocs } from '@/lib/hooks/use-docs'
-import { cn } from '@/lib/utils'
 
 export type DocsTab = 'library' | 'inbox' | 'questions'
 
@@ -22,75 +21,6 @@ const TAB_HREF: Record<DocsTab, string> = {
   library: '/docs',
   inbox: '/docs/inbox',
   questions: '/docs/questions',
-}
-
-function TabBar({
-  active,
-  inboxCount,
-  questionsCount,
-}: {
-  active: DocsTab
-  inboxCount: number
-  questionsCount: number
-}) {
-  const items: Array<{
-    id: DocsTab
-    label: string
-    Icon: typeof Library
-    count: number
-    urgent?: boolean
-  }> = [
-    { id: 'library', label: 'Library', Icon: Library, count: 0 },
-    { id: 'inbox', label: 'Inbox', Icon: Inbox, count: inboxCount, urgent: true },
-    {
-      id: 'questions',
-      label: 'Questions',
-      Icon: MessageCircleQuestion,
-      count: questionsCount,
-      urgent: true,
-    },
-  ]
-
-  return (
-    <div role="tablist" aria-label="Knowledge sections" className="mb-6 flex gap-1 border-b">
-      {items.map(({ id, label, Icon, count, urgent }) => {
-        const selected = active === id
-        return (
-          <Link
-            key={id}
-            href={TAB_HREF[id]}
-            role="tab"
-            aria-selected={selected}
-            aria-controls={`tabpanel-${id}`}
-            id={`tab-${id}`}
-            scroll={false}
-            className={cn(
-              'relative -mb-px flex cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition-colors',
-              selected
-                ? 'border-foreground font-medium text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground',
-            )}
-          >
-            <Icon className="h-4 w-4" aria-hidden />
-            <span>{label}</span>
-            {count > 0 ? (
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
-                  selected ? 'bg-foreground/10 text-foreground' : 'bg-muted text-muted-foreground',
-                )}
-              >
-                {urgent ? (
-                  <span className="inline-block h-1 w-1 rounded-full bg-amber-500" aria-hidden />
-                ) : null}
-                {count}
-              </span>
-            ) : null}
-          </Link>
-        )
-      })}
-    </div>
-  )
 }
 
 export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
@@ -124,21 +54,39 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
             <KnowledgeEmptyState onUploadClick={() => setUploadOpen(true)} />
           ) : (
             <>
-              <TabBar active={tab} inboxCount={inboxCount} questionsCount={questionsCount} />
+              <Tabs
+                items={
+                  [
+                    { id: 'library', label: 'Library', icon: Library, href: TAB_HREF.library },
+                    {
+                      id: 'inbox',
+                      label: 'Inbox',
+                      icon: Inbox,
+                      count: inboxCount,
+                      urgent: inboxCount > 0,
+                      href: TAB_HREF.inbox,
+                    },
+                    {
+                      id: 'questions',
+                      label: 'Questions',
+                      icon: MessageCircleQuestion,
+                      count: questionsCount,
+                      urgent: questionsCount > 0,
+                      href: TAB_HREF.questions,
+                    },
+                  ] as TabItem<DocsTab>[]
+                }
+                value={tab}
+                ariaLabel="Knowledge sections"
+                hasPanels
+              />
 
               {TABS.map((id) => (
-                <div
-                  key={id}
-                  role="tabpanel"
-                  id={`tabpanel-${id}`}
-                  aria-labelledby={`tab-${id}`}
-                  hidden={tab !== id}
-                  className="min-w-0"
-                >
+                <TabPanel key={id} id={id} active={tab === id}>
                   {id === 'library' ? <LibraryTab /> : null}
                   {id === 'inbox' ? <InboxTab /> : null}
                   {id === 'questions' ? <QuestionsTab /> : null}
-                </div>
+                </TabPanel>
               ))}
             </>
           )}
