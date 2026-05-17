@@ -326,6 +326,11 @@ export class InviteService {
         select: { id: true, phoneVerifiedAt: true },
       })
 
+      // Spec metric I — anchor onboarding window on member create. For an
+      // existing member, GREATEST(existing, now) bumps re-invited users
+      // forward without ever pulling the anchor backwards. Raw UPDATE
+      // because Prisma can't reference the prior column value in `update`.
+      const onboardingAnchor = new Date()
       await txn.organizationMember.upsert({
         where: {
           userId_organizationId: { userId: user.id, organizationId: invite.organizationId },
@@ -334,9 +339,15 @@ export class InviteService {
           userId: user.id,
           organizationId: invite.organizationId,
           role: invite.role,
+          onboardingStartedAt: onboardingAnchor,
         },
         update: {},
       })
+      await txn.$executeRaw`
+        UPDATE "organization_members"
+        SET "onboardingStartedAt" = GREATEST(COALESCE("onboardingStartedAt", ${onboardingAnchor}), ${onboardingAnchor})
+        WHERE "userId" = ${user.id} AND "organizationId" = ${invite.organizationId}
+      `
 
       try {
         await txn.whatsappSession.create({

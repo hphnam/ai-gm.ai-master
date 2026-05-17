@@ -15,6 +15,7 @@ import { IngestModule } from './modules/ingest/ingest.module'
 import { IntegrationsModule } from './modules/integrations/integrations.module'
 import { SquareModule } from './modules/integrations/square/square.module'
 import { InvitationsModule } from './modules/invitations/invitations.module'
+import { OnboardingMetricsModule } from './modules/metrics/onboarding/onboarding-metrics.module'
 import { MockOpsModule } from './modules/mock-ops/mock-ops.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
 import { NudgeModule } from './modules/nudges/nudge.module'
@@ -56,6 +57,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     ChatStartersModule,
     IntegrationsModule,
     SquareModule,
+    OnboardingMetricsModule,
   ],
   controllers: [AppController],
 })

@@ -67,6 +67,7 @@ export const auth = betterAuth({
                 userId: user.id,
                 organizationId: org.id,
                 role: 'owner',
+                onboardingStartedAt: new Date(),
               },
             })
           } catch (err) {

@@ -190,6 +190,10 @@ model OrganizationMember {
   /// likelyShiftRole, commonTopics, languageHints, refreshedAt, sourceMessageCount).
   metadata       Json         @default("{}")
   createdAt      DateTime     @default(now())
+  /// Spec metric I — time-to-competency. Anchors the 14-day onboarding window
+  /// for repeat-question analysis. Set on membership create; bumped forward
+  /// if a WhatsApp invite is later redeemed for this (user, org) pair.
+  onboardingStartedAt DateTime?
 
   @@unique([userId, organizationId])
   @@index([organizationId])

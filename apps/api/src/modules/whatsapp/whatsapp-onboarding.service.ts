@@ -302,7 +302,12 @@ export class WhatsappOnboardingService {
         })
       }
 
-      // Ensure membership in the issuing org.
+      // Ensure membership in the issuing org. Spec metric I anchors the
+      // 14-day onboarding window on member create. For an existing member,
+      // GREATEST(existing, now) handles the re-invite case without ever
+      // pulling the anchor BACKWARDS (raw SQL because Prisma's update
+      // payload can't reference the column's prior value).
+      const now = new Date()
       await txn.organizationMember.upsert({
         where: {
           userId_organizationId: { userId: user.id, organizationId: invite.organizationId },
@@ -311,9 +316,15 @@ export class WhatsappOnboardingService {
           userId: user.id,
           organizationId: invite.organizationId,
           role: invite.role,
+          onboardingStartedAt: now,
         },
         update: {},
       })
+      await txn.$executeRaw`
+        UPDATE "organization_members"
+        SET "onboardingStartedAt" = GREATEST(COALESCE("onboardingStartedAt", ${now}), ${now})
+        WHERE "userId" = ${user.id} AND "organizationId" = ${invite.organizationId}
+      `
 
       // Pull all memberships now (so we can decide single-vs-multi welcome).
       const memberships = await txn.organizationMember.findMany({
