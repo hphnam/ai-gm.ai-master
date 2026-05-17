@@ -15,10 +15,13 @@ import { IngestModule } from './modules/ingest/ingest.module'
 import { IntegrationsModule } from './modules/integrations/integrations.module'
 import { SquareModule } from './modules/integrations/square/square.module'
 import { InvitationsModule } from './modules/invitations/invitations.module'
+import { MetricsModule } from './modules/metrics/metrics.module'
+import { OnboardingMetricsModule } from './modules/metrics/onboarding/onboarding-metrics.module'
 import { MockOpsModule } from './modules/mock-ops/mock-ops.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
 import { NudgeModule } from './modules/nudges/nudge.module'
 import { PhoneModule } from './modules/phone/phone.module'
+import { PricingRecommendationsModule } from './modules/pricing-recommendations/pricing-recommendations.module'
 import { ReportsModule } from './modules/reports/reports.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
 import { ScheduledReportsModule } from './modules/scheduled-reports/scheduled-reports.module'
@@ -56,6 +59,9 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     ChatStartersModule,
     IntegrationsModule,
     SquareModule,
+    MetricsModule,
+    OnboardingMetricsModule,
+    PricingRecommendationsModule,
   ],
   controllers: [AppController],
 })
