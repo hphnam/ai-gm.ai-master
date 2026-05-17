@@ -434,6 +434,10 @@ export class InvitationsService {
         // Another request won the race
         throw new InvitationError('invitation-already-accepted')
       }
+      // Spec metric I — anchor onboarding window on first join. GREATEST
+      // protects against pulling the anchor backwards if this user already
+      // belongs (idempotent invitation accept).
+      const onboardingAnchor = new Date()
       await tx.organizationMember.upsert({
         where: {
           userId_organizationId: {
@@ -445,9 +449,15 @@ export class InvitationsService {
           userId: input.currentUser.id,
           organizationId: invitation.organizationId,
           role: invitation.role,
+          onboardingStartedAt: onboardingAnchor,
         },
         update: {},
       })
+      await tx.$executeRaw`
+        UPDATE "organization_members"
+        SET "onboardingStartedAt" = GREATEST(COALESCE("onboardingStartedAt", ${onboardingAnchor}), ${onboardingAnchor})
+        WHERE "userId" = ${input.currentUser.id} AND "organizationId" = ${invitation.organizationId}
+      `
       // M8: update ONLY this request's session — not all user sessions
       await tx.session.update({
         where: { id: input.sessionId },
