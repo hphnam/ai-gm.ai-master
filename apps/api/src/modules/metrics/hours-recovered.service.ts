@@ -42,8 +42,16 @@ export type HoursRecoveredResult = {
 @Injectable()
 export class HoursRecoveredService {
   private readonly logger = new Logger(HoursRecoveredService.name)
+  // Nest DI: no constructor args — Prisma is a module-level singleton, not a
+  // Nest provider, and `MetricsPrisma` is a TS-only type the container can't
+  // resolve. Tests inject a fake via `withPrismaForTest`.
+  private db: MetricsPrisma = defaultPrisma
 
-  constructor(private readonly db: MetricsPrisma = defaultPrisma) {}
+  static withPrismaForTest(db: MetricsPrisma): HoursRecoveredService {
+    const svc = new HoursRecoveredService()
+    svc.db = db
+    return svc
+  }
 
   /// Convert successful find_knowledge query volume into management hours
   /// saved and £ value. Always returns numbers (zeros for empty ranges) —

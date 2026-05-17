@@ -71,7 +71,7 @@ const defaultConfig = (orgId: string): FakeConfig => ({
 
 describe('HoursRecoveredService.compute', () => {
   it('returns zeros for an empty range', async () => {
-    const svc = new HoursRecoveredService(buildDb([], [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb([], [defaultConfig(ORG)]))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.queriesCount, 0)
     assert.equal(result.minutesSaved, 0)
@@ -88,7 +88,7 @@ describe('HoursRecoveredService.compute', () => {
       outcome: 'hit',
       createdAt: new Date(FROM.getTime() + i * 1000),
     }))
-    const svc = new HoursRecoveredService(buildDb(rows, [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, [defaultConfig(ORG)]))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.queriesCount, 10)
     assert.equal(result.minutesSaved, 42)
@@ -105,7 +105,7 @@ describe('HoursRecoveredService.compute', () => {
       { organizationId: ORG, venueId: VENUE_A, outcome: 'no-data', createdAt: FROM },
       { organizationId: ORG, venueId: VENUE_A, outcome: 'error', createdAt: FROM },
     ]
-    const svc = new HoursRecoveredService(buildDb(rows, [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, [defaultConfig(ORG)]))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.queriesCount, 1)
   })
@@ -116,7 +116,7 @@ describe('HoursRecoveredService.compute', () => {
       { organizationId: ORG, venueId: VENUE_A, outcome: 'hit', createdAt: FROM },
       { organizationId: ORG, venueId: VENUE_B, outcome: 'hit', createdAt: FROM },
     ]
-    const svc = new HoursRecoveredService(buildDb(rows, [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, [defaultConfig(ORG)]))
     const scoped = await svc.compute(ORG, { from: FROM, to: TO, venueId: VENUE_A })
     assert.equal(scoped.queriesCount, 2)
     assert.equal(scoped.scope.venueId, VENUE_A)
@@ -130,7 +130,7 @@ describe('HoursRecoveredService.compute', () => {
       { organizationId: OTHER_ORG, venueId: VENUE_A, outcome: 'hit', createdAt: FROM },
       { organizationId: OTHER_ORG, venueId: VENUE_A, outcome: 'hit', createdAt: FROM },
     ]
-    const svc = new HoursRecoveredService(buildDb(rows, [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, [defaultConfig(ORG)]))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.queriesCount, 0)
   })
@@ -143,7 +143,7 @@ describe('HoursRecoveredService.compute', () => {
       { organizationId: ORG, venueId: VENUE_A, outcome: 'hit', createdAt: atTo },
       { organizationId: ORG, venueId: VENUE_A, outcome: 'hit', createdAt: FROM },
     ]
-    const svc = new HoursRecoveredService(buildDb(rows, [defaultConfig(ORG)]))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, [defaultConfig(ORG)]))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.queriesCount, 1)
   })
@@ -156,7 +156,7 @@ describe('HoursRecoveredService.compute', () => {
       outcome: 'hit' as const,
       createdAt: FROM,
     }))
-    const svc = new HoursRecoveredService(
+    const svc = HoursRecoveredService.withPrismaForTest(
       buildDb(rows, [
         {
           organizationId: ORG,
@@ -177,7 +177,7 @@ describe('HoursRecoveredService.compute', () => {
       { organizationId: ORG, venueId: VENUE_A, outcome: 'hit', createdAt: FROM },
     ]
     // No configs for ORG.
-    const svc = new HoursRecoveredService(buildDb(rows, []))
+    const svc = HoursRecoveredService.withPrismaForTest(buildDb(rows, []))
     const result = await svc.compute(ORG, { from: FROM, to: TO })
     assert.equal(result.baseline.minutesPerQuery, DEFAULT_MINUTES_PER_QUERY)
     assert.equal(result.baseline.hourlyRateCents, DEFAULT_HOURLY_RATE_CENTS)
