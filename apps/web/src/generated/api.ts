@@ -714,12 +714,17 @@ export interface StreamChatMessageRequestDto {
   conversationId?: string;
 }
 
-export interface ListConversationItemDto {
+export type ListConversationsPageDtoItemsItem = {
   id: string;
   venueId: string;
   venueName: string;
   lastMessageAt: string;
   preview: string | null;
+};
+
+export interface ListConversationsPageDto {
+  items: ListConversationsPageDtoItemsItem[];
+  nextCursor: string | null;
 }
 
 export type ConversationResponseDtoVisibility = typeof ConversationResponseDtoVisibility[keyof typeof ConversationResponseDtoVisibility];
@@ -785,6 +790,204 @@ export const UpdateConversationVisibilityResponseDtoVisibility = {
 export interface UpdateConversationVisibilityResponseDto {
   id: string;
   visibility: UpdateConversationVisibilityResponseDtoVisibility;
+}
+
+export type ListIncidentsResponseDtoIncidentsItemSeverity = typeof ListIncidentsResponseDtoIncidentsItemSeverity[keyof typeof ListIncidentsResponseDtoIncidentsItemSeverity];
+
+
+export const ListIncidentsResponseDtoIncidentsItemSeverity = {
+  minor: 'minor',
+  major: 'major',
+  critical: 'critical',
+} as const;
+
+export type ListIncidentsResponseDtoIncidentsItemStatus = typeof ListIncidentsResponseDtoIncidentsItemStatus[keyof typeof ListIncidentsResponseDtoIncidentsItemStatus];
+
+
+export const ListIncidentsResponseDtoIncidentsItemStatus = {
+  open: 'open',
+  acknowledged: 'acknowledged',
+  closed: 'closed',
+} as const;
+
+export type ListIncidentsResponseDtoIncidentsItemLoggedBy = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+} | null;
+
+export type ListIncidentsResponseDtoIncidentsItemDetails = {[key: string]: unknown};
+
+export type ListIncidentsResponseDtoIncidentsItem = {
+  id: string;
+  organizationId: string;
+  venueId: string;
+  venueName: string;
+  severity: ListIncidentsResponseDtoIncidentsItemSeverity;
+  status: ListIncidentsResponseDtoIncidentsItemStatus;
+  summary: string;
+  loggedBy: ListIncidentsResponseDtoIncidentsItemLoggedBy;
+  sourceMessageId: string | null;
+  sourceConversationId: string | null;
+  details: ListIncidentsResponseDtoIncidentsItemDetails;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  commentCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface ListIncidentsResponseDto {
+  incidents: ListIncidentsResponseDtoIncidentsItem[];
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  openCount: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  criticalOpenCount: number;
+}
+
+export type SingleIncidentResponseDtoIncidentSeverity = typeof SingleIncidentResponseDtoIncidentSeverity[keyof typeof SingleIncidentResponseDtoIncidentSeverity];
+
+
+export const SingleIncidentResponseDtoIncidentSeverity = {
+  minor: 'minor',
+  major: 'major',
+  critical: 'critical',
+} as const;
+
+export type SingleIncidentResponseDtoIncidentStatus = typeof SingleIncidentResponseDtoIncidentStatus[keyof typeof SingleIncidentResponseDtoIncidentStatus];
+
+
+export const SingleIncidentResponseDtoIncidentStatus = {
+  open: 'open',
+  acknowledged: 'acknowledged',
+  closed: 'closed',
+} as const;
+
+export type SingleIncidentResponseDtoIncidentLoggedBy = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+} | null;
+
+export type SingleIncidentResponseDtoIncidentDetails = {[key: string]: unknown};
+
+export type SingleIncidentResponseDtoIncident = {
+  id: string;
+  organizationId: string;
+  venueId: string;
+  venueName: string;
+  severity: SingleIncidentResponseDtoIncidentSeverity;
+  status: SingleIncidentResponseDtoIncidentStatus;
+  summary: string;
+  loggedBy: SingleIncidentResponseDtoIncidentLoggedBy;
+  sourceMessageId: string | null;
+  sourceConversationId: string | null;
+  details: SingleIncidentResponseDtoIncidentDetails;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  commentCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface SingleIncidentResponseDto {
+  incident: SingleIncidentResponseDtoIncident;
+}
+
+export type UpdateIncidentStatusBodyDtoStatus = typeof UpdateIncidentStatusBodyDtoStatus[keyof typeof UpdateIncidentStatusBodyDtoStatus];
+
+
+export const UpdateIncidentStatusBodyDtoStatus = {
+  open: 'open',
+  acknowledged: 'acknowledged',
+  closed: 'closed',
+} as const;
+
+export interface UpdateIncidentStatusBodyDto {
+  status: UpdateIncidentStatusBodyDtoStatus;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  resolution?: string;
+}
+
+export type ListIncidentCommentsResponseDtoCommentsItemKind = typeof ListIncidentCommentsResponseDtoCommentsItemKind[keyof typeof ListIncidentCommentsResponseDtoCommentsItemKind];
+
+
+export const ListIncidentCommentsResponseDtoCommentsItemKind = {
+  comment: 'comment',
+  status_change: 'status_change',
+} as const;
+
+export type ListIncidentCommentsResponseDtoCommentsItemMeta = {[key: string]: unknown};
+
+export type ListIncidentCommentsResponseDtoCommentsItemAuthor = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+} | null;
+
+export type ListIncidentCommentsResponseDtoCommentsItem = {
+  id: string;
+  incidentId: string;
+  kind: ListIncidentCommentsResponseDtoCommentsItemKind;
+  body: string;
+  meta: ListIncidentCommentsResponseDtoCommentsItemMeta;
+  author: ListIncidentCommentsResponseDtoCommentsItemAuthor;
+  createdAt: string;
+};
+
+export interface ListIncidentCommentsResponseDto {
+  comments: ListIncidentCommentsResponseDtoCommentsItem[];
+}
+
+export interface ComposeIncidentCommentBodyDto {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  body: string;
+}
+
+export type SingleIncidentCommentResponseDtoCommentKind = typeof SingleIncidentCommentResponseDtoCommentKind[keyof typeof SingleIncidentCommentResponseDtoCommentKind];
+
+
+export const SingleIncidentCommentResponseDtoCommentKind = {
+  comment: 'comment',
+  status_change: 'status_change',
+} as const;
+
+export type SingleIncidentCommentResponseDtoCommentMeta = {[key: string]: unknown};
+
+export type SingleIncidentCommentResponseDtoCommentAuthor = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+} | null;
+
+export type SingleIncidentCommentResponseDtoComment = {
+  id: string;
+  incidentId: string;
+  kind: SingleIncidentCommentResponseDtoCommentKind;
+  body: string;
+  meta: SingleIncidentCommentResponseDtoCommentMeta;
+  author: SingleIncidentCommentResponseDtoCommentAuthor;
+  createdAt: string;
+};
+
+export interface SingleIncidentCommentResponseDto {
+  comment: SingleIncidentCommentResponseDtoComment;
 }
 
 export type ReportListResponseDtoReportsItem = {
@@ -1326,6 +1529,147 @@ export type SingleIntegrationResponseDtoIntegration = {
 
 export interface SingleIntegrationResponseDto {
   integration: SingleIntegrationResponseDtoIntegration;
+}
+
+export type ListPricingRecommendationsResponseDtoRecommendationsItemStatus = typeof ListPricingRecommendationsResponseDtoRecommendationsItemStatus[keyof typeof ListPricingRecommendationsResponseDtoRecommendationsItemStatus];
+
+
+export const ListPricingRecommendationsResponseDtoRecommendationsItemStatus = {
+  pending: 'pending',
+  adopted: 'adopted',
+  dismissed: 'dismissed',
+} as const;
+
+export type ListPricingRecommendationsResponseDtoRecommendationsItem = {
+  id: string;
+  organizationId: string;
+  venueId: string;
+  sourceItemRef: string;
+  sourceItemLabel: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  currentPriceCents: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  recommendedPriceCents: number;
+  rationale: string;
+  status: ListPricingRecommendationsResponseDtoRecommendationsItemStatus;
+  createdAt: string;
+  adoptedAt: string | null;
+  adoptedPriceCents: number | null;
+  dismissedAt: string | null;
+  dismissedReason: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  upliftWindowDays: number;
+  measuredUpliftCents: number | null;
+  measuredAt: string | null;
+};
+
+export interface ListPricingRecommendationsResponseDto {
+  recommendations: ListPricingRecommendationsResponseDtoRecommendationsItem[];
+}
+
+export interface CreatePricingRecommendationBodyDto {
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  venueId: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  sourceItemRef: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  sourceItemLabel: string;
+  /**
+     * @minimum 0
+     * @maximum 10000000
+     */
+  currentPriceCents: number;
+  /**
+     * @minimum 0
+     * @maximum 10000000
+     */
+  recommendedPriceCents: number;
+  /**
+     * @minLength 3
+     * @maxLength 2000
+     */
+  rationale: string;
+  /**
+     * @minimum 1
+     * @maximum 365
+     */
+  upliftWindowDays?: number;
+}
+
+export type SinglePricingRecommendationResponseDtoRecommendationStatus = typeof SinglePricingRecommendationResponseDtoRecommendationStatus[keyof typeof SinglePricingRecommendationResponseDtoRecommendationStatus];
+
+
+export const SinglePricingRecommendationResponseDtoRecommendationStatus = {
+  pending: 'pending',
+  adopted: 'adopted',
+  dismissed: 'dismissed',
+} as const;
+
+export type SinglePricingRecommendationResponseDtoRecommendation = {
+  id: string;
+  organizationId: string;
+  venueId: string;
+  sourceItemRef: string;
+  sourceItemLabel: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  currentPriceCents: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  recommendedPriceCents: number;
+  rationale: string;
+  status: SinglePricingRecommendationResponseDtoRecommendationStatus;
+  createdAt: string;
+  adoptedAt: string | null;
+  adoptedPriceCents: number | null;
+  dismissedAt: string | null;
+  dismissedReason: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  upliftWindowDays: number;
+  measuredUpliftCents: number | null;
+  measuredAt: string | null;
+};
+
+export interface SinglePricingRecommendationResponseDto {
+  recommendation: SinglePricingRecommendationResponseDtoRecommendation;
+}
+
+export interface AdoptPricingRecommendationBodyDto {
+  /**
+     * @minimum 0
+     * @maximum 10000000
+     */
+  adoptedPriceCents?: number;
+}
+
+export interface DismissPricingRecommendationBodyDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason?: string;
 }
 
 export interface SuggestionsOnOpenRequestDto {
@@ -2229,6 +2573,332 @@ export interface ListSquareLocationsResponseDto {
   error: string | null;
 }
 
+export type WauResponseDtoWeeksItem = {
+  weekStart: string;
+  weekEnd: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  activeUsers: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  messageCount: number;
+};
+
+export interface WauResponseDto {
+  venueId: string;
+  weeks: WauResponseDtoWeeksItem[];
+}
+
+export type HoursRecoveredResponseDtoRange = {
+  from: string;
+  to: string;
+};
+
+export type HoursRecoveredResponseDtoScope = {
+  organizationId: string;
+  venueId: string | null;
+};
+
+export type HoursRecoveredResponseDtoBaseline = {
+  /** @minimum 0 */
+  minutesPerQuery: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  hourlyRateCents: number;
+};
+
+export interface HoursRecoveredResponseDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  queriesCount: number;
+  /** @minimum 0 */
+  minutesSaved: number;
+  /** @minimum 0 */
+  hoursSaved: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  valueGbpCents: number;
+  range: HoursRecoveredResponseDtoRange;
+  scope: HoursRecoveredResponseDtoScope;
+  baseline: HoursRecoveredResponseDtoBaseline;
+}
+
+export type SearchOutcomesResponseDtoBucketsItem = {
+  date: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  hit: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  noData: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  error: number;
+};
+
+export type SearchOutcomesResponseDtoTotals = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  hit: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  noData: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  error: number;
+};
+
+export interface SearchOutcomesResponseDto {
+  buckets: SearchOutcomesResponseDtoBucketsItem[];
+  totals: SearchOutcomesResponseDtoTotals;
+}
+
+export type NoDataQueriesResponseDtoItemsItem = {
+  query: string;
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  count: number;
+  lastSeen: string;
+};
+
+export interface NoDataQueriesResponseDto {
+  items: NoDataQueriesResponseDtoItemsItem[];
+}
+
+export type EscalationsResponseDtoBucketsItem = {
+  date: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resolved: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  escalated: number;
+};
+
+export type EscalationsResponseDtoTotals = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  resolved: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  escalated: number;
+  resolutionRate: number;
+};
+
+export interface EscalationsResponseDto {
+  buckets: EscalationsResponseDtoBucketsItem[];
+  totals: EscalationsResponseDtoTotals;
+}
+
+export type CostsResponseDtoBucketsItem = {
+  date: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  usdCents: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  messages: number;
+};
+
+export type CostsResponseDtoTotals = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  usdCents: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  messages: number;
+  costPerMessageCents: number;
+};
+
+export interface CostsResponseDto {
+  buckets: CostsResponseDtoBucketsItem[];
+  totals: CostsResponseDtoTotals;
+}
+
+export type MetricsFeedbackResponseDtoBucketsItem = {
+  date: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  up: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  down: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  regenerate: number;
+};
+
+export type MetricsFeedbackResponseDtoTotals = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  up: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  down: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  regenerate: number;
+  positiveRate: number;
+};
+
+export interface MetricsFeedbackResponseDto {
+  buckets: MetricsFeedbackResponseDtoBucketsItem[];
+  totals: MetricsFeedbackResponseDtoTotals;
+}
+
+export interface PricingFunnelResponseDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  pending: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  adopted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  dismissed: number;
+  adoptionRate: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  measuredUpliftGbpCents: number;
+}
+
+export type OnboardingCohortResponseDtoMembersItem = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+  role: string;
+  startedAt: string | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  daysSinceStart: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalQueries: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  repeatQueries: number;
+  repeatRate: number;
+  firstIndependentAt: string | null;
+};
+
+export interface OnboardingCohortResponseDto {
+  members: OnboardingCohortResponseDtoMembersItem[];
+}
+
+export type TopQuestionsResponseDtoItemsItem = {
+  query: string;
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  count: number;
+  lastSeen: string;
+};
+
+export interface TopQuestionsResponseDto {
+  items: TopQuestionsResponseDtoItemsItem[];
+}
+
+export type RecentEscalationsResponseDtoItemsItem = {
+  messageId: string;
+  conversationId: string;
+  escalatedAt: string;
+  escalationKind: string | null;
+  venueId: string;
+  venueName: string;
+  staffUserId: string | null;
+  staffName: string | null;
+  escalatedToUserId: string | null;
+  escalatedToName: string | null;
+};
+
+export interface RecentEscalationsResponseDto {
+  items: RecentEscalationsResponseDtoItemsItem[];
+}
+
+export type ActiveStaffResponseDtoItemsItem = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+  role: string | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  count: number;
+  lastSeen: string;
+};
+
+export interface ActiveStaffResponseDto {
+  items: ActiveStaffResponseDtoItemsItem[];
+}
+
 export type ComplianceControllerListParams = {
 status?: ComplianceControllerListStatus;
 /**
@@ -2371,6 +3041,21 @@ export type ChatControllerListConversationsParams = {
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
 venueId?: string;
+/**
+ * @minLength 1
+ * @maxLength 200
+ */
+cursor?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minLength 2
+ * @maxLength 100
+ */
+q?: string;
 };
 
 export type ChatControllerGetConversationParams = {
@@ -2393,6 +3078,38 @@ export type ChatControllerUpdateVisibilityParams = {
  */
 venueId: string;
 };
+
+export type IncidentsControllerListParams = {
+status?: IncidentsControllerListStatus;
+severity?: IncidentsControllerListSeverity;
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};
+
+export type IncidentsControllerListStatus = typeof IncidentsControllerListStatus[keyof typeof IncidentsControllerListStatus];
+
+
+export const IncidentsControllerListStatus = {
+  open: 'open',
+  acknowledged: 'acknowledged',
+  closed: 'closed',
+} as const;
+
+export type IncidentsControllerListSeverity = typeof IncidentsControllerListSeverity[keyof typeof IncidentsControllerListSeverity];
+
+
+export const IncidentsControllerListSeverity = {
+  minor: 'minor',
+  major: 'major',
+  critical: 'critical',
+} as const;
 
 export type ReportsControllerListParams = {
 /**
@@ -2424,6 +3141,28 @@ limit?: number;
  */
 offset?: number;
 };
+
+export type PricingRecommendationsControllerListParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId: string;
+status?: PricingRecommendationsControllerListStatus;
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+};
+
+export type PricingRecommendationsControllerListStatus = typeof PricingRecommendationsControllerListStatus[keyof typeof PricingRecommendationsControllerListStatus];
+
+
+export const PricingRecommendationsControllerListStatus = {
+  pending: 'pending',
+  adopted: 'adopted',
+  dismissed: 'dismissed',
+} as const;
 
 export type DebugControllerGetConversationParams = {
 /**
@@ -2525,6 +3264,180 @@ export type ChatStartersControllerGetParams = {
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
  */
 venueId: string;
+};
+
+export type MetricsControllerGetWauParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId: string;
+/**
+ * @minimum 1
+ * @maximum 52
+ */
+weeks?: number;
+};
+
+export type MetricsControllerGetHoursRecoveredParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+};
+
+export type MetricsControllerGetSearchOutcomesParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+};
+
+export type MetricsControllerGetNoDataQueriesParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+
+export type MetricsControllerGetEscalationsParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+};
+
+export type MetricsControllerGetCostsParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+};
+
+export type MetricsControllerGetFeedbackParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+};
+
+export type MetricsControllerGetPricingFunnelParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+};
+
+export type MetricsControllerGetTopQuestionsParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+
+export type MetricsControllerGetRecentEscalationsParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+
+export type MetricsControllerGetActiveStaffParams = {
+/**
+ * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+from?: string;
+/**
+ * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+ */
+to?: string;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -5063,7 +5976,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type chatControllerListConversationsResponse200 = {
-  data: ListConversationItemDto[]
+  data: ListConversationsPageDto
   status: 200
 }
 
@@ -5467,6 +6380,642 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChatControllerUpdateVisibilityMutationOptions(options), queryClient);
+    }
+
+export type incidentsControllerListResponse200 = {
+  data: ListIncidentsResponseDto
+  status: 200
+}
+
+export type incidentsControllerListResponseSuccess = (incidentsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerListResponse = (incidentsControllerListResponseSuccess)
+
+export const getIncidentsControllerListUrl = (params?: IncidentsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/incidents?${stringifiedParams}` : `/incidents`
+}
+
+export const incidentsControllerList = async (params?: IncidentsControllerListParams, options?: RequestInit): Promise<incidentsControllerListResponse> => {
+
+  return orvalMutator<incidentsControllerListResponse>(getIncidentsControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getIncidentsControllerListQueryKey = (params?: IncidentsControllerListParams,) => {
+    return [
+    `/incidents`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getIncidentsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof incidentsControllerList>>, TError = unknown>(params?: IncidentsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getIncidentsControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof incidentsControllerList>>> = ({ signal }) => incidentsControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type IncidentsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerList>>>
+export type IncidentsControllerListQueryError = unknown
+
+
+export function useIncidentsControllerList<TData = Awaited<ReturnType<typeof incidentsControllerList>>, TError = unknown>(
+ params: undefined |  IncidentsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerList<TData = Awaited<ReturnType<typeof incidentsControllerList>>, TError = unknown>(
+ params?: IncidentsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerList<TData = Awaited<ReturnType<typeof incidentsControllerList>>, TError = unknown>(
+ params?: IncidentsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useIncidentsControllerList<TData = Awaited<ReturnType<typeof incidentsControllerList>>, TError = unknown>(
+ params?: IncidentsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getIncidentsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type incidentsControllerGetOneResponse200 = {
+  data: SingleIncidentResponseDto
+  status: 200
+}
+
+export type incidentsControllerGetOneResponseSuccess = (incidentsControllerGetOneResponse200) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerGetOneResponse = (incidentsControllerGetOneResponseSuccess)
+
+export const getIncidentsControllerGetOneUrl = (id: string,) => {
+
+
+
+
+  return `/incidents/${id}`
+}
+
+export const incidentsControllerGetOne = async (id: string, options?: RequestInit): Promise<incidentsControllerGetOneResponse> => {
+
+  return orvalMutator<incidentsControllerGetOneResponse>(getIncidentsControllerGetOneUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getIncidentsControllerGetOneQueryKey = (id: string,) => {
+    return [
+    `/incidents/${id}`
+    ] as const;
+    }
+
+
+export const getIncidentsControllerGetOneQueryOptions = <TData = Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getIncidentsControllerGetOneQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof incidentsControllerGetOne>>> = ({ signal }) => incidentsControllerGetOne(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type IncidentsControllerGetOneQueryResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerGetOne>>>
+export type IncidentsControllerGetOneQueryError = unknown
+
+
+export function useIncidentsControllerGetOne<TData = Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerGetOne<TData = Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerGetOne<TData = Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useIncidentsControllerGetOne<TData = Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getIncidentsControllerGetOneQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type incidentsControllerDeleteOneResponse204 = {
+  data: void
+  status: 204
+}
+
+export type incidentsControllerDeleteOneResponseSuccess = (incidentsControllerDeleteOneResponse204) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerDeleteOneResponse = (incidentsControllerDeleteOneResponseSuccess)
+
+export const getIncidentsControllerDeleteOneUrl = (id: string,) => {
+
+
+
+
+  return `/incidents/${id}`
+}
+
+export const incidentsControllerDeleteOne = async (id: string, options?: RequestInit): Promise<incidentsControllerDeleteOneResponse> => {
+
+  return orvalMutator<incidentsControllerDeleteOneResponse>(getIncidentsControllerDeleteOneUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getIncidentsControllerDeleteOneMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteOne>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteOne>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['incidentsControllerDeleteOne'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof incidentsControllerDeleteOne>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  incidentsControllerDeleteOne(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IncidentsControllerDeleteOneMutationResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerDeleteOne>>>
+
+    export type IncidentsControllerDeleteOneMutationError = unknown
+
+    export const useIncidentsControllerDeleteOne = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteOne>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof incidentsControllerDeleteOne>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getIncidentsControllerDeleteOneMutationOptions(options), queryClient);
+    }
+
+export type incidentsControllerUpdateStatusResponse200 = {
+  data: SingleIncidentResponseDto
+  status: 200
+}
+
+export type incidentsControllerUpdateStatusResponseSuccess = (incidentsControllerUpdateStatusResponse200) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerUpdateStatusResponse = (incidentsControllerUpdateStatusResponseSuccess)
+
+export const getIncidentsControllerUpdateStatusUrl = (id: string,) => {
+
+
+
+
+  return `/incidents/${id}/status`
+}
+
+export const incidentsControllerUpdateStatus = async (id: string,
+    updateIncidentStatusBodyDto: UpdateIncidentStatusBodyDto, options?: RequestInit): Promise<incidentsControllerUpdateStatusResponse> => {
+
+  return orvalMutator<incidentsControllerUpdateStatusResponse>(getIncidentsControllerUpdateStatusUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateIncidentStatusBodyDto)
+  }
+);}
+
+
+
+
+export const getIncidentsControllerUpdateStatusMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>, TError,{id: string;data: UpdateIncidentStatusBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>, TError,{id: string;data: UpdateIncidentStatusBodyDto}, TContext> => {
+
+const mutationKey = ['incidentsControllerUpdateStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>, {id: string;data: UpdateIncidentStatusBodyDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  incidentsControllerUpdateStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IncidentsControllerUpdateStatusMutationResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>>
+    export type IncidentsControllerUpdateStatusMutationBody = UpdateIncidentStatusBodyDto
+    export type IncidentsControllerUpdateStatusMutationError = unknown
+
+    export const useIncidentsControllerUpdateStatus = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>, TError,{id: string;data: UpdateIncidentStatusBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof incidentsControllerUpdateStatus>>,
+        TError,
+        {id: string;data: UpdateIncidentStatusBodyDto},
+        TContext
+      > => {
+      return useMutation(getIncidentsControllerUpdateStatusMutationOptions(options), queryClient);
+    }
+
+export type incidentsControllerListCommentsResponse200 = {
+  data: ListIncidentCommentsResponseDto
+  status: 200
+}
+
+export type incidentsControllerListCommentsResponseSuccess = (incidentsControllerListCommentsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerListCommentsResponse = (incidentsControllerListCommentsResponseSuccess)
+
+export const getIncidentsControllerListCommentsUrl = (id: string,) => {
+
+
+
+
+  return `/incidents/${id}/comments`
+}
+
+export const incidentsControllerListComments = async (id: string, options?: RequestInit): Promise<incidentsControllerListCommentsResponse> => {
+
+  return orvalMutator<incidentsControllerListCommentsResponse>(getIncidentsControllerListCommentsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getIncidentsControllerListCommentsQueryKey = (id: string,) => {
+    return [
+    `/incidents/${id}/comments`
+    ] as const;
+    }
+
+
+export const getIncidentsControllerListCommentsQueryOptions = <TData = Awaited<ReturnType<typeof incidentsControllerListComments>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getIncidentsControllerListCommentsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof incidentsControllerListComments>>> = ({ signal }) => incidentsControllerListComments(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type IncidentsControllerListCommentsQueryResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerListComments>>>
+export type IncidentsControllerListCommentsQueryError = unknown
+
+
+export function useIncidentsControllerListComments<TData = Awaited<ReturnType<typeof incidentsControllerListComments>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerListComments>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerListComments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerListComments<TData = Awaited<ReturnType<typeof incidentsControllerListComments>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof incidentsControllerListComments>>,
+          TError,
+          Awaited<ReturnType<typeof incidentsControllerListComments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useIncidentsControllerListComments<TData = Awaited<ReturnType<typeof incidentsControllerListComments>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useIncidentsControllerListComments<TData = Awaited<ReturnType<typeof incidentsControllerListComments>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof incidentsControllerListComments>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getIncidentsControllerListCommentsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type incidentsControllerAddCommentResponse201 = {
+  data: SingleIncidentCommentResponseDto
+  status: 201
+}
+
+export type incidentsControllerAddCommentResponseSuccess = (incidentsControllerAddCommentResponse201) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerAddCommentResponse = (incidentsControllerAddCommentResponseSuccess)
+
+export const getIncidentsControllerAddCommentUrl = (id: string,) => {
+
+
+
+
+  return `/incidents/${id}/comments`
+}
+
+export const incidentsControllerAddComment = async (id: string,
+    composeIncidentCommentBodyDto: ComposeIncidentCommentBodyDto, options?: RequestInit): Promise<incidentsControllerAddCommentResponse> => {
+
+  return orvalMutator<incidentsControllerAddCommentResponse>(getIncidentsControllerAddCommentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(composeIncidentCommentBodyDto)
+  }
+);}
+
+
+
+
+export const getIncidentsControllerAddCommentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerAddComment>>, TError,{id: string;data: ComposeIncidentCommentBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerAddComment>>, TError,{id: string;data: ComposeIncidentCommentBodyDto}, TContext> => {
+
+const mutationKey = ['incidentsControllerAddComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof incidentsControllerAddComment>>, {id: string;data: ComposeIncidentCommentBodyDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  incidentsControllerAddComment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IncidentsControllerAddCommentMutationResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerAddComment>>>
+    export type IncidentsControllerAddCommentMutationBody = ComposeIncidentCommentBodyDto
+    export type IncidentsControllerAddCommentMutationError = unknown
+
+    export const useIncidentsControllerAddComment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerAddComment>>, TError,{id: string;data: ComposeIncidentCommentBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof incidentsControllerAddComment>>,
+        TError,
+        {id: string;data: ComposeIncidentCommentBodyDto},
+        TContext
+      > => {
+      return useMutation(getIncidentsControllerAddCommentMutationOptions(options), queryClient);
+    }
+
+export type incidentsControllerDeleteCommentResponse204 = {
+  data: void
+  status: 204
+}
+
+export type incidentsControllerDeleteCommentResponseSuccess = (incidentsControllerDeleteCommentResponse204) & {
+  headers: Headers;
+};
+;
+
+export type incidentsControllerDeleteCommentResponse = (incidentsControllerDeleteCommentResponseSuccess)
+
+export const getIncidentsControllerDeleteCommentUrl = (id: string,
+    commentId: string,) => {
+
+
+
+
+  return `/incidents/${id}/comments/${commentId}`
+}
+
+export const incidentsControllerDeleteComment = async (id: string,
+    commentId: string, options?: RequestInit): Promise<incidentsControllerDeleteCommentResponse> => {
+
+  return orvalMutator<incidentsControllerDeleteCommentResponse>(getIncidentsControllerDeleteCommentUrl(id,commentId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getIncidentsControllerDeleteCommentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteComment>>, TError,{id: string;commentId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteComment>>, TError,{id: string;commentId: string}, TContext> => {
+
+const mutationKey = ['incidentsControllerDeleteComment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof incidentsControllerDeleteComment>>, {id: string;commentId: string}> = (props) => {
+          const {id,commentId} = props ?? {};
+
+          return  incidentsControllerDeleteComment(id,commentId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IncidentsControllerDeleteCommentMutationResult = NonNullable<Awaited<ReturnType<typeof incidentsControllerDeleteComment>>>
+
+    export type IncidentsControllerDeleteCommentMutationError = unknown
+
+    export const useIncidentsControllerDeleteComment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof incidentsControllerDeleteComment>>, TError,{id: string;commentId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof incidentsControllerDeleteComment>>,
+        TError,
+        {id: string;commentId: string},
+        TContext
+      > => {
+      return useMutation(getIncidentsControllerDeleteCommentMutationOptions(options), queryClient);
     }
 
 export type reportsControllerListResponse200 = {
@@ -6701,6 +8250,350 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getIntegrationsControllerDisconnectMutationOptions(options), queryClient);
+    }
+
+export type pricingRecommendationsControllerListResponse200 = {
+  data: ListPricingRecommendationsResponseDto
+  status: 200
+}
+
+export type pricingRecommendationsControllerListResponseSuccess = (pricingRecommendationsControllerListResponse200) & {
+  headers: Headers;
+};
+;
+
+export type pricingRecommendationsControllerListResponse = (pricingRecommendationsControllerListResponseSuccess)
+
+export const getPricingRecommendationsControllerListUrl = (params: PricingRecommendationsControllerListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/pricing-recommendations?${stringifiedParams}` : `/pricing-recommendations`
+}
+
+export const pricingRecommendationsControllerList = async (params: PricingRecommendationsControllerListParams, options?: RequestInit): Promise<pricingRecommendationsControllerListResponse> => {
+
+  return orvalMutator<pricingRecommendationsControllerListResponse>(getPricingRecommendationsControllerListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPricingRecommendationsControllerListQueryKey = (params?: PricingRecommendationsControllerListParams,) => {
+    return [
+    `/pricing-recommendations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getPricingRecommendationsControllerListQueryOptions = <TData = Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError = unknown>(params: PricingRecommendationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPricingRecommendationsControllerListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>> = ({ signal }) => pricingRecommendationsControllerList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PricingRecommendationsControllerListQueryResult = NonNullable<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>>
+export type PricingRecommendationsControllerListQueryError = unknown
+
+
+export function usePricingRecommendationsControllerList<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError = unknown>(
+ params: PricingRecommendationsControllerListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof pricingRecommendationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof pricingRecommendationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePricingRecommendationsControllerList<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError = unknown>(
+ params: PricingRecommendationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof pricingRecommendationsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof pricingRecommendationsControllerList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePricingRecommendationsControllerList<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError = unknown>(
+ params: PricingRecommendationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePricingRecommendationsControllerList<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError = unknown>(
+ params: PricingRecommendationsControllerListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerList>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPricingRecommendationsControllerListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type pricingRecommendationsControllerCreateResponse201 = {
+  data: SinglePricingRecommendationResponseDto
+  status: 201
+}
+
+export type pricingRecommendationsControllerCreateResponseSuccess = (pricingRecommendationsControllerCreateResponse201) & {
+  headers: Headers;
+};
+;
+
+export type pricingRecommendationsControllerCreateResponse = (pricingRecommendationsControllerCreateResponseSuccess)
+
+export const getPricingRecommendationsControllerCreateUrl = () => {
+
+
+
+
+  return `/pricing-recommendations`
+}
+
+export const pricingRecommendationsControllerCreate = async (createPricingRecommendationBodyDto: CreatePricingRecommendationBodyDto, options?: RequestInit): Promise<pricingRecommendationsControllerCreateResponse> => {
+
+  return orvalMutator<pricingRecommendationsControllerCreateResponse>(getPricingRecommendationsControllerCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createPricingRecommendationBodyDto)
+  }
+);}
+
+
+
+
+export const getPricingRecommendationsControllerCreateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>, TError,{data: CreatePricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>, TError,{data: CreatePricingRecommendationBodyDto}, TContext> => {
+
+const mutationKey = ['pricingRecommendationsControllerCreate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>, {data: CreatePricingRecommendationBodyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  pricingRecommendationsControllerCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PricingRecommendationsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>>
+    export type PricingRecommendationsControllerCreateMutationBody = CreatePricingRecommendationBodyDto
+    export type PricingRecommendationsControllerCreateMutationError = unknown
+
+    export const usePricingRecommendationsControllerCreate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>, TError,{data: CreatePricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pricingRecommendationsControllerCreate>>,
+        TError,
+        {data: CreatePricingRecommendationBodyDto},
+        TContext
+      > => {
+      return useMutation(getPricingRecommendationsControllerCreateMutationOptions(options), queryClient);
+    }
+
+export type pricingRecommendationsControllerAdoptResponse200 = {
+  data: SinglePricingRecommendationResponseDto
+  status: 200
+}
+
+export type pricingRecommendationsControllerAdoptResponseSuccess = (pricingRecommendationsControllerAdoptResponse200) & {
+  headers: Headers;
+};
+;
+
+export type pricingRecommendationsControllerAdoptResponse = (pricingRecommendationsControllerAdoptResponseSuccess)
+
+export const getPricingRecommendationsControllerAdoptUrl = (id: string,) => {
+
+
+
+
+  return `/pricing-recommendations/${id}/adopt`
+}
+
+export const pricingRecommendationsControllerAdopt = async (id: string,
+    adoptPricingRecommendationBodyDto: AdoptPricingRecommendationBodyDto, options?: RequestInit): Promise<pricingRecommendationsControllerAdoptResponse> => {
+
+  return orvalMutator<pricingRecommendationsControllerAdoptResponse>(getPricingRecommendationsControllerAdoptUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adoptPricingRecommendationBodyDto)
+  }
+);}
+
+
+
+
+export const getPricingRecommendationsControllerAdoptMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>, TError,{id: string;data: AdoptPricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>, TError,{id: string;data: AdoptPricingRecommendationBodyDto}, TContext> => {
+
+const mutationKey = ['pricingRecommendationsControllerAdopt'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>, {id: string;data: AdoptPricingRecommendationBodyDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  pricingRecommendationsControllerAdopt(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PricingRecommendationsControllerAdoptMutationResult = NonNullable<Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>>
+    export type PricingRecommendationsControllerAdoptMutationBody = AdoptPricingRecommendationBodyDto
+    export type PricingRecommendationsControllerAdoptMutationError = unknown
+
+    export const usePricingRecommendationsControllerAdopt = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>, TError,{id: string;data: AdoptPricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pricingRecommendationsControllerAdopt>>,
+        TError,
+        {id: string;data: AdoptPricingRecommendationBodyDto},
+        TContext
+      > => {
+      return useMutation(getPricingRecommendationsControllerAdoptMutationOptions(options), queryClient);
+    }
+
+export type pricingRecommendationsControllerDismissResponse200 = {
+  data: SinglePricingRecommendationResponseDto
+  status: 200
+}
+
+export type pricingRecommendationsControllerDismissResponseSuccess = (pricingRecommendationsControllerDismissResponse200) & {
+  headers: Headers;
+};
+;
+
+export type pricingRecommendationsControllerDismissResponse = (pricingRecommendationsControllerDismissResponseSuccess)
+
+export const getPricingRecommendationsControllerDismissUrl = (id: string,) => {
+
+
+
+
+  return `/pricing-recommendations/${id}/dismiss`
+}
+
+export const pricingRecommendationsControllerDismiss = async (id: string,
+    dismissPricingRecommendationBodyDto: DismissPricingRecommendationBodyDto, options?: RequestInit): Promise<pricingRecommendationsControllerDismissResponse> => {
+
+  return orvalMutator<pricingRecommendationsControllerDismissResponse>(getPricingRecommendationsControllerDismissUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(dismissPricingRecommendationBodyDto)
+  }
+);}
+
+
+
+
+export const getPricingRecommendationsControllerDismissMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>, TError,{id: string;data: DismissPricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>, TError,{id: string;data: DismissPricingRecommendationBodyDto}, TContext> => {
+
+const mutationKey = ['pricingRecommendationsControllerDismiss'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>, {id: string;data: DismissPricingRecommendationBodyDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  pricingRecommendationsControllerDismiss(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PricingRecommendationsControllerDismissMutationResult = NonNullable<Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>>
+    export type PricingRecommendationsControllerDismissMutationBody = DismissPricingRecommendationBodyDto
+    export type PricingRecommendationsControllerDismissMutationError = unknown
+
+    export const usePricingRecommendationsControllerDismiss = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>, TError,{id: string;data: DismissPricingRecommendationBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pricingRecommendationsControllerDismiss>>,
+        TError,
+        {id: string;data: DismissPricingRecommendationBodyDto},
+        TContext
+      > => {
+      return useMutation(getPricingRecommendationsControllerDismissMutationOptions(options), queryClient);
     }
 
 export type suggestionsControllerOnOpenResponse200 = {
@@ -11005,6 +12898,1581 @@ export function useSquareControllerListLocations<TData = Awaited<ReturnType<type
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getSquareControllerListLocationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetWauResponse200 = {
+  data: WauResponseDto
+  status: 200
+}
+
+export type metricsControllerGetWauResponseSuccess = (metricsControllerGetWauResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetWauResponse = (metricsControllerGetWauResponseSuccess)
+
+export const getMetricsControllerGetWauUrl = (params: MetricsControllerGetWauParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/wau?${stringifiedParams}` : `/metrics/wau`
+}
+
+export const metricsControllerGetWau = async (params: MetricsControllerGetWauParams, options?: RequestInit): Promise<metricsControllerGetWauResponse> => {
+
+  return orvalMutator<metricsControllerGetWauResponse>(getMetricsControllerGetWauUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetWauQueryKey = (params?: MetricsControllerGetWauParams,) => {
+    return [
+    `/metrics/wau`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetWauQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetWau>>, TError = unknown>(params: MetricsControllerGetWauParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetWauQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetWau>>> = ({ signal }) => metricsControllerGetWau(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetWauQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetWau>>>
+export type MetricsControllerGetWauQueryError = unknown
+
+
+export function useMetricsControllerGetWau<TData = Awaited<ReturnType<typeof metricsControllerGetWau>>, TError = unknown>(
+ params: MetricsControllerGetWauParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetWau>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetWau>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetWau<TData = Awaited<ReturnType<typeof metricsControllerGetWau>>, TError = unknown>(
+ params: MetricsControllerGetWauParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetWau>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetWau>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetWau<TData = Awaited<ReturnType<typeof metricsControllerGetWau>>, TError = unknown>(
+ params: MetricsControllerGetWauParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetWau<TData = Awaited<ReturnType<typeof metricsControllerGetWau>>, TError = unknown>(
+ params: MetricsControllerGetWauParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetWau>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetWauQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetHoursRecoveredResponse200 = {
+  data: HoursRecoveredResponseDto
+  status: 200
+}
+
+export type metricsControllerGetHoursRecoveredResponseSuccess = (metricsControllerGetHoursRecoveredResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetHoursRecoveredResponse = (metricsControllerGetHoursRecoveredResponseSuccess)
+
+export const getMetricsControllerGetHoursRecoveredUrl = (params?: MetricsControllerGetHoursRecoveredParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/hours-recovered?${stringifiedParams}` : `/metrics/hours-recovered`
+}
+
+export const metricsControllerGetHoursRecovered = async (params?: MetricsControllerGetHoursRecoveredParams, options?: RequestInit): Promise<metricsControllerGetHoursRecoveredResponse> => {
+
+  return orvalMutator<metricsControllerGetHoursRecoveredResponse>(getMetricsControllerGetHoursRecoveredUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetHoursRecoveredQueryKey = (params?: MetricsControllerGetHoursRecoveredParams,) => {
+    return [
+    `/metrics/hours-recovered`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetHoursRecoveredQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError = unknown>(params?: MetricsControllerGetHoursRecoveredParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetHoursRecoveredQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>> = ({ signal }) => metricsControllerGetHoursRecovered(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetHoursRecoveredQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>>
+export type MetricsControllerGetHoursRecoveredQueryError = unknown
+
+
+export function useMetricsControllerGetHoursRecovered<TData = Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetHoursRecoveredParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetHoursRecovered<TData = Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError = unknown>(
+ params?: MetricsControllerGetHoursRecoveredParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetHoursRecovered<TData = Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError = unknown>(
+ params?: MetricsControllerGetHoursRecoveredParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetHoursRecovered<TData = Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError = unknown>(
+ params?: MetricsControllerGetHoursRecoveredParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetHoursRecovered>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetHoursRecoveredQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetSearchOutcomesResponse200 = {
+  data: SearchOutcomesResponseDto
+  status: 200
+}
+
+export type metricsControllerGetSearchOutcomesResponseSuccess = (metricsControllerGetSearchOutcomesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetSearchOutcomesResponse = (metricsControllerGetSearchOutcomesResponseSuccess)
+
+export const getMetricsControllerGetSearchOutcomesUrl = (params?: MetricsControllerGetSearchOutcomesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/search-outcomes?${stringifiedParams}` : `/metrics/search-outcomes`
+}
+
+export const metricsControllerGetSearchOutcomes = async (params?: MetricsControllerGetSearchOutcomesParams, options?: RequestInit): Promise<metricsControllerGetSearchOutcomesResponse> => {
+
+  return orvalMutator<metricsControllerGetSearchOutcomesResponse>(getMetricsControllerGetSearchOutcomesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetSearchOutcomesQueryKey = (params?: MetricsControllerGetSearchOutcomesParams,) => {
+    return [
+    `/metrics/search-outcomes`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetSearchOutcomesQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError = unknown>(params?: MetricsControllerGetSearchOutcomesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetSearchOutcomesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>> = ({ signal }) => metricsControllerGetSearchOutcomes(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetSearchOutcomesQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>>
+export type MetricsControllerGetSearchOutcomesQueryError = unknown
+
+
+export function useMetricsControllerGetSearchOutcomes<TData = Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetSearchOutcomesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetSearchOutcomes<TData = Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError = unknown>(
+ params?: MetricsControllerGetSearchOutcomesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetSearchOutcomes<TData = Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError = unknown>(
+ params?: MetricsControllerGetSearchOutcomesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetSearchOutcomes<TData = Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError = unknown>(
+ params?: MetricsControllerGetSearchOutcomesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetSearchOutcomes>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetSearchOutcomesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetNoDataQueriesResponse200 = {
+  data: NoDataQueriesResponseDto
+  status: 200
+}
+
+export type metricsControllerGetNoDataQueriesResponseSuccess = (metricsControllerGetNoDataQueriesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetNoDataQueriesResponse = (metricsControllerGetNoDataQueriesResponseSuccess)
+
+export const getMetricsControllerGetNoDataQueriesUrl = (params?: MetricsControllerGetNoDataQueriesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/no-data-queries?${stringifiedParams}` : `/metrics/no-data-queries`
+}
+
+export const metricsControllerGetNoDataQueries = async (params?: MetricsControllerGetNoDataQueriesParams, options?: RequestInit): Promise<metricsControllerGetNoDataQueriesResponse> => {
+
+  return orvalMutator<metricsControllerGetNoDataQueriesResponse>(getMetricsControllerGetNoDataQueriesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetNoDataQueriesQueryKey = (params?: MetricsControllerGetNoDataQueriesParams,) => {
+    return [
+    `/metrics/no-data-queries`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetNoDataQueriesQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError = unknown>(params?: MetricsControllerGetNoDataQueriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetNoDataQueriesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>> = ({ signal }) => metricsControllerGetNoDataQueries(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetNoDataQueriesQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>>
+export type MetricsControllerGetNoDataQueriesQueryError = unknown
+
+
+export function useMetricsControllerGetNoDataQueries<TData = Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetNoDataQueriesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetNoDataQueries<TData = Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError = unknown>(
+ params?: MetricsControllerGetNoDataQueriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetNoDataQueries<TData = Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError = unknown>(
+ params?: MetricsControllerGetNoDataQueriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetNoDataQueries<TData = Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError = unknown>(
+ params?: MetricsControllerGetNoDataQueriesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetNoDataQueries>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetNoDataQueriesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetEscalationsResponse200 = {
+  data: EscalationsResponseDto
+  status: 200
+}
+
+export type metricsControllerGetEscalationsResponseSuccess = (metricsControllerGetEscalationsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetEscalationsResponse = (metricsControllerGetEscalationsResponseSuccess)
+
+export const getMetricsControllerGetEscalationsUrl = (params?: MetricsControllerGetEscalationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/escalations?${stringifiedParams}` : `/metrics/escalations`
+}
+
+export const metricsControllerGetEscalations = async (params?: MetricsControllerGetEscalationsParams, options?: RequestInit): Promise<metricsControllerGetEscalationsResponse> => {
+
+  return orvalMutator<metricsControllerGetEscalationsResponse>(getMetricsControllerGetEscalationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetEscalationsQueryKey = (params?: MetricsControllerGetEscalationsParams,) => {
+    return [
+    `/metrics/escalations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetEscalationsQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError = unknown>(params?: MetricsControllerGetEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetEscalationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetEscalations>>> = ({ signal }) => metricsControllerGetEscalations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetEscalationsQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetEscalations>>>
+export type MetricsControllerGetEscalationsQueryError = unknown
+
+
+export function useMetricsControllerGetEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetEscalationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetEscalations>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetEscalations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetEscalations>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetEscalations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetEscalationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetCostsResponse200 = {
+  data: CostsResponseDto
+  status: 200
+}
+
+export type metricsControllerGetCostsResponseSuccess = (metricsControllerGetCostsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetCostsResponse = (metricsControllerGetCostsResponseSuccess)
+
+export const getMetricsControllerGetCostsUrl = (params?: MetricsControllerGetCostsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/costs?${stringifiedParams}` : `/metrics/costs`
+}
+
+export const metricsControllerGetCosts = async (params?: MetricsControllerGetCostsParams, options?: RequestInit): Promise<metricsControllerGetCostsResponse> => {
+
+  return orvalMutator<metricsControllerGetCostsResponse>(getMetricsControllerGetCostsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetCostsQueryKey = (params?: MetricsControllerGetCostsParams,) => {
+    return [
+    `/metrics/costs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetCostsQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError = unknown>(params?: MetricsControllerGetCostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetCostsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetCosts>>> = ({ signal }) => metricsControllerGetCosts(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetCostsQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetCosts>>>
+export type MetricsControllerGetCostsQueryError = unknown
+
+
+export function useMetricsControllerGetCosts<TData = Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetCostsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetCosts>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetCosts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetCosts<TData = Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError = unknown>(
+ params?: MetricsControllerGetCostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetCosts>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetCosts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetCosts<TData = Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError = unknown>(
+ params?: MetricsControllerGetCostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetCosts<TData = Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError = unknown>(
+ params?: MetricsControllerGetCostsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetCosts>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetCostsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetFeedbackResponse200 = {
+  data: MetricsFeedbackResponseDto
+  status: 200
+}
+
+export type metricsControllerGetFeedbackResponseSuccess = (metricsControllerGetFeedbackResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetFeedbackResponse = (metricsControllerGetFeedbackResponseSuccess)
+
+export const getMetricsControllerGetFeedbackUrl = (params?: MetricsControllerGetFeedbackParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/feedback?${stringifiedParams}` : `/metrics/feedback`
+}
+
+export const metricsControllerGetFeedback = async (params?: MetricsControllerGetFeedbackParams, options?: RequestInit): Promise<metricsControllerGetFeedbackResponse> => {
+
+  return orvalMutator<metricsControllerGetFeedbackResponse>(getMetricsControllerGetFeedbackUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetFeedbackQueryKey = (params?: MetricsControllerGetFeedbackParams,) => {
+    return [
+    `/metrics/feedback`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetFeedbackQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError = unknown>(params?: MetricsControllerGetFeedbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetFeedbackQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetFeedback>>> = ({ signal }) => metricsControllerGetFeedback(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetFeedbackQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetFeedback>>>
+export type MetricsControllerGetFeedbackQueryError = unknown
+
+
+export function useMetricsControllerGetFeedback<TData = Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetFeedbackParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetFeedback>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetFeedback<TData = Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError = unknown>(
+ params?: MetricsControllerGetFeedbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetFeedback>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetFeedback>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetFeedback<TData = Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError = unknown>(
+ params?: MetricsControllerGetFeedbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetFeedback<TData = Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError = unknown>(
+ params?: MetricsControllerGetFeedbackParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetFeedback>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetFeedbackQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetPricingFunnelResponse200 = {
+  data: PricingFunnelResponseDto
+  status: 200
+}
+
+export type metricsControllerGetPricingFunnelResponseSuccess = (metricsControllerGetPricingFunnelResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetPricingFunnelResponse = (metricsControllerGetPricingFunnelResponseSuccess)
+
+export const getMetricsControllerGetPricingFunnelUrl = (params?: MetricsControllerGetPricingFunnelParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/pricing-funnel?${stringifiedParams}` : `/metrics/pricing-funnel`
+}
+
+export const metricsControllerGetPricingFunnel = async (params?: MetricsControllerGetPricingFunnelParams, options?: RequestInit): Promise<metricsControllerGetPricingFunnelResponse> => {
+
+  return orvalMutator<metricsControllerGetPricingFunnelResponse>(getMetricsControllerGetPricingFunnelUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetPricingFunnelQueryKey = (params?: MetricsControllerGetPricingFunnelParams,) => {
+    return [
+    `/metrics/pricing-funnel`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetPricingFunnelQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError = unknown>(params?: MetricsControllerGetPricingFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetPricingFunnelQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>> = ({ signal }) => metricsControllerGetPricingFunnel(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetPricingFunnelQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>>
+export type MetricsControllerGetPricingFunnelQueryError = unknown
+
+
+export function useMetricsControllerGetPricingFunnel<TData = Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetPricingFunnelParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetPricingFunnel<TData = Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError = unknown>(
+ params?: MetricsControllerGetPricingFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetPricingFunnel<TData = Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError = unknown>(
+ params?: MetricsControllerGetPricingFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetPricingFunnel<TData = Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError = unknown>(
+ params?: MetricsControllerGetPricingFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetPricingFunnel>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetPricingFunnelQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetOnboardingCohortResponse200 = {
+  data: OnboardingCohortResponseDto
+  status: 200
+}
+
+export type metricsControllerGetOnboardingCohortResponseSuccess = (metricsControllerGetOnboardingCohortResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetOnboardingCohortResponse = (metricsControllerGetOnboardingCohortResponseSuccess)
+
+export const getMetricsControllerGetOnboardingCohortUrl = () => {
+
+
+
+
+  return `/metrics/onboarding-cohort`
+}
+
+export const metricsControllerGetOnboardingCohort = async ( options?: RequestInit): Promise<metricsControllerGetOnboardingCohortResponse> => {
+
+  return orvalMutator<metricsControllerGetOnboardingCohortResponse>(getMetricsControllerGetOnboardingCohortUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetOnboardingCohortQueryKey = () => {
+    return [
+    `/metrics/onboarding-cohort`
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetOnboardingCohortQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetOnboardingCohortQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>> = ({ signal }) => metricsControllerGetOnboardingCohort({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetOnboardingCohortQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>>
+export type MetricsControllerGetOnboardingCohortQueryError = unknown
+
+
+export function useMetricsControllerGetOnboardingCohort<TData = Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetOnboardingCohort<TData = Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetOnboardingCohort<TData = Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetOnboardingCohort<TData = Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetOnboardingCohort>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetOnboardingCohortQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetTopQuestionsResponse200 = {
+  data: TopQuestionsResponseDto
+  status: 200
+}
+
+export type metricsControllerGetTopQuestionsResponseSuccess = (metricsControllerGetTopQuestionsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetTopQuestionsResponse = (metricsControllerGetTopQuestionsResponseSuccess)
+
+export const getMetricsControllerGetTopQuestionsUrl = (params?: MetricsControllerGetTopQuestionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/top-questions?${stringifiedParams}` : `/metrics/top-questions`
+}
+
+export const metricsControllerGetTopQuestions = async (params?: MetricsControllerGetTopQuestionsParams, options?: RequestInit): Promise<metricsControllerGetTopQuestionsResponse> => {
+
+  return orvalMutator<metricsControllerGetTopQuestionsResponse>(getMetricsControllerGetTopQuestionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetTopQuestionsQueryKey = (params?: MetricsControllerGetTopQuestionsParams,) => {
+    return [
+    `/metrics/top-questions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetTopQuestionsQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError = unknown>(params?: MetricsControllerGetTopQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetTopQuestionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>> = ({ signal }) => metricsControllerGetTopQuestions(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetTopQuestionsQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>>
+export type MetricsControllerGetTopQuestionsQueryError = unknown
+
+
+export function useMetricsControllerGetTopQuestions<TData = Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetTopQuestionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetTopQuestions<TData = Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError = unknown>(
+ params?: MetricsControllerGetTopQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetTopQuestions<TData = Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError = unknown>(
+ params?: MetricsControllerGetTopQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetTopQuestions<TData = Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError = unknown>(
+ params?: MetricsControllerGetTopQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetTopQuestions>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetTopQuestionsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetRecentEscalationsResponse200 = {
+  data: RecentEscalationsResponseDto
+  status: 200
+}
+
+export type metricsControllerGetRecentEscalationsResponseSuccess = (metricsControllerGetRecentEscalationsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetRecentEscalationsResponse = (metricsControllerGetRecentEscalationsResponseSuccess)
+
+export const getMetricsControllerGetRecentEscalationsUrl = (params?: MetricsControllerGetRecentEscalationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/recent-escalations?${stringifiedParams}` : `/metrics/recent-escalations`
+}
+
+export const metricsControllerGetRecentEscalations = async (params?: MetricsControllerGetRecentEscalationsParams, options?: RequestInit): Promise<metricsControllerGetRecentEscalationsResponse> => {
+
+  return orvalMutator<metricsControllerGetRecentEscalationsResponse>(getMetricsControllerGetRecentEscalationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetRecentEscalationsQueryKey = (params?: MetricsControllerGetRecentEscalationsParams,) => {
+    return [
+    `/metrics/recent-escalations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetRecentEscalationsQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError = unknown>(params?: MetricsControllerGetRecentEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetRecentEscalationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>> = ({ signal }) => metricsControllerGetRecentEscalations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetRecentEscalationsQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>>
+export type MetricsControllerGetRecentEscalationsQueryError = unknown
+
+
+export function useMetricsControllerGetRecentEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetRecentEscalationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetRecentEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetRecentEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetRecentEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetRecentEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetRecentEscalations<TData = Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError = unknown>(
+ params?: MetricsControllerGetRecentEscalationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetRecentEscalations>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetRecentEscalationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type metricsControllerGetActiveStaffResponse200 = {
+  data: ActiveStaffResponseDto
+  status: 200
+}
+
+export type metricsControllerGetActiveStaffResponseSuccess = (metricsControllerGetActiveStaffResponse200) & {
+  headers: Headers;
+};
+;
+
+export type metricsControllerGetActiveStaffResponse = (metricsControllerGetActiveStaffResponseSuccess)
+
+export const getMetricsControllerGetActiveStaffUrl = (params?: MetricsControllerGetActiveStaffParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/metrics/active-staff?${stringifiedParams}` : `/metrics/active-staff`
+}
+
+export const metricsControllerGetActiveStaff = async (params?: MetricsControllerGetActiveStaffParams, options?: RequestInit): Promise<metricsControllerGetActiveStaffResponse> => {
+
+  return orvalMutator<metricsControllerGetActiveStaffResponse>(getMetricsControllerGetActiveStaffUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMetricsControllerGetActiveStaffQueryKey = (params?: MetricsControllerGetActiveStaffParams,) => {
+    return [
+    `/metrics/active-staff`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMetricsControllerGetActiveStaffQueryOptions = <TData = Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError = unknown>(params?: MetricsControllerGetActiveStaffParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMetricsControllerGetActiveStaffQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>> = ({ signal }) => metricsControllerGetActiveStaff(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MetricsControllerGetActiveStaffQueryResult = NonNullable<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>>
+export type MetricsControllerGetActiveStaffQueryError = unknown
+
+
+export function useMetricsControllerGetActiveStaff<TData = Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError = unknown>(
+ params: undefined |  MetricsControllerGetActiveStaffParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetActiveStaff<TData = Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError = unknown>(
+ params?: MetricsControllerGetActiveStaffParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>,
+          TError,
+          Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMetricsControllerGetActiveStaff<TData = Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError = unknown>(
+ params?: MetricsControllerGetActiveStaffParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMetricsControllerGetActiveStaff<TData = Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError = unknown>(
+ params?: MetricsControllerGetActiveStaffParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof metricsControllerGetActiveStaff>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMetricsControllerGetActiveStaffQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type onboardingMetricsControllerGetMineResponse200 = {
+  data: void
+  status: 200
+}
+
+export type onboardingMetricsControllerGetMineResponseSuccess = (onboardingMetricsControllerGetMineResponse200) & {
+  headers: Headers;
+};
+;
+
+export type onboardingMetricsControllerGetMineResponse = (onboardingMetricsControllerGetMineResponseSuccess)
+
+export const getOnboardingMetricsControllerGetMineUrl = () => {
+
+
+
+
+  return `/metrics/onboarding/me`
+}
+
+export const onboardingMetricsControllerGetMine = async ( options?: RequestInit): Promise<onboardingMetricsControllerGetMineResponse> => {
+
+  return orvalMutator<onboardingMetricsControllerGetMineResponse>(getOnboardingMetricsControllerGetMineUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getOnboardingMetricsControllerGetMineQueryKey = () => {
+    return [
+    `/metrics/onboarding/me`
+    ] as const;
+    }
+
+
+export const getOnboardingMetricsControllerGetMineQueryOptions = <TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOnboardingMetricsControllerGetMineQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>> = ({ signal }) => onboardingMetricsControllerGetMine({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OnboardingMetricsControllerGetMineQueryResult = NonNullable<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>>
+export type OnboardingMetricsControllerGetMineQueryError = unknown
+
+
+export function useOnboardingMetricsControllerGetMine<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>,
+          TError,
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOnboardingMetricsControllerGetMine<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>,
+          TError,
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOnboardingMetricsControllerGetMine<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useOnboardingMetricsControllerGetMine<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetMine>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOnboardingMetricsControllerGetMineQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type onboardingMetricsControllerGetByUserIdResponse200 = {
+  data: void
+  status: 200
+}
+
+export type onboardingMetricsControllerGetByUserIdResponseSuccess = (onboardingMetricsControllerGetByUserIdResponse200) & {
+  headers: Headers;
+};
+;
+
+export type onboardingMetricsControllerGetByUserIdResponse = (onboardingMetricsControllerGetByUserIdResponseSuccess)
+
+export const getOnboardingMetricsControllerGetByUserIdUrl = (userId: string,) => {
+
+
+
+
+  return `/metrics/onboarding/${userId}`
+}
+
+export const onboardingMetricsControllerGetByUserId = async (userId: string, options?: RequestInit): Promise<onboardingMetricsControllerGetByUserIdResponse> => {
+
+  return orvalMutator<onboardingMetricsControllerGetByUserIdResponse>(getOnboardingMetricsControllerGetByUserIdUrl(userId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getOnboardingMetricsControllerGetByUserIdQueryKey = (userId: string,) => {
+    return [
+    `/metrics/onboarding/${userId}`
+    ] as const;
+    }
+
+
+export const getOnboardingMetricsControllerGetByUserIdQueryOptions = <TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError = unknown>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOnboardingMetricsControllerGetByUserIdQueryKey(userId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>> = ({ signal }) => onboardingMetricsControllerGetByUserId(userId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: userId !== null && userId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OnboardingMetricsControllerGetByUserIdQueryResult = NonNullable<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>>
+export type OnboardingMetricsControllerGetByUserIdQueryError = unknown
+
+
+export function useOnboardingMetricsControllerGetByUserId<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError = unknown>(
+ userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>,
+          TError,
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOnboardingMetricsControllerGetByUserId<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>,
+          TError,
+          Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOnboardingMetricsControllerGetByUserId<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useOnboardingMetricsControllerGetByUserId<TData = Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError = unknown>(
+ userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof onboardingMetricsControllerGetByUserId>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOnboardingMetricsControllerGetByUserIdQueryOptions(userId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

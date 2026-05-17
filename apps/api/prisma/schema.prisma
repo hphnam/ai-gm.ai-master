@@ -71,6 +71,7 @@ model User {
   notificationsReceived       Notification[]       @relation("NotificationRecipient")
   notificationsAuthored       Notification[]       @relation("NotificationAuthor")
   notificationRepliesAuthored NotificationReply[]  @relation("NotificationReplyAuthor")
+  incidentCommentsAuthored    IncidentComment[]    @relation("IncidentCommentAuthor")
   hiddenConversations         ConversationHidden[] @relation("ConversationHiddenByUser")
   conversationsHiddenAgainst  ConversationHidden[] @relation("ConversationHiddenOtherUser")
   hiddenMessages              HiddenMessage[]      @relation("HiddenMessageUser")
@@ -696,12 +697,39 @@ model IncidentLog {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  venue        Venue        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  venue        Venue             @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  comments     IncidentComment[]
 
   @@index([organizationId, createdAt(sort: Desc)])
   @@index([venueId, createdAt(sort: Desc)])
   @@map("incident_logs")
+}
+
+/// Flat thread on an IncidentLog so GMs can record context before closing —
+/// without comments a close is a silent state-flip with no audit trail.
+/// `kind='comment'` rows are GM-authored (authorUserId required at insert).
+/// `kind='status_change'` rows are system-attributed (authorUserId may be
+/// null when the actor cannot be resolved) and capture the from→to
+/// transition in `meta` for the timeline view. Cascade on incident delete
+/// keeps the thread consistent with the parent row.
+model IncidentComment {
+  id           String   @id @default(uuid())
+  incidentId   String
+  authorUserId String?
+  /// 'comment' | 'status_change'
+  kind         String   @default("comment")
+  body         String
+  /// Snapshot payload for status_change rows: { from, to }. Empty object
+  /// for plain comments.
+  meta         Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  incident IncidentLog @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  author   User?       @relation("IncidentCommentAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+
+  @@index([incidentId, createdAt])
+  @@map("incident_comments")
 }
 
 model VenueContact {

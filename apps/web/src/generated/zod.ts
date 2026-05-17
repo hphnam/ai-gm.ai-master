@@ -716,20 +716,32 @@ export const ChatControllerStreamMessageBody = zod.object({
 
 
 export const chatControllerListConversationsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const chatControllerListConversationsQueryCursorMax = 200;
+
+export const chatControllerListConversationsQueryLimitMax = 100;
+
+export const chatControllerListConversationsQueryQMin = 2;
+export const chatControllerListConversationsQueryQMax = 100;
+
 
 
 export const ChatControllerListConversationsQueryParams = zod.object({
-  "venueId": zod.string().regex(chatControllerListConversationsQueryVenueIdRegExp).optional()
+  "venueId": zod.string().regex(chatControllerListConversationsQueryVenueIdRegExp).optional(),
+  "cursor": zod.string().min(1).max(chatControllerListConversationsQueryCursorMax).optional(),
+  "limit": zod.number().min(1).max(chatControllerListConversationsQueryLimitMax).optional(),
+  "q": zod.string().min(chatControllerListConversationsQueryQMin).max(chatControllerListConversationsQueryQMax).optional()
 })
 
-export const ChatControllerListConversationsResponseItem = zod.object({
+export const ChatControllerListConversationsResponse = zod.object({
+  "items": zod.array(zod.object({
   "id": zod.string(),
   "venueId": zod.string(),
   "venueName": zod.string(),
   "lastMessageAt": zod.string(),
   "preview": zod.union([zod.string(),zod.null()])
+})),
+  "nextCursor": zod.union([zod.string(),zod.null()])
 })
-export const ChatControllerListConversationsResponse = zod.array(ChatControllerListConversationsResponseItem)
 
 
 export const chatControllerGetConversationPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
@@ -810,6 +822,195 @@ export const ChatControllerUpdateVisibilityBody = zod.object({
 export const ChatControllerUpdateVisibilityResponse = zod.object({
   "id": zod.string(),
   "visibility": zod.enum(['private', 'org'])
+})
+
+
+export const incidentsControllerListQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const incidentsControllerListQueryLimitDefault = 50;
+export const incidentsControllerListQueryLimitMax = 100;
+
+
+
+export const IncidentsControllerListQueryParams = zod.object({
+  "status": zod.enum(['open', 'acknowledged', 'closed']).optional(),
+  "severity": zod.enum(['minor', 'major', 'critical']).optional(),
+  "venueId": zod.string().regex(incidentsControllerListQueryVenueIdRegExp).optional(),
+  "limit": zod.number().min(1).max(incidentsControllerListQueryLimitMax).default(incidentsControllerListQueryLimitDefault)
+})
+
+export const incidentsControllerListResponseIncidentsItemCommentCountMin = 0;
+export const incidentsControllerListResponseIncidentsItemCommentCountMax = 9007199254740991;
+
+export const incidentsControllerListResponseOpenCountMin = 0;
+export const incidentsControllerListResponseOpenCountMax = 9007199254740991;
+
+export const incidentsControllerListResponseCriticalOpenCountMin = 0;
+export const incidentsControllerListResponseCriticalOpenCountMax = 9007199254740991;
+
+
+
+export const IncidentsControllerListResponse = zod.object({
+  "incidents": zod.array(zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "venueName": zod.string(),
+  "severity": zod.enum(['minor', 'major', 'critical']),
+  "status": zod.enum(['open', 'acknowledged', 'closed']),
+  "summary": zod.string(),
+  "loggedBy": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "details": zod.record(zod.string(), zod.unknown()),
+  "commentCount": zod.number().min(incidentsControllerListResponseIncidentsItemCommentCountMin).max(incidentsControllerListResponseIncidentsItemCommentCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "openCount": zod.number().min(incidentsControllerListResponseOpenCountMin).max(incidentsControllerListResponseOpenCountMax),
+  "criticalOpenCount": zod.number().min(incidentsControllerListResponseCriticalOpenCountMin).max(incidentsControllerListResponseCriticalOpenCountMax)
+})
+
+
+export const incidentsControllerGetOnePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerGetOneParams = zod.object({
+  "id": zod.string().regex(incidentsControllerGetOnePathIdRegExp)
+})
+
+export const incidentsControllerGetOneResponseIncidentCommentCountMin = 0;
+export const incidentsControllerGetOneResponseIncidentCommentCountMax = 9007199254740991;
+
+
+
+export const IncidentsControllerGetOneResponse = zod.object({
+  "incident": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "venueName": zod.string(),
+  "severity": zod.enum(['minor', 'major', 'critical']),
+  "status": zod.enum(['open', 'acknowledged', 'closed']),
+  "summary": zod.string(),
+  "loggedBy": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "details": zod.record(zod.string(), zod.unknown()),
+  "commentCount": zod.number().min(incidentsControllerGetOneResponseIncidentCommentCountMin).max(incidentsControllerGetOneResponseIncidentCommentCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const incidentsControllerDeleteOnePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerDeleteOneParams = zod.object({
+  "id": zod.string().regex(incidentsControllerDeleteOnePathIdRegExp)
+})
+
+
+export const incidentsControllerUpdateStatusPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerUpdateStatusParams = zod.object({
+  "id": zod.string().regex(incidentsControllerUpdateStatusPathIdRegExp)
+})
+
+export const incidentsControllerUpdateStatusBodyResolutionMax = 2000;
+
+
+
+export const IncidentsControllerUpdateStatusBody = zod.object({
+  "status": zod.enum(['open', 'acknowledged', 'closed']),
+  "resolution": zod.string().min(1).max(incidentsControllerUpdateStatusBodyResolutionMax).optional()
+})
+
+export const incidentsControllerUpdateStatusResponseIncidentCommentCountMin = 0;
+export const incidentsControllerUpdateStatusResponseIncidentCommentCountMax = 9007199254740991;
+
+
+
+export const IncidentsControllerUpdateStatusResponse = zod.object({
+  "incident": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "venueName": zod.string(),
+  "severity": zod.enum(['minor', 'major', 'critical']),
+  "status": zod.enum(['open', 'acknowledged', 'closed']),
+  "summary": zod.string(),
+  "loggedBy": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
+  "sourceMessageId": zod.union([zod.string(),zod.null()]),
+  "sourceConversationId": zod.union([zod.string(),zod.null()]),
+  "details": zod.record(zod.string(), zod.unknown()),
+  "commentCount": zod.number().min(incidentsControllerUpdateStatusResponseIncidentCommentCountMin).max(incidentsControllerUpdateStatusResponseIncidentCommentCountMax),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+export const incidentsControllerListCommentsPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerListCommentsParams = zod.object({
+  "id": zod.string().regex(incidentsControllerListCommentsPathIdRegExp)
+})
+
+export const IncidentsControllerListCommentsResponse = zod.object({
+  "comments": zod.array(zod.object({
+  "id": zod.string(),
+  "incidentId": zod.string(),
+  "kind": zod.enum(['comment', 'status_change']),
+  "body": zod.string(),
+  "meta": zod.record(zod.string(), zod.unknown()),
+  "author": zod.union([zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
+  "createdAt": zod.string()
+}))
+})
+
+
+export const incidentsControllerAddCommentPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerAddCommentParams = zod.object({
+  "id": zod.string().regex(incidentsControllerAddCommentPathIdRegExp)
+})
+
+export const incidentsControllerAddCommentBodyBodyMax = 2000;
+
+
+
+export const IncidentsControllerAddCommentBody = zod.object({
+  "body": zod.string().min(1).max(incidentsControllerAddCommentBodyBodyMax)
+})
+
+
+export const incidentsControllerDeleteCommentPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const incidentsControllerDeleteCommentPathCommentIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const IncidentsControllerDeleteCommentParams = zod.object({
+  "id": zod.string().regex(incidentsControllerDeleteCommentPathIdRegExp),
+  "commentId": zod.string().regex(incidentsControllerDeleteCommentPathCommentIdRegExp)
 })
 
 
@@ -1463,6 +1664,198 @@ export const integrationsControllerDisconnectPathProviderRegExp = new RegExp('^[
 
 export const IntegrationsControllerDisconnectParams = zod.object({
   "provider": zod.string().min(1).max(integrationsControllerDisconnectPathProviderMax).regex(integrationsControllerDisconnectPathProviderRegExp)
+})
+
+
+export const pricingRecommendationsControllerListQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const pricingRecommendationsControllerListQueryLimitDefault = 100;
+export const pricingRecommendationsControllerListQueryLimitMax = 200;
+
+
+
+export const PricingRecommendationsControllerListQueryParams = zod.object({
+  "venueId": zod.string().regex(pricingRecommendationsControllerListQueryVenueIdRegExp),
+  "status": zod.enum(['pending', 'adopted', 'dismissed']).optional(),
+  "limit": zod.number().min(1).max(pricingRecommendationsControllerListQueryLimitMax).default(pricingRecommendationsControllerListQueryLimitDefault)
+})
+
+export const pricingRecommendationsControllerListResponseRecommendationsItemCurrentPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerListResponseRecommendationsItemCurrentPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerListResponseRecommendationsItemRecommendedPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerListResponseRecommendationsItemRecommendedPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerListResponseRecommendationsItemAdoptedPriceCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerListResponseRecommendationsItemAdoptedPriceCentsOneMax = 9007199254740991;
+
+export const pricingRecommendationsControllerListResponseRecommendationsItemUpliftWindowDaysMin = -9007199254740991;
+export const pricingRecommendationsControllerListResponseRecommendationsItemUpliftWindowDaysMax = 9007199254740991;
+
+export const pricingRecommendationsControllerListResponseRecommendationsItemMeasuredUpliftCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerListResponseRecommendationsItemMeasuredUpliftCentsOneMax = 9007199254740991;
+
+
+
+export const PricingRecommendationsControllerListResponse = zod.object({
+  "recommendations": zod.array(zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "sourceItemRef": zod.string(),
+  "sourceItemLabel": zod.string(),
+  "currentPriceCents": zod.number().min(pricingRecommendationsControllerListResponseRecommendationsItemCurrentPriceCentsMin).max(pricingRecommendationsControllerListResponseRecommendationsItemCurrentPriceCentsMax),
+  "recommendedPriceCents": zod.number().min(pricingRecommendationsControllerListResponseRecommendationsItemRecommendedPriceCentsMin).max(pricingRecommendationsControllerListResponseRecommendationsItemRecommendedPriceCentsMax),
+  "rationale": zod.string(),
+  "status": zod.enum(['pending', 'adopted', 'dismissed']),
+  "createdAt": zod.string(),
+  "adoptedAt": zod.union([zod.string(),zod.null()]),
+  "adoptedPriceCents": zod.union([zod.number().min(pricingRecommendationsControllerListResponseRecommendationsItemAdoptedPriceCentsOneMin).max(pricingRecommendationsControllerListResponseRecommendationsItemAdoptedPriceCentsOneMax),zod.null()]),
+  "dismissedAt": zod.union([zod.string(),zod.null()]),
+  "dismissedReason": zod.union([zod.string(),zod.null()]),
+  "upliftWindowDays": zod.number().min(pricingRecommendationsControllerListResponseRecommendationsItemUpliftWindowDaysMin).max(pricingRecommendationsControllerListResponseRecommendationsItemUpliftWindowDaysMax),
+  "measuredUpliftCents": zod.union([zod.number().min(pricingRecommendationsControllerListResponseRecommendationsItemMeasuredUpliftCentsOneMin).max(pricingRecommendationsControllerListResponseRecommendationsItemMeasuredUpliftCentsOneMax),zod.null()]),
+  "measuredAt": zod.union([zod.string(),zod.null()])
+}))
+})
+
+
+export const pricingRecommendationsControllerCreateBodyVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const pricingRecommendationsControllerCreateBodySourceItemRefMax = 200;
+
+export const pricingRecommendationsControllerCreateBodySourceItemLabelMax = 200;
+
+export const pricingRecommendationsControllerCreateBodyCurrentPriceCentsMin = 0;
+export const pricingRecommendationsControllerCreateBodyCurrentPriceCentsMax = 10000000;
+
+export const pricingRecommendationsControllerCreateBodyRecommendedPriceCentsMin = 0;
+export const pricingRecommendationsControllerCreateBodyRecommendedPriceCentsMax = 10000000;
+
+export const pricingRecommendationsControllerCreateBodyRationaleMin = 3;
+export const pricingRecommendationsControllerCreateBodyRationaleMax = 2000;
+
+export const pricingRecommendationsControllerCreateBodyUpliftWindowDaysMax = 365;
+
+
+
+export const PricingRecommendationsControllerCreateBody = zod.object({
+  "venueId": zod.string().regex(pricingRecommendationsControllerCreateBodyVenueIdRegExp),
+  "sourceItemRef": zod.string().min(1).max(pricingRecommendationsControllerCreateBodySourceItemRefMax),
+  "sourceItemLabel": zod.string().min(1).max(pricingRecommendationsControllerCreateBodySourceItemLabelMax),
+  "currentPriceCents": zod.number().min(pricingRecommendationsControllerCreateBodyCurrentPriceCentsMin).max(pricingRecommendationsControllerCreateBodyCurrentPriceCentsMax),
+  "recommendedPriceCents": zod.number().min(pricingRecommendationsControllerCreateBodyRecommendedPriceCentsMin).max(pricingRecommendationsControllerCreateBodyRecommendedPriceCentsMax),
+  "rationale": zod.string().min(pricingRecommendationsControllerCreateBodyRationaleMin).max(pricingRecommendationsControllerCreateBodyRationaleMax),
+  "upliftWindowDays": zod.number().min(1).max(pricingRecommendationsControllerCreateBodyUpliftWindowDaysMax).optional()
+})
+
+
+export const pricingRecommendationsControllerAdoptPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const PricingRecommendationsControllerAdoptParams = zod.object({
+  "id": zod.string().regex(pricingRecommendationsControllerAdoptPathIdRegExp)
+})
+
+export const pricingRecommendationsControllerAdoptBodyAdoptedPriceCentsMin = 0;
+export const pricingRecommendationsControllerAdoptBodyAdoptedPriceCentsMax = 10000000;
+
+
+
+export const PricingRecommendationsControllerAdoptBody = zod.object({
+  "adoptedPriceCents": zod.number().min(pricingRecommendationsControllerAdoptBodyAdoptedPriceCentsMin).max(pricingRecommendationsControllerAdoptBodyAdoptedPriceCentsMax).optional()
+})
+
+export const pricingRecommendationsControllerAdoptResponseRecommendationCurrentPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerAdoptResponseRecommendationCurrentPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerAdoptResponseRecommendationRecommendedPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerAdoptResponseRecommendationRecommendedPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerAdoptResponseRecommendationAdoptedPriceCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerAdoptResponseRecommendationAdoptedPriceCentsOneMax = 9007199254740991;
+
+export const pricingRecommendationsControllerAdoptResponseRecommendationUpliftWindowDaysMin = -9007199254740991;
+export const pricingRecommendationsControllerAdoptResponseRecommendationUpliftWindowDaysMax = 9007199254740991;
+
+export const pricingRecommendationsControllerAdoptResponseRecommendationMeasuredUpliftCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerAdoptResponseRecommendationMeasuredUpliftCentsOneMax = 9007199254740991;
+
+
+
+export const PricingRecommendationsControllerAdoptResponse = zod.object({
+  "recommendation": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "sourceItemRef": zod.string(),
+  "sourceItemLabel": zod.string(),
+  "currentPriceCents": zod.number().min(pricingRecommendationsControllerAdoptResponseRecommendationCurrentPriceCentsMin).max(pricingRecommendationsControllerAdoptResponseRecommendationCurrentPriceCentsMax),
+  "recommendedPriceCents": zod.number().min(pricingRecommendationsControllerAdoptResponseRecommendationRecommendedPriceCentsMin).max(pricingRecommendationsControllerAdoptResponseRecommendationRecommendedPriceCentsMax),
+  "rationale": zod.string(),
+  "status": zod.enum(['pending', 'adopted', 'dismissed']),
+  "createdAt": zod.string(),
+  "adoptedAt": zod.union([zod.string(),zod.null()]),
+  "adoptedPriceCents": zod.union([zod.number().min(pricingRecommendationsControllerAdoptResponseRecommendationAdoptedPriceCentsOneMin).max(pricingRecommendationsControllerAdoptResponseRecommendationAdoptedPriceCentsOneMax),zod.null()]),
+  "dismissedAt": zod.union([zod.string(),zod.null()]),
+  "dismissedReason": zod.union([zod.string(),zod.null()]),
+  "upliftWindowDays": zod.number().min(pricingRecommendationsControllerAdoptResponseRecommendationUpliftWindowDaysMin).max(pricingRecommendationsControllerAdoptResponseRecommendationUpliftWindowDaysMax),
+  "measuredUpliftCents": zod.union([zod.number().min(pricingRecommendationsControllerAdoptResponseRecommendationMeasuredUpliftCentsOneMin).max(pricingRecommendationsControllerAdoptResponseRecommendationMeasuredUpliftCentsOneMax),zod.null()]),
+  "measuredAt": zod.union([zod.string(),zod.null()])
+})
+})
+
+
+export const pricingRecommendationsControllerDismissPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const PricingRecommendationsControllerDismissParams = zod.object({
+  "id": zod.string().regex(pricingRecommendationsControllerDismissPathIdRegExp)
+})
+
+export const pricingRecommendationsControllerDismissBodyReasonMax = 500;
+
+
+
+export const PricingRecommendationsControllerDismissBody = zod.object({
+  "reason": zod.string().min(1).max(pricingRecommendationsControllerDismissBodyReasonMax).optional()
+})
+
+export const pricingRecommendationsControllerDismissResponseRecommendationCurrentPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerDismissResponseRecommendationCurrentPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerDismissResponseRecommendationRecommendedPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerDismissResponseRecommendationRecommendedPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerDismissResponseRecommendationAdoptedPriceCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerDismissResponseRecommendationAdoptedPriceCentsOneMax = 9007199254740991;
+
+export const pricingRecommendationsControllerDismissResponseRecommendationUpliftWindowDaysMin = -9007199254740991;
+export const pricingRecommendationsControllerDismissResponseRecommendationUpliftWindowDaysMax = 9007199254740991;
+
+export const pricingRecommendationsControllerDismissResponseRecommendationMeasuredUpliftCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerDismissResponseRecommendationMeasuredUpliftCentsOneMax = 9007199254740991;
+
+
+
+export const PricingRecommendationsControllerDismissResponse = zod.object({
+  "recommendation": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "sourceItemRef": zod.string(),
+  "sourceItemLabel": zod.string(),
+  "currentPriceCents": zod.number().min(pricingRecommendationsControllerDismissResponseRecommendationCurrentPriceCentsMin).max(pricingRecommendationsControllerDismissResponseRecommendationCurrentPriceCentsMax),
+  "recommendedPriceCents": zod.number().min(pricingRecommendationsControllerDismissResponseRecommendationRecommendedPriceCentsMin).max(pricingRecommendationsControllerDismissResponseRecommendationRecommendedPriceCentsMax),
+  "rationale": zod.string(),
+  "status": zod.enum(['pending', 'adopted', 'dismissed']),
+  "createdAt": zod.string(),
+  "adoptedAt": zod.union([zod.string(),zod.null()]),
+  "adoptedPriceCents": zod.union([zod.number().min(pricingRecommendationsControllerDismissResponseRecommendationAdoptedPriceCentsOneMin).max(pricingRecommendationsControllerDismissResponseRecommendationAdoptedPriceCentsOneMax),zod.null()]),
+  "dismissedAt": zod.union([zod.string(),zod.null()]),
+  "dismissedReason": zod.union([zod.string(),zod.null()]),
+  "upliftWindowDays": zod.number().min(pricingRecommendationsControllerDismissResponseRecommendationUpliftWindowDaysMin).max(pricingRecommendationsControllerDismissResponseRecommendationUpliftWindowDaysMax),
+  "measuredUpliftCents": zod.union([zod.number().min(pricingRecommendationsControllerDismissResponseRecommendationMeasuredUpliftCentsOneMin).max(pricingRecommendationsControllerDismissResponseRecommendationMeasuredUpliftCentsOneMax),zod.null()]),
+  "measuredAt": zod.union([zod.string(),zod.null()])
+})
 })
 
 
@@ -2797,4 +3190,436 @@ export const SquareControllerListLocationsResponse = zod.object({
   "address": zod.union([zod.string(),zod.null()])
 })),
   "error": zod.union([zod.string(),zod.null()])
+})
+
+
+export const metricsControllerGetWauQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetWauQueryWeeksDefault = 12;
+export const metricsControllerGetWauQueryWeeksMax = 52;
+
+
+
+export const MetricsControllerGetWauQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetWauQueryVenueIdRegExp),
+  "weeks": zod.number().min(1).max(metricsControllerGetWauQueryWeeksMax).default(metricsControllerGetWauQueryWeeksDefault)
+})
+
+export const metricsControllerGetWauResponseWeeksItemActiveUsersMin = 0;
+export const metricsControllerGetWauResponseWeeksItemActiveUsersMax = 9007199254740991;
+
+export const metricsControllerGetWauResponseWeeksItemMessageCountMin = 0;
+export const metricsControllerGetWauResponseWeeksItemMessageCountMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetWauResponse = zod.object({
+  "venueId": zod.string(),
+  "weeks": zod.array(zod.object({
+  "weekStart": zod.string(),
+  "weekEnd": zod.string(),
+  "activeUsers": zod.number().min(metricsControllerGetWauResponseWeeksItemActiveUsersMin).max(metricsControllerGetWauResponseWeeksItemActiveUsersMax),
+  "messageCount": zod.number().min(metricsControllerGetWauResponseWeeksItemMessageCountMin).max(metricsControllerGetWauResponseWeeksItemMessageCountMax)
+}))
+})
+
+
+export const metricsControllerGetHoursRecoveredQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetHoursRecoveredQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetHoursRecoveredQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+
+
+export const MetricsControllerGetHoursRecoveredQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetHoursRecoveredQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetHoursRecoveredQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetHoursRecoveredQueryToRegExp).optional()
+})
+
+export const metricsControllerGetHoursRecoveredResponseQueriesCountMin = 0;
+export const metricsControllerGetHoursRecoveredResponseQueriesCountMax = 9007199254740991;
+
+export const metricsControllerGetHoursRecoveredResponseMinutesSavedMin = 0;
+
+export const metricsControllerGetHoursRecoveredResponseHoursSavedMin = 0;
+
+export const metricsControllerGetHoursRecoveredResponseValueGbpCentsMin = 0;
+export const metricsControllerGetHoursRecoveredResponseValueGbpCentsMax = 9007199254740991;
+
+export const metricsControllerGetHoursRecoveredResponseBaselineMinutesPerQueryMin = 0;
+
+export const metricsControllerGetHoursRecoveredResponseBaselineHourlyRateCentsMin = 0;
+export const metricsControllerGetHoursRecoveredResponseBaselineHourlyRateCentsMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetHoursRecoveredResponse = zod.object({
+  "queriesCount": zod.number().min(metricsControllerGetHoursRecoveredResponseQueriesCountMin).max(metricsControllerGetHoursRecoveredResponseQueriesCountMax),
+  "minutesSaved": zod.number().min(metricsControllerGetHoursRecoveredResponseMinutesSavedMin),
+  "hoursSaved": zod.number().min(metricsControllerGetHoursRecoveredResponseHoursSavedMin),
+  "valueGbpCents": zod.number().min(metricsControllerGetHoursRecoveredResponseValueGbpCentsMin).max(metricsControllerGetHoursRecoveredResponseValueGbpCentsMax),
+  "range": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "scope": zod.object({
+  "organizationId": zod.string(),
+  "venueId": zod.union([zod.string(),zod.null()])
+}),
+  "baseline": zod.object({
+  "minutesPerQuery": zod.number().min(metricsControllerGetHoursRecoveredResponseBaselineMinutesPerQueryMin),
+  "hourlyRateCents": zod.number().min(metricsControllerGetHoursRecoveredResponseBaselineHourlyRateCentsMin).max(metricsControllerGetHoursRecoveredResponseBaselineHourlyRateCentsMax)
+})
+})
+
+
+export const metricsControllerGetSearchOutcomesQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetSearchOutcomesQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetSearchOutcomesQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+
+
+export const MetricsControllerGetSearchOutcomesQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetSearchOutcomesQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetSearchOutcomesQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetSearchOutcomesQueryToRegExp).optional()
+})
+
+export const metricsControllerGetSearchOutcomesResponseBucketsItemHitMin = 0;
+export const metricsControllerGetSearchOutcomesResponseBucketsItemHitMax = 9007199254740991;
+
+export const metricsControllerGetSearchOutcomesResponseBucketsItemNoDataMin = 0;
+export const metricsControllerGetSearchOutcomesResponseBucketsItemNoDataMax = 9007199254740991;
+
+export const metricsControllerGetSearchOutcomesResponseBucketsItemErrorMin = 0;
+export const metricsControllerGetSearchOutcomesResponseBucketsItemErrorMax = 9007199254740991;
+
+export const metricsControllerGetSearchOutcomesResponseTotalsHitMin = -9007199254740991;
+export const metricsControllerGetSearchOutcomesResponseTotalsHitMax = 9007199254740991;
+
+export const metricsControllerGetSearchOutcomesResponseTotalsNoDataMin = -9007199254740991;
+export const metricsControllerGetSearchOutcomesResponseTotalsNoDataMax = 9007199254740991;
+
+export const metricsControllerGetSearchOutcomesResponseTotalsErrorMin = -9007199254740991;
+export const metricsControllerGetSearchOutcomesResponseTotalsErrorMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetSearchOutcomesResponse = zod.object({
+  "buckets": zod.array(zod.object({
+  "date": zod.string(),
+  "hit": zod.number().min(metricsControllerGetSearchOutcomesResponseBucketsItemHitMin).max(metricsControllerGetSearchOutcomesResponseBucketsItemHitMax),
+  "noData": zod.number().min(metricsControllerGetSearchOutcomesResponseBucketsItemNoDataMin).max(metricsControllerGetSearchOutcomesResponseBucketsItemNoDataMax),
+  "error": zod.number().min(metricsControllerGetSearchOutcomesResponseBucketsItemErrorMin).max(metricsControllerGetSearchOutcomesResponseBucketsItemErrorMax)
+})),
+  "totals": zod.object({
+  "hit": zod.number().min(metricsControllerGetSearchOutcomesResponseTotalsHitMin).max(metricsControllerGetSearchOutcomesResponseTotalsHitMax),
+  "noData": zod.number().min(metricsControllerGetSearchOutcomesResponseTotalsNoDataMin).max(metricsControllerGetSearchOutcomesResponseTotalsNoDataMax),
+  "error": zod.number().min(metricsControllerGetSearchOutcomesResponseTotalsErrorMin).max(metricsControllerGetSearchOutcomesResponseTotalsErrorMax)
+})
+})
+
+
+export const metricsControllerGetNoDataQueriesQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetNoDataQueriesQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetNoDataQueriesQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetNoDataQueriesQueryLimitDefault = 10;
+export const metricsControllerGetNoDataQueriesQueryLimitMax = 50;
+
+
+
+export const MetricsControllerGetNoDataQueriesQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetNoDataQueriesQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetNoDataQueriesQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetNoDataQueriesQueryToRegExp).optional(),
+  "limit": zod.number().min(1).max(metricsControllerGetNoDataQueriesQueryLimitMax).default(metricsControllerGetNoDataQueriesQueryLimitDefault)
+})
+
+export const metricsControllerGetNoDataQueriesResponseItemsItemCountExclusiveMin = 0;
+export const metricsControllerGetNoDataQueriesResponseItemsItemCountMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetNoDataQueriesResponse = zod.object({
+  "items": zod.array(zod.object({
+  "query": zod.string(),
+  "count": zod.number().gt(metricsControllerGetNoDataQueriesResponseItemsItemCountExclusiveMin).max(metricsControllerGetNoDataQueriesResponseItemsItemCountMax),
+  "lastSeen": zod.string()
+}))
+})
+
+
+export const metricsControllerGetEscalationsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetEscalationsQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetEscalationsQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+
+
+export const MetricsControllerGetEscalationsQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetEscalationsQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetEscalationsQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetEscalationsQueryToRegExp).optional()
+})
+
+export const metricsControllerGetEscalationsResponseBucketsItemResolvedMin = 0;
+export const metricsControllerGetEscalationsResponseBucketsItemResolvedMax = 9007199254740991;
+
+export const metricsControllerGetEscalationsResponseBucketsItemEscalatedMin = 0;
+export const metricsControllerGetEscalationsResponseBucketsItemEscalatedMax = 9007199254740991;
+
+export const metricsControllerGetEscalationsResponseTotalsResolvedMin = -9007199254740991;
+export const metricsControllerGetEscalationsResponseTotalsResolvedMax = 9007199254740991;
+
+export const metricsControllerGetEscalationsResponseTotalsEscalatedMin = -9007199254740991;
+export const metricsControllerGetEscalationsResponseTotalsEscalatedMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetEscalationsResponse = zod.object({
+  "buckets": zod.array(zod.object({
+  "date": zod.string(),
+  "resolved": zod.number().min(metricsControllerGetEscalationsResponseBucketsItemResolvedMin).max(metricsControllerGetEscalationsResponseBucketsItemResolvedMax),
+  "escalated": zod.number().min(metricsControllerGetEscalationsResponseBucketsItemEscalatedMin).max(metricsControllerGetEscalationsResponseBucketsItemEscalatedMax)
+})),
+  "totals": zod.object({
+  "resolved": zod.number().min(metricsControllerGetEscalationsResponseTotalsResolvedMin).max(metricsControllerGetEscalationsResponseTotalsResolvedMax),
+  "escalated": zod.number().min(metricsControllerGetEscalationsResponseTotalsEscalatedMin).max(metricsControllerGetEscalationsResponseTotalsEscalatedMax),
+  "resolutionRate": zod.number()
+})
+})
+
+
+export const metricsControllerGetCostsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetCostsQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetCostsQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+
+
+export const MetricsControllerGetCostsQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetCostsQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetCostsQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetCostsQueryToRegExp).optional()
+})
+
+export const metricsControllerGetCostsResponseBucketsItemUsdCentsMin = 0;
+export const metricsControllerGetCostsResponseBucketsItemUsdCentsMax = 9007199254740991;
+
+export const metricsControllerGetCostsResponseBucketsItemMessagesMin = 0;
+export const metricsControllerGetCostsResponseBucketsItemMessagesMax = 9007199254740991;
+
+export const metricsControllerGetCostsResponseTotalsUsdCentsMin = -9007199254740991;
+export const metricsControllerGetCostsResponseTotalsUsdCentsMax = 9007199254740991;
+
+export const metricsControllerGetCostsResponseTotalsMessagesMin = -9007199254740991;
+export const metricsControllerGetCostsResponseTotalsMessagesMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetCostsResponse = zod.object({
+  "buckets": zod.array(zod.object({
+  "date": zod.string(),
+  "usdCents": zod.number().min(metricsControllerGetCostsResponseBucketsItemUsdCentsMin).max(metricsControllerGetCostsResponseBucketsItemUsdCentsMax),
+  "messages": zod.number().min(metricsControllerGetCostsResponseBucketsItemMessagesMin).max(metricsControllerGetCostsResponseBucketsItemMessagesMax)
+})),
+  "totals": zod.object({
+  "usdCents": zod.number().min(metricsControllerGetCostsResponseTotalsUsdCentsMin).max(metricsControllerGetCostsResponseTotalsUsdCentsMax),
+  "messages": zod.number().min(metricsControllerGetCostsResponseTotalsMessagesMin).max(metricsControllerGetCostsResponseTotalsMessagesMax),
+  "costPerMessageCents": zod.number()
+})
+})
+
+
+export const metricsControllerGetFeedbackQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetFeedbackQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetFeedbackQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+
+
+export const MetricsControllerGetFeedbackQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetFeedbackQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetFeedbackQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetFeedbackQueryToRegExp).optional()
+})
+
+export const metricsControllerGetFeedbackResponseBucketsItemUpMin = 0;
+export const metricsControllerGetFeedbackResponseBucketsItemUpMax = 9007199254740991;
+
+export const metricsControllerGetFeedbackResponseBucketsItemDownMin = 0;
+export const metricsControllerGetFeedbackResponseBucketsItemDownMax = 9007199254740991;
+
+export const metricsControllerGetFeedbackResponseBucketsItemRegenerateMin = 0;
+export const metricsControllerGetFeedbackResponseBucketsItemRegenerateMax = 9007199254740991;
+
+export const metricsControllerGetFeedbackResponseTotalsUpMin = -9007199254740991;
+export const metricsControllerGetFeedbackResponseTotalsUpMax = 9007199254740991;
+
+export const metricsControllerGetFeedbackResponseTotalsDownMin = -9007199254740991;
+export const metricsControllerGetFeedbackResponseTotalsDownMax = 9007199254740991;
+
+export const metricsControllerGetFeedbackResponseTotalsRegenerateMin = -9007199254740991;
+export const metricsControllerGetFeedbackResponseTotalsRegenerateMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetFeedbackResponse = zod.object({
+  "buckets": zod.array(zod.object({
+  "date": zod.string(),
+  "up": zod.number().min(metricsControllerGetFeedbackResponseBucketsItemUpMin).max(metricsControllerGetFeedbackResponseBucketsItemUpMax),
+  "down": zod.number().min(metricsControllerGetFeedbackResponseBucketsItemDownMin).max(metricsControllerGetFeedbackResponseBucketsItemDownMax),
+  "regenerate": zod.number().min(metricsControllerGetFeedbackResponseBucketsItemRegenerateMin).max(metricsControllerGetFeedbackResponseBucketsItemRegenerateMax)
+})),
+  "totals": zod.object({
+  "up": zod.number().min(metricsControllerGetFeedbackResponseTotalsUpMin).max(metricsControllerGetFeedbackResponseTotalsUpMax),
+  "down": zod.number().min(metricsControllerGetFeedbackResponseTotalsDownMin).max(metricsControllerGetFeedbackResponseTotalsDownMax),
+  "regenerate": zod.number().min(metricsControllerGetFeedbackResponseTotalsRegenerateMin).max(metricsControllerGetFeedbackResponseTotalsRegenerateMax),
+  "positiveRate": zod.number()
+})
+})
+
+
+export const metricsControllerGetPricingFunnelQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const MetricsControllerGetPricingFunnelQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetPricingFunnelQueryVenueIdRegExp).optional()
+})
+
+export const metricsControllerGetPricingFunnelResponsePendingMin = 0;
+export const metricsControllerGetPricingFunnelResponsePendingMax = 9007199254740991;
+
+export const metricsControllerGetPricingFunnelResponseAdoptedMin = 0;
+export const metricsControllerGetPricingFunnelResponseAdoptedMax = 9007199254740991;
+
+export const metricsControllerGetPricingFunnelResponseDismissedMin = 0;
+export const metricsControllerGetPricingFunnelResponseDismissedMax = 9007199254740991;
+
+export const metricsControllerGetPricingFunnelResponseMeasuredUpliftGbpCentsMin = -9007199254740991;
+export const metricsControllerGetPricingFunnelResponseMeasuredUpliftGbpCentsMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetPricingFunnelResponse = zod.object({
+  "pending": zod.number().min(metricsControllerGetPricingFunnelResponsePendingMin).max(metricsControllerGetPricingFunnelResponsePendingMax),
+  "adopted": zod.number().min(metricsControllerGetPricingFunnelResponseAdoptedMin).max(metricsControllerGetPricingFunnelResponseAdoptedMax),
+  "dismissed": zod.number().min(metricsControllerGetPricingFunnelResponseDismissedMin).max(metricsControllerGetPricingFunnelResponseDismissedMax),
+  "adoptionRate": zod.number(),
+  "measuredUpliftGbpCents": zod.number().min(metricsControllerGetPricingFunnelResponseMeasuredUpliftGbpCentsMin).max(metricsControllerGetPricingFunnelResponseMeasuredUpliftGbpCentsMax)
+})
+
+
+export const metricsControllerGetOnboardingCohortResponseMembersItemDaysSinceStartMin = 0;
+export const metricsControllerGetOnboardingCohortResponseMembersItemDaysSinceStartMax = 9007199254740991;
+
+export const metricsControllerGetOnboardingCohortResponseMembersItemTotalQueriesMin = 0;
+export const metricsControllerGetOnboardingCohortResponseMembersItemTotalQueriesMax = 9007199254740991;
+
+export const metricsControllerGetOnboardingCohortResponseMembersItemRepeatQueriesMin = 0;
+export const metricsControllerGetOnboardingCohortResponseMembersItemRepeatQueriesMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetOnboardingCohortResponse = zod.object({
+  "members": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()]),
+  "role": zod.string(),
+  "startedAt": zod.union([zod.string(),zod.null()]),
+  "daysSinceStart": zod.number().min(metricsControllerGetOnboardingCohortResponseMembersItemDaysSinceStartMin).max(metricsControllerGetOnboardingCohortResponseMembersItemDaysSinceStartMax),
+  "totalQueries": zod.number().min(metricsControllerGetOnboardingCohortResponseMembersItemTotalQueriesMin).max(metricsControllerGetOnboardingCohortResponseMembersItemTotalQueriesMax),
+  "repeatQueries": zod.number().min(metricsControllerGetOnboardingCohortResponseMembersItemRepeatQueriesMin).max(metricsControllerGetOnboardingCohortResponseMembersItemRepeatQueriesMax),
+  "repeatRate": zod.number(),
+  "firstIndependentAt": zod.union([zod.string(),zod.null()])
+}))
+})
+
+
+export const metricsControllerGetTopQuestionsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetTopQuestionsQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetTopQuestionsQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetTopQuestionsQueryLimitDefault = 10;
+export const metricsControllerGetTopQuestionsQueryLimitMax = 50;
+
+
+
+export const MetricsControllerGetTopQuestionsQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetTopQuestionsQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetTopQuestionsQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetTopQuestionsQueryToRegExp).optional(),
+  "limit": zod.number().min(1).max(metricsControllerGetTopQuestionsQueryLimitMax).default(metricsControllerGetTopQuestionsQueryLimitDefault)
+})
+
+export const metricsControllerGetTopQuestionsResponseItemsItemCountExclusiveMin = 0;
+export const metricsControllerGetTopQuestionsResponseItemsItemCountMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetTopQuestionsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "query": zod.string(),
+  "count": zod.number().gt(metricsControllerGetTopQuestionsResponseItemsItemCountExclusiveMin).max(metricsControllerGetTopQuestionsResponseItemsItemCountMax),
+  "lastSeen": zod.string()
+}))
+})
+
+
+export const metricsControllerGetRecentEscalationsQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetRecentEscalationsQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetRecentEscalationsQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetRecentEscalationsQueryLimitDefault = 8;
+export const metricsControllerGetRecentEscalationsQueryLimitMax = 50;
+
+
+
+export const MetricsControllerGetRecentEscalationsQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetRecentEscalationsQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetRecentEscalationsQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetRecentEscalationsQueryToRegExp).optional(),
+  "limit": zod.number().min(1).max(metricsControllerGetRecentEscalationsQueryLimitMax).default(metricsControllerGetRecentEscalationsQueryLimitDefault)
+})
+
+export const MetricsControllerGetRecentEscalationsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "messageId": zod.string(),
+  "conversationId": zod.string(),
+  "escalatedAt": zod.string(),
+  "escalationKind": zod.union([zod.string(),zod.null()]),
+  "venueId": zod.string(),
+  "venueName": zod.string(),
+  "staffUserId": zod.union([zod.string(),zod.null()]),
+  "staffName": zod.union([zod.string(),zod.null()]),
+  "escalatedToUserId": zod.union([zod.string(),zod.null()]),
+  "escalatedToName": zod.union([zod.string(),zod.null()])
+}))
+})
+
+
+export const metricsControllerGetActiveStaffQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const metricsControllerGetActiveStaffQueryFromRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetActiveStaffQueryToRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const metricsControllerGetActiveStaffQueryLimitDefault = 8;
+export const metricsControllerGetActiveStaffQueryLimitMax = 50;
+
+
+
+export const MetricsControllerGetActiveStaffQueryParams = zod.object({
+  "venueId": zod.string().regex(metricsControllerGetActiveStaffQueryVenueIdRegExp).optional(),
+  "from": zod.iso.datetime({"offset":true}).regex(metricsControllerGetActiveStaffQueryFromRegExp).optional(),
+  "to": zod.iso.datetime({"offset":true}).regex(metricsControllerGetActiveStaffQueryToRegExp).optional(),
+  "limit": zod.number().min(1).max(metricsControllerGetActiveStaffQueryLimitMax).default(metricsControllerGetActiveStaffQueryLimitDefault)
+})
+
+export const metricsControllerGetActiveStaffResponseItemsItemCountMin = 0;
+export const metricsControllerGetActiveStaffResponseItemsItemCountMax = 9007199254740991;
+
+
+
+export const MetricsControllerGetActiveStaffResponse = zod.object({
+  "items": zod.array(zod.object({
+  "userId": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.union([zod.string(),zod.null()]),
+  "role": zod.union([zod.string(),zod.null()]),
+  "count": zod.number().min(metricsControllerGetActiveStaffResponseItemsItemCountMin).max(metricsControllerGetActiveStaffResponseItemsItemCountMax),
+  "lastSeen": zod.string()
+}))
+})
+
+
+export const OnboardingMetricsControllerGetByUserIdParams = zod.object({
+  "userId": zod.string()
 })

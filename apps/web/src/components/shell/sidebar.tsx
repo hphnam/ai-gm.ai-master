@@ -1,10 +1,12 @@
 'use client'
 
 import {
+  AlertTriangle,
   BookOpen,
   CalendarClock,
   CheckSquare,
   FileBarChart,
+  LayoutDashboard,
   MessageSquarePlus,
   Settings,
   ShieldCheck,
@@ -16,6 +18,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useInboxCount } from '@/components/docs/inbox-tab'
 import { useQuestionsCount } from '@/components/docs/questions-tab'
 import { useExpiryCounts } from '@/lib/hooks/use-compliance'
+import { useOpenIncidentsCount } from '@/lib/hooks/use-incidents'
+import { useOrgMembers } from '@/lib/hooks/use-org-members'
 import { useOpenTasksCount } from '@/lib/hooks/use-tasks'
 import { markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
@@ -33,6 +37,20 @@ type NavItem = NavChild & {
   /// Sub-items rendered indented underneath the parent when the parent
   /// section is active. Keeps the flat-nav feel for everything else.
   children?: NavChild[]
+}
+
+const dashboardNav: NavItem = {
+  label: 'Dashboard',
+  href: '/dashboard',
+  icon: LayoutDashboard,
+  match: (p) => p.startsWith('/dashboard'),
+}
+
+const incidentsNav: NavItem = {
+  label: 'Incidents',
+  href: '/incidents',
+  icon: AlertTriangle,
+  match: (p) => p.startsWith('/incidents'),
 }
 
 const primaryNav: NavItem[] = [
@@ -101,7 +119,28 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
   const expiryActiveCount = expiryCounts?.activeCount ?? 0
   const expiryOverdueCount = expiryCounts?.overdueCount ?? 0
   const expiryWithin30Count = expiryCounts?.within30dCount ?? 0
+  // Incidents badge only fetches when the user can see the link (owner +
+  // manager). Staff don't get the entry, so the hook is gated by canSeeDashboard
+  // below — until then the fields stay 0 and no badge renders.
+  const incidentCounts = useOpenIncidentsCount().data
+  const incidentOpenCount = incidentCounts?.openCount ?? 0
+  const incidentCriticalCount = incidentCounts?.criticalOpenCount ?? 0
   const settingsActive = pathname.startsWith('/settings')
+  // Dashboard is owner/manager only — staff don't see the entry. We derive
+  // the role from the members list (same fetch the org-settings page uses,
+  // so this is free) and fall back to "show" while loading so the link
+  // never flashes off for a privileged user.
+  const orgMembers = useOrgMembers()
+  const me = orgMembers.data?.members.find((m) => m.isSelf)
+  const canSeeDashboard =
+    orgMembers.isLoading || me === undefined || me.role === 'owner' || me.role === 'manager'
+  // Incidents page is owner+manager only (same gate as the dashboard).
+  // Inserted between Compliance and Knowledge so it sits with the other
+  // operational surfaces rather than alongside Chat at the top.
+  const baseNav = canSeeDashboard
+    ? [dashboardNav, ...withIncidents(primaryNav, incidentsNav)]
+    : primaryNav
+  const nav: NavItem[] = baseNav
 
   // Client-first thread ids: the new chat's UUID is generated here and carried
   // through the URL as the only source of truth for "which thread am I in".
@@ -177,25 +216,31 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
         </button>
 
         <nav className="mt-1 flex flex-col gap-0.5" aria-label="Primary navigation">
-          {primaryNav.map((item) => {
+          {nav.map((item) => {
             const active = item.match(pathname)
             const Icon = item.icon
             const isKnowledge = item.href === '/docs'
             const isTasks = item.href === '/tasks'
             const isCompliance = item.href === '/compliance'
+            const isIncidents = item.href === '/incidents'
             const badgeCount = isKnowledge
               ? knowledgeUrgentCount
               : isTasks
                 ? tasksOpenCount
                 : isCompliance
                   ? expiryActiveCount
-                  : 0
+                  : isIncidents
+                    ? incidentOpenCount
+                    : 0
             const badgeUrgent = isTasks
               ? tasksOverdueCount > 0
               : isCompliance
                 ? expiryOverdueCount > 0 || expiryWithin30Count > 0
-                : isKnowledge
-            const showBadge = (isKnowledge || isTasks || isCompliance) && badgeCount > 0
+                : isIncidents
+                  ? incidentCriticalCount > 0
+                  : isKnowledge
+            const showBadge =
+              (isKnowledge || isTasks || isCompliance || isIncidents) && badgeCount > 0
             // Expand child links when the section (parent or any child) is
             // active.
             const sectionActive = active || (item.children?.some((c) => c.match(pathname)) ?? false)
@@ -268,10 +313,18 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
 
         {isChat ? (
           <div className="mt-2 flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
-            <span className="px-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted">
-              Recent
-            </span>
-            <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="flex items-baseline justify-between px-2 pt-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted">
+                Recent
+              </span>
+              <Link
+                href="/chat/history"
+                className="text-[11px] text-sidebar-muted hover:text-sidebar-foreground"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="min-h-0 flex-1">
               <SidebarThreads />
             </div>
           </div>
@@ -300,4 +353,14 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
       </aside>
     </>
   )
+}
+
+/// Insert the incidents nav item after Compliance so the security/triage
+/// surfaces group together. Falls back to appending if Compliance is missing
+/// from the primary list (which never happens today, but keeps the helper
+/// honest as the nav evolves).
+function withIncidents(primary: NavItem[], incidents: NavItem): NavItem[] {
+  const idx = primary.findIndex((n) => n.href === '/compliance')
+  if (idx === -1) return [...primary, incidents]
+  return [...primary.slice(0, idx + 1), incidents, ...primary.slice(idx + 1)]
 }

@@ -28,6 +28,7 @@ export type {
 } from '../../types/chat-message'
 
 import { AdaptationService } from '../adaptation/adaptation.service'
+import { IncidentsService } from '../incidents/incidents.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
@@ -188,6 +189,7 @@ export class ChatService implements OnModuleInit {
     private readonly verifier: QuoteVerifierService,
     private readonly realtime: RealtimeGateway,
     private readonly integrations: IntegrationRegistry,
+    private readonly incidents: IncidentsService,
   ) {}
 
   onModuleInit(): void {
@@ -899,6 +901,25 @@ Assistant answer: ${assistantText}`,
       retrievedItemIds: Array.from(retrievedItemIds),
     })
 
+    // Back-fill IncidentLog.sourceMessageId for any incidents created during
+    // this turn — the dispatcher couldn't write it at create time because
+    // the assistant message didn't exist yet. Fire-and-forget so a slow
+    // update can't stall the response; an error here only means the
+    // /incidents card loses its "Source" link for those rows, not a
+    // correctness issue.
+    void this.incidents
+      .backfillSourceMessageIds({ orgId, messageId: assistantMessage.id, toolCallLog })
+      .catch((err: unknown) => {
+        this.logger.error(
+          JSON.stringify({
+            event: 'chat.incident_backfill.failed',
+            messageId: assistantMessage.id,
+            orgId,
+            error: err instanceof Error ? err.message : String(err),
+          }),
+        )
+      })
+
     // Auto-verify floats after persistence — user has the answer already.
     this.triggerAutoVerify({
       draft: finalText,
@@ -984,30 +1005,74 @@ Assistant answer: ${assistantText}`,
     return { id: conversationId, visibility }
   }
 
-  async listRecent(
+  async listPage(
     orgId: string,
     userId: string,
-    venueId: string | undefined,
-    limit = 40,
-  ): Promise<
-    Array<{
+    opts: {
+      venueId?: string
+      cursor?: string
+      limit?: number
+      q?: string
+    } = {},
+  ): Promise<{
+    items: Array<{
       id: string
       venueId: string
       venueName: string
       lastMessageAt: string
       preview: string | null
     }>
-  > {
-    const safeLimit = Math.max(1, Math.min(100, limit))
+    nextCursor: string | null
+  }> {
+    const safeLimit = Math.max(1, Math.min(100, opts.limit ?? 30))
+    const cur = decodeConversationCursor(opts.cursor)
+    const q = opts.q?.trim()
+
+    // Keyset pagination on (updatedAt desc, id desc). The compound OR is the
+    // standard "strictly less than the cursor tuple" predicate — equal
+    // updatedAt timestamps are tie-broken by id so the page boundary stays
+    // stable when multiple threads share a timestamp.
+    const cursorWhere = cur
+      ? {
+          OR: [
+            { updatedAt: { lt: cur.updatedAt } },
+            { AND: [{ updatedAt: cur.updatedAt }, { id: { lt: cur.id } }] },
+          ],
+        }
+      : {}
+
+    // Search filter: venue name OR first user-message content. We rely on
+    // Prisma's `contains` + `mode: 'insensitive'` which compiles to ILIKE.
+    // Prisma escapes the parameter so this is safe with user-supplied `q`.
+    const searchWhere = q
+      ? {
+          OR: [
+            { venue: { name: { contains: q, mode: 'insensitive' as const } } },
+            {
+              messages: {
+                some: {
+                  role: 'user',
+                  content: { contains: q, mode: 'insensitive' as const },
+                },
+              },
+            },
+          ],
+        }
+      : {}
+
     const rows = await prisma.chatConversation.findMany({
       where: {
         userId,
         deletedAt: null,
         venue: { organizationId: orgId },
-        ...(venueId ? { venueId } : {}),
+        ...(opts.venueId ? { venueId: opts.venueId } : {}),
+        ...cursorWhere,
+        ...searchWhere,
       },
       orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
-      take: safeLimit,
+      // Fetch limit+1 so we know if another page exists without a second
+      // count query.
+      take: safeLimit + 1,
       select: {
         id: true,
         venueId: true,
@@ -1021,13 +1086,22 @@ Assistant answer: ${assistantText}`,
         },
       },
     })
-    return rows.map((r) => ({
-      id: r.id,
-      venueId: r.venueId,
-      venueName: r.venue.name,
-      lastMessageAt: r.updatedAt.toISOString(),
-      preview: r.messages[0]?.content ? truncate(r.messages[0].content, 80) : null,
-    }))
+
+    const hasNext = rows.length > safeLimit
+    const page = hasNext ? rows.slice(0, safeLimit) : rows
+    const last = page[page.length - 1]
+    const nextCursor = hasNext && last ? encodeConversationCursor(last.updatedAt, last.id) : null
+
+    return {
+      items: page.map((r) => ({
+        id: r.id,
+        venueId: r.venueId,
+        venueName: r.venue.name,
+        lastMessageAt: r.updatedAt.toISOString(),
+        preview: r.messages[0]?.content ? truncate(r.messages[0].content, 80) : null,
+      })),
+      nextCursor,
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -1297,6 +1371,25 @@ Assistant answer: ${assistantText}`,
           retrievedItemIds: Array.from(retrievedItemIds),
         })
 
+        // Back-fill IncidentLog.sourceMessageId for incidents created during
+        // this streamed turn. Same shape as the non-streaming path above.
+        void this.incidents
+          .backfillSourceMessageIds({
+            orgId: params.orgId,
+            messageId: assistantMessage.id,
+            toolCallLog,
+          })
+          .catch((err: unknown) => {
+            this.logger.error(
+              JSON.stringify({
+                event: 'chat.incident_backfill.failed',
+                messageId: assistantMessage.id,
+                orgId: params.orgId,
+                error: err instanceof Error ? err.message : String(err),
+              }),
+            )
+          })
+
         // Auto-verify after stream completes — user has the answer already.
         this.triggerAutoVerify({
           draft: storedContent,
@@ -1336,4 +1429,29 @@ Assistant answer: ${assistantText}`,
 function truncate(s: string, max: number): string {
   const trimmed = s.trim().replace(/\s+/g, ' ')
   return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed
+}
+
+/// Keyset cursor for the conversations list. Encodes the last row's
+/// (updatedAt, id) as a base64url-encoded `${iso}|${uuid}` blob. Opaque to
+/// clients — the encoding is internal and may change without a contract bump.
+function encodeConversationCursor(updatedAt: Date, id: string): string {
+  return Buffer.from(`${updatedAt.toISOString()}|${id}`, 'utf8').toString('base64url')
+}
+
+function decodeConversationCursor(
+  cursor: string | undefined,
+): { updatedAt: Date; id: string } | null {
+  if (!cursor) return null
+  try {
+    const raw = Buffer.from(cursor, 'base64url').toString('utf8')
+    const pipe = raw.indexOf('|')
+    if (pipe < 0) return null
+    const iso = raw.slice(0, pipe)
+    const id = raw.slice(pipe + 1)
+    const updatedAt = new Date(iso)
+    if (Number.isNaN(updatedAt.getTime()) || !id) return null
+    return { updatedAt, id }
+  } catch {
+    return null
+  }
 }

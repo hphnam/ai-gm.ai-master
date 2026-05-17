@@ -1180,6 +1180,36 @@
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
               "type": "string"
             }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minLength": 2,
+              "maxLength": 100,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1188,10 +1218,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ListConversationItemDto"
-                  }
+                  "$ref": "#/components/schemas/ListConversationsPageDto"
                 }
               }
             }
@@ -1340,6 +1367,306 @@
         ],
         "tags": [
           "chat"
+        ]
+      }
+    },
+    "/incidents": {
+      "get": {
+        "operationId": "IncidentsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "acknowledged",
+                "closed"
+              ]
+            }
+          },
+          {
+            "name": "severity",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "minor",
+                "major",
+                "critical"
+              ]
+            }
+          },
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListIncidentsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/incidents/{id}": {
+      "get": {
+        "operationId": "IncidentsController_getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleIncidentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      },
+      "delete": {
+        "operationId": "IncidentsController_deleteOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/incidents/{id}/status": {
+      "patch": {
+        "operationId": "IncidentsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIncidentStatusBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleIncidentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/incidents/{id}/comments": {
+      "get": {
+        "operationId": "IncidentsController_listComments",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListIncidentCommentsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      },
+      "post": {
+        "operationId": "IncidentsController_addComment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComposeIncidentCommentBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleIncidentCommentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/incidents/{id}/comments/{commentId}": {
+      "delete": {
+        "operationId": "IncidentsController_deleteComment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "commentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "incidents"
         ]
       }
     },
@@ -1875,6 +2202,192 @@
         ],
         "tags": [
           "integrations"
+        ]
+      }
+    },
+    "/pricing-recommendations": {
+      "get": {
+        "operationId": "PricingRecommendationsController_list",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "adopted",
+                "dismissed"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPricingRecommendationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "pricing-recommendations"
+        ]
+      },
+      "post": {
+        "operationId": "PricingRecommendationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePricingRecommendationBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePricingRecommendationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "pricing-recommendations"
+        ]
+      }
+    },
+    "/pricing-recommendations/{id}/adopt": {
+      "post": {
+        "operationId": "PricingRecommendationsController_adopt",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdoptPricingRecommendationBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePricingRecommendationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "pricing-recommendations"
+        ]
+      }
+    },
+    "/pricing-recommendations/{id}/dismiss": {
+      "post": {
+        "operationId": "PricingRecommendationsController_dismiss",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DismissPricingRecommendationBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePricingRecommendationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "pricing-recommendations"
         ]
       }
     },
@@ -3594,6 +4107,710 @@
         ],
         "tags": [
           "integrations"
+        ]
+      }
+    },
+    "/metrics/wau": {
+      "get": {
+        "operationId": "MetricsController_getWau",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "weeks",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 52,
+              "default": 12,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WauResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/hours-recovered": {
+      "get": {
+        "operationId": "MetricsController_getHoursRecovered",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HoursRecoveredResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/search-outcomes": {
+      "get": {
+        "operationId": "MetricsController_getSearchOutcomes",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchOutcomesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/no-data-queries": {
+      "get": {
+        "operationId": "MetricsController_getNoDataQueries",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoDataQueriesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/escalations": {
+      "get": {
+        "operationId": "MetricsController_getEscalations",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/costs": {
+      "get": {
+        "operationId": "MetricsController_getCosts",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/feedback": {
+      "get": {
+        "operationId": "MetricsController_getFeedback",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsFeedbackResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/pricing-funnel": {
+      "get": {
+        "operationId": "MetricsController_getPricingFunnel",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingFunnelResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/onboarding-cohort": {
+      "get": {
+        "operationId": "MetricsController_getOnboardingCohort",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingCohortResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/top-questions": {
+      "get": {
+        "operationId": "MetricsController_getTopQuestions",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopQuestionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/recent-escalations": {
+      "get": {
+        "operationId": "MetricsController_getRecentEscalations",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 8,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentEscalationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/active-staff": {
+      "get": {
+        "operationId": "MetricsController_getActiveStaff",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 8,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveStaffResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/onboarding/me": {
+      "get": {
+        "operationId": "OnboardingMetricsController_getMine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
+        ]
+      }
+    },
+    "/metrics/onboarding/{userId}": {
+      "get": {
+        "operationId": "OnboardingMetricsController_getByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "metrics"
         ]
       }
     }
@@ -5805,26 +7022,48 @@
           "userMessage"
         ]
       },
-      "ListConversationItemDto": {
+      "ListConversationsPageDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "venueId": {
+                  "type": "string"
+                },
+                "venueName": {
+                  "type": "string"
+                },
+                "lastMessageAt": {
+                  "type": "string"
+                },
+                "preview": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "venueId",
+                "venueName",
+                "lastMessageAt",
+                "preview"
+              ]
+            },
             "x-nestjs_zod-has-null": true
           },
-          "venueId": {
-            "type": "string",
-            "x-nestjs_zod-has-null": true
-          },
-          "venueName": {
-            "type": "string",
-            "x-nestjs_zod-has-null": true
-          },
-          "lastMessageAt": {
-            "type": "string",
-            "x-nestjs_zod-has-null": true
-          },
-          "preview": {
+          "nextCursor": {
             "anyOf": [
               {
                 "type": "string"
@@ -5838,11 +7077,8 @@
           }
         },
         "required": [
-          "id",
-          "venueId",
-          "venueName",
-          "lastMessageAt",
-          "preview"
+          "items",
+          "nextCursor"
         ]
       },
       "ConversationResponseDto": {
@@ -6025,6 +7261,518 @@
         "required": [
           "id",
           "visibility"
+        ]
+      },
+      "ListIncidentsResponseDto": {
+        "type": "object",
+        "properties": {
+          "incidents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "venueId": {
+                  "type": "string"
+                },
+                "venueName": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "minor",
+                    "major",
+                    "critical"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "acknowledged",
+                    "closed"
+                  ]
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "loggedBy": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "email": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "userId",
+                        "name",
+                        "email"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sourceMessageId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sourceConversationId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "details": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                },
+                "commentCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "organizationId",
+                "venueId",
+                "venueName",
+                "severity",
+                "status",
+                "summary",
+                "loggedBy",
+                "sourceMessageId",
+                "sourceConversationId",
+                "details",
+                "commentCount",
+                "createdAt",
+                "updatedAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          },
+          "openCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
+          },
+          "criticalOpenCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "incidents",
+          "openCount",
+          "criticalOpenCount"
+        ]
+      },
+      "SingleIncidentResponseDto": {
+        "type": "object",
+        "properties": {
+          "incident": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "organizationId": {
+                "type": "string"
+              },
+              "venueId": {
+                "type": "string"
+              },
+              "venueName": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "minor",
+                  "major",
+                  "critical"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "acknowledged",
+                  "closed"
+                ]
+              },
+              "summary": {
+                "type": "string"
+              },
+              "loggedBy": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "userId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "email": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "userId",
+                      "name",
+                      "email"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sourceMessageId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sourceConversationId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "details": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "commentCount": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "organizationId",
+              "venueId",
+              "venueName",
+              "severity",
+              "status",
+              "summary",
+              "loggedBy",
+              "sourceMessageId",
+              "sourceConversationId",
+              "details",
+              "commentCount",
+              "createdAt",
+              "updatedAt"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "incident"
+        ]
+      },
+      "UpdateIncidentStatusBodyDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "acknowledged",
+              "closed"
+            ]
+          },
+          "resolution": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ListIncidentCommentsResponseDto": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "incidentId": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "comment",
+                    "status_change"
+                  ]
+                },
+                "body": {
+                  "type": "string"
+                },
+                "meta": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                },
+                "author": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "email": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "userId",
+                        "name",
+                        "email"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "incidentId",
+                "kind",
+                "body",
+                "meta",
+                "author",
+                "createdAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "comments"
+        ]
+      },
+      "ComposeIncidentCommentBodyDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "SingleIncidentCommentResponseDto": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "incidentId": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "comment",
+                  "status_change"
+                ]
+              },
+              "body": {
+                "type": "string"
+              },
+              "meta": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "author": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "userId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "email": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "userId",
+                      "name",
+                      "email"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "incidentId",
+              "kind",
+              "body",
+              "meta",
+              "author",
+              "createdAt"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "comment"
         ]
       },
       "ReportListResponseDto": {
@@ -7733,6 +9481,359 @@
         "required": [
           "integration"
         ]
+      },
+      "ListPricingRecommendationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "venueId": {
+                  "type": "string"
+                },
+                "sourceItemRef": {
+                  "type": "string"
+                },
+                "sourceItemLabel": {
+                  "type": "string"
+                },
+                "currentPriceCents": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "recommendedPriceCents": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "rationale": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "adopted",
+                    "dismissed"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "adoptedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "adoptedPriceCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "dismissedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "dismissedReason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "upliftWindowDays": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "measuredUpliftCents": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "measuredAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "organizationId",
+                "venueId",
+                "sourceItemRef",
+                "sourceItemLabel",
+                "currentPriceCents",
+                "recommendedPriceCents",
+                "rationale",
+                "status",
+                "createdAt",
+                "adoptedAt",
+                "adoptedPriceCents",
+                "dismissedAt",
+                "dismissedReason",
+                "upliftWindowDays",
+                "measuredUpliftCents",
+                "measuredAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "recommendations"
+        ]
+      },
+      "CreatePricingRecommendationBodyDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "sourceItemRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "sourceItemLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "currentPriceCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          "recommendedPriceCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000
+          },
+          "upliftWindowDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          }
+        },
+        "required": [
+          "venueId",
+          "sourceItemRef",
+          "sourceItemLabel",
+          "currentPriceCents",
+          "recommendedPriceCents",
+          "rationale"
+        ]
+      },
+      "SinglePricingRecommendationResponseDto": {
+        "type": "object",
+        "properties": {
+          "recommendation": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "organizationId": {
+                "type": "string"
+              },
+              "venueId": {
+                "type": "string"
+              },
+              "sourceItemRef": {
+                "type": "string"
+              },
+              "sourceItemLabel": {
+                "type": "string"
+              },
+              "currentPriceCents": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "recommendedPriceCents": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "adopted",
+                  "dismissed"
+                ]
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "adoptedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "adoptedPriceCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dismissedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dismissedReason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "upliftWindowDays": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "measuredUpliftCents": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "measuredAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "organizationId",
+              "venueId",
+              "sourceItemRef",
+              "sourceItemLabel",
+              "currentPriceCents",
+              "recommendedPriceCents",
+              "rationale",
+              "status",
+              "createdAt",
+              "adoptedAt",
+              "adoptedPriceCents",
+              "dismissedAt",
+              "dismissedReason",
+              "upliftWindowDays",
+              "measuredUpliftCents",
+              "measuredAt"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "recommendation"
+        ]
+      },
+      "AdoptPricingRecommendationBodyDto": {
+        "type": "object",
+        "properties": {
+          "adoptedPriceCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000
+          }
+        }
+      },
+      "DismissPricingRecommendationBodyDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        }
       },
       "SuggestionsOnOpenRequestDto": {
         "type": "object",
@@ -10899,6 +13000,753 @@
         "required": [
           "locations",
           "error"
+        ]
+      },
+      "WauResponseDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string"
+          },
+          "weeks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "weekStart": {
+                  "type": "string"
+                },
+                "weekEnd": {
+                  "type": "string"
+                },
+                "activeUsers": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "messageCount": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "weekStart",
+                "weekEnd",
+                "activeUsers",
+                "messageCount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "venueId",
+          "weeks"
+        ]
+      },
+      "HoursRecoveredResponseDto": {
+        "type": "object",
+        "properties": {
+          "queriesCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
+          },
+          "minutesSaved": {
+            "type": "number",
+            "minimum": 0,
+            "x-nestjs_zod-has-null": true
+          },
+          "hoursSaved": {
+            "type": "number",
+            "minimum": 0,
+            "x-nestjs_zod-has-null": true
+          },
+          "valueGbpCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "x-nestjs_zod-has-null": true
+          },
+          "range": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "organizationId": {
+                "type": "string"
+              },
+              "venueId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "organizationId",
+              "venueId"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          },
+          "baseline": {
+            "type": "object",
+            "properties": {
+              "minutesPerQuery": {
+                "type": "number",
+                "minimum": 0
+              },
+              "hourlyRateCents": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "minutesPerQuery",
+              "hourlyRateCents"
+            ],
+            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "queriesCount",
+          "minutesSaved",
+          "hoursSaved",
+          "valueGbpCents",
+          "range",
+          "scope",
+          "baseline"
+        ]
+      },
+      "SearchOutcomesResponseDto": {
+        "type": "object",
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "hit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "noData": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "error": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "date",
+                "hit",
+                "noData",
+                "error"
+              ]
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "hit": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "noData": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "error": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "hit",
+              "noData",
+              "error"
+            ],
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "buckets",
+          "totals"
+        ]
+      },
+      "NoDataQueriesResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "lastSeen": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query",
+                "count",
+                "lastSeen"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "EscalationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "resolved": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "escalated": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "date",
+                "resolved",
+                "escalated"
+              ]
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "resolved": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "escalated": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "resolutionRate": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "resolved",
+              "escalated",
+              "resolutionRate"
+            ],
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "buckets",
+          "totals"
+        ]
+      },
+      "CostsResponseDto": {
+        "type": "object",
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "usdCents": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "messages": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "date",
+                "usdCents",
+                "messages"
+              ]
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "usdCents": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "messages": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "costPerMessageCents": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "usdCents",
+              "messages",
+              "costPerMessageCents"
+            ],
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "buckets",
+          "totals"
+        ]
+      },
+      "MetricsFeedbackResponseDto": {
+        "type": "object",
+        "properties": {
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "up": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "down": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "regenerate": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "date",
+                "up",
+                "down",
+                "regenerate"
+              ]
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "up": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "down": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "regenerate": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "positiveRate": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "up",
+              "down",
+              "regenerate",
+              "positiveRate"
+            ],
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "buckets",
+          "totals"
+        ]
+      },
+      "PricingFunnelResponseDto": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "adopted": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "dismissed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "adoptionRate": {
+            "type": "number"
+          },
+          "measuredUpliftGbpCents": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "pending",
+          "adopted",
+          "dismissed",
+          "adoptionRate",
+          "measuredUpliftGbpCents"
+        ]
+      },
+      "OnboardingCohortResponseDto": {
+        "type": "object",
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "email": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "role": {
+                  "type": "string"
+                },
+                "startedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "daysSinceStart": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "totalQueries": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "repeatQueries": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "repeatRate": {
+                  "type": "number"
+                },
+                "firstIndependentAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "userId",
+                "name",
+                "email",
+                "role",
+                "startedAt",
+                "daysSinceStart",
+                "totalQueries",
+                "repeatQueries",
+                "repeatRate",
+                "firstIndependentAt"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "members"
+        ]
+      },
+      "TopQuestionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "lastSeen": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query",
+                "count",
+                "lastSeen"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "RecentEscalationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string"
+                },
+                "conversationId": {
+                  "type": "string"
+                },
+                "escalatedAt": {
+                  "type": "string"
+                },
+                "escalationKind": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "venueId": {
+                  "type": "string"
+                },
+                "venueName": {
+                  "type": "string"
+                },
+                "staffUserId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "staffName": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "escalatedToUserId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "escalatedToName": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "messageId",
+                "conversationId",
+                "escalatedAt",
+                "escalationKind",
+                "venueId",
+                "venueName",
+                "staffUserId",
+                "staffName",
+                "escalatedToUserId",
+                "escalatedToName"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ActiveStaffResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "email": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "role": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "lastSeen": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "userId",
+                "name",
+                "email",
+                "role",
+                "count",
+                "lastSeen"
+              ]
+            },
+            "x-nestjs_zod-has-null": true
+          }
+        },
+        "required": [
+          "items"
         ]
       }
     }

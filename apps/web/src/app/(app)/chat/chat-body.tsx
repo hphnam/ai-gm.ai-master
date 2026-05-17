@@ -23,7 +23,7 @@ import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
 import { useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
-import { type ConvListItem, useConversationsList } from '@/lib/hooks/use-conversations-list'
+import type { ConvListItem } from '@/lib/hooks/use-conversations-list'
 import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
 import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
 import { useVenues } from '@/lib/hooks/use-venues'
@@ -100,20 +100,46 @@ function ChatSkeleton() {
   )
 }
 
+// The conversations list lives in an infinite-query cache keyed by
+// ['chat-conversations', venueKey, { q, limit }] — there can be several
+// active entries (sidebar default, history page search, etc.). Both
+// optimistic helpers mutate every matching entry so the new/updated thread
+// appears immediately regardless of which surface is mounted.
+type ConvListInfinite = {
+  pages: Array<{ items: ConvListItem[]; nextCursor: string | null }>
+  pageParams: unknown[]
+}
+
+function listContains(data: ConvListInfinite | undefined, id: string): boolean {
+  return data?.pages.some((p) => p.items.some((it) => it.id === id)) ?? false
+}
+
 function prependOptimisticThread(qc: RqClient, entry: ConvListItem) {
-  qc.setQueryData<ConvListItem[]>(['chat-conversations', '__all__'], (prev) => {
-    const base = prev ?? []
-    if (base.some((c) => c.id === entry.id)) return base
-    return [entry, ...base]
+  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
+    if (!prev) return prev
+    if (listContains(prev, entry.id)) return prev
+    const [first, ...rest] = prev.pages
+    const head = first ?? { items: [], nextCursor: null }
+    return {
+      ...prev,
+      pages: [{ ...head, items: [entry, ...head.items] }, ...rest],
+    }
   })
 }
 
 function bumpOptimisticThread(qc: RqClient, conversationId: string, preview: string) {
-  qc.setQueryData<ConvListItem[]>(['chat-conversations', '__all__'], (prev) => {
+  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
     if (!prev) return prev
-    return prev.map((c) =>
-      c.id === conversationId ? { ...c, preview, lastMessageAt: new Date().toISOString() } : c,
-    )
+    const now = new Date().toISOString()
+    return {
+      ...prev,
+      pages: prev.pages.map((p) => ({
+        ...p,
+        items: p.items.map((c) =>
+          c.id === conversationId ? { ...c, preview, lastMessageAt: now } : c,
+        ),
+      })),
+    }
   })
 }
 
@@ -237,7 +263,6 @@ function ChatCore({
 }) {
   const router = useRouter()
   const { data: venues } = useVenues()
-  const _conversationsList = useConversationsList(null)
   const { data: session } = useSession()
   const sessionUserId = session?.user?.id ?? null
 
@@ -361,8 +386,14 @@ function ChatCore({
 
       // 2. Sidebar: first message → prepend a new row at the conv UUID (server
       //    will upsert with the same id). Subsequent messages → bump + preview.
-      const list = queryClient.getQueryData<ConvListItem[]>(['chat-conversations', '__all__'])
-      const existsInSidebar = list?.some((c) => c.id === conv)
+      //    The infinite-query cache may have multiple entries (different q/limit
+      //    on the history page) — checking just one is enough to decide
+      //    prepend-vs-bump because either branch fans out to all matching
+      //    entries via setQueriesData.
+      const lists = queryClient.getQueriesData<ConvListInfinite>({
+        queryKey: ['chat-conversations', '__all__'],
+      })
+      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
       const preview = text.length > 80 ? `${text.slice(0, 79)}…` : text
       if (!existsInSidebar) {
         const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
@@ -410,8 +441,10 @@ function ChatCore({
       const previewText = text.trim().length > 0 ? text : '[image attached]'
       setPendingUserTexts((prev) => [...prev, previewText])
 
-      const list = queryClient.getQueryData<ConvListItem[]>(['chat-conversations', '__all__'])
-      const existsInSidebar = list?.some((c) => c.id === conv)
+      const lists = queryClient.getQueriesData<ConvListInfinite>({
+        queryKey: ['chat-conversations', '__all__'],
+      })
+      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
       const preview = previewText.length > 80 ? `${previewText.slice(0, 79)}…` : previewText
       if (!existsInSidebar) {
         const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'

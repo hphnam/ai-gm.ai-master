@@ -43,7 +43,7 @@ import {
   ConversationIdParamDto,
   ConversationResponseDto,
   GetConversationQueryDto,
-  ListConversationItemDto,
+  ListConversationsPageDto,
   ListConversationsQueryDto,
   SendChatMessageRequestDto,
   SendChatMessageResponseDto,
@@ -223,18 +223,19 @@ export class ChatController {
   }
 
   @Get('conversations')
-  @ApiResponse({ status: 200, type: [ListConversationItemDto] })
+  @ApiResponse({ status: 200, type: ListConversationsPageDto })
   async listConversations(
     @Query(new ZodValidationPipe(ListConversationsQueryDto))
-    q: ListConversationsQueryDto,
+    query: ListConversationsQueryDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
-  ): Promise<ListConversationItemDto[]> {
-    return (await this.chatService.listRecent(
-      org.id,
-      user.id,
-      q.venueId,
-    )) as unknown as ListConversationItemDto[]
+  ): Promise<ListConversationsPageDto> {
+    return (await this.chatService.listPage(org.id, user.id, {
+      venueId: query.venueId,
+      cursor: query.cursor,
+      limit: query.limit,
+      q: query.q,
+    })) as unknown as ListConversationsPageDto
   }
 
   @Get('conversations/:id')

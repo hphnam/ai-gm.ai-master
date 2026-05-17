@@ -11,6 +11,7 @@ import { ComplianceModule } from './modules/compliance/compliance.module'
 import { DebugModule } from './modules/debug/debug.module'
 import { DocsModule } from './modules/docs/docs.module'
 import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
+import { IncidentsModule } from './modules/incidents/incidents.module'
 import { IngestModule } from './modules/ingest/ingest.module'
 import { IntegrationsModule } from './modules/integrations/integrations.module'
 import { SquareModule } from './modules/integrations/square/square.module'
@@ -61,6 +62,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     SquareModule,
     MetricsModule,
     OnboardingMetricsModule,
+    IncidentsModule,
     PricingRecommendationsModule,
   ],
   controllers: [AppController],

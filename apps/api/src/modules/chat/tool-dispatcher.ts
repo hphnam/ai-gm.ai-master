@@ -12,6 +12,7 @@ import {
   type ToolResult,
 } from '../../types'
 import { ChatV2Service } from '../chat-v2/chat-v2.service'
+import { IncidentsService } from '../incidents/incidents.service'
 import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
@@ -99,6 +100,7 @@ export class ToolDispatcher {
     private readonly chatV2: ChatV2Service,
     private readonly realtime: RealtimeGateway,
     private readonly tasks: TasksService,
+    private readonly incidents: IncidentsService,
     private readonly integrations: IntegrationRegistry,
     private readonly reports: ReportsService,
     private readonly pricingRecommendations: PricingRecommendationsService,
@@ -209,9 +211,13 @@ export class ToolDispatcher {
           }
           const venue = await prisma.venue.findFirst({
             where: { id: i.venueId, organizationId: ctx.orgId },
-            select: { id: true },
+            select: { id: true, name: true },
           })
           if (!venue) return fail('error', 'venue not found in your organisation')
+          const logger = await prisma.user.findUnique({
+            where: { id: ctx.userId },
+            select: { name: true },
+          })
           const incident = await prisma.incidentLog.create({
             data: {
               organizationId: ctx.orgId,
@@ -235,6 +241,19 @@ export class ToolDispatcher {
               summaryLength: i.summary.length,
             }),
           )
+          // Fan-out to owners/managers. Awaited so a failure shows up in the
+          // tool-call log; the service itself catches per-recipient errors so
+          // a single bad bell delivery doesn't fail the whole tool call.
+          await this.incidents.notifyEscalation({
+            incidentId: incident.id,
+            organizationId: ctx.orgId,
+            venueId: i.venueId,
+            venueName: venue.name,
+            severity: i.severity,
+            summary: i.summary,
+            loggedByUserId: ctx.userId,
+            loggedByName: logger?.name ?? null,
+          })
           return {
             ok: true,
             data: {

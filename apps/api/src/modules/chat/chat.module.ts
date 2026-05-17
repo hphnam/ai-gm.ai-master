@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
 import { ChatV2Module } from '../chat-v2/chat-v2.module'
+import { IncidentsModule } from '../incidents/incidents.module'
 import { IngestModule } from '../ingest/ingest.module'
 // IntegrationsModule is @Global — no import needed for the registry, but we
 // keep one here for explicitness around the chat → integrations dependency.
@@ -38,6 +39,7 @@ import { UserProfileService } from './user-profile.service'
     ChatV2Module,
     RealtimeModule,
     TasksModule,
+    IncidentsModule,
     ReportsModule,
     forwardRef(() => ScheduledReportsModule),
     IntegrationsModule,

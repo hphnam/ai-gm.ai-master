@@ -16,6 +16,17 @@ export class GetConversationQueryDto extends createZodDto(GetConversationQuerySc
 
 export const ListConversationsQuerySchema = z.object({
   venueId: z.string().regex(UUID_RE, 'invalid uuid').optional(),
+  /// Opaque keyset cursor returned by the previous page. Encodes the last
+  /// row's (updatedAt, id) so pagination is stable even when rows are
+  /// inserted/updated mid-scroll.
+  cursor: z.string().min(1).max(200).optional(),
+  /// Page size. Clamped server-side to [1, 100].
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  /// Free-text search across venue name and first user message content.
+  /// Compiles to Postgres ILIKE on both columns. Minimum length is 2 to keep
+  /// 1-character wildcard scans off the table (the message-content path is
+  /// unindexed today); trim + 100-char cap bounds pattern size.
+  q: z.string().trim().min(2).max(100).optional(),
 })
 export class ListConversationsQueryDto extends createZodDto(ListConversationsQuerySchema) {}
 
@@ -85,3 +96,10 @@ export const ListConversationItemSchema = z.object({
   preview: z.string().nullable(),
 })
 export class ListConversationItemDto extends createZodDto(ListConversationItemSchema) {}
+
+export const ListConversationsPageSchema = z.object({
+  items: z.array(ListConversationItemSchema),
+  /// Opaque cursor for the next page, or null if this is the final page.
+  nextCursor: z.string().nullable(),
+})
+export class ListConversationsPageDto extends createZodDto(ListConversationsPageSchema) {}
