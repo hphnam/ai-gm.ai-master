@@ -775,11 +775,28 @@ model ChatMessage {
   /// Count of issues found when verifyStatus='issues'. Used by the UI badge
   /// to render "checked N · 1 issue" style copy without re-fetching detail.
   verifyIssueCount Int?
+  /// Operator-metrics instrumentation (spec A + F — "Manager Interruptions
+  /// Prevented" and "AI Response Resolution Rate"). Set on assistant turns
+  /// when the turn escalated to a human via a tool call (log_incident,
+  /// cross-assigned create_task, or leave_note_for_user to another user).
+  /// NULL means the AI resolved the turn without escalation. Derived from
+  /// toolCallLog at persist time — see chat/escalation.ts.
+  escalatedAt        DateTime?
+  /// Target user when the escalation has a specific recipient (task assignee,
+  /// note recipient). NULL for generic escalations like log_incident (duty
+  /// manager is implicit, not a specific user row). NOT a FK — the recipient
+  /// may be deactivated later and we still want the metric row to survive.
+  escalatedToUserId  String?
+  /// 'incident' | 'task' | 'note' — the tool that triggered the escalation.
+  /// NULL when escalatedAt is NULL.
+  escalationKind     String?
   createdAt        DateTime @default(now())
 
   conversation    ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   feedback        MessageFeedback?
   retagQueueItems ReTagQueueItem[] @relation("sourceMessage")
+
+  @@index([conversationId, escalatedAt])
 }
 
 model MessageFeedback {

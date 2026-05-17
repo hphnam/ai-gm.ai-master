@@ -33,6 +33,7 @@ import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
 import { ConversationModeService } from './conversation-mode.service'
+import { deriveEscalation } from './escalation'
 import {
   type AgentMode,
   buildGmAgent,
@@ -873,6 +874,8 @@ Assistant answer: ${assistantText}`,
       }),
     )
 
+    const escalation = deriveEscalation(toolCallLog, userId)
+
     const assistantMessage = await prisma.chatMessage.create({
       data: {
         conversationId,
@@ -883,6 +886,9 @@ Assistant answer: ${assistantText}`,
         followUps,
         reasoning: reasoningText ?? null,
         parts: (partsJson ?? undefined) as object | undefined,
+        escalatedAt: escalation?.escalatedAt ?? null,
+        escalatedToUserId: escalation?.escalatedToUserId ?? null,
+        escalationKind: escalation?.escalationKind ?? null,
       },
       select: { id: true, content: true, followUps: true },
     })
@@ -1265,6 +1271,8 @@ Assistant answer: ${assistantText}`,
         // delays when the pills appear — not when the message arrives.
         const followUps = await this.generateFollowUps(params.userText, storedContent)
 
+        const escalation = deriveEscalation(toolCallLog, params.userId)
+
         const assistantMessage = await prisma.chatMessage.create({
           data: {
             id: assistantMessageId,
@@ -1276,6 +1284,9 @@ Assistant answer: ${assistantText}`,
             followUps,
             reasoning: reasoningText ?? null,
             parts: (partsJson ?? undefined) as object | undefined,
+            escalatedAt: escalation?.escalatedAt ?? null,
+            escalatedToUserId: escalation?.escalatedToUserId ?? null,
+            escalationKind: escalation?.escalationKind ?? null,
           },
           select: { id: true },
         })
