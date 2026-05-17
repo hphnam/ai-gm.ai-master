@@ -73,10 +73,15 @@ export type CreatePricingRecommendationInput = {
 @Injectable()
 export class PricingRecommendationsService {
   private readonly logger = new Logger(PricingRecommendationsService.name)
-  private readonly prisma: PrismaSeam
+  // Nest DI: no constructor args — the prisma client is a module-level
+  // singleton, not a Nest provider. Tests inject a fake via the static
+  // `withPrismaForTest` factory below.
+  private prisma: PrismaSeam = defaultPrisma as unknown as PrismaSeam
 
-  constructor(prismaOverride?: PrismaSeam) {
-    this.prisma = prismaOverride ?? (defaultPrisma as unknown as PrismaSeam)
+  static withPrismaForTest(prismaStub: PrismaSeam): PricingRecommendationsService {
+    const svc = new PricingRecommendationsService()
+    svc.prisma = prismaStub
+    return svc
   }
 
   async create(

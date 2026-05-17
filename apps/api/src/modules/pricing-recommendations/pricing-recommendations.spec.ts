@@ -76,8 +76,8 @@ type FakePrisma = {
 }
 
 function buildService(prismaStub: FakePrisma): PricingRecommendationsService {
-  return new PricingRecommendationsService(
-    prismaStub as unknown as ConstructorParameters<typeof PricingRecommendationsService>[0],
+  return PricingRecommendationsService.withPrismaForTest(
+    prismaStub as unknown as Parameters<typeof PricingRecommendationsService.withPrismaForTest>[0],
   )
 }
 
@@ -370,6 +370,9 @@ describe('PricingRecommendationsService.markDismissed', () => {
     const service = buildService(prismaStub)
     const row = await service.markDismissed(ORG, 'rec-1', 'price war risk')
     assert.equal(row.status, 'dismissed')
-    assert.equal((updateArgs as unknown as { dismissedReason: string }).dismissedReason, 'price war risk')
+    assert.equal(
+      (updateArgs as unknown as { dismissedReason: string }).dismissedReason,
+      'price war risk',
+    )
   })
 })
