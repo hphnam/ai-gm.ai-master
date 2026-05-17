@@ -1,15 +1,11 @@
-import { redirect } from 'next/navigation'
 import { ScheduledReportsBody } from '@/components/scheduled-reports/scheduled-reports-body'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { BackLink } from '@/components/ui/back-link'
-import { getServerSession } from '@/lib/server-session'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ScheduledReportsPage() {
-  const session = await getServerSession()
-  if (!session) redirect('/auth/sign-in?redirect=/reports/schedules')
+export default function ScheduledReportsPage() {
   return (
     <AppShell>
       <PageHeader

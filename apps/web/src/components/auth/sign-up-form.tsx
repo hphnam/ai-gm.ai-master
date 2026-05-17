@@ -55,7 +55,12 @@ export function SignUpForm() {
         }
         return
       }
-      const target = safeRedirectOr(search.get('redirect'), '/chat')
+      // Fresh accounts have zero venues — go straight into onboarding instead
+      // of dumping them onto an empty /chat. requireAppAccess on /chat would
+      // bounce them to /welcome anyway; routing directly avoids the extra hop.
+      // If a redirect was explicitly requested (e.g. a magic-link invite),
+      // honour it.
+      const target = safeRedirectOr(search.get('redirect'), '/welcome')
       router.replace(target)
       router.refresh()
     } catch {
