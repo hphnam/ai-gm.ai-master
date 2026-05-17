@@ -40,6 +40,11 @@ export type RetrievalHit = {
 
 export type RetrievalOpts = {
   orgId: string
+  /// Author of the find_knowledge call. Threaded into SearchAnalytics.userId so
+  /// the onboarding-competency metric (spec I) can count per-user repeats.
+  /// Optional: WhatsApp legacy paths and the schema/probe harnesses don't have
+  /// one and shouldn't fail the call.
+  userId?: string
   venueId?: string
   limit?: number
   minSimilarity?: number
@@ -235,6 +240,7 @@ export class RetrievalService implements OnModuleInit {
       await prisma.searchAnalytics.create({
         data: {
           organizationId: opts.orgId,
+          userId: opts.userId ?? null,
           venueId: opts.venueId ?? null,
           query: query.slice(0, 500),
           outcome,

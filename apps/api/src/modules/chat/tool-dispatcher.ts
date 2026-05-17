@@ -170,6 +170,7 @@ export class ToolDispatcher {
           void this.flagPossibleIntegrationMisroute(i.query, ctx.orgId)
           const result = await this.retrieval.find(i.query, {
             orgId: ctx.orgId,
+            userId: ctx.userId,
             venueId: i.venueId,
             limit: i.limit,
             minSimilarity: i.minSimilarity,
@@ -1143,18 +1144,12 @@ export class ToolDispatcher {
           // the review queue via the agent, even though the queue is read-only
           // surfacing on the dashboard.
           if (ctx.userRole !== 'owner' && ctx.userRole !== 'manager') {
-            return fail(
-              'invalid-input',
-              'only managers or owners can log pricing recommendations',
-            )
+            return fail('invalid-input', 'only managers or owners can log pricing recommendations')
           }
           // Reuse the per-author throttle so a jailbroken prompt can't flood
           // the review queue. Same window as leave_note / create_task.
           if (!leaveNoteRateLimit.allow(ctx.userId)) {
-            return fail(
-              'error',
-              'too many pricing recommendations in a short window — slow down',
-            )
+            return fail('error', 'too many pricing recommendations in a short window — slow down')
           }
           const i = parsed.data as {
             venueId: string
