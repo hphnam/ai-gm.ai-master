@@ -15,6 +15,7 @@ import { ChatV2Service } from '../chat-v2/chat-v2.service'
 import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
+import { PricingRecommendationsService } from '../pricing-recommendations/pricing-recommendations.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { ReportsService } from '../reports/reports.service'
 import type { RetrievalHit } from '../retrieval/retrieval.service'
@@ -100,6 +101,7 @@ export class ToolDispatcher {
     private readonly tasks: TasksService,
     private readonly integrations: IntegrationRegistry,
     private readonly reports: ReportsService,
+    private readonly pricingRecommendations: PricingRecommendationsService,
     // forwardRef breaks the chat ↔ scheduled-reports module cycle:
     // ScheduledReportsModule's ReportGeneratorService injects ToolDispatcher,
     // and ToolDispatcher injects ScheduledReportsService. Both module imports
@@ -1130,6 +1132,60 @@ export class ToolDispatcher {
               JSON.stringify({ event: `${toolName}.error`, message, orgId: ctx.orgId }),
             )
             return fail('error', `${toolName} failed — please retry shortly`)
+          }
+        }
+        case 'record_pricing_recommendation': {
+          if (!ctx) {
+            return fail('error', 'record_pricing_recommendation requires an authenticated context')
+          }
+          // Mirror the controller-level role gate. Pricing decisions are an
+          // owner / manager activity; staff users shouldn't be able to seed
+          // the review queue via the agent, even though the queue is read-only
+          // surfacing on the dashboard.
+          if (ctx.userRole !== 'owner' && ctx.userRole !== 'manager') {
+            return fail(
+              'invalid-input',
+              'only managers or owners can log pricing recommendations',
+            )
+          }
+          // Reuse the per-author throttle so a jailbroken prompt can't flood
+          // the review queue. Same window as leave_note / create_task.
+          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+            return fail(
+              'error',
+              'too many pricing recommendations in a short window — slow down',
+            )
+          }
+          const i = parsed.data as {
+            venueId: string
+            sourceItemRef: string
+            sourceItemLabel: string
+            currentPriceCents: number
+            recommendedPriceCents: number
+            rationale: string
+          }
+          try {
+            const row = await this.pricingRecommendations.create(ctx.orgId, {
+              venueId: i.venueId,
+              sourceItemRef: i.sourceItemRef,
+              sourceItemLabel: i.sourceItemLabel,
+              currentPriceCents: i.currentPriceCents,
+              recommendedPriceCents: i.recommendedPriceCents,
+              rationale: i.rationale,
+            })
+            return ok({
+              id: row.id,
+              status: row.status,
+              sourceItemLabel: row.sourceItemLabel,
+              currentPriceCents: row.currentPriceCents,
+              recommendedPriceCents: row.recommendedPriceCents,
+            })
+          } catch (err) {
+            const message = (err as Error).message ?? 'unknown'
+            if (/invalid-venue/.test(message)) {
+              return fail('invalid-input', 'venue-not-in-org')
+            }
+            return fail('error', `record_pricing_recommendation failed: ${message}`)
           }
         }
         case 'present_checklist': {

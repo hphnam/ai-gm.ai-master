@@ -5,6 +5,7 @@ import { IngestModule } from '../ingest/ingest.module'
 // IntegrationsModule is @Global — no import needed for the registry, but we
 // keep one here for explicitness around the chat → integrations dependency.
 import { IntegrationsModule } from '../integrations/integrations.module'
+import { PricingRecommendationsModule } from '../pricing-recommendations/pricing-recommendations.module'
 import { RealtimeModule } from '../realtime/realtime.module'
 import { ReportsModule } from '../reports/reports.module'
 import { RetrievalModule } from '../retrieval/retrieval.module'
@@ -40,6 +41,7 @@ import { UserProfileService } from './user-profile.service'
     ReportsModule,
     forwardRef(() => ScheduledReportsModule),
     IntegrationsModule,
+    PricingRecommendationsModule,
   ],
   controllers: [ChatController],
   providers: [

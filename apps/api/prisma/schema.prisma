@@ -29,15 +29,16 @@ model Venue {
   organizationId   String
   createdAt        DateTime @default(now())
 
-  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  mockStock          MockStock[]
-  knowledgeItems     KnowledgeItem[]
-  mockPurchaseOrders MockPurchaseOrder[]
-  contacts           VenueContact[]
-  chatConversations  ChatConversation[]
-  incidentLogs       IncidentLog[]
-  tasks              Task[]
-  expiryRecords      ExpiryRecord[]
+  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  mockStock              MockStock[]
+  knowledgeItems         KnowledgeItem[]
+  mockPurchaseOrders     MockPurchaseOrder[]
+  contacts               VenueContact[]
+  chatConversations      ChatConversation[]
+  incidentLogs           IncidentLog[]
+  tasks                  Task[]
+  expiryRecords          ExpiryRecord[]
+  pricingRecommendations PricingRecommendation[]
 
   @@index([organizationId])
 }
@@ -172,9 +173,10 @@ model Organization {
   integrations        Integration[]
   reports             Report[]
   scheduledReports    ScheduledReport[]
-  hiddenConversations ConversationHidden[]
+  hiddenConversations    ConversationHidden[]
   dismissedNoDataQueries DismissedNoDataQuery[]
-  metricsConfig       MetricsConfig?
+  metricsConfig          MetricsConfig?
+  pricingRecommendations PricingRecommendation[]
 
   @@index([slug])
   @@map("organizations")
@@ -1278,3 +1280,44 @@ model MetricsConfig {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("metrics_config")
+}
+
+/// Spec metric G — audit trail of AI-surfaced pricing recommendations.
+/// Lifecycle: pending (default at creation) → adopted | dismissed. The
+/// measuredUpliftCents column is filled in by a downstream measurement loop
+/// (out of scope for this model); leave NULL at creation and only flip once
+/// the comparison window closes.
+model PricingRecommendation {
+  id                    String    @id @default(uuid())
+  organizationId        String
+  venueId               String
+  /// Free-form ref to the priced thing — Square catalog item ID, MockStock id,
+  /// or a SKU string. Stored as text because the priced entity isn't always a
+  /// first-class Prisma row. Validated by the creating service.
+  sourceItemRef         String
+  sourceItemLabel       String
+  currentPriceCents     Int
+  recommendedPriceCents Int
+  rationale             String
+  /// 'pending' | 'adopted' | 'dismissed'
+  status                String    @default("pending")
+  createdAt             DateTime  @default(now())
+  adoptedAt             DateTime?
+  /// May differ from recommendedPriceCents if the owner partially accepted.
+  adoptedPriceCents     Int?
+  dismissedAt           DateTime?
+  dismissedReason       String?
+  /// Window over which uplift is measured after adoption (default 30 days).
+  upliftWindowDays      Int       @default(30)
+  /// Measured £ uplift in cents — populated by a downstream measurement loop
+  /// (out of scope here). Leave NULL on create.
+  measuredUpliftCents   Int?
+  measuredAt            DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  venue        Venue        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([venueId, status])
+  @@map("pricing_recommendations")
+}

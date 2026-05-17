@@ -46,6 +46,11 @@ export const TOOL_NAMES = [
   'pause_scheduled_report',
   'resume_scheduled_report',
   'cancel_scheduled_report',
+  // Spec metric G — audit trail of AI-surfaced pricing recommendations. The
+  // agent captures a recommendation when it spots a pricing opportunity in
+  // chat (e.g. after pos_get_cogs_summary surfaces a thin-margin item). The
+  // owner adopts/dismisses from the dashboard; a downstream loop measures uplift.
+  'record_pricing_recommendation',
 ] as const
 export type ToolName = (typeof TOOL_NAMES)[number]
 
@@ -296,6 +301,23 @@ export const TOOL_INPUT_SCHEMAS = {
   pause_scheduled_report: z.object({ scheduleId: UUID }),
   resume_scheduled_report: z.object({ scheduleId: UUID }),
   cancel_scheduled_report: z.object({ scheduleId: UUID }),
+  record_pricing_recommendation: z.object({
+    venueId: UUID,
+    /// Free-form ref to the priced thing — Square catalog variation id, MockStock id,
+    /// or a SKU string. 1-200 chars.
+    sourceItemRef: z.string().trim().min(1).max(200),
+    /// Human-readable label for the priced item ("Camden Hells pint",
+    /// "House red 175ml"). Surfaced verbatim in the owner's review queue.
+    sourceItemLabel: z.string().trim().min(1).max(200),
+    /// Today's price in pennies (e.g. 575 = £5.75). Non-negative.
+    currentPriceCents: z.number().int().min(0).max(10_000_000),
+    /// Proposed new price in pennies. May be higher OR lower than current —
+    /// recommendation = both upward repricing and discount-rollback suggestions.
+    recommendedPriceCents: z.number().int().min(0).max(10_000_000),
+    /// Why you're suggesting this — anchor in numbers ("Margin only 18%
+    /// vs 65% target"). 3-2000 chars.
+    rationale: z.string().trim().min(3).max(2000),
+  }),
 } as const satisfies Record<ToolName, z.ZodTypeAny>
 
 export type ToolInput<T extends ToolName> = z.infer<(typeof TOOL_INPUT_SCHEMAS)[T]>
@@ -822,6 +844,48 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
       },
       required: ['body'],
+    },
+  },
+  {
+    name: 'record_pricing_recommendation',
+    description:
+      "Capture an AI-surfaced pricing recommendation into the owner's review queue. FIRES when, while answering a margin / COGS / pricing / discount question, you spot a concrete opportunity to change a price — e.g. pos_get_cogs_summary surfaces an item priced well under target margin, pos_get_discount_usage shows a discount eating significant revenue, or pos_get_top_items shows a runaway best-seller priced below comparable items. ALWAYS ground the recommendation in numbers from a prior tool call THIS turn — never invent prices or margins. Pass venueId from <current_context>; sourceItemRef = the Square variation id (or MockStock id / SKU) for the priced thing; sourceItemLabel = a human-readable name (\"Camden Hells pint\"); currentPriceCents and recommendedPriceCents in pennies (575 = £5.75); rationale = one or two sentences citing the supporting numbers (\"Currently £5.75 vs £6.20 at comparable city venues; GP only 48% vs your 65% target\"). The recommendation lands in the dashboard as 'pending' — the owner adopts or dismisses from there; a downstream measurement loop later attributes uplift to adopted ones. Returns { id, status, currentPriceCents, recommendedPriceCents }. ok:false reason:'invalid-input' with detail 'venue-not-in-org' → wrong venueId, retry with the one from <current_context>. After success, mention to the user in ONE line that you've logged the suggestion for them to review — don't paste the full rationale (it's already saved). Skip if the user is asking for live data only and you have no margin or comparator number to support a price change.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        sourceItemRef: {
+          type: 'string',
+          description:
+            'Identifier for the priced thing — Square catalog variation id, MockStock id, or SKU string.',
+        },
+        sourceItemLabel: {
+          type: 'string',
+          description: 'Human-readable item name shown in the review queue.',
+        },
+        currentPriceCents: {
+          type: 'integer',
+          description: 'Current price in pennies (e.g. 575 for £5.75). Non-negative.',
+        },
+        recommendedPriceCents: {
+          type: 'integer',
+          description:
+            'Proposed new price in pennies. May be higher or lower than current.',
+        },
+        rationale: {
+          type: 'string',
+          description:
+            'Why you are suggesting this — anchor in numbers from prior tool calls this turn.',
+        },
+      },
+      required: [
+        'venueId',
+        'sourceItemRef',
+        'sourceItemLabel',
+        'currentPriceCents',
+        'recommendedPriceCents',
+        'rationale',
+      ],
     },
   },
 ]
