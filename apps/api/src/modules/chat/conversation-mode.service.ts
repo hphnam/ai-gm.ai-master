@@ -1,9 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common'
 
-export type ConversationMode = 'default' | 'incident' | 'handover' | 'training'
+export type ConversationMode = 'default' | 'incident' | 'handover'
 
-const VALID_MODES: ConversationMode[] = ['default', 'incident', 'handover', 'training']
+export const VALID_MODES: ConversationMode[] = ['default', 'incident', 'handover']
 const CALL_TIMEOUT_MS = 3500
 
 @Injectable()
@@ -38,7 +38,6 @@ export class ConversationModeService implements OnModuleInit {
   - default     (normal Q&A, ordering, troubleshooting, lookups)
   - incident    (injury, fire, gas leak, theft, fraud, safety emergency in progress or just happened)
   - handover    (end-of-shift summary for the next manager)
-  - training    (user wants to be quizzed / trained on a procedure)
 
 Message: ${text}`,
             },

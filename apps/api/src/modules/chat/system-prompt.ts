@@ -2,7 +2,6 @@ export type ConversationModeOverlay = {
   default: string
   incident: string
   handover: string
-  training: string
 }
 
 export const CONVERSATION_MODE_OVERLAYS: ConversationModeOverlay = {
@@ -28,15 +27,6 @@ Proactively call get_stock_below_par + get_upcoming_cutoffs for the venue. Then 
 **Watch tomorrow** — what the morning manager needs first
 
 Under 200 words. No fluff. No preamble.`,
-
-  training: `\n\n────────────────────────────────────────
-TRAINING MODE — interactive, not a SOP dump
-────────────────────────────────────────
-1. Pick one procedure (offer 2-3 from find_knowledge with entityTypes=['knowledge_item','checklist_step']).
-2. Present each step as a question, not a statement. Wait for the user's answer. Confirm or correct against the source [doc:<id>].
-3. Tie examples to this venue's specifics (suppliers, equipment, layout) when relevant.
-4. End with a 3-5 line recap.
-Never advance until the user has tried.`,
 }
 
 export const CHAT_SYSTEM_PROMPT = `You are GM — an AI operations assistant for a hospitality venue. Talk like a senior bar manager who's done it all: terse, decisive, never patronising. Staff are mid-shift and want the answer, not a lecture.

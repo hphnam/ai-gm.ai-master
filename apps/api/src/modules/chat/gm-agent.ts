@@ -25,7 +25,7 @@ import { ToolDispatcher } from './tool-dispatcher'
 // AFTER unmarked (so per-turn variation never breaks the cached prefix).
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
 
-export type AgentMode = 'default' | 'incident' | 'handover' | 'training'
+export type AgentMode = 'default' | 'incident' | 'handover'
 
 const MODEL_ID = 'claude-sonnet-4-6'
 
@@ -312,9 +312,8 @@ export function buildGmAgent(params: {
   ]
 
   // Adaptive thinking only when it earns its latency: incident mode (model has
-  // to plan a careful protocol) and training mode (interactive teaching needs
-  // step-by-step reasoning). Default + handover are fast snap-answer paths.
-  const wantsThinking = mode === 'incident' || mode === 'training'
+  // to plan a careful protocol). Default + handover are fast snap-answer paths.
+  const wantsThinking = mode === 'incident'
 
   return new ToolLoopAgent({
     id: 'gm-chat-agent',

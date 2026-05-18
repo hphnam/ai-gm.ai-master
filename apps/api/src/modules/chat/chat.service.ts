@@ -33,7 +33,7 @@ import { IntegrationRegistry } from '../integrations/integration-registry'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
-import { ConversationModeService } from './conversation-mode.service'
+import { ConversationModeService, VALID_MODES } from './conversation-mode.service'
 import { deriveEscalation } from './escalation'
 import {
   type AgentMode,
@@ -324,11 +324,17 @@ export class ChatService implements OnModuleInit {
       where: { id: conversationId },
       select: { mode: true },
     })
-    const stored = existing?.mode
+    // Coerce stored mode against the live allowlist — legacy rows (e.g. an
+    // old 'training' mode after that overlay was removed) fall back to default.
+    const storedRaw = existing?.mode
+    const stored: AgentMode | null =
+      storedRaw && (VALID_MODES as readonly string[]).includes(storedRaw)
+        ? (storedRaw as AgentMode)
+        : null
     if (stored && stored !== 'default') {
-      return stored as AgentMode
+      return stored
     }
-    if (!firstUserMessage) return (stored as AgentMode) ?? 'default'
+    if (!firstUserMessage) return stored ?? 'default'
 
     void this.modeClassifier
       .classify(firstUserMessage)
