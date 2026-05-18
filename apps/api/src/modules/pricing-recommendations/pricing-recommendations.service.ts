@@ -125,6 +125,13 @@ export class PricingRecommendationsService {
     return this.toRow(row)
   }
 
+  async getById(orgId: string, id: string): Promise<PricingRecommendationRow | null> {
+    const row = await this.prisma.pricingRecommendation.findFirst({
+      where: { id, organizationId: orgId },
+    })
+    return row ? this.toRow(row) : null
+  }
+
   async listForVenue(
     orgId: string,
     venueId: string,

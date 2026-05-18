@@ -10,7 +10,7 @@ import {
   MoreHorizontal,
   RefreshCcw,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
@@ -37,6 +37,28 @@ import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
 import { hasToolCard, ToolCard } from './tool-cards/tool-card-router'
 import type { ToolCardCtx, ToolPart } from './tool-cards/types'
+
+// Sections that find_knowledge retrieved this turn, grouped by docId. Lets the
+// CitationTooltipBody surface "which section of this doc the model was reading
+// when it wrote this answer" without changing the [doc:<uuid>] marker contract.
+// Built once per assistant message from message.parts; consumed by chips
+// rendered inside that message's prose.
+type SectionsByDoc = ReadonlyMap<string, readonly string[]>
+const CitationsContext = createContext<SectionsByDoc>(new Map())
+
+function formatRelativeUpdated(iso: string): string {
+  const ts = new Date(iso).getTime()
+  if (Number.isNaN(ts)) return ''
+  const diffMs = Date.now() - ts
+  const mins = Math.round(diffMs / 60_000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.round(hrs / 24)
+  if (days < 30) return `${days}d ago`
+  return new Date(iso).toLocaleDateString()
+}
 
 // Citation chip — a small numbered pill that sits inline with prose. The
 // Tooltip exposes the source title on hover so the number reads as a real
@@ -91,6 +113,8 @@ function CitationChip({ docId, children }: { docId: string; children: React.Reac
 // multiple chips referencing the same doc is cheap.
 function CitationTooltipBody({ docId, index }: { docId: string; index: React.ReactNode }) {
   const { data, isLoading, isError } = useDoc(docId)
+  const sectionsByDoc = useContext(CitationsContext)
+  const sections = sectionsByDoc.get(docId) ?? []
   const title = data?.title?.trim() || null
   const description = (() => {
     if (isLoading) return 'Loading source…'
@@ -98,6 +122,7 @@ function CitationTooltipBody({ docId, index }: { docId: string; index: React.Rea
     if (title) return title
     return 'Untitled document'
   })()
+  const updated = data?.updatedAt ? formatRelativeUpdated(data.updatedAt) : null
   return (
     <div className="flex flex-col gap-1">
       <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -106,7 +131,27 @@ function CitationTooltipBody({ docId, index }: { docId: string; index: React.Rea
       <span className="line-clamp-2 text-[12.5px] font-medium leading-snug text-foreground">
         {description}
       </span>
-      <span className="text-[11px] text-muted-foreground">Click to preview</span>
+      {updated ? (
+        <span className="text-[11px] text-muted-foreground">Updated {updated}</span>
+      ) : null}
+      {sections.length > 0 ? (
+        <div className="mt-1 border-t border-border/60 pt-1">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            {sections.length === 1 ? 'Section read' : 'Sections read'}
+          </span>
+          <ul className="mt-0.5 space-y-0.5">
+            {sections.slice(0, 3).map((s) => (
+              <li key={s} className="line-clamp-1 text-[11.5px] text-foreground/85">
+                {s}
+              </li>
+            ))}
+            {sections.length > 3 ? (
+              <li className="text-[11px] text-muted-foreground">+{sections.length - 3} more</li>
+            ) : null}
+          </ul>
+        </div>
+      ) : null}
+      <span className="mt-0.5 text-[11px] text-muted-foreground">Click to preview</span>
     </div>
   )
 }
@@ -431,6 +476,65 @@ function ReasoningBlock({
 // CitationChip pill (numbered, tappable, visually distinct from prose).
 const DOC_CITATION_RE = /\[doc:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\]/gi
 
+// Tool names where calling them implies the model sourced from the knowledge
+// corpus. If any of these fired this turn and the visible text has no
+// [doc:<uuid>] markers, we render UncitedKbWarning so the user knows the
+// answer wasn't backed by a verifiable source.
+const KB_TOOL_NAMES = new Set(['find_knowledge', 'query_document_table'])
+
+// Walks an assistant message's parts and groups retrieved section titles by
+// their parent knowledge_item id (the same id the [doc:<uuid>] marker
+// references). Each docId maps to a deduped, insertion-ordered list of section
+// titles surfaced during the turn — typically 1-3 entries. Hits without a
+// knowledge_item entityType or without a section title are skipped.
+function buildSectionsByDoc(parts: UIMessage['parts']): Map<string, string[]> {
+  const out = new Map<string, string[]>()
+  parts.forEach((p) => {
+    if (!isToolUIPart(p)) return
+    if (getToolName(p) !== 'find_knowledge') return
+    const output = (p as { output?: unknown }).output
+    if (!output || typeof output !== 'object') return
+    const wrapper = output as { ok?: boolean; data?: unknown }
+    if (wrapper.ok !== true || !Array.isArray(wrapper.data)) return
+    for (const raw of wrapper.data) {
+      if (!raw || typeof raw !== 'object') continue
+      const hit = raw as {
+        entityType?: unknown
+        entityId?: unknown
+        metadata?: unknown
+      }
+      if (hit.entityType !== 'knowledge_item') continue
+      if (typeof hit.entityId !== 'string' || hit.entityId.length === 0) continue
+      const meta = (hit.metadata ?? {}) as { sectionTitle?: unknown }
+      if (typeof meta.sectionTitle !== 'string') continue
+      const title = meta.sectionTitle.trim()
+      if (title.length === 0) continue
+      const existing = out.get(hit.entityId)
+      if (existing) {
+        if (!existing.includes(title)) existing.push(title)
+      } else {
+        out.set(hit.entityId, [title])
+      }
+    }
+  })
+  return out
+}
+
+// True when the model called a knowledge-base tool this turn but the rendered
+// answer text has zero citation markers. Used to surface UncitedKbWarning so
+// the user knows the answer wasn't anchored to a verifiable source — the
+// system prompt asks for citations whenever a fact comes from a KB doc.
+function hasUncitedKb(parts: UIMessage['parts'], text: string): boolean {
+  // Empty-text turns (user aborted mid-stream, post-answer-only tool calls,
+  // record_kb_gap-style replies with no prose) have nothing to warn about —
+  // the warning under an empty bubble would confuse rather than help.
+  if (text.trim().length === 0) return false
+  const kbCalled = parts.some((p) => isToolUIPart(p) && KB_TOOL_NAMES.has(getToolName(p)))
+  if (!kbCalled) return false
+  // Non-global clone so we don't carry lastIndex state from rewriteCitations.
+  return !/\[doc:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\]/i.test(text)
+}
+
 function rewriteCitations(raw: string): string {
   const seen = new Map<string, number>()
   return raw.replace(DOC_CITATION_RE, (_match, id: string) => {
@@ -730,6 +834,27 @@ function AssistantActions({
   )
 }
 
+// Shown when the model searched the knowledge corpus but produced an answer
+// without any [doc:<uuid>] markers. The system prompt says cite whenever a
+// fact is sourced from the KB; silence means either (a) the model fabricated,
+// (b) the model paraphrased without anchoring, or (c) retrieval returned
+// nothing useful and the answer is from training-data alone. Either way the
+// user should not trust specifics without verifying.
+function UncitedKbWarning() {
+  return (
+    <div
+      className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-[12px] text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+      role="note"
+    >
+      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+      <span>
+        No sources cited — the model searched the knowledge base but didn't anchor this answer to a
+        document. Treat specifics as a guess and verify before acting.
+      </span>
+    </div>
+  )
+}
+
 // Wave-C auto-verify status. Quiet inline strip — a small dot + grey text.
 // Colour is reserved for true alarms (the "issues" state uses destructive); a
 // clean check is just a muted dot, so a successful answer stays calm.
@@ -816,6 +941,11 @@ export function ChatMessage({
   const plainText = assistantPlainText(message.parts)
   const classification = classifyAssistantParts(message.parts, Boolean(isStreaming))
   const { answerChunks, toolChips, reasoningText, toolCardParts, lastPartIsText } = classification
+  // Built once per message render — chips inside this message's prose look it
+  // up via CitationsContext. Memoised on the parts identity to avoid rebuilds
+  // when adjacent state (streaming, follow-ups) changes.
+  const sectionsByDoc = useMemo(() => buildSectionsByDoc(message.parts), [message.parts])
+  const showUncitedWarning = !isStreaming && hasUncitedKb(message.parts, plainText)
 
   // Continuity bridge — useChat pushes an empty assistant message the moment
   // the stream opens, before any reasoning / tool / text deltas arrive. Render
@@ -838,60 +968,63 @@ export function ChatMessage({
   const lastChunkIdx = renderedChunks.length - 1
 
   return (
-    <div className="flex flex-col gap-6">
-      {showThinkingBridge ? (
-        <article
-          key={`${message.id}:bridge`}
-          aria-label="Assistant message"
-          aria-busy="true"
-          className="flex w-full gap-3"
-        >
-          <AssistantAvatar />
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <AssistantThinkingBridge />
-          </div>
-        </article>
-      ) : null}
-      {renderedChunks.map((chunk, i) => {
-        const isFirst = i === 0
-        const isLast = i === lastChunkIdx
-        return (
+    <CitationsContext.Provider value={sectionsByDoc}>
+      <div className="flex flex-col gap-6">
+        {showThinkingBridge ? (
           <article
-            // biome-ignore lint/suspicious/noArrayIndexKey: chunks mirror model emission order and never reorder within a turn; index is the stable identity here.
-            key={`${message.id}:chunk-${i}`}
+            key={`${message.id}:bridge`}
             aria-label="Assistant message"
-            aria-busy={isStreaming && isLast ? 'true' : undefined}
+            aria-busy="true"
             className="flex w-full gap-3"
           >
             <AssistantAvatar />
             <div className="flex min-w-0 flex-1 flex-col gap-2">
-              {isFirst ? (
-                <AssistantTurnHeader classification={classification} ctx={cardCtx} />
-              ) : null}
-              {chunk.length > 0 ? (
-                <AssistantAnswer
-                  text={chunk}
-                  showCursor={Boolean(isStreaming) && isLast && lastPartIsText}
-                />
-              ) : null}
-              {isLast && !isStreaming ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <AssistantActions
-                    messageId={message.id}
-                    text={plainText}
-                    onRegenerate={onRegenerate}
-                    initialFeedback={initialFeedback}
-                  />
-                  {verify ? <VerifyBadge verify={verify} /> : null}
-                </div>
-              ) : null}
-              {isLast && !isStreaming && followUps && onFollowUpSelect ? (
-                <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
-              ) : null}
+              <AssistantThinkingBridge />
             </div>
           </article>
-        )
-      })}
-    </div>
+        ) : null}
+        {renderedChunks.map((chunk, i) => {
+          const isFirst = i === 0
+          const isLast = i === lastChunkIdx
+          return (
+            <article
+              // biome-ignore lint/suspicious/noArrayIndexKey: chunks mirror model emission order and never reorder within a turn; index is the stable identity here.
+              key={`${message.id}:chunk-${i}`}
+              aria-label="Assistant message"
+              aria-busy={isStreaming && isLast ? 'true' : undefined}
+              className="flex w-full gap-3"
+            >
+              <AssistantAvatar />
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                {isFirst ? (
+                  <AssistantTurnHeader classification={classification} ctx={cardCtx} />
+                ) : null}
+                {chunk.length > 0 ? (
+                  <AssistantAnswer
+                    text={chunk}
+                    showCursor={Boolean(isStreaming) && isLast && lastPartIsText}
+                  />
+                ) : null}
+                {isLast && showUncitedWarning ? <UncitedKbWarning /> : null}
+                {isLast && !isStreaming ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <AssistantActions
+                      messageId={message.id}
+                      text={plainText}
+                      onRegenerate={onRegenerate}
+                      initialFeedback={initialFeedback}
+                    />
+                    {verify ? <VerifyBadge verify={verify} /> : null}
+                  </div>
+                ) : null}
+                {isLast && !isStreaming && followUps && onFollowUpSelect ? (
+                  <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
+                ) : null}
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </CitationsContext.Provider>
   )
 }

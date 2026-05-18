@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
 import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
@@ -56,6 +66,20 @@ export class PricingRecommendationsController {
       rationale: body.rationale,
       upliftWindowDays: body.upliftWindowDays,
     })
+    return { recommendation }
+  }
+
+  @Get(':id')
+  @ApiResponse({ status: 200, type: SinglePricingRecommendationResponseDto })
+  async getOne(
+    @CurrentOrg() org: { id: string },
+    @Param(new ZodValidationPipe(PricingRecommendationIdParamDto))
+    params: PricingRecommendationIdParamDto,
+  ): Promise<SinglePricingRecommendationResponseDto> {
+    const recommendation = await this.service.getById(org.id, params.id)
+    if (!recommendation) {
+      throw new NotFoundException({ error: 'not-found' })
+    }
     return { recommendation }
   }
 

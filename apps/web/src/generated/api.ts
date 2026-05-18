@@ -8442,6 +8442,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getPricingRecommendationsControllerCreateMutationOptions(options), queryClient);
     }
 
+export type pricingRecommendationsControllerGetOneResponse200 = {
+  data: SinglePricingRecommendationResponseDto
+  status: 200
+}
+
+export type pricingRecommendationsControllerGetOneResponseSuccess = (pricingRecommendationsControllerGetOneResponse200) & {
+  headers: Headers;
+};
+;
+
+export type pricingRecommendationsControllerGetOneResponse = (pricingRecommendationsControllerGetOneResponseSuccess)
+
+export const getPricingRecommendationsControllerGetOneUrl = (id: string,) => {
+
+
+
+
+  return `/pricing-recommendations/${id}`
+}
+
+export const pricingRecommendationsControllerGetOne = async (id: string, options?: RequestInit): Promise<pricingRecommendationsControllerGetOneResponse> => {
+
+  return orvalMutator<pricingRecommendationsControllerGetOneResponse>(getPricingRecommendationsControllerGetOneUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPricingRecommendationsControllerGetOneQueryKey = (id: string,) => {
+    return [
+    `/pricing-recommendations/${id}`
+    ] as const;
+    }
+
+
+export const getPricingRecommendationsControllerGetOneQueryOptions = <TData = Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPricingRecommendationsControllerGetOneQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>> = ({ signal }) => pricingRecommendationsControllerGetOne(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PricingRecommendationsControllerGetOneQueryResult = NonNullable<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>>
+export type PricingRecommendationsControllerGetOneQueryError = unknown
+
+
+export function usePricingRecommendationsControllerGetOne<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePricingRecommendationsControllerGetOne<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePricingRecommendationsControllerGetOne<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePricingRecommendationsControllerGetOne<TData = Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof pricingRecommendationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPricingRecommendationsControllerGetOneQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export type pricingRecommendationsControllerAdoptResponse200 = {
   data: SinglePricingRecommendationResponseDto
   status: 200

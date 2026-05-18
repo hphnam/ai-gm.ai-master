@@ -1748,6 +1748,53 @@ export const PricingRecommendationsControllerCreateBody = zod.object({
 })
 
 
+export const pricingRecommendationsControllerGetOnePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const PricingRecommendationsControllerGetOneParams = zod.object({
+  "id": zod.string().regex(pricingRecommendationsControllerGetOnePathIdRegExp)
+})
+
+export const pricingRecommendationsControllerGetOneResponseRecommendationCurrentPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerGetOneResponseRecommendationCurrentPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerGetOneResponseRecommendationRecommendedPriceCentsMin = -9007199254740991;
+export const pricingRecommendationsControllerGetOneResponseRecommendationRecommendedPriceCentsMax = 9007199254740991;
+
+export const pricingRecommendationsControllerGetOneResponseRecommendationAdoptedPriceCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerGetOneResponseRecommendationAdoptedPriceCentsOneMax = 9007199254740991;
+
+export const pricingRecommendationsControllerGetOneResponseRecommendationUpliftWindowDaysMin = -9007199254740991;
+export const pricingRecommendationsControllerGetOneResponseRecommendationUpliftWindowDaysMax = 9007199254740991;
+
+export const pricingRecommendationsControllerGetOneResponseRecommendationMeasuredUpliftCentsOneMin = -9007199254740991;
+export const pricingRecommendationsControllerGetOneResponseRecommendationMeasuredUpliftCentsOneMax = 9007199254740991;
+
+
+
+export const PricingRecommendationsControllerGetOneResponse = zod.object({
+  "recommendation": zod.object({
+  "id": zod.string(),
+  "organizationId": zod.string(),
+  "venueId": zod.string(),
+  "sourceItemRef": zod.string(),
+  "sourceItemLabel": zod.string(),
+  "currentPriceCents": zod.number().min(pricingRecommendationsControllerGetOneResponseRecommendationCurrentPriceCentsMin).max(pricingRecommendationsControllerGetOneResponseRecommendationCurrentPriceCentsMax),
+  "recommendedPriceCents": zod.number().min(pricingRecommendationsControllerGetOneResponseRecommendationRecommendedPriceCentsMin).max(pricingRecommendationsControllerGetOneResponseRecommendationRecommendedPriceCentsMax),
+  "rationale": zod.string(),
+  "status": zod.enum(['pending', 'adopted', 'dismissed']),
+  "createdAt": zod.string(),
+  "adoptedAt": zod.union([zod.string(),zod.null()]),
+  "adoptedPriceCents": zod.union([zod.number().min(pricingRecommendationsControllerGetOneResponseRecommendationAdoptedPriceCentsOneMin).max(pricingRecommendationsControllerGetOneResponseRecommendationAdoptedPriceCentsOneMax),zod.null()]),
+  "dismissedAt": zod.union([zod.string(),zod.null()]),
+  "dismissedReason": zod.union([zod.string(),zod.null()]),
+  "upliftWindowDays": zod.number().min(pricingRecommendationsControllerGetOneResponseRecommendationUpliftWindowDaysMin).max(pricingRecommendationsControllerGetOneResponseRecommendationUpliftWindowDaysMax),
+  "measuredUpliftCents": zod.union([zod.number().min(pricingRecommendationsControllerGetOneResponseRecommendationMeasuredUpliftCentsOneMin).max(pricingRecommendationsControllerGetOneResponseRecommendationMeasuredUpliftCentsOneMax),zod.null()]),
+  "measuredAt": zod.union([zod.string(),zod.null()])
+})
+})
+
+
 export const pricingRecommendationsControllerAdoptPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 

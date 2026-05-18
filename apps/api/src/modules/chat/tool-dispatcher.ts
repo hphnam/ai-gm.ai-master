@@ -1187,12 +1187,17 @@ export class ToolDispatcher {
               recommendedPriceCents: i.recommendedPriceCents,
               rationale: i.rationale,
             })
+            // rationale + venueId in the response so the chat tool-card can
+            // render the why and so adopt/dismiss mutations know which venue
+            // cache to invalidate without an extra round-trip.
             return ok({
               id: row.id,
               status: row.status,
+              venueId: row.venueId,
               sourceItemLabel: row.sourceItemLabel,
               currentPriceCents: row.currentPriceCents,
               recommendedPriceCents: row.recommendedPriceCents,
+              rationale: row.rationale,
             })
           } catch (err) {
             const message = (err as Error).message ?? 'unknown'

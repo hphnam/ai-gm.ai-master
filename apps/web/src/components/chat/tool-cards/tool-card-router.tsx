@@ -4,6 +4,7 @@ import { getToolName, isToolUIPart } from 'ai'
 import { ChecklistCard } from './checklist-card'
 import { CutoffsCard } from './cutoffs-card'
 import { NoteCard } from './note-card'
+import { PricingRecommendationCard } from './pricing-recommendation-card'
 import { ReportCard } from './report-card'
 import { StockBelowParCard, StockByNameCard } from './stock-card'
 import { SupplierCard } from './supplier-card'
@@ -25,6 +26,7 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
   get_supplier_by_name: SupplierCard,
   get_upcoming_cutoffs: CutoffsCard,
   leave_note_for_user: NoteCard,
+  record_pricing_recommendation: PricingRecommendationCard,
 }
 
 export function hasToolCard(toolName: string): boolean {
