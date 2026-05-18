@@ -13,7 +13,7 @@
 
 import type { PrismaClient } from '@prisma/client'
 import { fail, MAX_PERSON_MENTIONS_PER_QUERY, ok, type ToolResult } from '../../../types'
-import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
+import { chatCoreLogger, hashId, hashQuery } from '../log-helpers'
 
 export type PersonMention = {
   knowledgeItemId: string
@@ -133,7 +133,7 @@ export async function getPerson(
   })
 
   if (matches.length === 0 && mentionsByItemId.size === 0) {
-    chatV2Logger.info('tool.get_person', {
+    chatCoreLogger.info('tool.get_person', {
       orgId: hashId(orgId),
       queryHash: hashQuery(`${name ?? ''}|${role ?? ''}`),
       hitCount: 0,
@@ -145,7 +145,7 @@ export async function getPerson(
   // venueId passed through for log payload only.
   void venueId
 
-  chatV2Logger.info('tool.get_person', {
+  chatCoreLogger.info('tool.get_person', {
     orgId: hashId(orgId),
     queryHash: hashQuery(`${name ?? ''}|${role ?? ''}`),
     hitCount: matches.length,

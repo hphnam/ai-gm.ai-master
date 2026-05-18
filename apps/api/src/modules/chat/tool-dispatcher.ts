@@ -11,7 +11,7 @@ import {
   type ToolName,
   type ToolResult,
 } from '../../types'
-import { ChatV2Service } from '../chat-v2/chat-v2.service'
+import { ChatCoreService } from '../chat-core/chat-core.service'
 import { IncidentsService } from '../incidents/incidents.service'
 import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
@@ -34,7 +34,7 @@ export type DispatchContext = {
   /// any rows we write from tool calls (currently leave_note_for_user). Defaults
   /// to 'chat' when the caller omits it — only WhatsApp-originated turns should
   /// override to 'whatsapp'. NOTE 2026-05-13: WhatsApp inbound currently flows
-  /// through ChatV2Service, which uses its own tool pipeline — it never reaches
+  /// through ChatCoreService, which uses its own tool pipeline — it never reaches
   /// this dispatcher today. Field kept so the contract is correct when/if a
   /// WhatsApp turn does route through chat-v1, and so the type forces future
   /// integrators to think about provenance.
@@ -97,7 +97,7 @@ export class ToolDispatcher {
     private readonly ingest: IngestService,
     private readonly verifier: QuoteVerifierService,
     private readonly tabular: TabularQueryService,
-    private readonly chatV2: ChatV2Service,
+    private readonly chatCore: ChatCoreService,
     private readonly realtime: RealtimeGateway,
     private readonly tasks: TasksService,
     private readonly incidents: IncidentsService,
@@ -579,19 +579,19 @@ export class ToolDispatcher {
           }
           const i = parsed.data as { venueId: string; question: string }
           // Cross-tenant guard mirrors find_knowledge: confirm venue belongs to ctx.orgId
-          // before invoking the chat-v2 pipeline (it does its own check too).
+          // before invoking the chat-core pipeline (it does its own check too).
           const venue = await prisma.venue.findFirst({
             where: { id: i.venueId, organizationId: ctx.orgId },
             select: { id: true },
           })
           if (!venue) return fail('error', 'venue not found in your organisation')
           try {
-            // Use chat-v2's full multi-agent pipeline as a sub-call. We
+            // Use chat-core's full multi-agent pipeline as a sub-call. We
             // intentionally don't pass conversationId — the deep_research turn is
             // ephemeral; its output becomes a tool result the parent agent
             // composes into its final reply. Persistence + cost tracking happen
-            // inside ChatV2Service against an isolated conversation row.
-            const result = await this.chatV2.sendMessage(
+            // inside ChatCoreService against an isolated conversation row.
+            const result = await this.chatCore.sendMessage(
               { venueId: i.venueId, userMessage: i.question },
               {
                 orgId: ctx.orgId,
@@ -1220,8 +1220,8 @@ export class ToolDispatcher {
               steps: normaliseChecklistSteps(row.steps),
             })
           }
-          // Intent fallback — reuse the chat-v2 fuzzy matcher.
-          const { getChecklist } = await import('../chat-v2/tools/get-checklist.tool')
+          // Intent fallback — reuse the chat-core fuzzy matcher.
+          const { getChecklist } = await import('../chat-core/tools/get-checklist.tool')
           const result = await getChecklist(i.intent ?? '', ctx.orgId, null, prisma)
           if (!result.ok) return result
           return ok({
@@ -1507,7 +1507,7 @@ export class ToolDispatcher {
   }
 }
 
-// Mirror of the step normalisation in chat-v2/tools/get-checklist — the JSON
+// Mirror of the step normalisation in chat-core/tools/get-checklist — the JSON
 // blob on Checklist.steps may use { index, text } or { index, content }; we
 // surface { index, content } to the client.
 function normaliseChecklistSteps(raw: unknown): Array<{ index: number; content: string }> {

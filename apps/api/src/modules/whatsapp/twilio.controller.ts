@@ -113,7 +113,7 @@ function normalizeTwilioEvent(
   // attachment per message; multi-media inbound is truncated to MediaUrl0 and
   // a debug log is emitted so we have telemetry if users hit this in practice.
   // Upgrading to multi-attachment requires extending WhatsappInboundResult +
-  // the chat-v2 sendMessage signature, both of which are bigger lifts.
+  // the chat-core sendMessage signature, both of which are bigger lifts.
   const e = event as unknown as Record<string, string | undefined>
   const mediaUrl = numMedia > 0 ? e.MediaUrl0 : undefined
   const mediaType = numMedia > 0 ? e.MediaContentType0 : undefined

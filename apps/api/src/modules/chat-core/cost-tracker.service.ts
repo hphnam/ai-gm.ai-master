@@ -1,7 +1,7 @@
 // Plan 06-01 Task 3 — per-turn cost accumulator.
 // Plan 06-02 — extended from 4-stage to 5-stage with Analyser + Critic.
 //
-// One CostTracker per chat-v2 turn. Each role records its Anthropic usage; the
+// One CostTracker per chat-core turn. Each role records its Anthropic usage; the
 // Docs researcher additionally records its Voyage embed call count. total()
 // returns CostBreakdown and total USD, persisted as chat_messages.costUsd at
 // end-of-turn aggregation. On partial failure (audit-M2), total() is called

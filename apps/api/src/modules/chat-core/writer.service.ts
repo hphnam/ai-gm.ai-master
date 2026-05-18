@@ -47,7 +47,7 @@ const PROMPT_BY_MODE: Record<WriterInput['mode'], string> = {
 @Injectable()
 export class WriterService {
   async compose(input: WriterInput): Promise<WriterResult> {
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubCompose(input)
     }
 

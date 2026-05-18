@@ -15,7 +15,7 @@ export const TOOL_NAMES = [
   'add_supplier_note',
   // Plan 05-01 — structured-data path over CSV/XLSX docs (aggregate / enumeration).
   'query_document_table',
-  // Plan 06-04 hot-fix 2026-05-02 — fallback escalation tool. Wraps the chat-v2
+  // Plan 06-04 hot-fix 2026-05-02 — fallback escalation tool. Wraps the chat-core
   // multi-agent pipeline (Triage → Researchers → Analyser → Writer → Critic)
   // for genuinely-deep multi-source synthesis. Should fire RARELY — only when
   // find_knowledge + direct entity tools have all returned thin / no-data and
@@ -177,7 +177,7 @@ export const TOOL_INPUT_SCHEMAS = {
     limit: z.number().int().min(1).max(1000).optional(),
   }),
   // Plan 06-04 hot-fix 2026-05-02 — deep_research escalation. Required:
-  // venueId so the chat-v2 pipeline can scope its researchers; question carries
+  // venueId so the chat-core pipeline can scope its researchers; question carries
   // the full context the agent wants synthesised.
   deep_research: z.object({
     venueId: UUID,
@@ -869,8 +869,7 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         },
         recommendedPriceCents: {
           type: 'integer',
-          description:
-            'Proposed new price in pennies. May be higher or lower than current.',
+          description: 'Proposed new price in pennies. May be higher or lower than current.',
         },
         rationale: {
           type: 'string',

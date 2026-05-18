@@ -1,10 +1,10 @@
-// Plan 06-01 Task 3 audit-M5 — single-source PII redaction helper for chat-v2.
+// Plan 06-01 Task 3 audit-M5 — single-source PII redaction helper for chat-core.
 //
-// All chat-v2 logger calls go through chatV2Logger. Sensitive field names are
+// All chat-core logger calls go through chatCoreLogger. Sensitive field names are
 // stripped BEFORE serialization; long string values are truncated. Org/user/
 // conversation IDs go through hashId; user-supplied query text through hashQuery.
 //
-// Direct NestJS Logger.log/info/warn/error calls inside chat-v2 are forbidden
+// Direct NestJS Logger.log/info/warn/error calls inside chat-core are forbidden
 // (grep-gated by Task 3 verify + repo-level verification table).
 
 import { createHash } from 'node:crypto'
@@ -28,7 +28,7 @@ export const hashId = (s: string): string => sha12(s)
 export const hashQuery = (s: string): string => sha12(s)
 
 function redact(payload: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = { via: 'chatV2Logger' }
+  const out: Record<string, unknown> = { via: 'chatCoreLogger' }
   for (const [k, v] of Object.entries(payload)) {
     if (SENSITIVE_KEYS.has(k)) {
       out[k] = '[REDACTED]'
@@ -43,9 +43,9 @@ function redact(payload: Record<string, unknown>): Record<string, unknown> {
   return out
 }
 
-const baseLogger = new Logger('chatV2')
+const baseLogger = new Logger('chatCore')
 
-export const chatV2Logger = {
+export const chatCoreLogger = {
   info(event: string, payload: Record<string, unknown> = {}): void {
     baseLogger.log(JSON.stringify({ event, ...redact(payload) }))
   },

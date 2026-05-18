@@ -1,13 +1,6 @@
-// Plan 06-04 hot-fix 2026-05-02 — chat-v1 controller revival.
-//
-// Cuts the public /chat/* surface back over to ChatService (the single-Sonnet
-// ToolLoopAgent with 13 direct tools + new `deep_research` escalation that
-// wraps the chat-v2 pipeline). Mirrors the route shape from
-// ChatV2Controller (paths + DTOs unchanged) so the web client and probes need
-// no changes; only the underlying service binding flips.
-//
-// chat-v2's ChatV2Controller has its @Controller registration removed in the
-// same change so NestJS doesn't see two controllers at @Controller('chat').
+// Public /chat/* surface. Backed by ChatService (single-Sonnet ToolLoopAgent
+// with 13 direct tools + `deep_research` escalation that wraps the chat-core
+// multi-agent pipeline).
 
 import {
   BadRequestException,
@@ -36,8 +29,8 @@ import type { ApiErrorResponse } from '../../types'
 import { CurrentOrg, CurrentRole, CurrentUser } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
-import { ConversationService } from '../chat-v2/conversation.service'
-import { validateMultimodalAttachment } from '../chat-v2/multimodal-validator'
+import { ConversationService } from '../chat-core/conversation.service'
+import { validateMultimodalAttachment } from '../chat-core/multimodal-validator'
 import { ChatService } from './chat.service'
 import {
   ConversationIdParamDto,

@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { prisma } from '../../../database/prisma'
 import { type AnthropicUsage, RESEARCHER_TIMEOUT_MS, RoleTimeoutError } from '../../../types'
 import { MockOpsService } from '../../mock-ops/mock-ops.service'
-import { chatV2Logger, hashId } from '../log-helpers'
+import { chatCoreLogger, hashId } from '../log-helpers'
 import { VENUE_RESEARCHER_PROMPT } from '../prompts/venue-researcher.prompt'
 import type { ResearcherResult } from '../researcher.interface'
 import { Researcher } from '../researcher.interface'
@@ -28,7 +28,7 @@ export class VenueResearcher implements Researcher {
 
   async research(brief: string, ctx: ResearchContext): Promise<ResearcherResult> {
     const t0 = Date.now()
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubResearch(brief, ctx, t0)
     }
 
@@ -81,14 +81,14 @@ export class VenueResearcher implements Researcher {
         result.text.slice(0, 200) ||
         'venue clean — no active incidents, no imminent cutoffs.'
 
-      chatV2Logger.info('chat_v2.researcher_complete', {
+      chatCoreLogger.info('chat_core.researcher_complete', {
         orgId: hashId(ctx.orgId),
         researcher: 'venue',
         citationCount: 0,
         voyageCalls: 0,
         latencyMs: Date.now() - t0,
       })
-      chatV2Logger.info('chat_v2.researcher_cost_observed', {
+      chatCoreLogger.info('chat_core.researcher_cost_observed', {
         researcher: 'venue',
         anthropicUsd: 0,
         voyageUsd: 0,
@@ -102,7 +102,7 @@ export class VenueResearcher implements Researcher {
       }
     } catch (err) {
       const aborted = controller.signal.aborted
-      chatV2Logger.warn('chat_v2.researcher_failed', {
+      chatCoreLogger.warn('chat_core.researcher_failed', {
         orgId: hashId(ctx.orgId),
         researcher: 'venue',
         error: (err as Error)?.message ?? 'unknown',
@@ -133,9 +133,9 @@ function numberOr0(v: unknown): number {
 }
 
 function stubResearch(brief: string, ctx: ResearchContext, t0: number): ResearcherResult {
-  const forceThrow = process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  const forceThrow = process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
   if (forceThrow === 'venue' || forceThrow === 'all') {
-    chatV2Logger.warn('chat_v2.researcher_failed', {
+    chatCoreLogger.warn('chat_core.researcher_failed', {
       orgId: hashId(ctx.orgId),
       researcher: 'venue',
       error: 'researcher synthetic failure (probe injection)',
@@ -152,14 +152,14 @@ function stubResearch(brief: string, ctx: ResearchContext, t0: number): Research
   const summary =
     'Shift state: venue open, last 24h clean (no incidents), Bibendum cutoff 16:00. Sarah Cleary on duty (07700 900 200).'
 
-  chatV2Logger.info('chat_v2.researcher_complete', {
+  chatCoreLogger.info('chat_core.researcher_complete', {
     orgId: hashId(ctx.orgId),
     researcher: 'venue',
     citationCount: 0,
     voyageCalls: 0,
     latencyMs: Date.now() - t0,
   })
-  chatV2Logger.info('chat_v2.researcher_cost_observed', {
+  chatCoreLogger.info('chat_core.researcher_cost_observed', {
     researcher: 'venue',
     anthropicUsd: 0,
     voyageUsd: 0,

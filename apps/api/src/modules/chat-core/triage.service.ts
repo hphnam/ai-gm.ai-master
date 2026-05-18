@@ -1,9 +1,9 @@
 // Plan 06-01 Task 2 — Triage agent. Calls Haiku 4.5 via @ai-sdk/anthropic
 // generateObject with the strict Zod schema, returns parsed output + usage so
-// the orchestrator (chat-v2.service) can accumulate cost across the turn.
+// the orchestrator (chat-core.service) can accumulate cost across the turn.
 //
 // Hard wall-clock timeout (audit-M3): TRIAGE_TIMEOUT_MS via AbortController.
-// Stub mode (PROBE_CHAT_V2_STUB=1): returns deterministic canned output keyed
+// Stub mode (PROBE_CHAT_CORE_STUB=1): returns deterministic canned output keyed
 // by userMessage substring. No network call.
 
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
@@ -19,7 +19,7 @@ import {
   type TriageOutput,
   TriageOutputSchema,
 } from '../../types'
-import { chatV2Logger } from './log-helpers'
+import { chatCoreLogger } from './log-helpers'
 import { TRIAGE_PROMPT } from './prompts/triage.prompt'
 import { quickClassify } from './triage-quick-classify'
 
@@ -37,7 +37,7 @@ export class TriageService {
     userMessage: string,
     _ctx: { conversationHistory?: { role: string; content: string }[] } = {},
   ): Promise<TriageResult> {
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubClassify(userMessage)
     }
 
@@ -49,7 +49,7 @@ export class TriageService {
     // generateObject below.
     const quick = quickClassify(userMessage)
     if (quick) {
-      chatV2Logger.info('chat_v2.triage_fast_path', {
+      chatCoreLogger.info('chat_core.triage_fast_path', {
         mode: quick.mode,
         dispatched: quick.researchersToDispatch,
         safetySignal: quick.safetySignal,
@@ -123,7 +123,7 @@ export function _probeResetLastSanitizedInput(): void {
   _probeLastSanitizedInput = null
 }
 
-// Stub mode for probe-chat-v2.ts. Plan 06-02 audit-S7 — explicit priority
+// Stub mode for probe-chat-core.ts. Plan 06-02 audit-S7 — explicit priority
 // ordering: SAFETY patterns (incident) check FIRST, THEN reasoning patterns,
 // THEN lookup patterns. Without this priority, generic 'flat pint' regex would
 // catch "pint tasted off and they feel sick" before the safety-signal pattern
@@ -151,13 +151,13 @@ function stubClassify(userMessage: string): TriageResult {
 
   // V15 audit-M3 — synthetic per-role timeout. Throw RoleTimeoutError to
   // exercise the orchestrator's catch-block + turn-failed cost persistence.
-  if (process.env.PROBE_CHAT_V2_FORCE_TRIAGE_TIMEOUT === '1') {
+  if (process.env.PROBE_CHAT_CORE_FORCE_TRIAGE_TIMEOUT === '1') {
     throw new RoleTimeoutError('triage', TRIAGE_TIMEOUT_MS)
   }
 
   // V80.cap — force-five-researcher dispatch for orchestrator cap test.
   if (
-    process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH === '1' ||
+    process.env.PROBE_CHAT_CORE_FORCE_FIVE_DISPATCH === '1' ||
     userMessage.includes(FORCE_FIVE_DISPATCH)
   ) {
     return makeStubResult(

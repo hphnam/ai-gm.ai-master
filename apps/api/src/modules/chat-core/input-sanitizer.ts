@@ -6,7 +6,7 @@
 // reach the model as a fresh role marker, and instruction-injection cliches get
 // flagged so Triage sees `[SANITIZED]` instead of imperative-mood overrides.
 
-import { MAX_USER_MESSAGE_LEN } from '../../types/chat-v2'
+import { MAX_USER_MESSAGE_LEN } from '../../types/chat-core'
 
 // Control-character class: nulls, BEL, backspace, FF, ESC, etc. Keep \n (0x0A)
 // and \t (0x09) so multi-line questions / pasted text survive intact.

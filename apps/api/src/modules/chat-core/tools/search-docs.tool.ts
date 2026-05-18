@@ -13,7 +13,7 @@
 
 import { fail, ok, type ToolResult } from '../../../types'
 import { RetrievalService } from '../../retrieval/retrieval.service'
-import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
+import { chatCoreLogger, hashId, hashQuery } from '../log-helpers'
 
 export type SearchDocsHit = {
   knowledgeItemId: string
@@ -52,7 +52,7 @@ export async function searchDocs(
   })
 
   if (!result.ok) {
-    chatV2Logger.info('tool.search_docs', {
+    chatCoreLogger.info('tool.search_docs', {
       orgId: hashId(orgId),
       query: hashQuery(trimmed),
       hitCount: 0,
@@ -72,7 +72,7 @@ export async function searchDocs(
     similarity: h.similarity,
   }))
 
-  chatV2Logger.info('tool.search_docs', {
+  chatCoreLogger.info('tool.search_docs', {
     orgId: hashId(orgId),
     query: hashQuery(trimmed),
     hitCount: hits.length,

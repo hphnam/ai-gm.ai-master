@@ -1,11 +1,11 @@
 // Plan 06-04 Task 1 — relocated from chat-v1 chat.service.ts during migration.
 // Types are now owned by `apps/api/src/types/chat-message.ts`. chat-v1's
-// chat.service.ts re-exports them transitionally; chat-v2 imports from here
+// chat.service.ts re-exports them transitionally; chat-core imports from here
 // directly. After 06-04 Task 7 deletes chat-v1, the re-export shim disappears.
 //
 // Schema: SendMessageInput (Zod) + SendMessageResult / ToolCallLogEntry (TS).
 // Identical contract to the prior chat-v1 surface — call-site shape preserved
-// for both ChatService.sendMessage and ChatV2Service.sendMessage.
+// for both ChatService.sendMessage and ChatCoreService.sendMessage.
 
 import { z } from 'zod'
 

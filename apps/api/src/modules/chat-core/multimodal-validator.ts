@@ -8,7 +8,7 @@
 //   4. Multer per-request 15MB outer cap (configured at FileInterceptor level)
 //
 // The validator is intentionally pure (no NestJS DI) so it can be called
-// directly from chat-v2.controller.ts and unit-tested without bootstrapping
+// directly from chat-core.controller.ts and unit-tested without bootstrapping
 // the module graph.
 
 import { magicByteMatchesMime } from '../../common/image-magic-bytes'

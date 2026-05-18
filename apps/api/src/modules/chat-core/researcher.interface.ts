@@ -1,6 +1,6 @@
 // Plan 06-03 audit-M2 — discriminated-union contract for resolveResearcher.
 //
-// Without a unifying interface, ChatV2Service.resolveResearcher would compile
+// Without a unifying interface, ChatCoreService.resolveResearcher would compile
 // only because TypeScript happens to infer a structural union over the 5
 // researcher classes. A future researcher with `voyageCalls: bigint` instead
 // of `number` would compile in isolation but break the orchestrator's

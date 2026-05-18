@@ -2,7 +2,7 @@
 //
 // In production: AI SDK ToolLoopAgent (Haiku) with two shaped tools wrapping
 // pure functions. Bounded steps (3 max — researcher should be quick).
-// In stub mode (PROBE_CHAT_V2_STUB=1): canned ResearcherFinding keyed by brief
+// In stub mode (PROBE_CHAT_CORE_STUB=1): canned ResearcherFinding keyed by brief
 // substring. No network, no tool calls, voyageCalls = 0.
 //
 // audit-M3 — wraps the AI SDK call in AbortController + setTimeout per
@@ -20,7 +20,7 @@ import {
   RoleTimeoutError,
 } from '../../../types'
 import { RetrievalService } from '../../retrieval/retrieval.service'
-import { chatV2Logger, hashId } from '../log-helpers'
+import { chatCoreLogger, hashId } from '../log-helpers'
 import { DOCS_RESEARCHER_PROMPT } from '../prompts/docs-researcher.prompt'
 import type { ResearcherResult } from '../researcher.interface'
 import { Researcher } from '../researcher.interface'
@@ -55,7 +55,7 @@ export class DocsResearcher implements Researcher {
 
   async research(brief: string, ctx: ResearchContext): Promise<ResearcherResult> {
     const t0 = Date.now()
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubResearch(brief, ctx, t0)
     }
 
@@ -133,14 +133,14 @@ export class DocsResearcher implements Researcher {
       const usage = extractUsage(result.usage)
       const summary = evidenceSummary || result.text.slice(0, 200) || 'No procedure on file.'
 
-      chatV2Logger.info('chat_v2.researcher_complete', {
+      chatCoreLogger.info('chat_core.researcher_complete', {
         orgId: hashId(ctx.orgId),
         researcher: 'docs',
         citationCount: citations.length,
         voyageCalls,
         latencyMs: Date.now() - t0,
       })
-      chatV2Logger.info('chat_v2.researcher_cost_observed', {
+      chatCoreLogger.info('chat_core.researcher_cost_observed', {
         researcher: 'docs',
         anthropicUsd: 0,
         voyageUsd: 0,
@@ -158,7 +158,7 @@ export class DocsResearcher implements Researcher {
       }
     } catch (err) {
       const aborted = controller.signal.aborted
-      chatV2Logger.warn('chat_v2.researcher_failed', {
+      chatCoreLogger.warn('chat_core.researcher_failed', {
         orgId: hashId(ctx.orgId),
         researcher: 'docs',
         error: (err as Error)?.message ?? 'unknown',
@@ -191,13 +191,13 @@ function numberOr0(v: unknown): number {
 function stubResearch(brief: string, ctx: ResearchContext, t0: number): ResearcherResult {
   // Probe-injected failure mode (audit-M2 V14): force the researcher to throw
   // mid-flight after Triage has succeeded. Used to assert turn-failed cost row.
-  // 06-01 used PROBE_CHAT_V2_FORCE_RESEARCHER_THROW='1' (single bool); 06-03
+  // 06-01 used PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW='1' (single bool); 06-03
   // unifies the contract (audit-S3) — single env var carries researcher name
   // ('docs' / 'ops' / 'people' / 'tabular' / 'venue' / 'all'). Backward-compat:
   // the legacy '1' value still triggers the docs researcher.
-  const forceThrow = process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  const forceThrow = process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
   if (forceThrow === '1' || forceThrow === 'docs' || forceThrow === 'all') {
-    chatV2Logger.warn('chat_v2.researcher_failed', {
+    chatCoreLogger.warn('chat_core.researcher_failed', {
       orgId: hashId(ctx.orgId),
       researcher: 'docs',
       error: 'researcher synthetic failure (probe injection)',
@@ -230,14 +230,14 @@ function stubResearch(brief: string, ctx: ResearchContext, t0: number): Research
     citations.push({ knowledgeItemId: '00000000-0000-4000-8000-000000000005' })
   }
 
-  chatV2Logger.info('chat_v2.researcher_complete', {
+  chatCoreLogger.info('chat_core.researcher_complete', {
     orgId: hashId(ctx.orgId),
     researcher: 'docs',
     citationCount: citations.length,
     voyageCalls: 0,
     latencyMs: Date.now() - t0,
   })
-  chatV2Logger.info('chat_v2.researcher_cost_observed', {
+  chatCoreLogger.info('chat_core.researcher_cost_observed', {
     researcher: 'docs',
     anthropicUsd: 0,
     voyageUsd: 0,

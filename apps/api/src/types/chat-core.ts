@@ -1,4 +1,4 @@
-// Plan 06-01 Task 2 — chat-v2 type contract.
+// Plan 06-01 Task 2 — chat-core type contract.
 //
 // Single source of truth for the multi-agent pipeline shape. Stable across 06-01
 // (lookup mode + Docs researcher only) and 06-02 (full Analyser/Critic + 4 more
@@ -69,7 +69,7 @@ export const CRITIC_MAX_WRITER_RETRIES = 1
 // audit-S2: orchestrator + Triage prompt cap dispatch list to 4 researchers
 // (defends cost discipline against prompt-confused dispatch).
 // audit-M5: stub-clock anchor for "now-X" boundaries (last 24h / next 4h);
-// stubClock() returns this constant when PROBE_CHAT_V2_STUB=1, otherwise
+// stubClock() returns this constant when PROBE_CHAT_CORE_STUB=1, otherwise
 // Date.now(). Two probe iterations spaced milliseconds apart produce
 // byte-identical "now-anchored" data.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -237,7 +237,7 @@ export const StreamPhaseEventEnum = z.enum([
 export type StreamPhaseEvent = z.infer<typeof StreamPhaseEventEnum>
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Errors thrown by the pipeline. Caller (chat-v2.service) is responsible for
+// Errors thrown by the pipeline. Caller (chat-core.service) is responsible for
 // turning these into a turn-failed ChatMessage row with partial cost (audit-M2).
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -104,7 +104,7 @@ export function buildAiSdkTools(
           }
           return result
         },
-        // deep_research wraps the chat-v2 multi-agent pipeline. Its dispatcher
+        // deep_research wraps the chat-core multi-agent pipeline. Its dispatcher
         // result is { ok, data: { synthesis, retrievedItemIds } }. The
         // `synthesis` is already the final answer text — pass that to the
         // parent model verbatim so it composes its reply from a clean string

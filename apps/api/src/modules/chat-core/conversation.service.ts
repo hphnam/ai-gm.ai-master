@@ -1,4 +1,4 @@
-// Plan 06-04 Task 3 — chat-v2 ConversationService.
+// Plan 06-04 Task 3 — chat-core ConversationService.
 //
 // Lifted from chat-v1's chat.service.ts: listRecent / getById / softDelete.
 // Cross-tenant via `prisma.chatConversation.findFirst({ where: { id, venue:

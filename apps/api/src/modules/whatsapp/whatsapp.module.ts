@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
 // Plan 06-04 Task 4 — WhatsApp consumer migrated from ChatModule (v1) to
-// ChatV2Module. Inbound WhatsApp turns now flow through the multi-agent
+// ChatCoreModule. Inbound WhatsApp turns now flow through the multi-agent
 // pipeline (Triage → Researchers → Analyser → Writer + optional Critic).
-import { ChatV2Module } from '../chat-v2/chat-v2.module'
+import { ChatCoreModule } from '../chat-core/chat-core.module'
 import { RealtimeModule } from '../realtime/realtime.module'
 import { SuggestionsModule } from '../suggestions/suggestions.module'
 import { InviteController, InviteRedeemController } from './invite.controller'
@@ -17,7 +17,7 @@ import { WhatsappOnboardingService } from './whatsapp-onboarding.service'
 import { WhatsappOtpService } from './whatsapp-otp.service'
 
 @Module({
-  imports: [ChatV2Module, SuggestionsModule, AuthModule, RealtimeModule],
+  imports: [ChatCoreModule, SuggestionsModule, AuthModule, RealtimeModule],
   providers: [
     WhatsAppAdapter,
     WhatsappService,

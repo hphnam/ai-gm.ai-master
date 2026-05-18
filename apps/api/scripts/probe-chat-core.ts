@@ -1,7 +1,7 @@
 /**
- * Plan 06-01 Task 4 — probe-chat-v2.
+ * Plan 06-01 Task 4 — probe-chat-core.
  *
- * Verifies the chat-v2 dispatch boundary + lookup-mode pipeline end-to-end:
+ * Verifies the chat-core dispatch boundary + lookup-mode pipeline end-to-end:
  * V1 (flag-off→v1), V2 (flag-on→v2), V3 (Triage classifies), V4 (strict
  * schema), V5 (get_checklist full ordered list), V6 (search_docs neighbors:[]),
  * V7-V9 (Writer no preamble / no meta / no headings), V10 (costUsd > 0),
@@ -14,40 +14,40 @@
  * Idempotent: pre-cleanup + post-cleanup symmetric. Two consecutive runs
  * must produce 19/19 each.
  *
- * Cost: $0 — PROBE_CHAT_V2_STUB=1 makes Triage / Researcher / Writer return
+ * Cost: $0 — PROBE_CHAT_CORE_STUB=1 makes Triage / Researcher / Writer return
  * canned outputs. No Anthropic, no Voyage. Real-Anthropic variant lives at
- * probe:chat-v2:real (audit-M6 manual checkpoint).
+ * probe:chat-core:real (audit-M6 manual checkpoint).
  *
- *   npm run probe:chat-v2 --workspace=api
+ *   npm run probe:chat-core --workspace=api
  */
 
-// CRITICAL: PROBE_CHAT_V2_STUB must be set BEFORE any chat-v2 import — call-time
+// CRITICAL: PROBE_CHAT_CORE_STUB must be set BEFORE any chat-core import — call-time
 // env check needs it true on the very first classify/research/compose call.
-process.env.PROBE_CHAT_V2_STUB = '1'
+process.env.PROBE_CHAT_CORE_STUB = '1'
 
 import '../src/load-env'
 import 'reflect-metadata'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../src/database/prisma'
-import { AnalyserService } from '../src/modules/chat-v2/analyser.service'
-import { ChatV2Service } from '../src/modules/chat-v2/chat-v2.service'
-import { CriticService } from '../src/modules/chat-v2/critic.service'
-import { sanitizeForTriage } from '../src/modules/chat-v2/input-sanitizer'
-import type { Researcher } from '../src/modules/chat-v2/researcher.interface'
-import { sanitizeForResearcher } from '../src/modules/chat-v2/researcher-sanitizer'
-import { DocsResearcher } from '../src/modules/chat-v2/researchers/docs.researcher'
-import { OpsResearcher } from '../src/modules/chat-v2/researchers/ops.researcher'
-import { PeopleResearcher } from '../src/modules/chat-v2/researchers/people.researcher'
-import { TabularResearcher } from '../src/modules/chat-v2/researchers/tabular.researcher'
-import { VenueResearcher } from '../src/modules/chat-v2/researchers/venue.researcher'
-import { getChecklist } from '../src/modules/chat-v2/tools/get-checklist.tool'
-import { searchDocs } from '../src/modules/chat-v2/tools/search-docs.tool'
+import { AnalyserService } from '../src/modules/chat-core/analyser.service'
+import { ChatCoreService } from '../src/modules/chat-core/chat-core.service'
+import { CriticService } from '../src/modules/chat-core/critic.service'
+import { sanitizeForTriage } from '../src/modules/chat-core/input-sanitizer'
+import type { Researcher } from '../src/modules/chat-core/researcher.interface'
+import { sanitizeForResearcher } from '../src/modules/chat-core/researcher-sanitizer'
+import { DocsResearcher } from '../src/modules/chat-core/researchers/docs.researcher'
+import { OpsResearcher } from '../src/modules/chat-core/researchers/ops.researcher'
+import { PeopleResearcher } from '../src/modules/chat-core/researchers/people.researcher'
+import { TabularResearcher } from '../src/modules/chat-core/researchers/tabular.researcher'
+import { VenueResearcher } from '../src/modules/chat-core/researchers/venue.researcher'
+import { getChecklist } from '../src/modules/chat-core/tools/get-checklist.tool'
+import { searchDocs } from '../src/modules/chat-core/tools/search-docs.tool'
 import {
   _probeGetLastSanitizedInput,
   _probeResetLastSanitizedInput,
   TriageService,
-} from '../src/modules/chat-v2/triage.service'
-import { WriterService } from '../src/modules/chat-v2/writer.service'
+} from '../src/modules/chat-core/triage.service'
+import { WriterService } from '../src/modules/chat-core/writer.service'
 import { MockOpsService } from '../src/modules/mock-ops/mock-ops.service'
 import { TabularQueryService } from '../src/modules/tabular/tabular.service'
 import { AnalyserOutputSchema, TriageOutputSchema } from '../src/types'
@@ -57,12 +57,12 @@ void TabularQueryService
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error(
-    'probe-chat-v2 MUST NOT run in production — DB writes seed/cleanup test fixtures.',
+    'probe-chat-core MUST NOT run in production — DB writes seed/cleanup test fixtures.',
   )
 }
 
-const PROBE_ORG_A_SLUG = 'probe-chat-v2-org-a'
-const PROBE_ORG_B_SLUG = 'probe-chat-v2-org-b'
+const PROBE_ORG_A_SLUG = 'probe-chat-core-org-a'
+const PROBE_ORG_B_SLUG = 'probe-chat-core-org-b'
 
 type AssertResult = { name: string; pass: boolean; detail?: string }
 const results: AssertResult[] = []
@@ -308,7 +308,7 @@ function buildServices() {
   const writer = new WriterService()
   const analyser = new AnalyserService()
   const critic = new CriticService()
-  const orchestrator = new ChatV2Service(
+  const orchestrator = new ChatCoreService(
     triage,
     docs,
     writer,
@@ -366,33 +366,10 @@ async function runProbe(iteration: number): Promise<void> {
   // Pre-cleanup. First iteration is a no-op; second iteration cleans iter-1's rows.
   await pnpCleanup()
 
-  const orgA = await ensureOrg(PROBE_ORG_A_SLUG, 'Probe Chat-v2 Org A')
-  const orgB = await ensureOrg(PROBE_ORG_B_SLUG, 'Probe Chat-v2 Org B')
-  // Default both flags to false — V1 reads flag, V12 verifies B stays off after A flips.
-  await prisma.organization.update({ where: { id: orgA.orgId }, data: { chatV2Enabled: false } })
-  await prisma.organization.update({ where: { id: orgB.orgId }, data: { chatV2Enabled: false } })
+  const orgA = await ensureOrg(PROBE_ORG_A_SLUG, 'Probe Chat-core Org A')
+  const orgB = await ensureOrg(PROBE_ORG_B_SLUG, 'Probe Chat-core Org B')
 
   const { triage, analyser, critic, orchestrator } = buildServices()
-
-  // ──────────────────────── V1 — flag-off routes to v1 ────────────────────────
-  // We assert the dispatch decision: read the flag; the dispatcher in
-  // chat.controller routes on this exact value. V2 covers the flipped case.
-  const orgAFlagBefore = await prisma.organization.findUnique({
-    where: { id: orgA.orgId },
-    select: { chatV2Enabled: true },
-  })
-  assertEqual('V1.flag_off_v1_route', orgAFlagBefore?.chatV2Enabled, false)
-
-  // ──────────────────────── V2 — flag-on routes to v2 ─────────────────────────
-  await prisma.organization.update({
-    where: { id: orgA.orgId },
-    data: { chatV2Enabled: true },
-  })
-  const orgAFlagAfter = await prisma.organization.findUnique({
-    where: { id: orgA.orgId },
-    select: { chatV2Enabled: true },
-  })
-  assertEqual('V2.flag_on_v2_route', orgAFlagAfter?.chatV2Enabled, true)
 
   // ──────────────────────── V3 — Triage classifies lookup ─────────────────────
   const triageRes = await triage.classify("what's below par?")
@@ -477,13 +454,6 @@ async function runProbe(iteration: number): Promise<void> {
   )
   assertEqual('V11.cost_math_cache_aware', v11Cost, 0.00375)
 
-  // ──────────────────────── V12 — cross-tenant flag isolation ─────────────────
-  const orgBFlag = await prisma.organization.findUnique({
-    where: { id: orgB.orgId },
-    select: { chatV2Enabled: true },
-  })
-  assertEqual('V12.cross_tenant_flag_isolated', orgBFlag?.chatV2Enabled, false)
-
   // ──────────────────────── V13 — cross-tenant data isolation ────────────────
   // Session orgId=A but body venueId=B → service must return not-found
   // (404-not-403 per Plan 04-18). Assert the error path.
@@ -507,7 +477,7 @@ async function runProbe(iteration: number): Promise<void> {
   // Plan 06-03 audit-M6: under parallel fan-out, ONE researcher throwing leaves
   // the other N-1 to fulfill, so the turn ships. Stub: target a multi-dispatch
   // turn (reasoning "flat pint" → ['venue','docs','ops']) and force docs to throw.
-  process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW = 'docs'
+  process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW = 'docs'
   let v14aShipped = false
   let v14aConvId: string | null = null
   try {
@@ -533,7 +503,7 @@ async function runProbe(iteration: number): Promise<void> {
   } catch {
     v14aShipped = false
   }
-  delete process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  delete process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
   assertEqual('V14a.one_of_n_throws_turn_ships', v14aShipped, true)
   if (v14aConvId) {
     const v14aAssistant = await prisma.chatMessage.findFirst({
@@ -545,7 +515,7 @@ async function runProbe(iteration: number): Promise<void> {
   }
 
   // ──────────────────────── V14b — N-of-N throw → turn-failed cost row ────
-  process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW = 'all'
+  process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW = 'all'
   let v14bThrew = false
   let v14bConvId: string | null = null
   try {
@@ -570,7 +540,7 @@ async function runProbe(iteration: number): Promise<void> {
   } catch {
     v14bThrew = true
   }
-  delete process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  delete process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
   assertEqual('V14b.all_researchers_throw', v14bThrew, true)
   if (v14bConvId) {
     const failed = await prisma.chatMessage.findFirst({
@@ -584,7 +554,7 @@ async function runProbe(iteration: number): Promise<void> {
   }
 
   // ──────────────────────── V15 — per-role hard timeout ───────────────────────
-  process.env.PROBE_CHAT_V2_FORCE_TRIAGE_TIMEOUT = '1'
+  process.env.PROBE_CHAT_CORE_FORCE_TRIAGE_TIMEOUT = '1'
   let v15Threw = false
   let v15ConvId: string | null = null
   try {
@@ -605,7 +575,7 @@ async function runProbe(iteration: number): Promise<void> {
   } catch {
     v15Threw = true
   }
-  delete process.env.PROBE_CHAT_V2_FORCE_TRIAGE_TIMEOUT
+  delete process.env.PROBE_CHAT_CORE_FORCE_TRIAGE_TIMEOUT
   assertEqual('V15.timeout_threw', v15Threw, true)
   if (v15ConvId) {
     const failed = await prisma.chatMessage.findFirst({
@@ -678,9 +648,9 @@ async function runProbe(iteration: number): Promise<void> {
   stopCapture()
   const v17LeakLines = captured.filter((l) => l.msg.includes(v17UniqueMessage))
   assertEqual('V17.pii_unique_marker_not_in_logs', v17LeakLines.length, 0)
-  // chatV2Logger stamps `via:"chatV2Logger"` on every payload.
-  const v17ChatV2Lines = captured.filter((l) => l.msg.includes('chatV2Logger'))
-  assertGte('V17.chatv2_logger_via_stamp_present', v17ChatV2Lines.length, 1)
+  // chatCoreLogger stamps `via:"chatCoreLogger"` on every payload.
+  const v17ChatCoreLines = captured.filter((l) => l.msg.includes('chatCoreLogger'))
+  assertGte('V17.chatv2_logger_via_stamp_present', v17ChatCoreLines.length, 1)
 
   // ──────────────────────── V18 — latency p95 < 3000ms ───────────────────────
   const latencies: number[] = []
@@ -726,7 +696,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // Regex contracts for 06-02 mode shapes.
   // V21: stub Writer output validates the STUB shape, NOT the real prompt.
-  // Real-Anthropic verification of voice/shape happens via PROBE_CHAT_V2_REAL=1
+  // Real-Anthropic verification of voice/shape happens via PROBE_CHAT_CORE_REAL=1
   // manual checkpoint (audit-S6 / audit-M6 carry-forward from 06-01).
   const POSITIVE_REASONING_RE =
     /first thing —|two paths|quick check:|80% of (it|the|cases)|the move (is|here)|if (it|that|this).*if not/i
@@ -822,7 +792,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // ──────────────────────── V29-V31 — re-research circuit-breaker ─────────
   startCapture()
-  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE = '1'
   try {
     const v29Conv = await prisma.chatConversation.create({
       data: { venueId: orgA.venueId, userId: orgA.userId, channel: 'web' },
@@ -833,16 +803,16 @@ async function runProbe(iteration: number): Promise<void> {
       orgA_ctx,
     )
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE
     stopCapture()
   }
-  const v29Reresearch = captured.filter((l) => l.msg.includes('chat_v2.reresearch_dispatched'))
+  const v29Reresearch = captured.filter((l) => l.msg.includes('chat_core.reresearch_dispatched'))
   assertGte('V29.reresearch_dispatched_on_low_confidence', v29Reresearch.length, 1)
 
   // V30 — fake high running cost → re-research SKIPPED.
   startCapture()
-  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
-  process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD = '0.06'
+  process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_CORE_FAKE_RUNNING_COST_USD = '0.06'
   let v30Result: { assistantMessage: { id: string } } | null = null
   try {
     const v30Conv = await prisma.chatConversation.create({
@@ -854,12 +824,12 @@ async function runProbe(iteration: number): Promise<void> {
       orgA_ctx,
     )
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
-    delete process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD
+    delete process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_CORE_FAKE_RUNNING_COST_USD
     stopCapture()
   }
   const v30Skipped = captured.filter((l) =>
-    l.msg.includes('chat_v2.reresearch_skipped_cost_ceiling'),
+    l.msg.includes('chat_core.reresearch_skipped_cost_ceiling'),
   )
   assertGte('V30.reresearch_skipped_when_cost_ceiling_breached', v30Skipped.length, 1)
 
@@ -882,7 +852,7 @@ async function runProbe(iteration: number): Promise<void> {
     stopCapture()
   }
   const v31NoReresearch =
-    captured.filter((l) => l.msg.includes('chat_v2.reresearch_dispatched')).length === 0
+    captured.filter((l) => l.msg.includes('chat_core.reresearch_dispatched')).length === 0
   assert('V31.no_reresearch_on_high_confidence', v31NoReresearch)
 
   // ──────────────────────── V32-V34 — Critic gating ───────────────────────
@@ -904,7 +874,7 @@ async function runProbe(iteration: number): Promise<void> {
     } finally {
       stopCapture()
     }
-    const costLines = captured.filter((l) => l.msg.includes('chat_v2.turn_complete'))
+    const costLines = captured.filter((l) => l.msg.includes('chat_core.turn_complete'))
     const costMatch = costLines[0]?.msg.match(/"breakdown":(\{[^}]+\})/)
     const breakdown = costMatch ? JSON.parse(costMatch[1]) : null
     return { result, breakdown, capturedLines: [...captured], conversationId: conv.id }
@@ -919,23 +889,23 @@ async function runProbe(iteration: number): Promise<void> {
   assertEqual('V33.reasoning_high_conf_no_critic', Number(v33.breakdown?.critic ?? 0), 0)
 
   // V34 reasoning + low confidence → Critic invoked.
-  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE = '1'
   let v34Breakdown: { critic: number } | null = null
   try {
     const v34 = await turnAndReadCostBreakdown('complaint about a flat pint')
     v34Breakdown = v34.breakdown
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE
   }
   assertGt('V34.reasoning_low_conf_critic_invoked', Number(v34Breakdown?.critic ?? 0), 0)
 
   // ──────────────────────── V35-V37 — Critic correction loop ──────────────
-  process.env.PROBE_CHAT_V2_FORCE_CRITIC_REJECT = '1'
+  process.env.PROBE_CHAT_CORE_FORCE_CRITIC_REJECT = '1'
   let v35Result: Awaited<ReturnType<typeof turnAndReadCostBreakdown>> | null = null
   try {
     v35Result = await turnAndReadCostBreakdown("cellar's flooding")
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_CRITIC_REJECT
+    delete process.env.PROBE_CHAT_CORE_FORCE_CRITIC_REJECT
   }
   // V35: Writer was invoked twice — observable via [RETRY] sentinel in stub Writer
   // OR via cost.writer being roughly double the single-call value.
@@ -950,9 +920,9 @@ async function runProbe(iteration: number): Promise<void> {
   )
   // V36: same — assert [RETRY] sentinel explicitly.
   assertContains('V36.retry_sentinel_present', v35Assistant?.content ?? '', '[RETRY]')
-  // V37: chat_v2.critic_writer_retry_dispatched warn emitted.
+  // V37: chat_core.critic_writer_retry_dispatched warn emitted.
   const v37Warn = v35Result!.capturedLines.filter((l) =>
-    l.msg.includes('chat_v2.critic_writer_retry_dispatched'),
+    l.msg.includes('chat_core.critic_writer_retry_dispatched'),
   )
   assertGte('V37.critic_writer_retry_dispatched_warn', v37Warn.length, 1)
 
@@ -989,7 +959,7 @@ async function runProbe(iteration: number): Promise<void> {
   // ──────────────────────── V41-V43 — stream phase events ─────────────────
   // Reasoning turn — phase events fire in order with seq + timestampMs.
   const reasoningPhases = v33.capturedLines
-    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .filter((l) => l.msg.includes('chat_core.phase_event'))
     .map((l) => {
       const phaseMatch = l.msg.match(/"phase":"(\w+)"/)
       const seqMatch = l.msg.match(/"seq":(\d+)/)
@@ -1004,7 +974,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // V42 — lookup mode skips analyse + critique phases.
   const lookupPhases = v40.capturedLines
-    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .filter((l) => l.msg.includes('chat_core.phase_event'))
     .map((l) => l.msg.match(/"phase":"(\w+)"/)?.[1] ?? '')
   const v42HasAnalyse = lookupPhases.includes('analyse')
   const v42HasCritique = lookupPhases.includes('critique')
@@ -1012,7 +982,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // V43 — incident emits both analyse + critique.
   const incidentPhases = v32.capturedLines
-    .filter((l) => l.msg.includes('chat_v2.phase_event'))
+    .filter((l) => l.msg.includes('chat_core.phase_event'))
     .map((l) => l.msg.match(/"phase":"(\w+)"/)?.[1] ?? '')
   assert(
     'V43.incident_emits_analyse_and_critique',
@@ -1034,7 +1004,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // ──────────────────────── V47 — Analyser confidence telemetry ───────────
   const v47Lines = v33.capturedLines.filter((l) =>
-    l.msg.includes('chat_v2.analyser_confidence_observed'),
+    l.msg.includes('chat_core.analyser_confidence_observed'),
   )
   assertGte('V47.analyser_confidence_observed_emitted', v47Lines.length, 1)
   if (v47Lines.length > 0) {
@@ -1098,8 +1068,8 @@ async function runProbe(iteration: number): Promise<void> {
   )
 
   // ──────────────────────── V50 — low_confidence_flag persistence (audit-M6) ──
-  process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE = '1'
-  process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD = '0.06'
+  process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE = '1'
+  process.env.PROBE_CHAT_CORE_FAKE_RUNNING_COST_USD = '0.06'
   let v50AssistantId: string | null = null
   try {
     const v50Conv = await prisma.chatConversation.create({
@@ -1116,8 +1086,8 @@ async function runProbe(iteration: number): Promise<void> {
     )
     v50AssistantId = v50Result.assistantMessage.id
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE
-    delete process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD
+    delete process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE
+    delete process.env.PROBE_CHAT_CORE_FAKE_RUNNING_COST_USD
   }
   if (v50AssistantId) {
     const v50Row = await prisma.chatMessage.findFirst({
@@ -1155,10 +1125,12 @@ async function runProbe(iteration: number): Promise<void> {
   const { ops, people, tabular, venue: venueR } = buildServices()
 
   // Imports for tool-level cross-tenant assertions.
-  const { getPerson } = await import('../src/modules/chat-v2/tools/get-person.tool')
-  const { getVenueBriefing } = await import('../src/modules/chat-v2/tools/get-venue-briefing.tool')
-  const { stubClock } = await import('../src/modules/chat-v2/stub-clock')
-  const { FROZEN_STUB_NOW_MS } = await import('../src/types/chat-v2')
+  const { getPerson } = await import('../src/modules/chat-core/tools/get-person.tool')
+  const { getVenueBriefing } = await import(
+    '../src/modules/chat-core/tools/get-venue-briefing.tool'
+  )
+  const { stubClock } = await import('../src/modules/chat-core/stub-clock')
+  const { FROZEN_STUB_NOW_MS } = await import('../src/types/chat-core')
 
   // ──────────────────────── V51-V55 — parallel fan-out ─────────────────────
   startCapture()
@@ -1178,7 +1150,7 @@ async function runProbe(iteration: number): Promise<void> {
   const v51Wallclock = Date.now() - v51T0
   stopCapture()
 
-  const v51CompleteLines = captured.filter((l) => l.msg.includes('chat_v2.researcher_complete'))
+  const v51CompleteLines = captured.filter((l) => l.msg.includes('chat_core.researcher_complete'))
   const v51ResearchersInLogs = new Set<string>()
   for (const l of v51CompleteLines) {
     const m = l.msg.match(/"researcher":"(\w+)"/)
@@ -1199,7 +1171,7 @@ async function runProbe(iteration: number): Promise<void> {
   // V54 — single 'research' phase event for the parallel fan-out (re-research
   // wouldn't fire here because evidenceSufficiency=0.75 > threshold 0.6).
   const v54ResearchPhases = captured.filter(
-    (l) => l.msg.includes('chat_v2.phase_event') && l.msg.includes('"phase":"research"'),
+    (l) => l.msg.includes('chat_core.phase_event') && l.msg.includes('"phase":"research"'),
   ).length
   assertEqual('V54.single_research_phase_event', v54ResearchPhases, 1)
   // V55 — no researcher fired for a non-dispatched name (people/tabular).
@@ -1329,7 +1301,7 @@ async function runProbe(iteration: number): Promise<void> {
   })
   stopCapture()
   const v65Logs = captured.filter(
-    (l) => l.msg.includes('chat_v2.researcher_complete') && l.msg.includes('"researcher":"ops"'),
+    (l) => l.msg.includes('chat_core.researcher_complete') && l.msg.includes('"researcher":"ops"'),
   )
   assertGte('V65.ops_researcher_complete_logged', v65Logs.length, 1)
   // V66 — orgB hash differs from orgA hash in logs (no cross-tenant leak).
@@ -1341,7 +1313,7 @@ async function runProbe(iteration: number): Promise<void> {
   })
   stopCapture()
   const v66LogsB = captured.filter(
-    (l) => l.msg.includes('chat_v2.researcher_complete') && l.msg.includes('"researcher":"ops"'),
+    (l) => l.msg.includes('chat_core.researcher_complete') && l.msg.includes('"researcher":"ops"'),
   )
   // both should have orgId hashes; they should be different.
   const v66HashA = v65Logs[0]?.msg.match(/"orgId":"(\w+)"/)?.[1]
@@ -1403,7 +1375,7 @@ async function runProbe(iteration: number): Promise<void> {
 
   // ──────────────────────── V71-V75 — partial-failure resilience ──────────
   // Already exercised by V14a/V14b; just assert specific researcher coverage.
-  process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW = 'venue'
+  process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW = 'venue'
   startCapture()
   let v71Conv: string | null = null
   let v71Result: { assistantMessage: { id: string } } | null = null
@@ -1422,7 +1394,7 @@ async function runProbe(iteration: number): Promise<void> {
       orgA_ctx,
     )
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+    delete process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
     stopCapture()
   }
   assert(
@@ -1430,13 +1402,13 @@ async function runProbe(iteration: number): Promise<void> {
     v71Result !== null && v71Result.assistantMessage.id.length > 0,
   )
   const v72Failed = captured.filter(
-    (l) => l.msg.includes('chat_v2.researcher_failed') && l.msg.includes('"researcher":"venue"'),
+    (l) => l.msg.includes('chat_core.researcher_failed') && l.msg.includes('"researcher":"venue"'),
   )
   assertGte('V72.researcher_failed_warn_logged', v72Failed.length, 1)
   // V73 — fulfilled count = dispatch count - 1. dispatch was 3 (venue,docs,ops).
   // Assert via researcher_complete log count for this turn (after capture clear,
   // so search the capture buffer).
-  const v73Complete = captured.filter((l) => l.msg.includes('chat_v2.researcher_complete'))
+  const v73Complete = captured.filter((l) => l.msg.includes('chat_core.researcher_complete'))
   assertEqual('V73.fulfilled_count_n_minus_one', v73Complete.length, 2)
   // V74 — assistant cost > 0 (fulfilled researchers + writer + analyser).
   if (v71Result) {
@@ -1474,7 +1446,7 @@ async function runProbe(iteration: number): Promise<void> {
     orgA_ctx,
   )
   stopCapture()
-  const v76Lines = captured.filter((l) => l.msg.includes('chat_v2.turn_complete'))
+  const v76Lines = captured.filter((l) => l.msg.includes('chat_core.turn_complete'))
   const v76Match = v76Lines[0]?.msg.match(/"breakdown":(\{[^}]+\})/)
   const v76Breakdown = v76Match ? JSON.parse(v76Match[1]) : null
   // 3 researchers each contributing 0.00044 → total researchers ≈ 0.00132.
@@ -1492,7 +1464,7 @@ async function runProbe(iteration: number): Promise<void> {
     orgA_ctx,
   )
   stopCapture()
-  const v77Lines = captured.filter((l) => l.msg.includes('chat_v2.turn_complete'))
+  const v77Lines = captured.filter((l) => l.msg.includes('chat_core.turn_complete'))
   const v77Match = v77Lines[0]?.msg.match(/"breakdown":(\{[^}]+\})/)
   const v77Breakdown = v77Match ? JSON.parse(v77Match[1]) : null
   assertGt('V77.lookup_ops_researchers_cost_gt_zero', Number(v77Breakdown?.researchers ?? 0), 0)
@@ -1510,7 +1482,7 @@ async function runProbe(iteration: number): Promise<void> {
     orgA_ctx,
   )
   stopCapture()
-  const v78Lines = captured.filter((l) => l.msg.includes('chat_v2.turn_complete'))
+  const v78Lines = captured.filter((l) => l.msg.includes('chat_core.turn_complete'))
   const v78Match = v78Lines[0]?.msg.match(/"breakdown":(\{[^}]+\})/)
   const v78Breakdown = v78Match ? JSON.parse(v78Match[1]) : null
   const v78Keys = v78Breakdown ? Object.keys(v78Breakdown) : []
@@ -1537,7 +1509,7 @@ async function runProbe(iteration: number): Promise<void> {
   }
 
   // V80.cap (audit-S2) — synthetic 5-researcher dispatch → orchestrator caps to 4.
-  process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH = '1'
+  process.env.PROBE_CHAT_CORE_FORCE_FIVE_DISPATCH = '1'
   startCapture()
   let v80AssistantId: string | null = null
   try {
@@ -1551,10 +1523,10 @@ async function runProbe(iteration: number): Promise<void> {
     )
     v80AssistantId = v80Result.assistantMessage.id
   } finally {
-    delete process.env.PROBE_CHAT_V2_FORCE_FIVE_DISPATCH
+    delete process.env.PROBE_CHAT_CORE_FORCE_FIVE_DISPATCH
     stopCapture()
   }
-  const v80CappedWarns = captured.filter((l) => l.msg.includes('chat_v2.dispatch_capped'))
+  const v80CappedWarns = captured.filter((l) => l.msg.includes('chat_core.dispatch_capped'))
   assertGte('V80.dispatch_capped_warn_emitted', v80CappedWarns.length, 1)
   // Assert toolCallLog dispatched length = 4 (truncated from 5).
   if (v80AssistantId) {
@@ -1583,9 +1555,9 @@ async function runProbe(iteration: number): Promise<void> {
   // turn_budget_exhausted in source.
   const fs = await import('node:fs')
   const path = await import('node:path')
-  const orchSrcPath = path.resolve(__dirname, '..', 'src/modules/chat-v2/chat-v2.service.ts')
+  const orchSrcPath = path.resolve(__dirname, '..', 'src/modules/chat-core/chat-core.service.ts')
   const orchSrc = fs.readFileSync(orchSrcPath, 'utf8')
-  assertContains('V81.parent_abort_warn_referenced', orchSrc, 'chat_v2.turn_budget_exhausted')
+  assertContains('V81.parent_abort_warn_referenced', orchSrc, 'chat_core.turn_budget_exhausted')
   assertContains('V81.parent_abort_controller_present', orchSrc, 'parentAbort')
 
   // ──────────────────────── V82 — Tabular docId discovery (AC-18) ─────────
@@ -1611,13 +1583,13 @@ async function runProbe(iteration: number): Promise<void> {
     { orgId: orgA.orgId, venueId: orgA.venueId, conversationId: v51Conv.id },
   )
   stopCapture()
-  const v83Complete = captured.filter((l) => l.msg.includes('chat_v2.researcher_complete'))
+  const v83Complete = captured.filter((l) => l.msg.includes('chat_core.researcher_complete'))
   assertGte('V83.researcher_latency_log_emitted', v83Complete.length, 1)
   const v83HasLatency = v83Complete.some((l) => /"latencyMs":\d+/.test(l.msg))
   assertEqual('V83.researcher_latency_log_field_present', v83HasLatency, true)
   // V83 — failure path also logs latencyMs.
   startCapture()
-  process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW = 'venue'
+  process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW = 'venue'
   try {
     await venueR.research('any', {
       orgId: orgA.orgId,
@@ -1627,9 +1599,9 @@ async function runProbe(iteration: number): Promise<void> {
   } catch {
     // expected
   }
-  delete process.env.PROBE_CHAT_V2_FORCE_RESEARCHER_THROW
+  delete process.env.PROBE_CHAT_CORE_FORCE_RESEARCHER_THROW
   stopCapture()
-  const v83Failed = captured.filter((l) => l.msg.includes('chat_v2.researcher_failed'))
+  const v83Failed = captured.filter((l) => l.msg.includes('chat_core.researcher_failed'))
   const v83FailedHasLatency = v83Failed.some((l) => /"latencyMs":\d+/.test(l.msg))
   assertEqual('V83.researcher_failure_latency_log', v83FailedHasLatency, true)
 
@@ -1641,7 +1613,7 @@ async function runProbe(iteration: number): Promise<void> {
     conversationId: v51Conv.id,
   })
   stopCapture()
-  const v84CostLogs = captured.filter((l) => l.msg.includes('chat_v2.researcher_cost_observed'))
+  const v84CostLogs = captured.filter((l) => l.msg.includes('chat_core.researcher_cost_observed'))
   assertGte('V84.researcher_cost_log_emitted', v84CostLogs.length, 1)
   assert(
     'V84.researcher_cost_log_fields',
@@ -1679,11 +1651,11 @@ async function runProbe(iteration: number): Promise<void> {
 // Real-Anthropic mode (audit-M6 manual checkpoint).
 // ──────────────────────────────────────────────────────────────────
 async function realAnthropicBanner(): Promise<void> {
-  if (process.env.PROBE_CHAT_V2_REAL === '1') {
+  if (process.env.PROBE_CHAT_CORE_REAL === '1') {
     console.log('⚠️  real-Anthropic probe — estimated cost $0.05-$0.20. Press Ctrl-C now to abort.')
     console.log('    (5-second hold)')
     await new Promise((r) => setTimeout(r, 5000))
-    delete process.env.PROBE_CHAT_V2_STUB
+    delete process.env.PROBE_CHAT_CORE_STUB
   }
 }
 
@@ -1696,11 +1668,11 @@ async function main(): Promise<void> {
 
   const passed = results.filter((r) => r.pass).length
   const total = results.length
-  console.log(JSON.stringify({ event: 'probe-chat-v2.completed', passed, total, runs: 2 }))
+  console.log(JSON.stringify({ event: 'probe-chat-core.completed', passed, total, runs: 2 }))
   if (passed < total) {
     console.error(
       JSON.stringify({
-        event: 'probe-chat-v2.failures',
+        event: 'probe-chat-core.failures',
         failures: results.filter((r) => !r.pass).map((r) => ({ name: r.name, detail: r.detail })),
       }),
     )
@@ -1710,7 +1682,9 @@ async function main(): Promise<void> {
 
 main()
   .catch(async (err) => {
-    console.error(JSON.stringify({ event: 'probe-chat-v2.fatal', message: (err as Error).message }))
+    console.error(
+      JSON.stringify({ event: 'probe-chat-core.fatal', message: (err as Error).message }),
+    )
     await pnpCleanup().catch(() => {})
     process.exit(1)
   })

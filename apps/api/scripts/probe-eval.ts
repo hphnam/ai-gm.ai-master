@@ -5,10 +5,10 @@
  *
  * Plan 06-04 Task 5 — extended 6 → 12 queries. Original 6 are retrieval-shape
  * assertions (E1-E6 — "did the doc come back with a section?"). New 6 are
- * mode-classified shape assertions for the chat-v2 quality gate spanning
+ * mode-classified shape assertions for the chat-core quality gate spanning
  * lookup (L1-L2), reasoning (R1-R2), incident (I1-I2). Each new query carries
  * an `expectedShape: { mode, mustInclude: RegExp[], mustNotInclude: RegExp[] }`
- * that asserts chat-v2 Writer output matches the mode's voice contract (e.g.,
+ * that asserts chat-core Writer output matches the mode's voice contract (e.g.,
  * reasoning includes "first thing —" or branching; incident includes
  * Now/Then/Don't or sequenced output; lookup is one-line + nudge with no
  * "I found" / "I searched" preamble).
@@ -19,13 +19,13 @@
  * Modes:
  *   - DEFAULT (no env) — retrieval-only stub mode for 6 original queries E1-E6;
  *     new mode-shape queries L1/R1/I1/etc are stub-marked `expectedShape.mode`
- *     but actual chat-v2 invocation runs in real-mode only.
- *   - PROBE_CHAT_V2_REAL=1 — invokes ChatV2Service.sendMessage on each mode-shape
+ *     but actual chat-core invocation runs in real-mode only.
+ *   - PROBE_CHAT_CORE_REAL=1 — invokes ChatCoreService.sendMessage on each mode-shape
  *     query and asserts mustInclude/mustNotInclude regexes on Writer output.
  *     Cost: ~$0.50 for the 6 mode queries (Sonnet @ ~$0.04/turn ish).
  *
  *   npm run probe:eval --workspace=api                       # retrieval-only stub-mode
- *   PROBE_CHAT_V2_REAL=1 npm run probe:eval --workspace=api   # quality gate (real)
+ *   PROBE_CHAT_CORE_REAL=1 npm run probe:eval --workspace=api   # quality gate (real)
  */
 
 import '../src/load-env'
@@ -92,8 +92,8 @@ async function ensureOrgWithVenue(): Promise<{ orgId: string; venueId: string }>
 }
 
 // Plan 06-04 Task 5 — Each query optionally carries `expectedShape` for the
-// real-mode chat-v2 quality gate (PROBE_CHAT_V2_REAL=1). Retrieval shape is
-// asserted for all 12 in stub mode (DEFAULT). chat-v2 Writer output is
+// real-mode chat-core quality gate (PROBE_CHAT_CORE_REAL=1). Retrieval shape is
+// asserted for all 12 in stub mode (DEFAULT). chat-core Writer output is
 // asserted for the 6 mode-classified queries (L*/R*/I*) when REAL=1.
 type ExpectedShape = {
   mode: 'lookup' | 'reasoning' | 'incident'
@@ -108,7 +108,7 @@ type CannedQuery = {
 }
 
 // 6 retrieval-shape queries (E1-E6) — legacy v0.1 04-03 corpus topics.
-// 6 mode-shape queries (L1-L2, R1-R2, I1-I2) — Plan 06-04 chat-v2 gate.
+// 6 mode-shape queries (L1-L2, R1-R2, I1-I2) — Plan 06-04 chat-core gate.
 const CANNED: CannedQuery[] = [
   {
     topic: 'E1.stock_status',
@@ -165,7 +165,7 @@ Empty kegs go to the cask-return area near the rear delivery door.
 Stack them upright, label-side out, ready for the brewery to swap on the next drop.
 Do NOT crush or damage kegs — the brewery charges for damage.`,
   },
-  // ─── Plan 06-04 — mode-shape queries (chat-v2 quality gate) ────────────
+  // ─── Plan 06-04 — mode-shape queries (chat-core quality gate) ────────────
   {
     topic: 'L1.lookup_below_par',
     query: 'what is below par right now',
@@ -341,7 +341,7 @@ async function main() {
   console.log(
     JSON.stringify({
       event: 'probe.eval.cost_banner',
-      note: '15-query canned harness (E1-E6 retrieval shape, L1-L2/R1-R2/I1-I2 mode shape, N1-N2/B1 chat-overhaul Wave A/B path coverage) · retrieval-only in stub mode (~15-135 ingest Voyage + 15 query Voyage calls @ $0.00006 each ≈ $0.0018-$0.009). PROBE_CHAT_V2_REAL=1 invokes ChatV2Service for the 6 mode queries — adds ~$0.50 (Sonnet @ ~$0.04-0.08/turn).',
+      note: '15-query canned harness (E1-E6 retrieval shape, L1-L2/R1-R2/I1-I2 mode shape, N1-N2/B1 chat-overhaul Wave A/B path coverage) · retrieval-only in stub mode (~15-135 ingest Voyage + 15 query Voyage calls @ $0.00006 each ≈ $0.0018-$0.009). PROBE_CHAT_CORE_REAL=1 invokes ChatCoreService for the 6 mode queries — adds ~$0.50 (Sonnet @ ~$0.04-0.08/turn).',
     }),
   )
 

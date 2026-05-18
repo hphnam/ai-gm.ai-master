@@ -8,7 +8,7 @@ import {
   VERIFIED_SENDER_LIMIT_PER_HOUR,
   type WhatsappInboundResult,
 } from '../../types'
-import { ChatV2Service } from '../chat-v2/chat-v2.service'
+import { ChatCoreService } from '../chat-core/chat-core.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import { SuggestionsService } from '../suggestions/suggestions.service'
 import { markAndCheckSid } from './seen-message-sids'
@@ -80,7 +80,7 @@ export class WhatsappService {
 
   constructor(
     private readonly adapter: WhatsAppAdapter,
-    private readonly chatV2Service: ChatV2Service,
+    private readonly chatCoreService: ChatCoreService,
     private readonly suggestions: SuggestionsService,
     private readonly onboarding: WhatsappOnboardingService,
     private readonly realtime: RealtimeGateway,
@@ -136,7 +136,7 @@ export class WhatsappService {
       // the phone's onboarding state. Unknown / otp_pending / linked_no_venue
       // are handled inline by the state machine; only fully-linked phones fall
       // through to chat. Plan 03-02 will close D-06-04-A by routing the linked
-      // path through chat-v1 ChatService instead of ChatV2Service.
+      // path through chat-v1 ChatService instead of ChatCoreService.
       const onboardingState = await this.onboarding.loadState(phoneNumber)
 
       if (onboardingState.kind !== 'linked') {
@@ -411,12 +411,12 @@ export class WhatsappService {
         const startedAt = Date.now()
         const userMessage =
           bodyText.length > 0 ? bodyText : attachment ? 'User sent an image.' : bodyText
-        // Plan 06-04 Task 4 — WhatsApp consumer migrated from chat-v1 to chat-v2.
-        // Same SendMessageInput shape; chat-v2 uses a single ctx-object instead
+        // Plan 06-04 Task 4 — WhatsApp consumer migrated from chat-v1 to chat-core.
+        // Same SendMessageInput shape; chat-core uses a single ctx-object instead
         // of positional args. WhatsApp inbound now flows through Triage →
         // Researchers (with Venue always-on for reasoning + incident) → Writer.
         const chatResult = await Promise.race([
-          this.chatV2Service.sendMessage(
+          this.chatCoreService.sendMessage(
             {
               venueId: venue.id,
               userMessage,

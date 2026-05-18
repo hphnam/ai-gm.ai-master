@@ -70,11 +70,7 @@ export class PricingRecommendationsController {
     @Body(new ZodValidationPipe(AdoptPricingRecommendationBodyDto))
     body: AdoptPricingRecommendationBodyDto,
   ): Promise<SinglePricingRecommendationResponseDto> {
-    const recommendation = await this.service.markAdopted(
-      org.id,
-      params.id,
-      body.adoptedPriceCents,
-    )
+    const recommendation = await this.service.markAdopted(org.id, params.id, body.adoptedPriceCents)
     return { recommendation }
   }
 

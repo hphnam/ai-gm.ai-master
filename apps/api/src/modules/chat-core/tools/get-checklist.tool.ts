@@ -13,7 +13,7 @@
 
 import type { PrismaClient } from '@prisma/client'
 import { fail, ok, type ToolResult } from '../../../types'
-import { chatV2Logger, hashId, hashQuery } from '../log-helpers'
+import { chatCoreLogger, hashId, hashQuery } from '../log-helpers'
 
 export type ChecklistStepLite = { index: number; content: string }
 
@@ -57,7 +57,7 @@ export async function getChecklist(
   })
 
   if (candidates.length === 0) {
-    chatV2Logger.info('tool.get_checklist', {
+    chatCoreLogger.info('tool.get_checklist', {
       orgId: hashId(orgId),
       intent: hashQuery(normIntent),
       hitCount: 0,
@@ -72,7 +72,7 @@ export async function getChecklist(
   const top = scored[0]
 
   if (!top || top.score < SIMILARITY_THRESHOLD) {
-    chatV2Logger.info('tool.get_checklist', {
+    chatCoreLogger.info('tool.get_checklist', {
       orgId: hashId(orgId),
       intent: hashQuery(normIntent),
       hitCount: 0,
@@ -93,7 +93,7 @@ export async function getChecklist(
   // Suppress venueId in output but keep parameter for cross-tenant audit logs.
   void venueId
 
-  chatV2Logger.info('tool.get_checklist', {
+  chatCoreLogger.info('tool.get_checklist', {
     orgId: hashId(orgId),
     intent: hashQuery(normIntent),
     hitCount: 1,

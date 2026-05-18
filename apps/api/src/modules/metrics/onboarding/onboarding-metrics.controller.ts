@@ -70,7 +70,9 @@ export class OnboardingMetricsController {
   }
 }
 
-function serialize(r: Awaited<ReturnType<OnboardingMetricsService['getCompetency']>>): CompetencyResponse {
+function serialize(
+  r: Awaited<ReturnType<OnboardingMetricsService['getCompetency']>>,
+): CompetencyResponse {
   return {
     startedAt: r.startedAt ? r.startedAt.toISOString() : null,
     daysSinceStart: r.daysSinceStart,

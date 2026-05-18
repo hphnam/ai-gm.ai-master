@@ -10,11 +10,7 @@ const NOW = new Date('2026-05-17T12:00:00Z')
 const AUTHOR = 'user_author'
 const MANAGER = 'user_manager'
 
-const entry = (
-  tool: string,
-  result: unknown,
-  round: number = 0,
-): ToolCallLogEntry => ({
+const entry = (tool: string, result: unknown, round: number = 0): ToolCallLogEntry => ({
   round,
   toolUseId: `tu_${round}_${tool}`,
   tool,

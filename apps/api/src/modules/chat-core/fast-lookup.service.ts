@@ -11,7 +11,7 @@ import { prisma } from '../../database/prisma'
 import type { ResearcherFinding } from '../../types'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import type { FastPathRecipe } from './fast-lookup-recipes'
-import { chatV2Logger, hashId } from './log-helpers'
+import { chatCoreLogger, hashId } from './log-helpers'
 import { getChecklist } from './tools/get-checklist.tool'
 import { getPerson } from './tools/get-person.tool'
 
@@ -51,7 +51,7 @@ export class FastLookupService {
         }
       }
     } catch (err) {
-      chatV2Logger.warn('chat_v2.fast_lookup_failed', {
+      chatCoreLogger.warn('chat_core.fast_lookup_failed', {
         orgId: hashId(ctx.orgId),
         tool: recipe.tool,
         error: (err as Error)?.message ?? 'unknown',
@@ -193,7 +193,7 @@ export class FastLookupService {
   }
 
   private logHit(tool: string, hitCount: number, ctx: FastLookupContext, t0: number): void {
-    chatV2Logger.info('chat_v2.fast_lookup_hit', {
+    chatCoreLogger.info('chat_core.fast_lookup_hit', {
       orgId: hashId(ctx.orgId),
       tool,
       hitCount,
@@ -202,7 +202,7 @@ export class FastLookupService {
   }
 
   private logMiss(tool: string, ctx: FastLookupContext, t0: number): void {
-    chatV2Logger.info('chat_v2.fast_lookup_miss', {
+    chatCoreLogger.info('chat_core.fast_lookup_miss', {
       orgId: hashId(ctx.orgId),
       tool,
       latencyMs: Date.now() - t0,

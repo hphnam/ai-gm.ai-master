@@ -49,7 +49,7 @@ export type AnalyserResult = {
 @Injectable()
 export class AnalyserService {
   async analyse(input: AnalyserInput): Promise<AnalyserResult> {
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubAnalyse(input)
     }
 
@@ -145,7 +145,7 @@ function stubAnalyse(input: AnalyserInput): AnalyserResult {
   }
 
   // Probe-injected low-confidence override for re-research circuit-breaker tests.
-  if (process.env.PROBE_CHAT_V2_FORCE_LOW_CONFIDENCE === '1') {
+  if (process.env.PROBE_CHAT_CORE_FORCE_LOW_CONFIDENCE === '1') {
     evidenceSufficiency = 0.4
   }
 

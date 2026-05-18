@@ -5,7 +5,7 @@
 // add infrastructure). Run via:
 //   npm run test:cost-tracker --workspace=api
 // or directly:
-//   node --import tsx --test apps/api/src/modules/chat-v2/cost-tracker.service.spec.ts
+//   node --import tsx --test apps/api/src/modules/chat-core/cost-tracker.service.spec.ts
 
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'

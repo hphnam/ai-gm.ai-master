@@ -8,7 +8,7 @@
 // Cross-tenant guard: venue.organizationId === orgId before any data fetch.
 // audit-S4 — 4 internal Prisma queries fire via Promise.all (1×RTT vs 4×RTT).
 // audit-S5 — mockOps.getUpcomingCutoffs no-data flattens to []; any other
-// failure reason emits chat_v2.tool.get_venue_briefing.cutoffs_failed warn.
+// failure reason emits chat_core.tool.get_venue_briefing.cutoffs_failed warn.
 // audit-M5 — uses stubClock() for "last 24h" / "next 4h" boundaries.
 
 import type { PrismaClient } from '@prisma/client'
@@ -23,7 +23,7 @@ import {
 import { VenueProfileSchema } from '../../../types/api'
 import type { MockUpcomingCutoff } from '../../mock-ops/mock-ops.service'
 import { MockOpsService } from '../../mock-ops/mock-ops.service'
-import { chatV2Logger, hashId } from '../log-helpers'
+import { chatCoreLogger, hashId } from '../log-helpers'
 import { stubClock } from '../stub-clock'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -90,7 +90,7 @@ export async function getVenueBriefing(
 
   // 404-not-403 — venue must exist AND belong to org. Anything else → no-data.
   if (!venue) {
-    chatV2Logger.info('tool.get_venue_briefing', {
+    chatCoreLogger.info('tool.get_venue_briefing', {
       orgId: hashId(orgId),
       venueIdHash: hashId(venueId),
       hitCount: 0,
@@ -109,7 +109,7 @@ export async function getVenueBriefing(
   if (cutoffsResult.ok) {
     upcomingCutoffs = cutoffsResult.data
   } else if (cutoffsResult.reason !== 'no-data') {
-    chatV2Logger.warn('chat_v2.tool.get_venue_briefing.cutoffs_failed', {
+    chatCoreLogger.warn('chat_core.tool.get_venue_briefing.cutoffs_failed', {
       orgId: hashId(orgId),
       venueIdHash: hashId(venueId),
       reason: cutoffsResult.reason,
@@ -131,7 +131,7 @@ export async function getVenueBriefing(
     createdAt: i.createdAt,
   }))
 
-  chatV2Logger.info('tool.get_venue_briefing', {
+  chatCoreLogger.info('tool.get_venue_briefing', {
     orgId: hashId(orgId),
     venueIdHash: hashId(venueId),
     contactCount: contactSummaries.length,

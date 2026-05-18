@@ -146,10 +146,7 @@ function localIsoMonday(now: Date, timezone: string): Date {
   return addDaysUtc(localDate, -(isoDow - 1))
 }
 
-function wallClockParts(
-  d: Date,
-  timezone: string,
-): { year: number; month: number; day: number } {
+function wallClockParts(d: Date, timezone: string): { year: number; month: number; day: number } {
   const fmt = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
     year: 'numeric',

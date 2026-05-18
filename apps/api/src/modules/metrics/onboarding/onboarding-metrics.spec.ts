@@ -85,7 +85,10 @@ describe('computeCompetency', () => {
     ]
     const now = at(ONBOARDING_WINDOW_DAYS)
     const result = computeCompetency(START, queries, now)
-    assert.ok(result.firstIndependentAt, 'expected firstIndependentAt to be set once repeats age out')
+    assert.ok(
+      result.firstIndependentAt,
+      'expected firstIndependentAt to be set once repeats age out',
+    )
     // The repeats live in days 0-2; with a 7-day trailing window they age
     // out by the start of day 10. The first independent day must therefore
     // be no earlier than day 10's boundary (start of day 10).
@@ -108,12 +111,7 @@ describe('computeCompetency', () => {
 
   it('does not reach independence when total queries in the trailing window stay below the minimum', () => {
     // 4 unique queries spread across the window — never hits the 5-query floor.
-    const queries: NormalizedQuery[] = [
-      q('a', 0),
-      q('b', 3),
-      q('c', 6),
-      q('d', 9),
-    ]
+    const queries: NormalizedQuery[] = [q('a', 0), q('b', 3), q('c', 6), q('d', 9)]
     const result = computeCompetency(START, queries, at(ONBOARDING_WINDOW_DAYS))
     assert.equal(result.firstIndependentAt, null)
   })
@@ -133,10 +131,7 @@ describe('computeCompetency', () => {
   it('honours the trailing-window length so older repeats fall out of the count', () => {
     // Day 0: repeated query. Day TRAILING+1: 5 unique queries. The trailing
     // 7-day window at that point excludes the day-0 repeats entirely.
-    const queries: NormalizedQuery[] = [
-      q('shared', 0, 9),
-      q('shared', 0, 10),
-    ]
+    const queries: NormalizedQuery[] = [q('shared', 0, 9), q('shared', 0, 10)]
     for (let i = 0; i < COMPETENCY_MIN_QUERIES; i += 1) {
       queries.push(q(`fresh ${i}`, COMPETENCY_TRAILING_DAYS + 1, i))
     }

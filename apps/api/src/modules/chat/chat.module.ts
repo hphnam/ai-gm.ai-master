@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { AdaptationModule } from '../adaptation/adaptation.module'
-import { ChatV2Module } from '../chat-v2/chat-v2.module'
+import { ChatCoreModule } from '../chat-core/chat-core.module'
 import { IncidentsModule } from '../incidents/incidents.module'
 import { IngestModule } from '../ingest/ingest.module'
 // IntegrationsModule is @Global — no import needed for the registry, but we
@@ -25,18 +25,13 @@ import { QuoteVerifierService } from './quote-verifier.service'
 import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
 
-// Plan 06-04 hot-fix 2026-05-02 — chat-v1 controller revived. Public /chat/*
-// surface flips back to ChatService (single-Sonnet ToolLoopAgent + new
-// `deep_research` tool wrapping chat-v2's pipeline). ChatV2Controller's
-// @Controller registration is removed in lockstep — only one controller may
-// own @Controller('chat') at a time or NestJS errors at startup.
 @Module({
   imports: [
     RetrievalModule,
     AdaptationModule,
     IngestModule,
     TabularModule,
-    ChatV2Module,
+    ChatCoreModule,
     RealtimeModule,
     TasksModule,
     IncidentsModule,

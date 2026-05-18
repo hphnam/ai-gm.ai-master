@@ -1,4 +1,4 @@
-// Plan 06-01 Task 1 — Cost capture helpers for chat-v2.
+// Plan 06-01 Task 1 — Cost capture helpers for chat-core.
 //
 // SCHEMA precision rationale (audit-S11):
 //   chat_messages.costUsd + knowledge_items.ingestionCostUsd are Decimal(10,6).
@@ -85,7 +85,7 @@ export function calculateVoyageUsd(callCount: number): number {
 }
 
 // Per-turn cost breakdown captured by CostTracker. Persisted as single Decimal value
-// on chat_messages.costUsd; breakdown is logged via chat_v2.turn_complete event
+// on chat_messages.costUsd; breakdown is logged via chat_core.turn_complete event
 // (audit-M5 PII-safe).
 //
 // Plan 06-02 — extended from 4-stage to 5-stage with Analyser + Critic. Key order

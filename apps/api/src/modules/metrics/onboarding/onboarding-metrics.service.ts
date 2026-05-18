@@ -37,7 +37,11 @@ export class OnboardingMetricsService {
   /// Fetches a user's queries within their onboarding window and computes
   /// the competency snapshot. Returns zeros (not null) for queries to keep
   /// the response shape stable for the UI.
-  async getCompetency(orgId: string, userId: string, now: Date = new Date()): Promise<CompetencyResult> {
+  async getCompetency(
+    orgId: string,
+    userId: string,
+    now: Date = new Date(),
+  ): Promise<CompetencyResult> {
     const membership = await prisma.organizationMember.findUnique({
       where: { userId_organizationId: { userId, organizationId: orgId } },
       select: { onboardingStartedAt: true },
@@ -116,11 +120,7 @@ export function computeCompetency(
 /// repeat rate below `COMPETENCY_REPEAT_RATE_THRESHOLD` wins. The returned
 /// timestamp is the END of that day (start-of-next-day) so the UI can say
 /// "independent by end of day D".
-function firstIndependentDay(
-  startedAt: Date,
-  queries: NormalizedQuery[],
-  now: Date,
-): Date | null {
+function firstIndependentDay(startedAt: Date, queries: NormalizedQuery[], now: Date): Date | null {
   if (queries.length === 0) return null
   const lastScanDay = Math.min(
     ONBOARDING_WINDOW_DAYS - 1,

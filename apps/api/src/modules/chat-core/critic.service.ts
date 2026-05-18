@@ -49,7 +49,7 @@ export type CriticResult = {
 @Injectable()
 export class CriticService {
   async verify(input: CriticInput): Promise<CriticResult> {
-    if (process.env.PROBE_CHAT_V2_STUB === '1') {
+    if (process.env.PROBE_CHAT_CORE_STUB === '1') {
       return stubVerify(input)
     }
 
@@ -120,7 +120,7 @@ function numberOr0(v: unknown): number {
 
 function stubVerify(input: CriticInput): CriticResult {
   // Probe-injected reject for V35-V37 (Critic correction loop assertions).
-  if (process.env.PROBE_CHAT_V2_FORCE_CRITIC_REJECT === '1') {
+  if (process.env.PROBE_CHAT_CORE_FORCE_CRITIC_REJECT === '1') {
     return {
       output: {
         verdict: 'corrections-needed',

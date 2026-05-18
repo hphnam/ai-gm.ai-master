@@ -1,4 +1,4 @@
-// Plan 06-01 Task 3 — chat-v2 orchestrator.
+// Plan 06-01 Task 3 — chat-core orchestrator.
 // Plan 06-02 — extended for reasoning + incident modes with Analyser → Critic
 // loop, re-research circuit-breaker, stream phase events.
 //
@@ -44,7 +44,7 @@ import { CriticService } from './critic.service'
 import { FastLookupService } from './fast-lookup.service'
 import { identifyFastPath } from './fast-lookup-recipes'
 import { sanitizeForTriage } from './input-sanitizer'
-import { chatV2Logger, hashId, sanitizeError } from './log-helpers'
+import { chatCoreLogger, hashId, sanitizeError } from './log-helpers'
 import { Researcher } from './researcher.interface'
 import { sanitizeForResearcher } from './researcher-sanitizer'
 import { DocsResearcher } from './researchers/docs.researcher'
@@ -55,7 +55,7 @@ import { VenueResearcher } from './researchers/venue.researcher'
 import { TriageService } from './triage.service'
 import { WriterService } from './writer.service'
 
-export type ChatV2DispatchContext = {
+export type ChatCoreDispatchContext = {
   orgId: string
   userId: string
   userRole: string
@@ -64,17 +64,17 @@ export type ChatV2DispatchContext = {
 
 // audit-M6: lowConfidence flag persistence on chat_messages.toolCallLog (no
 // metadata column exists in schema; toolCallLog is Json[] and unused for
-// chat-v2 turns from 06-01). Sentinel entry shape:
+// chat-core turns from 06-01). Sentinel entry shape:
 const LOW_CONFIDENCE_FLAG_ENTRY = {
   round: -1,
-  toolUseId: 'chat-v2-low-confidence',
+  toolUseId: 'chat-core-low-confidence',
   tool: 'low_confidence_flag',
   input: null,
   result: { value: true },
 } as const
 
 @Injectable()
-export class ChatV2Service {
+export class ChatCoreService {
   constructor(
     private readonly triage: TriageService,
     private readonly docs: DocsResearcher,
@@ -113,7 +113,7 @@ export class ChatV2Service {
 
   async sendMessage(
     input: SendMessageInput,
-    ctx: ChatV2DispatchContext,
+    ctx: ChatCoreDispatchContext,
   ): Promise<SendMessageResult> {
     const t0 = Date.now()
 
@@ -169,7 +169,7 @@ export class ChatV2Service {
     // audit-M5 phase event emitter — seq monotonic from 0 + Date.now timestamp.
     let seq = 0
     const emitPhase = (phase: StreamPhaseEvent, mode: ChatMode | null): void => {
-      chatV2Logger.info('chat_v2.phase_event', {
+      chatCoreLogger.info('chat_core.phase_event', {
         phase,
         mode,
         conversationIdHash,
@@ -213,7 +213,7 @@ export class ChatV2Service {
           )
           const fastPathEntry = {
             round: -2,
-            toolUseId: 'chat-v2-fast-lookup',
+            toolUseId: 'chat-core-fast-lookup',
             tool: fastResult.toolName,
             input: { recipe: fastRecipe.tool },
             result: { hitCount: fastResult.hitCount },
@@ -230,7 +230,7 @@ export class ChatV2Service {
             select: { id: true, content: true, followUps: true },
           })
           emitPhase('complete', 'lookup')
-          chatV2Logger.info('chat_v2.turn_complete', {
+          chatCoreLogger.info('chat_core.turn_complete', {
             orgId: orgIdHash,
             conversationIdHash,
             mode: 'lookup',
@@ -251,7 +251,7 @@ export class ChatV2Service {
             retrievedItemIds,
           }
         }
-        chatV2Logger.info('chat_v2.fast_lookup_fallthrough', {
+        chatCoreLogger.info('chat_core.fast_lookup_fallthrough', {
           orgId: orgIdHash,
           conversationIdHash,
           recipe: fastRecipe.tool,
@@ -276,7 +276,7 @@ export class ChatV2Service {
           0,
           MAX_RESEARCHERS_PER_TURN,
         )
-        chatV2Logger.warn('chat_v2.dispatch_capped', {
+        chatCoreLogger.warn('chat_core.dispatch_capped', {
           orgId: orgIdHash,
           conversationIdHash,
           requestedCount: requestedDispatch.length,
@@ -318,7 +318,7 @@ export class ChatV2Service {
       const parentTimer = setTimeout(() => {
         parentAbort.abort()
         _parentBudgetExhausted = true
-        chatV2Logger.warn('chat_v2.turn_budget_exhausted', {
+        chatCoreLogger.warn('chat_core.turn_budget_exhausted', {
           orgId: orgIdHash,
           conversationIdHash,
           elapsedMs: Date.now() - t0,
@@ -350,7 +350,7 @@ export class ChatV2Service {
             tracker.recordResearcher(s.result.usage, s.result.voyageCalls)
             findings.push(s.result.finding)
           } else {
-            chatV2Logger.warn('chat_v2.researcher_failed', {
+            chatCoreLogger.warn('chat_core.researcher_failed', {
               orgId: orgIdHash,
               conversationIdHash,
               researcher: s.name,
@@ -399,7 +399,7 @@ export class ChatV2Service {
 
         // audit-S1: Analyser confidence telemetry — calibration substrate for
         // D-06-02-M threshold retune.
-        chatV2Logger.info('chat_v2.analyser_confidence_observed', {
+        chatCoreLogger.info('chat_core.analyser_confidence_observed', {
           mode: triageOutput.mode,
           suggestedShape: analyserResult.output.suggestedShape,
           evidenceSufficiency: analyserResult.output.evidenceSufficiency,
@@ -410,12 +410,12 @@ export class ChatV2Service {
         // refined brief, BUT only if running cost still under ceiling.
         if (analyserResult.output.evidenceSufficiency < ANALYSER_RERESEARCH_CONFIDENCE_THRESHOLD) {
           // Probe-only fake running cost override (V30) — production uses real total.
-          const fakeRunningCost = Number(process.env.PROBE_CHAT_V2_FAKE_RUNNING_COST_USD ?? '0')
+          const fakeRunningCost = Number(process.env.PROBE_CHAT_CORE_FAKE_RUNNING_COST_USD ?? '0')
           const runningCost = fakeRunningCost > 0 ? fakeRunningCost : tracker.total().totalUsd
 
           if (runningCost < RERESEARCH_COST_CEILING_USD) {
             const refinedBrief = composeRefinedBrief(brief, analyserResult.output.openQuestions)
-            chatV2Logger.info('chat_v2.reresearch_dispatched', {
+            chatCoreLogger.info('chat_core.reresearch_dispatched', {
               orgId: orgIdHash,
               conversationIdHash,
               originalConfidence: analyserResult.output.evidenceSufficiency,
@@ -440,7 +440,7 @@ export class ChatV2Service {
             })
             tracker.recordAnalyser(analyserResult.usage)
             analyserOutput = analyserResult.output
-            chatV2Logger.info('chat_v2.analyser_confidence_observed', {
+            chatCoreLogger.info('chat_core.analyser_confidence_observed', {
               mode: triageOutput.mode,
               suggestedShape: analyserResult.output.suggestedShape,
               evidenceSufficiency: analyserResult.output.evidenceSufficiency,
@@ -448,7 +448,7 @@ export class ChatV2Service {
               afterReresearch: true,
             })
           } else {
-            chatV2Logger.info('chat_v2.reresearch_skipped_cost_ceiling', {
+            chatCoreLogger.info('chat_core.reresearch_skipped_cost_ceiling', {
               orgId: orgIdHash,
               conversationIdHash,
               runningCost,
@@ -504,7 +504,7 @@ export class ChatV2Service {
             writerText = retry.text
             // audit-M3: event renamed (was critic_unresolved). We don't
             // re-verify on retry, so we cannot truthfully claim "unresolved".
-            chatV2Logger.warn('chat_v2.critic_writer_retry_dispatched', {
+            chatCoreLogger.warn('chat_core.critic_writer_retry_dispatched', {
               orgId: orgIdHash,
               conversationIdHash,
               mode: triageOutput.mode,
@@ -524,7 +524,7 @@ export class ChatV2Service {
       // incident reconstruction. Brief content is hashed (PII-safe), not raw.
       const triageDispatchEntry = {
         round: -2,
-        toolUseId: 'chat-v2-triage-dispatch',
+        toolUseId: 'chat-core-triage-dispatch',
         tool: 'triage_dispatch',
         input: {
           mode: triageOutput.mode,
@@ -543,7 +543,7 @@ export class ChatV2Service {
         const byteLength = Buffer.from(input.attachment.base64, 'base64').length
         toolCallLog.push({
           round: -3,
-          toolUseId: 'chat-v2-attachment-received',
+          toolUseId: 'chat-core-attachment-received',
           tool: 'attachment_received',
           input: {
             mediaType: input.attachment.mediaType,
@@ -567,7 +567,7 @@ export class ChatV2Service {
 
       emitPhase('complete', triageOutput.mode)
 
-      chatV2Logger.info('chat_v2.turn_complete', {
+      chatCoreLogger.info('chat_core.turn_complete', {
         orgId: orgIdHash,
         conversationIdHash,
         mode: triageOutput.mode,
@@ -601,13 +601,13 @@ export class ChatV2Service {
           },
         })
       } catch (persistErr) {
-        chatV2Logger.error('chat_v2.turn_failed_persist_error', {
+        chatCoreLogger.error('chat_core.turn_failed_persist_error', {
           orgId: orgIdHash,
           conversationIdHash,
           persistError: sanitizeError(persistErr),
         })
       }
-      chatV2Logger.error('chat_v2.turn_failed', {
+      chatCoreLogger.error('chat_core.turn_failed', {
         orgId: orgIdHash,
         conversationIdHash,
         mode: triageOutput?.mode ?? null,
@@ -631,11 +631,11 @@ export class ChatV2Service {
   // Returns { conversationId, assistantMessageId, result } where `result` is
   // a streamText result with `.pipeUIMessageStreamToResponse(res, opts)` —
   // matches chat-v1's prepareStream contract so the UI controller code path
-  // stays unchanged when the route moves to chat-v2.
+  // stays unchanged when the route moves to chat-core.
   // ─────────────────────────────────────────────────────────────────────────
   async streamMessage(
     input: SendMessageInput,
-    ctx: ChatV2DispatchContext,
+    ctx: ChatCoreDispatchContext,
     abortSignal?: AbortSignal,
   ): Promise<{
     conversationId: string
@@ -698,7 +698,7 @@ export class ChatV2Service {
 
     let seq = 0
     const emitPhase = (phase: StreamPhaseEvent, mode: ChatMode | null): void => {
-      chatV2Logger.info('chat_v2.phase_event', {
+      chatCoreLogger.info('chat_core.phase_event', {
         phase,
         mode,
         conversationIdHash,
@@ -726,7 +726,7 @@ export class ChatV2Service {
         const result = this.writer.streamCompose(writerInput, abortSignal)
         const fastPathEntry = {
           round: -2,
-          toolUseId: 'chat-v2-fast-lookup',
+          toolUseId: 'chat-core-fast-lookup',
           tool: fastResult.toolName,
           input: { recipe: fastRecipe.tool },
           result: { hitCount: fastResult.hitCount },
@@ -763,7 +763,7 @@ export class ChatV2Service {
               },
             })
             emitPhase('complete', 'lookup')
-            chatV2Logger.info('chat_v2.turn_complete', {
+            chatCoreLogger.info('chat_core.turn_complete', {
               orgId: orgIdHash,
               conversationIdHash,
               mode: 'lookup',
@@ -790,7 +790,7 @@ export class ChatV2Service {
             } catch {
               /* swallow */
             }
-            chatV2Logger.error('chat_v2.stream_turn_failed', {
+            chatCoreLogger.error('chat_core.stream_turn_failed', {
               orgId: orgIdHash,
               conversationIdHash,
               mode: 'lookup',
@@ -804,7 +804,7 @@ export class ChatV2Service {
         })()
         return { conversationId, assistantMessageId, result }
       }
-      chatV2Logger.info('chat_v2.fast_lookup_fallthrough', {
+      chatCoreLogger.info('chat_core.fast_lookup_fallthrough', {
         orgId: orgIdHash,
         conversationIdHash,
         recipe: fastRecipe.tool,
@@ -827,7 +827,7 @@ export class ChatV2Service {
         0,
         MAX_RESEARCHERS_PER_TURN,
       )
-      chatV2Logger.warn('chat_v2.dispatch_capped', {
+      chatCoreLogger.warn('chat_core.dispatch_capped', {
         orgId: orgIdHash,
         conversationIdHash,
         requestedCount: requestedDispatch.length,
@@ -872,7 +872,7 @@ export class ChatV2Service {
         tracker.recordResearcher(s.result.usage, s.result.voyageCalls)
         findings.push(s.result.finding)
       } else {
-        chatV2Logger.warn('chat_v2.researcher_failed', {
+        chatCoreLogger.warn('chat_core.researcher_failed', {
           orgId: orgIdHash,
           conversationIdHash,
           researcher: s.name,
@@ -897,7 +897,7 @@ export class ChatV2Service {
       tracker.recordAnalyser(analyserResult.usage)
       analyserOutput = analyserResult.output
       citationCount = new Set(analyserResult.output.citations.map((c) => c.knowledgeItemId)).size
-      chatV2Logger.info('chat_v2.analyser_confidence_observed', {
+      chatCoreLogger.info('chat_core.analyser_confidence_observed', {
         mode: triageOutput.mode,
         suggestedShape: analyserResult.output.suggestedShape,
         evidenceSufficiency: analyserResult.output.evidenceSufficiency,
@@ -909,7 +909,7 @@ export class ChatV2Service {
     // D-06-04-A: incident streaming SKIPS Critic (streaming + Critic-correction
     // rewrite is incompatible with token-by-token delivery; reconciles v0.4).
     if (triageOutput.mode === 'incident') {
-      chatV2Logger.warn('chat_v2.critic_skipped_streaming', {
+      chatCoreLogger.warn('chat_core.critic_skipped_streaming', {
         mode: 'incident',
         conversationIdHash,
         reason: 'streaming-incompatible',
@@ -960,7 +960,7 @@ export class ChatV2Service {
         )
         const triageDispatchEntry = {
           round: -2,
-          toolUseId: 'chat-v2-triage-dispatch',
+          toolUseId: 'chat-core-triage-dispatch',
           tool: 'triage_dispatch',
           input: {
             mode: triageOutput.mode,
@@ -980,7 +980,7 @@ export class ChatV2Service {
           },
         })
         emitPhase('complete', triageOutput.mode)
-        chatV2Logger.info('chat_v2.turn_complete', {
+        chatCoreLogger.info('chat_core.turn_complete', {
           orgId: orgIdHash,
           conversationIdHash,
           mode: triageOutput.mode,
@@ -1007,7 +1007,7 @@ export class ChatV2Service {
         } catch {
           /* swallow — already-failed turn shouldn't fail again on persist */
         }
-        chatV2Logger.error('chat_v2.stream_turn_failed', {
+        chatCoreLogger.error('chat_core.stream_turn_failed', {
           orgId: orgIdHash,
           conversationIdHash,
           mode: triageOutput.mode,
