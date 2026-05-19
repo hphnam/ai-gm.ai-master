@@ -123,6 +123,84 @@ export function resolveWindow(
   }
 }
 
+// ─── Forward-looking schedule windows ─────────────────────────────────────
+// Distinct from the sales/labor backward-looking WindowInput because the
+// natural framing for rotas / bookings is "next 7 days", not "last 7 days".
+// Supports a hybrid: sinceHours back + aheadHours forward (so "this week"
+// can include yesterday + today + the rest of the week in one call), OR a
+// fixed fromIso/toIso pair.
+
+export const ScheduleWindowInputShape = {
+  sinceHours: z.number().int().min(0).optional(),
+  aheadHours: z.number().int().min(1).optional(),
+  fromIso: z.string().datetime().optional(),
+  toIso: z.string().datetime().optional(),
+} as const
+
+export type ScheduleWindowInput = {
+  sinceHours?: number
+  aheadHours?: number
+  fromIso?: string
+  toIso?: string
+}
+
+export function applyScheduleWindowRefinements<T extends z.ZodTypeAny>(schema: T): T {
+  return schema.superRefine((value, ctx) => {
+    const v = value as ScheduleWindowInput
+    const rolling = v.sinceHours !== undefined || v.aheadHours !== undefined
+    const fixed = v.fromIso !== undefined || v.toIso !== undefined
+    if (rolling && fixed) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'pass either sinceHours/aheadHours OR fromIso/toIso, not both',
+      })
+    }
+    if (v.toIso && !v.fromIso) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'toIso requires fromIso',
+        path: ['toIso'],
+      })
+    }
+    if (v.fromIso && v.toIso) {
+      const s = Date.parse(v.fromIso)
+      const e = Date.parse(v.toIso)
+      if (Number.isFinite(s) && Number.isFinite(e) && e <= s) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'toIso must be after fromIso',
+          path: ['toIso'],
+        })
+      }
+    }
+  }) as unknown as T
+}
+
+export function scheduleWindowJsonSchemaProps(opts: {
+  defaultAheadHours: number
+  maxHours: number
+}) {
+  return {
+    sinceHours: {
+      type: 'integer',
+      description: `Hours back from now to include past shifts (0-${opts.maxHours}, default 0). Use for "this week" if today is mid-week.`,
+    },
+    aheadHours: {
+      type: 'integer',
+      description: `Hours forward from now (1-${opts.maxHours}, default ${opts.defaultAheadHours}). Use for "next 7 days" / "this coming week".`,
+    },
+    fromIso: {
+      type: 'string',
+      description:
+        'ISO 8601 inclusive start (e.g. "2026-05-18T00:00:00Z"). Use for a fixed range like "week commencing 18 May". Mutually exclusive with sinceHours/aheadHours.',
+    },
+    toIso: {
+      type: 'string',
+      description: 'ISO 8601 inclusive end (e.g. "2026-05-24T23:59:59Z"). Requires fromIso.',
+    },
+  } as const
+}
+
 /// Reusable JSON-Schema subset for a window argument — saves repeating the
 /// same property block on every tool definition.
 export function windowJsonSchemaProps(opts: { defaultHours: number; maxHours: number }) {

@@ -1,6 +1,13 @@
 import { z } from 'zod'
 import type { IntegrationToolDefinition } from '../integration-provider'
-import { applyWindowRefinements, WindowInputShape, windowJsonSchemaProps } from './square-window'
+import {
+  applyScheduleWindowRefinements,
+  applyWindowRefinements,
+  ScheduleWindowInputShape,
+  scheduleWindowJsonSchemaProps,
+  WindowInputShape,
+  windowJsonSchemaProps,
+} from './square-window'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const UUID = z.string().regex(UUID_RE, 'invalid uuid')
@@ -27,6 +34,8 @@ export const POS_LIST_LOCATIONS = 'pos_list_locations'
 export const POS_LIST_RECENT_SHIFTS = 'pos_list_recent_shifts'
 export const POS_GET_ACTIVE_SHIFTS = 'pos_get_active_shifts'
 export const POS_GET_LABOR_SUMMARY = 'pos_get_labor_summary'
+export const POS_LIST_SCHEDULED_SHIFTS = 'pos_list_scheduled_shifts'
+export const POS_GET_SCHEDULED_LABOR_SUMMARY = 'pos_get_scheduled_labor_summary'
 export const POS_COMPARE_PERIODS = 'pos_compare_periods'
 export const POS_GET_TOP_ITEMS = 'pos_get_top_items'
 export const POS_GET_PAYMENT_BREAKDOWN = 'pos_get_payment_breakdown'
@@ -104,6 +113,23 @@ export const SQUARE_TOOL_SCHEMAS = {
       venueId: UUID,
       teamMemberId: SQUARE_ID.optional(),
       ...WindowInputShape,
+    }),
+  ),
+  [POS_LIST_SCHEDULED_SHIFTS]: applyScheduleWindowRefinements(
+    z.object({
+      venueId: UUID,
+      limit: z.number().int().min(1).max(200).optional(),
+      teamMemberId: SQUARE_ID.optional(),
+      includeDrafts: z.boolean().optional(),
+      ...ScheduleWindowInputShape,
+    }),
+  ),
+  [POS_GET_SCHEDULED_LABOR_SUMMARY]: applyScheduleWindowRefinements(
+    z.object({
+      venueId: UUID,
+      teamMemberId: SQUARE_ID.optional(),
+      includeDrafts: z.boolean().optional(),
+      ...ScheduleWindowInputShape,
     }),
   ),
   [POS_COMPARE_PERIODS]: z.object({
@@ -434,6 +460,53 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
     },
   },
   {
+    name: POS_LIST_SCHEDULED_SHIFTS,
+    description:
+      'List FUTURE / SCHEDULED rota shifts at a venue (the rota staff see in Square Team) inside a forward-looking window. FIRES on "what\'s my rota for this week", "who\'s scheduled tomorrow", "rota for next week", "what shifts are on the rota for Saturday", "who\'s supposed to be in on Friday". DISTINCT from pos_list_recent_shifts — that one returns CLOCKED (timeclock) shifts only and CANNOT see future scheduled work. Returns per-shift teamMemberName, status (PUBLISHED/DRAFT), startAt, endAt, planned hours, hourlyRate (joined from teamMemberWages), estimatedCost, and notes. PUBLISHED = staff can see it in the Team app; DRAFT = manager has staged but not pressed publish (omitted by default — pass includeDrafts:true to see them). Window: rolling `aheadHours` (default 168 = next 7 days) plus optional `sinceHours` back, OR fixed `fromIso`/`toIso`. Pass `teamMemberId` to filter to one staff member. For aggregate "how much will the rota cost" use pos_get_scheduled_labor_summary; for clocked / historical shifts use pos_list_recent_shifts.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...scheduleWindowJsonSchemaProps({ defaultAheadHours: 168, maxHours: 24 * 90 }),
+        teamMemberId: {
+          type: 'string',
+          description:
+            "Optional Square team member id (e.g. from a prior pos_list_team_members hit). When set, only that member's scheduled shifts surface.",
+        },
+        includeDrafts: {
+          type: 'boolean',
+          description:
+            "Default false — only PUBLISHED (staff-visible) shifts. Pass true to also see DRAFT shifts the manager hasn't published yet.",
+        },
+        limit: { type: 'integer', description: 'Max shifts (1-200, default 50)' },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
+    name: POS_GET_SCHEDULED_LABOR_SUMMARY,
+    description:
+      'Aggregate planned labour cost over a FUTURE / SCHEDULED rota window. FIRES on "how much will the rota cost this week", "planned labour for next week", "what\'s the cost of next week\'s schedule", "labour budget for Friday-Sunday". DISTINCT from pos_get_labor_summary — that one only sees clocked timeclock shifts. Returns shiftCount, totalHours (planned), estimatedCost (wage × hours summed across all scheduled shifts), coverageRate (% of shifts we could price via teamMemberWages), uncostedShiftCount (shifts whose assigned team member has no wage in Square — usually salaried staff), and `truncated:true` when the rota for the window exceeds ~1000 shifts (rare — flag it to the user and suggest narrowing the window). Window matches pos_list_scheduled_shifts. By default only PUBLISHED shifts count; pass `includeDrafts: true` to include the draft plan as well. Pair with pos_get_sales_summary for cost-vs-revenue planning.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venueId: { type: 'string', description: 'Venue UUID (from <current_context>)' },
+        ...scheduleWindowJsonSchemaProps({ defaultAheadHours: 168, maxHours: 24 * 90 }),
+        teamMemberId: {
+          type: 'string',
+          description:
+            "Optional Square team member id — when set, the totals reflect only that member's scheduled shifts.",
+        },
+        includeDrafts: {
+          type: 'boolean',
+          description:
+            "Default false. Pass true to include DRAFT shifts the manager hasn't published yet.",
+        },
+      },
+      required: ['venueId'],
+    },
+  },
+  {
     name: POS_COMPARE_PERIODS,
     description:
       'Compare two fixed time periods side-by-side. FIRES on "this month vs last month", "compare yesterday to today", "Saturday compared to last Saturday", "Q1 vs Q4 last year". Pass `metric: "sales"` (orderCount + gross + net) or `metric: "labor"` (shiftCount + hours + cost). Each period takes `fromIso` (required) and `toIso` (optional, defaults to now). Returns both periods\' totals plus deltas (absolute + percent) so the agent can describe trend. Use this INSTEAD of two manual pos_get_*_summary calls — it ensures both periods are computed identically and packages the delta in one round trip. Pass optional `label` strings ("April", "March") to make the response self-describing.',
@@ -593,7 +666,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_GET_COGS_SUMMARY,
     description:
-      'Compute COGS + gross margin for a sales window by joining order line items to per-variation receive costs from Square. FIRES on "what\'s our COGS today", "calculate GP", "what\'s the gross margin this week", "how much did we spend on stock", "P&L numbers". Returns cogsAmount, grossSales, netSales, grossMarginPct, coverageRate (% of line items we could price), topUncostedItems (top items by revenue we couldn\'t cost), and recommendManualCostPercent (true when coverageRate<50 — agent should then ASK the user for a manual cost % and call pos_compute_cogs_from_percent). Window: rolling sinceHours OR fixed fromIso/toIso. lookbackDays defaults to 90 (how far back to derive unit cost from receive events). When coverage is high (>=50%) the GP is reliable; when low, present the numbers with explicit caveat then offer the manual-cost-percent path.',
+      'Compute COGS + gross margin for a sales window. FIRES on "what\'s our COGS today", "calculate GP", "what\'s the gross margin this week", "cost of sales report", "how much did we spend on stock", "P&L numbers". Returns cogsAmount, grossSales, netSales, grossMarginPct, coverageRate, topUncostedItems, recommendManualCostPercent, and a structured `noData` object when Square couldn\'t supply cost data. IMPORTANT — Square\'s public API does NOT expose vendor cost for the typical seller; in production this tool will usually return cogsAmount:null, coverageRate:0, recommendManualCostPercent:true, and noData:{reason:"square-api-does-not-expose-vendor-cost", suggestedCostPercent:30, suggestedCostPercentRange:{min:25,max:35}, ...}. THIS IS THE EXPECTED FLOW — DO NOT TELL THE USER "no data". Instead: state the gross sales figure, say you can\'t pull vendor cost from Square automatically, offer the suggestedCostPercent (or ask the user for their own) and call pos_compute_cogs_from_percent on the next turn. The other noData reason "no-completed-orders-in-window" means the date range was empty — confirm the window with the user instead of asking for a cost %. Window: rolling sinceHours OR fixed fromIso/toIso (default 24h).',
     input_schema: {
       type: 'object',
       properties: {

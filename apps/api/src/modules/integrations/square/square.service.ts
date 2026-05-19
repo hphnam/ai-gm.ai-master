@@ -3,7 +3,7 @@ import { prisma } from '../../../database/prisma'
 import { fail, type ToolResult } from '../../../types'
 import { IntegrationsService } from '../integrations.service'
 import { formatMoney, getSquareClient, ZERO_DECIMAL_CURRENCIES } from './square-client'
-import { resolveWindow, type WindowInput } from './square-window'
+import { resolveWindow, type ScheduleWindowInput, type WindowInput } from './square-window'
 
 // Per-tool window caps duplicated here in case a service caller bypasses the
 // schema layer (e.g. internal compose tools). Keep in sync with square.tools.ts.
@@ -136,6 +136,32 @@ export type SquareShiftRow = {
   hourlyRate: { value: number; currency: string } | null
   estimatedCost: { value: number; currency: string } | null
   jobTitle: string | null
+}
+
+/// Row shape for forward-looking rota items. Differs from SquareShiftRow:
+/// (a) covers both DRAFT and PUBLISHED variants — staff only see published;
+/// (b) wage is not on the shift, so hourlyRate/estimatedCost are joined from
+/// teamMemberWages keyed by (teamMemberId, jobId);
+/// (c) hours is the planned shift length (endAt − startAt), never "so far".
+export type SquareScheduledShiftRow = {
+  id: string
+  teamMemberId: string | null
+  teamMemberName: string | null
+  /// 'PUBLISHED' when published_shift_details is populated, otherwise 'DRAFT'.
+  /// PUBLISHED = staff can see this in the Square Team app; DRAFT = manager
+  /// has staged it but not pressed publish.
+  status: 'DRAFT' | 'PUBLISHED'
+  startAt: string | null
+  endAt: string | null
+  /// Planned hours (endAt − startAt). Zero when either bound is missing.
+  hours: number
+  /// Matched against teamMemberWages by (teamMemberId, jobId). Null when the
+  /// team member has no wage configured for that job in Square — e.g. salaried
+  /// staff or a manager who's never had an hourly rate set.
+  hourlyRate: { value: number; currency: string } | null
+  estimatedCost: { value: number; currency: string } | null
+  jobTitle: string | null
+  notes: string | null
 }
 
 @Injectable()
@@ -606,6 +632,309 @@ export class SquareService {
     } catch (err) {
       return await this.handleApiError(orgId, 'getLaborSummary', err)
     }
+  }
+
+  // ─── Scheduled shifts (forward-looking rota) ────────────────────────────
+
+  /// List scheduled (rota) shifts at a venue inside a forward-looking window.
+  /// Reads Square's `labor.searchScheduledShifts` — separate from the
+  /// timeclock `labor.shifts.search` used by listRecentShifts. Returns the
+  /// PUBLISHED variant when present (what staff see in the Team app), falling
+  /// back to DRAFT (manager-staged but not yet published).
+  async listScheduledShifts(
+    orgId: string,
+    args: {
+      venueId: string
+      limit?: number
+      teamMemberId?: string
+      includeDrafts?: boolean
+    } & ScheduleWindowInput,
+  ): Promise<
+    ToolResult<{
+      shifts: SquareScheduledShiftRow[]
+      windowFromIso: string
+      windowToIso: string
+    }>
+  > {
+    const resolved = await this.resolveForVenue(orgId, args.venueId)
+    if (!('client' in resolved)) return resolved
+    const window = resolveScheduleWindow(args)
+    try {
+      const resp = await resolved.client.labor.searchScheduledShifts({
+        limit: Math.min(args.limit ?? 50, 200),
+        query: {
+          filter: {
+            locationIds: [resolved.locationId],
+            start: { startAt: window.startAt, endAt: window.endAt },
+            scheduledShiftStatuses: args.includeDrafts ? ['PUBLISHED', 'DRAFT'] : ['PUBLISHED'],
+            ...(args.teamMemberId ? { teamMemberIds: [args.teamMemberId] } : {}),
+          },
+          sort: { field: 'START_AT', order: 'ASC' },
+        },
+      })
+      const rawShifts = ((resp as { scheduledShifts?: unknown[] }).scheduledShifts ?? []) as Array<
+        Record<string, unknown>
+      >
+      const shifts = await this.enrichScheduledShifts(resolved.client, rawShifts)
+      await this.integrations.touchLastSynced(orgId, SQUARE_PROVIDER_ID)
+      return {
+        ok: true,
+        data: {
+          shifts,
+          windowFromIso: window.startAt,
+          windowToIso: window.endAt,
+        },
+      }
+    } catch (err) {
+      return await this.handleApiError(orgId, 'listScheduledShifts', err)
+    }
+  }
+
+  /// Aggregate the rota over a forward-looking window: total planned hours
+  /// and estimated labour cost (sum of wage × hours per shift). Mirrors
+  /// getLaborSummary but for scheduled shifts so the agent can answer "how
+  /// much will we spend on staff this coming week".
+  async getScheduledLaborSummary(
+    orgId: string,
+    args: {
+      venueId: string
+      teamMemberId?: string
+      includeDrafts?: boolean
+    } & ScheduleWindowInput,
+  ): Promise<
+    ToolResult<{
+      shiftCount: number
+      totalHours: number
+      estimatedCost: { value: number; currency: string } | null
+      coverageRate: number
+      uncostedShiftCount: number
+      windowFromIso: string
+      windowToIso: string
+      truncated: boolean
+    }>
+  > {
+    const resolved = await this.resolveForVenue(orgId, args.venueId)
+    if (!('client' in resolved)) return resolved
+    const window = resolveScheduleWindow(args)
+    const PAGE_LIMIT = 200
+    const MAX_PAGES = 5
+    try {
+      let cursor: string | undefined
+      let pages = 0
+      const rawCollected: Array<Record<string, unknown>> = []
+      while (pages < MAX_PAGES) {
+        const resp = await resolved.client.labor.searchScheduledShifts({
+          limit: PAGE_LIMIT,
+          ...(cursor ? { cursor } : {}),
+          query: {
+            filter: {
+              locationIds: [resolved.locationId],
+              start: { startAt: window.startAt, endAt: window.endAt },
+              scheduledShiftStatuses: args.includeDrafts ? ['PUBLISHED', 'DRAFT'] : ['PUBLISHED'],
+              ...(args.teamMemberId ? { teamMemberIds: [args.teamMemberId] } : {}),
+            },
+            sort: { field: 'START_AT', order: 'ASC' },
+          },
+        })
+        const page = ((resp as { scheduledShifts?: unknown[] }).scheduledShifts ?? []) as Array<
+          Record<string, unknown>
+        >
+        for (const s of page) rawCollected.push(s)
+        pages += 1
+        const next = (resp as { cursor?: string }).cursor
+        if (!next || page.length === 0) {
+          cursor = undefined
+          break
+        }
+        cursor = next
+      }
+      const truncated = pages >= MAX_PAGES && cursor !== undefined
+
+      const wageMap = await this.loadWageMap(resolved.client, rawCollected)
+      let shiftCount = 0
+      let totalHours = 0
+      let costMinor = 0n
+      let currency: string | null = null
+      let uncostedShiftCount = 0
+      for (const raw of rawCollected) {
+        const details = pickShiftDetails(raw)
+        if (!details) continue
+        const startMs = typeof details.startAt === 'string' ? Date.parse(details.startAt) : NaN
+        const endMs = typeof details.endAt === 'string' ? Date.parse(details.endAt) : NaN
+        if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) continue
+        shiftCount += 1
+        const hours = (endMs - startMs) / (60 * 60 * 1000)
+        totalHours += hours
+        const wage = lookupWage(wageMap, details.teamMemberId, details.jobId)
+        if (wage?.amount != null) {
+          const rateMinor =
+            typeof wage.amount === 'bigint' ? wage.amount : BigInt(Math.round(wage.amount))
+          const scaled = BigInt(Math.round(hours * 1_000_000))
+          costMinor += (rateMinor * scaled) / 1_000_000n
+          if (!currency && wage.currency) currency = wage.currency
+        } else {
+          uncostedShiftCount += 1
+        }
+      }
+      const divisor = currency && ZERO_DECIMAL_CURRENCIES.has(currency) ? 1 : 100
+      const coverageRate =
+        shiftCount > 0
+          ? Math.round(((shiftCount - uncostedShiftCount) / shiftCount) * 10000) / 100
+          : 0
+      await this.integrations.touchLastSynced(orgId, SQUARE_PROVIDER_ID)
+      return {
+        ok: true,
+        data: {
+          shiftCount,
+          totalHours: Math.round(totalHours * 100) / 100,
+          estimatedCost: currency
+            ? { value: Math.round((Number(costMinor) / divisor) * 100) / 100, currency }
+            : null,
+          coverageRate,
+          uncostedShiftCount,
+          windowFromIso: window.startAt,
+          windowToIso: window.endAt,
+          truncated,
+        },
+      }
+    } catch (err) {
+      return await this.handleApiError(orgId, 'getScheduledLaborSummary', err)
+    }
+  }
+
+  /// Page through teamMemberWages for every team member that appears on the
+  /// supplied scheduled shifts and build a (teamMemberId|jobId) → hourlyRate
+  /// lookup. Wage rows without a jobId match any shift for that team member
+  /// (stored under the empty-jobId key).
+  ///
+  /// Bounded: at most MAX_PAGES of 200 rows so a huge wage catalogue can't
+  /// stall a chat turn. Best-effort — failures (missing scope, etc.) result
+  /// in an empty map and the caller surfaces uncovered shifts.
+  private async loadWageMap(
+    client: ReturnType<typeof getSquareClient>,
+    rawShifts: Array<Record<string, unknown>>,
+  ): Promise<Map<string, { amount: bigint | number; currency?: string }>> {
+    const map = new Map<string, { amount: bigint | number; currency?: string }>()
+    const ids = new Set<string>()
+    for (const s of rawShifts) {
+      const d = pickShiftDetails(s)
+      if (d?.teamMemberId) ids.add(d.teamMemberId)
+    }
+    if (ids.size === 0) return map
+    try {
+      const MAX_PAGES = 5
+      const PAGE_LIMIT = 200
+      let cursor: string | undefined
+      let pages = 0
+      const seenMembers = new Set<string>()
+      while (pages < MAX_PAGES) {
+        const resp = await client.labor.teamMemberWages.list({
+          limit: PAGE_LIMIT,
+          ...(cursor ? { cursor } : {}),
+        })
+        const data = ((resp as { data?: unknown[] }).data ?? []) as Array<Record<string, unknown>>
+        for (const w of data) {
+          const memberId = typeof w.teamMemberId === 'string' ? w.teamMemberId : null
+          if (!memberId || !ids.has(memberId)) continue
+          seenMembers.add(memberId)
+          const jobId = typeof w.jobId === 'string' ? w.jobId : ''
+          const rate = w.hourlyRate as { amount?: bigint | number; currency?: string } | undefined
+          if (rate?.amount == null) continue
+          const key = `${memberId}|${jobId}`
+          // Square's labor.teamMemberWages.list returns the CURRENT rate per
+          // (team_member, job) pair — historical/inactive rates live on the
+          // deprecated employeeWages endpoint. So one row per key is the
+          // expected shape; first-write-wins is safe. If Square ever changes
+          // this and starts returning multiple, we'd need an "active" filter
+          // (no such field exists on TeamMemberWage today).
+          if (!map.has(key)) map.set(key, { amount: rate.amount, currency: rate.currency })
+        }
+        pages += 1
+        const next = (resp as { cursor?: string }).cursor
+        if (!next || data.length === 0) break
+        if (seenMembers.size >= ids.size) break
+        cursor = next
+      }
+    } catch (err) {
+      // Best-effort. Missing EMPLOYEES_READ scope or 403s degrade gracefully —
+      // the summary still returns hours, with uncostedShiftCount reflecting
+      // the gap. Log so a tenant who revokes scope shows up in ops signals
+      // instead of silently reporting 100% uncovered shifts forever.
+      this.logger.warn(
+        JSON.stringify({
+          event: 'square.load_wage_map_failed',
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      )
+    }
+    return map
+  }
+
+  /// Resolve team-member names + wages onto raw ScheduledShift records.
+  private async enrichScheduledShifts(
+    client: ReturnType<typeof getSquareClient>,
+    rawShifts: Array<Record<string, unknown>>,
+  ): Promise<SquareScheduledShiftRow[]> {
+    const ids = new Set<string>()
+    for (const s of rawShifts) {
+      const d = pickShiftDetails(s)
+      if (d?.teamMemberId) ids.add(d.teamMemberId)
+    }
+    const [idToName, wageMap] = await Promise.all([
+      this.loadTeamMemberNames(client, ids),
+      this.loadWageMap(client, rawShifts),
+    ])
+    return rawShifts.map((s) => toScheduledShiftRow(s, idToName, wageMap))
+  }
+
+  /// Page through teamMembers.search to resolve a set of team member ids to
+  /// "Given Family" display names. Shared by historical-shift and scheduled-
+  /// shift enrichment so neither needs to repeat the pagination + cap logic.
+  /// Best-effort — missing EMPLOYEES_READ scope returns an empty map and the
+  /// caller surfaces opaque ids rather than failing the whole tool call.
+  private async loadTeamMemberNames(
+    client: ReturnType<typeof getSquareClient>,
+    ids: Set<string>,
+  ): Promise<Map<string, string>> {
+    const idToName = new Map<string, string>()
+    if (ids.size === 0) return idToName
+    try {
+      const PAGE_LIMIT = 200
+      const MAX_PAGES = 10
+      let cursor: string | undefined
+      let pages = 0
+      while (pages < MAX_PAGES) {
+        const resp = await client.teamMembers.search({
+          query: {},
+          limit: PAGE_LIMIT,
+          ...(cursor ? { cursor } : {}),
+        })
+        const members = ((resp as { teamMembers?: unknown[] }).teamMembers ?? []) as Array<
+          Record<string, unknown>
+        >
+        for (const m of members) {
+          const id = typeof m.id === 'string' ? m.id : null
+          if (!id || !ids.has(id)) continue
+          const given = typeof m.givenName === 'string' ? m.givenName : ''
+          const family = typeof m.familyName === 'string' ? m.familyName : ''
+          const full = `${given} ${family}`.trim()
+          if (full) idToName.set(id, full)
+        }
+        if (idToName.size >= ids.size) break
+        const next = (resp as { cursor?: string }).cursor
+        if (!next || members.length === 0) break
+        cursor = next
+        pages += 1
+      }
+    } catch (err) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'square.load_team_member_names_failed',
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      )
+    }
+    return idToName
   }
 
   // ─── Period comparison ──────────────────────────────────────────────────
@@ -1170,14 +1499,10 @@ export class SquareService {
     }
   }
 
-  /// Resolve team-member ids on the given shifts to human-readable names via
-  /// `team.searchTeamMembers`. Square's shifts payload only carries
-  /// teamMemberId — without this hop the agent surfaces opaque UUIDs.
-  ///
-  /// Looks up only the ids that appear in the shifts (not the full roster) so
-  /// large orgs (>200 staff) don't truncate. Includes ALL statuses (former
-  /// staff still surface on historical shifts). Pages until every required
-  /// id is resolved or we hit MAX_PAGES.
+  /// Resolve team-member ids on the given timeclock shifts to display names
+  /// via the shared `loadTeamMemberNames` helper. Square's shifts payload
+  /// only carries teamMemberId; without this hop the agent surfaces opaque
+  /// UUIDs.
   private async enrichShiftsWithNames(
     client: ReturnType<typeof getSquareClient>,
     rawShifts: Array<Record<string, unknown>>,
@@ -1187,45 +1512,7 @@ export class SquareService {
       const id = (s.teamMemberId ?? s.employeeId) as string | undefined
       if (typeof id === 'string' && id.length > 0) ids.add(id)
     }
-    const idToName = new Map<string, string>()
-    if (ids.size > 0) {
-      try {
-        // Square's teamMembers.search has no id filter — page through the
-        // roster (no status filter so historical shifts still resolve INACTIVE
-        // staff names) and stop once every required id is matched. Cap pages
-        // so an absurdly large team doesn't burn the request budget.
-        const PAGE_LIMIT = 200
-        const MAX_PAGES = 10
-        let cursor: string | undefined
-        let pages = 0
-        while (pages < MAX_PAGES) {
-          const resp = await client.teamMembers.search({
-            query: {},
-            limit: PAGE_LIMIT,
-            ...(cursor ? { cursor } : {}),
-          })
-          const members = ((resp as { teamMembers?: unknown[] }).teamMembers ?? []) as Array<
-            Record<string, unknown>
-          >
-          for (const m of members) {
-            const id = typeof m.id === 'string' ? m.id : null
-            if (!id || !ids.has(id)) continue
-            const given = typeof m.givenName === 'string' ? m.givenName : ''
-            const family = typeof m.familyName === 'string' ? m.familyName : ''
-            const full = `${given} ${family}`.trim()
-            if (full) idToName.set(id, full)
-          }
-          if (idToName.size >= ids.size) break
-          const next = (resp as { cursor?: string }).cursor
-          if (!next || members.length === 0) break
-          cursor = next
-          pages += 1
-        }
-      } catch {
-        // Best-effort. If team members lookup fails (e.g. token lacks
-        // EMPLOYEES_READ scope), we just surface ids. Logged at the caller.
-      }
-    }
+    const idToName = await this.loadTeamMemberNames(client, ids)
     const now = Date.now()
     return rawShifts.map((s) => this.toShiftRow(s, idToName, now))
   }
@@ -1499,6 +1786,132 @@ function computePeriodDelta(a: PeriodSnapshot, b: PeriodSnapshot): PeriodDelta {
     delta[f.key] = { absolute, percent }
   }
   return delta
+}
+
+// ─── Scheduled-shift helpers ─────────────────────────────────────────────
+
+const SCHEDULE_WINDOW_MAX_HOURS = 24 * 90
+
+function resolveScheduleWindow(input: ScheduleWindowInput | undefined): {
+  startAt: string
+  endAt: string
+} {
+  const now = Date.now()
+  const HOUR = 60 * 60 * 1000
+  if (input?.fromIso) {
+    const startMs = Date.parse(input.fromIso)
+    const endMs = input.toIso ? Date.parse(input.toIso) : now + 7 * 24 * HOUR
+    const safeStart = Number.isFinite(startMs) ? startMs : now
+    const safeEnd = Number.isFinite(endMs) ? endMs : now + 7 * 24 * HOUR
+    if (safeEnd <= safeStart) {
+      throw new RangeError(
+        `invalid window: toIso (${input.toIso ?? new Date(safeEnd).toISOString()}) must be after fromIso (${input.fromIso})`,
+      )
+    }
+    // Cap forward-looking windows by trimming the FAR end, not the near end.
+    // A user asking "rota now → 100 days out" expects the next few days back,
+    // not the back-half of the requested window with today missing.
+    const span = safeEnd - safeStart
+    const capped = Math.min(span, SCHEDULE_WINDOW_MAX_HOURS * HOUR)
+    return {
+      startAt: new Date(safeStart).toISOString(),
+      endAt: new Date(safeStart + capped).toISOString(),
+    }
+  }
+  const sinceHours = Math.min(Math.max(input?.sinceHours ?? 0, 0), SCHEDULE_WINDOW_MAX_HOURS)
+  const aheadHours = Math.min(Math.max(input?.aheadHours ?? 168, 1), SCHEDULE_WINDOW_MAX_HOURS)
+  return {
+    startAt: new Date(now - sinceHours * HOUR).toISOString(),
+    endAt: new Date(now + aheadHours * HOUR).toISOString(),
+  }
+}
+
+/// Prefer published_shift_details (what staff see). Fall back to
+/// draft_shift_details when unpublished. Returns null when neither is usable.
+function pickShiftDetails(raw: Record<string, unknown>): {
+  teamMemberId: string | null
+  jobId: string | null
+  startAt: string | null
+  endAt: string | null
+  notes: string | null
+  published: boolean
+} | null {
+  const published = raw.publishedShiftDetails as Record<string, unknown> | undefined
+  const draft = raw.draftShiftDetails as Record<string, unknown> | undefined
+  const source = published ?? draft
+  if (!source) return null
+  // Exclude tombstoned variants. Square's docs are clearest on draft.isDeleted
+  // (a manager removed it before publish), but defensively guard the published
+  // path too — if published.isDeleted ever becomes a thing, we'd otherwise
+  // surface deleted shifts on the rota.
+  if (source.isDeleted === true) return null
+  return {
+    teamMemberId: typeof source.teamMemberId === 'string' ? source.teamMemberId : null,
+    jobId: typeof source.jobId === 'string' ? source.jobId : null,
+    startAt: typeof source.startAt === 'string' ? source.startAt : null,
+    endAt: typeof source.endAt === 'string' ? source.endAt : null,
+    notes: typeof source.notes === 'string' ? source.notes : null,
+    published: Boolean(published),
+  }
+}
+
+function lookupWage(
+  wageMap: Map<string, { amount: bigint | number; currency?: string }>,
+  teamMemberId: string | null,
+  jobId: string | null,
+): { amount: bigint | number; currency?: string } | null {
+  if (!teamMemberId) return null
+  if (jobId) {
+    const exact = wageMap.get(`${teamMemberId}|${jobId}`)
+    if (exact) return exact
+  }
+  // Fall back to a job-less wage row for that member (covers staff with a
+  // single hourly rate and no per-job split).
+  return wageMap.get(`${teamMemberId}|`) ?? null
+}
+
+function toScheduledShiftRow(
+  raw: Record<string, unknown>,
+  idToName: Map<string, string>,
+  wageMap: Map<string, { amount: bigint | number; currency?: string }>,
+): SquareScheduledShiftRow {
+  const id = typeof raw.id === 'string' ? raw.id : ''
+  const details = pickShiftDetails(raw)
+  const teamMemberId = details?.teamMemberId ?? null
+  const startAt = details?.startAt ?? null
+  const endAt = details?.endAt ?? null
+  const startMs = startAt ? Date.parse(startAt) : NaN
+  const endMs = endAt ? Date.parse(endAt) : NaN
+  const hours =
+    Number.isFinite(startMs) && Number.isFinite(endMs) && endMs > startMs
+      ? Math.round(((endMs - startMs) / (60 * 60 * 1000)) * 100) / 100
+      : 0
+  const wage = lookupWage(wageMap, teamMemberId, details?.jobId ?? null)
+  const hourlyRate = wage ? formatMoney(wage) : null
+  const estimatedCost =
+    hourlyRate && hours > 0
+      ? {
+          value: Math.round(hourlyRate.value * hours * 100) / 100,
+          currency: hourlyRate.currency,
+        }
+      : null
+  return {
+    id,
+    teamMemberId,
+    teamMemberName: teamMemberId ? (idToName.get(teamMemberId) ?? null) : null,
+    status: details?.published ? 'PUBLISHED' : 'DRAFT',
+    startAt,
+    endAt,
+    hours,
+    hourlyRate,
+    estimatedCost,
+    // Square's ScheduledShiftDetails doesn't carry job title — only jobId. The
+    // agent can call pos_list_team_members or a future job-list tool if it
+    // really needs the title, but it's almost never asked for on a rota
+    // question, so we leave it null rather than block on an extra round trip.
+    jobTitle: null,
+    notes: details?.notes ?? null,
+  }
 }
 
 /// Hour-of-day (0-23) for an ISO timestamp in the given IANA zone. Falls back

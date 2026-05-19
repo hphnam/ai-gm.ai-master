@@ -22,22 +22,34 @@ export type ItemCostRow = {
   receiveEvents: number
 }
 
+/// Hospitality-norm cost-of-goods band the agent can offer when Square has
+/// no cost data on file. Brewpubs / bars run 25-35% (beer 18-25%, wine 30-40%,
+/// food 28-35%, spirits 18-22%) — picking the midpoint of the union gives
+/// 30% as a sensible default if the operator can't supply one.
+const HOSPITALITY_COST_PERCENT_HINT = {
+  min: 25,
+  max: 35,
+  typical: 30,
+} as const
+
 export type CogsSummary = {
   /// Items sold in the sales window whose unit cost we could derive from
-  /// recent receive events. Sums `unitCost × quantity_sold` per line item.
+  /// Square inventory receives. NULL in the common case because Square's
+  /// public API doesn't populate vendor cost on the inventory adjustment
+  /// objects we can read — `noData` below explains the fallback the agent
+  /// should take.
   cogsAmount: { value: number; currency: string } | null
   grossSales: { value: number; currency: string } | null
   netSales: { value: number; currency: string } | null
-  /// Gross margin = (gross − cogs) / gross × 100. `null` when gross is zero,
-  /// or when we have <50% line-item cost coverage (signal to the user that the
-  /// figure is unreliable as-is — better to ask them for a cost %).
+  /// Gross margin = (gross − cogs) / gross × 100. `null` whenever cogsAmount
+  /// is null, gross is zero, or coverage is too low (<50%) to trust.
   grossMarginPct: number | null
-  /// Percentage of sold line items we matched to a unit cost. <100% means we
-  /// couldn't price the rest from Square's receive history — usually because
-  /// the operator doesn't use Square for purchasing.
+  /// Percentage of sold line items we matched to a unit cost. 0 in the common
+  /// case (see noData).
   coverageRate: number
   /// Items with the highest revenue we couldn't price — flag to the agent so
-  /// it can suggest the operator add cost data for these.
+  /// it can suggest the operator add cost data for these. Empty when
+  /// coverageRate is 0 (every item is "uncosted" and listing them all is noise).
   topUncostedItems: Array<{
     name: string
     quantitySold: number
@@ -47,9 +59,22 @@ export type CogsSummary = {
   windowFromIso: string
   windowToIso: string
   /// Whether the agent should fall back to asking the operator for a manual
-  /// cost % (true when coverageRate < 50 OR no cost data at all). Matches the
-  /// behaviour Ryan flagged from the production chat screenshot.
+  /// cost % (true when coverageRate < 50 OR no cost data at all).
   recommendManualCostPercent: boolean
+  /// Loud, structured "we couldn't derive COGS from Square" signal — present
+  /// when Square returned zero priced receive events. The agent should treat
+  /// this as the explicit cue to ask the user for a typical cost %, offering
+  /// `suggestedCostPercent` as a starting point, then call
+  /// pos_compute_cogs_from_percent to finish the calculation. Null when we
+  /// have at least partial cost coverage.
+  noData: {
+    reason:
+      | 'square-api-does-not-expose-vendor-cost'
+      | 'no-completed-orders-in-window'
+    suggestedCostPercent: number
+    suggestedCostPercentRange: { min: number; max: number }
+    explanation: string
+  } | null
   truncated: boolean
 }
 
@@ -57,20 +82,21 @@ export type CogsSummary = {
 export class SquareCogsService {
   constructor(private readonly square: SquareService) {}
 
-  /// Derive weighted-average unit cost per catalog variation from the venue's
-  /// RECEIVE_STOCK inventory adjustments.
+  /// Attempt to derive weighted-average unit cost per catalog variation from
+  /// the venue's RECEIVE_STOCK inventory adjustments.
   ///
-  /// Why this approach: Square's v44 SDK doesn't expose `cost_money` on
-  /// `CatalogItemVariation`. The only authoritative cost data the public API
-  /// surfaces is `InventoryAdjustment.totalPriceMoney` on RECEIVE_STOCK
-  /// changes — i.e. what the seller paid the vendor when goods landed. We
-  /// aggregate those across a lookback window and produce
-  /// (sum_total_price / sum_quantity_received) per variation. The result is
-  /// approximate (it's *receiving* cost, not landed cost; doesn't include
-  /// shrinkage / wastage), but it's the best the platform gives us.
+  /// IMPORTANT — Square's public API does NOT expose vendor cost in the way
+  /// this scan needs. `InventoryAdjustment.totalPriceMoney` is populated by
+  /// Square ONLY when `to_state === 'SOLD'` (i.e. revenue), not on receive
+  /// transitions. For the typical Square seller the receive scan returns an
+  /// empty tally and this method's `costs` array is empty. We keep the scan
+  /// because (a) a small number of third-party integrations DO write cost
+  /// data onto receive adjustments and the data is free when present, and
+  /// (b) `coverageHint` truthfully describes the gap so the caller can fall
+  /// back to a manual-cost-percent flow.
   ///
-  /// Defaults to a 90-day lookback so we have enough receive events to make
-  /// the average stable, while still tracking recent supplier price changes.
+  /// Defaults to a 90-day lookback. There is no point widening it — Square's
+  /// payload won't suddenly start carrying cost.
   async getItemCosts(
     orgId: string,
     args: { venueId: string; catalogObjectIds?: string[]; lookbackDays?: number },
@@ -279,6 +305,37 @@ export class SquareCogsService {
           ? Math.round(((grossValue - cogsValue) / grossValue) * 10000) / 100
           : null
 
+      // Loud signal for the agent when we have no cost data at all. Two
+      // distinct shapes so the model can phrase its reply correctly:
+      //   - no priced receives ever → ask user for typical cost % and call
+      //     pos_compute_cogs_from_percent
+      //   - no orders in window → tell user nothing was sold; the cost %
+      //     doesn't help here
+      let noData: CogsSummary['noData'] = null
+      if (totalLines === 0 || grossValue == null || grossValue === 0) {
+        noData = {
+          reason: 'no-completed-orders-in-window',
+          suggestedCostPercent: HOSPITALITY_COST_PERCENT_HINT.typical,
+          suggestedCostPercentRange: {
+            min: HOSPITALITY_COST_PERCENT_HINT.min,
+            max: HOSPITALITY_COST_PERCENT_HINT.max,
+          },
+          explanation:
+            'No completed orders fell inside this window. Confirm the date range or check the venue has activity in Square.',
+        }
+      } else if (coverageRate === 0) {
+        noData = {
+          reason: 'square-api-does-not-expose-vendor-cost',
+          suggestedCostPercent: HOSPITALITY_COST_PERCENT_HINT.typical,
+          suggestedCostPercentRange: {
+            min: HOSPITALITY_COST_PERCENT_HINT.min,
+            max: HOSPITALITY_COST_PERCENT_HINT.max,
+          },
+          explanation:
+            "Square's API doesn't expose vendor cost on the inventory data we can read for this seller, so we can't compute COGS from the platform alone. Ask the operator for their typical cost % (hospitality norm is 25-35%; 30% is a sensible default) and call pos_compute_cogs_from_percent to finish the calculation.",
+        }
+      }
+
       await this.square.touchSync(orgId)
       return {
         ok: true,
@@ -297,11 +354,14 @@ export class SquareCogsService {
               : null,
           grossMarginPct,
           coverageRate,
-          topUncostedItems: uncosted.slice(0, 10),
+          // Listing every sold item as "uncosted" when coverage is 0 is just
+          // noise — the agent already gets the structured noData signal.
+          topUncostedItems: coverageRate === 0 ? [] : uncosted.slice(0, 10),
           windowHours: window.hours,
           windowFromIso: window.startAt,
           windowToIso: window.endAt,
           recommendManualCostPercent: coverageRate < 50,
+          noData,
           truncated,
         },
       }
@@ -396,14 +456,17 @@ async function collectReceiveCosts(args: {
       if (c.type !== 'ADJUSTMENT') continue
       const adj = c.adjustment as Record<string, unknown> | undefined
       if (!adj) continue
-      // RECEIVE_STOCK and IN_STOCK_FROM_SOLD are the two "stock came in" flavours
-      // that carry totalPriceMoney. We only want receive events — sold-returns
-      // would inflate cost basis with retail prices.
+      // Real Square InventoryState values that represent stock landing in
+      // inventory. See node_modules/square/serialization/types/InventoryState
+      // for the full enum — the prior `SUPPLIER` value was a typo (no such
+      // state exists; the real Square value is `RECEIVED_FROM_VENDOR`).
+      // We only count receive transitions — sold-returns would inflate
+      // cost basis with retail prices.
       const fromState = typeof adj.fromState === 'string' ? adj.fromState : ''
       const toState = typeof adj.toState === 'string' ? adj.toState : ''
       const isReceive =
         (fromState === 'NONE' && toState === 'IN_STOCK') ||
-        (fromState === 'SUPPLIER' && toState === 'IN_STOCK') ||
+        (fromState === 'RECEIVED_FROM_VENDOR' && toState === 'IN_STOCK') ||
         (fromState === 'UNLINKED_RETURN' && toState === 'IN_STOCK')
       if (!isReceive) continue
       const catalogId = typeof adj.catalogObjectId === 'string' ? adj.catalogObjectId : ''

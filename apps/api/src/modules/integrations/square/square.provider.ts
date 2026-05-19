@@ -27,6 +27,7 @@ import {
   POS_GET_PAYMENT_BREAKDOWN,
   POS_GET_REFUND_SUMMARY,
   POS_GET_SALES_SUMMARY,
+  POS_GET_SCHEDULED_LABOR_SUMMARY,
   POS_GET_TOP_ITEMS,
   POS_LIST_BOOKINGS,
   POS_LIST_DEVICES,
@@ -38,6 +39,7 @@ import {
   POS_LIST_RECENT_ORDERS,
   POS_LIST_RECENT_SHIFTS,
   POS_LIST_REFUNDS,
+  POS_LIST_SCHEDULED_SHIFTS,
   POS_LIST_TEAM_MEMBERS,
   POS_LIST_VENDORS,
   POS_SEARCH_CUSTOMERS,
@@ -49,7 +51,7 @@ import { SquareCatalogExtrasService } from './square-catalog-extras.service'
 import { SquareCogsService } from './square-cogs.service'
 import { SquareCommerceService } from './square-commerce.service'
 import { SquareCrmService } from './square-crm.service'
-import type { WindowInput } from './square-window'
+import type { ScheduleWindowInput, WindowInput } from './square-window'
 
 /// SquareProvider self-registers with IntegrationRegistry on module init so
 /// future providers follow the same pattern (new file → register → tools
@@ -130,6 +132,23 @@ export class SquareProvider implements IntegrationProvider, OnModuleInit {
       case POS_GET_LABOR_SUMMARY: {
         const i = input as { venueId: string; teamMemberId?: string } & WindowInput
         return this.square.getLaborSummary(ctx.orgId, i)
+      }
+      case POS_LIST_SCHEDULED_SHIFTS: {
+        const i = input as {
+          venueId: string
+          limit?: number
+          teamMemberId?: string
+          includeDrafts?: boolean
+        } & ScheduleWindowInput
+        return this.square.listScheduledShifts(ctx.orgId, i)
+      }
+      case POS_GET_SCHEDULED_LABOR_SUMMARY: {
+        const i = input as {
+          venueId: string
+          teamMemberId?: string
+          includeDrafts?: boolean
+        } & ScheduleWindowInput
+        return this.square.getScheduledLaborSummary(ctx.orgId, i)
       }
       case POS_COMPARE_PERIODS: {
         const i = input as {
