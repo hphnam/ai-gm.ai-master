@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Canary fixtures — POS exports + beerhall xlsx are test inputs only,
+# never to be tracked (real venue revenue / payroll / customer data).
+docs/*.xlsx
+docs/*.csv
+docs/*.tsv
+
+# Turbo
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Prisma
+packages/database/src/generated/
+
+# Swagger / OpenAPI codegen — committed so deploys don't have to run
+# the regen pipeline. Refresh with:
+#   pnpm --filter api swagger:generate && pnpm --filter web api:generate
+# Treat the diff like a Prisma migration — review before push.
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*
+.paul/automation-logs/
+CLAUDE.local.md

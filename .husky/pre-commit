@@ -1,0 +1,40 @@
+# Lint + format staged files via Biome (fast — only touches what's staged).
+npx lint-staged || exit 1
+
+# Auto-regenerate the OpenAPI spec + orval client when API surface
+# changes. Skips entirely when no relevant file is staged so most
+# commits incur zero cost.
+#
+# Triggers on:
+#   apps/api/src/modules/**/*.controller.ts   (endpoint shape)
+#   apps/api/src/modules/**/dto/*.ts          (DTO shape)
+#   apps/api/src/types/**                     (shared zod schemas)
+#   apps/api/src/common/dto/**                (cross-cutting DTOs)
+#   apps/api/src/main.ts                      (Swagger config)
+#   apps/api/src/generate-swagger.ts          (the generator itself)
+#
+# Auto-stages the regenerated apps/api/swagger.json + apps/web/src/generated/
+# into the in-flight commit (heyjot-style — trust the codegen).
+
+CHANGED=$(git diff --cached --name-only --diff-filter=ACMR)
+
+needs_regen() {
+  echo "$CHANGED" | grep -E '^apps/api/src/(modules/.+\.controller\.ts|modules/.+/dto/.+\.ts|types/|common/dto/|main\.ts|generate-swagger\.ts)' > /dev/null
+}
+
+if ! needs_regen; then
+  exit 0
+fi
+
+echo "▶ API surface changed — regenerating swagger.json + orval client…"
+npm run swagger:generate --workspace=api > /dev/null || {
+  echo "✗ swagger:generate failed — fix the API build before committing." >&2
+  exit 1
+}
+npm run api:generate --workspace=web > /dev/null || {
+  echo "✗ orval failed — check apps/web/orval.config.ts." >&2
+  exit 1
+}
+
+git add apps/api/swagger.json apps/web/src/generated
+echo "✓ codegen artifacts re-staged into commit"
