@@ -23,6 +23,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { NudgeModule } from './modules/nudges/nudge.module'
 import { PhoneModule } from './modules/phone/phone.module'
 import { PricingRecommendationsModule } from './modules/pricing-recommendations/pricing-recommendations.module'
+import { ProactiveBrainModule } from './modules/proactive-brain/proactive-brain.module'
 import { ReportsModule } from './modules/reports/reports.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
 import { ScheduledReportsModule } from './modules/scheduled-reports/scheduled-reports.module'
@@ -64,6 +65,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     OnboardingMetricsModule,
     IncidentsModule,
     PricingRecommendationsModule,
+    ProactiveBrainModule,
   ],
   controllers: [AppController],
 })
