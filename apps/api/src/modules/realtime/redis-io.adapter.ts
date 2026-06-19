@@ -4,6 +4,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
 import Redis from 'ioredis'
 import type { ServerOptions } from 'socket.io'
+import { parseRedisUrl } from '../../redis-connection'
 
 // Wraps NestJS's default socket.io adapter with @socket.io/redis-adapter so
 // emits fan out across every API replica connected to the same Redis. Same
@@ -29,12 +30,13 @@ export class RedisIoAdapter extends IoAdapter {
     if (this.adapter) return
 
     const redisOptions = {
+      ...parseRedisUrl(this.redisUrl),
       // Reconnect aggressively in dev/prod; ioredis backs off automatically.
       maxRetriesPerRequest: null,
       enableReadyCheck: false,
     }
 
-    this.pubClient = new Redis(this.redisUrl, redisOptions)
+    this.pubClient = new Redis(redisOptions)
     this.subClient = this.pubClient.duplicate()
 
     this.pubClient.on('error', (err) => this.logger.error(`redis pub error: ${err.message}`))
