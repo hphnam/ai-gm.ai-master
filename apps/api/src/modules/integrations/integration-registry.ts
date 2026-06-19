@@ -83,6 +83,36 @@ export class IntegrationRegistry {
     return [...seen.values()]
   }
 
+  /// Provider ids the org has connected as active. The ChatModule calls this
+  /// once per turn to build a capability-scoped tool surface (see
+  /// getToolSurfaceForProviders). Delegates to IntegrationsService so the
+  /// active-status source of truth stays in one place.
+  async getActiveProviderIds(orgId: string): Promise<Set<string>> {
+    return this.integrations.listActiveProviderIds(orgId)
+  }
+
+  /// Tool definitions + schemas for ONLY the providers in `activeProviderIds`.
+  /// A tool is included when ANY active provider implements it (capabilities
+  /// can be shared across vendors — Square + Toast both claiming
+  /// `pos_search_items`). An empty set yields no integration tools, so the
+  /// model sees built-ins only and falls back to knowledge for live data.
+  /// This is what makes routing capability-driven instead of prompt-driven:
+  /// the agent's tools ARE the org's connected integrations.
+  getToolSurfaceForProviders(activeProviderIds: ReadonlySet<string>): {
+    definitions: IntegrationToolDefinition[]
+    schemas: Record<string, import('zod').ZodTypeAny>
+  } {
+    if (activeProviderIds.size === 0) return { definitions: [], schemas: {} }
+    const allSchemas = this.getAllToolSchemas()
+    const definitions = this.getAllToolDefinitions().filter((def) => {
+      const providers = this.toolToProviders.get(def.name)
+      return providers != null && [...providers].some((p) => activeProviderIds.has(p))
+    })
+    const schemas: Record<string, import('zod').ZodTypeAny> = {}
+    for (const def of definitions) schemas[def.name] = allSchemas[def.name]
+    return { definitions, schemas }
+  }
+
   /// Tool name → Zod schema lookup. Mirrors getAllToolDefinitions —
   /// first-registered provider's schema is canonical for shared capabilities.
   getAllToolSchemas(): Readonly<Record<string, import('zod').ZodTypeAny>> {

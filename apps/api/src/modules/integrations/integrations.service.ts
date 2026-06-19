@@ -174,6 +174,18 @@ export class IntegrationsService {
     return row?.provider ?? null
   }
 
+  /// Every provider id this org currently has connected as active. The chat
+  /// layer calls this once per turn to scope the model's tool surface to the
+  /// org's real integrations — so a venue with no POS never even sees pos_*
+  /// tools and falls back to knowledge structurally, with no prompt rule.
+  async listActiveProviderIds(orgId: string): Promise<Set<string>> {
+    const rows = await prisma.integration.findMany({
+      where: { organizationId: orgId, status: 'active' },
+      select: { provider: true },
+    })
+    return new Set(rows.map((r) => r.provider))
+  }
+
   /// Provider-side hook to record a recoverable error (e.g. SDK 401 because
   /// the PAT was revoked). Flips the row to 'error' so the UI can surface a
   /// "reconnect" CTA; preserves the cipher so reconnect-with-rotation works.

@@ -103,6 +103,7 @@ export class ReportGeneratorService {
     // billing and onStepFinish keeps firing past the timeout.
     const controller = new AbortController()
 
+    const activeProviderIds = await this.integrations.getActiveProviderIds(input.orgId)
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       integrations: this.integrations,
@@ -112,6 +113,7 @@ export class ReportGeneratorService {
         userRole,
         source: 'chat',
       },
+      activeProviderIds,
       venueContext: {
         id: venue.id,
         // Sanitise names that flow into the system prompt's <current_context>.

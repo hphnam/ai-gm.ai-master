@@ -140,6 +140,9 @@ export function buildGmAgent(params: {
   dispatcher: ToolDispatcher
   integrations: IntegrationRegistry
   ctx: DispatchContext
+  /// Provider ids the org has connected as active — scopes the integration
+  /// tool surface so the model only sees tools for this org's integrations.
+  activeProviderIds: ReadonlySet<string>
   venueContext: {
     id: string
     name: string
@@ -184,7 +187,12 @@ export function buildGmAgent(params: {
     }>
   }) => void
 }) {
-  const tools: ToolSet = buildAiSdkTools(params.dispatcher, params.integrations, params.ctx)
+  const tools: ToolSet = buildAiSdkTools(
+    params.dispatcher,
+    params.integrations,
+    params.ctx,
+    params.activeProviderIds,
+  )
 
   const now = new Date()
   const tz = params.venueContext.timezone

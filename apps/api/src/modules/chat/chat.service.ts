@@ -749,10 +749,12 @@ Assistant answer: ${assistantText}`,
       venueSnapshot.tabularDocs?.length ?? 0,
     )
 
+    const activeProviderIds = await this.integrations.getActiveProviderIds(orgId)
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx: { orgId, userId, userRole },
+      activeProviderIds,
       venueContext,
       mode: agentMode,
       priorSummary: compaction.summary,
@@ -1235,14 +1237,21 @@ Assistant answer: ${assistantText}`,
       streamHistory.find((m) => m.role === 'user')?.content ?? params.userText
 
     // Pre-amble — fan out everything in parallel to minimise TTFB.
-    const [streamCompaction, agentMode, venueContext, profileSummary, venueSnapshot] =
-      await Promise.all([
-        this.compactor.compactIfNeeded(conversationId, streamHistory),
-        this.resolveConversationMode(conversationId, firstUserMessage),
-        this.buildVenueContext(venue),
-        this.getUserProfileSummary(params.userId, params.orgId),
-        this.buildVenueSnapshot(params.orgId, venue.id),
-      ])
+    const [
+      streamCompaction,
+      agentMode,
+      venueContext,
+      profileSummary,
+      venueSnapshot,
+      activeProviderIds,
+    ] = await Promise.all([
+      this.compactor.compactIfNeeded(conversationId, streamHistory),
+      this.resolveConversationMode(conversationId, firstUserMessage),
+      this.buildVenueContext(venue),
+      this.getUserProfileSummary(params.userId, params.orgId),
+      this.buildVenueSnapshot(params.orgId, venue.id),
+      this.integrations.getActiveProviderIds(params.orgId),
+    ])
     const modelMessages: ModelMessage[] = expandRecentToModelMessages(
       streamCompaction.recent,
       streamToolCallsByMessageId,
@@ -1263,6 +1272,7 @@ Assistant answer: ${assistantText}`,
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx,
+      activeProviderIds,
       venueContext,
       mode: agentMode,
       priorSummary: streamCompaction.summary,
