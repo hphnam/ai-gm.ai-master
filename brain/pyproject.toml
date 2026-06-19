@@ -1,0 +1,13 @@
+[project]
+name = "proactive-brain"
+version = "0.1.0"
+description = "PRJ93 Proactive Brain — standalone Python forecasting & signals engine (Track A)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+# Run pytest from brain/ — this puts the workspace root on sys.path so the
+# top-level modules (config, ingest, store, ...) import the same way the
+# `python -m <module>` entry points do.
+pythonpath = ["."]
+addopts = "-q"
+testpaths = ["tests"]
