@@ -1,0 +1,229 @@
+'use client'
+
+import { AlertTriangle, Lightbulb, TrendingUp } from 'lucide-react'
+import { CardEmpty, CardShell } from './card-shell'
+import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
+
+// Cards for the Proactive Brain tools (Track B). Tools without a card still
+// function — they render as a chip in the thought-process strip.
+
+const VENUE_LABELS: Record<string, string> = {
+  beer_hall: 'The Beer Hall',
+  two_river_taps: 'Two River Taps',
+  ellel: 'Ellel Village Hall',
+}
+
+function gbp(n: number): string {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    maximumFractionDigits: 0,
+  }).format(n)
+}
+
+// ─── brain_forecast_sales ────────────────────────────────────────────────
+
+type BandRow = { date: string; yhat: number; lo: number; hi: number; level: number }
+type ForecastData = {
+  venue: string
+  layer: string
+  level: number
+  key: string | null
+  forecast: BandRow[]
+}
+
+export function ForecastBandCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={TrendingUp} title="Sales forecast">
+        <CardEmpty
+          message={
+            output.reason === 'no-data'
+              ? 'No calibrated band for that venue/range yet.'
+              : (output.detail ?? "Couldn't produce a forecast.")
+          }
+        />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<ForecastData>(output)) return null
+  const { venue, layer, level, key, forecast } = output.data
+  if (!forecast?.length) {
+    return (
+      <CardShell icon={TrendingUp} title="Sales forecast">
+        <CardEmpty message="No dates in that range." />
+      </CardShell>
+    )
+  }
+  const isMoney = layer === 'L1'
+  const rows = forecast.slice(0, 8)
+  const fmt = (n: number) => (isMoney ? gbp(n) : `${Math.round(n)}`)
+  return (
+    <CardShell
+      icon={TrendingUp}
+      title={`Forecast — ${VENUE_LABELS[venue] ?? venue}`}
+      subtitle={`${key ? `${key} · ` : ''}${layer} · ${Math.round(level * 100)}% band`}
+    >
+      <ul className="-mx-1 divide-y divide-border/60">
+        {rows.map((r) => (
+          <li key={r.date} className="flex items-center justify-between gap-3 px-1 py-1.5">
+            <span className="text-[12px] tabular-nums text-muted-foreground">{r.date}</span>
+            <span className="text-[13px] font-medium tabular-nums text-foreground">
+              {fmt(r.yhat)}
+            </span>
+            <span className="text-[11px] tabular-nums text-muted-foreground">
+              {fmt(r.lo)} – {fmt(r.hi)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {forecast.length > rows.length ? (
+        <p className="mt-1.5 text-[11px] text-muted-foreground">
+          +{forecast.length - rows.length} more day(s)
+        </p>
+      ) : null}
+    </CardShell>
+  )
+}
+
+// ─── brain_check_deviation ───────────────────────────────────────────────
+
+type Breach = {
+  date: string
+  value: number
+  lo: number
+  hi: number
+  direction: 'above' | 'below'
+  severity: 'low' | 'medium' | 'high'
+}
+type DeviationData = {
+  venue: string
+  layer: string
+  n_checked: number
+  n_breaches: number
+  breaches: Breach[]
+}
+
+const SEVERITY_CLASS: Record<string, string> = {
+  high: 'bg-red-500/10 text-red-700 dark:text-red-400',
+  medium: 'bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  low: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-500',
+}
+
+export function DeviationCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={AlertTriangle} title="Deviation check">
+        <CardEmpty message={output.detail ?? "Couldn't check for deviations."} />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<DeviationData>(output)) return null
+  const { venue, layer, n_checked, n_breaches, breaches } = output.data
+  // L1 is revenue (£); L2/L3 are unit counts — don't render kegs as currency.
+  const fmt = (n: number) => (layer === 'L1' ? gbp(n) : `${Math.round(n)}`)
+  if (n_breaches === 0) {
+    return (
+      <CardShell
+        icon={TrendingUp}
+        title={`${VENUE_LABELS[venue] ?? venue} — trading normally`}
+        subtitle={`${n_checked} day(s) checked, all inside band`}
+        tone="success"
+      >
+        <p className="text-[12.5px] text-muted-foreground">No breaches of the calibrated band.</p>
+      </CardShell>
+    )
+  }
+  return (
+    <CardShell
+      icon={AlertTriangle}
+      title={`${VENUE_LABELS[venue] ?? venue} — ${n_breaches} deviation${n_breaches === 1 ? '' : 's'}`}
+      subtitle={`${n_checked} day(s) checked`}
+      tone="warning"
+    >
+      <ul className="-mx-1 divide-y divide-border/60">
+        {breaches.map((b) => (
+          <li key={b.date} className="flex items-center justify-between gap-2 px-1 py-1.5">
+            <span className="text-[12px] tabular-nums text-muted-foreground">{b.date}</span>
+            <span className="text-[12.5px] tabular-nums text-foreground">
+              {fmt(b.value)} {b.direction === 'above' ? '↑' : '↓'}{' '}
+              <span className="text-muted-foreground">
+                (band {fmt(b.lo)}–{fmt(b.hi)})
+              </span>
+            </span>
+            <span
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
+                SEVERITY_CLASS[b.severity] ?? SEVERITY_CLASS.low
+              }`}
+            >
+              {b.severity}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </CardShell>
+  )
+}
+
+// ─── brain_find_sop_gaps ─────────────────────────────────────────────────
+
+type Gap = {
+  size: number
+  failed: number
+  failure_density: number
+  score: number
+  examples: string[]
+}
+type SopGapsData = {
+  failure_rate: number
+  embedding_backend: string
+  gaps: Gap[]
+}
+
+export function SopGapsCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={Lightbulb} title="Missing SOPs">
+        <CardEmpty message={output.detail ?? "Couldn't analyse the chat history."} />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<SopGapsData>(output)) return null
+  const { failure_rate, gaps } = output.data
+  if (!gaps?.length) {
+    return (
+      <CardShell icon={Lightbulb} title="Missing SOPs" tone="success">
+        <CardEmpty message="No knowledge gaps above baseline." />
+      </CardShell>
+    )
+  }
+  return (
+    <CardShell
+      icon={Lightbulb}
+      title="Missing SOPs"
+      subtitle={`${Math.round(failure_rate * 100)}% of questions currently go unanswered`}
+      tone="warning"
+    >
+      <ul className="space-y-2">
+        {gaps.slice(0, 4).map((g, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: ranked gaps for one result never reorder mid-render
+          <li key={i} className="rounded-md bg-muted/40 px-2.5 py-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[12.5px] font-medium text-foreground">
+                {Math.round(g.failure_density * 100)}% fail · {g.failed} asks
+              </span>
+            </div>
+            {g.examples?.[0] ? (
+              <p className="mt-0.5 truncate text-[11.5px] italic text-muted-foreground">
+                “{g.examples[0]}”
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </CardShell>
+  )
+}
