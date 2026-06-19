@@ -1,0 +1,22 @@
+# Optional / heavier dependencies. The pipeline runs without these; the
+# corresponding ladder rungs and signals self-skip (and say so in their
+# PASS/FAIL output) when an import fails. Install what your machine supports:
+#
+#   pip install -r requirements-optional.txt
+#
+# Notes:
+# - prophet pulls cmdstanpy and can be slow to build; it is Rung 2 only.
+# - xgboost / lightgbm are Rung 3 (the pooling baseline).
+# - voyageai is the preferred embedder for A8; sentence-transformers is the
+#   keyless offline fallback (large torch download).
+# - foundation models (TimesFM / Chronos / Moirai) are Rung 4 and GPU-aware;
+#   left commented as they are environment-specific.
+
+prophet>=1.1
+xgboost>=2.0
+lightgbm>=4.3
+voyageai>=0.2
+sentence-transformers>=2.7
+
+# chronos-forecasting>=1.4
+# timesfm>=1.2

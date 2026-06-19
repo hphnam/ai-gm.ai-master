@@ -1,0 +1,12 @@
+# Python env + caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated store (rebuilt by the pipeline) — keep the small text/JSON artefacts
+store/brain.duckdb
+store/*.parquet
+
+# Raw data is symlinked from the repo root, never committed here
+data/*.csv

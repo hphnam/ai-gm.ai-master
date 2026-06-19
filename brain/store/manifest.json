@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-06-18T22:27:10.707828+00:00",
+  "source_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/data/items-2024-01-01-2026-06-01.csv",
+  "total_source_rows": 92329,
+  "expected_total_rows": 92329,
+  "total_kept_rows": 92329,
+  "total_dropped_rows": 0,
+  "dropped_reasons": {},
+  "per_venue_counts": {
+    "beer_hall": 47644,
+    "two_river_taps": 33993,
+    "ellel": 10489,
+    "events": 203
+  },
+  "expected_per_venue": {
+    "beer_hall": 47644,
+    "two_river_taps": 33993,
+    "ellel": 10489,
+    "events": 203
+  },
+  "venue_count_match": true,
+  "date_span": {
+    "min": "2025-06-04",
+    "max": "2026-05-31"
+  },
+  "null_rates": {
+    "qty": 0.0,
+    "net_sales": 0.0,
+    "gross_sales": 0.0,
+    "discounts": 0.0,
+    "tax": 0.0,
+    "ts": 0.0
+  },
+  "net_sales_total_by_venue": {
+    "beer_hall": 202087.69,
+    "ellel": 44282.75,
+    "events": 1438.74,
+    "two_river_taps": 171970.12
+  },
+  "net_sales_exvat_total_by_venue": {
+    "beer_hall": 202087.69,
+    "ellel": 44282.75,
+    "events": 1438.74,
+    "two_river_taps": 143308.43
+  },
+  "vat_rule": {
+    "rate": 0.2,
+    "inclusive_venues": ["two_river_taps"],
+    "note": "TRT Net Sales treated as VAT-inclusive; deflated by 1/1.2 into net_sales_exvat (working assumption \u2014 owner to confirm)."
+  },
+  "reconciles": true
+}
