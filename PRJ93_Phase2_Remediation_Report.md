@@ -37,8 +37,10 @@ checked before.
 fails on the old parametric code, passes now); `test_both_l2_and_l3_coverage_reported`.
 
 ### FIX-2 — Closure-aware evaluation via a shared active-span (Two River Taps)
-**Problem:** TRT's long closure tail of zeros let a naïve forecaster "win"
-trivially by predicting zero.
+**Problem:** `fill_calendar` pads the calendar past TRT's last transaction with
+zeros, so the naïve "last 8 weeks" test block was post-closure zero-padding
+rather than real trading days (TRT's pre-closure block is a genuine decline, not
+zeros — the trimming removes the trailing padding, not a "dead zero-tail").
 **Fix:** New shared module [brain/store/active_span.py](brain/store/active_span.py)
 (`active_trading_start/end`, `trim_to_active`, `is_closed`). The ladder,
 conformal wrapper, and transfer harness all trim to the pre-closure **active
@@ -135,7 +137,23 @@ clean and the suite is fully green. No code change was needed to recover. See
 
 ---
 
-## 5. Outstanding (owner action — outside the repo)
+## 5. Patch v2 (follow-up review — 22 Jun 2026)
+
+A second review found four loose ends. All resolved; **test count 69 → 73**.
+
+| Patch | Outcome |
+|---|---|
+| **PATCH-1** (the real one) | `is_closed("two_river_taps")` was returning **False** — it compared TRT's last active day against its *own* reindexed calendar max (equal), so the "+28-day standby band" the reports claimed **never persisted**. Fixed `is_closed` to judge closure against the **dataset-global max date** and to treat `EVENT_ONLY_VENUES` (Ellel) as never-closed (a booking lull ≠ a shutdown). TRT now persists **56 standby rows** past 2026-05-08 and shows the "currently closed" banner. **Note:** the patch's own assumption that Ellel reaches the global max was wrong (Ellel ends 2026-05-22, not 05-31), so a bare `active_end < dataset_max` would have mis-flagged Ellel — the `EVENT_ONLY_VENUES` guard is what keeps it correct. 4 guard tests added. |
+| **PATCH-2** | Regenerated `signals/checklist_discipline.md` — no longer contradicts the FIX-6 code (no `ChecklistStepCompletion`/`exported`). |
+| **PATCH-3** | README pipeline now shows `--all-venues` (canonical), added a Multi-venue subsection + `scripts/run_all_venues.sh`. |
+| **PATCH-4** | Deleted the two stale generic-named reports (`ladder_results_L1.md`, `conformal_L1.md`) — no code referenced them. |
+| **PATCH-5** | FIX-7 verdict corrected ("highly correlated r≈0.98–1.00, **not** independent"); Ellel cap reframed as a **scope substitution** (not a bespoke event model); `EVENT_ONLY_VENUES` now wired into `is_closed` (no longer dead); trimming rationale corrected to "post-closure zero-padding." |
+
+**Full suite after Patch v2: 73 passed.**
+
+---
+
+## 6. Outstanding (owner action — outside the repo)
 
 1. **FIX-5 decision-log row** for `PRJ93_Decision_and_Resolution_Log.md` (project
    knowledge file, not in this repo): *A7 transfer-gate redefined from unanimous

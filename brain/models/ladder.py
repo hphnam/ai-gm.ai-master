@@ -447,8 +447,12 @@ def _write_report(
     if cap is not None:
         out.append(
             f"> **Ladder capped at Rung {cap}** for this venue (Data Audit Report "
-            "§8.3 — insufficient training signal for classical/ML rungs). Rungs "
-            "above the cap are listed as 'capped', not silently omitted.\n")
+            "§8.3 — insufficient training signal for classical/ML rungs). Rung 1 "
+            "(robust DOW × season) is a deliberate **scope substitution** for the "
+            "audit's recommended event-characteristic regression — a reasonable "
+            "stand-in given the ~64 booking-driven trading days, not an "
+            "implementation of a bespoke event-type model. Rungs above the cap are "
+            "listed as 'capped', not silently omitted.\n")
     out += [
         "## Operational regime — rolling-origin, 7-day horizon (the milestone gate)",
         f"Expanding-window backtest, {n_folds} held-out folds. MASE per fold vs "
@@ -483,7 +487,7 @@ def ets_prophet_diagnostic(venue: str) -> list[str]:
              "Per rolling-origin fold: max pointwise |ETS − Prophet| and their "
              "correlation.\n",
              "| Fold | max&#124;Δ&#124; | corr |", "|---|---|---|"]
-    diffs = []
+    diffs, corrs = [], []
     for k, (tr, te) in enumerate(
         harness.rolling_origin(feats, n_folds=6, horizon_days=7, min_train_days=120), 1
     ):
@@ -492,11 +496,17 @@ def ets_prophet_diagnostic(venue: str) -> list[str]:
         corr = (float(np.corrcoef(e, p)[0, 1])
                 if len(e) > 1 and np.std(e) > 0 and np.std(p) > 0 else float("nan"))
         diffs.append(md)
+        if np.isfinite(corr):
+            corrs.append(corr)
         lines.append(f"| {k} | {md:.1f} | {corr:.3f} |")
+    cr = (f"r ≈ {min(corrs):.2f}–{max(corrs):.2f}" if corrs else "r ≈ n/a")
     verdict = (
-        f"ETS and Prophet differ per-day (max |Δ| up to £{max(diffs):.0f}) yet "
-        "land on the same average MASE — genuinely independent forecasts that "
-        "happen to tie, not a computation bug."
+        f"ETS and Prophet are **highly correlated ({cr}) but not pointwise-"
+        f"identical** (diverging up to £{max(diffs):.0f}/day on the longest-horizon "
+        "fold). On this strongly DOW-dominated series their additive "
+        "weekly-seasonality decompositions track each other closely, so the equal "
+        "average MASE is expected — not a computation alias, and not a claim of "
+        "statistical independence."
         if max(diffs) > 1.0 else
         "ETS and Prophet are near-identical pointwise — on this strongly "
         "DOW-dominated series Prophet's additive weekly+holiday decomposition "
