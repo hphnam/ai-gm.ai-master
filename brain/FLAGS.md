@@ -3,15 +3,33 @@
 Flagged, not silently coerced (per the build contract). None of these block the
 sales critical path (A0–A6); two are open confirmations off the critical path.
 
+## ✅ Environment regression (RESOLVED — 22 Jun 2026)
+
+Two raw source files briefly **disappeared from the repo-root working directory**
+mid-session (OneDrive offload/desync; not deleted by any code change). The owner
+has since **restored both** — duplicates had been left inside `brain/` and the
+root copies are back in place:
+
+- `items-2024-01-01-2026-06-01.csv` (the 77 MB Square export) ✅ present
+- `Elliot's AI-GM Questions - Query result.csv` (the chat log) ✅ present
+
+`opening_and_closing_checklist.md` had also vanished and was **restored verbatim**
+during remediation (small static template). With all three files present the
+full suite is green again: **69 passed** (A0 ingest + A8 chat KB-gap no longer
+error). No code change was needed to recover.
+
 ## Open confirmations (off critical path)
 
 1. **TRT VAT basis** — working assumption: Two River Taps `Net Sales` is
    VAT-inclusive, deflated by `1/1.2` into `net_sales_exvat` before any
    cross-venue/group use (`config.VAT_INCLUSIVE_VENUES`). **Owner to confirm.**
    Per-venue work is unaffected.
-2. **`ChecklistStepCompletion` export (Ryan)** — A9 runs in **template-only
-   mode** against `signals.checklist_discipline.synthetic_log()`. Swap that for
-   the real timestamped completion rows when exported; the detector is unchanged.
+2. **Checklist completion capture (Ryan)** — A9 runs in **template-only mode**
+   against `signals.checklist_discipline.synthetic_log()`. Ryan is building a new
+   mobile-integrated capture system (not an export of the old
+   `ChecklistStepCompletion` table); swap `synthetic_log()` for the real rows
+   once that system starts accumulating data — the detector itself is unchanged
+   either way.
 
 ## Standing flags (design decisions, not blockers)
 
