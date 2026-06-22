@@ -31,15 +31,36 @@ python -m ingest.normalise              # A0  UTF-16 TSV -> tidy long table + ma
 python -m store.warehouse --build       # A1  DuckDB L1/L2/L3 views + helpers
 python -m eval.harness                  # A2  splits, MASE/coverage/Winkler, rolling-origin, LOVO
 python -m features.build_features       # A3  leak-free L1 feature table
-python -m models.ladder --layer L1      # A4  ladder rungs 0–4  (milestone)
-python -m conformal.wrap --layer L1     # A5  conformal band + coverage  (Objective 1 deliverable)
-python -m hierarchy.reconcile           # A6  MinT reconciliation + keg consumption proxy
+python -m models.ladder --all-venues    # A4  ladder rungs 0–4 for all 3 venues  (canonical; milestone gate = Beer Hall)
+python -m conformal.wrap --all-venues   # A5  conformal band + per-venue standby band  (Objective 1 deliverable)
+python -m hierarchy.reconcile           # A6  MinT reconciliation + keg consumption proxy (Beer Hall)
 python -m transfer.lovo                 # A7  leave-one-venue-out onboarding transfer
 python -m signals.chatlog_kb_gap        # A8  failure-rate + ranked SOP gaps
 python -m signals.checklist_discipline  # A9  weighted missed-step detector
 uvicorn service.app:app --port 8088     # A10 http://127.0.0.1:8088/docs
 pytest                                  # all module tests, printed PASS/FAIL
 ```
+
+> **Canonical run:** A4/A5 use `--all-venues` so `/forecast` is served for all
+> three venues (a single-venue run leaves TRT/Ellel 404-ing). `scripts/run_all_venues.sh`
+> wraps the full pipeline so it can't silently revert to Beer-Hall-only.
+
+### Multi-venue
+
+The ladder and conformal wrapper run for all three forecast venues; each writes a
+per-venue report (`ladder_results_L1_<venue>.md`, `conformal_L1_<venue>.md`):
+
+- **The Beer Hall** is the milestone gate — the strict ±3pp two-sided conformal
+  gate and the rolling-origin ladder gate are judged on it.
+- **Two River Taps** is evaluated on its **pre-closure active span** (the closure
+  is a known structural break, not a forecast target); a **+28-day standby band**
+  is persisted forward so the band is queryable on reopening. It is detected as
+  closed against the dataset-global max date (`store.active_span.is_closed`).
+- **Ellel** is **capped at Rung 1** (robust DOW × season) per the Data Audit
+  Report §8.3 — it is booking/event-driven (`EVENT_ONLY_VENUES`) so a trailing
+  booking lull is sparsity, not closure.
+
+A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 
 ## What each step proves (Phase-2 gates)
 
