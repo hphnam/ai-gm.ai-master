@@ -127,8 +127,32 @@ def mint_reconcile(Ybase: np.ndarray, S: np.ndarray, w: np.ndarray) -> np.ndarra
     return S @ bottom                        # m x H, coherent by construction
 
 
+def node_quantiles(
+    node_series: dict, nodes: list[str], test_start: pd.Timestamp
+) -> dict[tuple[str, float], float]:
+    """Split-conformal quantile per non-VENUE node per level — the single band
+    source of truth for A6 (used by BOTH the coverage check and persistence).
+
+    Score = |actual - DOW-median| on each node's pre-test training span, which
+    is exactly the residual of that node's base forecaster (_dow_median_forecast).
+    """
+    out: dict[tuple[str, float], float] = {}
+    for node in nodes:
+        if node == "VENUE":
+            continue
+        s = node_series[node]
+        train = s[s.index < test_start]
+        med = train.groupby(train.index.dayofweek).median()
+        res = np.abs(train.to_numpy() - np.array(
+            [med.get(d.dayofweek, train.median()) for d in train.index], float))
+        for lvl in CONFORMAL_LEVELS:
+            out[(node, lvl)] = conformal_quantile(res, lvl)
+    return out
+
+
 def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
     node_series, S, nodes, bottom_nodes, cat_of_bottom = build_hierarchy(venue, top_k)
+    cat_nodes = [n for n in nodes if n.startswith("CAT::")]
     calendar = node_series["VENUE"].index
     test_start = calendar.max() - pd.Timedelta(weeks=TEST_WEEKS)
     test_dates = calendar[calendar >= test_start]
@@ -153,33 +177,35 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
                 recon[ci] - recon[members].sum(axis=0)))))
     coherent = max(venue_disc, cat_disc) < 1e-6
 
-    # Conformal bands on the top item nodes (validated, pooled coverage).
-    item_cov = {lvl: {"hit": 0, "tot": 0} for lvl in CONFORMAL_LEVELS}
-    for b in bottom_nodes:
-        if b.endswith("::OTHER"):
-            continue
-        i = nodes.index(b)
-        train = node_series[b][node_series[b].index < test_start]
-        med = train.groupby(train.index.dayofweek).median()
-        res = np.abs(train.to_numpy() - np.array(
-            [med.get(d.dayofweek, train.median()) for d in train.index], float))
-        for lvl in CONFORMAL_LEVELS:
-            q = conformal_quantile(res, lvl)
-            lo, hi = np.clip(recon[i] - q, 0, None), recon[i] + q
-            inside = (actual[i] >= lo) & (actual[i] <= hi)
-            item_cov[lvl]["hit"] += int(inside.sum())
-            item_cov[lvl]["tot"] += len(inside)
+    # One conformal band source (node_q), used for coverage AND persistence.
+    node_q = node_quantiles(node_series, nodes, test_start)
+
+    def _coverage(node_list: list[str]) -> dict[float, float]:
+        cov = {lvl: {"hit": 0, "tot": 0} for lvl in CONFORMAL_LEVELS}
+        for node in node_list:
+            i = nodes.index(node)
+            for lvl in CONFORMAL_LEVELS:
+                q = node_q[(node, lvl)]
+                lo, hi = np.clip(recon[i] - q, 0, None), recon[i] + q
+                inside = (actual[i] >= lo) & (actual[i] <= hi)
+                cov[lvl]["hit"] += int(inside.sum())
+                cov[lvl]["tot"] += len(inside)
+        return {lvl: cov[lvl]["hit"] / max(cov[lvl]["tot"], 1) for lvl in CONFORMAL_LEVELS}
+
+    # L3 = item nodes (exclude the OTHER residual buckets); L2 = category nodes.
+    item_nodes = [b for b in bottom_nodes if not b.endswith("::OTHER")]
+    l3_coverage = _coverage(item_nodes)
+    l2_coverage = _coverage(cat_nodes)
 
     # Consumption proxy: reconciled pints of the keg line over the next 7 days.
     keg = _consumption_proxy(node_series, nodes, recon, bottom_nodes, test_dates)
 
-    _persist(venue, nodes, recon, bottom_nodes, cat_of_bottom, test_dates, w, S)
+    _persist(venue, nodes, recon, test_dates, node_q)
 
     return {
         "venue": venue, "n_nodes": len(nodes), "n_bottom": len(bottom_nodes),
         "venue_disc": venue_disc, "cat_disc": cat_disc, "coherent": coherent,
-        "item_coverage": {lvl: (item_cov[lvl]["hit"] / max(item_cov[lvl]["tot"], 1))
-                          for lvl in CONFORMAL_LEVELS},
+        "l2_coverage": l2_coverage, "l3_coverage": l3_coverage,
         "keg": keg, "test_dates": (test_dates.min(), test_dates.max()),
     }
 
@@ -201,24 +227,28 @@ def _consumption_proxy(node_series, nodes, recon, bottom_nodes, test_dates) -> d
     }
 
 
-def _persist(venue, nodes, recon, bottom_nodes, cat_of_bottom, test_dates, w, S) -> None:
+def _persist(venue, nodes, recon, test_dates, node_q) -> None:
+    """Persist forecasts + bands. The band is the SAME conformal band whose
+    coverage reconcile() validates — `recon[i] ± node_q[(node, level)]` — so the
+    rows the /forecast API serves are exactly the rows that were coverage-checked.
+    """
     fc_rows, band_rows = [], []
     for i, node in enumerate(nodes):
         if node == "VENUE":
             continue
         layer = "L2" if node.startswith("CAT::") else "L3"
         key = node.split("::", 1)[1] if layer == "L2" else node.split("::")[-1]
-        # band from the node's own base error variance (already in w)
-        sd = float(np.sqrt(max(w[i], _EPS)))
         for d, yhat in zip(test_dates, recon[i]):
+            yhat = float(max(yhat, 0.0))
             fc_rows.append({"venue": venue, "layer": layer, "key": key,
                             "target_date": d.date(), "model": "mint_dowmedian",
-                            "yhat": float(max(yhat, 0.0))})
-            for lvl, z in ((0.80, 1.2816), (0.90, 1.6449)):
+                            "yhat": yhat})
+            for lvl in CONFORMAL_LEVELS:
+                q = node_q[(node, lvl)]
                 band_rows.append({"venue": venue, "layer": layer, "key": key,
                                   "target_date": d.date(), "model": "mint_dowmedian",
-                                  "level": lvl, "lo": float(max(yhat - z * sd, 0.0)),
-                                  "hi": float(yhat + z * sd)})
+                                  "level": lvl, "lo": float(max(yhat - q, 0.0)),
+                                  "hi": float(yhat + q)})
     con = connect()
     try:
         write_forecast(pd.DataFrame(fc_rows), con=con)
@@ -234,13 +264,38 @@ def _write_report(out: dict) -> None:
         f"Nodes: {out['n_nodes']} ({out['n_bottom']} bottom item nodes). "
         "Base forecasts: robust DOW-median per node. Reconciliation: MinT "
         "(diagonal WLS).\n",
+        "**Scope:** A6 (L2/L3 hierarchy reconciliation) is run for the Beer Hall "
+        "only. It is intentionally not extended to Two River Taps (closed) or "
+        "Ellel (booking-driven, ~64 trading days) — their category/item splits "
+        "would be sparser than the Beer Hall's already-under-covering item bands. "
+        "Revisit if/when those venues' L1 forecasts prove operationally useful.\n",
+        "## Base forecaster (scope decision)",
+        "Base forecasts at L2/L3 use robust DOW-median only — the rung-climbing "
+        "discipline applied at L1 (A4) was deliberately **not** repeated here, "
+        "because (a) the ~30 item-level series are individually too sparse to "
+        "support ETS/GBM fitting without overfitting, and (b) MinT's coherence "
+        "guarantee depends only on the *summing matrix*, not on the base "
+        "forecaster's sophistication — a better base forecaster would tighten "
+        "the bands, not change the coherence result. This is a considered scope "
+        "decision, not an oversight; revisit if item-level band sharpness "
+        "becomes operationally important.\n",
         "## Coherence (Σ item = category = venue)",
         f"- max venue discrepancy: {out['venue_disc']:.2e}",
         f"- max category discrepancy: {out['cat_disc']:.2e}",
         f"- **coherent: {out['coherent']}**\n",
-        "## Top-N item bands (pooled coverage)",
-        *[f"- {int(l*100)}% band coverage: {c*100:.1f}%"
-          for l, c in out["item_coverage"].items()],
+        "## Reconciled-band coverage (the SAME band the /forecast API serves)",
+        "Each band is `reconciled ŷ ± split-conformal quantile of the node's "
+        "DOW-median residuals` — one band-construction path, used for both this "
+        "coverage check and persistence (no separate parametric band).\n",
+        "| Layer | 80% coverage | 90% coverage |",
+        "|---|---|---|",
+        f"| L2 (category) | {out['l2_coverage'][0.80]*100:.1f}% | "
+        f"{out['l2_coverage'][0.90]*100:.1f}% |",
+        f"| L3 (top item) | {out['l3_coverage'][0.80]*100:.1f}% | "
+        f"{out['l3_coverage'][0.90]*100:.1f}% |",
+        "\nItem (L3) series are sparse and noisy, so their bands under-cover — "
+        "an honest, expected limitation of conformal at this grain; category "
+        "(L2) bands are tighter to nominal.",
         "\n## Stock-consumption proxy",
     ]
     if out["keg"]:
@@ -271,8 +326,9 @@ def main() -> int:
     print(f"  venue discrepancy : {out['venue_disc']:.2e}")
     print(f"  category discrep. : {out['cat_disc']:.2e}")
     print(f"  coherent          : {out['coherent']}")
-    for lvl, cov in out["item_coverage"].items():
-        print(f"  item band @{int(lvl*100)}%  : coverage={cov*100:.1f}%")
+    for lvl in CONFORMAL_LEVELS:
+        print(f"  L2 band @{int(lvl*100)}%    : coverage={out['l2_coverage'][lvl]*100:.1f}%"
+              f"   L3 @{int(lvl*100)}%: {out['l3_coverage'][lvl]*100:.1f}%")
     if out["keg"]:
         k = out["keg"]
         print(f"  consumption proxy : {k['line']} {k['forecast_pints']} pints/"
@@ -281,7 +337,8 @@ def main() -> int:
     print(f"  report            : {RESULTS_MD}")
 
     ok = out["coherent"] and bool(out["keg"]) and all(
-        v > 0 for v in out["item_coverage"].values())
+        v > 0 for v in out["l3_coverage"].values()) and all(
+        v > 0 for v in out["l2_coverage"].values())
     print(f"A6 RESULT: {'PASS' if ok else 'FAIL'} "
           f"(coherent hierarchy + item bands + consumption proxy)")
     return 0 if ok else 1

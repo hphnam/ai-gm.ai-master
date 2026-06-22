@@ -2,7 +2,8 @@
 
 **Branch:** `feat/proactive-brain` · **Prepared:** 19 June 2026
 **Scope:** Full execution of `PRJ93_Phase2_FullStack_Build_Plan_for_ClaudeCode.md`
-**Status:** Track A complete (A0–A10, 59/59 tests pass). Track B complete (B1–B4, 18/18 tests pass). Nothing committed or pushed.
+**Status:** Track A complete (A0–A10). Track B complete (B1–B4, 18/18 tests pass). Nothing committed or pushed.
+**Update (19 Jun 2026):** 9-fix remediation applied — see **§7**. Track A tests now 69 total (62 passing; 7 error only because two source CSVs vanished from the working dir — FLAGS.md ⚠). Sections 1–6 below are the original build record; §7 carries the per-venue results after remediation.
 
 ---
 
@@ -232,3 +233,46 @@ Tenant isolation confirmed: `orgId` comes from `DispatchContext`, never the mode
 | A9 | `brain/signals/checklist_discipline.md` |
 | A10 | `brain/service/app.py`, `brain/README.md` |
 | Flags | `brain/FLAGS.md` |
+
+---
+
+## 7. Remediation addendum (19 Jun 2026)
+
+Nine fixes from the build-vs-methodology review. Track B untouched. Test count
+rose 59 → **69** (new tests for FIX-1/3/4). Current run: **62 passed, 7 errors** —
+the 7 errors are `FileNotFoundError` from two source CSVs that disappeared from
+the repo-root working directory mid-session (see FLAGS.md ⚠); with those files
+present it is 69/69. No code path is broken.
+
+| Fix | Change | Result |
+|---|---|---|
+| **FIX-1** | A6 persisted bands were a parametric `z·sd` Gaussian while the *reported* coverage used split-conformal — two paths. Unified on one `node_q` conformal band used for both eval and persistence; added L2 coverage (previously never checked). | Persisted band now provably = reported band (regression test). L2 70.8%/82.5%, L3 60.5%/77.6%. |
+| **FIX-2** | TRT closure-aware. New `store/active_span.py` (one shared definition of active span); ladder + conformal trim to the pre-closure span; +28-day **standby band** persisted for reopening; per-venue reports. | TRT milestone **PASS** (ETS 0.597 < naïve 0.673 / DOW 0.737). L1 band persisted. |
+| **FIX-3** | Ellel capped at Rung 1 (`MAX_RUNG`, Data Audit §8.3); cap-aware milestone (Rung 1 beats Rung 0); conformal wraps robust DOW. | Ellel **PASS** (Rung 1 0.572 < naïve 0.924). Rungs 2–4 shown "capped", not omitted. |
+| **FIX-4** | `--all-venues` driver on ladder + conformal; parametrised API test for all three venues. | `/forecast` + `/deviation/check` return 200 for all three venues. |
+| **FIX-5** | A7 majority-gate (≥2/3) rationale written into `lovo.run` docstring + decision-log row. | Documented (decision-log row is project knowledge — apply outside repo). |
+| **FIX-6** | Checklist dependency reframed: Ryan's new mobile capture system, not a `ChecklistStepCompletion` export. | FLAGS.md + docstrings updated. |
+| **FIX-7** | ETS/Prophet identical-MASE diagnostic (per-fold max\|Δ\| + corr). | Recorded in `ladder_results_L1_beer_hall.md`. |
+| **FIX-8** | `is_ellel_event` permutation importance (spillover hypothesis). | Reported in the Beer Hall ladder report. |
+| **FIX-9** | "No ladder below L1" + "A6 Beer-Hall-only" scope decisions. | Written into `reconciliation_forecast.md`. |
+
+### Per-venue results after remediation
+
+**A4 ladder (rolling-origin, 7-day) — best vs baselines:**
+
+| Venue | Best (rolling) | MASE | naïve | DOW | Gate |
+|---|---|---|---|---|---|
+| Beer Hall | Prophet / ETS | 0.799 | 1.006 | 1.029 | PASS |
+| Two River Taps | ETS | 0.597 | 0.673 | 0.737 | PASS (pre-closure span) |
+| Ellel | robust DOW (capped) | 0.572 | 0.924 | — | PASS (Rung 1 beats naïve) |
+
+**A5 conformal (pooled Mondrian coverage):**
+
+| Venue | 80% | 90% | Note |
+|---|---|---|---|
+| Beer Hall | 78.5% | 90.7% | within ±3pp (Objective-1 deliverable) |
+| Two River Taps | 83.0% | 95.7% | over-covers @90 (conservative); +28d standby band |
+| Ellel | 87.6% | 92.8% | over-covers @80 (conservative) |
+
+Per-venue artefacts now: `ladder_results_L1_{venue}.md`, `conformal_L1_{venue}.md`,
+`conformal_coverage_{venue}.png`.

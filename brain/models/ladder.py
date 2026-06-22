@@ -33,14 +33,32 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 
-from config import ANCHOR_VENUE, FORECAST_VENUES, SEASONAL_PERIOD, STORE_DIR
+from config import (
+    ANCHOR_VENUE,
+    FORECAST_VENUES,
+    MAX_RUNG,
+    SEASONAL_PERIOD,
+    STORE_DIR,
+    VENUE_LABELS,
+)
 from eval import harness
 from features.build_features import build_features, feature_columns
+from store.active_span import active_trading_end, is_closed, trim_to_active
 
 warnings.filterwarnings("ignore")
 
 MODELS_DIR = STORE_DIR.parent / "models_L1"
-RESULTS_MD = STORE_DIR.parent / "models" / "ladder_results_L1.md"
+
+
+def _report_path(venue: str):
+    return STORE_DIR.parent / "models" / f"ladder_results_L1_{venue}.md"
+
+
+def _load_feats(venue: str) -> pd.DataFrame:
+    """Build features, then trim to the venue's active trading span so a closed
+    venue's zero-tail (e.g. TRT after 2026-05-08) is never the held-out test
+    block — otherwise every model trivially 'wins' by predicting zero."""
+    return trim_to_active(build_features(venue), venue)
 
 try:
     from statsmodels.tsa.holtwinters import ExponentialSmoothing
@@ -249,8 +267,14 @@ def _predict_all(
     venue: str, train: pd.DataFrame, target: pd.DataFrame, cols: list[str],
     *, with_prophet: bool = True,
 ) -> list[tuple[str, int, np.ndarray | None, str]]:
+    cap = MAX_RUNG.get(venue, 99)
+    cap_note = (f"capped at Rung {cap} per Data Audit Report §8.3 — insufficient "
+                "training signal for classical/ML rungs")
     out: list[tuple[str, int, np.ndarray | None, str]] = []
     for name, rung, fn, avail in PREDICTORS:
+        if rung > cap:
+            out.append((name, rung, None, cap_note))
+            continue
         if name == "rung2_prophet" and not with_prophet:
             out.append((name, rung, None, "skipped (rolling)"))
             continue
@@ -261,11 +285,14 @@ def _predict_all(
             out.append((name, rung, fn(train, target, cols), ""))
         except Exception as exc:  # pragma: no cover - defensive
             out.append((name, rung, None, f"error: {type(exc).__name__}"))
-    try:
-        out.append(("rung3_global_gbm", 3,
-                    global_gbm_predict(venue, train, target, cols), ""))
-    except Exception as exc:  # pragma: no cover
-        out.append(("rung3_global_gbm", 3, None, f"error: {type(exc).__name__}"))
+    if 3 > cap:
+        out.append(("rung3_global_gbm", 3, None, cap_note))
+    else:
+        try:
+            out.append(("rung3_global_gbm", 3,
+                        global_gbm_predict(venue, train, target, cols), ""))
+        except Exception as exc:  # pragma: no cover
+            out.append(("rung3_global_gbm", 3, None, f"error: {type(exc).__name__}"))
     return out
 
 
@@ -287,7 +314,7 @@ def _rung4_foundation() -> RungResult:
 # --- Evaluation regimes ------------------------------------------------------
 
 def evaluate_static(venue: str = ANCHOR_VENUE):
-    feats = build_features(venue)
+    feats = _load_feats(venue)
     cols = feature_columns(feats)
     split = harness.time_split(feats)
     train, test = split.train, split.test
@@ -310,7 +337,7 @@ def evaluate_rolling(
     venue: str = ANCHOR_VENUE, *, n_folds: int = 6, horizon: int = 7,
     with_prophet: bool = True,
 ):
-    feats = build_features(venue)
+    feats = _load_feats(venue)
     cols = feature_columns(feats)
     folds = list(harness.rolling_origin(
         feats, n_folds=n_folds, horizon_days=horizon, min_train_days=120))
@@ -356,20 +383,30 @@ def select_best(results: list[RungResult]) -> RungResult | None:
     return min(finite, key=lambda r: r.metrics["MASE"]) if finite else None
 
 
-def milestone(results: list[RungResult]) -> tuple[bool, dict]:
+def milestone(results: list[RungResult], cap: int = 99) -> tuple[bool, dict]:
     by_name = {r.name: r for r in results if r.metrics}
     naive = by_name.get("rung0_seasonal_naive")
     dow = by_name.get("rung1_robust_dow")
     best = select_best(results)
     if not (naive and dow and best):
         return False, {}
-    passed = (best.metrics["MASE"] < naive.metrics["MASE"]
-              and best.metrics["MASE"] < dow.metrics["MASE"])
+    if cap <= 1:
+        # Capped venue (e.g. Ellel): the ladder stops at Rung 1, so the
+        # adoption criterion is "robust DOW (Rung 1) beats seasonal-naive (Rung
+        # 0)" — there is no higher rung that could beat Rung 1.
+        passed = dow.metrics["MASE"] < naive.metrics["MASE"]
+        gate = "Rung 1 (robust DOW) beats seasonal-naive"
+        best = dow
+    else:
+        passed = (best.metrics["MASE"] < naive.metrics["MASE"]
+                  and best.metrics["MASE"] < dow.metrics["MASE"])
+        gate = "beats seasonal-naive AND robust DOW"
     return passed, {
         "best": best.name,
         "best_mase": best.metrics["MASE"],
         "naive_mase": naive.metrics["MASE"],
         "dow_mase": dow.metrics["MASE"],
+        "gate": gate,
     }
 
 
@@ -389,10 +426,30 @@ def _table(results: list[RungResult], cols: tuple[str, ...]) -> list[str]:
     return rows
 
 
-def _write_report(static_res, split, rolling_res, n_folds, passed, info) -> None:
+def _write_report(
+    venue, static_res, split, rolling_res, n_folds, passed, info,
+    extra_sections=None,
+) -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    label = VENUE_LABELS.get(venue, venue)
+    cap = MAX_RUNG.get(venue)
     out = [
-        "# A4 · L1 ladder results (Beer Hall)\n",
+        f"# A4 · L1 ladder results ({label})\n",
+    ]
+    if is_closed(venue):
+        out.append(
+            f"> **{label} is currently closed** (last active day "
+            f"{active_trading_end(venue).date()}). This evaluation uses the "
+            "pre-closure active span only — the closure is modelled as a known "
+            "structural break, not a forecast target. The persisted band reflects "
+            "pre-closure rhythm and has **not** been validated against any "
+            "post-reopening data.\n")
+    if cap is not None:
+        out.append(
+            f"> **Ladder capped at Rung {cap}** for this venue (Data Audit Report "
+            "§8.3 — insufficient training signal for classical/ML rungs). Rungs "
+            "above the cap are listed as 'capped', not silently omitted.\n")
+    out += [
         "## Operational regime — rolling-origin, 7-day horizon (the milestone gate)",
         f"Expanding-window backtest, {n_folds} held-out folds. MASE per fold vs "
         "in-sample seasonal-naive (m=7), averaged.\n",
@@ -402,29 +459,89 @@ def _write_report(static_res, split, rolling_res, n_folds, passed, info) -> None
         f"(n={len(split.test)}). A stress test over a long static horizon.\n",
         *_table(static_res, ("MASE", "MAE", "RMSE", "sMAPE")),
         "\n## Milestone (rolling regime)",
+        f"- gate: *{info.get('gate', 'beats seasonal-naive AND robust DOW')}*",
         f"- best model: **{info.get('best')}** (MASE {info.get('best_mase', float('nan')):.3f})",
         f"- seasonal-naive MASE: {info.get('naive_mase', float('nan')):.3f}",
         f"- robust-DOW MASE: {info.get('dow_mase', float('nan')):.3f}",
-        f"- **beats seasonal-naive AND robust DOW: {passed}**\n",
-        "## Reading",
-        "Over the long static horizon the robust DOW profile is the strongest "
-        "single predictor — exactly the methodology's warning that a black box "
-        "must *earn* its place. In the operational short-horizon regime (the "
-        "brief's \"next week's order\"), the gradient-boosting rung adds real "
-        "value over both baselines, which is the Phase-2 milestone.\n",
+        f"- **gate met: {passed}**\n",
     ]
+    out.extend(extra_sections or [])
+    RESULTS_MD = _report_path(venue)
     RESULTS_MD.write_text("\n".join(out))
+    return RESULTS_MD
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description="Proactive Brain baseline ladder")
-    ap.add_argument("--layer", default="L1")
-    ap.add_argument("--venue", default=ANCHOR_VENUE)
-    args = ap.parse_args()
+def ets_prophet_diagnostic(venue: str) -> list[str]:
+    """FIX-7: are ETS and Prophet's identical MASE a genuine convergence (they
+    differ per-day but tie on average) or pointwise-identical (Prophet reduced
+    to the same fit)? Recorded so the dissertation cites it honestly."""
+    if not (_HAS_STATSMODELS and _HAS_PROPHET):
+        return []
+    feats = _load_feats(venue)
+    cols = feature_columns(feats)
+    lines = ["## Diagnostic — ETS vs Prophet (FIX-7)",
+             "Per rolling-origin fold: max pointwise |ETS − Prophet| and their "
+             "correlation.\n",
+             "| Fold | max&#124;Δ&#124; | corr |", "|---|---|---|"]
+    diffs = []
+    for k, (tr, te) in enumerate(
+        harness.rolling_origin(feats, n_folds=6, horizon_days=7, min_train_days=120), 1
+    ):
+        e, p = rung2_ets(tr, te, cols), rung2_prophet(tr, te, cols)
+        md = float(np.max(np.abs(e - p)))
+        corr = (float(np.corrcoef(e, p)[0, 1])
+                if len(e) > 1 and np.std(e) > 0 and np.std(p) > 0 else float("nan"))
+        diffs.append(md)
+        lines.append(f"| {k} | {md:.1f} | {corr:.3f} |")
+    verdict = (
+        f"ETS and Prophet differ per-day (max |Δ| up to £{max(diffs):.0f}) yet "
+        "land on the same average MASE — genuinely independent forecasts that "
+        "happen to tie, not a computation bug."
+        if max(diffs) > 1.0 else
+        "ETS and Prophet are near-identical pointwise — on this strongly "
+        "DOW-dominated series Prophet's additive weekly+holiday decomposition "
+        "reduces to essentially the same fit as additive Holt-Winters; the equal "
+        "MASE is expected, not an unexplained coincidence.")
+    lines.append("\n" + verdict + "\n")
+    return lines
 
-    print(f"A4 · baseline ladder ({args.layer}, {args.venue})")
 
-    static_res, split, _ = evaluate_static(args.venue)
+def spillover_importance(venue: str) -> list[str]:
+    """FIX-8: permutation importance of is_ellel_event in the Beer Hall GBM —
+    does an Ellel event night spill over into Beer Hall demand?"""
+    from sklearn.inspection import permutation_importance
+
+    feats = _load_feats(venue)
+    cols = feature_columns(feats)
+    if "is_ellel_event" not in cols:
+        return []
+    split = harness.time_split(feats)
+    fit = split.train.dropna(subset=["lag_14", "roll28_median"])
+    test = split.test.dropna(subset=["lag_14", "roll28_median"])
+    if test.empty:
+        return []
+    model = _fit_gbm(fit[cols], fit["value"].to_numpy())
+    r = permutation_importance(
+        model, test[cols], test["value"].to_numpy(), n_repeats=10, random_state=0)
+    imp = float(r.importances_mean[cols.index("is_ellel_event")])
+    ranked = sorted(zip(cols, r.importances_mean, strict=True), key=lambda x: -x[1])
+    rank = [c for c, _ in ranked].index("is_ellel_event") + 1
+    verdict = ("supports" if imp > 0 and rank <= len(cols) / 2
+               else "does not support" if imp <= 0
+               else "is weak / inconclusive for")
+    return [
+        "## Spillover-hypothesis check — is_ellel_event (FIX-8)",
+        f"Permutation importance of `is_ellel_event` in the Rung-3 Beer Hall GBM "
+        f"(held-out fold, 10 repeats): **{imp:.4f}** (rank {rank}/{len(cols)} of "
+        "features).",
+        f"This **{verdict}** the audit's hypothesis that Ellel event nights spill "
+        "over into Beer Hall demand.\n",
+    ]
+
+
+def _run_one(venue: str, layer: str) -> bool:
+    print(f"A4 · baseline ladder ({layer}, {venue})")
+    static_res, split, _ = evaluate_static(venue)
     print("  -- static (8-week block) --")
     for r in sorted(static_res, key=lambda x: (x.rung, x.name)):
         if r.metrics:
@@ -432,7 +549,7 @@ def main() -> int:
         else:
             print(f"    [{r.rung}] {r.name:22s} skipped — {r.note}")
 
-    rolling_res, n_folds = evaluate_rolling(args.venue, n_folds=6, horizon=7)
+    rolling_res, n_folds = evaluate_rolling(venue, n_folds=6, horizon=7)
     print(f"  -- rolling (7-day, {n_folds} folds) [milestone gate] --")
     for r in sorted(rolling_res, key=lambda x: (x.rung, x.name)):
         if r.metrics:
@@ -441,15 +558,38 @@ def main() -> int:
         else:
             print(f"    [{r.rung}] {r.name:22s} skipped — {r.note}")
 
-    passed, info = milestone(rolling_res)
-    _write_report(static_res, split, rolling_res, n_folds, passed, info)
+    passed, info = milestone(rolling_res, cap=MAX_RUNG.get(venue, 99))
+    extra = (ets_prophet_diagnostic(venue) + spillover_importance(venue)
+             if venue == ANCHOR_VENUE else [])
+    report_path = _write_report(
+        venue, static_res, split, rolling_res, n_folds, passed, info, extra)
     if info:
         print(f"  best={info['best']} (MASE {info['best_mase']:.3f}) vs "
               f"naive {info['naive_mase']:.3f} / DOW {info['dow_mase']:.3f}")
-    print(f"  report            : {RESULTS_MD}")
-    print(f"A4 RESULT: {'PASS' if passed else 'FAIL'} "
-          f"(rolling: beats seasonal-naive AND robust DOW)")
-    return 0 if passed else 1
+    print(f"  report            : {report_path}")
+    print(f"A4 RESULT ({venue}): {'PASS' if passed else 'FAIL'} "
+          f"(rolling: {info.get('gate', '—')})")
+    return passed
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Proactive Brain baseline ladder")
+    ap.add_argument("--layer", default="L1")
+    ap.add_argument("--venue", default=ANCHOR_VENUE)
+    ap.add_argument("--all-venues", action="store_true",
+                    help="run every FORECAST_VENUES venue (the canonical pipeline)")
+    args = ap.parse_args()
+
+    venues = list(FORECAST_VENUES) if args.all_venues else [args.venue]
+    # The anchor (Beer Hall) is the milestone gate; closed/capped venues report
+    # their own status but don't fail the run (they are coverage targets, not
+    # the milestone). Exit nonzero only if the anchor's milestone fails.
+    anchor_ok = True
+    for v in venues:
+        ok = _run_one(v, args.layer)
+        if v == ANCHOR_VENUE:
+            anchor_ok = ok
+    return 0 if anchor_ok else 1
 
 
 if __name__ == "__main__":

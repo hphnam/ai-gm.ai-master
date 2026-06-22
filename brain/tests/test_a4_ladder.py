@@ -69,3 +69,23 @@ def test_milestone_fails_when_baseline_is_best():
     ]
     passed, _ = ladder.milestone(results)
     assert passed is False
+
+
+def test_capped_milestone_gate_is_rung1_beats_naive():
+    # A capped venue (cap=1) is adopted when Rung 1 beats Rung 0 — there is no
+    # higher rung to beat Rung 1 with.
+    results = [
+        RungResult("rung0_seasonal_naive", 0, metrics={"MASE": 0.92}),
+        RungResult("rung1_robust_dow", 1, metrics={"MASE": 0.57}),
+    ]
+    passed, info = ladder.milestone(results, cap=1)
+    assert passed is True
+    assert info["best"] == "rung1_robust_dow"
+    assert "Rung 1" in info["gate"]
+
+
+def test_ellel_ladder_never_returns_an_available_rung_above_one():
+    results, _split, _cols = ladder.evaluate_static("ellel")
+    for r in results:
+        if r.rung >= 2:
+            assert r.available is False, f"{r.name} should be capped for Ellel"

@@ -28,6 +28,7 @@ import pandas as pd
 
 from config import FORECAST_VENUES, SEASONAL_PERIOD, STORE_DIR, VENUE_LABELS
 from eval import harness
+from store.active_span import trim_to_active
 from store.warehouse import read_series
 
 RESULTS_MD = STORE_DIR.parent / "transfer" / "transfer_results.md"
@@ -41,12 +42,9 @@ def _series(venue: str) -> pd.DataFrame:
 def _active_series(venue: str) -> pd.DataFrame:
     """Trim leading/trailing all-zero stretches — e.g. Two River Taps' closure
     tail — so onboarding-transfer is judged on days the venue actually trades
-    (the closure is a known structural break, not a forecast target here)."""
-    s = _series(venue).sort_values("date").reset_index(drop=True)
-    nz = s.index[s["value"] > 0]
-    if len(nz) == 0:
-        return s
-    return s.iloc[nz.min(): nz.max() + 1].reset_index(drop=True)
+    (the closure is a known structural break, not a forecast target here).
+    Delegates to the shared store.active_span definition used by A4/A5/A7."""
+    return trim_to_active(_series(venue), venue)
 
 
 def donor_dow_shape(donors: list[str]) -> dict[int, float]:
@@ -127,6 +125,16 @@ def _foundation_ablation() -> dict:
 
 
 def run(cold_days: int = 14) -> dict:
+    """Run the LOVO transfer evaluation across all venues.
+
+    GATE DECISION (recorded, not implicit): the A7 gate is **majority-of-venues**
+    (≥2 of 3) beating per-venue-naïve at the cold-start window — NOT unanimous.
+    Two River Taps loses its fold (transfer 1.19 vs naïve 0.70 MASE) and is not
+    held to the unanimity bar: at the point of measurement TRT is a declining /
+    closing venue with an atypical DOW shape, so the donor-shape assumption is
+    not expected to hold for it the way it does for an actively-trading venue.
+    See PRJ93_Decision_and_Resolution_Log.md ("A7 transfer-gate criterion").
+    """
     folds = [lovo_fold(v, cold_days) for v in FORECAST_VENUES]
     folds = [f for f in folds if f]
     wins = sum(1 for f in folds if f["mase_transfer"] < f["mase_naive"])
