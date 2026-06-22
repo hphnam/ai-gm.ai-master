@@ -2,14 +2,25 @@
 
 Nodes: 39 (30 bottom item nodes). Base forecasts: robust DOW-median per node. Reconciliation: MinT (diagonal WLS).
 
+**Scope:** A6 (L2/L3 hierarchy reconciliation) is run for the Beer Hall only. It is intentionally not extended to Two River Taps (closed) or Ellel (booking-driven, ~64 trading days) — their category/item splits would be sparser than the Beer Hall's already-under-covering item bands. Revisit if/when those venues' L1 forecasts prove operationally useful.
+
+## Base forecaster (scope decision)
+Base forecasts at L2/L3 use robust DOW-median only — the rung-climbing discipline applied at L1 (A4) was deliberately **not** repeated here, because (a) the ~30 item-level series are individually too sparse to support ETS/GBM fitting without overfitting, and (b) MinT's coherence guarantee depends only on the *summing matrix*, not on the base forecaster's sophistication — a better base forecaster would tighten the bands, not change the coherence result. This is a considered scope decision, not an oversight; revisit if item-level band sharpness becomes operationally important.
+
 ## Coherence (Σ item = category = venue)
 - max venue discrepancy: 0.00e+00
 - max category discrepancy: 0.00e+00
 - **coherent: True**
 
-## Top-N item bands (pooled coverage)
-- 80% band coverage: 60.5%
-- 90% band coverage: 77.6%
+## Reconciled-band coverage (the SAME band the /forecast API serves)
+Each band is `reconciled ŷ ± split-conformal quantile of the node's DOW-median residuals` — one band-construction path, used for both this coverage check and persistence (no separate parametric band).
+
+| Layer | 80% coverage | 90% coverage |
+|---|---|---|
+| L2 (category) | 70.8% | 82.5% |
+| L3 (top item) | 60.5% | 77.6% |
+
+Item (L3) series are sparse and noisy, so their bands under-cover — an honest, expected limitation of conformal at this grain; category (L2) bands are tighter to nominal.
 
 ## Stock-consumption proxy
 - line: **Lager - BH** (2 node(s))

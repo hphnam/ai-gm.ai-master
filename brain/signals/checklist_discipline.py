@@ -5,9 +5,11 @@ Parses the opening (27) / closing (32) templates into an expected step-set with
 **Sunday-only** close #31 rule, and scores a completion log for deviations:
 missed mandatory step, skipped/unsigned checklist, abnormally late completion.
 
-Runs in **template-only mode** against a synthetic completion log until Ryan
-exports the real `ChecklistStepCompletion` rows (standing dependency — see
-FLAGS.md). Swapping in the real log means replacing `synthetic_log()`.
+Runs in **template-only mode** against a synthetic completion log until Ryan's
+new mobile checklist-capture system starts producing real timestamped completion
+rows (standing dependency — see FLAGS.md; this supersedes the earlier assumption
+that the old `ChecklistStepCompletion` table would be the source). Swapping in
+the real log means replacing `synthetic_log()`.
 
 Run:
     python -m signals.checklist_discipline
@@ -132,7 +134,8 @@ def evaluate(
 def synthetic_log(checklists: dict[str, list[Step]]) -> list[dict]:
     """A small hand-built completion log to exercise the detector now. Each
     scenario names the checklist, the day, the completed step numbers, and an
-    optional completion time. Replace with real ChecklistStepCompletion rows."""
+    optional completion time. Replace with rows from Ryan's mobile checklist-
+    capture system once it is producing data."""
     op = checklists["opening"]
     cl = checklists["closing"]
     op_mand_mon = {s.number for s in expected_mandatory(op, is_sunday=False)}
@@ -179,8 +182,8 @@ def _write_report(checklists, results) -> None:
         "# A9 · Checklist completion-discipline (template-only mode)\n",
         f"Parsed: opening {len(op)} steps, closing {len(cl)} steps. "
         "Mode: **template-only** against a synthetic completion log — replace "
-        "`synthetic_log()` with `ChecklistStepCompletion` rows when exported "
-        "(standing dependency on Ryan).\n",
+        "`synthetic_log()` with rows from Ryan's new mobile checklist-capture "
+        "system once it is producing data (standing dependency on Ryan).\n",
         "## Criticality weighting",
         "| Weight | Meaning | Example steps |",
         "|---|---|---|",

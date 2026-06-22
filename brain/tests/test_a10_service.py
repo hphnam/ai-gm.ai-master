@@ -1,10 +1,14 @@
-"""A10 tests — every endpoint returns valid JSON and OpenAPI is served."""
+"""A10 tests — every endpoint returns valid JSON and OpenAPI is served, and all
+three forecast venues are actually served (the regression guard for FIX-4: all
+venues are forecast targets, not just the Beer Hall)."""
 
 from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
 
+from config import FORECAST_VENUES
+from conformal.wrap import default_model, evaluate
 from service.app import app
 from store import warehouse
 
@@ -12,6 +16,9 @@ from store import warehouse
 @pytest.fixture(scope="module", autouse=True)
 def _store():
     warehouse.build()  # ensure the DuckDB store exists for read endpoints
+    # Persist an L1 band for every forecast venue so /forecast serves all three.
+    for v in FORECAST_VENUES:
+        evaluate(v, default_model(v))
 
 
 @pytest.fixture(scope="module")
@@ -61,3 +68,19 @@ def test_deviation_check_returns_json(client):
     assert r.status_code in (200, 404)
     if r.status_code == 200:
         assert "n_breaches" in r.json()
+
+
+@pytest.mark.parametrize("venue", list(FORECAST_VENUES))
+def test_forecast_served_for_every_venue(client, venue):
+    """FIX-4: all three venues are forecast targets — /forecast must not 404."""
+    r = client.get(f"/forecast?venue={venue}&layer=L1&level=0.9")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["n"] > 0, f"no L1 band served for {venue}"
+
+
+@pytest.mark.parametrize("venue", list(FORECAST_VENUES))
+def test_deviation_check_served_for_every_venue(client, venue):
+    r = client.post("/deviation/check", json={"venue": venue, "layer": "L1", "level": 0.9})
+    assert r.status_code == 200
+    assert "n_breaches" in r.json()
