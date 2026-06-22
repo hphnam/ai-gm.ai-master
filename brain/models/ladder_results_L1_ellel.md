@@ -1,6 +1,6 @@
 # A4 · L1 ladder results (Ellel Village Hall)
 
-> **Ladder capped at Rung 1** for this venue (Data Audit Report §8.3 — insufficient training signal for classical/ML rungs). Rungs above the cap are listed as 'capped', not silently omitted.
+> **Ladder capped at Rung 1** for this venue (Data Audit Report §8.3 — insufficient training signal for classical/ML rungs). Rung 1 (robust DOW × season) is a deliberate **scope substitution** for the audit's recommended event-characteristic regression — a reasonable stand-in given the ~64 booking-driven trading days, not an implementation of a bespoke event-type model. Rungs above the cap are listed as 'capped', not silently omitted.
 
 ## Operational regime — rolling-origin, 7-day horizon (the milestone gate)
 Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal-naive (m=7), averaged.

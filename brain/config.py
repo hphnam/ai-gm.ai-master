@@ -81,14 +81,16 @@ FORECAST_VENUES = ("beer_hall", "two_river_taps", "ellel")
 
 # Per-venue ladder rung cap. Ellel has only ~64 booking-driven trading days —
 # the Data Audit Report (§8.3) explicitly says do not attempt SARIMA/Prophet/
-# neural models on it. So cap the ladder at Rung 1 (robust DOW × season), which
-# is exactly the event-calendar method the audit recommends. Default: no cap.
+# neural models on it. So cap the ladder at Rung 1 (robust DOW × season), a
+# deliberate scope substitution for the audit's event-characteristic regression
+# (a reasonable stand-in given the data, not a bespoke event model). Default: no cap.
 MAX_RUNG: dict[str, int] = {"ellel": 1}
 
-# Venues whose "structural zero" is not a fixed weekday (Mon/Tue) but *any*
-# zero-revenue day — booking/event-driven sites that simply have no sales most
-# days. The harness already excludes all zeros from sMAPE, which is correct for
-# these too; this set documents the intent.
+# Booking/event-driven venues whose "structural zero" is not a fixed weekday
+# (Mon/Tue) but *any* zero-revenue day — they simply have no sales most days.
+# Used by store.active_span.is_closed (a trailing booking lull is sparsity, not
+# a closure, so these are never flagged "closed"); the sMAPE harness also
+# excludes all-zero days, which is correct for these too.
 EVENT_ONLY_VENUES = frozenset({"ellel"})
 
 # Expected per-venue line-item counts (the profiled audit figures). A0 asserts

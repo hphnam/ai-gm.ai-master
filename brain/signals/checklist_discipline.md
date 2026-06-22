@@ -1,6 +1,6 @@
 # A9 · Checklist completion-discipline (template-only mode)
 
-Parsed: opening 27 steps, closing 32 steps. Mode: **template-only** against a synthetic completion log — replace `synthetic_log()` with `ChecklistStepCompletion` rows when exported (standing dependency on Ryan).
+Parsed: opening 27 steps, closing 32 steps. Mode: **template-only** against a synthetic completion log — replace `synthetic_log()` with rows from Ryan's new mobile checklist-capture system once it is producing data (standing dependency on Ryan).
 
 ## Criticality weighting
 | Weight | Meaning | Example steps |

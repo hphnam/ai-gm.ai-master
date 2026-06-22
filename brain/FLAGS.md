@@ -15,8 +15,25 @@ root copies are back in place:
 
 `opening_and_closing_checklist.md` had also vanished and was **restored verbatim**
 during remediation (small static template). With all three files present the
-full suite is green again: **69 passed** (A0 ingest + A8 chat KB-gap no longer
-error). No code change was needed to recover.
+full suite is green (**73 passed** after Patch v2; A0 ingest + A8 chat KB-gap no
+longer error). No code change was needed to recover the files.
+
+## Patch v2 correction (22 Jun 2026)
+
+- **TRT standby band was aspirational until Patch-1.** Earlier reports claimed a
+  "+28-day standby band persisted forward" for the closed venue, but
+  `is_closed("two_river_taps")` was returning `False` (it compared the venue's
+  last active day against its *own* reindexed calendar max, which are equal), so
+  `_persist_standby_forward` never fired and no forward band existed. Patch-1
+  fixed `is_closed` to judge closure against the **dataset-global** max date and
+  to treat `EVENT_ONLY_VENUES` (Ellel) as never-closed (a booking lull is not a
+  shutdown). TRT now persists 56 standby band rows (28 days × 2 levels) past
+  2026-05-08 and its reports carry the "currently closed" banner; guard tests in
+  `tests/test_a5_conformal.py` lock this in.
+- **Trimming rationale corrected.** `trim_to_active` removes **post-closure
+  zero-padding** added by `fill_calendar`, not a real "declining tail the models
+  would win on by predicting zero" — TRT's pre-closure block is a genuine
+  decline, not zeros. Wording fixed in `store/active_span.py` and the build report.
 
 ## Open confirmations (off critical path)
 

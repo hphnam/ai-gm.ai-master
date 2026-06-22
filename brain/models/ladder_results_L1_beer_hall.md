@@ -29,10 +29,11 @@ Test 2026-04-06 → 2026-05-31 (n=56). A stress test over a long static horizon.
 | 4 | rung4_foundation | – | – | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
 
 ## Milestone (rolling regime)
+- gate: *beats seasonal-naive AND robust DOW*
 - best model: **rung2_prophet** (MASE 0.799)
 - seasonal-naive MASE: 1.006
 - robust-DOW MASE: 1.029
-- **beats seasonal-naive AND robust DOW: True**
+- **gate met: True**
 
 ## Diagnostic — ETS vs Prophet (FIX-7)
 Per rolling-origin fold: max pointwise |ETS − Prophet| and their correlation.
@@ -46,7 +47,7 @@ Per rolling-origin fold: max pointwise |ETS − Prophet| and their correlation.
 | 5 | 132.4 | 0.987 |
 | 6 | 184.1 | 0.977 |
 
-ETS and Prophet differ per-day (max |Δ| up to £184) yet land on the same average MASE — genuinely independent forecasts that happen to tie, not a computation bug.
+ETS and Prophet are **highly correlated (r ≈ 0.98–1.00) but not pointwise-identical** (diverging up to £184/day on the longest-horizon fold). On this strongly DOW-dominated series their additive weekly-seasonality decompositions track each other closely, so the equal average MASE is expected — not a computation alias, and not a claim of statistical independence.
 
 ## Spillover-hypothesis check — is_ellel_event (FIX-8)
 Permutation importance of `is_ellel_event` in the Rung-3 Beer Hall GBM (held-out fold, 10 repeats): **-0.0459** (rank 22/22 of features).

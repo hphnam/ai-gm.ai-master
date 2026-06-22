@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
-from conformal.wrap import _mondrian_quantiles, conformal_quantile
+from conformal.wrap import _mondrian_quantiles, conformal_quantile, default_model, evaluate
+from store import warehouse
+from store.active_span import is_closed
+
+
+@pytest.fixture(scope="module")
+def store():
+    warehouse.build()
 
 
 def test_conformal_quantile_is_monotone_in_level():
@@ -31,3 +39,27 @@ def test_mondrian_quantiles_differ_by_group():
 
 def test_conformal_quantile_handles_empty():
     assert np.isnan(conformal_quantile(np.array([]), 0.9))
+
+
+def test_trt_detected_as_closed_against_dataset_max(store):
+    assert is_closed("two_river_taps") is True
+
+
+def test_event_only_venue_is_never_closed(store):
+    assert is_closed("ellel") is False
+
+
+def test_continuously_trading_venue_is_not_closed(store):
+    assert is_closed("beer_hall") is False
+
+
+def test_trt_standby_band_persisted_past_closure(store):
+    evaluate("two_river_taps", default_model("two_river_taps"))
+    con = warehouse.connect(read_only=True)
+    try:
+        n = con.execute(
+            "SELECT COUNT(*) FROM bands WHERE venue='two_river_taps' "
+            "AND target_date > DATE '2026-05-08'").fetchone()[0]
+    finally:
+        con.close()
+    assert n > 0

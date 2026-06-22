@@ -1,5 +1,7 @@
 # A4 · L1 ladder results (Two River Taps)
 
+> **Two River Taps is currently closed** (last active day 2026-05-08). This evaluation uses the pre-closure active span only — the closure is modelled as a known structural break, not a forecast target. The persisted band reflects pre-closure rhythm and has **not** been validated against any post-reopening data.
+
 ## Operational regime — rolling-origin, 7-day horizon (the milestone gate)
 Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal-naive (m=7), averaged.
 
@@ -29,7 +31,8 @@ Test 2026-03-14 → 2026-05-08 (n=56). A stress test over a long static horizon.
 | 4 | rung4_foundation | – | – | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
 
 ## Milestone (rolling regime)
+- gate: *beats seasonal-naive AND robust DOW*
 - best model: **rung2_ets** (MASE 0.597)
 - seasonal-naive MASE: 0.673
 - robust-DOW MASE: 0.737
-- **beats seasonal-naive AND robust DOW: True**
+- **gate met: True**

@@ -2,6 +2,8 @@
 
 Selected forecaster: **rung2_ets**. Validation: online rolling-origin split conformal (EnbPI-style), coverage pooled across 141 held-out points.
 
+> **Two River Taps is currently closed** (last active 2026-05-08). Coverage is validated on the pre-closure active span; a +28-day **standby band** is persisted past the last active day so the band is queryable on reopening. It reflects pre-closure rhythm and is **not** validated against any post-reopening data.
+
 | Variant | Level | Coverage | Width | Winkler | Pinball | Within ±3pp |
 |---|---|---|---|---|---|---|
 | plain | 80% | 80.9% | 436 | 638 | 32 | True |
