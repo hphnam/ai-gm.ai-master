@@ -39,6 +39,10 @@ python -m signals.chatlog_kb_gap        # A8  failure-rate + ranked SOP gaps
 python -m signals.checklist_discipline  # A9  weighted missed-step detector
 python -m ingest.stock_normalise        # A11 bar-stock panel + master + agg (Beer Hall)
 python -m signals.stock_inventory       # A12 days-of-cover reorder signal (reads A6)
+python -m ingest.exog_weather           # A14 weather (3 bases, Open-Meteo; needs network)
+python -m ingest.local_events           # A14 curated local-event anchors
+python -m ingest.spike_days             # A14 retrospective discount-spike flag
+python -m signals.feature_ablation      # A14 enrichment ablation + weather train/serve study
 uvicorn service.app:app --port 8088     # A10 http://127.0.0.1:8088/docs
 pytest                                  # all module tests, printed PASS/FAIL
 ```
@@ -79,6 +83,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A9 | weighted miss detector; conditionals never raise; Sunday-only #31 correct |
 | A11 | 13 bar sheets → 10 snapshots; 238 products (129 core); date conflict flagged |
 | A12 | days-of-cover for mapped core kegs; unmapped lines NULL (not guessed) |
+| A14 | exo seam populated (calendar/weather/events); ablation gates adoption — honest null on BH + weather train/serve study |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
