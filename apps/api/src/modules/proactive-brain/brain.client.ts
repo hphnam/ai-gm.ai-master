@@ -103,6 +103,27 @@ export interface ChecklistResponse {
   severity: 'ok' | 'low' | 'medium' | 'high' | 'critical'
 }
 
+export interface StockCoverLine {
+  product: string
+  l1: string
+  on_hand_kegs: number | null
+  on_hand_pints: number | null
+  forecast_daily_pints: number | null
+  days_of_cover: number | null
+  reorder: boolean | null
+  suggested_order_kegs: number | null
+  a6_node: string | null
+}
+
+export interface StockCoverResponse {
+  venue: string
+  as_of: string | null
+  n: number
+  n_reorder: number
+  lines: StockCoverLine[]
+  note?: string
+}
+
 @Injectable()
 export class BrainClient {
   private readonly baseUrl = (process.env.BRAIN_BASE_URL ?? 'http://127.0.0.1:8088').replace(
@@ -136,6 +157,10 @@ export class BrainClient {
 
   sopGaps(): Promise<SopGapsResponse> {
     return this.get('/sop-gaps')
+  }
+
+  stockCover(venue: string): Promise<StockCoverResponse> {
+    return this.get(`/stock/cover?venue=${encodeURIComponent(venue)}`)
   }
 
   checkChecklist(q: ChecklistQuery): Promise<ChecklistResponse> {

@@ -26,3 +26,10 @@ Item (L3) series are sparse and noisy, so their bands under-cover — an honest,
 - line: **Lager - BH** (2 node(s))
 - reconciled 7-day forecast: **90.6 pints**
 - @ 88 pints/keg → **1.03 kegs** to order for the week.
+
+## Inventory-aware reorder (A12 stock-cover join)
+The demand-only proxy above becomes a true reorder signal once the physical on-hand position (A12 `stock_cover`) is joined: `days_of_cover = on_hand_pints / forecast_daily_pints`. Lines whose brand is not a forecast A6 node are omitted here (NULL demand, not guessed).
+
+| Product | L1 | On-hand kegs | Forecast pints/day | Days cover | Reorder | Suggest kegs |
+|---|---|---|---|---|---|---|
+| lunebrew caravan of love | Draught | 0.0 | 5.32 | **0.0** | ⚠ YES | 1 |

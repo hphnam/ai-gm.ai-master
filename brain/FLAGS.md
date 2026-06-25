@@ -53,9 +53,10 @@ longer error). No code change was needed to recover the files.
 3. **No research schema / time-series store** — by design, the brain persists
    its own history to `store/brain.duckdb` (the methodology's stated design
    contribution). Phase 2 runs off the CSV exports.
-4. **Real stock data** — mock only; the ordering signal is served by the
-   sales-derived **consumption proxy** (A6, L3 item units → implied kegs).
-   Real-stock integration deferred.
+4. **Real stock data** — ✅ **RESOLVED** (stock-integration spec). 13 Beer Hall
+   monthly bar-stock sheets → `stock_panel`/master/agg (A11) joined to the A6
+   forecast for a days-of-cover reorder signal (A12). The A6 consumption proxy is
+   *extended*, not replaced. See the "Stock integration" section below.
 
 ## Data caveats
 
@@ -88,3 +89,33 @@ longer error). No code change was needed to recover the files.
   hands over to own-history as it accrues — the partial-pooling story.
 - A6: item-level (L3) conformal bands under-cover (60.5% / 77.6%) — expected for
   sparse item series; the L1 band (A5) is the validated deliverable.
+
+## Stock integration (A11/A12 — spec FLAG register §11)
+
+- **FLAG-1 (date conflict).** `Stock Sheet 01.03.2026.xlsx` internal title reads
+  `01.02.2026` but is a distinct count (footer £6,157 vs Feb £4,773) and the
+  filename says March. Dated **2026-03-01** (filename-primary); surfaced in the
+  A11 run output. *Owner: Ryan/James to confirm it is the March count.*
+- **FLAG-2 (levels not flows).** Monthly snapshots are on-hand *levels*;
+  deliveries are unobserved, so consumption comes from the A6 sales forecast,
+  never from stock differences.
+- **FLAG-3 (lead/safety days).** `STOCK_LEAD_TIME_DAYS=3`, `STOCK_SAFETY_DAYS=2`
+  are working assumptions. *Owner: James/Ryan to confirm supplier lead times.*
+- **FLAG-4 (pints per keg).** 30 L→52.8, 50 L→88, unknown→88. Refines A6's flat 88.
+- **FLAG-5 (Beer Hall only).** No TRT/Ellel bar-stock sheets supplied; stock scope
+  = A6 scope. Stated, not silently omitted.
+- **FLAG-6 (stale footers).** Hand-typed `TOTAL CASH` footers lag edits on **3**
+  sheets — **Feb/Apr/May** (the spec assumed 2; Feb confirmed a stale footer, not
+  a double-count). Line-item sums are authoritative; footer reconciliation is a
+  diagnostic (7/10 within 1%), not a hard gate.
+- **FLAG-7 (cost inflation confounded).** Median keg-cost rise is mix-confounded;
+  reported as indicative only.
+- **FLAG-8 (brewery scope).** The 5 Lune Brew Co. stocktakes are cleaned to a
+  standalone `brewery_inventory` table with **no join** to the venue brain; the
+  vertical-integration link (brewery finished kegs → estate draught demand) is
+  logged as future work.
+- **A6→stock mapping depth.** Only **1 of 14** core keg lines (`Caravan of Love`)
+  maps to a forecast A6 node at the default top-k, because A6 buckets most branded
+  items into OTHER and generic sales items ("Lager - BH") span several keg brands.
+  Unmapped lines carry NULL demand by design (no guessed attribution). Raising A6
+  `--top-k` would resolve more lines; not done to keep A6's default behaviour.

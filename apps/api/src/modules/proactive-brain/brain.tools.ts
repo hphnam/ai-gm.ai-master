@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { IntegrationToolDefinition } from '../integrations/integration-provider'
 
-/// The four new agent functions exposed by the Proactive Brain. Same shape as
+/// The five agent functions exposed by the Proactive Brain. Same shape as
 /// SQUARE_TOOL_DEFINITIONS so they feed straight into buildAiSdkTools via the
 /// IntegrationRegistry — no edits to chat-tools.ts or ai-sdk-tools.ts.
 ///
@@ -13,6 +13,7 @@ export const BRAIN_FORECAST_SALES = 'brain_forecast_sales'
 export const BRAIN_CHECK_DEVIATION = 'brain_check_deviation'
 export const BRAIN_FIND_SOP_GAPS = 'brain_find_sop_gaps'
 export const BRAIN_CHECK_CHECKLIST = 'brain_check_checklist'
+export const BRAIN_CHECK_STOCK_COVER = 'brain_check_stock_cover'
 
 /// Canonical brain venue slugs (Track A `config.VENUE_MAP`). A full wiring maps
 /// these to the org's Venue rows; until then the agent names the venue directly.
@@ -48,6 +49,7 @@ export const BRAIN_TOOL_SCHEMAS = {
       .optional(),
   }),
   [BRAIN_FIND_SOP_GAPS]: z.object({}).strict(),
+  [BRAIN_CHECK_STOCK_COVER]: z.object({ venue: VenueSlug }).strict(),
   [BRAIN_CHECK_CHECKLIST]: z.object({
     checklist: z.enum(['opening', 'closing']),
     completed: z.array(z.number().int().min(1).max(40)).max(40),
@@ -112,6 +114,22 @@ export const BRAIN_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = 
     description:
       'Surface the knowledge-base gaps the chat history reveals: topics where the assistant repeatedly could not answer. FIRES on "what are we missing", "what SOPs should we write", "where is the knowledge base weak". Returns the current failure rate plus ranked clusters (size, failure density, example questions) that fail ABOVE the baseline — each is a missing SOP to write. Estate-wide / owner-level signal; no parameters.',
     input_schema: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: BRAIN_CHECK_STOCK_COVER,
+    description:
+      'Inventory-aware REORDER signal: how many days of cover each keg/cask line has, given physical on-hand stock and forecast demand. FIRES on "what do we need to order", "which kegs are running low", "are we about to run out of X", "stock cover". Returns per-line days_of_cover = on-hand pints ÷ forecast pints/day, a reorder flag where cover is below lead+safety time, and a suggested order in kegs. Lines whose demand the brain cannot forecast are returned on-hand-only (days_of_cover null) rather than guessed. Beer Hall only — other venues have no stock sheets and return an empty list.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venue: {
+          type: 'string',
+          enum: [...BRAIN_VENUES],
+          description: 'Venue slug (stock data is Beer Hall only)',
+        },
+      },
+      required: ['venue'],
+    },
   },
   {
     name: BRAIN_CHECK_CHECKLIST,
