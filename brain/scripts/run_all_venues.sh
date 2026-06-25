@@ -17,3 +17,7 @@ python -m signals.chatlog_kb_gap
 python -m signals.checklist_discipline
 python -m signals.stock_inventory       # A12 days-of-cover reorder (reads A6 forecasts)
 python -m hierarchy.reconcile           # A6 re-run enriches its report with the stock-cover join
+python -m ingest.exog_weather           # A14 weather (3 bases, Open-Meteo) — needs network
+python -m ingest.local_events           # A14 curated local-event anchors
+python -m ingest.spike_days             # A14 retrospective discount-spike flag
+python -m signals.feature_ablation      # A14 ablation + weather train/serve study
