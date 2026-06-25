@@ -8,6 +8,7 @@ Endpoints (typed JSON):
     POST /deviation/check       band breaches + severity (the §6 breach rule)
     GET  /sop-gaps              ranked KB-gap clusters + failure rate (A8)
     POST /checklist/discipline  expected vs actual, weighted misses (A9)
+    GET  /stock/cover           days-of-cover reorder lines per venue (A12)
 
 Run:
     uvicorn service.app:app --port 8088     # http://127.0.0.1:8088/docs
@@ -19,13 +20,23 @@ from datetime import date
 from functools import lru_cache
 
 import duckdb
+import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from config import DUCKDB_PATH
+from config import DUCKDB_PATH, VENUES_WITH_STOCK
 from signals.checklist_discipline import evaluate as checklist_evaluate
 from signals.checklist_discipline import expected_mandatory, parse_checklists
 from store import warehouse
+
+
+def _f(v) -> float | None:
+    """Pandas/NumPy scalar → JSON float, or None for NULL/NaN."""
+    return None if v is None or pd.isna(v) else float(v)
+
+
+def _b(v) -> bool | None:
+    return None if v is None or pd.isna(v) else bool(v)
 
 app = FastAPI(
     title="Proactive Brain",
@@ -209,6 +220,43 @@ def deviation_check(req: DeviationRequest) -> dict:
 @app.get("/sop-gaps")
 def sop_gaps() -> dict:
     return _sop_gaps_cached()
+
+
+@app.get("/stock/cover")
+def stock_cover(venue: str = "beer_hall") -> dict:
+    """A12 days-of-cover reorder lines, reorder-flagged first. Venues without
+    stock sheets return an explicit empty envelope (200), never an error."""
+    con = _read_only()
+    try:
+        has_table = con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name='stock_cover'"
+        ).fetchone()
+        if venue not in VENUES_WITH_STOCK or not has_table:
+            return {"venue": venue, "as_of": None, "n": 0, "n_reorder": 0,
+                    "lines": [], "note": f"no stock data for venue '{venue}'"}
+        df = con.execute(
+            "SELECT * FROM stock_cover WHERE venue = ? "
+            "ORDER BY reorder_flag DESC NULLS LAST, days_of_cover ASC NULLS LAST",
+            [venue],
+        ).df()
+    finally:
+        con.close()
+    lines = []
+    for _, r in df.iterrows():
+        lines.append({
+            "product": r["product_canon"], "l1": r["l1"],
+            "on_hand_kegs": _f(r["on_hand_kegs"]),
+            "on_hand_pints": _f(r["on_hand_pints"]),
+            "forecast_daily_pints": _f(r["forecast_daily_pints"]),
+            "days_of_cover": _f(r["days_of_cover"]),
+            "reorder": _b(r["reorder_flag"]),
+            "suggested_order_kegs": _f(r["suggested_order_kegs"]),
+            "a6_node": r["a6_node"] if pd.notna(r["a6_node"]) else None,
+        })
+    as_of = str(df["as_of"].iloc[0])[:10] if not df.empty else None
+    n_reorder = int(df["reorder_flag"].fillna(False).sum()) if not df.empty else 0
+    return {"venue": venue, "as_of": as_of, "n": len(lines),
+            "n_reorder": n_reorder, "lines": lines}
 
 
 @app.post("/checklist/discipline")

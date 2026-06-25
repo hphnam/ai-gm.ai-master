@@ -5,6 +5,7 @@ import { BrainClient, BrainUnavailableError } from './brain.client'
 import {
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
+  BRAIN_CHECK_STOCK_COVER,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
   BRAIN_TOOL_SCHEMAS,
@@ -48,6 +49,8 @@ export class BrainService {
           return await this.checkDeviation(parsed.data as DeviationInput)
         case BRAIN_FIND_SOP_GAPS:
           return await this.findSopGaps()
+        case BRAIN_CHECK_STOCK_COVER:
+          return await this.checkStockCover(parsed.data as StockCoverInput)
         case BRAIN_CHECK_CHECKLIST:
           return await this.checkChecklist(parsed.data as ChecklistInput)
         default:
@@ -106,8 +109,22 @@ export class BrainService {
     const res = await this.client.checkChecklist(i)
     return ok(res)
   }
+
+  private async checkStockCover(i: StockCoverInput): Promise<ToolResult<unknown>> {
+    const res = await this.client.stockCover(i.venue)
+    if (res.n === 0) {
+      return fail('no-data', res.note ?? `No stock data for ${i.venue}`)
+    }
+    return ok({
+      venue: res.venue,
+      as_of: res.as_of,
+      n_reorder: res.n_reorder,
+      lines: res.lines,
+    })
+  }
 }
 
 type ForecastInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_FORECAST_SALES]['_output']
 type DeviationInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_DEVIATION]['_output']
 type ChecklistInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHECKLIST]['_output']
+type StockCoverInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_STOCK_COVER]['_output']

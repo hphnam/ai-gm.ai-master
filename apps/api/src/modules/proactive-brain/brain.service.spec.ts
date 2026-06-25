@@ -6,6 +6,7 @@ import { BrainService } from './brain.service'
 import {
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
+  BRAIN_CHECK_STOCK_COVER,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
 } from './brain.tools'
@@ -18,6 +19,7 @@ class StubClient {
   enabled = true
   lastCall: { method: string; arg?: unknown } | null = null
   forecastN = 1
+  stockN = 14
   throwUnavailable = false
 
   private record(method: string, arg?: unknown) {
@@ -84,6 +86,31 @@ class StubClient {
           score: 1.8,
           venue_tags: { estate: 5 },
           examples: ['Why is the gas not connecting?'],
+        },
+      ],
+    }
+  }
+  async stockCover(venue: string) {
+    this.record('stockCover', venue)
+    if (this.stockN === 0) {
+      return { venue, as_of: null, n: 0, n_reorder: 0, lines: [], note: 'no stock data' }
+    }
+    return {
+      venue,
+      as_of: '2026-06-01',
+      n: this.stockN,
+      n_reorder: 1,
+      lines: [
+        {
+          product: 'lunebrew caravan of love',
+          l1: 'Draught',
+          on_hand_kegs: 0,
+          on_hand_pints: 0,
+          forecast_daily_pints: 5.32,
+          days_of_cover: 0,
+          reorder: true,
+          suggested_order_kegs: 1,
+          a6_node: 'Caravan of Love',
         },
       ],
     }
@@ -170,6 +197,24 @@ describe('BrainService.dispatch', () => {
     const res = await svc.dispatch(BRAIN_FIND_SOP_GAPS, {}, CTX)
     assert.equal(stub.lastCall?.method, 'sopGaps')
     assert.ok(res.ok && (res.data as { failure_rate: number }).failure_rate === 0.189)
+  })
+
+  it('stock-cover: valid venue hits the stock endpoint and returns reorder lines', async () => {
+    const res = await svc.dispatch(BRAIN_CHECK_STOCK_COVER, { venue: 'beer_hall' }, CTX)
+    assert.equal(stub.lastCall?.method, 'stockCover')
+    assert.ok(res.ok && (res.data as { n_reorder: number }).n_reorder === 1)
+  })
+
+  it('stock-cover: returns no-data for a venue without stock sheets', async () => {
+    stub.stockN = 0
+    const res = await svc.dispatch(BRAIN_CHECK_STOCK_COVER, { venue: 'ellel' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'no-data')
+  })
+
+  it('stock-cover: rejects an unknown venue with invalid-input', async () => {
+    const res = await svc.dispatch(BRAIN_CHECK_STOCK_COVER, { venue: 'not_a_venue' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'invalid-input')
+    assert.equal(stub.lastCall, null)
   })
 
   it('checklist: valid input returns weighted misses', async () => {

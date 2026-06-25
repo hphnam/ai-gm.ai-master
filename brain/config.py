@@ -147,6 +147,44 @@ COVERAGE_TOL_PP = 3.0    # allowed deviation from nominal coverage, percentage p
 CHATLOG_FAILURE_BASELINE = 0.189
 VOYAGE_MODEL = "voyage-3.5"
 
+# --- Stock / inventory (PRJ93 stock-integration spec) ------------------------
+# Raw monthly bar-stock sheets live here (Beer Hall only — no TRT/Ellel sheets
+# exist, FLAG-5). Brewery stocktakes share the dir but are cleaned to a separate
+# out-of-scope table (FLAG-8).
+STOCK_DIR = DATA_DIR / "stock"
+
+# Days-of-cover reorder rule. Lead time + safety are working assumptions pending
+# supplier confirmation (FLAG-3); reorder_cycle extends the order target ~1 week
+# beyond the cover horizon.
+STOCK_LEAD_TIME_DAYS = 3        # supplier lead time — CONFIRM with Ryan/James (FLAG-3)
+STOCK_SAFETY_DAYS = 2          # buffer
+STOCK_REORDER_CYCLE_DAYS = 7   # order to ~1 week beyond the cover horizon
+
+# Keg-size → pints, refining A6's flat 88 (FLAG-4). 30 L kegs (most LuneBrew
+# draught) yield ~52.8 pints; 50 L and unknown keep 88.
+PINTS_PER_KEG = {30.0: 52.8, 50.0: 88.0}
+PINTS_PER_KEG_DEFAULT = 88.0
+
+# A product is "core" (stable range, cover-modelled) if it appears in ≥ this many
+# of the 10 monthly snapshots. Guest/one-off kegs below this are flagged transient.
+STOCK_CORE_MIN_SNAPSHOTS = 6
+
+# Scope marker (mirrors EVENT_ONLY_VENUES): only these venues have stock sheets.
+# Uses the canonical brain slug ('beer_hall', per VENUE_MAP) so stock joins the
+# sales-side forecasts and the Track-B venue enum without a slug-translation seam.
+VENUES_WITH_STOCK = ("beer_hall",)
+
+# Map a stock keg line (product_canon, l1) to the A6 reconciliation L3 item node
+# (the Square item name) that draws it down, so days-of-cover joins demand
+# (forecast pints/day from A6) to on-hand (kegs from the latest stock snapshot).
+# Evidence-based, clean brand matches that are actually in A6's forecast node set
+# only. Generic sales items ("Lager - BH", "Cider - BH") span multiple keg brands,
+# and items A6 buckets into OTHER are not forecast — both are left unmapped so the
+# cover line carries NULL demand rather than a guessed attribution (spec §4.4/G5).
+STOCK_A6_NODE_MAP: dict[tuple[str, str], str] = {
+    ("lunebrew caravan of love", "Draught"): "Caravan of Love",
+}
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
