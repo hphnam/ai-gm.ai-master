@@ -21,3 +21,4 @@ python -m ingest.exog_weather           # A14 weather (3 bases, Open-Meteo) — 
 python -m ingest.local_events           # A14 curated local-event anchors
 python -m ingest.spike_days             # A14 retrospective discount-spike flag
 python -m signals.feature_ablation      # A14 ablation + weather train/serve study
+python -m signals.weather_diagnostic    # A14b weather/calendar signal diagnostic (slow; diagnostic only)

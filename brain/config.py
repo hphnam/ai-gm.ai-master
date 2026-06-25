@@ -225,6 +225,12 @@ ENRICH_FEATURES = (
 # a forward regressor (FLAG-FE9).
 SPIKE_DISCOUNT_SHARE = 0.95
 
+# --- Weather/calendar diagnostic (A14b) — diagnostic only, adopts nothing ----
+BEER_GARDEN_TEMP_C = 20.0     # exo_beer_garden_day threshold (with WEATHER_DRY_MM)
+WD_CLIMATOLOGY_WIN = 15       # ± days for the day-of-year temperature climatology
+WD_L2_CATEGORIES = ()         # () = auto-pick top-volume beer_hall L2 categories
+WD_MIN_SERIES_DAYS = 120      # skip series with fewer trading days (reported)
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))

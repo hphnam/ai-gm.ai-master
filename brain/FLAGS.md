@@ -153,3 +153,19 @@ longer error). No code change was needed to recover the files.
 - **FLAG-FE-TRTLOC.** TRT stated to be in Preston but the supplied coordinate
   (53.8751, −2.7599) sits ~13 km north (Galgate/Forton). TRT is closed, so this
   affects historical weather/event attribution only — confirm before any live use.
+
+## Weather/calendar diagnostic (A14b — diagnostic only, adopts nothing)
+
+- **FLAG-WD1 (anomaly fragility).** `exo_temp_anomaly` rests on a ~1-summer
+  day-of-year climatology; treat it as indicative and weight the
+  `exo_beer_garden_day` threshold result more.
+- **FLAG-WD2 (L2 power).** Per-category (and draught-L3) series are lower-volume
+  than L1; a lone series' apparent lift must be corroborated by the Test-D
+  redundancy regression before it counts.
+- **FLAG-WD3 (fold provenance).** Calendar verdicts state which fold set produced
+  them — a flat result on *transition-aware* folds (flag varies) is real evidence
+  of no signal; a flat result on the A14 *operational* folds (flag near-constant)
+  is not.
+- **FLAG-WD4 (diagnostic, non-adopting).** A14b changes no forecast and flips
+  nothing into `_ADOPTED_EXO`; any positive finding is a candidate for a separate,
+  gated decision (and a covariate-aware model, not a univariate foundation model).
