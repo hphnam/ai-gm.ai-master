@@ -19,7 +19,7 @@ suites (commands and results in §6).
 
 | Track | Result |
 |---|---|
-| **Track A** (`brain/`, Python) | 15 modules, A0–A12. **86 pytest passing.** Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
+| **Track A** (`brain/`, Python) | A0–A12 + A14 enrichment. **98 pytest passing** (13 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
 | **Track B** (`apps/api` + `apps/web`, TS) | 5 self-registered agent tools. **21 specs passing, 0 typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
 | **Reviews** | Stock tool: security-reviewer **no findings**; code-reviewer 1 MEDIUM + 1 LOW, **both fixed**. |
 
@@ -65,7 +65,7 @@ CSV / XLSX sources
 | A0 ingest | `ingest/normalise.py` | PASS — 92,329 rows reconcile to per-venue audit counts |
 | A1 store | `store/warehouse.py` | PASS — L1/L2/L3 views; BH L1 ex-VAT within 1% of £202,491 |
 | A2 harness | `eval/harness.py` | PASS — MASE/coverage/Winkler, rolling-origin, leakage guard |
-| A3 features | `features/build_features.py` | PASS — leak-free L1 feature table |
+| A3 features | `features/build_features.py` | PASS — leak-free L1 feature table; A14 exo seam now populated (calendar/weather/events), adoption ablation-gated |
 | A4 ladder | `models/ladder.py` | PASS — BH Prophet 0.799 < naïve 1.006; TRT ETS 0.597 < 0.673; Ellel (capped R1) 0.572 < 0.924 |
 | A5 conformal | `conformal/wrap.py` | PASS — BH strict ±3pp; TRT/Ellel band persisted (conservative), TRT +28d standby band |
 | A6 reconcile | `hierarchy/reconcile.py` | PASS — coherent Σ=cat=venue; L2 70.8%/82.5%, L3 60.5%/77.6%; consumption proxy + **stock-cover join** |
@@ -74,6 +74,7 @@ CSV / XLSX sources
 | A9 checklist | `signals/checklist_discipline.py` | PASS — weighted misses, conditionals never raise, Sunday rule |
 | **A11 stock ingest** | `ingest/stock_normalise.py` | PASS — 13 sheets → 10 snapshots / 1,407 rows; 238 products (**129 core**); date conflict flagged; brewery isolated |
 | **A12 stock cover** | `signals/stock_inventory.py` | PASS — days-of-cover for the mapped core keg line; unmapped lines NULL (not guessed) |
+| **A14 enrichment** | `features/build_features.py`, `ingest/exog_weather.py`, `ingest/local_events.py`, `ingest/spike_days.py`, `signals/feature_ablation.py` | PASS — exo seam populated (calendar/weather/events); ablation adopts **none** (honest null on BH); weather train/serve study delivered |
 | A10 service | `service/app.py` | PASS — all 6 endpoints return typed JSON |
 
 ---
@@ -98,6 +99,44 @@ inefficiency the signal targets).
 calls `GET /stock/cover`, returns a `ToolResult` envelope (`no-data` for non-stock
 venues). `StockCoverCard` renders reorder lines first. Self-registers via the
 existing IntegrationRegistry seam.
+
+---
+
+## 4b. Feature enrichment detail (A14 — newest work)
+
+**What it adds.** Activates the pre-built exogenous seam in `build_features` with
+real data: deterministic calendar (Lancaster university + Lancashire school term,
+from `ingest/calendar_sources.py`), Open-Meteo weather (three bases), and curated
+local events. Every feature is gated by a rolling-origin ablation —
+`signals/feature_ablation.py`.
+
+**Tables / sources (verified):** `exog_weather_observed/hindcast/leadmatched` (693
+rows each, real Open-Meteo pulls, cached to DuckDB) · `local_events` (7 curated
+Lancaster anchor-days) · `spike_days` (614 venue×date, 1 retrospective spike) ·
+empty `promo_calendar` forward hook.
+
+**Headline result — an honest negative, established not assumed.** Against the
+strong autoregressive GBM baseline (MASE **0.816**), the ablation **adopts no
+exogenous feature**: calendar flags hurt slightly (school −2%, uni −6%), weather
+overfits (−20%), events are null. Cause: the 6-week operational test folds sit
+inside one term (calendar flags near-constant there) and the curated event anchors
+fall outside the test window — and, verified by search, the two biggest recurring
+Lancaster festivals (Music Festival, Highest Point) **did not run in the 2025-26
+data window**. The seam is populated for **deviation attribution** and the study,
+not adopted — so the live ladder is unchanged (no-regression).
+
+**Weather train/serve consistency study (the methodological contribution).** Under
+forecast serving, the **matched** training basis (lead-matched) beats the
+**mismatched** clean-reanalysis basis (MASE 0.82 vs 0.97) — the direction the
+train/serve-consistency principle predicts. But the best weather config only
+*matches* the no-weather baseline and the oracle (perfect weather both ends, 0.93)
+is no better, so on this ~270-day single-venue sample weather carries no net
+forecast signal; the basis gaps are partly small-sample overfitting. Forecast
+skill at 3-day lead: temp MAE 0.89 °C (accurate), rain MAE 3.48 mm (noisy). Full
+write-up: [brain/signals/feature_ablation.md](brain/signals/feature_ablation.md).
+
+`is_spike_day` (≥0.95 discount share) lives in its own table, **never joined to the
+feature frame** — retrospective attribution only, not a forward regressor.
 
 ---
 
@@ -137,7 +176,9 @@ are deliberate, evidence-based decisions, not defects:
 | Stale slugs | `grep the_beer_hall brain/**/*.py` | none |
 | Track B wiring | grep across layers | tool present in tools/client/service/router/card |
 | Forbidden touch-points | `git status` on chat-tools/dispatcher/ai-sdk/gm-agent | none touched |
-| brain tests | `pytest` | **86 passed** (12 files) |
+| brain tests | `pytest` | **98 passed** (13 files; +11 A14, +1 stock-slug) |
+| A14 weather reachability | Open-Meteo archive/hindcast/previous-runs | reachable; 3 bases cached (693 rows each) |
+| A14 ablation verdict | rolling-origin GBM | no exo feature adopted (honest null); weather train/serve study computed |
 | Track B tests | `node --test proactive-brain/*.spec.ts` | **21 passed** |
 | Typecheck | `tsc --noEmit` (proactive-brain + cards) | **0 errors** |
 | patch-v2 closure logic | `is_closed()` per venue | TRT True, Ellel/BH False |

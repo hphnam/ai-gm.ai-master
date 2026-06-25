@@ -22,8 +22,9 @@ DUCKDB_PATH = STORE_DIR / "brain.duckdb"
 MANIFEST_PATH = STORE_DIR / "manifest.json"
 FLAGS_PATH = BRAIN_DIR / "FLAGS.md"
 
-# Raw source CSVs. We read from brain/data (symlinked to repo root) if present,
-# otherwise fall back to the repo root copies so the pipeline runs either way.
+# Raw source files. They live in brain/data/ (the canonical location); the
+# repo-root fallback in _resolve is kept only for backwards compatibility with
+# older checkouts that still have the files at the root.
 _ITEMS_NAME = "items-2024-01-01-2026-06-01.csv"
 _CHAT_NAME = "Elliot's AI-GM Questions - Query result.csv"
 _CHECKLIST_NAME = "opening_and_closing_checklist.md"
@@ -184,6 +185,45 @@ VENUES_WITH_STOCK = ("beer_hall",)
 STOCK_A6_NODE_MAP: dict[tuple[str, str], str] = {
     ("lunebrew caravan of love", "Draught"): "Caravan of Love",
 }
+
+# --- Feature enrichment (A14) -----------------------------------------------
+# Venue -> shared weather grid cell. Beer Hall and Ellel are ~0.6 km apart, so
+# one Open-Meteo pull (cell="lancaster") serves both; TRT (closed, Preston-ish)
+# is a separate cell. NB FLAG-FE-TRTLOC: the supplied TRT coordinate sits ~13 km
+# north of Preston — confirm before trusting TRT weather/event attribution.
+WEATHER_CELLS = {
+    "beer_hall": "lancaster", "ellel": "lancaster", "two_river_taps": "trt_south",
+}
+WEATHER_CELL_COORDS = {
+    "lancaster": (53.9955, -2.7867), "trt_south": (53.8751, -2.7599),
+}
+WEATHER_DAILY_VARS = ("temperature_2m_max", "precipitation_sum", "sunshine_duration")
+# Training basis for the weather feature. The ablation sweeps all three; serving
+# is always on a forecast basis (reality). "observed" = ERA5 reanalysis (clean,
+# an upper bound only); "hindcast" = historical-forecast (matches serving);
+# "leadmatched" = forecast as issued WEATHER_LEAD_DAYS ahead.
+WEATHER_TRAIN_BASIS = "hindcast"          # {"observed","hindcast","leadmatched"}
+WEATHER_LEAD_DAYS = 3                      # operational reorder lead for leadmatched
+WEATHER_FORECAST_MAX_DAYS = 16            # live forecast horizon ceiling
+WEATHER_DRY_MM = 1.0                      # exo_is_dry threshold
+
+# Venue -> the event scope(s) it inherits. Lancaster anchors must never touch
+# TRT; Preston anchors must never touch BH/Ellel.
+EVENT_SCOPE = {
+    "beer_hall": ("lancaster",), "ellel": ("lancaster",), "two_river_taps": ("preston",),
+}
+# PredictHQ token is read from os.environ["PREDICTHQ_TOKEN"] at call time — never
+# stored or committed here. Absent -> the curated local_events table is used.
+
+PROPHET_USE_REGRESSORS = False
+# Columns the GBM rung may use once populated (the activated exogenous features).
+ENRICH_FEATURES = (
+    "exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs", "exo_is_dry",
+    "exo_is_school_term", "exo_is_uni_term", "exo_fixture_nearby",
+)
+# is_spike_day threshold (Σdiscounts / Σgross_sales). Retrospective only — never
+# a forward regressor (FLAG-FE9).
+SPIKE_DISCOUNT_SHARE = 0.95
 
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")

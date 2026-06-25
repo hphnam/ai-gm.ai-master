@@ -119,3 +119,37 @@ longer error). No code change was needed to recover the files.
   items into OTHER and generic sales items ("Lager - BH") span several keg brands.
   Unmapped lines carry NULL demand by design (no guessed attribution). Raising A6
   `--top-k` would resolve more lines; not done to keep A6's default behaviour.
+
+## Feature enrichment (A14 — spec FLAG register §10)
+
+- **FLAG-FE1 (weather basis).** Adopted training basis = `WEATHER_TRAIN_BASIS`
+  (`hindcast`), but weather is **not adopted as a model feature** (FLAG-FE10). The
+  train/serve study (signals/feature_ablation.md) shows the **lead-matched**
+  forecast basis predicts best under forecast serving (MASE 0.816), the ERA5
+  **observed/oracle basis is the worst** (0.969) — the train/serve shift is real.
+- **FLAG-FE2 (weather horizon).** Live forecast ≤16 d; weather applies to the
+  reorder horizon, not the full 8-week eval.
+- **FLAG-FE3 (shared grid cell).** Beer Hall and Ellel share `cell="lancaster"`
+  (one Open-Meteo pull serves both).
+- **FLAG-FE4 (calendar refresh).** Uni/school tables are static lookups in
+  `ingest/calendar_sources.py`; refresh each academic year. Coverage confirmed
+  from 2024-09; the data window (2025-06→2026-05) is fully covered.
+- **FLAG-FE5 (PredictHQ).** Not pursued — no `PREDICTHQ_TOKEN`; the curated
+  `local_events` table ships by default. Token via env only, never committed.
+- **FLAG-FE6/7/8 (operational out-of-scope).** Staffing (no labour data),
+  shrinkage (levels-not-flows, = stock FLAG-2), keg tap-date shelf-life (no flows).
+- **FLAG-FE9 (spike flag retrospective).** `is_spike_day` (≥0.95 discount share)
+  is in its own `spike_days` table, **never joined to the feature table** — it is
+  not a forward regressor. Forward hook: the empty `promo_calendar` table.
+- **FLAG-FE10 (no exo feature adopted — the honest result).** The A14 ablation
+  rejected **every** exogenous feature for the BH GBM: against the autoregressive
+  baseline (MASE 0.816) calendar flags hurt slightly (school −2%, uni −6%), weather
+  overfits (−20%), events are null. Cause: the 6-week operational test folds sit
+  inside one term, so calendar flags are near-constant there and add only an
+  overfitting split. The seam is **populated for attribution + the weather study**,
+  not adopted. Re-run the ablation on a longer horizon spanning term boundaries to
+  reconsider. Curated event anchors are also limited — the two biggest recurring
+  Lancaster festivals (Music Festival, Highest Point) **did not run in-window**.
+- **FLAG-FE-TRTLOC.** TRT stated to be in Preston but the supplied coordinate
+  (53.8751, −2.7599) sits ~13 km north (Galgate/Forton). TRT is closed, so this
+  affects historical weather/event attribution only — confirm before any live use.

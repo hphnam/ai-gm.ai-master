@@ -12,8 +12,8 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 | 2 | rung2_ets | 0.597 | 6 |  |
 | 2 | rung2_prophet | 0.709 | 6 |  |
 | 2 | rung2_stl | 0.829 | 6 |  |
-| 3 | rung3_gbm | 0.602 | 6 |  |
-| 3 | rung3_global_gbm | 0.792 | 6 |  |
+| 3 | rung3_gbm | 0.616 | 6 |  |
+| 3 | rung3_global_gbm | 0.813 | 6 |  |
 | 4 | rung4_foundation | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
@@ -26,8 +26,8 @@ Test 2026-03-14 → 2026-05-08 (n=56). A stress test over a long static horizon.
 | 2 | rung2_ets | 0.897 | 151.217 | 214.960 | 95.834 |  |
 | 2 | rung2_prophet | 0.823 | 138.742 | 191.510 | 92.725 |  |
 | 2 | rung2_stl | 0.676 | 113.900 | 164.213 | 47.562 |  |
-| 3 | rung3_gbm | 0.766 | 129.039 | 164.384 | 44.329 |  |
-| 3 | rung3_global_gbm | 1.242 | 209.371 | 267.800 | 139.282 |  |
+| 3 | rung3_gbm | 0.796 | 134.085 | 169.122 | 45.972 |  |
+| 3 | rung3_global_gbm | 1.094 | 184.297 | 244.589 | 103.323 |  |
 | 4 | rung4_foundation | – | – | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
 
 ## Milestone (rolling regime)

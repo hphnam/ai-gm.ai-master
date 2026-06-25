@@ -1,4 +1,4 @@
-"""A3 tests — features reconcile, are leak-free, and carry the empty seam."""
+"""A3 tests — features reconcile, are leak-free, and carry the activated seam."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import pytest
 
 from config import BH_NET_SALES_TOTAL, RECONCILE_TOL
 from features.build_features import (
+    _ADOPTED_EXO,
     EXO_COLUMNS,
     assert_no_leakage,
     build_features,
@@ -35,18 +36,24 @@ def test_no_future_leakage(feats):
     assert_no_leakage(feats)  # raises on leak
 
 
-def test_exogenous_seam_present_but_empty(feats):
+def test_exogenous_seam_present_and_populated(feats):
     for col in EXO_COLUMNS:
         assert col in feats.columns
-        assert feats[col].isna().all()
 
 
-def test_feature_columns_exclude_target_ids_and_seam(feats):
+def test_deterministic_calendar_seam_is_populated(feats):
+    for col in ("exo_is_school_term", "exo_is_uni_term"):
+        assert not feats[col].isna().any()
+
+
+def test_feature_columns_expose_adopted_exo_only(feats):
     cols = feature_columns(feats)
     assert "value" not in cols
     assert "date" not in cols
     assert "venue" not in cols
-    assert not any(c in cols for c in EXO_COLUMNS)
+    assert _ADOPTED_EXO <= set(cols)
+    # Non-adopted exo (everything, per the ablation verdict) stays out of the model.
+    assert not (set(EXO_COLUMNS) - _ADOPTED_EXO) & set(cols)
 
 
 def test_happy_hour_flag_is_wed_and_fri(feats):
