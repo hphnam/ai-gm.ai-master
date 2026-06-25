@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowUp, ImagePlus, Loader2, Mic, Square, X } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -14,27 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Recipient } from '@/lib/hooks/use-notifications'
 import { cn } from '@/lib/utils'
-import {
-  type ChipMention,
-  detectMentionTrigger,
-  insertMention,
-  MentionPicker,
-  pruneMissingMentions,
-  serializeMentions,
-} from './mention-picker'
-
-const VOICE_CONSENT_KEY = 'gm.voice.consent.v1'
+import { IMAGE_ALLOWED_MIME, useImageAttachment } from './composer/use-image-attachment'
+import { useMentionState } from './composer/use-mention-state'
+import { useVoiceInput } from './composer/use-voice-input'
+import { MentionPicker, serializeMentions } from './mention-picker'
 
 const ComposerSchema = z.object({
   // Allow empty when an image is attached; we add a stand-in question on send.
   userMessage: z.string().trim().max(8000, 'Message too long (max 8000 characters)'),
 })
 type ComposerInput = z.infer<typeof ComposerSchema>
-
-const IMAGE_ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-const IMAGE_MAX_BYTES = 10 * 1024 * 1024
 
 type Props = {
   onSubmit: (userMessage: string) => Promise<void>
@@ -50,21 +40,6 @@ type Props = {
   disabled?: boolean
   disabledReason?: string
 }
-
-// Web Speech API typing — DOM lib doesn't expose SpeechRecognition globally
-// in every TS setup, so we declare just what we need.
-type SpeechRecognitionLike = EventTarget & {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  abort: () => void
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
-  onerror: ((event: { error: string }) => void) | null
-  onend: (() => void) | null
-}
-type SpeechRecognitionCtor = new () => SpeechRecognitionLike
 
 export function ChatComposer({
   onSubmit,
@@ -89,216 +64,37 @@ export function ChatComposer({
   })
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [attachedImage, setAttachedImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'unsupported'>('idle')
-  const [voiceConsentOpen, setVoiceConsentOpen] = useState(false)
-  const [voiceConsentGranted, setVoiceConsentGranted] = useState(false)
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
-  const transcriptBaseRef = useRef('')
 
-  // Read prior consent on mount. Stored locally per browser/device, not synced
-  // server-side — this is a one-time UX nudge, not auth.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      setVoiceConsentGranted(window.localStorage.getItem(VOICE_CONSENT_KEY) === 'granted')
-    } catch {
-      // localStorage blocked (private mode) — treat as un-granted; user will be re-asked.
-    }
-  }, [])
   const { ref: formRef, onBlur: rhfOnBlur, ...rest } = register('userMessage')
   const value = watch('userMessage')
 
-  // @-mention picker — opens whenever the caret sits inside an active "@..."
-  // fragment in the textarea. Trigger detection runs on every keystroke + on
-  // every selection change; the picker reads the same `mentionQuery` to
-  // render itself. The recipientsList query is enabled lazily by the picker
-  // so we don't fan out a fetch until someone actually types '@'.
-  const [mentionState, setMentionState] = useState<{
-    query: string
-    triggerStart: number
-  } | null>(null)
-  // Picker-inserted chips. Visible text holds `@Name`; we keep the userId
-  // mapping here and reattach it at submit time via serializeMentions. A
-  // value-change effect drops entries whose `@Name` no longer appears in the
-  // text (user backspaced the chip) so this list never grows unbounded.
-  const [chipMentions, setChipMentions] = useState<ChipMention[]>([])
-  const recomputeMention = useCallback(() => {
-    const el = textareaRef.current
-    if (!el) {
-      setMentionState(null)
-      return
-    }
-    const caret = el.selectionStart ?? 0
-    const trigger = detectMentionTrigger(el.value, caret)
-    setMentionState(trigger)
-  }, [])
-  const onMentionPick = useCallback(
-    (member: Recipient) => {
-      const el = textareaRef.current
-      if (!el || !mentionState) return
-      const caret = el.selectionStart ?? mentionState.triggerStart
-      const {
-        value: nextValue,
-        nextCaret,
-        mention,
-      } = insertMention(el.value, mentionState.triggerStart, caret, member)
-      setValue('userMessage', nextValue, { shouldDirty: true })
-      setChipMentions((prev) => [...prev, mention])
-      setMentionState(null)
-      // Restore caret position on the next frame — RHF's controlled-ish flow
-      // re-renders the textarea, so we can't set selection synchronously.
-      requestAnimationFrame(() => {
-        const elNow = textareaRef.current
-        if (!elNow) return
-        elNow.focus()
-        elNow.setSelectionRange(nextCaret, nextCaret)
-      })
-    },
-    [mentionState, setValue],
-  )
-  // Cover the voice-transcription path: `setValue` doesn't fire DOM input
-  // events, so onInput-driven recomputeMention never sees voice-dictated
-  // "@...". Re-run trigger detection whenever the watched form value
-  // changes — picks up programmatic setValue calls from anywhere. Same
-  // effect prunes the chipMentions list so stale entries (user deleted the
-  // chip) don't leak userIds at submit time.
-  useEffect(() => {
-    recomputeMention()
-    setChipMentions((prev) => {
-      const pruned = pruneMissingMentions(value ?? '', prev)
-      return pruned.length === prev.length ? prev : pruned
-    })
-  }, [value, recomputeMention])
+  const {
+    fileInputRef,
+    attachedImage,
+    setAttachedImage,
+    imagePreview,
+    handlePickImage,
+    handleFileChange,
+    clearImage,
+  } = useImageAttachment()
 
-  // Detect Web Speech API support once on mount. SSR-safe: window is gated.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const Ctor =
-      (window as unknown as { SpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition ??
-      (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor })
-        .webkitSpeechRecognition
-    if (!Ctor) {
-      setVoiceState('unsupported')
-      return
-    }
-    const rec = new Ctor()
-    rec.continuous = false
-    rec.interimResults = true
-    rec.lang = typeof navigator !== 'undefined' ? navigator.language || 'en-GB' : 'en-GB'
-    rec.onresult = (event) => {
-      let transcript = ''
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0]?.transcript ?? ''
-      }
-      const combined = `${transcriptBaseRef.current}${transcript}`.trimStart()
-      setValue('userMessage', combined, { shouldDirty: true })
-    }
-    rec.onerror = (event) => {
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        toast.error('Microphone permission denied')
-      } else if (event.error === 'no-speech') {
-        // benign — user didn't speak; quietly end
-      } else {
-        toast.error(`Voice input error (${event.error})`)
-      }
-      setVoiceState('idle')
-    }
-    rec.onend = () => setVoiceState('idle')
-    recognitionRef.current = rec
-    return () => {
-      try {
-        rec.abort()
-      } catch {
-        // ignore abort errors on teardown
-      }
-      recognitionRef.current = null
-    }
-  }, [setValue])
+  const {
+    mentionState,
+    setMentionState,
+    chipMentions,
+    setChipMentions,
+    recomputeMention,
+    onMentionPick,
+  } = useMentionState({ value, setValue, textareaRef })
 
-  const startListening = useCallback(() => {
-    const rec = recognitionRef.current
-    if (!rec) return
-    transcriptBaseRef.current = value ? `${value.trimEnd()} ` : ''
-    try {
-      rec.start()
-      setVoiceState('listening')
-    } catch {
-      try {
-        rec.abort()
-      } catch {
-        // best-effort
-      }
-      setVoiceState('idle')
-    }
-  }, [value])
-
-  const grantConsent = useCallback(() => {
-    try {
-      window.localStorage.setItem(VOICE_CONSENT_KEY, 'granted')
-    } catch {
-      // best-effort persistence
-    }
-    setVoiceConsentGranted(true)
-    setVoiceConsentOpen(false)
-    startListening()
-  }, [startListening])
-
-  const toggleVoice = useCallback(() => {
-    const rec = recognitionRef.current
-    if (!rec) return
-    if (voiceState === 'listening') {
-      rec.stop()
-      setVoiceState('idle')
-      return
-    }
-    if (!voiceConsentGranted) {
-      setVoiceConsentOpen(true)
-      return
-    }
-    startListening()
-  }, [voiceState, voiceConsentGranted, startListening])
-
-  // Stop listening if the parent disables the composer (venue switch,
-  // conversation flip to read-only, etc.) or while a turn is in flight.
-  // Without this the mic keeps recording into a textarea the user can no
-  // longer send from.
-  useEffect(() => {
-    if ((disabled || isPending) && voiceState === 'listening') {
-      recognitionRef.current?.stop()
-    }
-  }, [disabled, isPending, voiceState])
-
-  useEffect(() => {
-    if (!attachedImage) {
-      setImagePreview(null)
-      return
-    }
-    const url = URL.createObjectURL(attachedImage)
-    setImagePreview(url)
-    return () => URL.revokeObjectURL(url)
-  }, [attachedImage])
-
-  const handlePickImage = () => fileInputRef.current?.click()
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    if (!IMAGE_ALLOWED_MIME.includes(file.type)) {
-      toast.error('Image must be JPEG, PNG, WebP or GIF')
-      return
-    }
-    if (file.size > IMAGE_MAX_BYTES) {
-      toast.error('Image too large (max 10MB)')
-      return
-    }
-    setAttachedImage(file)
-  }
-
-  const clearImage = () => setAttachedImage(null)
+  const {
+    voiceSupported,
+    voiceListening,
+    voiceConsentOpen,
+    setVoiceConsentOpen,
+    toggleVoice,
+    grantConsent,
+  } = useVoiceInput({ value, setValue, disabled, isPending })
 
   useEffect(() => {
     if (initialValue) setValue('userMessage', initialValue)
@@ -360,8 +156,6 @@ export function ChatComposer({
   const hasImage = !!attachedImage
   const canSend = !isPending && !disabled && (hasText || hasImage)
   const canStop = isPending && typeof onStop === 'function'
-  const voiceSupported = voiceState !== 'unsupported'
-  const voiceListening = voiceState === 'listening'
   // Lock the textarea while voice is active — without it, anything the user
   // types is silently overwritten on the next interim-result tick because
   // transcriptBaseRef was snapshotted when listening started.

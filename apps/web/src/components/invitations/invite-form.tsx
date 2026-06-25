@@ -31,10 +31,12 @@ export function InviteForm() {
   })
 
   const onSubmit = form.handleSubmit(async (values) => {
-    await mutation.mutateAsync(values).catch(() => {
+    try {
+      await mutation.mutateAsync(values)
+      form.reset({ email: '', role: 'staff' })
+    } catch {
       /* onError toast handles user feedback */
-    })
-    if (!mutation.isError) form.reset({ email: '', role: 'staff' })
+    }
   })
 
   return (

@@ -1,8 +1,13 @@
 'use client'
 
 import type { UIMessage } from 'ai'
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { ChatMessage } from './chat-message'
+
+// Settled messages keep a stable `message` reference across streaming deltas
+// (useChat only replaces the in-flight message object), so a shallow-prop memo
+// lets every prior bubble skip the ReactMarkdown re-parse on each token.
+const MemoChatMessage = memo(ChatMessage)
 
 export type VerifyEntry = {
   status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
@@ -36,9 +41,13 @@ export function ChatThread({
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  // Key on message COUNT, not the array identity — the array gets a fresh
+  // reference on every streaming token, which would fire a smooth-scroll per
+  // delta (scroll thrash). Counting scrolls once per new message; `status`
+  // keeps the scroll when the pending-assistant indicator appears.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, status])
+  }, [messages.length, status])
 
   const isPendingAssistant = status === 'submitted'
   const isStreaming = status === 'streaming'
@@ -51,6 +60,11 @@ export function ChatThread({
     return -1
   })()
 
+  // Resolve once so every row passes the same function reference — recomputing
+  // `onPrompt ?? onFollowUpSelect` inline per row would still be stable, but
+  // hoisting keeps the memo contract obvious.
+  const promptHandler = onPrompt ?? onFollowUpSelect
+
   return (
     <ol
       role="log"
@@ -61,7 +75,7 @@ export function ChatThread({
     >
       {messages.map((m, i) => (
         <li key={m.id}>
-          <ChatMessage
+          <MemoChatMessage
             message={m}
             isStreaming={isStreaming && i === messages.length - 1}
             onFollowUpSelect={onFollowUpSelect}
@@ -69,7 +83,7 @@ export function ChatThread({
             onRegenerate={i === lastAssistantIdx ? onRegenerate : undefined}
             initialFeedback={feedbackByMessageId?.[m.id] ?? null}
             verify={verifyByMessageId?.[m.id] ?? null}
-            onPrompt={onPrompt ?? onFollowUpSelect}
+            onPrompt={promptHandler}
             venueId={venueId}
           />
         </li>

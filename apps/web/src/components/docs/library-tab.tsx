@@ -100,7 +100,7 @@ export function LibraryTab() {
     )
     observer.observe(node)
     return () => observer.disconnect()
-  }, [docs.hasNextPage, docs.isFetchingNextPage, docs.fetchNextPage, docs])
+  }, [docs.hasNextPage, docs.isFetchingNextPage, docs.fetchNextPage])
 
   function clearFilters() {
     void setQuery('')

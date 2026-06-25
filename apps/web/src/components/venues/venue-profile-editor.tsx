@@ -1,7 +1,6 @@
 'use client'
 
 import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -84,10 +83,9 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
     mode: 'onChange',
   })
 
-  // Reset when venue changes (selector switch).
-  useEffect(() => {
-    form.reset(profileToForm(venue.profile))
-  }, [venue.id, venue.profile, form])
+  // Venue switches remount this component via `key` in VenueProfilesBody, so the form
+  // re-initialises from defaultValues — no reset effect needed (it would also clobber
+  // in-progress edits on background refetch).
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {

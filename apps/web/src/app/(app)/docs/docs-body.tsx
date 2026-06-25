@@ -1,7 +1,7 @@
 'use client'
 
 import { Inbox, Library, MessageCircleQuestion, Upload } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { KnowledgeEmptyState } from '@/components/docs/empty-state'
 import { InboxTab, useInboxCount } from '@/components/docs/inbox-tab'
 import { LibraryTab } from '@/components/docs/library-tab'
@@ -11,7 +11,7 @@ import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Button } from '@/components/ui/button'
 import { type TabItem, TabPanel, Tabs } from '@/components/ui/tabs'
-import { useDocs } from '@/lib/hooks/use-docs'
+import { useDocsTotal } from '@/lib/hooks/use-docs'
 
 export type DocsTab = 'library' | 'inbox' | 'questions'
 
@@ -24,16 +24,39 @@ const TAB_HREF: Record<DocsTab, string> = {
 }
 
 export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
-  // First-page peek to drive the "no docs at all" empty state. Filters stay
-  // at defaults so `total` reflects the whole org's library, not the
-  // currently-filtered view (the Library tab handles that itself).
-  const docs = useDocs()
+  // Drives the "no docs at all" empty state. Reuses the Library tab's
+  // default-filter list query (shared cache key) and selects just the total,
+  // so this reflects the whole org's library without a second request.
+  const docsTotal = useDocsTotal()
   const inboxCount = useInboxCount()
   const questionsCount = useQuestionsCount()
   const [uploadOpen, setUploadOpen] = useState(false)
 
-  const totalDocs = docs.data?.pages[0]?.total ?? 0
-  const showFullEmpty = !docs.isLoading && totalDocs === 0
+  const totalDocs = docsTotal.data ?? 0
+  const showFullEmpty = !docsTotal.isLoading && totalDocs === 0
+
+  const tabItems = useMemo<TabItem<DocsTab>[]>(
+    () => [
+      { id: 'library', label: 'Library', icon: Library, href: TAB_HREF.library },
+      {
+        id: 'inbox',
+        label: 'Inbox',
+        icon: Inbox,
+        count: inboxCount,
+        urgent: inboxCount > 0,
+        href: TAB_HREF.inbox,
+      },
+      {
+        id: 'questions',
+        label: 'Questions',
+        icon: MessageCircleQuestion,
+        count: questionsCount,
+        urgent: questionsCount > 0,
+        href: TAB_HREF.questions,
+      },
+    ],
+    [inboxCount, questionsCount],
+  )
 
   return (
     <AppShell>
@@ -54,32 +77,7 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
             <KnowledgeEmptyState onUploadClick={() => setUploadOpen(true)} />
           ) : (
             <>
-              <Tabs
-                items={
-                  [
-                    { id: 'library', label: 'Library', icon: Library, href: TAB_HREF.library },
-                    {
-                      id: 'inbox',
-                      label: 'Inbox',
-                      icon: Inbox,
-                      count: inboxCount,
-                      urgent: inboxCount > 0,
-                      href: TAB_HREF.inbox,
-                    },
-                    {
-                      id: 'questions',
-                      label: 'Questions',
-                      icon: MessageCircleQuestion,
-                      count: questionsCount,
-                      urgent: questionsCount > 0,
-                      href: TAB_HREF.questions,
-                    },
-                  ] as TabItem<DocsTab>[]
-                }
-                value={tab}
-                ariaLabel="Knowledge sections"
-                hasPanels
-              />
+              <Tabs items={tabItems} value={tab} ariaLabel="Knowledge sections" hasPanels />
 
               {TABS.map((id) => (
                 <TabPanel key={id} id={id} active={tab === id}>

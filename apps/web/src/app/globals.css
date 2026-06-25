@@ -164,7 +164,9 @@
   }
   html,
   body {
-    @apply h-dvh;
+    /* min, not fixed: the app surface sets its own h-dvh on the shell, while
+     * the marketing pages need to grow past the viewport and scroll. */
+    @apply min-h-dvh;
   }
   body {
     @apply bg-background text-foreground antialiased;

@@ -5,11 +5,11 @@ import { getServerVenues } from './server-venues'
 /// Shared server-side gate for the authenticated app surface. Called once by
 /// the `(app)/layout.tsx` route-group layout, not per page.
 ///
-/// Middleware (apps/web/src/middleware.ts) does the instant cookie-only
-/// check at the edge — if no session cookie is present the request never
-/// reaches this layout. So this function only handles two cases:
+/// The proxy (apps/web/src/proxy.ts) does the instant cookie-only check at
+/// the edge — if no session cookie is present the request never reaches this
+/// layout. So this function only handles two cases:
 /// - Session cookie present but no valid session on the API → punt to
-///   sign-in. (Cookie was stale; middleware can't tell.)
+///   sign-in. (Cookie was stale; the proxy can't tell.)
 /// - Session valid but zero venues → punt to /welcome so onboarding can run.
 ///
 /// On a transient venue-fetch failure (null), we let the page render and let

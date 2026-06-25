@@ -1,6 +1,9 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -31,55 +34,70 @@ type Props = {
   onOpenChange: (open: boolean) => void
 }
 
+const FormSchema = z.object({
+  title: z.string().trim().min(2),
+  category: z.enum(COMPLIANCE_CATEGORIES),
+  // Native date input gives "YYYY-MM-DD" — we widen to ISO before submit.
+  expiresAt: z.string().min(1),
+  venueId: z.string(),
+  personName: z.string(),
+  assetName: z.string(),
+  renewalCost: z.string(),
+})
+
+type FormValues = z.infer<typeof FormSchema>
+
+const DEFAULT_VALUES: FormValues = {
+  title: '',
+  category: 'food_hygiene',
+  expiresAt: '',
+  venueId: '',
+  personName: '',
+  assetName: '',
+  renewalCost: '',
+}
+
 export function AddExpiryDialog({ open, onOpenChange }: Props) {
   const venues = useVenues()
   const create = useCreateExpiryRecord()
-  const [title, setTitle] = useState('')
-  const [category, setCategory] = useState<ComplianceCategory>('food_hygiene')
-  // Native date input gives "YYYY-MM-DD" — we widen to ISO before submit.
-  const [expiresAt, setExpiresAt] = useState('')
-  const [venueId, setVenueId] = useState<string>('')
-  const [personName, setPersonName] = useState('')
-  const [assetName, setAssetName] = useState('')
-  const [renewalCost, setRenewalCost] = useState('')
   const [error, setError] = useState<string | null>(null)
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: DEFAULT_VALUES,
+  })
+
+  const title = form.watch('title')
+  const expiresAt = form.watch('expiresAt')
   const canSubmit = title.trim().length >= 2 && !!expiresAt && !create.isPending
 
   const reset = () => {
-    setTitle('')
-    setCategory('food_hygiene')
-    setExpiresAt('')
-    setVenueId('')
-    setPersonName('')
-    setAssetName('')
-    setRenewalCost('')
+    form.reset(DEFAULT_VALUES)
     setError(null)
   }
 
-  const onSubmit = async () => {
-    if (!canSubmit) return
+  const onSubmit = form.handleSubmit(async (values) => {
     setError(null)
     try {
       // Date input is timezone-naive; treat it as end-of-day in the user's
       // local zone so a Friday cert doesn't trigger reminders one day early
       // in UTC-+1 zones. ISO string keeps the server contract simple.
-      const iso = new Date(`${expiresAt}T23:59:00`).toISOString()
+      const iso = new Date(`${values.expiresAt}T23:59:00`).toISOString()
       await create.mutateAsync({
-        title: title.trim(),
-        category,
+        title: values.title.trim(),
+        category: values.category,
         expiresAt: iso,
-        venueId: venueId || null,
-        personName: personName.trim() || null,
-        assetName: assetName.trim() || null,
-        renewalCostGbp: renewalCost ? Number(renewalCost) : null,
+        venueId: values.venueId || null,
+        personName: values.personName.trim() || null,
+        assetName: values.assetName.trim() || null,
+        renewalCostGbp: values.renewalCost ? Number(values.renewalCost) : null,
       })
       reset()
       onOpenChange(false)
     } catch (err) {
       setError((err as Error)?.message ?? 'Failed to add expiry record')
     }
-  }
+  })
 
   return (
     <Dialog
@@ -93,115 +111,150 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle>Add expiry</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-3 pt-2">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="exp-title">What expires?</Label>
-            <Input
-              id="exp-title"
-              placeholder="e.g. Food Hygiene Certificate — Sarah Brown"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
+        <Form {...form}>
+          <form onSubmit={onSubmit} className="flex flex-col gap-3 pt-2" noValidate>
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-1.5 space-y-0">
+                  <FormLabel>What expires?</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="e.g. Food Hygiene Certificate — Sarah Brown"
+                      maxLength={200}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-category">Category</Label>
-              <Select value={category} onValueChange={(v) => setCategory(v as ComplianceCategory)}>
-                <SelectTrigger id="exp-category">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {COMPLIANCE_CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {CATEGORY_LABELS[c]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-date">Expires on</Label>
-              <Input
-                id="exp-date"
-                type="date"
-                value={expiresAt}
-                onChange={(e) => setExpiresAt(e.target.value)}
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={(v) => field.onChange(v as ComplianceCategory)}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {COMPLIANCE_CATEGORIES.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {CATEGORY_LABELS[c]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-venue">Venue (optional)</Label>
-              <Select value={venueId} onValueChange={setVenueId}>
-                <SelectTrigger id="exp-venue">
-                  <SelectValue placeholder="All venues" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(venues.data ?? []).map((v) => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-cost">Renewal cost (£, optional)</Label>
-              <Input
-                id="exp-cost"
-                type="number"
-                min={0}
-                step={1}
-                placeholder="0"
-                value={renewalCost}
-                onChange={(e) => setRenewalCost(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-person">Person (optional)</Label>
-              <Input
-                id="exp-person"
-                placeholder="e.g. Sarah Brown"
-                value={personName}
-                onChange={(e) => setPersonName(e.target.value)}
-                maxLength={120}
+              <FormField
+                control={form.control}
+                name="expiresAt"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Expires on</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="exp-asset">Asset (optional)</Label>
-              <Input
-                id="exp-asset"
-                placeholder="e.g. Beer line"
-                value={assetName}
-                onChange={(e) => setAssetName(e.target.value)}
-                maxLength={120}
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="venueId"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Venue (optional)</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="All venues" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {(venues.data ?? []).map((v) => (
+                          <SelectItem key={v.id} value={v.id}>
+                            {v.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="renewalCost"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Renewal cost (£, optional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="number" min={0} step={1} placeholder="0" />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          {error ? (
-            <p className="text-xs text-red-700" role="alert">
-              {error}
-            </p>
-          ) : null}
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={onSubmit} disabled={!canSubmit}>
-            {create.isPending ? 'Saving…' : 'Add expiry'}
-          </Button>
-        </DialogFooter>
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="personName"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Person (optional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g. Sarah Brown" maxLength={120} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="assetName"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1.5 space-y-0">
+                    <FormLabel>Asset (optional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g. Beer line" maxLength={120} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {error ? (
+              <p className="text-xs text-red-700" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!canSubmit}>
+                {create.isPending ? 'Saving…' : 'Add expiry'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

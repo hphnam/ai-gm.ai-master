@@ -6,7 +6,7 @@ import { DefaultChatTransport, type UIMessage } from 'ai'
 import { ArrowRight, Check, Link2, Loader2, Lock, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
@@ -23,13 +23,14 @@ import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
 import { useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
-import type { ConvListItem } from '@/lib/hooks/use-conversations-list'
 import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
 import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
 import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
+import { useChatSubmit } from './use-chat-submit'
+import { useOptimisticThreads } from './use-optimistic-threads'
 
 type GmUIMessage = UIMessage
 
@@ -98,49 +99,6 @@ function ChatSkeleton() {
       Loading…
     </div>
   )
-}
-
-// The conversations list lives in an infinite-query cache keyed by
-// ['chat-conversations', venueKey, { q, limit }] — there can be several
-// active entries (sidebar default, history page search, etc.). Both
-// optimistic helpers mutate every matching entry so the new/updated thread
-// appears immediately regardless of which surface is mounted.
-type ConvListInfinite = {
-  pages: Array<{ items: ConvListItem[]; nextCursor: string | null }>
-  pageParams: unknown[]
-}
-
-function listContains(data: ConvListInfinite | undefined, id: string): boolean {
-  return data?.pages.some((p) => p.items.some((it) => it.id === id)) ?? false
-}
-
-function prependOptimisticThread(qc: RqClient, entry: ConvListItem) {
-  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
-    if (!prev) return prev
-    if (listContains(prev, entry.id)) return prev
-    const [first, ...rest] = prev.pages
-    const head = first ?? { items: [], nextCursor: null }
-    return {
-      ...prev,
-      pages: [{ ...head, items: [entry, ...head.items] }, ...rest],
-    }
-  })
-}
-
-function bumpOptimisticThread(qc: RqClient, conversationId: string, preview: string) {
-  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
-    if (!prev) return prev
-    const now = new Date().toISOString()
-    return {
-      ...prev,
-      pages: prev.pages.map((p) => ({
-        ...p,
-        items: p.items.map((c) =>
-          c.id === conversationId ? { ...c, preview, lastMessageAt: now } : c,
-        ),
-      })),
-    }
-  })
 }
 
 function ChatInner() {
@@ -368,123 +326,16 @@ function ChatCore({
     },
   })
 
-  const submit = useCallback(
-    async (text: string) => {
-      const venue = venueIdRef.current
-      const conv = convIdRef.current
-      if (!venue) {
-        toast.error('Pick a venue for this chat first.')
-        return
-      }
-      if (!conv) {
-        toast.error('No conversation is open — try again.')
-        return
-      }
-
-      // 1. Show the user's message on the very next paint.
-      setPendingUserTexts((prev) => [...prev, text])
-
-      // 2. Sidebar: first message → prepend a new row at the conv UUID (server
-      //    will upsert with the same id). Subsequent messages → bump + preview.
-      //    The infinite-query cache may have multiple entries (different q/limit
-      //    on the history page) — checking just one is enough to decide
-      //    prepend-vs-bump because either branch fans out to all matching
-      //    entries via setQueriesData.
-      const lists = queryClient.getQueriesData<ConvListInfinite>({
-        queryKey: ['chat-conversations', '__all__'],
-      })
-      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
-      const preview = text.length > 80 ? `${text.slice(0, 79)}…` : text
-      if (!existsInSidebar) {
-        const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
-        prependOptimisticThread(queryClient, {
-          id: conv,
-          venueId: venue,
-          venueName,
-          lastMessageAt: new Date().toISOString(),
-          preview,
-        })
-      } else {
-        bumpOptimisticThread(queryClient, conv, preview)
-      }
-
-      // 3. Fire proactive suggestions in parallel with the send.
-      turnSuggestions
-        .mutateAsync({
-          venueId: venue,
-          userMessage: text,
-          conversationId: conv,
-        })
-        .catch(() => undefined)
-
-      // 4. Stream.
-      await sendMessage({ text })
-    },
-    [sendMessage, turnSuggestions, queryClient, venues],
-  )
-
-  // Phase G1 — image-attached send. Bypasses useChat (which doesn't support
-  // multipart) and POSTs to /chat/messages/with-image, then invalidates the
-  // conversation query so the new turn appears.
-  const submitWithImage = useCallback(
-    async (text: string, file: File) => {
-      const venue = venueIdRef.current
-      const conv = convIdRef.current
-      if (!venue) {
-        toast.error('Pick a venue for this chat first.')
-        return
-      }
-      if (!conv) {
-        toast.error('No conversation is open — try again.')
-        return
-      }
-      const previewText = text.trim().length > 0 ? text : '[image attached]'
-      setPendingUserTexts((prev) => [...prev, previewText])
-
-      const lists = queryClient.getQueriesData<ConvListInfinite>({
-        queryKey: ['chat-conversations', '__all__'],
-      })
-      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
-      const preview = previewText.length > 80 ? `${previewText.slice(0, 79)}…` : previewText
-      if (!existsInSidebar) {
-        const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
-        prependOptimisticThread(queryClient, {
-          id: conv,
-          venueId: venue,
-          venueName,
-          lastMessageAt: new Date().toISOString(),
-          preview,
-        })
-      } else {
-        bumpOptimisticThread(queryClient, conv, preview)
-      }
-
-      try {
-        const form = new FormData()
-        form.append('image', file)
-        form.append('venueId', venue)
-        form.append('userMessage', text)
-        form.append('conversationId', conv)
-        const res = await fetch(`${API_URL}/chat/messages/with-image`, {
-          method: 'POST',
-          credentials: 'include',
-          body: form,
-        })
-        if (!res.ok) {
-          const text = await res.text()
-          throw new Error(text || `HTTP ${res.status}`)
-        }
-        await queryClient.invalidateQueries({
-          queryKey: ['conversation', conv, venue],
-        })
-        await queryClient.invalidateQueries({ queryKey: ['chat-conversations'] })
-      } catch (err) {
-        toast.error(mapApiError(err))
-        setPendingUserTexts((prev) => prev.filter((t) => t !== previewText))
-      }
-    },
-    [queryClient, venues],
-  )
+  const recordOptimisticThread = useOptimisticThreads(queryClient, venues)
+  const { submit, submitWithImage } = useChatSubmit({
+    venueIdRef,
+    convIdRef,
+    setPendingUserTexts,
+    recordOptimisticThread,
+    turnSuggestions,
+    sendMessage,
+    queryClient,
+  })
 
   const lastAssistantFollowUps = useMemo<string[]>(() => {
     if (!historyMessages) return []

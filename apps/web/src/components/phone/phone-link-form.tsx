@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import {
@@ -38,13 +38,17 @@ export function PhoneLinkForm() {
   const sendMutation = useSendPhoneCode()
   const verifyMutation = useVerifyPhoneCode()
 
-  // Re-render every second while on the code step so the resend link enables after cooldown.
-  if (step.kind === 'enter-code') {
-    const remainingMs = step.lastSentAt + RESEND_COOLDOWN_MS - now
-    if (remainingMs > 0) {
-      setTimeout(() => setNow(Date.now()), 500)
-    }
-  }
+  // Tick once a second while the resend cooldown runs so the link re-enables. A single
+  // interval per cooldown window, cleared on unmount and once the cooldown has elapsed.
+  useEffect(() => {
+    if (step.kind !== 'enter-code') return
+    const endsAt = step.lastSentAt + RESEND_COOLDOWN_MS
+    const id = setInterval(() => {
+      setNow(Date.now())
+      if (Date.now() >= endsAt) clearInterval(id)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [step])
 
   const numberForm = useForm<SendPhoneCodeBody>({
     resolver: zodResolver(SendPhoneCodeBodySchema),
@@ -58,6 +62,7 @@ export function PhoneLinkForm() {
   const onSendSubmit = numberForm.handleSubmit(async (values) => {
     try {
       await sendMutation.mutateAsync(values)
+      setNow(Date.now())
       setStep({
         kind: 'enter-code',
         phoneNumber: values.phoneNumber,

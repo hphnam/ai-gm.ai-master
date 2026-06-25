@@ -96,6 +96,24 @@ export function useDocs(filters?: DocsFilters) {
   })
 }
 
+// Lightweight subscriber to the unfiltered library total, used to gate the
+// "no docs at all" empty state. Shares the default-filter query key with the
+// Library tab's list, so it dedupes onto the same cache entry instead of
+// firing a second request; `select` keeps this from re-rendering as more
+// pages stream in.
+export function useDocsTotal() {
+  const norm = normaliseFilters(undefined)
+  return useInfiniteQuery<DocListPage, Error, number, readonly unknown[], string | null>({
+    queryKey: ['docs', 'list', norm] as const,
+    queryFn: ({ signal, pageParam }) =>
+      apiFetch<DocListPage>(`/docs${buildDocsQs(norm, pageParam ?? null)}`, { signal }),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
+    staleTime: 30_000,
+    select: (data) => data.pages[0]?.total ?? 0,
+  })
+}
+
 // Inbox: small flat list of attention-needed rows. Not paginated — capped
 // server-side. Used by the Inbox tab + the inbox count badge.
 export function useInbox() {

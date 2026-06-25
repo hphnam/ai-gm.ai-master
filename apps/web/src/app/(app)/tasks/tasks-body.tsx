@@ -1,6 +1,7 @@
 'use client'
 
 import { Check, CircleAlert, Inbox } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
@@ -14,6 +15,8 @@ import { cn } from '@/lib/utils'
 
 type Filter = 'open' | 'done' | 'all'
 
+const FILTER_VALUES = ['open', 'done', 'all'] as const
+
 const FILTERS: TabItem<Filter>[] = [
   { id: 'open', label: 'Open' },
   { id: 'done', label: 'Done' },
@@ -21,7 +24,10 @@ const FILTERS: TabItem<Filter>[] = [
 ]
 
 export function TasksBody() {
-  const [filter, setFilter] = useState<Filter>('open')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('open').withOptions({ clearOnDefault: true }),
+  )
   // Realtime invalidation — agent/scheduler updates push through here and
   // refresh both the list and the sidebar badge without a page reload.
   useTasksSocket()

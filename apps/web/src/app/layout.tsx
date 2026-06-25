@@ -4,6 +4,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { SITE_NAME, SITE_URL } from '@/lib/seo'
 import './globals.css'
 
 // Single-font system. Geist Sans handles UI, body, and display sizes; weight
@@ -17,8 +18,13 @@ const geist = Geist({
 })
 
 export const metadata: Metadata = {
-  title: 'GM AI',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'gm-ai — AI operator for brewpub & beerhall managers',
+    template: `%s · ${SITE_NAME}`,
+  },
   description: 'General Manager AI for hospitality operations',
+  applicationName: SITE_NAME,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -17,11 +17,17 @@ export default async function WelcomePage({
 }: {
   searchParams: Promise<SearchParams>
 }) {
-  const session = await getServerSession()
+  // Session and venues are independent cookie-based fetches — run them
+  // together rather than as a waterfall. getServerVenues returns null on a
+  // missing session, so fetching it before the redirect check is harmless.
+  const [session, venuesResult, params] = await Promise.all([
+    getServerSession(),
+    getServerVenues(),
+    searchParams,
+  ])
   if (!session) redirect('/auth/sign-in?redirect=/welcome')
 
-  const params = await searchParams
-  const venues = (await getServerVenues()) ?? []
+  const venues = venuesResult ?? []
   const requestedStep: OnboardingStepId = isStepId(params.step) ? params.step : 'basics'
 
   // Returning users with venues land here only when they explicitly continue

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { Suspense, useCallback } from 'react'
 import { OnboardingShell } from './onboarding-shell'
 import { ProgressHeader } from './progress-header'
 import { StepBasics } from './step-basics'
@@ -17,7 +17,17 @@ type Props = {
   userName: string | null
 }
 
-export function WelcomeBody({ initialStep, venueId, userName }: Props) {
+export function WelcomeBody(props: Props) {
+  // Suspense boundary so useSearchParams() doesn't force a client-side render
+  // bailout independent of the page's force-dynamic flag.
+  return (
+    <Suspense fallback={<OnboardingShell header={null}>{null}</OnboardingShell>}>
+      <WelcomeBodyInner {...props} />
+    </Suspense>
+  )
+}
+
+function WelcomeBodyInner({ initialStep, venueId, userName }: Props) {
   const router = useRouter()
   const params = useSearchParams()
   const step = (params.get('step') as OnboardingStepId | null) ?? initialStep

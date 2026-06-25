@@ -1,6 +1,7 @@
 'use client'
 
 import { CircleAlert, FileText, Plus, ShieldCheck } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
@@ -22,6 +23,8 @@ import { AddExpiryDialog } from './add-expiry-dialog'
 
 type Filter = 'active' | 'all' | 'dismissed'
 
+const FILTER_VALUES = ['active', 'all', 'dismissed'] as const
+
 const FILTERS: TabItem<Filter>[] = [
   { id: 'active', label: 'Active' },
   { id: 'all', label: 'All' },
@@ -29,7 +32,10 @@ const FILTERS: TabItem<Filter>[] = [
 ]
 
 export function ComplianceBody() {
-  const [filter, setFilter] = useState<Filter>('active')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('active').withOptions({ clearOnDefault: true }),
+  )
   const [addOpen, setAddOpen] = useState(false)
   useComplianceSocket()
   const records = useExpiryRecords({ status: filter === 'all' ? 'all' : filter })

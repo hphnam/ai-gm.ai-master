@@ -13,7 +13,8 @@ import {
   StickyNote,
   Users,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import { SearchOutcomesChart } from '@/components/dashboard/charts/search-outcomes-chart'
 import { WauChart } from '@/components/dashboard/charts/wau-chart'
 import {
@@ -54,11 +55,19 @@ import { useVenues } from '@/lib/hooks/use-venues'
 
 const ALL_VENUES = 'all'
 
+const PRESET_VALUES = Object.keys(RANGE_PRESETS) as RangePreset[]
+
 export function DashboardBody() {
-  const [preset, setPreset] = useState<RangePreset>('30d')
+  const [preset, setPreset] = useQueryState(
+    'preset',
+    parseAsStringLiteral(PRESET_VALUES).withDefault('30d').withOptions({ clearOnDefault: true }),
+  )
   const { from, to } = useDashboardRange(preset)
   const venues = useVenues()
-  const [scope, setScope] = useState<string>(ALL_VENUES)
+  const [scope, setScope] = useQueryState(
+    'venue',
+    parseAsString.withDefault(ALL_VENUES).withOptions({ clearOnDefault: true }),
+  )
   const venueId = scope === ALL_VENUES ? undefined : scope
   const range = useMemo(() => ({ venueId, from, to }), [venueId, from, to])
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { CheckCircle2, ClipboardCheck, RotateCcw, Square, SquareCheck } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSession } from '@/lib/auth-client'
 import { CardEmpty, CardShell } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
@@ -52,6 +52,12 @@ function saveTicked(userId: string, checklistId: string, ticked: Set<number>) {
 }
 
 export function ChecklistCard({ part }: ToolCardRendererProps) {
+  const { data: session } = useSession()
+  // Back-of-house terminals are shared between shift workers; key the local
+  // tick state by the logged-in user so the next shift starts fresh. 'anon'
+  // fallback covers the brief render before session resolves — once auth lands
+  // the key flips and the checklist remounts against the proper user's state.
+  const userId = session?.user?.id ?? 'anon'
   const output = part.output
   if (isToolFail(output)) {
     return (
@@ -76,7 +82,11 @@ export function ChecklistCard({ part }: ToolCardRendererProps) {
     )
   }
   return (
+    // Remount on user/checklist change (logout/login, a new procedure surfaced
+    // in the same thread) so tick state resets via identity, not an effect.
     <InteractiveChecklist
+      key={`${userId}:${checklistId}`}
+      userId={userId}
       checklistId={checklistId}
       title={title || 'Checklist'}
       steps={steps}
@@ -86,29 +96,19 @@ export function ChecklistCard({ part }: ToolCardRendererProps) {
 }
 
 function InteractiveChecklist({
+  userId,
   checklistId,
   title,
   steps,
   sourceHref,
 }: {
+  userId: string
   checklistId: string
   title: string
   steps: ChecklistStep[]
   sourceHref: string | null
 }) {
-  const { data: session } = useSession()
-  // Back-of-house terminals are shared between shift workers; key the local
-  // tick state by the logged-in user too so the next shift starts fresh.
-  // 'anon' fallback covers the brief render before session resolves — refreshes
-  // pick up the proper key once auth lands.
-  const userId = session?.user?.id ?? 'anon'
   const [ticked, setTicked] = useState<Set<number>>(() => loadTicked(userId, checklistId))
-
-  // Re-hydrate when either the checklist id or the user flips (logout/login,
-  // a new procedure surfaced in the same thread).
-  useEffect(() => {
-    setTicked(loadTicked(userId, checklistId))
-  }, [userId, checklistId])
 
   const toggle = (idx: number) => {
     setTicked((prev) => {

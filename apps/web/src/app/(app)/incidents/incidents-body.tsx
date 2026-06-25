@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowUpRight,
   CheckCircle2,
+  ChevronDown,
   Eye,
   Loader2,
   MessageSquare,
@@ -12,6 +13,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { AppShell } from '@/components/shell/app-shell'
@@ -45,6 +47,8 @@ import { cn } from '@/lib/utils'
 
 type StatusFilter = 'open' | 'acknowledged' | 'closed' | 'all'
 
+const FILTER_VALUES = ['open', 'acknowledged', 'closed', 'all'] as const
+
 const FILTERS: TabItem<StatusFilter>[] = [
   { id: 'open', label: 'Open' },
   { id: 'acknowledged', label: 'Acknowledged' },
@@ -63,7 +67,10 @@ const CHIP_PRIMARY_CLASS =
   'inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 font-medium text-xs text-background transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
 
 export function IncidentsBody() {
-  const [filter, setFilter] = useState<StatusFilter>('open')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('open').withOptions({ clearOnDefault: true }),
+  )
   const status: IncidentStatus | undefined = filter === 'all' ? undefined : filter
   const { data, isLoading, error } = useIncidents({ status })
   const isForbidden = isAuthError(error)
@@ -257,7 +264,11 @@ function IncidentCard({ incident }: { incident: Incident }) {
 // ──────────────────────────────────────────────────────────────────
 
 function Activity({ incident }: { incident: Incident }) {
-  const { data, isLoading, error } = useIncidentComments(incident.id, true)
+  // Comment threads are fetched lazily — the open queue can list dozens of
+  // cards and we don't want a comments request per card on mount. The thread
+  // loads when the operator expands it (or after they post a comment).
+  const [expanded, setExpanded] = useState(false)
+  const { data, isLoading, error } = useIncidentComments(incident.id, expanded)
   const add = useAddIncidentComment(incident.id)
   const update = useUpdateIncidentStatus()
   const [body, setBody] = useState('')
@@ -274,6 +285,8 @@ function Activity({ incident }: { incident: Incident }) {
     try {
       await add.mutateAsync(trimmed)
       setBody('')
+      // Reveal the thread so the just-posted comment is visible.
+      setExpanded(true)
     } catch (err) {
       toast.error(`Couldn't post comment: ${apiErrorLabel(err)}`)
     }
@@ -308,9 +321,23 @@ function Activity({ incident }: { incident: Incident }) {
 
   return (
     <>
-      {/* Activity feed — only renders when something exists. Keeps the */}
-      {/* empty state quiet rather than showing "No comments yet" filler. */}
-      {hasFeed ? (
+      {/* Collapsed thread — a lightweight toggle stands in for the feed until */}
+      {/* the operator opens it, so we don't fetch comments for every card. */}
+      {!expanded && incident.commentCount > 0 ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex w-full cursor-pointer items-center gap-2 px-6 py-4 text-left text-foreground/55 text-xs transition-colors hover:bg-muted/30 hover:text-foreground"
+        >
+          <MessageSquare className="h-3.5 w-3.5" aria-hidden />
+          Show {incident.commentCount} {incident.commentCount === 1 ? 'update' : 'updates'}
+          <ChevronDown className="ml-auto h-4 w-4" aria-hidden />
+        </button>
+      ) : null}
+
+      {/* Activity feed — only renders once expanded and something exists. Keeps */}
+      {/* the empty state quiet rather than showing "No comments yet" filler. */}
+      {expanded && hasFeed ? (
         <div className="space-y-4 px-6 py-5">
           {isLoading && rows.length === 0 ? (
             <div className="space-y-3">

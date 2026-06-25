@@ -1,5 +1,6 @@
 'use client'
 
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   AlertTriangle,
   BookOpen,
@@ -11,7 +12,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -142,7 +143,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
   const title = doc.title?.trim() || 'Untitled document'
 
   return (
-    <li
+    <div
       className={cn(
         'group relative flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-foreground/20 hover:bg-accent/40',
         doc.processingStatus === 'failed' && 'border-red-500/20',
@@ -180,7 +181,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
       <div className="ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
         <DeleteDocButton doc={doc} />
       </div>
-    </li>
+    </div>
   )
 }
 
@@ -201,6 +202,25 @@ function DocListSkeleton() {
   )
 }
 
+// Card height (~68px) plus the 8px inter-row gap baked into each wrapper's
+// bottom padding. Only the initial estimate — rows re-measure on mount.
+const ROW_ESTIMATE_PX = 76
+
+// The docs page scrolls through an ancestor container (see docs-body.tsx), not
+// a container owned by this list, so the virtualizer reads that ancestor as its
+// scroll element and offsets item positions by the list's distance from the
+// scroll origin (scrollMargin). Keeping the list at full height preserves the
+// load-more sentinel that lives just below it in library-tab.tsx.
+function getScrollParent(node: HTMLElement): HTMLElement | null {
+  let el: HTMLElement | null = node.parentElement
+  while (el) {
+    const overflowY = getComputedStyle(el).overflowY
+    if (overflowY === 'auto' || overflowY === 'scroll') return el
+    el = el.parentElement
+  }
+  return null
+}
+
 export function DocList({
   docs,
   isLoading,
@@ -210,9 +230,36 @@ export function DocList({
   isLoading: boolean
   searchQuery?: string
 }) {
+  const rows = docs ?? []
+  const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null)
+  const [scrollMargin, setScrollMargin] = useState(0)
+
+  // Callback ref: the list mounts only once data arrives (after the loading /
+  // empty branches), so a layout effect with [] deps would miss it. Computing
+  // here runs synchronously when the <ul> attaches.
+  const measureLayout = useCallback((node: HTMLUListElement | null) => {
+    if (!node) return
+    const parent = getScrollParent(node)
+    setScrollEl(parent)
+    if (parent) {
+      setScrollMargin(
+        node.getBoundingClientRect().top - parent.getBoundingClientRect().top + parent.scrollTop,
+      )
+    }
+  }, [])
+
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollEl,
+    estimateSize: () => ROW_ESTIMATE_PX,
+    overscan: 8,
+    scrollMargin,
+    getItemKey: (i) => rows[i]?.id ?? i,
+  })
+
   if (isLoading) return <DocListSkeleton />
 
-  if (!docs || docs.length === 0) {
+  if (rows.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card/40 px-6 py-10 text-center">
         <p className="text-sm text-muted-foreground">
@@ -223,10 +270,26 @@ export function DocList({
   }
 
   return (
-    <ul className="space-y-2">
-      {docs.map((d) => (
-        <DocRow key={d.id} doc={d} />
-      ))}
+    <ul
+      ref={measureLayout}
+      className="relative list-none"
+      style={{ height: virtualizer.getTotalSize() }}
+    >
+      {virtualizer.getVirtualItems().map((vi) => {
+        const d = rows[vi.index]
+        if (!d) return null
+        return (
+          <li
+            key={vi.key}
+            ref={virtualizer.measureElement}
+            data-index={vi.index}
+            className="absolute inset-x-0 top-0 pb-2"
+            style={{ transform: `translateY(${vi.start - scrollMargin}px)` }}
+          >
+            <DocRow doc={d} />
+          </li>
+        )
+      })}
     </ul>
   )
 }

@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown, MapPin, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -21,15 +21,10 @@ import { VenueProfileEditor } from './venue-profile-editor'
 export function VenueProfilesBody() {
   const venues = useVenues()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Fall back to the first venue during render rather than writing derived state in an effect.
+  const activeId = selectedId ?? venues.data?.[0]?.id ?? null
 
-  // Auto-select first venue once loaded.
-  useEffect(() => {
-    if (!selectedId && venues.data && venues.data.length > 0) {
-      setSelectedId(venues.data[0].id)
-    }
-  }, [venues.data, selectedId])
-
-  const detail = useVenue(selectedId)
+  const detail = useVenue(activeId)
 
   if (venues.isLoading) {
     return (
@@ -59,7 +54,7 @@ export function VenueProfilesBody() {
     )
   }
 
-  const activeVenue = venues.data.find((v) => v.id === selectedId) ?? venues.data[0]
+  const activeVenue = venues.data.find((v) => v.id === activeId) ?? venues.data[0]
 
   return (
     <div className="space-y-5">
