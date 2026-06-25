@@ -75,6 +75,7 @@ CSV / XLSX sources
 | **A11 stock ingest** | `ingest/stock_normalise.py` | PASS — 13 sheets → 10 snapshots / 1,407 rows; 238 products (**129 core**); date conflict flagged; brewery isolated |
 | **A12 stock cover** | `signals/stock_inventory.py` | PASS — days-of-cover for the mapped core keg line; unmapped lines NULL (not guessed) |
 | **A14 enrichment** | `features/build_features.py`, `ingest/exog_weather.py`, `ingest/local_events.py`, `ingest/spike_days.py`, `signals/feature_ablation.py` | PASS — exo seam populated (calendar/weather/events); ablation adopts **none** (honest null on BH); weather train/serve study delivered |
+| **A14b diagnostic** | `signals/weather_diagnostic.py` | PASS — 4 tests find a **weak-but-significant** temperature signal in draught (Test D incr R²≈0.02, p<0.05) that the GBM can't convert to forecast lift; calendar genuinely uninformative; **adopts nothing** (`_ADOPTED_EXO` untouched), logged as a candidate |
 | A10 service | `service/app.py` | PASS — all 6 endpoints return typed JSON |
 
 ---

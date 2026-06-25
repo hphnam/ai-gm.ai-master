@@ -84,6 +84,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A11 | 13 bar sheets → 10 snapshots; 238 products (129 core); date conflict flagged |
 | A12 | days-of-cover for mapped core kegs; unmapped lines NULL (not guessed) |
 | A14 | exo seam populated (calendar/weather/events); ablation gates adoption — honest null on BH + weather train/serve study |
+| A14b | diagnostic-only: is the A14 null hidden by aggregation/eval, or genuinely redundant-with-season? L2/L3 ablation + residual regression; adopts nothing |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
