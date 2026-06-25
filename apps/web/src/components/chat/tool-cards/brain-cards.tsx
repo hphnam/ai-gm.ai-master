@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Lightbulb, TrendingUp } from 'lucide-react'
+import { AlertTriangle, Beer, Lightbulb, TrendingUp } from 'lucide-react'
 import { CardEmpty, CardShell } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
 
@@ -221,6 +221,90 @@ export function SopGapsCard({ part }: ToolCardRendererProps) {
                 “{g.examples[0]}”
               </p>
             ) : null}
+          </li>
+        ))}
+      </ul>
+    </CardShell>
+  )
+}
+
+// ─── brain_check_stock_cover ─────────────────────────────────────────────
+
+type CoverLine = {
+  product: string
+  l1: string
+  on_hand_kegs: number | null
+  days_of_cover: number | null
+  reorder: boolean | null
+  suggested_order_kegs: number | null
+  a6_node: string | null
+}
+type StockCoverData = {
+  venue: string
+  as_of: string | null
+  n_reorder: number
+  lines: CoverLine[]
+}
+
+export function StockCoverCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={Beer} title="Stock cover">
+        <CardEmpty
+          message={
+            output.reason === 'no-data'
+              ? (output.detail ?? 'No stock data for that venue.')
+              : (output.detail ?? "Couldn't check stock cover.")
+          }
+        />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<StockCoverData>(output)) return null
+  const { venue, as_of, n_reorder, lines } = output.data
+  // Reorder lines first, then by tightest cover; show the actionable ones.
+  const ranked = [...(lines ?? [])]
+    .filter((l) => l.days_of_cover != null)
+    .sort(
+      (a, b) =>
+        Number(b.reorder ?? false) - Number(a.reorder ?? false) ||
+        (a.days_of_cover ?? 0) - (b.days_of_cover ?? 0),
+    )
+    .slice(0, 6)
+  if (!ranked.length) {
+    return (
+      <CardShell icon={Beer} title={`Stock cover — ${VENUE_LABELS[venue] ?? venue}`}>
+        <CardEmpty message="No keg lines with a forecast to compute cover yet." />
+      </CardShell>
+    )
+  }
+  return (
+    <CardShell
+      icon={Beer}
+      title={`Stock cover — ${VENUE_LABELS[venue] ?? venue}`}
+      subtitle={`${n_reorder} line(s) to reorder${as_of ? ` · as of ${as_of}` : ''}`}
+      tone={n_reorder > 0 ? 'warning' : 'success'}
+    >
+      <ul className="-mx-1 divide-y divide-border/60">
+        {ranked.map((l) => (
+          <li
+            key={`${l.product}-${l.l1}-${l.a6_node ?? ''}`}
+            className="flex items-center justify-between gap-2 px-1 py-1.5"
+          >
+            <span className="truncate text-[12.5px] capitalize text-foreground">{l.product}</span>
+            <span className="shrink-0 text-[12px] tabular-nums text-muted-foreground">
+              {l.days_of_cover?.toFixed(1)}d cover
+            </span>
+            {l.reorder ? (
+              <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10.5px] font-medium text-amber-700 dark:text-amber-400">
+                order {l.suggested_order_kegs ?? 0}
+              </span>
+            ) : (
+              <span className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10.5px] font-medium text-emerald-700 dark:text-emerald-400">
+                ok
+              </span>
+            )}
           </li>
         ))}
       </ul>

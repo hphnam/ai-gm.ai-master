@@ -202,12 +202,37 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
 
     _persist(venue, nodes, recon, test_dates, node_q)
 
+    # Optional inventory-aware upgrade: if A12 has written stock_cover, attach the
+    # on-hand position so the demand-only proxy becomes a days-of-cover signal.
+    # A6 still runs headless when no stock table exists (spec G6).
+    stock = _read_stock_position()
+
     return {
         "venue": venue, "n_nodes": len(nodes), "n_bottom": len(bottom_nodes),
         "venue_disc": venue_disc, "cat_disc": cat_disc, "coherent": coherent,
         "l2_coverage": l2_coverage, "l3_coverage": l3_coverage,
-        "keg": keg, "test_dates": (test_dates.min(), test_dates.max()),
+        "keg": keg, "stock": stock, "test_dates": (test_dates.min(), test_dates.max()),
     }
+
+
+def _read_stock_position() -> list[dict]:
+    """Read mapped days-of-cover rows from the A12 `stock_cover` table, if it
+    exists. Returns [] when stock has not been ingested — keeping A6 headless."""
+    con = connect(read_only=True)
+    try:
+        exists = con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name = 'stock_cover'"
+        ).fetchone()
+        if not exists:
+            return []
+        return con.execute(
+            "SELECT product_canon, l1, on_hand_kegs, on_hand_pints, "
+            "forecast_daily_pints, days_of_cover, reorder_flag, "
+            "suggested_order_kegs, a6_node FROM stock_cover "
+            "WHERE a6_node IS NOT NULL ORDER BY days_of_cover"
+        ).df().to_dict("records")
+    finally:
+        con.close()
 
 
 def _consumption_proxy(node_series, nodes, recon, bottom_nodes, test_dates) -> dict:
@@ -309,6 +334,25 @@ def _write_report(out: dict) -> None:
         ]
     else:
         lines.append("- (keg line not found)")
+
+    if out.get("stock"):
+        lines += [
+            "\n## Inventory-aware reorder (A12 stock-cover join)",
+            "The demand-only proxy above becomes a true reorder signal once the "
+            "physical on-hand position (A12 `stock_cover`) is joined: "
+            "`days_of_cover = on_hand_pints / forecast_daily_pints`. Lines whose "
+            "brand is not a forecast A6 node are omitted here (NULL demand, not "
+            "guessed).\n",
+            "| Product | L1 | On-hand kegs | Forecast pints/day | Days cover | "
+            "Reorder | Suggest kegs |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for s in out["stock"]:
+            lines.append(
+                f"| {s['product_canon']} | {s['l1']} | {s['on_hand_kegs']:.1f} | "
+                f"{s['forecast_daily_pints']:.2f} | **{s['days_of_cover']:.1f}** | "
+                f"{'⚠ YES' if s['reorder_flag'] else 'no'} | "
+                f"{s['suggested_order_kegs']:.0f} |")
     RESULTS_MD.write_text("\n".join(lines))
 
 
@@ -333,6 +377,10 @@ def main() -> int:
         k = out["keg"]
         print(f"  consumption proxy : {k['line']} {k['forecast_pints']} pints/"
               f"{k['horizon_days']}d → {k['implied_kegs']} kegs")
+    if out.get("stock"):
+        print(f"  stock-cover join  : {len(out['stock'])} mapped line(s) "
+              f"(A12); e.g. {out['stock'][0]['product_canon']} "
+              f"{out['stock'][0]['days_of_cover']:.1f}d cover")
     _write_report(out)
     print(f"  report            : {RESULTS_MD}")
 

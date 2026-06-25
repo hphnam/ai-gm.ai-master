@@ -37,6 +37,8 @@ python -m hierarchy.reconcile           # A6  MinT reconciliation + keg consumpt
 python -m transfer.lovo                 # A7  leave-one-venue-out onboarding transfer
 python -m signals.chatlog_kb_gap        # A8  failure-rate + ranked SOP gaps
 python -m signals.checklist_discipline  # A9  weighted missed-step detector
+python -m ingest.stock_normalise        # A11 bar-stock panel + master + agg (Beer Hall)
+python -m signals.stock_inventory       # A12 days-of-cover reorder signal (reads A6)
 uvicorn service.app:app --port 8088     # A10 http://127.0.0.1:8088/docs
 pytest                                  # all module tests, printed PASS/FAIL
 ```
@@ -75,6 +77,8 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A7 | shape-transfer beats per-venue-naïve at cold-start; foundation dropped (Tan) |
 | A8 | 18.9% failure baseline reproduced; ≥1 ranked above-baseline SOP gap |
 | A9 | weighted miss detector; conditionals never raise; Sunday-only #31 correct |
+| A11 | 13 bar sheets → 10 snapshots; 238 products (129 core); date conflict flagged |
+| A12 | days-of-cover for mapped core kegs; unmapped lines NULL (not guessed) |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
@@ -93,6 +97,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | POST | `/deviation/check` | §6 breach rule |
 | GET | `/sop-gaps` | A8 |
 | POST | `/checklist/discipline` | A9 |
+| GET | `/stock/cover?venue=` | A12 (Beer Hall; empty envelope for other venues) |
 
 This service is what Track B (`apps/api/.../proactive-brain`) calls over HTTP.
 ```

@@ -9,8 +9,11 @@ python -m ingest.normalise
 python -m store.warehouse --build
 python -m features.build_features
 python -m models.ladder --all-venues
+python -m ingest.stock_normalise        # A11 stock panel + master + agg (Beer Hall)
 python -m conformal.wrap --all-venues
-python -m hierarchy.reconcile
+python -m hierarchy.reconcile           # A6 (headless first pass — no stock_cover yet)
 python -m transfer.lovo
 python -m signals.chatlog_kb_gap
 python -m signals.checklist_discipline
+python -m signals.stock_inventory       # A12 days-of-cover reorder (reads A6 forecasts)
+python -m hierarchy.reconcile           # A6 re-run enriches its report with the stock-cover join
