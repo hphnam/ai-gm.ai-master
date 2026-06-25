@@ -95,7 +95,10 @@ function StatTile({ label, value, delta }: { label: string; value: string; delta
 
 export function ChatPreview({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion()
-  const [stage, setStage] = useState<number>(STAGE.citation)
+  // Start on the empty composer (both SSR and first client paint) so the reply
+  // only ever animates forward — typing in, then streaming out. Initialising on
+  // the finished answer made it visibly collapse backwards before the loop.
+  const [stage, setStage] = useState<number>(STAGE.reset)
   const [typed, setTyped] = useState(0)
 
   useEffect(() => {
@@ -118,14 +121,7 @@ export function ChatPreview({ className }: { className?: string }) {
       })
 
     async function play() {
-      // The SSR/first paint already shows the finished answer, so hold on it
-      // once before restarting — otherwise it blanks and retypes on hydration.
-      let first = true
       while (!cancelled) {
-        if (first) {
-          first = false
-          await wait(4600)
-        }
         setStage(STAGE.reset)
         setTyped(0)
         await wait(700)

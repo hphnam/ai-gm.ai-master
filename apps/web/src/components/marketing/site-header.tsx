@@ -42,14 +42,8 @@ export function SiteHeader() {
             : 'border border-transparent bg-transparent',
         )}
       >
-        <Link href="/" className="flex items-center gap-2" aria-label="gm-ai home">
+        <Link href="/" className="flex items-center" aria-label="gm-ai home">
           <Wordmark />
-          {/* "Live" pulse — signals the assistant is awake and answering, the
-              same one streaming a reply in the hero below. */}
-          <span className="relative flex size-1.5" aria-hidden>
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--chart-1)] opacity-70 motion-reduce:hidden" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-[var(--chart-1)]" />
-          </span>
         </Link>
 
         <nav
