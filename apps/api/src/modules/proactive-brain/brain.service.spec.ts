@@ -51,25 +51,32 @@ class StubClient {
         : [],
     }
   }
+  deviationFound = true
   async checkDeviation(q: unknown) {
     this.record('checkDeviation', q)
+    if (!this.deviationFound) {
+      return {
+        found: false,
+        venue: 'beer_hall',
+        layer: 'L1',
+        status: 'no_data' as const,
+        note: 'no trading-day band',
+      }
+    }
     return {
+      found: true,
       venue: 'beer_hall',
       layer: 'L1',
-      level: 0.9,
-      n_checked: 2,
-      n_breaches: 1,
-      breaches: [
-        {
-          date: '2026-05-15',
-          value: 2262,
-          lo: 78,
-          hi: 1550,
-          direction: 'above',
-          exceedance_ratio: 0.97,
-          severity: 'medium',
-        },
-      ],
+      date: '2026-05-15',
+      status: 'deviation' as const,
+      direction: 'up' as const,
+      severity: 'medium' as const,
+      actual: 2262,
+      expected: 1200,
+      band_low: 78,
+      band_high: 1550,
+      z: 1.4,
+      reason: ['coincides with a local event (Lancaster Music Festival)'],
     }
   }
   async sopGaps() {
@@ -211,14 +218,30 @@ describe('BrainService.dispatch', () => {
     assert.equal(stub.lastCall?.method, 'forecast')
   })
 
-  it('deviation: valid input hits the deviation endpoint and returns breaches', async () => {
+  it('deviation: valid input hits the deviation endpoint and returns the classified day', async () => {
     const res = await svc.dispatch(
       BRAIN_CHECK_DEVIATION,
-      { venue: 'beer_hall', observations: [{ date: '2026-05-15', value: 2262 }] },
+      { venue: 'beer_hall', as_of: '2026-05-15' },
       CTX,
     )
     assert.equal(stub.lastCall?.method, 'checkDeviation')
-    assert.ok(res.ok && (res.data as { n_breaches: number }).n_breaches === 1)
+    assert.ok(res.ok && (res.data as { status: string }).status === 'deviation')
+  })
+
+  it('deviation: returns no-data when the requested day is not a trading day', async () => {
+    stub.deviationFound = false
+    const res = await svc.dispatch(BRAIN_CHECK_DEVIATION, { venue: 'ellel' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'no-data')
+  })
+
+  it('deviation: rejects an unknown field with invalid-input (strict schema)', async () => {
+    const res = await svc.dispatch(
+      BRAIN_CHECK_DEVIATION,
+      { venue: 'beer_hall', observations: [] },
+      CTX,
+    )
+    assert.equal(res.ok === false && res.reason, 'invalid-input')
+    assert.equal(stub.lastCall, null)
   })
 
   it('sop-gaps: returns the failure rate and ranked gaps', async () => {
