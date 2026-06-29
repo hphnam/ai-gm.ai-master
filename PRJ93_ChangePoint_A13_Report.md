@@ -49,7 +49,7 @@ post-closure zero run is appended so the closure is a detectable abrupt drop;
 
 | Venue | Onset | Detector | Dir | Mag (band/%) | Severity | Top attribution |
 |---|---|---|---|---|---|---|
-| The Beer Hall | 2025-12-27 | persistence | down | −0.68 / −12% | medium | coincides with a cold snap (~6 °C vs 13 °C avg) |
+| The Beer Hall | 2025-12-27 | persistence | down | −0.68 / −29% | medium | coincides with a cold snap (~6 °C vs 13 °C avg) |
 | Two River Taps | 2025-11-01 | cusum | down | −0.58 | low | coincides with a school term↔holiday transition |
 | Two River Taps | 2026-05-08 | **both** | down | −1.12 | medium | **coincides with TRT's closure (structural break)** |
 | Ellel Village Hall | — | — | — | — | — | (no change points; persistence-only, sparse) |
