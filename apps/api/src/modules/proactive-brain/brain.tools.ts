@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { IntegrationToolDefinition } from '../integrations/integration-provider'
 
-/// The five agent functions exposed by the Proactive Brain. Same shape as
+/// The six agent functions exposed by the Proactive Brain. Same shape as
 /// SQUARE_TOOL_DEFINITIONS so they feed straight into buildAiSdkTools via the
 /// IntegrationRegistry — no edits to chat-tools.ts or ai-sdk-tools.ts.
 ///
@@ -14,6 +14,7 @@ export const BRAIN_CHECK_DEVIATION = 'brain_check_deviation'
 export const BRAIN_FIND_SOP_GAPS = 'brain_find_sop_gaps'
 export const BRAIN_CHECK_CHECKLIST = 'brain_check_checklist'
 export const BRAIN_CHECK_STOCK_COVER = 'brain_check_stock_cover'
+export const BRAIN_CHECK_CHANGE_POINT = 'brain_check_change_point'
 
 /// Canonical brain venue slugs (Track A `config.VENUE_MAP`). A full wiring maps
 /// these to the org's Venue rows; until then the agent names the venue directly.
@@ -50,6 +51,7 @@ export const BRAIN_TOOL_SCHEMAS = {
   }),
   [BRAIN_FIND_SOP_GAPS]: z.object({}).strict(),
   [BRAIN_CHECK_STOCK_COVER]: z.object({ venue: VenueSlug }).strict(),
+  [BRAIN_CHECK_CHANGE_POINT]: z.object({ venue: VenueSlug, layer: Layer.optional() }).strict(),
   [BRAIN_CHECK_CHECKLIST]: z.object({
     checklist: z.enum(['opening', 'closing']),
     completed: z.array(z.number().int().min(1).max(40)).max(40),
@@ -127,6 +129,19 @@ export const BRAIN_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = 
           enum: [...BRAIN_VENUES],
           description: 'Venue slug (stock data is Beer Hall only)',
         },
+      },
+      required: ['venue'],
+    },
+  },
+  {
+    name: BRAIN_CHECK_CHANGE_POINT,
+    description:
+      'Detect SUSTAINED regime shifts in a venue\'s trading rhythm (not a single odd day — that\'s brain_check_deviation). FIRES on "has normal changed", "is trade persistently up/down", "did something shift and since when", "is the forecast stale". Returns dated change points: onset, direction, magnitude (band units + %), which detector fired (CUSUM drift / k-of-n persistence), severity, a recalibration-needed flag, and a ranked, CORRELATIONAL attribution ("coincides with a cold snap / term transition / closure", never "caused by"). Beer Hall + Two River Taps in scope; other venues return an empty, stable envelope.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venue: { type: 'string', enum: [...BRAIN_VENUES], description: 'Venue slug to check' },
+        layer: { type: 'string', enum: ['L1', 'L2', 'L3'], description: 'Layer (default L1)' },
       },
       required: ['venue'],
     },

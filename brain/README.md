@@ -85,6 +85,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A12 | days-of-cover for mapped core kegs; unmapped lines NULL (not guessed) |
 | A14 | exo seam populated (calendar/weather/events); ablation gates adoption — honest null on BH + weather train/serve study |
 | A14b | diagnostic-only: is the A14 null hidden by aggregation/eval, or genuinely redundant-with-season? L2/L3 ablation + residual regression; adopts nothing |
+| A13 | sustained regime-shift detection (CUSUM + persistence + BOCPD) on the conformal residual stream; TRT closure recovered as ground truth; attribution against the A14 seam |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
@@ -101,6 +102,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | GET | `/health` | store status |
 | GET | `/forecast?venue=&layer=&level=&date_from=&date_to=&key=` | A5/A6 bands |
 | POST | `/deviation/check` | §6 breach rule |
+| POST | `/deviation/changepoint` | A13 sustained regime shifts + attribution |
 | GET | `/sop-gaps` | A8 |
 | POST | `/checklist/discipline` | A9 |
 | GET | `/stock/cover?venue=` | A12 (Beer Hall; empty envelope for other venues) |

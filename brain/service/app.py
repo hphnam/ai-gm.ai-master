@@ -6,6 +6,7 @@ Endpoints (typed JSON):
     GET  /health                health + store status
     GET  /forecast              point + calibrated band per date (A5/A6)
     POST /deviation/check       band breaches + severity (the §6 breach rule)
+    POST /deviation/changepoint sustained regime shifts + attribution (A13)
     GET  /sop-gaps              ranked KB-gap clusters + failure rate (A8)
     POST /checklist/discipline  expected vs actual, weighted misses (A9)
     GET  /stock/cover           days-of-cover reorder lines per venue (A12)
@@ -24,7 +25,7 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from config import DUCKDB_PATH, VENUES_WITH_STOCK
+from config import DUCKDB_PATH, EVENT_ONLY_VENUES, VENUES_FOR_CHANGEPOINT, VENUES_WITH_STOCK
 from signals.checklist_discipline import evaluate as checklist_evaluate
 from signals.checklist_discipline import expected_mandatory, parse_checklists
 from store import warehouse
@@ -65,6 +66,12 @@ class ChecklistRequest(BaseModel):
     completed: list[int]
     dow: int = Field(..., ge=0, le=6, description="Mon=0 … Sun=6")
     completion_minutes: int | None = None
+
+
+class ChangePointRequest(BaseModel):
+    venue: str = "beer_hall"
+    layer: str = "L1"
+    level: float = 0.90
 
 
 # --- Cached, read-only resources --------------------------------------------
@@ -257,6 +264,45 @@ def stock_cover(venue: str = "beer_hall") -> dict:
     n_reorder = int(df["reorder_flag"].fillna(False).sum()) if not df.empty else 0
     return {"venue": venue, "as_of": as_of, "n": len(lines),
             "n_reorder": n_reorder, "lines": lines}
+
+
+@app.post("/deviation/changepoint")
+def deviation_changepoint(req: ChangePointRequest) -> dict:
+    """A13 sustained regime-shift detection (complements the per-day
+    /deviation/check). Excluded / short-history venues return a 200 envelope."""
+    import json as _json
+
+    eligible = req.venue in VENUES_FOR_CHANGEPOINT or req.venue in EVENT_ONLY_VENUES
+    con = _read_only()
+    try:
+        has_table = con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name='change_points'"
+        ).fetchone()
+        if not eligible or not has_table:
+            return {"venue": req.venue, "layer": req.layer, "n_change_points": 0,
+                    "change_points": [], "stable": True,
+                    "note": f"change-point detection not run for venue '{req.venue}'"}
+        df = con.execute(
+            "SELECT * FROM change_points WHERE venue=? AND layer=? "
+            "ORDER BY severity='high' DESC, onset_date DESC", [req.venue, req.layer]).df()
+    finally:
+        con.close()
+    cps = []
+    for _, r in df.iterrows():
+        cps.append({
+            "onset_date": str(r["onset_date"])[:10],
+            "detected_date": str(r["detected_date"])[:10],
+            "detection_delay_days": _f(r["detection_delay_days"]),
+            "direction": r["direction"],
+            "magnitude_band_units": _f(r["magnitude_band_units"]),
+            "magnitude_pct": _f(r["magnitude_pct"]),
+            "detector": r["detector"], "severity": r["severity"],
+            "recalibration_needed": _b(r["recalibration_needed"]),
+            "attribution": _json.loads(r["attribution"]) if r["attribution"] else [],
+            "note": r["note"] if pd.notna(r["note"]) else None,
+        })
+    return {"venue": req.venue, "layer": req.layer, "n_change_points": len(cps),
+            "change_points": cps, "stable": len(cps) == 0}
 
 
 @app.post("/checklist/discipline")
