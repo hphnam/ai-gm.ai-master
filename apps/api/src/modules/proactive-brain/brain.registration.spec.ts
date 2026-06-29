@@ -6,6 +6,7 @@ import type { IntegrationProvider } from '../integrations/integration-provider'
 import { BRAIN_PROVIDER_ID, BrainProvider } from './brain.provider'
 import type { BrainService } from './brain.service'
 import {
+  BRAIN_CHECK_CHANGE_POINT,
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
@@ -21,6 +22,7 @@ const EXPECTED_TOOLS = [
   BRAIN_CHECK_DEVIATION,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_CHECK_STOCK_COVER,
+  BRAIN_CHECK_CHANGE_POINT,
   BRAIN_CHECK_CHECKLIST,
 ]
 
@@ -56,7 +58,7 @@ function makeProvider() {
 }
 
 describe('brain.tools contract', () => {
-  it('declares exactly the five brain tools', () => {
+  it('declares exactly the six brain tools', () => {
     assert.deepEqual(BRAIN_TOOL_DEFINITIONS.map((d) => d.name).sort(), [...EXPECTED_TOOLS].sort())
   })
 
@@ -80,7 +82,7 @@ describe('BrainProvider self-registration', () => {
     assert.equal(provider.domain, 'other')
   })
 
-  it('surfaces all five tool definitions through the registry', () => {
+  it('surfaces all six tool definitions through the registry', () => {
     const { registry, provider } = makeProvider()
     provider.onModuleInit()
     assert.deepEqual(registry.getAllToolDefinitions().sort(), [...EXPECTED_TOOLS].sort())

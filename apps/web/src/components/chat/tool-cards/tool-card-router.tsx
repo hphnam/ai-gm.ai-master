@@ -1,7 +1,13 @@
 'use client'
 
 import { getToolName, isToolUIPart } from 'ai'
-import { DeviationCard, ForecastBandCard, SopGapsCard, StockCoverCard } from './brain-cards'
+import {
+  ChangePointCard,
+  DeviationCard,
+  ForecastBandCard,
+  SopGapsCard,
+  StockCoverCard,
+} from './brain-cards'
 import { ChecklistCard } from './checklist-card'
 import { CutoffsCard } from './cutoffs-card'
 import { NoteCard } from './note-card'
@@ -32,6 +38,7 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
   brain_check_deviation: DeviationCard,
   brain_find_sop_gaps: SopGapsCard,
   brain_check_stock_cover: StockCoverCard,
+  brain_check_change_point: ChangePointCard,
 }
 
 export function hasToolCard(toolName: string): boolean {

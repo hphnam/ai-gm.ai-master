@@ -4,6 +4,7 @@ import type { DispatchContext } from '../chat/tool-dispatcher'
 import { BrainUnavailableError } from './brain.client'
 import { BrainService } from './brain.service'
 import {
+  BRAIN_CHECK_CHANGE_POINT,
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
@@ -20,6 +21,7 @@ class StubClient {
   lastCall: { method: string; arg?: unknown } | null = null
   forecastN = 1
   stockN = 14
+  changeN = 1
   throwUnavailable = false
 
   private record(method: string, arg?: unknown) {
@@ -113,6 +115,32 @@ class StubClient {
           a6_node: 'Caravan of Love',
         },
       ],
+    }
+  }
+  async changePoint(q: unknown) {
+    this.record('changePoint', q)
+    return {
+      venue: 'beer_hall',
+      layer: 'L1',
+      n_change_points: this.changeN,
+      stable: this.changeN === 0,
+      change_points: this.changeN
+        ? [
+            {
+              onset_date: '2025-12-27',
+              detected_date: '2026-01-03',
+              detection_delay_days: 7,
+              direction: 'down' as const,
+              magnitude_band_units: -0.68,
+              magnitude_pct: -12,
+              detector: 'persistence' as const,
+              severity: 'medium' as const,
+              recalibration_needed: true,
+              attribution: ['coincides with a cold snap (~6°C vs 13°C avg)'],
+              note: null,
+            },
+          ]
+        : [],
     }
   }
   async checkChecklist(q: unknown) {
@@ -213,6 +241,24 @@ describe('BrainService.dispatch', () => {
 
   it('stock-cover: rejects an unknown venue with invalid-input', async () => {
     const res = await svc.dispatch(BRAIN_CHECK_STOCK_COVER, { venue: 'not_a_venue' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'invalid-input')
+    assert.equal(stub.lastCall, null)
+  })
+
+  it('change-point: valid venue hits the changepoint endpoint and returns shifts', async () => {
+    const res = await svc.dispatch(BRAIN_CHECK_CHANGE_POINT, { venue: 'beer_hall' }, CTX)
+    assert.equal(stub.lastCall?.method, 'changePoint')
+    assert.ok(res.ok && (res.data as { n_change_points: number }).n_change_points === 1)
+  })
+
+  it('change-point: returns a stable envelope (ok) when nothing shifted', async () => {
+    stub.changeN = 0
+    const res = await svc.dispatch(BRAIN_CHECK_CHANGE_POINT, { venue: 'beer_hall' }, CTX)
+    assert.ok(res.ok && (res.data as { stable: boolean }).stable === true)
+  })
+
+  it('change-point: rejects an unknown venue with invalid-input', async () => {
+    const res = await svc.dispatch(BRAIN_CHECK_CHANGE_POINT, { venue: 'nope' }, CTX)
     assert.equal(res.ok === false && res.reason, 'invalid-input')
     assert.equal(stub.lastCall, null)
   })

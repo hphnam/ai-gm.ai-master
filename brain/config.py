@@ -231,6 +231,21 @@ WD_CLIMATOLOGY_WIN = 15       # ± days for the day-of-year temperature climatol
 WD_L2_CATEGORIES = ()         # () = auto-pick top-volume beer_hall L2 categories
 WD_MIN_SERIES_DAYS = 120      # skip series with fewer trading days (reported)
 
+# --- Change-point / regime-shift detection (A13) ----------------------------
+# Detect sustained shifts on the standardised conformal residual stream z_t.
+CP_CUSUM_K = 0.5              # CUSUM slack (band-half units; min shift of interest)
+CP_TARGET_ARL0 = 75          # target mean trading-days between false alarms
+CP_CUSUM_H = 5.0             # CUSUM decision threshold — CALIBRATE to ARL0 (FLAG-CP1)
+CP_RUN_M = 4                 # persistence: same-direction breaches required …
+CP_RUN_N = 7                 # … within this trailing window of trading days
+CP_BOCPD_HAZARD = 1 / 60.0   # BOCPD constant hazard (benchmark detector)
+CP_MIN_SPAN_DAYS = 90        # min active trading days before A13 runs (else "insufficient")
+CP_RELEARN_MIN_DAYS = 28     # post-change days before recalibration is attempted (T4 loop)
+CP_LEVEL = 0.90              # conformal level whose half-band-width defines the z-scale
+CP_ATTRIB_WINDOW_DAYS = 7    # ± days around an onset to scan the A14 seam for coincidences
+CP_WARMUP_DAYS = 56          # expanding-window warmup before the residual stream starts
+VENUES_FOR_CHANGEPOINT = ("beer_hall", "two_river_taps")  # Ellel persistence-only/excluded
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
