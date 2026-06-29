@@ -40,15 +40,13 @@ export const BRAIN_TOOL_SCHEMAS = {
       message: 'key (category for L2 / item for L3) is required when layer is L2 or L3',
       path: ['key'],
     }),
-  [BRAIN_CHECK_DEVIATION]: z.object({
-    venue: VenueSlug,
-    layer: Layer.optional(),
-    level: Level.optional(),
-    observations: z
-      .array(z.object({ date: IsoDate, value: z.number().finite() }))
-      .max(120)
-      .optional(),
-  }),
+  [BRAIN_CHECK_DEVIATION]: z
+    .object({
+      venue: VenueSlug,
+      layer: Layer.optional(),
+      as_of: IsoDate.optional(),
+    })
+    .strict(),
   [BRAIN_FIND_SOP_GAPS]: z.object({}).strict(),
   [BRAIN_CHECK_STOCK_COVER]: z.object({ venue: VenueSlug }).strict(),
   [BRAIN_CHECK_CHANGE_POINT]: z.object({ venue: VenueSlug, layer: Layer.optional() }).strict(),
@@ -88,24 +86,15 @@ export const BRAIN_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = 
   {
     name: BRAIN_CHECK_DEVIATION,
     description:
-      'Check whether recent trading is OUTSIDE its calibrated band, and how severe. FIRES on "are we trading normally", "is tonight unusual", "did anything spike/drop". A deviation is an observation outside the band (the breach rule). Pass `observations` (date+value) to check specific days, or omit them to check the most recent stored actuals. Returns each breach with direction (above/below), an exceedance ratio, and severity (low/medium/high). This is the input to a proactive nudge.',
+      'Check whether ONE trading day is OUTSIDE its 90% calibrated band, and how severe — the per-day primitive (a single odd day, not a sustained shift; for "has normal changed" use brain_check_change_point). FIRES on "are we trading normally", "is tonight unusual", "did today spike/drop". Pass `as_of` (YYYY-MM-DD) to check a specific trading day, or omit it for the latest stored day. Returns status (normal/deviation), direction (up/down), severity (medium/high), the actual vs expected, the band (low/high), z (band-multiples), and a CORRELATIONAL reason ("coincides with …") when it deviates. A normal day is reported as within range. This is the input to a proactive nudge.',
     input_schema: {
       type: 'object',
       properties: {
         venue: { type: 'string', enum: [...BRAIN_VENUES], description: 'Venue slug to check' },
         layer: { type: 'string', enum: ['L1', 'L2', 'L3'], description: 'Layer (default L1)' },
-        level: { type: 'number', enum: [0.8, 0.9], description: 'Band confidence (default 0.9)' },
-        observations: {
-          type: 'array',
-          description: 'Optional days to check; omit to use recent stored actuals',
-          items: {
-            type: 'object',
-            properties: {
-              date: { type: 'string', description: 'YYYY-MM-DD' },
-              value: { type: 'number', description: 'Observed value (e.g. net revenue)' },
-            },
-            required: ['date', 'value'],
-          },
+        as_of: {
+          type: 'string',
+          description: 'Trading day to check (YYYY-MM-DD); omit for the latest stored day',
         },
       },
       required: ['venue'],

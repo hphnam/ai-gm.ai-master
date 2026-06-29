@@ -246,6 +246,18 @@ CP_ATTRIB_WINDOW_DAYS = 7    # ± days around an onset to scan the A14 seam for 
 CP_WARMUP_DAYS = 56          # expanding-window warmup before the residual stream starts
 VENUES_FOR_CHANGEPOINT = ("beer_hall", "two_river_taps")  # Ellel persistence-only/excluded
 
+# --- Point deviation (PRJ93 point-deviation spec) ---------------------------
+# The per-day primitive: is a single trading day outside its 90% conformal band?
+# Reuses CP_LEVEL (one confidence level) and the shared residual stream, so point
+# severity and change-point evidence are on the same z-scale. Band-multiple rule
+# (distinct from change-point's persistence-aware severity — FLAG-PD2).
+DEV_BAND_K = 1.0        # |z| > 1 → outside the 90% conformal band
+DEV_SEVERE_K = 2.0      # |z| > 2 → high severity
+DEV_SCAN_WINDOW = 14    # trading days returned by scan()
+# Ellel included: the shared stream excludes non-trading days, so deviation fires
+# only on genuine trading days (FLAG-PD1).
+VENUES_FOR_DEVIATION = ("beer_hall", "ellel", "two_river_taps")
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))

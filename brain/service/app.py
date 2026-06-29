@@ -5,7 +5,8 @@ Endpoints (typed JSON):
 
     GET  /health                health + store status
     GET  /forecast              point + calibrated band per date (A5/A6)
-    POST /deviation/check       band breaches + severity (the §6 breach rule)
+    POST /deviation/check       per-day band check on the residual stream (point primitive)
+    POST /deviation/scan        last N trading days, classified (briefing feed)
     POST /deviation/changepoint sustained regime shifts + attribution (A13)
     GET  /sop-gaps              ranked KB-gap clusters + failure rate (A8)
     POST /checklist/discipline  expected vs actual, weighted misses (A9)
@@ -25,7 +26,13 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from config import DUCKDB_PATH, EVENT_ONLY_VENUES, VENUES_FOR_CHANGEPOINT, VENUES_WITH_STOCK
+from config import (
+    DEV_SCAN_WINDOW,
+    DUCKDB_PATH,
+    EVENT_ONLY_VENUES,
+    VENUES_FOR_CHANGEPOINT,
+    VENUES_WITH_STOCK,
+)
 from signals.checklist_discipline import evaluate as checklist_evaluate
 from signals.checklist_discipline import expected_mandatory, parse_checklists
 from store import warehouse
@@ -48,17 +55,17 @@ app = FastAPI(
 
 # --- Models ------------------------------------------------------------------
 
-class Observation(BaseModel):
-    date: date
-    value: float
-
-
 class DeviationRequest(BaseModel):
     venue: str = "beer_hall"
     layer: str = "L1"
-    level: float = 0.90
-    observations: list[Observation] | None = Field(
-        default=None, description="If omitted, recent stored actuals are used.")
+    as_of: date | None = Field(
+        default=None, description="Trading day to check; omit for the latest.")
+
+
+class DeviationScanRequest(BaseModel):
+    venue: str = "beer_hall"
+    layer: str = "L1"
+    window: int = Field(DEV_SCAN_WINDOW, ge=1, le=90)
 
 
 class ChecklistRequest(BaseModel):
@@ -187,41 +194,48 @@ def _read_band_with_key(venue, layer, level, key):
 
 @app.post("/deviation/check")
 def deviation_check(req: DeviationRequest) -> dict:
-    band = _read_band_with_key(req.venue, req.layer, req.level, None)
-    if band.empty:
-        raise HTTPException(404, f"no stored band for {req.venue}/{req.layer}")
-    band = band.set_index(band["date"].astype(str).str[:10])
+    """Per-day point primitive: is one trading day outside its 90% conformal band
+    on the shared residual stream (`z = (actual − DOW-median) / half-band`)? Returns
+    the classified day, or a `found=false` envelope (200, never an error) when the
+    requested day is not a trading day in the stream (closed / non-trading / beyond
+    data / too little history)."""
+    # NOTE: function-local import — defers the heavy pandas/signal graph off module
+    # load (same lazy pattern as the sop-gaps handler).
+    from signals.deviation import check_point
 
-    if req.observations:
-        obs = {o.date.isoformat(): o.value for o in req.observations}
-    else:
-        con = warehouse.connect(read_only=True)
-        try:
-            series = warehouse.read_series(req.venue, "L1", con=con)
-        finally:
-            con.close()
-        obs = {str(d)[:10]: float(v) for d, v in
-               zip(series["date"].tail(14), series["value"].tail(14))}
+    con = _read_only()
+    try:
+        result = check_point(req.venue, layer=req.layer, as_of=req.as_of, con=con)
+    finally:
+        con.close()
+    if result is None:
+        return {"venue": req.venue, "layer": req.layer,
+                "as_of": req.as_of.isoformat() if req.as_of else None,
+                "found": False, "status": "no_data",
+                "note": f"no trading-day band to check for '{req.venue}'"
+                        + (f" on {req.as_of.isoformat()}" if req.as_of else "")}
+    return {"found": True, **result}
 
-    breaches = []
-    checked = 0
-    for d, value in obs.items():
-        if d not in band.index:
-            continue
-        row = band.loc[d]
-        lo, hi = float(row["lo"]), float(row["hi"])
-        checked += 1
-        if value < lo or value > hi:
-            half = max((hi - lo) / 2.0, 1e-6)
-            dist = (lo - value) if value < lo else (value - hi)
-            ratio = dist / half
-            severity = "high" if ratio > 1.0 else "medium" if ratio > 0.5 else "low"
-            breaches.append({
-                "date": d, "value": round(value, 2), "lo": round(lo, 2),
-                "hi": round(hi, 2), "direction": "below" if value < lo else "above",
-                "exceedance_ratio": round(ratio, 3), "severity": severity})
-    return {"venue": req.venue, "layer": req.layer, "level": req.level,
-            "n_checked": checked, "n_breaches": len(breaches), "breaches": breaches}
+
+@app.post("/deviation/scan")
+def deviation_scan(req: DeviationScanRequest) -> dict:
+    """The daily-briefing feed: the last `window` trading days, each classified
+    normal/deviation. A run of deviations here is what change-point escalates."""
+    from signals.deviation import scan as scan_days
+
+    con = _read_only()
+    try:
+        df = scan_days(req.venue, layer=req.layer, window=req.window, con=con)
+    finally:
+        con.close()
+    days = [
+        {"date": str(r["date"])[:10], "actual": _f(r["actual"]),
+         "expected": _f(r["expected"]), "z": _f(r["z"]), "status": r["status"],
+         "direction": r["direction"], "severity": r["severity"]}
+        for _, r in df.iterrows()
+    ]
+    return {"venue": req.venue, "layer": req.layer, "window": req.window,
+            "n": len(days), "days": days}
 
 
 @app.get("/sop-gaps")

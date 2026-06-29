@@ -42,27 +42,28 @@ export interface ForecastResponse {
 export interface DeviationQuery {
   venue: string
   layer?: string
-  level?: number
-  observations?: Array<{ date: string; value: number }>
+  as_of?: string
 }
 
-export interface Breach {
-  date: string
-  value: number
-  lo: number
-  hi: number
-  direction: 'above' | 'below'
-  exceedance_ratio: number
-  severity: 'low' | 'medium' | 'high'
-}
-
+// Per-day point check on the residual stream. `found:false` is the stable
+// envelope when the requested day is not a trading day in the stream (closed /
+// non-trading / beyond data / too little history) — never an HTTP error.
 export interface DeviationResponse {
+  found: boolean
   venue: string
   layer: string
-  level: number
-  n_checked: number
-  n_breaches: number
-  breaches: Breach[]
+  as_of?: string | null
+  date?: string
+  status: 'normal' | 'deviation' | 'no_data'
+  direction?: 'up' | 'down'
+  severity?: 'medium' | 'high' | null
+  actual?: number
+  expected?: number
+  band_low?: number
+  band_high?: number
+  z?: number
+  reason?: string[]
+  note?: string
 }
 
 export interface SopGapsResponse {

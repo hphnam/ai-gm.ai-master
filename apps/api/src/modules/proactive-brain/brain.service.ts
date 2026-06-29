@@ -92,8 +92,8 @@ export class BrainService {
 
   private async checkDeviation(i: DeviationInput): Promise<ToolResult<unknown>> {
     const res = await this.client.checkDeviation(i)
-    if (res.n_checked === 0) {
-      return fail('no-data', `No stored band to compare against for ${i.venue}`)
+    if (!res.found) {
+      return fail('no-data', res.note ?? `No trading-day band to check for ${i.venue}`)
     }
     return ok(res)
   }

@@ -23,7 +23,8 @@ import numpy as np
 import pandas as pd
 
 from config import CP_CUSUM_K, CP_RUN_M, CP_RUN_N, CP_TARGET_ARL0, STORE_DIR
-from signals.change_point import bocpd, build_residual_stream, cusum, persistence
+from signals.change_point import bocpd, cusum, persistence
+from signals.residual import build_residual_stream
 
 RESULTS_MD = STORE_DIR.parent / "eval" / "change_point_eval.md"
 ANCHOR = "beer_hall"

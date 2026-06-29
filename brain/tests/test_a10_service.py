@@ -61,13 +61,17 @@ def test_checklist_sunday_rule(client):
 
 
 def test_deviation_check_returns_json(client):
-    r = client.post("/deviation/check", json={
-        "venue": "beer_hall", "layer": "L1", "level": 0.90,
-        "observations": [{"date": "2026-05-01", "value": 99999.0}]})
-    # Either a 404 (no band persisted yet) or a valid breach payload.
-    assert r.status_code in (200, 404)
-    if r.status_code == 200:
-        assert "n_breaches" in r.json()
+    r = client.post("/deviation/check", json={"venue": "beer_hall", "layer": "L1"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["found"] and body["status"] in ("normal", "deviation")
+    assert "z" in body and "band_low" in body and "band_high" in body
+
+
+def test_deviation_check_unknown_venue_returns_not_found_envelope(client):
+    r = client.post("/deviation/check", json={"venue": "no_such_venue"})
+    assert r.status_code == 200
+    assert r.json()["found"] is False
 
 
 @pytest.mark.parametrize("venue", list(FORECAST_VENUES))
@@ -81,6 +85,13 @@ def test_forecast_served_for_every_venue(client, venue):
 
 @pytest.mark.parametrize("venue", list(FORECAST_VENUES))
 def test_deviation_check_served_for_every_venue(client, venue):
-    r = client.post("/deviation/check", json={"venue": venue, "layer": "L1", "level": 0.9})
+    r = client.post("/deviation/check", json={"venue": venue, "layer": "L1"})
     assert r.status_code == 200
-    assert "n_breaches" in r.json()
+    assert "found" in r.json()
+
+
+def test_deviation_scan_returns_recent_days(client):
+    r = client.post("/deviation/scan", json={"venue": "beer_hall", "window": 7})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["n"] <= 7 and isinstance(body["days"], list)

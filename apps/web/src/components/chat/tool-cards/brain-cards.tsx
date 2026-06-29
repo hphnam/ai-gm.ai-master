@@ -89,20 +89,20 @@ export function ForecastBandCard({ part }: ToolCardRendererProps) {
 
 // ─── brain_check_deviation ───────────────────────────────────────────────
 
-type Breach = {
-  date: string
-  value: number
-  lo: number
-  hi: number
-  direction: 'above' | 'below'
-  severity: 'low' | 'medium' | 'high'
-}
 type DeviationData = {
+  found: boolean
   venue: string
   layer: string
-  n_checked: number
-  n_breaches: number
-  breaches: Breach[]
+  date?: string
+  status: 'normal' | 'deviation'
+  direction?: 'up' | 'down'
+  severity?: 'medium' | 'high' | null
+  actual?: number
+  expected?: number
+  band_low?: number
+  band_high?: number
+  z?: number
+  reason?: string[]
 }
 
 const SEVERITY_CLASS: Record<string, string> = {
@@ -116,53 +116,65 @@ export function DeviationCard({ part }: ToolCardRendererProps) {
   if (isToolFail(output)) {
     return (
       <CardShell icon={AlertTriangle} title="Deviation check">
-        <CardEmpty message={output.detail ?? "Couldn't check for deviations."} />
+        <CardEmpty
+          message={
+            output.reason === 'no-data'
+              ? (output.detail ?? 'No trading-day band to check for that venue.')
+              : (output.detail ?? "Couldn't check for deviations.")
+          }
+        />
       </CardShell>
     )
   }
   if (!isToolOk<DeviationData>(output)) return null
-  const { venue, layer, n_checked, n_breaches, breaches } = output.data
+  const { venue, layer, date, status, direction, severity, actual, band_low, band_high, reason } =
+    output.data
+  const label = VENUE_LABELS[venue] ?? venue
   // L1 is revenue (£); L2/L3 are unit counts — don't render kegs as currency.
   const fmt = (n: number) => (layer === 'L1' ? gbp(n) : `${Math.round(n)}`)
-  if (n_breaches === 0) {
+  const band =
+    band_low != null && band_high != null ? `band ${fmt(band_low)}–${fmt(band_high)}` : null
+
+  if (status === 'normal') {
     return (
       <CardShell
         icon={TrendingUp}
-        title={`${VENUE_LABELS[venue] ?? venue} — trading normally`}
-        subtitle={`${n_checked} day(s) checked, all inside band`}
+        title={`${label} — trading normally`}
+        subtitle={date ? `${date} · inside band` : 'inside band'}
         tone="success"
       >
-        <p className="text-[12.5px] text-muted-foreground">No breaches of the calibrated band.</p>
+        <p className="text-[12.5px] text-muted-foreground">
+          {actual != null ? `${fmt(actual)} ` : ''}within the calibrated band
+          {band ? ` (${band})` : ''}.
+        </p>
       </CardShell>
     )
   }
   return (
     <CardShell
       icon={AlertTriangle}
-      title={`${VENUE_LABELS[venue] ?? venue} — ${n_breaches} deviation${n_breaches === 1 ? '' : 's'}`}
-      subtitle={`${n_checked} day(s) checked`}
+      title={`${label} — ${direction === 'up' ? 'above' : 'below'} band`}
+      subtitle={date ?? undefined}
       tone="warning"
     >
-      <ul className="-mx-1 divide-y divide-border/60">
-        {breaches.map((b) => (
-          <li key={b.date} className="flex items-center justify-between gap-2 px-1 py-1.5">
-            <span className="text-[12px] tabular-nums text-muted-foreground">{b.date}</span>
-            <span className="text-[12.5px] tabular-nums text-foreground">
-              {fmt(b.value)} {b.direction === 'above' ? '↑' : '↓'}{' '}
-              <span className="text-muted-foreground">
-                (band {fmt(b.lo)}–{fmt(b.hi)})
-              </span>
-            </span>
-            <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
-                SEVERITY_CLASS[b.severity] ?? SEVERITY_CLASS.low
-              }`}
-            >
-              {b.severity}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] tabular-nums text-foreground">
+          {actual != null ? fmt(actual) : '—'} {direction === 'up' ? '↑' : '↓'}{' '}
+          {band ? <span className="text-muted-foreground">({band})</span> : null}
+        </span>
+        {severity ? (
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
+              SEVERITY_CLASS[severity] ?? SEVERITY_CLASS.low
+            }`}
+          >
+            {severity}
+          </span>
+        ) : null}
+      </div>
+      {reason?.[0] ? (
+        <p className="mt-1 text-[11.5px] italic text-muted-foreground">{reason[0]}</p>
+      ) : null}
     </CardShell>
   )
 }
