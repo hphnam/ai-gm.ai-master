@@ -3,6 +3,7 @@ import { fail, ok, type ToolResult } from '../../types'
 import type { DispatchContext } from '../chat/tool-dispatcher'
 import { BrainClient, BrainUnavailableError } from './brain.client'
 import {
+  BRAIN_CHECK_CHANGE_POINT,
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
@@ -11,7 +12,7 @@ import {
   BRAIN_TOOL_SCHEMAS,
 } from './brain.tools'
 
-/// Orchestrates the four brain tools: validate input, call the FastAPI client,
+/// Orchestrates the six brain tools: validate input, call the FastAPI client,
 /// and shape the result into the codebase's ToolResult<T> envelope. orgId is
 /// taken from ctx (never the model); the brain is gated by BRAIN_ENABLED so the
 /// module is inert when the brain is down.
@@ -51,6 +52,8 @@ export class BrainService {
           return await this.findSopGaps()
         case BRAIN_CHECK_STOCK_COVER:
           return await this.checkStockCover(parsed.data as StockCoverInput)
+        case BRAIN_CHECK_CHANGE_POINT:
+          return await this.checkChangePoint(parsed.data as ChangePointInput)
         case BRAIN_CHECK_CHECKLIST:
           return await this.checkChecklist(parsed.data as ChecklistInput)
         default:
@@ -122,9 +125,24 @@ export class BrainService {
       lines: res.lines,
     })
   }
+
+  private async checkChangePoint(i: ChangePointInput): Promise<ToolResult<unknown>> {
+    const res = await this.client.changePoint(i)
+    if (res.note && res.n_change_points === 0) {
+      return fail('not-supported', res.note)
+    }
+    return ok({
+      venue: res.venue,
+      layer: res.layer,
+      stable: res.stable,
+      n_change_points: res.n_change_points,
+      change_points: res.change_points,
+    })
+  }
 }
 
 type ForecastInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_FORECAST_SALES]['_output']
 type DeviationInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_DEVIATION]['_output']
 type ChecklistInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHECKLIST]['_output']
 type StockCoverInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_STOCK_COVER]['_output']
+type ChangePointInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHANGE_POINT]['_output']

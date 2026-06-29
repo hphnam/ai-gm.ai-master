@@ -22,3 +22,5 @@ python -m ingest.local_events           # A14 curated local-event anchors
 python -m ingest.spike_days             # A14 retrospective discount-spike flag
 python -m signals.feature_ablation      # A14 ablation + weather train/serve study
 python -m signals.weather_diagnostic    # A14b weather/calendar signal diagnostic (slow; diagnostic only)
+python -m signals.change_point          # A13 change-point detection + attribution
+python -m eval.change_point_eval        # A13 detector validation (ARL0 / TRT / injection)

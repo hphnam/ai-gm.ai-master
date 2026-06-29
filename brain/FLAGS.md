@@ -169,3 +169,28 @@ longer error). No code change was needed to recover the files.
 - **FLAG-WD4 (diagnostic, non-adopting).** A14b changes no forecast and flips
   nothing into `_ADOPTED_EXO`; any positive finding is a candidate for a separate,
   gated decision (and a covariate-aware model, not a univariate foundation model).
+
+## Change-point detection (A13)
+
+- **FLAG-CP1 (threshold calibration).** `CP_CUSUM_H` is the conservative default;
+  on the BH stable span the standardised-residual noise sits below the slack
+  `CP_CUSUM_K`, so empirical ARL₀ **exceeds the simulation horizon at every h**
+  (≫ target 75) — essentially no false alarms, at the cost of detection delay.
+  The binding constraint is delay, not false-alarm rate (see change_point_eval.md).
+  Recalibrate if the baseline model or venue set changes.
+- **FLAG-CP2 (Ellel).** Persistence-only (sparse, booking-driven) — CUSUM is
+  skipped for `EVENT_ONLY_VENUES`; currently yields no change points. Stated, not
+  silently omitted.
+- **FLAG-CP3 (recalibration is a flag).** A13 sets `recalibration_needed=TRUE` and
+  surfaces a degraded-confidence note; automatic re-fit on the post-change window
+  is future work (T4).
+- **FLAG-CP4 (attribution is correlational).** Coincident signals are leads, not
+  causes ("coincides with", never "caused by"); weather is weighted to draught
+  layers per A14b; never asserted as causal.
+- **FLAG-CP5 (scale source).** `z` uses the level-`CP_LEVEL` conformal half-band-
+  width (same yardstick as `/deviation/check`), recomputed expanding-window.
+- **FLAG-CP6 (spillover / closure).** For closed venues the post-closure zero run
+  is appended so the closure is a detectable abrupt drop; `is_closed` then makes
+  monitoring dormant. TRT's closure is the validated ground-truth break (delay
+  reported). A BH shift coincident with the TRT closure window is documented
+  spillover, surfaced via attribution — not a false alarm.

@@ -19,11 +19,11 @@ suites (commands and results in §6).
 
 | Track | Result |
 |---|---|
-| **Track A** (`brain/`, Python) | A0–A12 + A14 enrichment. **98 pytest passing** (13 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
-| **Track B** (`apps/api` + `apps/web`, TS) | 5 self-registered agent tools. **21 specs passing, 0 typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
+| **Track A** (`brain/`, Python) | A0–A14 + A13 change-point. **112 pytest passing** (15 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
+| **Track B** (`apps/api` + `apps/web`, TS) | 6 self-registered agent tools. **24 specs passing, 0 typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
 | **Reviews** | Stock tool: security-reviewer **no findings**; code-reviewer 1 MEDIUM + 1 LOW, **both fixed**. |
 
-**Overall: all acceptance gates pass (A0–A12, stock G1–G10).**
+**Overall: all acceptance gates pass (A0–A14 + A13 change-point; stock G1–G10, enrichment, change-point G1–G12).**
 
 ---
 
@@ -76,6 +76,7 @@ CSV / XLSX sources
 | **A12 stock cover** | `signals/stock_inventory.py` | PASS — days-of-cover for the mapped core keg line; unmapped lines NULL (not guessed) |
 | **A14 enrichment** | `features/build_features.py`, `ingest/exog_weather.py`, `ingest/local_events.py`, `ingest/spike_days.py`, `signals/feature_ablation.py` | PASS — exo seam populated (calendar/weather/events); ablation adopts **none** (honest null on BH); weather train/serve study delivered |
 | **A14b diagnostic** | `signals/weather_diagnostic.py` | PASS — 4 tests find a **weak-but-significant** temperature signal in draught (Test D incr R²≈0.02, p<0.05) that the GBM can't convert to forecast lift; calendar genuinely uninformative; **adopts nothing** (`_ADOPTED_EXO` untouched), logged as a candidate |
+| **A13 change-point** | `signals/change_point.py`, `eval/change_point_eval.py` | PASS — CUSUM + persistence + BOCPD on the conformal residual stream; **TRT closure recovered** (8-day delay, `both` detectors); injection δ=1→100%@~9d, δ=2→~3d, ~0 false alarms; each shift **attributed** against the A14 seam; 6th Track-B tool; no forecast change |
 | A10 service | `service/app.py` | PASS — all 6 endpoints return typed JSON |
 
 ---
@@ -177,7 +178,7 @@ are deliberate, evidence-based decisions, not defects:
 | Stale slugs | `grep the_beer_hall brain/**/*.py` | none |
 | Track B wiring | grep across layers | tool present in tools/client/service/router/card |
 | Forbidden touch-points | `git status` on chat-tools/dispatcher/ai-sdk/gm-agent | none touched |
-| brain tests | `pytest` | **98 passed** (13 files; +11 A14, +1 stock-slug) |
+| brain tests | `pytest` | **112 passed** (15 files; +9 A13 change-point) |
 | A14 weather reachability | Open-Meteo archive/hindcast/previous-runs | reachable; 3 bases cached (693 rows each) |
 | A14 ablation verdict | rolling-origin GBM | no exo feature adopted (honest null); weather train/serve study computed |
 | Track B tests | `node --test proactive-brain/*.spec.ts` | **21 passed** |

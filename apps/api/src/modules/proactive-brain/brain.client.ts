@@ -124,6 +124,29 @@ export interface StockCoverResponse {
   note?: string
 }
 
+export interface ChangePoint {
+  onset_date: string
+  detected_date: string
+  detection_delay_days: number | null
+  direction: 'up' | 'down'
+  magnitude_band_units: number | null
+  magnitude_pct: number | null
+  detector: 'cusum' | 'persistence' | 'both' | 'bocpd'
+  severity: 'low' | 'medium' | 'high'
+  recalibration_needed: boolean | null
+  attribution: string[]
+  note: string | null
+}
+
+export interface ChangePointResponse {
+  venue: string
+  layer: string
+  n_change_points: number
+  change_points: ChangePoint[]
+  stable: boolean
+  note?: string
+}
+
 @Injectable()
 export class BrainClient {
   private readonly baseUrl = (process.env.BRAIN_BASE_URL ?? 'http://127.0.0.1:8088').replace(
@@ -161,6 +184,10 @@ export class BrainClient {
 
   stockCover(venue: string): Promise<StockCoverResponse> {
     return this.get(`/stock/cover?venue=${encodeURIComponent(venue)}`)
+  }
+
+  changePoint(q: { venue: string; layer?: string }): Promise<ChangePointResponse> {
+    return this.post('/deviation/changepoint', q)
   }
 
   checkChecklist(q: ChecklistQuery): Promise<ChecklistResponse> {

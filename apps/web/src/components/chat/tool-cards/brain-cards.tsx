@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Beer, Lightbulb, TrendingUp } from 'lucide-react'
+import { Activity, AlertTriangle, Beer, Lightbulb, TrendingUp } from 'lucide-react'
 import { CardEmpty, CardShell } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
 
@@ -305,6 +305,104 @@ export function StockCoverCard({ part }: ToolCardRendererProps) {
                 ok
               </span>
             )}
+          </li>
+        ))}
+      </ul>
+    </CardShell>
+  )
+}
+
+// ─── brain_check_change_point ────────────────────────────────────────────
+
+type ChangePoint = {
+  onset_date: string
+  direction: 'up' | 'down'
+  magnitude_band_units: number | null
+  magnitude_pct: number | null
+  detector: string
+  severity: 'low' | 'medium' | 'high'
+  recalibration_needed: boolean | null
+  attribution: string[]
+}
+type ChangePointData = {
+  venue: string
+  stable: boolean
+  n_change_points: number
+  change_points: ChangePoint[]
+}
+
+export function ChangePointCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={Activity} title="Regime shift">
+        <CardEmpty
+          message={
+            output.reason === 'not-supported'
+              ? (output.detail ?? 'Change-point detection not run for that venue.')
+              : (output.detail ?? "Couldn't check for regime shifts.")
+          }
+        />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<ChangePointData>(output)) return null
+  const { venue, stable, change_points } = output.data
+  if (stable || !change_points?.length) {
+    return (
+      <CardShell
+        icon={TrendingUp}
+        title={`${VENUE_LABELS[venue] ?? venue} — no regime shift`}
+        subtitle="trading rhythm is stable"
+        tone="success"
+      >
+        <p className="text-[12.5px] text-muted-foreground">
+          No sustained change in normal detected.
+        </p>
+      </CardShell>
+    )
+  }
+  const ranked = [...change_points].sort(
+    (a, b) =>
+      Number(b.severity === 'high') - Number(a.severity === 'high') ||
+      b.onset_date.localeCompare(a.onset_date),
+  )
+  return (
+    <CardShell
+      icon={Activity}
+      title={`${VENUE_LABELS[venue] ?? venue} — ${change_points.length} regime shift${change_points.length === 1 ? '' : 's'}`}
+      subtitle="sustained change in normal"
+      tone="warning"
+    >
+      <ul className="space-y-2">
+        {ranked.slice(0, 4).map((cp) => (
+          <li
+            key={`${cp.onset_date}-${cp.direction}`}
+            className="rounded-md bg-muted/40 px-2.5 py-1.5"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[12.5px] font-medium text-foreground">
+                since {cp.onset_date} · {cp.direction === 'down' ? '↓' : '↑'}
+                {cp.magnitude_pct != null ? ` ${Math.abs(Math.round(cp.magnitude_pct))}%` : ''}
+              </span>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
+                  SEVERITY_CLASS[cp.severity] ?? SEVERITY_CLASS.low
+                }`}
+              >
+                {cp.severity}
+              </span>
+            </div>
+            {cp.attribution?.[0] ? (
+              <p className="mt-0.5 text-[11.5px] italic text-muted-foreground">
+                {cp.attribution[0]}
+              </p>
+            ) : null}
+            {cp.recalibration_needed ? (
+              <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                forecast baseline likely stale — re-learn the rhythm
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>
