@@ -194,3 +194,21 @@ longer error). No code change was needed to recover the files.
   monitoring dormant. TRT's closure is the validated ground-truth break (delay
   reported). A BH shift coincident with the TRT closure window is documented
   spillover, surfaced via attribution — not a false alarm.
+
+## Point deviation (the per-day primitive)
+
+- **FLAG-PD1 (Ellel sparsity).** Point deviation fires only on genuine trading
+  days — the shared residual stream excludes structural-zero days, so a
+  booking-driven venue's empty days never raise a false deviation. Ellel
+  therefore deviates only on real booking days.
+- **FLAG-PD2 (band-multiple severity).** Point severity uses band multiples
+  (`DEV_BAND_K`, `DEV_SEVERE_K`), deliberately distinct from change-point's
+  persistence-aware `_severity` (a single point has no run length).
+- **FLAG-PD3 (attribution is correlational).** Inherits the change-point caveats:
+  coincident ≠ causal; A14b draught weighting; the seasonal-baseline limitation
+  (the "cold snap" wording compares to the annual mean).
+- **FLAG-PD4 (API migration).** `POST /deviation/check` was migrated from the old
+  band-breach detector (`observations` → `breaches`) to the residual-stream
+  `check_point`, so point-deviation and change-point share one scale. The
+  caller-supplied-`observations` path was dropped (unused by any caller; reading
+  stored actuals via `as_of`/latest covers the live need). Confirm with the owner.

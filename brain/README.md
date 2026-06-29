@@ -101,7 +101,8 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 |---|---|---|
 | GET | `/health` | store status |
 | GET | `/forecast?venue=&layer=&level=&date_from=&date_to=&key=` | A5/A6 bands |
-| POST | `/deviation/check` | §6 breach rule |
+| POST | `/deviation/check` | per-day band check on the residual stream (point primitive) |
+| POST | `/deviation/scan` | last N trading days, classified (briefing feed) |
 | POST | `/deviation/changepoint` | A13 sustained regime shifts + attribution |
 | GET | `/sop-gaps` | A8 |
 | POST | `/checklist/discipline` | A9 |
