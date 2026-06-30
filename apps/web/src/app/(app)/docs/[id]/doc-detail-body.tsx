@@ -2,15 +2,19 @@
 
 import {
   AlertTriangle,
+  Archive,
   BookOpen,
   Camera,
   CheckSquare,
   ClipboardList,
   FileText,
+  GitBranch,
   Hash,
   Loader2,
   MapPin,
   Pencil,
+  Replace,
+  RotateCcw,
   Sparkles,
   Tag,
   Trash2,
@@ -22,6 +26,7 @@ import { toast } from 'sonner'
 import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 import { EditDocModal } from '@/components/docs/edit-doc-modal'
+import { SupersedePickerModal } from '@/components/docs/supersede-picker-modal'
 import { AppShell } from '@/components/shell/app-shell'
 import { PageHeader } from '@/components/shell/page-header'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -39,7 +44,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { DocDetailDto } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
 import { formatRelative } from '@/lib/format-relative'
-import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
+import { useDeleteDoc, useDoc, useUnsupersedeDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
 
@@ -202,6 +207,92 @@ function StatusBanner({
   return null
 }
 
+// Shown on an archived (superseded) doc. Names the successor and offers an undo
+// that re-ingests this version back into the live library.
+function SupersededBanner({ doc }: { doc: DocDetailDto }) {
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const unsupersede = useUnsupersedeDoc()
+
+  async function handleRestore() {
+    try {
+      await unsupersede.mutateAsync(doc.id)
+      toast.success('Restoring — re-reading the document')
+      setConfirmOpen(false)
+    } catch (err) {
+      toast.error(mapApiError(err))
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+          <Archive className="h-4 w-4" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <p className="text-sm font-semibold">This version has been archived</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {doc.supersededBy ? (
+              <>
+                Replaced by{' '}
+                <Link
+                  href={`/docs/${doc.supersededBy.id}`}
+                  className="font-medium underline underline-offset-2 hover:text-foreground"
+                >
+                  {doc.supersededBy.title?.trim() || 'a newer version'}
+                </Link>
+                . It no longer shows up in chat answers.
+              </>
+            ) : (
+              <>It no longer shows up in chat answers.</>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setConfirmOpen(true)}
+              className="cursor-pointer gap-1.5"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+              Restore this version
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Restore this version?</DialogTitle>
+            <DialogDescription>
+              We’ll re-read this document and bring it back into your live knowledge base. The newer
+              version stays put — you’ll have both until you archive one again.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+              disabled={unsupersede.isPending}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRestore}
+              disabled={unsupersede.isPending}
+              className="cursor-pointer"
+            >
+              {unsupersede.isPending ? 'Restoring…' : 'Restore'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
 function DeleteDocDialog({
   docId,
   open,
@@ -263,14 +354,19 @@ function DocActions({
   onOpenClassify,
   onOpenProposal,
   onOpenEdit,
+  onOpenSupersede,
 }: {
   doc: DocDetailDto
   onOpenClassify: () => void
   onOpenProposal: () => void
   onOpenEdit: () => void
+  onOpenSupersede: () => void
 }) {
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const canPickCategory = doc.processingStatus === 'ready'
+  // Archived docs are read-only history — reclassify/edit/replace don't apply
+  // (restore lives in the banner). Delete stays available everywhere.
+  const isArchived = Boolean(doc.supersededAt)
+  const canPickCategory = doc.processingStatus === 'ready' && !isArchived
   const reclassifyLabel = doc.documentType
     ? 'Change category'
     : doc.pendingTypeProposal
@@ -289,16 +385,30 @@ function DocActions({
           {reclassifyLabel}
         </Button>
       ) : null}
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={onOpenEdit}
-        aria-label="Edit document"
-        title="Edit document"
-        className="cursor-pointer text-muted-foreground hover:text-foreground"
-      >
-        <Pencil className="h-4 w-4" aria-hidden />
-      </Button>
+      {!isArchived && doc.processingStatus === 'ready' ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onOpenSupersede}
+          aria-label="Replace an older version"
+          title="Replace an older version"
+          className="cursor-pointer text-muted-foreground hover:text-foreground"
+        >
+          <Replace className="h-4 w-4" aria-hidden />
+        </Button>
+      ) : null}
+      {!isArchived ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onOpenEdit}
+          aria-label="Edit document"
+          title="Edit document"
+          className="cursor-pointer text-muted-foreground hover:text-foreground"
+        >
+          <Pencil className="h-4 w-4" aria-hidden />
+        </Button>
+      ) : null}
       <Button
         size="sm"
         variant="ghost"
@@ -469,6 +579,7 @@ export function DocDetailBody({ id }: { id: string }) {
   const [classifyOpen, setClassifyOpen] = useState(false)
   const [proposalOpen, setProposalOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [supersedeOpen, setSupersedeOpen] = useState(false)
 
   const data = doc.data
   const title = data?.title?.trim() || 'Untitled document'
@@ -484,6 +595,7 @@ export function DocDetailBody({ id }: { id: string }) {
               onOpenClassify={() => setClassifyOpen(true)}
               onOpenProposal={() => setProposalOpen(true)}
               onOpenEdit={() => setEditOpen(true)}
+              onOpenSupersede={() => setSupersedeOpen(true)}
             />
           ) : null
         }
@@ -508,6 +620,12 @@ export function DocDetailBody({ id }: { id: string }) {
               <header className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <CategoryChip doc={data} />
+                  {data.supersededAt ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                      <Archive className="h-3.5 w-3.5" aria-hidden />
+                      Archived
+                    </span>
+                  ) : null}
                 </div>
                 <h1
                   className={cn(
@@ -523,6 +641,21 @@ export function DocDetailBody({ id }: { id: string }) {
                   </p>
                 ) : null}
                 <MetaLine doc={data} />
+                {data.supersedes ? (
+                  <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                    <GitBranch className="h-3.5 w-3.5" aria-hidden />
+                    Replaces an earlier version
+                    <span className="text-muted-foreground/40" aria-hidden>
+                      ·
+                    </span>
+                    <Link
+                      href={`/docs/${data.supersedes.id}`}
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      View previous
+                    </Link>
+                  </p>
+                ) : null}
                 {data.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {data.tags.map((t) => (
@@ -537,11 +670,15 @@ export function DocDetailBody({ id }: { id: string }) {
                 ) : null}
               </header>
 
-              <StatusBanner
-                doc={data}
-                onOpenClassify={() => setClassifyOpen(true)}
-                onOpenProposal={() => setProposalOpen(true)}
-              />
+              {data.supersededAt ? (
+                <SupersededBanner doc={data} />
+              ) : (
+                <StatusBanner
+                  doc={data}
+                  onOpenClassify={() => setClassifyOpen(true)}
+                  onOpenProposal={() => setProposalOpen(true)}
+                />
+              )}
 
               <ContentBlock content={data.content} />
 
@@ -565,6 +702,13 @@ export function DocDetailBody({ id }: { id: string }) {
             />
           ) : null}
           {editOpen ? <EditDocModal doc={data} open={editOpen} onOpenChange={setEditOpen} /> : null}
+          {supersedeOpen ? (
+            <SupersedePickerModal
+              docId={data.id}
+              open={supersedeOpen}
+              onOpenChange={setSupersedeOpen}
+            />
+          ) : null}
         </>
       ) : null}
     </AppShell>

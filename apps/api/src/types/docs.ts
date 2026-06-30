@@ -196,6 +196,13 @@ export type ChecklistInstanceKey = z.infer<typeof ChecklistInstanceKeySchema>
 
 export type ProcessingStatus = 'processing' | 'ready' | 'failed'
 
+// Minimal pointer to another version of a doc — the immediate successor or
+// predecessor in a supersede chain. Title is null for untitled docs.
+export type DocVersionRef = {
+  id: string
+  title: string | null
+}
+
 export type DocListItem = {
   id: string
   title: string | null
@@ -210,6 +217,11 @@ export type DocListItem = {
   isProcedural: boolean
   processingStatus: ProcessingStatus
   processingError: string | null
+  // Version-history lifecycle. version is display-only (1 for never-superseded
+  // docs); supersededAt is non-null only on archived rows, which the library
+  // surfaces under the "Archived" filter.
+  version: number
+  supersededAt: string | null
   createdAt: string
   updatedAt: string
 }
@@ -242,6 +254,14 @@ export type DocDetail = {
   docPurpose: DocPurpose | null
   processingStatus: ProcessingStatus
   processingError: string | null
+  // Version history. version is display-only. supersededBy is the successor that
+  // archived this doc (non-null ⇒ this row is archived); supersedes is the
+  // predecessor this doc replaced (non-null ⇒ this is a newer version). A
+  // mid-chain doc can carry both.
+  version: number
+  supersededAt: string | null
+  supersededBy: DocVersionRef | null
+  supersedes: DocVersionRef | null
   createdAt: string
   updatedAt: string
 }

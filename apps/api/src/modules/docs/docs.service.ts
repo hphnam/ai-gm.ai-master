@@ -16,6 +16,7 @@ import {
   DocumentTypeDto,
   type DocumentTypeKind,
   DocumentTypeKindSchema,
+  type DocVersionRef,
   type ProcessingStatus,
   type ProposedDocType,
   ProposedDocTypeSchema,
@@ -58,6 +59,13 @@ function titleFromMetadata(metadata: unknown): string | null {
   if (typeof m.title === 'string' && m.title.trim()) return m.title.trim()
   if (typeof m.docType === 'string' && m.docType.trim()) return m.docType.trim()
   return null
+}
+
+// Adjacent-version pointer for the doc-detail banners. Title falls back through
+// the same metadata path as the doc itself so an untitled neighbour still reads.
+function toVersionRef(row: { id: string; metadata: unknown } | null): DocVersionRef | null {
+  if (!row) return null
+  return { id: row.id, title: titleFromMetadata(row.metadata) }
 }
 
 // Library-list helpers. Cursor is base64(JSON({v, id})). `v` is whatever the
@@ -108,7 +116,7 @@ function buildFiltersSql(args: {
   q: string | null
   category: string | null
   venue: string | null
-  status: 'ready' | 'processing' | 'attention' | 'all'
+  status: 'ready' | 'processing' | 'attention' | 'archived' | 'all'
 }) {
   const parts: Prisma.Sql[] = [Prisma.sql`TRUE`]
   if (args.q) {
@@ -165,6 +173,8 @@ function toListItem(r: {
   aiSummary: string | null
   processingStatus: string
   processingError: string | null
+  version: number
+  supersededAt: Date | null
   createdAt: Date
   updatedAt: Date
   pendingTypeProposal: unknown
@@ -207,6 +217,8 @@ function toListItem(r: {
     isProcedural: documentType?.kind === 'procedural',
     processingStatus: coerceProcessingStatus(r.processingStatus),
     processingError: r.processingError,
+    version: r.version,
+    supersededAt: r.supersededAt ? r.supersededAt.toISOString() : null,
     createdAt: r.createdAt.toISOString(),
     updatedAt: r.updatedAt.toISOString(),
   }
@@ -382,7 +394,7 @@ export class DocsService {
       q?: string
       category?: string
       venue?: string
-      status?: 'ready' | 'processing' | 'attention' | 'all'
+      status?: 'ready' | 'processing' | 'attention' | 'archived' | 'all'
       sort?: 'recent' | 'oldest' | 'name'
       cursor?: string | null
       limit?: number
@@ -404,6 +416,8 @@ export class DocsService {
       aiSummary: string | null
       processingStatus: string
       processingError: string | null
+      version: number
+      supersededAt: Date | null
       createdAt: Date
       updatedAt: Date
       pendingTypeProposal: unknown
@@ -440,11 +454,19 @@ export class DocsService {
     })()
 
     const filtersSql = buildFiltersSql({ q, category, venue, status })
+    // Lifecycle gate. The library shows live docs by default; the dedicated
+    // 'archived' filter surfaces superseded rows (otherwise invisible) so an
+    // operator can find — and undo — an auto-reconcile.
+    const lifecycleSql =
+      status === 'archived'
+        ? Prisma.sql`ki."supersededAt" IS NOT NULL`
+        : Prisma.sql`ki."supersededAt" IS NULL`
 
     const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
       SELECT
         ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
-        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."processingStatus", ki."processingError", ki.version, ki."supersededAt",
+        ki."createdAt", ki."updatedAt",
         ki."pendingTypeProposal",
         v.id AS venue_id, v.name AS venue_name,
         dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
@@ -454,7 +476,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
-        AND ki."supersededAt" IS NULL
+        AND ${lifecycleSql}
         AND ${filtersSql}
         AND ${cursorSql}
       ORDER BY ${orderBySql}
@@ -471,7 +493,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
-        AND ki."supersededAt" IS NULL
+        AND ${lifecycleSql}
         AND ${filtersSql}
     `)
     const total = Number(totalRow[0]?.total ?? 0)
@@ -503,6 +525,8 @@ export class DocsService {
         aiSummary: string | null
         processingStatus: string
         processingError: string | null
+        version: number
+        supersededAt: Date | null
         createdAt: Date
         updatedAt: Date
         pendingTypeProposal: unknown
@@ -517,7 +541,8 @@ export class DocsService {
     >(Prisma.sql`
       SELECT
         ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
-        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."processingStatus", ki."processingError", ki.version, ki."supersededAt",
+        ki."createdAt", ki."updatedAt",
         ki."pendingTypeProposal",
         v.id AS venue_id, v.name AS venue_name,
         dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
@@ -842,11 +867,23 @@ export class DocsService {
         aiSummary: true,
         processingStatus: true,
         processingError: true,
+        version: true,
+        supersededAt: true,
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
         documentType: {
           select: { id: true, name: true, description: true, schema: true, kind: true },
+        },
+        // Successor that archived this doc (if any).
+        supersededBy: { select: { id: true, metadata: true } },
+        // Predecessor(s) this doc replaced. Linear chains have one; manual
+        // reconcile can fold several older docs into one successor — surface the
+        // most-recently-archived as the "previous version" link.
+        supersedes: {
+          select: { id: true, metadata: true },
+          orderBy: { supersededAt: 'desc' },
+          take: 1,
         },
         pendingTypeProposal: true,
         // Plan 04-03 Task 1 — include 1-1 Checklist for procedural docs.
@@ -900,6 +937,10 @@ export class DocsService {
       docPurpose: docPurpose.success ? docPurpose.data : null,
       processingStatus: coerceProcessingStatus(row.processingStatus),
       processingError: row.processingError,
+      version: row.version,
+      supersededAt: row.supersededAt ? row.supersededAt.toISOString() : null,
+      supersededBy: toVersionRef(row.supersededBy),
+      supersedes: toVersionRef(row.supersedes[0] ?? null),
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     }
@@ -972,6 +1013,11 @@ export class DocsService {
       // this category — re-classifying would clobber their decision.
       preserveDocumentTypeId?: string | null
       preservePendingTypeProposal?: Record<string, unknown> | null
+      // Skip version reconciliation for this ingest regardless of whether a type
+      // is preserved. The restore (un-supersede) path sets this so a re-ingested
+      // doc can't be re-archived against its own successor — preserveDocumentTypeId
+      // alone wouldn't cover an archived doc that has no confirmed type.
+      skipReconcile?: boolean
       // When true AND no venueId is set, the classifier is asked to propose a
       // venue from the org's list. High-confidence proposals are auto-applied.
       autoDetectVenue?: boolean
@@ -1122,7 +1168,11 @@ export class DocsService {
       // explicit in-place update of the same id — not a new version — so it's
       // excluded. The doc is fully built by here; archiving the predecessor is
       // best-effort and must not fail the upload.
-      if (!input.preserveDocumentTypeId && process.env.DOC_RECONCILE_DISABLED !== '1') {
+      if (
+        !input.preserveDocumentTypeId &&
+        !input.skipReconcile &&
+        process.env.DOC_RECONCILE_DISABLED !== '1'
+      ) {
         try {
           await this.reconcile.detectAndSupersede({
             newItemId: id,
@@ -1788,6 +1838,91 @@ export class DocsService {
         supersededId: replacesId,
       }),
     )
+  }
+
+  // Undo a supersede — bring an archived doc back to the live library. Clears the
+  // archive stamps (ReconcileService.unsupersede) then re-ingests the doc to
+  // rebuild the retrieval rows that archiveWithinTx dropped, so it re-enters
+  // search instead of returning as a dead row. Tabular structured rows can't be
+  // rebuilt without the original file, so a restored table-doc loses those — an
+  // accepted degradation on an undo.
+  async unsupersedeManually(
+    archivedId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: archivedId },
+      select: {
+        id: true,
+        organizationId: true,
+        answerStatus: true,
+        supersededAt: true,
+        supersededById: true,
+        content: true,
+        metadata: true,
+        venueId: true,
+        documentTypeId: true,
+        pendingTypeProposal: true,
+      },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'unsupersede',
+            targetRowId: archivedId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    // Gaps (pending questions) aren't real docs; refuse to restore them.
+    if (row.answerStatus !== 'answered') throw new DocNotFoundOrCrossOrgError()
+    if (!row.supersededAt || !row.supersededById) {
+      throw new ReconcileConflictError('that document is not archived')
+    }
+
+    const restored = await this.reconcile.unsupersede(archivedId, row.supersededById, orgId)
+    if (!restored) {
+      throw new ReconcileConflictError('that document is not archived')
+    }
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.unsuperseded',
+        orgId,
+        actingUserId: userId,
+        restoredId: archivedId,
+        successorId: row.supersededById,
+      }),
+    )
+
+    // Re-ingest from the doc's stored content (no original file needed) to
+    // rebuild its sections/search index/checklist. preserveDocumentTypeId keeps
+    // the confirmed category when there is one (a manually-superseded doc may
+    // have none, which would otherwise re-classify it). skipReconcile guarantees
+    // the restore can't immediately re-archive itself against its own successor
+    // regardless of whether a type is preserved.
+    const metadata = (row.metadata ?? {}) as Record<string, unknown>
+    const enrichInput = {
+      title: titleFromMetadata(metadata) ?? '',
+      content: row.content,
+      venueId: row.venueId,
+      preserveDocumentTypeId: row.documentTypeId,
+      preservePendingTypeProposal: (row.pendingTypeProposal ?? null) as Record<
+        string,
+        unknown
+      > | null,
+      skipReconcile: true,
+    }
+    setImmediate(() => {
+      void this.enrichInBackground(archivedId, enrichInput, orgId, userId)
+    })
   }
 
   async remove(id: string, orgId: string): Promise<void> {

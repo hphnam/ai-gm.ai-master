@@ -139,6 +139,55 @@ export class ReconcileService {
     return true
   }
 
+  // Reverse a supersede: clear the predecessor's archive stamps, flip it back to
+  // 'processing' (the caller re-ingests to rebuild its dropped retrieval rows),
+  // and roll the successor's display version back to the predecessor's. Returns
+  // false when the predecessor is no longer archived (already restored / lost a
+  // race). Mirrors supersede()'s locked-tx + realtime-fanout shape.
+  async unsupersede(predecessorId: string, successorId: string, orgId: string): Promise<boolean> {
+    const restored = await prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(
+        `SELECT id FROM "knowledge_items" WHERE id IN ($1, $2) ORDER BY id FOR UPDATE`,
+        predecessorId,
+        successorId,
+      )
+      const rows = await tx.knowledgeItem.findMany({
+        where: { id: { in: [predecessorId, successorId] }, organizationId: orgId },
+        select: { id: true, version: true, supersededAt: true },
+      })
+      const pred = rows.find((r) => r.id === predecessorId)
+      const succ = rows.find((r) => r.id === successorId)
+      // Bail if the predecessor isn't archived anymore (race) or the successor
+      // vanished / is cross-org. The org filter above makes this self-defending
+      // rather than trusting the caller's invariant. Don't require the successor
+      // to still be live — a longer chain shouldn't block restoring one of its links.
+      if (!pred?.supersededAt || !succ) return false
+
+      await tx.knowledgeItem.update({
+        where: { id: predecessorId },
+        data: {
+          supersededAt: null,
+          supersededById: null,
+          processingStatus: 'processing',
+          processingError: null,
+        },
+      })
+      // version is display-only; reverse the +1 bump archiveWithinTx applied.
+      // Best-effort for fan-in chains (a successor folding several predecessors).
+      await tx.knowledgeItem.update({
+        where: { id: successorId },
+        data: { version: pred.version },
+      })
+      return true
+    })
+    if (!restored) return false
+    this.realtime.emitDocUpdated(orgId, { id: predecessorId, status: 'processing' })
+    this.realtime.emitDocUpdated(orgId, { id: successorId, status: 'ready' })
+    // KB changed (a doc came back) — debounce-trigger a memory reconcile.
+    this.memoryReconcile.onKbChanged(orgId)
+    return true
+  }
+
   // Closest live doc of the same DocumentType in the same venue scope, ranked by
   // cosine against the new item's stored embedding (no re-embed — the row is
   // already embedded by the time ingest returns). The incoming item is pinned to

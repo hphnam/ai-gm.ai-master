@@ -574,6 +574,32 @@ export class DocsController {
     }
   }
 
+  // Undo a reconcile — restore an archived doc (`:id`) to the live library and
+  // re-ingest it. See DocsService.unsupersedeManually.
+  @Post(':id/unsupersede')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  async unsupersede(
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<void> {
+    if (!SUPERSEDE_LIMITER.allow(org.id)) {
+      throw new HttpException({ error: 'rate-limited' }, 429)
+    }
+    try {
+      await this.docsService.unsupersedeManually(params.id, org.id, user?.id ?? null)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      if (err instanceof ReconcileConflictError) {
+        throw new ConflictException({ error: 'reconcile-conflict' } satisfies ApiErrorResponse)
+      }
+      throw err
+    }
+  }
+
   @Post(':id/classify')
   @HttpCode(200)
   @RequireRole('owner', 'manager')

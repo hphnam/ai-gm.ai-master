@@ -2034,6 +2034,8 @@ export type DocListResponseDtoItemsItem = {
   isProcedural: boolean;
   processingStatus: DocListResponseDtoItemsItemProcessingStatus;
   processingError: string | null;
+  version: number;
+  supersededAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -2112,6 +2114,8 @@ export interface DocListItemDto {
   isProcedural: boolean;
   processingStatus: DocListItemDtoProcessingStatus;
   processingError: string | null;
+  version: number;
+  supersededAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -2476,6 +2480,16 @@ export const DocDetailDtoProcessingStatus = {
   failed: 'failed',
 } as const;
 
+export type DocDetailDtoSupersededBy = {
+  id: string;
+  title: string | null;
+} | null;
+
+export type DocDetailDtoSupersedes = {
+  id: string;
+  title: string | null;
+} | null;
+
 export interface DocDetailDto {
   id: string;
   title: string | null;
@@ -2492,6 +2506,10 @@ export interface DocDetailDto {
   docPurpose: DocDetailDtoDocPurpose;
   processingStatus: DocDetailDtoProcessingStatus;
   processingError: string | null;
+  version: number;
+  supersededAt: string | null;
+  supersededBy: DocDetailDtoSupersededBy;
+  supersedes: DocDetailDtoSupersedes;
   createdAt: string;
   updatedAt: string;
 }
@@ -3500,6 +3518,7 @@ export const DocsControllerListStatus = {
   ready: 'ready',
   processing: 'processing',
   attention: 'attention',
+  archived: 'archived',
 } as const;
 
 export type DocsControllerListSort = typeof DocsControllerListSort[keyof typeof DocsControllerListSort];
@@ -11643,6 +11662,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDocsControllerSupersedeMutationOptions(options), queryClient);
+    }
+
+export type docsControllerUnsupersedeResponse204 = {
+  data: void
+  status: 204
+}
+
+export type docsControllerUnsupersedeResponseSuccess = (docsControllerUnsupersedeResponse204) & {
+  headers: Headers;
+};
+;
+
+export type docsControllerUnsupersedeResponse = (docsControllerUnsupersedeResponseSuccess)
+
+export const getDocsControllerUnsupersedeUrl = (id: string,) => {
+
+
+
+
+  return `/docs/${id}/unsupersede`
+}
+
+export const docsControllerUnsupersede = async (id: string, options?: RequestInit): Promise<docsControllerUnsupersedeResponse> => {
+
+  return orvalMutator<docsControllerUnsupersedeResponse>(getDocsControllerUnsupersedeUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDocsControllerUnsupersedeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerUnsupersede>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof docsControllerUnsupersede>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['docsControllerUnsupersede'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof docsControllerUnsupersede>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  docsControllerUnsupersede(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DocsControllerUnsupersedeMutationResult = NonNullable<Awaited<ReturnType<typeof docsControllerUnsupersede>>>
+
+    export type DocsControllerUnsupersedeMutationError = unknown
+
+    export const useDocsControllerUnsupersede = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof docsControllerUnsupersede>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof docsControllerUnsupersede>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDocsControllerUnsupersedeMutationOptions(options), queryClient);
     }
 
 export type docsControllerClassifyManuallyResponse200 = {

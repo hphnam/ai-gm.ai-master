@@ -20,12 +20,12 @@ import { cn } from '@/lib/utils'
 
 type CategoryFilter = 'all' | 'unclassified' | string
 type VenueFilter = 'all' | 'global' | string
-type StatusFilter = 'all' | 'ready' | 'processing' | 'attention'
+type StatusFilter = 'all' | 'ready' | 'processing' | 'attention' | 'archived'
 type SortKey = 'recent' | 'name' | 'oldest'
 
 const SEARCH_DEBOUNCE_MS = 250
 
-const STATUS_VALUES = ['all', 'ready', 'processing', 'attention'] as const
+const STATUS_VALUES = ['all', 'ready', 'processing', 'attention', 'archived'] as const
 const SORT_VALUES = ['recent', 'oldest', 'name'] as const
 
 export function LibraryTab() {
@@ -240,6 +240,7 @@ export function LibraryTab() {
                     <SelectItem value="ready">Ready</SelectItem>
                     <SelectItem value="processing">Processing</SelectItem>
                     <SelectItem value="attention">Needs attention</SelectItem>
+                    <SelectItem value="archived">Archived (superseded)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

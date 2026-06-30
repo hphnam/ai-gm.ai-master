@@ -56,6 +56,12 @@ export class ChecklistDto extends createZodDto(ChecklistSchema) {}
 
 const ProcessingStatusSchema = z.enum(['processing', 'ready', 'failed'])
 
+// Pointer to an adjacent version (successor/predecessor) in a supersede chain.
+const DocVersionRefSchema = z.object({
+  id: z.string(),
+  title: z.string().nullable(),
+})
+
 export const DocListItemSchema = z.object({
   id: z.string(),
   title: z.string().nullable(),
@@ -70,6 +76,8 @@ export const DocListItemSchema = z.object({
   isProcedural: z.boolean(),
   processingStatus: ProcessingStatusSchema,
   processingError: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
@@ -104,6 +112,10 @@ export const DocDetailSchema = z.object({
   docPurpose: DocPurposeSchema.nullable(),
   processingStatus: ProcessingStatusSchema,
   processingError: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
+  supersededBy: DocVersionRefSchema.nullable(),
+  supersedes: DocVersionRefSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
@@ -177,7 +189,7 @@ export const DocListQuerySchema = z.object({
     .union([z.literal('all'), z.literal('unclassified'), z.string().regex(UUID_RE)])
     .optional(),
   venue: z.union([z.literal('all'), z.literal('global'), z.string().regex(UUID_RE)]).optional(),
-  status: z.enum(['all', 'ready', 'processing', 'attention']).optional(),
+  status: z.enum(['all', 'ready', 'processing', 'attention', 'archived']).optional(),
   sort: z.enum(['recent', 'oldest', 'name']).optional(),
   cursor: z.string().max(500).optional(),
   limit: z.coerce.number().int().min(1).max(50).optional(),

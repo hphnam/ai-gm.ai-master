@@ -2710,7 +2710,7 @@ export const DocsControllerListQueryParams = zod.object({
   "q": zod.string().max(docsControllerListQueryQMax).optional(),
   "category": zod.union([zod.literal("all"),zod.literal("unclassified"),zod.string().regex(docsControllerListQueryCategoryThreeRegExp)]).optional(),
   "venue": zod.union([zod.literal("all"),zod.literal("global"),zod.string().regex(docsControllerListQueryVenueThreeRegExp)]).optional(),
-  "status": zod.enum(['all', 'ready', 'processing', 'attention']).optional(),
+  "status": zod.enum(['all', 'ready', 'processing', 'attention', 'archived']).optional(),
   "sort": zod.enum(['recent', 'oldest', 'name']).optional(),
   "cursor": zod.string().max(docsControllerListQueryCursorMax).optional(),
   "limit": zod.number().min(1).max(docsControllerListQueryLimitMax).optional()
@@ -2753,6 +2753,8 @@ export const DocsControllerListResponse = zod.object({
   "isProcedural": zod.boolean(),
   "processingStatus": zod.enum(['processing', 'ready', 'failed']),
   "processingError": zod.union([zod.string(),zod.null()]),
+  "version": zod.number(),
+  "supersededAt": zod.union([zod.string(),zod.null()]),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })),
@@ -2908,6 +2910,8 @@ export const DocsControllerInboxResponseItem = zod.object({
   "isProcedural": zod.boolean(),
   "processingStatus": zod.enum(['processing', 'ready', 'failed']),
   "processingError": zod.union([zod.string(),zod.null()]),
+  "version": zod.number(),
+  "supersededAt": zod.union([zod.string(),zod.null()]),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -3222,6 +3226,16 @@ export const DocsControllerGetResponse = zod.object({
   "docPurpose": zod.union([zod.enum(['org_chart']),zod.null()]),
   "processingStatus": zod.enum(['processing', 'ready', 'failed']),
   "processingError": zod.union([zod.string(),zod.null()]),
+  "version": zod.number(),
+  "supersededAt": zod.union([zod.string(),zod.null()]),
+  "supersededBy": zod.union([zod.object({
+  "id": zod.string(),
+  "title": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
+  "supersedes": zod.union([zod.object({
+  "id": zod.string(),
+  "title": zod.union([zod.string(),zod.null()])
+}),zod.null()]),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -3419,6 +3433,16 @@ export const DocsControllerSupersedeBody = zod.object({
 })
 
 export const DocsControllerSupersedeResponse = zod.void()
+
+
+export const docsControllerUnsupersedePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const DocsControllerUnsupersedeParams = zod.object({
+  "id": zod.string().regex(docsControllerUnsupersedePathIdRegExp)
+})
+
+export const DocsControllerUnsupersedeResponse = zod.void()
 
 
 export const docsControllerClassifyManuallyPathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
