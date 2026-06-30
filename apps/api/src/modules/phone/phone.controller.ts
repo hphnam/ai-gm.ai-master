@@ -80,7 +80,7 @@ export class PhoneController {
     try {
       // audit-added M2: block silent number swap — require explicit unlink first.
       await this.service.assertNoExistingPhone(user.id)
-      this.service.assertSendRateLimit(user.id, phoneHash, ipHash)
+      await this.service.assertSendRateLimit(user.id, phoneHash, ipHash)
       const start = await this.verifier.startVerification(body.phoneNumber, { requestId })
       if (!start.ok) {
         if (start.reason === 'phone-invalid-format') {

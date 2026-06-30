@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { AppShell } from '@/components/shell/app-shell'
 import { useDebouncedValue } from '@/components/shell/notifications-shared'
 import { PageHeader } from '@/components/shell/page-header'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -110,14 +111,29 @@ export function HistoryBody() {
     }
   }, [lastVisibleIndex, rows.length, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const handleDelete = async (e: React.MouseEvent, convId: string, venueId: string) => {
+  const [pendingDelete, setPendingDelete] = useState<{ convId: string; venueId: string } | null>(
+    null,
+  )
+
+  const handleDelete = (e: React.MouseEvent, convId: string, venueId: string) => {
     e.stopPropagation()
-    if (!window.confirm('Delete this thread? This cannot be undone.')) return
+    setPendingDelete({ convId, venueId })
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
     try {
-      await deleteConversation.mutateAsync({ conversationId: convId, venueId })
+      await deleteConversation.mutateAsync({
+        conversationId: pendingDelete.convId,
+        venueId: pendingDelete.venueId,
+      })
       toast.success('Thread deleted')
-    } catch {
+      setPendingDelete(null)
+    } catch (err) {
+      // Re-throw so ConfirmDeleteDialog keeps itself open for a retry instead
+      // of dismissing on a failed delete (matches the incidents flow).
       toast.error('Could not delete thread')
+      throw err
     }
   }
 
@@ -213,6 +229,19 @@ export function HistoryBody() {
           </div>
         </div>
       </div>
+      <ConfirmDeleteDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null)
+        }}
+        title="Delete this thread?"
+        description={
+          <span>This permanently deletes the conversation. The action can't be undone.</span>
+        }
+        confirmLabel="Delete thread"
+        isPending={deleteConversation.isPending}
+        onConfirm={confirmDelete}
+      />
     </AppShell>
   )
 }

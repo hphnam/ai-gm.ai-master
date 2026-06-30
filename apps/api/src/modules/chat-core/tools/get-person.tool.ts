@@ -92,6 +92,9 @@ export async function getPerson(
       .findMany({
         where: {
           organizationId: orgId,
+          // Exclude archived (superseded) versions — a stale contact from an old
+          // doc must not surface in live answers.
+          supersededAt: null,
           OR: [
             // contactNames metadata path holding an array of names; array_contains
             // matches when array contains the given string verbatim.

@@ -24,12 +24,14 @@ import {
   type UpdateDocRequest,
 } from '../../types'
 import { IngestService } from '../ingest/ingest.service'
+import { MemoryReconcileTrigger } from '../organization/memory-reconcile.trigger'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { ParsedDocument } from '../reducto/reducto.service'
 import { ReductoService } from '../reducto/reducto.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService, VENUE_AUTO_ASSIGN_CONFIDENCE } from './classifier.service'
+import { ReconcileService } from './reconcile.service'
 
 function composeContent(description: string | undefined, body: string): string {
   const desc = description?.trim()
@@ -217,6 +219,16 @@ export class DocNotFoundOrCrossOrgError extends Error {
   }
 }
 
+// Manual reconcile preconditions: the two docs are the same row, or one of them
+// is already archived. Distinct from not-found so the controller can map it to a
+// 409 rather than a 404.
+export class ReconcileConflictError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ReconcileConflictError'
+  }
+}
+
 // Plan 04-02 Task 3 — accept/reject endpoint error classes.
 export class TypeProposalMissingError extends Error {
   constructor() {
@@ -323,6 +335,8 @@ export class DocsService {
     private readonly reducto: ReductoService,
     private readonly retrieval: RetrievalService,
     private readonly realtime: RealtimeGateway,
+    private readonly reconcile: ReconcileService,
+    private readonly memoryReconcile: MemoryReconcileTrigger,
   ) {}
 
   // Wraps a status update so callers don't have to remember to also push the
@@ -342,6 +356,9 @@ export class DocsService {
         },
       })
       .catch(() => undefined)
+    // A doc reaching 'ready' means the KB content changed — debounce-trigger a
+    // memory reconcile so stale agent-memory notes get pruned within minutes.
+    if (data.processingStatus === 'ready') this.memoryReconcile.onKbChanged(orgId)
     try {
       this.realtime.emitDocUpdated(orgId, {
         id: knowledgeItemId,
@@ -437,6 +454,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ki."supersededAt" IS NULL
         AND ${filtersSql}
         AND ${cursorSql}
       ORDER BY ${orderBySql}
@@ -453,6 +471,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ki."supersededAt" IS NULL
         AND ${filtersSql}
     `)
     const total = Number(totalRow[0]?.total ?? 0)
@@ -508,6 +527,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ki."supersededAt" IS NULL
         AND (
           ki."processingStatus" = 'failed'
           OR (
@@ -1096,6 +1116,32 @@ export class DocsService {
           userId,
           kindSource: input.preserveDocumentTypeId ? 'accept-type' : 'matched',
         })
+      }
+
+      // Version reconciliation. A re-ingest (preserveDocumentTypeId) is an
+      // explicit in-place update of the same id — not a new version — so it's
+      // excluded. The doc is fully built by here; archiving the predecessor is
+      // best-effort and must not fail the upload.
+      if (!input.preserveDocumentTypeId && process.env.DOC_RECONCILE_DISABLED !== '1') {
+        try {
+          await this.reconcile.detectAndSupersede({
+            newItemId: id,
+            orgId,
+            venueId: input.venueId ?? null,
+            documentTypeId,
+            title: input.title ?? null,
+          })
+        } catch (err) {
+          this.logger.warn(
+            JSON.stringify({
+              level: 'warn',
+              event: 'docs.reconcile_failed',
+              knowledgeItemId: id,
+              orgId,
+              message: (err as Error)?.message ?? 'unknown',
+            }),
+          )
+        }
       }
 
       await this.setProcessingStatus(id, orgId, {
@@ -1688,6 +1734,58 @@ export class DocsService {
         orgId,
         actingUserId: userId,
         knowledgeItemId,
+      }),
+    )
+  }
+
+  // Manual reconcile — an operator (or the backfill script's reviewed output)
+  // explicitly marks `keepId` as the version that supersedes `replacesId`.
+  // Bypasses the automatic path's similarity/title/expiry guards (those exist to
+  // avoid false positives when *guessing*; a human's explicit choice overrides
+  // them) but adds strict org-ownership validation on BOTH ids — the auto path
+  // can skip that because detection is already org-scoped; here the ids come
+  // from the caller.
+  async supersedeManually(
+    keepId: string,
+    replacesId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<void> {
+    if (keepId === replacesId) {
+      throw new ReconcileConflictError('a document cannot supersede itself')
+    }
+    const rows = await prisma.knowledgeItem.findMany({
+      where: { id: { in: [keepId, replacesId] }, organizationId: orgId },
+      select: { id: true, supersededAt: true, answerStatus: true },
+    })
+    const keep = rows.find((r) => r.id === keepId)
+    const old = rows.find((r) => r.id === replacesId)
+    // Either id missing or cross-org → 404 (don't disclose which). Gaps (pending
+    // questions) aren't real docs, so refuse to reconcile them too.
+    if (!keep || !old) throw new DocNotFoundOrCrossOrgError()
+    if (keep.answerStatus !== 'answered' || old.answerStatus !== 'answered') {
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    if (keep.supersededAt) {
+      throw new ReconcileConflictError('the new version is itself archived')
+    }
+    if (old.supersededAt) {
+      throw new ReconcileConflictError('that document is already archived')
+    }
+
+    const archived = await this.reconcile.supersede(replacesId, keepId, orgId)
+    if (!archived) {
+      throw new ReconcileConflictError('that document is already archived')
+    }
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.superseded_manually',
+        orgId,
+        actingUserId: userId,
+        keptId: keepId,
+        supersededId: replacesId,
       }),
     )
   }

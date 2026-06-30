@@ -3,14 +3,17 @@ import { fail, type ToolResult } from '../../types'
 import type { DispatchContext } from '../chat/tool-dispatcher'
 import type { IntegrationProvider, IntegrationToolDefinition } from './integration-provider'
 import { IntegrationsService } from './integrations.service'
-import { createRateLimiter } from './rate-limit'
+import { createRedisRateLimiter } from './rate-limit'
 
 /// Per-org throttle on integration tool invocation. The chat agent can be
 /// nudged via prompt injection in indexed docs to call pos_* tools in a
 /// loop — both DoS-y on us and a billing-amplification vector against the
-/// org's Square account. Cap at 30 hits / min / (org, tool) — comfortably
-/// above any plausible legitimate burst (e.g. paging through orders).
-const TOOL_INVOCATION_LIMITER = createRateLimiter(60_000, 30)
+/// org's Square account. Cap at 120 hits / min / (org, tool): high enough that
+/// a whole shift of staff hammering the copilot on the same data question never
+/// trips it (the limit is per single tool, not aggregate POS traffic), but a
+/// runaway/injected tool loop fires hundreds/min and still gets caught. Now
+/// Redis-backed, so this is a true org-wide cap rather than per-node × N.
+const TOOL_INVOCATION_LIMITER = createRedisRateLimiter(60_000, 120, 'tool-invocation')
 
 /// In-process registry that integration providers self-register into on
 /// module init. The ChatModule queries this for tool definitions when
@@ -89,6 +92,35 @@ export class IntegrationRegistry {
   /// active-status source of truth stays in one place.
   async getActiveProviderIds(orgId: string): Promise<Set<string>> {
     return this.integrations.listActiveProviderIds(orgId)
+  }
+
+  /// Human-readable description of the org's active integrations for prompt
+  /// injection: vendor label + capability domain + freshness. Joins the active
+  /// DB rows with each provider's registered label/domain. A provider that's
+  /// connected but no longer registered (renamed/removed) is skipped.
+  async describeActiveIntegrations(
+    orgId: string,
+  ): Promise<
+    Array<{ provider: string; label: string; domain: string; lastSyncedAt: Date | null }>
+  > {
+    const rows = await this.integrations.listActiveIntegrations(orgId)
+    const out: Array<{
+      provider: string
+      label: string
+      domain: string
+      lastSyncedAt: Date | null
+    }> = []
+    for (const row of rows) {
+      const provider = this.providers.get(row.provider)
+      if (!provider) continue
+      out.push({
+        provider: row.provider,
+        label: provider.label,
+        domain: provider.domain,
+        lastSyncedAt: row.lastSyncedAt,
+      })
+    }
+    return out
   }
 
   /// Tool definitions + schemas for ONLY the providers in `activeProviderIds`.
@@ -172,7 +204,7 @@ export class IntegrationRegistry {
       return fail('not-supported', `tool: ${toolName}`)
     }
 
-    if (!TOOL_INVOCATION_LIMITER.allow(`${ctx.orgId}|${toolName}`)) {
+    if (!(await TOOL_INVOCATION_LIMITER.allow(`${ctx.orgId}|${toolName}`))) {
       this.logger.warn(
         JSON.stringify({
           event: 'integration_registry.rate_limited',
@@ -182,7 +214,7 @@ export class IntegrationRegistry {
       )
       return fail(
         'error',
-        `Rate limit hit for ${toolName} (max 30/min per org). Wait a moment before retrying.`,
+        `Rate limit hit for ${toolName} (max 120/min per org). Wait a moment before retrying.`,
       )
     }
 

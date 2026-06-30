@@ -25,22 +25,10 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { DocListItemDto as DocListItem } from '@/generated/api'
+import { formatRelative } from '@/lib/format-relative'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
-
-function formatRelative(iso: string): string {
-  const ts = new Date(iso).getTime()
-  const diffMs = Date.now() - ts
-  const mins = Math.round(diffMs / 60_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(iso).toLocaleDateString()
-}
 
 type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
 

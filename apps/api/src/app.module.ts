@@ -21,6 +21,8 @@ import { OnboardingMetricsModule } from './modules/metrics/onboarding/onboarding
 import { MockOpsModule } from './modules/mock-ops/mock-ops.module'
 import { NotificationsModule } from './modules/notifications/notifications.module'
 import { NudgeModule } from './modules/nudges/nudge.module'
+import { MemoryReconcileModule } from './modules/organization/memory-reconcile.module'
+import { OrganizationModule } from './modules/organization/organization.module'
 import { PhoneModule } from './modules/phone/phone.module'
 import { PricingRecommendationsModule } from './modules/pricing-recommendations/pricing-recommendations.module'
 import { ReportsModule } from './modules/reports/reports.module'
@@ -50,6 +52,8 @@ import { parseRedisUrl } from './redis-connection'
     DebugModule,
     DocsModule,
     InvitationsModule,
+    OrganizationModule,
+    MemoryReconcileModule,
     PhoneModule,
     WhatsappModule,
     NudgeModule,

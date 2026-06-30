@@ -30,6 +30,9 @@ export type {
 import { AdaptationService } from '../adaptation/adaptation.service'
 import { IncidentsService } from '../incidents/incidents.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import type { MemoryAction } from '../organization/agent-memory'
+import { handleMemoryCommand } from '../organization/agent-memory.store'
+import { loadOrganizationProfile } from '../organization/organization.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -372,6 +375,7 @@ export class ChatService implements OnModuleInit {
         WHERE "organizationId" = ${orgId}
           AND ("venueId" = ${venueId} OR "venueId" IS NULL)
           AND "answerStatus" = 'answered'
+          AND "supersededAt" IS NULL
         ORDER BY "updatedAt" DESC
         LIMIT 48
       `
@@ -749,12 +753,22 @@ Assistant answer: ${assistantText}`,
       venueSnapshot.tabularDocs?.length ?? 0,
     )
 
-    const activeProviderIds = await this.integrations.getActiveProviderIds(orgId)
+    const [activeProviderIds, businessProfile, integrationsSummary] = await Promise.all([
+      this.integrations.getActiveProviderIds(orgId),
+      loadOrganizationProfile(orgId),
+      this.integrations.describeActiveIntegrations(orgId),
+    ])
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx: { orgId, userId, userRole },
       activeProviderIds,
+      businessProfile,
+      integrationsSummary,
+      memoryExecute:
+        process.env.AGENT_MEMORY_DISABLED === '1'
+          ? null
+          : (action: MemoryAction) => handleMemoryCommand(orgId, action),
       venueContext,
       mode: agentMode,
       priorSummary: compaction.summary,
@@ -1244,6 +1258,8 @@ Assistant answer: ${assistantText}`,
       profileSummary,
       venueSnapshot,
       activeProviderIds,
+      businessProfile,
+      integrationsSummary,
     ] = await Promise.all([
       this.compactor.compactIfNeeded(conversationId, streamHistory),
       this.resolveConversationMode(conversationId, firstUserMessage),
@@ -1251,6 +1267,8 @@ Assistant answer: ${assistantText}`,
       this.getUserProfileSummary(params.userId, params.orgId),
       this.buildVenueSnapshot(params.orgId, venue.id),
       this.integrations.getActiveProviderIds(params.orgId),
+      loadOrganizationProfile(params.orgId),
+      this.integrations.describeActiveIntegrations(params.orgId),
     ])
     const modelMessages: ModelMessage[] = expandRecentToModelMessages(
       streamCompaction.recent,
@@ -1273,6 +1291,12 @@ Assistant answer: ${assistantText}`,
       integrations: this.integrations,
       ctx,
       activeProviderIds,
+      businessProfile,
+      integrationsSummary,
+      memoryExecute:
+        process.env.AGENT_MEMORY_DISABLED === '1'
+          ? null
+          : (action: MemoryAction) => handleMemoryCommand(params.orgId, action),
       venueContext,
       mode: agentMode,
       priorSummary: streamCompaction.summary,

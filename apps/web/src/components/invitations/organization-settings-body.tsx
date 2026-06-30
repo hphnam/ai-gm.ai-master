@@ -1,5 +1,6 @@
 'use client'
 
+import { BusinessProfileForm } from '@/components/organization/business-profile-form'
 import { Alert } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
@@ -34,6 +35,7 @@ export function OrganizationSettingsBody() {
       <MembersList />
       <InviteForm />
       <InvitationList data={query.data} />
+      <BusinessProfileForm />
     </div>
   )
 }

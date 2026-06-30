@@ -431,12 +431,25 @@ model KnowledgeItem {
   // Backfill of historic rows deferred (column nullable) — first month of forward data validates
   // the helper math before backfill commits. Decimal(10,6) precision rationale matches ChatMessage.costUsd.
   ingestionCostUsd    Decimal?                     @db.Decimal(10, 6)
+  // Document version reconciliation. When a new upload is auto-detected as a
+  // newer version of an existing doc, the predecessor is archived in place:
+  // supersededAt is stamped and supersededById points at the replacement. Live
+  // docs have supersededAt = NULL; lists + inbox filter on it directly, and
+  // retrieval excludes the predecessor because its derived rows below are dropped.
+  // version is display-only, incremented along the supersede chain. The row +
+  // content stay for version history; the predecessor's heavy derived rows
+  // (sections/chunks, tabular, search index, checklist) are dropped on supersede.
+  version             Int                          @default(1)
+  supersededAt        DateTime?
+  supersededById      String?
   createdAt           DateTime                     @default(now())
   updatedAt           DateTime                     @updatedAt
 
   organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   venue           Venue?             @relation(fields: [venueId], references: [id], onDelete: Cascade)
   documentType    DocumentType?      @relation(fields: [documentTypeId], references: [id], onDelete: SetNull)
+  supersededBy    KnowledgeItem?     @relation("DocVersion", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes      KnowledgeItem[]    @relation("DocVersion")
   retagQueueItems ReTagQueueItem[]
   checklist       Checklist?
   sections        KnowledgeSection[]
@@ -448,6 +461,7 @@ model KnowledgeItem {
   @@index([venueId])
   @@index([documentTypeId])
   @@index([organizationId, answerStatus], map: "knowledge_items_answerStatus_idx")
+  @@index([supersededById])
   @@map("knowledge_items")
 }
 

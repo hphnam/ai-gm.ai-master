@@ -38,10 +38,20 @@ export function createRateLimiter(windowMs: number, limit: number): RateLimiter 
 /// MUST hold across horizontally-scaled API instances — otherwise each of the N
 /// nodes keeps its own counter and the effective limit becomes N×. Fixed-window
 /// (not sliding): a caller can burst up to `limit` either side of a window
-/// boundary, which is fine for these coarse guards. Fails OPEN (allows the
-/// request) and logs if Redis is unreachable, so a cache outage degrades to the
-/// old single-node behaviour rather than locking everyone out.
+/// boundary, which is fine for these coarse guards.
+///
+/// On a Redis outage (or unset REDIS_URL) the limiter has no counter at all —
+/// there is NO in-process fallback. The `failClosed` option picks the failure
+/// mode: the default (false) fails OPEN — allows the request and logs — so a
+/// cache blip doesn't lock everyone out, correct for self-targeted DoS/billing
+/// guards. Set `failClosed: true` for guards that protect THIRD parties (e.g.
+/// OTP anti-bombing): there, an outage must not become an open relay, so the
+/// request is rejected with a short retry-after until Redis recovers.
 export type RateLimitResult = { ok: boolean; retryAfterSeconds: number }
+
+// Retry-after handed back when a fail-closed limiter rejects during a Redis
+// outage. Short, so a recovered cache lets the caller straight back through.
+const FAIL_CLOSED_RETRY_SECONDS = 60
 
 export type RedisRateLimiter = {
   /// Record a hit and report whether it was within the limit.
@@ -94,10 +104,16 @@ export function createRedisRateLimiter(
   windowMs: number,
   limit: number,
   prefix: string,
+  opts: { failClosed?: boolean } = {},
 ): RedisRateLimiter {
+  // What to return when there's no working counter (Redis down / unset).
+  const onUnavailable: RateLimitResult = opts.failClosed
+    ? { ok: false, retryAfterSeconds: FAIL_CLOSED_RETRY_SECONDS }
+    : { ok: true, retryAfterSeconds: 0 }
+
   const check = async (key: string): Promise<RateLimitResult> => {
     const client = getClient()
-    if (!client) return { ok: true, retryAfterSeconds: 0 }
+    if (!client) return onUnavailable
     try {
       const [count, pttl] = (await client.eval(
         HIT_SCRIPT,
@@ -109,15 +125,15 @@ export function createRedisRateLimiter(
       const ttl = pttl > 0 ? pttl : windowMs
       return { ok: false, retryAfterSeconds: Math.max(1, Math.ceil(ttl / 1000)) }
     } catch (err) {
-      // Fail open — a limiter outage must not take down the endpoint.
       console.warn(
         JSON.stringify({
           event: 'rate_limit.check_failed',
           prefix,
+          failClosed: opts.failClosed === true,
           message: (err as Error).message,
         }),
       )
-      return { ok: true, retryAfterSeconds: 0 }
+      return onUnavailable
     }
   }
   return {

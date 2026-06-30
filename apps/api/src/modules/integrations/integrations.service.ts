@@ -186,6 +186,21 @@ export class IntegrationsService {
     return new Set(rows.map((r) => r.provider))
   }
 
+  /// Active integrations with their last-sync timestamp. Used to build the
+  /// human-readable `<integrations>` block injected into the chat prompt, so
+  /// the agent knows what's connected BY NAME (and how fresh) — not just which
+  /// provider ids exist for tool-filtering.
+  async listActiveIntegrations(
+    orgId: string,
+  ): Promise<Array<{ provider: string; lastSyncedAt: Date | null }>> {
+    const rows = await prisma.integration.findMany({
+      where: { organizationId: orgId, status: 'active' },
+      select: { provider: true, lastSyncedAt: true },
+      orderBy: { provider: 'asc' },
+    })
+    return rows.map((r) => ({ provider: r.provider, lastSyncedAt: r.lastSyncedAt }))
+  }
+
   /// Provider-side hook to record a recoverable error (e.g. SDK 401 because
   /// the PAT was revoked). Flips the row to 'error' so the UI can surface a
   /// "reconnect" CTA; preserves the cipher so reconnect-with-rotation works.

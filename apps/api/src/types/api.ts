@@ -50,6 +50,8 @@ export const API_ERROR_CODES = [
   'checklist-extraction-failed',
   // AI suggest-name button — classifier returned 'none' (low signal).
   'category-suggestion-unavailable',
+  // Manual doc reconcile — same id, or one side already archived.
+  'reconcile-conflict',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

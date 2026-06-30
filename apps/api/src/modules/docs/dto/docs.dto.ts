@@ -20,6 +20,12 @@ export const DocIdParamSchema = z.object({
 })
 export class DocIdParamDto extends createZodDto(DocIdParamSchema) {}
 
+// Manual reconcile body — `:id` (the kept/new version) supersedes `replaces`.
+export const SupersedeDocRequestSchema = z.object({
+  replaces: z.string().regex(UUID_RE, 'invalid uuid'),
+})
+export class SupersedeDocRequestDto extends createZodDto(SupersedeDocRequestSchema) {}
+
 export class CreateDocRequestDto extends createZodDto(CreateDocRequestSchema) {}
 export class AcceptTypeRequestDto extends createZodDto(AcceptTypeRequestSchema) {}
 // ClassifyDocRequestSchema is a z.union — createZodDto can't extend unions.

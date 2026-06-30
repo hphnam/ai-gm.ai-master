@@ -4,8 +4,9 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { MessagesSquare, Store, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useConversationsList, useDeleteConversation } from '@/lib/hooks/use-conversations-list'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +35,7 @@ export function SidebarThreads() {
   const { items, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useConversationsList(null)
   const deleteConversation = useDeleteConversation()
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; venueId: string } | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
@@ -57,16 +59,18 @@ export function SidebarThreads() {
     }
   }, [lastVisibleIndex, items.length, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const handleDelete = async (convId: string, venueId: string) => {
-    if (!window.confirm('Delete this thread? This cannot be undone.')) return
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return
+    const { id, venueId } = pendingDelete
     try {
-      await deleteConversation.mutateAsync({ conversationId: convId, venueId })
+      await deleteConversation.mutateAsync({ conversationId: id, venueId })
       toast.success('Thread deleted')
-      if (convId === currentConv) {
+      if (id === currentConv) {
         router.replace(`/chat?venue=${venueId}`)
       }
-    } catch {
+    } catch (err) {
       toast.error('Could not delete thread')
+      throw err
     }
   }
 
@@ -83,84 +87,95 @@ export function SidebarThreads() {
   }
 
   return (
-    <div ref={scrollRef} className="scrollbar-thin h-full overflow-y-auto pr-1">
-      <ol
-        className="relative"
-        style={{ height: virtualizer.getTotalSize() }}
-        aria-label="Recent conversations"
-      >
-        {virtualItems.map((vi) => {
-          const c = items[vi.index]
-          if (!c) return null
-          const isActive = c.id === currentConv
-          return (
-            <li
-              key={c.id}
-              ref={virtualizer.measureElement}
-              data-index={vi.index}
-              className="group/thread absolute inset-x-0"
-              style={{ transform: `translateY(${vi.start}px)` }}
-            >
-              <div
-                className={cn(
-                  'mx-0 mb-0.5 flex items-start gap-1.5 rounded-md px-2 py-1.5 text-left transition-colors',
-                  isActive ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent/60',
-                )}
+    <>
+      <div ref={scrollRef} className="scrollbar-thin h-full overflow-y-auto pr-1">
+        <ol
+          className="relative"
+          style={{ height: virtualizer.getTotalSize() }}
+          aria-label="Recent conversations"
+        >
+          {virtualItems.map((vi) => {
+            const c = items[vi.index]
+            if (!c) return null
+            const isActive = c.id === currentConv
+            return (
+              <li
+                key={c.id}
+                ref={virtualizer.measureElement}
+                data-index={vi.index}
+                className="group/thread absolute inset-x-0"
+                style={{ transform: `translateY(${vi.start}px)` }}
               >
-                <button
-                  type="button"
-                  onClick={() => router.push(`/chat?venue=${c.venueId}&conv=${c.id}`)}
-                  className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
-                >
-                  <span
-                    className={cn(
-                      'line-clamp-1 text-[13px]',
-                      isActive
-                        ? 'font-semibold text-sidebar-foreground'
-                        : 'text-sidebar-foreground/90',
-                    )}
-                  >
-                    {c.preview ?? '(empty thread)'}
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] text-sidebar-muted">
-                    <Store className="h-3 w-3" aria-hidden />
-                    <span className="truncate">{c.venueName}</span>
-                    <span>·</span>
-                    <span>{formatRelative(c.lastMessageAt)}</span>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Delete thread"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDelete(c.id, c.venueId)
-                  }}
-                  disabled={deleteConversation.isPending}
+                <div
                   className={cn(
-                    'mt-0.5 rounded p-1 text-sidebar-muted opacity-0 transition',
-                    'hover:bg-destructive/10 hover:text-destructive',
-                    'focus-visible:opacity-100 group-hover/thread:opacity-100',
-                    'disabled:opacity-50',
+                    'mx-0 mb-0.5 flex items-start gap-1.5 rounded-md px-2 py-1.5 text-left transition-colors',
+                    isActive ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent/60',
                   )}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </li>
-          )
-        })}
-      </ol>
-      {isFetchingNextPage ? (
-        <p className="px-2 py-1.5 text-[11px] text-sidebar-muted">Loading more…</p>
-      ) : !hasNextPage && items.length > 0 ? (
-        <Link
-          href="/chat/history"
-          className="block px-2 py-1.5 text-[11px] text-sidebar-muted hover:text-sidebar-foreground"
-        >
-          View all in history →
-        </Link>
-      ) : null}
-    </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/chat?venue=${c.venueId}&conv=${c.id}`)}
+                    className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
+                  >
+                    <span
+                      className={cn(
+                        'line-clamp-1 text-[13px]',
+                        isActive
+                          ? 'font-semibold text-sidebar-foreground'
+                          : 'text-sidebar-foreground/90',
+                      )}
+                    >
+                      {c.preview ?? '(empty thread)'}
+                    </span>
+                    <span className="flex items-center gap-1 text-[11px] text-sidebar-muted">
+                      <Store className="h-3 w-3" aria-hidden />
+                      <span className="truncate">{c.venueName}</span>
+                      <span>·</span>
+                      <span>{formatRelative(c.lastMessageAt)}</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Delete thread"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setPendingDelete({ id: c.id, venueId: c.venueId })
+                    }}
+                    disabled={deleteConversation.isPending}
+                    className={cn(
+                      'mt-0.5 rounded p-1 text-sidebar-muted opacity-0 transition',
+                      'hover:bg-destructive/10 hover:text-destructive',
+                      'focus-visible:opacity-100 group-hover/thread:opacity-100',
+                      'disabled:opacity-50',
+                    )}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </li>
+            )
+          })}
+        </ol>
+        {isFetchingNextPage ? (
+          <p className="px-2 py-1.5 text-[11px] text-sidebar-muted">Loading more…</p>
+        ) : !hasNextPage && items.length > 0 ? (
+          <Link
+            href="/chat/history"
+            className="block px-2 py-1.5 text-[11px] text-sidebar-muted hover:text-sidebar-foreground"
+          >
+            View all in history →
+          </Link>
+        ) : null}
+      </div>
+
+      <ConfirmDeleteDialog
+        open={pendingDelete !== null}
+        onOpenChange={(v) => !v && setPendingDelete(null)}
+        title="Delete this thread?"
+        description="This cannot be undone."
+        isPending={deleteConversation.isPending}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   )
 }

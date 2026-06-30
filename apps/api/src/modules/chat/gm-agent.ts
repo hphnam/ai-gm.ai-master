@@ -7,7 +7,14 @@ import {
   ToolLoopAgent,
   type ToolSet,
 } from 'ai'
+import {
+  currencyCodeFor,
+  currencySymbolFor,
+  emergencyNumberFor,
+  type OrganizationProfile,
+} from '../../types'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import type { MemoryAction } from '../organization/agent-memory'
 import { buildAiSdkTools } from './ai-sdk-tools'
 import { CHAT_SYSTEM_PROMPT, CONVERSATION_MODE_OVERLAYS } from './system-prompt'
 import type { DispatchContext } from './tool-dispatcher'
@@ -24,6 +31,18 @@ import { ToolDispatcher } from './tool-dispatcher'
 // FIRST (so the cached prefix is byte-stable across turns); dynamic comes
 // AFTER unmarked (so per-turn variation never breaks the cached prefix).
 const SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
+
+/// Defence-in-depth for free-text that flows into a system-prompt block. Strips
+/// angle brackets (so a value can't forge a closing </block> or a fake <tag>)
+/// and collapses newlines/tabs to spaces (so it can't open new prompt lines).
+/// Profile authors are trusted org admins, but the data still shouldn't be able
+/// to restructure the prompt.
+function sanitizeForBlock(value: string): string {
+  return value
+    .replace(/[<>]/g, '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .trim()
+}
 
 export type AgentMode = 'default' | 'incident' | 'handover'
 
@@ -136,6 +155,15 @@ export type VenueSnapshot = {
   orgChartDoc?: { id: string; title: string; content: string }
 }
 
+/// Human-readable summary of one connected integration, for the <integrations>
+/// prompt block. Built by IntegrationRegistry.describeActiveIntegrations.
+export type ActiveIntegrationSummary = {
+  provider: string
+  label: string
+  domain: string
+  lastSyncedAt: Date | null
+}
+
 export function buildGmAgent(params: {
   dispatcher: ToolDispatcher
   integrations: IntegrationRegistry
@@ -143,6 +171,19 @@ export function buildGmAgent(params: {
   /// Provider ids the org has connected as active — scopes the integration
   /// tool surface so the model only sees tools for this org's integrations.
   activeProviderIds: ReadonlySet<string>
+  /// Per-org business profile (type, description, goals, constraints, region).
+  /// Drives the persona, currency, and emergency number so the agent adapts
+  /// per-business instead of assuming UK hospitality. Empty profile is fine —
+  /// the prompt falls back to hospitality + GB defaults.
+  businessProfile?: OrganizationProfile | null
+  /// Active integrations described by vendor + domain + freshness, for the
+  /// <integrations> block. Empty array → the agent is told nothing is
+  /// connected and to route to the knowledge base for live-data questions.
+  integrationsSummary?: ActiveIntegrationSummary[] | null
+  /// When provided, the org-scoped Anthropic memory tool is enabled. The
+  /// closure persists the model's memory commands to this org's store. Omit
+  /// (headless report generation) to run without memory.
+  memoryExecute?: ((action: MemoryAction) => Promise<string>) | null
   venueContext: {
     id: string
     name: string
@@ -187,12 +228,24 @@ export function buildGmAgent(params: {
     }>
   }) => void
 }) {
-  const tools: ToolSet = buildAiSdkTools(
+  const baseTools = buildAiSdkTools(
     params.dispatcher,
     params.integrations,
     params.ctx,
     params.activeProviderIds,
   )
+  // Org-scoped persistent memory (Anthropic provider-defined tool). Enabled only
+  // when an execute closure is passed (interactive chat) — the closure routes
+  // every command through this org's store. Headless report generation omits it.
+  const memoryExecute = params.memoryExecute
+  const tools: ToolSet = memoryExecute
+    ? {
+        ...baseTools,
+        memory: anthropicProvider.tools.memory_20250818({
+          execute: async (action) => memoryExecute(action as MemoryAction),
+        }),
+      }
+    : baseTools
 
   const now = new Date()
   const tz = params.venueContext.timezone
@@ -285,6 +338,65 @@ export function buildGmAgent(params: {
       ? `\n<venue_snapshot>\n${snapshotLines.join('\n')}\n</venue_snapshot>`
       : ''
 
+  // Per-business operating context — currency + local emergency number, derived
+  // from the org profile (defaults: GB / £ / 999, so an org with no profile set
+  // behaves exactly as before). Always emitted: the prompt references it for
+  // money formatting and incident mode.
+  const profile = params.businessProfile ?? null
+  const currencyCode = currencyCodeFor(profile)
+  const currencySymbol = currencySymbolFor(currencyCode)
+  const emergencyNumber = emergencyNumberFor(profile?.country)
+  const operatingContextBlock = `\n<operating_context>\ncurrency: ${currencyCode} (${currencySymbol})\nemergencyNumber: ${emergencyNumber}\n</operating_context>`
+
+  // Business profile — who this org is, in their own words. Drives persona and
+  // domain assumptions. Omitted entirely when the org hasn't filled anything,
+  // so the base prompt's hospitality fallback applies.
+  const profileBusinessLines: string[] = []
+  if (profile?.businessType)
+    profileBusinessLines.push(`type: ${sanitizeForBlock(profile.businessType)}`)
+  if (profile?.description)
+    profileBusinessLines.push(`about: ${sanitizeForBlock(profile.description)}`)
+  if (profile?.goals && profile.goals.length > 0)
+    profileBusinessLines.push(`goals: ${profile.goals.map(sanitizeForBlock).join('; ')}`)
+  if (profile?.constraints)
+    profileBusinessLines.push(`constraints: ${sanitizeForBlock(profile.constraints)}`)
+  const businessProfileBlock =
+    profileBusinessLines.length > 0
+      ? `\n<business_profile>\n${profileBusinessLines.join('\n')}\n</business_profile>`
+      : ''
+
+  // Integrations — what live-data sources are connected, by name + domain +
+  // freshness. When empty, tell the agent explicitly so it routes live-data
+  // questions to the KB instead of implying a POS exists.
+  const integrationsList = params.integrationsSummary ?? []
+  const integrationsBlock =
+    integrationsList.length > 0
+      ? `\n<integrations>\nConnected live-data sources (your ${integrationsList
+          .map((i) => i.domain)
+          .join('/')} tools read from these):\n${integrationsList
+          .map(
+            (i) =>
+              `  • ${i.label} (${i.domain})${
+                i.lastSyncedAt ? ` — last used ${i.lastSyncedAt.toISOString()}` : ''
+              }`,
+          )
+          .join('\n')}\n</integrations>`
+      : `\n<integrations>\nNo external integrations are connected. You have no live POS/accounting/CRM tools this org — for any live-numbers question (sales, COGS, stock, labour) say plainly that nothing is connected and point the user to Settings → Integrations, then offer the knowledge-base / manual route.\n</integrations>`
+
+  // Memory guidance — only when the memory tool is wired (interactive chat).
+  // Kept in the dynamic block so headless paths (no memory tool) never reference
+  // a tool that isn't in their set, and so the cached prefix stays unchanged.
+  const memoryBlock = memoryExecute
+    ? `\n<memory>\nYou have a private, persistent memory for THIS business via the memory tool (a /memories file directory that survives across conversations). It is YOUR working scratchpad — a SEPARATE, lower-authority layer from gm-ai's own stores. Keep them from clashing:
+  • PRECEDENCE (never let memory override the real sources): the knowledge base (SOPs/docs/Q&As), live integration tools, <venue_snapshot>/<venue_contacts>/<venue_profile>, and an owner's explicit instruction ALWAYS win over memory. If a memory contradicts any of them, trust the source and fix the stale memory (str_replace/delete). Memory NEVER decides whether you can do something and never substitutes for a find_knowledge or tool call.
+  • WHAT BELONGS WHERE — do not duplicate across stores:
+      – /memories → durable, business-level operating preferences + small learned facts NOT worth a formal SOP ("owner prefers terse replies", "we price beer to ~68% GP", "Friday is always short-staffed").
+      – save_knowledge_doc → shareable SOPs / policies / Q&As other staff rely on. If a fact is important or shareable enough to cite, it belongs in the KB, NOT memory.
+      – create_task → future actions. leave_note_for_user → messages to a person.
+  • Memory is NOT a citation source — never emit [doc:…] for it; only KB docs get cited.
+  • Check /memories when a question may lean on remembered preferences; save only when the user states a lasting preference/fact not already captured elsewhere. Keep entries short; prune outdated ones. NEVER store secrets, card/bank numbers, passwords, or personal data.\n</memory>`
+    : ''
+
   // Plan 01-03 — split system message into stable (cache-marked) + dynamic (no marker).
   // Stable goes FIRST so the cached prefix `[tools + stable_system]` is byte-stable
   // across turns. Per-turn dynamic context comes AFTER, unmarked, so it never breaks
@@ -296,6 +408,10 @@ export function buildGmAgent(params: {
       : ''
   const dynamicSystemBody = [
     `\n\n<current_context>\nvenueId: ${params.venueContext.id}\nvenueName: ${params.venueContext.name}\nvenueTimezone: ${tz}\nuserName: ${userLabel}\nuserRole: ${params.ctx.userRole}\nconversationMode: ${mode}\nnow: ${localIso} (${dayOfWeek}, local time)\n</current_context>`,
+    businessProfileBlock,
+    operatingContextBlock,
+    integrationsBlock,
+    memoryBlock,
     routingHintBlock,
     snapshotBlock,
     profileBlock,

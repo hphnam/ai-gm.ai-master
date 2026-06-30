@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import { PENDING_VERIFICATION_TTL_MS, PhoneRateLimit, type PhoneStatusResponse } from '../../types'
+import { createRedisRateLimiter } from '../integrations/rate-limit'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 
 export type PhoneErrorCode =
@@ -34,7 +35,30 @@ function hashIp(ip: string): string {
   return createHash('sha256').update(ip).digest('hex').slice(0, 16)
 }
 
-type Bucket = { count: number; windowStart: number }
+// Redis-backed so the send caps hold across API instances (an in-process
+// counter would be multiplied by the node count behind the load balancer).
+// failClosed: these guard OTP delivery to arbitrary phone numbers — if Redis
+// is down we must NOT become an open relay that bombs third parties, so a
+// counter outage rejects sends rather than waving them through.
+const sendPerUserLimit = createRedisRateLimiter(
+  PhoneRateLimit.WINDOW_MS,
+  PhoneRateLimit.MAX_SENDS_PER_USER,
+  'phone-send-user',
+  { failClosed: true },
+)
+const sendPerNumberLimit = createRedisRateLimiter(
+  PhoneRateLimit.WINDOW_MS,
+  PhoneRateLimit.MAX_SENDS_PER_NUMBER,
+  'phone-send-number',
+  { failClosed: true },
+)
+const sendPerIpLimit = createRedisRateLimiter(
+  PhoneRateLimit.WINDOW_MS,
+  PhoneRateLimit.MAX_SENDS_PER_IP,
+  'phone-send-ip',
+  { failClosed: true },
+)
+
 type PendingEntry = {
   phoneNumber: string
   phoneHash: string
@@ -46,42 +70,15 @@ type PendingEntry = {
 export class PhoneService {
   private readonly logger = new Logger(PhoneService.name)
 
-  // In-memory maps — single-node POC scope. Multi-instance deployment needs Redis-backed
-  // throttler (see SCOPE LIMITS in 01-03-PLAN.md).
-  private readonly sendsPerUser = new Map<string, Bucket>()
-  private readonly sendsPerNumber = new Map<string, Bucket>()
-  private readonly sendsPerIp = new Map<string, Bucket>()
+  // Send throttles are Redis-backed (see the module-level limiters above).
+  // pendingVerifications stays in-memory — it's short-lived per-user state,
+  // not a cross-node abuse guard.
   private readonly pendingVerifications = new Map<string, PendingEntry>()
 
   constructor(private readonly realtime: RealtimeGateway) {}
 
-  private checkBucket(
-    map: Map<string, Bucket>,
-    key: string,
-    max: number,
-  ): {
-    ok: boolean
-    retryAfterSeconds: number
-  } {
-    const now = Date.now()
-    const bucket = map.get(key)
-    if (!bucket || now - bucket.windowStart > PhoneRateLimit.WINDOW_MS) {
-      map.set(key, { count: 1, windowStart: now })
-      return { ok: true, retryAfterSeconds: 0 }
-    }
-    bucket.count += 1
-    if (bucket.count > max) {
-      const retryAfterSeconds = Math.max(
-        1,
-        Math.ceil((bucket.windowStart + PhoneRateLimit.WINDOW_MS - now) / 1000),
-      )
-      return { ok: false, retryAfterSeconds }
-    }
-    return { ok: true, retryAfterSeconds: 0 }
-  }
-
-  assertSendRateLimit(userId: string, phoneHash: string, ipHash: string): void {
-    const user = this.checkBucket(this.sendsPerUser, userId, PhoneRateLimit.MAX_SENDS_PER_USER)
+  async assertSendRateLimit(userId: string, phoneHash: string, ipHash: string): Promise<void> {
+    const user = await sendPerUserLimit.check(userId)
     if (!user.ok) {
       this.logger.warn(
         JSON.stringify({
@@ -95,11 +92,7 @@ export class PhoneService {
         window: 'user-send-15m',
       })
     }
-    const num = this.checkBucket(
-      this.sendsPerNumber,
-      phoneHash,
-      PhoneRateLimit.MAX_SENDS_PER_NUMBER,
-    )
+    const num = await sendPerNumberLimit.check(phoneHash)
     if (!num.ok) {
       this.logger.warn(
         JSON.stringify({
@@ -113,7 +106,7 @@ export class PhoneService {
         window: 'number-send-15m',
       })
     }
-    const ip = this.checkBucket(this.sendsPerIp, ipHash, PhoneRateLimit.MAX_SENDS_PER_IP)
+    const ip = await sendPerIpLimit.check(ipHash)
     if (!ip.ok) {
       this.logger.warn(
         JSON.stringify({

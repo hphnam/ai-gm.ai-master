@@ -15,6 +15,7 @@ import { ChatCoreService } from '../chat-core/chat-core.service'
 import { IncidentsService } from '../incidents/incidents.service'
 import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import { createRedisRateLimiter } from '../integrations/rate-limit'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { PricingRecommendationsService } from '../pricing-recommendations/pricing-recommendations.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
@@ -45,47 +46,17 @@ export type DispatchContext = {
 // process / single node — sufficient for the current Nest server. If we scale
 // horizontally swap this for a Redis token bucket. Kept module-scoped so the
 // state survives request lifecycles.
-const LEAVE_NOTE_WINDOW_MS = 60_000
-const LEAVE_NOTE_LIMIT_PER_WINDOW = 5
-const leaveNoteRateLimit = (() => {
-  const buckets = new Map<string, number[]>()
-  return {
-    allow(authorUserId: string): boolean {
-      const now = Date.now()
-      const cutoff = now - LEAVE_NOTE_WINDOW_MS
-      const recent = (buckets.get(authorUserId) ?? []).filter((t) => t > cutoff)
-      if (recent.length >= LEAVE_NOTE_LIMIT_PER_WINDOW) {
-        buckets.set(authorUserId, recent)
-        return false
-      }
-      recent.push(now)
-      buckets.set(authorUserId, recent)
-      return true
-    },
-  }
-})()
+// Shared per-user write throttle for the agent's notify/task/pricing actions
+// (leave_note_for_user, create_task, record_pricing_recommendation). Redis-
+// backed so a model can't bypass it by being load-balanced across API nodes.
+// 15/min/user: a manager setting up a shift can fire off several tasks + notes
+// in a burst without tripping it, while a runaway/injected write loop is still
+// bounded.
+const leaveNoteRateLimit = createRedisRateLimiter(60_000, 15, 'leave-note')
 
 // Mirror of the controller-level throttle for the agent tool path so a
 // jailbroken model can't bypass it by going through chat.
-const SCHEDULE_REPORT_WINDOW_MS = 60_000
-const SCHEDULE_REPORT_LIMIT_PER_WINDOW = 5
-const scheduleReportRateLimit = (() => {
-  const buckets = new Map<string, number[]>()
-  return {
-    allow(userId: string): boolean {
-      const now = Date.now()
-      const cutoff = now - SCHEDULE_REPORT_WINDOW_MS
-      const recent = (buckets.get(userId) ?? []).filter((t) => t > cutoff)
-      if (recent.length >= SCHEDULE_REPORT_LIMIT_PER_WINDOW) {
-        buckets.set(userId, recent)
-        return false
-      }
-      recent.push(now)
-      buckets.set(userId, recent)
-      return true
-    },
-  }
-})()
+const scheduleReportRateLimit = createRedisRateLimiter(60_000, 5, 'schedule-report')
 
 @Injectable()
 export class ToolDispatcher {
@@ -642,7 +613,7 @@ export class ToolDispatcher {
           // Per-author throttle. Prompt-injection from indexed knowledge could
           // otherwise drive the agent to mass-spam managers from a single
           // chat turn. Cap CREATE attempts (not lookups) at 5/min/author.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail(
               'error',
               'too many notes in a short window — slow down or compose from the bell menu',
@@ -803,7 +774,7 @@ export class ToolDispatcher {
           // Per-author throttle reuse — same window covers leave_note + tasks
           // since both are "agent writes a row addressed at another user". A
           // jailbroken prompt could otherwise drive the agent to spam tasks.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail(
               'error',
               'too many tasks in a short window — slow down or compose from the dashboard',
@@ -1038,7 +1009,7 @@ export class ToolDispatcher {
           if (!ctx) {
             return fail('error', 'schedule_report requires an authenticated context')
           }
-          if (!scheduleReportRateLimit.allow(ctx.userId)) {
+          if (!(await scheduleReportRateLimit.allow(ctx.userId))) {
             return fail('error', 'rate-limited: too many schedule creations — try again shortly')
           }
           const i = parsed.data as {
@@ -1167,7 +1138,7 @@ export class ToolDispatcher {
           }
           // Reuse the per-author throttle so a jailbroken prompt can't flood
           // the review queue. Same window as leave_note / create_task.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail('error', 'too many pricing recommendations in a short window — slow down')
           }
           const i = parsed.data as {

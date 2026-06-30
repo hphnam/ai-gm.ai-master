@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -45,6 +46,7 @@ import {
   DocNotFoundOrCrossOrgError,
   DocsService,
   PromoteNoDataQueryInvalidError,
+  ReconcileConflictError,
   TypeNameConflictError,
   TypeProposalMissingError,
 } from './docs.service'
@@ -67,6 +69,7 @@ import {
   NoDataQueryActionSchema,
   NoDataQueryDto,
   NoDataQueryPromoteResponseDto,
+  SupersedeDocRequestDto,
   UpdateDocRequestDto,
 } from './dto/docs.dto'
 import { extractImage, isDocsImageMime } from './extractors/image-extractor'
@@ -79,6 +82,8 @@ import { UploadPayloadTooLargeFilter } from './multer-exception.filter'
 // (single Prisma upsert; promote additionally calls recordGap which is more
 // expensive but already has embedding-side caching upstream).
 const NO_DATA_QUERY_ACTION_LIMITER = createRateLimiter(60_000, 60)
+// Destructive + manual — a tighter per-org bar than the read-ish actions above.
+const SUPERSEDE_LIMITER = createRateLimiter(60_000, 30)
 
 @ApiTags('docs')
 @ApiBearerAuth()
@@ -536,6 +541,34 @@ export class DocsController {
       }
       if (err instanceof TypeNameConflictError) {
         throw new HttpException({ error: 'type-name-conflict' } satisfies ApiErrorResponse, 422)
+      }
+      throw err
+    }
+  }
+
+  // Manual reconcile — mark this doc (`:id`, the kept/new version) as superseding
+  // an older one (`replaces`). Archives the old version in place; see
+  // DocsService.supersedeManually.
+  @Post(':id/supersede')
+  @HttpCode(204)
+  @RequireRole('owner', 'manager')
+  async supersede(
+    @Param(new ZodValidationPipe(DocIdParamDto)) params: DocIdParamDto,
+    @Body(new ZodValidationPipe(SupersedeDocRequestDto)) body: SupersedeDocRequestDto,
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string } | null,
+  ): Promise<void> {
+    if (!SUPERSEDE_LIMITER.allow(org.id)) {
+      throw new HttpException({ error: 'rate-limited' }, 429)
+    }
+    try {
+      await this.docsService.supersedeManually(params.id, body.replaces, org.id, user?.id ?? null)
+    } catch (err) {
+      if (err instanceof DocNotFoundOrCrossOrgError) {
+        throw new NotFoundException({ error: 'not-found' } satisfies ApiErrorResponse)
+      }
+      if (err instanceof ReconcileConflictError) {
+        throw new ConflictException({ error: 'reconcile-conflict' } satisfies ApiErrorResponse)
       }
       throw err
     }

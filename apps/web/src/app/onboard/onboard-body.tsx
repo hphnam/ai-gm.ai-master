@@ -1,7 +1,23 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { apiPost } from '@/lib/api-client'
+import { mapApiError } from '@/lib/map-api-error'
 
 // 03-06 — minimal onboarding completion form. Asks for the invitee's name and
 // kicks off the redeem flow against the API. Auth integration with better-auth
@@ -15,35 +31,28 @@ type Preview = {
   role: string
 }
 
+const schema = z.object({
+  name: z.string().trim().min(1, 'Enter your name').max(120, 'Name is too long'),
+})
+type FormValues = z.infer<typeof schema>
+
 export function OnboardBody({ token, preview }: { token: string; preview: Preview }) {
   const router = useRouter()
-  const [name, setName] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { name: '' },
+  })
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSubmitting(true)
-    setError(null)
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-      const res = await fetch(`${apiUrl}/whatsapp/invites/redeem/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ token, name }),
-      })
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { error?: string }
-        setError(body.error ?? 'Redemption failed')
-        return
-      }
+  const redeem = useMutation({
+    mutationFn: (name: string) =>
+      apiPost<void>('/whatsapp/invites/redeem/complete', { token, name }),
+    onSuccess: () => {
       router.push('/chat')
-    } catch {
-      setError('Network error — try again')
-    } finally {
-      setSubmitting(false)
-    }
+    },
+  })
+
+  async function onSubmit(values: FormValues) {
+    await redeem.mutateAsync(values.name).catch(() => undefined)
   }
 
   return (
@@ -53,35 +62,45 @@ export function OnboardBody({ token, preview }: { token: string; preview: Previe
         You've been invited as a {preview.role}. Confirm your name to get started.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <label className="block">
-          <span className="text-sm font-medium">Your name</span>
-          <input
-            type="text"
-            required
-            minLength={1}
-            maxLength={120}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-md border px-3 py-2"
-            placeholder="Alex Smith"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    autoComplete="name"
+                    placeholder="Alex Smith"
+                    disabled={redeem.isPending}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </label>
 
-        {error && (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        )}
+          {redeem.isError ? (
+            <p className="text-sm text-destructive" role="alert">
+              {mapApiError(redeem.error)}
+            </p>
+          ) : null}
 
-        <button
-          type="submit"
-          disabled={submitting || name.length === 0}
-          className="w-full rounded-md bg-black px-4 py-2 text-white disabled:opacity-50"
-        >
-          {submitting ? 'Joining…' : `Join ${preview.orgName}`}
-        </button>
-      </form>
+          <Button type="submit" className="w-full" disabled={redeem.isPending}>
+            {redeem.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                Joining…
+              </>
+            ) : (
+              `Join ${preview.orgName}`
+            )}
+          </Button>
+        </form>
+      </Form>
     </div>
   )
 }

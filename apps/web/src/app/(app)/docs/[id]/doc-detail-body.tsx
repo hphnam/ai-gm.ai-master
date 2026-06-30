@@ -38,6 +38,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import type { DocDetailDto } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
+import { formatRelative } from '@/lib/format-relative'
 import { useDeleteDoc, useDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
@@ -48,19 +49,6 @@ type ChecklistStep = Checklist['steps'][number]
 type AudienceRole = NonNullable<Checklist['audience']['roles']>[number]
 
 const STEP_DISPLAY_CAP = 200
-
-function formatRelative(iso: string): string {
-  const ts = new Date(iso).getTime()
-  const diffMs = Date.now() - ts
-  const mins = Math.round(diffMs / 60_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(iso).toLocaleDateString()
-}
 
 function formatScheduleLine(s: Schedule): string {
   const cadence = s.cadence ?? 'unknown'

@@ -2,7 +2,7 @@
 
 import { useChat } from '@ai-sdk/react'
 import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
-import { DefaultChatTransport, type UIMessage } from 'ai'
+import { DefaultChatTransport } from 'ai'
 import { ArrowRight, Check, Link2, Loader2, Lock, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -19,79 +19,19 @@ import type {
   VenueListItemDto as VenueListItem,
 } from '@/generated/api'
 import { API_URL } from '@/lib/api-client'
-import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
 import { useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
 import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
-import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
 import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
+import { dbToUIMessage, type GmUIMessage, uiMessageToText } from './message-mapping'
 import { useChatSubmit } from './use-chat-submit'
+import { useConversationDerivedState } from './use-conversation-derived-state'
 import { useOptimisticThreads } from './use-optimistic-threads'
-
-type GmUIMessage = UIMessage
-
-type LegacyToolCallEntry = {
-  round?: number
-  toolUseId?: string
-  tool?: string
-  input?: unknown
-  result?: unknown
-}
-
-// Rebuild an assistant turn's UI parts from the DB row. The persisted `parts`
-// snapshot is just the final text part (the AI SDK ModelMessage→DB shape drops
-// the rich UI-message tool entries), so we rehydrate the interactive surface
-// from the columns that DO hold the history: `reasoning` (text) and
-// `toolCallLog` (array of {tool, toolUseId, input, result}). Order matters —
-// AssistantBody reads parts and renders reasoning → tool cards → final text.
-function assistantPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
-  const parts: GmUIMessage['parts'] = []
-  const reasoning = (m as unknown as { reasoning?: string | null }).reasoning
-  if (typeof reasoning === 'string' && reasoning.trim().length > 0) {
-    parts.push({
-      type: 'reasoning',
-      text: reasoning,
-      state: 'done',
-    } as unknown as GmUIMessage['parts'][number])
-  }
-  const log = (m as unknown as { toolCallLog?: LegacyToolCallEntry[] }).toolCallLog
-  if (Array.isArray(log)) {
-    for (const entry of log) {
-      if (!entry?.tool || !entry?.toolUseId) continue
-      parts.push({
-        type: `tool-${entry.tool}`,
-        toolCallId: entry.toolUseId,
-        state: 'output-available',
-        input: entry.input,
-        output: entry.result,
-      } as unknown as GmUIMessage['parts'][number])
-    }
-  }
-  parts.push({ type: 'text', text: m.content })
-  return parts
-}
-
-function dbToUIMessage(m: ChatMessageDto): GmUIMessage {
-  if (m.role === 'assistant') {
-    return { id: m.id, role: m.role, parts: assistantPartsFromDto(m) }
-  }
-  return {
-    id: m.id,
-    role: m.role,
-    parts: [{ type: 'text', text: m.content }],
-  }
-}
-
-function uiMessageToText(m: GmUIMessage): string {
-  return m.parts
-    .map((p) => (p.type === 'text' ? p.text : ''))
-    .join('')
-    .trim()
-}
+import { useShareConversation } from './use-share-conversation'
 
 function ChatSkeleton() {
   return (
@@ -231,7 +171,7 @@ function ChatCore({
   // have no human owner and stay read-only on web.
   const conversationExists = visibility !== null
   const isOwner = !conversationExists ? true : ownerUserId !== null && ownerUserId === sessionUserId
-  const updateVisibility = useUpdateConversationVisibility()
+  const share = useShareConversation()
 
   // The transport closure captures these via refs — useChat freezes the
   // transport at construction.
@@ -337,48 +277,8 @@ function ChatCore({
     queryClient,
   })
 
-  const lastAssistantFollowUps = useMemo<string[]>(() => {
-    if (!historyMessages) return []
-    if (status !== 'ready') return []
-    for (let i = historyMessages.length - 1; i >= 0; i--) {
-      const m = historyMessages[i]
-      if (m.role === 'assistant') return m.followUps ?? []
-    }
-    return []
-  }, [historyMessages, status])
-
-  // Persisted feedback indexed by assistant messageId — seeds the thumbs
-  // buttons so a thumbs-up survives a refresh.
-  const feedbackByMessageId = useMemo<Record<string, 'up' | 'down' | 'regenerate'>>(() => {
-    if (!historyMessages) return {}
-    const map: Record<string, 'up' | 'down' | 'regenerate'> = {}
-    for (const m of historyMessages) {
-      if (m.role === 'assistant' && m.feedbackKind) {
-        map[m.id] = m.feedbackKind
-      }
-    }
-    return map
-  }, [historyMessages])
-
-  // Wave-C auto-verify state, indexed by assistant messageId. Drives the
-  // small "verified" / "couldn't verify" badge under each answer.
-  type VerifyEntry = {
-    status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
-    issueCount: number | null
-  }
-  const verifyByMessageId = useMemo<Record<string, VerifyEntry>>(() => {
-    if (!historyMessages) return {}
-    const map: Record<string, VerifyEntry> = {}
-    for (const m of historyMessages) {
-      if (m.role === 'assistant' && m.verifyStatus) {
-        map[m.id] = {
-          status: m.verifyStatus,
-          issueCount: m.verifyIssueCount ?? null,
-        }
-      }
-    }
-    return map
-  }, [historyMessages])
+  const { lastAssistantFollowUps, feedbackByMessageId, verifyByMessageId } =
+    useConversationDerivedState(historyMessages, status)
 
   // Merge pending-user with useChat messages, deduping by text.
   const displayMessages = useMemo<GmUIMessage[]>(() => {
@@ -456,32 +356,9 @@ function ChatCore({
       <VenueChip venueId={venueId} onChange={isOwner ? onPickVenue : undefined} />
       {showShareButton && conversationId && venueId ? (
         <ShareButton
-          conversationId={conversationId}
-          venueId={venueId}
           isShared={isShared}
-          isPending={updateVisibility.isPending}
-          onToggle={async (next) => {
-            try {
-              await updateVisibility.mutateAsync({
-                conversationId,
-                venueId,
-                visibility: next,
-              })
-              if (next === 'org' && typeof window !== 'undefined') {
-                const url = `${window.location.origin}/chat?venue=${venueId}&conv=${conversationId}`
-                try {
-                  await navigator.clipboard.writeText(url)
-                  toast.success('Share link copied — anyone in your org can view')
-                } catch {
-                  toast.success('Sharing on — copy the URL from your address bar')
-                }
-              } else {
-                toast.success('Sharing off — only you can view this chat')
-              }
-            } catch (err) {
-              toast.error(mapApiError(err))
-            }
-          }}
+          isPending={share.isPending}
+          onToggle={(next) => share.toggle({ conversationId, venueId, next })}
         />
       ) : null}
     </>
@@ -755,8 +632,6 @@ function ShareButton({
   isPending,
   onToggle,
 }: {
-  conversationId: string
-  venueId: string
   isShared: boolean
   isPending: boolean
   onToggle: (next: 'private' | 'org') => Promise<void>

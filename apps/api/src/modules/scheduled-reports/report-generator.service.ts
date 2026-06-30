@@ -9,6 +9,7 @@ import {
 } from '../chat/gm-agent'
 import { ToolDispatcher } from '../chat/tool-dispatcher'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import { loadOrganizationProfile } from '../organization/organization.service'
 import {
   buildReportUserMessage,
   inspectReportToolResult,
@@ -103,7 +104,11 @@ export class ReportGeneratorService {
     // billing and onStepFinish keeps firing past the timeout.
     const controller = new AbortController()
 
-    const activeProviderIds = await this.integrations.getActiveProviderIds(input.orgId)
+    const [activeProviderIds, businessProfile, integrationsSummary] = await Promise.all([
+      this.integrations.getActiveProviderIds(input.orgId),
+      loadOrganizationProfile(input.orgId),
+      this.integrations.describeActiveIntegrations(input.orgId),
+    ])
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       integrations: this.integrations,
@@ -114,6 +119,8 @@ export class ReportGeneratorService {
         source: 'chat',
       },
       activeProviderIds,
+      businessProfile,
+      integrationsSummary,
       venueContext: {
         id: venue.id,
         // Sanitise names that flow into the system prompt's <current_context>.

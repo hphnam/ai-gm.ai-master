@@ -3,6 +3,7 @@
 import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Plug, Unplug } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import {
   Dialog,
   DialogContent,
@@ -70,6 +71,7 @@ function ProviderCard({
   integration: IntegrationSummary | null
 }) {
   const [connectOpen, setConnectOpen] = useState(false)
+  const [disconnectOpen, setDisconnectOpen] = useState(false)
   const disconnect = useDisconnectIntegration()
 
   const status = integration?.status ?? null
@@ -127,15 +129,7 @@ function ProviderCard({
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => {
-                  if (
-                    confirm(
-                      `Disconnect ${meta.label}? The chat agent will stop being able to read live data.`,
-                    )
-                  ) {
-                    disconnect.mutate({ provider: meta.id })
-                  }
-                }}
+                onClick={() => setDisconnectOpen(true)}
                 disabled={disconnect.isPending}
               >
                 <Unplug className="mr-1.5 h-3.5 w-3.5" aria-hidden />
@@ -156,6 +150,16 @@ function ProviderCard({
         onOpenChange={setConnectOpen}
         meta={meta}
         isRotation={isActive}
+      />
+
+      <ConfirmDeleteDialog
+        open={disconnectOpen}
+        onOpenChange={setDisconnectOpen}
+        title={`Disconnect ${meta.label}?`}
+        description="The chat agent will stop being able to read live data."
+        confirmLabel="Disconnect"
+        isPending={disconnect.isPending}
+        onConfirm={() => disconnect.mutateAsync({ provider: meta.id })}
       />
     </article>
   )

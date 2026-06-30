@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { Textarea } from '@/components/ui/textarea'
 import type { KbGapDto } from '@/generated/api'
 import type { KbGapAskerDto as KbGapAsker } from '@/lib/api-types'
+import { formatRelative } from '@/lib/format-relative'
 import { type GapKbMatch, useAnswerGap, useDeleteGap, useGapKbMatches } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
@@ -27,23 +29,11 @@ function formatAskedBy(askers: KbGapAsker[]): { primary: string; title: string }
   return { primary: `${labels[0]}, ${labels[1]} +${labels.length - 2}`, title }
 }
 
-function formatRelative(iso: string): string {
-  const ts = new Date(iso).getTime()
-  const diffMs = Date.now() - ts
-  const mins = Math.round(diffMs / 60_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(iso).toLocaleDateString()
-}
-
 function GapCard({ gap }: { gap: KbGapDto }) {
   const [open, setOpen] = useState(false)
   const [answer, setAnswer] = useState('')
   const [matches, setMatches] = useState<GapKbMatch[] | null>(null)
+  const [pendingAction, setPendingAction] = useState<'delete' | 'resolve' | null>(null)
   const answerGap = useAnswerGap()
   const deleteGap = useDeleteGap()
   const kbMatches = useGapKbMatches()
@@ -65,13 +55,16 @@ function GapCard({ gap }: { gap: KbGapDto }) {
     }
   }
 
-  async function handleDelete() {
-    if (!window.confirm('Delete this question? It will no longer appear in the queue.')) return
+  async function handleConfirmAction() {
     try {
       await deleteGap.mutateAsync(gap.id)
-      toast.success('Question deleted')
+      toast.success(
+        pendingAction === 'resolve' ? 'Resolved — already in your KB' : 'Question deleted',
+      )
+      setPendingAction(null)
     } catch (err) {
       toast.error(mapApiError(err))
+      throw err
     }
   }
 
@@ -79,21 +72,6 @@ function GapCard({ gap }: { gap: KbGapDto }) {
     try {
       const hits = await kbMatches.mutateAsync(gap.id)
       setMatches(hits)
-    } catch (err) {
-      toast.error(mapApiError(err))
-    }
-  }
-
-  async function resolveWithDoc() {
-    if (
-      !window.confirm(
-        'Mark this question as already answered by the KB and remove it from the queue?',
-      )
-    )
-      return
-    try {
-      await deleteGap.mutateAsync(gap.id)
-      toast.success('Resolved — already in your KB')
     } catch (err) {
       toast.error(mapApiError(err))
     }
@@ -164,7 +142,7 @@ function GapCard({ gap }: { gap: KbGapDto }) {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={handleDelete}
+                  onClick={() => setPendingAction('delete')}
                   disabled={deleteGap.isPending}
                   className="cursor-pointer text-muted-foreground hover:text-destructive"
                 >
@@ -209,7 +187,7 @@ function GapCard({ gap }: { gap: KbGapDto }) {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={resolveWithDoc}
+                          onClick={() => setPendingAction('resolve')}
                           disabled={deleteGap.isPending}
                           className="h-7 cursor-pointer text-xs"
                         >
@@ -277,6 +255,20 @@ function GapCard({ gap }: { gap: KbGapDto }) {
           ) : null}
         </div>
       </div>
+
+      <ConfirmDeleteDialog
+        open={pendingAction !== null}
+        onOpenChange={(v) => !v && setPendingAction(null)}
+        title={pendingAction === 'resolve' ? 'Mark as already answered?' : 'Delete this question?'}
+        description={
+          pendingAction === 'resolve'
+            ? 'This marks the question as already answered by the KB and removes it from the queue.'
+            : 'It will no longer appear in the queue.'
+        }
+        confirmLabel={pendingAction === 'resolve' ? 'Mark resolved' : 'Delete'}
+        isPending={deleteGap.isPending}
+        onConfirm={handleConfirmAction}
+      />
     </div>
   )
 }
