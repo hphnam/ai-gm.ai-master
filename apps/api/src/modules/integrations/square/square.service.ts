@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import type { SquareClient } from 'square'
 import { prisma } from '../../../database/prisma'
 import { fail, type ToolResult } from '../../../types'
 import { IntegrationsService } from '../integrations.service'
@@ -269,23 +270,17 @@ export class SquareService {
     // items from sister venues (and so a follow-up pos_get_item_inventory
     // call against the mapped location actually returns counts).
     let locationId: string | null = null
+    let client: SquareClient
     if (args.venueId) {
       const resolved = await this.resolveForVenue(orgId, args.venueId)
       if (!('client' in resolved)) return resolved
       locationId = resolved.locationId
+      client = resolved.client
     } else {
       const resolved = await this.resolveClient(orgId)
       if (!('client' in resolved)) return resolved
+      client = resolved.client
     }
-    // Re-resolve the client (cheap — cached). Single source of truth for
-    // creds avoids two callsites repeating the env/credential plumbing.
-    const creds = await this.integrations.getActiveCredentials(orgId, SQUARE_PROVIDER_ID)
-    if (!creds) return NOT_CONNECTED
-    const client = getSquareClient({
-      orgId,
-      accessToken: creds.accessToken,
-      environment: creds.environment,
-    })
     try {
       const resp = await client.catalog.searchItems({
         textFilter: args.query,
@@ -1555,7 +1550,7 @@ export class SquareService {
     // both the client and the locationId; otherwise just the unscoped client.
     // Single resolve either way (the previous version called both).
     let scopedLocationId: string | null = null
-    let client: ReturnType<typeof getSquareClient>
+    let client: SquareClient
     if (args.venueId) {
       const resolved = await this.resolveForVenue(orgId, args.venueId)
       if (!('client' in resolved)) return resolved

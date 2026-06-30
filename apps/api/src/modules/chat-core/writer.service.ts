@@ -60,6 +60,7 @@ export class WriterService {
     try {
       const result = await generateText({
         model: anthropicProvider(SONNET_MODEL),
+        allowSystemInMessages: true,
         messages: [
           {
             role: 'system',
@@ -92,6 +93,7 @@ export class WriterService {
     const userContent = buildUserContent(input)
     return streamText({
       model: anthropicProvider(SONNET_MODEL),
+      allowSystemInMessages: true,
       messages: [
         {
           role: 'system',

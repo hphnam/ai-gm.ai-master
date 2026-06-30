@@ -8,6 +8,9 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "multer": "^2.2.0"
+  },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",

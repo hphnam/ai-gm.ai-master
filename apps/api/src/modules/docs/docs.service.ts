@@ -1495,10 +1495,10 @@ export class DocsService {
         // mutation lacks a portable "delete key" op; `jsonb - 'key'` is Postgres-native.
         // Treat null and non-null venueId symmetrically (IS NOT DISTINCT FROM).
         await tx.$executeRaw`
-          UPDATE knowledge_items
+          UPDATE "knowledge_items"
           SET metadata = metadata - 'docPurpose'
-          WHERE organization_id = ${orgId}
-            AND (venue_id IS NOT DISTINCT FROM ${nextVenueId})
+          WHERE "organizationId" = ${orgId}
+            AND ("venueId" IS NOT DISTINCT FROM ${nextVenueId})
             AND id <> ${id}::uuid
             AND metadata->>'docPurpose' = ${input.docPurpose}
         `

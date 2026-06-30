@@ -365,12 +365,7 @@ function Activity({ incident }: { incident: Incident }) {
       ) : null}
 
       {/* Composer */}
-      <div
-        className={cn(
-          'bg-muted/15 px-6 py-5',
-          hasFeed ? 'border-border/60 border-t' : 'border-border/60 border-t',
-        )}
-      >
+      <div className={cn('bg-muted/15 border-border/60 border-t px-6 py-5')}>
         {isClosed ? (
           <div className="flex items-center justify-between gap-3">
             <p className="text-foreground/55 text-xs">

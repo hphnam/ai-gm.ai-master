@@ -211,24 +211,26 @@ export class IntegrationsService {
   }
 
   /// Called by providers after a successful tool call to surface "last
-  /// synced X minutes ago" in the UI. Best-effort but errors are logged so
-  /// a swallowed Prisma failure doesn't hide a real outage.
+  /// synced X minutes ago" in the UI. Fire-and-forget: the write is detached
+  /// so it never adds a Neon round-trip to the tool-call critical path (agents
+  /// chain several POS calls per turn). Errors are logged, not thrown, so a
+  /// swallowed Prisma failure doesn't hide a real outage.
   async touchLastSynced(orgId: string, provider: string): Promise<void> {
-    try {
-      await prisma.integration.update({
+    void prisma.integration
+      .update({
         where: { organizationId_provider: { organizationId: orgId, provider } },
         data: { lastSyncedAt: new Date(), lastError: null },
       })
-    } catch (err) {
-      this.logger.warn(
-        JSON.stringify({
-          event: 'integrations.touch_last_synced_failed',
-          orgId,
-          provider,
-          message: (err as Error).message,
-        }),
-      )
-    }
+      .catch((err) => {
+        this.logger.warn(
+          JSON.stringify({
+            event: 'integrations.touch_last_synced_failed',
+            orgId,
+            provider,
+            message: (err as Error).message,
+          }),
+        )
+      })
   }
 
   private readonly summarySelect = {

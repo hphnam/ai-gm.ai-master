@@ -360,21 +360,21 @@ export class ChatService implements OnModuleInit {
   ///  - Soft-fails to an empty snapshot — the agent falls back to find_knowledge.
   private async buildVenueSnapshot(orgId: string, venueId: string): Promise<VenueSnapshot> {
     try {
-      const rows = await prisma.knowledgeItem.findMany({
-        where: {
-          organizationId: orgId,
-          OR: [{ venueId }, { venueId: null }],
-          answerStatus: 'answered',
-        },
-        orderBy: [{ updatedAt: 'desc' }],
-        take: 48,
-        select: {
-          id: true,
-          content: true,
-          aiSummary: true,
-          metadata: true,
-        },
-      })
+      // Only the first ~2000 chars of content are ever used (80-char title,
+      // 240-char summary, 2000-char capped org chart). Pull a bounded prefix
+      // via left() instead of the full column — content holds entire tabular
+      // doc bodies (hundreds of KB) and this runs in the per-turn TTFB preamble.
+      const rows = await prisma.$queryRaw<
+        { id: string; content: string; aiSummary: string | null; metadata: unknown }[]
+      >`
+        SELECT id, left(content, 4000) AS content, "aiSummary", metadata
+        FROM "knowledge_items"
+        WHERE "organizationId" = ${orgId}
+          AND ("venueId" = ${venueId} OR "venueId" IS NULL)
+          AND "answerStatus" = 'answered'
+        ORDER BY "updatedAt" DESC
+        LIMIT 48
+      `
 
       const topKnowledge: VenueSnapshot['topKnowledge'] = []
       const recentlyAnswered: VenueSnapshot['recentlyAnswered'] = []
@@ -1128,8 +1128,8 @@ Assistant answer: ${assistantText}`,
   }): Promise<{
     conversationId: string
     assistantMessageId: string
-    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any output schema
-    result: StreamTextResult<ToolSet, any>
+    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any runtime context + output schema
+    result: StreamTextResult<ToolSet, any, any>
   }> {
     const venue = await prisma.venue.findFirst({
       where: { id: params.venueId, organizationId: params.orgId },
