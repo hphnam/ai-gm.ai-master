@@ -16,6 +16,7 @@ import {
   DocumentTypeDto,
   type DocumentTypeKind,
   DocumentTypeKindSchema,
+  type DocVersionHistoryEntry,
   type DocVersionRef,
   type ProcessingStatus,
   type ProposedDocType,
@@ -116,7 +117,7 @@ function buildFiltersSql(args: {
   q: string | null
   category: string | null
   venue: string | null
-  status: 'ready' | 'processing' | 'attention' | 'archived' | 'all'
+  status: 'ready' | 'processing' | 'attention' | 'all'
 }) {
   const parts: Prisma.Sql[] = [Prisma.sql`TRUE`]
   if (args.q) {
@@ -394,7 +395,7 @@ export class DocsService {
       q?: string
       category?: string
       venue?: string
-      status?: 'ready' | 'processing' | 'attention' | 'archived' | 'all'
+      status?: 'ready' | 'processing' | 'attention' | 'all'
       sort?: 'recent' | 'oldest' | 'name'
       cursor?: string | null
       limit?: number
@@ -454,13 +455,9 @@ export class DocsService {
     })()
 
     const filtersSql = buildFiltersSql({ q, category, venue, status })
-    // Lifecycle gate. The library shows live docs by default; the dedicated
-    // 'archived' filter surfaces superseded rows (otherwise invisible) so an
-    // operator can find — and undo — an auto-reconcile.
-    const lifecycleSql =
-      status === 'archived'
-        ? Prisma.sql`ki."supersededAt" IS NOT NULL`
-        : Prisma.sql`ki."supersededAt" IS NULL`
+    // Lifecycle gate. Superseded rows never appear in any listing — an archived
+    // version is reached only through its successor's version history.
+    const lifecycleSql = Prisma.sql`ki."supersededAt" IS NULL`
 
     const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
       SELECT
@@ -921,6 +918,11 @@ export class DocsService {
       : []
     const docType = typeof metadata.docType === 'string' ? metadata.docType : null
     const docPurpose = DocPurposeSchema.safeParse(metadata.docPurpose)
+    // Only walk the lineage when this doc is part of a chain — archived (has a
+    // successor) or a newer version (has a predecessor). Standalone docs skip
+    // the recursive query entirely.
+    const inChain = row.supersededAt !== null || row.supersedes.length > 0
+    const versionHistory = inChain ? await this.buildVersionHistory(row.id, orgId) : []
     return {
       id: row.id,
       title: titleFromMetadata(metadata),
@@ -940,10 +942,62 @@ export class DocsService {
       version: row.version,
       supersededAt: row.supersededAt ? row.supersededAt.toISOString() : null,
       supersededBy: toVersionRef(row.supersededBy),
-      supersedes: toVersionRef(row.supersedes[0] ?? null),
+      versionHistory,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     }
+  }
+
+  // Full version lineage for a doc, newest first. Walks the supersede chain in
+  // both directions from `docId` (successors via supersededById, predecessors
+  // via the reverse edge) with a recursive CTE, org-scoped at every hop so a
+  // chain can never cross a tenant boundary. Includes the doc itself.
+  private async buildVersionHistory(
+    docId: string,
+    orgId: string,
+  ): Promise<DocVersionHistoryEntry[]> {
+    const rows = await prisma.$queryRawUnsafe<
+      {
+        id: string
+        metadata: unknown
+        version: number
+        supersededAt: Date | null
+        updatedAt: Date
+      }[]
+    >(
+      `
+      WITH RECURSIVE chain AS (
+        SELECT id, "supersededById"
+        FROM "knowledge_items"
+        WHERE id = $1 AND "organizationId" = $2
+        UNION
+        SELECT k.id, k."supersededById"
+        FROM "knowledge_items" k
+        JOIN chain c ON (k.id = c."supersededById" OR k."supersededById" = c.id)
+        WHERE k."organizationId" = $2
+      )
+      SELECT ki.id,
+             ki.metadata,
+             ki.version,
+             ki."supersededAt",
+             ki."updatedAt"
+      FROM "knowledge_items" ki
+      JOIN chain ON chain.id = ki.id
+      ORDER BY (ki."supersededAt" IS NULL) DESC, ki.version DESC, ki."updatedAt" DESC
+      `,
+      docId,
+      orgId,
+    )
+    return rows.map((r) => ({
+      id: r.id,
+      // Same title/docType fallback the doc itself uses, so a titled-by-docType
+      // version doesn't render as "Untitled" in the history list.
+      title: titleFromMetadata(r.metadata),
+      version: r.version,
+      supersededAt: r.supersededAt ? r.supersededAt.toISOString() : null,
+      updatedAt: r.updatedAt.toISOString(),
+      isCurrent: r.id === docId,
+    }))
   }
 
   // Sync phase — inserts a minimal KnowledgeItem with status 'processing' so the

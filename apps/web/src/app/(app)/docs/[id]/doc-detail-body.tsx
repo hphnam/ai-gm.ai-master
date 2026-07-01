@@ -8,8 +8,8 @@ import {
   CheckSquare,
   ClipboardList,
   FileText,
-  GitBranch,
   Hash,
+  History,
   Loader2,
   MapPin,
   Pencil,
@@ -290,6 +290,75 @@ function SupersededBanner({ doc }: { doc: DocDetailDto }) {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+// Full version lineage for the doc, newest first. Only rendered when the chain
+// has more than one entry. The row you're viewing is inert and highlighted;
+// every other version links to its own detail page (archived ones included).
+function VersionHistory({ history }: { history: DocDetailDto['versionHistory'] }) {
+  return (
+    <section
+      aria-labelledby="version-history-heading"
+      className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-4 sm:p-5"
+    >
+      <div className="flex items-center gap-2">
+        <History className="h-4 w-4 text-muted-foreground" aria-hidden />
+        <h2 id="version-history-heading" className="text-sm font-semibold">
+          Version history
+        </h2>
+      </div>
+      <ol className="space-y-1">
+        {history.map((v) => (
+          <li key={v.id}>
+            <VersionRow version={v} />
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+function VersionRow({ version }: { version: DocDetailDto['versionHistory'][number] }) {
+  const body = (
+    <div
+      className={cn(
+        'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
+        version.isCurrent ? 'bg-background ring-1 ring-border' : 'hover:bg-background/60',
+      )}
+    >
+      <span className="inline-flex h-6 min-w-[2.25rem] shrink-0 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">
+        v{version.version}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p
+          className={cn(
+            'truncate text-sm',
+            version.title?.trim() ? 'font-medium' : 'italic text-muted-foreground',
+          )}
+        >
+          {version.title?.trim() || 'Untitled'}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {version.supersededAt
+            ? `Archived ${formatRelative(version.supersededAt)}`
+            : `Updated ${formatRelative(version.updatedAt)}`}
+        </p>
+      </div>
+      {version.isCurrent ? (
+        <span className="shrink-0 text-xs font-medium text-muted-foreground">Viewing</span>
+      ) : version.supersededAt ? null : (
+        <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+          Live
+        </span>
+      )}
+    </div>
+  )
+  if (version.isCurrent) return body
+  return (
+    <Link href={`/docs/${version.id}`} className="block">
+      {body}
+    </Link>
   )
 }
 
@@ -641,21 +710,6 @@ export function DocDetailBody({ id }: { id: string }) {
                   </p>
                 ) : null}
                 <MetaLine doc={data} />
-                {data.supersedes ? (
-                  <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                    <GitBranch className="h-3.5 w-3.5" aria-hidden />
-                    Replaces an earlier version
-                    <span className="text-muted-foreground/40" aria-hidden>
-                      ·
-                    </span>
-                    <Link
-                      href={`/docs/${data.supersedes.id}`}
-                      className="underline underline-offset-2 hover:text-foreground"
-                    >
-                      View previous
-                    </Link>
-                  </p>
-                ) : null}
                 {data.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {data.tags.map((t) => (
@@ -683,6 +737,10 @@ export function DocDetailBody({ id }: { id: string }) {
               <ContentBlock content={data.content} />
 
               {data.checklist ? <ChecklistBlock checklist={data.checklist} /> : null}
+
+              {data.versionHistory.length > 1 ? (
+                <VersionHistory history={data.versionHistory} />
+              ) : null}
             </article>
           ) : null}
         </div>

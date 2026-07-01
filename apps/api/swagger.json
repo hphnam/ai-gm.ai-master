@@ -2904,8 +2904,7 @@
                 "all",
                 "ready",
                 "processing",
-                "attention",
-                "archived"
+                "attention"
               ]
             }
           },
@@ -12438,36 +12437,54 @@
             "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
-          "supersedes": {
-            "anyOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "title": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
+          "versionHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
                 },
-                "required": [
-                  "id",
-                  "title"
-                ]
+                "title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "version": {
+                  "type": "number"
+                },
+                "supersededAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "isCurrent": {
+                  "type": "boolean"
+                }
               },
-              {
-                "type": "null"
-              }
-            ],
-            "x-nestjs_zod-uses-3-point-1-syntax": true,
-            "x-nestjs_zod-empty-type": true
+              "required": [
+                "id",
+                "title",
+                "version",
+                "supersededAt",
+                "updatedAt",
+                "isCurrent"
+              ]
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "createdAt": {
             "type": "string",
@@ -12497,7 +12514,7 @@
           "version",
           "supersededAt",
           "supersededBy",
-          "supersedes",
+          "versionHistory",
           "createdAt",
           "updatedAt"
         ]

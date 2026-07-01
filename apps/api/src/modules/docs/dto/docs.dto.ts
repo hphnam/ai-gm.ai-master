@@ -62,6 +62,17 @@ const DocVersionRefSchema = z.object({
   title: z.string().nullable(),
 })
 
+// One version in a doc's full lineage (newest first). supersededAt null marks
+// the live version; isCurrent flags the entry being viewed.
+const DocVersionHistoryEntrySchema = z.object({
+  id: z.string(),
+  title: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
+  updatedAt: z.string(),
+  isCurrent: z.boolean(),
+})
+
 export const DocListItemSchema = z.object({
   id: z.string(),
   title: z.string().nullable(),
@@ -115,7 +126,7 @@ export const DocDetailSchema = z.object({
   version: z.number(),
   supersededAt: z.string().nullable(),
   supersededBy: DocVersionRefSchema.nullable(),
-  supersedes: DocVersionRefSchema.nullable(),
+  versionHistory: z.array(DocVersionHistoryEntrySchema),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
@@ -189,7 +200,7 @@ export const DocListQuerySchema = z.object({
     .union([z.literal('all'), z.literal('unclassified'), z.string().regex(UUID_RE)])
     .optional(),
   venue: z.union([z.literal('all'), z.literal('global'), z.string().regex(UUID_RE)]).optional(),
-  status: z.enum(['all', 'ready', 'processing', 'attention', 'archived']).optional(),
+  status: z.enum(['all', 'ready', 'processing', 'attention']).optional(),
   sort: z.enum(['recent', 'oldest', 'name']).optional(),
   cursor: z.string().max(500).optional(),
   limit: z.coerce.number().int().min(1).max(50).optional(),

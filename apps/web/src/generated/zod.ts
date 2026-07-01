@@ -2710,7 +2710,7 @@ export const DocsControllerListQueryParams = zod.object({
   "q": zod.string().max(docsControllerListQueryQMax).optional(),
   "category": zod.union([zod.literal("all"),zod.literal("unclassified"),zod.string().regex(docsControllerListQueryCategoryThreeRegExp)]).optional(),
   "venue": zod.union([zod.literal("all"),zod.literal("global"),zod.string().regex(docsControllerListQueryVenueThreeRegExp)]).optional(),
-  "status": zod.enum(['all', 'ready', 'processing', 'attention', 'archived']).optional(),
+  "status": zod.enum(['all', 'ready', 'processing', 'attention']).optional(),
   "sort": zod.enum(['recent', 'oldest', 'name']).optional(),
   "cursor": zod.string().max(docsControllerListQueryCursorMax).optional(),
   "limit": zod.number().min(1).max(docsControllerListQueryLimitMax).optional()
@@ -3232,10 +3232,14 @@ export const DocsControllerGetResponse = zod.object({
   "id": zod.string(),
   "title": zod.union([zod.string(),zod.null()])
 }),zod.null()]),
-  "supersedes": zod.union([zod.object({
+  "versionHistory": zod.array(zod.object({
   "id": zod.string(),
-  "title": zod.union([zod.string(),zod.null()])
-}),zod.null()]),
+  "title": zod.union([zod.string(),zod.null()]),
+  "version": zod.number(),
+  "supersededAt": zod.union([zod.string(),zod.null()]),
+  "updatedAt": zod.string(),
+  "isCurrent": zod.boolean()
+})),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })

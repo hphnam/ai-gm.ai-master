@@ -2485,10 +2485,14 @@ export type DocDetailDtoSupersededBy = {
   title: string | null;
 } | null;
 
-export type DocDetailDtoSupersedes = {
+export type DocDetailDtoVersionHistoryItem = {
   id: string;
   title: string | null;
-} | null;
+  version: number;
+  supersededAt: string | null;
+  updatedAt: string;
+  isCurrent: boolean;
+};
 
 export interface DocDetailDto {
   id: string;
@@ -2509,7 +2513,7 @@ export interface DocDetailDto {
   version: number;
   supersededAt: string | null;
   supersededBy: DocDetailDtoSupersededBy;
-  supersedes: DocDetailDtoSupersedes;
+  versionHistory: DocDetailDtoVersionHistoryItem[];
   createdAt: string;
   updatedAt: string;
 }
@@ -3518,7 +3522,6 @@ export const DocsControllerListStatus = {
   ready: 'ready',
   processing: 'processing',
   attention: 'attention',
-  archived: 'archived',
 } as const;
 
 export type DocsControllerListSort = typeof DocsControllerListSort[keyof typeof DocsControllerListSort];

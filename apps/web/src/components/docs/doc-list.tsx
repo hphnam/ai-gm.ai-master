@@ -3,7 +3,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   AlertTriangle,
-  Archive,
   BookOpen,
   ClipboardList,
   FileQuestion,
@@ -34,7 +33,6 @@ import { cn } from '@/lib/utils'
 type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
 
 function statusFor(doc: DocListItem): { text: string; tone: StatusTone } {
-  if (doc.supersededAt) return { text: 'Archived — replaced by a newer version', tone: 'muted' }
   if (doc.processingStatus === 'processing') return { text: 'Reading your document…', tone: 'info' }
   if (doc.processingStatus === 'failed') return { text: 'Couldn’t read this file', tone: 'danger' }
   if (doc.documentType) return { text: doc.documentType.name, tone: 'muted' }
@@ -50,7 +48,6 @@ const toneClass: Record<StatusTone, string> = {
 }
 
 function DocIcon({ doc }: { doc: DocListItem }) {
-  if (doc.supersededAt) return <Archive className="h-5 w-5" aria-hidden />
   if (doc.processingStatus === 'processing')
     return <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
   if (doc.processingStatus === 'failed') return <AlertTriangle className="h-5 w-5" aria-hidden />

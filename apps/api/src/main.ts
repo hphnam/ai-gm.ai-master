@@ -1,5 +1,6 @@
 import './load-env'
 
+import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { json, type NextFunction, type Request, type Response, urlencoded } from 'express'
@@ -9,6 +10,8 @@ import { requestIdMiddleware } from './common/request-id.middleware'
 import { securityHeadersMiddleware } from './common/security-headers.middleware'
 import { assertAuthEnv } from './modules/auth/assert-auth-env'
 import { RedisIoAdapter } from './modules/realtime/redis-io.adapter'
+
+const logger = new Logger('Bootstrap')
 
 async function bootstrap() {
   // audit-added M8: fail-fast startup — missing/malformed BETTER_AUTH_* + WEB_ORIGIN exit 1
@@ -84,9 +87,18 @@ async function bootstrap() {
 
   // Realtime fan-out across replicas. Same Redis instance BullMQ uses, no
   // extra infra dep. Done after createDocument so swagger setup is unaffected.
+  // A Redis outage here must NOT block boot — if the adapter can't connect in
+  // time we log and fall through to the default in-process adapter so the
+  // server still listens and the health check passes (cross-replica fanout
+  // resumes on the next restart once Redis is reachable).
   const redisAdapter = new RedisIoAdapter(app, process.env.REDIS_URL ?? 'redis://127.0.0.1:6379')
-  await redisAdapter.connectToRedis()
-  app.useWebSocketAdapter(redisAdapter)
+  try {
+    await redisAdapter.connectToRedis()
+    app.useWebSocketAdapter(redisAdapter)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    logger.error(`redis socket.io adapter unavailable, using in-process adapter: ${message}`)
+  }
 
   app.enableShutdownHooks()
 
