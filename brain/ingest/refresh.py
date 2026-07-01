@@ -54,6 +54,14 @@ def _ensure_tables(con) -> None:
             adopted BOOLEAN, reason VARCHAR, ts TIMESTAMP DEFAULT now()
         )
         """)
+    con.execute(
+        """
+        CREATE TABLE IF NOT EXISTS served_forecast (
+            venue VARCHAR NOT NULL, layer VARCHAR NOT NULL,
+            model VARCHAR, data_as_of DATE, promoted_ts TIMESTAMP,
+            PRIMARY KEY (venue, layer)
+        )
+        """)
 
 
 def _has_table(con, name: str) -> bool:
@@ -98,10 +106,27 @@ def _last_refit(venue: str, con, layer: str = "L1") -> tuple[datetime | None, in
     return row[0], row[1]
 
 
+def _served(venue: str, con, layer: str = "L1") -> tuple[str | None, date | None]:
+    """What /forecast is actually serving for this venue, and as of what data date.
+    Guarded read: absent table (fresh CSV store, never promoted) → (None, None)."""
+    if not _has_table(con, "served_forecast"):
+        return None, None
+    row = con.execute(
+        "SELECT model, data_as_of FROM served_forecast WHERE venue=? AND layer=?",
+        [venue, layer]).fetchone()
+    if row is None:
+        return None, None
+    return row[0], row[1]
+
+
 def freshness(venue: str, con) -> dict:
     """Per-venue currency: is this current, does it need a refresh? Never falsely
     stale on the CSV ceiling (G2) — a store with no watermark falls back to its
-    data max and reports staleness 0 against the source's own latest date."""
+    data max and reports staleness 0 against the source's own latest date.
+
+    `last_refit` (from ladder_selection) is when the rung was last RE-SELECTED;
+    `served_model`/`served_as_of` (from served_forecast) is what is CURRENTLY served
+    and as of when — the surface distinguishes the two."""
     adapter = get_adapter()
     latest = adapter.latest_available_date()
     wm = read_watermark(venue, con)
@@ -109,6 +134,7 @@ def freshness(venue: str, con) -> dict:
     as_of = wm["last_txn_date"] if wm else data_max
     staleness_days = (latest - as_of).days if (latest and as_of) else 0
     last_refit, incumbent_rung = _last_refit(venue, con)
+    served_model, served_as_of = _served(venue, con)
     return {
         "venue": venue,
         "as_of": as_of.isoformat() if as_of else None,
@@ -119,6 +145,8 @@ def freshness(venue: str, con) -> dict:
         "staleness_days": int(staleness_days),
         "last_refit": last_refit.isoformat() if last_refit else None,
         "incumbent_rung": incumbent_rung,
+        "served_model": served_model,
+        "served_as_of": served_as_of.isoformat() if served_as_of else None,
     }
 
 
@@ -219,6 +247,56 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
             "winner": best.name if best else None}
 
 
+# --- Promote (regenerate the served forecast) --------------------------------
+
+def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | None = None) -> dict:
+    """Regenerate the SERVED forecast, not just the signal layer, so /forecast and
+    /stock/cover move with new data. This closes the v2 gap where 'beat the rung'
+    was detect-only: detection audits `ladder_selection`; promotion re-persists the
+    served artifacts here and records `served_forecast`.
+
+    Re-persists L1 `forecasts`/`bands` via `conformal.wrap.evaluate(model_name=...)`
+    (which also keeps the closed-venue standby-forward band via its existing path),
+    and the Beer Hall keg forecast via `hierarchy.reconcile.reconcile`, then upserts
+    `served_forecast`. Model served = the rung this cycle's T3 adopted, else the
+    incumbent served model, else the venue default (respecting MAX_RUNG).
+
+    Connection discipline (the flaky-fix lesson): `wrap.evaluate` and `reconcile`
+    open their own connections, so the heavy calls run with NO connection open here;
+    a single short write connection brackets each side (resolve model, then upsert)."""
+    con = connect()
+    try:
+        _ensure_tables(con)
+        incumbent_model, _ = _served(venue, con, layer)
+        wm = read_watermark(venue, con, layer)
+        data_as_of = wm["last_txn_date"] if wm else _data_max(venue, con)
+    finally:
+        con.close()
+
+    from conformal.wrap import default_model
+    served_model = adopted_model or incumbent_model or default_model(venue)
+
+    from conformal import wrap
+    wrap.evaluate(venue, model_name=served_model)
+    reconciled = venue in config.VENUES_WITH_STOCK
+    if reconciled:
+        from hierarchy import reconcile as _reconcile
+        _reconcile.reconcile(venue)
+
+    promoted_ts = datetime.now()
+    con = connect()
+    try:
+        con.execute("DELETE FROM served_forecast WHERE venue=? AND layer=?", [venue, layer])
+        con.execute(
+            "INSERT INTO served_forecast (venue, layer, model, data_as_of, promoted_ts) "
+            "VALUES (?, ?, ?, ?, ?)", [venue, layer, served_model, data_as_of, promoted_ts])
+    finally:
+        con.close()
+    return {"model": served_model, "reconciled": reconciled,
+            "data_as_of": str(data_as_of) if data_as_of else None,
+            "promoted_ts": promoted_ts.isoformat()}
+
+
 # --- Orchestrator ------------------------------------------------------------
 
 def refresh(venue: str | None = None, *, force: bool = False, refit: str = "auto") -> dict:
@@ -275,9 +353,25 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
     else:
         notes.append(f"T3 skipped: {reason}")
 
+    # Phase 4 — promote: regenerate the served forecast so /forecast and
+    # /stock/cover reflect the new data (or a newly adopted rung). Fires only on new
+    # closed days or an adoption (a force refresh always promotes); never per
+    # transaction. Rides the closed-day cadence: at most one fit per venue per cycle.
+    promote = None
+    adopted = bool(rung_change and rung_change.get("adopted"))
+    if force or n_added or adopted:
+        adopted_model = rung_change.get("winner") if adopted else None
+        try:
+            promote = _promote_and_serve(venue, adopted_model=adopted_model)
+            notes.append(f"promoted: serving {promote['model']} as of {promote['data_as_of']}")
+        except Exception as exc:                          # pragma: no cover - defensive
+            notes.append(f"promote failed: {type(exc).__name__}: {exc}")
+    else:
+        notes.append("promote skipped: no new data and no rung adoption")
+
     return {"venue": venue, "rows_added": n_added, "new_as_of": str(new_max) if new_max else None,
             "exog_dates_filled": exog_dates, "features_rebuilt": features_built,
-            "refit": refit_done, "rung_change": rung_change, "notes": notes}
+            "refit": refit_done, "rung_change": rung_change, "promote": promote, "notes": notes}
 
 
 def _auto_exog(notes: list[str]) -> int:
@@ -313,8 +407,9 @@ def main() -> int:
     out = run()
     print(f"  source {out['source']} (is_live={out['is_live']})")
     for v, s in out["venues"].items():
+        served = s["promote"]["model"] if s.get("promote") else "unchanged"
         print(f"  {v:16s}: +{s['rows_added']} rows, as_of {s['new_as_of']}, "
-              f"refit={s['refit']}")
+              f"refit={s['refit']}, serving {served}")
         for n in s["notes"]:
             print(f"      note: {n}")
     ok = isinstance(out["venues"], dict)

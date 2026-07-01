@@ -194,6 +194,8 @@ class StubClient {
           staleness_days: 0,
           last_refit: null,
           incumbent_rung: 2,
+          served_model: 'rung2_ets',
+          served_as_of: '2026-05-31',
         },
       ],
     }
@@ -361,6 +363,12 @@ describe('BrainService.dispatch', () => {
   it('freshness: defaults venue and stays read-only ok', async () => {
     const res = await svc.dispatch(BRAIN_DATA_FRESHNESS, {}, CTX)
     assert.equal(res.ok, true)
+  })
+
+  it('freshness: surfaces the currently-served model', async () => {
+    const res = await svc.dispatch(BRAIN_DATA_FRESHNESS, { venue: 'all' }, CTX)
+    const rows = (res as { data: { venues: { served_model: string }[] } }).data.venues
+    assert.equal(rows[0].served_model, 'rung2_ets')
   })
 
   it('freshness: rejects an unknown venue with invalid-input', async () => {

@@ -139,3 +139,12 @@ T1 = live facts (Square, cached ~10 min, never warehoused); T2 = append closed
 days to the store (`refresh()`); T3 = ladder re-fit, only on a weekly boundary or a
 confirmed change-point (a transaction never triggers a re-fit). See
 `PRJ93_Live_Ingest_Report.md`.
+
+After T2/T3, `refresh()` **promotes**: it regenerates the served forecast (L1
+`forecasts`/`bands` via the conformal wrapper, plus the Beer Hall keg via the MinT
+reconciler) and records `served_forecast(venue, layer, model, data_as_of,
+promoted_ts)`, so `/forecast` and `/stock/cover` move with the data instead of serving
+a stale band. "Beat the rung" is detect (`ladder_selection`) plus promote
+(`served_forecast`). Promotion fires only on new data, an adoption, or a forced refresh,
+never per transaction. `/freshness` and `brain_data_freshness` report `served_model` and
+`served_as_of`. See `PRJ93_Promote_And_Serve_Report.md`.

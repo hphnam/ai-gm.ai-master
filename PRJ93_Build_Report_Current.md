@@ -19,9 +19,9 @@ suites (commands and results in §6).
 
 | Track | Result |
 |---|---|
-| **Track A** (`brain/`, Python) | A0–A14 + A13 change-point + point deviation + briefing capstone + live-ingest/freshness. **157 pytest passing** (19 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
-| **Track B** (`apps/api` + `apps/web`, TS) | 8 self-registered agent tools. **32 specs passing, 0 new typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
-| **Reviews** | Live ingest: code-reviewer 3 LOW (all inert-today) **fixed** (incl. a flaky read↔write conn race, hardened); security-reviewer **no findings**; doc-reviewer stale docs **fixed**. Briefing capstone: code 1 HIGH + 2 LOW **all fixed**; security clean. Point deviation: code clean; security 1 LOW **fixed**. Stock: security clean; code 1 MEDIUM + 1 LOW **fixed**. |
+| **Track A** (`brain/`, Python) | A0–A14 + A13 change-point + point deviation + briefing capstone + live-ingest/freshness + promote-and-serve. **171 pytest passing** (20 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
+| **Track B** (`apps/api` + `apps/web`, TS) | 8 self-registered agent tools. **33 specs passing, 0 new typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
+| **Reviews** | Promote-and-serve (v2.1): code-reviewer **no HIGH/MEDIUM** (2 LOW, both intended behaviour, no fix); security-reviewer **no findings**. Live ingest: code-reviewer 3 LOW (all inert-today) **fixed** (incl. a flaky read↔write conn race, hardened); security-reviewer **no findings**; doc-reviewer stale docs **fixed**. Briefing capstone: code 1 HIGH + 2 LOW **all fixed**; security clean. Point deviation: code clean; security 1 LOW **fixed**. Stock: security clean; code 1 MEDIUM + 1 LOW **fixed**. |
 
 **Overall: all acceptance gates pass (A0–A14 + A13 + point deviation + briefing + live-ingest G0–G9; stock G1–G10, enrichment, change-point G1–G12).**
 
@@ -181,10 +181,10 @@ are deliberate, evidence-based decisions, not defects:
 | Stale slugs | `grep the_beer_hall brain/**/*.py` | none |
 | Track B wiring | grep across layers | tool present in tools/client/service/router/card |
 | Forbidden touch-points | `git status` on chat-tools/dispatcher/ai-sdk/gm-agent | none touched |
-| brain tests | `pytest` | **157 passed** (19 files; +9 A13, +14 point deviation, +11 briefing, +18 live-ingest) |
+| brain tests | `pytest` | **171 passed** (20 files; +9 A13, +14 point deviation, +11 briefing, +18 live-ingest, +14 promote-and-serve) |
 | A14 weather reachability | Open-Meteo archive/hindcast/previous-runs | reachable; 3 bases cached (693 rows each) |
 | A14 ablation verdict | rolling-origin GBM | no exo feature adopted (honest null); weather train/serve study computed |
-| Track B tests | `node --test proactive-brain/*.spec.ts` | **32 passed** |
+| Track B tests | `node --test proactive-brain/*.spec.ts` | **33 passed** |
 | Typecheck | `tsc --noEmit` (proactive-brain + cards) | **0 errors** |
 | patch-v2 closure logic | `is_closed()` per venue | TRT True, Ellel/BH False |
 

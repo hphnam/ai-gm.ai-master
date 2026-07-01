@@ -374,7 +374,8 @@ def _freshness_block(venue: str, con) -> dict:
 
     f = _freshness(venue, con)
     return {"source": f["source"], "is_live": f["is_live"],
-            "stale": f["stale"], "staleness_days": f["staleness_days"]}
+            "stale": f["stale"], "staleness_days": f["staleness_days"],
+            "served_model": f["served_model"], "served_as_of": f["served_as_of"]}
 
 
 def _freshness_for(venue: str) -> dict:
@@ -387,10 +388,16 @@ def _freshness_for(venue: str) -> dict:
 
 def _estate_freshness_block(venues, con) -> dict:
     blocks = [_freshness_block(v, con) for v in venues] or [_freshness_block("beer_hall", con)]
+    models = {b["served_model"] for b in blocks}
+    served_dates = [b["served_as_of"] for b in blocks if b["served_as_of"]]
     return {"source": blocks[0]["source"],
             "is_live": any(b["is_live"] for b in blocks),
             "stale": any(b["stale"] for b in blocks),
-            "staleness_days": max(b["staleness_days"] for b in blocks)}
+            "staleness_days": max(b["staleness_days"] for b in blocks),
+            # One served model across the estate, or None when venues differ; the
+            # oldest served date is the conservative estate-wide currency.
+            "served_model": next(iter(models)) if len(models) == 1 else None,
+            "served_as_of": min(served_dates) if served_dates else None}
 
 
 def _live_topup(venue: str, freshness: str) -> None:
@@ -411,7 +418,8 @@ def _live_topup(venue: str, freshness: str) -> None:
 @app.get("/freshness")
 def get_freshness(venue: str = "all") -> dict:
     """Per-venue currency: as-of, source, is_live, stale, staleness, last re-fit,
-    incumbent rung. Read-only; reports, never triggers work."""
+    incumbent rung, and the currently-served model + its data date (served_model /
+    served_as_of). Read-only; reports, never triggers work."""
     from config import FORECAST_VENUES
     from ingest.refresh import freshness as _freshness
 

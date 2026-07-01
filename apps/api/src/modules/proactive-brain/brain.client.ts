@@ -29,6 +29,8 @@ export interface FreshnessBlock {
   is_live: boolean
   stale: boolean
   staleness_days: number
+  served_model?: string | null
+  served_as_of?: string | null
 }
 
 export interface FreshnessRow {
@@ -41,6 +43,8 @@ export interface FreshnessRow {
   staleness_days: number
   last_refit: string | null
   incumbent_rung: number | null
+  served_model: string | null
+  served_as_of: string | null
 }
 
 export interface FreshnessResponse {
