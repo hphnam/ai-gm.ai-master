@@ -7,12 +7,13 @@ import {
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
+  BRAIN_DAILY_BRIEFING,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
   BRAIN_TOOL_SCHEMAS,
 } from './brain.tools'
 
-/// Orchestrates the six brain tools: validate input, call the FastAPI client,
+/// Orchestrates the seven brain tools: validate input, call the FastAPI client,
 /// and shape the result into the codebase's ToolResult<T> envelope. orgId is
 /// taken from ctx (never the model); the brain is gated by BRAIN_ENABLED so the
 /// module is inert when the brain is down.
@@ -54,6 +55,8 @@ export class BrainService {
           return await this.checkStockCover(parsed.data as StockCoverInput)
         case BRAIN_CHECK_CHANGE_POINT:
           return await this.checkChangePoint(parsed.data as ChangePointInput)
+        case BRAIN_DAILY_BRIEFING:
+          return await this.dailyBriefing(parsed.data as BriefingInput)
         case BRAIN_CHECK_CHECKLIST:
           return await this.checkChecklist(parsed.data as ChecklistInput)
         default:
@@ -139,6 +142,13 @@ export class BrainService {
       change_points: res.change_points,
     })
   }
+
+  private async dailyBriefing(i: BriefingInput): Promise<ToolResult<unknown>> {
+    // A quiet day (items: []) is a valid, informative answer, so this is always
+    // ok — the card renders the "nothing to flag" state.
+    const res = await this.client.briefing(i)
+    return ok(res)
+  }
 }
 
 type ForecastInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_FORECAST_SALES]['_output']
@@ -146,3 +156,4 @@ type DeviationInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_DEVIATION][
 type ChecklistInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHECKLIST]['_output']
 type StockCoverInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_STOCK_COVER]['_output']
 type ChangePointInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHANGE_POINT]['_output']
+type BriefingInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_DAILY_BRIEFING]['_output']

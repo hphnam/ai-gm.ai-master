@@ -148,6 +148,29 @@ export interface ChangePointResponse {
   note?: string
 }
 
+export interface BriefingItem {
+  item_key: string
+  venue: string
+  venue_label: string
+  status: 'new' | 'continuing' | 'resolved'
+  score: number
+  severity: 'critical' | 'high' | 'medium' | 'low' | 'ok'
+  direction: 'up' | 'down' | 'na'
+  headline: string
+  reason: string
+  caveats: string[]
+}
+
+export interface BriefingResponse {
+  as_of: string
+  generated_at: string
+  layer: string
+  venues: string[]
+  counts: { new: number; continuing: number; resolved: number }
+  items: BriefingItem[]
+  notes: string[]
+}
+
 @Injectable()
 export class BrainClient {
   private readonly baseUrl = (process.env.BRAIN_BASE_URL ?? 'http://127.0.0.1:8088').replace(
@@ -189,6 +212,14 @@ export class BrainClient {
 
   changePoint(q: { venue: string; layer?: string }): Promise<ChangePointResponse> {
     return this.post('/deviation/changepoint', q)
+  }
+
+  briefing(q: { venue?: string; as_of?: string }): Promise<BriefingResponse> {
+    const params = new URLSearchParams()
+    if (q.venue) params.set('venue', q.venue)
+    if (q.as_of) params.set('as_of', q.as_of)
+    const qs = params.toString()
+    return this.get(`/briefing${qs ? `?${qs}` : ''}`)
   }
 
   checkChecklist(q: ChecklistQuery): Promise<ChecklistResponse> {

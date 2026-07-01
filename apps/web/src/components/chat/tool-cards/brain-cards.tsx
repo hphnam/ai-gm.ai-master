@@ -1,6 +1,6 @@
 'use client'
 
-import { Activity, AlertTriangle, Beer, Lightbulb, TrendingUp } from 'lucide-react'
+import { Activity, AlertTriangle, Beer, Lightbulb, Newspaper, TrendingUp } from 'lucide-react'
 import { CardEmpty, CardShell } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
 
@@ -418,6 +418,97 @@ export function ChangePointCard({ part }: ToolCardRendererProps) {
           </li>
         ))}
       </ul>
+    </CardShell>
+  )
+}
+
+// ─── brain_daily_briefing ────────────────────────────────────────────────
+
+type BriefingItem = {
+  item_key: string
+  venue_label: string
+  status: 'new' | 'continuing' | 'resolved'
+  severity: 'critical' | 'high' | 'medium' | 'low' | 'ok'
+  direction: 'up' | 'down' | 'na'
+  headline: string
+  reason: string
+  caveats: string[]
+}
+type BriefingData = {
+  as_of: string
+  counts: { new: number; continuing: number; resolved: number }
+  items: BriefingItem[]
+  notes: string[]
+}
+
+const STATUS_CLASS: Record<string, string> = {
+  new: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  continuing: 'bg-muted text-muted-foreground',
+  resolved: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+}
+
+export function BriefingCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={Newspaper} title="Daily briefing">
+        <CardEmpty message={output.detail ?? "Couldn't build the briefing."} />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<BriefingData>(output)) return null
+  const { as_of, counts, items, notes } = output.data
+  if (!items?.length) {
+    return (
+      <CardShell
+        icon={Newspaper}
+        title="Daily briefing — nothing to flag"
+        subtitle={as_of ? `as of ${as_of}` : undefined}
+        tone="success"
+      >
+        <p className="text-[12.5px] text-muted-foreground">
+          A quiet day: no changes above threshold across the estate.
+        </p>
+        {notes?.length ? (
+          <p className="mt-1 text-[11px] text-muted-foreground">{notes.join(' · ')}</p>
+        ) : null}
+      </CardShell>
+    )
+  }
+  return (
+    <CardShell
+      icon={Newspaper}
+      title="Daily briefing"
+      subtitle={`${as_of ? `as of ${as_of} · ` : ''}${counts.new} new · ${counts.continuing} continuing · ${counts.resolved} resolved`}
+      tone={counts.new > 0 ? 'warning' : 'default'}
+    >
+      <ul className="space-y-2">
+        {items.slice(0, 6).map((it) => (
+          <li key={it.item_key} className="rounded-md bg-muted/40 px-2.5 py-1.5">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-[12.5px] font-medium text-foreground">{it.headline}</span>
+              <span
+                className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
+                  STATUS_CLASS[it.status] ?? STATUS_CLASS.continuing
+                }`}
+              >
+                {it.status}
+              </span>
+            </div>
+            {it.reason ? (
+              <p className="mt-0.5 text-[11.5px] italic text-muted-foreground">{it.reason}</p>
+            ) : null}
+            {it.caveats?.map((c) => (
+              <p key={c} className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                {c}
+              </p>
+            ))}
+          </li>
+        ))}
+      </ul>
+      {notes?.length ? (
+        <p className="mt-1.5 text-[11px] text-muted-foreground">{notes.join(' · ')}</p>
+      ) : null}
     </CardShell>
   )
 }

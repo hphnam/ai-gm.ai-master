@@ -11,6 +11,7 @@ Endpoints (typed JSON):
     GET  /sop-gaps              ranked KB-gap clusters + failure rate (A8)
     POST /checklist/discipline  expected vs actual, weighted misses (A9)
     GET  /stock/cover           days-of-cover reorder lines per venue (A12)
+    GET  /briefing              ranked, de-duplicated, attributed daily feed (capstone)
 
 Run:
     uvicorn service.app:app --port 8088     # http://127.0.0.1:8088/docs
@@ -328,3 +329,20 @@ def checklist_discipline(req: ChecklistRequest) -> dict:
     res["checklist"] = req.checklist
     res["n_expected_mandatory"] = len(expected_mandatory(steps, req.dow == 6))
     return res
+
+
+@app.get("/briefing")
+def briefing(venue: str = "all", as_of: date | None = None, layer: str = "L1") -> dict:
+    """The proactive-briefing capstone: the four signals composed into one ranked,
+    de-duplicated, attributed daily feed with new/continuing/resolved status. A
+    quiet day returns `items: []` at 200; a closed / unknown venue never 500s.
+    Read-only — the daily `run()` (CLI/cron) is what persists `briefing_runs`."""
+    # NOTE: function-local import defers the signal graph off module load.
+    from signals.briefing import build
+
+    con = _read_only()
+    try:
+        venues = None if venue == "all" else [venue]
+        return build(as_of=as_of, venues=venues, layer=layer, con=con)
+    finally:
+        con.close()

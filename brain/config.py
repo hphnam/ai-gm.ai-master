@@ -258,6 +258,36 @@ DEV_SCAN_WINDOW = 14    # trading days returned by scan()
 # only on genuine trading days (FLAG-PD1).
 VENUES_FOR_DEVIATION = ("beer_hall", "ellel", "two_river_taps")
 
+# --- Proactive briefing (capstone) ------------------------------------------
+# The synthesis layer: composes the four signals (point deviation, change-point,
+# stock cover, checklist/SOP) into one ranked, de-duplicated, attributed daily
+# feed. No new detection maths — every constant below is a knob on the synthesis
+# (de-dup window, ranking weights, honesty gates), printed in the report so a
+# reviewer can reproduce the ordering.
+BRIEFING_VENUES = FORECAST_VENUES            # the three real venues
+BRIEFING_MERGE_WINDOW_DAYS = CP_RUN_N        # cluster same-direction onsets within 7 days
+
+# G5a — checklist/SOP data is template-only until Ryan's completion export lands.
+# While False, checklist and SOP signals are excluded from the ranked feed and
+# from scoring (never counted as a real miss). Flipping to True is a one-liner.
+CHECKLIST_LIVE = False
+
+# Ranking (§7). score = SOURCE_WEIGHT · SEVERITY_MULT · recency · novelty ·
+# baseline_trust · direction_bump. Deterministic tie-break in briefing.py.
+BRIEFING_SOURCE_WEIGHT = {
+    "change_point": 1.00, "stock": 0.85, "deviation": 0.60,
+    "checklist": 0.40, "sop": 0.35,
+}
+BRIEFING_SEVERITY_MULT = {
+    "critical": 1.5, "high": 1.5, "medium": 1.0, "low": 0.6, "ok": 0.0,
+}
+BRIEFING_NOVELTY_FACTOR = {"new": 1.25, "continuing": 0.80, "resolved": 0.50}
+BRIEFING_DIRECTION_BUMP = {"down": 1.10, "up": 1.00, "na": 1.00}
+# G5b — a single-day deviation on a sparse (event-only) venue gets a narrow band
+# that inflates z; down-weight and caveat it (the Ellel z=+6.22 reading).
+BRIEFING_BASELINE_TRUST_SPARSE = 0.5
+BRIEFING_RECENCY_FLOOR = 0.5                 # recency_factor floor at the window edge
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))

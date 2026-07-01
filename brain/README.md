@@ -86,6 +86,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A14 | exo seam populated (calendar/weather/events); ablation gates adoption — honest null on BH + weather train/serve study |
 | A14b | diagnostic-only: is the A14 null hidden by aggregation/eval, or genuinely redundant-with-season? L2/L3 ablation + residual regression; adopts nothing |
 | A13 | sustained regime-shift detection (CUSUM + persistence + BOCPD) on the conformal residual stream; TRT closure recovered as ground truth; attribution against the A14 seam |
+| briefing | capstone synthesis: composes the four signals into one ranked, de-duplicated, attributed daily feed with new/continuing/resolved status; honesty gates (template checklist excluded, sparse baseline down-weighted, closed venue quiet); no new detection maths |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
@@ -107,6 +108,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | GET | `/sop-gaps` | A8 |
 | POST | `/checklist/discipline` | A9 |
 | GET | `/stock/cover?venue=` | A12 (Beer Hall; empty envelope for other venues) |
+| GET | `/briefing?venue=&as_of=&layer=` | capstone: ranked, de-duplicated, attributed daily feed |
 
 This service is what Track B (`apps/api/.../proactive-brain`) calls over HTTP.
 ```

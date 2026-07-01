@@ -19,11 +19,11 @@ suites (commands and results in §6).
 
 | Track | Result |
 |---|---|
-| **Track A** (`brain/`, Python) | A0–A14 + A13 change-point + point deviation. **128 pytest passing** (16 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
-| **Track B** (`apps/api` + `apps/web`, TS) | 6 self-registered agent tools. **26 specs passing, 0 new typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
-| **Reviews** | Point deviation: code-reviewer **no HIGH/MEDIUM**; security-reviewer 1 LOW (DuckDB conn leak) **fixed**; doc-reviewer 1 stale README line **fixed**. Stock tool: security **no findings**; code 1 MEDIUM + 1 LOW **fixed**. |
+| **Track A** (`brain/`, Python) | A0–A14 + A13 change-point + point deviation + briefing capstone. **139 pytest passing** (17 files). Full pipeline runs end-to-end via `scripts/run_all_venues.sh`. |
+| **Track B** (`apps/api` + `apps/web`, TS) | 7 self-registered agent tools. **29 specs passing, 0 new typecheck errors** in the proactive-brain module + web cards. No forbidden touch-points edited. |
+| **Reviews** | Briefing capstone: code-reviewer 1 HIGH (empty-run re-resolve loop) + 2 LOW **all fixed**; security-reviewer **no findings**; doc-reviewer stale docs **fixed**. Point deviation: code **no HIGH/MEDIUM**; security 1 LOW **fixed**. Stock: security **no findings**; code 1 MEDIUM + 1 LOW **fixed**. |
 
-**Overall: all acceptance gates pass (A0–A14 + A13 change-point + point deviation G0–G9; stock G1–G10, enrichment, change-point G1–G12).**
+**Overall: all acceptance gates pass (A0–A14 + A13 change-point + point deviation G0–G9 + briefing capstone G0–G9; stock G1–G10, enrichment, change-point G1–G12).**
 
 ---
 
@@ -42,11 +42,11 @@ CSV / XLSX sources
                                        │
   A6 forecasts ───────────────────────┴─► A12 stock cover ─► stock_cover(14) ─► (A6 re-run enriches its report)
                                                               │
-  A10 FastAPI: /health /forecast /deviation/check /deviation/scan /deviation/changepoint /sop-gaps /checklist/discipline /stock/cover
+  A10 FastAPI: /health /forecast /deviation/check /deviation/scan /deviation/changepoint /sop-gaps /checklist/discipline /stock/cover /briefing
                                                               │
   Track B (NestJS): BrainClient ─► BrainService ─► BrainProvider ─(IntegrationRegistry)─► AI-GM agent
-                    6 tools: forecast_sales, check_deviation, find_sop_gaps, check_checklist, check_stock_cover, check_change_point
-                    Web: ForecastBandCard, DeviationCard, SopGapsCard, ChecklistCard, StockCoverCard, ChangePointCard
+                    7 tools: forecast_sales, check_deviation, find_sop_gaps, check_checklist, check_stock_cover, check_change_point, daily_briefing
+                    Web: ForecastBandCard, DeviationCard, SopGapsCard, ChecklistCard, StockCoverCard, ChangePointCard, BriefingCard
 ```
 
 **Connection points audited and confirmed working:**
@@ -78,6 +78,7 @@ CSV / XLSX sources
 | **A14b diagnostic** | `signals/weather_diagnostic.py` | PASS — 4 tests find a **weak-but-significant** temperature signal in draught (Test D incr R²≈0.02, p<0.05) that the GBM can't convert to forecast lift; calendar genuinely uninformative; **adopts nothing** (`_ADOPTED_EXO` untouched), logged as a candidate |
 | **A13 change-point** | `signals/change_point.py`, `eval/change_point_eval.py` | PASS — CUSUM + persistence + BOCPD on the conformal residual stream; **TRT closure recovered** (8-day delay, `both` detectors); injection δ=1→100%@~9d, δ=2→~3d, ~0 false alarms; each shift **attributed** against the A14 seam; 6th Track-B tool; no forecast change |
 | **Point deviation** | `signals/residual.py` (shared foundation), `signals/deviation.py` | PASS (G0–G9) — per-day band primitive on the shared residual stream; foundation extracted so deviation and change-point share a scale and neither imports the other; `/deviation/check` migrated band-breach→check_point (+`/deviation/scan`); `brain_check_deviation` re-shaped; no forecast change |
+| **Briefing capstone** | `signals/briefing.py`, `briefing_runs` table | PASS (G0–G9) — composes the four signals into one ranked, de-duplicated, attributed daily feed; change-point absorbs its deviation run + coincident stock; transparent config-driven score; new/continuing/resolved via `briefing_runs`; honesty gates (CHECKLIST_LIVE, sparse baseline_trust, closed-venue quiet); 7th Track-B tool; no new detection maths |
 | A10 service | `service/app.py` | PASS — all endpoints return typed JSON |
 
 ---
@@ -179,10 +180,10 @@ are deliberate, evidence-based decisions, not defects:
 | Stale slugs | `grep the_beer_hall brain/**/*.py` | none |
 | Track B wiring | grep across layers | tool present in tools/client/service/router/card |
 | Forbidden touch-points | `git status` on chat-tools/dispatcher/ai-sdk/gm-agent | none touched |
-| brain tests | `pytest` | **128 passed** (16 files; +9 A13 change-point, +14 point deviation) |
+| brain tests | `pytest` | **139 passed** (17 files; +9 A13 change-point, +14 point deviation, +11 briefing) |
 | A14 weather reachability | Open-Meteo archive/hindcast/previous-runs | reachable; 3 bases cached (693 rows each) |
 | A14 ablation verdict | rolling-origin GBM | no exo feature adopted (honest null); weather train/serve study computed |
-| Track B tests | `node --test proactive-brain/*.spec.ts` | **26 passed** |
+| Track B tests | `node --test proactive-brain/*.spec.ts` | **29 passed** |
 | Typecheck | `tsc --noEmit` (proactive-brain + cards) | **0 errors** |
 | patch-v2 closure logic | `is_closed()` per venue | TRT True, Ellel/BH False |
 

@@ -2,6 +2,7 @@
 
 import { getToolName, isToolUIPart } from 'ai'
 import {
+  BriefingCard,
   ChangePointCard,
   DeviationCard,
   ForecastBandCard,
@@ -39,6 +40,7 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
   brain_find_sop_gaps: SopGapsCard,
   brain_check_stock_cover: StockCoverCard,
   brain_check_change_point: ChangePointCard,
+  brain_daily_briefing: BriefingCard,
 }
 
 export function hasToolCard(toolName: string): boolean {

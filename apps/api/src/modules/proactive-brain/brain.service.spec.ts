@@ -8,6 +8,7 @@ import {
   BRAIN_CHECK_CHECKLIST,
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
+  BRAIN_DAILY_BRIEFING,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
 } from './brain.tools'
@@ -150,6 +151,34 @@ class StubClient {
         : [],
     }
   }
+  briefingItems = 1
+  async briefing(q: unknown) {
+    this.record('briefing', q)
+    return {
+      as_of: '2026-05-31',
+      generated_at: '2026-05-31T09:00:00',
+      layer: 'L1',
+      venues: ['beer_hall'],
+      counts: { new: this.briefingItems, continuing: 0, resolved: 0 },
+      items: this.briefingItems
+        ? [
+            {
+              item_key: 'beer_hall:down:2025-12-27:change_point',
+              venue: 'beer_hall',
+              venue_label: 'The Beer Hall',
+              status: 'new' as const,
+              score: 0.69,
+              severity: 'medium' as const,
+              direction: 'down' as const,
+              headline: 'The Beer Hall: sustained shift since 2025-12-27 (29% below normal)',
+              reason: 'coincides with a cold snap (~6°C vs 13°C avg)',
+              caveats: [],
+            },
+          ]
+        : [],
+      notes: ['checklist/SOP data not live (template) — excluded from the feed'],
+    }
+  }
   async checkChecklist(q: unknown) {
     this.record('checkChecklist', q)
     return {
@@ -282,6 +311,24 @@ describe('BrainService.dispatch', () => {
 
   it('change-point: rejects an unknown venue with invalid-input', async () => {
     const res = await svc.dispatch(BRAIN_CHECK_CHANGE_POINT, { venue: 'nope' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'invalid-input')
+    assert.equal(stub.lastCall, null)
+  })
+
+  it('briefing: valid input hits the briefing endpoint and returns ranked items', async () => {
+    const res = await svc.dispatch(BRAIN_DAILY_BRIEFING, { venue: 'all' }, CTX)
+    assert.equal(stub.lastCall?.method, 'briefing')
+    assert.ok(res.ok && (res.data as { items: unknown[] }).items.length === 1)
+  })
+
+  it('briefing: a quiet day returns ok with an empty item list', async () => {
+    stub.briefingItems = 0
+    const res = await svc.dispatch(BRAIN_DAILY_BRIEFING, {}, CTX)
+    assert.ok(res.ok && (res.data as { items: unknown[] }).items.length === 0)
+  })
+
+  it('briefing: rejects an unknown venue with invalid-input', async () => {
+    const res = await svc.dispatch(BRAIN_DAILY_BRIEFING, { venue: 'nope' }, CTX)
     assert.equal(res.ok === false && res.reason, 'invalid-input')
     assert.equal(stub.lastCall, null)
   })

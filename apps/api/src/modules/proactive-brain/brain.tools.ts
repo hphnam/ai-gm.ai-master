@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { IntegrationToolDefinition } from '../integrations/integration-provider'
 
-/// The six agent functions exposed by the Proactive Brain. Same shape as
+/// The seven agent functions exposed by the Proactive Brain. Same shape as
 /// SQUARE_TOOL_DEFINITIONS so they feed straight into buildAiSdkTools via the
 /// IntegrationRegistry — no edits to chat-tools.ts or ai-sdk-tools.ts.
 ///
@@ -15,6 +15,7 @@ export const BRAIN_FIND_SOP_GAPS = 'brain_find_sop_gaps'
 export const BRAIN_CHECK_CHECKLIST = 'brain_check_checklist'
 export const BRAIN_CHECK_STOCK_COVER = 'brain_check_stock_cover'
 export const BRAIN_CHECK_CHANGE_POINT = 'brain_check_change_point'
+export const BRAIN_DAILY_BRIEFING = 'brain_daily_briefing'
 
 /// Canonical brain venue slugs (Track A `config.VENUE_MAP`). A full wiring maps
 /// these to the org's Venue rows; until then the agent names the venue directly.
@@ -50,6 +51,12 @@ export const BRAIN_TOOL_SCHEMAS = {
   [BRAIN_FIND_SOP_GAPS]: z.object({}).strict(),
   [BRAIN_CHECK_STOCK_COVER]: z.object({ venue: VenueSlug }).strict(),
   [BRAIN_CHECK_CHANGE_POINT]: z.object({ venue: VenueSlug, layer: Layer.optional() }).strict(),
+  [BRAIN_DAILY_BRIEFING]: z
+    .object({
+      venue: z.enum(['all', ...BRAIN_VENUES]).optional(),
+      as_of: IsoDate.optional(),
+    })
+    .strict(),
   [BRAIN_CHECK_CHECKLIST]: z.object({
     checklist: z.enum(['opening', 'closing']),
     completed: z.array(z.number().int().min(1).max(40)).max(40),
@@ -155,6 +162,26 @@ export const BRAIN_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = 
         },
       },
       required: ['checklist', 'completed', 'dow'],
+    },
+  },
+  {
+    name: BRAIN_DAILY_BRIEFING,
+    description:
+      'The daily proactive briefing: ONE ranked, de-duplicated feed of what changed across the estate, each item with a reason and a new/continuing/resolved label. FIRES on "what changed", "daily briefing", "what do I need to know today", "anything I should act on", "brief me". Composes the other signals (deviation, change-point, stock cover) into a single story per event — a sustained downturn absorbs the day-by-day breaches and any coincident stock flag behind it — so it is the ONE tool to call for a morning overview rather than checking each signal separately. Returns ranked items (headline, severity, reason, caveats, status) plus counts. A quiet day returns an empty list, which is itself the answer. Pass venue "all" (default) for the estate, or a single venue.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venue: {
+          type: 'string',
+          enum: ['all', ...BRAIN_VENUES],
+          description: 'Venue slug, or "all" for the whole estate (default)',
+        },
+        as_of: {
+          type: 'string',
+          description: 'Reference day (YYYY-MM-DD); omit for the latest',
+        },
+      },
+      required: [],
     },
   },
 ]
