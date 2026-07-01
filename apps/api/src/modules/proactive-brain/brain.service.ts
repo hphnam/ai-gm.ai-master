@@ -8,12 +8,13 @@ import {
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
   BRAIN_DAILY_BRIEFING,
+  BRAIN_DATA_FRESHNESS,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
   BRAIN_TOOL_SCHEMAS,
 } from './brain.tools'
 
-/// Orchestrates the seven brain tools: validate input, call the FastAPI client,
+/// Orchestrates the eight brain tools: validate input, call the FastAPI client,
 /// and shape the result into the codebase's ToolResult<T> envelope. orgId is
 /// taken from ctx (never the model); the brain is gated by BRAIN_ENABLED so the
 /// module is inert when the brain is down.
@@ -57,6 +58,8 @@ export class BrainService {
           return await this.checkChangePoint(parsed.data as ChangePointInput)
         case BRAIN_DAILY_BRIEFING:
           return await this.dailyBriefing(parsed.data as BriefingInput)
+        case BRAIN_DATA_FRESHNESS:
+          return await this.dataFreshness(parsed.data as FreshnessInput)
         case BRAIN_CHECK_CHECKLIST:
           return await this.checkChecklist(parsed.data as ChecklistInput)
         default:
@@ -149,6 +152,12 @@ export class BrainService {
     const res = await this.client.briefing(i)
     return ok(res)
   }
+
+  private async dataFreshness(i: FreshnessInput): Promise<ToolResult<unknown>> {
+    // Read-only currency report; always ok (an empty estate still reports source).
+    const res = await this.client.freshness(i)
+    return ok(res)
+  }
 }
 
 type ForecastInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_FORECAST_SALES]['_output']
@@ -157,3 +166,4 @@ type ChecklistInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHECKLIST][
 type StockCoverInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_STOCK_COVER]['_output']
 type ChangePointInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_CHECK_CHANGE_POINT]['_output']
 type BriefingInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_DAILY_BRIEFING]['_output']
+type FreshnessInput = (typeof BRAIN_TOOL_SCHEMAS)[typeof BRAIN_DATA_FRESHNESS]['_output']

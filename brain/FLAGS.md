@@ -231,3 +231,27 @@ longer error). No code change was needed to recover the files.
   event-only venue (Ellel) gets `baseline_trust=0.5` and a small-sample caveat — a
   narrow band inflates z there (the Ellel z=+6.22 reading). Fires on genuinely
   isolated bookings; clustered booking-weekends are treated as a pattern.
+
+## Live ingest / freshness / conditional retrain (three-tier model)
+
+- **FLAG-LI1 (inert default).** `LIVE_INGEST=False` / `INGEST_SOURCE=csv` ship on:
+  the brain warehouses from the CSVs, `live_facts` returns an inert envelope, and
+  `refresh()` is a genuine no-op (the CSV adapter's latest date is the warehouse
+  ceiling). Going live is a two-env-var swap once access is provisioned.
+- **FLAG-LI2 (Neon system-of-record — Ryan-gated).** `NeonAdapter` + DDL sketch ship
+  inert; the intended primary T2 history source. Standing it up is Ryan's task
+  (`INGEST_SOURCE=neon`, `LIVE_INGEST=1`).
+- **FLAG-LI3 (Square brain access — Ryan-gated).** T1 live facts + the `SquareAdapter`
+  fallback need Square access provisioned to the BRAIN env, separate from Track-B's
+  credential store. Until then T1 is inert and the agent uses its own Square tools.
+  `live_facts._fetch_metric` is the single swap-in point.
+- **FLAG-LI4 (net profit / labour are Square-sourced).** The brain owns rhythm, not
+  P&L. Live COGS, labour, and net profit come from the existing Track-B Square tools;
+  the brain supplies "is that normal, what's the forecast, and why". No P&L is
+  re-warehoused.
+- **FLAG-LI5 (deferred).** Stock is mock (live stock needs Square inventory via the
+  adapter). The intraday-expectation curve for "is tonight-so-far unusual" is a
+  bounded next step — end-of-day snapshots of Square's hourly profile per closed day
+  (still closed-day history, never a live moving figure), not built here.
+- **FLAG-LI6 (localhost trust boundary).** `/refresh` mutates the store and has no
+  auth; it relies on the localhost bind. Keep `BRAIN_HOST` off `0.0.0.0` in deploy.
