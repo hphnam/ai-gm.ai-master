@@ -19,6 +19,32 @@ export interface ForecastQuery {
   level?: number
   date_from?: string
   date_to?: string
+  freshness?: string
+}
+
+// Stamped onto every serving envelope so no answer is returned without stating
+// its own currency.
+export interface FreshnessBlock {
+  source: string
+  is_live: boolean
+  stale: boolean
+  staleness_days: number
+}
+
+export interface FreshnessRow {
+  venue: string
+  as_of: string | null
+  last_ingested_at: string | null
+  source: string
+  is_live: boolean
+  stale: boolean
+  staleness_days: number
+  last_refit: string | null
+  incumbent_rung: number | null
+}
+
+export interface FreshnessResponse {
+  venues: FreshnessRow[]
 }
 
 export interface BandRow {
@@ -43,6 +69,7 @@ export interface DeviationQuery {
   venue: string
   layer?: string
   as_of?: string
+  freshness?: string
 }
 
 // Per-day point check on the residual stream. `found:false` is the stable
@@ -195,7 +222,13 @@ export class BrainClient {
     if (q.level != null) params.set('level', String(q.level))
     if (q.date_from) params.set('date_from', q.date_from)
     if (q.date_to) params.set('date_to', q.date_to)
+    if (q.freshness) params.set('freshness', q.freshness)
     return this.get(`/forecast?${params.toString()}`)
+  }
+
+  freshness(q: { venue?: string }): Promise<FreshnessResponse> {
+    const venue = q.venue ?? 'all'
+    return this.get(`/freshness?venue=${encodeURIComponent(venue)}`)
   }
 
   checkDeviation(q: DeviationQuery): Promise<DeviationResponse> {
@@ -214,10 +247,11 @@ export class BrainClient {
     return this.post('/deviation/changepoint', q)
   }
 
-  briefing(q: { venue?: string; as_of?: string }): Promise<BriefingResponse> {
+  briefing(q: { venue?: string; as_of?: string; freshness?: string }): Promise<BriefingResponse> {
     const params = new URLSearchParams()
     if (q.venue) params.set('venue', q.venue)
     if (q.as_of) params.set('as_of', q.as_of)
+    if (q.freshness) params.set('freshness', q.freshness)
     const qs = params.toString()
     return this.get(`/briefing${qs ? `?${qs}` : ''}`)
   }

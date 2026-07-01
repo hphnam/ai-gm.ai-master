@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { IntegrationToolDefinition } from '../integrations/integration-provider'
 
-/// The seven agent functions exposed by the Proactive Brain. Same shape as
+/// The eight agent functions exposed by the Proactive Brain. Same shape as
 /// SQUARE_TOOL_DEFINITIONS so they feed straight into buildAiSdkTools via the
 /// IntegrationRegistry — no edits to chat-tools.ts or ai-sdk-tools.ts.
 ///
@@ -16,6 +16,7 @@ export const BRAIN_CHECK_CHECKLIST = 'brain_check_checklist'
 export const BRAIN_CHECK_STOCK_COVER = 'brain_check_stock_cover'
 export const BRAIN_CHECK_CHANGE_POINT = 'brain_check_change_point'
 export const BRAIN_DAILY_BRIEFING = 'brain_daily_briefing'
+export const BRAIN_DATA_FRESHNESS = 'brain_data_freshness'
 
 /// Canonical brain venue slugs (Track A `config.VENUE_MAP`). A full wiring maps
 /// these to the org's Venue rows; until then the agent names the venue directly.
@@ -24,6 +25,10 @@ const VenueSlug = z.enum(BRAIN_VENUES)
 const Layer = z.enum(['L1', 'L2', 'L3'])
 const Level = z.union([z.literal(0.8), z.literal(0.9)])
 const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD')
+// `live` asks the brain for a capped top-up before serving (never a re-fit);
+// `cached` (default) serves the warehoused history as-is.
+const Freshness = z.enum(['cached', 'live'])
+const FreshnessVenue = z.enum(['all', ...BRAIN_VENUES])
 
 export const BRAIN_TOOL_SCHEMAS = {
   [BRAIN_FORECAST_SALES]: z
@@ -34,6 +39,7 @@ export const BRAIN_TOOL_SCHEMAS = {
       level: Level.optional(),
       date_from: IsoDate.optional(),
       date_to: IsoDate.optional(),
+      freshness: Freshness.optional(),
     })
     // L2 (category) / L3 (item) forecasts need a key; fail fast rather than
     // letting an unkeyed L2/L3 query hit the brain and return mixed series.
@@ -46,6 +52,7 @@ export const BRAIN_TOOL_SCHEMAS = {
       venue: VenueSlug,
       layer: Layer.optional(),
       as_of: IsoDate.optional(),
+      freshness: Freshness.optional(),
     })
     .strict(),
   [BRAIN_FIND_SOP_GAPS]: z.object({}).strict(),
@@ -53,10 +60,12 @@ export const BRAIN_TOOL_SCHEMAS = {
   [BRAIN_CHECK_CHANGE_POINT]: z.object({ venue: VenueSlug, layer: Layer.optional() }).strict(),
   [BRAIN_DAILY_BRIEFING]: z
     .object({
-      venue: z.enum(['all', ...BRAIN_VENUES]).optional(),
+      venue: FreshnessVenue.optional(),
       as_of: IsoDate.optional(),
+      freshness: Freshness.optional(),
     })
     .strict(),
+  [BRAIN_DATA_FRESHNESS]: z.object({ venue: FreshnessVenue.optional() }).strict(),
   [BRAIN_CHECK_CHECKLIST]: z.object({
     checklist: z.enum(['opening', 'closing']),
     completed: z.array(z.number().int().min(1).max(40)).max(40),
@@ -162,6 +171,22 @@ export const BRAIN_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = 
         },
       },
       required: ['checklist', 'completed', 'dow'],
+    },
+  },
+  {
+    name: BRAIN_DATA_FRESHNESS,
+    description:
+      'Report how CURRENT the brain\'s data is — is it up to date, when was it last ingested, when was the model last re-fit, and is it stale? FIRES on "is this the latest", "how fresh is this data", "is the forecast current", "when did this last update". Returns per-venue as-of date, source (csv/neon/square), whether the source is live, staleness in days, last re-fit time, and the incumbent forecast rung. READ-ONLY: it reports currency and never triggers ingestion or a re-fit. Use it to caveat an answer ("note: this is as of yesterday\'s close").',
+    input_schema: {
+      type: 'object',
+      properties: {
+        venue: {
+          type: 'string',
+          enum: ['all', ...BRAIN_VENUES],
+          description: 'Venue slug, or "all" for the estate (default)',
+        },
+      },
+      required: [],
     },
   },
   {

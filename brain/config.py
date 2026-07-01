@@ -288,6 +288,19 @@ BRIEFING_DIRECTION_BUMP = {"down": 1.10, "up": 1.00, "na": 1.00}
 BRIEFING_BASELINE_TRUST_SPARSE = 0.5
 BRIEFING_RECENCY_FLOOR = 0.5                 # recency_factor floor at the window edge
 
+# --- Live ingest / freshness / conditional retrain (three-tier model) --------
+# T1 live facts (read now), T2 incremental store (append closed days), T3
+# re-learn (ladder re-fit). A transaction only ever reaches T2; T3 fires on a
+# weekly boundary or a confirmed change-point, never per transaction. All of this
+# is INERT by default: the brain warehouses from the CSVs, not Square/Neon, until
+# Ryan provisions access and LIVE_INGEST flips.
+LIVE_INGEST = os.environ.get("LIVE_INGEST", "0") == "1"   # master gate; False today
+INGEST_SOURCE = os.environ.get("INGEST_SOURCE", "csv")    # csv | neon | square
+LIVE_CACHE_TTL_MIN = 10          # T1 per-(venue,metric,window) cache TTL (minutes)
+INGEST_STALENESS_DAYS = 1        # source ahead of the watermark by > this → stale
+RETRAIN_CADENCE_DAYS = 7         # T3 weekly boundary since the last fit
+RETRAIN_ON_CHANGEPOINT = True    # T3 also fires on a confirmed change-point onset
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
