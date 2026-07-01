@@ -41,6 +41,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { type TabItem, TabPanel, Tabs } from '@/components/ui/tabs'
 import type { DocDetailDto } from '@/generated/api'
 import { ApiError } from '@/lib/api-client'
 import { formatRelative } from '@/lib/format-relative'
@@ -207,11 +208,15 @@ function StatusBanner({
   return null
 }
 
-// Shown on an archived (superseded) doc. Names the successor and offers an undo
-// that re-ingests this version back into the live library.
-function SupersededBanner({ doc }: { doc: DocDetailDto }) {
+// The sidebar home for everything version-related: the full lineage (newest
+// first) plus — when you're on an archived version — the "why" and the Restore
+// action, so lifecycle controls live in one place instead of a banner competing
+// with the document body. The viewed row is inert and highlighted; every other
+// version links to its own detail page (archived ones included).
+function VersionPanel({ doc }: { doc: DocDetailDto }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const unsupersede = useUnsupersedeDoc()
+  const isArchived = Boolean(doc.supersededAt)
 
   async function handleRestore() {
     try {
@@ -224,83 +229,9 @@ function SupersededBanner({ doc }: { doc: DocDetailDto }) {
   }
 
   return (
-    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
-          <Archive className="h-4 w-4" aria-hidden />
-        </div>
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <p className="text-sm font-semibold">This version has been archived</p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {doc.supersededBy ? (
-              <>
-                Replaced by{' '}
-                <Link
-                  href={`/docs/${doc.supersededBy.id}`}
-                  className="font-medium underline underline-offset-2 hover:text-foreground"
-                >
-                  {doc.supersededBy.title?.trim() || 'a newer version'}
-                </Link>
-                . It no longer shows up in chat answers.
-              </>
-            ) : (
-              <>It no longer shows up in chat answers.</>
-            )}
-          </p>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setConfirmOpen(true)}
-              className="cursor-pointer gap-1.5"
-            >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden />
-              Restore this version
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Restore this version?</DialogTitle>
-            <DialogDescription>
-              We’ll re-read this document and bring it back into your live knowledge base. The newer
-              version stays put — you’ll have both until you archive one again.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setConfirmOpen(false)}
-              disabled={unsupersede.isPending}
-              className="cursor-pointer"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleRestore}
-              disabled={unsupersede.isPending}
-              className="cursor-pointer"
-            >
-              {unsupersede.isPending ? 'Restoring…' : 'Restore'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
-}
-
-// Full version lineage for the doc, newest first. Only rendered when the chain
-// has more than one entry. The row you're viewing is inert and highlighted;
-// every other version links to its own detail page (archived ones included).
-function VersionHistory({ history }: { history: DocDetailDto['versionHistory'] }) {
-  return (
     <section
       aria-labelledby="version-history-heading"
-      className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-4 sm:p-5"
+      className="space-y-3 rounded-xl border bg-card p-4 shadow-sm"
     >
       <div className="flex items-center gap-2">
         <History className="h-4 w-4 text-muted-foreground" aria-hidden />
@@ -309,12 +240,76 @@ function VersionHistory({ history }: { history: DocDetailDto['versionHistory'] }
         </h2>
       </div>
       <ol className="space-y-1">
-        {history.map((v) => (
+        {doc.versionHistory.map((v) => (
           <li key={v.id}>
             <VersionRow version={v} />
           </li>
         ))}
       </ol>
+
+      {isArchived ? (
+        <div className="space-y-2.5 border-t border-border/60 pt-3">
+          <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
+            <Archive
+              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400"
+              aria-hidden
+            />
+            <span>
+              You’re viewing an archived version
+              {doc.supersededBy ? (
+                <>
+                  , replaced by{' '}
+                  <Link
+                    href={`/docs/${doc.supersededBy.id}`}
+                    className="font-medium underline underline-offset-2 hover:text-foreground"
+                  >
+                    {doc.supersededBy.title?.trim() || 'a newer version'}
+                  </Link>
+                </>
+              ) : null}
+              . It no longer shows up in chat answers.
+            </span>
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setConfirmOpen(true)}
+            className="w-full cursor-pointer gap-1.5"
+          >
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+            Restore this version
+          </Button>
+
+          <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Restore this version?</DialogTitle>
+                <DialogDescription>
+                  We’ll re-read this document and bring it back into your live knowledge base. The
+                  newer version stays put — you’ll have both until you archive one again.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setConfirmOpen(false)}
+                  disabled={unsupersede.isPending}
+                  className="cursor-pointer"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleRestore}
+                  disabled={unsupersede.isPending}
+                  className="cursor-pointer"
+                >
+                  {unsupersede.isPending ? 'Restoring…' : 'Restore'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      ) : null}
     </section>
   )
 }
@@ -508,15 +503,25 @@ function MetaLine({ doc }: { doc: DocDetailDto }) {
   )
 }
 
-function ContentBlock({ content }: { content: string }) {
+function ContentBody({ content }: { content: string }) {
   const text = content.trim()
   if (!text) {
     return (
-      <p className="rounded-xl border border-dashed bg-card/40 p-6 text-center text-sm italic text-muted-foreground">
+      <p className="rounded-lg border border-dashed bg-card/40 p-6 text-center text-sm italic text-muted-foreground">
         No readable content was extracted from this file.
       </p>
     )
   }
+  return (
+    <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-foreground">
+      {text}
+    </pre>
+  )
+}
+
+// Standalone content card used when a doc has no checklist — no tabs, so the
+// section keeps its own header for context.
+function ContentCard({ content }: { content: string }) {
   return (
     <section
       aria-label="Document content"
@@ -526,85 +531,112 @@ function ContentBlock({ content }: { content: string }) {
         <FileText className="h-3.5 w-3.5" aria-hidden />
         Document content
       </header>
-      <pre className="whitespace-pre-wrap break-words px-4 py-4 font-sans text-sm leading-relaxed text-foreground sm:px-6 sm:py-5">
-        {text}
-      </pre>
+      <div className="px-4 py-4 sm:px-6 sm:py-5">
+        <ContentBody content={content} />
+      </div>
     </section>
   )
 }
 
-function ChecklistBlock({ checklist }: { checklist: Checklist }) {
+function ChecklistBody({ checklist }: { checklist: Checklist }) {
   const roles = checklist.audience.roles ?? []
   const stepCount = checklist.steps.length
   const visibleSteps = checklist.steps.slice(0, STEP_DISPLAY_CAP)
 
   return (
-    <section
-      aria-labelledby="checklist-heading"
-      className="overflow-hidden rounded-xl border bg-card shadow-sm"
-    >
-      <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        <ClipboardList className="h-3.5 w-3.5" aria-hidden />
-        <span id="checklist-heading">Steps to follow ({stepCount})</span>
-      </header>
-
-      <div className="space-y-5 px-4 py-5 sm:px-6">
-        <dl className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              When
-            </dt>
-            <dd className="text-sm">{formatScheduleLine(checklist.schedule)}</dd>
-          </div>
-          <div className="space-y-1">
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Who
-            </dt>
-            <dd className="flex flex-wrap items-center gap-1.5">
-              {roles.length > 0 ? (
-                roles.map((r) => <RolePill key={r} role={r} />)
-              ) : (
-                <span className="text-sm text-muted-foreground">
-                  {checklist.audience.rawText || 'Unspecified'}
-                </span>
-              )}
-            </dd>
-          </div>
-        </dl>
-
-        <ol className="space-y-2.5">
-          {visibleSteps.map((s, idx) => (
-            <li
-              key={s.index}
-              className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
-            >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">
-                {idx + 1}
+    <div className="space-y-5">
+      <dl className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            When
+          </dt>
+          <dd className="text-sm">{formatScheduleLine(checklist.schedule)}</dd>
+        </div>
+        <div className="space-y-1">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Who
+          </dt>
+          <dd className="flex flex-wrap items-center gap-1.5">
+            {roles.length > 0 ? (
+              roles.map((r) => <RolePill key={r} role={r} />)
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                {checklist.audience.rawText || 'Unspecified'}
               </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start gap-2 text-sm">
-                  <StepKindIcon kind={s.kind} />
-                  <span className="break-words">
-                    {s.text}
-                    {s.required === false ? (
-                      <span className="ml-2 text-xs text-muted-foreground">(optional)</span>
-                    ) : null}
-                  </span>
-                </div>
-                {s.hint ? (
-                  <p className="mt-1 break-words text-xs text-muted-foreground">{s.hint}</p>
-                ) : null}
-              </div>
-            </li>
-          ))}
-        </ol>
+            )}
+          </dd>
+        </div>
+      </dl>
 
-        {stepCount > STEP_DISPLAY_CAP ? (
-          <p className="text-xs text-muted-foreground">
-            Showing first {STEP_DISPLAY_CAP} of {stepCount} steps.
-          </p>
-        ) : null}
-      </div>
+      <ol className="space-y-2.5">
+        {visibleSteps.map((s, idx) => (
+          <li
+            key={s.index}
+            className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
+          >
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">
+              {idx + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-2 text-sm">
+                <StepKindIcon kind={s.kind} />
+                <span className="break-words">
+                  {s.text}
+                  {s.required === false ? (
+                    <span className="ml-2 text-xs text-muted-foreground">(optional)</span>
+                  ) : null}
+                </span>
+              </div>
+              {s.hint ? (
+                <p className="mt-1 break-words text-xs text-muted-foreground">{s.hint}</p>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {stepCount > STEP_DISPLAY_CAP ? (
+        <p className="text-xs text-muted-foreground">
+          Showing first {STEP_DISPLAY_CAP} of {stepCount} steps.
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+// Content + checklist behind a tab switcher so neither buries the other in a
+// long scroll. Only used when a checklist exists; otherwise ContentCard stands
+// alone (a single tab would be pointless).
+function DocSections({ content, checklist }: { content: string; checklist: Checklist }) {
+  const [tab, setTab] = useState<'content' | 'checklist'>('content')
+  const items: TabItem<'content' | 'checklist'>[] = [
+    { id: 'content', label: 'Document', icon: FileText },
+    { id: 'checklist', label: 'Checklist', icon: ClipboardList, count: checklist.steps.length },
+  ]
+  return (
+    <section aria-label="Document sections">
+      <Tabs
+        items={items}
+        value={tab}
+        onValueChange={setTab}
+        ariaLabel="Document sections"
+        hasPanels
+        className="mb-4"
+      />
+      <TabPanel
+        id="content"
+        active={tab === 'content'}
+        className="rounded-xl border bg-card p-4 shadow-sm sm:p-6"
+      >
+        <ContentBody content={content} />
+      </TabPanel>
+      <TabPanel
+        id="checklist"
+        active={tab === 'checklist'}
+        className="rounded-xl border bg-card p-4 shadow-sm sm:p-6"
+      >
+        <ChecklistBody checklist={checklist} />
+      </TabPanel>
     </section>
   )
 }
@@ -652,6 +684,66 @@ export function DocDetailBody({ id }: { id: string }) {
 
   const data = doc.data
   const title = data?.title?.trim() || 'Untitled document'
+  // A version chain (or any archived doc, which always has a successor) earns a
+  // two-column layout with a sticky Versions sidebar; otherwise the doc stays a
+  // single readable column.
+  const hasSidebar = Boolean(data && (data.versionHistory.length > 1 || data.supersededAt))
+
+  const mainContent = data ? (
+    <>
+      <header className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <CategoryChip doc={data} />
+          {data.supersededAt ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+              <Archive className="h-3.5 w-3.5" aria-hidden />
+              Archived
+            </span>
+          ) : null}
+        </div>
+        <h1
+          className={cn(
+            'text-2xl font-semibold leading-tight tracking-tight sm:text-3xl',
+            !data.title && 'italic text-muted-foreground',
+          )}
+        >
+          {title}
+        </h1>
+        {data.summary ? (
+          <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {data.summary}
+          </p>
+        ) : null}
+        <MetaLine doc={data} />
+        {data.tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {data.tags.map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </header>
+
+      {data.supersededAt ? null : (
+        <StatusBanner
+          doc={data}
+          onOpenClassify={() => setClassifyOpen(true)}
+          onOpenProposal={() => setProposalOpen(true)}
+        />
+      )}
+
+      {data.checklist ? (
+        <DocSections key={data.id} content={data.content} checklist={data.checklist} />
+      ) : (
+        <ContentCard content={data.content} />
+      )}
+    </>
+  ) : null
 
   return (
     <AppShell>
@@ -670,7 +762,12 @@ export function DocDetailBody({ id }: { id: string }) {
         }
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
+        <div
+          className={cn(
+            'mx-auto flex w-full flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8',
+            hasSidebar ? 'max-w-6xl' : 'max-w-3xl',
+          )}
+        >
           {/* No href so router.back() preserves any ?q=/?status= filters set
               via nuqs in the library tab. Falls back to /docs when there's no
               history (cold-loaded detail). */}
@@ -685,63 +782,16 @@ export function DocDetailBody({ id }: { id: string }) {
               <GenericError />
             )
           ) : data ? (
-            <article className="space-y-6">
-              <header className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <CategoryChip doc={data} />
-                  {data.supersededAt ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
-                      <Archive className="h-3.5 w-3.5" aria-hidden />
-                      Archived
-                    </span>
-                  ) : null}
-                </div>
-                <h1
-                  className={cn(
-                    'text-2xl font-semibold leading-tight tracking-tight sm:text-3xl',
-                    !data.title && 'italic text-muted-foreground',
-                  )}
-                >
-                  {title}
-                </h1>
-                {data.summary ? (
-                  <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-                    {data.summary}
-                  </p>
-                ) : null}
-                <MetaLine doc={data} />
-                {data.tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {data.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </header>
-
-              {data.supersededAt ? (
-                <SupersededBanner doc={data} />
-              ) : (
-                <StatusBanner
-                  doc={data}
-                  onOpenClassify={() => setClassifyOpen(true)}
-                  onOpenProposal={() => setProposalOpen(true)}
-                />
-              )}
-
-              <ContentBlock content={data.content} />
-
-              {data.checklist ? <ChecklistBlock checklist={data.checklist} /> : null}
-
-              {data.versionHistory.length > 1 ? (
-                <VersionHistory history={data.versionHistory} />
-              ) : null}
-            </article>
+            hasSidebar ? (
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
+                <article className="min-w-0 space-y-6">{mainContent}</article>
+                <aside className="self-start lg:sticky lg:top-6">
+                  <VersionPanel doc={data} />
+                </aside>
+              </div>
+            ) : (
+              <article className="space-y-6">{mainContent}</article>
+            )
           ) : null}
         </div>
       </div>
