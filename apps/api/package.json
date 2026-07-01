@@ -21,6 +21,8 @@
     "probe:section": "tsx scripts/probe-section.ts",
     "probe:eval": "tsx scripts/probe-eval.ts",
     "probe:tabular": "tsx scripts/probe-tabular.ts",
+    "probe:versioning": "tsx scripts/probe-versioning.ts",
+    "cleanup:orphaned-steps": "tsx scripts/cleanup-orphaned-checklist-steps.ts",
     "probe:chat-core": "tsx scripts/probe-chat-core.ts",
     "probe:chat-core:real": "PROBE_CHAT_CORE_REAL=1 tsx scripts/probe-chat-core.ts",
     "probe:whatsapp-onboarding": "PROBE_INFOBIP_STUB=1 tsx scripts/probe-whatsapp-onboarding.ts",

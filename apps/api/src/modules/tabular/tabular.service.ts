@@ -294,7 +294,8 @@ export class TabularQueryService {
                    FROM tabular_rows tr
                    JOIN knowledge_items ki ON tr."docId" = ki.id
                    WHERE ki."organizationId" = ${orgId}
-                     AND tr."docId" = ${input.docId}${filterClause}
+                     AND tr."docId" = ${input.docId}
+                     AND ki."supersededAt" IS NULL${filterClause}
                    GROUP BY ${groupColAlias}
                    ORDER BY ${sortColRef} ${directionFragment}, ${groupColAlias} ASC
                    LIMIT ${fetchLimit}`,
@@ -312,7 +313,8 @@ export class TabularQueryService {
                    FROM tabular_rows tr
                    JOIN knowledge_items ki ON tr."docId" = ki.id
                    WHERE ki."organizationId" = ${orgId}
-                     AND tr."docId" = ${input.docId}${filterClause}`,
+                     AND tr."docId" = ${input.docId}
+                     AND ki."supersededAt" IS NULL${filterClause}`,
       )
     } else {
       aggregateBranch = 'enumeration'
@@ -333,7 +335,8 @@ export class TabularQueryService {
                    FROM tabular_rows tr
                    JOIN knowledge_items ki ON tr."docId" = ki.id
                    WHERE ki."organizationId" = ${orgId}
-                     AND tr."docId" = ${input.docId}${filterClause}
+                     AND tr."docId" = ${input.docId}
+                     AND ki."supersededAt" IS NULL${filterClause}
                    ORDER BY ${sortFragment}
                    LIMIT ${fetchLimit}`,
       )

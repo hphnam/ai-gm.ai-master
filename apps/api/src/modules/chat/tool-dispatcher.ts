@@ -465,6 +465,7 @@ export class ToolDispatcher {
             const seed = await prisma.knowledgeItem.findFirst({
               where: {
                 organizationId: ctx.orgId,
+                supersededAt: null,
                 tabularColumns: { some: {} },
               },
               select: { id: true },
@@ -488,6 +489,7 @@ export class ToolDispatcher {
             where: {
               organizationId: ctx.orgId,
               id: { not: startingDocId },
+              supersededAt: null,
               tabularColumns: { some: {} },
             },
             select: { id: true },

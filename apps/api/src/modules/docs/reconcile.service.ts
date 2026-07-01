@@ -283,6 +283,21 @@ export async function archiveWithinTx(
   await tx.knowledgeSection.deleteMany({ where: { knowledgeItemId: predecessorId } })
   await tx.tabularRow.deleteMany({ where: { docId: predecessorId } })
   await tx.tabularColumn.deleteMany({ where: { docId: predecessorId } })
+  // Per-step retrieval rows (entityType 'checklist_step', keyed by checklist id)
+  // aren't covered by the knowledge_item SE delete above and have no FK to the
+  // Checklist row, so delete them explicitly before the Checklist goes — else an
+  // archived procedure keeps surfacing step-by-step in chat retrieval.
+  const checklistIds = (
+    await tx.checklist.findMany({
+      where: { knowledgeItemId: predecessorId },
+      select: { id: true },
+    })
+  ).map((c) => c.id)
+  if (checklistIds.length > 0) {
+    await tx.searchableEntity.deleteMany({
+      where: { entityType: 'checklist_step', entityId: { in: checklistIds } },
+    })
+  }
   await tx.checklist.deleteMany({ where: { knowledgeItemId: predecessorId } })
   await tx.expiryRecord.updateMany({
     where: { knowledgeItemId: predecessorId, status: 'active' },
