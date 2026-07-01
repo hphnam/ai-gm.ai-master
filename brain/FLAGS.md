@@ -212,3 +212,22 @@ longer error). No code change was needed to recover the files.
   `check_point`, so point-deviation and change-point share one scale. The
   caller-supplied-`observations` path was dropped (unused by any caller; reading
   stored actuals via `as_of`/latest covers the live need). Confirm with the owner.
+
+## Proactive briefing (the synthesis capstone)
+
+- **FLAG-BR1 (checklist not live — G5a).** `CHECKLIST_LIVE=False` gates checklist
+  and SOP signals out of the ranked feed until Ryan's mobile completion export
+  exists (the standing open-confirmation above). While False the feed says so in
+  its `notes`; flipping to True is the single swap-in at `briefing._live_completion`.
+  No synthetic miss is ever ranked as a real alert.
+- **FLAG-BR2 (stock is a snapshot, not a series).** `stock_cover` holds a single
+  latest row (levels-not-flows, per the stock flags). So "new reorder since the last
+  run" is knowable ONLY through the `briefing_runs` diff, not a daily stock history.
+- **FLAG-BR3 (`/deviation/scan` upstream).** The briefing's deviation feed is the
+  migrated `/deviation/scan` / residual stream — FLAG-PD4 is upstream of it. The
+  call is stable so the briefing does not block on ratification, but the dependency
+  is recorded.
+- **FLAG-BR4 (sparse-baseline down-weight — G5b).** A single-day deviation on an
+  event-only venue (Ellel) gets `baseline_trust=0.5` and a small-sample caveat — a
+  narrow band inflates z there (the Ellel z=+6.22 reading). Fires on genuinely
+  isolated bookings; clustered booking-weekends are treated as a pattern.
