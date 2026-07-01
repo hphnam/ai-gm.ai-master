@@ -9,6 +9,7 @@ import {
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
   BRAIN_DAILY_BRIEFING,
+  BRAIN_DATA_FRESHNESS,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
 } from './brain.tools'
@@ -179,6 +180,24 @@ class StubClient {
       notes: ['checklist/SOP data not live (template) — excluded from the feed'],
     }
   }
+  async freshness(q: unknown) {
+    this.record('freshness', q)
+    return {
+      venues: [
+        {
+          venue: 'beer_hall',
+          as_of: '2026-05-31',
+          last_ingested_at: null,
+          source: 'csv',
+          is_live: false,
+          stale: false,
+          staleness_days: 0,
+          last_refit: null,
+          incumbent_rung: 2,
+        },
+      ],
+    }
+  }
   async checkChecklist(q: unknown) {
     this.record('checkChecklist', q)
     return {
@@ -329,6 +348,23 @@ describe('BrainService.dispatch', () => {
 
   it('briefing: rejects an unknown venue with invalid-input', async () => {
     const res = await svc.dispatch(BRAIN_DAILY_BRIEFING, { venue: 'nope' }, CTX)
+    assert.equal(res.ok === false && res.reason, 'invalid-input')
+    assert.equal(stub.lastCall, null)
+  })
+
+  it('freshness: valid input hits the freshness endpoint and returns per-venue currency', async () => {
+    const res = await svc.dispatch(BRAIN_DATA_FRESHNESS, { venue: 'all' }, CTX)
+    assert.equal(stub.lastCall?.method, 'freshness')
+    assert.ok(res.ok && (res.data as { venues: unknown[] }).venues.length === 1)
+  })
+
+  it('freshness: defaults venue and stays read-only ok', async () => {
+    const res = await svc.dispatch(BRAIN_DATA_FRESHNESS, {}, CTX)
+    assert.equal(res.ok, true)
+  })
+
+  it('freshness: rejects an unknown venue with invalid-input', async () => {
+    const res = await svc.dispatch(BRAIN_DATA_FRESHNESS, { venue: 'nope' }, CTX)
     assert.equal(res.ok === false && res.reason, 'invalid-input')
     assert.equal(stub.lastCall, null)
   })

@@ -1,6 +1,14 @@
 'use client'
 
-import { Activity, AlertTriangle, Beer, Lightbulb, Newspaper, TrendingUp } from 'lucide-react'
+import {
+  Activity,
+  AlertTriangle,
+  Beer,
+  Clock,
+  Lightbulb,
+  Newspaper,
+  TrendingUp,
+} from 'lucide-react'
 import { CardEmpty, CardShell } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
 
@@ -509,6 +517,63 @@ export function BriefingCard({ part }: ToolCardRendererProps) {
       {notes?.length ? (
         <p className="mt-1.5 text-[11px] text-muted-foreground">{notes.join(' · ')}</p>
       ) : null}
+    </CardShell>
+  )
+}
+
+// ─── brain_data_freshness ────────────────────────────────────────────────
+
+type FreshnessRow = {
+  venue: string
+  as_of: string | null
+  source: string
+  is_live: boolean
+  stale: boolean
+  staleness_days: number
+  last_refit: string | null
+  incumbent_rung: number | null
+}
+type FreshnessData = { venues: FreshnessRow[] }
+
+export function FreshnessCard({ part }: ToolCardRendererProps) {
+  const output = part.output
+  if (isToolFail(output)) {
+    return (
+      <CardShell icon={Clock} title="Data freshness">
+        <CardEmpty message={output.detail ?? "Couldn't read data freshness."} />
+      </CardShell>
+    )
+  }
+  if (!isToolOk<FreshnessData>(output)) return null
+  const { venues } = output.data
+  if (!venues?.length) return null
+  const anyStale = venues.some((v) => v.stale)
+  return (
+    <CardShell
+      icon={Clock}
+      title="Data freshness"
+      subtitle={`source: ${venues[0].source}${venues[0].is_live ? ' (live)' : ''}`}
+      tone={anyStale ? 'warning' : 'success'}
+    >
+      <ul className="-mx-1 divide-y divide-border/60">
+        {venues.map((v) => (
+          <li key={v.venue} className="flex items-center justify-between gap-2 px-1 py-1.5">
+            <span className="text-[12.5px] text-foreground">
+              {VENUE_LABELS[v.venue] ?? v.venue}
+            </span>
+            <span className="text-[12px] tabular-nums text-muted-foreground">{v.as_of ?? '—'}</span>
+            <span
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
+                v.stale
+                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                  : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+              }`}
+            >
+              {v.stale ? `${v.staleness_days}d behind` : 'current'}
+            </span>
+          </li>
+        ))}
+      </ul>
     </CardShell>
   )
 }

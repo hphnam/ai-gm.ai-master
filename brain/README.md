@@ -101,16 +101,41 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | Method | Path | Source |
 |---|---|---|
 | GET | `/health` | store status |
-| GET | `/forecast?venue=&layer=&level=&date_from=&date_to=&key=` | A5/A6 bands |
+| GET | `/forecast?venue=&layer=&level=&date_from=&date_to=&key=&freshness=` | A5/A6 bands (`freshness=live` → capped top-up) |
 | POST | `/deviation/check` | per-day band check on the residual stream (point primitive) |
 | POST | `/deviation/scan` | last N trading days, classified (briefing feed) |
 | POST | `/deviation/changepoint` | A13 sustained regime shifts + attribution |
 | GET | `/sop-gaps` | A8 |
 | POST | `/checklist/discipline` | A9 |
 | GET | `/stock/cover?venue=` | A12 (Beer Hall; empty envelope for other venues) |
-| GET | `/briefing?venue=&as_of=&layer=` | capstone: ranked, de-duplicated, attributed daily feed |
+| GET | `/briefing?venue=&as_of=&layer=&freshness=` | capstone: ranked, de-duplicated, attributed daily feed |
+| GET | `/freshness?venue=` | per-venue currency (source, staleness, last re-fit) |
+| POST | `/refresh?venue=&force=&refit=` | operator/cron T2 refresh (+ conditional T3) — off the model surface |
+
+Every serving envelope also carries a `freshness` block (`source`, `is_live`,
+`stale`, `staleness_days`), so no answer is returned without stating its currency.
 
 This service is what Track B (`apps/api/.../proactive-brain`) calls over HTTP.
 ```
 BRAIN_BASE_URL=http://127.0.0.1:8088
 ```
+
+> Bind the service to localhost only. `/refresh` mutates the store and triggers
+> compute; it has no auth and relies on the localhost bind as its trust boundary.
+> Do not set `BRAIN_HOST=0.0.0.0` without adding auth in front.
+
+## Live ingest / freshness (three-tier model)
+
+Inert by default — the brain warehouses from the CSVs. Two env vars flip it on
+once Ryan provisions access (the other four knobs are code constants in `config.py`):
+
+```bash
+LIVE_INGEST=1                 # master gate (default 0 = inert, CSV only)
+INGEST_SOURCE=neon            # csv (default) | neon | square
+python -m ingest.refresh      # nightly T2 refresh (+ conditional T3); no-op on csv
+```
+
+T1 = live facts (Square, cached ~10 min, never warehoused); T2 = append closed
+days to the store (`refresh()`); T3 = ladder re-fit, only on a weekly boundary or a
+confirmed change-point (a transaction never triggers a re-fit). See
+`PRJ93_Live_Ingest_Report.md`.

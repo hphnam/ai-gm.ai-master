@@ -11,6 +11,7 @@ import {
   BRAIN_CHECK_DEVIATION,
   BRAIN_CHECK_STOCK_COVER,
   BRAIN_DAILY_BRIEFING,
+  BRAIN_DATA_FRESHNESS,
   BRAIN_FIND_SOP_GAPS,
   BRAIN_FORECAST_SALES,
   BRAIN_TOOL_DEFINITIONS,
@@ -25,6 +26,7 @@ const EXPECTED_TOOLS = [
   BRAIN_CHECK_STOCK_COVER,
   BRAIN_CHECK_CHANGE_POINT,
   BRAIN_DAILY_BRIEFING,
+  BRAIN_DATA_FRESHNESS,
   BRAIN_CHECK_CHECKLIST,
 ]
 
@@ -60,7 +62,7 @@ function makeProvider() {
 }
 
 describe('brain.tools contract', () => {
-  it('declares exactly the seven brain tools', () => {
+  it('declares exactly the eight brain tools', () => {
     assert.deepEqual(BRAIN_TOOL_DEFINITIONS.map((d) => d.name).sort(), [...EXPECTED_TOOLS].sort())
   })
 
@@ -84,7 +86,7 @@ describe('BrainProvider self-registration', () => {
     assert.equal(provider.domain, 'other')
   })
 
-  it('surfaces all seven tool definitions through the registry', () => {
+  it('surfaces all eight tool definitions through the registry', () => {
     const { registry, provider } = makeProvider()
     provider.onModuleInit()
     assert.deepEqual(registry.getAllToolDefinitions().sort(), [...EXPECTED_TOOLS].sort())

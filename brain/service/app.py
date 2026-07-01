@@ -12,6 +12,8 @@ Endpoints (typed JSON):
     POST /checklist/discipline  expected vs actual, weighted misses (A9)
     GET  /stock/cover           days-of-cover reorder lines per venue (A12)
     GET  /briefing              ranked, de-duplicated, attributed daily feed (capstone)
+    GET  /freshness             per-venue currency (source, staleness, last re-fit)
+    POST /refresh               operator/cron T2 refresh (+ conditional T3)
 
 Run:
     uvicorn service.app:app --port 8088     # http://127.0.0.1:8088/docs
@@ -61,6 +63,7 @@ class DeviationRequest(BaseModel):
     layer: str = "L1"
     as_of: date | None = Field(
         default=None, description="Trading day to check; omit for the latest.")
+    freshness: str = Field("cached", pattern="^(cached|live)$")
 
 
 class DeviationScanRequest(BaseModel):
@@ -147,7 +150,9 @@ def forecast(
     date_from: date | None = None,
     date_to: date | None = None,
     key: str | None = Query(None, description="category (L2) or item (L3)"),
+    freshness: str = "cached",
 ) -> dict:
+    _live_topup(venue, freshness)
     con = _read_only()
     try:
         df = warehouse.read_band(venue, layer, level=level, con=con)
@@ -170,7 +175,7 @@ def forecast(
                      "lo": round(float(r["lo"]), 2), "hi": round(float(r["hi"]), 2),
                      "level": float(r["level"]), "model": r["model"]})
     return {"venue": venue, "layer": layer, "level": level, "key": key,
-            "n": len(rows), "forecast": rows}
+            "n": len(rows), "forecast": rows, "freshness": _freshness_for(venue)}
 
 
 def _read_band_with_key(venue, layer, level, key):
@@ -204,9 +209,11 @@ def deviation_check(req: DeviationRequest) -> dict:
     # load (same lazy pattern as the sop-gaps handler).
     from signals.deviation import check_point
 
+    _live_topup(req.venue, req.freshness)
     con = _read_only()
     try:
         result = check_point(req.venue, layer=req.layer, as_of=req.as_of, con=con)
+        block = _freshness_block(req.venue, con)
     finally:
         con.close()
     if result is None:
@@ -214,8 +221,9 @@ def deviation_check(req: DeviationRequest) -> dict:
                 "as_of": req.as_of.isoformat() if req.as_of else None,
                 "found": False, "status": "no_data",
                 "note": f"no trading-day band to check for '{req.venue}'"
-                        + (f" on {req.as_of.isoformat()}" if req.as_of else "")}
-    return {"found": True, **result}
+                        + (f" on {req.as_of.isoformat()}" if req.as_of else ""),
+                "freshness": block}
+    return {"found": True, **result, "freshness": block}
 
 
 @app.post("/deviation/scan")
@@ -236,7 +244,7 @@ def deviation_scan(req: DeviationScanRequest) -> dict:
         for _, r in df.iterrows()
     ]
     return {"venue": req.venue, "layer": req.layer, "window": req.window,
-            "n": len(days), "days": days}
+            "n": len(days), "days": days, "freshness": _freshness_for(req.venue)}
 
 
 @app.get("/sop-gaps")
@@ -255,12 +263,14 @@ def stock_cover(venue: str = "beer_hall") -> dict:
         ).fetchone()
         if venue not in VENUES_WITH_STOCK or not has_table:
             return {"venue": venue, "as_of": None, "n": 0, "n_reorder": 0,
-                    "lines": [], "note": f"no stock data for venue '{venue}'"}
+                    "lines": [], "note": f"no stock data for venue '{venue}'",
+                    "freshness": _freshness_block(venue, con)}
         df = con.execute(
             "SELECT * FROM stock_cover WHERE venue = ? "
             "ORDER BY reorder_flag DESC NULLS LAST, days_of_cover ASC NULLS LAST",
             [venue],
         ).df()
+        block = _freshness_block(venue, con)
     finally:
         con.close()
     lines = []
@@ -278,7 +288,7 @@ def stock_cover(venue: str = "beer_hall") -> dict:
     as_of = str(df["as_of"].iloc[0])[:10] if not df.empty else None
     n_reorder = int(df["reorder_flag"].fillna(False).sum()) if not df.empty else 0
     return {"venue": venue, "as_of": as_of, "n": len(lines),
-            "n_reorder": n_reorder, "lines": lines}
+            "n_reorder": n_reorder, "lines": lines, "freshness": block}
 
 
 @app.post("/deviation/changepoint")
@@ -296,10 +306,12 @@ def deviation_changepoint(req: ChangePointRequest) -> dict:
         if not eligible or not has_table:
             return {"venue": req.venue, "layer": req.layer, "n_change_points": 0,
                     "change_points": [], "stable": True,
-                    "note": f"change-point detection not run for venue '{req.venue}'"}
+                    "note": f"change-point detection not run for venue '{req.venue}'",
+                    "freshness": _freshness_block(req.venue, con)}
         df = con.execute(
             "SELECT * FROM change_points WHERE venue=? AND layer=? "
             "ORDER BY severity='high' DESC, onset_date DESC", [req.venue, req.layer]).df()
+        block = _freshness_block(req.venue, con)
     finally:
         con.close()
     cps = []
@@ -317,7 +329,7 @@ def deviation_changepoint(req: ChangePointRequest) -> dict:
             "note": r["note"] if pd.notna(r["note"]) else None,
         })
     return {"venue": req.venue, "layer": req.layer, "n_change_points": len(cps),
-            "change_points": cps, "stable": len(cps) == 0}
+            "change_points": cps, "stable": len(cps) == 0, "freshness": block}
 
 
 @app.post("/checklist/discipline")
@@ -332,17 +344,95 @@ def checklist_discipline(req: ChecklistRequest) -> dict:
 
 
 @app.get("/briefing")
-def briefing(venue: str = "all", as_of: date | None = None, layer: str = "L1") -> dict:
+def briefing(venue: str = "all", as_of: date | None = None, layer: str = "L1",
+             freshness: str = "cached") -> dict:
     """The proactive-briefing capstone: the four signals composed into one ranked,
     de-duplicated, attributed daily feed with new/continuing/resolved status. A
     quiet day returns `items: []` at 200; a closed / unknown venue never 500s.
-    Read-only — the daily `run()` (CLI/cron) is what persists `briefing_runs`."""
+    Read-only — the daily `run()` (CLI/cron) is what persists `briefing_runs`.
+    `freshness=live` does a capped T2 top-up first (never a T3 re-fit)."""
     # NOTE: function-local import defers the signal graph off module load.
     from signals.briefing import build
 
+    _live_topup(venue, freshness)
     con = _read_only()
     try:
         venues = None if venue == "all" else [venue]
-        return build(as_of=as_of, venues=venues, layer=layer, con=con)
+        env = build(as_of=as_of, venues=venues, layer=layer, con=con)
+        env["freshness"] = _estate_freshness_block(env.get("venues") or venues or [], con)
+        return env
     finally:
         con.close()
+
+
+# --- Freshness / live-ingest surface (three-tier model) ----------------------
+
+def _freshness_block(venue: str, con) -> dict:
+    """The compact currency block stamped onto every serving envelope, so no answer
+    is returned without stating its own freshness. A stale answer says so."""
+    from ingest.refresh import freshness as _freshness
+
+    f = _freshness(venue, con)
+    return {"source": f["source"], "is_live": f["is_live"],
+            "stale": f["stale"], "staleness_days": f["staleness_days"]}
+
+
+def _freshness_for(venue: str) -> dict:
+    con = _read_only()
+    try:
+        return _freshness_block(venue, con)
+    finally:
+        con.close()
+
+
+def _estate_freshness_block(venues, con) -> dict:
+    blocks = [_freshness_block(v, con) for v in venues] or [_freshness_block("beer_hall", con)]
+    return {"source": blocks[0]["source"],
+            "is_live": any(b["is_live"] for b in blocks),
+            "stale": any(b["stale"] for b in blocks),
+            "staleness_days": max(b["staleness_days"] for b in blocks)}
+
+
+def _live_topup(venue: str, freshness: str) -> None:
+    """`freshness=live` → a capped T2 top-up (append closed days since the
+    watermark), NEVER a T3 re-fit (D1). Inert and a no-op while INGEST_SOURCE=csv
+    sits at the ceiling. Never fails the read: a swallowed top-up failure cannot
+    stamp a false 'fresh' answer, because the freshness block is computed AFTER this
+    from the store's actual watermark, so it still reports the true staleness."""
+    if freshness != "live" or venue == "all":
+        return
+    try:
+        from ingest.refresh import refresh as _refresh
+        _refresh(venue, refit="never")
+    except Exception:  # pragma: no cover - a top-up must never break the answer
+        pass
+
+
+@app.get("/freshness")
+def get_freshness(venue: str = "all") -> dict:
+    """Per-venue currency: as-of, source, is_live, stale, staleness, last re-fit,
+    incumbent rung. Read-only; reports, never triggers work."""
+    from config import FORECAST_VENUES
+    from ingest.refresh import freshness as _freshness
+
+    con = _read_only()
+    try:
+        venues = list(FORECAST_VENUES) if venue == "all" else [venue]
+        return {"venues": [_freshness(v, con) for v in venues]}
+    finally:
+        con.close()
+
+
+class RefreshRequest(BaseModel):
+    venue: str | None = None
+    force: bool = False
+    refit: str = Field("auto", pattern="^(auto|force|never)$")
+
+
+@app.post("/refresh")
+def post_refresh(req: RefreshRequest) -> dict:
+    """Operator / cron entry: run T2 refresh (+ conditional T3). Not on the model
+    surface — the agent gets read-only freshness, never a way to trigger a re-fit."""
+    from ingest.refresh import refresh as _refresh
+
+    return _refresh(req.venue, force=req.force, refit=req.refit)

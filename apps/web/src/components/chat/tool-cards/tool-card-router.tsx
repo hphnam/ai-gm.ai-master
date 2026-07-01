@@ -6,6 +6,7 @@ import {
   ChangePointCard,
   DeviationCard,
   ForecastBandCard,
+  FreshnessCard,
   SopGapsCard,
   StockCoverCard,
 } from './brain-cards'
@@ -41,6 +42,7 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
   brain_check_stock_cover: StockCoverCard,
   brain_check_change_point: ChangePointCard,
   brain_daily_briefing: BriefingCard,
+  brain_data_freshness: FreshnessCard,
 }
 
 export function hasToolCard(toolName: string): boolean {
