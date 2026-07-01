@@ -255,3 +255,11 @@ longer error). No code change was needed to recover the files.
   (still closed-day history, never a live moving figure), not built here.
 - **FLAG-LI6 (localhost trust boundary).** `/refresh` mutates the store and has no
   auth; it relies on the localhost bind. Keep `BRAIN_HOST` off `0.0.0.0` in deploy.
+- **FLAG-LI7 (promote-and-serve, v2.1).** `refresh()` now regenerates the SERVED
+  forecast, not just the signal layer: after new closed days land or a T3 adopts a rung,
+  `_promote_and_serve` re-persists L1 `forecasts`/`bands` (via `conformal.wrap.evaluate`)
+  and the Beer Hall keg (via `hierarchy.reconcile.reconcile`), then upserts
+  `served_forecast(venue, layer, model, data_as_of, promoted_ts)`. "Beat the rung" is now
+  detect (`ladder_selection`) **plus** promote (`served_forecast`). Fires only on new
+  data, an adoption, or an explicit force — never per transaction. `/freshness` and
+  `brain_data_freshness` report `served_model`/`served_as_of`.

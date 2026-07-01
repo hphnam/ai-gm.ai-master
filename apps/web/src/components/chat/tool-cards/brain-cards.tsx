@@ -532,6 +532,8 @@ type FreshnessRow = {
   staleness_days: number
   last_refit: string | null
   incumbent_rung: number | null
+  served_model: string | null
+  served_as_of: string | null
 }
 type FreshnessData = { venues: FreshnessRow[] }
 
@@ -561,7 +563,12 @@ export function FreshnessCard({ part }: ToolCardRendererProps) {
             <span className="text-[12.5px] text-foreground">
               {VENUE_LABELS[v.venue] ?? v.venue}
             </span>
-            <span className="text-[12px] tabular-nums text-muted-foreground">{v.as_of ?? '—'}</span>
+            <span className="text-[12px] tabular-nums text-muted-foreground">
+              {v.as_of ?? '—'}
+              {v.served_model ? (
+                <span className="ml-1.5 text-[11px] opacity-70">· {v.served_model}</span>
+              ) : null}
+            </span>
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-medium ${
                 v.stale
