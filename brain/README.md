@@ -44,6 +44,7 @@ python -m ingest.local_events           # A14 curated local-event anchors
 python -m ingest.spike_days             # A14 retrospective discount-spike flag
 python -m signals.feature_ablation      # A14 enrichment ablation + weather train/serve study
 uvicorn service.app:app --port 8088     # A10 http://127.0.0.1:8088/docs
+python -m eval.agent_eval               # agent-eval: injection oracle + human anchor + LLM-judge (offline)
 pytest                                  # all module tests, printed PASS/FAIL
 ```
 
@@ -87,6 +88,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A14b | diagnostic-only: is the A14 null hidden by aggregation/eval, or genuinely redundant-with-season? L2/L3 ablation + residual regression; adopts nothing |
 | A13 | sustained regime-shift detection (CUSUM + persistence + BOCPD) on the conformal residual stream; TRT closure recovered as ground truth; attribution against the A14 seam |
 | briefing | capstone synthesis: composes the four signals into one ranked, de-duplicated, attributed daily feed with new/continuing/resolved status; honesty gates (template checklist excluded, sparse baseline down-weighted, closed venue quiet); no new detection maths |
+| agent-eval | briefing USEFULNESS (not accuracy): a synthetic-injection oracle (detection P/R/F1, ranking NDCG/Spearman, attribution top-1 + honest-null, latency), a human-labelled anchor (`eval_labels`), and an LLM-judge calibrated to it (kappa, pre-registered threshold); Ask-F1 cost sweep + two named probes; leakage-guarded, small-N with CIs; read-only, offline (`PRJ93_Agent_Eval_Report.md`) |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout

@@ -301,6 +301,25 @@ INGEST_STALENESS_DAYS = 1        # source ahead of the watermark by > this → s
 RETRAIN_CADENCE_DAYS = 7         # T3 weekly boundary since the last fit
 RETRAIN_ON_CHANGEPOINT = True    # T3 also fires on a confirmed change-point onset
 
+# --- Agent evaluation framework (offline; briefing usefulness, not accuracy) --
+# Evaluates whether the proactive briefing surfaces/ranks/attributes the right
+# insights. Read-only over the briefing + signals; runs on historical data with
+# LIVE_INGEST off. Triangulates three ground-truth sources: a synthetic-injection
+# oracle, a small human-labelled anchor, and an LLM-judge calibrated to the anchor.
+EVAL_ONSET_TOLERANCE_DAYS = 3     # a surfaced onset within ±this of truth = a hit
+EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units)
+EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units)
+# Ask-F1 cost model: miss:false-alarm penalty ratios to sweep (a missed stock-out
+# or regime shift costs more than a spurious alert, but fatigue is real). Reported
+# as an operating curve, never a single hard-coded point.
+EVAL_COST_RATIOS = (1.0, 2.0, 5.0, 10.0)
+EVAL_FALSE_ALARM_WEEK_DAYS = 7    # window for the weekly false-alarm (fatigue) rate
+# LLM-as-judge: a CALIBRATED proxy, never ground truth. Model + rubric + prompt are
+# pinned; agreement with the human anchor (Cohen's kappa) is reported, and a
+# pre-registered threshold decides whether the judge may scale beyond the humans.
+JUDGE_MODEL = "claude-opus-4-8"   # pinned; logged in the judge output for reproducibility
+JUDGE_KAPPA_THRESHOLD = 0.6       # pre-registered: kappa ≥ this → judge may scale
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
