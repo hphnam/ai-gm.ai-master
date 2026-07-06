@@ -89,7 +89,7 @@ def test_new_data_triggers_promote(monkeypatch):
     monkeypatch.setattr(refresh, "_promote_and_serve",
                         lambda venue, **k: calls.append(venue) or {"model": "rung2_ets", "data_as_of": None})
     monkeypatch.setattr(refresh, "get_adapter", lambda *a, **k: _FakeAdapter(_synthetic_next_day()))
-    monkeypatch.setattr(refresh, "_auto_exog", lambda notes: 0)
+    monkeypatch.setattr(refresh, "_auto_exog", lambda notes: (0, []))
     monkeypatch.setattr(refresh, "_rebuild_features", lambda venue, notes: True)
     try:
         refresh.refresh("beer_hall", refit="never")

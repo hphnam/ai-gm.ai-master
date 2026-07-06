@@ -124,7 +124,7 @@ def test_append_new_closed_day_then_idempotent(store, monkeypatch):
     _reset_store()                                       # clean ceiling
     fake = FakeAdapter(_synthetic_next_day())
     monkeypatch.setattr(refresh, "get_adapter", lambda *a, **k: fake)
-    monkeypatch.setattr(refresh, "_auto_exog", lambda notes: 0)
+    monkeypatch.setattr(refresh, "_auto_exog", lambda notes: (0, []))
     monkeypatch.setattr(refresh, "_rebuild_features", lambda venue, notes: True)
     try:
         first = refresh.refresh("beer_hall", refit="never")["venues"]["beer_hall"]

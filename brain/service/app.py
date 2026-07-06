@@ -375,7 +375,8 @@ def _freshness_block(venue: str, con) -> dict:
     f = _freshness(venue, con)
     return {"source": f["source"], "is_live": f["is_live"],
             "stale": f["stale"], "staleness_days": f["staleness_days"],
-            "served_model": f["served_model"], "served_as_of": f["served_as_of"]}
+            "served_model": f["served_model"], "served_as_of": f["served_as_of"],
+            "weather_gap": f.get("weather_gap", [])}
 
 
 def _freshness_for(venue: str) -> dict:

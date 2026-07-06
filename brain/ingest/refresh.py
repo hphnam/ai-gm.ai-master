@@ -147,17 +147,34 @@ def freshness(venue: str, con) -> dict:
         "incumbent_rung": incumbent_rung,
         "served_model": served_model,
         "served_as_of": served_as_of.isoformat() if served_as_of else None,
+        "weather_gap": _weather_gap_for(venue, con),
     }
+
+
+def _weather_gap_for(venue: str, con) -> list:
+    """The weather-coverage gap for this venue's cell (B3): a visible currency state
+    so a stale weather seam is never silent. Empty when weather covers the data max."""
+    try:
+        from ingest import exog_weather
+        cell = config.WEATHER_CELLS.get(venue)
+        return [g for g in exog_weather.weather_gap(con) if g["cell"] == cell]
+    except Exception:                                    # pragma: no cover - defensive
+        return []
 
 
 # --- T2 append ---------------------------------------------------------------
 
 def _append_transactions(con, venue: str, rows) -> int:
     """Append genuinely-new closed days (date beyond the store's current max for
-    this venue) to line_items. Dedup-by-date makes it idempotent: re-running never
-    double-appends. Views (l1/l2/l3) derive from line_items, so readers update."""
+    this venue) to line_items. The candidate rows are scoped to THIS venue and to
+    dates beyond its own ceiling, so a multi-venue frame (or a fresh store where
+    venues sit at different date ceilings) can never insert one venue's rows under
+    another's watermark. Dedup-by-venue-and-date makes it idempotent: re-running
+    never double-appends. Views (l1/l2/l3) derive from line_items, so readers update."""
     if rows is None or rows.empty:
         return 0
+    if "venue" in rows.columns:
+        rows = rows[rows["venue"] == venue]
     cur_max = con.execute("SELECT MAX(date) FROM line_items WHERE venue=?", [venue]).fetchone()[0]
     new = rows[rows["date"] > cur_max] if cur_max is not None else rows
     if new.empty:
@@ -336,9 +353,9 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
         con.close()
 
     # Phase 2 — enrich (own connections), only when new closed days landed.
-    exog_dates, features_built = 0, False
+    exog_dates, features_built, weather_gap = 0, False, []
     if n_added:
-        exog_dates = _auto_exog(notes)
+        exog_dates, weather_gap = _auto_exog(notes)
         features_built = _rebuild_features(venue, notes)
 
     # Phase 3 — conditional T3 re-fit (each helper manages its own connection).
@@ -371,21 +388,35 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
 
     return {"venue": venue, "rows_added": n_added, "new_as_of": str(new_max) if new_max else None,
             "exog_dates_filled": exog_dates, "features_rebuilt": features_built,
+            "weather_gap": weather_gap,
             "refit": refit_done, "rung_change": rung_change, "promote": promote, "notes": notes}
 
 
-def _auto_exog(notes: list[str]) -> int:
-    """Pull exogenous for the new span. Forecast-neutral while the adopted exo set
-    is empty (G-live-b) — it serves reasoning/attribution, not the forecast."""
+def _auto_exog(notes: list[str]) -> tuple[int, list]:
+    """Pull exogenous for the new span incrementally, then assert coverage. Returns
+    (dates_added, weather_gap). Forecast-neutral while the adopted exo set is empty
+    (G-live-b) — it serves reasoning/attribution, not the forecast. A missing-weather
+    span is recorded as a structured `weather_gap`, never a swallowed 'skipped' note
+    (B3): a genuine network failure produces a loud gap, not silence, and does not
+    crash the refresh."""
+    from ingest import exog_weather
+    added = 0
     try:
-        from ingest.exog_weather import build as exog_build
-        res = exog_build()
-        notes.append("auto-exog refreshed (reasoning-serving; forecast-neutral "
-                     "while the adopted exo set is empty)")
-        return int(res.get("rows", 0)) if isinstance(res, dict) else 0
+        res = exog_weather.build()
+        added = sum(int(v.get("added", 0)) for v in res.values()) if isinstance(res, dict) else 0
     except Exception as exc:                              # pragma: no cover - network/offline
-        notes.append(f"auto-exog skipped: {type(exc).__name__}")
-        return 0
+        notes.append(f"auto-exog pull failed ({type(exc).__name__}); coverage checked below")
+    try:
+        gap = exog_weather.weather_gap()
+    except Exception as exc:                              # pragma: no cover - defensive
+        gap = [{"basis": "all", "cell": "all", "error": type(exc).__name__}]
+    if gap:
+        notes.append(f"auto-exog: weather_gap — {len(gap)} basis/cell span(s) short of the "
+                     f"data max (attribution on those dates reads 'not checked', not 'no signal')")
+    else:
+        notes.append("auto-exog refreshed; weather covers the new span (reasoning-serving; "
+                     "forecast-neutral while the adopted exo set is empty)")
+    return added, gap
 
 
 def _rebuild_features(venue: str, notes: list[str]) -> bool:

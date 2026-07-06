@@ -108,6 +108,7 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
     lo, hi = onset - w, onset + w
     is_draught = layer in ("L2", "L3")
     hits: list[tuple[float, str]] = []
+    weather_available = False
     try:
         # Known structural breaks first (highest confidence).
         if is_closed(venue, con=con) and abs((active_trading_end(venue, con=con) - onset).days) <= CP_ATTRIB_WINDOW_DAYS:
@@ -125,13 +126,17 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
                 hits.append((65, "coincides with a university term↔vacation transition"))
                 break
 
-        # Weather anomaly (draught-weighted).
+        # Weather anomaly (draught-weighted). Track whether weather actually covers
+        # this date's window (B3): "checked, no anomaly" must read differently from
+        # "no weather for this date, not checked" so the honest null cannot claim a
+        # weather check it could not make.
         cell = WEATHER_CELLS.get(venue)
         wx = _table(con, "exog_weather_leadmatched")
         if wx is not None and cell:
             wx = wx[wx["cell"] == cell]
             win = wx[(wx["date"] >= lo) & (wx["date"] <= hi)]
-            if not win.empty and len(wx) > 30:
+            weather_available = not win.empty
+            if weather_available and len(wx) > 30:
                 t_mean, t_win = wx["exo_temp_c"].mean(), win["exo_temp_c"].mean()
                 t_sd = wx["exo_temp_c"].std() or 1.0
                 if abs(t_win - t_mean) > t_sd:
@@ -172,8 +177,14 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
 
     ranked = [s for _, s in sorted(hits, key=lambda x: -x[0])]
     if not ranked:
-        return ["no coincident calendar/weather/event/promo signal — likely an "
-                "operational or competitive change worth investigating"]
+        weather_clause = (
+            "no coincident calendar/weather/event/promo signal" if weather_available
+            else "no coincident calendar/event/promo signal; weather unavailable for "
+                 "this date, not checked")
+        return [f"{weather_clause} — likely an operational or competitive change "
+                "worth investigating"]
+    if not weather_available:
+        ranked.append("weather unavailable for this date, not checked")
     return ranked
 
 
