@@ -307,8 +307,18 @@ RETRAIN_ON_CHANGEPOINT = True    # T3 also fires on a confirmed change-point ons
 # LIVE_INGEST off. Triangulates three ground-truth sources: a synthetic-injection
 # oracle, a small human-labelled anchor, and an LLM-judge calibrated to the anchor.
 EVAL_ONSET_TOLERANCE_DAYS = 3     # a surfaced onset within ±this of truth = a hit
-EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units)
-EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units)
+EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units) — smoke run
+EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units) — smoke run
+# Scaled run: the magnitude sweep that exposes the sensitivity FLOOR (how subtle an
+# event the brain catches before it misses) — the headline result, not a pooled F1.
+# z spans near-threshold (|z|~1, the band edge) to large; stock sweeps days-of-cover
+# from mildly low to clearly out. The grid crosses venue × kind × magnitude × onset ×
+# fold × direction; a fixed seed makes it reproducible.
+EVAL_INJECT_Z_GRID = (1.0, 1.25, 1.5, 2.0, 3.0, 4.0)
+EVAL_STOCK_COVER_GRID = (2.0, 1.0, 0.0, -1.0, -2.0)   # days-of-cover: mildly low → clearly out
+EVAL_SCALED_FOLDS = 4             # rolling-origin folds to iterate (different historical contexts)
+EVAL_SCALED_ONSETS = ("early", "mid", "late")          # onset positions within the held-out window
+EVAL_SCALED_SEED = 93             # reproducibility of the scaled run + the day sampler
 # Ask-F1 cost model: miss:false-alarm penalty ratios to sweep (a missed stock-out
 # or regime shift costs more than a spurious alert, but fatigue is real). Reported
 # as an operating curve, never a single hard-coded point.

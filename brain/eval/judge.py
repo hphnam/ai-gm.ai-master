@@ -172,7 +172,34 @@ def calibrate(scores: list[dict], con=None) -> dict:
 def evaluate(surfaced: dict, con=None) -> dict:
     """Score the surfaced items and (if a human anchor exists) calibrate. Default
     mode is the offline emit-prompts seam — no fabricated numbers."""
-    item_dicts = _flatten(surfaced)
+    return _evaluate_dicts(_flatten(surfaced), con=con)
+
+
+def evaluate_labelled(con=None) -> dict:
+    """Calibrate the judge over the SAME days the human labelled (spec B4): surface the
+    briefing's items for each labelled (day, venue), score them, and report the
+    judge-versus-human kappa against the pre-registered threshold. Honest no-op until
+    labels exist."""
+    from eval import labels as labels_mod
+
+    lab = labels_mod.load_labels(con=con)
+    kd = lab[lab["verdict"].isin(("keep", "drop"))] if not lab.empty else lab
+    if kd.empty:
+        return {"mode": "no-labels", "model": config.JUDGE_MODEL, "n_items": 0,
+                "calibration": {"calibrated": False, "kappa": None},
+                "summary": "no human labels yet — run `python -m eval.labels --label`, "
+                           "then this reports the judge-vs-human kappa over those days."}
+    item_dicts = []
+    seen: set[str] = set()
+    for (day, venue), _ in kd.groupby(["day", "venue"]):
+        for d in labels_mod.briefing_items_for(day, venue, con=con):
+            if d["item_key"] not in seen:
+                seen.add(d["item_key"])
+                item_dicts.append(d)
+    return _evaluate_dicts(item_dicts, con=con)
+
+
+def _evaluate_dicts(item_dicts: list[dict], con=None) -> dict:
     if _api_available():
         scores = run_api(item_dicts)
         cal = calibrate(scores, con=con)

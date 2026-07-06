@@ -27,6 +27,7 @@ import sys
 import numpy as np
 import pandas as pd
 
+import config
 from store.warehouse import connect
 
 _COLS = ["day", "venue", "item_key", "verdict", "priority_rank", "note", "labeller"]
@@ -144,10 +145,157 @@ def score_report(con=None) -> dict:
                        "Small N — read the CI, not the point estimate."}
 
 
+# --- B1: stratified day sampler ----------------------------------------------
+
+_STRATA = ("quiet", "deviation", "change_point", "stock")
+
+
+def _day_strata(venue: str, con) -> dict:
+    """Assign each of the venue's trading days to ONE stratum (change-point > stock >
+    deviation > quiet), plus any stock-reorder snapshot day. Read-only over the signals."""
+    from signals import change_point as cp
+    from signals.deviation import _classify
+    from signals.residual import build_residual_stream
+
+    strata: dict = {}
+    for _, r in build_residual_stream(venue, con=con).iterrows():
+        d = pd.Timestamp(r["date"]).date()
+        strata[d] = "deviation" if _classify(float(r["z"]))[0] == "deviation" else "quiet"
+    try:
+        cpdf = cp.detect(venue, con=con)
+        for _, r in cpdf.iterrows():
+            d = r["onset_date"] if hasattr(r["onset_date"], "isoformat") else pd.Timestamp(r["onset_date"]).date()
+            strata[d] = "change_point"
+    except Exception:      # pragma: no cover - detector unavailable for a venue
+        pass
+    if venue in config.VENUES_WITH_STOCK and _has_table(con, "stock_cover"):
+        for (as_of,) in con.execute(
+                "SELECT DISTINCT as_of FROM stock_cover WHERE venue=? AND reorder_flag=TRUE",
+                [venue]).fetchall():
+            strata[pd.Timestamp(as_of).date()] = "stock"
+    return strata
+
+
+def sample_days(n_per_stratum: int = 5, seed: int | None = None, con=None) -> pd.DataFrame:
+    """A deterministic stratified sample of (day, venue) across quiet / deviation /
+    change-point / stock strata, so the labelled set is neither all quiet nor all noise.
+    Sparse strata return fewer than requested — the achieved N is reported, not padded."""
+    seed = seed if seed is not None else config.EVAL_SCALED_SEED
+    rng = np.random.default_rng(seed)
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        rows = []
+        for venue in config.FORECAST_VENUES:
+            by: dict = {}
+            for d, st in _day_strata(venue, con).items():
+                by.setdefault(st, []).append(d)
+            for st, days in by.items():
+                days = sorted(days)
+                if len(days) > n_per_stratum:
+                    idx = sorted(rng.choice(len(days), n_per_stratum, replace=False))
+                    days = [days[i] for i in idx]
+                for d in days:
+                    rows.append({"day": d.isoformat(), "venue": venue, "stratum": st})
+        return pd.DataFrame(rows, columns=["day", "venue", "stratum"])
+    finally:
+        if own:
+            con.close()
+
+
+def sample_report(sample: pd.DataFrame) -> dict:
+    """Achieved N per stratum (sparse venues will be small — say so)."""
+    if sample.empty:
+        return {"total": 0, "per_stratum": {}, "per_venue": {}}
+    return {"total": int(len(sample)),
+            "per_stratum": sample.groupby("stratum").size().to_dict(),
+            "per_venue": sample.groupby("venue").size().to_dict()}
+
+
+# --- B2: two-pass labelling instrument ---------------------------------------
+
+def render_raw_day(day, venue: str, con=None) -> str:
+    """The raw numbers a labeller forms an independent view from BEFORE seeing the
+    briefing (pass 1) — the anti-anchoring half of the instrument."""
+    from signals.residual import build_residual_stream
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        stream = build_residual_stream(venue, con=con)
+        target = pd.Timestamp(day).normalize()
+        row = stream[stream["date"].dt.normalize() == target]
+        head = f"{venue} · {pd.Timestamp(day).date()}"
+        if row.empty:
+            return f"{head}: no trading-day record (closed / non-trading)."
+        r = row.iloc[-1]
+        return (f"{head}: actual £{float(r['actual']):,.0f} vs expected "
+                f"£{float(r['expected']):,.0f} (band ±£{float(r['scale']):,.0f}, "
+                f"z={float(r['z']):+.2f}).")
+    finally:
+        if own:
+            con.close()
+
+
+def briefing_items_for(day, venue: str, con=None) -> list[dict]:
+    """The briefing's items for (day, venue), revealed in pass 2 for keep/drop/rank."""
+    from signals.briefing import build
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        env = build(as_of=pd.Timestamp(day).date(), venues=[venue], con=con)
+        return env["items"]
+    finally:
+        if own:
+            con.close()
+
+
+def label_day(day, venue: str, labeller: str, con=None) -> None:  # pragma: no cover - interactive
+    """Two-pass interactive labelling for one (day, venue): pass 1 shows the raw day and
+    captures any MISSING insight (finds false negatives before anchoring); pass 2 reveals
+    the briefing's items and captures keep/drop + priority. Writes to `eval_labels`."""
+    print("\n" + "=" * 70)
+    print("PASS 1 — raw day (form your own view before seeing the briefing)")
+    print("  " + render_raw_day(day, venue, con=con))
+    missing = input("  Anything worth surfacing the briefing might miss? (blank = no): ").strip()
+    if missing:
+        add_label(day, venue, f"missing::{missing[:40]}", "missing", note=missing,
+                  labeller=labeller, con=con)
+
+    print("PASS 2 — the briefing's items (keep = a duty manager would want to know)")
+    items = briefing_items_for(day, venue, con=con)
+    if not items:
+        print("  (quiet day — no items)")
+        return
+    for i, it in enumerate(items, 1):
+        print(f"  [{i}] {it['headline']}")
+        verdict = ""
+        while verdict not in ("keep", "drop", "k", "d"):
+            verdict = input("      keep/drop (k/d): ").strip().lower()
+        rank = input("      priority rank (int, blank = none): ").strip()
+        add_label(day, venue, it["item_key"], "keep" if verdict[0] == "k" else "drop",
+                  priority_rank=int(rank) if rank.isdigit() else None, labeller=labeller, con=con)
+
+
+def _label_session(seed: int, n_per_stratum: int, labeller: str) -> None:  # pragma: no cover - interactive
+    con = connect()
+    try:
+        sample = sample_days(n_per_stratum=n_per_stratum, seed=seed, con=con)
+        rep = sample_report(sample)
+        print(f"sampled {rep['total']} (day, venue) pairs — per stratum {rep['per_stratum']}")
+        for _, s in sample.iterrows():
+            label_day(s["day"], s["venue"], labeller, con=con)
+    finally:
+        con.close()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Human-anchor labelling for the agent eval")
     ap.add_argument("--add", action="store_true")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--sample", action="store_true", help="print the stratified day sample")
+    ap.add_argument("--label", action="store_true", help="run the two-pass labelling session")
+    ap.add_argument("--n-per-stratum", type=int, default=5)
+    ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--day"); ap.add_argument("--venue"); ap.add_argument("--item-key")
     ap.add_argument("--verdict", choices=_VERDICTS)
     ap.add_argument("--rank", type=int); ap.add_argument("--note")
@@ -158,6 +306,12 @@ def main() -> int:
         add_label(args.day, args.venue, args.item_key, args.verdict,
                   priority_rank=args.rank, note=args.note, labeller=args.labeller)
         print(f"labelled {args.item_key} = {args.verdict}")
+    if args.sample:
+        sample = sample_days(n_per_stratum=args.n_per_stratum, seed=args.seed)
+        print(sample.to_string(index=False) if not sample.empty else "(no days sampled)")
+        print(f"  achieved: {sample_report(sample)}")
+    if args.label:
+        _label_session(args.seed or config.EVAL_SCALED_SEED, args.n_per_stratum, args.labeller)
     rep = score_report()
     print(f"eval_labels: {rep['n']} row(s) — {rep['status']}")
     if args.list:

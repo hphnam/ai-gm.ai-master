@@ -70,21 +70,39 @@ def base_stream(venue: str, con=None) -> pd.DataFrame:
     return build_residual_stream(venue, con=con)
 
 
-def holdout(stream: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """The single most-recent leakage-checked (train, test) fold from the harness.
-    Falls back to a plain tail split if the series is too short for a full fold."""
-    folds = list(harness.rolling_origin(
-        stream, n_folds=1, horizon_days=_HORIZON_DAYS, min_train_days=_MIN_TRAIN_DAYS))
-    if folds:
-        return folds[0]
+def folds(stream: pd.DataFrame, n_folds: int | None = None) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
+    """Leakage-checked (train, test) folds from the harness — different historical
+    contexts for the scaled run. Falls back to a single tail split when the series is
+    too short for a full rolling-origin fold."""
+    n = n_folds if n_folds is not None else config.EVAL_SCALED_FOLDS
+    out = list(harness.rolling_origin(
+        stream, n_folds=n, horizon_days=_HORIZON_DAYS, min_train_days=_MIN_TRAIN_DAYS))
+    if out:
+        return out
     cut = stream["date"].max() - pd.Timedelta(days=_HORIZON_DAYS)
     train, test = stream[stream["date"] <= cut], stream[stream["date"] > cut]
     harness.assert_no_leakage(train, test)
-    return train.copy(), test.copy()
+    return [(train.copy(), test.copy())]
+
+
+def holdout(stream: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """The single most-recent leakage-checked (train, test) fold (the smoke default)."""
+    return folds(stream, n_folds=1)[-1]
 
 
 def _onset(test: pd.DataFrame, offset: int = _ONSET_OFFSET_DAYS) -> pd.Timestamp:
-    return pd.Timestamp(test["date"].iloc[min(offset, len(test) - 1)])
+    return pd.Timestamp(test["date"].iloc[min(max(offset, 0), len(test) - 1)])
+
+
+def _position_offset(test: pd.DataFrame, position: str) -> int:
+    """Onset position within the held-out window: early (room to persist), mid
+    (isolated), or late (the hard case — little room before the window ends)."""
+    n = len(test)
+    if position == "mid":
+        return n // 2
+    if position == "late":
+        return max(0, n - 4)
+    return _ONSET_OFFSET_DAYS   # early
 
 
 def _reassemble(stream: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:
@@ -104,65 +122,75 @@ def _apply_z(test: pd.DataFrame, mask, dz: float) -> pd.DataFrame:
 
 # --- The four event kinds ----------------------------------------------------
 
+def _resolve(venue, con, stream, window):
+    """Shared setup: reuse a caller-supplied stream/window (the scaled grid computes
+    them once per venue-fold) or compute the smoke defaults."""
+    stream = stream if stream is not None else base_stream(venue, con=con)
+    train, test = window if window is not None else holdout(stream)
+    return stream, train, test
+
+
 def inject_regime_shift(venue: str, con=None, *, direction: str = "down",
-                        magnitude_z: float | None = None) -> Injection:
+                        magnitude_z: float | None = None, stream=None, window=None,
+                        onset: str = "early") -> Injection:
     """A sustained step in z from a known onset to the end of the held-out window."""
-    stream = base_stream(venue, con=con)
-    train, test = holdout(stream)
-    onset = _onset(test)
-    dz = (magnitude_z or config.EVAL_INJECT_SHIFT_Z) * (-1 if direction == "down" else 1)
-    test = _apply_z(test, test["date"] >= onset, dz)
-    truth = TruthRecord(venue, "regime_shift", onset.date(), direction, abs(dz), None,
-                        relevance=2.0)
+    stream, train, test = _resolve(venue, con, stream, window)
+    at = _onset(test, _position_offset(test, onset))
+    dz = (magnitude_z if magnitude_z is not None else config.EVAL_INJECT_SHIFT_Z) \
+        * (-1 if direction == "down" else 1)
+    test = _apply_z(test, test["date"] >= at, dz)
+    truth = TruthRecord(venue, "regime_shift", at.date(), direction, abs(dz), None, relevance=2.0)
     return Injection(venue, test["date"].max().date(), "regime_shift",
                      _reassemble(stream, test), [truth], train_end=train["date"].max().date())
 
 
-def inject_spike(venue: str, con=None, *, direction: str = "up",
-                 z: float | None = None) -> Injection:
+def inject_spike(venue: str, con=None, *, direction: str = "up", z: float | None = None,
+                 stream=None, window=None, onset: str = "mid") -> Injection:
     """A single-day |z| excursion — a point anomaly with no persistence."""
-    stream = base_stream(venue, con=con)
-    train, test = holdout(stream)
-    onset = _onset(test, offset=len(test) // 2)   # mid-window, isolated
-    dz = (z or config.EVAL_INJECT_SPIKE_Z) * (-1 if direction == "down" else 1)
-    test = _apply_z(test, test["date"] == onset, dz)
-    truth = TruthRecord(venue, "spike", onset.date(), direction, abs(dz), None,
-                        relevance=1.0)
+    stream, train, test = _resolve(venue, con, stream, window)
+    at = _onset(test, _position_offset(test, onset))
+    dz = (z if z is not None else config.EVAL_INJECT_SPIKE_Z) * (-1 if direction == "down" else 1)
+    test = _apply_z(test, test["date"] == at, dz)
+    truth = TruthRecord(venue, "spike", at.date(), direction, abs(dz), None, relevance=1.0)
     return Injection(venue, test["date"].max().date(), "spike",
                      _reassemble(stream, test), [truth], train_end=train["date"].max().date())
 
 
-def inject_stock_drawdown(venue: str, con=None) -> Injection:
-    """A keg line crossing the reorder threshold. Stock is a snapshot, not a series,
-    so this is a synthetic `stock` Signal dated at the window end (onset = as_of)."""
-    stream = base_stream(venue, con=con)
-    _train, test = holdout(stream)
+def inject_stock_drawdown(venue: str, con=None, *, days_of_cover: float = 0.0,
+                          stream=None, window=None) -> Injection:
+    """A keg line at `days_of_cover` cover crossing the reorder threshold. Stock is a
+    snapshot, not a series, so this is a synthetic reorder `Signal` dated at the window
+    end (onset = as_of); severity scales with how far out of cover it is."""
+    stream, train, test = _resolve(venue, con, stream, window)
     onset = pd.Timestamp(test["date"].max())
-    sig = Signal("stock", venue, onset.date(), "down", "high", 0.0,
-                 {"product": "Synthetic Keg", "days_of_cover": 0.0,
+    severity = "high" if days_of_cover <= 0 else "medium"
+    sig = Signal("stock", venue, onset.date(), "down", severity, float(days_of_cover),
+                 {"product": "Synthetic Keg", "days_of_cover": float(days_of_cover),
                   "suggested_order_kegs": 2.0, "as_of": onset.date().isoformat()})
-    truth = TruthRecord(venue, "stock_drawdown", onset.date(), "down", 0.0, None,
-                        relevance=2.0)
+    truth = TruthRecord(venue, "stock_drawdown", onset.date(), "down", float(days_of_cover),
+                        None, relevance=2.0)
     return Injection(venue, onset.date(), "stock_drawdown", stream, [truth], stock=[sig],
-                     train_end=_train["date"].max().date())
+                     train_end=train["date"].max().date())
 
 
-def inject_exo_coincident(venue: str, con=None, *, direction: str = "down") -> Injection:
-    """A downward shift anchored on a REAL weather anomaly in the held-out window, so
-    the correlational attribution should name weather (a planted cause). Falls back to
-    a plain regime shift (expected_cause=None) if no weather anomaly is available."""
+def inject_exo_coincident(venue: str, con=None, *, direction: str = "down",
+                          magnitude_z: float | None = None, stream=None,
+                          window=None) -> Injection:
+    """A shift anchored on a REAL weather anomaly in the held-out window, so the
+    correlational attribution should name weather (a planted cause). Falls back to a
+    plain shift (expected_cause=None) if no weather anomaly is available."""
     own = con is None
     con = con or connect(read_only=True)
     try:
-        stream = base_stream(venue, con=con)
-        train, test = holdout(stream)
-        onset = _weather_anomaly_date(venue, test, con)
+        stream, train, test = _resolve(venue, con, stream, window)
+        at = _weather_anomaly_date(venue, test, con)
         expected_cause = "weather"
-        if onset is None:                       # honest fallback: no anomaly to anchor on
-            onset, expected_cause = _onset(test), None
-        dz = config.EVAL_INJECT_SHIFT_Z * (-1 if direction == "down" else 1)
-        test = _apply_z(test, test["date"] >= onset, dz)
-        truth = TruthRecord(venue, "exo_coincident", pd.Timestamp(onset).date(),
+        if at is None:                          # honest fallback: no anomaly to anchor on
+            at, expected_cause = _onset(test, _position_offset(test, "early")), None
+        dz = (magnitude_z if magnitude_z is not None else config.EVAL_INJECT_SHIFT_Z) \
+            * (-1 if direction == "down" else 1)
+        test = _apply_z(test, test["date"] >= at, dz)
+        truth = TruthRecord(venue, "exo_coincident", pd.Timestamp(at).date(),
                             direction, abs(dz), expected_cause, relevance=2.0)
         return Injection(venue, test["date"].max().date(), "exo_coincident",
                          _reassemble(stream, test), [truth],
@@ -192,11 +220,12 @@ def _weather_anomaly_date(venue: str, test: pd.DataFrame, con) -> pd.Timestamp |
     return pd.Timestamp(win.sort_values("dev").iloc[-1]["date"]).normalize()
 
 
-def multi_event(venue: str, con=None) -> Injection:
+def multi_event(venue: str, con=None, *, stream=None, window=None) -> Injection:
     """A single window carrying a HIGH-magnitude regime shift and a lower spike, for
     the ranking axis: the briefing should rank the shift above the spike."""
     big = inject_regime_shift(venue, con=con, direction="down",
-                              magnitude_z=config.EVAL_INJECT_SHIFT_Z * 1.6)
+                              magnitude_z=config.EVAL_INJECT_SHIFT_Z * 1.6,
+                              stream=stream, window=window)
     stream = big.stream.copy()
     test = stream[stream["date"] > pd.Timestamp(big.train_end)]
     spike_day = pd.Timestamp(test["date"].iloc[len(test) - 2])   # late, isolated up-spike

@@ -36,6 +36,7 @@ from signals import briefing
 from signals import change_point as cp
 from signals import deviation as dev
 from signals.residual import _EPS, attribute
+from store.active_span import active_trading_end, is_closed
 from store.warehouse import connect
 
 REPORT_MD = config.STORE_DIR.parent.parent / "PRJ93_Agent_Eval_Report.md"
@@ -331,6 +332,317 @@ def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
     return rows
 
 
+# --- Scaled run: the venue × kind × magnitude × onset × fold × direction grid ---
+# The point is the sensitivity FLOOR (how subtle an event is still caught), reported
+# per (kind, venue, magnitude) with N and a Wilson interval — not one pooled F1 that
+# large easy events would flatter. Exhaustive + deterministic (no RNG), so it needs
+# no seed; the seed lives in the Part B day sampler where sampling actually happens.
+_SCALED_VENUE_KINDS = {
+    "beer_hall": ("regime_shift", "spike", "stock_drawdown", "exo_coincident"),
+    "two_river_taps": ("regime_shift", "spike", "exo_coincident"),   # net-sales; no stock
+    "ellel": ("spike",),   # sparse: the 1 short fold can't test a sustained shift (flagged)
+}
+
+
+_SCALED_ATTR_STUB = ["(attribution skipped in the scaled detection run — the correlational "
+                     "attribution axis is measured separately in the smoke run's §2)"]
+
+
+class _StubAttribution:
+    """Stub `attribute()` for the scaled run. Attribution is a per-DB-query cost, and a
+    strong sustained injection makes CUSUM re-alarm many times → many attribution calls
+    per surface. But NO scaled metric reads the attribution reason (detection, latency,
+    ranking, and fatigue use onset / direction / severity only — attribution top-1 is an
+    axis of the smoke run), so stubbing it is exact for every scaled number and ~10×
+    faster. Patches the `attribute` reference in this module and in `briefing` (which
+    `_build_item` calls) for the run's duration, then restores it."""
+
+    def __init__(self):
+        self._saved: dict = {}
+
+    @staticmethod
+    def _stub(*_a, **_k):
+        return _SCALED_ATTR_STUB
+
+    def __enter__(self):
+        for mod in (sys.modules[__name__], briefing):
+            self._saved[mod] = mod.attribute
+            mod.attribute = self._stub
+        return self
+
+    def __exit__(self, *exc):
+        for mod, fn in self._saved.items():
+            mod.attribute = fn
+
+
+def _usable_folds(venue: str, stream: pd.DataFrame, con):
+    """Injection windows for a venue. For a closed venue, only PRE-closure folds — a
+    post-closure window is all structural zeros and the closure dominates (respect
+    closure, GA1)."""
+    fs = inject.folds(stream)
+    if is_closed(venue, con=con):
+        aend = active_trading_end(venue, con=con)
+        fs = [(tr, te) for tr, te in fs if te["date"].max() <= aend]
+    return fs
+
+
+def build_scaled_corpus(con) -> list[Injection]:
+    """The full grid. Streams + folds are computed once per venue and threaded into the
+    injectors, so the stream is not rebuilt hundreds of times."""
+    corpus: list[Injection] = []
+    for venue, kinds in _SCALED_VENUE_KINDS.items():
+        stream = inject.base_stream(venue, con=con)
+        for _train, test in _usable_folds(venue, stream, con):
+            window = (_train, test)
+            for kind in kinds:
+                if kind == "stock_drawdown":
+                    for doc in config.EVAL_STOCK_COVER_GRID:
+                        corpus.append(inject.inject_stock_drawdown(
+                            venue, con, days_of_cover=doc, stream=stream, window=window))
+                elif kind == "exo_coincident":
+                    for z in config.EVAL_INJECT_Z_GRID:
+                        for d in ("down", "up"):
+                            corpus.append(inject.inject_exo_coincident(
+                                venue, con, direction=d, magnitude_z=z, stream=stream, window=window))
+                else:   # regime_shift | spike
+                    fn = inject.inject_regime_shift if kind == "regime_shift" else inject.inject_spike
+                    for z in config.EVAL_INJECT_Z_GRID:
+                        for pos in config.EVAL_SCALED_ONSETS:
+                            for d in ("down", "up"):
+                                kw = {"direction": d, "stream": stream, "window": window, "onset": pos}
+                                kw["magnitude_z" if kind == "regime_shift" else "z"] = z
+                                corpus.append(fn(venue, con, **kw))
+    return corpus
+
+
+def _magbin(kind: str, mag: float) -> str:
+    if kind == "stock_drawdown":
+        return "in-cover (doc>0)" if mag > 0 else "out-of-cover (doc≤0)"
+    if mag <= 1.25:
+        return "near-threshold (|z|≤1.25)"
+    if mag <= 2.0:
+        return "mid (1.25<|z|≤2)"
+    return "large (|z|>2)"
+
+
+def _score_injection(inj_s: Injection, con, clean_keys: set[str]) -> dict:
+    """One grid cell: did the briefing catch the injected event, how many
+    injection-attributable items did it raise, and (for a caught shift) the latency."""
+    items = surface(inj_s, con)
+    new_items = [it for it in items if it.item_key not in clean_keys]
+    truth = inj_s.truth[0]
+    covered = any(item_covers(it, truth) for it in items)
+    spurious = sum(1 for it in new_items if not any(item_covers(it, t) for t in inj_s.truth))
+    delay = None
+    if covered and inj_s.kind in ("regime_shift", "exo_coincident"):
+        for it in items:
+            for s in _all_signals(it):
+                if (s.source == "change_point"
+                        and abs((s.onset_date - truth.onset).days) <= config.EVAL_ONSET_TOLERANCE_DAYS):
+                    delay = (date.fromisoformat(s.payload["detected_date"]) - truth.onset).days
+                    break
+            if delay is not None:
+                break
+    return {"venue": inj_s.venue, "kind": inj_s.kind, "mag": truth.magnitude,
+            "magbin": _magbin(inj_s.kind, truth.magnitude), "caught": covered,
+            "attributable": len(new_items), "spurious": spurious, "delay": delay}
+
+
+def _cell(records: list[dict]) -> dict:
+    """P/R/F1 (+ Wilson CIs) for a set of injection records."""
+    n = len(records)
+    caught = sum(r["caught"] for r in records)
+    attributable = sum(r["attributable"] for r in records)
+    spurious = sum(r["spurious"] for r in records)
+    recall = caught / n if n else float("nan")
+    precision = (attributable - spurious) / attributable if attributable else float("nan")
+    f1 = (2 * precision * recall / (precision + recall)
+          if np.isfinite(precision) and np.isfinite(recall) and (precision + recall) > 0
+          else float("nan"))
+    return {"n": n, "caught": caught, "recall": recall, "recall_ci": wilson(caught, n),
+            "precision": precision, "f1": f1}
+
+
+def scaled_detection(records: list[dict]) -> dict:
+    """Overall + by kind, by venue, and the sensitivity curve (catch rate vs magnitude
+    per kind × venue), with the near-threshold operating point called out."""
+    overall = _cell(records)
+    by_kind = {k: _cell([r for r in records if r["kind"] == k])
+               for k in sorted({r["kind"] for r in records})}
+    by_venue = {v: _cell([r for r in records if r["venue"] == v])
+                for v in sorted({r["venue"] for r in records})}
+    sensitivity: dict = {}
+    near_threshold: dict = {}
+    for k in sorted({r["kind"] for r in records}):
+        sensitivity[k] = {}
+        for v in sorted({r["venue"] for r in records if r["kind"] == k}):
+            mags = sorted({r["mag"] for r in records if r["kind"] == k and r["venue"] == v})
+            curve = []
+            for m in mags:
+                cell = _cell([r for r in records if r["kind"] == k and r["venue"] == v and r["mag"] == m])
+                curve.append({"mag": m, "rate": cell["recall"], "n": cell["n"], "ci": cell["recall_ci"]})
+            sensitivity[k][v] = curve
+            if curve:
+                near_threshold[f"{k}/{v}"] = curve[0]   # smallest magnitude = the hard case
+    return {"overall": overall, "by_kind": by_kind, "by_venue": by_venue,
+            "sensitivity": sensitivity, "near_threshold": near_threshold}
+
+
+def latency_distribution(records: list[dict]) -> dict:
+    """Regime/exo detection delay by magnitude bin — bigger shifts should detect
+    faster; report the distribution (median + IQR), not one number."""
+    out: dict = {}
+    delays = [r for r in records if r["kind"] in ("regime_shift", "exo_coincident")
+              and r["delay"] is not None]
+    for b in sorted({r["magbin"] for r in delays}):
+        d = sorted(r["delay"] for r in delays if r["magbin"] == b)
+        arr = np.array(d, float)
+        out[b] = {"n": len(d), "median": float(np.median(arr)),
+                  "q1": float(np.percentile(arr, 25)), "q3": float(np.percentile(arr, 75)),
+                  "min": int(arr.min()), "max": int(arr.max())}
+    return out
+
+
+def scaled_ranking(con) -> dict:
+    """NDCG + Spearman across MANY synthetic multi-event days (one per usable fold per
+    net-sales venue), with N — a shift should rank above a coincident spike."""
+    ndcgs, rhos = [], []
+    for venue in ("beer_hall", "two_river_taps"):
+        stream = inject.base_stream(venue, con=con)
+        for window in _usable_folds(venue, stream, con):
+            inj_s = inject.multi_event(venue, con=con, stream=stream, window=window)
+            items = surface(inj_s, con)
+            rels, matched = [], []
+            for it in items:
+                best = max((t.relevance for t in inj_s.truth if item_covers(it, t)), default=0.0)
+                rels.append(best)
+                if best > 0:
+                    matched.append(best)
+            if len(matched) >= 2:
+                ndcgs.append(ndcg(rels))
+                rhos.append(spearman(list(range(len(matched), 0, -1)), matched))
+    finite = [r for r in rhos if np.isfinite(r)]
+    return {"n_days": len(ndcgs), "ndcg_mean": float(np.mean(ndcgs)) if ndcgs else float("nan"),
+            "spearman_mean": float(np.mean(finite)) if finite else float("nan")}
+
+
+def run_scaled(con=None) -> dict:
+    """The dissertation-grade run: the full grid, aggregated with Wilson intervals, the
+    sensitivity curve, the latency distribution, and ranking across many multi-event
+    days. Writes the extended section of the report. Deterministic (no seed needed)."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        with _StubAttribution():
+            corpus = build_scaled_corpus(con)
+            clean_cache: dict = {}
+            records = []
+            for inj_s in corpus:
+                key = (inj_s.venue, str(inj_s.as_of))
+                if key not in clean_cache:
+                    clean_stream = inject.base_stream(inj_s.venue, con=con)
+                    clean_cache[key] = {it.item_key for it in surface(
+                        Injection(inj_s.venue, inj_s.as_of, "clean", clean_stream, []), con)}
+                records.append(_score_injection(inj_s, con, clean_cache[key]))
+            detection = scaled_detection(records)
+            latency = latency_distribution(records)
+            ranking = scaled_ranking(con)
+            fatigue = fatigue_metrics(con)
+        cost = cost_curve({"fn": sum(1 for r in records if not r["caught"])}, fatigue)
+        out = {"n_injections": len(records), "detection": detection, "latency": latency,
+               "ranking": ranking, "fatigue": fatigue, "cost": cost}
+        _write_scaled_report(out)
+        return out
+    finally:
+        if own:
+            con.close()
+
+
+_SCALED_MARKER = "\n## S1. Scaled injection run (dissertation-grade)"
+
+
+def _write_scaled_report(out: dict) -> None:
+    """Append (idempotently) the scaled section to the report — truncates any prior
+    scaled section first, so re-runs don't duplicate. The N=4 smoke sections above stay
+    as the quick self-test; this is what the Results chapter cites."""
+    base = REPORT_MD.read_text().split(_SCALED_MARKER)[0] if REPORT_MD.exists() else ""
+    d = out["detection"]
+    o = d["overall"]
+    lines = [
+        base.rstrip(),
+        _SCALED_MARKER.strip() + "\n",
+        f"The N=4 smoke run above is a plumbing self-test; **this** is the citable run. "
+        f"The injection oracle is expanded to a **venue × kind × magnitude × onset × "
+        f"fold × direction grid** (**N={out['n_injections']}** injections), exhaustive "
+        "and deterministic (no RNG → no seed needed for Part A). Precision is judged on "
+        "injection-attributable items; real-window background feeds the fatigue rate.\n",
+        "### S2. Detection (Wilson 95% CIs)\n",
+        f"**Overall** (N={o['n']}): recall **{_f(o['recall'])}** {_ci(o['recall_ci'])}, "
+        f"precision {_f(o['precision'])}, F1 {_f(o['f1'])}.\n",
+        "| By kind | N | Recall | 95% CI | Precision | F1 |",
+        "|---|---|---|---|---|---|",
+    ]
+    for k, c in d["by_kind"].items():
+        lines.append(f"| {k} | {c['n']} | {_f(c['recall'])} | {_ci(c['recall_ci'])} | "
+                     f"{_f(c['precision'])} | {_f(c['f1'])} |")
+    lines += ["\n| By venue | N | Recall | 95% CI | Precision | F1 |", "|---|---|---|---|---|---|"]
+    for v, c in d["by_venue"].items():
+        lines.append(f"| {v} | {c['n']} | {_f(c['recall'])} | {_ci(c['recall_ci'])} | "
+                     f"{_f(c['precision'])} | {_f(c['f1'])} |")
+    lines += [
+        "\n### S3. Sensitivity curve — catch rate vs event magnitude (the headline)\n",
+        "How subtle an event the brain catches before it misses. The **near-threshold** "
+        "row (smallest magnitude) is the honest hard case; a large-only detector would "
+        "still score 1.0 on easy injections.\n",
+    ]
+    for k, per_venue in d["sensitivity"].items():
+        for v, curve in per_venue.items():
+            lines.append(f"**{k} · {v}**\n")
+            lines.append("| magnitude | catch rate | N | 95% CI |")
+            lines.append("|---|---|---|---|")
+            for pt in curve:
+                unit = "doc" if k == "stock_drawdown" else "z"
+                lines.append(f"| {unit}={pt['mag']:g} | {_f(pt['rate'])} | {pt['n']} | {_ci(pt['ci'])} |")
+            lines.append("")
+    lines += ["**Near-threshold operating points** (the hard case):\n",
+              "| kind / venue | magnitude | catch rate | N | 95% CI |", "|---|---|---|---|---|"]
+    for name, pt in d["near_threshold"].items():
+        lines.append(f"| {name} | {pt['mag']:g} | {_f(pt['rate'])} | {pt['n']} | {_ci(pt['ci'])} |")
+    lines += ["\n### S4. Regime/exo detection latency by magnitude bin\n",
+              "| magnitude bin | N | median delay (d) | IQR | min–max |", "|---|---|---|---|---|"]
+    for b, s in out["latency"].items():
+        lines.append(f"| {b} | {s['n']} | {s['median']:g} | [{s['q1']:g}, {s['q3']:g}] | "
+                     f"{s['min']}–{s['max']} |")
+    if not out["latency"]:
+        lines.append("| (no regime/exo events surfaced with a change-point onset) | | | | |")
+    r = out["ranking"]
+    lines += [
+        f"\n### S5. Ranking across many multi-event days\n",
+        f"Over **N={r['n_days']}** synthetic multi-event days (one per usable fold per "
+        f"net-sales venue): mean NDCG **{_f(r['ndcg_mean'])}**, mean Spearman "
+        f"**{_f(r['spearman_mean'])}** (a shift should rank above a coincident spike).\n",
+        "### S6. Alert fatigue + cost (scaled corpus)\n",
+        f"False-alarm upper bound **{out['fatigue']['per_week_upper_bound']}/week**. "
+        "Cost = ratio·misses + 1·false-alarms:\n",
+        "| miss : false-alarm | misses | false-alarms | weighted cost | dominant |",
+        "|---|---|---|---|---|",
+    ]
+    for c in out["cost"]:
+        lines.append(f"| {c['miss_to_false_alarm']:g} : 1 | {c['misses']} | {c['false_alarms']} | "
+                     f"{c['weighted_cost']} | {c['dominant']} |")
+    lines += [
+        "\n### S7. Caveats (honest small-N)\n",
+        "- **Two River Taps** is closed (active to 2026-05-08); only PRE-closure folds "
+        "are injected, so its N is smaller and post-closure behaviour is out of scope.",
+        "- **Ellel** is booking-driven and sparse: its residual stream leaves a single "
+        "short held-out fold, too short to test a sustained shift, so it is **spike-only** "
+        "and flagged small-N — not a detector failure, a data limit.",
+        "- Sensitivity cells with small N carry wide Wilson intervals by construction; "
+        "read the interval, not the point estimate.\n",
+    ]
+    REPORT_MD.write_text("\n".join(lines))
+
+
 # --- The two named probes (spec §6) ------------------------------------------
 
 def aged_regime_shift_probe() -> dict:
@@ -588,6 +900,13 @@ def _ci(pair) -> str:
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser(description="Agent evaluation (briefing usefulness)")
+    ap.add_argument("--scaled", action="store_true",
+                    help="run the full venue×kind×magnitude×onset×fold×direction grid "
+                         "(the dissertation-grade run) and extend the report")
+    args = ap.parse_args()
+
     print("Agent evaluation · briefing usefulness (offline oracle + anchor + judge)")
     r = run()
     d = r.detection
@@ -604,6 +923,14 @@ def main() -> int:
           f"inflation x{r.sparse_probe['score_inflation_x']}")
     print(f"  judge       : {r.judge['mode']} (model {r.judge['model']})")
     _write_report(r)
+    if args.scaled:
+        print("  scaled run  : building the full grid ...")
+        s = run_scaled()
+        sd = s["detection"]["overall"]
+        print(f"  scaled      : N={s['n_injections']} injections; "
+              f"recall {_f(sd['recall'])} {_ci(sd['recall_ci'])}, precision {_f(sd['precision'])}")
+        for name, pt in s["detection"]["near_threshold"].items():
+            print(f"    near-threshold {name}: rate {_f(pt['rate'])} (mag {pt['mag']:g}, N {pt['n']})")
     print(f"  report      : {REPORT_MD}")
     ok = np.isfinite(d["f1"]) and d["n_truths"] > 0
     print(f"AGENT-EVAL RESULT: {'PASS' if ok else 'FAIL'} "
