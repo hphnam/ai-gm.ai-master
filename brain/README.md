@@ -89,6 +89,7 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 | A13 | sustained regime-shift detection (CUSUM + persistence + BOCPD) on the conformal residual stream; TRT closure recovered as ground truth; attribution against the A14 seam |
 | briefing | capstone synthesis: composes the four signals into one ranked, de-duplicated, attributed daily feed with new/continuing/resolved status; honesty gates (template checklist excluded, sparse baseline down-weighted, closed venue quiet); no new detection maths |
 | agent-eval | briefing USEFULNESS (not accuracy): a synthetic-injection oracle (detection P/R/F1, ranking NDCG/Spearman, attribution top-1 + honest-null, latency), a human-labelled anchor (`eval_labels`), and an LLM-judge calibrated to it (kappa, pre-registered threshold); Ask-F1 cost sweep + two named probes; leakage-guarded, small-N with CIs; read-only, offline (`PRJ93_Agent_Eval_Report.md`) |
+| agent-eval (scaled) | `--scaled`: a venue×kind×magnitude×onset×fold×direction injection grid (N=644) → the **sensitivity curve** (catch rate vs event size, near-threshold operating point) with Wilson CIs, a latency-vs-magnitude distribution, and ranking over many multi-event days; plus a stratified day sampler + two-pass labelling instrument (`eval.labels --sample/--label`) and judge calibration over labelled days (`PRJ93_Scaled_Eval_Report.md`) |
 | A10 | every endpoint returns JSON; `/docs` served; warm latency < 500ms |
 
 ## Store layout
