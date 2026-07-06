@@ -189,9 +189,13 @@ def build_corpus(con) -> list[Injection]:
 
 def _clean(inj_s: Injection, con) -> Injection:
     """The same held-out window with the injection removed — the background the
-    briefing would surface anyway."""
-    return Injection(inj_s.venue, inj_s.as_of, "clean",
-                     inject.base_stream(inj_s.venue, con=con), [])
+    briefing would surface anyway. Truncated at the fold's as-of so its deviation
+    tail-scan and change-point set align with the (fold-truncated) injected stream,
+    not the dataset end — otherwise non-final-fold background is not subtracted and
+    precision is understated."""
+    full = inject.base_stream(inj_s.venue, con=con)
+    fold = full[full["date"] <= pd.Timestamp(inj_s.as_of)].reset_index(drop=True)
+    return Injection(inj_s.venue, inj_s.as_of, "clean", fold, [])
 
 
 def detection_metrics(corpus: list[Injection], con) -> dict:
@@ -483,7 +487,9 @@ def scaled_detection(records: list[dict]) -> dict:
                 curve.append({"mag": m, "rate": cell["recall"], "n": cell["n"], "ci": cell["recall_ci"]})
             sensitivity[k][v] = curve
             if curve:
-                near_threshold[f"{k}/{v}"] = curve[0]   # smallest magnitude = the hard case
+                # The hard case is the mildest event: smallest |z| for a shift/spike,
+                # but the LARGEST days-of-cover for stock (closest to still-in-cover).
+                near_threshold[f"{k}/{v}"] = curve[-1] if k == "stock_drawdown" else curve[0]
     return {"overall": overall, "by_kind": by_kind, "by_venue": by_venue,
             "sensitivity": sensitivity, "near_threshold": near_threshold}
 
@@ -540,9 +546,7 @@ def run_scaled(con=None) -> dict:
             for inj_s in corpus:
                 key = (inj_s.venue, str(inj_s.as_of))
                 if key not in clean_cache:
-                    clean_stream = inject.base_stream(inj_s.venue, con=con)
-                    clean_cache[key] = {it.item_key for it in surface(
-                        Injection(inj_s.venue, inj_s.as_of, "clean", clean_stream, []), con)}
+                    clean_cache[key] = {it.item_key for it in surface(_clean(inj_s, con), con)}
                 records.append(_score_injection(inj_s, con, clean_cache[key]))
             detection = scaled_detection(records)
             latency = latency_distribution(records)

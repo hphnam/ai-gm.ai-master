@@ -215,6 +215,28 @@ every metric reported with its N and interval.
 
 ## 7. Review gate
 
-`code-reviewer` and `security-reviewer` ran over the scaled grid, the aggregation maths,
-the sampler, and the labelling instrument. Findings and resolutions are recorded at close
-of build; any HIGH/MEDIUM was surfaced and fixed before declaring complete.
+`code-reviewer` and `security-reviewer` ran in parallel over the scaled grid, the
+aggregation maths, the sampler, and the labelling instrument.
+
+- **security — no findings**: every DuckDB statement is parameterised (including the
+  free-text `missing::` label and notes); the layer is read-only except the dedicated
+  `eval_labels` table; `_StubAttribution` restores the real `attribute` even on exception;
+  the judge surface stays triple-gated; `LIVE_INGEST` untouched.
+- **code — no HIGH; 1 MEDIUM + 1 LOW, both fixed**:
+  - **MEDIUM (precision understated) — fixed.** The scaled clean-baseline was surfaced over
+    the *full* stream while the injected streams are fold-truncated, so for non-final folds
+    genuine background inside the fold window was not subtracted and was miscounted as
+    spurious — understating **precision** in the cited run (recall, the sensitivity curve,
+    latency, and ranking were unaffected). Fixed by truncating the clean baseline at the
+    fold's as-of (`_clean`), and, for consistency, truncating the stock injection's stream
+    to the fold too. Overall precision corrected **0.68 → 0.87** (spike 0.51 → 0.87); the
+    headline recall/sensitivity numbers are unchanged.
+  - **LOW (near-threshold semantics) — fixed.** The "near-threshold operating point" picked
+    the smallest magnitude, which for stock (`days_of_cover`) is the *most* out-of-cover
+    (easiest), not the hardest; now the hard end is per kind (smallest |z| for shifts, the
+    largest days-of-cover for stock).
+  - Verified clean by the reviewer: `_StubAttribution` cannot change any scaled result (no
+    metric reads the attribution reason), no leaked patch, `sample_days` determinism, the
+    closure fold-filter, and the `_cell`/latency maths.
+
+No blocking findings remain; the full suite (**207**) is green after the fixes.
