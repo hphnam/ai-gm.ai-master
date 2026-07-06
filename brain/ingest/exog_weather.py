@@ -119,9 +119,16 @@ _FETCH = {"observed": fetch_observed, "hindcast": fetch_hindcast,
           "leadmatched": fetch_leadmatched}
 
 
+_COLS = ["date", "cell", "exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs"]
+
+
 def build(force: bool = False) -> dict:
-    """Pull every basis for every cell and persist. Skips a (basis) table that is
-    already populated unless force=True (weather is immutable history)."""
+    """Pull every basis for every cell and persist. INCREMENTAL by default: an
+    already-populated basis table is EXTENDED per cell from its current max date to
+    the store's data max, never skipped (weather is immutable history, but the span
+    grows as closed days land). `force=True` is the repair hatch: full drop and
+    rebuild. The required span end is the store's L1 data max (via `_cell_span`), not
+    a fixed constant, so `_auto_exog` genuinely carries new dates into the seam."""
     cells = sorted(set(WEATHER_CELLS.values()))
     spans = {cell: _cell_span(cell) for cell in cells}  # read-only, before write conn
     con = connect()
@@ -132,24 +139,113 @@ def build(force: bool = False) -> dict:
             exists = con.execute(
                 "SELECT 1 FROM information_schema.tables WHERE table_name=?",
                 [table]).fetchone()
-            if exists and not force:
-                n = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-                summary[basis] = {"rows": n, "cached": True}
+            if not exists or force:
+                frames = [_FETCH[basis](cell, *spans[cell]) for cell in cells]
+                df = pd.concat(frames, ignore_index=True)
+                con.execute(f"DROP TABLE IF EXISTS {table}")
+                con.register("_w", df)
+                con.execute(f"CREATE TABLE {table} AS SELECT * FROM _w")
+                con.unregister("_w")
+                summary[basis] = {"rows": len(df), "added": len(df), "cached": False,
+                                  "mode": "rebuild", "cells": cells}
                 continue
-            frames = []
+            # Incremental: extend each cell to its required span end.
+            added, pulled = 0, {}
             for cell in cells:
                 start, end = spans[cell]
-                frames.append(_FETCH[basis](cell, start, end))
-            df = pd.concat(frames, ignore_index=True)
-            con.execute(f"DROP TABLE IF EXISTS {table}")
-            con.register("_w", df)
-            con.execute(f"CREATE TABLE {table} AS SELECT * FROM _w")
-            con.unregister("_w")
-            summary[basis] = {"rows": len(df), "cached": False,
-                              "cells": cells, "span": (start, end)}
+                cur = con.execute(
+                    f"SELECT MAX(date) FROM {table} WHERE cell=?", [cell]).fetchone()[0]
+                if cur is None:
+                    gap_start = start
+                else:
+                    cur_d = pd.Timestamp(cur)
+                    if cur_d.date() >= pd.Timestamp(end).date():
+                        continue
+                    gap_start = str((cur_d + pd.Timedelta(days=1)).date())
+                df = _FETCH[basis](cell, gap_start, end)
+                if cur is not None:
+                    df = df[df["date"] > pd.Timestamp(cur)]
+                if df.empty:
+                    continue
+                con.register("_w", df)
+                con.execute(
+                    f"INSERT INTO {table} ({', '.join(_COLS)}) "
+                    f"SELECT {', '.join(_COLS)} FROM _w")
+                con.unregister("_w")
+                added += len(df)
+                pulled[cell] = (gap_start, end)
+            total = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            summary[basis] = {"rows": total, "added": added, "cached": added == 0,
+                              "mode": "incremental", "pulled": pulled}
     finally:
         con.close()
     return summary
+
+
+def coverage(con=None) -> dict:
+    """Per-basis, per-cell max covered date. `{basis: {cell: date|None}}`."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        out: dict = {}
+        for basis in BASES:
+            table = _TABLE[basis]
+            exists = con.execute(
+                "SELECT 1 FROM information_schema.tables WHERE table_name=?",
+                [table]).fetchone()
+            if not exists:
+                out[basis] = {}
+                continue
+            rows = con.execute(f"SELECT cell, MAX(date) FROM {table} GROUP BY cell").fetchall()
+            out[basis] = {c: (pd.Timestamp(m).date() if m is not None else None)
+                          for c, m in rows}
+        return out
+    finally:
+        if own:
+            con.close()
+
+
+def _required_ends(con) -> dict:
+    """Per-cell required weather coverage end = the store's L1 data max across the
+    venues that share the cell (the honest 'new date span' end)."""
+    out: dict = {}
+    for cell in sorted(set(WEATHER_CELLS.values())):
+        ms = []
+        for v in FORECAST_VENUES:
+            if WEATHER_CELLS[v] != cell:
+                continue
+            r = con.execute("SELECT MAX(date) FROM l1_daily WHERE venue=?", [v]).fetchone()[0]
+            if r is not None:
+                ms.append(pd.Timestamp(r).date())
+        out[cell] = max(ms) if ms else None
+    return out
+
+
+def weather_gap(con=None) -> list:
+    """Structured coverage gap: one entry per (basis, cell) whose weather does not
+    reach the store's data max. Empty list means every basis covers the new span.
+    This is the loud, visible state B3 requires, in place of a swallowed skip."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        cov = coverage(con)
+        req = _required_ends(con)
+        gaps = []
+        for basis in BASES:
+            for cell, need in req.items():
+                if need is None:
+                    continue
+                have = cov.get(basis, {}).get(cell)
+                if have is None or have < need:
+                    gaps.append({
+                        "basis": basis, "cell": cell,
+                        "covered_through": have.isoformat() if have else None,
+                        "required_through": need.isoformat(),
+                    })
+        return gaps
+    finally:
+        if own:
+            con.close()
 
 
 def read_basis(basis: str, con=None) -> pd.DataFrame:
@@ -178,7 +274,8 @@ def main() -> int:
     ok = True
     for basis in BASES:
         s = summary[basis]
-        tag = "cached" if s.get("cached") else f"pulled {s.get('span')}"
+        tag = ("cached (covers span)" if s.get("cached")
+               else f"{s.get('mode', 'rebuild')} +{s.get('added', s['rows'])} rows")
         print(f"  {basis:12s} rows={s['rows']:5d}  {tag}")
         ok = ok and s["rows"] > 0
     # Sanity: observed and hindcast must differ somewhere (a forecast is not ERA5).
