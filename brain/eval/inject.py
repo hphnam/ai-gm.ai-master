@@ -169,8 +169,10 @@ def inject_stock_drawdown(venue: str, con=None, *, days_of_cover: float = 0.0,
                   "suggested_order_kegs": 2.0, "as_of": onset.date().isoformat()})
     truth = TruthRecord(venue, "stock_drawdown", onset.date(), "down", float(days_of_cover),
                         None, relevance=2.0)
-    return Injection(venue, onset.date(), "stock_drawdown", stream, [truth], stock=[sig],
-                     train_end=train["date"].max().date())
+    # Truncate the stream at the fold end (like the z-kinds via _reassemble), so it
+    # ends at `onset`/as_of and the clean-baseline diff aligns per fold.
+    return Injection(venue, onset.date(), "stock_drawdown", _reassemble(stream, test),
+                     [truth], stock=[sig], train_end=train["date"].max().date())
 
 
 def inject_exo_coincident(venue: str, con=None, *, direction: str = "down",

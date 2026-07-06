@@ -101,18 +101,18 @@ The N=4 smoke run above is a plumbing self-test; **this** is the citable run. Th
 
 ### S2. Detection (Wilson 95% CIs)
 
-**Overall** (N=644): recall **0.803** [0.77, 0.83], precision 0.681, F1 0.737.
+**Overall** (N=644): recall **0.803** [0.77, 0.83], precision 0.870, F1 0.835.
 
 | By kind | N | Recall | 95% CI | Precision | F1 |
 |---|---|---|---|---|---|
-| exo_coincident | 84 | 0.988 | [0.94, 1.00] | 0.744 | 0.849 |
-| regime_shift | 252 | 0.996 | [0.98, 1.00] | 0.781 | 0.876 |
-| spike | 288 | 0.566 | [0.51, 0.62] | 0.513 | 0.538 |
+| exo_coincident | 84 | 0.988 | [0.94, 1.00] | 0.827 | 0.900 |
+| regime_shift | 252 | 0.996 | [0.98, 1.00] | 0.877 | 0.933 |
+| spike | 288 | 0.566 | [0.51, 0.62] | 0.869 | 0.685 |
 | stock_drawdown | 20 | 1.000 | [0.84, 1.00] | 1.000 | 1.000 |
 
 | By venue | N | Recall | 95% CI | Precision | F1 |
 |---|---|---|---|---|---|
-| beer_hall | 356 | 0.815 | [0.77, 0.85] | 0.605 | 0.695 |
+| beer_hall | 356 | 0.815 | [0.77, 0.85] | 0.921 | 0.865 |
 | ellel | 36 | 0.639 | [0.48, 0.78] | 0.550 | 0.591 |
 | two_river_taps | 252 | 0.810 | [0.76, 0.85] | 0.833 | 0.821 |
 
@@ -218,7 +218,7 @@ How subtle an event the brain catches before it misses. The **near-threshold** r
 | spike/beer_hall | 1 | 0.375 | 24 | [0.21, 0.57] |
 | spike/ellel | 1 | 0.500 | 6 | [0.19, 0.81] |
 | spike/two_river_taps | 1 | 0.333 | 18 | [0.16, 0.56] |
-| stock_drawdown/beer_hall | -2 | 1.000 | 4 | [0.51, 1.00] |
+| stock_drawdown/beer_hall | 2 | 1.000 | 4 | [0.51, 1.00] |
 
 ### S4. Regime/exo detection latency by magnitude bin
 
