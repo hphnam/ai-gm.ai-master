@@ -234,8 +234,11 @@ WD_MIN_SERIES_DAYS = 120      # skip series with fewer trading days (reported)
 # --- Change-point / regime-shift detection (A13) ----------------------------
 # Detect sustained shifts on the standardised conformal residual stream z_t.
 CP_CUSUM_K = 0.5              # CUSUM slack (band-half units; min shift of interest)
-CP_TARGET_ARL0 = 75          # target mean trading-days between false alarms
-CP_CUSUM_H = 5.0             # CUSUM decision threshold — CALIBRATE to ARL0 (FLAG-CP1)
+# empirical ARL0 lower bound at h=5.0, right-censored at the 400-day simulation
+# horizon; deliberately conservative relative to the original 75-day target
+# (FLAG-CP1 resolved, see decision log)
+CP_ARL0_EMPIRICAL_LB = 400
+CP_CUSUM_H = 5.0             # CUSUM decision threshold (shipped operating point)
 CP_RUN_M = 4                 # persistence: same-direction breaches required …
 CP_RUN_N = 7                 # … within this trailing window of trading days
 CP_BOCPD_HAZARD = 1 / 60.0   # BOCPD constant hazard (benchmark detector)

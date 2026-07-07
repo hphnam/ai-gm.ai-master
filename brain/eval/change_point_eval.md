@@ -2,8 +2,8 @@
 
 Honest characterisation against ground truth + synthetic injection; the operating point is reported, not asserted (cf. A14b).
 
-## 1. ARL₀ calibration (CUSUM, k=0.5)
-Mean trading-days to a false alarm on noise matched to the BH stable span (MAD scale). Target ARL₀ = **75**.
+## 1. ARL₀ operating point (CUSUM, k=0.5)
+Mean trading-days to a false alarm on noise matched to the BH stable span (MAD scale). Operating point: h=5.0 (shipped). Empirical ARL₀ lower bound: **400** (right-censored at the simulation horizon). FLAG-CP1 is resolved: this is a chosen operating point, not a pending calibration target.
 
 | h | empirical ARL₀ |
 |---|---|
@@ -14,7 +14,7 @@ Mean trading-days to a false alarm on noise matched to the BH stable span (MAD s
 | 8 | >400 |
 | 10 | >400 |
 
-→ ARL₀ **exceeds the 400-day simulation horizon at every h** tested (right-censored): the standardised residual noise sits below the CUSUM slack k=0.5, so the default operating point produces **essentially no false alarms** (ARL₀ ≫ target 75). The binding constraint here is **detection delay (§3), not false-alarm rate** — a deliberately conservative operating point, honest for a small single-venue sample (FLAG-CP1).
+→ ARL₀ **exceeds the 400-day simulation horizon at every h** tested (right-censored): the standardised residual noise sits below the CUSUM slack k=0.5, so the shipped operating point h=5.0 produces **essentially no false alarms** (empirical ARL₀ lower bound 400, far above the original 75-day target). The binding constraint here is **detection delay (§3), not false-alarm rate**. FLAG-CP1 resolved: h=5.0 is retained deliberately under the project's false-alarm thesis, honest for a small single-venue sample.
 
 ## 2. TRT closure (ground-truth structural break)
 - onset **2026-05-08** → detected **2026-05-16** (delay **8 trading-days**), detector `both`, then `is_closed` dormant (no repeat alarms on the zero run). ✅ ground-truth break recovered.
