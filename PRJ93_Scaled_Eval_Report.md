@@ -95,6 +95,20 @@ persistence detector to accumulate enough evidence. The curve, not a single numb
 and Spearman **1.000** — a sustained shift is ranked above a coincident one-day spike
 every time. **Fatigue** upper bound **0.667 surfaced items/week** on un-injected windows.
 
+### 2.1 VUS-PR detector-level supplement (WP5)
+
+The system-level battery above remains the headline: fixed-threshold detectors and
+discrete surfaced events, which is what a manager actually receives. VUS-PR is added as a
+detector-level supplement on the continuous z score, so the chapter's lag-tolerant,
+random-robust commitment is met in the letter as well as the spirit. It is computed per
+(kind, venue) by the pinned TSB-AD library (VUS fallback), min-max-scaled abs(z) as the
+score and injected event days as the label (regime/exo: onset to window end; spike: the
+single day; stock_drawdown excluded, as it has no z signature). The metric is never
+reimplemented by hand. The table lands in §S6b of
+[PRJ93_Agent_Eval_Report.md](PRJ93_Agent_Eval_Report.md); in this environment neither
+TSB-AD nor the VUS fallback builds on the Python 3.14 venv, so §S6b records the supplement
+as "not computed, dependency unavailable" rather than approximating it.
+
 ---
 
 ## 3. Part B — the labelling protocol

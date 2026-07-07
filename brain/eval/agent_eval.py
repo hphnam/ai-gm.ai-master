@@ -535,6 +535,59 @@ def scaled_ranking(con) -> dict:
             "spearman_mean": float(np.mean(finite)) if finite else float("nan")}
 
 
+def _load_vus_get_metrics():
+    """Return (get_metrics, source) from the pinned TSB-AD library, or the pinned
+    VUS fallback, or (None, reason). The VUS-PR metric is never reimplemented
+    locally; if neither library is importable the supplement reports as not
+    computed (spec S2/WP5)."""
+    try:
+        from TSB_AD.evaluation.metrics import get_metrics
+        return get_metrics, "TSB-AD"
+    except Exception:
+        pass
+    try:
+        from vus.metrics import get_metrics
+        return get_metrics, "VUS (TheDatumOrg/VUS)"
+    except Exception:
+        return None, "not computed, dependency unavailable"
+
+
+def vus_pr_supplement(corpus: list[Injection]) -> dict:
+    """Detector-level VUS-PR on the continuous z score, per (kind, venue) (spec WP5).
+
+    For each injected window: score = min-max scaled abs(z) over the window;
+    label = 1 on injected event days (regime_shift/exo_coincident: onset to window
+    end; spike: the single day). stock_drawdown is skipped (no z signature). The
+    metric comes from the pinned library via get_metrics(score, label,
+    slidingWindow=7); it is never approximated by hand.
+    """
+    get_metrics, source = _load_vus_get_metrics()
+    if get_metrics is None:
+        return {"available": False, "source": source, "by_cell": {}}
+    cells: dict[tuple[str, str], list[float]] = {}
+    for inj_s in corpus:
+        if inj_s.kind == "stock_drawdown":
+            continue
+        window = inj_s.stream[inj_s.stream["date"] > pd.Timestamp(inj_s.train_end)]
+        z = np.abs(window["z"].to_numpy(float))
+        if z.size == 0:
+            continue
+        rng = float(z.max() - z.min())
+        score = (z - z.min()) / rng if rng > 0 else np.zeros_like(z)
+        dates = window["date"].to_numpy()
+        onset = np.datetime64(pd.Timestamp(inj_s.truth[0].onset))
+        label = ((dates == onset) if inj_s.kind == "spike"
+                 else (dates >= onset)).astype(int)
+        if label.sum() == 0 or label.sum() == label.size:
+            continue  # get_metrics needs both classes present in the window
+        m = get_metrics(score, label, slidingWindow=7)
+        vus_pr = float(m["VUS-PR"] if isinstance(m, dict) else m)
+        cells.setdefault((inj_s.kind, inj_s.venue), []).append(vus_pr)
+    by_cell = {f"{k}/{v}": {"vus_pr": float(np.mean(vals)), "n": len(vals)}
+               for (k, v), vals in sorted(cells.items())}
+    return {"available": True, "source": source, "by_cell": by_cell}
+
+
 def run_scaled(con=None) -> dict:
     """The dissertation-grade run: the full grid, aggregated with Wilson intervals, the
     sensitivity curve, the latency distribution, and ranking across many multi-event
@@ -556,8 +609,9 @@ def run_scaled(con=None) -> dict:
             ranking = scaled_ranking(con)
             fatigue = fatigue_metrics(con)
         cost = cost_curve({"fn": sum(1 for r in records if not r["caught"])}, fatigue)
+        vus_pr = vus_pr_supplement(corpus)
         out = {"n_injections": len(records), "detection": detection, "latency": latency,
-               "ranking": ranking, "fatigue": fatigue, "cost": cost}
+               "ranking": ranking, "fatigue": fatigue, "cost": cost, "vus_pr": vus_pr}
         _write_scaled_report(out)
         return out
     finally:
@@ -566,6 +620,29 @@ def run_scaled(con=None) -> dict:
 
 
 _SCALED_MARKER = "\n## S1. Scaled injection run (dissertation-grade)"
+
+
+def _vus_pr_section(vus: dict) -> list[str]:
+    """WP5 detector-level VUS-PR supplement. States the metric per (kind, venue)
+    when the pinned library computed it, otherwise records it as not computed
+    (never approximated by hand)."""
+    head = ["\n### S6b. VUS-PR (detector-level supplement, continuous z score)\n",
+            "The system-level battery above remains the headline (fixed-threshold "
+            "detectors, discrete surfaced events). VUS-PR is a lag-tolerant, "
+            "random-robust supplement on the continuous z score, computed by the "
+            "pinned TSB-AD library (VUS fallback), never reimplemented here.\n"]
+    if not vus or not vus.get("available"):
+        reason = vus.get("source", "not computed, dependency unavailable") if vus else \
+            "not computed, dependency unavailable"
+        return head + [f"**VUS-PR: {reason}.** Install `TSB-AD` (or the pinned "
+                       "`vus` fallback) from requirements-eval.txt to populate this "
+                       "table; the metric is deliberately not approximated by hand."]
+    head.append(f"Source library: **{vus['source']}**. stock_drawdown is excluded "
+                "(no z signature).\n")
+    head += ["| kind / venue | VUS-PR | N windows |", "|---|---|---|"]
+    for name, cell in vus["by_cell"].items():
+        head.append(f"| {name} | {cell['vus_pr']:.3f} | {cell['n']} |")
+    return head
 
 
 def _write_scaled_report(out: dict) -> None:
@@ -637,6 +714,7 @@ def _write_scaled_report(out: dict) -> None:
     for c in out["cost"]:
         lines.append(f"| {c['miss_to_false_alarm']:g} : 1 | {c['misses']} | {c['false_alarms']} | "
                      f"{c['weighted_cost']} | {c['dominant']} |")
+    lines += _vus_pr_section(out.get("vus_pr", {}))
     lines += [
         "\n### S7. Caveats (honest small-N)\n",
         "- **Two River Taps** is closed (active to 2026-05-08); only PRE-closure folds "

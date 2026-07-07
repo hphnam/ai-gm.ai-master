@@ -243,6 +243,12 @@ False-alarm upper bound **0.667/week**. Cost = ratio·misses + 1·false-alarms:
 | 5 : 1 | 127 | 8 | 643.0 | misses |
 | 10 : 1 | 127 | 8 | 1278.0 | misses |
 
+### S6b. VUS-PR (detector-level supplement, continuous z score)
+
+The system-level battery above remains the headline (fixed-threshold detectors, discrete surfaced events). VUS-PR is a lag-tolerant, random-robust supplement on the continuous z score, computed by the pinned TSB-AD library (VUS fallback), never reimplemented here.
+
+**VUS-PR: not computed, dependency unavailable.** Install `TSB-AD` (or the pinned `vus` fallback) from requirements-eval.txt to populate this table; the metric is deliberately not approximated by hand.
+
 ### S7. Caveats (honest small-N)
 
 - **Two River Taps** is closed (active to 2026-05-08); only PRE-closure folds are injected, so its N is smaller and post-closure behaviour is out of scope.
