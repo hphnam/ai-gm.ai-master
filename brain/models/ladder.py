@@ -51,6 +51,7 @@ from config import (
 )
 from eval import harness
 from features.build_features import build_features, feature_columns
+from models.foundation import CHRONOS_MODEL_ID, HAS_CHRONOS, chronos_bolt_predict
 from store.active_span import active_trading_end, is_closed, trim_to_active
 
 warnings.filterwarnings("ignore")
@@ -270,6 +271,13 @@ PREDICTORS: list[tuple[str, int, object, bool]] = [
     ("rung3_gbm", 3, rung3_gbm, True),
 ]
 
+# WP4: Rung-4 Chronos-Bolt zero-shot participates as a first-class predictor when
+# the backend is installed, so it climbs the same gate as every other rung and is
+# subject to the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the
+# list is unchanged, so the ladder is byte-identical to its pre-Rung-4 behaviour.
+if HAS_CHRONOS:
+    PREDICTORS.append(("rung4_chronos_bolt", 4, chronos_bolt_predict, True))
+
 
 def _predict_all(
     venue: str, train: pd.DataFrame, target: pd.DataFrame, cols: list[str],
@@ -342,7 +350,8 @@ def evaluate_static(venue: str = ANCHOR_VENUE):
                 name, rung,
                 metrics=harness.point_metrics(yte, preds, ytr, season=SEASONAL_PERIOD),
                 predictions=preds))
-    results.append(_rung4_foundation())
+    if not HAS_CHRONOS:
+        results.append(_rung4_foundation())
     return results, split, cols
 
 
@@ -380,7 +389,8 @@ def evaluate_rolling(
         else:
             results.append(RungResult(name, rung, available=False,
                                       note=notes.get(name, "")))
-    results.append(_rung4_foundation())
+    if not HAS_CHRONOS:
+        results.append(_rung4_foundation())
     return results, len(folds)
 
 
@@ -437,6 +447,39 @@ def _table(results: list[RungResult], cols: tuple[str, ...]) -> list[str]:
             rows.append(f"| {r.rung} | {r.name} | " + " | ".join("–" for _ in cols)
                         + f" | {r.note} |")
     return rows
+
+
+def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
+    """WP4: state the Rung-4 zero-shot outcome strictly by the gate. Returns []
+    when the chronos backend is absent (no rung4_chronos_bolt result), so the
+    report is byte-identical to the pre-Rung-4 ladder."""
+    by = {r.name: r for r in rolling_res}
+    r4 = by.get("rung4_chronos_bolt")
+    if r4 is None:
+        return []
+    head = f"\n## Rung 4: Chronos-Bolt zero-shot ({CHRONOS_MODEL_ID})"
+    if not r4.metrics:
+        return [head, f"Rung 4 evaluated zero-shot ({CHRONOS_MODEL_ID}, pinned); "
+                f"not scored on this venue ({r4.note})."]
+    naive, dow, gbm = (by.get("rung0_seasonal_naive"), by.get("rung1_robust_dow"),
+                       by.get("rung3_global_gbm"))
+    m4 = r4.metrics["MASE"]
+    adopted = bool(naive and dow and m4 < naive.metrics["MASE"]
+                   and m4 < dow.metrics["MASE"])
+    reason = (f"it beats seasonal-naive ({naive.metrics['MASE']:.3f}) and robust "
+              f"DOW ({dow.metrics['MASE']:.3f}) on held-out rolling MASE" if adopted
+              else "it does not beat both seasonal-naive and robust DOW on "
+              "held-out rolling MASE")
+    if gbm and gbm.metrics:
+        beats = "beats" if m4 < gbm.metrics["MASE"] else "does not beat"
+        gbm_txt = (f" It {beats} rung3_global_gbm ({gbm.metrics['MASE']:.3f}), "
+                   "the Rung-4 adoption criterion.")
+    else:
+        gbm_txt = " rung3_global_gbm is unavailable on this venue for comparison."
+    return [head,
+            f"Rung 4 evaluated zero-shot ({CHRONOS_MODEL_ID}, pinned); "
+            f"{'adopted' if adopted else 'not adopted'} because {reason} "
+            f"(rolling MASE {m4:.3f}).{gbm_txt}"]
 
 
 def _write_report(
@@ -584,6 +627,7 @@ def _run_one(venue: str, layer: str) -> bool:
     passed, info = milestone(rolling_res, cap=MAX_RUNG.get(venue, 99))
     extra = (ets_prophet_diagnostic(venue) + spillover_importance(venue)
              if venue == ANCHOR_VENUE else [])
+    extra = extra + _rung4_report_lines(rolling_res)
     report_path = _write_report(
         venue, static_res, split, rolling_res, n_folds, passed, info, extra)
     if info:

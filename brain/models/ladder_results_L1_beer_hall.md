@@ -12,7 +12,7 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 | 2 | rung2_stl | 1.125 | 6 |  |
 | 3 | rung3_gbm | 0.927 | 6 |  |
 | 3 | rung3_global_gbm | 0.905 | 6 |  |
-| 4 | rung4_foundation | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
+| 4 | rung4_foundation | – | – | no foundation backend installed; adoption criterion: beats rung3_global_gbm on held-out rolling MASE (Tan et al. 2024 motivates scepticism toward unjustified backbones, but its ablations target LLM-backbone forecasters, not pretrained time-series models) — not evaluated. |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
 Test 2026-04-06 → 2026-05-31 (n=56). A stress test over a long static horizon.
@@ -26,7 +26,7 @@ Test 2026-04-06 → 2026-05-31 (n=56). A stress test over a long static horizon.
 | 2 | rung2_stl | 0.847 | 251.178 | 375.093 | 34.539 |  |
 | 3 | rung3_gbm | 0.852 | 252.862 | 425.985 | 46.050 |  |
 | 3 | rung3_global_gbm | 0.979 | 290.443 | 410.921 | 42.130 |  |
-| 4 | rung4_foundation | – | – | – | – | no foundation backend installed; Tan ablation: adopt only if it beats rung3_global_gbm — not evaluated. |
+| 4 | rung4_foundation | – | – | – | – | no foundation backend installed; adoption criterion: beats rung3_global_gbm on held-out rolling MASE (Tan et al. 2024 motivates scepticism toward unjustified backbones, but its ablations target LLM-backbone forecasters, not pretrained time-series models) — not evaluated. |
 
 ## Milestone (rolling regime)
 - gate: *beats seasonal-naive AND robust DOW*
