@@ -22,8 +22,16 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import ANCHOR_VENUE, CONFORMAL_LEVELS, STORE_DIR, TEST_WEEKS
+from config import (
+    ANCHOR_VENUE,
+    CONFORMAL_LEVELS,
+    SEASONAL_PERIOD,
+    STORE_DIR,
+    TEST_WEEKS,
+)
 from conformal.wrap import conformal_quantile
+from eval import harness
+from models.intermittent import croston_fitted, croston_sba
 from store.warehouse import connect, read_series, write_band, write_forecast
 
 MODELS_DIR = STORE_DIR.parent / "models_L2_L3"
@@ -164,6 +172,18 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
         Ybase[i], w[i] = _dow_median_forecast(node_series[node], test_dates)
         actual[i] = node_series[node].reindex(test_dates, fill_value=0.0).to_numpy()
 
+    # One conformal band source (node_q), used for coverage AND persistence.
+    node_q = node_quantiles(node_series, nodes, test_start)
+
+    # WP2: for intermittent L3 nodes (ADI >= 1.32), score croston_sba against the
+    # DOW-median base on the held-out block and adopt it per node only if it wins
+    # on MASE. Adoption overrides Ybase/w/node_q in place, so MinT and the band
+    # both use the winning forecaster. MinT coherence is unaffected (S unchanged).
+    from eval.intermittency_diagnostic import intermittent_nodes
+    intermittent = intermittent_nodes(venue, top_k)
+    croston_rows = _croston_comparison(
+        node_series, nodes, test_dates, test_start, intermittent, Ybase, w, node_q)
+
     recon = mint_reconcile(Ybase, S, w)
 
     # Coherence: venue row == Σ bottom rows; each category == Σ its bottoms.
@@ -176,9 +196,6 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
             cat_disc = max(cat_disc, float(np.max(np.abs(
                 recon[ci] - recon[members].sum(axis=0)))))
     coherent = max(venue_disc, cat_disc) < 1e-6
-
-    # One conformal band source (node_q), used for coverage AND persistence.
-    node_q = node_quantiles(node_series, nodes, test_start)
 
     def _coverage(node_list: list[str]) -> dict[float, float]:
         cov = {lvl: {"hit": 0, "tot": 0} for lvl in CONFORMAL_LEVELS}
@@ -212,7 +229,51 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
         "venue_disc": venue_disc, "cat_disc": cat_disc, "coherent": coherent,
         "l2_coverage": l2_coverage, "l3_coverage": l3_coverage,
         "keg": keg, "stock": stock, "test_dates": (test_dates.min(), test_dates.max()),
+        "croston": croston_rows,
     }
+
+
+def _croston_comparison(node_series, nodes, test_dates, test_start, intermittent,
+                        Ybase, w, node_q) -> list[dict]:
+    """WP2 evaluation-only path: croston_sba vs DOW-median per intermittent node.
+
+    Scores both base forecasters on the held-out TEST_WEEKS block (MAE + MASE,
+    same seasonal-naive denominator as elsewhere). Where SBA wins on MASE, adopts
+    it as that node's base forecast by overriding Ybase (fed to MinT and
+    persistence), w (the MinT trust weight), and node_q (the conformal band, so
+    the band is calibrated on the forecaster that produces the point). Returns one
+    comparison row per node for the report.
+    """
+    rows = []
+    for node in intermittent:
+        if node not in nodes:
+            continue
+        i = nodes.index(node)
+        s = node_series[node]
+        ytr = s[s.index < test_start].to_numpy(float)
+        y_true = s.reindex(test_dates, fill_value=0.0).to_numpy(float)
+        dow_pred = Ybase[i].copy()
+        cro_pred = np.full(len(test_dates), croston_sba(ytr, alpha=0.1), float)
+
+        mase_dow = harness.mase(y_true, dow_pred, ytr, SEASONAL_PERIOD)
+        mase_sba = harness.mase(y_true, cro_pred, ytr, SEASONAL_PERIOD)
+        adopt = bool(np.isfinite(mase_dow) and np.isfinite(mase_sba)
+                     and mase_sba < mase_dow)
+        if adopt:
+            Ybase[i] = cro_pred
+            resid = np.abs(ytr - croston_fitted(ytr, alpha=0.1, deflate=True))
+            resid = resid[np.isfinite(resid)]
+            if resid.size > 1:
+                w[i] = float(np.var(resid))
+                for lvl in CONFORMAL_LEVELS:
+                    node_q[(node, lvl)] = conformal_quantile(resid, lvl)
+        rows.append({
+            "node": node, "adopted": adopt,
+            "mae_dow": harness.mae(y_true, dow_pred),
+            "mae_sba": harness.mae(y_true, cro_pred),
+            "mase_dow": mase_dow, "mase_sba": mase_sba,
+        })
+    return rows
 
 
 def _read_stock_position() -> list[dict]:
@@ -282,6 +343,37 @@ def _persist(venue, nodes, recon, test_dates, node_q) -> None:
         con.close()
 
 
+def _croston_section(rows: list[dict]) -> list[str]:
+    if not rows:
+        return [
+            "\n## Intermittency: Croston/SBA vs DOW-median (WP2)",
+            "No non-OTHER L3 node classified as intermittent (ADI >= 1.32), so the "
+            "DOW-median base forecaster stands unchanged (see "
+            "eval/intermittency_diagnostic.md).",
+        ]
+
+    def fmt(x: float) -> str:
+        return "n/a" if not np.isfinite(x) else f"{x:.3f}"
+
+    n_adopt = sum(1 for r in rows if r["adopted"])
+    out = [
+        "\n## Intermittency: Croston/SBA vs DOW-median (WP2)",
+        "Intermittent L3 nodes (ADI >= 1.32) scored on the held-out TEST_WEEKS "
+        "block. croston_sba is adopted as a node's base forecast only when it "
+        "beats DOW-median on MASE (same seasonal-naive denominator); otherwise "
+        "DOW-median stands. MinT coherence is preserved either way.",
+        f"\n**{n_adopt} of {len(rows)}** intermittent nodes adopted croston_sba.\n",
+        "| Node | MASE DOW | MASE SBA | MAE DOW | MAE SBA | Adopted |",
+        "|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        out.append(
+            f"| {r['node']} | {fmt(r['mase_dow'])} | {fmt(r['mase_sba'])} | "
+            f"{fmt(r['mae_dow'])} | {fmt(r['mae_sba'])} | "
+            f"{'yes' if r['adopted'] else 'no'} |")
+    return out
+
+
 def _write_report(out: dict) -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -321,8 +413,9 @@ def _write_report(out: dict) -> None:
         "\nItem (L3) series are sparse and noisy, so their bands under-cover — "
         "an honest, expected limitation of conformal at this grain; category "
         "(L2) bands are tighter to nominal.",
-        "\n## Stock-consumption proxy",
     ]
+    lines += _croston_section(out.get("croston", []))
+    lines += ["\n## Stock-consumption proxy"]
     if out["keg"]:
         k = out["keg"]
         lines += [
@@ -373,6 +466,10 @@ def main() -> int:
     for lvl in CONFORMAL_LEVELS:
         print(f"  L2 band @{int(lvl*100)}%    : coverage={out['l2_coverage'][lvl]*100:.1f}%"
               f"   L3 @{int(lvl*100)}%: {out['l3_coverage'][lvl]*100:.1f}%")
+    if out.get("croston"):
+        n_adopt = sum(1 for r in out["croston"] if r["adopted"])
+        print(f"  intermittency     : {n_adopt}/{len(out['croston'])} intermittent "
+              "nodes adopt croston_sba (held-out MASE rule)")
     if out["keg"]:
         k = out["keg"]
         print(f"  consumption proxy : {k['line']} {k['forecast_pints']} pints/"

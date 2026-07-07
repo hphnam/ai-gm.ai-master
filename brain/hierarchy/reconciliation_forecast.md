@@ -22,6 +22,31 @@ Each band is `reconciled ŷ ± split-conformal quantile of the node's DOW-median
 
 Item (L3) series are sparse and noisy, so their bands under-cover — an honest, expected limitation of conformal at this grain; category (L2) bands are tighter to nominal.
 
+## Intermittency: Croston/SBA vs DOW-median (WP2)
+Intermittent L3 nodes (ADI >= 1.32) scored on the held-out TEST_WEEKS block. croston_sba is adopted as a node's base forecast only when it beats DOW-median on MASE (same seasonal-naive denominator); otherwise DOW-median stands. MinT coherence is preserved either way.
+
+**0 of 17** intermittent nodes adopted croston_sba.
+
+| Node | MASE DOW | MASE SBA | MAE DOW | MAE SBA | Adopted |
+|---|---|---|---|---|---|
+| ITEM::Beer::Lager - BH | 1.056 | 1.662 | 10.140 | 15.960 | no |
+| ITEM::Beer::Caravan of Love | 1.216 | 2.223 | 6.509 | 11.899 | no |
+| ITEM::Spirits::SMIRNOFF | 0.616 | 0.767 | 3.035 | 3.776 | no |
+| ITEM::Spirits::Whitley Neil | 0.351 | 0.529 | 0.702 | 1.056 | no |
+| ITEM::Soft Drinks::Cordial & Soda | 1.384 | 1.549 | 1.807 | 2.022 | no |
+| ITEM::Soft Drinks::Fruit Shoot | 1.033 | 1.322 | 1.193 | 1.526 | no |
+| ITEM::Wine::Discovery Beach Zinfandel | 0.570 | 0.920 | 0.789 | 1.276 | no |
+| ITEM::Wine::Alpino Pinot Grigio | 0.000 | 0.641 | 0.000 | 0.646 | no |
+| ITEM::Wine::Aperol Spritz | 1.843 | 1.880 | 1.614 | 1.647 | no |
+| ITEM::Uncategorised::Centennial Summer Pale | 0.000 | 0.270 | 0.000 | 0.609 | no |
+| ITEM::Happy Hour::£4 Lager/Cider | 0.709 | 1.425 | 2.175 | 4.370 | no |
+| ITEM::Happy Hour::£3.50 Cask | 0.748 | 1.869 | 1.649 | 4.120 | no |
+| ITEM::Happy Hour::£15 FIZZ | 0.840 | 1.320 | 0.158 | 0.248 | no |
+| ITEM::Food::Nuts | 0.347 | 0.782 | 0.439 | 0.990 | no |
+| ITEM::Merchandise::Lunebrew T Shirt | 0.000 | 3.468 | 0.000 | 0.186 | no |
+| ITEM::Merchandise::Hire Fee | 0.654 | 1.501 | 0.035 | 0.081 | no |
+| ITEM::Merchandise::Pool Table deposit | 1.426 | 3.274 | 0.053 | 0.121 | no |
+
 ## Stock-consumption proxy
 - line: **Lager - BH** (2 node(s))
 - reconciled 7-day forecast: **90.6 pints**
@@ -32,4 +57,4 @@ The demand-only proxy above becomes a true reorder signal once the physical on-h
 
 | Product | L1 | On-hand kegs | Forecast pints/day | Days cover | Reorder | Suggest kegs |
 |---|---|---|---|---|---|---|
-| lunebrew caravan of love | Draught | 0.0 | 5.32 | **0.0** | ⚠ YES | 1 |
+| lunebrew caravan of love | Draught | 0.0 | 5.22 | **0.0** | ⚠ YES | 1 |
