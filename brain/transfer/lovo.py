@@ -8,9 +8,12 @@ turn to simulate onboarding, give it only a short cold-start window to estimate
 its level, and forecast the rest from the donor shape.
 
 Gate: shape-transfer beats per-venue-naive on the held-out venue, AND the
-foundation-model rung beats the global GBM OR is dropped per the Tan et al.
-ablation. No foundation backbone is installed here, so it is **dropped** — the
-ablation's honest outcome (an unjustified backbone is not adopted).
+foundation-model rung is adopted only if it beats the global GBM on held-out
+rolling MASE, otherwise dropped. Tan et al. (2024) motivates scepticism toward
+unjustified backbone components, but its ablations target LLM-backbone
+forecasters, not time-series-pretrained foundation models; the criterion here is
+the empirical MASE comparison, not that ablation. No foundation backbone is
+installed here, so the rung is dropped (an unjustified backbone is not adopted).
 
 All cross-venue work is on VAT-corrected ex-VAT revenue (TRT deflated by 1/1.2).
 

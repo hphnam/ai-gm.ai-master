@@ -16,7 +16,15 @@ held-out MASE. Two evaluation regimes are reported:
     Rung 1  robust DOW x seasonal index        — the interpretable baseline
     Rung 2  STL / ETS / Prophet                — classical decomposition
     Rung 3  gradient boosting (+ global pool)  — non-linear, partial pooling
-    Rung 4  foundation models                  — optional, Tan-ablation gated
+    Rung 4  foundation models                  — optional; adopted only if it
+                                                  beats rung3_global_gbm on
+                                                  held-out rolling MASE. Tan et
+                                                  al. (2024) motivates scepticism
+                                                  toward unjustified backbone
+                                                  components, but its ablations
+                                                  target LLM-backbone
+                                                  forecasters, not time-series-
+                                                  pretrained foundation models.
 
 Run:
     python -m models.ladder --layer L1
@@ -301,13 +309,18 @@ def _rung4_foundation() -> RungResult:
         try:
             __import__(mod)
             return RungResult("rung4_foundation", 4, available=False,
-                              note=f"{mod} present — wire zero-shot eval + Tan ablation")
+                              note=f"{mod} present — wire zero-shot eval; "
+                              "adopt only if it beats rung3_global_gbm on "
+                              "held-out rolling MASE")
         except Exception:
             continue
     return RungResult(
         "rung4_foundation", 4, available=False,
-        note="no foundation backend installed; Tan ablation: adopt only if it "
-        "beats rung3_global_gbm — not evaluated.",
+        note="no foundation backend installed; adoption criterion: beats "
+        "rung3_global_gbm on held-out rolling MASE (Tan et al. 2024 motivates "
+        "scepticism toward unjustified backbones, but its ablations target "
+        "LLM-backbone forecasters, not pretrained time-series models) — "
+        "not evaluated.",
     )
 
 

@@ -1,10 +1,12 @@
 """A5 · Conformal wrapper — the deliverable of Objective 1 (methodology §2/§5).
 
 Wraps the selected L1 forecaster so it emits a **calibrated band**, not a
-point. We use split conformal with calibration residuals collected from a
-rolling-origin backtest over the *pre-test* region (an EnbPI-style temporally
-robust calibration; Xu & Xie 2023). The forward option for sustained shifts is
-change-point-aware online conformal (Sun & Yu 2025) — noted, not yet wired.
+point. The band is split conformal (the finite-sample quantile of absolute
+residuals), recalibrated per 7-day block on the residuals accumulated strictly
+before that block, in the temporally robust spirit of EnbPI (Xu and Xie 2021).
+SPCI (Xu and Xie 2023), whose defining step is quantile-random-forest
+regression on recent residuals, is not implemented here. Change-point-aware
+online conformal (Sun and Yu 2025) remains noted, not wired.
 
 Two band variants are produced and validated on the held-out test block:
   * **plain**     y_hat ± q,  q = conformal quantile of |residual| (marginal)

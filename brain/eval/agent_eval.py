@@ -300,7 +300,10 @@ def ranking_metrics(con) -> dict:
             "n_matched": len(matched), "n_items": len(items)}
 
 
-# --- Ask-F1 fatigue + cost sweep ---------------------------------------------
+# --- Fatigue + miss-to-false-alarm cost sweep --------------------------------
+# The detection F1 (precision on injection-attributable surfaced items, recall on
+# injected truths) is the Ask-F1 analogue in the sense of Trinh et al.; the sweep
+# below is a separate miss-to-false-alarm weighted cost, not an Ask-F1.
 
 def fatigue_metrics(con, venues=("beer_hall", "two_river_taps", "ellel")) -> dict:
     """Surfacing rate on UN-injected held-out windows. On real data these alarms may
@@ -322,10 +325,10 @@ def fatigue_metrics(con, venues=("beer_hall", "two_river_taps", "ellel")) -> dic
 
 
 def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
-    """Ask-F1 cost = ratio·misses + 1·false-alarms, swept over the miss:false-alarm
-    ratios. A fixed-threshold detector has a fixed operating point; what MOVES is
-    which failure dominates the cost — reported so the reader sees the trade, not a
-    single hard-coded number (spec §5)."""
+    """Weighted cost = ratio·misses + 1·false-alarms, swept over the miss:false-alarm
+    ratios. This is a separate cost sweep, not the Ask-F1. A fixed-threshold detector
+    has a fixed operating point; what MOVES is which failure dominates the cost —
+    reported so the reader sees the trade, not a single hard-coded number (spec §5)."""
     fn = detection["fn"]
     fa = fatigue["items"]
     rows = []
@@ -798,7 +801,7 @@ def _write_report(r: EvalResult) -> None:
         mark = "reported" if x["correct"] is None else str(x["correct"])
         lines.append(f"| {x['kind']} | {x['expected']} | {mark} | {x['reason']} |")
     lines += [
-        "\n## 3. Ask-F1 — fatigue + cost sweep\n",
+        "\n## 3. Fatigue + miss-to-false-alarm cost sweep\n",
         f"Surfacing rate on un-injected windows (an **upper bound** on weekly "
         f"false-alarms — on real data these may be genuine): "
         f"**{r.fatigue['per_week_upper_bound']}/week** "
