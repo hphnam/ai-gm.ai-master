@@ -21,9 +21,9 @@ Cold-start window: **14 days** (used only to anchor the held-out venue's level).
 
 This is the partial-pooling story: borrow the donor shape while the venue is data-poor; rely on its own seasonal-naïve once it has enough history. The transfer wins where it is supposed to — the cold-start regime — and gracefully hands over as history accrues.
 
-## Foundation-model rung (Tan ablation)
+## Foundation-model rung (adoption by held-out rolling MASE)
 - available: False
-- DROPPED per Tan et al. ablation — no backbone installed, so an unjustified pretrained backbone is not adopted (the ablation's honest outcome). Global GBM (A4) remains the pooling baseline.
+- DROPPED: no backbone installed, so an unjustified pretrained backbone is not adopted. The criterion is beating rung3_global_gbm on held-out rolling MASE; Tan et al. (2024) motivates scepticism toward unjustified backbones but its ablations target LLM-backbone forecasters, not pretrained time-series models. Global GBM (A4) remains the pooling baseline.
 
 ## In-context fine-tuning (Das et al. 2025) — forward note
 The shape-transfer here is the hand-built analogue of conditioning a held-out venue on the donor's shape. A foundation backbone with in-context fine-tuning would condition on the donor series directly; the LOVO harness above is exactly the test it must pass to be adopted.

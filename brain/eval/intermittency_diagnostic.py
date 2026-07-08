@@ -131,6 +131,13 @@ def _write_report(venue: str, rows: list[dict], dows: set[int]) -> None:
         "non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the "
         "conditional Croston/SBA comparison in hierarchy/reconcile.py; adoption "
         "stays strictly by the held-out MASE rule, per node.",
+        "\n**ADI blind spot (noted):** ADI measures the spacing between successive "
+        "demands, so an item that sold densely for a short season and then went "
+        "dead (for example Lancashire crisps, zero_fraction 0.88 with ADI 1.00) "
+        "classifies as non-intermittent. Such obsolescence patterns are the "
+        "Teunter-Syntetos-Babai case, out of scope here, and they do not affect "
+        "the WP2 outcome because Croston lost on every node that did classify as "
+        "intermittent.",
     ]
     RESULTS_MD.write_text("\n".join(lines))
 

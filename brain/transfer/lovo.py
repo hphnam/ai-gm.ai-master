@@ -116,14 +116,18 @@ def _foundation_ablation() -> dict:
         try:
             __import__(mod)
             return {"available": True, "backend": mod,
-                    "verdict": "evaluate zero-shot vs global GBM (Tan ablation)"}
+                    "verdict": "evaluate zero-shot vs global GBM; adopt only if it "
+                    "beats it on held-out rolling MASE"}
         except Exception:
             continue
     return {
         "available": False, "backend": None,
-        "verdict": "DROPPED per Tan et al. ablation — no backbone installed, so "
-        "an unjustified pretrained backbone is not adopted (the ablation's "
-        "honest outcome). Global GBM (A4) remains the pooling baseline.",
+        "verdict": "DROPPED: no backbone installed, so an unjustified pretrained "
+        "backbone is not adopted. The criterion is beating rung3_global_gbm on "
+        "held-out rolling MASE; Tan et al. (2024) motivates scepticism toward "
+        "unjustified backbones but its ablations target LLM-backbone forecasters, "
+        "not pretrained time-series models. Global GBM (A4) remains the pooling "
+        "baseline.",
     }
 
 
@@ -188,7 +192,7 @@ def _write_report(out: dict, passed: bool) -> None:
         "venue is data-poor; rely on its own seasonal-naïve once it has enough "
         "history. The transfer wins where it is supposed to — the cold-start "
         "regime — and gracefully hands over as history accrues.\n",
-        "## Foundation-model rung (Tan ablation)",
+        "## Foundation-model rung (adoption by held-out rolling MASE)",
         f"- available: {out['foundation']['available']}",
         f"- {out['foundation']['verdict']}",
         "\n## In-context fine-tuning (Das et al. 2025) — forward note",

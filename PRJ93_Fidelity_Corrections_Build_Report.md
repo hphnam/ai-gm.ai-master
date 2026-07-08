@@ -197,3 +197,33 @@ Edited: `conformal/wrap.py`, `models/ladder.py`, `transfer/lovo.py`,
 `eval/agent_eval.py`, `config.py`, `eval/change_point_eval.py`,
 `hierarchy/reconcile.py`, `PRJ93_Scaled_Eval_Report.md`, plus regenerated report
 markdown under `eval/`, `hierarchy/`, and `models/`.
+
+---
+
+## 5. Addendum (WP8 to WP11, Chronos-2)
+
+The three acceptances deferred above by the Python 3.14 venv (D5 statsforecast
+cross-check, D10 Rung-4 run, D14 VUS-PR) are now closed. A Python 3.12 evaluation
+venv (`brain/.venv-eval`, uv-provisioned) was stood up and the heavy probes run
+in it; the runtime venv is untouched. Highlights:
+
+- **WP8:** eval venv on Python 3.12.13; chronos-forecasting 2.3.1, torch 2.12.1,
+  statsforecast 2.0.3, TSB-AD 1.5. The now-runnable statsforecast cross-check
+  exposed the Croston `phat0` initialisation risk (G8.4); it was aligned to the
+  oracle (`phat0` = first observed interval) and now matches within rtol 1e-6. The
+  WP2 per-node verdict did not flip (DOW-median still wins all 17). **D5 closed.**
+- **WP9:** the Rung-4 entrant was upgraded to **Chronos-2** (`amazon/chronos-2`) and
+  actually run. Zero-shot, it is the **Beer Hall milestone winner** (rolling MASE
+  0.793, beating prophet 0.799 and `rung3_global_gbm` 0.905); on TRT it passes the
+  Rung-4 criterion but ETS stays selected; Ellel capped. Report-only, no promotion.
+  Backend-absent output remains byte-identical. A covariate probe (WP9b) shows
+  known-future covariates help modestly (0.793 to 0.779). **D10 closed.**
+- **WP10:** VUS-PR is computed via the pinned TSB-AD 1.5; S6b is a populated table
+  (sustained 0.90 to 0.99, spikes 0.76 to 0.91). **D14 closed.**
+- **WP11:** the lovo.py "Tan ablation" residue (D4) is qualified; the ADI blind-spot
+  note is added; decision-log Section B records the addendum outcomes.
+
+Full delivered/acceptance/deviations detail (deviations D19 to D28, including the
+Chronos-2 fallback-API correction and the Bolt `context`-to-`inputs` kwarg fix) is
+in **`PRJ93_Fidelity_Corrections_Addendum_Report.md`**. Both suites green at close:
+runtime venv 223 passed / 5 skipped; eval venv 228 passed / 0 skipped (chunked, D26).
