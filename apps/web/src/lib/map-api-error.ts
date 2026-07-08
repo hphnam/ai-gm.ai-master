@@ -2,6 +2,9 @@ import { ApiError } from './api-client'
 
 export function mapApiError(err: unknown): string {
   if (err instanceof ApiError) {
+    if (err.status === 429) {
+      return "You're sending messages faster than I can keep up — give it a moment and try again."
+    }
     // Plan 03-01 — codes added to the API surface after the last orval regen
     // aren't in the generated ApiErrorCode union. Match by string before the
     // typed switch so they map to user-friendly text.

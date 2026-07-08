@@ -35,7 +35,7 @@ import type {
   ConversationResponseDto as ConversationResponse,
   VenueListItemDto as VenueListItem,
 } from '@/generated/api'
-import { API_URL } from '@/lib/api-client'
+import { API_URL, ApiError } from '@/lib/api-client'
 import { useSession } from '@/lib/auth-client'
 import { type StarterQuestion, useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
@@ -258,6 +258,14 @@ function ChatCore({
       new DefaultChatTransport<GmUIMessage>({
         api: `${API_URL}/chat/stream`,
         credentials: 'include',
+        // The stream transport surfaces non-2xx as a plain Error, which would
+        // fall through to the generic "network error" toast. Translate a 429 to
+        // an ApiError so onError can show the real rate-limit message.
+        fetch: async (input, init) => {
+          const res = await fetch(input, init)
+          if (res.status === 429) throw new ApiError(429, 'unknown')
+          return res
+        },
         prepareSendMessagesRequest: ({ messages }) => {
           const last = messages[messages.length - 1]
           const userMessage =

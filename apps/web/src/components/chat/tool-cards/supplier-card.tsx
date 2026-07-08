@@ -89,21 +89,18 @@ function SupplierRow({ supplier }: { supplier: Supplier }) {
 export function SupplierCard({ part }: ToolCardRendererProps) {
   const output = part.output
   if (isToolFail(output)) {
+    // No supplier match is a negative finding the prose already covers —
+    // suppress it and only card a genuine error.
+    if (output.reason === 'no-data') return null
     return (
       <CardShell icon={Truck} title="Supplier">
-        <CardEmpty message={output.detail ?? 'No supplier matched.'} />
+        <CardEmpty message={output.detail ?? "Couldn't look up that supplier right now."} />
       </CardShell>
     )
   }
   if (!isToolOk<Data>(output)) return null
   const suppliers = asArray(output.data)
-  if (suppliers.length === 0) {
-    return (
-      <CardShell icon={Truck} title="Supplier">
-        <CardEmpty message="Nothing matched." />
-      </CardShell>
-    )
-  }
+  if (suppliers.length === 0) return null
   return (
     <CardShell
       icon={Truck}
