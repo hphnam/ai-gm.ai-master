@@ -138,6 +138,21 @@ INGEST_SOURCE=neon            # csv (default) | neon | square
 python -m ingest.refresh      # nightly T2 refresh (+ conditional T3); no-op on csv
 ```
 
+**Nightly job (WP12):** the Beer Hall served model is a Rung-4 Chronos-2 entrant,
+so the nightly refresh needs the chronos backend. Run it from the forecast venv,
+not the API's runtime venv (which serves `/forecast` from persisted DuckDB tables
+only and needs no chronos dependency):
+
+```bash
+nightly: .venv-forecast/bin/python -m ingest.refresh
+```
+
+See `requirements-forecast.txt` for the venv build (Python 3.12, uv-provisioned,
+gitignored). A chronos-less environment (the runtime venv, or any Python 3.13+
+venv) never re-fits or re-promotes a Rung-4 served model as a side effect; see
+the environment guards in `ingest/refresh.py` (`_should_refit`,
+`_promote_and_serve`).
+
 T1 = live facts (Square, cached ~10 min, never warehoused); T2 = append closed
 days to the store (`refresh()`); T3 = ladder re-fit, only on a weekly boundary or a
 confirmed change-point (a transaction never triggers a re-fit). See

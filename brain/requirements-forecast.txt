@@ -1,0 +1,22 @@
+# Production nightly forecast dependencies (WP12). The nightly job
+# (`python -m ingest.refresh`) runs from a SEPARATE Python 3.12 venv,
+# brain/.venv-forecast (uv-provisioned, gitignored), distinct from:
+#   - the runtime venv (Python 3.14, API serving; reads persisted DuckDB tables
+#     only, needs no chronos dependency at all)
+#   - brain/.venv-eval (the research environment: statsforecast, TSB-AD, vus,
+#     prophet, plus everything below)
+#
+#   uv venv --python 3.12 .venv-forecast
+#   VIRTUAL_ENV=.venv-forecast uv pip install -r requirements.txt
+#   VIRTUAL_ENV=.venv-forecast uv pip install -r requirements-forecast.txt
+#
+# Deliberately excludes statsforecast, TSB-AD, vus, and prophet: those are
+# eval-only concerns. Prophet's absence changes only the ladder's report
+# comparison rows (rung2_prophet becomes "backend not installed"), never the
+# served model - the served model for Beer Hall is a Rung-4 Chronos-2 entrant,
+# not prophet, and prophet was never a serving candidate. This reporting
+# asymmetry versus .venv-eval is the same one documented as D25 in the
+# addendum report; it is intentional, not an oversight.
+
+chronos-forecasting>=2.3
+torch>=2.5

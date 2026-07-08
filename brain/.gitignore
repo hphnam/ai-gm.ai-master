@@ -1,6 +1,7 @@
 # Python env + caches
 .venv/
 .venv-eval/
+.venv-forecast/
 __pycache__/
 *.pyc
 .pytest_cache/
