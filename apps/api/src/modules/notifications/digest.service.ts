@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
-import { getMailMode, sendMail } from '../email/mailer'
+import { sendMail } from '../email/mailer'
 import {
   NOTE_DIGEST_ANCHOR_HOUR_UTC,
   NOTE_DIGEST_MAX_NOTES_PER_EMAIL,
@@ -105,13 +105,6 @@ export class NoteDigestService {
         notes: group.notes.slice(0, NOTE_DIGEST_MAX_NOTES_PER_EMAIL),
         totalUnread: group.notes.length,
       })
-      if (getMailMode() === 'console') {
-        this.logger.log(
-          JSON.stringify({ event: 'note_digest.console_fallback', to: group.email, subject }),
-        )
-        emails += 1
-        continue
-      }
       const res = await sendMail({ to: group.email, subject, html, text })
       if (res.ok) {
         emails += 1

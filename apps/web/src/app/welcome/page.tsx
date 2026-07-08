@@ -40,14 +40,18 @@ export default async function WelcomePage({
   // it must belong to this org — otherwise we send them back to basics so the
   // URL can't be tampered into pointing at a venue they don't own.
   const venueId = params.venueId ?? null
-  const venueIdValid = venueId ? venues.some((v) => v.id === venueId) : false
-  const step: OnboardingStepId =
-    requestedStep === 'basics' || venueIdValid ? requestedStep : 'basics'
+  const venue = venueId ? (venues.find((v) => v.id === venueId) ?? null) : null
+  const step: OnboardingStepId = requestedStep === 'basics' || venue ? requestedStep : 'basics'
 
   return (
     <WelcomeBody
       initialStep={step}
-      venueId={venueIdValid ? venueId : null}
+      venueId={venue?.id ?? null}
+      initialVenue={
+        venue
+          ? { name: venue.name, type: venue.type, address: venue.address, timezone: venue.timezone }
+          : null
+      }
       userName={session.user.name}
     />
   )

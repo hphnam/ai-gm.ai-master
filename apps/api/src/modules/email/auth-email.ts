@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { Logger } from '@nestjs/common'
-import { getMailMode, sendMail } from './mailer'
+import { sendMail } from './mailer'
 
 const logger = new Logger('AuthEmail')
 
@@ -31,12 +31,6 @@ function renderPasswordResetEmail(resetUrl: string): { html: string; text: strin
 }
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
-  if (getMailMode() === 'console') {
-    logger.log(
-      JSON.stringify({ event: 'mail.console_fallback', kind: 'password_reset', to, resetUrl }),
-    )
-    return
-  }
   const { html, text } = renderPasswordResetEmail(resetUrl)
   // Fire-and-forget: awaiting would leak account existence via response timing.
   void sendMail({ to, subject: 'Reset your GM AI password', html, text })

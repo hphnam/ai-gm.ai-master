@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback } from 'react'
 import { OnboardingShell } from './onboarding-shell'
 import { ProgressHeader } from './progress-header'
-import { StepBasics } from './step-basics'
+import { StepBasics, type VenueBasics } from './step-basics'
 import { StepDone } from './step-done'
 import { StepKnowledge } from './step-knowledge'
 import { StepOperations } from './step-operations'
@@ -14,6 +14,7 @@ import { type OnboardingStepId, prevStep } from './steps'
 type Props = {
   initialStep: OnboardingStepId
   venueId: string | null
+  initialVenue: VenueBasics | null
   userName: string | null
 }
 
@@ -27,7 +28,7 @@ export function WelcomeBody(props: Props) {
   )
 }
 
-function WelcomeBodyInner({ initialStep, venueId, userName }: Props) {
+function WelcomeBodyInner({ initialStep, venueId, initialVenue, userName }: Props) {
   const router = useRouter()
   const params = useSearchParams()
   const step = (params.get('step') as OnboardingStepId | null) ?? initialStep
@@ -50,19 +51,26 @@ function WelcomeBodyInner({ initialStep, venueId, userName }: Props) {
 
   return (
     <OnboardingShell header={<ProgressHeader current={step} />}>
-      {step === 'basics' && (
-        <StepBasics userName={userName} initialVenueId={venueId} onAdvance={go} />
-      )}
-      {step === 'operations' && venueId && (
-        <StepOperations venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'safety' && venueId && (
-        <StepSafety venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'knowledge' && venueId && (
-        <StepKnowledge venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'done' && venueId && <StepDone venueId={venueId} />}
+      <div key={step} className="animate-in fade-in duration-300 motion-reduce:animate-none">
+        {step === 'basics' && (
+          <StepBasics
+            userName={userName}
+            initialVenueId={venueId}
+            initialVenue={initialVenue}
+            onAdvance={go}
+          />
+        )}
+        {step === 'operations' && venueId && (
+          <StepOperations venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'safety' && venueId && (
+          <StepSafety venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'knowledge' && venueId && (
+          <StepKnowledge venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'done' && venueId && <StepDone venueId={venueId} />}
+      </div>
     </OnboardingShell>
   )
 }

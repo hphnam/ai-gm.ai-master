@@ -9,6 +9,10 @@
       "persistent": true,
       "cache": false
     },
+    "tunnel": {
+      "persistent": true,
+      "cache": false
+    },
     "lint": {},
     "typecheck": {
       "dependsOn": ["^build"]
