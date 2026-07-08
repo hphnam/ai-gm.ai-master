@@ -25,27 +25,18 @@ function asArray(data: Data): CutoffRow[] {
 export function CutoffsCard({ part, ctx }: ToolCardRendererProps) {
   const output = part.output
   if (isToolFail(output)) {
+    // No upcoming cutoffs is a negative finding the prose already states —
+    // suppress the card and only surface a genuine error.
+    if (output.reason === 'no-data') return null
     return (
       <CardShell icon={Clock3} title="Order cutoffs">
-        <CardEmpty
-          message={
-            output.reason === 'no-data'
-              ? 'No cutoffs coming up in that window.'
-              : (output.detail ?? "Couldn't check cutoffs.")
-          }
-        />
+        <CardEmpty message={output.detail ?? "Couldn't check cutoffs."} />
       </CardShell>
     )
   }
   if (!isToolOk<Data>(output)) return null
   const rows = asArray(output.data)
-  if (rows.length === 0) {
-    return (
-      <CardShell icon={Clock3} title="Order cutoffs">
-        <CardEmpty message="Nothing pressing." />
-      </CardShell>
-    )
-  }
+  if (rows.length === 0) return null
   return (
     <CardShell
       icon={Clock3}

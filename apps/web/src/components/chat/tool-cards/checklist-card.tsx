@@ -60,27 +60,18 @@ export function ChecklistCard({ part }: ToolCardRendererProps) {
   const userId = session?.user?.id ?? 'anon'
   const output = part.output
   if (isToolFail(output)) {
+    // A missing checklist is a negative finding the prose already states —
+    // suppress it and only card a genuine error.
+    if (output.reason === 'no-data') return null
     return (
       <CardShell icon={ClipboardCheck} title="Checklist">
-        <CardEmpty
-          message={
-            output.reason === 'no-data'
-              ? "I couldn't find that checklist in the knowledge base yet."
-              : (output.detail ?? "Couldn't load that checklist.")
-          }
-        />
+        <CardEmpty message={output.detail ?? "Couldn't load that checklist."} />
       </CardShell>
     )
   }
   if (!isToolOk<Data>(output)) return null
   const { checklistId, title, steps, knowledgeItemId } = output.data
-  if (steps.length === 0) {
-    return (
-      <CardShell icon={ClipboardCheck} title={title || 'Checklist'}>
-        <CardEmpty message="No steps recorded for this checklist yet." />
-      </CardShell>
-    )
-  }
+  if (steps.length === 0) return null
   return (
     // Remount on user/checklist change (logout/login, a new procedure surfaced
     // in the same thread) so tick state resets via identity, not an effect.

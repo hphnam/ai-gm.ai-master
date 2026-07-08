@@ -13,6 +13,9 @@ import {
 import { ChecklistCard } from './checklist-card'
 import { CutoffsCard } from './cutoffs-card'
 import { NoteCard } from './note-card'
+import { PosPaymentBreakdownCard } from './pos-payment-breakdown-card'
+import { PosSalesSummaryCard } from './pos-sales-summary-card'
+import { PosTopItemsCard } from './pos-top-items-card'
 import { PricingRecommendationCard } from './pricing-recommendation-card'
 import { ReportCard } from './report-card'
 import { StockBelowParCard, StockByNameCard } from './stock-card'
@@ -43,6 +46,9 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
   brain_check_change_point: ChangePointCard,
   brain_daily_briefing: BriefingCard,
   brain_data_freshness: FreshnessCard,
+  pos_get_sales_summary: PosSalesSummaryCard,
+  pos_get_top_items: PosTopItemsCard,
+  pos_get_payment_breakdown: PosPaymentBreakdownCard,
 }
 
 export function hasToolCard(toolName: string): boolean {

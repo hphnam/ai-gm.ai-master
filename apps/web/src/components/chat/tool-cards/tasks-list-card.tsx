@@ -63,9 +63,12 @@ function scopeLabel(scope: string | undefined): string {
 export function TasksListCard({ part }: ToolCardRendererProps) {
   const output = part.output
   if (isToolFail(output)) {
+    // An empty list is a negative finding the prose already covers — suppress
+    // it and only card a genuine error.
+    if (output.reason === 'no-data') return null
     return (
       <CardShell icon={ListChecks} title="Tasks">
-        <CardEmpty message={output.detail ?? 'No matching tasks.'} />
+        <CardEmpty message={output.detail ?? "Couldn't load your tasks right now."} />
       </CardShell>
     )
   }
@@ -73,13 +76,7 @@ export function TasksListCard({ part }: ToolCardRendererProps) {
   const { tasks, openCount, overdueCount, scope } = output.data
   const subtitle = `${openCount} open${overdueCount ? ` · ${overdueCount} overdue` : ''}`
 
-  if (tasks.length === 0) {
-    return (
-      <CardShell icon={ListChecks} title={scopeLabel(scope)} subtitle={subtitle}>
-        <CardEmpty message="Nothing on your list. Enjoy the calm." />
-      </CardShell>
-    )
-  }
+  if (tasks.length === 0) return null
 
   return (
     <CardShell icon={ListChecks} title={scopeLabel(scope)} subtitle={subtitle}>

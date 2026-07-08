@@ -5,6 +5,12 @@ import { prisma } from '../../database/prisma'
 import { fail, ok, type ToolResult } from '../../types'
 import { EmbeddingsService } from '../embeddings/embeddings.service'
 
+// Thrown when the retrieval infra (Voyage embeddings or Postgres) is unreachable
+// mid-search. find() converts it to reason:'error' so a transient outage surfaces
+// as "can't reach the knowledge base" rather than collapsing into no-data — a
+// swallowed outage that reads as "we have no SOP on file" is the dangerous path.
+class RetrievalUnavailableError extends Error {}
+
 export type EntityType =
   | 'knowledge_item'
   | 'checklist_step'
@@ -152,6 +158,27 @@ export class RetrievalService implements OnModuleInit {
     const rerank = opts.rerank ?? true
     const reformulate = opts.reformulateOnEmpty ?? true
 
+    try {
+      return await this.runFind(capped, opts, { limit, minSim, rerank, reformulate })
+    } catch (err) {
+      // Any throw from here down means the KB infra (embeddings or Postgres)
+      // is unreachable — a genuinely empty corpus returns fail('no-data')
+      // normally, never throws. Surface a distinct, stable signal so the model
+      // says "can't reach the knowledge base" (not "not on file") and the web
+      // can flag degraded mode. Raw DB/driver text is never passed to the model.
+      this.logCall(capped, opts.orgId, 'error', 0, null, {
+        message: (err as Error).message,
+      })
+      return fail('error', 'retrieval-unavailable')
+    }
+  }
+
+  private async runFind(
+    capped: string,
+    opts: RetrievalOpts,
+    cfg: { limit: number; minSim: number; rerank: boolean; reformulate: boolean },
+  ): Promise<ToolResult<RetrievalHit[]>> {
+    const { limit, minSim, rerank, reformulate } = cfg
     let hits = await this.runHybrid(capped, opts, limit * 2, minSim)
     let usedQuery = capped
     let reformulated = false
@@ -290,7 +317,9 @@ export class RetrievalService implements OnModuleInit {
           message: (err as Error).message,
         }),
       )
-      return []
+      // Infra outage — NOT an empty result. Propagate so find() can return
+      // reason:'error' instead of masquerading the outage as no-data.
+      throw new RetrievalUnavailableError('embeddings-unavailable')
     }
     const vectorLiteral = `[${vec.join(',')}]`
 

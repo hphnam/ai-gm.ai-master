@@ -1,6 +1,10 @@
 import { anthropic as anthropicProvider } from '@ai-sdk/anthropic'
+import { Logger } from '@nestjs/common'
 import {
+  generateObject,
   hasToolCall,
+  jsonSchema,
+  NoSuchToolError,
   type OnFinishEvent,
   type SystemModelMessage,
   stepCountIs,
@@ -45,6 +49,8 @@ function sanitizeForBlock(value: string): string {
 }
 
 export type AgentMode = 'default' | 'incident' | 'handover'
+
+const logger = new Logger('GmAgent')
 
 const MODEL_ID = 'claude-sonnet-5'
 
@@ -176,6 +182,10 @@ export function buildGmAgent(params: {
   dispatcher: ToolDispatcher
   integrations: IntegrationRegistry
   ctx: DispatchContext
+  /// Conversation this turn belongs to — logged with per-turn token telemetry.
+  conversationId?: string
+  /// Turn abort signal — also cancels a repair re-ask if the client disconnects.
+  abortSignal?: AbortSignal
   /// Provider ids the org has connected as active — scopes the integration
   /// tool surface so the model only sees tools for this org's integrations.
   activeProviderIds: ReadonlySet<string>
@@ -482,7 +492,46 @@ export function buildGmAgent(params: {
     // second call would orphan the first row, and the headless scheduled-
     // report path relies on first-wins capture in onStepFinish.
     stopWhen: [stepCountIs(MAX_STEPS), ...TERMINAL_STOP_TOOLS.map((t) => hasToolCall(t))],
-    onFinish: params.onFinish,
+    // Recover a malformed tool call instead of failing the whole turn: re-ask
+    // the model for arguments that satisfy the tool's own JSON schema. Only
+    // fires on a parse/validation failure (rare); an unknown-tool call can't be
+    // repaired, so bail and let the loop surface it.
+    experimental_repairToolCall: async ({ toolCall, inputSchema, error }) => {
+      if (NoSuchToolError.isInstance(error)) return null
+      const schema = await inputSchema({ toolName: toolCall.toolName })
+      const { object } = await generateObject({
+        model: anthropicProvider(MODEL_ID),
+        schema: jsonSchema(schema),
+        abortSignal: params.abortSignal,
+        prompt: [
+          `The tool "${toolCall.toolName}" was called with arguments that failed its schema.`,
+          `Invalid arguments: ${toolCall.input}`,
+          `Error: ${error.message}`,
+          'Return corrected arguments that satisfy the schema.',
+        ].join('\n'),
+      })
+      return { ...toolCall, input: JSON.stringify(object) }
+    },
+    onFinish: async (event) => {
+      const usage = event.usage
+      logger.log(
+        JSON.stringify({
+          event: 'chat.turn_usage',
+          conversationId: params.conversationId,
+          orgId: params.ctx.orgId,
+          userRole: params.ctx.userRole,
+          model: MODEL_ID,
+          steps: event.steps.length,
+          inputTokens: usage.inputTokens ?? 0,
+          outputTokens: usage.outputTokens ?? 0,
+          totalTokens: usage.totalTokens ?? 0,
+          reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? 0,
+          cacheReadTokens: usage.inputTokenDetails?.cacheReadTokens ?? 0,
+          cacheWriteTokens: usage.inputTokenDetails?.cacheWriteTokens ?? 0,
+        }),
+      )
+      await params.onFinish?.(event)
+    },
     onStepFinish: params.onStepFinish,
   })
 }

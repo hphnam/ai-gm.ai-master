@@ -83,27 +83,18 @@ function StockTable({
 export function StockBelowParCard({ part, ctx }: ToolCardRendererProps) {
   const output = part.output
   if (isToolFail(output)) {
+    // "Nothing below par" is a negative finding the prose already states — a
+    // card restating it is noise. Only surface a card for a genuine error.
+    if (output.reason === 'no-data') return null
     return (
-      <CardShell icon={TrendingDown} title="Stock at par" tone="success">
-        <CardEmpty
-          message={
-            output.reason === 'no-data'
-              ? 'Everything is above par. Nothing to reorder.'
-              : (output.detail ?? "Couldn't check stock right now.")
-          }
-        />
+      <CardShell icon={TrendingDown} title="Stock check">
+        <CardEmpty message={output.detail ?? "Couldn't check stock right now."} />
       </CardShell>
     )
   }
   if (!isToolOk<StockData>(output)) return null
   const items = normaliseList(output.data)
-  if (items.length === 0) {
-    return (
-      <CardShell icon={TrendingDown} title="Stock at par" tone="success">
-        <CardEmpty message="Everything is above par." />
-      </CardShell>
-    )
-  }
+  if (items.length === 0) return null
   return (
     <CardShell
       icon={TrendingDown}
@@ -119,21 +110,18 @@ export function StockBelowParCard({ part, ctx }: ToolCardRendererProps) {
 export function StockByNameCard({ part, ctx }: ToolCardRendererProps) {
   const output = part.output
   if (isToolFail(output)) {
+    // No match is a negative finding the prose already covers — suppress it and
+    // only card a genuine error.
+    if (output.reason === 'no-data') return null
     return (
       <CardShell icon={Package} title="Stock lookup">
-        <CardEmpty message={output.detail ?? 'No stock matched that name.'} />
+        <CardEmpty message={output.detail ?? "Couldn't look up that stock right now."} />
       </CardShell>
     )
   }
   if (!isToolOk<StockData>(output)) return null
   const items = normaliseList(output.data)
-  if (items.length === 0) {
-    return (
-      <CardShell icon={Package} title="Stock lookup">
-        <CardEmpty message="Nothing matched." />
-      </CardShell>
-    )
-  }
+  if (items.length === 0) return null
   return (
     <CardShell
       icon={Package}
