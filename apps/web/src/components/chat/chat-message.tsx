@@ -1,7 +1,7 @@
 'use client'
 
 import { getToolName, isToolUIPart, type UIMessage } from 'ai'
-import { AlertTriangle, Copy, MoreHorizontal, RefreshCcw } from 'lucide-react'
+import { AlertTriangle, CloudOff, Copy, MoreHorizontal, RefreshCcw, SearchX } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { MentionedText } from '@/components/chat/mention-picker'
@@ -13,7 +13,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { AgentTraceDisclosure, AgentTraceLive, type TraceStep } from './agent-trace'
 import { AssistantMarkdown } from './assistant-markdown'
-import { buildSectionsByDoc, CitationsContext, hasUncitedKb } from './citations'
+import {
+  answeredWithoutSources,
+  buildSectionsByDoc,
+  CitationsContext,
+  hasKbRetrievalError,
+  hasUncitedKb,
+} from './citations'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
 import { hasToolCard, ToolCard } from './tool-cards/tool-card-router'
@@ -230,6 +236,45 @@ function UncitedKbWarning() {
   )
 }
 
+// Phase 1.2 — shown when the model answered with factual claims but called NO
+// tools at all: the reply came straight from training data / injected context,
+// never checked a live source. Distinct failure mode from UncitedKbWarning (the
+// KB tool RAN there); a search icon + neutral tone so it reads as "unchecked",
+// not "the model searched and came up short".
+function UncheckedAnswerWarning() {
+  return (
+    <div
+      className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 px-2.5 py-2 text-xs text-warning"
+      role="note"
+    >
+      <SearchX className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+      <span>
+        Answered without checking sources — the model didn't search the knowledge base or any live
+        tool for this. Treat specifics as a guess and verify before acting.
+      </span>
+    </div>
+  )
+}
+
+// Phase 1.5 — shown when a knowledge-base lookup ERRORED this turn (embeddings /
+// database unreachable) rather than returning empty. Degraded-mode signal so the
+// operator knows the KB was DOWN — distinct from "we have no doc on file". Uses a
+// neutral/muted tone + offline icon so it doesn't read as a content warning.
+function KbUnreachableBanner() {
+  return (
+    <div
+      className="flex items-start gap-2 rounded-md border border-border bg-muted/60 px-2.5 py-2 text-xs text-muted-foreground"
+      role="status"
+    >
+      <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+      <span>
+        Knowledge base was unreachable — this answer couldn't be checked against your documents. Try
+        again in a moment.
+      </span>
+    </div>
+  )
+}
+
 // Wave-C auto-verify status. Quiet inline strip — a small dot + grey text.
 // Colour is reserved for true alarms (the "issues" state uses destructive); a
 // clean check is just a muted dot, so a successful answer stays calm.
@@ -321,7 +366,15 @@ export function ChatMessage({
   const plainText = assistantPlainText(message.parts)
   const classification = classifyAssistantParts(message.parts)
   const { answerChunks, toolSteps, toolCardParts, lastPartIsText } = classification
-  const showUncitedWarning = !isStreaming && hasUncitedKb(message.parts, plainText)
+  // Three mutually-considered trust signals, all derived from parts + text so
+  // they survive reload. A KB retrieval error owns the turn — suppress the
+  // uncited warning under it (the model was told to say "can't reach the KB",
+  // not fabricate). answeredWithoutSources is naturally exclusive of the other
+  // two (it requires zero tool calls).
+  const kbUnreachable = !isStreaming && hasKbRetrievalError(message.parts)
+  const showUncitedWarning =
+    !isStreaming && !kbUnreachable && hasUncitedKb(message.parts, plainText)
+  const showUncheckedWarning = !isStreaming && answeredWithoutSources(message.parts, plainText)
 
   const liveSteps: TraceStep[] = toolSteps.map((s) => ({
     id: s.id,
@@ -382,7 +435,9 @@ export function ChatMessage({
               />
             )
           })}
+          {kbUnreachable ? <KbUnreachableBanner /> : null}
           {showUncitedWarning ? <UncitedKbWarning /> : null}
+          {showUncheckedWarning ? <UncheckedAnswerWarning /> : null}
           {!isStreaming ? (
             <div className="flex flex-wrap items-center gap-2">
               <AssistantActions

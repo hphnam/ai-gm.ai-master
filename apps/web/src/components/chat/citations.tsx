@@ -205,6 +205,58 @@ export function hasUncitedKb(parts: UIMessage['parts'], text: string): boolean {
   return !/\[doc:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\]/i.test(text)
 }
 
+// True when a KB tool ran this turn but its result envelope reports an infra
+// failure (reason:'error') rather than a genuine empty (reason:'no-data'). The
+// dispatcher/retrieval layer stamps reason:'error' only when embeddings or
+// Postgres were unreachable, so this cleanly separates "the KB was down" from
+// "we have no doc on file". Survives reload — the persisted tool result is
+// rehydrated as the part's output (message-mapping.ts).
+export function hasKbRetrievalError(parts: UIMessage['parts']): boolean {
+  return parts.some((p) => {
+    if (!isToolUIPart(p) || !KB_TOOL_NAMES.has(getToolName(p))) return false
+    const output = (p as { output?: unknown }).output
+    if (!output || typeof output !== 'object') return false
+    const env = output as { ok?: unknown; reason?: unknown; detail?: unknown }
+    // Match the specific infra-outage detail, not any reason:'error' — keeps a
+    // future tabular query-level error from misfiring the "KB unreachable" banner.
+    return env.ok === false && env.reason === 'error' && env.detail === 'retrieval-unavailable'
+  })
+}
+
+// Phrasings that mark a turn as a refusal / role-handoff / capability explanation
+// rather than a confident factual assertion — a zero-tool turn matching any of
+// these is declining or steering, not asserting from unverified memory, so it
+// gets no trust nudge. Deliberately excludes trailing pleasantries ("let me know",
+// "happy to help") and clarifier questions: those attach to genuine factual
+// answers as closers and would silently defeat the guard. Pure clarifier turns
+// are already filtered by makesFactualClaims' no-declarative-sentence check.
+const NON_FACTUAL_RE =
+  /\b(i don't have|i can't help|i'm not able|i've got no|not connected|no [a-z ]{0,25}integration|manager-level|duty manager|manager or owner|only (managers|owners)|ask (your|a) (duty )?manager|out of scope|settings ?→? ?integrations|set up for running the business|connect (one|an integration)|i'm your)\b/i
+
+// Conservative "the answer asserts something" gate for the zero-search guard.
+// Requires a declarative sentence and rejects pure questions / refusals. Errs
+// toward NOT warning — false positives are a harmless nudge, but we don't want
+// to slap the warning on greetings or clarifiers.
+function makesFactualClaims(text: string): boolean {
+  if (!text.includes('.')) return false // no declarative sentence (pure questions/acks)
+  if (NON_FACTUAL_RE.test(text)) return false
+  return true
+}
+
+// Phase 1.2 — zero-search hallucination guard. True when the model produced a
+// factual-claim answer having called NO tools at all this turn — i.e. answered
+// straight from training data / injected context with zero grounding. Distinct
+// failure mode from hasUncitedKb (which requires a KB tool to have RUN); the two
+// are mutually exclusive because any KB call means at least one tool part exists.
+export function answeredWithoutSources(parts: UIMessage['parts'], text: string): boolean {
+  const t = text.trim()
+  if (t.length < 40) return false // trivial acknowledgement — nothing to warn on
+  // Any tool call means the turn attempted grounding (KB miss is covered by
+  // hasUncitedKb; live-data tools ARE the source). Only warn on pure no-tool answers.
+  if (parts.some((p) => isToolUIPart(p))) return false
+  return makesFactualClaims(t)
+}
+
 export function rewriteCitations(raw: string): string {
   const seen = new Map<string, number>()
   return raw.replace(DOC_CITATION_RE, (_match, id: string) => {
