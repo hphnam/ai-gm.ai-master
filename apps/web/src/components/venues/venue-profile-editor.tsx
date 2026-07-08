@@ -119,11 +119,12 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <Section title="Operations" icon={<MapPin className="h-3.5 w-3.5" />}>
-        <Field
-          label="Opening hours"
-          hint="Plain English. Example: Mon–Thu 12:00–23:00, Fri/Sat 12:00–01:00, Sun 12:00–22:00"
-        >
-          <Input {...form.register('openingHours')} placeholder="Mon–Sun 12:00–23:00" />
+        <Field label="Opening hours" hint="One day per line. Plain English is fine.">
+          <Textarea
+            {...form.register('openingHours')}
+            rows={7}
+            placeholder={'Monday: Closed\nTuesday–Friday: 16:00 – 23:00\nSunday: 13:00 – 22:00'}
+          />
         </Field>
         <Field
           label="Layout notes"

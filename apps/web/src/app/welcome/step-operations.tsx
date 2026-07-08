@@ -98,14 +98,17 @@ export function StepOperations({
               <FormItem>
                 <FormLabel>Opening hours</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
                     {...field}
-                    placeholder="Mon–Thu 12:00–23:00, Fri/Sat 12:00–01:00, Sun 12:00–22:00"
+                    rows={7}
+                    placeholder={
+                      'Monday: Closed\nTuesday–Friday: 16:00 – 23:00\nSaturday: 13:00 – 23:00\nSunday: 13:00 – 22:00'
+                    }
                     disabled={submitting}
                     autoFocus
                   />
                 </FormControl>
-                <FormDescription>Plain English is fine.</FormDescription>
+                <FormDescription>One day per line. Plain English is fine.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
