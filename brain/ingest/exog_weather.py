@@ -9,8 +9,10 @@ best basis when serving on forecast.
     exog_weather_hindcast     historical-forecast (matches serve)  — realistic training basis
     exog_weather_leadmatched  previous-runs, issued N days ahead   — forecast as actually issued
 
-Beer Hall and Ellel share cell="lancaster" (one pull serves both). One HTTP call
-per (cell, basis) — never one per venue or per forecast.
+Each venue now has its own precise grid cell (G12.9e; `config.WEATHER_CELLS`).
+Beer Hall and Ellel are ~0.6 km apart but no longer share one, and TRT's cell is
+`preston`, not the old mis-located `trt_south`. One HTTP call per (cell, basis),
+never one per venue or per forecast.
 
 Run:
     python -m ingest.exog_weather              # pull all bases for all cells, cache to DuckDB

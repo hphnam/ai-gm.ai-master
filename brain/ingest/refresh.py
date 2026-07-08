@@ -51,9 +51,14 @@ def _ensure_tables(con) -> None:
             venue VARCHAR NOT NULL, layer VARCHAR NOT NULL,
             old_rung INTEGER, new_rung INTEGER,
             old_mase DOUBLE, new_mase DOUBLE,
-            adopted BOOLEAN, reason VARCHAR, ts TIMESTAMP DEFAULT now()
+            adopted BOOLEAN, reason VARCHAR, ts TIMESTAMP DEFAULT now(),
+            per_fold_mase VARCHAR, n_folds INTEGER
         )
         """)
+    # G12.9b: idempotent guard for stores created before per_fold_mase/n_folds
+    # existed, so an older store on disk picks up the audit columns in place.
+    con.execute("ALTER TABLE ladder_selection ADD COLUMN IF NOT EXISTS per_fold_mase VARCHAR")
+    con.execute("ALTER TABLE ladder_selection ADD COLUMN IF NOT EXISTS n_folds INTEGER")
     con.execute(
         """
         CREATE TABLE IF NOT EXISTS served_forecast (
@@ -245,6 +250,8 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
     (no backtest run, no audit row written) — a chronos-less venv must never
     re-select among rungs 0-3 and silently demote a served Rung-4 model. Returns
     a `"skipped"` dict instead; the served model is left untouched."""
+    import json
+
     from models import ladder
     from models.foundation import HAS_CHRONOS
 
@@ -259,7 +266,7 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
                 ".venv-forecast")
         return {"skipped": "backend absent", "note": note}
 
-    results, *_ = ladder.evaluate_rolling(venue, n_folds=4, horizon=7, with_prophet=False)
+    results, n_folds = ladder.evaluate_rolling(venue, n_folds=6, horizon=7, with_prophet=False)
     best = ladder.select_best(results)
     by_name = {r.name: r for r in results}
     naive = by_name.get("rung0_seasonal_naive")
@@ -270,6 +277,10 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
         and best.metrics.get("MASE", float("inf")) < dow.metrics.get("MASE", float("inf")))
     new_mase = float(best.metrics["MASE"]) if best is not None else None
     old_mase = float(naive.metrics["MASE"]) if naive is not None else None
+    # G12.9b: surface the winner's per-fold MASE vector (not just its mean), so a
+    # win concentrated in a single fold is visible in the audit row, not hidden.
+    per_fold_mase = (json.dumps(best.metrics["per_fold_mase"])
+                     if best is not None and "per_fold_mase" in best.metrics else None)
 
     con = connect()
     try:
@@ -278,13 +289,16 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
         new_rung = best.rung if (adopted and best is not None) else (old_rung if old_rung is not None else 1)
         con.execute(
             "INSERT INTO ladder_selection (venue, layer, old_rung, new_rung, old_mase, "
-            "new_mase, adopted, reason, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "new_mase, adopted, reason, ts, per_fold_mase, n_folds) VALUES "
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [venue, layer, old_rung, new_rung, old_mase, new_mase, adopted, reason,
-             datetime.now()])
+             datetime.now(), per_fold_mase, n_folds])
     finally:
         con.close()
     return {"old_rung": old_rung, "new_rung": new_rung, "old_mase": old_mase,
             "new_mase": new_mase, "adopted": adopted, "reason": reason,
+            "per_fold_mase": best.metrics.get("per_fold_mase") if best is not None else None,
+            "n_folds": n_folds,
             "winner": best.name if best else None}
 
 

@@ -132,8 +132,14 @@ longer error). No code change was needed to recover the files.
   **observed/oracle basis is the worst** (0.969) — the train/serve shift is real.
 - **FLAG-FE2 (weather horizon).** Live forecast ≤16 d; weather applies to the
   reorder horizon, not the full 8-week eval.
-- **FLAG-FE3 (shared grid cell).** Beer Hall and Ellel share `cell="lancaster"`
-  (one Open-Meteo pull serves both).
+- **FLAG-FE3 (shared grid cell), RESOLVED (G12.9e).** Beer Hall and Ellel
+  previously shared `cell="lancaster"`. Each venue now has its own precise
+  Open-Meteo cell (`beer_hall`, `ellel`, `preston`). BH and Ellel are still
+  only ~0.6 km apart, but the extra pull is cheap and cached, and per-venue
+  precision was explicitly requested now that Ellel forecasts on its own
+  rungs. Historical hindcast weather for all three venues therefore shifted
+  slightly on the new basis; `build_features`/ladder reports were re-run
+  (G12.9e) so the committed numbers match.
 - **FLAG-FE4 (calendar refresh).** Uni/school tables are static lookups in
   `ingest/calendar_sources.py`; refresh each academic year. Coverage confirmed
   from 2024-09; the data window (2025-06→2026-05) is fully covered.
@@ -153,9 +159,19 @@ longer error). No code change was needed to recover the files.
   not adopted. Re-run the ablation on a longer horizon spanning term boundaries to
   reconsider. Curated event anchors are also limited — the two biggest recurring
   Lancaster festivals (Music Festival, Highest Point) **did not run in-window**.
-- **FLAG-FE-TRTLOC.** TRT stated to be in Preston but the supplied coordinate
-  (53.8751, −2.7599) sits ~13 km north (Galgate/Forton). TRT is closed, so this
-  affects historical weather/event attribution only — confirm before any live use.
+- **FLAG-FE-TRTLOC, resolved pending Ryan's exact street coordinate (G12.9e).**
+  TRT stated to be in Preston but the old `trt_south` coordinate (53.8751,
+  −2.7599) sat ~13 km north (Galgate/Forton); the label said Preston, the point
+  didn't. The cell is renamed `preston` and re-keyed to a Preston city-centre
+  coordinate (53.7632, −2.7031), which resolves the "sits outside Preston"
+  problem, but it is still a city-centre placeholder, not TRT's confirmed
+  street address. *Owner: Ryan to confirm the exact TRT street coordinate;*
+  swap `WEATHER_CELL_COORDS["preston"]` in `config.py` once known. TRT is
+  closed, so this affects historical weather/event attribution only.
+  `EVENT_SCOPE["two_river_taps"] = ("preston",)` was already correctly named
+  and is unaffected (it is a separate mapping from the weather cell); the
+  Lancaster/Preston `EVENT_SCOPE` isolation (BH/Ellel never see Preston
+  anchors and vice versa) is unchanged.
 
 ## Weather/calendar diagnostic (A14b — diagnostic only, adopts nothing)
 
@@ -234,6 +250,49 @@ longer error). No code change was needed to recover the files.
   event-only venue (Ellel) gets `baseline_trust=0.5` and a small-sample caveat — a
   narrow band inflates z there (the Ellel z=+6.22 reading). Fires on genuinely
   isolated bookings; clustered booking-weekends are treated as a pattern.
+
+## Downstream rerun matrix (G12.9g)
+
+**See [`DOWNSTREAM.md`](DOWNSTREAM.md) for the full "run live or rerun" answer.**
+Headline: deviation, change-point, briefing, and reasoning all read the
+DOW-median residual stream, not the served L1 forecast, so they run live with
+no rerun after G12.9's promotion changes. Stock cover reads a separate
+MinT-DOW-median model and is unaffected (and out of scope for Ellel). Only the
+served `/forecast` band itself needed regenerating, which promotion already
+does.
+
+## WP12 follow-up (G12.9f, known gaps, not fixed now)
+
+- **FLAG-G12.9-1 (Ellel-event dormant gap).** `is_ellel_event` (`build_features.
+  _ellel_event_dates`) is derived from Ellel's own OBSERVED L1 revenue, not a
+  forward bookings feed, so it returns 0 for genuinely future dates. Harmless
+  today: every path that calls the Chronos-2-exo entrant only ever forecasts
+  already-observed held-out dates for an open venue (ladder backtest, `wrap.
+  evaluate`'s rolling-origin persistence), where the flag is fully populated.
+  The gap would only bite a genuinely future, unobserved date. In this
+  codebase that only arises via `conformal.wrap._persist_standby_forward`,
+  which fires solely for a CLOSED venue, and Ellel is never flagged closed
+  (`EVENT_ONLY_VENUES`, see above). The real fix is a forward Ellel bookings
+  feed (the standing James/Ryan dependency, same as FLAG-5/FLAG-1 stock items).
+  Related, but distinct: the SELF-leak decision in G12.9d (`exo_cols_for_venue`
+  excludes `is_ellel_event` when forecasting Ellel itself, because on Ellel's
+  own frame the flag is a near-perfect proxy for Ellel's own sparse target).
+  That fix is already shipped; this dormant-gap flag is about forecasting
+  *other* venues (Beer Hall) from Ellel's event flag, which still has no
+  forward-looking source.
+- **FLAG-G12.9-2 (TRT `rung3_global_gbm` serving bug).** `conformal.wrap.
+  _predictor` resolves model names against `models.ladder.PREDICTORS`, which
+  registers the per-venue GBM as `rung3_gbm` but never registers the pooled
+  `rung3_global_gbm` variant (`global_gbm_predict`): it is added only inside
+  `_predict_all`'s per-call `out` list, not the static registry. If a rolling
+  backtest ever selects `rung3_global_gbm` as the MASE winner for a venue and
+  something then tries to serve/force-refit it via `wrap.evaluate`, `_predictor`
+  raises (`unknown model 'rung3_global_gbm'`) instead of resolving a predictor.
+  Observed on TRT. Pre-existing, unrelated to Chronos/G12.9, and TRT is closed
+  (out of scope for this pass). Recorded here per the spec's instruction to log
+  it, not fix it now; fix if TRT ever reopens or `rung3_global_gbm` is ever
+  adopted for a served venue. The fix is registering the pooled GBM under its
+  own name in `PREDICTORS` (or teaching `_predictor` to special-case it).
 
 ## Live ingest / freshness / conditional retrain (three-tier model)
 

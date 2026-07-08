@@ -176,3 +176,59 @@ def test_exo_predict_happy_path_uses_future_df_and_median(monkeypatch):
     out = foundation.chronos2_exo_predict(train, target)
     assert out.tolist() == [7.0, 8.0]
     assert set(foundation.CHRONOS2_EXO_COLS) <= seen["future_cols"]
+
+
+# --- G12.9d: Ellel self-leak exclusion (is_ellel_event) ----------------------
+
+def test_exo_cols_for_venue_drops_is_ellel_event_for_ellel_only():
+    from models.foundation import CHRONOS2_EXO_COLS, exo_cols_for_venue
+
+    assert "is_ellel_event" not in exo_cols_for_venue("ellel")
+    assert set(exo_cols_for_venue("ellel")) == set(CHRONOS2_EXO_COLS) - {"is_ellel_event"}
+    assert exo_cols_for_venue("beer_hall") == list(CHRONOS2_EXO_COLS)
+    assert exo_cols_for_venue(None) == list(CHRONOS2_EXO_COLS)
+
+
+def test_exo_predict_for_ellel_does_not_require_is_ellel_event(monkeypatch):
+    pytest.importorskip("torch", reason="torch absent in the runtime venv")
+    from models import foundation
+
+    class _FakeC2:
+        def predict_df(self, df, future_df, prediction_length, quantile_levels,
+                       id_column, timestamp_column, target):
+            return pd.DataFrame({"0.5": [1.0, 2.0, 3.0]})
+
+    monkeypatch.setattr(foundation, "_chronos2_pipeline", lambda: _FakeC2())
+    train = _exo_frame(10, "2026-01-01").drop(columns=["is_ellel_event"])
+    target = _exo_frame(3, "2026-01-11").drop(columns=["is_ellel_event"])
+    # Would raise MissingCovariateError without the venue="ellel" exclusion.
+    out = foundation.chronos2_exo_predict(train, target, venue="ellel")
+    assert out.tolist() == [1.0, 2.0, 3.0]
+
+
+def test_exo_predict_for_other_venue_still_requires_is_ellel_event():
+    from models.foundation import MissingCovariateError, chronos2_exo_predict
+
+    train = _exo_frame(10, "2026-01-01").drop(columns=["is_ellel_event"])
+    target = _exo_frame(3, "2026-01-11")
+    with pytest.raises(MissingCovariateError, match="is_ellel_event"):
+        chronos2_exo_predict(train, target, venue="beer_hall")
+
+
+def test_exo_predict_for_ellel_never_sends_is_ellel_event_to_future_df(monkeypatch):
+    pytest.importorskip("torch", reason="torch absent in the runtime venv")
+    from models import foundation
+
+    seen = {}
+
+    class _FakeC2:
+        def predict_df(self, df, future_df, prediction_length, quantile_levels,
+                       id_column, timestamp_column, target):
+            seen["future_cols"] = set(future_df.columns)
+            return pd.DataFrame({"0.5": [7.0, 8.0]})
+
+    monkeypatch.setattr(foundation, "_chronos2_pipeline", lambda: _FakeC2())
+    train = _exo_frame(10, "2026-01-01")
+    target = _exo_frame(2, "2026-01-11")
+    foundation.chronos2_exo_predict(train, target, venue="ellel")
+    assert "is_ellel_event" not in seen["future_cols"]

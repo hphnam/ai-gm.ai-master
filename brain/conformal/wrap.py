@@ -55,8 +55,11 @@ STANDBY_DAYS = 28
 
 
 def default_model(venue: str) -> str:
-    """Point forecaster to wrap. Ellel is capped at Rung 1 (Data Audit §8.3), so
-    wrap its robust-DOW forecaster; other venues wrap ETS (the rolling winner)."""
+    """Fallback point forecaster to wrap when no rung has been adopted/served yet
+    for this venue: robust-DOW for any venue still capped at Rung 1 via
+    `MAX_RUNG` (empty by default post-G12.9c, so Ellel is no longer capped),
+    else ETS. The actual served model normally comes from `ladder_selection`/
+    `served_forecast` once a T3 re-fit has run."""
     return "rung1_robust_dow" if MAX_RUNG.get(venue, 99) <= 1 else "rung2_ets"
 
 warnings.filterwarnings("ignore")
@@ -74,10 +77,15 @@ def conformal_quantile(scores: np.ndarray, level: float) -> float:
     return float(scores[k - 1])
 
 
-def _predictor(model_name: str):
+def _predictor(model_name: str, venue: str | None = None):
     fn = dict((name, fn) for name, _r, fn, _a in ladder.PREDICTORS).get(model_name)
     if fn is None:
         raise ValueError(f"unknown model {model_name!r}")
+    if model_name == "rung4_chronos2_exo":
+        # G12.9d: serving must apply the same venue-scoped covariate exclusion
+        # (drop the Ellel self-leak column for Ellel) as the ladder backtest.
+        import functools
+        fn = functools.partial(fn, venue=venue)
     return fn
 
 
@@ -90,10 +98,11 @@ def rolling_point_forecasts(
     min_train_days: int = 120,
     first_target: pd.Timestamp | None = None,
     last_target: pd.Timestamp | None = None,
+    venue: str | None = None,
 ) -> pd.DataFrame:
     """Operational 7-day rolling forecasts: each block is forecast from a model
     fit on all data strictly before the block. Returns (date, y, yhat)."""
-    fn = _predictor(model_name)
+    fn = _predictor(model_name, venue)
     feats = feats.sort_values("date").reset_index(drop=True)
     start = first_target or (feats["date"].min() + pd.Timedelta(days=min_train_days))
     end = last_target or feats["date"].max()
@@ -140,7 +149,7 @@ def evaluate(
     # calibrated/validated against — the closure is a structural break.
     feats = trim_to_active(build_features(venue), venue)
     cols = feature_columns(feats)
-    full = rolling_point_forecasts(feats, model_name, cols, horizon=7)
+    full = rolling_point_forecasts(feats, model_name, cols, horizon=7, venue=venue)
     full = full.sort_values("date").reset_index(drop=True)
     full["res"] = np.abs(full["y"] - full["yhat"])
 
@@ -195,7 +204,7 @@ def _persist_standby_forward(venue, model_name, feats, full) -> None:
     """For a closed venue: project the band forward STANDBY_DAYS past the last
     active day, so /forecast returns a ready-for-reopening band. Calibrated on
     the whole active residual set (Mondrian by active/closed weekday)."""
-    fn = _predictor(model_name)
+    fn = _predictor(model_name, venue)
     last = pd.Timestamp(feats["date"].max())
     future = pd.DataFrame({
         "date": pd.date_range(last + pd.Timedelta(days=1), periods=STANDBY_DAYS, freq="D")

@@ -10,6 +10,7 @@ import duckdb
 import pandas as pd
 import pytest
 
+from config import WEATHER_CELLS
 from signals import residual
 
 _ONSET = pd.Timestamp("2026-06-13")
@@ -26,7 +27,8 @@ def con(tmp_path, monkeypatch):
 def _seed_leadmatched(con):
     df = pd.DataFrame({
         "date": pd.to_datetime(pd.date_range("2026-06-01", "2026-06-30")),
-        "cell": "lancaster", "exo_temp_c": 15.0, "exo_rain_mm": 1.0, "exo_sunshine_hrs": 5.0,
+        "cell": WEATHER_CELLS["beer_hall"], "exo_temp_c": 15.0, "exo_rain_mm": 1.0,
+        "exo_sunshine_hrs": 5.0,
     })
     con.register("_w", df)
     con.execute("CREATE TABLE exog_weather_leadmatched AS SELECT * FROM _w")

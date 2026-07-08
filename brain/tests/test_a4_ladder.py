@@ -84,8 +84,13 @@ def test_capped_milestone_gate_is_rung1_beats_naive():
     assert "Rung 1" in info["gate"]
 
 
-def test_ellel_ladder_never_returns_an_available_rung_above_one():
+def test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted():
+    # G12.9c: Ellel is uncapped. Every rung competes, subject only to the same
+    # milestone gate as any other venue. A rung above 1 may still legitimately
+    # fail to fit on ~64 trading days, but it must be attempted (not pre-emptively
+    # skipped with a "capped" note) and never crash the run.
+    assert "ellel" not in ladder.MAX_RUNG
     results, _split, _cols = ladder.evaluate_static("ellel")
     for r in results:
-        if r.rung >= 2:
-            assert r.available is False, f"{r.name} should be capped for Ellel"
+        if not r.available:
+            assert "capped" not in r.note, f"{r.name} should not be reported as capped for Ellel"

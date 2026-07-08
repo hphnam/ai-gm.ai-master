@@ -175,12 +175,14 @@ def test_resolution_defaults_to_venue_default(monkeypatch):
         _reset()
 
 
-def test_capped_venue_default_is_rung1(monkeypatch):
+def test_ellel_default_is_rung2_ets_now_uncapped(monkeypatch):
+    # G12.9c: Ellel is no longer capped at Rung 1 (MAX_RUNG is empty), so its
+    # fallback default resolves the same way as any other venue.
     _reset()
     seen = _stub_heavy(monkeypatch)
     try:
         refresh._promote_and_serve("ellel")
-        assert seen["model"] == "rung1_robust_dow"
+        assert seen["model"] == "rung2_ets"
     finally:
         _reset()
 

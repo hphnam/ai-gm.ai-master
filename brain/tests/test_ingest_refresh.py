@@ -209,6 +209,48 @@ def test_forced_refit_selects_rung_and_logs_selection(store):
     assert _count_selection("beer_hall") == before + 1
 
 
+# --- G12.9b: per-fold MASE audit column --------------------------------------
+
+def test_refit_records_per_fold_mase_so_a_single_fold_win_is_visible(store, monkeypatch):
+    """The winner's per-fold MASE vector is surfaced in the audit row, not just
+    its mean. A win concentrated in one fold must be visible in the row."""
+    import json
+
+    from models import ladder
+    from models.ladder import RungResult
+
+    _reset_store()
+    single_fold_dominant = [0.20, 0.95, 0.95, 0.95, 0.95, 0.80]
+
+    def _fake_rolling(venue, *, n_folds=6, horizon=7, with_prophet=False):
+        results = [
+            RungResult("rung0_seasonal_naive", 0,
+                      metrics={"MASE": 1.0, "folds": 6, "per_fold_mase": [1.0] * 6}),
+            RungResult("rung1_robust_dow", 1,
+                      metrics={"MASE": 0.95, "folds": 6, "per_fold_mase": [0.95] * 6}),
+            RungResult("rung4_chronos2_exo", 4,
+                      metrics={"MASE": float(sum(single_fold_dominant) / 6), "folds": 6,
+                              "per_fold_mase": single_fold_dominant}),
+        ]
+        return results, n_folds
+
+    monkeypatch.setattr(ladder, "evaluate_rolling", _fake_rolling)
+    refresh._refit_ladder("beer_hall", "test single-fold-dominant win")
+
+    con = warehouse.connect(read_only=True)
+    try:
+        row = con.execute(
+            "SELECT per_fold_mase, n_folds FROM ladder_selection WHERE venue='beer_hall' "
+            "ORDER BY ts DESC LIMIT 1").fetchone()
+    finally:
+        con.close()
+    stored = json.loads(row[0])
+    assert stored == single_fold_dominant
+    assert row[1] == 6
+    # the audit row itself exposes that one fold, not the mean, drove the win.
+    assert min(stored) < 0.5 * (sum(stored) / len(stored))
+
+
 # --- G12.4 environment guards: a chronos-less venv never demotes a served
 # Rung-4 model as a side effect -----------------------------------------------
 

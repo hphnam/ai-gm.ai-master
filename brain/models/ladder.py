@@ -283,8 +283,9 @@ PREDICTORS: list[tuple[str, int, object, bool]] = [
 # when the backend is installed (Chronos-2 the flagship entrant, Chronos-Bolt a
 # same-family comparison row, Chronos-2 + known-future covariates a third
 # entrant), so each climbs the same gate as every other rung and is subject to
-# the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the list is
-# unchanged, so the ladder is byte-identical to its pre-Rung-4 behaviour.
+# any per-venue MAX_RUNG cap (empty by default post-G12.9c). When chronos is
+# absent the list is unchanged, so the ladder is byte-identical to its
+# pre-Rung-4 behaviour.
 if HAS_CHRONOS:
     PREDICTORS.append(("rung4_chronos_bolt", 4, chronos_bolt_predict, True))
     PREDICTORS.append(("rung4_chronos2", 4, chronos2_predict, True))
@@ -310,7 +311,11 @@ def _predict_all(
             out.append((name, rung, None, "backend not installed"))
             continue
         try:
-            out.append((name, rung, fn(train, target, cols), ""))
+            if name == "rung4_chronos2_exo":
+                # G12.9d: exclude the Ellel-self-leak covariate for Ellel only.
+                out.append((name, rung, fn(train, target, cols, venue=venue), ""))
+            else:
+                out.append((name, rung, fn(train, target, cols), ""))
         except Exception as exc:  # pragma: no cover - defensive
             out.append((name, rung, None, f"error: {type(exc).__name__}"))
     if 3 > cap:
@@ -397,7 +402,8 @@ def evaluate_rolling(
         if vals:
             results.append(RungResult(
                 name, rung,
-                metrics={"MASE": float(np.mean(vals)), "folds": len(vals)}))
+                metrics={"MASE": float(np.mean(vals)), "folds": len(vals),
+                        "per_fold_mase": vals}))
         else:
             results.append(RungResult(name, rung, available=False,
                                       note=notes.get(name, "")))

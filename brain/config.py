@@ -80,18 +80,33 @@ EXCLUDED_VENUES = frozenset({"events"})
 # Forecast targets — the three real venues.
 FORECAST_VENUES = ("beer_hall", "two_river_taps", "ellel")
 
-# Per-venue ladder rung cap. Ellel has only ~64 booking-driven trading days —
-# the Data Audit Report (§8.3) explicitly says do not attempt SARIMA/Prophet/
-# neural models on it. So cap the ladder at Rung 1 (robust DOW × season), a
-# deliberate scope substitution for the audit's event-characteristic regression
-# (a reasonable stand-in given the data, not a bespoke event model). Default: no cap.
-MAX_RUNG: dict[str, int] = {"ellel": 1}
+# Per-venue ladder rung cap. Previously capped Ellel at Rung 1 (robust DOW ×
+# season) per the Data Audit Report (§8.3): with only ~64 booking-driven
+# trading days, SARIMA/Prophet/neural models were assumed to have insufficient
+# training signal. G12.9c retires that hypothesis for Rung 4 specifically:
+# Chronos-2 is zero-shot and needs no per-venue training signal, so the
+# "insufficient signal" rationale never applied to it. Ellel is uncapped: every
+# rung competes and the milestone gate (beats seasonal-naive and robust DOW)
+# decides what is adopted, same as every other venue. Classical/ML rungs
+# (STL/ETS/GBM) that genuinely cannot fit on ~64 days fail gracefully (report
+# "not evaluable", per the ladder's existing contract) rather than being
+# pre-emptively excluded. Kept as an empty dict, not removed, for any future
+# per-venue cap need.
+MAX_RUNG: dict[str, int] = {}
 
 # Booking/event-driven venues whose "structural zero" is not a fixed weekday
 # (Mon/Tue) but *any* zero-revenue day — they simply have no sales most days.
-# Used by store.active_span.is_closed (a trailing booking lull is sparsity, not
-# a closure, so these are never flagged "closed"); the sMAPE harness also
-# excludes all-zero days, which is correct for these too.
+# G12.9c: this flag governs the detector path and two other decoupled seams
+# ONLY. It has never gated the ladder's rung cap (that was MAX_RUNG alone, now
+# uncapped for Ellel above). After G12.9c, EVENT_ONLY_VENUES still controls:
+#   1. signals.change_point.detect: persistence-only detection (CUSUM skipped,
+#      the CP_MIN_SPAN_DAYS history gate relaxed) for a sparse, booking-driven
+#      series where CUSUM is unreliable. Still a valid, separate design choice.
+#   2. store.active_span.is_closed: a trailing booking lull is sparsity, never
+#      flagged as venue "closed".
+#   3. signals.briefing._baseline_trust: down-weights a single-day deviation on
+#      a sparse venue (a narrow conformal band inflates z there, FLAG-BR4).
+# None of these three touch which forecasting rung is served.
 EVENT_ONLY_VENUES = frozenset({"ellel"})
 
 # Expected per-venue line-item counts (the profiled audit figures). A0 asserts
@@ -187,15 +202,25 @@ STOCK_A6_NODE_MAP: dict[tuple[str, str], str] = {
 }
 
 # --- Feature enrichment (A14) -----------------------------------------------
-# Venue -> shared weather grid cell. Beer Hall and Ellel are ~0.6 km apart, so
-# one Open-Meteo pull (cell="lancaster") serves both; TRT (closed, Preston-ish)
-# is a separate cell. NB FLAG-FE-TRTLOC: the supplied TRT coordinate sits ~13 km
-# north of Preston — confirm before trusting TRT weather/event attribution.
+# Venue -> its own weather grid cell (G12.9e). Beer Hall and Ellel are only
+# ~0.6 km apart, but each now gets its own precise Open-Meteo cell rather than
+# sharing "lancaster". The extra pull is cheap and cached, and precision was
+# requested now that Ellel forecasts on its own rungs. TRT's cell is named
+# `preston` (was `trt_south`) and keyed to a Preston coordinate; FLAG-FE-TRTLOC
+# is resolved pending Ryan's exact street coordinate (see FLAGS.md). The
+# supplied `trt_south` point sat ~13 km north of Preston (Galgate/Forton), never
+# Preston itself. This is a city-centre placeholder, not the confirmed venue
+# address. EVENT_SCOPE (below) is a separate, unaffected mapping (events, not
+# weather) that already read "preston".
 WEATHER_CELLS = {
-    "beer_hall": "lancaster", "ellel": "lancaster", "two_river_taps": "trt_south",
+    "beer_hall": "beer_hall", "ellel": "ellel", "two_river_taps": "preston",
 }
 WEATHER_CELL_COORDS = {
-    "lancaster": (53.9955, -2.7867), "trt_south": (53.8751, -2.7599),
+    "beer_hall": (53.99553968526141, -2.786711886507146),
+    "ellel": (53.990090612186854, -2.792154498681027),
+    # FLAG-FE-TRTLOC: Preston city-centre coordinate (placeholder). Ryan to
+    # confirm the exact TRT street coordinate; not yet the venue's own address.
+    "preston": (53.7632, -2.7031),
 }
 WEATHER_DAILY_VARS = ("temperature_2m_max", "precipitation_sum", "sunshine_duration")
 # Training basis for the weather feature. The ablation sweeps all three; serving

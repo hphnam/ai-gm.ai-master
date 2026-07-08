@@ -215,22 +215,39 @@ class MissingCovariateError(ValueError):
     known-future covariate value. Deliberate: this entrant never imputes."""
 
 
-def _require_covariates(frame: pd.DataFrame, which: str) -> None:
-    missing_cols = [c for c in CHRONOS2_EXO_COLS if c not in frame.columns]
+# G12.9d: `is_ellel_event` is a spillover signal designed for forecasting OTHER
+# venues from Ellel's own trading days (build_features._ellel_event_dates
+# derives it from Ellel's observed L1 revenue, per FIX-8's spillover-hypothesis
+# check). Feeding it back as a covariate when forecasting Ellel ITSELF would be
+# a self-leak: on Ellel's own feature frame the flag is 1 exactly when Ellel
+# traded (value > 0), so it is a near-perfect proxy for the sparse target it is
+# meant to help predict, on both the train and held-out target frame. Excluded
+# for the Ellel venue specifically; every other venue keeps the full set.
+def exo_cols_for_venue(venue: str | None) -> list[str]:
+    if venue == "ellel":
+        return [c for c in CHRONOS2_EXO_COLS if c != "is_ellel_event"]
+    return list(CHRONOS2_EXO_COLS)
+
+
+def _require_covariates(frame: pd.DataFrame, which: str, exo_cols: list[str]) -> None:
+    missing_cols = [c for c in exo_cols if c not in frame.columns]
     if missing_cols:
         raise MissingCovariateError(
             f"chronos2_exo_predict: {which} frame is missing covariate column(s) "
-            f"{missing_cols} (of {CHRONOS2_EXO_COLS}); not imputing, raising instead")
-    nan_cols = [c for c in CHRONOS2_EXO_COLS if frame[c].isna().any()]
+            f"{missing_cols} (of {exo_cols}); not imputing, raising instead")
+    nan_cols = [c for c in exo_cols if frame[c].isna().any()]
     if nan_cols:
         raise MissingCovariateError(
             f"chronos2_exo_predict: {which} frame has NaN covariate value(s) in "
             f"{nan_cols}; not imputing, raising instead")
 
 
-def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
+def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None, *,
+                         venue: str | None = None) -> np.ndarray:
     """Zero-shot Chronos-2 point forecast with known-future calendar covariates
-    (WP12), clipped at 0. Reads exactly CHRONOS2_EXO_COLS; never weather.
+    (WP12), clipped at 0. Reads `exo_cols_for_venue(venue)` (== CHRONOS2_EXO_COLS
+    for every venue except Ellel, where `is_ellel_event` is dropped to avoid the
+    self-leak, see G12.9d); never weather.
 
     Shares the process-level Chronos-2 pipeline with chronos2_predict (one model
     in memory for both entrants). No fallback to the univariate tensor path: if
@@ -238,19 +255,20 @@ def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) 
     error), this raises so the ladder harness reports it as a distinct failed
     entrant, never a silent degrade to the univariate row (which already exists
     on its own)."""
-    _require_covariates(train, "train")
-    _require_covariates(target, "target")
+    exo_cols = exo_cols_for_venue(venue)
+    _require_covariates(train, "train", exo_cols)
+    _require_covariates(target, "target", exo_cols)
     n = len(target)
     pipe = _chronos2_pipeline()
     context_df = pd.DataFrame({
         "id": "l1",
         "timestamp": pd.to_datetime(train["date"].to_numpy()),
         "target": train["value"].to_numpy(float)})
-    for c in CHRONOS2_EXO_COLS:
+    for c in exo_cols:
         context_df[c] = train[c].to_numpy(float)
     future_df = pd.DataFrame({
         "id": "l1", "timestamp": pd.to_datetime(target["date"].to_numpy())})
-    for c in CHRONOS2_EXO_COLS:
+    for c in exo_cols:
         future_df[c] = target[c].to_numpy(float)
     pred_df = pipe.predict_df(
         context_df, future_df=future_df, prediction_length=n,
