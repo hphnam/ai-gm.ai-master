@@ -52,8 +52,11 @@ closed.**
 - **Actual run (G9.4, A9.1, A9.2):** Beer Hall `rung4_chronos2` rolling MASE **0.793**
   is the **milestone winner**, beating robust DOW (1.029), seasonal-naive (1.006),
   prophet (0.799) and `rung3_global_gbm` (0.905), so **Rung 4 is adopted by the gate
-  on Beer Hall**. Two River Taps `rung4_chronos2` 0.636 (Bolt 0.612) beats
-  naive/DOW/GBM but not `rung2_ets` (0.584, still selected there). Ellel capped.
+  on Beer Hall**. On Two River Taps the best Rung-4 entrant is `rung4_chronos_bolt`
+  (rolling MASE 0.612), with `rung4_chronos2` at 0.636; both beat naive/DOW/GBM but
+  neither beats `rung2_ets` (0.584), which stays selected. Ellel capped. (All figures
+  here are rolling MASE, the milestone-gate metric; static-regime figures differ, e.g.
+  TRT Bolt is 0.556 static; cite from the `models/ladder_results_L1_*.md` tables.)
   Provenance line: "chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API
   path predict_df."
 - **A9.3:** backend-absent output verified byte-identical (runtime-venv rerun matches

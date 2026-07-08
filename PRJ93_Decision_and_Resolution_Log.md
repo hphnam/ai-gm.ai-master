@@ -78,9 +78,13 @@ runtime venv and its dependencies are untouched.
    `models/ladder_results_L1_*.md`). Result, zero-shot, held-out rolling MASE:
    Beer Hall rung4_chronos2 0.793, the milestone winner, beating robust DOW (1.029),
    seasonal-naive (1.006), prophet (0.799) and rung3_global_gbm (0.905), so Rung 4
-   is adopted by the gate on Beer Hall; Two River Taps rung4_chronos2 0.636 (Bolt
-   0.612), which beats naive/DOW/GBM but not rung2_ets (0.584, still the selected
-   model there); Ellel stays capped at Rung 1. Report-only: promotion (`_promote_and_serve`)
+   is adopted by the gate on Beer Hall. On Two River Taps the best Rung-4 entrant is
+   rung4_chronos_bolt (rolling MASE 0.612), with rung4_chronos2 at 0.636; both beat
+   naive/DOW/GBM but neither beats rung2_ets (0.584), which stays selected. (All
+   figures here are rolling MASE, the milestone-gate metric; the static-regime
+   figures differ, e.g. TRT Bolt is 0.556 static. Quote dissertation figures from
+   the report tables in `models/ladder_results_L1_*.md`, not this prose.) Ellel stays
+   capped at Rung 1. Report-only: promotion (`_promote_and_serve`)
    is a separate deliberate step awaiting Nam's sign-off; no persisted band or
    forecast was changed. Backend-absent behaviour remains byte-identical.
 
