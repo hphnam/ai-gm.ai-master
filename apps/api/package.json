@@ -27,7 +27,6 @@
     "probe:chat-core": "tsx scripts/probe-chat-core.ts",
     "probe:chat-latency": "tsx scripts/probe-chat-latency.ts",
     "probe:chat-core:real": "PROBE_CHAT_CORE_REAL=1 tsx scripts/probe-chat-core.ts",
-    "probe:whatsapp-onboarding": "PROBE_INFOBIP_STUB=1 tsx scripts/probe-whatsapp-onboarding.ts",
     "test:cost-tracker": "node --import tsx --test src/modules/chat-core/cost-tracker.service.spec.ts",
     "backfill:sections": "tsx scripts/backfill-knowledge-sections.ts",
     "reembed:corpus": "tsx scripts/reembed-corpus.ts"

@@ -24,7 +24,7 @@ export const SendMessageInputSchema = z.object({
     .object({
       mediaType: z.enum(['image/jpeg', 'image/png', 'image/webp', 'image/gif']),
       base64: z.string().min(1),
-      // audit S2: channel-specific source ref (e.g. Infobip inbound messageId) for forensics.
+      // audit S2: channel-specific source ref (e.g. Twilio inbound MessageSid) for forensics.
       sourceRef: z.string().min(1).max(64).optional(),
     })
     .optional(),
