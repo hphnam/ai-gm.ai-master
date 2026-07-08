@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Recipient } from '@/lib/hooks/use-notifications'
 import { ConversationThread } from './conversation-thread'
 import { ConversationsList } from './conversations-list'
@@ -20,6 +20,18 @@ export function ConversationsView({ initialOtherUserId }: { initialOtherUserId?:
         { kind: 'thread', otherUserId: initialOtherUserId, otherParty: { name: null, email: '' } }
       : { kind: 'list' },
   )
+
+  // A deep link can land while the view is already mounted (sheet sitting
+  // open on the list) — the initializer above only covers fresh mounts.
+  useEffect(() => {
+    if (initialOtherUserId) {
+      setMode({
+        kind: 'thread',
+        otherUserId: initialOtherUserId,
+        otherParty: { name: null, email: '' },
+      })
+    }
+  }, [initialOtherUserId])
 
   if (mode.kind === 'list') {
     return (

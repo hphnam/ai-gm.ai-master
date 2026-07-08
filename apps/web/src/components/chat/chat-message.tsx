@@ -2,7 +2,7 @@
 
 import { getToolName, isToolUIPart, type UIMessage } from 'ai'
 import { AlertTriangle, Copy, MoreHorizontal, RefreshCcw } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { MentionedText } from '@/components/chat/mention-picker'
 import {
@@ -11,14 +11,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AgentTraceDisclosure, AgentTraceLive, type TraceStep } from './agent-trace'
 import { AssistantMarkdown } from './assistant-markdown'
 import { buildSectionsByDoc, CitationsContext, hasUncitedKb } from './citations'
 import { FeedbackButtons } from './feedback-buttons'
 import { FollowUpPills } from './follow-up-pills'
-import { LiveStatusLine } from './live-status'
 import { hasToolCard, ToolCard } from './tool-cards/tool-card-router'
 import type { ToolCardCtx, ToolPart } from './tool-cards/types'
-import { toolStatusPhrase } from './tool-labels'
+import { toolDonePhrase, toolStatusPhrase } from './tool-labels'
 
 type Props = {
   message: UIMessage
@@ -58,11 +58,16 @@ function AssistantAvatar() {
   )
 }
 
+type ToolStep = {
+  id: string
+  name: string
+  status: 'active' | 'done' | 'error'
+}
+
 type AssistantClassification = {
-  /// The tool currently in flight (input streamed, no output yet), if any. It
-  /// drives the ephemeral live status line. We surface the most recent one so a
-  /// multi-tool chain shows the freshest action.
-  liveTool: { name: string; input: unknown } | null
+  /// Every tool call this turn, in emission order — settled or in flight.
+  /// Drives the step trace (live while streaming, disclosure once settled).
+  toolSteps: ToolStep[]
   /// Deliverable tool cards (report, checklist, task-created, stock list, …).
   /// These are content the user keeps, so they render both mid-stream and on
   /// reload. Non-deliverable tool calls render nothing.
@@ -78,18 +83,23 @@ type AssistantClassification = {
 function classifyAssistantParts(parts: UIMessage['parts']): AssistantClassification {
   const lastIdx = parts.length - 1
 
-  let liveTool: { name: string; input: unknown } | null = null
+  const toolSteps: ToolStep[] = []
   const answerChunks: string[] = []
   const toolCardParts: ToolPart[] = []
-  parts.forEach((p) => {
+  parts.forEach((p, idx) => {
     if (isToolUIPart(p)) {
       const name = getToolName(p)
       const settled = p.state === 'output-available' || p.state === 'output-error'
-      if (!settled) {
-        liveTool = { name, input: (p as { input?: unknown }).input }
-        return
+      const status = p.state === 'output-error' ? 'error' : settled ? 'done' : 'active'
+      const prev = toolSteps[toolSteps.length - 1]
+      if (prev?.name === name) {
+        // Consecutive calls to the same tool collapse into one step; an error
+        // only sticks if the whole run errored.
+        if (status !== 'error' || prev.status === 'error') prev.status = status
+      } else {
+        toolSteps.push({ id: p.toolCallId ?? `${name}-${idx}`, name, status })
       }
-      if (hasToolCard(name)) toolCardParts.push(p as unknown as ToolPart)
+      if (settled && hasToolCard(name)) toolCardParts.push(p as unknown as ToolPart)
       return
     }
     if (p.type === 'text') {
@@ -99,38 +109,31 @@ function classifyAssistantParts(parts: UIMessage['parts']): AssistantClassificat
   })
 
   return {
-    liveTool,
+    toolSteps,
     toolCardParts,
     answerChunks,
     lastPartIsText: lastIdx >= 0 && parts[lastIdx]?.type === 'text',
   }
 }
 
-/// Renders the per-turn header: the ephemeral live status line (streaming only)
-/// and any deliverable tool cards. The answer text is rendered separately by
-/// ChatMessage so multi-chunk turns can split into multiple bubbles.
-function AssistantTurnHeader({
-  liveStatus,
-  toolCardParts,
-  ctx,
-}: {
-  liveStatus: string | null
-  toolCardParts: ToolPart[]
-  ctx: ToolCardCtx
-}) {
-  if (!liveStatus && toolCardParts.length === 0) return null
-  return (
-    <div className="flex flex-col gap-2.5">
-      {liveStatus ? <LiveStatusLine label={liveStatus} /> : null}
-      {toolCardParts.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          {toolCardParts.map((p, i) => (
-            <ToolCard key={p.toolCallId ?? `tool-card-${i}`} part={p} ctx={ctx} />
-          ))}
-        </div>
-      ) : null}
-    </div>
-  )
+/// Wall-clock for the whole turn, captured client-side while this message
+/// streams. Null on reloaded turns — the persisted log carries no timings.
+function useTurnElapsed(isStreaming: boolean): number | null {
+  const startRef = useRef<number | null>(isStreaming ? Date.now() : null)
+  const [elapsedSec, setElapsedSec] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (isStreaming) {
+      if (startRef.current === null) startRef.current = Date.now()
+      return
+    }
+    if (startRef.current !== null) {
+      setElapsedSec(Math.max(1, Math.round((Date.now() - startRef.current) / 1000)))
+      startRef.current = null
+    }
+  }, [isStreaming])
+
+  return elapsedSec
 }
 
 function AssistantAnswer({ text, showCursor }: { text: string; showCursor: boolean }) {
@@ -215,7 +218,7 @@ function AssistantActions({
 function UncitedKbWarning() {
   return (
     <div
-      className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-[12px] text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+      className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 px-2.5 py-2 text-xs text-warning"
       role="note"
     >
       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
@@ -237,10 +240,7 @@ function VerifyBadge({ verify }: { verify: NonNullable<Props['verify']> }) {
         className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
         title="Specifics in this answer were checked against the cited sources."
       >
-        <span
-          className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-500"
-          aria-hidden
-        />
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
         <span>Checked against sources</span>
       </span>
     )
@@ -294,6 +294,11 @@ export function ChatMessage({
   }
   const isUser = message.role === 'user'
 
+  // Hooks before the user-bubble early return — a message row never changes
+  // role in place (keyed by id), but the hook order must not depend on it.
+  const sectionsByDoc = useMemo(() => buildSectionsByDoc(message.parts), [message.parts])
+  const turnElapsed = useTurnElapsed(!isUser && Boolean(isStreaming))
+
   if (isUser) {
     const text = stripFollowUpTail(
       message.parts
@@ -302,8 +307,11 @@ export function ChatMessage({
         .trim(),
     )
     return (
-      <article aria-label="Your message" className="flex w-full justify-end">
-        <div className="max-w-[85%] rounded-2xl bg-muted px-4 py-2.5 text-[15px] leading-relaxed text-foreground">
+      <article
+        aria-label="Your message"
+        className="flex w-full justify-end duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
+      >
+        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-muted px-4 py-2.5 text-[15px] leading-relaxed text-foreground">
           <MentionedText text={text} className="whitespace-pre-wrap break-words" />
         </div>
       </article>
@@ -312,24 +320,26 @@ export function ChatMessage({
 
   const plainText = assistantPlainText(message.parts)
   const classification = classifyAssistantParts(message.parts)
-  const { answerChunks, liveTool, toolCardParts, lastPartIsText } = classification
-  // Built once per message render — chips inside this message's prose look it
-  // up via CitationsContext. Memoised on the parts identity to avoid rebuilds
-  // when adjacent state (streaming, follow-ups) changes.
-  const sectionsByDoc = useMemo(() => buildSectionsByDoc(message.parts), [message.parts])
+  const { answerChunks, toolSteps, toolCardParts, lastPartIsText } = classification
   const showUncitedWarning = !isStreaming && hasUncitedKb(message.parts, plainText)
 
-  // Ephemeral working status — only while streaming, and only until the answer
-  // text starts landing. An in-flight tool names the action ("Getting sales
-  // from your POS"); between steps a generic "Working" covers the model's
-  // thinking gaps. Never shown on settled/reloaded turns, so saved history
-  // stays clean.
-  const liveStatus =
-    isStreaming && (liveTool || answerChunks.length === 0)
-      ? liveTool
-        ? toolStatusPhrase(liveTool.name, liveTool.input)
-        : 'Working'
-      : null
+  const liveSteps: TraceStep[] = toolSteps.map((s) => ({
+    id: s.id,
+    label: s.status === 'active' ? toolStatusPhrase(s.name) : toolDonePhrase(s.name),
+    status: s.status,
+  }))
+  if (isStreaming && answerChunks.length === 0 && !liveSteps.some((s) => s.status === 'active')) {
+    liveSteps.push({
+      id: 'working',
+      label: liveSteps.length > 0 ? 'Working' : 'Thinking',
+      status: 'active',
+    })
+  }
+  const settledSteps: TraceStep[] = toolSteps.map((s) => ({
+    id: s.id,
+    label: toolDonePhrase(s.name),
+    status: s.status === 'error' ? 'error' : 'done',
+  }))
 
   // One <article> per answer chunk, with at least one rendered (an empty-text
   // bubble shows the live status / deliverable cards before any text arrives).
@@ -341,53 +351,54 @@ export function ChatMessage({
 
   return (
     <CitationsContext.Provider value={sectionsByDoc}>
-      <div className="flex flex-col gap-6">
-        {renderedChunks.map((chunk, i) => {
-          const isFirst = i === 0
-          const isLast = i === lastChunkIdx
-          return (
-            <article
-              // biome-ignore lint/suspicious/noArrayIndexKey: chunks mirror model emission order and never reorder within a turn; index is the stable identity here.
-              key={`${message.id}:chunk-${i}`}
-              aria-label="Assistant message"
-              aria-busy={isStreaming && isLast ? 'true' : undefined}
-              className="flex w-full gap-3"
-            >
-              <AssistantAvatar />
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                {isFirst ? (
-                  <AssistantTurnHeader
-                    liveStatus={liveStatus}
-                    toolCardParts={toolCardParts}
-                    ctx={cardCtx}
-                  />
-                ) : null}
-                {chunk.length > 0 ? (
-                  <AssistantAnswer
-                    text={chunk}
-                    showCursor={Boolean(isStreaming) && isLast && lastPartIsText}
-                  />
-                ) : null}
-                {isLast && showUncitedWarning ? <UncitedKbWarning /> : null}
-                {isLast && !isStreaming ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <AssistantActions
-                      messageId={message.id}
-                      text={plainText}
-                      onRegenerate={onRegenerate}
-                      initialFeedback={initialFeedback}
-                    />
-                    {verify ? <VerifyBadge verify={verify} /> : null}
-                  </div>
-                ) : null}
-                {isLast && !isStreaming && followUps && onFollowUpSelect ? (
-                  <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
-                ) : null}
-              </div>
-            </article>
-          )
-        })}
-      </div>
+      <article
+        aria-label="Assistant message"
+        aria-busy={isStreaming ? 'true' : undefined}
+        className="flex w-full gap-3 duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
+      >
+        <AssistantAvatar />
+        <div className="flex min-w-0 flex-1 flex-col gap-3 pt-0.5">
+          {isStreaming ? (
+            <AgentTraceLive steps={liveSteps} />
+          ) : (
+            <AgentTraceDisclosure steps={settledSteps} elapsedSec={turnElapsed} />
+          )}
+          {toolCardParts.length > 0 ? (
+            <div className="flex flex-col gap-2 duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none">
+              {toolCardParts.map((p, i) => (
+                <ToolCard key={p.toolCallId ?? `tool-card-${i}`} part={p} ctx={cardCtx} />
+              ))}
+            </div>
+          ) : null}
+          {renderedChunks.map((chunk, i) => {
+            if (chunk.length === 0) return null
+            const isLast = i === lastChunkIdx
+            return (
+              <AssistantAnswer
+                // biome-ignore lint/suspicious/noArrayIndexKey: chunks mirror model emission order and never reorder within a turn; index is the stable identity here.
+                key={`${message.id}:chunk-${i}`}
+                text={chunk}
+                showCursor={Boolean(isStreaming) && isLast && lastPartIsText}
+              />
+            )
+          })}
+          {showUncitedWarning ? <UncitedKbWarning /> : null}
+          {!isStreaming ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <AssistantActions
+                messageId={message.id}
+                text={plainText}
+                onRegenerate={onRegenerate}
+                initialFeedback={initialFeedback}
+              />
+              {verify ? <VerifyBadge verify={verify} /> : null}
+            </div>
+          ) : null}
+          {!isStreaming && followUps && onFollowUpSelect ? (
+            <FollowUpPills followUps={followUps} onSelect={onFollowUpSelect} />
+          ) : null}
+        </div>
+      </article>
     </CitationsContext.Provider>
   )
 }

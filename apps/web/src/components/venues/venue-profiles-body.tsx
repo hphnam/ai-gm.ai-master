@@ -14,12 +14,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 import { VenueProfileEditor } from './venue-profile-editor'
 
 export function VenueProfilesBody() {
   const venues = useVenues()
+  const { isManager } = useCurrentMember()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // Fall back to the first venue during render rather than writing derived state in an effect.
   const activeId = selectedId ?? venues.data?.[0]?.id ?? null
@@ -43,12 +45,14 @@ export function VenueProfilesBody() {
         title="No venues yet"
         description="Create your first venue to start adding context the AI can read."
         action={
-          <Button asChild size="sm" className="cursor-pointer gap-1.5">
-            <Link href="/venues/new">
-              <Plus className="h-3.5 w-3.5" aria-hidden />
-              New venue
-            </Link>
-          </Button>
+          isManager ? (
+            <Button asChild size="sm" className="cursor-pointer gap-1.5">
+              <Link href="/venues/new">
+                <Plus className="h-3.5 w-3.5" aria-hidden />
+                New venue
+              </Link>
+            </Button>
+          ) : undefined
         }
       />
     )
@@ -82,6 +86,7 @@ function VenuePicker({
   activeId: string
   onSelect: (id: string) => void
 }) {
+  const { isManager } = useCurrentMember()
   const active = venues.find((v) => v.id === activeId)
   if (!active) return null
   const count = venues.length
@@ -154,13 +159,17 @@ function VenuePicker({
             ) : null}
           </DropdownMenuItem>
         ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/venues/new" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" aria-hidden />
-            New venue
-          </Link>
-        </DropdownMenuItem>
+        {isManager ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/venues/new" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" aria-hidden />
+                New venue
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   )

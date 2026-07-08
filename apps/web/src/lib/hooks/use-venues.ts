@@ -37,6 +37,18 @@ export function useCreateVenue() {
   })
 }
 
+export function useUpdateVenue() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<CreateVenueBody> }) =>
+      apiFetch<VenueDetail>(`/venues/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['venues', data.id], data)
+      queryClient.invalidateQueries({ queryKey: ['venues'] })
+    },
+  })
+}
+
 export function useUpdateVenueProfile() {
   const queryClient = useQueryClient()
   return useMutation({

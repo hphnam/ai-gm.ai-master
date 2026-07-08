@@ -2,6 +2,7 @@
 
 import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Plug, Unplug } from 'lucide-react'
 import { useState } from 'react'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import {
@@ -21,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import {
   INTEGRATION_PROVIDERS,
   type IntegrationProviderMeta,
@@ -35,14 +37,19 @@ import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 
 export function IntegrationsBody() {
   const integrations = useIntegrations()
+  const { isManager, isLoading: roleLoading } = useCurrentMember()
 
-  if (integrations.isLoading) {
+  if (roleLoading || integrations.isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Loading integrations…
       </div>
     )
+  }
+
+  if (!isManager) {
+    return <Alert>Only owners and managers can manage integrations.</Alert>
   }
 
   const byProvider = new Map<string, IntegrationSummary>()

@@ -1,6 +1,4 @@
 import type { UIMessage } from 'ai'
-import { KB_TOOL_NAMES } from '@/components/chat/citations'
-import { hasToolCard } from '@/components/chat/tool-cards/tool-card-router'
 import type { ChatMessageDto } from '@/lib/api-types'
 
 export type GmUIMessage = UIMessage
@@ -13,22 +11,16 @@ type LegacyToolCallEntry = {
   result?: unknown
 }
 
-// Rebuild an assistant turn's UI parts from the DB row. Saved history shows the
-// clean answer plus any deliverable cards — never the working-status chrome. So
-// we drop reasoning entirely and rehydrate tool parts only for tools we still
-// need on reload: deliverable tools (those with a rich card) render their card,
-// and KB tools (find_knowledge, query_document_table) are kept as invisible
-// data carriers — they have no card and no chip, but their parts still feed the
-// "No sources cited" trust warning and the citation "sections read" tooltip.
-// All other tool steps are dropped. The full `toolCallLog` still persists
-// server-side for the model's follow-up coherence.
+// Rebuild an assistant turn's UI parts from the DB row. Every persisted tool
+// call becomes a settled tool part: deliverable tools render their card, KB
+// tools feed the "No sources cited" warning + citation tooltips, and the rest
+// feed the "Ran N steps" trace disclosure. Reasoning is dropped.
 function assistantPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
   const parts: GmUIMessage['parts'] = []
   const log = (m as unknown as { toolCallLog?: LegacyToolCallEntry[] }).toolCallLog
   if (Array.isArray(log)) {
     for (const entry of log) {
       if (!entry?.tool || !entry?.toolUseId) continue
-      if (!hasToolCard(entry.tool) && !KB_TOOL_NAMES.has(entry.tool)) continue
       parts.push({
         type: `tool-${entry.tool}`,
         toolCallId: entry.toolUseId,

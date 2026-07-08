@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/api-client'
 
 // Mirrors apps/api/src/modules/invitations/dto/invitations.dto.ts OrgMemberSchema.
@@ -8,7 +8,10 @@ import { apiFetch } from '@/lib/api-client'
 export type OrgMember = {
   userId: string
   name: string | null
-  email: string
+  // Null for phone-only members — show phoneNumber instead of the synthetic
+  // placeholder email the backend suppresses.
+  email: string | null
+  phoneNumber: string | null
   role: string
   isSelf: boolean
   joinedAt: string
@@ -27,5 +30,16 @@ export function useOrgMembers() {
     staleTime: 60_000,
     refetchOnWindowFocus: false,
     retry: false,
+  })
+}
+
+export function useRemoveOrgMember() {
+  const queryClient = useQueryClient()
+  return useMutation<{ ok: true; deletedUser: boolean }, Error, string>({
+    mutationFn: (userId) =>
+      apiFetch<{ ok: true; deletedUser: boolean }>(`/org/members/${userId}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['org-members'] })
+    },
   })
 }

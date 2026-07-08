@@ -154,7 +154,7 @@ export function LibraryTab() {
                 <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden />
                 Filters
                 {activeDropdownCount > 0 ? (
-                  <span className="ml-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-foreground/10 px-1 text-[10px] font-medium tabular-nums">
+                  <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground/10 px-1 text-xs font-medium tabular-nums">
                     {activeDropdownCount}
                   </span>
                 ) : null}
@@ -164,7 +164,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-category"
-                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
                 >
                   Category
                 </label>
@@ -193,7 +193,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-venue"
-                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
                 >
                   Venue
                 </label>
@@ -220,7 +220,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-status"
-                  className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground"
+                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
                 >
                   Status
                 </label>

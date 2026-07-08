@@ -27,10 +27,10 @@ import { ClassifyDocModal } from '@/components/docs/classify-doc-modal'
 import { DocTypeProposalModal } from '@/components/docs/doc-type-proposal-modal'
 import { EditDocModal } from '@/components/docs/edit-doc-modal'
 import { SupersedePickerModal } from '@/components/docs/supersede-picker-modal'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { BackButton } from '@/components/ui/back-button'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -40,6 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TabItem, TabPanel, Tabs } from '@/components/ui/tabs'
 import type { DocDetailDto } from '@/generated/api'
@@ -69,9 +70,9 @@ function formatScheduleLine(s: Schedule): string {
 
 function RolePill({ role }: { role: AudienceRole }) {
   return (
-    <span className="rounded-full border bg-muted/50 px-2 py-0.5 text-[11px] font-medium capitalize text-muted-foreground">
+    <Badge variant="neutral" size="sm">
       {role}
-    </span>
+    </Badge>
   )
 }
 
@@ -92,42 +93,42 @@ function StepKindIcon({ kind }: { kind: ChecklistStep['kind'] }) {
 function CategoryChip({ doc }: { doc: DocDetailDto }) {
   if (doc.processingStatus === 'processing') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">
+      <Badge variant="neutral">
         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
         Reading…
-      </span>
+      </Badge>
     )
   }
   if (doc.processingStatus === 'failed') {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-300">
+      <Badge variant="urgent">
         <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
         Couldn’t read
-      </span>
+      </Badge>
     )
   }
   if (doc.documentType) {
     const Icon = doc.documentType.kind === 'procedural' ? ClipboardList : BookOpen
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+      <Badge variant="success">
         <Icon className="h-3.5 w-3.5" aria-hidden />
         {doc.documentType.name}
-      </span>
+      </Badge>
     )
   }
   if (doc.pendingTypeProposal) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-2.5 py-1 text-xs font-medium text-sky-700 dark:text-sky-300">
+      <Badge variant="brand">
         <Sparkles className="h-3.5 w-3.5" aria-hidden />
         Awaiting your review
-      </span>
+      </Badge>
     )
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+    <Badge variant="warning">
       <Tag className="h-3.5 w-3.5" aria-hidden />
       Not categorized
-    </span>
+    </Badge>
   )
 }
 
@@ -142,9 +143,9 @@ function StatusBanner({
 }) {
   if (doc.processingStatus === 'failed') {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 sm:p-5">
+      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-700 dark:text-red-300">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
             <AlertTriangle className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 space-y-1">
@@ -162,9 +163,9 @@ function StatusBanner({
   if (doc.pendingTypeProposal) {
     const proposal = doc.pendingTypeProposal
     return (
-      <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 p-4 sm:p-5">
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-300">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Sparkles className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
@@ -184,9 +185,9 @@ function StatusBanner({
   }
   if (!doc.documentType) {
     return (
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
+      <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning">
             <Tag className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
@@ -250,10 +251,7 @@ function VersionPanel({ doc }: { doc: DocDetailDto }) {
       {isArchived ? (
         <div className="space-y-2.5 border-t border-border/60 pt-3">
           <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
-            <Archive
-              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400"
-              aria-hidden
-            />
+            <Archive className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
             <span>
               You’re viewing an archived version
               {doc.supersededBy ? (
@@ -343,9 +341,9 @@ function VersionRow({ version }: { version: DocDetailDto['versionHistory'][numbe
       {version.isCurrent ? (
         <span className="shrink-0 text-xs font-medium text-muted-foreground">Viewing</span>
       ) : version.supersededAt ? null : (
-        <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+        <Badge variant="success" className="shrink-0">
           Live
-        </span>
+        </Badge>
       )}
     </div>
   )
@@ -547,15 +545,13 @@ function ChecklistBody({ checklist }: { checklist: Checklist }) {
     <div className="space-y-5">
       <dl className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             When
           </dt>
           <dd className="text-sm">{formatScheduleLine(checklist.schedule)}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Who
-          </dt>
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Who</dt>
           <dd className="flex flex-wrap items-center gap-1.5">
             {roles.length > 0 ? (
               roles.map((r) => <RolePill key={r} role={r} />)
@@ -574,7 +570,7 @@ function ChecklistBody({ checklist }: { checklist: Checklist }) {
             key={s.index}
             className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums text-muted-foreground">
               {idx + 1}
             </span>
             <div className="min-w-0 flex-1">
@@ -695,10 +691,10 @@ export function DocDetailBody({ id }: { id: string }) {
         <div className="flex flex-wrap items-center gap-2">
           <CategoryChip doc={data} />
           {data.supersededAt ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+            <Badge variant="warning">
               <Archive className="h-3.5 w-3.5" aria-hidden />
               Archived
-            </span>
+            </Badge>
           ) : null}
         </div>
         <h1
@@ -746,8 +742,8 @@ export function DocDetailBody({ id }: { id: string }) {
   ) : null
 
   return (
-    <AppShell>
-      <PageHeader
+    <>
+      <SetPageHeader
         title={data ? title : 'Document'}
         actions={
           data ? (
@@ -762,15 +758,10 @@ export function DocDetailBody({ id }: { id: string }) {
         }
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div
-          className={cn(
-            'mx-auto flex w-full flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8',
-            hasSidebar ? 'max-w-6xl' : 'max-w-3xl',
-          )}
+        <PageContainer
+          width="prose"
+          className={cn('flex flex-col gap-6', hasSidebar && 'max-w-6xl')}
         >
-          {/* No href so router.back() preserves any ?q=/?status= filters set
-              via nuqs in the library tab. Falls back to /docs when there's no
-              history (cold-loaded detail). */}
           <BackButton fallbackHref="/docs">Back to Knowledge</BackButton>
 
           {doc.isLoading ? (
@@ -793,7 +784,7 @@ export function DocDetailBody({ id }: { id: string }) {
               <article className="space-y-6">{mainContent}</article>
             )
           ) : null}
-        </div>
+        </PageContainer>
       </div>
 
       {data ? (
@@ -819,6 +810,6 @@ export function DocDetailBody({ id }: { id: string }) {
           ) : null}
         </>
       ) : null}
-    </AppShell>
+    </>
   )
 }

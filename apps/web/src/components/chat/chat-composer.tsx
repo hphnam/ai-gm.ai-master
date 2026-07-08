@@ -101,13 +101,16 @@ export function ChatComposer({
     setFocus('userMessage')
   }, [initialValue, setValue, setFocus])
 
-  // Auto-grow textarea up to a max height, then scroll internally.
+  // Auto-grow the textarea between a roomy two-line floor and a max height,
+  // then scroll internally. The floor gives the input generous space to type
+  // into before it needs to grow (mobile-first), matching the two-line feel.
   useLayoutEffect(() => {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
+    const min = 52
     const max = 220
-    el.style.height = `${Math.min(el.scrollHeight, max)}px`
+    el.style.height = `${Math.min(Math.max(el.scrollHeight, min), max)}px`
   }, [value])
 
   const submit = handleSubmit(async (data) => {
@@ -168,8 +171,8 @@ export function ChatComposer({
       </label>
       <div
         className={cn(
-          'relative flex items-end gap-2 rounded-2xl border border-border bg-background',
-          'px-3 py-2.5 shadow-sm transition-all',
+          'relative flex flex-col gap-1 rounded-3xl border border-border bg-background',
+          'px-2 py-2 shadow-sm transition-colors duration-150',
           'focus-within:border-foreground/40 focus-within:ring-2 focus-within:ring-foreground/10',
         )}
       >
@@ -180,42 +183,11 @@ export function ChatComposer({
           className="hidden"
           onChange={handleFileChange}
         />
-        {onSubmitWithImage ? (
-          <button
-            type="button"
-            onClick={handlePickImage}
-            disabled={inputDisabled}
-            aria-label="Attach image"
-            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
-          >
-            <ImagePlus className="h-4 w-4" aria-hidden />
-          </button>
-        ) : null}
-        {voiceSupported ? (
-          <button
-            type="button"
-            onClick={toggleVoice}
-            disabled={disabled || isPending}
-            aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
-            aria-pressed={voiceListening}
-            title={voiceListening ? 'Listening — tap to stop' : 'Voice input'}
-            className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-colors disabled:opacity-50',
-              voiceListening
-                ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-            )}
-          >
-            <Mic className={cn('h-4 w-4', voiceListening && 'animate-pulse')} aria-hidden />
-          </button>
-        ) : null}
         <textarea
           id="composer-input"
-          rows={1}
+          rows={2}
           aria-invalid={Boolean(errors.userMessage)}
-          placeholder={
-            disabled && disabledReason ? disabledReason : 'Ask about stock, ordering, SOPs…'
-          }
+          placeholder={disabled && disabledReason ? disabledReason : 'Ask about your venue…'}
           disabled={inputDisabled}
           onKeyDown={onKeyDown}
           // Recompute the mention trigger on every input + selection change.
@@ -238,46 +210,78 @@ export function ChatComposer({
             formRef(el)
             textareaRef.current = el
           }}
+          // Full width — the toolbar lives on its own row below, so the text
+          // gets the entire composer width to breathe (mobile-first). Auto-grow
+          // (effect above) owns the height between a two-line floor and the cap.
           className={cn(
-            'flex-1 resize-none self-center bg-transparent text-[15px] leading-6',
+            'w-full resize-none bg-transparent px-2 pt-1 text-[15px] leading-6',
             'placeholder:text-muted-foreground/70 focus:outline-none',
-            // min-h matches the h-8 (32px) of the side buttons; py-1 centres
-            // the single-line text vertically in that 32px box so its baseline
-            // sits on the same line as the icon centres. As the textarea grows
-            // multi-line it expands downward and the parent's items-end keeps
-            // the buttons aligned to the new bottom edge.
-            'min-h-8 max-h-[220px] py-1',
+            'min-h-[52px] max-h-[220px]',
           )}
         />
-        {canStop ? (
-          <button
-            type="button"
-            onClick={() => onStop?.()}
-            aria-label="Stop generating"
-            title="Stop"
-            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110"
-          >
-            <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={!canSend}
-            aria-label={isPending ? 'Sending' : 'Send'}
-            className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-all',
-              canSend
-                ? 'bg-brand text-brand-foreground hover:brightness-110 cursor-pointer'
-                : 'bg-muted text-muted-foreground cursor-not-allowed',
-            )}
-          >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : (
-              <ArrowUp className="h-4 w-4" aria-hidden />
-            )}
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {onSubmitWithImage ? (
+            <button
+              type="button"
+              onClick={handlePickImage}
+              disabled={inputDisabled}
+              aria-label="Attach image"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-95 disabled:opacity-50"
+            >
+              <ImagePlus className="h-[18px] w-[18px]" aria-hidden />
+            </button>
+          ) : null}
+          {voiceSupported ? (
+            <button
+              type="button"
+              onClick={toggleVoice}
+              disabled={disabled || isPending}
+              aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
+              aria-pressed={voiceListening}
+              title={voiceListening ? 'Listening — tap to stop' : 'Voice input'}
+              className={cn(
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors active:scale-95 disabled:opacity-50',
+                voiceListening
+                  ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              <Mic
+                className={cn('h-[18px] w-[18px]', voiceListening && 'animate-pulse')}
+                aria-hidden
+              />
+            </button>
+          ) : null}
+          {canStop ? (
+            <button
+              type="button"
+              onClick={() => onStop?.()}
+              aria-label="Stop generating"
+              title="Stop"
+              className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110 active:scale-95"
+            >
+              <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!canSend}
+              aria-label={isPending ? 'Sending' : 'Send'}
+              className={cn(
+                'ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-150',
+                canSend
+                  ? 'bg-brand text-brand-foreground hover:brightness-110 active:scale-95 cursor-pointer'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed',
+              )}
+            >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <ArrowUp className="h-[18px] w-[18px]" aria-hidden />
+              )}
+            </button>
+          )}
+        </div>
       </div>
       {imagePreview && attachedImage ? (
         <div className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted/40 p-1.5">

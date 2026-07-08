@@ -1,40 +1,30 @@
-/// Present-continuous status phrases shown WHILE a tool is in flight. The live
-/// status line appends its own animated ellipsis, so phrases end without
-/// punctuation ("Getting sales from your POS"). These are ephemeral — they
-/// never persist into saved history, so they only need to read well in the
-/// moment. Unmapped tools fall back to a generic phrase.
 const TOOL_STATUS_PHRASES: Record<string, string> = {
-  // Knowledge + retrieval
   find_knowledge: 'Searching the knowledge base',
   query_document_table: 'Reading your documents',
   save_knowledge_doc: 'Saving to the knowledge base',
   record_kb_gap: 'Noting that for next time',
   verify_quote: 'Checking the source',
   deep_research: 'Digging into the research',
-  // Stock + suppliers
+  find_person: 'Looking up that person',
+  memory: 'Updating my notes',
   get_stock_below_par: 'Checking stock levels',
   get_stock_by_name: 'Looking up that item',
   get_supplier_by_name: 'Looking up the supplier',
   get_upcoming_cutoffs: 'Checking order cutoffs',
   update_stock: 'Updating stock',
   add_supplier_note: 'Updating supplier notes',
-  // Incident + ops
   log_incident: 'Logging the incident',
   leave_note_for_user: 'Leaving you a note',
-  // Tasks
   create_task: 'Adding the task',
   complete_task: 'Marking the task done',
   list_my_tasks: 'Pulling up your list',
-  // Checklists
   present_checklist: 'Pulling up the checklist',
-  // Reports
   generate_report: 'Building your report',
   schedule_report: 'Scheduling the report',
   list_scheduled_reports: 'Pulling your schedules',
   pause_scheduled_report: 'Pausing the schedule',
   resume_scheduled_report: 'Resuming the schedule',
   cancel_scheduled_report: 'Cancelling the schedule',
-  // POS (Square + future providers)
   pos_get_sales_summary: 'Getting sales from your POS',
   pos_get_labor_summary: 'Getting labour numbers from your POS',
   pos_get_top_items: 'Getting your top sellers from your POS',
@@ -52,13 +42,60 @@ const TOOL_STATUS_PHRASES: Record<string, string> = {
   pos_list_team_members: 'Listing your team',
 }
 
-/// Maps a tool call to a human-readable "working…" phrase. `input` is accepted
-/// for future per-call detail (e.g. naming the metric) but isn't needed yet —
-/// the static phrases read well enough. Unknown pos_* tools get a generic POS
-/// phrase; everything else falls back to "Working".
+const TOOL_DONE_PHRASES: Record<string, string> = {
+  find_knowledge: 'Searched the knowledge base',
+  query_document_table: 'Read your documents',
+  save_knowledge_doc: 'Saved to the knowledge base',
+  record_kb_gap: 'Noted that for next time',
+  verify_quote: 'Checked the source',
+  deep_research: 'Dug into the research',
+  find_person: 'Looked up that person',
+  memory: 'Updated my notes',
+  get_stock_below_par: 'Checked stock levels',
+  get_stock_by_name: 'Looked up that item',
+  get_supplier_by_name: 'Looked up the supplier',
+  get_upcoming_cutoffs: 'Checked order cutoffs',
+  update_stock: 'Updated stock',
+  add_supplier_note: 'Updated supplier notes',
+  log_incident: 'Logged the incident',
+  leave_note_for_user: 'Left you a note',
+  create_task: 'Added the task',
+  complete_task: 'Marked the task done',
+  list_my_tasks: 'Pulled up your list',
+  present_checklist: 'Pulled up the checklist',
+  generate_report: 'Built your report',
+  schedule_report: 'Scheduled the report',
+  list_scheduled_reports: 'Pulled your schedules',
+  pause_scheduled_report: 'Paused the schedule',
+  resume_scheduled_report: 'Resumed the schedule',
+  cancel_scheduled_report: 'Cancelled the schedule',
+  pos_get_sales_summary: 'Got sales from your POS',
+  pos_get_labor_summary: 'Got labour numbers from your POS',
+  pos_get_top_items: 'Got your top sellers from your POS',
+  pos_get_payment_breakdown: 'Got the payment mix from your POS',
+  pos_get_refund_summary: 'Got refund totals from your POS',
+  pos_list_refunds: 'Got refunds from your POS',
+  pos_get_hourly_breakdown: 'Got the hourly breakdown from your POS',
+  pos_compare_periods: 'Compared periods in your POS',
+  pos_search_items: 'Searched your POS menu',
+  pos_get_item_inventory: 'Checked inventory in your POS',
+  pos_list_recent_orders: 'Got recent orders from your POS',
+  pos_list_locations: 'Listed your POS locations',
+  pos_list_recent_shifts: 'Got recent shifts from your POS',
+  pos_get_active_shifts: 'Checked who is on shift',
+  pos_list_team_members: 'Listed your team',
+}
+
 export function toolStatusPhrase(toolName: string, _input?: unknown): string {
   const phrase = TOOL_STATUS_PHRASES[toolName]
   if (phrase) return phrase
   if (toolName.startsWith('pos_')) return 'Getting data from your POS'
   return 'Working'
+}
+
+export function toolDonePhrase(toolName: string): string {
+  const phrase = TOOL_DONE_PHRASES[toolName]
+  if (phrase) return phrase
+  if (toolName.startsWith('pos_')) return 'Got data from your POS'
+  return 'Ran a step'
 }

@@ -118,9 +118,7 @@ function TaskRow({ task }: { task: ListTask }) {
         disabled={localDone || isPending}
         className={cn(
           'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors',
-          localDone
-            ? 'text-emerald-600 dark:text-emerald-500'
-            : 'text-muted-foreground hover:text-foreground',
+          localDone ? 'text-success' : 'text-muted-foreground hover:text-foreground',
           isPending && 'animate-pulse',
         )}
         aria-label={localDone ? 'Marked done' : 'Mark task done'}

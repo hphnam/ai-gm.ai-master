@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --port 3000",
+    "tunnel": "ngrok http --url=https://local.andpro.digital 3000",
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
@@ -31,6 +32,8 @@
     "better-auth": "^1.6.5",
     "class-variance-authority": "latest",
     "clsx": "latest",
+    "input-otp": "^1.4.2",
+    "libphonenumber-js": "^1.13.8",
     "lucide-react": "^1.16.0",
     "next": "latest",
     "next-themes": "latest",

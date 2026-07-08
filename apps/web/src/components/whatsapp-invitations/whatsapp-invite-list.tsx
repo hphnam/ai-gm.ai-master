@@ -1,7 +1,9 @@
 'use client'
 
-import { CheckCircle2, Clock, MessageCircle, Trash2, XCircle } from 'lucide-react'
+import { MessageCircle, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { INVITE_STATUS } from '@/components/invitations/invite-status'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,45 +36,12 @@ function formatRelative(iso: string): string {
   return `${diffMs >= 0 ? 'in ' : ''}${Math.max(1, Math.round(abs / min))}m${diffMs < 0 ? ' ago' : ''}`
 }
 
-const STATUS_STYLES: Record<
-  WhatsappInvitePublic['status'],
-  { label: string; dot: string; text: string; Icon: typeof Clock }
-> = {
-  pending: { label: 'Pending', dot: 'bg-amber-500', text: 'text-foreground/80', Icon: Clock },
-  redeemed: {
-    label: 'Redeemed',
-    dot: 'bg-emerald-600',
-    text: 'text-muted-foreground',
-    Icon: CheckCircle2,
-  },
-  revoked: {
-    label: 'Revoked',
-    dot: 'bg-muted-foreground/50',
-    text: 'text-muted-foreground',
-    Icon: XCircle,
-  },
-  exhausted: {
-    label: 'Code exhausted',
-    dot: 'bg-destructive',
-    text: 'text-destructive',
-    Icon: XCircle,
-  },
-  expired: {
-    label: 'Expired',
-    dot: 'bg-muted-foreground/50',
-    text: 'text-muted-foreground',
-    Icon: XCircle,
-  },
-}
-
 function StatusBadge({ status }: { status: WhatsappInvitePublic['status'] }) {
-  const { label, dot, text, Icon } = STATUS_STYLES[status]
+  const { label, variant } = INVITE_STATUS[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${text}`}>
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
-      <Icon className="h-3 w-3" aria-hidden />
+    <Badge variant={variant} size="sm">
       {label}
-    </span>
+    </Badge>
   )
 }
 
@@ -85,8 +54,8 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
       <EmptyState
         icon={MessageCircle}
         size="compact"
-        title="No WhatsApp invites yet"
-        description={'Click "Invite via WhatsApp" to send your first one.'}
+        title="No SMS invites yet"
+        description="Invite someone by phone above to send an SMS join link."
       />
     )
   }
@@ -97,7 +66,7 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
   return (
     <section className="space-y-4 rounded-lg border bg-card p-4 shadow-sm sm:p-5">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Active WhatsApp invites
+        Active SMS invites
       </h2>
 
       {pending.length === 0 ? (
@@ -122,8 +91,9 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
                   type="button"
                   variant="ghost"
                   size="sm"
+                  className="cursor-pointer"
                   onClick={() => setConfirmRevoke(inv)}
-                  aria-label={`Revoke WhatsApp invite for ${inv.phoneNumberMasked}`}
+                  aria-label={`Revoke SMS invite for ${inv.phoneNumberMasked}`}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
                   <span className="sr-only sm:not-sr-only sm:ml-1">Revoke</span>
@@ -158,10 +128,10 @@ export function WhatsappInviteList({ data }: { data: ListWhatsappInvitesResponse
       <Dialog open={!!confirmRevoke} onOpenChange={(v) => !v && setConfirmRevoke(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Revoke WhatsApp invite?</DialogTitle>
+            <DialogTitle>Revoke SMS invite?</DialogTitle>
             <DialogDescription>
               {confirmRevoke
-                ? `This cancels the code for ${confirmRevoke.phoneNumberMasked}. They won't be able to verify with this code anymore.`
+                ? `This cancels the invite for ${confirmRevoke.phoneNumberMasked}. The SMS link will no longer work.`
                 : ''}
             </DialogDescription>
           </DialogHeader>

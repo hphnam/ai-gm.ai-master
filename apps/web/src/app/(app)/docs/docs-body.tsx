@@ -7,9 +7,9 @@ import { InboxTab, useInboxCount } from '@/components/docs/inbox-tab'
 import { LibraryTab } from '@/components/docs/library-tab'
 import { QuestionsTab, useQuestionsCount } from '@/components/docs/questions-tab'
 import { UploadModal } from '@/components/docs/upload-modal'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
 import { Button } from '@/components/ui/button'
+import { PageContainer } from '@/components/ui/page-container'
 import { type TabItem, TabPanel, Tabs } from '@/components/ui/tabs'
 import { useDocsTotal } from '@/lib/hooks/use-docs'
 
@@ -59,8 +59,8 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
   )
 
   return (
-    <AppShell>
-      <PageHeader
+    <>
+      <SetPageHeader
         title="Knowledge"
         description="Everything your AI assistant can answer about your venues."
         actions={
@@ -72,7 +72,7 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
       />
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+        <PageContainer width="content">
           {showFullEmpty ? (
             <KnowledgeEmptyState onUploadClick={() => setUploadOpen(true)} />
           ) : (
@@ -88,10 +88,10 @@ export function DocsBody({ tab = 'library' }: { tab?: DocsTab }) {
               ))}
             </>
           )}
-        </div>
+        </PageContainer>
       </div>
 
       <UploadModal open={uploadOpen} onOpenChange={setUploadOpen} />
-    </AppShell>
+    </>
   )
 }

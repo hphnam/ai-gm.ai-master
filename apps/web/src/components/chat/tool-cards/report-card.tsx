@@ -224,7 +224,7 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
         : ArrowRight
   const trendTone =
     kpi.trend?.direction === 'up'
-      ? 'text-emerald-700 dark:text-emerald-400'
+      ? 'text-success'
       : kpi.trend?.direction === 'down'
         ? 'text-destructive'
         : 'text-muted-foreground'
@@ -256,8 +256,8 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
 
 const TONE_CLASSES: Record<NonNullable<BarRow['tone']>, string> = {
   neutral: 'bg-foreground/70',
-  positive: 'bg-emerald-600 dark:bg-emerald-500',
-  warning: 'bg-amber-500 dark:bg-amber-400',
+  positive: 'bg-success',
+  warning: 'bg-warning',
   negative: 'bg-destructive',
 }
 

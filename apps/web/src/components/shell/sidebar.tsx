@@ -18,8 +18,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useInboxCount } from '@/components/docs/inbox-tab'
 import { useQuestionsCount } from '@/components/docs/questions-tab'
 import { useExpiryCounts } from '@/lib/hooks/use-compliance'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useOpenIncidentsCount } from '@/lib/hooks/use-incidents'
-import { useOrgMembers } from '@/lib/hooks/use-org-members'
 import { useOpenTasksCount } from '@/lib/hooks/use-tasks'
 import { markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
@@ -126,14 +126,12 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
   const incidentOpenCount = incidentCounts?.openCount ?? 0
   const incidentCriticalCount = incidentCounts?.criticalOpenCount ?? 0
   const settingsActive = pathname.startsWith('/settings')
-  // Dashboard is owner/manager only — staff don't see the entry. We derive
-  // the role from the members list (same fetch the org-settings page uses,
-  // so this is free) and fall back to "show" while loading so the link
-  // never flashes off for a privileged user.
-  const orgMembers = useOrgMembers()
-  const me = orgMembers.data?.members.find((m) => m.isSelf)
-  const canSeeDashboard =
-    orgMembers.isLoading || me === undefined || me.role === 'owner' || me.role === 'manager'
+  // Dashboard + Incidents are owner/manager only. Role comes off the session
+  // (customSession) so it's readable by staff too — the old members-list fetch
+  // 403'd for staff and defaulted the gate OPEN, leaking those entries. Show
+  // while loading so the link doesn't flash off for a privileged user.
+  const { isManager, isLoading: roleLoading } = useCurrentMember()
+  const canSeeDashboard = roleLoading || isManager
   // Incidents page is owner+manager only (same gate as the dashboard).
   // Inserted between Compliance and Knowledge so it sits with the other
   // operational surfaces rather than alongside Chat at the top.
@@ -195,10 +193,10 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
           <button
             type="button"
             onClick={onMobileClose}
-            className="ml-auto rounded-md p-1.5 text-sidebar-muted hover:bg-sidebar-accent md:hidden"
+            className="-my-2 -mr-1 ml-auto inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-sidebar-muted hover:bg-sidebar-accent md:hidden"
             aria-label="Close sidebar"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -206,9 +204,9 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
           type="button"
           onClick={onNewChat}
           className={cn(
-            'flex items-center justify-center gap-2 rounded-md border border-sidebar-border',
-            'bg-sidebar px-3 py-2 text-sm font-medium shadow-sm',
-            'hover:border-brand/40 hover:bg-sidebar-accent/60 transition-colors cursor-pointer',
+            'flex items-center justify-center gap-2 rounded-md',
+            'bg-brand px-3 py-2 text-sm font-medium text-brand-foreground shadow-sm',
+            'cursor-pointer transition-all hover:brightness-110 active:scale-[0.99]',
           )}
         >
           <MessageSquarePlus className="h-4 w-4" aria-hidden />
@@ -251,7 +249,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                   className={cn(
                     'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors',
                     active
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      ? 'bg-brand/10 text-brand'
                       : 'text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
                   )}
                   aria-current={active ? 'page' : undefined}
@@ -264,14 +262,14 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                         className={cn(
                           'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
                           active
-                            ? 'bg-sidebar-foreground/15 text-sidebar-accent-foreground'
+                            ? 'bg-brand/15 text-brand'
                             : 'bg-sidebar-accent text-sidebar-foreground/85',
                         )}
                         aria-hidden
                       >
                         {badgeUrgent ? (
                           <span
-                            className="inline-block h-1 w-1 rounded-full bg-amber-500"
+                            className="inline-block h-1 w-1 rounded-full bg-destructive"
                             aria-hidden
                           />
                         ) : null}
@@ -293,7 +291,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
                             className={cn(
                               'flex items-center gap-2 rounded-md px-2 py-1 text-[13px] transition-colors',
                               childActive
-                                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                                ? 'bg-brand/10 text-brand font-medium'
                                 : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
                             )}
                             aria-current={childActive ? 'page' : undefined}
@@ -338,7 +336,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
             className={cn(
               'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors',
               settingsActive
-                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                ? 'bg-brand/10 text-brand font-medium'
                 : 'text-sidebar-foreground/75 hover:bg-sidebar-accent/60',
             )}
             aria-current={settingsActive ? 'page' : undefined}

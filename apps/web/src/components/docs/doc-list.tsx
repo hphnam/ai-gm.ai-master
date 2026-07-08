@@ -88,7 +88,7 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
         aria-label="Delete document"
         title="Delete document"
         onClick={() => setOpen(true)}
-        className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:opacity-100"
+        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:opacity-100 md:h-8 md:w-8"
       >
         <Trash2 className="h-4 w-4" aria-hidden />
       </button>
@@ -134,7 +134,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
     <div
       className={cn(
         'group relative flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-foreground/20 hover:bg-accent/40',
-        doc.processingStatus === 'failed' && 'border-red-500/20',
+        doc.processingStatus === 'failed' && 'border-destructive/20',
       )}
     >
       <div
@@ -150,7 +150,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
           href={`/docs/${doc.id}`}
           className="block rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4 sm:text-[15px]">
+          <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4">
             {title}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground sm:text-sm">
@@ -166,7 +166,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
           </p>
         </Link>
       </div>
-      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-100 transition-opacity md:opacity-0 md:focus-within:opacity-100 md:group-hover:opacity-100">
         <DeleteDocButton doc={doc} />
       </div>
     </div>

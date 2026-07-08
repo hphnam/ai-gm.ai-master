@@ -1,18 +1,20 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { OnboardBody } from './onboard-body'
 
-// 03-06 — WhatsApp signed-link invite landing.
-// The manager creates an invite; we DM the invitee `<app>/onboard?t=<token>`.
-// Token is HMAC-signed (no DB roundtrip to verify), but the invite row is the
-// authoritative state. Preview fetch validates both.
+// The single-use PIN rides in the URL fragment (#c=, resolved client-side in
+// OnboardBody); ?c= is still accepted for links sent before that change.
+// no-referrer keeps token/PIN out of the Referer on any navigation from here.
+export const metadata: Metadata = { referrer: 'no-referrer' }
 
 export default async function OnboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ t?: string }>
+  searchParams: Promise<{ t?: string; c?: string }>
 }) {
   const params = await searchParams
   const token = params.t
+  const autoCode = typeof params.c === 'string' ? params.c : undefined
   if (!token) redirect('/auth/sign-in')
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
@@ -36,7 +38,8 @@ export default async function OnboardPage({
     inviteId: string
     orgName: string
     role: string
+    phoneNumber: string
   }
 
-  return <OnboardBody token={token} preview={preview} />
+  return <OnboardBody preview={preview} autoCode={autoCode} />
 }

@@ -1,8 +1,9 @@
 'use client'
 
-import { CheckCircle2, Clock, Copy, Trash2, UserPlus, XCircle } from 'lucide-react'
+import { Copy, Trash2, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -13,9 +14,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { EmptyState } from '@/components/ui/empty-state'
 import type { ListInvitationsResponseDto as ListInvitationsResponse } from '@/generated/api'
 import type { InvitationDto as InvitationDTO } from '@/lib/api-types'
 import { useRevokeInvitation } from '@/lib/hooks/use-invitations'
+import { INVITE_STATUS } from './invite-status'
 
 function formatRelative(iso: string): string {
   const now = Date.now()
@@ -62,40 +65,11 @@ async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 function StatusBadge({ status }: { status: InvitationDTO['status'] }) {
-  // Quiet status pill. Pending earns an amber dot (operator scan signal);
-  // accepted is muted because it's a settled state; revoked/expired are
-  // muted past-tense.
-  const map: Record<
-    InvitationDTO['status'],
-    { label: string; dot: string; text: string; Icon: typeof Clock }
-  > = {
-    pending: { label: 'Pending', dot: 'bg-amber-500', text: 'text-foreground/80', Icon: Clock },
-    accepted: {
-      label: 'Accepted',
-      dot: 'bg-emerald-600',
-      text: 'text-muted-foreground',
-      Icon: CheckCircle2,
-    },
-    revoked: {
-      label: 'Revoked',
-      dot: 'bg-muted-foreground/50',
-      text: 'text-muted-foreground',
-      Icon: XCircle,
-    },
-    expired: {
-      label: 'Expired',
-      dot: 'bg-muted-foreground/50',
-      text: 'text-muted-foreground',
-      Icon: XCircle,
-    },
-  }
-  const { label, dot, text, Icon } = map[status]
+  const { label, variant } = INVITE_STATUS[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${text}`}>
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
-      <Icon className="h-3 w-3" aria-hidden />
+    <Badge variant={variant} size="sm">
       {label}
-    </span>
+    </Badge>
   )
 }
 
@@ -105,12 +79,12 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
 
   if (!data || data.invitations.length === 0) {
     return (
-      <section className="rounded-lg border bg-card p-6 text-center shadow-sm">
-        <UserPlus className="mx-auto mb-2 h-6 w-6 text-muted-foreground" aria-hidden />
-        <p className="text-sm text-muted-foreground">
-          No invitations yet. Use the form above to invite a teammate.
-        </p>
-      </section>
+      <EmptyState
+        icon={UserPlus}
+        size="compact"
+        title="No invitations yet"
+        description="Use the form above to invite a teammate."
+      />
     )
   }
 
@@ -147,6 +121,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
                     type="button"
                     variant="outline"
                     size="sm"
+                    className="cursor-pointer"
                     onClick={async () => {
                       const ok = await copyToClipboard(inviteUrl(inv.id))
                       toast[ok ? 'success' : 'error'](
@@ -162,6 +137,7 @@ export function InvitationList({ data }: { data: ListInvitationsResponse | undef
                     type="button"
                     variant="ghost"
                     size="sm"
+                    className="cursor-pointer"
                     onClick={() => setConfirmRevoke(inv)}
                     aria-label="Revoke invitation"
                   >

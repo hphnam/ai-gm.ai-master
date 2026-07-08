@@ -37,7 +37,6 @@ type Props = {
 const FormSchema = z.object({
   title: z.string().trim().min(2),
   category: z.enum(COMPLIANCE_CATEGORIES),
-  // Native date input gives "YYYY-MM-DD" — we widen to ISO before submit.
   expiresAt: z.string().min(1),
   venueId: z.string(),
   personName: z.string(),
@@ -79,9 +78,6 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null)
     try {
-      // Date input is timezone-naive; treat it as end-of-day in the user's
-      // local zone so a Friday cert doesn't trigger reminders one day early
-      // in UTC-+1 zones. ISO string keeps the server contract simple.
       const iso = new Date(`${values.expiresAt}T23:59:00`).toISOString()
       await create.mutateAsync({
         title: values.title.trim(),
@@ -130,7 +126,7 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="category"
@@ -172,7 +168,7 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="venueId"
@@ -211,7 +207,7 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="personName"
@@ -240,7 +236,7 @@ export function AddExpiryDialog({ open, onOpenChange }: Props) {
             </div>
 
             {error ? (
-              <p className="text-xs text-red-700" role="alert">
+              <p className="text-xs text-destructive" role="alert">
                 {error}
               </p>
             ) : null}

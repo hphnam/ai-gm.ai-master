@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import type { VenueDetailDto as VenueDetail } from '@/generated/api'
 import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
 import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useRunNudge, useUpdateVenueProfile } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
@@ -73,6 +74,7 @@ function formToProfile(values: FormValues): VenueProfile {
 export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
   const update = useUpdateVenueProfile()
   const runNudge = useRunNudge()
+  const { isManager } = useCurrentMember()
 
   // No client-side resolver — VenueProfileSchema runs at submit time inside
   // formToProfile() and on the server. The form fields are stringy mirrors of
@@ -197,40 +199,42 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
         </Field>
       </Section>
 
-      <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background/90 py-3 backdrop-blur-sm">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Bell className="h-3.5 w-3.5" />
-          <button
-            type="button"
-            onClick={onSendTestNudge}
-            disabled={runNudge.isPending}
-            className="underline-offset-2 hover:underline disabled:opacity-50"
-          >
-            {runNudge.isPending ? 'Sending nudge…' : 'Send a test nudge to the duty manager'}
-          </button>
+      {isManager ? (
+        <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background/90 py-3 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Bell className="h-3.5 w-3.5" />
+            <button
+              type="button"
+              onClick={onSendTestNudge}
+              disabled={runNudge.isPending}
+              className="underline-offset-2 hover:underline disabled:opacity-50"
+            >
+              {runNudge.isPending ? 'Sending nudge…' : 'Send a test nudge to the duty manager'}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={!dirty || isSaving}
+              onClick={() => form.reset(profileToForm(venue.profile))}
+            >
+              Discard
+            </Button>
+            <Button type="submit" size="sm" disabled={!dirty || isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Saving
+                </>
+              ) : (
+                'Save profile'
+              )}
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={!dirty || isSaving}
-            onClick={() => form.reset(profileToForm(venue.profile))}
-          >
-            Discard
-          </Button>
-          <Button type="submit" size="sm" disabled={!dirty || isSaving}>
-            {isSaving ? (
-              <>
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Saving
-              </>
-            ) : (
-              'Save profile'
-            )}
-          </Button>
-        </div>
-      </div>
+      ) : null}
     </form>
   )
 }

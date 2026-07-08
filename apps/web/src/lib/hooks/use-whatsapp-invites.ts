@@ -77,7 +77,7 @@ export function useRevokeWhatsappInvite() {
     mutationFn: (id) => apiFetch<void>(`/whatsapp/invites/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY })
-      toast.success('WhatsApp invite revoked')
+      toast.success('SMS invite revoked')
     },
     onError: (err) => toast.error(mapApiError(err)),
   })

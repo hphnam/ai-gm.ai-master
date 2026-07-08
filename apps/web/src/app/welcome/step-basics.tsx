@@ -1,9 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -16,24 +16,15 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { BusinessLookup, type PlaceCandidate } from '@/components/venues/business-lookup'
+import { VenueTypeChips } from '@/components/venues/venue-type-chips'
 import type { CreateVenueBodyDto as CreateVenueBody } from '@/generated/api'
 import { VenuesControllerCreateBody as CreateVenueBodySchema } from '@/generated/zod'
-import { useCreateVenue, useVenue } from '@/lib/hooks/use-venues'
+import { useOrgProfile, useUpdateOrgProfile } from '@/lib/hooks/use-org-profile'
+import { useCreateVenue, useUpdateVenueProfile, useVenue } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
-import { cn } from '@/lib/utils'
 import { StepFooter, StepShell } from './step-shell'
 import type { OnboardingStepId } from './steps'
-
-const VENUE_TYPES = [
-  'pub',
-  'restaurant',
-  'bar',
-  'cafe',
-  'hotel',
-  'nightclub',
-  'event space',
-  'other',
-] as const
 
 function detectTimezone(): string {
   try {
@@ -53,8 +44,13 @@ export function StepBasics({
   onAdvance: (next: OnboardingStepId, venueId?: string | null) => void
 }) {
   const createVenue = useCreateVenue()
+  const updateVenueProfile = useUpdateVenueProfile()
+  const orgProfile = useOrgProfile()
+  const updateOrgProfile = useUpdateOrgProfile({ silent: true })
   const { data: existingVenue } = useVenue(initialVenueId)
   const [tzOverride, setTzOverride] = useState(false)
+  const [mode, setMode] = useState<'search' | 'manual'>('search')
+  const [selected, setSelected] = useState<PlaceCandidate | null>(null)
   const detectedTz = useMemo(detectTimezone, [])
 
   const form = useForm<CreateVenueBody>({
@@ -78,7 +74,54 @@ export function StepBasics({
     if (!form.getValues('timezone')) form.setValue('timezone', detectedTz)
   }, [detectedTz, form])
 
-  const submitting = createVenue.isPending
+  const onSelectCandidate = useCallback(
+    (candidate: PlaceCandidate) => {
+      setSelected(candidate)
+      form.reset({
+        name: candidate.name,
+        type: candidate.venueType,
+        address: candidate.address ?? '',
+        timezone: candidate.timezone ?? detectedTz,
+      })
+    },
+    [form, detectedTz],
+  )
+
+  const onSearchAgain = useCallback(() => {
+    setSelected(null)
+    form.reset({ name: '', type: '', address: '', timezone: detectedTz })
+  }, [form, detectedTz])
+
+  const onManual = useCallback(() => setMode('manual'), [])
+  const onUnavailable = useCallback(() => setMode('manual'), [])
+
+  const [finalizing, setFinalizing] = useState(false)
+  const submitting = createVenue.isPending || finalizing
+
+  async function fanOutCandidateDetails(candidate: PlaceCandidate, venueId: string) {
+    const tasks: Promise<unknown>[] = []
+    const profileData = orgProfile.data ?? (await orgProfile.refetch()).data
+    if (profileData) {
+      const current = profileData.profile
+      tasks.push(
+        updateOrgProfile.mutateAsync({
+          ...current,
+          businessType: current.businessType ?? candidate.businessType ?? undefined,
+          country: current.country ?? candidate.country ?? undefined,
+          currency: current.currency ?? candidate.currency ?? undefined,
+        }),
+      )
+    }
+    if (candidate.openingHours) {
+      tasks.push(
+        updateVenueProfile.mutateAsync({
+          id: venueId,
+          patch: { openingHours: candidate.openingHours },
+        }),
+      )
+    }
+    await Promise.allSettled(tasks)
+  }
 
   async function onSubmit(values: CreateVenueBody) {
     if (initialVenueId) {
@@ -88,6 +131,10 @@ export function StepBasics({
     try {
       const venue = await createVenue.mutateAsync(values)
       toast.success(`Created ${venue.name}`)
+      if (selected) {
+        setFinalizing(true)
+        await fanOutCandidateDetails(selected, venue.id)
+      }
       onAdvance('operations', venue.id)
     } catch (err) {
       toast.error(mapApiError(err))
@@ -103,6 +150,9 @@ export function StepBasics({
   // create path uses the editable form below.
   const isEditMode = Boolean(initialVenueId)
   const readOnly = isEditMode || submitting
+
+  const showLookup = !isEditMode && mode === 'search' && !selected
+  const showForm = isEditMode || mode === 'manual' || Boolean(selected)
 
   return (
     <StepShell
@@ -125,148 +175,166 @@ export function StepBasics({
             </Link>
             .
           </>
+        ) : mode === 'search' ? (
+          'Search for your business and we’ll fill in the details — your AI GM speaks fluently about your venue from day one.'
         ) : (
           'Two minutes now and your AI GM speaks fluently about your venue. You can edit anything later in settings.'
         )
       }
       footer={null}
     >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Venue name</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="The Crown"
-                    disabled={readOnly}
-                    autoFocus={!isEditMode}
-                    autoComplete="organization"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {showLookup ? (
+        <BusinessLookup
+          onSelect={onSelectCandidate}
+          onManual={onManual}
+          onUnavailable={onUnavailable}
+          disabled={submitting}
+        />
+      ) : null}
 
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>What kind of venue?</FormLabel>
-                <FormControl>
-                  <div className="flex flex-wrap gap-2">
-                    {VENUE_TYPES.map((t) => {
-                      const active = field.value === t
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => field.onChange(active ? '' : t)}
-                          disabled={readOnly}
-                          aria-pressed={active}
-                          className={cn(
-                            'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm capitalize transition-colors',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                            readOnly ? 'cursor-default' : 'cursor-pointer',
-                            active
-                              ? 'border-foreground bg-foreground text-background'
-                              : 'border-border bg-background text-foreground hover:bg-accent',
-                            readOnly && !active && 'opacity-50',
-                          )}
-                        >
-                          {active ? <Check className="h-3 w-3" aria-hidden /> : null}
-                          {t}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {showForm ? (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
+            {selected && !isEditMode ? (
+              <div className="rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm">
+                Found <span className="font-medium">{selected.name}</span>
+                {selected.openingHours ? ' — opening hours will be filled in too' : ''}. Not right?
+                Edit below, or{' '}
+                <button
+                  type="button"
+                  onClick={onSearchAgain}
+                  disabled={submitting}
+                  className="cursor-pointer underline underline-offset-4 hover:text-foreground"
+                >
+                  search again
+                </button>
+                .
+              </div>
+            ) : null}
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Address{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ''}
-                    placeholder="14 High Street, London SW1A 1AA"
-                    disabled={readOnly}
-                    autoComplete="street-address"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="timezone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="sr-only">Timezone</FormLabel>
-                {tzOverride && !isEditMode ? (
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Venue name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Europe/London" disabled={submitting} autoFocus />
+                    <Input
+                      {...field}
+                      placeholder="The Crown"
+                      disabled={readOnly}
+                      autoFocus={!isEditMode && !selected}
+                      autoComplete="organization"
+                    />
                   </FormControl>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    {isEditMode ? 'Timezone' : 'Detected timezone'}:{' '}
-                    <span className="font-medium text-foreground">{field.value}</span>
-                    {isEditMode ? null : (
-                      <>
-                        {' '}
-                        &middot;{' '}
-                        <button
-                          type="button"
-                          onClick={() => setTzOverride(true)}
-                          className="cursor-pointer underline-offset-4 hover:underline"
-                        >
-                          Change
-                        </button>
-                      </>
-                    )}
-                  </p>
-                )}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <StepFooter
-            primary={
-              <Button type="submit" disabled={submitting}>
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                    Creating&hellip;
-                  </>
-                ) : initialVenueId ? (
-                  'Continue'
-                ) : (
-                  'Create venue & continue'
-                )}
-              </Button>
-            }
-          />
-        </form>
-      </Form>
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>What kind of venue?</FormLabel>
+                  <FormControl>
+                    <VenueTypeChips
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={readOnly}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Address{' '}
+                    <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="14 High Street, London SW1A 1AA"
+                      disabled={readOnly}
+                      autoComplete="street-address"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="timezone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Timezone</FormLabel>
+                  {tzOverride && !isEditMode ? (
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Europe/London"
+                        disabled={submitting}
+                        autoFocus
+                      />
+                    </FormControl>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      {isEditMode
+                        ? 'Timezone'
+                        : selected?.timezone
+                          ? 'Timezone'
+                          : 'Detected timezone'}
+                      : <span className="font-medium text-foreground">{field.value}</span>
+                      {isEditMode ? null : (
+                        <>
+                          {' '}
+                          &middot;{' '}
+                          <button
+                            type="button"
+                            onClick={() => setTzOverride(true)}
+                            className="cursor-pointer underline-offset-4 hover:underline"
+                          >
+                            Change
+                          </button>
+                        </>
+                      )}
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <StepFooter
+              primary={
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      Creating&hellip;
+                    </>
+                  ) : initialVenueId ? (
+                    'Continue'
+                  ) : (
+                    'Create venue & continue'
+                  )}
+                </Button>
+              }
+            />
+          </form>
+        </Form>
+      ) : null}
     </StepShell>
   )
 }

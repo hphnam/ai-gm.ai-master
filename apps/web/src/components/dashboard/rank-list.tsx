@@ -73,7 +73,7 @@ export function RankList({
   }
   if (items.length === 0) {
     return (
-      <div className="flex items-center justify-center py-10 text-center">
+      <div className="flex items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 py-10 text-center">
         <p className="max-w-[28ch] text-sm text-muted-foreground">{emptyLabel}</p>
       </div>
     )

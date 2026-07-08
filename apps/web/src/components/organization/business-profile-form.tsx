@@ -16,6 +16,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { ApiError } from '@/lib/api-client'
@@ -24,6 +31,47 @@ import {
   useOrgProfile,
   useUpdateOrgProfile,
 } from '@/lib/hooks/use-org-profile'
+
+const CURRENCY_BY_COUNTRY: Record<string, string> = {
+  GB: 'GBP',
+  IE: 'EUR',
+  US: 'USD',
+  CA: 'CAD',
+  AU: 'AUD',
+  NZ: 'NZD',
+  IN: 'INR',
+  ZA: 'ZAR',
+  DE: 'EUR',
+  FR: 'EUR',
+  ES: 'EUR',
+  PT: 'EUR',
+  IT: 'EUR',
+  NL: 'EUR',
+  BE: 'EUR',
+  AT: 'EUR',
+  FI: 'EUR',
+  CH: 'CHF',
+  DK: 'DKK',
+  SE: 'SEK',
+  NO: 'NOK',
+  PL: 'PLN',
+  CZ: 'CZK',
+  JP: 'JPY',
+  SG: 'SGD',
+  HK: 'HKD',
+  AE: 'AED',
+}
+
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
+// .of() throws RangeError on structurally invalid codes; the API only enforces
+// length 2, so profiles written by other clients may hold e.g. "U1".
+const regionName = (code: string) =>
+  /^[A-Za-z]{2}$/.test(code) ? (regionNames.of(code.toUpperCase()) ?? code) : code
+const COUNTRIES = Object.keys(CURRENCY_BY_COUNTRY)
+  .map((code) => ({ code, name: regionName(code) }))
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+const NO_COUNTRY = 'none'
 
 const profileFormSchema = z.object({
   businessType: z.string().max(120, 'Keep this under 120 characters.'),
@@ -199,12 +247,37 @@ export function BusinessProfileForm() {
               control={form.control}
               name="country"
               render={({ field }) => (
-                <FormItem className="sm:w-40">
+                <FormItem className="sm:w-56">
                   <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input maxLength={2} autoCapitalize="characters" placeholder="US" {...field} />
-                  </FormControl>
-                  <FormDescription>2-letter code.</FormDescription>
+                  <Select
+                    value={field.value || NO_COUNTRY}
+                    onValueChange={(value) => {
+                      const code = value === NO_COUNTRY ? '' : value
+                      field.onChange(code)
+                      const currency = CURRENCY_BY_COUNTRY[code]
+                      if (currency) {
+                        form.setValue('currency', currency, { shouldDirty: true })
+                      }
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Not set" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_COUNTRY}>Not set</SelectItem>
+                      {field.value && !CURRENCY_BY_COUNTRY[field.value] ? (
+                        <SelectItem value={field.value}>{regionName(field.value)}</SelectItem>
+                      ) : null}
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>Sets the default currency.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

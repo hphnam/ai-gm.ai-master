@@ -47,16 +47,14 @@ export function MessageBubble({
           <span className="px-1 text-[10px] text-foreground/55">{author.name ?? author.email}</span>
         ) : null}
         <div className={cn('flex items-center gap-1', fromMe ? 'flex-row' : 'flex-row-reverse')}>
-          {/* Hover-revealed ⋮ on the OUTSIDE of the bubble so it never */}
-          {/* overlaps the text. */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
                 aria-label="Message actions"
-                className="inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground/40 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 group-hover:opacity-100"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground/40 opacity-100 transition-opacity hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
               >
-                <MoreVertical className="h-3.5 w-3.5" aria-hidden />
+                <MoreVertical className="h-4 w-4" aria-hidden />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={fromMe ? 'end' : 'start'} className="min-w-[180px]">

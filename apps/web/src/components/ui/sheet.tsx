@@ -29,7 +29,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = 'SheetOverlay'
 
 type SheetContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-  side?: 'left' | 'right'
+  side?: 'left' | 'right' | 'bottom'
   hideCloseButton?: boolean
 }
 
@@ -42,14 +42,17 @@ const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-y-0 z-50 flex w-full max-w-[440px] flex-col border-border bg-background shadow-2xl outline-none',
+        'fixed z-50 flex flex-col border-border bg-background shadow-2xl outline-none',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=open]:duration-350 data-[state=closed]:duration-250',
         'data-[state=open]:ease-[cubic-bezier(0.32,0.72,0,1)] data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)]',
+        (side === 'left' || side === 'right') && 'inset-y-0 w-full max-w-[440px]',
         side === 'right' &&
           'right-0 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
         side === 'left' &&
           'left-0 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+        side === 'bottom' &&
+          'inset-x-0 bottom-0 max-h-[88dvh] w-full rounded-t-2xl border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
         className,
       )}
       {...props}

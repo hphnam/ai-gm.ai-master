@@ -43,7 +43,7 @@ export function ConversationListRow({
       <button
         type="button"
         onClick={onClick}
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 pr-10 text-left transition-colors hover:bg-accent/40"
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 pr-12 text-left transition-colors hover:bg-accent/40"
       >
         <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-medium text-[11px] text-foreground/75 uppercase tracking-tight">
           {initials(otherParty)}
@@ -95,15 +95,13 @@ export function ConversationListRow({
         </div>
       </button>
 
-      {/* Hover-revealed action menu. On touch the trigger is always visible */}
-      {/* (group-hover only affects pointer:fine devices). */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+      <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
               aria-label={`Actions for ${partyDisplayName(otherParty)}`}
-              className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-foreground/55 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground/55 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               // Stop the row's onClick from firing when opening the menu.
               onClick={(e) => e.stopPropagation()}
             >

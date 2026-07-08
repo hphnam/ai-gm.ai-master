@@ -69,7 +69,7 @@ export function CutoffsCard({ part, ctx }: ToolCardRendererProps) {
                 ) : null}
               </div>
               {typeof r.estimatedDeliveryHours === 'number' ? (
-                <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                <span className="shrink-0 rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-medium text-warning">
                   ~{Math.max(1, Math.round(r.estimatedDeliveryHours))}h delivery
                 </span>
               ) : null}

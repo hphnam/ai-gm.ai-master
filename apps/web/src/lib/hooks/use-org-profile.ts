@@ -27,8 +27,9 @@ export function useOrgProfile() {
   })
 }
 
-export function useUpdateOrgProfile() {
+export function useUpdateOrgProfile(opts?: { silent?: boolean }) {
   const queryClient = useQueryClient()
+  const silent = opts?.silent ?? false
   return useMutation<OrgProfileResponse, Error, OrganizationProfile>({
     mutationFn: (body) =>
       apiFetch<OrgProfileResponse>('/org/profile', {
@@ -37,8 +38,10 @@ export function useUpdateOrgProfile() {
       }),
     onSuccess: (res) => {
       queryClient.setQueryData(['org-profile'], res)
-      toast.success('Business profile saved')
+      if (!silent) toast.success('Business profile saved')
     },
-    onError: (err) => toast.error(mapApiError(err)),
+    onError: (err) => {
+      if (!silent) toast.error(mapApiError(err))
+    },
   })
 }

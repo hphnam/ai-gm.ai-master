@@ -1,18 +1,23 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import { SignInForm } from '@/components/auth/sign-in-form'
+import { SignInMethods } from '@/components/auth/sign-in-methods'
 import { getServerSession } from '@/lib/server-session'
 
 export const dynamic = 'force-dynamic'
 
-export default async function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ method?: string }>
+}) {
   const session = await getServerSession()
   if (session) redirect('/chat')
+  const { method } = await searchParams
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-medium text-center">Sign in</h2>
+    <div className="space-y-5">
+      <h2 className="text-center text-lg font-medium">Sign in</h2>
       <Suspense fallback={<div className="text-sm text-muted-foreground">Loading…</div>}>
-        <SignInForm />
+        <SignInMethods initialMethod={method === 'phone' ? 'phone' : 'email'} />
       </Suspense>
     </div>
   )

@@ -25,7 +25,10 @@ export function FollowUpPills({ followUps, onSelect, disabled }: Props) {
   }
 
   return (
-    <section aria-label="Suggested follow-ups" className="mt-2 flex flex-wrap gap-2">
+    <section
+      aria-label="Suggested follow-ups"
+      className="mt-2 flex flex-wrap gap-2 duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
+    >
       {followUps.map((q) => (
         <Button
           key={q}

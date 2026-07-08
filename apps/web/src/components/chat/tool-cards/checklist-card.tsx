@@ -170,7 +170,7 @@ function InteractiveChecklist({
                 <span
                   className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center transition-colors ${
                     isTicked
-                      ? 'text-emerald-600 dark:text-emerald-500'
+                      ? 'text-success'
                       : 'text-muted-foreground/70 group-hover:text-foreground'
                   }`}
                   aria-hidden
@@ -195,7 +195,7 @@ function InteractiveChecklist({
         })}
       </ol>
       {allDone ? (
-        <div className="mt-2 flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-3 py-1.5 text-[12px] font-medium text-emerald-700 dark:text-emerald-400">
+        <div className="mt-2 flex items-center gap-1.5 rounded-md bg-success/10 px-3 py-1.5 text-xs font-medium text-success">
           <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
           All steps done — nice work.
         </div>

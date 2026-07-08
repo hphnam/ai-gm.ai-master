@@ -1,14 +1,31 @@
 'use client'
 
 import { Users } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
-import { type OrgMember, useOrgMembers } from '@/lib/hooks/use-org-members'
+import { type OrgMember, useOrgMembers, useRemoveOrgMember } from '@/lib/hooks/use-org-members'
 import { cn } from '@/lib/utils'
 
+// Actor is always owner or manager here (server-gated read). Mirror the server
+// rule so we only show Remove where the action would succeed: owner removes
+// managers + staff; manager removes staff only; never yourself or an owner.
+function canRemove(member: OrgMember, actorRole: string | undefined): boolean {
+  if (member.isSelf || member.role === 'owner') return false
+  return actorRole === 'owner' || member.role === 'staff'
+}
+
+function memberLabel(member: OrgMember): string {
+  return member.name?.trim() || member.phoneNumber || member.email || 'this member'
+}
+
 function initials(member: OrgMember): string {
-  const source = member.name?.trim() || member.email
+  const source = member.name?.trim() || member.email || member.phoneNumber || '?'
   const parts = source.split(/\s+/).filter(Boolean)
   if (parts.length >= 2) {
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
@@ -26,6 +43,8 @@ const MEMBERS_SKELETON_KEYS = ['a', 'b', 'c']
 
 export function MembersList() {
   const query = useOrgMembers()
+  const removeMember = useRemoveOrgMember()
+  const [pendingRemove, setPendingRemove] = useState<OrgMember | null>(null)
 
   if (query.isLoading) {
     return (
@@ -49,15 +68,15 @@ export function MembersList() {
   }
 
   const members = query.data?.members ?? []
+  const actorRole = members.find((m) => m.isSelf)?.role
   if (members.length === 0) {
     return (
-      <section className="rounded-lg border border-dashed bg-card p-6 text-center shadow-sm">
-        <Users className="mx-auto mb-2 h-5 w-5 text-muted-foreground" aria-hidden />
-        <p className="text-sm font-medium">No members yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Invite teammates below and they&apos;ll appear here once they accept.
-        </p>
-      </section>
+      <EmptyState
+        icon={Users}
+        size="compact"
+        title="No members yet"
+        description="Invite teammates below and they'll appear here once they accept."
+      />
     )
   }
 
@@ -80,7 +99,7 @@ export function MembersList() {
             <div
               className={cn(
                 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-                'border border-border bg-background text-[11px] font-semibold tracking-[-0.02em] text-foreground/75',
+                'border border-border bg-background text-xs font-semibold tracking-tight text-foreground/75',
               )}
               aria-hidden
             >
@@ -89,22 +108,60 @@ export function MembersList() {
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2">
                 <span className="truncate text-sm font-medium text-foreground">
-                  {m.name?.trim() || m.email}
+                  {m.name?.trim() || m.phoneNumber || m.email || 'Unknown'}
                 </span>
                 {m.isSelf ? (
-                  <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-foreground/60">
+                  <Badge variant="neutral" size="sm" className="shrink-0">
                     You
-                  </span>
+                  </Badge>
                 ) : null}
               </p>
-              {m.name ? <p className="truncate text-xs text-muted-foreground">{m.email}</p> : null}
+              {m.name && (m.phoneNumber || m.email) ? (
+                <p className="truncate text-xs text-muted-foreground">{m.phoneNumber ?? m.email}</p>
+              ) : null}
             </div>
             <span className="shrink-0 text-xs text-muted-foreground">
               {ROLE_LABEL[m.role] ?? m.role}
             </span>
+            {canRemove(m, actorRole) ? (
+              <DeleteButton
+                size="icon"
+                label={`Remove ${memberLabel(m)}`}
+                onClick={() => setPendingRemove(m)}
+              />
+            ) : null}
           </li>
         ))}
       </ul>
+      <ConfirmDeleteDialog
+        open={pendingRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingRemove(null)
+        }}
+        title="Remove team member"
+        description={
+          pendingRemove ? (
+            <>
+              Remove <span className="font-medium">{memberLabel(pendingRemove)}</span> from your
+              team and sign them out immediately? If this is their only team, their account is
+              deleted and they'd need a fresh invite to return.
+            </>
+          ) : null
+        }
+        confirmLabel="Remove"
+        isPending={removeMember.isPending}
+        onConfirm={async () => {
+          if (!pendingRemove) return
+          const label = memberLabel(pendingRemove)
+          try {
+            const { deletedUser } = await removeMember.mutateAsync(pendingRemove.userId)
+            toast.success(deletedUser ? `Deleted ${label}.` : `Removed ${label} from your team.`)
+          } catch {
+            toast.error(`Couldn't remove ${label}. Please try again.`)
+            throw new Error('remove-failed')
+          }
+        }}
+      />
     </section>
   )
 }

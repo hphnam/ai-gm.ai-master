@@ -71,7 +71,9 @@ export function AlertReplyThread({
           ))}
         </ul>
       ) : (
-        <p className="mb-2 text-[11px] text-foreground/50 italic">No replies yet.</p>
+        <div className="mb-2 rounded-md border border-dashed border-border/60 py-3 text-center">
+          <p className="text-xs text-muted-foreground">No replies yet</p>
+        </div>
       )}
 
       <form className="flex items-end gap-2" onSubmit={onSubmit}>
@@ -87,7 +89,7 @@ export function AlertReplyThread({
         <button
           type="submit"
           disabled={compose.isPending || draft.trim().length === 0}
-          className="shrink-0 cursor-pointer rounded-md bg-foreground px-2.5 py-1.5 font-medium text-background text-xs transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-md bg-foreground px-3 font-medium text-background text-xs transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {compose.isPending ? 'Sending…' : 'Send'}
         </button>

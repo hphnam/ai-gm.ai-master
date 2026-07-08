@@ -155,14 +155,14 @@ export function ConversationThread({
 
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           aria-label="Back to conversations"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
+          <ArrowLeft className="h-5 w-5" aria-hidden />
         </button>
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-medium text-[10px] text-foreground/75 uppercase tracking-tight">
           {initials(otherParty)}

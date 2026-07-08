@@ -88,7 +88,15 @@ export function SignInForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <div className="flex items-center justify-between gap-2">
+                <FormLabel>Password</FormLabel>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  Forgot?
+                </Link>
+              </div>
               <FormControl>
                 <Input
                   {...field}
@@ -111,7 +119,7 @@ export function SignInForm() {
             'Sign in'
           )}
         </Button>
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link
             href={`/auth/sign-up${search.get('redirect') ? `?redirect=${encodeURIComponent(search.get('redirect')!)}` : ''}`}
