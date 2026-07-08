@@ -25,6 +25,7 @@ import { NudgeModule } from './modules/nudges/nudge.module'
 import { MemoryReconcileModule } from './modules/organization/memory-reconcile.module'
 import { OrganizationModule } from './modules/organization/organization.module'
 import { PhoneModule } from './modules/phone/phone.module'
+import { PlacesModule } from './modules/places/places.module'
 import { PricingRecommendationsModule } from './modules/pricing-recommendations/pricing-recommendations.module'
 import { ReportsModule } from './modules/reports/reports.module'
 import { RetrievalModule } from './modules/retrieval/retrieval.module'
@@ -56,6 +57,7 @@ import { parseRedisUrl } from './redis-connection'
     OrganizationModule,
     MemoryReconcileModule,
     PhoneModule,
+    PlacesModule,
     WhatsappModule,
     NudgeModule,
     NotificationsModule,

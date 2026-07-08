@@ -333,7 +333,7 @@ const laborWindowProps = windowJsonSchemaProps({
   maxHours: LABOR_MAX_HOURS,
 })
 
-export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = [
+const BASE_SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = [
   {
     name: POS_SEARCH_ITEMS,
     description:
@@ -963,3 +963,29 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
     },
   },
 ]
+
+// Staff-visible allowlist. The registry treats every OTHER tool as manager-only
+// by default (fail closed — see IntegrationToolDefinition.minRole), so a newly
+// added Square tool is withheld from staff until it's deliberately listed here.
+// The line is "Financials + cross-person PII": these carry neither. Menu prices
+// are customer-facing; stock/devices/locations are operational; tonight's
+// bookings are team-visible (names, no money); the shift-LISTING tools show
+// who's on / the rota (the provider redacts hourlyRate/estimatedCost per row
+// for staff — see redactShiftPayForStaff). Everything with revenue, cost,
+// margin, payouts, disputes, customer PII, the team roster, or a labour-COST
+// summary is intentionally absent and therefore manager-only.
+const STAFF_VISIBLE_POS_TOOLS: ReadonlySet<string> = new Set<string>([
+  POS_SEARCH_ITEMS,
+  POS_GET_ITEM_INVENTORY,
+  POS_LIST_LOCATIONS,
+  POS_LIST_BOOKINGS,
+  POS_LIST_DEVICES,
+  POS_LIST_RECENT_SHIFTS,
+  POS_GET_ACTIVE_SHIFTS,
+  POS_LIST_SCHEDULED_SHIFTS,
+])
+
+export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
+  BASE_SQUARE_TOOL_DEFINITIONS.map((def) =>
+    STAFF_VISIBLE_POS_TOOLS.has(def.name) ? { ...def, minRole: 'staff' as const } : def,
+  )

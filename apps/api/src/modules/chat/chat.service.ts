@@ -797,8 +797,14 @@ Assistant answer: ${assistantText}`,
           if (tr.toolName === 'find_knowledge') {
             const output = tr.output as { ok?: boolean; data?: unknown } | null
             if (output?.ok && Array.isArray(output.data)) {
-              for (const hit of output.data as Array<{ id?: string }>) {
-                if (hit?.id) retrievedItemIds.add(hit.id)
+              // Collect hit.entityId (the KnowledgeItem id), NOT hit.id (the
+              // SearchableEntity row id) — auto-verify and the feedback re-tag
+              // queue both look these ids up in knowledgeItem, so se row ids
+              // matched nothing and silently no-op'd both pipelines.
+              for (const hit of output.data as Array<{ entityType?: string; entityId?: string }>) {
+                if (hit?.entityType === 'knowledge_item' && hit.entityId) {
+                  retrievedItemIds.add(hit.entityId)
+                }
               }
             }
           }
@@ -1326,8 +1332,12 @@ Assistant answer: ${assistantText}`,
           if (tr.toolName === 'find_knowledge') {
             const output = tr.output as { ok?: boolean; data?: unknown } | null
             if (output?.ok && Array.isArray(output.data)) {
-              for (const hit of output.data as Array<{ id?: string }>) {
-                if (hit?.id) retrievedItemIds.add(hit.id)
+              // entityId = KnowledgeItem id; hit.id is the SearchableEntity row
+              // id, which auto-verify/re-tag can't resolve (see sendMessage path).
+              for (const hit of output.data as Array<{ entityType?: string; entityId?: string }>) {
+                if (hit?.entityType === 'knowledge_item' && hit.entityId) {
+                  retrievedItemIds.add(hit.entityId)
+                }
               }
             }
           }

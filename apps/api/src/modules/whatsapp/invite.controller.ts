@@ -99,8 +99,6 @@ export class InviteController {
 export class InviteRedeemController {
   private readonly logger = new Logger(InviteRedeemController.name)
 
-  constructor(private readonly invites: InviteService) {}
-
   private throttleOrThrow(req: Request, inviteIdOrNull: string | null): void {
     const ip = req.ip ?? req.socket?.remoteAddress ?? 'unknown'
     const gate = checkRedeemRateLimit(ip, inviteIdOrNull)
@@ -123,7 +121,7 @@ export class InviteRedeemController {
   async preview(
     @Req() req: Request,
     @Query('t') token?: string,
-  ): Promise<{ inviteId: string; orgName: string; role: string }> {
+  ): Promise<{ inviteId: string; orgName: string; role: string; phoneNumber: string }> {
     this.throttleOrThrow(req, null)
     if (!token) this.opaqueInvalid('missing-token')
 
@@ -141,33 +139,19 @@ export class InviteRedeemController {
         id: true,
         status: true,
         role: true,
+        phoneNumber: true,
         organization: { select: { name: true } },
       },
     })
     if (!invite || invite.status !== 'pending') {
       this.opaqueInvalid('not-active', verified.inviteId)
     }
-    return { inviteId: invite!.id, orgName: invite!.organization.name, role: invite!.role }
-  }
-
-  @Post('complete')
-  @HttpCode(200)
-  async complete(
-    @Req() req: Request,
-    @Body() body: { token?: string; name?: string },
-  ): Promise<{ ok: true; organizationId: string }> {
-    this.throttleOrThrow(req, null)
-    if (!body.token || !body.name) this.opaqueInvalid('missing-fields')
-
-    const secret = assertAuthSecret()
-    const verified = verifyInviteToken(body.token!, secret)
-    if (!verified.ok) this.opaqueInvalid(`token-${verified.reason}`)
-
-    this.throttleOrThrow(req, verified.inviteId)
-
-    const result = await this.invites.redeemByToken(verified.inviteId, body.name!)
-    if (!result.ok) this.opaqueInvalid(`redeem-${result.reason}`, verified.inviteId)
-    return { ok: true, organizationId: result.organizationId }
+    return {
+      inviteId: invite!.id,
+      orgName: invite!.organization.name,
+      role: invite!.role,
+      phoneNumber: invite!.phoneNumber,
+    }
   }
 }
 

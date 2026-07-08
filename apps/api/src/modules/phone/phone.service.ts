@@ -197,7 +197,7 @@ export class PhoneService {
       try {
         const updated = await tx.user.update({
           where: { id: userId },
-          data: { phoneNumber, phoneVerifiedAt: new Date() },
+          data: { phoneNumber, phoneVerifiedAt: new Date(), phoneNumberVerified: true },
           select: { phoneNumber: true, phoneVerifiedAt: true },
         })
         this.logger.log(JSON.stringify({ event: 'phone.verified', userId, phoneHash }))
@@ -239,7 +239,7 @@ export class PhoneService {
     const priorPhoneHash = hashPhone(u.phoneNumber)
     await prisma.user.update({
       where: { id: userId },
-      data: { phoneNumber: null, phoneVerifiedAt: null },
+      data: { phoneNumber: null, phoneVerifiedAt: null, phoneNumberVerified: false },
     })
     this.logger.log(JSON.stringify({ event: 'phone.unlinked', userId, priorPhoneHash }))
     return { wasLinked: true }

@@ -16,6 +16,30 @@ export interface IntegrationToolDefinition {
   name: string
   description: string
   input_schema: Record<string, unknown>
+  /// Minimum org role allowed to invoke this capability. FAIL-CLOSED: an
+  /// integration tool that OMITS this is treated as 'manager' by the registry
+  /// — a new tool is withheld from staff until a provider deliberately marks it
+  /// 'staff'. So a forgotten classification costs staff access to a new tool
+  /// (safe, reversible), never leaks financial / cross-person data. Mark only
+  /// the genuinely operational tools (stock, menu, bookings) 'staff'. Scopes by
+  /// capability, not phrasing — a reworded ask that routes to a manager tool is
+  /// still blocked.
+  minRole?: ToolMinRole
+}
+
+/// Access floor for a tool. 'staff' = everyone; 'manager' = manager + owner.
+export type ToolMinRole = 'staff' | 'manager'
+
+/// Fail-closed default for an integration tool whose provider left minRole
+/// unset — see IntegrationToolDefinition.minRole.
+export const DEFAULT_TOOL_MIN_ROLE: ToolMinRole = 'manager'
+
+/// True when `userRole` clears the tool's access floor. Unknown roles clear
+/// only 'staff' tools (matches the fail-safe 'staff' default in the chat
+/// controller), so an unexpected role never reaches manager data.
+export function roleMeetsMinRole(userRole: string, minRole: ToolMinRole): boolean {
+  if (minRole === 'staff') return true
+  return userRole === 'manager' || userRole === 'owner'
 }
 
 /// Logical category a provider competes in. Used to enforce "one provider

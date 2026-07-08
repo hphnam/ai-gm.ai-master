@@ -513,6 +513,42 @@ export const NotificationsControllerRecipientsResponse = zod.object({
 })
 
 
+export const notificationsControllerGetOnePathIdMax = 64;
+
+
+
+export const NotificationsControllerGetOneParams = zod.object({
+  "id": zod.string().min(1).max(notificationsControllerGetOnePathIdMax)
+})
+
+export const NotificationsControllerGetOneResponse = zod.object({
+  "notification": zod.object({
+  "id": zod.string(),
+  "body": zod.string(),
+  "source": zod.enum(['chat', 'whatsapp', 'manual']),
+  "category": zod.enum(['chat', 'report', 'compliance', 'task', 'system']),
+  "automated": zod.boolean(),
+  "reference": zod.union([zod.object({
+  "kind": zod.string(),
+  "id": zod.string()
+}),zod.null()]),
+  "status": zod.enum(['unread', 'read']),
+  "createdAt": zod.string(),
+  "readAt": zod.union([zod.string(),zod.null()]),
+  "author": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+}),zod.null()]),
+  "recipient": zod.object({
+  "id": zod.string(),
+  "name": zod.union([zod.string(),zod.null()]),
+  "email": zod.string()
+})
+})
+})
+
+
 export const notificationsControllerMarkReadPathIdMax = 64;
 
 
@@ -2415,6 +2451,77 @@ export const VenuesControllerGetResponse = zod.object({
 })
 
 
+export const venuesControllerUpdatePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const VenuesControllerUpdateParams = zod.object({
+  "id": zod.string().regex(venuesControllerUpdatePathIdRegExp)
+})
+
+export const venuesControllerUpdateBodyNameMax = 120;
+
+export const venuesControllerUpdateBodyTypeMax = 40;
+
+export const venuesControllerUpdateBodyAddressOneMax = 240;
+
+export const venuesControllerUpdateBodyTimezoneMax = 64;
+
+
+
+export const VenuesControllerUpdateBody = zod.object({
+  "name": zod.string().min(1).max(venuesControllerUpdateBodyNameMax).optional(),
+  "type": zod.string().min(1).max(venuesControllerUpdateBodyTypeMax).optional(),
+  "address": zod.union([zod.string().max(venuesControllerUpdateBodyAddressOneMax),zod.literal("")]).optional(),
+  "timezone": zod.string().min(1).max(venuesControllerUpdateBodyTimezoneMax).optional()
+})
+
+export const venuesControllerUpdateResponseProfileLayoutNotesMax = 2000;
+
+export const venuesControllerUpdateResponseProfileFireEscapesItemMax = 240;
+
+export const venuesControllerUpdateResponseProfileFireEscapesMax = 10;
+
+export const venuesControllerUpdateResponseProfileFirstAidPointsItemMax = 240;
+
+export const venuesControllerUpdateResponseProfileFirstAidPointsMax = 10;
+
+export const venuesControllerUpdateResponseProfileKeySafePolicyMax = 500;
+
+export const venuesControllerUpdateResponseProfileAlarmPolicyMax = 500;
+
+export const venuesControllerUpdateResponseProfileOpeningHoursMax = 500;
+
+export const venuesControllerUpdateResponseProfileWhat3wordsMax = 60;
+
+export const venuesControllerUpdateResponseProfileAccessibilityNotesMax = 500;
+
+export const venuesControllerUpdateResponseProfileDeliveryNotesMax = 500;
+
+export const venuesControllerUpdateResponseProfileFloorPlanKnowledgeItemIdOneRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+
+
+export const VenuesControllerUpdateResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "address": zod.union([zod.string(),zod.null()]),
+  "type": zod.string(),
+  "timezone": zod.string(),
+  "profile": zod.object({
+  "layoutNotes": zod.string().max(venuesControllerUpdateResponseProfileLayoutNotesMax).optional(),
+  "fireEscapes": zod.array(zod.string().min(1).max(venuesControllerUpdateResponseProfileFireEscapesItemMax)).max(venuesControllerUpdateResponseProfileFireEscapesMax).optional(),
+  "firstAidPoints": zod.array(zod.string().min(1).max(venuesControllerUpdateResponseProfileFirstAidPointsItemMax)).max(venuesControllerUpdateResponseProfileFirstAidPointsMax).optional(),
+  "keySafePolicy": zod.string().max(venuesControllerUpdateResponseProfileKeySafePolicyMax).optional(),
+  "alarmPolicy": zod.string().max(venuesControllerUpdateResponseProfileAlarmPolicyMax).optional(),
+  "openingHours": zod.string().max(venuesControllerUpdateResponseProfileOpeningHoursMax).optional(),
+  "what3words": zod.string().max(venuesControllerUpdateResponseProfileWhat3wordsMax).optional(),
+  "accessibilityNotes": zod.string().max(venuesControllerUpdateResponseProfileAccessibilityNotesMax).optional(),
+  "deliveryNotes": zod.string().max(venuesControllerUpdateResponseProfileDeliveryNotesMax).optional(),
+  "floorPlanKnowledgeItemId": zod.union([zod.string().regex(venuesControllerUpdateResponseProfileFloorPlanKnowledgeItemIdOneRegExp),zod.null()]).optional()
+}),
+  "squareLocationId": zod.union([zod.string(),zod.null()])
+})
+
+
 export const venuesControllerUpdateProfilePathIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 
 
@@ -3579,11 +3686,22 @@ export const OrgMembersControllerListResponse = zod.object({
   "members": zod.array(zod.object({
   "userId": zod.string(),
   "name": zod.union([zod.string(),zod.null()]),
-  "email": zod.string(),
+  "email": zod.union([zod.string(),zod.null()]),
+  "phoneNumber": zod.union([zod.string(),zod.null()]),
   "role": zod.string(),
   "isSelf": zod.boolean(),
   "joinedAt": zod.string()
 }))
+})
+
+
+export const OrgMembersControllerRemoveParams = zod.object({
+  "userId": zod.string()
+})
+
+export const OrgMembersControllerRemoveResponse = zod.object({
+  "ok": zod.boolean(),
+  "deletedUser": zod.boolean()
 })
 
 
@@ -3734,7 +3852,30 @@ export const InviteRedeemControllerPreviewQueryParams = zod.object({
 export const InviteRedeemControllerPreviewResponse = zod.unknown()
 
 
-export const InviteRedeemControllerCompleteResponse = zod.unknown()
+export const placesControllerSearchBodyQueryMin = 2;
+export const placesControllerSearchBodyQueryMax = 200;
+
+
+
+export const PlacesControllerSearchBody = zod.object({
+  "query": zod.string().min(placesControllerSearchBodyQueryMin).max(placesControllerSearchBodyQueryMax)
+})
+
+export const PlacesControllerSearchResponse = zod.object({
+  "available": zod.boolean(),
+  "candidates": zod.array(zod.object({
+  "placeId": zod.string(),
+  "name": zod.string(),
+  "address": zod.union([zod.string(),zod.null()]),
+  "businessType": zod.union([zod.string(),zod.null()]),
+  "venueType": zod.string(),
+  "country": zod.union([zod.string(),zod.null()]),
+  "currency": zod.union([zod.string(),zod.null()]),
+  "timezone": zod.union([zod.string(),zod.null()]),
+  "openingHours": zod.union([zod.string(),zod.null()])
+})),
+  "error": zod.literal("lookup-failed").optional()
+})
 
 
 export const nudgeControllerRunNudgePathVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');

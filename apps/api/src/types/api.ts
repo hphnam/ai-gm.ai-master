@@ -115,6 +115,17 @@ export const CreateVenueBodySchema = z.object({
 })
 export type CreateVenueBody = z.infer<typeof CreateVenueBodySchema>
 
+export const UpdateVenueBodySchema = z
+  .object({
+    name: z.string().trim().min(1, 'name required').max(120, 'name too long'),
+    type: z.string().trim().min(1, 'type required').max(40, 'type too long'),
+    address: z.string().trim().max(240, 'address too long').or(z.literal('')),
+    timezone: z.string().trim().min(1, 'timezone required').max(64),
+  })
+  .partial()
+  .strict()
+export type UpdateVenueBody = z.infer<typeof UpdateVenueBodySchema>
+
 /// Phase D — structured venue operational profile. All fields optional so
 /// owners can fill incrementally. The agent reads this on every conversation
 /// (auto-loaded into prompt context) so it knows fire escapes, hours,

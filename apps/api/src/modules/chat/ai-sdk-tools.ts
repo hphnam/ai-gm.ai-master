@@ -135,7 +135,7 @@ export function buildAiSdkTools(
     ] as const
   })
 
-  const surface = integrations.getToolSurfaceForProviders(activeProviderIds)
+  const surface = integrations.getToolSurfaceForProviders(activeProviderIds, ctx.userRole)
   const integrationEntries = surface.definitions.map((def) => {
     const schema = surface.schemas[def.name]
     return [

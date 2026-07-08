@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { fail, type ToolResult } from '../../types'
 import type { DispatchContext } from '../chat/tool-dispatcher'
-import type { IntegrationProvider, IntegrationToolDefinition } from './integration-provider'
+import type {
+  IntegrationProvider,
+  IntegrationToolDefinition,
+  ToolMinRole,
+} from './integration-provider'
+import { DEFAULT_TOOL_MIN_ROLE, roleMeetsMinRole } from './integration-provider'
 import { IntegrationsService } from './integrations.service'
 import { createRedisRateLimiter } from './rate-limit'
 
@@ -36,6 +41,11 @@ export class IntegrationRegistry {
   /// usually implemented by one provider; when two implement it (e.g. two
   /// POS vendors), the org's active Integration row picks the winner.
   private readonly toolToProviders = new Map<string, Set<string>>()
+  /// tool name → effective access floor. Populated for EVERY registered tool
+  /// (default 'manager' when a provider omits minRole — fail closed). Used to
+  /// scope the staff tool surface and as the dispatch backstop so a jailbroken
+  /// model can't reach a manager-only capability.
+  private readonly toolToMinRole = new Map<string, ToolMinRole>()
 
   constructor(private readonly integrations: IntegrationsService) {}
 
@@ -62,6 +72,13 @@ export class IntegrationRegistry {
       }
       set.add(provider.id)
       this.toolToProviders.set(def.name, set)
+      // A capability's access floor is the STRICTEST any provider declares —
+      // manager (incl. an omitted, default-manager classification) beats staff,
+      // so a shared capability is only staff-visible when EVERY implementer
+      // explicitly opts in.
+      const floor = def.minRole ?? DEFAULT_TOOL_MIN_ROLE
+      const existing = this.toolToMinRole.get(def.name)
+      if (existing !== 'manager') this.toolToMinRole.set(def.name, floor)
     }
     this.providers.set(provider.id, provider)
     this.logger.log(
@@ -130,13 +147,23 @@ export class IntegrationRegistry {
   /// model sees built-ins only and falls back to knowledge for live data.
   /// This is what makes routing capability-driven instead of prompt-driven:
   /// the agent's tools ARE the org's connected integrations.
-  getToolSurfaceForProviders(activeProviderIds: ReadonlySet<string>): {
+  ///
+  /// `userRole` scopes the surface to the caller's access floor: a staff member
+  /// never sees manager-only tools (financials, another person's data), so the
+  /// model can't call them by accident and won't imply the venue "isn't
+  /// connected" — the DATA ACCESS BY ROLE prompt block explains the withholding.
+  getToolSurfaceForProviders(
+    activeProviderIds: ReadonlySet<string>,
+    userRole: string,
+  ): {
     definitions: IntegrationToolDefinition[]
     schemas: Record<string, import('zod').ZodTypeAny>
   } {
     if (activeProviderIds.size === 0) return { definitions: [], schemas: {} }
     const allSchemas = this.getAllToolSchemas()
     const definitions = this.getAllToolDefinitions().filter((def) => {
+      const floor = this.toolToMinRole.get(def.name) ?? DEFAULT_TOOL_MIN_ROLE
+      if (!roleMeetsMinRole(userRole, floor)) return false
       const providers = this.toolToProviders.get(def.name)
       return providers != null && [...providers].some((p) => activeProviderIds.has(p))
     })
@@ -202,6 +229,28 @@ export class IntegrationRegistry {
     const candidates = this.toolToProviders.get(toolName)
     if (!candidates || candidates.size === 0) {
       return fail('not-supported', `tool: ${toolName}`)
+    }
+
+    // Hard role backstop. Staff never see manager-only tools in their surface,
+    // so reaching here means either a jailbroken/regressed model or a stale
+    // tool id — deny before touching the vendor. Kept independent of the
+    // surface filter so prompt-level defenses never have to hold alone.
+    if (
+      !roleMeetsMinRole(ctx.userRole, this.toolToMinRole.get(toolName) ?? DEFAULT_TOOL_MIN_ROLE)
+    ) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'integration_registry.role_denied',
+          orgId: ctx.orgId,
+          userId: ctx.userId,
+          userRole: ctx.userRole,
+          toolName,
+        }),
+      )
+      return fail(
+        'not-supported',
+        `"${toolName}" returns manager-level information — a staff member can't access it. Ask an owner or manager.`,
+      )
     }
 
     if (!(await TOOL_INVOCATION_LIMITER.allow(`${ctx.orgId}|${toolName}`))) {

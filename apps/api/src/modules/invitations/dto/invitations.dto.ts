@@ -71,7 +71,11 @@ export class RevokeInvitationResponseDto extends createZodDto(RevokeInvitationRe
 export const OrgMemberSchema = z.object({
   userId: z.string(),
   name: z.string().nullable(),
-  email: z.string(),
+  // Null for phone-only members — their `User.email` is a non-routable
+  // synthetic placeholder (ph+<e164>@phone.gm-ai.local) that must never surface
+  // in the UI. Use phoneNumber for those.
+  email: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
   role: z.string(),
   isSelf: z.boolean(),
   joinedAt: z.string(),
@@ -82,3 +86,16 @@ export const ListOrgMembersResponseSchema = z.object({
   members: z.array(OrgMemberSchema),
 })
 export class ListOrgMembersResponseDto extends createZodDto(ListOrgMembersResponseSchema) {}
+
+// User ids are better-auth-generated (NOT Postgres uuids), so validate a
+// bounded non-empty string rather than a uuid — the service resolves it and
+// returns member-not-found for anything that doesn't map to a member.
+export const RemoveMemberParamSchema = z.object({ userId: z.string().min(1).max(64) })
+
+// deletedUser=true when this was the member's last org and their account was
+// fully deleted; false when they remain in another org (membership removed only).
+export const RemoveMemberResponseSchema = z.object({
+  ok: z.literal(true),
+  deletedUser: z.boolean(),
+})
+export class RemoveMemberResponseDto extends createZodDto(RemoveMemberResponseSchema) {}

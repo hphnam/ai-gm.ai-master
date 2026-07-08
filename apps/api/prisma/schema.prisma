@@ -53,8 +53,9 @@ model User {
   emailVerified   Boolean   @default(false)
   name            String?
   image           String?
-  phoneNumber     String?   @unique
-  phoneVerifiedAt DateTime?
+  phoneNumber       String?   @unique
+  phoneNumberVerified Boolean @default(false)
+  phoneVerifiedAt   DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -127,7 +128,7 @@ model Account {
   @@map("accounts")
 }
 
-model VerificationToken {
+model Verification {
   id         String   @id @default(uuid())
   identifier String
   value      String
@@ -137,6 +138,22 @@ model VerificationToken {
 
   @@index([identifier])
   @@map("verification_tokens")
+}
+
+/// Self-owned 5-digit phone OTP for the better-auth phoneNumber plugin. One live
+/// row per phone (re-issue deletes prior). sha256-hashed, attempt-capped.
+model PhoneOtp {
+  id           String    @id @default(uuid())
+  phoneNumber  String // E.164
+  codeHash     String // HMAC-SHA256(plaintext) keyed on BETTER_AUTH_SECRET
+  attemptsLeft Int       @default(5)
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([phoneNumber])
+  @@index([expiresAt])
+  @@map("phone_otps")
 }
 
 model Organization {
@@ -970,6 +987,8 @@ model Notification {
   @@index([organizationId, recipientUserId, status, createdAt(sort: Desc)], map: "notifications_organizationId_recipientUserId_status_createdAt_i")
   @@index([organizationId, recipientUserId, createdAt(sort: Desc)])
   @@index([organizationId, recipientUserId, category, createdAt(sort: Desc)], map: "notifications_org_recipient_category_createdAt_idx")
+  /// Cross-org scan for the daily unread-notes email digest.
+  @@index([status, createdAt])
   @@map("notifications")
 }
 

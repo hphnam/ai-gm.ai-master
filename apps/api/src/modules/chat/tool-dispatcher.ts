@@ -25,6 +25,7 @@ import { RetrievalService } from '../retrieval/retrieval.service'
 import { ScheduledReportsService } from '../scheduled-reports/scheduled-reports.service'
 import { TabularQueryService } from '../tabular/tabular.service'
 import { TasksService } from '../tasks/tasks.service'
+import { findPerson, redactPersonForRole } from './find-person'
 import { QuoteVerifierService } from './quote-verifier.service'
 
 export type DispatchContext = {
@@ -158,16 +159,35 @@ export class ToolDispatcher {
           const expanded = await this.expandChecklistStepHits(result.data, ctx.orgId)
           return this.applyFindKnowledgeFormat(expanded, ctx.orgId)
         }
-        case 'get_stock_below_par':
-          return await this.mockOps.getStockBelowPar((parsed.data as { venueId: string }).venueId)
+        case 'get_stock_below_par': {
+          if (!ctx) return fail('error', 'get_stock_below_par requires an authenticated context')
+          const i = parsed.data as { venueId: string }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
+          return await this.mockOps.getStockBelowPar(i.venueId)
+        }
         case 'get_stock_by_name': {
+          if (!ctx) return fail('error', 'get_stock_by_name requires an authenticated context')
           const i = parsed.data as { venueId: string; name: string }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
           return await this.mockOps.getStockByName(i.venueId, i.name)
         }
-        case 'get_supplier_by_name':
-          return await this.mockOps.getSupplierByName((parsed.data as { name: string }).name)
+        case 'get_supplier_by_name': {
+          if (!ctx) return fail('error', 'get_supplier_by_name requires an authenticated context')
+          return await this.mockOps.getSupplierByName(
+            (parsed.data as { name: string }).name,
+            ctx.orgId,
+          )
+        }
         case 'get_upcoming_cutoffs': {
+          if (!ctx) return fail('error', 'get_upcoming_cutoffs requires an authenticated context')
           const i = parsed.data as { venueId: string; withinHours?: number }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
           return await this.mockOps.getUpcomingCutoffs(i.venueId, i.withinHours)
         }
         case 'log_incident': {
@@ -313,8 +333,13 @@ export class ToolDispatcher {
             return fail('error', 'only managers or owners can add supplier notes')
           }
           const i = parsed.data as { supplierName: string; note: string }
+          // MockSupplier has no org column (TEMPORARY table) — scope through
+          // the stock relation so one org can't read/write another's suppliers.
           const matches = await prisma.mockSupplier.findMany({
-            where: { name: { contains: i.supplierName, mode: 'insensitive' } },
+            where: {
+              name: { contains: i.supplierName, mode: 'insensitive' },
+              mockStock: { some: { venue: { organizationId: ctx.orgId } } },
+            },
             select: { id: true, name: true, notes: true },
             take: 2,
           })
@@ -602,6 +627,24 @@ export class ToolDispatcher {
             )
             return fail('error', `deep_research failed: ${message}`)
           }
+        }
+        case 'find_person': {
+          if (!ctx) {
+            return fail('error', 'find_person requires an authenticated context')
+          }
+          const i = parsed.data as { name: string }
+          const resolved = await findPerson(i.name, { orgId: ctx.orgId }, prisma)
+          // Redaction is applied to the RESULT (not the prompt) so a jailbroken
+          // model can't talk its way into another person's PII.
+          const scoped = redactPersonForRole(resolved, ctx.userRole)
+          if (
+            scoped.members.length === 0 &&
+            scoped.contacts.length === 0 &&
+            scoped.mentions.length === 0
+          ) {
+            return fail('no-data', `no one matching "${i.name}" in this organisation`)
+          }
+          return ok(scoped)
         }
         case 'leave_note_for_user': {
           if (!ctx) {
@@ -1269,6 +1312,17 @@ export class ToolDispatcher {
         }),
       )
     }
+  }
+
+  /// Cross-tenant guard for tools that take a model-supplied venueId. The
+  /// model's inputs are attacker-influenced (prompt injection via uploaded
+  /// docs), so every venue-scoped read must confirm org ownership.
+  private async venueBelongsToOrg(venueId: string, orgId: string): Promise<boolean> {
+    const venue = await prisma.venue.findFirst({
+      where: { id: venueId, organizationId: orgId },
+      select: { id: true },
+    })
+    return venue !== null
   }
 
   /**

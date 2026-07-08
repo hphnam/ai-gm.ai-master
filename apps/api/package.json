@@ -11,6 +11,7 @@
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "start": "node dist/src/main",
+    "tunnel": "ngrok http --url=https://api.andpro.digital 3001",
     "start:prod": "prisma migrate deploy && node dist/src/main",
     "swagger:generate": "nest build && node dist/src/generate-swagger.js",
     "db:generate": "prisma generate",
@@ -24,6 +25,7 @@
     "probe:versioning": "tsx scripts/probe-versioning.ts",
     "cleanup:orphaned-steps": "tsx scripts/cleanup-orphaned-checklist-steps.ts",
     "probe:chat-core": "tsx scripts/probe-chat-core.ts",
+    "probe:chat-latency": "tsx scripts/probe-chat-latency.ts",
     "probe:chat-core:real": "PROBE_CHAT_CORE_REAL=1 tsx scripts/probe-chat-core.ts",
     "probe:whatsapp-onboarding": "PROBE_INFOBIP_STUB=1 tsx scripts/probe-whatsapp-onboarding.ts",
     "test:cost-tracker": "node --import tsx --test src/modules/chat-core/cost-tracker.service.spec.ts",
@@ -31,7 +33,7 @@
     "reembed:corpus": "tsx scripts/reembed-corpus.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.3",
+    "@ai-sdk/anthropic": "^4.0.4",
     "@anthropic-ai/sdk": "latest",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "latest",
@@ -55,6 +57,7 @@
     "multer": "latest",
     "nest-commander": "latest",
     "nestjs-zod": "^5.3.0",
+    "nodemailer": "^9.0.3",
     "pg": "latest",
     "prisma": "latest",
     "reflect-metadata": "latest",
@@ -72,6 +75,7 @@
     "@types/express": "latest",
     "@types/multer": "latest",
     "@types/node": "latest",
+    "@types/nodemailer": "^8.0.1",
     "@types/pg": "latest",
     "tsx": "latest",
     "typescript": "latest"

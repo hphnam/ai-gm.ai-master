@@ -1825,6 +1825,25 @@ export interface CreateVenueBodyDto {
   timezone: string;
 }
 
+export interface UpdateVenueBodyDto {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name?: string;
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  type?: string;
+  address?: string;
+  /**
+     * @minLength 1
+     * @maxLength 64
+     */
+  timezone?: string;
+}
+
 export interface UpdateVenueProfileDto {
   /** @maxLength 2000 */
   layoutNotes?: string;
@@ -2729,7 +2748,8 @@ export type RevokeInvitationResponseDto = typeof RevokeInvitationResponseDtoValu
 export type ListOrgMembersResponseDtoMembersItem = {
   userId: string;
   name: string | null;
-  email: string;
+  email: string | null;
+  phoneNumber: string | null;
   role: string;
   isSelf: boolean;
   joinedAt: string;
@@ -2737,6 +2757,11 @@ export type ListOrgMembersResponseDtoMembersItem = {
 
 export interface ListOrgMembersResponseDto {
   members: ListOrgMembersResponseDtoMembersItem[];
+}
+
+export interface RemoveMemberResponseDto {
+  ok: true;
+  deletedUser: boolean;
 }
 
 export type OrganizationProfileResponseDtoProfile = {
@@ -2822,6 +2847,32 @@ export type UnlinkPhoneResponseDto = typeof UnlinkPhoneResponseDtoValue;
 export interface PhoneStatusResponseDto {
   phoneNumber: string | null;
   phoneVerifiedAt: string | null;
+}
+
+export interface PlacesSearchDto {
+  /**
+     * @minLength 2
+     * @maxLength 200
+     */
+  query: string;
+}
+
+export type PlacesSearchResponseDtoCandidatesItem = {
+  placeId: string;
+  name: string;
+  address: string | null;
+  businessType: string | null;
+  venueType: string;
+  country: string | null;
+  currency: string | null;
+  timezone: string | null;
+  openingHours: string | null;
+};
+
+export interface PlacesSearchResponseDto {
+  available: boolean;
+  candidates: PlacesSearchResponseDtoCandidatesItem[];
+  error?: 'lookup-failed';
 }
 
 export interface RunNudgeResponseDto {
@@ -5092,6 +5143,113 @@ export function useNotificationsControllerRecipients<TData = Awaited<ReturnType<
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getNotificationsControllerRecipientsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type notificationsControllerGetOneResponse200 = {
+  data: SimpleNotificationResponseDto
+  status: 200
+}
+
+export type notificationsControllerGetOneResponseSuccess = (notificationsControllerGetOneResponse200) & {
+  headers: Headers;
+};
+;
+
+export type notificationsControllerGetOneResponse = (notificationsControllerGetOneResponseSuccess)
+
+export const getNotificationsControllerGetOneUrl = (id: string,) => {
+
+
+
+
+  return `/notifications/${id}`
+}
+
+export const notificationsControllerGetOne = async (id: string, options?: RequestInit): Promise<notificationsControllerGetOneResponse> => {
+
+  return orvalMutator<notificationsControllerGetOneResponse>(getNotificationsControllerGetOneUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNotificationsControllerGetOneQueryKey = (id: string,) => {
+    return [
+    `/notifications/${id}`
+    ] as const;
+    }
+
+
+export const getNotificationsControllerGetOneQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerGetOneQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetOne>>> = ({ signal }) => notificationsControllerGetOne(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NotificationsControllerGetOneQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerGetOne>>>
+export type NotificationsControllerGetOneQueryError = unknown
+
+
+export function useNotificationsControllerGetOne<TData = Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerGetOne<TData = Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof notificationsControllerGetOne>>,
+          TError,
+          Awaited<ReturnType<typeof notificationsControllerGetOne>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerGetOne<TData = Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNotificationsControllerGetOne<TData = Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetOne>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNotificationsControllerGetOneQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -9502,6 +9660,84 @@ export function useVenuesControllerGet<TData = Awaited<ReturnType<typeof venuesC
 
 
 
+export type venuesControllerUpdateResponse200 = {
+  data: VenueDetailDto
+  status: 200
+}
+
+export type venuesControllerUpdateResponseSuccess = (venuesControllerUpdateResponse200) & {
+  headers: Headers;
+};
+;
+
+export type venuesControllerUpdateResponse = (venuesControllerUpdateResponseSuccess)
+
+export const getVenuesControllerUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/venues/${id}`
+}
+
+export const venuesControllerUpdate = async (id: string,
+    updateVenueBodyDto: UpdateVenueBodyDto, options?: RequestInit): Promise<venuesControllerUpdateResponse> => {
+
+  return orvalMutator<venuesControllerUpdateResponse>(getVenuesControllerUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateVenueBodyDto)
+  }
+);}
+
+
+
+
+
+export const getVenuesControllerUpdateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof venuesControllerUpdate>>, TError,{id: string;data: UpdateVenueBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof venuesControllerUpdate>>, TError,{id: string;data: UpdateVenueBodyDto}, TContext> => {
+
+const mutationKey = ['venuesControllerUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof venuesControllerUpdate>>, {id: string;data: UpdateVenueBodyDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  venuesControllerUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VenuesControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof venuesControllerUpdate>>>
+    export type VenuesControllerUpdateMutationBody = UpdateVenueBodyDto
+    export type VenuesControllerUpdateMutationError = unknown
+
+    export const useVenuesControllerUpdate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof venuesControllerUpdate>>, TError,{id: string;data: UpdateVenueBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof venuesControllerUpdate>>,
+        TError,
+        {id: string;data: UpdateVenueBodyDto},
+        TContext
+      > => {
+      return useMutation(getVenuesControllerUpdateMutationOptions(options), queryClient);
+    }
+
 export type venuesControllerUpdateProfileResponse200 = {
   data: VenueDetailDto
   status: 200
@@ -12457,6 +12693,83 @@ export function useOrgMembersControllerList<TData = Awaited<ReturnType<typeof or
 
 
 
+export type orgMembersControllerRemoveResponse200 = {
+  data: RemoveMemberResponseDto
+  status: 200
+}
+
+export type orgMembersControllerRemoveResponseSuccess = (orgMembersControllerRemoveResponse200) & {
+  headers: Headers;
+};
+;
+
+export type orgMembersControllerRemoveResponse = (orgMembersControllerRemoveResponseSuccess)
+
+export const getOrgMembersControllerRemoveUrl = (userId: string,) => {
+
+
+
+
+  return `/org/members/${userId}`
+}
+
+export const orgMembersControllerRemove = async (userId: string, options?: RequestInit): Promise<orgMembersControllerRemoveResponse> => {
+
+  return orvalMutator<orgMembersControllerRemoveResponse>(getOrgMembersControllerRemoveUrl(userId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrgMembersControllerRemoveMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerRemove>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerRemove>>, TError,{userId: string}, TContext> => {
+
+const mutationKey = ['orgMembersControllerRemove'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof orgMembersControllerRemove>>, {userId: string}> = (props) => {
+          const {userId} = props ?? {};
+
+          return  orgMembersControllerRemove(userId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrgMembersControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof orgMembersControllerRemove>>>
+
+    export type OrgMembersControllerRemoveMutationError = unknown
+
+    export const useOrgMembersControllerRemove = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerRemove>>, TError,{userId: string}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof orgMembersControllerRemove>>,
+        TError,
+        {userId: string},
+        TContext
+      > => {
+      return useMutation(getOrgMembersControllerRemoveMutationOptions(options), queryClient);
+    }
+
 export type organizationControllerGetProfileResponse200 = {
   data: OrganizationProfileResponseDto
   status: 200
@@ -13361,34 +13674,34 @@ export function useInviteRedeemControllerPreview<TData = Awaited<ReturnType<type
 
 
 
-export type inviteRedeemControllerCompleteResponse200 = {
-  data: void
+export type placesControllerSearchResponse200 = {
+  data: PlacesSearchResponseDto
   status: 200
 }
 
-export type inviteRedeemControllerCompleteResponseSuccess = (inviteRedeemControllerCompleteResponse200) & {
+export type placesControllerSearchResponseSuccess = (placesControllerSearchResponse200) & {
   headers: Headers;
 };
 ;
 
-export type inviteRedeemControllerCompleteResponse = (inviteRedeemControllerCompleteResponseSuccess)
+export type placesControllerSearchResponse = (placesControllerSearchResponseSuccess)
 
-export const getInviteRedeemControllerCompleteUrl = () => {
-
-
+export const getPlacesControllerSearchUrl = () => {
 
 
-  return `/whatsapp/invites/redeem/complete`
+
+
+  return `/places/search`
 }
 
-export const inviteRedeemControllerComplete = async ( options?: RequestInit): Promise<inviteRedeemControllerCompleteResponse> => {
+export const placesControllerSearch = async (placesSearchDto: PlacesSearchDto, options?: RequestInit): Promise<placesControllerSearchResponse> => {
 
-  return orvalMutator<inviteRedeemControllerCompleteResponse>(getInviteRedeemControllerCompleteUrl(),
+  return orvalMutator<placesControllerSearchResponse>(getPlacesControllerSearchUrl(),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(placesSearchDto)
   }
 );}
 
@@ -13396,11 +13709,11 @@ export const inviteRedeemControllerComplete = async ( options?: RequestInit): Pr
 
 
 
-export const getInviteRedeemControllerCompleteMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
-): UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext> => {
+export const getPlacesControllerSearchMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placesControllerSearch>>, TError,{data: PlacesSearchDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof placesControllerSearch>>, TError,{data: PlacesSearchDto}, TContext> => {
 
-const mutationKey = ['inviteRedeemControllerComplete'];
+const mutationKey = ['placesControllerSearch'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -13410,10 +13723,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof placesControllerSearch>>, {data: PlacesSearchDto}> = (props) => {
+          const {data} = props ?? {};
 
-
-          return  inviteRedeemControllerComplete(requestOptions)
+          return  placesControllerSearch(data,requestOptions)
         }
 
 
@@ -13423,19 +13736,19 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type InviteRedeemControllerCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>>
+    export type PlacesControllerSearchMutationResult = NonNullable<Awaited<ReturnType<typeof placesControllerSearch>>>
+    export type PlacesControllerSearchMutationBody = PlacesSearchDto
+    export type PlacesControllerSearchMutationError = unknown
 
-    export type InviteRedeemControllerCompleteMutationError = unknown
-
-    export const useInviteRedeemControllerComplete = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteRedeemControllerComplete>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+    export const usePlacesControllerSearch = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placesControllerSearch>>, TError,{data: PlacesSearchDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof inviteRedeemControllerComplete>>,
+        Awaited<ReturnType<typeof placesControllerSearch>>,
         TError,
-        void,
+        {data: PlacesSearchDto},
         TContext
       > => {
-      return useMutation(getInviteRedeemControllerCompleteMutationOptions(options), queryClient);
+      return useMutation(getPlacesControllerSearchMutationOptions(options), queryClient);
     }
 
 export type nudgeControllerRunNudgeResponse200 = {

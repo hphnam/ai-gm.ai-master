@@ -607,6 +607,43 @@
         ]
       }
     },
+    "/notifications/{id}": {
+      "get": {
+        "operationId": "NotificationsController_getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 64,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleNotificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/notifications/{id}/read": {
       "patch": {
         "operationId": "NotificationsController_markRead",
@@ -2602,6 +2639,50 @@
         "tags": [
           "venues"
         ]
+      },
+      "patch": {
+        "operationId": "VenuesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVenueBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "venues"
+        ]
       }
     },
     "/venues/{id}/profile": {
@@ -3882,6 +3963,41 @@
         ]
       }
     },
+    "/org/members/{userId}": {
+      "delete": {
+        "operationId": "OrgMembersController_remove",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveMemberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "org-members"
+        ]
+      }
+    },
     "/org/profile": {
       "get": {
         "operationId": "OrganizationController_getProfile",
@@ -4162,17 +4278,39 @@
         ]
       }
     },
-    "/whatsapp/invites/redeem/complete": {
+    "/places/search": {
       "post": {
-        "operationId": "InviteRedeemController_complete",
+        "operationId": "PlacesController_search",
         "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacesSearchDto"
+              }
+            }
           }
         },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesSearchResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "tags": [
-          "whatsapp-invites"
+          "places"
         ]
       }
     },
@@ -10283,6 +10421,43 @@
           "timezone"
         ]
       },
+      "UpdateVenueBodyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "x-nestjs_zod-empty-type": true,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "x-nestjs_zod-parent-additional-properties": false
+          }
+        }
+      },
       "UpdateVenueProfileDto": {
         "type": "object",
         "properties": {
@@ -12981,7 +13156,24 @@
                   ]
                 },
                 "email": {
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "phoneNumber": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "role": {
                   "type": "string"
@@ -12997,6 +13189,7 @@
                 "userId",
                 "name",
                 "email",
+                "phoneNumber",
                 "role",
                 "isSelf",
                 "joinedAt"
@@ -13007,6 +13200,24 @@
         },
         "required": [
           "members"
+        ]
+      },
+      "RemoveMemberResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "deletedUser": {
+            "type": "boolean",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          }
+        },
+        "required": [
+          "ok",
+          "deletedUser"
         ]
       },
       "OrganizationProfileResponseDto": {
@@ -13209,6 +13420,127 @@
         "required": [
           "phoneNumber",
           "phoneVerifiedAt"
+        ]
+      },
+      "PlacesSearchDto": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "x-nestjs_zod-parent-additional-properties": false
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "PlacesSearchResponseDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "placeId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "address": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "businessType": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "venueType": {
+                  "type": "string"
+                },
+                "country": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "timezone": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "openingHours": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "placeId",
+                "name",
+                "address",
+                "businessType",
+                "venueType",
+                "country",
+                "currency",
+                "timezone",
+                "openingHours"
+              ]
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "error": {
+            "type": "string",
+            "const": "lookup-failed",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          }
+        },
+        "required": [
+          "available",
+          "candidates"
         ]
       },
       "RunNudgeResponseDto": {

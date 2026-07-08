@@ -46,13 +46,21 @@ function sanitizeForBlock(value: string): string {
 
 export type AgentMode = 'default' | 'incident' | 'handover'
 
-const MODEL_ID = 'claude-sonnet-4-6'
+const MODEL_ID = 'claude-sonnet-5'
 
 // Loop budget. 8 keeps the agent decisive — a real employee answers in
 // 1-4 tool calls; 8 is generous headroom. After step 5, prepareStep below
-// switches toolChoice to 'none' so the model MUST finalise.
+// injects a finalise instruction; stepCountIs(MAX_STEPS) is the hard stop.
 const MAX_STEPS = 8
 const FORCE_FINALISE_AFTER_STEP = 5
+
+// Injected as an extra system message once the step budget is spent. We do NOT
+// use toolChoice:'none' here: the Anthropic provider implements 'none' by
+// removing the tools array entirely, and Anthropic 400s any request whose
+// history contains tool_use/tool_result blocks without a tools param — which
+// is guaranteed by this point in the loop.
+const FORCE_FINALISE_INSTRUCTION =
+  'You have used your tool budget for this turn. Do not call any more tools — compose your final answer now from the results you already have. If something could not be confirmed, say so plainly instead of guessing.'
 
 // Tools whose call ends the agent loop immediately (see stopWhen below). Each
 // renders its own tool card in the UI, so the agent doesn't (and can't) emit a
@@ -435,10 +443,14 @@ export function buildGmAgent(params: {
       : []),
   ]
 
-  // Adaptive thinking only when it earns its latency: incident mode (model has
-  // to plan a careful protocol). Default + handover are fast snap-answer paths.
-  const wantsThinking = mode === 'incident'
-
+  // Adaptive thinking on every turn. On Sonnet 5 this is effectively
+  // unavoidable — the @ai-sdk/anthropic provider maps thinking:{type:'disabled'}
+  // to OMITTING the param, and an omitted thinking param on Sonnet 5 runs
+  // adaptive by default — so a 'disabled' branch would be a misleading no-op.
+  // We embrace it: the product bar is accuracy over latency, and adaptive
+  // self-moderates (trivial lookups think little), so snap answers stay fast
+  // while incident/reasoning turns get the depth they need. `display` stays at
+  // the provider default ('omitted') — we don't surface reasoning to the user.
   return new ToolLoopAgent({
     id: 'gm-chat-agent',
     model: anthropicProvider(MODEL_ID),
@@ -447,15 +459,21 @@ export function buildGmAgent(params: {
     toolChoice: 'auto',
     providerOptions: {
       anthropic: {
-        ...(wantsThinking ? { thinking: { type: 'adaptive' as const } } : {}),
+        thinking: { type: 'adaptive' as const },
       },
     },
-    // After FORCE_FINALISE_AFTER_STEP tool steps, force the model to answer
-    // with what it has — no more tool calls. This is the "don't stand there
-    // for 20 seconds" guard: a real employee doesn't keep searching forever.
+    // After FORCE_FINALISE_AFTER_STEP tool steps, tell the model to answer
+    // with what it has. This is the "don't stand there for 20 seconds" guard:
+    // a real employee doesn't keep searching forever. The nudge is appended
+    // AFTER the dynamic system message so the cached stable prefix is intact.
     prepareStep: async ({ stepNumber }) => {
       if (stepNumber >= FORCE_FINALISE_AFTER_STEP) {
-        return { toolChoice: 'none' as const }
+        return {
+          instructions: [
+            ...systemMessages,
+            { role: 'system' as const, content: FORCE_FINALISE_INSTRUCTION },
+          ],
+        }
       }
       return {}
     },

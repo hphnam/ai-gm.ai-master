@@ -1,9 +1,8 @@
 import { Injectable, Logger, type NestMiddleware, NotFoundException } from '@nestjs/common'
 import { fromNodeHeaders } from 'better-auth/node'
 import type { NextFunction, Response } from 'express'
-import { prisma } from '../../database/prisma'
 import type { ApiErrorResponse } from '../../types'
-import { auth } from './auth.config'
+import { auth, type SessionOrgContext } from './auth.config'
 import type { AuthedRequest } from './auth.guard'
 
 const AUTH_PREFIX = '/api/auth'
@@ -17,7 +16,19 @@ export class OrgContextMiddleware implements NestMiddleware {
     if (req.path.startsWith(AUTH_PREFIX)) return next()
 
     const headers = fromNodeHeaders(req.headers)
-    const result = await auth.api.getSession({ headers }).catch(() => null)
+    // getSession also runs the customSession membership query. Log failures so a
+    // DB/infra error surfaces instead of silently masking as an unauthenticated
+    // request (the null path below falls through to AuthGuard's 401).
+    const result = await auth.api.getSession({ headers }).catch((err) => {
+      this.logger.error(
+        JSON.stringify({
+          event: 'auth.get_session_failed',
+          requestId: req.requestId ?? null,
+          message: (err as Error)?.message ?? 'unknown',
+        }),
+      )
+      return null
+    })
     if (!result?.user || !result?.session) {
       // AuthGuard (if mounted on the route) will decide whether to 401.
       // Public routes (e.g. /app health) pass through.
@@ -36,41 +47,24 @@ export class OrgContextMiddleware implements NestMiddleware {
         (result.session as { activeOrganizationId?: string | null }).activeOrganizationId ?? null,
     }
 
-    const preferredOrgId = req.session.activeOrganizationId
-    const membership = preferredOrgId
-      ? await prisma.organizationMember.findFirst({
-          where: { userId: req.user.id, organizationId: preferredOrgId },
-          select: {
-            role: true,
-            organizationId: true,
-            organization: { select: { id: true, name: true, slug: true } },
-          },
-        })
-      : await prisma.organizationMember.findFirst({
-          where: { userId: req.user.id },
-          orderBy: { createdAt: 'asc' },
-          select: {
-            role: true,
-            organizationId: true,
-            organization: { select: { id: true, name: true, slug: true } },
-          },
-        })
-
-    if (!membership) {
+    // Active org + role now ride on the session (customSession plugin), so no
+    // second query here — one getSession per request resolves everything.
+    const enriched = result as unknown as SessionOrgContext
+    if (!enriched.membership || !enriched.activeOrganization) {
       const body: ApiErrorResponse = { error: 'organization-not-found' }
       throw new NotFoundException(body)
     }
 
-    req.organization = membership.organization
-    req.membership = { role: membership.role }
+    req.organization = enriched.activeOrganization
+    req.membership = { role: enriched.membership.role }
 
     this.logger.log(
       JSON.stringify({
         event: 'auth.org_resolved',
         requestId: req.requestId ?? null,
         userId: req.user.id,
-        orgId: membership.organizationId,
-        role: membership.role,
+        orgId: enriched.activeOrganization.id,
+        role: enriched.membership.role,
       }),
     )
 

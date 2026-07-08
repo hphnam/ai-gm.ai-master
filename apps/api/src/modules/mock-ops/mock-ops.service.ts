@@ -125,11 +125,16 @@ export class MockOpsService {
     })
   }
 
-  async getSupplierByName(name: string): Promise<ToolResult<MockSupplierMatch[]>> {
+  async getSupplierByName(name: string, orgId: string): Promise<ToolResult<MockSupplierMatch[]>> {
     if (!name || name.trim().length === 0) return fail('error', 'empty name')
     return guarded(async () => {
+      // MockSupplier has no org column (TEMPORARY table) — scope through the
+      // stock relation so one org can't read another's supplier contacts.
       const rows = await prisma.mockSupplier.findMany({
-        where: { name: { contains: name, mode: 'insensitive' } },
+        where: {
+          name: { contains: name, mode: 'insensitive' },
+          mockStock: { some: { venue: { organizationId: orgId } } },
+        },
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
         take: 5,
       })

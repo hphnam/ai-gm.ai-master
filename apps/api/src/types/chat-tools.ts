@@ -21,6 +21,9 @@ export const TOOL_NAMES = [
   // find_knowledge + direct entity tools have all returned thin / no-data and
   // the question genuinely needs cross-source reasoning.
   'deep_research',
+  // Read-only "who is <name>" resolver — unions org members (roles), venue
+  // contacts, and KB doc mentions org-wide. PII is role-scoped in the dispatcher.
+  'find_person',
   // "Note for <person>" — creates an in-app notification for an org member.
   // Resolve by name fragment OR explicit recipientUserId (after disambiguation).
   'leave_note_for_user',
@@ -182,6 +185,11 @@ export const TOOL_INPUT_SCHEMAS = {
   deep_research: z.object({
     venueId: UUID,
     question: z.string().min(8).max(2000),
+  }),
+  find_person: z.object({
+    /// The person's name (or fragment / email) to resolve. Matched
+    /// case-insensitively against org members, venue contacts, and doc mentions.
+    name: z.string().trim().min(2).max(120),
   }),
   leave_note_for_user: z
     .object({
@@ -820,6 +828,22 @@ export const TOOL_DEFINITIONS: ReadonlyArray<{
         scheduleId: { type: 'string', description: 'Schedule UUID from list_scheduled_reports.' },
       },
       required: ['scheduleId'],
+    },
+  },
+  {
+    name: 'find_person',
+    description:
+      'Resolve WHO a named person is across the whole organisation — fires on identity questions: "who is <name>", "do you know <name>", "what\'s <name>\'s role", "how do I reach <name>", "is <name> on the team". Searches THREE stores org-wide (all venues, not just this one) and unions the results: (1) ORG MEMBERS — people with a login and a role (owner / manager / staff); this is how you learn that e.g. the owner is who they are, even if they aren\'t in the venue address book. (2) VENUE CONTACTS — the operator-managed address book (suppliers, engineers, emergency contacts) with role and, for managers/owners, phone/email. (3) DOC MENTIONS — knowledge-base documents that name the person, returned as { knowledgeItemId, title }. Returns { query, members:[{userId,name,role,email}], contacts:[{name,role,phone,email,isEmergencyContact}], mentions:[{knowledgeItemId,title}] }. ROLE SCOPING: for a staff caller, other people\'s phone/email are stripped (null) — they still get name + role + which docs mention them; managers/owners get full contact details. Prefer this over find_knowledge for a PERSON — find_knowledge indexes documents, not people. All three lists empty = nobody by that name; say so plainly. This is READ-ONLY: it does not message anyone (use leave_note_for_user) or assign work (use create_task).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description:
+            'The person\'s name, name fragment, or email to look up (2-120 chars). e.g. "Elliot Horner", "Elliot", "cellar engineer".',
+        },
+      },
+      required: ['name'],
     },
   },
   {
