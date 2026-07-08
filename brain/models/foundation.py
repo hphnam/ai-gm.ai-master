@@ -29,6 +29,12 @@ Pinned per the Chronos paper's declared codebase
     the tensor API predict_quantiles(inputs=[<1D tensor>], ...); see D-note in the
     build-report addendum, Chronos-2's predict_quantiles takes `inputs`, not the
     Bolt-style `context=`, and returns lists of [1, H, n_levels] tensors.
+  * Chronos-2 + known-future covariates (WP12), same dataframe API with a
+    future_df: context_df carries the CHRONOS2_EXO_COLS columns from train,
+    future_df carries them for the target dates. No fallback to the univariate
+    tensor path here: a covariate failure raises loudly (see chronos2_exo_predict)
+    rather than silently degrading to the univariate entrant, which already
+    exists as its own row.
 """
 
 from __future__ import annotations
@@ -43,6 +49,12 @@ CHRONOS_MODEL_ID = "amazon/chronos-bolt-small"
 CHRONOS2_MODEL_ID = "amazon/chronos-2"
 CHRONOS2_FALLBACK_MODEL_ID = "autogluon/chronos-2-small"
 RESOURCE_GUARD_SECONDS = 120
+
+# WP12: the exact covariate set the exo entrant reads. Calendar-derived, known at
+# forecast time. Weather is never included here (it is not known-future); it
+# stays attribution-only per G-live-b / the covariate probe.
+CHRONOS2_EXO_COLS = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
+                     "exo_is_uni_term"]
 
 try:
     import torch
@@ -176,3 +188,56 @@ def chronos2_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> n
         median = np.asarray(quantiles[0][0, :, 1], dtype=float)  # series 0, 0.5 level
         _CHRONOS2["api"] = "predict_quantiles"
         return np.clip(median, 0.0, None)
+
+
+class MissingCovariateError(ValueError):
+    """Raised when chronos2_exo_predict is handed a frame lacking a required
+    known-future covariate value. Deliberate: this entrant never imputes."""
+
+
+def _require_covariates(frame: pd.DataFrame, which: str) -> None:
+    missing_cols = [c for c in CHRONOS2_EXO_COLS if c not in frame.columns]
+    if missing_cols:
+        raise MissingCovariateError(
+            f"chronos2_exo_predict: {which} frame is missing covariate column(s) "
+            f"{missing_cols} (of {CHRONOS2_EXO_COLS}); not imputing, raising instead")
+    nan_cols = [c for c in CHRONOS2_EXO_COLS if frame[c].isna().any()]
+    if nan_cols:
+        raise MissingCovariateError(
+            f"chronos2_exo_predict: {which} frame has NaN covariate value(s) in "
+            f"{nan_cols}; not imputing, raising instead")
+
+
+def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
+    """Zero-shot Chronos-2 point forecast with known-future calendar covariates
+    (WP12), clipped at 0. Reads exactly CHRONOS2_EXO_COLS; never weather.
+
+    Shares the process-level Chronos-2 pipeline with chronos2_predict (one model
+    in memory for both entrants). No fallback to the univariate tensor path: if
+    the covariate call fails for any reason (missing/NaN covariate, a predict_df
+    error), this raises so the ladder harness reports it as a distinct failed
+    entrant, never a silent degrade to the univariate row (which already exists
+    on its own)."""
+    _require_covariates(train, "train")
+    _require_covariates(target, "target")
+    n = len(target)
+    pipe = _chronos2_pipeline()
+    context_df = pd.DataFrame({
+        "id": "l1",
+        "timestamp": pd.to_datetime(train["date"].to_numpy()),
+        "target": train["value"].to_numpy(float)})
+    for c in CHRONOS2_EXO_COLS:
+        context_df[c] = train[c].to_numpy(float)
+    future_df = pd.DataFrame({
+        "id": "l1", "timestamp": pd.to_datetime(target["date"].to_numpy())})
+    for c in CHRONOS2_EXO_COLS:
+        future_df[c] = target[c].to_numpy(float)
+    pred_df = pipe.predict_df(
+        context_df, future_df=future_df, prediction_length=n,
+        quantile_levels=[0.1, 0.5, 0.9], id_column="id",
+        timestamp_column="timestamp", target="target")
+    col = "0.5" if "0.5" in pred_df.columns else "predictions"
+    out = np.asarray(pred_df[col].to_numpy(), float)
+    if out.shape[0] != n:
+        raise ValueError(f"predict_df returned {out.shape[0]} rows, expected {n}")
+    return np.clip(out, 0.0, None)

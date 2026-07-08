@@ -55,6 +55,7 @@ from models.foundation import (
     CHRONOS_MODEL_ID,
     CHRONOS2_MODEL_ID,
     HAS_CHRONOS,
+    chronos2_exo_predict,
     chronos2_predict,
     chronos2_runtime_info,
     chronos_bolt_predict,
@@ -278,14 +279,16 @@ PREDICTORS: list[tuple[str, int, object, bool]] = [
     ("rung3_gbm", 3, rung3_gbm, True),
 ]
 
-# WP4/WP9: Rung-4 foundation models participate as first-class predictors when the
-# backend is installed (Chronos-2 the flagship entrant, Chronos-Bolt a same-family
-# comparison row), so each climbs the same gate as every other rung and is subject
-# to the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the list is
+# WP4/WP9/WP12: Rung-4 foundation models participate as first-class predictors
+# when the backend is installed (Chronos-2 the flagship entrant, Chronos-Bolt a
+# same-family comparison row, Chronos-2 + known-future covariates a third
+# entrant), so each climbs the same gate as every other rung and is subject to
+# the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the list is
 # unchanged, so the ladder is byte-identical to its pre-Rung-4 behaviour.
 if HAS_CHRONOS:
     PREDICTORS.append(("rung4_chronos_bolt", 4, chronos_bolt_predict, True))
     PREDICTORS.append(("rung4_chronos2", 4, chronos2_predict, True))
+    PREDICTORS.append(("rung4_chronos2_exo", 4, chronos2_exo_predict, True))
 
 
 def _predict_all(
@@ -459,16 +462,18 @@ def _table(results: list[RungResult], cols: tuple[str, ...]) -> list[str]:
 
 
 _RUNG4_MODEL_IDS = {"rung4_chronos2": CHRONOS2_MODEL_ID,
-                    "rung4_chronos_bolt": CHRONOS_MODEL_ID}
+                    "rung4_chronos_bolt": CHRONOS_MODEL_ID,
+                    "rung4_chronos2_exo": CHRONOS2_MODEL_ID}
+_RUNG4_ENTRANT_ORDER = ("rung4_chronos2", "rung4_chronos2_exo", "rung4_chronos_bolt")
 
 
 def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
-    """WP4/WP9: state the Rung-4 zero-shot outcome strictly by the gate, reporting
-    both entrants (Chronos-2 and Chronos-Bolt) and the winning one. Returns []
-    when the chronos backend is absent (no rung4 result), so the report is
-    byte-identical to the pre-Rung-4 ladder."""
+    """WP4/WP9/WP12: state the Rung-4 zero-shot outcome strictly by the gate,
+    reporting all entrants (Chronos-2, Chronos-2 + covariates, Chronos-Bolt) and
+    the winning one. Returns [] when the chronos backend is absent (no rung4
+    result), so the report is byte-identical to the pre-Rung-4 ladder."""
     by = {r.name: r for r in rolling_res}
-    entrants = [by[n] for n in ("rung4_chronos2", "rung4_chronos_bolt") if n in by]
+    entrants = [by[n] for n in _RUNG4_ENTRANT_ORDER if n in by]
     if not entrants:
         return []
 
@@ -478,7 +483,8 @@ def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
                   f"{loaded}, API path {info['api'] or 'n/a'}"
                   + (" (small fallback substituted by the resource guard)"
                      if info["substituted"] else ""))
-    head = ["\n## Rung 4: foundation models zero-shot (Chronos-2, Chronos-Bolt)",
+    head = ["\n## Rung 4: foundation models zero-shot (Chronos-2, Chronos-2 + "
+            "covariates, Chronos-Bolt)",
             provenance + ".\n", "| Entrant | model id | rolling MASE |",
             "|---|---|---|"]
     for r in entrants:
