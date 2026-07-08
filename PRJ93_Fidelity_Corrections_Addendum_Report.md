@@ -160,3 +160,127 @@ Edited: `models/foundation.py`, `models/ladder.py`, `models/intermittent.py`,
 `tests/test_intermittent.py`, `tests/test_a7_transfer.py`,
 `PRJ93_Decision_and_Resolution_Log.md`, `PRJ93_Agent_Eval_Report.md`, plus
 regenerated report markdown under `models/`, `hierarchy/`, `eval/`, `transfer/`.
+
+---
+
+## 5. WP12 addendum: Chronos-2 live-serving promotion
+
+Implements `PRJ93_Chronos2_Promotion_Spec.md` on child branch
+`feat/chronos2-promotion` (off `fix/fidelity-corrections`). D-numbering
+continues from D28. This section is appended here per G12.8's own instruction;
+the full narrative (including the headline finding) is in the dedicated
+`PRJ93_Chronos2_Promotion_Report.md`, which is the primary deliverable for this
+spec.
+
+### What was delivered
+
+- **G12.1** `rung4_chronos2_exo` (`models/foundation.py`): a third Rung-4
+  entrant reading exactly `CHRONOS2_EXO_COLS` (is_bank_holiday, is_ellel_event,
+  exo_is_school_term, exo_is_uni_term; never weather), raising
+  `MissingCovariateError` on any missing/NaN covariate rather than falling back
+  to the univariate path. Wired into `PREDICTORS` alongside the other two
+  entrants, subject to `MAX_RUNG`.
+- **G12.2** Gate run (eval venv, `models.ladder --all-venues`): `rung4_chronos2_exo`
+  scores rolling MASE **0.779** on Beer Hall, matching F1 and winning the
+  6-fold preview milestone. No stop condition.
+- **G12.3** `requirements-forecast.txt` + `.venv-forecast` (Python 3.12,
+  uv-provisioned, gitignored): chronos-forecasting + torch only, verified
+  installable and correctly excludes eval-only deps. README nightly one-liner
+  added.
+- **G12.4** Environment guards in `ingest/refresh.py`: `_is_rung4()`, a refit
+  guard (`_refit_ladder`) and a promotion guard (`_promote_and_serve`) that
+  skip loudly with no audit row / no upsert when a Rung-4 model is served and
+  `HAS_CHRONOS` is False. `refresh(..., allow_fallback=True)` (also exposed on
+  `POST /refresh`) is the sole, audited escape hatch. Cadence untouched.
+- **G12.5** Exogenous coverage verified empirically (zero NaN, both venues,
+  full history) for the paths that actually call the entrant today; documented,
+  precisely, that F7's "Ellel events... bookings" claim does not match the
+  codebase (`is_ellel_event` is derived from Ellel's own observed revenue, not
+  a forward-looking table) and that this only matters via
+  `_persist_standby_forward`, which never fires for the open Beer Hall.
+- **G12.6** Actual promotion run, `.venv-forecast`, clean store. **Headline
+  finding: the real T3 refit (4 folds, no prophet - pre-existing, unmodified
+  settings) selects plain `rung4_chronos2` (MASE 0.823), not
+  `rung4_chronos2_exo`** (0.834 at that fold count), diverging from G12.2's
+  6-fold preview. Reproducible, deterministic. Accepted per "the gate decides,
+  formally"; not hand-picked. `served_forecast(beer_hall)` verified serving
+  `rung4_chronos2` cleanly. TRT/Ellel come out unchanged (neither had a served
+  model before or after); force-refitting TRT as a trial surfaced an unrelated,
+  pre-existing bug (`rung3_gbm` cannot be served via `wrap.evaluate`), left
+  untouched and out of scope.
+- **G12.7** `eval/chronos2_promotion_sensitivity.py`: 0 of 28
+  `signals.deviation.scan` rows differ before/after promotion. Confirms F6's
+  premise does not hold for this codebase - the deviation signal never reads
+  the served band.
+- **G12.8** Decision-log Section B row 5 (this document's companion log);
+  tests: `test_is_rung4_matches_any_rung4_entrant`,
+  `test_refit_guard_skips_loudly_with_no_audit_row_when_backend_absent`,
+  `test_promotion_guard_skips_and_leaves_band_untouched_when_backend_absent`,
+  `test_operator_approved_fallback_writes_audited_selection_row` (all in
+  `tests/test_ingest_refresh.py`), plus five in `tests/test_foundation.py`
+  (missing-covariate raise x2, never-reads-weather, happy-path future_df,
+  best-entrant selection). Runtime venv: 230 passed, 6 skipped throughout WP12.
+
+### Deviations from the WP12 spec
+
+- **D29. `chronos2_exo_predict` fails in the STATIC evaluation regime.**
+  Chronos-2's `predict_df` requires `future_df` to be a gap-free continuation
+  of `context_df`; `harness.time_split`'s static split reserves a ~29-day
+  validation buffer between train and test, violating that. The entrant raises
+  loudly (correct per the style rule); the milestone gate (rolling only) and
+  the promotion path (`wrap.evaluate`, gap-free by construction) are
+  unaffected. Not worked around (no `validate_inputs=False`).
+- **D30. `requirements-forecast.txt` is an addendum file, not `-r requirements.txt`
+  plus additions.** Matches the existing `requirements-eval.txt` precedent
+  rather than the spec's literal "runtime requirements plus X" phrasing, which
+  could be read either way.
+- **D31. `allow_fallback` also exposed on `POST /refresh`.** G12.4 specifies
+  `refresh(..., allow_fallback=True)` as a Python-API flag; `/refresh` is the
+  actual operator-facing surface in a deployed system, so `RefreshRequest`
+  gained the same field (default False) to make the flag genuinely reachable
+  by "the operator," not just a raw Python call.
+- **D32. F7 ("Ellel events... a bookings table") does not match the codebase.**
+  `build_features._ellel_event_dates` derives `is_ellel_event` from Ellel's own
+  observed L1 revenue (`value > 0`); there is no forward-looking events table.
+  Documented as a dormant limitation (G12.5), not fixed - no real bookings data
+  exists to extend from, and fabricating one would be exactly the imputation
+  the spec forbids.
+- **D33. The actual T3 gate does not select the covariate variant (the
+  headline finding).** See "What was delivered," G12.6. The spec's opening
+  decision framing names "the Chronos-2 covariate variant" as the option
+  chosen; the mechanically-determined promotion is plain Chronos-2. Surfaced
+  prominently, not smoothed over; reconciling T3's fold count with the preview
+  ladder CLI's is left for Nam.
+- **D34. TRT was not force-refit in the final run.** An initial trial
+  force-refit of TRT (matching a literal reading of "TRT and Ellel go through
+  the same run") surfaced the unrelated `rung3_gbm`/`wrap.evaluate` bug (D-note
+  in the promotion report). The final run scopes `force=True` to Beer Hall
+  only, per the spec's literal text, and confirms TRT/Ellel remain unpromoted
+  (unchanged) via a normal `refit="auto"` pass.
+- **D35. `_reset_store()` extended to drop `served_forecast`.** A real
+  promotion persists cross-venv-shared on-disk state
+  (`brain/store/brain.duckdb`); a leftover Rung-4 served row from this WP12
+  work would otherwise trip the new G12.4 guards for the pre-existing G6 test
+  (`test_forced_refit_selects_rung_and_logs_selection`), which is not
+  exercising those guards. Fixed at the source (`_reset_store`), and the G6
+  test now resets explicitly rather than relying on fixture-ordering luck.
+
+### Stop conditions
+
+None were hit in the sense of halting work: no step required altering
+detection thresholds, briefing weights, the Square pull cadence, or T3/Phase4
+trigger conditions, and every guard preserves the audit trail. The one true
+"surprise" (D33) is exactly the kind of gate-decides-formally outcome this
+project's stop-condition philosophy anticipates for a losing gate result; it
+was reported, not overridden, consistent with G12.2's own contingency wording.
+
+### Files changed (WP12)
+
+New: `models/foundation.py` additions (`chronos2_exo_predict`,
+`CHRONOS2_EXO_COLS`, `MissingCovariateError`), `requirements-forecast.txt`,
+`eval/chronos2_promotion_sensitivity.py` (+ its `.md`),
+`PRJ93_Chronos2_Promotion_Report.md`.
+Edited: `models/ladder.py`, `ingest/refresh.py`, `service/app.py`, `README.md`,
+`.gitignore`, `tests/test_foundation.py`, `tests/test_ingest_refresh.py`,
+`PRJ93_Decision_and_Resolution_Log.md`, plus regenerated
+`models/ladder_results_L1_*.md`.

@@ -107,3 +107,63 @@ runtime venv and its dependencies are untouched.
    univariate (0.793 to 0.779). This nuances the logged "foundation models ingest
    covariates poorly" null: on real folds Chronos-2's covariate path helps modestly
    rather than not at all. Report-only, no ladder or gate impact.
+
+5. **Beer Hall served forecaster promoted to Chronos-2 (WP12); the covariate
+   variant was gated but NOT the model actually adopted, and this is the finding
+   to read carefully.** Decision framing: promote the best-business-forecast
+   Rung-4 entrant, live-serving-ready (nightly refresh, Square-threshold, and
+   exogenous path all handled explicitly).
+   - `rung4_chronos2_exo` was added as a third first-class Rung-4 entrant
+     (`models/foundation.py`, `CHRONOS2_EXO_COLS` = is_bank_holiday,
+     is_ellel_event, exo_is_school_term, exo_is_uni_term; never weather) and
+     wired into the same milestone gate as every other rung.
+   - The preview ladder CLI check (6 folds, `models/ladder_results_L1_*.md`)
+     showed `rung4_chronos2_exo` winning Beer Hall at rolling MASE **0.779**,
+     matching F1 exactly.
+   - The REAL promotion mechanism (`ingest.refresh`'s T3 re-fit, which uses
+     4 folds and no prophet - settings that predate WP12 and were not changed)
+     produces a DIFFERENT winner: plain **`rung4_chronos2`** at rolling MASE
+     **0.823**, beating `rung4_chronos2_exo` (0.834) and `rung4_chronos_bolt`
+     (0.845) at that fold count. This is deterministic and reproducible (no
+     RNG), not a fluke; the root cause is fold-count sensitivity - the
+     covariate variant's win in the 6-fold check is driven by one large gain
+     in an early fold that the smaller 4-fold window does not include the
+     same way. Per this project's standing "the gate decides, formally; do not
+     hand-pick" principle, the actually-promoted model is `rung4_chronos2`,
+     not the covariate variant the spec's opening framing named. **This is a
+     genuine divergence from the spec's stated decision, surfaced, not
+     hidden**; reconciling T3's fold count with the ladder CLI's (so future
+     refits and the documented preview agree) is a call for Nam, not made
+     unilaterally here.
+   - Promotion executed from a new `.venv-forecast` (Python 3.12, uv-
+     provisioned; `requirements-forecast.txt`: chronos-forecasting + torch
+     only, no eval-only deps). `served_forecast(beer_hall) = rung4_chronos2`,
+     fresh `promoted_ts`; `/forecast?venue=beer_hall` serves
+     `conformal_rung4_chronos2` exclusively, verified against a clean store.
+   - Environment guards added to `ingest/refresh.py`: a chronos-less venv
+     (the runtime venv, or the API's serving environment) never re-fits or
+     re-promotes a Rung-4 served model as a side effect - it skips loudly with
+     a named note, writes no audit row, and leaves the band untouched. The
+     only path back to `rung2_ets` from such a venv is the explicit
+     `refresh(..., allow_fallback=True)` (also on `POST /refresh`), which
+     writes an audited `ladder_selection` row saying so. Cadence
+     (`INGEST_STALENESS_DAYS`, the T3 triggers, Phase 4 fire conditions) is
+     untouched.
+   - TRT and Ellel come out unchanged: neither had a `served_forecast` row
+     before this work and neither has one after (only Beer Hall was
+     force-promoted, per the spec's literal scope). Force-refitting TRT as a
+     trial surfaced a SEPARATE, pre-existing, unrelated bug - `rung3_gbm`
+     (T3's 4-fold winner there) cannot actually be served via
+     `wrap.evaluate` (KeyError on missing feature columns; `rung3_gbm` was
+     never previously exercised through the promotion path). Left untouched,
+     out of scope for WP12, flagged for a separate fix.
+   - Deviation-sensitivity check (G12.7,
+     `eval/chronos2_promotion_sensitivity.md`): 0 of 28 `signals.deviation.scan`
+     rows differ before vs after promotion, byte-identical. This is not
+     incidental - `signals.residual.build_residual_stream` (shared by
+     deviation and change-point) always recomputes its own DOW-median baseline
+     from `store.warehouse.read_series` and never reads `served_forecast`,
+     `forecasts`, or `bands`. The spec's F6 premise ("the deviation z
+     denominator is the conformal half-band of the served band") does not
+     hold for this codebase; promoting any model, including Chronos-2, cannot
+     change alert sensitivity through this path.
