@@ -66,9 +66,7 @@ export function assertAuthEnv(): AuthEnv {
 
   const isProd = process.env.NODE_ENV === 'production'
 
-  // 03-06 Twilio Conversations env block — runs alongside Infobip during the
-  // migration window. Cutover commit removes Infobip; this block becomes the
-  // sole WhatsApp transport config.
+  // 03-06 Twilio Conversations env block — the sole WhatsApp/SMS transport config.
   const twAcct = process.env.TWILIO_ACCOUNT_SID
   const twToken = process.env.TWILIO_AUTH_TOKEN
   const twServiceSid = process.env.TWILIO_CONVERSATIONS_SERVICE_SID
@@ -160,6 +158,18 @@ export function assertAuthEnv(): AuthEnv {
     }
   }
 
+  // Phase 6 — Reducto extraction. REDUCTO_API_KEY required at boot; the
+  // extractor path won't function without it (no soft fallbacks — if the key
+  // isn't there, uploads silently fail later, which is worse than refusing to
+  // start).
+  const reductoApiKey = process.env.REDUCTO_API_KEY
+  if (!reductoApiKey) {
+    errs.push(
+      'REDUCTO_API_KEY missing — required for document extraction (CSV / XLSX / PDF / DOCX / PPTX). Get a key at https://reducto.ai',
+    )
+  }
+  const reductoBaseUrl = process.env.REDUCTO_BASE_URL ?? 'https://platform.reducto.ai'
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
@@ -184,6 +194,11 @@ export function assertAuthEnv(): AuthEnv {
         `[backfill] WARN: PROBE_BACKFILL_COST_CEILING_USD=${probeBackfillCeilingRaw} active — overrides BACKFILL_TENANT_COST_CEILING_USD (non-production only)\n`,
       )
     }
+    if (!twSmsSender) {
+      process.stderr.write(
+        '[phone] WARN: TWILIO_SMS_SENDER not set — phone OTP + invite SMS sends will fail (no console fallback exists)\n',
+      )
+    }
   }
 
   const webOrigins = webOriginRaw!
@@ -203,18 +218,6 @@ export function assertAuthEnv(): AuthEnv {
       }
     : undefined
 
-  // Phase 6 — Reducto extraction. REDUCTO_API_KEY required at boot; the
-  // extractor path won't function without it. Same fail-fast posture as the
-  // other Phase-1+ env requirements (no soft fallbacks — if the key isn't
-  // there, uploads silently fail later, which is worse than refusing to start).
-  const reductoApiKey = process.env.REDUCTO_API_KEY
-  if (!reductoApiKey) {
-    errs.push(
-      'REDUCTO_API_KEY missing — required for document extraction (CSV / XLSX / PDF / DOCX / PPTX). Get a key at https://reducto.ai',
-    )
-  }
-  const reductoBaseUrl = process.env.REDUCTO_BASE_URL ?? 'https://platform.reducto.ai'
-
   return {
     secret: secret!,
     baseURL: baseURL!,
@@ -228,6 +231,6 @@ export function assertAuthEnv(): AuthEnv {
       secure: smtpPort === 465 || smtpPort === 2465,
     },
     twilio,
-    reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey ?? '' },
+    reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey! },
   }
 }

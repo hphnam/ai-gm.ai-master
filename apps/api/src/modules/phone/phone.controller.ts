@@ -129,27 +129,11 @@ export class PhoneController {
     // audit-S4: propagate HTTP X-Request-Id into service-layer logs for send→verify correlation
     const requestId = req.header('x-request-id') ?? undefined
     try {
-      // PHONE_VERIFY_DRIVER_OVERRIDE kill-switch precedes pending-match so a disabled-driver
-      // caller sees 503 not 400 (observable distinction between abuse and outage).
-      if (this.verifier.mode === 'disabled') {
-        const errBody: ApiErrorResponse = {
-          error: 'phone-service-unavailable',
-          details: { reason: 'disabled' },
-        }
-        throw new HttpException(errBody, HttpStatus.SERVICE_UNAVAILABLE)
-      }
       // audit-added M1: cross-session code-claim guard — requires pending entry for THIS user.
       this.service.assertPendingVerificationMatches(user.id, body.phoneNumber)
       const check = await this.verifier.checkVerification(body.phoneNumber, body.code, {
         requestId,
       })
-      if (!check.ok) {
-        const errBody: ApiErrorResponse = {
-          error: 'phone-service-unavailable',
-          details: check.details,
-        }
-        throw new HttpException(errBody, HttpStatus.SERVICE_UNAVAILABLE)
-      }
       if (!check.approved) {
         throw new PhoneError('phone-verification-failed')
       }

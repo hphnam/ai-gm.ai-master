@@ -5,12 +5,12 @@ import { z } from 'zod'
 // Content-Type: application/x-www-form-urlencoded
 // Twilio fires one event per request; signature is HMAC-SHA1(URL + sorted form params).
 
-// Outbound result contract — provider-agnostic.
+// Outbound result contract.
 export type WhatsAppOutboundResult =
-  | { ok: true; mode: 'live' | 'console' | 'disabled'; messageId?: string }
+  | { ok: true; messageId?: string }
   | {
       ok: false
-      reason: 'whatsapp-driver-disabled' | 'whatsapp-service-unavailable' | 'whatsapp-invalid-to'
+      reason: 'whatsapp-not-configured' | 'whatsapp-service-unavailable' | 'whatsapp-invalid-to'
     }
 
 // --- Operational constants (unchanged from 03-03 unless noted) ---
@@ -42,7 +42,7 @@ export type AllowedImageMimeType = (typeof ALLOWED_IMAGE_MIME_TYPES)[number]
 
 // 03-04 audit-added S4 (G11): batch-processing soft deadline.
 // Controller for-loop checks this BEFORE each handleInbound call so a slow batch doesn't
-// starve Infobip's webhook retry window. Any result skipped at the deadline logs at debug
+// starve Twilio's webhook retry window. Any result skipped at the deadline logs at debug
 // with its messageId; the controller still returns 200 (partial-success > full-retry).
 export const BATCH_DEADLINE_MS = 12_000
 
@@ -89,7 +89,6 @@ export const TwilioConversationsEventSchema = z
 export type TwilioConversationsEvent = z.infer<typeof TwilioConversationsEventSchema>
 
 // Normalized inbound message that the existing whatsapp.service handler consumes.
-// Shape mirrors the previous InfobipInboundResult so the service body needs minimal change.
 export type WhatsappInboundResult = {
   messageId: string
   conversationSid: string

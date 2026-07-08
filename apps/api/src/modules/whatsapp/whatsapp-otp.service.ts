@@ -126,7 +126,7 @@ export class WhatsappOtpService implements OnModuleInit, OnModuleDestroy {
     fresh.push(Date.now())
     this.rateLimitMap.set(phoneNumber, fresh)
 
-    // Send via adapter. Infobip wants bare digits (no +).
+    // Send via adapter (accepts +E164 or bare digits).
     const to = phoneNumber.replace(/^\+/, '')
     const body = `Your verification code is ${plaintext}. It expires in 10 minutes.`
 
@@ -170,7 +170,6 @@ export class WhatsappOtpService implements OnModuleInit, OnModuleDestroy {
       otpAttemptId: attempt.id,
       attemptsRemaining: attempt.attemptsRemaining,
       latencyMs: Date.now() - startedAt,
-      mode: sendResult.mode,
     })
 
     return { ok: true, attempt }

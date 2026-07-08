@@ -676,7 +676,7 @@ Assistant answer: ${assistantText}`,
     // 03-03 Task 3: when an image attachment is present, persist a placeholder into
     // ChatMessage.content (schema has no image column) so conversation history shows
     // "user sent image" without storing base64. Placeholder includes sourceRef
-    // (Infobip inbound messageId in the WhatsApp flow — previously Twilio MessageSid) for forensic correlation (audit S2).
+    // (Twilio inbound MessageSid in the WhatsApp flow) for forensic correlation (audit S2).
     const userContent = input.attachment
       ? (() => {
           const byteSize = Buffer.from(input.attachment.base64, 'base64').length
