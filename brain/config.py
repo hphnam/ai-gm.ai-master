@@ -16,7 +16,13 @@ from zoneinfo import ZoneInfo
 BRAIN_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BRAIN_DIR.parent
 DATA_DIR = BRAIN_DIR / "data"
-STORE_DIR = BRAIN_DIR / "store"
+
+# Store location (the DuckDB + parquet derived store). Overridable via
+# BRAIN_STORE_DIR (G12.10f / FLAG-STORE-ENV) so the live service can point its
+# database at a mounted persistent volume, separate from the code checkout, so a
+# redeploy never orphans or wipes it. Default is the in-repo store dir, so
+# nothing moves for local/dev runs.
+STORE_DIR = Path(os.environ.get("BRAIN_STORE_DIR") or (BRAIN_DIR / "store"))
 
 DUCKDB_PATH = STORE_DIR / "brain.duckdb"
 MANIFEST_PATH = STORE_DIR / "manifest.json"
@@ -202,25 +208,22 @@ STOCK_A6_NODE_MAP: dict[tuple[str, str], str] = {
 }
 
 # --- Feature enrichment (A14) -----------------------------------------------
-# Venue -> its own weather grid cell (G12.9e). Beer Hall and Ellel are only
-# ~0.6 km apart, but each now gets its own precise Open-Meteo cell rather than
-# sharing "lancaster". The extra pull is cheap and cached, and precision was
-# requested now that Ellel forecasts on its own rungs. TRT's cell is named
-# `preston` (was `trt_south`) and keyed to a Preston coordinate; FLAG-FE-TRTLOC
-# is resolved pending Ryan's exact street coordinate (see FLAGS.md). The
-# supplied `trt_south` point sat ~13 km north of Preston (Galgate/Forton), never
-# Preston itself. This is a city-centre placeholder, not the confirmed venue
-# address. EVENT_SCOPE (below) is a separate, unaffected mapping (events, not
-# weather) that already read "preston".
+# Venue -> its own weather grid cell (G12.9e / G12.10a). All three venues key
+# their cell by venue name uniformly, each with its own precise coordinate. Beer
+# Hall and Ellel are only ~0.6 km apart but get distinct cells; the extra pull
+# is cheap and cached. TRT's cell is `two_river_taps` keyed to the confirmed TRT
+# coordinate (near Galgate/Forton, north of Preston, which is correct for the
+# venue's real location). FLAG-FE-TRTLOC is resolved (see FLAGS.md). EVENT_SCOPE
+# (below) is a separate mapping (events, not weather).
 WEATHER_CELLS = {
-    "beer_hall": "beer_hall", "ellel": "ellel", "two_river_taps": "preston",
+    "beer_hall": "beer_hall", "ellel": "ellel", "two_river_taps": "two_river_taps",
 }
 WEATHER_CELL_COORDS = {
     "beer_hall": (53.99553968526141, -2.786711886507146),
     "ellel": (53.990090612186854, -2.792154498681027),
-    # FLAG-FE-TRTLOC: Preston city-centre coordinate (placeholder). Ryan to
-    # confirm the exact TRT street coordinate; not yet the venue's own address.
-    "preston": (53.7632, -2.7031),
+    # G12.10a: confirmed TRT venue coordinate (Nam). Near Galgate/Forton, north
+    # of Preston, the venue's real location, not an error to flag.
+    "two_river_taps": (53.875094426896766, -2.759934558207991),
 }
 WEATHER_DAILY_VARS = ("temperature_2m_max", "precipitation_sum", "sunshine_duration")
 # Training basis for the weather feature. The ablation sweeps all three; serving

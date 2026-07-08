@@ -50,31 +50,38 @@ CHRONOS2_MODEL_ID = "amazon/chronos-2"
 CHRONOS2_FALLBACK_MODEL_ID = "autogluon/chronos-2-small"
 RESOURCE_GUARD_SECONDS = 120
 
-# WP12: the exact covariate set the exo entrant reads. Weather is never included
-# here (it is not known-future); it stays attribution-only per G-live-b / the
-# covariate probe.
-#
-# Coverage note (G12.5): three of these four are genuinely known-future -
-# is_bank_holiday, exo_is_school_term, exo_is_uni_term are pure functions of the
-# date column (UK bank-holiday rules, term-date rules in ingest.calendar_sources)
-# and are computable for any date, past or future. is_ellel_event is NOT: despite
-# its name, build_features._ellel_event_dates derives it from Ellel's own
-# OBSERVED L1 revenue (value > 0), not a bookings/events table - there is no
-# forward-looking Ellel calendar in this codebase. This is fine for every path
-# that actually calls this entrant today: wrap.evaluate's rolling-origin
-# persistence and reconcile.py's consumption proxy both only ever forecast
-# already-observed held-out dates for an OPEN venue (Beer Hall), where all four
-# columns are populated with zero NaN (verified empirically, both venues, full
-# history). The gap only matters for a genuinely future, unobserved date, which
-# in this codebase only arises via conformal.wrap._persist_standby_forward - and
-# that path fires ONLY for a CLOSED venue (is_closed(venue)), which Beer Hall is
-# not. chronos2_exo_predict's _require_covariates check (raise, never impute)
-# is the correct backstop for that dormant case: if Beer Hall ever closes while
-# this entrant is served, the standby-forward call passes a bare `date`-only
-# future frame, and this entrant raises loudly rather than guessing is_ellel_event
-# for a date nobody can know in advance.
-CHRONOS2_EXO_COLS = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
-                     "exo_is_uni_term"]
+# G12.10b: the FULL known-future covariate universe the Chronos-2 exo entrant
+# reads (was four calendar flags pre-G12.10b). Chronos-2 supports arbitrary
+# covariates through the context frame + future_df, so the entrant consumes every
+# factor genuinely known in advance for the 7-day horizon and weighs them itself:
+#   * calendar (pure date functions, computable for any date):
+#     is_bank_holiday, exo_is_school_term, exo_is_uni_term.
+#   * is_ellel_event: the Ellel spillover flag. Safe for ALL venues now that
+#     G12.10a2 neutralises it AT SOURCE (constant 0 on the Ellel frame, genuine
+#     spillover on the Beer Hall frame). It is informative for Beer Hall and inert
+#     (constant, therefore harmless) for Ellel; a constant covariate must not make
+#     the entrant raise (the guard checks missing/NaN, not zero variance). No
+#     entrant-level special-case; the source fix is the single point of truth.
+#   * civic events: exo_fixture_nearby (curated Lancaster anchors, unchanged).
+#   * World Cup (G12.10d, code-derived, raw/un-ranked): wc_match_in_hours,
+#     wc_england_in_hours, wc_n_matches_in_hours, wc_any_match. Known-future
+#     because the fixture calendar is fixed.
+#   * weather: exo_temp_c, exo_rain_mm, exo_sunshine_hrs, exo_is_dry. Known-future
+#     at serving time BECAUSE config serves on a forecast basis
+#     (WEATHER_TRAIN_BASIS='hindcast', WEATHER_FORECAST_MAX_DAYS=16 covers the
+#     7-day horizon). The observed/ERA5 upper-bound basis is NEVER used here (it
+#     would leak into the backtest); `chronos2_exo_predict` asserts the basis.
+# Weather is populated from `WEATHER_TRAIN_BASIS`; the entrant records that basis
+# in its runtime info line.
+_CALENDAR_EXO = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
+                 "exo_is_uni_term"]
+_EVENT_EXO = ["exo_fixture_nearby"]
+_WORLD_CUP_EXO = ["wc_match_in_hours", "wc_england_in_hours",
+                  "wc_n_matches_in_hours", "wc_any_match"]
+_WEATHER_EXO = ["exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs", "exo_is_dry"]
+
+# The auditable full universe, in one place.
+CHRONOS2_EXO_COLS = _CALENDAR_EXO + _EVENT_EXO + _WORLD_CUP_EXO + _WEATHER_EXO
 
 try:
     import torch
@@ -86,10 +93,10 @@ except Exception:  # pragma: no cover - optional heavy backend
 
 _PIPELINE = None
 # Chronos-2 process-level state: the loaded pipelines, the model id actually
-# loaded, the API path last used, and whether the resource guard substituted the
-# small fallback model.
+# loaded, the API path last used, whether the resource guard substituted the
+# small fallback model, and the weather serving basis the exo entrant used.
 _CHRONOS2: dict = {"pipe": None, "base": None, "model_id": None,
-                   "api": None, "substituted": False}
+                   "api": None, "substituted": False, "weather_basis": None}
 
 
 def _pipeline():
@@ -109,7 +116,8 @@ def chronos2_runtime_info() -> dict:
     except Exception:  # pragma: no cover
         pkg = "unknown"
     return {"version": pkg, "model_id": _CHRONOS2["model_id"],
-            "api": _CHRONOS2["api"], "substituted": _CHRONOS2["substituted"]}
+            "api": _CHRONOS2["api"], "substituted": _CHRONOS2["substituted"],
+            "weather_basis": _CHRONOS2["weather_basis"]}
 
 
 def chronos_bolt_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
@@ -215,18 +223,17 @@ class MissingCovariateError(ValueError):
     known-future covariate value. Deliberate: this entrant never imputes."""
 
 
-# G12.9d: `is_ellel_event` is a spillover signal designed for forecasting OTHER
-# venues from Ellel's own trading days (build_features._ellel_event_dates
-# derives it from Ellel's observed L1 revenue, per FIX-8's spillover-hypothesis
-# check). Feeding it back as a covariate when forecasting Ellel ITSELF would be
-# a self-leak: on Ellel's own feature frame the flag is 1 exactly when Ellel
-# traded (value > 0), so it is a near-perfect proxy for the sparse target it is
-# meant to help predict, on both the train and held-out target frame. Excluded
-# for the Ellel venue specifically; every other venue keeps the full set.
-def exo_cols_for_venue(venue: str | None) -> list[str]:
-    if venue == "ellel":
-        return [c for c in CHRONOS2_EXO_COLS if c != "is_ellel_event"]
+# G12.10b: the resolver returns the FULL known-future universe for every venue.
+# No Ellel special-case: `is_ellel_event` is neutralised AT SOURCE (G12.10a2,
+# constant 0 on the Ellel frame), so it is inert-not-excluded here: informative
+# for Beer Hall, harmless-constant for Ellel. The `venue` argument is kept for
+# future per-venue flexibility but returns the same set for all venues today.
+# (Alias retained: `exo_cols_for_venue` == `chronos2_exo_cols`.)
+def chronos2_exo_cols(venue: str | None = None) -> list[str]:
     return list(CHRONOS2_EXO_COLS)
+
+
+exo_cols_for_venue = chronos2_exo_cols
 
 
 def _require_covariates(frame: pd.DataFrame, which: str, exo_cols: list[str]) -> None:
@@ -243,19 +250,38 @@ def _require_covariates(frame: pd.DataFrame, which: str, exo_cols: list[str]) ->
 
 
 def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None, *,
-                         venue: str | None = None) -> np.ndarray:
-    """Zero-shot Chronos-2 point forecast with known-future calendar covariates
-    (WP12), clipped at 0. Reads `exo_cols_for_venue(venue)` (== CHRONOS2_EXO_COLS
-    for every venue except Ellel, where `is_ellel_event` is dropped to avoid the
-    self-leak, see G12.9d); never weather.
+                         venue: str | None = None,
+                         exo_cols: list[str] | None = None) -> np.ndarray:
+    """Zero-shot Chronos-2 point forecast with the FULL known-future covariate set
+    (G12.10b), clipped at 0. Reads `chronos2_exo_cols(venue)` (the same full
+    universe for every venue): calendar + is_ellel_event (inert-not-excluded, safe
+    via the G12.10a2 source fix) + civic events + World Cup + weather.
 
-    Shares the process-level Chronos-2 pipeline with chronos2_predict (one model
-    in memory for both entrants). No fallback to the univariate tensor path: if
-    the covariate call fails for any reason (missing/NaN covariate, a predict_df
-    error), this raises so the ladder harness reports it as a distinct failed
-    entrant, never a silent degrade to the univariate row (which already exists
-    on its own)."""
-    exo_cols = exo_cols_for_venue(venue)
+    Weather is a genuine known-future covariate here ONLY because it is served on a
+    forecast basis (`config.WEATHER_TRAIN_BASIS`, which build_features uses to
+    populate the weather columns); the observed/ERA5 upper-bound basis would leak
+    into the backtest, so this raises if the serving basis is 'observed'. The
+    resolved basis is recorded in the runtime-info line.
+
+    Shares the process-level Chronos-2 pipeline with chronos2_predict (one model in
+    memory for both entrants). No fallback to the univariate tensor path: if the
+    covariate call fails for any reason (missing/NaN covariate, a predict_df error),
+    this raises so the ladder harness reports it as a distinct failed entrant, never
+    a silent degrade to the univariate row (which already exists on its own)."""
+    import config
+
+    # `exo_cols` override (G12.10e ablation): an explicit subset of the universe,
+    # e.g. the full set minus the wc_* features, for the with/without probe. Default
+    # is the full resolved universe for the venue.
+    exo_cols = list(exo_cols) if exo_cols is not None else chronos2_exo_cols(venue)
+    if any(c in _WEATHER_EXO for c in exo_cols):
+        basis = config.WEATHER_TRAIN_BASIS
+        if basis == "observed":
+            raise MissingCovariateError(
+                "chronos2_exo_predict: weather covariates require a FORECAST serving "
+                "basis (hindcast/leadmatched); WEATHER_TRAIN_BASIS='observed' is the "
+                "ERA5 upper bound and would leak into the backtest")
+        _CHRONOS2["weather_basis"] = basis
     _require_covariates(train, "train", exo_cols)
     _require_covariates(target, "target", exo_cols)
     n = len(target)

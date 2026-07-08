@@ -38,6 +38,8 @@ from config import (
 from ingest import calendar_sources as cal
 from ingest.exog_weather import read_basis
 from ingest.local_events import read_events
+from ingest.world_cup import WC_FEATURE_COLS as _WC_FEATURE_COLS
+from ingest.world_cup import world_cup_features
 from store.warehouse import connect, read_series
 
 BH_DAILY_PARQUET = STORE_DIR / "bh_daily.parquet"
@@ -57,6 +59,12 @@ EXO_COLUMNS = [
     "exo_event_rank",
 ]
 
+# World Cup fixture covariates (G12.10d): raw, un-ranked, code-derived relevance
+# (kickoff vs derived trading hours). Like the rest of the exo seam they are NOT
+# auto-adopted into the GBM feature set (kept out of feature_columns below); the
+# Chronos-2 exo entrant consumes them explicitly by name (G12.10b).
+WC_COLUMNS = list(_WC_FEATURE_COLS)
+
 # Exogenous columns ADOPTED as model features. This set is EMPTY by the A14
 # ablation's verdict (signals/feature_ablation.py): against the strong
 # autoregressive baseline (lag-7/14, roll-28, DOW), no exo feature improves
@@ -69,8 +77,11 @@ EXO_COLUMNS = [
 # term-boundary transitions). See feature_ablation.md / FLAG-FE10.
 _ADOPTED_EXO: frozenset[str] = frozenset()
 
-# Non-feature columns: identifiers, target, and the non-adopted exogenous columns.
-_NON_FEATURE = {"date", "venue", "value"} | (set(EXO_COLUMNS) - _ADOPTED_EXO)
+# Non-feature columns: identifiers, target, the non-adopted exogenous columns,
+# and the World Cup covariates (exo, consumed only by the Chronos exo entrant).
+_NON_FEATURE = ({"date", "venue", "value"}
+                | (set(EXO_COLUMNS) - _ADOPTED_EXO)
+                | set(WC_COLUMNS))
 
 
 def _uk_bank_holidays(years: range) -> set:
@@ -116,7 +127,17 @@ def build_features(venue: str = ANCHOR_VENUE,
 
     bh_holidays = _uk_bank_holidays(range(d.dt.year.min(), d.dt.year.max() + 1))
     df["is_bank_holiday"] = d.dt.date.isin(bh_holidays).astype(int)
-    df["is_ellel_event"] = d.dt.date.isin(ellel_events).astype(int)
+    # G12.10a2: `is_ellel_event` is a spillover signal ("did Ellel trade that
+    # day") for forecasting OTHER venues from Ellel's rhythm. On Ellel's own
+    # frame it is 1 exactly when Ellel had revenue > 0, i.e. a near-deterministic
+    # function of Ellel's own forecast target: a self-leak that reaches every
+    # rung reading this frame (GBM included, now that Ellel is uncapped). Neutralise
+    # it at source: constant 0 on the Ellel frame (column kept for schema/
+    # ENRICH_FEATURES stability), genuine spillover elsewhere.
+    if venue == "ellel":
+        df["is_ellel_event"] = 0
+    else:
+        df["is_ellel_event"] = d.dt.date.isin(ellel_events).astype(int)
     df["price_regime"] = (d >= pd.Timestamp(PRICE_REGIME_BREAK)).astype(int)
 
     # --- Strictly-past statistics (shifted so today is never used) ----------
@@ -161,6 +182,14 @@ def _attach_exog(df: pd.DataFrame, venue: str, basis: str = WEATHER_TRAIN_BASIS,
     else:
         df["exo_event_rank"] = 0.0
     df["exo_fixture_nearby"] = (df["exo_event_rank"] > 0).astype(int)
+
+    # World Cup fixtures (G12.10d): raw wc_* covariates, code-derived relevance
+    # (kickoff vs derived trading hours). Lancaster catchment (BH/Ellel); TRT and
+    # any other venue get all-zero. Absent schedule -> all-zero with a logged note.
+    wc = world_cup_features(venue, df["date"], con=con)
+    df = df.merge(wc, on="date", how="left")
+    for c in _WC_FEATURE_COLS:
+        df[c] = df[c].fillna(0).astype(int)
 
     return df[[c for c in df.columns if c != "exo_uni_phase"] + ["exo_uni_phase"]]
 

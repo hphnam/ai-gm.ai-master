@@ -9,9 +9,9 @@ best basis when serving on forecast.
     exog_weather_hindcast     historical-forecast (matches serve)  — realistic training basis
     exog_weather_leadmatched  previous-runs, issued N days ahead   — forecast as actually issued
 
-Each venue now has its own precise grid cell (G12.9e; `config.WEATHER_CELLS`).
-Beer Hall and Ellel are ~0.6 km apart but no longer share one, and TRT's cell is
-`preston`, not the old mis-located `trt_south`. One HTTP call per (cell, basis),
+Each venue has its own precise grid cell keyed by venue name (G12.9e / G12.10a;
+`config.WEATHER_CELLS`): `beer_hall`, `ellel`, `two_river_taps`. Beer Hall and
+Ellel are ~0.6 km apart but no longer share one. One HTTP call per (cell, basis),
 never one per venue or per forecast.
 
 Run:

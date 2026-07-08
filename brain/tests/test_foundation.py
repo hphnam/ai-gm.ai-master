@@ -152,10 +152,26 @@ def test_exo_predict_raises_on_nan_covariate_value():
         chronos2_exo_predict(train, target)
 
 
-def test_exo_predict_never_reads_weather():
+def test_exo_universe_includes_weather_calendar_events_and_world_cup():
+    # G12.10b: the entrant now consumes the full known-future set, not just
+    # calendar. Weather is in it (known-future via the forecast serving basis).
     from models.foundation import CHRONOS2_EXO_COLS
-    assert not any("weather" in c or "temp" in c or "rain" in c or "sun" in c
-                   for c in CHRONOS2_EXO_COLS)
+    for c in ("exo_temp_c", "exo_is_school_term", "exo_fixture_nearby",
+              "wc_england_in_hours"):
+        assert c in CHRONOS2_EXO_COLS
+
+
+def test_exo_predict_raises_on_observed_weather_basis(monkeypatch):
+    # Weather is known-future ONLY on a forecast basis; the ERA5 observed/oracle
+    # basis would leak into the backtest, so the entrant refuses it.
+    import config
+    from models.foundation import MissingCovariateError, chronos2_exo_predict
+
+    monkeypatch.setattr(config, "WEATHER_TRAIN_BASIS", "observed")
+    train = _exo_frame(10, "2026-01-01")
+    target = _exo_frame(3, "2026-01-11")
+    with pytest.raises(MissingCovariateError, match="FORECAST serving basis"):
+        chronos2_exo_predict(train, target)
 
 
 def test_exo_predict_happy_path_uses_future_df_and_median(monkeypatch):
@@ -178,18 +194,22 @@ def test_exo_predict_happy_path_uses_future_df_and_median(monkeypatch):
     assert set(foundation.CHRONOS2_EXO_COLS) <= seen["future_cols"]
 
 
-# --- G12.9d: Ellel self-leak exclusion (is_ellel_event) ----------------------
+# --- G12.10b: full exo universe, resolver, is_ellel_event inert-not-excluded --
 
-def test_exo_cols_for_venue_drops_is_ellel_event_for_ellel_only():
-    from models.foundation import CHRONOS2_EXO_COLS, exo_cols_for_venue
+def test_chronos2_exo_cols_returns_full_universe_for_all_venues():
+    from models.foundation import CHRONOS2_EXO_COLS, chronos2_exo_cols, exo_cols_for_venue
 
-    assert "is_ellel_event" not in exo_cols_for_venue("ellel")
-    assert set(exo_cols_for_venue("ellel")) == set(CHRONOS2_EXO_COLS) - {"is_ellel_event"}
-    assert exo_cols_for_venue("beer_hall") == list(CHRONOS2_EXO_COLS)
-    assert exo_cols_for_venue(None) == list(CHRONOS2_EXO_COLS)
+    # No per-venue special-case now: the resolver returns the full universe for
+    # every venue (Ellel's is_ellel_event is inert-not-excluded via the source fix).
+    assert chronos2_exo_cols("ellel") == list(CHRONOS2_EXO_COLS)
+    assert chronos2_exo_cols("beer_hall") == list(CHRONOS2_EXO_COLS)
+    assert chronos2_exo_cols(None) == list(CHRONOS2_EXO_COLS)
+    assert exo_cols_for_venue is chronos2_exo_cols   # alias retained
 
 
-def test_exo_predict_for_ellel_does_not_require_is_ellel_event(monkeypatch):
+def test_exo_predict_accepts_constant_is_ellel_event(monkeypatch):
+    # A constant covariate (Ellel's inert is_ellel_event) must not make the
+    # entrant raise: the guard checks missing/NaN, never zero variance.
     pytest.importorskip("torch", reason="torch absent in the runtime venv")
     from models import foundation
 
@@ -199,14 +219,15 @@ def test_exo_predict_for_ellel_does_not_require_is_ellel_event(monkeypatch):
             return pd.DataFrame({"0.5": [1.0, 2.0, 3.0]})
 
     monkeypatch.setattr(foundation, "_chronos2_pipeline", lambda: _FakeC2())
-    train = _exo_frame(10, "2026-01-01").drop(columns=["is_ellel_event"])
-    target = _exo_frame(3, "2026-01-11").drop(columns=["is_ellel_event"])
-    # Would raise MissingCovariateError without the venue="ellel" exclusion.
+    train = _exo_frame(10, "2026-01-01")   # is_ellel_event all-zero (constant)
+    target = _exo_frame(3, "2026-01-11")
     out = foundation.chronos2_exo_predict(train, target, venue="ellel")
     assert out.tolist() == [1.0, 2.0, 3.0]
 
 
-def test_exo_predict_for_other_venue_still_requires_is_ellel_event():
+def test_exo_predict_still_requires_is_ellel_event_column_present():
+    # Inert-not-excluded: the column must still be PRESENT (constant 0 on the Ellel
+    # frame from the source fix); a genuinely missing column raises for any venue.
     from models.foundation import MissingCovariateError, chronos2_exo_predict
 
     train = _exo_frame(10, "2026-01-01").drop(columns=["is_ellel_event"])
@@ -215,7 +236,7 @@ def test_exo_predict_for_other_venue_still_requires_is_ellel_event():
         chronos2_exo_predict(train, target, venue="beer_hall")
 
 
-def test_exo_predict_for_ellel_never_sends_is_ellel_event_to_future_df(monkeypatch):
+def test_exo_predict_sends_full_set_including_weather_and_world_cup(monkeypatch):
     pytest.importorskip("torch", reason="torch absent in the runtime venv")
     from models import foundation
 
@@ -231,4 +252,5 @@ def test_exo_predict_for_ellel_never_sends_is_ellel_event_to_future_df(monkeypat
     train = _exo_frame(10, "2026-01-01")
     target = _exo_frame(2, "2026-01-11")
     foundation.chronos2_exo_predict(train, target, venue="ellel")
-    assert "is_ellel_event" not in seen["future_cols"]
+    assert set(foundation.CHRONOS2_EXO_COLS) <= seen["future_cols"]
+    assert {"exo_temp_c", "wc_england_in_hours", "is_ellel_event"} <= seen["future_cols"]

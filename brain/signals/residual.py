@@ -154,6 +154,19 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
             for _, r in ew.iterrows():
                 hits.append((55, f"coincides with a local event ({r['event_name']})"))
 
+        # World Cup fixtures (G12.10d): a match overlapping the venue's derived
+        # trading hours within the window, named specifically. Strictly
+        # coincidence, never causation (same as every line here). Grounded in the
+        # same kickoff-vs-trading-hours overlap the wc_* forecast features use.
+        try:
+            from ingest.world_cup import coincident_fixtures
+            for fx in coincident_fixtures(venue, lo, hi, con=con):
+                weight = 58 if fx["is_england"] else 52
+                hits.append((weight, f"coincides with {fx['home']} vs {fx['away']}, "
+                             f"{fx['kickoff']} kickoff, within trading hours"))
+        except Exception:                                    # pragma: no cover - defensive
+            pass
+
         # Promo / discount day.
         sp = _table(con, "spike_days")
         if sp is not None:

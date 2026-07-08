@@ -112,6 +112,35 @@ def test_live_adapters_inert_while_off():
     assert NeonAdapter().latest_available_date() is None
 
 
+# --- G12.10c: Neon adapter wiring (inert until provisioned) ------------------
+
+def test_neon_fetch_transactions_raises_while_inert():
+    from ingest.sources.base import NotProvisionedError
+
+    with pytest.raises(NotProvisionedError):
+        NeonAdapter().fetch_transactions(since=None)
+
+
+def test_neon_to_txn_schema_derives_config_columns_only():
+    """The brain_txn -> TXN_COLUMNS mapping derives venue_label / net_sales_exvat /
+    excluded from config, never fabricating transaction facts, and keeps only the
+    known TXN_COLUMNS so a thinner Neon schema still appends cleanly."""
+    from ingest.sources.base import TXN_COLUMNS, _to_txn_schema
+
+    raw = pd.DataFrame({
+        "transaction_id": ["t1"], "venue": ["two_river_taps"], "category": ["Draught"],
+        "item": ["Lager"], "qty": [1.0], "net_sales": [12.0], "gross_sales": [12.0],
+        "discounts": [0.0], "tax": [0.0],
+        "ts": [pd.Timestamp("2026-06-15 20:00:00", tz="Europe/London")],
+        "date": [date(2026, 6, 15)]})
+    out = _to_txn_schema(raw)
+    assert set(out.columns) <= set(TXN_COLUMNS)
+    assert out.loc[0, "venue_label"] == config.VENUE_LABELS["two_river_taps"]
+    # TRT is VAT-inclusive: net_sales_exvat = net_sales / 1.2.
+    assert abs(out.loc[0, "net_sales_exvat"] - 10.0) < 1e-9
+    assert bool(out.loc[0, "excluded"]) is False
+
+
 # --- G2 watermark: fresh store is not falsely stale --------------------------
 
 def test_fresh_store_reports_current_not_stale(store):
