@@ -4,9 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { VenueDetailDto } from '@/generated/api'
 import { API_URL, type ApiError, apiFetch, apiPost } from '../api-client'
 
-/// Provider catalog the UI surfaces. Today: just Square. Adding a new
-/// provider tomorrow is a single entry here + the backend module — the rest
-/// of the UI fans out automatically (each provider gets a card).
+/// Provider catalog the UI surfaces. Adding a new provider is a single entry
+/// here + the backend module — the rest of the UI fans out automatically
+/// (each provider gets a card).
 export const INTEGRATION_PROVIDERS = [
   {
     id: 'square',
@@ -18,6 +18,17 @@ export const INTEGRATION_PROVIDERS = [
     tokenHelp:
       'Generate a personal access token at developer.squareup.com → Applications → your app → Sandbox/Production Access Token.',
     supportsEnvironment: true,
+  },
+  {
+    id: 'breww',
+    label: 'Breww',
+    domain: 'brewery',
+    description:
+      'Brewery management — production batches, packaged stock, supplier purchase orders, and per-product production cost / margin.',
+    docsHref: 'https://breww.com/docs/breww-public-api/',
+    tokenHelp:
+      'Generate a read-only API key in Breww under Settings → Breww Apps & API (keys start with "BRW.").',
+    supportsEnvironment: false,
   },
 ] as const
 

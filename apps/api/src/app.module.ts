@@ -13,6 +13,7 @@ import { DocsModule } from './modules/docs/docs.module'
 import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
 import { IncidentsModule } from './modules/incidents/incidents.module'
 import { IngestModule } from './modules/ingest/ingest.module'
+import { BrewwModule } from './modules/integrations/breww/breww.module'
 import { IntegrationsModule } from './modules/integrations/integrations.module'
 import { SquareModule } from './modules/integrations/square/square.module'
 import { InvitationsModule } from './modules/invitations/invitations.module'
@@ -65,6 +66,7 @@ import { parseRedisUrl } from './redis-connection'
     ChatStartersModule,
     IntegrationsModule,
     SquareModule,
+    BrewwModule,
     MetricsModule,
     OnboardingMetricsModule,
     IncidentsModule,

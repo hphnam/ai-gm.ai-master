@@ -23,7 +23,7 @@ export interface IntegrationToolDefinition {
 /// Square AND Toast connected at the same time and have us silently route
 /// to whichever was upserted most recently. Add new domains as we ship new
 /// integration categories.
-export type IntegrationDomain = 'pos' | 'accounting' | 'crm' | 'other'
+export type IntegrationDomain = 'pos' | 'accounting' | 'crm' | 'brewery' | 'other'
 
 export interface IntegrationProvider {
   /// Stable slug — matches Integration.provider in the DB. Used as the
