@@ -247,7 +247,17 @@ False-alarm upper bound **0.667/week**. Cost = ratio·misses + 1·false-alarms:
 
 The system-level battery above remains the headline (fixed-threshold detectors, discrete surfaced events). VUS-PR is a lag-tolerant, random-robust supplement on the continuous z score, computed by the pinned TSB-AD library (VUS fallback), never reimplemented here.
 
-**VUS-PR: not computed, dependency unavailable.** Install `TSB-AD` (or the pinned `vus` fallback) from requirements-eval.txt to populate this table; the metric is deliberately not approximated by hand.
+Source library: **TSB-AD 1.5**. stock_drawdown is excluded (no z signature).
+
+| kind / venue | VUS-PR | N windows |
+|---|---|---|
+| exo_coincident/beer_hall | 0.904 | 48 |
+| exo_coincident/two_river_taps | 0.991 | 36 |
+| regime_shift/beer_hall | 0.934 | 144 |
+| regime_shift/two_river_taps | 0.972 | 108 |
+| spike/beer_hall | 0.760 | 144 |
+| spike/ellel | 0.764 | 36 |
+| spike/two_river_taps | 0.912 | 108 |
 
 ### S7. Caveats (honest small-N)
 

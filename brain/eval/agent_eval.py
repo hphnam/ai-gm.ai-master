@@ -540,14 +540,22 @@ def _load_vus_get_metrics():
     VUS fallback, or (None, reason). The VUS-PR metric is never reimplemented
     locally; if neither library is importable the supplement reports as not
     computed (spec S2/WP5)."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    def _ver(pkg: str) -> str:
+        try:
+            return version(pkg)
+        except PackageNotFoundError:  # pragma: no cover
+            return "unknown"
+
     try:
         from TSB_AD.evaluation.metrics import get_metrics
-        return get_metrics, "TSB-AD"
+        return get_metrics, f"TSB-AD {_ver('TSB-AD')}"
     except Exception:
         pass
     try:
         from vus.metrics import get_metrics
-        return get_metrics, "VUS (TheDatumOrg/VUS)"
+        return get_metrics, f"VUS (TheDatumOrg/VUS) {_ver('vus')}"
     except Exception:
         return None, "not computed, dependency unavailable"
 
