@@ -1,11 +1,35 @@
-# Proactive Brain (Track A)
+# The brain — forecasting & signals engine
 
-PRJ93 Phase-2 forecasting & signals engine. Standalone Python — **no PostgreSQL
-required**. Runs entirely off the supplied CSVs and persists its own time-series
-memory to a local **DuckDB + Parquet** store (the methodology's design
-contribution: the system supplies the memory the architecture lacks).
+## What this is
 
-Every module prints an explicit `PASS`/`FAIL` and writes a checkable artefact.
+The brain is a standalone Python service that forecasts each venue's daily sales
+and raises operational signals from the result: unusual trading days, sustained
+regime shifts, low stock, and gaps in the staff SOPs. The main product (the
+NestJS API under `apps/api`, referred to as "Track B" in older notes) calls it
+over HTTP; the brain itself is "Track A."
+
+It runs on its own. There is no PostgreSQL dependency — it reads the supplied
+Square CSV exports and keeps its own time-series memory in a local **DuckDB +
+Parquet** store next to the code. That store *is* the point: the design
+contribution of the project is that the system supplies the historical memory the
+rest of the architecture doesn't have.
+
+Every step prints an explicit `PASS`/`FAIL` and writes a file you can check.
+
+> **New to the short codes?** `A6`, `Rung 3`, `L1`, `T2`, `WP12`, `FLAG-CP1` and
+> friends are all decoded in [`../GLOSSARY.md`](../GLOSSARY.md). The one-line
+> version: `A<n>` = a pipeline step (below), `Rung <n>` = a model tier,
+> `L1/L2/L3` = venue/category/item, `T1–T4` = how live a number is.
+
+## How it fits together
+
+The pipeline is a chain of steps (`A0` through `A14`), each gating the next: ingest
+the CSVs, build a local warehouse, engineer features, fit a ladder of forecasting
+models, wrap the winner in a calibrated uncertainty band, then run the signal
+detectors on top. The last step is an HTTP service (`A10`) that serves forecasts
+and signals to the main API. Full step-by-step is under
+[Pipeline](#pipeline-each-step-gates-the-next); the name and owning module of
+every `A<n>` step is in the glossary.
 
 ## Setup
 
@@ -118,7 +142,8 @@ A6 hierarchy reconciliation is intentionally Beer-Hall-only (see its report).
 Every serving envelope also carries a `freshness` block (`source`, `is_live`,
 `stale`, `staleness_days`), so no answer is returned without stating its currency.
 
-This service is what Track B (`apps/api/.../proactive-brain`) calls over HTTP.
+The main API calls this service over HTTP from
+`apps/api/src/modules/proactive-brain/brain.client.ts`.
 ```
 BRAIN_BASE_URL=http://127.0.0.1:8088
 ```

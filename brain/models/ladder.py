@@ -296,7 +296,7 @@ def _predict_all(
     *, with_prophet: bool = True,
 ) -> list[tuple[str, int, np.ndarray | None, str]]:
     cap = MAX_RUNG.get(venue, 99)
-    cap_note = (f"capped at Rung {cap} per Data Audit Report §8.3 — insufficient "
+    cap_note = (f"capped at Rung {cap} per Data Audit Report §8.3: insufficient "
                 "training signal for classical/ML rungs")
     out: list[tuple[str, int, np.ndarray | None, str]] = []
     for name, rung, fn, avail in PREDICTORS:

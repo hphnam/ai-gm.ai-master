@@ -1,5 +1,8 @@
 # FLAGS — standing flags, open confirmations, and data caveats
 
+> New to the codes here (`A6`, `FLAG-CP1`, `Rung 3`, `L1`)? See
+> [`../GLOSSARY.md`](../GLOSSARY.md) for what each one means.
+
 Flagged, not silently coerced (per the build contract). None of these block the
 sales critical path (A0–A6); two are open confirmations off the critical path.
 
@@ -79,7 +82,7 @@ longer error). No code change was needed to recover the files.
    **dropped per the Tan et al. ablation** (an unevaluable/unjustified backbone
    is not adopted). The global GBM remains the pooling baseline.
 
-## Methodology results worth noting
+## Methodology results
 
 - A4: over a static 8-week horizon the **robust DOW baseline is strongest**
   (MASE 0.704); in the operational 7-day rolling-origin regime, ETS/Prophet and

@@ -1,6 +1,6 @@
 # A4 · L1 ladder results (Ellel Village Hall)
 
-> **Ladder capped at Rung 1** for this venue (Data Audit Report §8.3 — insufficient training signal for classical/ML rungs). Rung 1 (robust DOW × season) is a deliberate **scope substitution** for the audit's recommended event-characteristic regression — a reasonable stand-in given the ~64 booking-driven trading days, not an implementation of a bespoke event-type model. Rungs above the cap are listed as 'capped', not silently omitted.
+> **Ladder capped at Rung 1** for this venue (Data Audit Report §8.3: insufficient training signal for classical/ML rungs). Rung 1 (robust DOW × season) is a deliberate **scope substitution** for the audit's recommended event-characteristic regression — a reasonable stand-in given the ~64 booking-driven trading days, not an implementation of a bespoke event-type model. Rungs above the cap are listed as 'capped', not silently omitted.
 
 ## Operational regime — rolling-origin, 7-day horizon (the milestone gate)
 Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal-naive (m=7), averaged.
@@ -9,14 +9,14 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 |---|---|---|---|---|
 | 0 | rung0_seasonal_naive | 0.924 | 6 |  |
 | 1 | rung1_robust_dow | 0.572 | 6 |  |
-| 2 | rung2_ets | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 2 | rung2_prophet | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 2 | rung2_stl | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 3 | rung3_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 3 | rung3_global_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos2 | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos2_exo | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos_bolt | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
+| 2 | rung2_ets | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 2 | rung2_prophet | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 2 | rung2_stl | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 3 | rung3_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 3 | rung3_global_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos2 | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos2_exo | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos_bolt | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
 Test 2026-03-28 → 2026-05-22 (n=56). A stress test over a long static horizon.
@@ -25,14 +25,14 @@ Test 2026-03-28 → 2026-05-22 (n=56). A stress test over a long static horizon.
 |---|---|---|---|---|---|---|
 | 0 | rung0_seasonal_naive | 1.095 | 184.200 | 535.893 | 200.000 |  |
 | 1 | rung1_robust_dow | 1.050 | 176.692 | 508.474 | 166.091 |  |
-| 2 | rung2_ets | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 2 | rung2_prophet | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 2 | rung2_stl | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 3 | rung3_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 3 | rung3_global_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos2 | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos2_exo | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_chronos_bolt | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
+| 2 | rung2_ets | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 2 | rung2_prophet | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 2 | rung2_stl | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 3 | rung3_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 3 | rung3_global_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos2 | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos2_exo | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos_bolt | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs |
 
 ## Milestone (rolling regime)
 - gate: *Rung 1 (robust DOW) beats seasonal-naive*
@@ -47,8 +47,8 @@ chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df.
 
 | Entrant | model id | rolling MASE |
 |---|---|---|
-| rung4_chronos2 | amazon/chronos-2 | not scored (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs) |
-| rung4_chronos2_exo | amazon/chronos-2 | not scored (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs) |
-| rung4_chronos_bolt | amazon/chronos-bolt-small | not scored (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs) |
+| rung4_chronos2 | amazon/chronos-2 | not scored (capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs) |
+| rung4_chronos2_exo | amazon/chronos-2 | not scored (capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs) |
+| rung4_chronos_bolt | amazon/chronos-bolt-small | not scored (capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs) |
 
-Rung 4 evaluated zero-shot but not scored on this venue (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs).
+Rung 4 evaluated zero-shot but not scored on this venue (capped at Rung 1 per Data Audit Report §8.3: insufficient training signal for classical/ML rungs).
