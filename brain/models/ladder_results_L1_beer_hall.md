@@ -11,9 +11,9 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 | 2 | rung2_prophet | – | – | backend not installed |
 | 2 | rung2_stl | 1.125 | 6 |  |
 | 3 | rung3_gbm | 0.927 | 6 |  |
-| 3 | rung3_global_gbm | 0.905 | 6 |  |
+| 3 | rung3_global_gbm | 0.920 | 6 |  |
 | 4 | rung4_chronos2 | 0.793 | 6 |  |
-| 4 | rung4_chronos2_exo | 0.779 | 6 |  |
+| 4 | rung4_chronos2_exo | 0.745 | 6 |  |
 | 4 | rung4_chronos_bolt | 0.796 | 6 |  |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
@@ -27,14 +27,14 @@ Test 2026-04-06 → 2026-05-31 (n=56). A stress test over a long static horizon.
 | 2 | rung2_prophet | – | – | – | – | backend not installed |
 | 2 | rung2_stl | 0.847 | 251.178 | 375.093 | 34.539 |  |
 | 3 | rung3_gbm | 0.852 | 252.862 | 425.985 | 46.050 |  |
-| 3 | rung3_global_gbm | 0.979 | 290.443 | 410.921 | 42.130 |  |
+| 3 | rung3_global_gbm | 1.198 | 355.526 | 517.384 | 76.820 |  |
 | 4 | rung4_chronos2 | 0.721 | 213.783 | 376.492 | 39.426 |  |
 | 4 | rung4_chronos2_exo | – | – | – | – | error: ValueError |
 | 4 | rung4_chronos_bolt | 0.731 | 216.823 | 367.376 | 34.855 |  |
 
 ## Milestone (rolling regime)
 - gate: *beats seasonal-naive AND robust DOW*
-- best model: **rung4_chronos2_exo** (MASE 0.779)
+- best model: **rung4_chronos2_exo** (MASE 0.745)
 - seasonal-naive MASE: 1.006
 - robust-DOW MASE: 1.029
 - **gate met: True**
@@ -45,12 +45,12 @@ This **does not support** the audit's hypothesis that Ellel event nights spill o
 
 
 ## Rung 4: foundation models zero-shot (Chronos-2, Chronos-2 + covariates, Chronos-Bolt)
-chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df.
+chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df, exo weather basis hindcast.
 
 | Entrant | model id | rolling MASE |
 |---|---|---|
 | rung4_chronos2 | amazon/chronos-2 | 0.793 |
-| rung4_chronos2_exo | amazon/chronos-2 | 0.779 |
+| rung4_chronos2_exo | amazon/chronos-2 | 0.745 |
 | rung4_chronos_bolt | amazon/chronos-bolt-small | 0.796 |
 
-Best Rung-4 entrant: **rung4_chronos2_exo** (rolling MASE 0.779). Rung 4 evaluated zero-shot (amazon/chronos-2, pinned); adopted because it beats seasonal-naive (1.006) and robust DOW (1.029) on held-out rolling MASE. It beats rung3_global_gbm (0.905), the Rung-4 adoption criterion.
+Best Rung-4 entrant: **rung4_chronos2_exo** (rolling MASE 0.745). Rung 4 evaluated zero-shot (amazon/chronos-2, pinned); adopted because it beats seasonal-naive (1.006) and robust DOW (1.029) on held-out rolling MASE. It beats rung3_global_gbm (0.920), the Rung-4 adoption criterion.

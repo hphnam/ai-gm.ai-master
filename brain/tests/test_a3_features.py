@@ -92,9 +92,18 @@ def test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap():
             "structured weather_gap, never a silent gap")
 
 
-def test_ellel_exo_entrant_never_reads_its_own_event_flag_as_a_covariate():
-    """The Ellel exo entrant excludes is_ellel_event (a self-leak: it is a
-    near-perfect proxy for Ellel's own sparse target on Ellel's own frame)."""
-    from models.foundation import exo_cols_for_venue
+# --- G12.10a2: is_ellel_event self-leak fixed at source in build_features ----
 
-    assert "is_ellel_event" not in exo_cols_for_venue("ellel")
+def test_ellel_frame_is_ellel_event_is_identically_zero():
+    """On Ellel's own frame the spillover flag is neutralised at source: it must
+    be constant 0 across the span (a venue cannot carry a 'did Ellel trade'
+    feature about itself, which would leak the target into every rung)."""
+    feats = build_features("ellel")
+    assert (feats["is_ellel_event"] == 0).all()
+
+
+def test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates():
+    """For every non-Ellel venue the flag is unchanged: it remains the genuine
+    spillover signal, non-zero on real Ellel trading days."""
+    feats = build_features("beer_hall")
+    assert feats["is_ellel_event"].sum() > 0

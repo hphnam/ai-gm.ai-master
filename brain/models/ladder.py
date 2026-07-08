@@ -485,8 +485,10 @@ def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
 
     info = chronos2_runtime_info()
     loaded = info["model_id"] or CHRONOS2_MODEL_ID
+    basis = info.get("weather_basis")
     provenance = (f"chronos-forecasting {info['version']}, model loaded "
                   f"{loaded}, API path {info['api'] or 'n/a'}"
+                  + (f", exo weather basis {basis}" if basis else "")
                   + (" (small fallback substituted by the resource guard)"
                      if info["substituted"] else ""))
     head = ["\n## Rung 4: foundation models zero-shot (Chronos-2, Chronos-2 + "

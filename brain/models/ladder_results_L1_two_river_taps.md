@@ -13,9 +13,9 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 | 2 | rung2_prophet | – | – | backend not installed |
 | 2 | rung2_stl | 0.829 | 6 |  |
 | 3 | rung3_gbm | 0.602 | 6 |  |
-| 3 | rung3_global_gbm | 0.792 | 6 |  |
+| 3 | rung3_global_gbm | 0.728 | 6 |  |
 | 4 | rung4_chronos2 | 0.636 | 6 |  |
-| 4 | rung4_chronos2_exo | 0.623 | 6 |  |
+| 4 | rung4_chronos2_exo | 0.612 | 6 |  |
 | 4 | rung4_chronos_bolt | 0.612 | 6 |  |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
@@ -29,7 +29,7 @@ Test 2026-03-14 → 2026-05-08 (n=56). A stress test over a long static horizon.
 | 2 | rung2_prophet | – | – | – | – | backend not installed |
 | 2 | rung2_stl | 0.676 | 113.900 | 164.213 | 47.562 |  |
 | 3 | rung3_gbm | 0.766 | 129.039 | 164.384 | 44.329 |  |
-| 3 | rung3_global_gbm | 1.242 | 209.371 | 267.800 | 139.282 |  |
+| 3 | rung3_global_gbm | 0.994 | 167.561 | 205.624 | 60.408 |  |
 | 4 | rung4_chronos2 | 0.621 | 104.742 | 146.256 | 43.994 |  |
 | 4 | rung4_chronos2_exo | – | – | – | – | error: ValueError |
 | 4 | rung4_chronos_bolt | 0.556 | 93.712 | 128.189 | 33.936 |  |
@@ -43,12 +43,12 @@ Test 2026-03-14 → 2026-05-08 (n=56). A stress test over a long static horizon.
 
 
 ## Rung 4: foundation models zero-shot (Chronos-2, Chronos-2 + covariates, Chronos-Bolt)
-chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df.
+chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df, exo weather basis hindcast.
 
 | Entrant | model id | rolling MASE |
 |---|---|---|
 | rung4_chronos2 | amazon/chronos-2 | 0.636 |
-| rung4_chronos2_exo | amazon/chronos-2 | 0.623 |
+| rung4_chronos2_exo | amazon/chronos-2 | 0.612 |
 | rung4_chronos_bolt | amazon/chronos-bolt-small | 0.612 |
 
-Best Rung-4 entrant: **rung4_chronos_bolt** (rolling MASE 0.612). Rung 4 evaluated zero-shot (amazon/chronos-bolt-small, pinned); adopted because it beats seasonal-naive (0.673) and robust DOW (0.737) on held-out rolling MASE. It beats rung3_global_gbm (0.792), the Rung-4 adoption criterion.
+Best Rung-4 entrant: **rung4_chronos2_exo** (rolling MASE 0.612). Rung 4 evaluated zero-shot (amazon/chronos-2, pinned); adopted because it beats seasonal-naive (0.673) and robust DOW (0.737) on held-out rolling MASE. It beats rung3_global_gbm (0.728), the Rung-4 adoption criterion.

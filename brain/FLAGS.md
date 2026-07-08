@@ -132,14 +132,16 @@ longer error). No code change was needed to recover the files.
   **observed/oracle basis is the worst** (0.969) — the train/serve shift is real.
 - **FLAG-FE2 (weather horizon).** Live forecast ≤16 d; weather applies to the
   reorder horizon, not the full 8-week eval.
-- **FLAG-FE3 (shared grid cell), RESOLVED (G12.9e).** Beer Hall and Ellel
-  previously shared `cell="lancaster"`. Each venue now has its own precise
-  Open-Meteo cell (`beer_hall`, `ellel`, `preston`). BH and Ellel are still
-  only ~0.6 km apart, but the extra pull is cheap and cached, and per-venue
-  precision was explicitly requested now that Ellel forecasts on its own
-  rungs. Historical hindcast weather for all three venues therefore shifted
-  slightly on the new basis; `build_features`/ladder reports were re-run
-  (G12.9e) so the committed numbers match.
+- **FLAG-FE3 (shared grid cell), RESOLVED (G12.9e, corrected G12.10a).** Beer
+  Hall and Ellel previously shared `cell="lancaster"`. Each venue now has its
+  own precise Open-Meteo cell keyed by venue name (`beer_hall`, `ellel`,
+  `two_river_taps`). BH and Ellel are still only ~0.6 km apart, but the extra
+  pull is cheap and cached, and per-venue precision was explicitly requested
+  now that Ellel forecasts on its own rungs. Historical hindcast weather for
+  all three venues therefore shifted on the per-venue basis; `build_features`/
+  ladder reports were re-run so the committed numbers match. (G12.10a corrected
+  the TRT cell name from the interim `preston` placeholder to `two_river_taps`
+  and re-keyed it to the confirmed venue coordinate.)
 - **FLAG-FE4 (calendar refresh).** Uni/school tables are static lookups in
   `ingest/calendar_sources.py`; refresh each academic year. Coverage confirmed
   from 2024-09; the data window (2025-06→2026-05) is fully covered.
@@ -159,19 +161,17 @@ longer error). No code change was needed to recover the files.
   not adopted. Re-run the ablation on a longer horizon spanning term boundaries to
   reconsider. Curated event anchors are also limited — the two biggest recurring
   Lancaster festivals (Music Festival, Highest Point) **did not run in-window**.
-- **FLAG-FE-TRTLOC, resolved pending Ryan's exact street coordinate (G12.9e).**
-  TRT stated to be in Preston but the old `trt_south` coordinate (53.8751,
-  −2.7599) sat ~13 km north (Galgate/Forton); the label said Preston, the point
-  didn't. The cell is renamed `preston` and re-keyed to a Preston city-centre
-  coordinate (53.7632, −2.7031), which resolves the "sits outside Preston"
-  problem, but it is still a city-centre placeholder, not TRT's confirmed
-  street address. *Owner: Ryan to confirm the exact TRT street coordinate;*
-  swap `WEATHER_CELL_COORDS["preston"]` in `config.py` once known. TRT is
-  closed, so this affects historical weather/event attribution only.
-  `EVENT_SCOPE["two_river_taps"] = ("preston",)` was already correctly named
-  and is unaffected (it is a separate mapping from the weather cell); the
-  Lancaster/Preston `EVENT_SCOPE` isolation (BH/Ellel never see Preston
-  anchors and vice versa) is unchanged.
+- **FLAG-FE-TRTLOC, RESOLVED (G12.10a).** TRT is keyed to its own venue
+  coordinate (53.8751, −2.7599), confirmed by Nam. The cell is named
+  `two_river_taps` (uniform with `beer_hall` and `ellel`, one cell per venue
+  name), not the earlier `preston` placeholder. The coordinate sits near
+  Galgate/Forton, north of Preston, and that is the venue's real location, not
+  an error. The G12.9 wording that called this "north of Preston, wrong" was
+  itself mistaken; the point was right and the label was the only issue.
+  `EVENT_SCOPE["two_river_taps"] = ("preston",)` is a separate mapping (events,
+  not the weather cell); its naming is cosmetic while TRT is closed and is left
+  as-is. The Lancaster/Preston `EVENT_SCOPE` isolation (BH/Ellel never see
+  Preston anchors and vice versa) is unchanged.
 
 ## Weather/calendar diagnostic (A14b — diagnostic only, adopts nothing)
 
@@ -302,7 +302,29 @@ does.
   ceiling). Going live is a two-env-var swap once access is provisioned.
 - **FLAG-LI2 (Neon system-of-record — Ryan-gated).** `NeonAdapter` + DDL sketch ship
   inert; the intended primary T2 history source. Standing it up is Ryan's task
-  (`INGEST_SOURCE=neon`, `LIVE_INGEST=1`).
+  (`INGEST_SOURCE=neon`, `LIVE_INGEST=1`). See FLAG-INGEST-NEON for the G12.10c
+  wiring and the committed-seed ceiling.
+- **FLAG-INGEST-NEON (G12.10c, adapter wired, provisioning-gated).** The committed
+  CSV seed ends **2026-05-31** (`items-2024-01-01-2026-06-01.csv` is UTF-16
+  tab-delimited; its filename overstates its span, with no June rows). June-onward
+  (and early-July) transactions were pulled via the Square MCP and live in Ryan's
+  **Neon** system of record, NOT the CSV. The CSV is bootstrap-only; **manual
+  injection is retired**: the brain refreshes exclusively through its configured
+  `SourceAdapter`, never by hand-dropping a newer CSV into `data/`.
+  `NeonAdapter.latest_available_date`/`fetch_transactions(since)` are now
+  implemented against `brain_txn` over a read-only connection whose `psycopg` (v3)
+  driver is imported inside the method (brain stays DB-free at import); DSN via
+  `BRAIN_NEON_DSN`. Going live is then a pure config swap (`INGEST_SOURCE=neon`,
+  `LIVE_INGEST=1`, `BRAIN_NEON_DSN=…`) and `python -m ingest.refresh` runs the
+  existing Phase 1–4 machinery (append → leak-free feature rebuild → conditional
+  T3 → promote). NOT yet integration-tested against live Neon: this build has no
+  Neon DSN or `brain_txn` schema access (Ryan owns them), and per the spec **no
+  June rows were simulated to pass a test**. Remaining step is Ryan provisioning
+  the DSN + schema. Interaction with the World Cup (FLAG-WC): the group stage
+  (11–27 Jun 2026) is after the committed-seed ceiling, so on the CSV-seeded store
+  the `wc_*` fixtures are a forward-looking covariate with no measurable sales
+  effect yet; once Neon brings June-onward rows in, the tournament window becomes
+  observed and the effect becomes estimable.
 - **FLAG-LI3 (Square brain access — Ryan-gated).** T1 live facts + the `SquareAdapter`
   fallback need Square access provisioned to the BRAIN env, separate from Track-B's
   credential store. Until then T1 is inert and the agent uses its own Square tools.
@@ -325,3 +347,23 @@ does.
   detect (`ladder_selection`) **plus** promote (`served_forecast`). Fires only on new
   data, an adoption, or an explicit force — never per transaction. `/freshness` and
   `brain_data_freshness` report `served_model`/`served_as_of`.
+
+## Production persistence (G12.10f)
+
+- **FLAG-STORE-ENV (RESOLVED, G12.10f).** `DUCKDB_PATH`/`STORE_DIR` were hard-coded
+  to `brain/store/`, unlike `LIVE_INGEST`/`INGEST_SOURCE`/`BRAIN_HOST` which read
+  env vars. In production the brain runs as a service and its DuckDB is a live
+  database (correctly gitignored) that must persist across redeploys. `STORE_DIR`
+  now reads a `BRAIN_STORE_DIR` env override (default unchanged: the in-repo
+  `brain/store`), so the store can sit on a mounted persistent volume separate from
+  the code checkout, preventing a redeploy from orphaning or wiping it. One small
+  `config.py` change; nothing else moves.
+- **FLAG-STORE-SOR (document only, Ryan decision).** Two stores now coexist: the
+  brain's local/served DuckDB (its derived analytical memory: `line_items`,
+  `forecasts`, `bands`, `served_forecast`, `data_watermark`, `venue_trading_hours`)
+  and Ryan's Neon transaction system of record (where the Square MCP pull lands
+  June-onward rows). The clean topology is **Neon as the transaction SOR and the
+  brain DuckDB as the derived store seeded from Neon via `NeonAdapter`** (lightweight,
+  preferred), NOT a heavier "brain maintains its own warehoused Neon copy" plan.
+  This is a Ryan conversation, named here so it is a recorded decision, not an
+  accident. No code beyond this note (the `NeonAdapter` read path is FLAG-INGEST-NEON).
