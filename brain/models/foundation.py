@@ -50,9 +50,29 @@ CHRONOS2_MODEL_ID = "amazon/chronos-2"
 CHRONOS2_FALLBACK_MODEL_ID = "autogluon/chronos-2-small"
 RESOURCE_GUARD_SECONDS = 120
 
-# WP12: the exact covariate set the exo entrant reads. Calendar-derived, known at
-# forecast time. Weather is never included here (it is not known-future); it
-# stays attribution-only per G-live-b / the covariate probe.
+# WP12: the exact covariate set the exo entrant reads. Weather is never included
+# here (it is not known-future); it stays attribution-only per G-live-b / the
+# covariate probe.
+#
+# Coverage note (G12.5): three of these four are genuinely known-future -
+# is_bank_holiday, exo_is_school_term, exo_is_uni_term are pure functions of the
+# date column (UK bank-holiday rules, term-date rules in ingest.calendar_sources)
+# and are computable for any date, past or future. is_ellel_event is NOT: despite
+# its name, build_features._ellel_event_dates derives it from Ellel's own
+# OBSERVED L1 revenue (value > 0), not a bookings/events table - there is no
+# forward-looking Ellel calendar in this codebase. This is fine for every path
+# that actually calls this entrant today: wrap.evaluate's rolling-origin
+# persistence and reconcile.py's consumption proxy both only ever forecast
+# already-observed held-out dates for an OPEN venue (Beer Hall), where all four
+# columns are populated with zero NaN (verified empirically, both venues, full
+# history). The gap only matters for a genuinely future, unobserved date, which
+# in this codebase only arises via conformal.wrap._persist_standby_forward - and
+# that path fires ONLY for a CLOSED venue (is_closed(venue)), which Beer Hall is
+# not. chronos2_exo_predict's _require_covariates check (raise, never impute)
+# is the correct backstop for that dormant case: if Beer Hall ever closes while
+# this entrant is served, the standby-forward call passes a bare `date`-only
+# future frame, and this entrant raises loudly rather than guessing is_ellel_event
+# for a date nobody can know in advance.
 CHRONOS2_EXO_COLS = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
                      "exo_is_uni_term"]
 

@@ -118,3 +118,61 @@ def test_chronos2_resource_guard_substitutes_small_model(monkeypatch):
                         staticmethod(_from_pretrained))
     foundation._chronos2_pipeline()
     assert foundation._CHRONOS2["substituted"] is True
+
+
+# --- WP12: chronos2_exo_predict (known-future covariates) --------------------
+# The covariate presence/NaN check runs before any pipeline call, so these
+# raise-on-missing tests need neither torch nor chronos importable and always
+# run (G12.5's assertion-test requirement).
+
+def _exo_frame(n: int, start: str) -> pd.DataFrame:
+    from models.foundation import CHRONOS2_EXO_COLS
+    df = pd.DataFrame({"date": pd.date_range(start, periods=n), "value": range(n)})
+    for c in CHRONOS2_EXO_COLS:
+        df[c] = 0.0
+    return df
+
+
+def test_exo_predict_raises_on_missing_covariate_column():
+    from models.foundation import MissingCovariateError, chronos2_exo_predict
+
+    train = _exo_frame(10, "2026-01-01")
+    target = _exo_frame(3, "2026-01-11").drop(columns=["is_ellel_event"])
+    with pytest.raises(MissingCovariateError, match="is_ellel_event"):
+        chronos2_exo_predict(train, target)
+
+
+def test_exo_predict_raises_on_nan_covariate_value():
+    from models.foundation import MissingCovariateError, chronos2_exo_predict
+
+    train = _exo_frame(10, "2026-01-01")
+    target = _exo_frame(3, "2026-01-11")
+    target.loc[1, "exo_is_uni_term"] = float("nan")
+    with pytest.raises(MissingCovariateError, match="exo_is_uni_term"):
+        chronos2_exo_predict(train, target)
+
+
+def test_exo_predict_never_reads_weather():
+    from models.foundation import CHRONOS2_EXO_COLS
+    assert not any("weather" in c or "temp" in c or "rain" in c or "sun" in c
+                   for c in CHRONOS2_EXO_COLS)
+
+
+def test_exo_predict_happy_path_uses_future_df_and_median(monkeypatch):
+    pytest.importorskip("torch", reason="torch absent in the runtime venv")
+    from models import foundation
+
+    seen = {}
+
+    class _FakeC2:
+        def predict_df(self, df, future_df, prediction_length, quantile_levels,
+                       id_column, timestamp_column, target):
+            seen["future_cols"] = set(future_df.columns)
+            return pd.DataFrame({"0.5": [7.0, 8.0]})
+
+    monkeypatch.setattr(foundation, "_chronos2_pipeline", lambda: _FakeC2())
+    train = _exo_frame(10, "2026-01-01")
+    target = _exo_frame(2, "2026-01-11")
+    out = foundation.chronos2_exo_predict(train, target)
+    assert out.tolist() == [7.0, 8.0]
+    assert set(foundation.CHRONOS2_EXO_COLS) <= seen["future_cols"]
