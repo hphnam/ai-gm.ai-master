@@ -60,7 +60,9 @@ export class SquareCatalogExtrasService {
     const resolved = await this.square.resolveClient(orgId)
     if (!('client' in resolved)) return resolved
     const cap = Math.min(args.limit ?? 100, 200)
-    const wantedStatus = args.status?.toUpperCase()
+    // Square rejects a missing/empty filter with 400 VALUE_EMPTY — always
+    // send a status; ACTIVE is the documented tool default.
+    const wantedStatus = args.status?.toUpperCase() === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE'
     try {
       const rows: VendorRow[] = []
       let cursor: string | undefined
@@ -69,10 +71,7 @@ export class SquareCatalogExtrasService {
       while (pages < MAX_PAGES && rows.length < cap) {
         const resp = await resolved.client.vendors.search({
           ...(cursor ? { cursor } : {}),
-          filter:
-            wantedStatus === 'ACTIVE' || wantedStatus === 'INACTIVE'
-              ? { status: [wantedStatus] }
-              : undefined,
+          filter: { status: [wantedStatus] },
         })
         const vendors = ((resp as { vendors?: unknown[] }).vendors ?? []) as Array<
           Record<string, unknown>

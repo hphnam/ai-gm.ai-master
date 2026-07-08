@@ -418,6 +418,7 @@ export class SquareCommerceService {
         locationId: resolved.locationId,
         beginTime: window.startAt,
         endTime: window.endAt,
+        sortOrder: 'DESC',
         ...(args.status ? { status: args.status as 'SENT' | 'PAID' | 'FAILED' } : {}),
       })
       let processed = 0

@@ -948,7 +948,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_LIST_DEVICES,
     description:
-      'List Square terminals / devices, optionally scoped to a venue. FIRES on "are all terminals online", "what devices are paired", "show me the tills", "any device offline". Returns id, name, status (the SDK\'s status enum), productType, deviceCode. Pass venueId to scope to that venue\'s mapped location; omit for the whole account.',
+      'List Square terminals / devices, optionally scoped to a venue. FIRES on "are all terminals online", "what devices are paired", "show me the tills", "any device offline". Returns id, name, status (the SDK\'s status enum), productType, deviceCode. Pass venueId to scope to that venue\'s mapped location; omit for the whole account. Only Square hardware paired to the account (Terminals / Registers) appears — phones or iPads running the POS app do not. If the venue\'s location has no devices the result falls back to the whole account and says so in `note`.',
     input_schema: {
       type: 'object',
       properties: {

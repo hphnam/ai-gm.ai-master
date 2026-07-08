@@ -20,6 +20,17 @@ const NOT_CONNECTED = fail(
   'No POS integration is connected for this organisation. Ask an owner or manager to connect Square in Settings → Integrations.',
 )
 
+/// Square's "you don't have this product" rejection (e.g. Bookings on a
+/// merchant without Appointments) arrives as a 401 AUTHENTICATION_ERROR with
+/// a "not onboarded" detail — distinguishable from a revoked token only by
+/// that detail string. Exported for spec coverage.
+export function isFeatureNotOnboarded(
+  status: number | undefined,
+  detail: string | undefined,
+): boolean {
+  return (status === 401 || status === 403) && /not onboarded/i.test(detail ?? '')
+}
+
 /// Same shape, but for the second failure mode: integration exists but no
 /// Square location is mapped to this venue. We tell the agent precisely so it
 /// can tell the user.
@@ -1745,6 +1756,26 @@ export class SquareService {
     // because a prompt-injected query that triggers an error could surface
     // attacker-controlled text in the assistant's reply.
     const rawDetail = e?.message ?? e?.body?.errors?.[0]?.detail ?? 'unknown'
+
+    // Square answers 401 for product-gated endpoints too (e.g. bookings on a
+    // merchant without Appointments). That's not a credential failure — do
+    // NOT markError, or one bookings question flips the whole integration to
+    // 'error' and every Square tool goes "not connected" until reconnect.
+    if (isFeatureNotOnboarded(status, e?.body?.errors?.[0]?.detail)) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'square.feature_not_onboarded',
+          orgId,
+          op,
+          status,
+          detail: String(rawDetail).slice(0, 200),
+        }),
+      )
+      return fail(
+        'error',
+        "This Square account isn't signed up for that Square feature, so there's no data to fetch. Reconnecting Square won't change this.",
+      )
+    }
 
     if (status === 401 || status === 403) {
       await this.integrations.markError(

@@ -309,7 +309,7 @@ export class SquareCrmService {
   async listDevices(
     orgId: string,
     args: { venueId?: string; limit?: number },
-  ): Promise<ToolResult<{ devices: DeviceRow[]; truncated: boolean }>> {
+  ): Promise<ToolResult<{ devices: DeviceRow[]; truncated: boolean; note?: string }>> {
     let locationId: string | null = null
     let client: SquareClient
     if (args.venueId) {
@@ -323,20 +323,36 @@ export class SquareCrmService {
       client = resolved.client
     }
     const cap = Math.min(args.limit ?? 50, 200)
-    try {
+    const MAX_SCAN = 500
+    const scan = async (loc: string | null) => {
       const rows: DeviceRow[] = []
       const page = await client.devices.list({
-        ...(locationId ? { locationId } : {}),
+        ...(loc ? { locationId: loc } : {}),
       })
       let processed = 0
-      const MAX_SCAN = 500
       for await (const raw of page as AsyncIterable<unknown>) {
         processed += 1
         if (processed > MAX_SCAN || rows.length >= cap) break
         rows.push(toDeviceRow(raw as Record<string, unknown>))
       }
+      return { rows, truncated: processed >= MAX_SCAN }
+    }
+    try {
+      let { rows, truncated } = await scan(locationId)
+      let note: string | undefined
+      if (rows.length === 0 && locationId) {
+        // Hardware is often paired to a different location than the venue
+        // mapping expects — fall back to the whole account so the agent can
+        // report the mismatch instead of a bare empty list.
+        const all = await scan(null)
+        if (all.rows.length > 0) {
+          rows = all.rows
+          truncated = all.truncated
+          note = `No devices are registered to this venue's Square location (${locationId}) — showing every device on the account instead.`
+        }
+      }
       await this.square.touchSync(orgId)
-      return { ok: true, data: { devices: rows, truncated: processed >= MAX_SCAN } }
+      return { ok: true, data: { devices: rows, truncated, ...(note ? { note } : {}) } }
     } catch (err) {
       return await this.square.handleApiError(orgId, 'listDevices', err)
     }

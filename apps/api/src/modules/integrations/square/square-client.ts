@@ -16,6 +16,24 @@ import { SquareClient, SquareEnvironment } from 'square'
 const CACHE_MAX = 256
 const cache = new Map<string, SquareClient>()
 
+/// The generated SDK (44.x) serializes unset optional enum query params as
+/// empty strings (?sort_order=), which Square rejects with 400
+/// INVALID_ENUM_VALUE on GET list endpoints (devices, payouts, payments).
+/// Strip empty-valued params before the request leaves the process.
+const scrubbingFetch: typeof fetch = (input, init) => {
+  if (typeof input === 'string' || input instanceof URL) {
+    const url = new URL(input.toString())
+    const emptyKeys = [...url.searchParams.entries()]
+      .filter(([, value]) => value === '')
+      .map(([key]) => key)
+    // Value-targeted delete: the SDK repeats keys for array params, so a
+    // blanket delete(key) could drop valid siblings of one empty entry.
+    for (const key of emptyKeys) url.searchParams.delete(key, '')
+    return fetch(url, init)
+  }
+  return fetch(input, init)
+}
+
 function fingerprintToken(token: string): string {
   return createHash('sha256').update(token, 'utf8').digest('hex').slice(0, 32)
 }
@@ -35,7 +53,11 @@ export function getSquareClient(input: {
     cache.set(key, existing)
     return existing
   }
-  const client = new SquareClient({ token: input.accessToken, environment: env })
+  const client = new SquareClient({
+    token: input.accessToken,
+    environment: env,
+    fetch: scrubbingFetch,
+  })
   cache.set(key, client)
   if (cache.size > CACHE_MAX) {
     const oldest = cache.keys().next().value
