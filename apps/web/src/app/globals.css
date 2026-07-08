@@ -4,16 +4,18 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design tokens — warm editorial palette with a copper-ale accent.
+ * Design tokens — warm editorial neutrals with a peacock accent.
  *
  * Light: warm off-white paper, warm-stone neutrals. The brand/primary token is
- *        a copper-ale accent (the ONE accent) reserved for primary CTAs, the
+ *        a peacock teal (the ONE accent) reserved for primary CTAs, the
  *        active nav state, and focus rings. Decorative chrome stays neutral.
- * Dark:  warm charcoal, near-black background; the copper accent holds its hue
- *        so primary actions read as branded copper in both modes.
+ * Dark:  warm charcoal, near-black background; the peacock accent lifts slightly
+ *        so primary actions stay vivid and branded in both modes.
  *
- * Colour roles: copper = brand/interactive · amber = caution · red = urgent /
- * destructive. Keep these separate — never use copper for a warning.
+ * Colour roles: peacock = brand/interactive · amber = caution · red = urgent /
+ * destructive. Keep these separate — never use peacock for a warning. The warm
+ * neutrals hold the hospitality warmth; the cool accent is deliberately distinct
+ * from the sage/amber/terracotta status hues.
  */
 :root {
   color-scheme: light;
@@ -26,7 +28,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.005 60);
 
-  --primary: oklch(0.56 0.12 54);
+  --primary: oklch(0.52 0.09 200);
   --primary-foreground: oklch(0.99 0.008 80);
 
   --secondary: oklch(0.93 0.006 75);
@@ -38,7 +40,7 @@
   --accent: oklch(0.91 0.006 75);
   --accent-foreground: oklch(0.18 0.005 60);
 
-  --brand: oklch(0.56 0.12 54);
+  --brand: oklch(0.52 0.09 200);
   --brand-foreground: oklch(0.99 0.008 80);
 
   --destructive: oklch(0.55 0.18 28);
@@ -54,7 +56,7 @@
 
   --border: oklch(0.9 0.006 75);
   --input: oklch(0.91 0.006 75);
-  --ring: oklch(0.55 0.1 54);
+  --ring: oklch(0.52 0.1 200);
 
   --sidebar: oklch(0.955 0.006 80);
   --sidebar-foreground: oklch(0.22 0.005 60);
@@ -85,7 +87,7 @@
   --popover: oklch(0.17 0.003 60);
   --popover-foreground: oklch(0.96 0.003 80);
 
-  --primary: oklch(0.58 0.12 54);
+  --primary: oklch(0.54 0.1 200);
   --primary-foreground: oklch(0.99 0.008 80);
 
   --secondary: oklch(0.23 0.003 60);
@@ -97,7 +99,7 @@
   --accent: oklch(0.24 0.003 60);
   --accent-foreground: oklch(0.96 0.003 80);
 
-  --brand: oklch(0.58 0.12 54);
+  --brand: oklch(0.54 0.1 200);
   --brand-foreground: oklch(0.99 0.008 80);
 
   --destructive: oklch(0.65 0.18 25);
@@ -110,7 +112,7 @@
 
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.64 0.1 55);
+  --ring: oklch(0.64 0.1 200);
 
   --sidebar: oklch(0.16 0.003 60);
   --sidebar-foreground: oklch(0.94 0.003 80);

@@ -4,7 +4,7 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Changelog',
-  description: 'What’s new in gm-ai: shipped improvements for craft-led pub operators.',
+  description: 'What’s new in gm-ai: shipped improvements for hospitality operators.',
   path: '/changelog',
 })
 
@@ -67,7 +67,7 @@ export default function ChangelogPage() {
             What’s new.
           </h1>
           <p className="max-w-xl text-pretty text-lg text-muted-foreground">
-            Shipped improvements, newest first. We build in the open, with a working brewpub.
+            Shipped improvements, newest first. We build in the open, with a working operator.
           </p>
         </div>
 

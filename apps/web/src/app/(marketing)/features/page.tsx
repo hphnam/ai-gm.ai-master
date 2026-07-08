@@ -10,7 +10,7 @@ import { pageMetadata } from '@/lib/seo'
 export const metadata: Metadata = pageMetadata({
   title: 'Features',
   description:
-    'POS-grounded answers, a cellar library that knows beer, cited SOP retrieval and in-chat knowledge capture. See what gm-ai does for craft-led pub operators.',
+    'POS-grounded answers, a starter library tuned to your venue, cited SOP retrieval and in-chat knowledge capture. See what gm-ai does for hospitality operators.',
   path: '/features',
 })
 
@@ -32,7 +32,7 @@ export default function FeaturesPage() {
             </h1>
             <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
               gm-ai joins your live POS data to your venue’s own documents. It answers the P&amp;L
-              question and the cellar question with the same confidence, and shows its working.
+              question and the ops question with the same confidence, and shows its working.
             </p>
           </div>
           <ChatPreview />
@@ -41,7 +41,10 @@ export default function FeaturesPage() {
 
       <section className="py-20 sm:py-24">
         <Container className="flex flex-col gap-12">
-          <SectionHeading eyebrow="Capabilities" title="Built for the brewpub operator’s day." />
+          <SectionHeading
+            eyebrow="Capabilities"
+            title="Built for the hospitality operator’s day."
+          />
           <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => (
               <div key={feature.title} className="flex flex-col gap-3 bg-card p-7">
@@ -62,8 +65,8 @@ export default function FeaturesPage() {
         <Container className="flex flex-col gap-12">
           <SectionHeading
             eyebrow="Integrations"
-            title="Anchored in your POS."
-            lede="Vertical focus forces a POS commitment. Square is shipped today; brewery-native POS is next. Each provider drops in without changing how you work."
+            title="Connect your whole stack."
+            lede="gm-ai reads across your POS, accounting, payroll and calendar. Square is live today and more are rolling out. Each one drops in without changing how you work."
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {INTEGRATIONS.map((integration) => (

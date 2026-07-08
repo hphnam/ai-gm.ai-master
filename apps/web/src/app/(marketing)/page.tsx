@@ -55,7 +55,7 @@ export default function MarketingHome() {
       {/* Hero — asymmetric split, product artifact on the right */}
       <section className="relative overflow-hidden">
         <div
-          className="pointer-events-none absolute -top-32 left-1/2 h-[34rem] w-[64rem] max-w-[120vw] -translate-x-1/2 rounded-full bg-[var(--chart-2)]/10 blur-3xl"
+          className="pointer-events-none absolute -top-32 left-1/2 h-[34rem] w-[64rem] max-w-[120vw] -translate-x-1/2 rounded-full bg-[var(--primary)]/10 blur-3xl"
           aria-hidden
         />
         <Container className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">

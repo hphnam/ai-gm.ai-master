@@ -16,7 +16,7 @@ export function CtaBand({
       <Container>
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card px-6 py-14 text-center sm:px-12">
           <div
-            className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-[36rem] max-w-full rounded-full bg-[var(--chart-2)]/15 blur-3xl"
+            className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-[36rem] max-w-full rounded-full bg-[var(--primary)]/15 blur-3xl"
             aria-hidden
           />
           <h2 className="relative mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">

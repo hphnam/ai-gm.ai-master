@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 export const metadata: Metadata = pageMetadata({
   title: 'Pricing',
   description:
-    'Simple per-venue pricing for independent brewpub and beerhall operators. 14-day free trial, no credit card.',
+    'Simple per-venue pricing for independent hospitality operators. 14-day free trial, no credit card.',
   path: '/pricing',
 })
 
@@ -31,9 +31,9 @@ const TIERS: Tier[] = [
     blurb: 'For the owner-operator running one site hands-on.',
     cta: { label: 'Start free trial', href: '/auth/sign-up' },
     features: [
-      'Square POS integration',
+      'POS integration',
       'Live P&L, labour & pricing answers',
-      'Brewpub SOP starter library',
+      'Venue SOP starter library',
       'Unlimited chat & knowledge capture',
       'Cited sources on every answer',
       'Email support',
@@ -56,14 +56,14 @@ const TIERS: Tier[] = [
     ],
   },
   {
-    name: 'Brewery+',
+    name: 'Multi-site',
     price: 'Custom',
     cadence: '',
-    blurb: 'Brewery plus tap rooms and sister sites, or a brewery-native POS.',
+    blurb: 'Larger estates, mixed venue types, or a specialist POS.',
     cta: { label: 'Talk to us', href: 'mailto:hello@gm-ai.app' },
     features: [
       'Everything in Group',
-      'GoTab / Arryved integration',
+      'Custom & specialist integrations',
       'Custom SOP onboarding',
       'Dedicated onboarding partner',
       'Volume pricing',
@@ -74,19 +74,19 @@ const TIERS: Tier[] = [
 const FAQS: { q: string; a: string }[] = [
   {
     q: 'Do I need to connect my POS?',
-    a: 'Yes. gm-ai’s edge is that it grounds answers in your real sales and labour data. Square connects in two minutes, read-only. Without a POS connected you lose half the product, so we don’t sell a SOP-only tier.',
+    a: 'Yes. gm-ai’s edge is that it grounds answers in your real sales and labour data. Your POS connects in minutes, read-only. Without a POS connected you lose half the product, so we don’t sell a SOP-only tier.',
   },
   {
     q: 'What does the free trial include?',
-    a: 'The full Group plan for 14 days: POS integration, the brewpub starter library, and unlimited chat. No credit card required to start.',
+    a: 'The full Group plan for 14 days: POS integration, the venue starter library, and unlimited chat. No credit card required to start.',
   },
   {
     q: 'How is a “venue” counted?',
-    a: 'A venue is one trading site with its own POS location. A brewery with a tap room and two sister pubs is four venues. You’re only billed for venues that are actively connected.',
+    a: 'A venue is one trading site with its own POS location. A group with a bar, a kitchen and two sister sites is four venues. You’re only billed for venues that are actively connected.',
   },
   {
     q: 'Which POS do you support?',
-    a: 'Square today. GoTab and Arryved are next, within 90 days of launch. Toast and Lightspeed are on the roadmap. Enterprise restaurant POS (Oracle, NCR Aloha) is deliberately out of scope.',
+    a: 'Square today. GoTab, Arryved and more are on the roadmap. We focus on modern SMB hospitality POS, so heavyweight enterprise systems (Oracle, NCR Aloha) are out of scope for now.',
   },
   {
     q: 'Is my data used to train models?',
@@ -106,8 +106,8 @@ export default function PricingPage() {
             Priced per venue. Built for independents.
           </h1>
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            No per-seat tax, no enterprise sales dance. Start free for 14 days, connect Square, and
-            ask your first question this afternoon.
+            No per-seat tax, no enterprise sales dance. Start free for 14 days, connect your POS,
+            and ask your first question this afternoon.
           </p>
         </Container>
       </section>

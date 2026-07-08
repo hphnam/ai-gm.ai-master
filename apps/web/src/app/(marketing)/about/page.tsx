@@ -6,22 +6,22 @@ import { pageMetadata } from '@/lib/seo'
 export const metadata: Metadata = pageMetadata({
   title: 'About',
   description:
-    'gm-ai is built with a working brewpub operator, for craft-led pub managers. Why the category is empty, and why now.',
+    'gm-ai is built with a working multi-venue operator, for hospitality managers. Why the category is empty, and why now.',
   path: '/about',
 })
 
 const PRINCIPLES = [
   {
-    title: 'Vertical on purpose',
-    body: 'Brewpubs, beerhalls and craft-led pubs. UK-first. Generic restaurant tools don’t speak the language of cellar temps, keg rotation and dispense troubleshooting. We do, because the product was shaped on real beerhall operations from day one.',
+    title: 'Grounded in real operations',
+    body: 'UK-first, built on a real venue’s day rather than a persona. Generic tools don’t speak the operator’s language of margin, labour, prep and compliance. We do, because the product was shaped on live multi-venue hospitality operations from day one.',
   },
   {
     title: 'POS-grounded, not SOP-only',
-    body: 'The difference between “here’s a checklist” and “your GP was 74% last night, put the Pale up 30p.” We answer from live POS data and your own documents in one chat. Checklist tools can’t answer the margin question; back-office tools aren’t in the conversation when it’s asked.',
+    body: 'The difference between “here’s a checklist” and “your GP was 74% last night, put your top line up 30p.” We answer from live POS data and your own documents in one chat. Checklist tools can’t answer the margin question; back-office tools aren’t in the conversation when it’s asked.',
   },
   {
     title: 'Built with an operator, not for a persona',
-    body: 'Our design partner runs four pubs and a brewery, and uses gm-ai daily. He builds the corpus and finds the gaps for us. We’re not guessing before launch; we’re launching with a customer already doing real work.',
+    body: 'Our design partner runs four venues and a brewery, and uses gm-ai daily. He builds the corpus and finds the gaps for us. We’re not guessing before launch; we’re launching with a customer already doing real work.',
   },
   {
     title: 'Trust is verifiable',
@@ -36,13 +36,13 @@ export default function AboutPage() {
         <Container className="flex max-w-3xl flex-col gap-6 py-16 sm:py-24">
           <Eyebrow>About</Eyebrow>
           <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            The operator copilot for craft-led pubs.
+            The operator copilot for hospitality.
           </h1>
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            Independent brewpub and beerhall managers run the business hands-on. They own the
-            P&amp;L conversation daily, not weekly. They want last night’s margin this morning, the
-            cellar SOP without leaving chat, and the supplier’s number without scrolling WhatsApp.
-            gm-ai is the one place to ask.
+            Independent hospitality operators run the business hands-on. They own the P&amp;L
+            conversation daily, not weekly. They want last night’s margin this morning, the right
+            SOP without leaving chat, and the supplier’s number without scrolling WhatsApp. gm-ai is
+            the one place to ask.
           </p>
         </Container>
       </section>
@@ -66,7 +66,7 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="Why now"
             title="The category is empty, and the data says the shape fits."
-            lede="Checklist tools, POS-native BI and back-office cost control are all real. But none of them ship a daily P&L answer, cellar SOP retrieval and in-chat capture in one place. The brewery POS ecosystem has no AI-ops layer at all."
+            lede="Checklist tools, POS-native BI and back-office cost control are all real. But none of them ship a daily P&L answer, SOP retrieval and in-chat capture in one place. Hospitality has the point tools; it has no AI-ops layer that ties them together."
           />
           <div className="grid gap-6 sm:grid-cols-3">
             {[
@@ -78,12 +78,12 @@ export default function AboutPage() {
               {
                 stat: 'Day one',
                 label:
-                  'beerhall-shaped: the classifier and starter library were tuned on craft-pub document types.',
+                  'venue-shaped: the classifier and starter library are tuned to real hospitality document types.',
               },
               {
                 stat: 'Empty',
                 label:
-                  'the brewery POS ecosystem (GoTab, Arryved) has no AI-ops layer to compete with.',
+                  'hospitality has BI and back-office cost control, but no AI-ops layer that sits across all of it.',
               },
             ].map((item) => (
               <div
@@ -100,7 +100,7 @@ export default function AboutPage() {
 
       <CtaBand
         title="See yourself in this?"
-        subtitle="If you run a brewpub, beerhall or craft-led pub, gm-ai was built for your day. Start free and connect Square."
+        subtitle="If you run a bar, restaurant, pub or hotel, gm-ai was built for your day. Start free and connect your POS."
       />
     </>
   )

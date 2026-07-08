@@ -6,7 +6,7 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Blog',
-  description: 'Notes on building an operator copilot for craft-led pubs and brewpubs.',
+  description: 'Notes on building an operator copilot for hospitality.',
   path: '/blog',
 })
 
@@ -17,11 +17,11 @@ export default function BlogIndexPage() {
         <div className="flex flex-col gap-4">
           <Eyebrow>Blog</Eyebrow>
           <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-            Notes from the cellar.
+            Notes from the floor.
           </h1>
           <p className="max-w-xl text-pretty text-lg text-muted-foreground">
-            How we’re building an AI operator for craft-led pubs: the decisions, the evidence, and
-            what we’re learning from real venues.
+            How we’re building an AI operator for hospitality: the decisions, the evidence, and what
+            we’re learning from real venues.
           </p>
         </div>
 
