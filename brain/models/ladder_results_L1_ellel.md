@@ -14,7 +14,8 @@ Expanding-window backtest, 6 held-out folds. MASE per fold vs in-sample seasonal
 | 2 | rung2_stl | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 | 3 | rung3_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 | 3 | rung3_global_gbm | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_foundation | – | – | no foundation backend installed; adoption criterion: beats rung3_global_gbm on held-out rolling MASE (Tan et al. 2024 motivates scepticism toward unjustified backbones, but its ablations target LLM-backbone forecasters, not pretrained time-series models) — not evaluated. |
+| 4 | rung4_chronos2 | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos_bolt | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 
 ## Static regime — single 8-week held-out block (multi-step from origin)
 Test 2026-03-28 → 2026-05-22 (n=56). A stress test over a long static horizon.
@@ -28,7 +29,8 @@ Test 2026-03-28 → 2026-05-22 (n=56). A stress test over a long static horizon.
 | 2 | rung2_stl | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 | 3 | rung3_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 | 3 | rung3_global_gbm | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
-| 4 | rung4_foundation | – | – | – | – | no foundation backend installed; adoption criterion: beats rung3_global_gbm on held-out rolling MASE (Tan et al. 2024 motivates scepticism toward unjustified backbones, but its ablations target LLM-backbone forecasters, not pretrained time-series models) — not evaluated. |
+| 4 | rung4_chronos2 | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
+| 4 | rung4_chronos_bolt | – | – | – | – | capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs |
 
 ## Milestone (rolling regime)
 - gate: *Rung 1 (robust DOW) beats seasonal-naive*
@@ -36,3 +38,14 @@ Test 2026-03-28 → 2026-05-22 (n=56). A stress test over a long static horizon.
 - seasonal-naive MASE: 0.924
 - robust-DOW MASE: 0.572
 - **gate met: True**
+
+
+## Rung 4: foundation models zero-shot (Chronos-2, Chronos-Bolt)
+chronos-forecasting 2.3.1, model loaded amazon/chronos-2, API path predict_df.
+
+| Entrant | model id | rolling MASE |
+|---|---|---|
+| rung4_chronos2 | amazon/chronos-2 | not scored (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs) |
+| rung4_chronos_bolt | amazon/chronos-bolt-small | not scored (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs) |
+
+Rung 4 evaluated zero-shot but not scored on this venue (capped at Rung 1 per Data Audit Report §8.3 — insufficient training signal for classical/ML rungs).

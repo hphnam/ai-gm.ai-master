@@ -51,7 +51,14 @@ from config import (
 )
 from eval import harness
 from features.build_features import build_features, feature_columns
-from models.foundation import CHRONOS_MODEL_ID, HAS_CHRONOS, chronos_bolt_predict
+from models.foundation import (
+    CHRONOS_MODEL_ID,
+    CHRONOS2_MODEL_ID,
+    HAS_CHRONOS,
+    chronos2_predict,
+    chronos2_runtime_info,
+    chronos_bolt_predict,
+)
 from store.active_span import active_trading_end, is_closed, trim_to_active
 
 warnings.filterwarnings("ignore")
@@ -271,12 +278,14 @@ PREDICTORS: list[tuple[str, int, object, bool]] = [
     ("rung3_gbm", 3, rung3_gbm, True),
 ]
 
-# WP4: Rung-4 Chronos-Bolt zero-shot participates as a first-class predictor when
-# the backend is installed, so it climbs the same gate as every other rung and is
-# subject to the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the
-# list is unchanged, so the ladder is byte-identical to its pre-Rung-4 behaviour.
+# WP4/WP9: Rung-4 foundation models participate as first-class predictors when the
+# backend is installed (Chronos-2 the flagship entrant, Chronos-Bolt a same-family
+# comparison row), so each climbs the same gate as every other rung and is subject
+# to the MAX_RUNG cap (Ellel stays at Rung 1). When chronos is absent the list is
+# unchanged, so the ladder is byte-identical to its pre-Rung-4 behaviour.
 if HAS_CHRONOS:
     PREDICTORS.append(("rung4_chronos_bolt", 4, chronos_bolt_predict, True))
+    PREDICTORS.append(("rung4_chronos2", 4, chronos2_predict, True))
 
 
 def _predict_all(
@@ -449,21 +458,42 @@ def _table(results: list[RungResult], cols: tuple[str, ...]) -> list[str]:
     return rows
 
 
+_RUNG4_MODEL_IDS = {"rung4_chronos2": CHRONOS2_MODEL_ID,
+                    "rung4_chronos_bolt": CHRONOS_MODEL_ID}
+
+
 def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
-    """WP4: state the Rung-4 zero-shot outcome strictly by the gate. Returns []
-    when the chronos backend is absent (no rung4_chronos_bolt result), so the
-    report is byte-identical to the pre-Rung-4 ladder."""
+    """WP4/WP9: state the Rung-4 zero-shot outcome strictly by the gate, reporting
+    both entrants (Chronos-2 and Chronos-Bolt) and the winning one. Returns []
+    when the chronos backend is absent (no rung4 result), so the report is
+    byte-identical to the pre-Rung-4 ladder."""
     by = {r.name: r for r in rolling_res}
-    r4 = by.get("rung4_chronos_bolt")
-    if r4 is None:
+    entrants = [by[n] for n in ("rung4_chronos2", "rung4_chronos_bolt") if n in by]
+    if not entrants:
         return []
-    head = f"\n## Rung 4: Chronos-Bolt zero-shot ({CHRONOS_MODEL_ID})"
-    if not r4.metrics:
-        return [head, f"Rung 4 evaluated zero-shot ({CHRONOS_MODEL_ID}, pinned); "
-                f"not scored on this venue ({r4.note})."]
+
+    info = chronos2_runtime_info()
+    loaded = info["model_id"] or CHRONOS2_MODEL_ID
+    provenance = (f"chronos-forecasting {info['version']}, model loaded "
+                  f"{loaded}, API path {info['api'] or 'n/a'}"
+                  + (" (small fallback substituted by the resource guard)"
+                     if info["substituted"] else ""))
+    head = ["\n## Rung 4: foundation models zero-shot (Chronos-2, Chronos-Bolt)",
+            provenance + ".\n", "| Entrant | model id | rolling MASE |",
+            "|---|---|---|"]
+    for r in entrants:
+        mase = f"{r.metrics['MASE']:.3f}" if r.metrics else f"not scored ({r.note})"
+        head.append(f"| {r.name} | {_RUNG4_MODEL_IDS.get(r.name, '')} | {mase} |")
+
+    scored = [r for r in entrants if r.metrics]
+    if not scored:
+        return head + ["\nRung 4 evaluated zero-shot but not scored on this venue "
+                       f"({entrants[0].note})."]
+    best = min(scored, key=lambda r: r.metrics["MASE"])
+    best_id = _RUNG4_MODEL_IDS.get(best.name, best.name)
     naive, dow, gbm = (by.get("rung0_seasonal_naive"), by.get("rung1_robust_dow"),
                        by.get("rung3_global_gbm"))
-    m4 = r4.metrics["MASE"]
+    m4 = best.metrics["MASE"]
     adopted = bool(naive and dow and m4 < naive.metrics["MASE"]
                    and m4 < dow.metrics["MASE"])
     reason = (f"it beats seasonal-naive ({naive.metrics['MASE']:.3f}) and robust "
@@ -476,10 +506,10 @@ def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
                    "the Rung-4 adoption criterion.")
     else:
         gbm_txt = " rung3_global_gbm is unavailable on this venue for comparison."
-    return [head,
-            f"Rung 4 evaluated zero-shot ({CHRONOS_MODEL_ID}, pinned); "
-            f"{'adopted' if adopted else 'not adopted'} because {reason} "
-            f"(rolling MASE {m4:.3f}).{gbm_txt}"]
+    return head + [
+        f"\nBest Rung-4 entrant: **{best.name}** (rolling MASE {m4:.3f}). "
+        f"Rung 4 evaluated zero-shot ({best_id}, pinned); "
+        f"{'adopted' if adopted else 'not adopted'} because {reason}.{gbm_txt}"]
 
 
 def _write_report(
