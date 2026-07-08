@@ -219,6 +219,31 @@ export class NotificationsService {
     }
   }
 
+  /// Single-note lookup for the /notes/:id deep link. Recipient-scoped only —
+  /// the link lands in the recipient's email, so the author viewing their own
+  /// sent note through it is not a case worth supporting.
+  async getOne(orgId: string, userId: string, notificationId: string): Promise<NotificationRow> {
+    const row = await prisma.notification.findFirst({
+      where: { id: notificationId, organizationId: orgId, recipientUserId: userId },
+      select: {
+        id: true,
+        body: true,
+        source: true,
+        category: true,
+        automated: true,
+        referenceKind: true,
+        referenceId: true,
+        status: true,
+        createdAt: true,
+        readAt: true,
+        author: { select: { id: true, name: true, email: true } },
+        recipient: { select: { id: true, name: true, email: true } },
+      },
+    })
+    if (!row) throw new NotFoundException({ error: 'notification-not-found' })
+    return this.toRow(row)
+  }
+
   async unreadCount(orgId: string, userId: string): Promise<number> {
     return prisma.notification.count({
       where: { organizationId: orgId, recipientUserId: userId, status: 'unread' },

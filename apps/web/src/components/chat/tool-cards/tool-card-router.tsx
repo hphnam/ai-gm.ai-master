@@ -46,7 +46,7 @@ const RENDERERS: Record<string, ToolCardRenderer> = {
 }
 
 export function hasToolCard(toolName: string): boolean {
-  return toolName in RENDERERS
+  return Object.hasOwn(RENDERERS, toolName)
 }
 
 type Props = {
@@ -57,7 +57,7 @@ type Props = {
 export function ToolCard({ part, ctx }: Props) {
   if (!isToolUIPart(part as Parameters<typeof isToolUIPart>[0])) return null
   const name = getToolName(part as Parameters<typeof getToolName>[0])
-  const Renderer = RENDERERS[name]
+  const Renderer = Object.hasOwn(RENDERERS, name) ? RENDERERS[name] : undefined
   if (!Renderer) return null
   // Only render once we have a final output (success or error). Streaming
   // input/partial output stays in the thought-process chip strip.

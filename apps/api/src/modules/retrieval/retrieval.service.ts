@@ -528,6 +528,11 @@ export class RetrievalService implements OnModuleInit {
       LEFT JOIN "knowledge_items" ki
         ON se."entityType" = 'knowledge_item' AND se."entityId" = ki.id
       LEFT JOIN "knowledge_sections" sec ON sec.id = f.section_id
+      -- Defense-in-depth: reconcile deletes an archived doc's SE/chunk rows so
+      -- superseded docs normally can't reach here, but guard the outer join too
+      -- in case a delete ever partially fails. Non-KI entities (ki.id IS NULL)
+      -- are unaffected.
+      WHERE ki.id IS NULL OR ki."supersededAt" IS NULL
       ORDER BY f.rrf_score DESC, se.id ASC, sec.id ASC NULLS LAST
       LIMIT ${limitParam}
     `

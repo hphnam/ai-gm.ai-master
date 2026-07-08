@@ -23,7 +23,7 @@ export type DocsFilters = {
   q?: string
   category?: 'all' | 'unclassified' | string
   venue?: 'all' | 'global' | string
-  status?: 'all' | 'ready' | 'processing' | 'attention'
+  status?: 'all' | 'ready' | 'processing' | 'attention' | 'archived'
   sort?: 'recent' | 'oldest' | 'name'
 }
 
@@ -93,6 +93,24 @@ export function useDocs(filters?: DocsFilters) {
     initialPageParam: null,
     getNextPageParam: (last) => last.nextCursor,
     staleTime: 30_000,
+  })
+}
+
+// Lightweight subscriber to the unfiltered library total, used to gate the
+// "no docs at all" empty state. Shares the default-filter query key with the
+// Library tab's list, so it dedupes onto the same cache entry instead of
+// firing a second request; `select` keeps this from re-rendering as more
+// pages stream in.
+export function useDocsTotal() {
+  const norm = normaliseFilters(undefined)
+  return useInfiniteQuery<DocListPage, Error, number, readonly unknown[], string | null>({
+    queryKey: ['docs', 'list', norm] as const,
+    queryFn: ({ signal, pageParam }) =>
+      apiFetch<DocListPage>(`/docs${buildDocsQs(norm, pageParam ?? null)}`, { signal }),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
+    staleTime: 30_000,
+    select: (data) => data.pages[0]?.total ?? 0,
   })
 }
 
@@ -534,6 +552,35 @@ export function useDeleteDoc() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['docs'] })
+    },
+  })
+}
+
+// Manual reconcile — mark `id` (the kept version) as superseding `replaces`
+// (the older one). The older doc is archived in place. Invalidates both docs'
+// detail caches plus the whole library so the archived row leaves the live list.
+export function useSupersedeDoc() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (args: { id: string; replaces: string }) =>
+      apiPost<void>(`/docs/${args.id}/supersede`, { replaces: args.replaces }),
+    onSuccess: (_data, args) => {
+      queryClient.invalidateQueries({ queryKey: ['docs'] })
+      queryClient.invalidateQueries({ queryKey: ['docs', args.id] })
+      queryClient.invalidateQueries({ queryKey: ['docs', args.replaces] })
+    },
+  })
+}
+
+// Undo a reconcile — restore an archived doc to the live library. The server
+// re-ingests it, so it returns in 'processing' before flipping back to 'ready'.
+export function useUnsupersedeDoc() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => apiPost<void>(`/docs/${id}/unsupersede`, {}),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['docs'] })
+      queryClient.invalidateQueries({ queryKey: ['docs', id] })
     },
   })
 }

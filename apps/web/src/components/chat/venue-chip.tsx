@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,7 @@ type Props = {
 // full-width VenueStrip that used to sit above the composer.
 export function VenueChip({ venueId, onChange }: Props) {
   const { data: venues, isLoading } = useVenues()
+  const { isManager } = useCurrentMember()
   const current = venues?.find((v) => v.id === venueId) ?? null
   const needsPick = Boolean(onChange) && !current
   const readOnly = !onChange
@@ -115,13 +117,17 @@ export function VenueChip({ venueId, onChange }: Props) {
         ) : (
           <div className="px-2 py-3 text-sm text-muted-foreground">No venues yet.</div>
         )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/venues/new" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" aria-hidden />
-            New venue
-          </Link>
-        </DropdownMenuItem>
+        {isManager ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/venues/new" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" aria-hidden />
+                New venue
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   )

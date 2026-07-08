@@ -174,6 +174,33 @@ export class IntegrationsService {
     return row?.provider ?? null
   }
 
+  /// Every provider id this org currently has connected as active. The chat
+  /// layer calls this once per turn to scope the model's tool surface to the
+  /// org's real integrations — so a venue with no POS never even sees pos_*
+  /// tools and falls back to knowledge structurally, with no prompt rule.
+  async listActiveProviderIds(orgId: string): Promise<Set<string>> {
+    const rows = await prisma.integration.findMany({
+      where: { organizationId: orgId, status: 'active' },
+      select: { provider: true },
+    })
+    return new Set(rows.map((r) => r.provider))
+  }
+
+  /// Active integrations with their last-sync timestamp. Used to build the
+  /// human-readable `<integrations>` block injected into the chat prompt, so
+  /// the agent knows what's connected BY NAME (and how fresh) — not just which
+  /// provider ids exist for tool-filtering.
+  async listActiveIntegrations(
+    orgId: string,
+  ): Promise<Array<{ provider: string; lastSyncedAt: Date | null }>> {
+    const rows = await prisma.integration.findMany({
+      where: { organizationId: orgId, status: 'active' },
+      select: { provider: true, lastSyncedAt: true },
+      orderBy: { provider: 'asc' },
+    })
+    return rows.map((r) => ({ provider: r.provider, lastSyncedAt: r.lastSyncedAt }))
+  }
+
   /// Provider-side hook to record a recoverable error (e.g. SDK 401 because
   /// the PAT was revoked). Flips the row to 'error' so the UI can surface a
   /// "reconnect" CTA; preserves the cipher so reconnect-with-rotation works.
@@ -199,24 +226,26 @@ export class IntegrationsService {
   }
 
   /// Called by providers after a successful tool call to surface "last
-  /// synced X minutes ago" in the UI. Best-effort but errors are logged so
-  /// a swallowed Prisma failure doesn't hide a real outage.
+  /// synced X minutes ago" in the UI. Fire-and-forget: the write is detached
+  /// so it never adds a Neon round-trip to the tool-call critical path (agents
+  /// chain several POS calls per turn). Errors are logged, not thrown, so a
+  /// swallowed Prisma failure doesn't hide a real outage.
   async touchLastSynced(orgId: string, provider: string): Promise<void> {
-    try {
-      await prisma.integration.update({
+    void prisma.integration
+      .update({
         where: { organizationId_provider: { organizationId: orgId, provider } },
         data: { lastSyncedAt: new Date(), lastError: null },
       })
-    } catch (err) {
-      this.logger.warn(
-        JSON.stringify({
-          event: 'integrations.touch_last_synced_failed',
-          orgId,
-          provider,
-          message: (err as Error).message,
-        }),
-      )
-    }
+      .catch((err) => {
+        this.logger.warn(
+          JSON.stringify({
+            event: 'integrations.touch_last_synced_failed',
+            orgId,
+            provider,
+            message: (err as Error).message,
+          }),
+        )
+      })
   }
 
   private readonly summarySelect = {

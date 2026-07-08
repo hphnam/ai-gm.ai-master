@@ -1,16 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { fail, type ToolResult } from '../../types'
 import type { DispatchContext } from '../chat/tool-dispatcher'
-import type { IntegrationProvider, IntegrationToolDefinition } from './integration-provider'
+import type {
+  IntegrationProvider,
+  IntegrationToolDefinition,
+  ToolMinRole,
+} from './integration-provider'
+import { DEFAULT_TOOL_MIN_ROLE, roleMeetsMinRole } from './integration-provider'
 import { IntegrationsService } from './integrations.service'
-import { createRateLimiter } from './rate-limit'
+import { createRedisRateLimiter } from './rate-limit'
 
 /// Per-org throttle on integration tool invocation. The chat agent can be
 /// nudged via prompt injection in indexed docs to call pos_* tools in a
 /// loop — both DoS-y on us and a billing-amplification vector against the
-/// org's Square account. Cap at 30 hits / min / (org, tool) — comfortably
-/// above any plausible legitimate burst (e.g. paging through orders).
-const TOOL_INVOCATION_LIMITER = createRateLimiter(60_000, 30)
+/// org's Square account. Cap at 120 hits / min / (org, tool): high enough that
+/// a whole shift of staff hammering the copilot on the same data question never
+/// trips it (the limit is per single tool, not aggregate POS traffic), but a
+/// runaway/injected tool loop fires hundreds/min and still gets caught. Now
+/// Redis-backed, so this is a true org-wide cap rather than per-node × N.
+const TOOL_INVOCATION_LIMITER = createRedisRateLimiter(60_000, 120, 'tool-invocation')
 
 /// In-process registry that integration providers self-register into on
 /// module init. The ChatModule queries this for tool definitions when
@@ -33,6 +41,11 @@ export class IntegrationRegistry {
   /// usually implemented by one provider; when two implement it (e.g. two
   /// POS vendors), the org's active Integration row picks the winner.
   private readonly toolToProviders = new Map<string, Set<string>>()
+  /// tool name → effective access floor. Populated for EVERY registered tool
+  /// (default 'manager' when a provider omits minRole — fail closed). Used to
+  /// scope the staff tool surface and as the dispatch backstop so a jailbroken
+  /// model can't reach a manager-only capability.
+  private readonly toolToMinRole = new Map<string, ToolMinRole>()
 
   constructor(private readonly integrations: IntegrationsService) {}
 
@@ -59,6 +72,13 @@ export class IntegrationRegistry {
       }
       set.add(provider.id)
       this.toolToProviders.set(def.name, set)
+      // A capability's access floor is the STRICTEST any provider declares —
+      // manager (incl. an omitted, default-manager classification) beats staff,
+      // so a shared capability is only staff-visible when EVERY implementer
+      // explicitly opts in.
+      const floor = def.minRole ?? DEFAULT_TOOL_MIN_ROLE
+      const existing = this.toolToMinRole.get(def.name)
+      if (existing !== 'manager') this.toolToMinRole.set(def.name, floor)
     }
     this.providers.set(provider.id, provider)
     this.logger.log(
@@ -81,6 +101,75 @@ export class IntegrationRegistry {
       }
     }
     return [...seen.values()]
+  }
+
+  /// Provider ids the org has connected as active. The ChatModule calls this
+  /// once per turn to build a capability-scoped tool surface (see
+  /// getToolSurfaceForProviders). Delegates to IntegrationsService so the
+  /// active-status source of truth stays in one place.
+  async getActiveProviderIds(orgId: string): Promise<Set<string>> {
+    return this.integrations.listActiveProviderIds(orgId)
+  }
+
+  /// Human-readable description of the org's active integrations for prompt
+  /// injection: vendor label + capability domain + freshness. Joins the active
+  /// DB rows with each provider's registered label/domain. A provider that's
+  /// connected but no longer registered (renamed/removed) is skipped.
+  async describeActiveIntegrations(
+    orgId: string,
+  ): Promise<
+    Array<{ provider: string; label: string; domain: string; lastSyncedAt: Date | null }>
+  > {
+    const rows = await this.integrations.listActiveIntegrations(orgId)
+    const out: Array<{
+      provider: string
+      label: string
+      domain: string
+      lastSyncedAt: Date | null
+    }> = []
+    for (const row of rows) {
+      const provider = this.providers.get(row.provider)
+      if (!provider) continue
+      out.push({
+        provider: row.provider,
+        label: provider.label,
+        domain: provider.domain,
+        lastSyncedAt: row.lastSyncedAt,
+      })
+    }
+    return out
+  }
+
+  /// Tool definitions + schemas for ONLY the providers in `activeProviderIds`.
+  /// A tool is included when ANY active provider implements it (capabilities
+  /// can be shared across vendors — Square + Toast both claiming
+  /// `pos_search_items`). An empty set yields no integration tools, so the
+  /// model sees built-ins only and falls back to knowledge for live data.
+  /// This is what makes routing capability-driven instead of prompt-driven:
+  /// the agent's tools ARE the org's connected integrations.
+  ///
+  /// `userRole` scopes the surface to the caller's access floor: a staff member
+  /// never sees manager-only tools (financials, another person's data), so the
+  /// model can't call them by accident and won't imply the venue "isn't
+  /// connected" — the DATA ACCESS BY ROLE prompt block explains the withholding.
+  getToolSurfaceForProviders(
+    activeProviderIds: ReadonlySet<string>,
+    userRole: string,
+  ): {
+    definitions: IntegrationToolDefinition[]
+    schemas: Record<string, import('zod').ZodTypeAny>
+  } {
+    if (activeProviderIds.size === 0) return { definitions: [], schemas: {} }
+    const allSchemas = this.getAllToolSchemas()
+    const definitions = this.getAllToolDefinitions().filter((def) => {
+      const floor = this.toolToMinRole.get(def.name) ?? DEFAULT_TOOL_MIN_ROLE
+      if (!roleMeetsMinRole(userRole, floor)) return false
+      const providers = this.toolToProviders.get(def.name)
+      return providers != null && [...providers].some((p) => activeProviderIds.has(p))
+    })
+    const schemas: Record<string, import('zod').ZodTypeAny> = {}
+    for (const def of definitions) schemas[def.name] = allSchemas[def.name]
+    return { definitions, schemas }
   }
 
   /// Tool name → Zod schema lookup. Mirrors getAllToolDefinitions —
@@ -142,7 +231,29 @@ export class IntegrationRegistry {
       return fail('not-supported', `tool: ${toolName}`)
     }
 
-    if (!TOOL_INVOCATION_LIMITER.allow(`${ctx.orgId}|${toolName}`)) {
+    // Hard role backstop. Staff never see manager-only tools in their surface,
+    // so reaching here means either a jailbroken/regressed model or a stale
+    // tool id — deny before touching the vendor. Kept independent of the
+    // surface filter so prompt-level defenses never have to hold alone.
+    if (
+      !roleMeetsMinRole(ctx.userRole, this.toolToMinRole.get(toolName) ?? DEFAULT_TOOL_MIN_ROLE)
+    ) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'integration_registry.role_denied',
+          orgId: ctx.orgId,
+          userId: ctx.userId,
+          userRole: ctx.userRole,
+          toolName,
+        }),
+      )
+      return fail(
+        'not-supported',
+        `"${toolName}" returns manager-level information — a staff member can't access it. Ask an owner or manager.`,
+      )
+    }
+
+    if (!(await TOOL_INVOCATION_LIMITER.allow(`${ctx.orgId}|${toolName}`))) {
       this.logger.warn(
         JSON.stringify({
           event: 'integration_registry.rate_limited',
@@ -152,7 +263,7 @@ export class IntegrationRegistry {
       )
       return fail(
         'error',
-        `Rate limit hit for ${toolName} (max 30/min per org). Wait a moment before retrying.`,
+        `Rate limit hit for ${toolName} (max 120/min per org). Wait a moment before retrying.`,
       )
     }
 

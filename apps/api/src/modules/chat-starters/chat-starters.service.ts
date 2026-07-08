@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import Redis from 'ioredis'
 import { prisma } from '../../database/prisma'
+import { parseRedisUrl } from '../../redis-connection'
 import { CHAT_STARTERS_TTL_SECONDS } from './chat-starters.queue'
 import { ChatStartersPayloadSchema, type StarterQuestion } from './dto/chat-starters.dto'
 
@@ -46,7 +47,8 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
     if (!url && process.env.NODE_ENV === 'production') {
       throw new Error('REDIS_URL is not set — chat-starters cache cannot start')
     }
-    this.redis = new Redis(url ?? 'redis://127.0.0.1:6379', {
+    this.redis = new Redis({
+      ...parseRedisUrl(url ?? 'redis://127.0.0.1:6379'),
       lazyConnect: false,
       maxRetriesPerRequest: 3,
       enableReadyCheck: true,

@@ -4,7 +4,7 @@ import { prisma } from '../../database/prisma'
 import type { WhatsAppOutboundResult } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
 
-// 03-06 Twilio Conversations API adapter (replaces 03-04 Infobip adapter).
+// 03-06 Twilio Conversations API adapter.
 // Public surface (sendText / sendTypingIndicator → WhatsAppOutboundResult) is
 // preserved so callers don't move. Internals:
 //   - resolveConversationForPhone(phone) → ConversationSid
@@ -20,7 +20,6 @@ import { assertAuthEnv } from '../auth/assert-auth-env'
 const TWILIO_API_TIMEOUT_MS = 10_000
 const CONVERSATIONS_BASE = 'https://conversations.twilio.com/v1'
 const E164_DIGITS_RE = /^[0-9]{6,20}$/
-type DriverMode = 'live' | 'console' | 'disabled'
 
 function sha256Prefix(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
@@ -41,7 +40,6 @@ function normalizeToE164Plus(to: string): string | null {
 @Injectable()
 export class WhatsAppAdapter {
   private readonly logger = new Logger(WhatsAppAdapter.name)
-  private readonly baseMode: 'live' | 'console'
   private readonly liveCreds?: {
     accountSid: string
     authToken: string
@@ -52,18 +50,16 @@ export class WhatsAppAdapter {
 
   constructor() {
     const env = assertAuthEnv()
-    const override = env.twilio?.driverOverride
-    if (override === 'console' || !env.twilio || !env.twilio.sender) {
-      this.baseMode = 'console'
+    // WhatsApp is optional (pending Meta approval) — when the sender isn't
+    // configured every send fails loudly with whatsapp-not-configured rather
+    // than pretending to deliver.
+    if (!env.twilio?.sender) {
+      this.logger.warn(
+        'TWILIO_WHATSAPP_SENDER not configured — all WhatsApp sends will fail with whatsapp-not-configured',
+      )
       return
     }
     const { accountSid, authToken, conversationsServiceSid, sender } = env.twilio
-    if (!accountSid || !authToken || !conversationsServiceSid || !sender) {
-      throw new Error(
-        'WhatsAppAdapter: live mode requires TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_CONVERSATIONS_SERVICE_SID + TWILIO_WHATSAPP_SENDER',
-      )
-    }
-    this.baseMode = 'live'
     this.liveCreds = {
       accountSid,
       authToken,
@@ -73,23 +69,12 @@ export class WhatsAppAdapter {
     }
   }
 
-  private resolveMode(): DriverMode {
-    if (process.env.TWILIO_DRIVER_OVERRIDE === 'disabled') return 'disabled'
-    if (process.env.TWILIO_DRIVER_OVERRIDE === 'console') return 'console'
-    return this.baseMode
-  }
-
   async sendTypingIndicator(conversationSid: string): Promise<WhatsAppOutboundResult> {
     if (!conversationSid || !/^CH[0-9a-fA-F]{32}$/.test(conversationSid)) {
       return { ok: false, reason: 'whatsapp-invalid-to' }
     }
-    const mode = this.resolveMode()
-    if (mode === 'disabled') {
-      return { ok: false, reason: 'whatsapp-driver-disabled' }
-    }
-    if (mode === 'console' || !this.liveCreds) {
-      this.logger.log('whatsapp.console_typing_indicator', { conversationSid })
-      return { ok: true, mode: 'console' }
+    if (!this.liveCreds) {
+      return { ok: false, reason: 'whatsapp-not-configured' }
     }
 
     const url = `${CONVERSATIONS_BASE}/Services/${this.liveCreds.serviceSid}/Conversations/${conversationSid}/Typing`
@@ -106,7 +91,7 @@ export class WhatsAppAdapter {
       if (!res.ok) {
         return { ok: false, reason: 'whatsapp-service-unavailable' }
       }
-      return { ok: true, mode: 'live' }
+      return { ok: true }
     } catch {
       return { ok: false, reason: 'whatsapp-service-unavailable' }
     }
@@ -117,20 +102,12 @@ export class WhatsAppAdapter {
     if (!phone) {
       return { ok: false, reason: 'whatsapp-invalid-to' }
     }
-    const mode = this.resolveMode()
-    if (mode === 'disabled') {
-      this.logger.warn('whatsapp.outbound_skipped_killswitch', {
+    if (!this.liveCreds) {
+      this.logger.warn('whatsapp.outbound_not_configured', {
         to: sha256Prefix(phone),
         bodyLength: body.length,
       })
-      return { ok: false, reason: 'whatsapp-driver-disabled' }
-    }
-    if (mode === 'console' || !this.liveCreds) {
-      this.logger.log('whatsapp.console_outbound', {
-        to: sha256Prefix(phone),
-        bodyLength: body.length,
-      })
-      return { ok: true, mode: 'console' }
+      return { ok: false, reason: 'whatsapp-not-configured' }
     }
 
     const startedAt = Date.now()
@@ -180,12 +157,11 @@ export class WhatsAppAdapter {
       }
       this.logger.log('whatsapp.outbound', {
         to: sha256Prefix(phone),
-        mode: 'live',
         messageId: json.sid,
         conversationSid,
         latencyMs: Date.now() - startedAt,
       })
-      return { ok: true, mode: 'live', messageId: json.sid }
+      return { ok: true, messageId: json.sid }
     } catch (err) {
       this.logger.warn('whatsapp.twilio_error', {
         to: sha256Prefix(phone),

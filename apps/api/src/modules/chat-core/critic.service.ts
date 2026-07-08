@@ -59,6 +59,7 @@ export class CriticService {
     try {
       const result = await generateText({
         model: anthropicProvider(HAIKU_MODEL),
+        allowSystemInMessages: true,
         messages: [
           {
             role: 'system',

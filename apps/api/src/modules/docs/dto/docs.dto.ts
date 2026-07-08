@@ -20,6 +20,12 @@ export const DocIdParamSchema = z.object({
 })
 export class DocIdParamDto extends createZodDto(DocIdParamSchema) {}
 
+// Manual reconcile body — `:id` (the kept/new version) supersedes `replaces`.
+export const SupersedeDocRequestSchema = z.object({
+  replaces: z.string().regex(UUID_RE, 'invalid uuid'),
+})
+export class SupersedeDocRequestDto extends createZodDto(SupersedeDocRequestSchema) {}
+
 export class CreateDocRequestDto extends createZodDto(CreateDocRequestSchema) {}
 export class AcceptTypeRequestDto extends createZodDto(AcceptTypeRequestSchema) {}
 // ClassifyDocRequestSchema is a z.union — createZodDto can't extend unions.
@@ -50,6 +56,23 @@ export class ChecklistDto extends createZodDto(ChecklistSchema) {}
 
 const ProcessingStatusSchema = z.enum(['processing', 'ready', 'failed'])
 
+// Pointer to an adjacent version (successor/predecessor) in a supersede chain.
+const DocVersionRefSchema = z.object({
+  id: z.string(),
+  title: z.string().nullable(),
+})
+
+// One version in a doc's full lineage (newest first). supersededAt null marks
+// the live version; isCurrent flags the entry being viewed.
+const DocVersionHistoryEntrySchema = z.object({
+  id: z.string(),
+  title: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
+  updatedAt: z.string(),
+  isCurrent: z.boolean(),
+})
+
 export const DocListItemSchema = z.object({
   id: z.string(),
   title: z.string().nullable(),
@@ -64,6 +87,8 @@ export const DocListItemSchema = z.object({
   isProcedural: z.boolean(),
   processingStatus: ProcessingStatusSchema,
   processingError: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
@@ -98,6 +123,10 @@ export const DocDetailSchema = z.object({
   docPurpose: DocPurposeSchema.nullable(),
   processingStatus: ProcessingStatusSchema,
   processingError: z.string().nullable(),
+  version: z.number(),
+  supersededAt: z.string().nullable(),
+  supersededBy: DocVersionRefSchema.nullable(),
+  versionHistory: z.array(DocVersionHistoryEntrySchema),
   createdAt: z.string(),
   updatedAt: z.string(),
 })

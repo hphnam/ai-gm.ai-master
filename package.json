@@ -8,8 +8,11 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "multer": "^2.2.0"
+  },
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "turbo run dev tunnel",
     "build": "turbo build",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

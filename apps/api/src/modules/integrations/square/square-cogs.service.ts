@@ -10,17 +10,24 @@ const COGS_MAX_HOURS = 24 * 365
 
 export type ItemCostRow = {
   catalogObjectId: string
-  /// Weighted-average unit cost in major units, derived from the venue's
-  /// RECEIVE_STOCK adjustments inside the lookback window. `null` when the
-  /// variation has no priced receive events on file.
+  /// Unit cost in major units. `null` only when the variation has neither a
+  /// catalog unit cost nor any priced receive on file. See `source` for where
+  /// the figure came from.
   unitCost: { value: number; currency: string } | null
   /// Total quantity received during the lookback (sanity check for the agent —
   /// a cost derived from a single 1-unit receive is less trustworthy than one
-  /// derived from hundreds of units).
+  /// derived from hundreds of units). 0 when the cost came from the catalog.
   quantityReceived: number
-  /// Distinct receive events the weighted average was computed from.
+  /// Distinct receive events the weighted average was computed from. 0 when the
+  /// cost came from the catalog.
   receiveEvents: number
+  /// Where the unit cost came from: a receive-derived weighted average (actual
+  /// paid, most accurate), the catalog's `defaultUnitCost` / vendor price, or
+  /// nothing on file.
+  source: 'receive-weighted-average' | 'catalog-default' | 'none'
 }
+
+type CatalogCost = { minor: bigint; currency: string }
 
 /// Hospitality-norm cost-of-goods band the agent can offer when Square has
 /// no cost data on file. Brewpubs / bars run 25-35% (beer 18-25%, wine 30-40%,
@@ -33,11 +40,12 @@ const HOSPITALITY_COST_PERCENT_HINT = {
 } as const
 
 export type CogsSummary = {
-  /// Items sold in the sales window whose unit cost we could derive from
-  /// Square inventory receives. NULL in the common case because Square's
-  /// public API doesn't populate vendor cost on the inventory adjustment
-  /// objects we can read — `noData` below explains the fallback the agent
-  /// should take.
+  /// COGS for the sales window: items sold × unit cost. Unit cost comes from
+  /// the catalog (`CatalogItemVariation.defaultUnitCost`, or the per-supplier
+  /// `itemVariationVendorInfos[].priceMoney`), preferring a receive-derived
+  /// weighted average when the seller's account carries one. NULL only when
+  /// none of the sold variations have any cost on file — `noData` below
+  /// explains the manual-cost-% fallback for that case.
   cogsAmount: { value: number; currency: string } | null
   grossSales: { value: number; currency: string } | null
   netSales: { value: number; currency: string } | null
@@ -61,16 +69,14 @@ export type CogsSummary = {
   /// Whether the agent should fall back to asking the operator for a manual
   /// cost % (true when coverageRate < 50 OR no cost data at all).
   recommendManualCostPercent: boolean
-  /// Loud, structured "we couldn't derive COGS from Square" signal — present
-  /// when Square returned zero priced receive events. The agent should treat
-  /// this as the explicit cue to ask the user for a typical cost %, offering
-  /// `suggestedCostPercent` as a starting point, then call
-  /// pos_compute_cogs_from_percent to finish the calculation. Null when we
-  /// have at least partial cost coverage.
+  /// Loud, structured "we couldn't derive COGS" signal — present when either
+  /// no orders fell in the window, or none of the sold variations carry a unit
+  /// cost in the catalog. The agent should treat this as the cue to ask the
+  /// user for a typical cost %, offering `suggestedCostPercent` as a starting
+  /// point, then call pos_compute_cogs_from_percent to finish the calculation.
+  /// Null when we have at least partial cost coverage.
   noData: {
-    reason:
-      | 'square-api-does-not-expose-vendor-cost'
-      | 'no-completed-orders-in-window'
+    reason: 'no-unit-cost-on-catalog-items' | 'no-completed-orders-in-window'
     suggestedCostPercent: number
     suggestedCostPercentRange: { min: number; max: number }
     explanation: string
@@ -82,21 +88,20 @@ export type CogsSummary = {
 export class SquareCogsService {
   constructor(private readonly square: SquareService) {}
 
-  /// Attempt to derive weighted-average unit cost per catalog variation from
-  /// the venue's RECEIVE_STOCK inventory adjustments.
+  /// Resolve per-variation unit cost. Square exposes cost on the CATALOG
+  /// (`CatalogItemVariation.defaultUnitCost`, and per-supplier on
+  /// `itemVariationVendorInfos[].priceMoney`) — neither field is in the v44 SDK
+  /// type, but both come back on the wire, so we read them off the raw object.
+  /// That catalog cost is the reliable source. We ALSO scan RECEIVE_STOCK
+  /// inventory adjustments and, when a variation has priced receives on file,
+  /// prefer that weighted-average actual-paid cost over the static catalog
+  /// figure. `source` on each row says which won.
   ///
-  /// IMPORTANT — Square's public API does NOT expose vendor cost in the way
-  /// this scan needs. `InventoryAdjustment.totalPriceMoney` is populated by
-  /// Square ONLY when `to_state === 'SOLD'` (i.e. revenue), not on receive
-  /// transitions. For the typical Square seller the receive scan returns an
-  /// empty tally and this method's `costs` array is empty. We keep the scan
-  /// because (a) a small number of third-party integrations DO write cost
-  /// data onto receive adjustments and the data is free when present, and
-  /// (b) `coverageHint` truthfully describes the gap so the caller can fall
-  /// back to a manual-cost-percent flow.
-  ///
-  /// Defaults to a 90-day lookback. There is no point widening it — Square's
-  /// payload won't suddenly start carrying cost.
+  /// `InventoryAdjustment.totalPriceMoney` is populated only when
+  /// `to_state === 'SOLD'`, so the receive scan is usually empty — but the
+  /// catalog cost fills the gap for any variation the operator has costed in
+  /// Square. Defaults to a 90-day receive lookback (more receives → more stable
+  /// weighted average); the catalog read ignores it.
   async getItemCosts(
     orgId: string,
     args: { venueId: string; catalogObjectIds?: string[]; lookbackDays?: number },
@@ -110,30 +115,50 @@ export class SquareCogsService {
     const updatedAfter = new Date(Date.now() - lookbackMs).toISOString()
     const wantedIds = args.catalogObjectIds ? new Set(args.catalogObjectIds) : null
     try {
-      const tally = await collectReceiveCosts({
-        client: resolved.client,
-        locationId: resolved.locationId,
-        updatedAfter,
-        wantedIds,
-      })
+      const [tally, catalogCosts] = await Promise.all([
+        collectReceiveCosts({
+          client: resolved.client,
+          locationId: resolved.locationId,
+          updatedAfter,
+          wantedIds,
+        }),
+        wantedIds && wantedIds.size > 0
+          ? collectCatalogUnitCosts({ client: resolved.client, variationIds: wantedIds })
+          : Promise.resolve(new Map<string, CatalogCost>()),
+      ])
       const rows: ItemCostRow[] = []
-      for (const [catalogObjectId, t] of tally) {
-        const divisor = t.currency && ZERO_DECIMAL_CURRENCIES.has(t.currency) ? 1 : 100
-        const totalMajor = Number(t.totalCostMinor) / divisor
-        const unitCostValue = t.quantity > 0 ? totalMajor / t.quantity : null
-        rows.push({
-          catalogObjectId,
-          unitCost:
-            unitCostValue != null && t.currency
+      const ids = new Set<string>([...tally.keys(), ...catalogCosts.keys()])
+      for (const catalogObjectId of ids) {
+        const t = tally.get(catalogObjectId)
+        if (t && t.quantity > 0 && t.totalCostMinor > 0n) {
+          const divisor = t.currency && ZERO_DECIMAL_CURRENCIES.has(t.currency) ? 1 : 100
+          const unitCostValue = Number(t.totalCostMinor) / divisor / t.quantity
+          rows.push({
+            catalogObjectId,
+            unitCost: t.currency
               ? { value: Math.round(unitCostValue * 1000) / 1000, currency: t.currency }
               : null,
-          quantityReceived: Math.round(t.quantity * 100) / 100,
-          receiveEvents: t.events,
+            quantityReceived: Math.round(t.quantity * 100) / 100,
+            receiveEvents: t.events,
+            source: 'receive-weighted-average',
+          })
+          continue
+        }
+        const cat = catalogCosts.get(catalogObjectId)
+        rows.push({
+          catalogObjectId,
+          unitCost: cat
+            ? { value: minorToMajor(cat.minor, cat.currency), currency: cat.currency }
+            : null,
+          quantityReceived: t ? Math.round(t.quantity * 100) / 100 : 0,
+          receiveEvents: t?.events ?? 0,
+          source: cat ? 'catalog-default' : 'none',
         })
       }
+      const costed = rows.filter((r) => r.unitCost != null).length
       const coverageHint =
-        wantedIds && rows.length < wantedIds.size
-          ? `${wantedIds.size - rows.length} of ${wantedIds.size} requested variations have no receive cost on file in the last ${lookbackDays}d`
+        wantedIds && costed < wantedIds.size
+          ? `${wantedIds.size - costed} of ${wantedIds.size} requested variations have no unit cost on file (no catalog cost and no priced receives in the last ${lookbackDays}d)`
           : null
       await this.square.touchSync(orgId)
       return { ok: true, data: { costs: rows, lookbackDays, coverageHint } }
@@ -143,9 +168,10 @@ export class SquareCogsService {
   }
 
   /// Compute COGS over a sales window by joining order line items to per-
-  /// variation receive costs derived from the same Square account. Reports
-  /// coverage explicitly so the agent can be honest with the user about how
-  /// much of revenue we could actually price.
+  /// variation unit cost (catalog `defaultUnitCost`, or a receive-derived
+  /// weighted average when the account carries one). Reports coverage
+  /// explicitly so the agent can be honest with the user about how much of
+  /// revenue we could actually price.
   async getCogsSummary(
     orgId: string,
     args: { venueId: string; lookbackDays?: number } & WindowInput,
@@ -238,17 +264,24 @@ export class SquareCogsService {
       }
       const truncated = pages >= MAX_PAGES && cursor !== undefined
 
-      // Second pass: derive unit cost for every sold variation from receive
-      // events. Skip if nothing was sold.
-      const costTally =
+      // Second pass: resolve unit cost for every sold variation. Catalog cost
+      // (defaultUnitCost / vendor price) is the reliable source; receive events
+      // give an actual-paid weighted average when the account carries one. Fetch
+      // both in parallel. Skip if nothing was sold.
+      const [costTally, catalogCosts] =
         soldIds.size > 0
-          ? await collectReceiveCosts({
-              client: resolved.client,
-              locationId: resolved.locationId,
-              updatedAfter: new Date(Date.now() - lookbackDays * 24 * 60 * 60 * 1000).toISOString(),
-              wantedIds: soldIds,
-            })
-          : new Map<string, ReceiveTally>()
+          ? await Promise.all([
+              collectReceiveCosts({
+                client: resolved.client,
+                locationId: resolved.locationId,
+                updatedAfter: new Date(
+                  Date.now() - lookbackDays * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+                wantedIds: soldIds,
+              }),
+              collectCatalogUnitCosts({ client: resolved.client, variationIds: soldIds }),
+            ])
+          : [new Map<string, ReceiveTally>(), new Map<string, CatalogCost>()]
 
       // Join: for each sold line, multiply quantity_sold × unit_cost; track
       // coverage (% line items priced) and top uncosted items.
@@ -262,19 +295,26 @@ export class SquareCogsService {
       }> = []
       const totalLines = lineByCatalog.size
       for (const [catalogId, line] of lineByCatalog) {
-        const cost = costTally.get(catalogId)
-        if (cost && cost.quantity > 0 && cost.totalCostMinor > 0n) {
-          // Unit cost is held as minor units / quantity (a fractional rate),
-          // so multiply line quantity × unit cost minor. Done with bigint
-          // by scaling — keep precision but avoid floating drift.
-          const unitCostMinorScaled =
-            (cost.totalCostMinor * 1_000_000n) /
-            BigInt(Math.max(1, Math.round(cost.quantity * 1_000_000)))
-          const lineCogs =
-            (unitCostMinorScaled * BigInt(Math.round(line.quantity * 1_000_000))) / 1_000_000n
-          cogsMinor += lineCogs
+        const receive = costTally.get(catalogId)
+        const catalog = catalogCosts.get(catalogId)
+        // Prefer receive-derived (actual paid) cost when present; else the
+        // catalog unit cost. Both resolve to a per-unit minor rate.
+        let unitCostMinor: bigint | null = null
+        let lineCurrency: string | null = null
+        if (receive && receive.quantity > 0 && receive.totalCostMinor > 0n) {
+          // Weighted average across all priced receives: total paid / total qty.
+          unitCostMinor =
+            (receive.totalCostMinor * 1_000_000n) /
+            BigInt(Math.max(1, Math.round(receive.quantity * 1_000_000)))
+          lineCurrency = receive.currency
+        } else if (catalog && catalog.minor > 0n) {
+          unitCostMinor = catalog.minor
+          lineCurrency = catalog.currency
+        }
+        if (unitCostMinor != null) {
+          cogsMinor += lineCogsMinor(unitCostMinor, line.quantity)
           costedLines += 1
-          if (!costCurrency && cost.currency) costCurrency = cost.currency
+          if (!costCurrency && lineCurrency) costCurrency = lineCurrency
         } else {
           const divisor = line.currency && ZERO_DECIMAL_CURRENCIES.has(line.currency) ? 1 : 100
           uncosted.push({
@@ -307,8 +347,8 @@ export class SquareCogsService {
 
       // Loud signal for the agent when we have no cost data at all. Two
       // distinct shapes so the model can phrase its reply correctly:
-      //   - no priced receives ever → ask user for typical cost % and call
-      //     pos_compute_cogs_from_percent
+      //   - sold items carry no unit cost in the catalog → ask user for a
+      //     typical cost % and call pos_compute_cogs_from_percent
       //   - no orders in window → tell user nothing was sold; the cost %
       //     doesn't help here
       let noData: CogsSummary['noData'] = null
@@ -325,14 +365,14 @@ export class SquareCogsService {
         }
       } else if (coverageRate === 0) {
         noData = {
-          reason: 'square-api-does-not-expose-vendor-cost',
+          reason: 'no-unit-cost-on-catalog-items',
           suggestedCostPercent: HOSPITALITY_COST_PERCENT_HINT.typical,
           suggestedCostPercentRange: {
             min: HOSPITALITY_COST_PERCENT_HINT.min,
             max: HOSPITALITY_COST_PERCENT_HINT.max,
           },
           explanation:
-            "Square's API doesn't expose vendor cost on the inventory data we can read for this seller, so we can't compute COGS from the platform alone. Ask the operator for their typical cost % (hospitality norm is 25-35%; 30% is a sensible default) and call pos_compute_cogs_from_percent to finish the calculation.",
+            'None of the items sold in this window have a unit cost set in Square (no defaultUnitCost on the catalog variation and no priced receives). Either ask the operator to set unit costs on their items in Square, or ask for their typical cost % (hospitality norm is 25-35%; 30% is a sensible default) and call pos_compute_cogs_from_percent to finish the calculation.',
         }
       }
 
@@ -402,6 +442,73 @@ export class SquareCogsService {
       },
     }
   }
+}
+
+/// Read per-variation unit cost straight from the Catalog. Square exposes this
+/// on `CatalogItemVariation` as `default_unit_cost`, and per-supplier on
+/// `item_variation_vendor_infos[].price_money`. Neither field is declared on
+/// the v44 SDK type, so they arrive in raw snake_case (see readVariationCost) —
+/// the same untyped-read pattern the rest of this integration uses for catalog
+/// objects. Verified live: 92% of Lune's 693 variations carry default_unit_cost.
+async function collectCatalogUnitCosts(args: {
+  client: Client
+  variationIds: Set<string>
+}): Promise<Map<string, CatalogCost>> {
+  const costs = new Map<string, CatalogCost>()
+  const ids = Array.from(args.variationIds)
+  // Square caps batchGet at 1000 object ids per request.
+  for (let i = 0; i < ids.length; i += 1000) {
+    const chunk = ids.slice(i, i + 1000)
+    const resp = await args.client.catalog.batchGet({ objectIds: chunk })
+    const objects = ((resp as { objects?: unknown[] }).objects ?? []) as Array<
+      Record<string, unknown>
+    >
+    for (const obj of objects) {
+      if (obj.type !== 'ITEM_VARIATION') continue
+      const id = typeof obj.id === 'string' ? obj.id : ''
+      if (!id) continue
+      const data = obj.itemVariationData as Record<string, unknown> | undefined
+      if (!data) continue
+      const money = readVariationCost(data)
+      if (money?.amount == null || !money.currency) continue
+      costs.set(id, { minor: toBigIntMinor(money.amount), currency: money.currency })
+    }
+  }
+  return costs
+}
+
+type Moneyish = { amount?: bigint | number; currency?: string }
+
+/// `defaultUnitCost` is the canonical "what it costs me" field; the per-supplier
+/// vendor price is the fallback when the operator only filled in supplier info.
+///
+/// CRITICAL — these fields are NOT in the v44 SDK's CatalogItemVariation type,
+/// so the SDK's deserializer leaves them in their raw WIRE form (snake_case:
+/// `default_unit_cost`, `item_variation_vendor_infos`, nested `price_money`).
+/// Fields the SDK *does* know (priceMoney, itemId) come back camelCased. We
+/// read snake_case first (today's reality) and fall back to camelCase so we
+/// keep working if a future SDK upgrade adds the types and starts converting.
+function readVariationCost(data: Record<string, unknown>): Moneyish | null {
+  const direct = (data.default_unit_cost ?? data.defaultUnitCost) as Moneyish | undefined
+  if (direct?.amount != null && direct.currency) return direct
+  const vendorInfos = (data.item_variation_vendor_infos ?? data.itemVariationVendorInfos) as
+    | Array<{
+        item_variation_vendor_info_data?: { price_money?: Moneyish }
+        itemVariationVendorInfoData?: { priceMoney?: Moneyish }
+      }>
+    | undefined
+  const vendorPrice = vendorInfos
+    ?.map(
+      (v) =>
+        v.item_variation_vendor_info_data?.price_money ?? v.itemVariationVendorInfoData?.priceMoney,
+    )
+    .find((m): m is Moneyish => m?.amount != null && !!m.currency)
+  return vendorPrice ?? null
+}
+
+function minorToMajor(minor: bigint, currency: string): number {
+  const divisor = ZERO_DECIMAL_CURRENCIES.has(currency) ? 1 : 100
+  return Math.round((Number(minor) / divisor) * 1000) / 1000
 }
 
 type ReceiveTally = {
@@ -507,6 +614,13 @@ function toBigIntMinor(amount: bigint | number): bigint {
   return typeof amount === 'bigint' ? amount : BigInt(Math.round(amount))
 }
 
+/// COGS for one sold line: per-unit minor cost × quantity. Quantity can be
+/// fractional (e.g. 2.5 kg), so we scale it by 1e6 before the bigint multiply
+/// and divide back out — keeps sub-unit precision without floating drift.
+function lineCogsMinor(unitCostMinor: bigint, quantity: number): bigint {
+  return (unitCostMinor * BigInt(Math.round(quantity * 1_000_000))) / 1_000_000n
+}
+
 // Surface formatMoney for tests / callers that round-trip Square Money shapes
 // through the same normalisation logic.
-export { formatMoney }
+export { formatMoney, readVariationCost, lineCogsMinor }

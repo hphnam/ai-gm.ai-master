@@ -26,7 +26,7 @@ function sha256Prefix(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 16)
 }
 
-// Provider-agnostic media classifier. Both Infobip + Twilio inbound paths
+// Media classifier for Twilio inbound payloads. All paths
 // normalize into WhatsappInboundResult whose message.type enum drives this.
 function classifyInboundMedia(result: WhatsappInboundResult): 'none' | 'image' | 'audio' | 'other' {
   const t = result.message.type
@@ -48,9 +48,9 @@ function sanitizeOpenerLine(raw: string): string {
 }
 
 // Appends follow-up pills to the WhatsApp outbound body as a sanitised bullet
-// list. WhatsApp has no interactive pills in our current Infobip tier, so
+// list. WhatsApp has no interactive pills in our current tier, so
 // inline text is the UX bridge — user can copy/type the suggestion back.
-// Later this can upgrade to Infobip interactive reply buttons (max 3).
+// Later this can upgrade to interactive reply buttons (max 3).
 function composeOutboundBody(reply: string, followUps: string[]): string {
   const trimmed = reply.trim()
   if (!followUps || followUps.length === 0) return trimmed
@@ -98,7 +98,6 @@ export class WhatsappService {
             from: sha256Prefix(result.from),
             messageId: result.messageId,
             conversationSid: result.conversationSid,
-            mode: r.mode,
           })
         }
       })
@@ -106,7 +105,7 @@ export class WhatsappService {
     startTypingRefire(result.messageId, result.conversationSid, this.adapter, this.logger)
 
     try {
-      // 03-01 M3: messageId idempotency — dedupe Infobip retries + replay attacks.
+      // 03-01 M3: messageId idempotency — dedupe Twilio retries + replay attacks.
       const dedupe = markAndCheckSid(result.messageId)
       if (dedupe.seen) {
         this.logger.log('whatsapp.replay_dedupe', {
@@ -128,7 +127,7 @@ export class WhatsappService {
       const fromHash = sha256Prefix(result.from)
       // 03-06: both controllers normalize `from` to E.164 WITH leading `+` so
       // the User.phoneNumber lookup matches directly. Twilio's Author was
-      // "whatsapp:+E164"; Infobip's was bare digits — normalization is handled
+      // "whatsapp:+E164"; normalization is handled
       // at the controller boundary.
       const phoneNumber = result.from
 
@@ -455,7 +454,6 @@ export class WhatsappService {
         if (out.ok) {
           this.logger.log('whatsapp.outbound', {
             to: fromHash,
-            mode: out.mode,
             latencyMs: Date.now() - startedAt,
           })
         }

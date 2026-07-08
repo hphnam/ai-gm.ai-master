@@ -3,6 +3,7 @@
 import { Loader2, Plus, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { formatRelative } from '@/lib/format-relative'
 import {
   type NoDataQuery,
   useDismissNoDataQuery,
@@ -10,19 +11,6 @@ import {
 } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
-
-function formatRelative(iso: string): string {
-  const ts = new Date(iso).getTime()
-  const diffMs = Date.now() - ts
-  const mins = Math.round(diffMs / 60_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(iso).toLocaleDateString()
-}
 
 function NoDataRow({ query }: { query: NoDataQuery }) {
   const promote = usePromoteNoDataQuery()
@@ -64,10 +52,8 @@ function NoDataRow({ query }: { query: NoDataQuery }) {
 
       <div className="min-w-0">
         <p className="break-words text-sm leading-snug text-foreground">{query.query}</p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
-          <span
-            className={cn('tabular-nums', hot && 'font-medium text-amber-700 dark:text-amber-400')}
-          >
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+          <span className={cn('tabular-nums', hot && 'font-medium text-warning')}>
             asked {query.askCount}×
           </span>
           <span aria-hidden className="text-muted-foreground/40">
@@ -79,14 +65,15 @@ function NoDataRow({ query }: { query: NoDataQuery }) {
 
       <div
         className={cn(
-          'col-start-2 row-start-2 flex items-center gap-1',
-          'sm:col-start-3 sm:row-start-1 sm:opacity-60 sm:transition-opacity sm:group-hover:opacity-100 sm:focus-within:opacity-100 motion-reduce:sm:transition-none',
+          'col-start-2 row-start-2 flex items-center gap-1 opacity-100',
+          'sm:col-start-3 sm:row-start-1',
+          'md:opacity-60 md:transition-opacity md:group-hover:opacity-100 md:focus-within:opacity-100 motion-reduce:md:transition-none',
         )}
       >
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 cursor-pointer gap-1 px-2 text-xs"
+          className="h-11 cursor-pointer gap-1 px-2 text-xs md:h-7"
           onClick={handlePromote}
           disabled={busy}
           aria-label={`Add "${query.query}" to questions`}
@@ -101,7 +88,7 @@ function NoDataRow({ query }: { query: NoDataQuery }) {
         <Button
           size="sm"
           variant="ghost"
-          className="h-7 w-7 cursor-pointer p-0 text-muted-foreground hover:text-foreground"
+          className="h-11 w-11 cursor-pointer p-0 text-muted-foreground hover:text-foreground md:h-7 md:w-7"
           onClick={handleDismiss}
           disabled={busy}
           aria-label={`Dismiss "${query.query}"`}

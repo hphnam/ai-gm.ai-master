@@ -5,9 +5,8 @@ import { MessagesSquare, Search, Store, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { AppShell } from '@/components/shell/app-shell'
 import { useDebouncedValue } from '@/components/shell/notifications-shared'
-import { PageHeader } from '@/components/shell/page-header'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -110,24 +109,34 @@ export function HistoryBody() {
     }
   }, [lastVisibleIndex, rows.length, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const handleDelete = async (e: React.MouseEvent, convId: string, venueId: string) => {
+  const [pendingDelete, setPendingDelete] = useState<{ convId: string; venueId: string } | null>(
+    null,
+  )
+
+  const handleDelete = (e: React.MouseEvent, convId: string, venueId: string) => {
     e.stopPropagation()
-    if (!window.confirm('Delete this thread? This cannot be undone.')) return
+    setPendingDelete({ convId, venueId })
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
     try {
-      await deleteConversation.mutateAsync({ conversationId: convId, venueId })
+      await deleteConversation.mutateAsync({
+        conversationId: pendingDelete.convId,
+        venueId: pendingDelete.venueId,
+      })
       toast.success('Thread deleted')
-    } catch {
+      setPendingDelete(null)
+    } catch (err) {
+      // Re-throw so ConfirmDeleteDialog keeps itself open for a retry instead
+      // of dismissing on a failed delete (matches the incidents flow).
       toast.error('Could not delete thread')
+      throw err
     }
   }
 
   return (
-    <AppShell>
-      <PageHeader
-        title="Chat history"
-        description="Search and reopen any thread you've started across your venues."
-      />
-
+    <>
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="border-b border-border bg-background/80 px-4 py-3 backdrop-blur sm:px-6">
           <div className="relative mx-auto max-w-3xl">
@@ -213,7 +222,20 @@ export function HistoryBody() {
           </div>
         </div>
       </div>
-    </AppShell>
+      <ConfirmDeleteDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null)
+        }}
+        title="Delete this thread?"
+        description={
+          <span>This permanently deletes the conversation. The action can't be undone.</span>
+        }
+        confirmLabel="Delete thread"
+        isPending={deleteConversation.isPending}
+        onConfirm={confirmDelete}
+      />
+    </>
   )
 }
 
@@ -240,11 +262,11 @@ function HistoryRow({
   deleting: boolean
 }) {
   return (
-    <div className="group/row flex items-start gap-2 rounded-md px-2 py-2 hover:bg-accent/50">
+    <div className="group/row flex min-h-11 items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent/50">
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
+        className="flex min-h-11 min-w-0 flex-1 cursor-pointer flex-col items-start justify-center gap-0.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <span className="line-clamp-1 text-sm text-foreground">
           {item.preview ?? '(empty thread)'}
@@ -262,13 +284,13 @@ function HistoryRow({
         onClick={onDelete}
         disabled={deleting}
         className={cn(
-          'mt-0.5 rounded p-1 text-muted-foreground opacity-0 transition',
+          'flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition',
           'hover:bg-destructive/10 hover:text-destructive',
-          'focus-visible:opacity-100 group-hover/row:opacity-100',
+          'sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover/row:opacity-100',
           'disabled:opacity-50',
         )}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="h-4 w-4" aria-hidden />
       </button>
     </div>
   )

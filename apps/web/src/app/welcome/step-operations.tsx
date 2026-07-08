@@ -86,8 +86,8 @@ export function StepOperations({
   return (
     <StepShell
       eyebrow="Operations"
-      title="How does your venue actually run?"
-      intro="These help your AI sound like it&rsquo;s actually been here — answering staff questions about hours, layout, and deliveries without guessing."
+      title="How does your venue run?"
+      intro="These help your AI answer staff questions about hours, layout, and deliveries without guessing."
     >
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-6" noValidate>
@@ -98,14 +98,17 @@ export function StepOperations({
               <FormItem>
                 <FormLabel>Opening hours</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
                     {...field}
-                    placeholder="Mon–Thu 12:00–23:00, Fri/Sat 12:00–01:00, Sun 12:00–22:00"
+                    rows={7}
+                    placeholder={
+                      'Monday: Closed\nTuesday–Friday: 16:00 – 23:00\nSaturday: 13:00 – 23:00\nSunday: 13:00 – 22:00'
+                    }
                     disabled={submitting}
                     autoFocus
                   />
                 </FormControl>
-                <FormDescription>Plain English is fine.</FormDescription>
+                <FormDescription>One day per line. Plain English is fine.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -139,8 +142,7 @@ export function StepOperations({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Deliveries{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  Deliveries <span className="font-normal text-muted-foreground">(optional)</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -161,8 +163,7 @@ export function StepOperations({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  what3words{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  what3words <span className="font-normal text-muted-foreground">(optional)</span>
                 </FormLabel>
                 <FormControl>
                   <Input {...field} placeholder="///filled.count.soap" disabled={submitting} />
@@ -177,7 +178,7 @@ export function StepOperations({
             onBack={onBack}
             onSkip={onSkip}
             primary={
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="min-h-11">
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

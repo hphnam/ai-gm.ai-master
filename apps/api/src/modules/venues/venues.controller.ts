@@ -17,6 +17,7 @@ import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
 import {
   CreateVenueBodyDto,
+  UpdateVenueBodyDto,
   UpdateVenueProfileDto,
   UpdateVenueSquareLocationBodyDto,
   VenueDetailDto,
@@ -58,6 +59,18 @@ export class VenuesController {
     @Body() body: CreateVenueBodyDto,
   ): Promise<VenueListItemDto> {
     return this.venuesService.create(org.id, body) as Promise<VenueListItemDto>
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @RequireRole('owner', 'manager')
+  @ApiResponse({ status: 200, type: VenueDetailDto })
+  update(
+    @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
+    @Body(new ZodValidationPipe(UpdateVenueBodyDto)) body: UpdateVenueBodyDto,
+    @CurrentOrg() org: { id: string },
+  ): Promise<VenueDetailDto> {
+    return this.venuesService.update(params.id, org.id, body) as Promise<VenueDetailDto>
   }
 
   @Patch(':id/profile')

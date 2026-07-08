@@ -1,6 +1,22 @@
-# gm-ai positioning — v1 strawman (2026-05-18)
+# gm-ai positioning
 
-Drafted from real-product evidence: 19 days of Elliot Horner's usage at Lune Brewing (586 messages, 46 conversations, 70+ knowledge items, heavy Square POS integration). Treat every claim below as opinionated and editable — the point is to commit, not hedge.
+> **Revised 2026-07-08 — broadened from brewpub vertical to whole hospitality.**
+>
+> The current positioning is below. Everything under "v1 strawman" further down is retained as origin context and real-usage evidence, not the live position.
+>
+> - **Market:** the whole hospitality sector — restaurants, bars, cafés, pubs, hotels, events venues. Not a brewpub-only vertical.
+> - **Promise:** the AI operator for hospitality. One chat, grounded in your live operational data and your venue's own SOPs, that answers the money question and the ops question with the same confidence and cites its working.
+> - **Integrations are a first-class, multi-category story, described generically:** POS, accounting, payroll, calendar, and more. Square is the only one live today. Vendor names appear only in the `/features` integrations directory (with live/next/later status) and the real product demos — never in "connect your X" body copy, which both overclaims unshipped vendors and narrows the pitch.
+> - **Proof, not identity:** Lune Brewing (Elliot Horner's four venues + brewery) is retained as the one named proof point — real numbers, real usage, the concrete chat/forecast demos. We do not invent café/hotel customers we don't have. The pitch is broad; the proof is one real operator.
+> - **Differentiation is unchanged:** POS-grounded operator copilot (P&L / labour / pricing live from the POS), not SOP-only retrieval.
+>
+> Superseded: the brewpub/beerhall vertical commitment, the "generic restaurants with no beer programme" anti-ICP, and the Square-anchored single-integration framing.
+
+---
+
+## v1 strawman (2026-05-18) — origin context, superseded above
+
+Drafted from real-product evidence: 19 days of Elliot Horner's usage at Lune Brewing (586 messages, 46 conversations, 70+ knowledge items, heavy Square POS integration). Retained for the real-usage evidence and the reasoning behind starting vertical; the vertical framing itself is superseded by the 2026-07-08 revision above.
 
 ---
 
@@ -128,14 +144,14 @@ This isn't in scope for the positioning doc. It's the first product question aft
 
 ## Decisions this doc commits to
 
-1. **Vertical**: brewpub / beerhall / craft-led pub. UK-first.
-2. **Primary user**: owner-operator GM, 1-5 venues, hands-on.
-3. **Primary integration**: Square now, one of {GoTab, Arryved} within 90 days post-launch.
-4. **Anti-ICP**: enterprise chains, hotels, QSR, POS-disconnected operators.
-5. **Differentiation thesis**: POS-grounded operator copilot, not SOP-only retrieval.
-6. **First launch problem**: not new orgs — team adoption inside Lune.
+> Superseded by the 2026-07-08 revision at the top. Original vertical commitments kept for the record:
 
-If any of these don't sit right, the call to redirect costs nothing today and 4 weeks if we wait until vertical content + integration work has been done on top.
+1. ~~**Vertical**: brewpub / beerhall / craft-led pub. UK-first.~~ → **Whole hospitality**, UK-first (restaurants, bars, cafés, pubs, hotels, events).
+2. **Primary user**: owner-operator GM, 1-5 venues, hands-on. *(unchanged)*
+3. ~~**Primary integration**: Square now, one of {GoTab, Arryved} within 90 days.~~ → **Multi-category stack**: POS, accounting, payroll, calendar. Square live; others on the roadmap.
+4. ~~**Anti-ICP**: enterprise chains, hotels, QSR, POS-disconnected operators.~~ → Hotels and general restaurants are now IN scope. Anti-ICP narrows to enterprise chains and POS-disconnected operators.
+5. **Differentiation thesis**: POS-grounded operator copilot, not SOP-only retrieval. *(unchanged)*
+6. **First launch problem**: not new orgs — team adoption inside Lune. *(unchanged)*
 
 ---
 

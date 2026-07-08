@@ -4,14 +4,14 @@ import { Copy, Download, Loader2, Printer, RefreshCcw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ReportSurface } from '@/components/chat/tool-cards/report-card'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
 import { Alert } from '@/components/ui/alert'
 import { BackLink } from '@/components/ui/back-link'
+import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
+import { PageContainer } from '@/components/ui/page-container'
 import { ApiError } from '@/lib/api-client'
 import { type Report, useDeleteReport, useReport } from '@/lib/hooks/use-reports'
-import { cn } from '@/lib/utils'
 
 function errorCopy(err: unknown): string {
   if (err instanceof ApiError) {
@@ -26,13 +26,13 @@ export function ReportDetailBody({ id }: { id: string }) {
   const { data, isLoading, isError, error } = useReport(id)
 
   return (
-    <AppShell>
-      <PageHeader
+    <>
+      <SetPageHeader
         title={data?.title ?? 'Report'}
         actions={data ? <ExportMenu report={data} /> : null}
       />
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div id="report-print-root" className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+        <PageContainer id="report-print-root" width="prose">
           <BackLink href="/reports" className="mb-4 print:hidden">
             All reports
           </BackLink>
@@ -58,7 +58,7 @@ export function ReportDetailBody({ id }: { id: string }) {
                 compact={false}
               />
               {data.createdByName ? (
-                <p className="mt-4 text-[12px] text-muted-foreground">
+                <p className="mt-4 text-xs text-muted-foreground">
                   Created by {data.createdByName} ·{' '}
                   {new Date(data.createdAt).toLocaleString(undefined, {
                     dateStyle: 'medium',
@@ -69,9 +69,9 @@ export function ReportDetailBody({ id }: { id: string }) {
               <ReportFooterActions report={data} />
             </>
           ) : null}
-        </div>
+        </PageContainer>
       </div>
-    </AppShell>
+    </>
   )
 }
 
@@ -97,18 +97,18 @@ function ReportFooterActions({ report }: { report: Report }) {
 
   return (
     <>
-      {/* The print stylesheet hides the wrapping flex container so these
-          buttons don't appear in the printed/PDF output. */}
       <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-4 print:hidden">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handleRerun}
           title="Opens chat with a prefilled prompt to regenerate this report with fresh data. The original stays put."
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/85 transition-colors hover:bg-accent"
+          className="cursor-pointer gap-1.5"
         >
           <RefreshCcw className="h-3.5 w-3.5" aria-hidden />
           Re-run in chat
-        </button>
+        </Button>
         <DeleteButton
           variant="destructive"
           onClick={() => setConfirmOpen(true)}
@@ -204,20 +204,19 @@ function IconButton({
   children: React.ReactNode
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={onClick}
       disabled={disabled}
       title={title}
       aria-label={title}
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 transition-colors',
-        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-accent',
-      )}
+      className="cursor-pointer gap-1.5"
     >
       {children}
       {label}
-    </button>
+    </Button>
   )
 }
 

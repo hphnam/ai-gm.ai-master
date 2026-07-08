@@ -28,9 +28,10 @@ import {
 } from '../../types'
 import { maskPhone } from '../../types/auth'
 import { assertAuthEnv } from '../auth/assert-auth-env'
+import { issuePhoneOtp } from '../phone/phone-otp'
+import { sendSms } from '../phone/twilio-verify'
 import { signInviteToken } from './invite-token'
 import { safeStringEqual } from './safe-equal'
-import { WhatsAppAdapter } from './whatsapp.adapter'
 
 const CODE_GEN_MAX_RETRIES = 5
 
@@ -41,8 +42,6 @@ const LIST_RECENTLY_TRANSITIONED_MS = 24 * 60 * 60 * 1000
 @Injectable()
 export class InviteService {
   private readonly logger = new Logger(InviteService.name)
-
-  constructor(private readonly adapter: WhatsAppAdapter) {}
 
   // ─── Code generation ────────────────────────────────────────────────
 
@@ -171,9 +170,8 @@ export class InviteService {
       expiresAt: expiresAt.toISOString(),
     })
 
-    // 03-06: signed onboarding link sent to the invitee via WhatsApp DM.
-    // The code is still returned to the manager UI as a fallback (rare path
-    // when the WhatsApp send fails or the invitee can't open the link).
+    // Signed onboarding link sent to the invitee by SMS; the code is still
+    // returned to the manager UI as a fallback when the send fails.
     await this.sendInviteLink(row, input.phoneNumber)
 
     return {
@@ -182,30 +180,33 @@ export class InviteService {
     }
   }
 
-  // 03-06 — fire-and-await WhatsApp send for the signed onboarding link.
-  // The token is stateless (HMAC over inviteId + expiresAt). Web /onboard
-  // verifies it and renders the org join screen. Send failures are logged
-  // but do NOT roll back the invite — the manager can resend manually via
-  // a future "resend" endpoint.
+  // Signed onboarding link delivered by SMS (WhatsApp is Meta-unverified). The
+  // token is stateless (HMAC over inviteId + expiresAt); send failures are
+  // logged but never roll back the invite.
   private async sendInviteLink(invite: WhatsappInvite, phoneNumber: string): Promise<void> {
     const secret = assertAuthEnv().secret
     const token = signInviteToken(invite.id, invite.expiresAt, secret)
     const appUrl = process.env.PUBLIC_APP_URL ?? 'http://localhost:3000'
-    const link = `${appUrl}/onboard?t=${token}`
-    const body = `You've been invited to join GM AI. Tap to set up your account: ${link}\n\nThis link expires in 24 hours.`
+    // Seed a PIN with the same TTL as the invite so the link + code in this one
+    // message stay valid together. The PIN rides in the URL FRAGMENT (never sent
+    // to servers, so it stays out of web/CDN access logs) and the onboard page
+    // auto-verifies on load; it's single-use (consumed on first verify) so a
+    // link that leaks after use is dead. Also printed in the text as a fallback
+    // if the URL is mangled by the SMS client.
+    const { code: pin } = await issuePhoneOtp(phoneNumber, WHATSAPP_INVITE_TTL_MS)
+    const link = `${appUrl}/onboard?t=${token}#c=${pin}`
+    const body = `You've been invited to join GM AI. Tap to set up your account: ${link}\n\nIf the link asks, your verification code is ${pin}. The link and code expire in 24 hours.`
 
     try {
-      const out = await this.adapter.sendText(phoneNumber, body)
+      const out = await sendSms(phoneNumber, body)
       if (out.ok) {
-        this.logger.log('whatsapp_invite.link_sent', {
+        this.logger.log('phone_invite.link_sent', {
           inviteId: invite.id,
-          mode: out.mode,
           phoneNumberMasked: maskPhone(phoneNumber),
         })
       } else {
-        this.logger.warn('whatsapp_invite.link_send_failed', {
+        this.logger.warn('phone_invite.link_send_failed', {
           inviteId: invite.id,
-          reason: out.reason,
           phoneNumberMasked: maskPhone(phoneNumber),
         })
       }
@@ -266,109 +267,6 @@ export class InviteService {
       }
     }
     return null
-  }
-
-  /**
-   * 03-06 — token-driven redemption from the web /onboard flow.
-   * Atomically: redeem invite, ensure User (by phone), set phoneVerifiedAt,
-   * upsert OrganizationMember, create WhatsappSession with the issuing org
-   * stickied. Mirrors whatsapp-onboarding.service.linkUserAndWelcome but
-   * surfaces success/error via a structured return shape for the API caller.
-   */
-  async redeemByToken(
-    inviteId: string,
-    submittedName: string,
-  ): Promise<
-    | { ok: true; userId: string; organizationId: string }
-    | { ok: false; reason: 'not-found' | 'not-pending' | 'expired' | 'race-lost' }
-  > {
-    const name = submittedName.trim().slice(0, 120)
-    if (name.length === 0) {
-      return { ok: false, reason: 'not-found' }
-    }
-    const result = await prisma.$transaction(async (txn: Prisma.TransactionClient) => {
-      const invite = await txn.whatsappInvite.findUnique({ where: { id: inviteId } })
-      if (!invite) return { kind: 'not-found' as const }
-      if (invite.status !== 'pending') return { kind: 'not-pending' as const }
-      if (invite.expiresAt.getTime() < Date.now()) {
-        await txn.whatsappInvite.updateMany({
-          where: { id: invite.id, status: 'pending' },
-          data: { status: 'expired' },
-        })
-        return { kind: 'expired' as const }
-      }
-
-      const redemption = await this.markRedeemed(invite.id, invite.targetUserId ?? '__self__', txn)
-      if (!redemption.redeemed) return { kind: 'race-lost' as const }
-
-      // 03-06 fix: race-safe user resolution. Two concurrent token submissions
-      // can both see `findUnique → null` and both call `create`, with the second
-      // hitting User.phoneNumber unique violation (P2002) AFTER the invite was
-      // flipped to redeemed — wedging the invite. Use upsert keyed on
-      // phoneNumber so the second submission grabs the row written by the first.
-      //
-      // 03-06 fix: do NOT overwrite `user.name` on the update path. If a pre-
-      // existing User row was seeded via another flow, the unauthenticated
-      // redeem endpoint must not let a link-holder rename the account.
-      const syntheticEmail = `wa+${invite.phoneNumber.replace(/\D/g, '')}@whatsapp.local`
-      const user = await txn.user.upsert({
-        where: { phoneNumber: invite.phoneNumber },
-        create: {
-          email: syntheticEmail,
-          name,
-          phoneNumber: invite.phoneNumber,
-          phoneVerifiedAt: new Date(),
-        },
-        update: {
-          // Only set phoneVerifiedAt when missing — leave name + email alone.
-          phoneVerifiedAt: new Date(),
-        },
-        select: { id: true, phoneVerifiedAt: true },
-      })
-
-      // Spec metric I — anchor onboarding window on member create. For an
-      // existing member, GREATEST(existing, now) bumps re-invited users
-      // forward without ever pulling the anchor backwards. Raw UPDATE
-      // because Prisma can't reference the prior column value in `update`.
-      const onboardingAnchor = new Date()
-      await txn.organizationMember.upsert({
-        where: {
-          userId_organizationId: { userId: user.id, organizationId: invite.organizationId },
-        },
-        create: {
-          userId: user.id,
-          organizationId: invite.organizationId,
-          role: invite.role,
-          onboardingStartedAt: onboardingAnchor,
-        },
-        update: {},
-      })
-      await txn.$executeRaw`
-        UPDATE "organization_members"
-        SET "onboardingStartedAt" = GREATEST(COALESCE("onboardingStartedAt", ${onboardingAnchor}), ${onboardingAnchor})
-        WHERE "userId" = ${user.id} AND "organizationId" = ${invite.organizationId}
-      `
-
-      try {
-        await txn.whatsappSession.create({
-          data: {
-            phoneNumber: invite.phoneNumber,
-            userId: user.id,
-            currentOrganizationId: invite.organizationId,
-          },
-        })
-      } catch (err) {
-        const code = (err as { code?: string })?.code
-        if (code !== 'P2002') throw err
-      }
-
-      return { kind: 'ok' as const, userId: user.id, organizationId: invite.organizationId }
-    })
-
-    if (result.kind === 'ok') {
-      return { ok: true, userId: result.userId, organizationId: result.organizationId }
-    }
-    return { ok: false, reason: result.kind }
   }
 
   /**

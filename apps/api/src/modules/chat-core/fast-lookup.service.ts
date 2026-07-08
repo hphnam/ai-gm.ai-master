@@ -119,7 +119,7 @@ export class FastLookupService {
     ctx: FastLookupContext,
     t0: number,
   ): Promise<FastLookupResult | null> {
-    const r = await this.mockOps.getSupplierByName(name)
+    const r = await this.mockOps.getSupplierByName(name, ctx.orgId)
     if (!r.ok || r.data.length === 0) {
       this.logMiss('get_supplier_by_name', ctx, t0)
       return null

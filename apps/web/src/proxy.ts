@@ -33,10 +33,12 @@ export function proxy(req: NextRequest) {
 /// onboarding).
 export const config = {
   matcher: [
+    '/dashboard/:path*',
     '/chat/:path*',
     '/tasks/:path*',
-    '/docs/:path*',
     '/compliance/:path*',
+    '/incidents/:path*',
+    '/docs/:path*',
     '/reports/:path*',
   ],
 }

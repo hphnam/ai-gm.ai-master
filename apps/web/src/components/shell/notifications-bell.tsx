@@ -1,26 +1,21 @@
 'use client'
 
 import { Bell } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { useUnreadNotificationsCount } from '@/lib/hooks/use-notifications'
 import { useNotificationsSocket } from '@/lib/hooks/use-notifications-socket'
 import { cn } from '@/lib/utils'
+import { useInbox } from './inbox-provider'
 import { NotificationsSidebar } from './notifications-sidebar'
 
 const TOAST_BODY_PREVIEW_CHARS = 140
 
 export function NotificationsBell() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [focusId, setFocusId] = useState<string | null>(null)
+  const { open, focus, openInbox, setOpen } = useInbox()
   const { data: countData } = useUnreadNotificationsCount()
 
   const unread = countData?.count ?? 0
-
-  const openSidebarFor = useCallback((id: string) => {
-    setFocusId(id)
-    setSidebarOpen(true)
-  }, [])
 
   useNotificationsSocket({
     onCreated: useCallback(
@@ -41,41 +36,33 @@ export function NotificationsBell() {
           description: preview,
           action: {
             label: 'View',
-            onClick: () => openSidebarFor(payload.id),
+            onClick: () => openInbox({ kind: 'alert', id: payload.id }),
           },
         })
       },
-      [openSidebarFor],
+      [openInbox],
     ),
   })
-
-  // Clear focusId after the sidebar closes so re-opening doesn't re-flash.
-  useEffect(() => {
-    if (!sidebarOpen) {
-      const t = setTimeout(() => setFocusId(null), 200)
-      return () => clearTimeout(t)
-    }
-  }, [sidebarOpen])
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setSidebarOpen(true)}
+        onClick={() => openInbox()}
         className={cn(
-          'relative inline-flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors',
+          'relative inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md transition-colors',
           'text-muted-foreground hover:bg-muted hover:text-foreground',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
         )}
         aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
         aria-haspopup="dialog"
-        aria-expanded={sidebarOpen}
+        aria-expanded={open}
       >
-        <Bell className="h-4 w-4" aria-hidden />
+        <Bell className="h-5 w-5" aria-hidden />
         {unread > 0 ? (
           <span
             className={cn(
-              'absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center',
+              'absolute top-1 right-1 inline-flex h-4 min-w-[1rem] items-center justify-center',
               'rounded-full bg-foreground px-1 text-[10px] font-semibold leading-none text-background',
             )}
           >
@@ -84,7 +71,7 @@ export function NotificationsBell() {
         ) : null}
       </button>
 
-      <NotificationsSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} focusId={focusId} />
+      <NotificationsSidebar open={open} onOpenChange={setOpen} focus={focus} />
     </>
   )
 }

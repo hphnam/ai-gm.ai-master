@@ -2,6 +2,7 @@ import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
 import {
   CreateVenueBodySchema,
+  UpdateVenueBodySchema,
   UpdateVenueProfileSchema,
   UUID_RE,
   VenueProfileSchema,
@@ -13,6 +14,7 @@ export const VenueIdParamSchema = z.object({
 export class VenueIdParamDto extends createZodDto(VenueIdParamSchema) {}
 
 export class CreateVenueBodyDto extends createZodDto(CreateVenueBodySchema) {}
+export class UpdateVenueBodyDto extends createZodDto(UpdateVenueBodySchema) {}
 export class UpdateVenueProfileDto extends createZodDto(UpdateVenueProfileSchema) {}
 
 // Response schemas — needed so Swagger can describe response shapes.

@@ -27,8 +27,8 @@ export function CardShell({
     <section
       className={cn(
         'overflow-hidden rounded-xl border bg-card shadow-sm',
-        tone === 'warning' && 'border-amber-500/40 bg-amber-50/40 dark:bg-amber-950/10',
-        tone === 'success' && 'border-emerald-500/40 bg-emerald-50/30 dark:bg-emerald-950/10',
+        tone === 'warning' && 'border-warning/40 bg-warning/5',
+        tone === 'success' && 'border-success/40 bg-success/5',
         tone === 'default' && 'border-border',
         className,
       )}
@@ -39,9 +39,9 @@ export function CardShell({
             className={cn(
               'mt-0.5 h-4 w-4 shrink-0',
               tone === 'warning'
-                ? 'text-amber-600 dark:text-amber-500'
+                ? 'text-warning'
                 : tone === 'success'
-                  ? 'text-emerald-600 dark:text-emerald-500'
+                  ? 'text-success'
                   : 'text-muted-foreground',
             )}
             aria-hidden

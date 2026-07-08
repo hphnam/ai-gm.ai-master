@@ -12,6 +12,13 @@ export type ServerSession = {
     id: string
     token: string
   }
+  membership: { role: string } | null
+}
+
+// Fail-closed: only owner/manager count as management roles; anything else
+// (including a missing membership) is treated as staff.
+export function isManagerRole(role: string | null | undefined): boolean {
+  return role === 'owner' || role === 'manager'
 }
 
 export async function getServerSession(): Promise<ServerSession | null> {

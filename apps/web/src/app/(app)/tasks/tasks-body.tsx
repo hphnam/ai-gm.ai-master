@@ -1,11 +1,13 @@
 'use client'
 
 import { Check, CircleAlert, Inbox } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { Badge } from '@/components/ui/badge'
 import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ListRow } from '@/components/ui/list-row'
+import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TabItem, Tabs } from '@/components/ui/tabs'
 import { type Task, useDeleteTask, useTasks, useUpdateTask } from '@/lib/hooks/use-tasks'
@@ -14,6 +16,8 @@ import { cn } from '@/lib/utils'
 
 type Filter = 'open' | 'done' | 'all'
 
+const FILTER_VALUES = ['open', 'done', 'all'] as const
+
 const FILTERS: TabItem<Filter>[] = [
   { id: 'open', label: 'Open' },
   { id: 'done', label: 'Done' },
@@ -21,62 +25,56 @@ const FILTERS: TabItem<Filter>[] = [
 ]
 
 export function TasksBody() {
-  const [filter, setFilter] = useState<Filter>('open')
-  // Realtime invalidation — agent/scheduler updates push through here and
-  // refresh both the list and the sidebar badge without a page reload.
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('open').withOptions({ clearOnDefault: true }),
+  )
   useTasksSocket()
   const tasks = useTasks({ status: filter === 'all' ? 'all' : filter, scope: 'mine' })
 
   const grouped = useMemo(() => groupByDue(tasks.data?.tasks ?? []), [tasks.data?.tasks])
 
   return (
-    <AppShell>
-      <PageHeader
-        title="My tasks"
-        description="Reminders and follow-ups the agent has captured for you."
-      />
+    <div className="scrollbar-thin flex-1 overflow-y-auto">
+      <PageContainer width="prose">
+        <Tabs
+          items={FILTERS}
+          value={filter}
+          onValueChange={setFilter}
+          ariaLabel="Filter tasks"
+          trailing={
+            tasks.data ? (
+              <span className="text-xs text-muted-foreground">
+                {tasks.data.openCount} open
+                {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
+              </span>
+            ) : null
+          }
+        />
 
-      <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-          <Tabs
-            items={FILTERS}
-            value={filter}
-            onValueChange={setFilter}
-            ariaLabel="Filter tasks"
-            trailing={
-              tasks.data ? (
-                <span className="text-xs text-muted-foreground">
-                  {tasks.data.openCount} open
-                  {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
-                </span>
-              ) : null
-            }
-          />
-
-          {tasks.isLoading ? (
-            <TasksLoading />
-          ) : tasks.data && tasks.data.tasks.length === 0 ? (
-            <TasksEmpty filter={filter} />
-          ) : (
-            <div className="flex flex-col gap-6">
-              {grouped.overdue.length > 0 ? (
-                <TaskGroup label="Overdue" tone="warn" tasks={grouped.overdue} />
-              ) : null}
-              {grouped.dueSoon.length > 0 ? (
-                <TaskGroup label="Due soon" tasks={grouped.dueSoon} />
-              ) : null}
-              {grouped.later.length > 0 ? <TaskGroup label="Later" tasks={grouped.later} /> : null}
-              {grouped.noDate.length > 0 ? (
-                <TaskGroup label="No due date" tasks={grouped.noDate} />
-              ) : null}
-              {grouped.completed.length > 0 ? (
-                <TaskGroup label="Completed" tasks={grouped.completed} muted />
-              ) : null}
-            </div>
-          )}
-        </div>
-      </div>
-    </AppShell>
+        {tasks.isLoading ? (
+          <TasksLoading />
+        ) : tasks.data && tasks.data.tasks.length === 0 ? (
+          <TasksEmpty filter={filter} />
+        ) : (
+          <div className="flex flex-col gap-6">
+            {grouped.overdue.length > 0 ? (
+              <TaskGroup label="Overdue" tone="urgent" tasks={grouped.overdue} />
+            ) : null}
+            {grouped.dueSoon.length > 0 ? (
+              <TaskGroup label="Due soon" tasks={grouped.dueSoon} />
+            ) : null}
+            {grouped.later.length > 0 ? <TaskGroup label="Later" tasks={grouped.later} /> : null}
+            {grouped.noDate.length > 0 ? (
+              <TaskGroup label="No due date" tasks={grouped.noDate} />
+            ) : null}
+            {grouped.completed.length > 0 ? (
+              <TaskGroup label="Completed" tasks={grouped.completed} muted />
+            ) : null}
+          </div>
+        )}
+      </PageContainer>
+    </div>
   )
 }
 
@@ -102,16 +100,13 @@ function TasksLoading() {
   return (
     <div className="flex flex-col gap-3">
       {TASK_SKELETON_KEYS.map((k) => (
-        <div
-          key={k}
-          className="flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm"
-        >
+        <ListRow key={k} className="flex items-start gap-3">
           <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/3" />
           </div>
-        </div>
+        </ListRow>
       ))}
     </div>
   )
@@ -125,15 +120,15 @@ function TaskGroup({
 }: {
   label: string
   tasks: Task[]
-  tone?: 'warn'
+  tone?: 'urgent'
   muted?: boolean
 }) {
   return (
     <section aria-label={label}>
       <h2
         className={cn(
-          'mb-2 text-[11px] font-semibold uppercase tracking-wider',
-          tone === 'warn' ? 'text-amber-700' : 'text-muted-foreground',
+          'mb-2 text-xs font-semibold uppercase tracking-wider',
+          tone === 'urgent' ? 'text-destructive' : 'text-muted-foreground',
         )}
       >
         {label}
@@ -147,7 +142,7 @@ function TaskGroup({
   )
 }
 
-function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'warn' }) {
+function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'urgent' }) {
   const update = useUpdateTask()
   const del = useDeleteTask()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -162,56 +157,62 @@ function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'w
   }
 
   return (
-    <li
+    <ListRow
+      asChild
       className={cn(
-        'flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm',
-        tone === 'warn' && 'border-amber-300/60 bg-amber-50/40',
+        'flex items-start gap-3',
+        tone === 'urgent' && 'border-destructive/25 bg-destructive/5',
         muted && 'opacity-70',
       )}
     >
-      <button
-        type="button"
-        aria-label={isDone ? 'Reopen task' : 'Mark task done'}
-        onClick={isDone ? onReopen : onComplete}
-        disabled={update.isPending}
-        className={cn(
-          'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors',
-          isDone
-            ? 'border-foreground/30 bg-foreground text-background'
-            : 'border-foreground/40 hover:border-foreground/80',
-          update.isPending && 'opacity-50',
-        )}
-      >
-        {isDone ? <Check className="h-3 w-3" aria-hidden /> : null}
-      </button>
-      <div className="min-w-0 flex-1">
-        <p
-          className={cn('text-sm', (isDone || isCancelled) && 'text-muted-foreground line-through')}
+      <li>
+        <button
+          type="button"
+          aria-label={isDone ? 'Reopen task' : 'Mark task done'}
+          onClick={isDone ? onReopen : onComplete}
+          disabled={update.isPending}
+          className={cn(
+            "relative mt-0.5 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors before:absolute before:-inset-3 before:content-['']",
+            isDone
+              ? 'border-foreground/30 bg-foreground text-background'
+              : 'border-foreground/40 hover:border-foreground/80',
+            update.isPending && 'opacity-50',
+          )}
         >
-          {task.body}
-        </p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-          {task.dueAt ? <DueLabel dueAt={task.dueAt} done={isDone} /> : null}
-          {task.category ? <span>· {task.category}</span> : null}
-          {task.creator && task.creator.userId !== task.assignee.userId ? (
-            <span>· from {task.creator.name ?? task.creator.email}</span>
-          ) : null}
+          {isDone ? <Check className="h-3 w-3" aria-hidden /> : null}
+        </button>
+        <div className="min-w-0 flex-1">
+          <p
+            className={cn(
+              'text-sm',
+              (isDone || isCancelled) && 'text-muted-foreground line-through',
+            )}
+          >
+            {task.body}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {task.dueAt ? <DueLabel dueAt={task.dueAt} done={isDone} /> : null}
+            {task.category ? <span>· {task.category}</span> : null}
+            {task.creator && task.creator.userId !== task.assignee.userId ? (
+              <span>· from {task.creator.name ?? task.creator.email}</span>
+            ) : null}
+          </div>
         </div>
-      </div>
-      <DeleteButton
-        onClick={() => setConfirmOpen(true)}
-        disabled={del.isPending}
-        aria-label={`Delete task: ${task.body}`}
-      />
-      <ConfirmDeleteDialog
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        title="Delete this task?"
-        description="The task will be permanently removed. This can't be undone."
-        onConfirm={() => del.mutateAsync(task.id)}
-        isPending={del.isPending}
-      />
-    </li>
+        <DeleteButton
+          onClick={() => setConfirmOpen(true)}
+          disabled={del.isPending}
+          aria-label={`Delete task: ${task.body}`}
+        />
+        <ConfirmDeleteDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Delete this task?"
+          description="The task will be permanently removed. This can't be undone."
+          onConfirm={() => del.mutateAsync(task.id)}
+          isPending={del.isPending}
+        />
+      </li>
+    </ListRow>
   )
 }
 
@@ -234,12 +235,15 @@ function DueLabel({ dueAt, done }: { dueAt: string; done: boolean }) {
             const days = Math.round(absHours / 24)
             return overdue ? `overdue ${days}d` : `due in ${days}d`
           })()
-  return (
-    <span className={cn('inline-flex items-center gap-1', overdue && 'text-amber-700')}>
-      {overdue ? <CircleAlert className="h-3 w-3" aria-hidden /> : null}
-      {label}
-    </span>
-  )
+  if (overdue) {
+    return (
+      <Badge variant="urgent" size="sm">
+        <CircleAlert className="h-3 w-3" aria-hidden />
+        {label}
+      </Badge>
+    )
+  }
+  return <span className="inline-flex items-center gap-1">{label}</span>
 }
 
 function groupByDue(tasks: Task[]) {

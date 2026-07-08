@@ -13,6 +13,7 @@ import {
   Sun,
 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,8 @@ import { ScheduleCreateDialog } from './schedule-create-dialog'
 
 type Filter = 'active' | 'paused' | 'cancelled' | 'all'
 
+const FILTER_VALUES = ['active', 'paused', 'cancelled', 'all'] as const
+
 const FILTERS: TabItem<Filter>[] = [
   { id: 'active', label: 'Active' },
   { id: 'paused', label: 'Paused' },
@@ -49,7 +52,10 @@ const FILTERS: TabItem<Filter>[] = [
 ]
 
 export function ScheduledReportsBody() {
-  const [filter, setFilter] = useState<Filter>('active')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('active').withOptions({ clearOnDefault: true }),
+  )
   const [createOpen, setCreateOpen] = useState(false)
   const list = useScheduledReports({ status: filter })
   const rows = useMemo(() => list.data?.pages.flatMap((p) => p.schedules) ?? [], [list.data?.pages])

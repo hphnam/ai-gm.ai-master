@@ -71,7 +71,7 @@ export class OpsResearcher implements Researcher {
         description: 'Supplier contact by name.',
         inputSchema: z.object({ name: z.string().min(1) }),
         execute: async ({ name }) => {
-          const r = await this.mockOps.getSupplierByName(name)
+          const r = await this.mockOps.getSupplierByName(name, ctx.orgId)
           if (r.ok) evidenceSummary = `supplier ${name} found`
           return r
         },
@@ -92,6 +92,7 @@ export class OpsResearcher implements Researcher {
     try {
       const result = await generateText({
         model: anthropicProvider(HAIKU_MODEL),
+        allowSystemInMessages: true,
         messages: [
           {
             role: 'system',

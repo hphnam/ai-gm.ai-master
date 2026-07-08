@@ -5,7 +5,7 @@ export function ProgressHeader({ current }: { current: OnboardingStepId }) {
   const currentIndex = stepIndex(current)
   return (
     <div className="flex items-center justify-end gap-3">
-      <span className="hidden text-[11px] font-medium uppercase tracking-wider text-muted-foreground sm:inline">
+      <span className="hidden text-xs font-medium uppercase tracking-wider text-muted-foreground sm:inline">
         Step {currentIndex + 1} of {ONBOARDING_STEPS.length}
       </span>
       <ol

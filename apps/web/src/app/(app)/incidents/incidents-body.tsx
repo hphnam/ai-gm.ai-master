@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowUpRight,
   CheckCircle2,
+  ChevronDown,
   Eye,
   Loader2,
   MessageSquare,
@@ -12,11 +13,12 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { AppShell } from '@/components/shell/app-shell'
 import { apiErrorLabel, formatRelative } from '@/components/shell/notifications-shared'
-import { PageHeader } from '@/components/shell/page-header'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import {
@@ -26,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TabItem, Tabs } from '@/components/ui/tabs'
 import { useSession } from '@/lib/auth-client'
@@ -45,6 +48,8 @@ import { cn } from '@/lib/utils'
 
 type StatusFilter = 'open' | 'acknowledged' | 'closed' | 'all'
 
+const FILTER_VALUES = ['open', 'acknowledged', 'closed', 'all'] as const
+
 const FILTERS: TabItem<StatusFilter>[] = [
   { id: 'open', label: 'Open' },
   { id: 'acknowledged', label: 'Acknowledged' },
@@ -52,84 +57,70 @@ const FILTERS: TabItem<StatusFilter>[] = [
   { id: 'all', label: 'All' },
 ]
 
-// Canonical button styles, aligned with alerts / notification-replies. Kept
-// inline so the incidents page stays visually consistent without dragging
-// in a new shared component.
-const CHIP_CLASS =
-  'inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 font-medium text-xs text-foreground/80 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
-const CHIP_DANGER_CLASS =
-  'inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 font-medium text-xs text-destructive transition-colors hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-50'
-const CHIP_PRIMARY_CLASS =
-  'inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 font-medium text-xs text-background transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
-
 export function IncidentsBody() {
-  const [filter, setFilter] = useState<StatusFilter>('open')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('open').withOptions({ clearOnDefault: true }),
+  )
   const status: IncidentStatus | undefined = filter === 'all' ? undefined : filter
   const { data, isLoading, error } = useIncidents({ status })
   const isForbidden = isAuthError(error)
 
   return (
-    <AppShell>
-      <PageHeader
-        title="Incidents"
-        description="Triage incidents the AI has logged from chat — acknowledge, comment, close."
-      />
-
-      <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
-          {isForbidden ? (
-            <EmptyState
-              icon={ShieldCheck}
-              title="Incident triage is restricted"
-              description="Only owners and managers can review incidents. Ask your owner for a role upgrade if you need access."
+    <div className="scrollbar-thin flex-1 overflow-y-auto">
+      <PageContainer width="prose">
+        {isForbidden ? (
+          <EmptyState
+            icon={ShieldCheck}
+            title="Incident triage is restricted"
+            description="Only owners and managers can review incidents. Ask your owner for a role upgrade if you need access."
+          />
+        ) : (
+          <>
+            <Tabs
+              items={FILTERS}
+              value={filter}
+              onValueChange={setFilter}
+              ariaLabel="Filter incidents"
+              trailing={
+                data ? (
+                  <span className="text-foreground/55 text-xs tabular-nums">
+                    {data.openCount} open
+                  </span>
+                ) : null
+              }
             />
-          ) : (
-            <>
-              <Tabs
-                items={FILTERS}
-                value={filter}
-                onValueChange={setFilter}
-                ariaLabel="Filter incidents"
-                trailing={
-                  data ? (
-                    <span className="text-foreground/55 text-xs tabular-nums">
-                      {data.openCount} open
-                    </span>
-                  ) : null
-                }
-              />
-              <div className="mt-5">
-                {isLoading ? (
-                  <ListSkeleton />
-                ) : error ? (
-                  <EmptyState
-                    icon={AlertTriangle}
-                    title="Couldn't load incidents"
-                    description={errorDetail(error)}
-                  />
-                ) : !data || data.incidents.length === 0 ? (
-                  <EmptyState
-                    icon={CheckCircle2}
-                    title="Nothing to triage"
-                    description={
-                      filter === 'open'
-                        ? "No open incidents. You'll see them here as the AI logs them from chat."
-                        : 'No incidents match this filter.'
-                    }
-                  />
-                ) : (
-                  <ul className="space-y-5">
-                    {data.incidents.map((incident) => (
-                      <IncidentCard key={incident.id} incident={incident} />
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </AppShell>
+            <div className="mt-5">
+              {isLoading ? (
+                <ListSkeleton />
+              ) : error ? (
+                <EmptyState
+                  icon={AlertTriangle}
+                  title="Couldn't load incidents"
+                  description={errorDetail(error)}
+                />
+              ) : !data || data.incidents.length === 0 ? (
+                <EmptyState
+                  icon={CheckCircle2}
+                  title="Nothing to triage"
+                  description={
+                    filter === 'open'
+                      ? "No open incidents. You'll see them here as the AI logs them from chat."
+                      : 'No incidents match this filter.'
+                  }
+                />
+              ) : (
+                <ul className="space-y-5">
+                  {data.incidents.map((incident) => (
+                    <IncidentCard key={incident.id} incident={incident} />
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
+      </PageContainer>
+    </div>
   )
 }
 
@@ -187,15 +178,12 @@ function IncidentCard({ incident }: { incident: Incident }) {
                   </Link>
                 ) : null}
 
-                {/* Card actions menu — hover-revealed on pointer devices, */}
-                {/* always visible on focus / touch. Mirrors the pattern in */}
-                {/* conversations-view.tsx for delete-affordance. */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
                       aria-label="Incident actions"
-                      className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-foreground/50 opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 group-hover/card:opacity-100 data-[state=open]:opacity-100"
+                      className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-foreground/50 opacity-100 transition-opacity hover:bg-muted hover:text-foreground focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:h-7 md:w-7 md:opacity-0 md:group-hover/card:opacity-100 data-[state=open]:opacity-100"
                     >
                       <MoreVertical className="h-4 w-4" aria-hidden />
                     </button>
@@ -206,7 +194,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
                         e.preventDefault()
                         setConfirmOpen(true)
                       }}
-                      className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950/30"
+                      className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                     >
                       <Trash2 className="mr-2 h-3.5 w-3.5" aria-hidden />
                       Delete incident
@@ -216,7 +204,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
               </div>
             </div>
 
-            <p className="text-[15px] text-foreground leading-relaxed">{incident.summary}</p>
+            <p className="text-sm text-foreground leading-relaxed">{incident.summary}</p>
             <p className="text-foreground/50 text-xs">
               Logged by{' '}
               <span className="text-foreground/75">
@@ -257,7 +245,11 @@ function IncidentCard({ incident }: { incident: Incident }) {
 // ──────────────────────────────────────────────────────────────────
 
 function Activity({ incident }: { incident: Incident }) {
-  const { data, isLoading, error } = useIncidentComments(incident.id, true)
+  // Comment threads are fetched lazily — the open queue can list dozens of
+  // cards and we don't want a comments request per card on mount. The thread
+  // loads when the operator expands it (or after they post a comment).
+  const [expanded, setExpanded] = useState(false)
+  const { data, isLoading, error } = useIncidentComments(incident.id, expanded)
   const add = useAddIncidentComment(incident.id)
   const update = useUpdateIncidentStatus()
   const [body, setBody] = useState('')
@@ -274,6 +266,8 @@ function Activity({ incident }: { incident: Incident }) {
     try {
       await add.mutateAsync(trimmed)
       setBody('')
+      // Reveal the thread so the just-posted comment is visible.
+      setExpanded(true)
     } catch (err) {
       toast.error(`Couldn't post comment: ${apiErrorLabel(err)}`)
     }
@@ -308,9 +302,23 @@ function Activity({ incident }: { incident: Incident }) {
 
   return (
     <>
-      {/* Activity feed — only renders when something exists. Keeps the */}
-      {/* empty state quiet rather than showing "No comments yet" filler. */}
-      {hasFeed ? (
+      {/* Collapsed thread — a lightweight toggle stands in for the feed until */}
+      {/* the operator opens it, so we don't fetch comments for every card. */}
+      {!expanded && incident.commentCount > 0 ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex w-full cursor-pointer items-center gap-2 px-6 py-4 text-left text-foreground/55 text-xs transition-colors hover:bg-muted/30 hover:text-foreground"
+        >
+          <MessageSquare className="h-3.5 w-3.5" aria-hidden />
+          Show {incident.commentCount} {incident.commentCount === 1 ? 'update' : 'updates'}
+          <ChevronDown className="ml-auto h-4 w-4" aria-hidden />
+        </button>
+      ) : null}
+
+      {/* Activity feed — only renders once expanded and something exists. Keeps */}
+      {/* the empty state quiet rather than showing "No comments yet" filler. */}
+      {expanded && hasFeed ? (
         <div className="space-y-4 px-6 py-5">
           {isLoading && rows.length === 0 ? (
             <div className="space-y-3">
@@ -338,28 +346,25 @@ function Activity({ incident }: { incident: Incident }) {
       ) : null}
 
       {/* Composer */}
-      <div
-        className={cn(
-          'bg-muted/15 px-6 py-5',
-          hasFeed ? 'border-border/60 border-t' : 'border-border/60 border-t',
-        )}
-      >
+      <div className={cn('bg-muted/15 border-border/60 border-t px-6 py-5')}>
         {isClosed ? (
           <div className="flex items-center justify-between gap-3">
             <p className="text-foreground/55 text-xs">
               This incident is closed. Reopen to add new comments.
             </p>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={reopen}
               disabled={update.isPending}
-              className={CHIP_CLASS}
+              className="cursor-pointer gap-1.5"
             >
               {update.isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
               ) : null}
               Reopen
-            </button>
+            </Button>
           </div>
         ) : (
           <form
@@ -385,11 +390,13 @@ function Activity({ incident }: { incident: Incident }) {
             {/* Right: send actions, both require body. Counter sits between. */}
             <div className="flex flex-wrap items-center gap-2">
               {isOpen ? (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={acknowledge}
                   disabled={anyPending}
-                  className={CHIP_CLASS}
+                  className="cursor-pointer gap-1.5"
                   title="Mark this as acknowledged (no comment required)"
                 >
                   {update.isPending ? (
@@ -398,18 +405,18 @@ function Activity({ incident }: { incident: Incident }) {
                     <Eye className="h-3.5 w-3.5" aria-hidden />
                   )}
                   Acknowledge
-                </button>
+                </Button>
               ) : null}
 
               <span className="ml-auto inline-flex flex-wrap items-center gap-2">
-                <span className="text-[11px] text-foreground/40 tabular-nums">
-                  {body.length}/2000
-                </span>
-                <button
+                <span className="text-xs text-foreground/40 tabular-nums">{body.length}/2000</span>
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={commentAndClose}
                   disabled={!hasBody || anyPending}
-                  className={CHIP_DANGER_CLASS}
+                  className="cursor-pointer gap-1.5 border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/15 hover:text-destructive"
                   title={
                     hasBody
                       ? 'Post your comment as the resolution and close this incident'
@@ -422,17 +429,18 @@ function Activity({ incident }: { incident: Incident }) {
                     <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                   )}
                   Comment &amp; close
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  size="sm"
                   disabled={!hasBody || anyPending}
-                  className={CHIP_PRIMARY_CLASS}
+                  className="cursor-pointer gap-1.5"
                 >
                   {add.isPending ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
                   ) : null}
                   Comment
-                </button>
+                </Button>
               </span>
             </div>
           </form>
@@ -525,13 +533,13 @@ function CommentRow({ comment, incidentId }: { comment: IncidentComment; inciden
               type="button"
               onClick={() => setConfirmOpen(true)}
               aria-label="Delete comment"
-              className="ml-auto inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground/35 opacity-0 transition-opacity hover:bg-muted hover:text-destructive focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 group-hover/comment:opacity-100"
+              className="ml-auto inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground/35 opacity-100 transition-opacity hover:bg-muted hover:text-destructive focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:h-6 md:w-6 md:opacity-0 md:group-hover/comment:opacity-100"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden />
             </button>
           ) : null}
         </div>
-        <p className="whitespace-pre-wrap break-words text-[14px] text-foreground/90 leading-relaxed">
+        <p className="whitespace-pre-wrap break-words text-sm text-foreground/90 leading-relaxed">
           {comment.body}
         </p>
       </div>
@@ -578,39 +586,29 @@ function ListSkeleton() {
 function SeverityBadge({ severity }: { severity: IncidentSeverity }) {
   const meta =
     severity === 'critical'
-      ? { label: 'Critical', className: 'bg-chart-3/15 text-chart-3 border-chart-3/30' }
+      ? { label: 'Critical', variant: 'urgent' as const }
       : severity === 'major'
-        ? { label: 'Major', className: 'bg-chart-2/15 text-chart-2 border-chart-2/30' }
-        : { label: 'Minor', className: 'bg-muted text-muted-foreground border-border' }
+        ? { label: 'Major', variant: 'warning' as const }
+        : { label: 'Minor', variant: 'neutral' as const }
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium text-[10px] uppercase tracking-wider',
-        meta.className,
-      )}
-    >
+    <Badge variant={meta.variant} size="sm">
       <AlertTriangle className="h-3 w-3" aria-hidden />
       {meta.label}
-    </span>
+    </Badge>
   )
 }
 
 function StatusBadge({ status }: { status: IncidentStatus }) {
   const meta =
     status === 'open'
-      ? { label: 'Open', className: 'bg-chart-3/10 text-chart-3' }
+      ? { label: 'Open', variant: 'urgent' as const }
       : status === 'acknowledged'
-        ? { label: 'Acknowledged', className: 'bg-chart-2/15 text-chart-2' }
-        : { label: 'Closed', className: 'bg-chart-1/15 text-chart-1' }
+        ? { label: 'Acknowledged', variant: 'warning' as const }
+        : { label: 'Closed', variant: 'success' as const }
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 font-medium text-[10px] uppercase tracking-wider',
-        meta.className,
-      )}
-    >
+    <Badge variant={meta.variant} size="sm">
       {meta.label}
-    </span>
+    </Badge>
   )
 }
 

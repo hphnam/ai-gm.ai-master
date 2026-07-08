@@ -22,6 +22,7 @@ import {
   type InviteRoleType,
   MAX_PENDING_INVITATIONS_PER_ORG,
 } from '../../types'
+import { isPhoneTempEmail } from '../phone/consume-phone-invite'
 export type InvitationErrorCode =
   | 'invitation-not-found'
   | 'invitation-expired'
@@ -39,6 +40,19 @@ export class InvitationError extends Error {
   ) {
     super(code)
     this.name = 'InvitationError'
+  }
+}
+
+export type MemberActionErrorCode =
+  | 'member-not-found'
+  | 'cannot-remove-self'
+  | 'cannot-remove-owner'
+  | 'insufficient-role-for-target'
+
+export class MemberActionError extends Error {
+  constructor(public readonly code: MemberActionErrorCode) {
+    super(code)
+    this.name = 'MemberActionError'
   }
 }
 
@@ -261,7 +275,8 @@ export class InvitationsService {
     members: Array<{
       userId: string
       name: string | null
-      email: string
+      email: string | null
+      phoneNumber: string | null
       role: string
       isSelf: boolean
       joinedAt: string
@@ -279,7 +294,7 @@ export class InvitationsService {
         userId: true,
         role: true,
         createdAt: true,
-        user: { select: { name: true, email: true } },
+        user: { select: { name: true, email: true, phoneNumber: true } },
       },
       orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
       take: 1000,
@@ -289,7 +304,10 @@ export class InvitationsService {
       .map((m) => ({
         userId: m.userId,
         name: m.user.name,
-        email: m.user.email,
+        // Suppress the synthetic phone placeholder — the UI shows phoneNumber
+        // for those members instead.
+        email: isPhoneTempEmail(m.user.email) ? null : m.user.email,
+        phoneNumber: m.user.phoneNumber,
         role: m.role,
         isSelf: m.userId === input.currentUserId,
         joinedAt: m.createdAt.toISOString(),
@@ -298,9 +316,87 @@ export class InvitationsService {
         const ra = ROLE_ORDER[a.role] ?? 99
         const rb = ROLE_ORDER[b.role] ?? 99
         if (ra !== rb) return ra - rb
-        return (a.name ?? a.email).localeCompare(b.name ?? b.email)
+        return (a.name ?? a.phoneNumber ?? a.email ?? '').localeCompare(
+          b.name ?? b.phoneNumber ?? b.email ?? '',
+        )
       })
     return { members }
+  }
+
+  /// Fully remove a member. Permission matrix (RoleGuard already ensured the
+  /// actor is owner/manager): owner may remove managers + staff; manager may
+  /// remove staff only; nobody removes an owner or themselves here. When this
+  /// was the member's LAST org the account is hard-deleted (sessions cascade →
+  /// instant logout, phone freed for re-invite); if they're in another org only
+  /// the membership goes. The three invite FKs that would block a user delete
+  /// (WhatsappInvite.targetUserId/issuedByUserId — NoAction; Invitation.inviterId
+  /// — Restrict) are detached first; every other User relation is Cascade/SetNull.
+  async removeMember(input: {
+    organizationId: string
+    actorUserId: string
+    actorRole: string
+    targetUserId: string
+  }): Promise<{ deletedUser: boolean }> {
+    if (input.targetUserId === input.actorUserId) {
+      throw new MemberActionError('cannot-remove-self')
+    }
+    const key = {
+      userId_organizationId: {
+        userId: input.targetUserId,
+        organizationId: input.organizationId,
+      },
+    }
+    const target = await prisma.organizationMember.findUnique({
+      where: key,
+      select: { role: true },
+    })
+    if (!target) throw new MemberActionError('member-not-found')
+    if (target.role === 'owner') throw new MemberActionError('cannot-remove-owner')
+    if (input.actorRole !== 'owner' && target.role !== 'staff') {
+      throw new MemberActionError('insufficient-role-for-target')
+    }
+
+    const deletedUser = await prisma.$transaction(
+      async (tx) => {
+        await tx.organizationMember.delete({ where: key })
+        const remaining = await tx.organizationMember.count({
+          where: { userId: input.targetUserId },
+        })
+        if (remaining > 0) return false
+        // Detach the invite FKs that would block the user delete. Invites the
+        // removed user ISSUED are REASSIGNED to the actor (not deleted) so their
+        // recipients' pending onboarding links keep working; the null-out only
+        // applies to invites that TARGETED the removed user.
+        await tx.whatsappInvite.updateMany({
+          where: { targetUserId: input.targetUserId },
+          data: { targetUserId: null },
+        })
+        await tx.whatsappInvite.updateMany({
+          where: { issuedByUserId: input.targetUserId },
+          data: { issuedByUserId: input.actorUserId },
+        })
+        await tx.invitation.updateMany({
+          where: { inviterId: input.targetUserId },
+          data: { inviterId: input.actorUserId },
+        })
+        await tx.user.delete({ where: { id: input.targetUserId } })
+        return true
+      },
+      // The user delete cascades across many tables; a long-tenured account can
+      // exceed the 5s default and roll back. Give the cascade room.
+      { timeout: 20_000 },
+    )
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'org_member.removed',
+        organizationId: input.organizationId,
+        actorUserId: input.actorUserId,
+        targetUserId: input.targetUserId,
+        deletedUser,
+      }),
+    )
+    return { deletedUser }
   }
 
   async getInvitationPreview(id: string): Promise<InvitationPreview> {

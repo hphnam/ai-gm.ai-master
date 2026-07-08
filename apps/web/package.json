@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --port 3000",
+    "tunnel": "ngrok http --url=https://local.andpro.digital 3000",
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
@@ -14,7 +15,7 @@
     "api:generate": "orval"
   },
   "dependencies": {
-    "@ai-sdk/react": "^3.0.170",
+    "@ai-sdk/react": "^4.0.9",
     "@hookform/resolvers": "latest",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-collapsible": "latest",
@@ -27,10 +28,12 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-query": "latest",
     "@tanstack/react-virtual": "^3.13.24",
-    "ai": "^6.0.168",
+    "ai": "^7.0.8",
     "better-auth": "^1.6.5",
     "class-variance-authority": "latest",
     "clsx": "latest",
+    "input-otp": "^1.4.2",
+    "libphonenumber-js": "^1.13.8",
     "lucide-react": "^1.16.0",
     "next": "latest",
     "next-themes": "latest",

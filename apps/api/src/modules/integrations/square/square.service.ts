@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import type { SquareClient } from 'square'
 import { prisma } from '../../../database/prisma'
 import { fail, type ToolResult } from '../../../types'
 import { IntegrationsService } from '../integrations.service'
@@ -18,6 +19,17 @@ const NOT_CONNECTED = fail(
   'not-supported',
   'No POS integration is connected for this organisation. Ask an owner or manager to connect Square in Settings → Integrations.',
 )
+
+/// Square's "you don't have this product" rejection (e.g. Bookings on a
+/// merchant without Appointments) arrives as a 401 AUTHENTICATION_ERROR with
+/// a "not onboarded" detail — distinguishable from a revoked token only by
+/// that detail string. Exported for spec coverage.
+export function isFeatureNotOnboarded(
+  status: number | undefined,
+  detail: string | undefined,
+): boolean {
+  return (status === 401 || status === 403) && /not onboarded/i.test(detail ?? '')
+}
 
 /// Same shape, but for the second failure mode: integration exists but no
 /// Square location is mapped to this venue. We tell the agent precisely so it
@@ -71,12 +83,21 @@ export type SquareLocation = {
   address: string | null
 }
 
+export type SquareTopItemVariationRow = {
+  name: string | null
+  quantitySold: number
+  grossSales: { value: number; currency: string } | null
+}
+
 export type SquareTopItemRow = {
   name: string
-  variation: string | null
   quantitySold: number
   grossSales: { value: number; currency: string } | null
   orderCount: number
+  // Per-size split (e.g. pint vs half) so the caller can show the breakdown
+  // beneath the grouped item, the way the Square Reports app does. A single-
+  // size item carries a one-element array.
+  variations: SquareTopItemVariationRow[]
 }
 
 export type SquareRefundRow = {
@@ -260,23 +281,17 @@ export class SquareService {
     // items from sister venues (and so a follow-up pos_get_item_inventory
     // call against the mapped location actually returns counts).
     let locationId: string | null = null
+    let client: SquareClient
     if (args.venueId) {
       const resolved = await this.resolveForVenue(orgId, args.venueId)
       if (!('client' in resolved)) return resolved
       locationId = resolved.locationId
+      client = resolved.client
     } else {
       const resolved = await this.resolveClient(orgId)
       if (!('client' in resolved)) return resolved
+      client = resolved.client
     }
-    // Re-resolve the client (cheap — cached). Single source of truth for
-    // creds avoids two callsites repeating the env/credential plumbing.
-    const creds = await this.integrations.getActiveCredentials(orgId, SQUARE_PROVIDER_ID)
-    if (!creds) return NOT_CONNECTED
-    const client = getSquareClient({
-      orgId,
-      accessToken: creds.accessToken,
-      environment: creds.environment,
-    })
     try {
       const resp = await client.catalog.searchItems({
         textFilter: args.query,
@@ -1092,27 +1107,85 @@ export class SquareService {
         cursor = next
       }
       const truncated = pages >= MAX_PAGES && cursor !== undefined
-      const rows = Array.from(tally.values()).map((r) => {
+      // Roll the per-variation tally up to the parent item so each beer ranks
+      // on its combined total, with the per-size split preserved underneath —
+      // mirroring Square's item → variation report drill-down.
+      // NOTE: Square order line items don't carry the parent item id (only the
+      // variation's catalogObjectId), so we group by display name. Two distinct
+      // catalog items sharing a name would merge — acceptable, since that's also
+      // how they'd read to the operator in Square's own item report.
+      const items = new Map<
+        string,
+        {
+          name: string
+          quantity: number
+          grossMinor: bigint
+          orderIds: Set<string>
+          currency: string | null
+          variations: Array<{ name: string | null; quantity: number; grossMinor: bigint }>
+        }
+      >()
+      for (const r of tally.values()) {
+        const item = items.get(r.name)
+        if (item) {
+          item.quantity += r.quantity
+          item.grossMinor += r.grossMinor
+          for (const id of r.orderIds) item.orderIds.add(id)
+          if (!item.currency && r.currency) item.currency = r.currency
+          item.variations.push({
+            name: r.variation,
+            quantity: r.quantity,
+            grossMinor: r.grossMinor,
+          })
+        } else {
+          items.set(r.name, {
+            name: r.name,
+            quantity: r.quantity,
+            grossMinor: r.grossMinor,
+            orderIds: new Set(r.orderIds),
+            currency: r.currency,
+            variations: [{ name: r.variation, quantity: r.quantity, grossMinor: r.grossMinor }],
+          })
+        }
+      }
+      const byMetric = (aQty: number, aRev: number, bQty: number, bRev: number) =>
+        sortBy === 'quantity' ? bQty - aQty : bRev - aRev
+      const rows: SquareTopItemRow[] = Array.from(items.values()).map((r) => {
         const divisor = r.currency && ZERO_DECIMAL_CURRENCIES.has(r.currency) ? 1 : 100
+        const toMoney = (minor: bigint) =>
+          r.currency
+            ? { value: Math.round((Number(minor) / divisor) * 100) / 100, currency: r.currency }
+            : null
+        const variations = r.variations
+          .map((v) => ({
+            name: v.name,
+            quantitySold: Math.round(v.quantity * 100) / 100,
+            grossSales: toMoney(v.grossMinor),
+          }))
+          .sort((a, b) =>
+            byMetric(
+              a.quantitySold,
+              a.grossSales?.value ?? 0,
+              b.quantitySold,
+              b.grossSales?.value ?? 0,
+            ),
+          )
         return {
           name: r.name,
-          variation: r.variation,
           quantitySold: Math.round(r.quantity * 100) / 100,
-          grossSales: r.currency
-            ? {
-                value: Math.round((Number(r.grossMinor) / divisor) * 100) / 100,
-                currency: r.currency,
-              }
-            : null,
+          grossSales: toMoney(r.grossMinor),
           orderCount: r.orderIds.size,
+          variations,
         }
       })
-      rows.sort((a, b) => {
-        if (sortBy === 'quantity') return b.quantitySold - a.quantitySold
-        const aRev = a.grossSales?.value ?? 0
-        const bRev = b.grossSales?.value ?? 0
-        return bRev - aRev
-      })
+      rows.sort((a, b) =>
+        byMetric(
+          a.quantitySold,
+          a.grossSales?.value ?? 0,
+          b.quantitySold,
+          b.grossSales?.value ?? 0,
+        ),
+      )
       await this.integrations.touchLastSynced(orgId, SQUARE_PROVIDER_ID)
       return {
         ok: true,
@@ -1146,9 +1219,16 @@ export class SquareService {
     const resolved = await this.resolveForVenue(orgId, args.venueId)
     if (!('client' in resolved)) return resolved
     const window = resolveWindow(args, { defaultHours: 24, maxHours: SALES_MAX_HOURS })
-    const PAGE_LIMIT = 100
+    const PAGE_LIMIT = 500
     const MAX_PAGES = 10
     try {
+      // Aggregate tender from order.tenders (not the Payments API). The
+      // Payments list endpoint silently omits transactions that settle
+      // outside its own created_at view, so its totals undercount what the
+      // Square Reports app shows. Order tenders are the same source Square
+      // Reports reads — and they carry one entry per tender, so split-paid
+      // tickets stay accurate. This mirrors getTopItems' orders.search path,
+      // which already matches Square's gross/order count.
       let cursor: string | undefined
       let pages = 0
       let paymentCount = 0
@@ -1157,48 +1237,61 @@ export class SquareService {
       let currency: string | null = null
       const tenderTally = new Map<string, { count: number; amountMinor: bigint }>()
       while (pages < MAX_PAGES) {
-        const resp = await resolved.client.payments.list({
-          locationId: resolved.locationId,
-          beginTime: window.startAt,
-          endTime: window.endAt,
+        const resp = await resolved.client.orders.search({
+          locationIds: [resolved.locationId],
           limit: PAGE_LIMIT,
           ...(cursor ? { cursor } : {}),
+          query: {
+            filter: {
+              dateTimeFilter: { createdAt: { startAt: window.startAt, endAt: window.endAt } },
+              stateFilter: { states: ['COMPLETED'] },
+            },
+          },
         })
-        // Square returns a Page<Payment, …> — drain its current data slice.
-        const payments = ((resp as { data?: unknown[] }).data ?? []) as Array<
+        const orders = ((resp as { orders?: unknown[] }).orders ?? []) as Array<
           Record<string, unknown>
         >
-        for (const p of payments) {
-          if (p.status !== 'COMPLETED' && p.status !== 'APPROVED') continue
+        for (const o of orders) {
           paymentCount += 1
-          const amt = p.amountMoney as { amount?: bigint | number; currency?: string } | undefined
-          if (amt?.amount != null) {
-            const v = typeof amt.amount === 'bigint' ? amt.amount : BigInt(Math.round(amt.amount))
-            totalMinor += v
-            if (!currency && amt.currency) currency = amt.currency
+          const tot = o.totalMoney as { amount?: bigint | number; currency?: string } | undefined
+          if (tot?.amount != null) {
+            totalMinor +=
+              typeof tot.amount === 'bigint' ? tot.amount : BigInt(Math.round(tot.amount))
+            if (!currency && tot.currency) currency = tot.currency
           }
-          const tip = p.tipMoney as { amount?: bigint | number } | undefined
-          if (tip?.amount != null) {
-            tipMinor += typeof tip.amount === 'bigint' ? tip.amount : BigInt(Math.round(tip.amount))
+          const totTip = o.totalTipMoney as { amount?: bigint | number } | undefined
+          if (totTip?.amount != null) {
+            tipMinor +=
+              typeof totTip.amount === 'bigint' ? totTip.amount : BigInt(Math.round(totTip.amount))
           }
-          // Collapse Square's tender taxonomy (CARD, CASH, EXTERNAL, WALLET,
-          // BUY_NOW_PAY_LATER, BANK_ACCOUNT, GIFT_CARD, …) into the three
-          // buckets the tool description promises: CARD, CASH, OTHER. The
-          // long tail goes into OTHER so the agent doesn't need to know
-          // every Square source-type.
-          const sourceType = typeof p.sourceType === 'string' ? p.sourceType.toUpperCase() : 'OTHER'
-          const tender = sourceType === 'CARD' ? 'CARD' : sourceType === 'CASH' ? 'CASH' : 'OTHER'
-          const existing = tenderTally.get(tender) ?? { count: 0, amountMinor: 0n }
-          existing.count += 1
-          if (amt?.amount != null) {
-            existing.amountMinor +=
-              typeof amt.amount === 'bigint' ? amt.amount : BigInt(Math.round(amt.amount))
+          // Collapse Square's tender taxonomy (CARD, THIRD_PARTY_CARD, WALLET,
+          // CASH, BANK_TRANSFER, SQUARE_GIFT_CARD, BUY_NOW_PAY_LATER, …) into
+          // the three buckets the tool description promises: CARD, CASH,
+          // OTHER. Card-funded tenders (incl. digital wallets) fold into CARD
+          // to match how Square Reports groups "Card"; the long tail goes to
+          // OTHER so the agent doesn't need to know every Square tender type.
+          const tenders = (o.tenders ?? []) as Array<Record<string, unknown>>
+          for (const t of tenders) {
+            const type = typeof t.type === 'string' ? t.type.toUpperCase() : 'OTHER'
+            const tender =
+              type === 'CARD' || type === 'THIRD_PARTY_CARD' || type === 'WALLET'
+                ? 'CARD'
+                : type === 'CASH'
+                  ? 'CASH'
+                  : 'OTHER'
+            const amt = t.amountMoney as { amount?: bigint | number } | undefined
+            const existing = tenderTally.get(tender) ?? { count: 0, amountMinor: 0n }
+            existing.count += 1
+            if (amt?.amount != null) {
+              existing.amountMinor +=
+                typeof amt.amount === 'bigint' ? amt.amount : BigInt(Math.round(amt.amount))
+            }
+            tenderTally.set(tender, existing)
           }
-          tenderTally.set(tender, existing)
         }
         pages += 1
         const next = (resp as { cursor?: string }).cursor
-        if (!next || payments.length === 0) {
+        if (!next || orders.length === 0) {
           cursor = undefined
           break
         }
@@ -1468,7 +1561,7 @@ export class SquareService {
     // both the client and the locationId; otherwise just the unscoped client.
     // Single resolve either way (the previous version called both).
     let scopedLocationId: string | null = null
-    let client: ReturnType<typeof getSquareClient>
+    let client: SquareClient
     if (args.venueId) {
       const resolved = await this.resolveForVenue(orgId, args.venueId)
       if (!('client' in resolved)) return resolved
@@ -1663,6 +1756,26 @@ export class SquareService {
     // because a prompt-injected query that triggers an error could surface
     // attacker-controlled text in the assistant's reply.
     const rawDetail = e?.message ?? e?.body?.errors?.[0]?.detail ?? 'unknown'
+
+    // Square answers 401 for product-gated endpoints too (e.g. bookings on a
+    // merchant without Appointments). That's not a credential failure — do
+    // NOT markError, or one bookings question flips the whole integration to
+    // 'error' and every Square tool goes "not connected" until reconnect.
+    if (isFeatureNotOnboarded(status, e?.body?.errors?.[0]?.detail)) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'square.feature_not_onboarded',
+          orgId,
+          op,
+          status,
+          detail: String(rawDetail).slice(0, 200),
+        }),
+      )
+      return fail(
+        'error',
+        "This Square account isn't signed up for that Square feature, so there's no data to fetch. Reconnecting Square won't change this.",
+      )
+    }
 
     if (status === 401 || status === 403) {
       await this.integrations.markError(

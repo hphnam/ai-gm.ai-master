@@ -65,6 +65,10 @@ export function buildAiSdkTools(
   dispatcher: ToolDispatcher,
   integrations: IntegrationRegistry,
   ctx: DispatchContext,
+  // Provider ids the calling org has connected as active. The integration
+  // tool surface is scoped to these, so the model only sees tools it can
+  // actually use for this org — a venue with no POS gets no pos_* tools.
+  activeProviderIds: ReadonlySet<string>,
 ): ToolSet {
   // record_kb_gap precondition gate. The system prompt mandates that the model
   // call find_knowledge before recording a gap; this enforces it at runtime so
@@ -131,9 +135,9 @@ export function buildAiSdkTools(
     ] as const
   })
 
-  const integrationSchemas = integrations.getAllToolSchemas()
-  const integrationEntries = integrations.getAllToolDefinitions().map((def) => {
-    const schema = integrationSchemas[def.name]
+  const surface = integrations.getToolSurfaceForProviders(activeProviderIds, ctx.userRole)
+  const integrationEntries = surface.definitions.map((def) => {
+    const schema = surface.schemas[def.name]
     return [
       def.name,
       tool({

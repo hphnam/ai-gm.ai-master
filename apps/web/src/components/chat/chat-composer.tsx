@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowUp, ImagePlus, Loader2, Mic, Square, X } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -14,27 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Recipient } from '@/lib/hooks/use-notifications'
 import { cn } from '@/lib/utils'
-import {
-  type ChipMention,
-  detectMentionTrigger,
-  insertMention,
-  MentionPicker,
-  pruneMissingMentions,
-  serializeMentions,
-} from './mention-picker'
-
-const VOICE_CONSENT_KEY = 'gm.voice.consent.v1'
+import { IMAGE_ALLOWED_MIME, useImageAttachment } from './composer/use-image-attachment'
+import { useMentionState } from './composer/use-mention-state'
+import { useVoiceInput } from './composer/use-voice-input'
+import { MentionPicker, serializeMentions } from './mention-picker'
 
 const ComposerSchema = z.object({
   // Allow empty when an image is attached; we add a stand-in question on send.
   userMessage: z.string().trim().max(8000, 'Message too long (max 8000 characters)'),
 })
 type ComposerInput = z.infer<typeof ComposerSchema>
-
-const IMAGE_ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-const IMAGE_MAX_BYTES = 10 * 1024 * 1024
 
 type Props = {
   onSubmit: (userMessage: string) => Promise<void>
@@ -50,21 +40,6 @@ type Props = {
   disabled?: boolean
   disabledReason?: string
 }
-
-// Web Speech API typing — DOM lib doesn't expose SpeechRecognition globally
-// in every TS setup, so we declare just what we need.
-type SpeechRecognitionLike = EventTarget & {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  abort: () => void
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
-  onerror: ((event: { error: string }) => void) | null
-  onend: (() => void) | null
-}
-type SpeechRecognitionCtor = new () => SpeechRecognitionLike
 
 export function ChatComposer({
   onSubmit,
@@ -89,229 +64,53 @@ export function ChatComposer({
   })
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [attachedImage, setAttachedImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'unsupported'>('idle')
-  const [voiceConsentOpen, setVoiceConsentOpen] = useState(false)
-  const [voiceConsentGranted, setVoiceConsentGranted] = useState(false)
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
-  const transcriptBaseRef = useRef('')
 
-  // Read prior consent on mount. Stored locally per browser/device, not synced
-  // server-side — this is a one-time UX nudge, not auth.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      setVoiceConsentGranted(window.localStorage.getItem(VOICE_CONSENT_KEY) === 'granted')
-    } catch {
-      // localStorage blocked (private mode) — treat as un-granted; user will be re-asked.
-    }
-  }, [])
   const { ref: formRef, onBlur: rhfOnBlur, ...rest } = register('userMessage')
   const value = watch('userMessage')
 
-  // @-mention picker — opens whenever the caret sits inside an active "@..."
-  // fragment in the textarea. Trigger detection runs on every keystroke + on
-  // every selection change; the picker reads the same `mentionQuery` to
-  // render itself. The recipientsList query is enabled lazily by the picker
-  // so we don't fan out a fetch until someone actually types '@'.
-  const [mentionState, setMentionState] = useState<{
-    query: string
-    triggerStart: number
-  } | null>(null)
-  // Picker-inserted chips. Visible text holds `@Name`; we keep the userId
-  // mapping here and reattach it at submit time via serializeMentions. A
-  // value-change effect drops entries whose `@Name` no longer appears in the
-  // text (user backspaced the chip) so this list never grows unbounded.
-  const [chipMentions, setChipMentions] = useState<ChipMention[]>([])
-  const recomputeMention = useCallback(() => {
-    const el = textareaRef.current
-    if (!el) {
-      setMentionState(null)
-      return
-    }
-    const caret = el.selectionStart ?? 0
-    const trigger = detectMentionTrigger(el.value, caret)
-    setMentionState(trigger)
-  }, [])
-  const onMentionPick = useCallback(
-    (member: Recipient) => {
-      const el = textareaRef.current
-      if (!el || !mentionState) return
-      const caret = el.selectionStart ?? mentionState.triggerStart
-      const {
-        value: nextValue,
-        nextCaret,
-        mention,
-      } = insertMention(el.value, mentionState.triggerStart, caret, member)
-      setValue('userMessage', nextValue, { shouldDirty: true })
-      setChipMentions((prev) => [...prev, mention])
-      setMentionState(null)
-      // Restore caret position on the next frame — RHF's controlled-ish flow
-      // re-renders the textarea, so we can't set selection synchronously.
-      requestAnimationFrame(() => {
-        const elNow = textareaRef.current
-        if (!elNow) return
-        elNow.focus()
-        elNow.setSelectionRange(nextCaret, nextCaret)
-      })
-    },
-    [mentionState, setValue],
-  )
-  // Cover the voice-transcription path: `setValue` doesn't fire DOM input
-  // events, so onInput-driven recomputeMention never sees voice-dictated
-  // "@...". Re-run trigger detection whenever the watched form value
-  // changes — picks up programmatic setValue calls from anywhere. Same
-  // effect prunes the chipMentions list so stale entries (user deleted the
-  // chip) don't leak userIds at submit time.
-  useEffect(() => {
-    recomputeMention()
-    setChipMentions((prev) => {
-      const pruned = pruneMissingMentions(value ?? '', prev)
-      return pruned.length === prev.length ? prev : pruned
-    })
-  }, [value, recomputeMention])
+  const {
+    fileInputRef,
+    attachedImage,
+    setAttachedImage,
+    imagePreview,
+    handlePickImage,
+    handleFileChange,
+    clearImage,
+  } = useImageAttachment()
 
-  // Detect Web Speech API support once on mount. SSR-safe: window is gated.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const Ctor =
-      (window as unknown as { SpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition ??
-      (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor })
-        .webkitSpeechRecognition
-    if (!Ctor) {
-      setVoiceState('unsupported')
-      return
-    }
-    const rec = new Ctor()
-    rec.continuous = false
-    rec.interimResults = true
-    rec.lang = typeof navigator !== 'undefined' ? navigator.language || 'en-GB' : 'en-GB'
-    rec.onresult = (event) => {
-      let transcript = ''
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0]?.transcript ?? ''
-      }
-      const combined = `${transcriptBaseRef.current}${transcript}`.trimStart()
-      setValue('userMessage', combined, { shouldDirty: true })
-    }
-    rec.onerror = (event) => {
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        toast.error('Microphone permission denied')
-      } else if (event.error === 'no-speech') {
-        // benign — user didn't speak; quietly end
-      } else {
-        toast.error(`Voice input error (${event.error})`)
-      }
-      setVoiceState('idle')
-    }
-    rec.onend = () => setVoiceState('idle')
-    recognitionRef.current = rec
-    return () => {
-      try {
-        rec.abort()
-      } catch {
-        // ignore abort errors on teardown
-      }
-      recognitionRef.current = null
-    }
-  }, [setValue])
+  const {
+    mentionState,
+    setMentionState,
+    chipMentions,
+    setChipMentions,
+    recomputeMention,
+    onMentionPick,
+  } = useMentionState({ value, setValue, textareaRef })
 
-  const startListening = useCallback(() => {
-    const rec = recognitionRef.current
-    if (!rec) return
-    transcriptBaseRef.current = value ? `${value.trimEnd()} ` : ''
-    try {
-      rec.start()
-      setVoiceState('listening')
-    } catch {
-      try {
-        rec.abort()
-      } catch {
-        // best-effort
-      }
-      setVoiceState('idle')
-    }
-  }, [value])
-
-  const grantConsent = useCallback(() => {
-    try {
-      window.localStorage.setItem(VOICE_CONSENT_KEY, 'granted')
-    } catch {
-      // best-effort persistence
-    }
-    setVoiceConsentGranted(true)
-    setVoiceConsentOpen(false)
-    startListening()
-  }, [startListening])
-
-  const toggleVoice = useCallback(() => {
-    const rec = recognitionRef.current
-    if (!rec) return
-    if (voiceState === 'listening') {
-      rec.stop()
-      setVoiceState('idle')
-      return
-    }
-    if (!voiceConsentGranted) {
-      setVoiceConsentOpen(true)
-      return
-    }
-    startListening()
-  }, [voiceState, voiceConsentGranted, startListening])
-
-  // Stop listening if the parent disables the composer (venue switch,
-  // conversation flip to read-only, etc.) or while a turn is in flight.
-  // Without this the mic keeps recording into a textarea the user can no
-  // longer send from.
-  useEffect(() => {
-    if ((disabled || isPending) && voiceState === 'listening') {
-      recognitionRef.current?.stop()
-    }
-  }, [disabled, isPending, voiceState])
-
-  useEffect(() => {
-    if (!attachedImage) {
-      setImagePreview(null)
-      return
-    }
-    const url = URL.createObjectURL(attachedImage)
-    setImagePreview(url)
-    return () => URL.revokeObjectURL(url)
-  }, [attachedImage])
-
-  const handlePickImage = () => fileInputRef.current?.click()
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    if (!IMAGE_ALLOWED_MIME.includes(file.type)) {
-      toast.error('Image must be JPEG, PNG, WebP or GIF')
-      return
-    }
-    if (file.size > IMAGE_MAX_BYTES) {
-      toast.error('Image too large (max 10MB)')
-      return
-    }
-    setAttachedImage(file)
-  }
-
-  const clearImage = () => setAttachedImage(null)
+  const {
+    voiceSupported,
+    voiceListening,
+    voiceConsentOpen,
+    setVoiceConsentOpen,
+    toggleVoice,
+    grantConsent,
+  } = useVoiceInput({ value, setValue, disabled, isPending })
 
   useEffect(() => {
     if (initialValue) setValue('userMessage', initialValue)
     setFocus('userMessage')
   }, [initialValue, setValue, setFocus])
 
-  // Auto-grow textarea up to a max height, then scroll internally.
+  // Auto-grow the textarea between a roomy two-line floor and a max height,
+  // then scroll internally. The floor gives the input generous space to type
+  // into before it needs to grow (mobile-first), matching the two-line feel.
   useLayoutEffect(() => {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
+    const min = 52
     const max = 220
-    el.style.height = `${Math.min(el.scrollHeight, max)}px`
+    el.style.height = `${Math.min(Math.max(el.scrollHeight, min), max)}px`
   }, [value])
 
   const submit = handleSubmit(async (data) => {
@@ -360,8 +159,6 @@ export function ChatComposer({
   const hasImage = !!attachedImage
   const canSend = !isPending && !disabled && (hasText || hasImage)
   const canStop = isPending && typeof onStop === 'function'
-  const voiceSupported = voiceState !== 'unsupported'
-  const voiceListening = voiceState === 'listening'
   // Lock the textarea while voice is active — without it, anything the user
   // types is silently overwritten on the next interim-result tick because
   // transcriptBaseRef was snapshotted when listening started.
@@ -374,8 +171,8 @@ export function ChatComposer({
       </label>
       <div
         className={cn(
-          'relative flex items-end gap-2 rounded-2xl border border-border bg-background',
-          'px-3 py-2.5 shadow-sm transition-all',
+          'relative flex flex-col gap-1 rounded-3xl border border-border bg-background',
+          'px-2 py-2 shadow-sm transition-colors duration-150',
           'focus-within:border-foreground/40 focus-within:ring-2 focus-within:ring-foreground/10',
         )}
       >
@@ -386,42 +183,11 @@ export function ChatComposer({
           className="hidden"
           onChange={handleFileChange}
         />
-        {onSubmitWithImage ? (
-          <button
-            type="button"
-            onClick={handlePickImage}
-            disabled={inputDisabled}
-            aria-label="Attach image"
-            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
-          >
-            <ImagePlus className="h-4 w-4" aria-hidden />
-          </button>
-        ) : null}
-        {voiceSupported ? (
-          <button
-            type="button"
-            onClick={toggleVoice}
-            disabled={disabled || isPending}
-            aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
-            aria-pressed={voiceListening}
-            title={voiceListening ? 'Listening — tap to stop' : 'Voice input'}
-            className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-colors disabled:opacity-50',
-              voiceListening
-                ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
-                : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-            )}
-          >
-            <Mic className={cn('h-4 w-4', voiceListening && 'animate-pulse')} aria-hidden />
-          </button>
-        ) : null}
         <textarea
           id="composer-input"
-          rows={1}
+          rows={2}
           aria-invalid={Boolean(errors.userMessage)}
-          placeholder={
-            disabled && disabledReason ? disabledReason : 'Ask about stock, ordering, SOPs…'
-          }
+          placeholder={disabled && disabledReason ? disabledReason : 'Ask about your venue…'}
           disabled={inputDisabled}
           onKeyDown={onKeyDown}
           // Recompute the mention trigger on every input + selection change.
@@ -444,46 +210,78 @@ export function ChatComposer({
             formRef(el)
             textareaRef.current = el
           }}
+          // Full width — the toolbar lives on its own row below, so the text
+          // gets the entire composer width to breathe (mobile-first). Auto-grow
+          // (effect above) owns the height between a two-line floor and the cap.
           className={cn(
-            'flex-1 resize-none self-center bg-transparent text-[15px] leading-6',
+            'w-full resize-none bg-transparent px-2 pt-1 text-[15px] leading-6',
             'placeholder:text-muted-foreground/70 focus:outline-none',
-            // min-h matches the h-8 (32px) of the side buttons; py-1 centres
-            // the single-line text vertically in that 32px box so its baseline
-            // sits on the same line as the icon centres. As the textarea grows
-            // multi-line it expands downward and the parent's items-end keeps
-            // the buttons aligned to the new bottom edge.
-            'min-h-8 max-h-[220px] py-1',
+            'min-h-[52px] max-h-[220px]',
           )}
         />
-        {canStop ? (
-          <button
-            type="button"
-            onClick={() => onStop?.()}
-            aria-label="Stop generating"
-            title="Stop"
-            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110"
-          >
-            <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={!canSend}
-            aria-label={isPending ? 'Sending' : 'Send'}
-            className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full transition-all',
-              canSend
-                ? 'bg-brand text-brand-foreground hover:brightness-110 cursor-pointer'
-                : 'bg-muted text-muted-foreground cursor-not-allowed',
-            )}
-          >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : (
-              <ArrowUp className="h-4 w-4" aria-hidden />
-            )}
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {onSubmitWithImage ? (
+            <button
+              type="button"
+              onClick={handlePickImage}
+              disabled={inputDisabled}
+              aria-label="Attach image"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-95 disabled:opacity-50"
+            >
+              <ImagePlus className="h-[18px] w-[18px]" aria-hidden />
+            </button>
+          ) : null}
+          {voiceSupported ? (
+            <button
+              type="button"
+              onClick={toggleVoice}
+              disabled={disabled || isPending}
+              aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
+              aria-pressed={voiceListening}
+              title={voiceListening ? 'Listening — tap to stop' : 'Voice input'}
+              className={cn(
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors active:scale-95 disabled:opacity-50',
+                voiceListening
+                  ? 'bg-destructive/15 text-destructive hover:bg-destructive/25'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              <Mic
+                className={cn('h-[18px] w-[18px]', voiceListening && 'animate-pulse')}
+                aria-hidden
+              />
+            </button>
+          ) : null}
+          {canStop ? (
+            <button
+              type="button"
+              onClick={() => onStop?.()}
+              aria-label="Stop generating"
+              title="Stop"
+              className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110 active:scale-95"
+            >
+              <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!canSend}
+              aria-label={isPending ? 'Sending' : 'Send'}
+              className={cn(
+                'ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-150',
+                canSend
+                  ? 'bg-brand text-brand-foreground hover:brightness-110 active:scale-95 cursor-pointer'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed',
+              )}
+            >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <ArrowUp className="h-[18px] w-[18px]" aria-hidden />
+              )}
+            </button>
+          )}
+        </div>
       </div>
       {imagePreview && attachedImage ? (
         <div className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted/40 p-1.5">

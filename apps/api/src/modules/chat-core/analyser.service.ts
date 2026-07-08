@@ -59,6 +59,7 @@ export class AnalyserService {
     try {
       const result = await generateText({
         model: anthropicProvider(SONNET_MODEL),
+        allowSystemInMessages: true,
         messages: [
           {
             role: 'system',

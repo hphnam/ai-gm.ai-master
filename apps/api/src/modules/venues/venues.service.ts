@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { prisma } from '../../database/prisma'
 import {
   type CreateVenueBody,
+  type UpdateVenueBody,
   type UpdateVenueProfile,
   type VenueDetail,
   type VenueListItem,
@@ -89,6 +90,59 @@ export class VenuesService {
       },
       select: { id: true, name: true, address: true, type: true, timezone: true },
     })
+  }
+
+  async update(id: string, orgId: string, patch: UpdateVenueBody): Promise<VenueDetail> {
+    const existing = await prisma.venue.findFirst({
+      where: { id, organizationId: orgId },
+      select: { id: true },
+    })
+    if (!existing) throw new NotFoundException({ error: 'venue-not-found' })
+
+    const updated = await prisma.venue.update({
+      where: { id },
+      data: {
+        ...(patch.name !== undefined && { name: patch.name }),
+        ...(patch.type !== undefined && { type: patch.type }),
+        ...(patch.address !== undefined && {
+          address: patch.address.length > 0 ? patch.address : null,
+        }),
+        ...(patch.timezone !== undefined && { timezone: patch.timezone }),
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        type: true,
+        timezone: true,
+        profile: true,
+        squareLocationId: true,
+      },
+    })
+
+    // safeParse: a legacy profile row with stray keys must not 500 a rename.
+    const parsed = VenueProfileSchema.safeParse(updated.profile ?? {})
+    const profile = parsed.success ? parsed.data : {}
+    // Name/type/address feed the profile embedding — keep retrieval in sync.
+    await this.reindexProfile(orgId, updated, profile).catch((err) => {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'venue.profile_index_failed',
+          venueId: id,
+          message: (err as Error).message,
+        }),
+      )
+    })
+
+    return {
+      id: updated.id,
+      name: updated.name,
+      address: updated.address,
+      type: updated.type,
+      timezone: updated.timezone,
+      profile,
+      squareLocationId: updated.squareLocationId,
+    }
   }
 
   /// Phase D — patch the venue profile. Merges over the existing profile JSON,

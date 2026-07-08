@@ -1,11 +1,14 @@
 'use client'
 
 import { CircleAlert, FileText, Plus, ShieldCheck } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ListRow } from '@/components/ui/list-row'
+import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TabItem, Tabs } from '@/components/ui/tabs'
 import {
@@ -22,6 +25,8 @@ import { AddExpiryDialog } from './add-expiry-dialog'
 
 type Filter = 'active' | 'all' | 'dismissed'
 
+const FILTER_VALUES = ['active', 'all', 'dismissed'] as const
+
 const FILTERS: TabItem<Filter>[] = [
   { id: 'active', label: 'Active' },
   { id: 'all', label: 'All' },
@@ -29,7 +34,10 @@ const FILTERS: TabItem<Filter>[] = [
 ]
 
 export function ComplianceBody() {
-  const [filter, setFilter] = useState<Filter>('active')
+  const [filter, setFilter] = useQueryState(
+    'status',
+    parseAsStringLiteral(FILTER_VALUES).withDefault('active').withOptions({ clearOnDefault: true }),
+  )
   const [addOpen, setAddOpen] = useState(false)
   useComplianceSocket()
   const records = useExpiryRecords({ status: filter === 'all' ? 'all' : filter })
@@ -37,8 +45,8 @@ export function ComplianceBody() {
   const grouped = useMemo(() => groupByWindow(records.data?.records ?? []), [records.data?.records])
 
   return (
-    <AppShell>
-      <PageHeader
+    <>
+      <SetPageHeader
         title="Compliance"
         description="Cert renewals, service intervals, and insurance — the things that close a venue if you miss them."
         actions={
@@ -50,7 +58,7 @@ export function ComplianceBody() {
       />
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+        <PageContainer width="prose">
           <Tabs
             items={FILTERS}
             value={filter}
@@ -95,11 +103,11 @@ export function ComplianceBody() {
               ) : null}
             </div>
           )}
-        </div>
+        </PageContainer>
       </div>
 
       <AddExpiryDialog open={addOpen} onOpenChange={setAddOpen} />
-    </AppShell>
+    </>
   )
 }
 
@@ -124,16 +132,13 @@ function ComplianceLoading() {
   return (
     <div className="flex flex-col gap-3">
       {COMPLIANCE_SKELETON_KEYS.map((k) => (
-        <div
-          key={k}
-          className="flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm"
-        >
+        <ListRow key={k} className="flex items-start gap-3">
           <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-2/3" />
             <Skeleton className="h-3 w-1/2" />
           </div>
-        </div>
+        </ListRow>
       ))}
     </div>
   )
@@ -154,11 +159,11 @@ function RecordGroup({
     <section aria-label={label}>
       <h2
         className={cn(
-          'mb-2 text-[11px] font-semibold uppercase tracking-wider',
+          'mb-2 text-xs font-semibold uppercase tracking-wider',
           tone === 'danger'
-            ? 'text-red-700'
+            ? 'text-destructive'
             : tone === 'warn'
-              ? 'text-amber-700'
+              ? 'text-warning'
               : 'text-muted-foreground',
         )}
       >
@@ -190,72 +195,79 @@ function RecordRow({
       : record.category
 
   return (
-    <li
+    <ListRow
+      asChild
       className={cn(
-        'flex items-start gap-3 rounded-md border border-border bg-card px-3 py-2.5 shadow-sm',
-        tone === 'danger' && 'border-red-300/60 bg-red-50/40',
-        tone === 'warn' && 'border-amber-300/60 bg-amber-50/40',
+        'flex items-start gap-3',
+        tone === 'danger' && 'border-destructive/25 bg-destructive/5',
+        tone === 'warn' && 'border-warning/30 bg-warning/5',
         muted && 'opacity-70',
       )}
     >
-      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
-        {tone === 'danger' ? (
-          <CircleAlert className="h-4 w-4 text-red-700" aria-hidden />
+      <li>
+        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
+          {tone === 'danger' ? (
+            <CircleAlert className="h-4 w-4 text-destructive" aria-hidden />
+          ) : (
+            <FileText
+              className={cn('h-4 w-4', tone === 'warn' ? 'text-warning' : 'text-muted-foreground')}
+              aria-hidden
+            />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p
+            className={cn('text-sm font-medium', isClosed && 'text-muted-foreground line-through')}
+          >
+            {record.title}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <ExpiryLabel expiresAt={record.expiresAt} closed={isClosed} />
+            <span>· {category}</span>
+            {record.personName ? <span>· {record.personName}</span> : null}
+            {record.assetName ? <span>· {record.assetName}</span> : null}
+            {record.renewalCostGbp !== null ? (
+              <span>· £{record.renewalCostGbp.toFixed(2)}</span>
+            ) : null}
+            {record.extractionConfidence !== null && record.extractionConfidence < 0.8 ? (
+              <span className="text-warning">· verify (auto-extracted)</span>
+            ) : null}
+          </div>
+        </div>
+        {!isClosed ? (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => update.mutate({ id: record.id, status: 'renewed' })}
+              disabled={update.isPending}
+              className="cursor-pointer"
+            >
+              Renewed
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => update.mutate({ id: record.id, status: 'dismissed' })}
+              disabled={update.isPending}
+              className="cursor-pointer text-muted-foreground hover:text-foreground"
+            >
+              Dismiss
+            </Button>
+          </div>
         ) : (
-          <FileText
-            className={cn('h-4 w-4', tone === 'warn' ? 'text-amber-700' : 'text-muted-foreground')}
-            aria-hidden
-          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => update.mutate({ id: record.id, status: 'active' })}
+            disabled={update.isPending}
+            className="cursor-pointer"
+          >
+            Reopen
+          </Button>
         )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className={cn('text-sm font-medium', isClosed && 'text-muted-foreground line-through')}>
-          {record.title}
-        </p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-          <ExpiryLabel expiresAt={record.expiresAt} closed={isClosed} />
-          <span>· {category}</span>
-          {record.personName ? <span>· {record.personName}</span> : null}
-          {record.assetName ? <span>· {record.assetName}</span> : null}
-          {record.renewalCostGbp !== null ? (
-            <span>· £{record.renewalCostGbp.toFixed(2)}</span>
-          ) : null}
-          {record.extractionConfidence !== null && record.extractionConfidence < 0.8 ? (
-            <span className="text-amber-700">· verify (auto-extracted)</span>
-          ) : null}
-        </div>
-      </div>
-      {!isClosed ? (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => update.mutate({ id: record.id, status: 'renewed' })}
-            disabled={update.isPending}
-          >
-            Renewed
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => update.mutate({ id: record.id, status: 'dismissed' })}
-            disabled={update.isPending}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Dismiss
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => update.mutate({ id: record.id, status: 'active' })}
-          disabled={update.isPending}
-        >
-          Reopen
-        </Button>
-      )}
-    </li>
+      </li>
+    </ListRow>
   )
 }
 
@@ -273,15 +285,15 @@ function ExpiryLabel({ expiresAt, closed }: { expiresAt: string; closed: boolean
   })
   if (overdue)
     return (
-      <span className="text-red-700">
+      <Badge variant="urgent" size="sm">
         overdue {absDays}d · {dateLabel}
-      </span>
+      </Badge>
     )
   if (diffMs < 7 * day)
     return (
-      <span className="text-amber-700">
+      <Badge variant="warning" size="sm">
         in {absDays}d · {dateLabel}
-      </span>
+      </Badge>
     )
   return <span>{dateLabel}</span>
 }

@@ -144,6 +144,7 @@ export function StepKnowledge({
           }}
           className={cn(
             'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-10 text-center transition-colors',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             dragOver
               ? 'border-foreground bg-accent'
               : 'border-border hover:border-foreground/40 hover:bg-accent/50',
@@ -156,7 +157,7 @@ export function StepKnowledge({
             <span className="font-medium">Drop files here</span>{' '}
             <span className="text-muted-foreground">or click to pick</span>
           </p>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             PDF &middot; DOCX &middot; XLSX &middot; CSV &middot; PPTX &middot; MD &middot; TXT
             &middot; JPG &middot; PNG &middot; WEBP
           </p>
@@ -174,14 +175,14 @@ export function StepKnowledge({
         </div>
 
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Ideas for what to upload
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {SUGGESTIONS.map((s) => (
               <span
                 key={s}
-                className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-[11px] text-muted-foreground"
+                className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-xs text-muted-foreground"
               >
                 {s}
               </span>
@@ -211,7 +212,7 @@ export function StepKnowledge({
           onSkip={counts.total === 0 ? () => onAdvance('done') : undefined}
           helper={
             counts.total > 0 ? (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground" aria-live="polite">
                 {counts.done > 0 ? `${counts.done} added` : null}
                 {counts.done > 0 && counts.uploading > 0 ? ' · ' : ''}
                 {counts.uploading > 0 ? `${counts.uploading} uploading…` : null}
@@ -222,7 +223,7 @@ export function StepKnowledge({
             ) : null
           }
           primary={
-            <Button type="button" onClick={() => onAdvance('done')}>
+            <Button type="button" onClick={() => onAdvance('done')} className="min-h-11">
               {counts.uploading > 0 ? 'Continue (uploads keep running)' : 'Continue'}
             </Button>
           }
@@ -247,7 +248,7 @@ function QueueRow({
       <StatusIcon status={item.status} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs font-medium">{item.file.name}</p>
-        <p className="truncate text-[10px] text-muted-foreground">
+        <p className="truncate text-xs text-muted-foreground">
           {item.status === 'error' && item.error
             ? item.error
             : item.status === 'done'
@@ -259,7 +260,7 @@ function QueueRow({
         <button
           type="button"
           onClick={onRetry}
-          className="cursor-pointer text-[11px] font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+          className="relative cursor-pointer rounded-sm text-xs font-medium text-muted-foreground underline-offset-2 after:absolute after:-inset-x-2 after:-inset-y-3.5 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Retry
         </button>
@@ -271,9 +272,9 @@ function QueueRow({
           size="icon"
           aria-label={`Remove ${item.file.name}`}
           onClick={onRemove}
-          className="h-6 w-6"
+          className="relative h-7 w-7 after:absolute after:-inset-2.5"
         >
-          <X className="h-3 w-3" />
+          <X className="h-3.5 w-3.5" />
         </Button>
       ) : null}
     </li>
@@ -286,8 +287,8 @@ function StatusIcon({ status }: { status: QueueStatus }) {
       <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
     )
   if (status === 'done')
-    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" aria-hidden />
   if (status === 'error')
-    return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-600" aria-hidden />
+    return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" aria-hidden />
   return <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
 }

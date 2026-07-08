@@ -607,6 +607,43 @@
         ]
       }
     },
+    "/notifications/{id}": {
+      "get": {
+        "operationId": "NotificationsController_getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 64,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimpleNotificationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/notifications/{id}/read": {
       "patch": {
         "operationId": "NotificationsController_markRead",
@@ -1831,7 +1868,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true,
             "schema": {
               "anyOf": [
@@ -1854,7 +1891,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "minimum": 1,
               "maximum": 200,
@@ -1865,7 +1902,7 @@
             "name": "offset",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "minimum": 0,
               "maximum": 10000,
@@ -2602,6 +2639,50 @@
         "tags": [
           "venues"
         ]
+      },
+      "patch": {
+        "operationId": "VenuesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVenueBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "venues"
+        ]
       }
     },
     "/venues/{id}/profile": {
@@ -2841,7 +2922,7 @@
             "name": "q",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "maxLength": 200,
               "type": "string"
@@ -2851,7 +2932,7 @@
             "name": "category",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true,
             "schema": {
               "anyOf": [
@@ -2874,7 +2955,7 @@
             "name": "venue",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true,
             "schema": {
               "anyOf": [
@@ -2897,7 +2978,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "type": "string",
               "enum": [
@@ -2912,7 +2993,7 @@
             "name": "sort",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "type": "string",
               "enum": [
@@ -2926,7 +3007,7 @@
             "name": "cursor",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "maxLength": 500,
               "type": "string"
@@ -2936,7 +3017,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "x-nestjs_zod-has-const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "schema": {
               "minimum": 1,
               "maximum": 50,
@@ -3535,6 +3616,74 @@
         ]
       }
     },
+    "/docs/{id}/supersede": {
+      "post": {
+        "operationId": "DocsController_supersede",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupersedeDocRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
+    "/docs/{id}/unsupersede": {
+      "post": {
+        "operationId": "DocsController_unsupersede",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "docs"
+        ]
+      }
+    },
     "/docs/{id}/classify": {
       "post": {
         "operationId": "DocsController_classifyManually",
@@ -3814,6 +3963,101 @@
         ]
       }
     },
+    "/org/members/{userId}": {
+      "delete": {
+        "operationId": "OrgMembersController_remove",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveMemberResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "org-members"
+        ]
+      }
+    },
+    "/org/profile": {
+      "get": {
+        "operationId": "OrganizationController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "organization"
+        ]
+      },
+      "put": {
+        "operationId": "OrganizationController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrganizationProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "organization"
+        ]
+      }
+    },
     "/auth/phone/send": {
       "post": {
         "operationId": "PhoneController_send",
@@ -4034,17 +4278,39 @@
         ]
       }
     },
-    "/whatsapp/invites/redeem/complete": {
+    "/places/search": {
       "post": {
-        "operationId": "InviteRedeemController_complete",
+        "operationId": "PlacesController_search",
         "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacesSearchDto"
+              }
+            }
           }
         },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesSearchResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "tags": [
-          "whatsapp-invites"
+          "places"
         ]
       }
     },
@@ -4904,7 +5170,8 @@
               "type-proposal-missing",
               "type-name-conflict",
               "checklist-extraction-failed",
-              "category-suggestion-unavailable"
+              "category-suggestion-unavailable",
+              "reconcile-conflict"
             ]
           },
           "details": {
@@ -5098,19 +5365,19 @@
                 "updatedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "activeCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "overdueCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "within30dCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -5299,7 +5566,7 @@
               "createdAt",
               "updatedAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -5314,19 +5581,19 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 200,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "category": {
             "type": "string",
             "minLength": 1,
             "maxLength": 64,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "expiresAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -5338,7 +5605,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "personUserId": {
@@ -5352,7 +5619,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "personName": {
@@ -5366,7 +5633,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "assetName": {
@@ -5380,7 +5647,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "renewalCostGbp": {
@@ -5394,7 +5661,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "notes": {
@@ -5407,7 +5674,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -5424,19 +5691,19 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 200,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "category": {
             "type": "string",
             "minLength": 1,
             "maxLength": 64,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "expiresAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -5448,7 +5715,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "personUserId": {
@@ -5462,7 +5729,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "personName": {
@@ -5476,7 +5743,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "assetName": {
@@ -5490,7 +5757,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "renewalCostGbp": {
@@ -5504,7 +5771,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "status": {
@@ -5515,7 +5782,7 @@
               "expired",
               "dismissed"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "notes": {
             "anyOf": [
@@ -5527,7 +5794,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         }
@@ -5711,15 +5978,15 @@
                 "updatedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "openCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "overdueCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -5904,7 +6171,7 @@
               "createdAt",
               "updatedAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -5919,7 +6186,7 @@
             "type": "string",
             "minLength": 3,
             "maxLength": 2000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "assigneeUserId": {
             "anyOf": [
@@ -5932,7 +6199,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "dueAt": {
@@ -5946,7 +6213,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "venueId": {
@@ -5959,7 +6226,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "category": {
@@ -5973,7 +6240,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -5988,7 +6255,7 @@
             "type": "string",
             "minLength": 3,
             "maxLength": 2000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "dueAt": {
             "anyOf": [
@@ -6001,7 +6268,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "status": {
@@ -6011,7 +6278,7 @@
               "done",
               "cancelled"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "category": {
             "anyOf": [
@@ -6024,7 +6291,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         }
@@ -6180,11 +6447,11 @@
                 "recipient"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "unreadCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextCursor": {
             "anyOf": [
@@ -6195,12 +6462,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "hasMore": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -6256,7 +6523,7 @@
                 "role"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -6411,7 +6678,7 @@
               "author",
               "recipient"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -6504,7 +6771,7 @@
                 "author"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -6576,7 +6843,7 @@
               "createdAt",
               "author"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -6645,7 +6912,7 @@
                 "unreadCount"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -6738,7 +7005,7 @@
                 "canDeleteForAll"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "otherParty": {
             "type": "object",
@@ -6765,7 +7032,7 @@
               "name",
               "email"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "nextCursor": {
@@ -6777,12 +7044,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "hasMore": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -6888,7 +7155,7 @@
               "status",
               "canDeleteForAll"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -6940,23 +7207,23 @@
           "ok": {
             "type": "boolean",
             "const": true,
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "feedbackId": {
             "type": "string",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "enqueuedCount": {
             "type": "number",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "dedupedCount": {
             "type": "number",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "exhaustedCount": {
             "type": "number",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -7097,7 +7364,7 @@
                 "preview"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextCursor": {
             "anyOf": [
@@ -7108,7 +7375,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -7122,11 +7389,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "userId": {
             "anyOf": [
@@ -7137,12 +7404,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "channel": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "visibility": {
             "type": "string",
@@ -7150,7 +7417,7 @@
               "private",
               "org"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "messages": {
             "type": "array",
@@ -7253,7 +7520,7 @@
                 "retrievedItemIds"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -7434,19 +7701,19 @@
                 "updatedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "openCount": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "criticalOpenCount": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -7587,7 +7854,7 @@
               "createdAt",
               "updatedAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -7701,7 +7968,7 @@
                 "createdAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -7803,7 +8070,7 @@
               "author",
               "createdAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -7857,17 +8124,17 @@
                 "createdAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "total": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hasMore": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextOffset": {
             "anyOf": [
@@ -7880,7 +8147,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -7896,13 +8163,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "organizationId": {
             "type": "string",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -7913,8 +8178,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdByUserId": {
@@ -7926,8 +8190,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdByName": {
@@ -7939,14 +8202,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "title": {
             "type": "string",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "summary": {
             "anyOf": [
@@ -7957,8 +8218,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "spec": {
@@ -8359,14 +8619,12 @@
             "required": [
               "sections"
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "createdAt": {
             "type": "string",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -8394,22 +8652,19 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "title": {
             "type": "string",
             "minLength": 3,
             "maxLength": 200,
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "summary": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "spec": {
             "type": "object",
@@ -8809,8 +9064,7 @@
             "required": [
               "sections"
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -8992,17 +9246,17 @@
                 "updatedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "total": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hasMore": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextOffset": {
             "anyOf": [
@@ -9015,7 +9269,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -9031,11 +9285,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "organizationId": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -9046,7 +9300,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdByUserId": {
@@ -9058,7 +9312,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdByName": {
@@ -9070,12 +9324,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "title": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "summary": {
             "anyOf": [
@@ -9086,7 +9340,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "frequency": {
@@ -9096,13 +9350,13 @@
               "weekly",
               "monthly"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hourOfDay": {
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "dayOfWeek": {
             "anyOf": [
@@ -9115,7 +9369,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "dayOfMonth": {
@@ -9129,12 +9383,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "timezone": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "prompt": {
             "anyOf": [
@@ -9145,7 +9399,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "status": {
@@ -9155,11 +9409,11 @@
               "paused",
               "cancelled"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextRunAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "lastRunAt": {
             "anyOf": [
@@ -9170,7 +9424,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "lastReportId": {
@@ -9182,22 +9436,22 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "runCount": {
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "createdAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "updatedAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -9236,19 +9490,19 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "title": {
             "type": "string",
             "minLength": 3,
             "maxLength": 200,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "summary": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "frequency": {
             "type": "string",
@@ -9257,13 +9511,13 @@
               "weekly",
               "monthly"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hourOfDay": {
             "type": "integer",
             "minimum": 0,
             "maximum": 23,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "dayOfWeek": {
             "anyOf": [
@@ -9276,7 +9530,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "dayOfMonth": {
@@ -9290,19 +9544,19 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "timezone": {
             "type": "string",
             "minLength": 1,
             "maxLength": 64,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "prompt": {
             "type": "string",
             "maxLength": 1000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -9391,7 +9645,7 @@
                 "connectedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -9510,7 +9764,7 @@
               "lastSyncedAt",
               "connectedAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -9655,7 +9909,7 @@
                 "measuredAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -9843,7 +10097,7 @@
               "measuredUpliftCents",
               "measuredAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -9891,23 +10145,27 @@
             "enum": [
               "below-par",
               "cutoff"
-            ]
+            ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "severity": {
             "type": "string",
             "enum": [
               "info",
               "warn"
-            ]
+            ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "text": {
-            "type": "string"
+            "type": "string",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "itemIds": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "sourceToolCall": {
             "type": "object",
@@ -9927,10 +10185,12 @@
               "tool",
               "input"
             ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "generatedAt": {
-            "type": "string"
+            "type": "string",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -9969,11 +10229,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "name": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "address": {
             "anyOf": [
@@ -9984,16 +10244,16 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "type": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "timezone": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -10009,11 +10269,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "name": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "address": {
             "anyOf": [
@@ -10024,16 +10284,16 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "type": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "timezone": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "profile": {
             "type": "object",
@@ -10097,7 +10357,7 @@
               }
             },
             "additionalProperties": false,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "squareLocationId": {
@@ -10109,7 +10369,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -10161,13 +10421,50 @@
           "timezone"
         ]
       },
+      "UpdateVenueBodyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 240
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "x-nestjs_zod-empty-type": true,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "x-nestjs_zod-parent-additional-properties": false
+          }
+        }
+      },
       "UpdateVenueProfileDto": {
         "type": "object",
         "properties": {
           "layoutNotes": {
             "type": "string",
             "maxLength": 2000,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "fireEscapes": {
@@ -10178,7 +10475,7 @@
               "minLength": 1,
               "maxLength": 240
             },
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "firstAidPoints": {
@@ -10189,43 +10486,43 @@
               "minLength": 1,
               "maxLength": 240
             },
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "keySafePolicy": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "alarmPolicy": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "openingHours": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "what3words": {
             "type": "string",
             "maxLength": 60,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "accessibilityNotes": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "deliveryNotes": {
             "type": "string",
             "maxLength": 500,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-parent-additional-properties": false
           },
           "floorPlanKnowledgeItemId": {
@@ -10238,7 +10535,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true,
             "x-nestjs_zod-parent-additional-properties": false
           }
@@ -10258,7 +10555,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -10291,7 +10588,7 @@
               "channel",
               "createdAt"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "messages": {
@@ -10362,7 +10659,7 @@
                 "feedback"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -10438,7 +10735,7 @@
               "toolCallLog",
               "feedback"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "retagQueueItems": {
@@ -10527,7 +10824,7 @@
                 "knowledgeItem"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "conversation": {
             "type": "object",
@@ -10547,7 +10844,7 @@
               "venueId",
               "channel"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -10646,7 +10943,7 @@
                 "knowledgeItem"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "counts": {
             "type": "object",
@@ -10674,7 +10971,7 @@
               "failed",
               "exhausted"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -10878,6 +11175,19 @@
                     }
                   ]
                 },
+                "version": {
+                  "type": "number"
+                },
+                "supersededAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "createdAt": {
                   "type": "string"
                 },
@@ -10899,11 +11209,13 @@
                 "isProcedural",
                 "processingStatus",
                 "processingError",
+                "version",
+                "supersededAt",
                 "createdAt",
                 "updatedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "nextCursor": {
             "anyOf": [
@@ -10914,12 +11226,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "total": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -10933,7 +11245,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "title": {
             "anyOf": [
@@ -10944,12 +11256,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "contentPreview": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -10960,7 +11272,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "venueName": {
@@ -10972,7 +11284,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "summary": {
@@ -10984,7 +11296,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "tags": {
@@ -10992,7 +11304,7 @@
             "items": {
               "type": "string"
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "docType": {
             "anyOf": [
@@ -11003,7 +11315,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "documentType": {
@@ -11054,7 +11366,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "pendingTypeProposal": {
@@ -11111,12 +11423,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "isProcedural": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "processingStatus": {
             "type": "string",
@@ -11125,7 +11437,7 @@
               "ready",
               "failed"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "processingError": {
             "anyOf": [
@@ -11136,16 +11448,32 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "version": {
+            "type": "number",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "supersededAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "updatedAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -11162,6 +11490,8 @@
           "isProcedural",
           "processingStatus",
           "processingError",
+          "version",
+          "supersededAt",
           "createdAt",
           "updatedAt"
         ]
@@ -11171,11 +11501,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "name": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "description": {
             "anyOf": [
@@ -11186,7 +11516,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "schema": {
@@ -11195,7 +11525,7 @@
               "type": "string"
             },
             "additionalProperties": {},
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "kind": {
@@ -11204,7 +11534,7 @@
               "reference",
               "procedural"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -11220,11 +11550,11 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "question": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "tentativeAnswer": {
             "anyOf": [
@@ -11235,19 +11565,19 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "askCount": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "askedByUserIds": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "askedBy": {
             "type": "array",
@@ -11284,7 +11614,7 @@
                 "email"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -11295,7 +11625,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "venueName": {
@@ -11307,16 +11637,16 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "createdAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "updatedAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "lastAskedAt": {
             "anyOf": [
@@ -11327,7 +11657,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -11414,7 +11744,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "summary": {
             "anyOf": [
@@ -11425,7 +11755,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "tags": {
@@ -11433,7 +11763,7 @@
             "items": {
               "type": "string"
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "docType": {
             "anyOf": [
@@ -11444,12 +11774,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "failSoft": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "documentType": {
             "anyOf": [
@@ -11499,7 +11829,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "pendingTypeProposal": {
@@ -11556,7 +11886,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "checklist": {
@@ -11750,7 +12080,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "processingStatus": {
@@ -11760,7 +12090,7 @@
               "ready",
               "failed"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -11780,7 +12110,7 @@
         "properties": {
           "docId": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "title": {
             "anyOf": [
@@ -11791,16 +12121,16 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "snippet": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "similarity": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -11815,7 +12145,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "title": {
             "anyOf": [
@@ -11826,12 +12156,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "content": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -11842,7 +12172,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "venueName": {
@@ -11854,7 +12184,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "summary": {
@@ -11866,7 +12196,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "tags": {
@@ -11874,7 +12204,7 @@
             "items": {
               "type": "string"
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "docType": {
             "anyOf": [
@@ -11885,7 +12215,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "documentType": {
@@ -11936,7 +12266,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "pendingTypeProposal": {
@@ -11993,7 +12323,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "checklist": {
@@ -12187,7 +12517,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "metadata": {
@@ -12196,7 +12526,7 @@
               "type": "string"
             },
             "additionalProperties": {},
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "docPurpose": {
@@ -12211,7 +12541,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "processingStatus": {
@@ -12221,7 +12551,7 @@
               "ready",
               "failed"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "processingError": {
             "anyOf": [
@@ -12232,16 +12562,112 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
+          },
+          "version": {
+            "type": "number",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "supersededAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "supersededBy": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "title"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
+            "x-nestjs_zod-empty-type": true
+          },
+          "versionHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "version": {
+                  "type": "number"
+                },
+                "supersededAt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "isCurrent": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "version",
+                "supersededAt",
+                "updatedAt",
+                "isCurrent"
+              ]
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "createdAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "updatedAt": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12260,6 +12686,10 @@
           "docPurpose",
           "processingStatus",
           "processingError",
+          "version",
+          "supersededAt",
+          "supersededBy",
+          "versionHistory",
           "createdAt",
           "updatedAt"
         ]
@@ -12271,13 +12701,13 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "content": {
             "type": "string",
             "minLength": 1,
             "maxLength": 50000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -12289,13 +12719,13 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "description": {
             "type": "string",
             "maxLength": 1000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12311,7 +12741,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "venueId": {
             "anyOf": [
@@ -12323,13 +12753,13 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "description": {
             "type": "string",
             "maxLength": 1000,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "docPurpose": {
             "anyOf": [
@@ -12343,7 +12773,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         }
@@ -12353,7 +12783,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "kind": {
             "type": "string",
@@ -12361,7 +12791,7 @@
               "reference",
               "procedural"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "description": {
             "anyOf": [
@@ -12372,12 +12802,12 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "existing": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12403,6 +12833,18 @@
             "maxLength": 80
           }
         }
+      },
+      "SupersedeDocRequestDto": {
+        "type": "object",
+        "properties": {
+          "replaces": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          }
+        },
+        "required": [
+          "replaces"
+        ]
       },
       "InviteBodyDto": {
         "type": "object",
@@ -12492,25 +12934,21 @@
               "expiresAt",
               "createdAt"
             ],
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "inviteUrl": {
             "type": "string",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "warning": {
             "type": "string",
             "const": "mail-send-failed",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "reissued": {
             "type": "boolean",
-            "x-nestjs_zod-has-const": true,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12587,23 +13025,23 @@
                 "createdAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "total": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "limit": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "offset": {
             "type": "number",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hasMore": {
             "type": "boolean",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12689,7 +13127,7 @@
           "ok": {
             "type": "boolean",
             "const": true,
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12718,7 +13156,24 @@
                   ]
                 },
                 "email": {
-                  "type": "string"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "phoneNumber": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "role": {
                   "type": "string"
@@ -12734,17 +13189,124 @@
                 "userId",
                 "name",
                 "email",
+                "phoneNumber",
                 "role",
                 "isSelf",
                 "joinedAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
           "members"
         ]
+      },
+      "RemoveMemberResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "deletedUser": {
+            "type": "boolean",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          }
+        },
+        "required": [
+          "ok",
+          "deletedUser"
+        ]
+      },
+      "OrganizationProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "businessType": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "goals": {
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              },
+              "constraints": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "country": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 2
+              },
+              "currency": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 3
+              }
+            },
+            "additionalProperties": false,
+            "x-nestjs_zod-self-required": true
+          }
+        },
+        "required": [
+          "profile"
+        ]
+      },
+      "UpdateOrganizationProfileDto": {
+        "type": "object",
+        "properties": {
+          "businessType": {
+            "type": "string",
+            "maxLength": 120,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "goals": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "constraints": {
+            "type": "string",
+            "maxLength": 1000,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "x-nestjs_zod-parent-additional-properties": false
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "x-nestjs_zod-parent-additional-properties": false
+          }
+        }
       },
       "SendPhoneCodeBodyDto": {
         "type": "object",
@@ -12763,11 +13325,11 @@
           "ok": {
             "type": "boolean",
             "const": true,
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "expiresInSeconds": {
             "type": "number",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12797,15 +13359,15 @@
           "ok": {
             "type": "boolean",
             "const": true,
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "phoneNumber": {
             "type": "string",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "phoneVerifiedAt": {
             "type": "string",
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12820,7 +13382,7 @@
           "ok": {
             "type": "boolean",
             "const": true,
-            "x-nestjs_zod-has-const": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -12839,7 +13401,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           },
           "phoneVerifiedAt": {
@@ -12851,13 +13413,134 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
         "required": [
           "phoneNumber",
           "phoneVerifiedAt"
+        ]
+      },
+      "PlacesSearchDto": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "x-nestjs_zod-parent-additional-properties": false
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "PlacesSearchResponseDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "placeId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "address": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "businessType": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "venueType": {
+                  "type": "string"
+                },
+                "country": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "timezone": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "openingHours": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "placeId",
+                "name",
+                "address",
+                "businessType",
+                "venueType",
+                "country",
+                "currency",
+                "timezone",
+                "openingHours"
+              ]
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "error": {
+            "type": "string",
+            "const": "lookup-failed",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          }
+        },
+        "required": [
+          "available",
+          "candidates"
         ]
       },
       "RunNudgeResponseDto": {
@@ -12882,7 +13565,7 @@
         "properties": {
           "venueId": {
             "type": "string",
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "questions": {
             "minItems": 1,
@@ -12906,7 +13589,7 @@
                 "text"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "source": {
             "type": "string",
@@ -12914,7 +13597,7 @@
               "generated",
               "fallback"
             ],
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "generatedAt": {
             "anyOf": [
@@ -12925,7 +13608,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -13018,7 +13701,7 @@
                 "address"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "error": {
             "anyOf": [
@@ -13029,7 +13712,7 @@
                 "type": "null"
               }
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-empty-type": true
           }
         },
@@ -13087,23 +13770,23 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "minutesSaved": {
             "type": "number",
             "minimum": 0,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "hoursSaved": {
             "type": "number",
             "minimum": 0,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "valueGbpCents": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "range": {
             "type": "object",
@@ -13119,7 +13802,7 @@
               "from",
               "to"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "scope": {
@@ -13143,7 +13826,7 @@
               "organizationId",
               "venueId"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           },
           "baseline": {
@@ -13163,7 +13846,7 @@
               "minutesPerQuery",
               "hourlyRateCents"
             ],
-            "x-nestjs_zod-has-null": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true,
             "x-nestjs_zod-self-required": true
           }
         },
@@ -13269,7 +13952,8 @@
                 "count",
                 "lastSeen"
               ]
-            }
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -13586,7 +14270,7 @@
                 "firstIndependentAt"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -13618,7 +14302,8 @@
                 "count",
                 "lastSeen"
               ]
-            }
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -13712,7 +14397,7 @@
                 "escalatedToName"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [
@@ -13778,7 +14463,7 @@
                 "lastSeen"
               ]
             },
-            "x-nestjs_zod-has-null": true
+            "x-nestjs_zod-uses-3-point-1-syntax": true
           }
         },
         "required": [

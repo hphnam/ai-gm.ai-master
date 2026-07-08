@@ -17,11 +17,17 @@ export default async function WelcomePage({
 }: {
   searchParams: Promise<SearchParams>
 }) {
-  const session = await getServerSession()
+  // Session and venues are independent cookie-based fetches — run them
+  // together rather than as a waterfall. getServerVenues returns null on a
+  // missing session, so fetching it before the redirect check is harmless.
+  const [session, venuesResult, params] = await Promise.all([
+    getServerSession(),
+    getServerVenues(),
+    searchParams,
+  ])
   if (!session) redirect('/auth/sign-in?redirect=/welcome')
 
-  const params = await searchParams
-  const venues = (await getServerVenues()) ?? []
+  const venues = venuesResult ?? []
   const requestedStep: OnboardingStepId = isStepId(params.step) ? params.step : 'basics'
 
   // Returning users with venues land here only when they explicitly continue
@@ -34,14 +40,18 @@ export default async function WelcomePage({
   // it must belong to this org — otherwise we send them back to basics so the
   // URL can't be tampered into pointing at a venue they don't own.
   const venueId = params.venueId ?? null
-  const venueIdValid = venueId ? venues.some((v) => v.id === venueId) : false
-  const step: OnboardingStepId =
-    requestedStep === 'basics' || venueIdValid ? requestedStep : 'basics'
+  const venue = venueId ? (venues.find((v) => v.id === venueId) ?? null) : null
+  const step: OnboardingStepId = requestedStep === 'basics' || venue ? requestedStep : 'basics'
 
   return (
     <WelcomeBody
       initialStep={step}
-      venueId={venueIdValid ? venueId : null}
+      venueId={venue?.id ?? null}
+      initialVenue={
+        venue
+          ? { name: venue.name, type: venue.type, address: venue.address, timezone: venue.timezone }
+          : null
+      }
       userName={session.user.name}
     />
   )

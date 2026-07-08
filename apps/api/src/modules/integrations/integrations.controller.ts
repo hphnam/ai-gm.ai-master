@@ -24,12 +24,12 @@ import {
 } from './dto/integrations.dto'
 import { IntegrationRegistry } from './integration-registry'
 import { IntegrationsService } from './integrations.service'
-import { createRateLimiter } from './rate-limit'
+import { createRedisRateLimiter } from './rate-limit'
 
 /// Per-org throttle on connect-pat. Generous (10 / 15 min) — managers
 /// rotating a token during incident response should not hit this; a buggy
 /// integration UI or a stolen manager session that hammers the endpoint will.
-const CONNECT_PAT_LIMITER = createRateLimiter(15 * 60_000, 10)
+const CONNECT_PAT_LIMITER = createRedisRateLimiter(15 * 60_000, 10, 'connect-pat')
 
 /// All connect/disconnect routes are owner|manager only. Staff can see WHICH
 /// integrations are connected (via list) but cannot rotate tokens. We don't
@@ -66,7 +66,7 @@ export class IntegrationsController {
     if (!provider) {
       throw new BadRequestException({ error: 'unknown-provider' })
     }
-    if (!CONNECT_PAT_LIMITER.allow(`${org.id}|${params.provider}`)) {
+    if (!(await CONNECT_PAT_LIMITER.allow(`${org.id}|${params.provider}`))) {
       throw new HttpException({ error: 'rate-limited' }, 429)
     }
 

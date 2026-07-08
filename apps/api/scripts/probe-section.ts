@@ -24,6 +24,8 @@ import {
 import { QuoteVerifierService } from '../src/modules/chat/quote-verifier.service'
 import { ToolDispatcher } from '../src/modules/chat/tool-dispatcher'
 import { EmbeddingsService } from '../src/modules/embeddings/embeddings.service'
+import { IntegrationRegistry } from '../src/modules/integrations/integration-registry'
+import { IntegrationsService } from '../src/modules/integrations/integrations.service'
 import { IndexerService } from '../src/modules/indexer/indexer.service'
 import { IngestService } from '../src/modules/ingest/ingest.service'
 import { SectionDetector } from '../src/modules/ingest/section-detector'
@@ -1001,10 +1003,16 @@ async function W24_chatCacheReadObservable(
     return
   }
 
+  // Empty registry + no active providers: this probe exercises cache_control
+  // wiring + retrieval, not integration tools, so the agent only needs its
+  // built-in tool surface (buildGmAgent requires the registry + active set).
+  const integrations = new IntegrationRegistry(new IntegrationsService())
   const buildAgent = () =>
     buildGmAgent({
       dispatcher,
+      integrations,
       ctx,
+      activeProviderIds: new Set<string>(),
       venueContext,
       userContext,
     })

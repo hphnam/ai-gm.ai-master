@@ -196,6 +196,24 @@ export type ChecklistInstanceKey = z.infer<typeof ChecklistInstanceKeySchema>
 
 export type ProcessingStatus = 'processing' | 'ready' | 'failed'
 
+// Minimal pointer to another version of a doc — the immediate successor or
+// predecessor in a supersede chain. Title is null for untitled docs.
+export type DocVersionRef = {
+  id: string
+  title: string | null
+}
+
+// One version in a doc's full lineage, newest first. supersededAt null marks the
+// single live version; isCurrent flags the entry the reader is viewing.
+export type DocVersionHistoryEntry = {
+  id: string
+  title: string | null
+  version: number
+  supersededAt: string | null
+  updatedAt: string
+  isCurrent: boolean
+}
+
 export type DocListItem = {
   id: string
   title: string | null
@@ -210,6 +228,12 @@ export type DocListItem = {
   isProcedural: boolean
   processingStatus: ProcessingStatus
   processingError: string | null
+  // Version-history lifecycle. version is display-only (1 for never-superseded
+  // docs); supersededAt is non-null only on archived rows, which the library
+  // hides from every listing — they're reachable via a live doc's version
+  // history.
+  version: number
+  supersededAt: string | null
   createdAt: string
   updatedAt: string
 }
@@ -242,6 +266,14 @@ export type DocDetail = {
   docPurpose: DocPurpose | null
   processingStatus: ProcessingStatus
   processingError: string | null
+  // Version history. version is display-only. supersededBy is the successor that
+  // archived this doc (non-null ⇒ this row is archived). versionHistory is the
+  // full lineage this doc belongs to (newest first, including this doc); empty
+  // when the doc has never been superseded and has no predecessors.
+  version: number
+  supersededAt: string | null
+  supersededBy: DocVersionRef | null
+  versionHistory: DocVersionHistoryEntry[]
   createdAt: string
   updatedAt: string
 }

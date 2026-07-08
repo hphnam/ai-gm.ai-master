@@ -30,6 +30,9 @@ export type {
 import { AdaptationService } from '../adaptation/adaptation.service'
 import { IncidentsService } from '../incidents/incidents.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import type { MemoryAction } from '../organization/agent-memory'
+import { handleMemoryCommand } from '../organization/agent-memory.store'
+import { loadOrganizationProfile } from '../organization/organization.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
@@ -360,21 +363,22 @@ export class ChatService implements OnModuleInit {
   ///  - Soft-fails to an empty snapshot — the agent falls back to find_knowledge.
   private async buildVenueSnapshot(orgId: string, venueId: string): Promise<VenueSnapshot> {
     try {
-      const rows = await prisma.knowledgeItem.findMany({
-        where: {
-          organizationId: orgId,
-          OR: [{ venueId }, { venueId: null }],
-          answerStatus: 'answered',
-        },
-        orderBy: [{ updatedAt: 'desc' }],
-        take: 48,
-        select: {
-          id: true,
-          content: true,
-          aiSummary: true,
-          metadata: true,
-        },
-      })
+      // Only the first ~2000 chars of content are ever used (80-char title,
+      // 240-char summary, 2000-char capped org chart). Pull a bounded prefix
+      // via left() instead of the full column — content holds entire tabular
+      // doc bodies (hundreds of KB) and this runs in the per-turn TTFB preamble.
+      const rows = await prisma.$queryRaw<
+        { id: string; content: string; aiSummary: string | null; metadata: unknown }[]
+      >`
+        SELECT id, left(content, 4000) AS content, "aiSummary", metadata
+        FROM "knowledge_items"
+        WHERE "organizationId" = ${orgId}
+          AND ("venueId" = ${venueId} OR "venueId" IS NULL)
+          AND "answerStatus" = 'answered'
+          AND "supersededAt" IS NULL
+        ORDER BY "updatedAt" DESC
+        LIMIT 48
+      `
 
       const topKnowledge: VenueSnapshot['topKnowledge'] = []
       const recentlyAnswered: VenueSnapshot['recentlyAnswered'] = []
@@ -672,7 +676,7 @@ Assistant answer: ${assistantText}`,
     // 03-03 Task 3: when an image attachment is present, persist a placeholder into
     // ChatMessage.content (schema has no image column) so conversation history shows
     // "user sent image" without storing base64. Placeholder includes sourceRef
-    // (Infobip inbound messageId in the WhatsApp flow — previously Twilio MessageSid) for forensic correlation (audit S2).
+    // (Twilio inbound MessageSid in the WhatsApp flow) for forensic correlation (audit S2).
     const userContent = input.attachment
       ? (() => {
           const byteSize = Buffer.from(input.attachment.base64, 'base64').length
@@ -749,10 +753,22 @@ Assistant answer: ${assistantText}`,
       venueSnapshot.tabularDocs?.length ?? 0,
     )
 
+    const [activeProviderIds, businessProfile, integrationsSummary] = await Promise.all([
+      this.integrations.getActiveProviderIds(orgId),
+      loadOrganizationProfile(orgId),
+      this.integrations.describeActiveIntegrations(orgId),
+    ])
     const agent = buildGmAgent({
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx: { orgId, userId, userRole },
+      activeProviderIds,
+      businessProfile,
+      integrationsSummary,
+      memoryExecute:
+        process.env.AGENT_MEMORY_DISABLED === '1'
+          ? null
+          : (action: MemoryAction) => handleMemoryCommand(orgId, action),
       venueContext,
       mode: agentMode,
       priorSummary: compaction.summary,
@@ -781,8 +797,14 @@ Assistant answer: ${assistantText}`,
           if (tr.toolName === 'find_knowledge') {
             const output = tr.output as { ok?: boolean; data?: unknown } | null
             if (output?.ok && Array.isArray(output.data)) {
-              for (const hit of output.data as Array<{ id?: string }>) {
-                if (hit?.id) retrievedItemIds.add(hit.id)
+              // Collect hit.entityId (the KnowledgeItem id), NOT hit.id (the
+              // SearchableEntity row id) — auto-verify and the feedback re-tag
+              // queue both look these ids up in knowledgeItem, so se row ids
+              // matched nothing and silently no-op'd both pipelines.
+              for (const hit of output.data as Array<{ entityType?: string; entityId?: string }>) {
+                if (hit?.entityType === 'knowledge_item' && hit.entityId) {
+                  retrievedItemIds.add(hit.entityId)
+                }
               }
             }
           }
@@ -1126,8 +1148,8 @@ Assistant answer: ${assistantText}`,
   }): Promise<{
     conversationId: string
     assistantMessageId: string
-    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any output schema
-    result: StreamTextResult<ToolSet, any>
+    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any runtime context + output schema
+    result: StreamTextResult<ToolSet, any, any>
   }> {
     const venue = await prisma.venue.findFirst({
       where: { id: params.venueId, organizationId: params.orgId },
@@ -1235,14 +1257,25 @@ Assistant answer: ${assistantText}`,
       streamHistory.find((m) => m.role === 'user')?.content ?? params.userText
 
     // Pre-amble — fan out everything in parallel to minimise TTFB.
-    const [streamCompaction, agentMode, venueContext, profileSummary, venueSnapshot] =
-      await Promise.all([
-        this.compactor.compactIfNeeded(conversationId, streamHistory),
-        this.resolveConversationMode(conversationId, firstUserMessage),
-        this.buildVenueContext(venue),
-        this.getUserProfileSummary(params.userId, params.orgId),
-        this.buildVenueSnapshot(params.orgId, venue.id),
-      ])
+    const [
+      streamCompaction,
+      agentMode,
+      venueContext,
+      profileSummary,
+      venueSnapshot,
+      activeProviderIds,
+      businessProfile,
+      integrationsSummary,
+    ] = await Promise.all([
+      this.compactor.compactIfNeeded(conversationId, streamHistory),
+      this.resolveConversationMode(conversationId, firstUserMessage),
+      this.buildVenueContext(venue),
+      this.getUserProfileSummary(params.userId, params.orgId),
+      this.buildVenueSnapshot(params.orgId, venue.id),
+      this.integrations.getActiveProviderIds(params.orgId),
+      loadOrganizationProfile(params.orgId),
+      this.integrations.describeActiveIntegrations(params.orgId),
+    ])
     const modelMessages: ModelMessage[] = expandRecentToModelMessages(
       streamCompaction.recent,
       streamToolCallsByMessageId,
@@ -1263,6 +1296,13 @@ Assistant answer: ${assistantText}`,
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx,
+      activeProviderIds,
+      businessProfile,
+      integrationsSummary,
+      memoryExecute:
+        process.env.AGENT_MEMORY_DISABLED === '1'
+          ? null
+          : (action: MemoryAction) => handleMemoryCommand(params.orgId, action),
       venueContext,
       mode: agentMode,
       priorSummary: streamCompaction.summary,
@@ -1292,8 +1332,12 @@ Assistant answer: ${assistantText}`,
           if (tr.toolName === 'find_knowledge') {
             const output = tr.output as { ok?: boolean; data?: unknown } | null
             if (output?.ok && Array.isArray(output.data)) {
-              for (const hit of output.data as Array<{ id?: string }>) {
-                if (hit?.id) retrievedItemIds.add(hit.id)
+              // entityId = KnowledgeItem id; hit.id is the SearchableEntity row
+              // id, which auto-verify/re-tag can't resolve (see sendMessage path).
+              for (const hit of output.data as Array<{ entityType?: string; entityId?: string }>) {
+                if (hit?.entityType === 'knowledge_item' && hit.entityId) {
+                  retrievedItemIds.add(hit.entityId)
+                }
               }
             }
           }

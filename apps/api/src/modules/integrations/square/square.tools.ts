@@ -333,7 +333,7 @@ const laborWindowProps = windowJsonSchemaProps({
   maxHours: LABOR_MAX_HOURS,
 })
 
-export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = [
+const BASE_SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = [
   {
     name: POS_SEARCH_ITEMS,
     description:
@@ -542,7 +542,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_GET_TOP_ITEMS,
     description:
-      'Top-selling items at a venue in a time window, ranked by revenue or quantity. FIRES on "what\'s our best seller this week", "top 10 wines this month", "which items are moving". Aggregates COMPLETED order line items, sums quantity + grossSales per catalog item. Returns name, variation, quantitySold, grossSales (in major units), and orderCount. Default sort is "revenue" — change to "quantity" for unit-volume questions. Truncates to top 50.',
+      'Top-selling items at a venue in a time window, ranked by revenue or quantity. FIRES on "what\'s our best seller this week", "top 10 wines this month", "which items are moving". Aggregates COMPLETED order line items, grouped by parent item (the way the Square Reports app groups them) so each beer ranks on its combined total. Returns name, quantitySold, grossSales (major units), orderCount, and a `variations` array splitting the item by size (e.g. pint vs half) — each with name, quantitySold, grossSales. When an item sold in more than one size, present the per-size split beneath it; for a single-size item the array has one entry and no split is needed. Default sort is "revenue" — change to "quantity" for unit-volume questions. Truncates to top 50.',
     input_schema: {
       type: 'object',
       properties: {
@@ -561,7 +561,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_GET_PAYMENT_BREAKDOWN,
     description:
-      'Tender mix + tips + average ticket from completed Square Payments at a venue. FIRES on "cash vs card today", "what % was card", "tips this week", "average ticket size", "how much did we take in cash". Returns paymentCount, totalCollected, by-tender breakdown (CARD / CASH / OTHER) with amount and count, total tips, and averageTicket. Computed from Payment objects (not Order totals) so tender split is accurate even when one ticket is split-paid. Window can be rolling or fixed.',
+      'Tender mix + tips + average ticket from completed Square orders at a venue. FIRES on "cash vs card today", "what % was card", "tips this week", "average ticket size", "how much did we take in cash". Returns paymentCount (completed ticket/order count — a split-paid ticket counts once, so it can be less than the summed by-tender counts), totalCollected, by-tender breakdown (CARD / CASH / OTHER) with amount and count, total tips, and averageTicket (totalCollected ÷ tickets). Computed from order tenders — the same source the Square Reports app reads — so totals and tender split match Square exactly, and split-paid tickets stay accurate. Window can be rolling or fixed.',
     input_schema: {
       type: 'object',
       properties: {
@@ -644,7 +644,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_GET_ITEM_COSTS,
     description:
-      'Weighted-average unit cost per catalog variation, derived from Square inventory RECEIVE adjustments at the venue. FIRES when the agent needs per-item COGS inputs — typically called by pos_get_cogs_summary internally, but exposed directly so the agent can answer "what does X cost us" / "what\'s our cost on the house red". Pass an optional `catalogObjectIds` list to scope; otherwise returns all variations with any receive history. lookbackDays defaults to 90 (more receives → more stable weighted average). Returns unitCost, quantityReceived, receiveEvents per variation. unitCost is null when the variation has no priced receive on file (operator likely doesn\'t use Square for purchasing).',
+      'Unit cost per catalog variation. FIRES when the agent needs per-item COGS inputs — typically called by pos_get_cogs_summary internally, but exposed directly so the agent can answer "what does X cost us" / "what\'s our cost on the house red". Cost comes from the catalog (the variation\'s defaultUnitCost, or its vendor price), preferring a receive-derived weighted average when the venue has priced receives on file. Each row\'s `source` says which won (catalog-default | receive-weighted-average | none). Pass an optional `catalogObjectIds` list to scope. lookbackDays defaults to 90 (governs the receive lookback only; catalog cost ignores it). Returns unitCost, quantityReceived, receiveEvents, source per variation. unitCost is null only when the variation has no cost set in Square at all.',
     input_schema: {
       type: 'object',
       properties: {
@@ -666,7 +666,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_GET_COGS_SUMMARY,
     description:
-      'Compute COGS + gross margin for a sales window. FIRES on "what\'s our COGS today", "calculate GP", "what\'s the gross margin this week", "cost of sales report", "how much did we spend on stock", "P&L numbers". Returns cogsAmount, grossSales, netSales, grossMarginPct, coverageRate, topUncostedItems, recommendManualCostPercent, and a structured `noData` object when Square couldn\'t supply cost data. IMPORTANT — Square\'s public API does NOT expose vendor cost for the typical seller; in production this tool will usually return cogsAmount:null, coverageRate:0, recommendManualCostPercent:true, and noData:{reason:"square-api-does-not-expose-vendor-cost", suggestedCostPercent:30, suggestedCostPercentRange:{min:25,max:35}, ...}. THIS IS THE EXPECTED FLOW — DO NOT TELL THE USER "no data". Instead: state the gross sales figure, say you can\'t pull vendor cost from Square automatically, offer the suggestedCostPercent (or ask the user for their own) and call pos_compute_cogs_from_percent on the next turn. The other noData reason "no-completed-orders-in-window" means the date range was empty — confirm the window with the user instead of asking for a cost %. Window: rolling sinceHours OR fixed fromIso/toIso (default 24h).',
+      'Compute COGS + gross margin for a sales window. FIRES on "what\'s our COGS today", "calculate GP", "what\'s the gross margin this week", "cost of sales report", "how much did we spend on stock", "P&L numbers". Joins items sold × unit cost, where unit cost comes from the catalog (the variation\'s defaultUnitCost / vendor price), preferring a receive-derived weighted average when present. Returns cogsAmount, grossSales, netSales, grossMarginPct, coverageRate, topUncostedItems, recommendManualCostPercent, and a structured `noData` object. USUAL CASE — venues that have costed their items in Square return a real cogsAmount + grossMarginPct; present them, using coverageRate as a caveat when <100. PARTIAL — coverageRate between 0 and 50 means only some items are costed: present the partial figure and offer to fill the rest with a typical cost %. NO-COST — noData.reason "no-unit-cost-on-catalog-items" means NONE of the sold items have a cost set in Square: state gross sales, note the items aren\'t costed in Square, offer suggestedCostPercent (or ask for theirs) and call pos_compute_cogs_from_percent next turn. NEVER just say "no data" and stop. noData.reason "no-completed-orders-in-window" means the date range was empty — confirm the window instead of asking for a cost %. Window: rolling sinceHours OR fixed fromIso/toIso (default 24h).',
     input_schema: {
       type: 'object',
       properties: {
@@ -684,7 +684,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_COMPUTE_COGS_FROM_PERCENT,
     description:
-      'Pure calculator — given a gross revenue figure and an operator-supplied cost %, return computed COGS + grossMarginPct. NO Square call. FIRES after pos_get_cogs_summary returns recommendManualCostPercent=true AND the user has supplied a typical cost % in the next turn (e.g. "use 32%"). Lets the agent close the loop on GP for venues that don\'t use Square for purchasing. Skip when you already have a reliable COGS from pos_get_cogs_summary.',
+      'Pure calculator — given a gross revenue figure and an operator-supplied cost %, return computed COGS + grossMarginPct. NO Square call. FIRES after pos_get_cogs_summary returns recommendManualCostPercent=true AND the user has supplied a typical cost % in the next turn (e.g. "use 32%"). Lets the agent close the loop on GP for venues that haven\'t costed their items in Square. Skip when you already have a reliable COGS from pos_get_cogs_summary.',
     input_schema: {
       type: 'object',
       properties: {
@@ -948,7 +948,7 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
   {
     name: POS_LIST_DEVICES,
     description:
-      'List Square terminals / devices, optionally scoped to a venue. FIRES on "are all terminals online", "what devices are paired", "show me the tills", "any device offline". Returns id, name, status (the SDK\'s status enum), productType, deviceCode. Pass venueId to scope to that venue\'s mapped location; omit for the whole account.',
+      'List Square terminals / devices, optionally scoped to a venue. FIRES on "are all terminals online", "what devices are paired", "show me the tills", "any device offline". Returns id, name, status (the SDK\'s status enum), productType, deviceCode. Pass venueId to scope to that venue\'s mapped location; omit for the whole account. Only Square hardware paired to the account (Terminals / Registers) appears — phones or iPads running the POS app do not. If the venue\'s location has no devices the result falls back to the whole account and says so in `note`.',
     input_schema: {
       type: 'object',
       properties: {
@@ -963,3 +963,29 @@ export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
     },
   },
 ]
+
+// Staff-visible allowlist. The registry treats every OTHER tool as manager-only
+// by default (fail closed — see IntegrationToolDefinition.minRole), so a newly
+// added Square tool is withheld from staff until it's deliberately listed here.
+// The line is "Financials + cross-person PII": these carry neither. Menu prices
+// are customer-facing; stock/devices/locations are operational; tonight's
+// bookings are team-visible (names, no money); the shift-LISTING tools show
+// who's on / the rota (the provider redacts hourlyRate/estimatedCost per row
+// for staff — see redactShiftPayForStaff). Everything with revenue, cost,
+// margin, payouts, disputes, customer PII, the team roster, or a labour-COST
+// summary is intentionally absent and therefore manager-only.
+const STAFF_VISIBLE_POS_TOOLS: ReadonlySet<string> = new Set<string>([
+  POS_SEARCH_ITEMS,
+  POS_GET_ITEM_INVENTORY,
+  POS_LIST_LOCATIONS,
+  POS_LIST_BOOKINGS,
+  POS_LIST_DEVICES,
+  POS_LIST_RECENT_SHIFTS,
+  POS_GET_ACTIVE_SHIFTS,
+  POS_LIST_SCHEDULED_SHIFTS,
+])
+
+export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =
+  BASE_SQUARE_TOOL_DEFINITIONS.map((def) =>
+    STAFF_VISIBLE_POS_TOOLS.has(def.name) ? { ...def, minRole: 'staff' as const } : def,
+  )

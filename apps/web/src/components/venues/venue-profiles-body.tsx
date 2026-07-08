@@ -1,8 +1,8 @@
 'use client'
 
-import { Check, ChevronDown, MapPin, Plus, Store } from 'lucide-react'
+import { Check, ChevronDown, MapPin, Plus, RotateCcw, Store } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,22 +14,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 import { VenueProfileEditor } from './venue-profile-editor'
 
 export function VenueProfilesBody() {
   const venues = useVenues()
+  const { isManager } = useCurrentMember()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Fall back to the first venue during render rather than writing derived state in an effect.
+  const activeId = selectedId ?? venues.data?.[0]?.id ?? null
 
-  // Auto-select first venue once loaded.
-  useEffect(() => {
-    if (!selectedId && venues.data && venues.data.length > 0) {
-      setSelectedId(venues.data[0].id)
-    }
-  }, [venues.data, selectedId])
-
-  const detail = useVenue(selectedId)
+  const detail = useVenue(activeId)
 
   if (venues.isLoading) {
     return (
@@ -48,22 +45,40 @@ export function VenueProfilesBody() {
         title="No venues yet"
         description="Create your first venue to start adding context the AI can read."
         action={
-          <Button asChild size="sm" className="cursor-pointer gap-1.5">
-            <Link href="/venues/new">
-              <Plus className="h-3.5 w-3.5" aria-hidden />
-              New venue
-            </Link>
-          </Button>
+          isManager ? (
+            <Button asChild size="sm" className="cursor-pointer gap-1.5">
+              <Link href="/venues/new">
+                <Plus className="h-3.5 w-3.5" aria-hidden />
+                New venue
+              </Link>
+            </Button>
+          ) : undefined
         }
       />
     )
   }
 
-  const activeVenue = venues.data.find((v) => v.id === selectedId) ?? venues.data[0]
+  const activeVenue = venues.data.find((v) => v.id === activeId) ?? venues.data[0]
 
   return (
     <div className="space-y-5">
       <VenuePicker venues={venues.data} activeId={activeVenue.id} onSelect={setSelectedId} />
+
+      {isManager ? (
+        <div className="-mt-3 flex justify-end">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="min-h-11 gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Link href={`/welcome?venueId=${activeVenue.id}&step=basics`}>
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+              Re-run guided setup
+            </Link>
+          </Button>
+        </div>
+      ) : null}
 
       {detail.isLoading ? (
         <div className="space-y-3">
@@ -87,6 +102,7 @@ function VenuePicker({
   activeId: string
   onSelect: (id: string) => void
 }) {
+  const { isManager } = useCurrentMember()
   const active = venues.find((v) => v.id === activeId)
   if (!active) return null
   const count = venues.length
@@ -109,7 +125,7 @@ function VenuePicker({
             <Store className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Editing
             </p>
             <p className="truncate text-sm font-medium text-foreground">{active.name}</p>
@@ -135,7 +151,7 @@ function VenuePicker({
         align="start"
         className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[280px]"
       >
-        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
           {count === 1 ? 'Your venue' : 'Switch venue'}
         </DropdownMenuLabel>
         {venues.map((v) => (
@@ -159,13 +175,17 @@ function VenuePicker({
             ) : null}
           </DropdownMenuItem>
         ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/venues/new" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" aria-hidden />
-            New venue
-          </Link>
-        </DropdownMenuItem>
+        {isManager ? (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/venues/new" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" aria-hidden />
+                New venue
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -50,6 +50,8 @@ export const API_ERROR_CODES = [
   'checklist-extraction-failed',
   // AI suggest-name button — classifier returned 'none' (low signal).
   'category-suggestion-unavailable',
+  // Manual doc reconcile — same id, or one side already archived.
+  'reconcile-conflict',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }
@@ -112,6 +114,17 @@ export const CreateVenueBodySchema = z.object({
   timezone: z.string().trim().min(1, 'timezone required').max(64),
 })
 export type CreateVenueBody = z.infer<typeof CreateVenueBodySchema>
+
+export const UpdateVenueBodySchema = z
+  .object({
+    name: z.string().trim().min(1, 'name required').max(120, 'name too long'),
+    type: z.string().trim().min(1, 'type required').max(40, 'type too long'),
+    address: z.string().trim().max(240, 'address too long').or(z.literal('')),
+    timezone: z.string().trim().min(1, 'timezone required').max(64),
+  })
+  .partial()
+  .strict()
+export type UpdateVenueBody = z.infer<typeof UpdateVenueBodySchema>
 
 /// Phase D — structured venue operational profile. All fields optional so
 /// owners can fill incrementally. The agent reads this on every conversation

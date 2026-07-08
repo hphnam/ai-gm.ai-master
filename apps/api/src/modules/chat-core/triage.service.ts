@@ -77,6 +77,7 @@ export class TriageService {
       const result = await generateObject({
         model: anthropicProvider(HAIKU_MODEL),
         schema: TriageOutputSchema,
+        allowSystemInMessages: true,
         messages: [...systemMessages, { role: 'user', content: userMessage }],
         abortSignal: controller.signal,
         maxRetries: 2,

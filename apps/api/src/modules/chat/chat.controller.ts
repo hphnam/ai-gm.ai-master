@@ -10,6 +10,7 @@ import {
   Get,
   HttpCode,
   HttpException,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -52,6 +53,8 @@ const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024
 @Controller('chat')
 @UseGuards(AuthGuard, RoleGuard)
 export class ChatController {
+  private readonly logger = new Logger(ChatController.name)
+
   constructor(
     private readonly chatService: ChatService,
     private readonly conversationService: ConversationService,
@@ -176,7 +179,9 @@ export class ChatController {
   @Post('stream')
   @HttpCode(200)
   async streamMessage(
-    @Body() body: StreamChatMessageRequestDto,
+    // No global validation pipe exists, so an unpiped @Body is raw JSON —
+    // prepareStream (unlike sendMessage) does not re-parse in the service.
+    @Body(new ZodValidationPipe(StreamChatMessageRequestDto)) body: StreamChatMessageRequestDto,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
@@ -206,7 +211,17 @@ export class ChatController {
           }
           return undefined
         },
-        onError: (err) => (err as Error)?.message ?? 'stream error',
+        onError: (err) => {
+          // Never forward raw error text (Anthropic/Prisma internals) to the client.
+          this.logger.error(
+            JSON.stringify({
+              event: 'chat.stream_error',
+              conversationId,
+              message: (err as Error)?.message ?? String(err),
+            }),
+          )
+          return 'The assistant hit an internal error mid-stream — please retry.'
+        },
       })
     } catch (err) {
       const translated = translateChatServiceError(err as Error)

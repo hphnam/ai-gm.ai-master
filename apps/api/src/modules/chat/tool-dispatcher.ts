@@ -15,6 +15,7 @@ import { ChatCoreService } from '../chat-core/chat-core.service'
 import { IncidentsService } from '../incidents/incidents.service'
 import { IngestService } from '../ingest/ingest.service'
 import { IntegrationRegistry } from '../integrations/integration-registry'
+import { createRedisRateLimiter } from '../integrations/rate-limit'
 import { MockOpsService } from '../mock-ops/mock-ops.service'
 import { PricingRecommendationsService } from '../pricing-recommendations/pricing-recommendations.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
@@ -24,6 +25,7 @@ import { RetrievalService } from '../retrieval/retrieval.service'
 import { ScheduledReportsService } from '../scheduled-reports/scheduled-reports.service'
 import { TabularQueryService } from '../tabular/tabular.service'
 import { TasksService } from '../tasks/tasks.service'
+import { findPerson, redactPersonForRole } from './find-person'
 import { QuoteVerifierService } from './quote-verifier.service'
 
 export type DispatchContext = {
@@ -45,47 +47,17 @@ export type DispatchContext = {
 // process / single node — sufficient for the current Nest server. If we scale
 // horizontally swap this for a Redis token bucket. Kept module-scoped so the
 // state survives request lifecycles.
-const LEAVE_NOTE_WINDOW_MS = 60_000
-const LEAVE_NOTE_LIMIT_PER_WINDOW = 5
-const leaveNoteRateLimit = (() => {
-  const buckets = new Map<string, number[]>()
-  return {
-    allow(authorUserId: string): boolean {
-      const now = Date.now()
-      const cutoff = now - LEAVE_NOTE_WINDOW_MS
-      const recent = (buckets.get(authorUserId) ?? []).filter((t) => t > cutoff)
-      if (recent.length >= LEAVE_NOTE_LIMIT_PER_WINDOW) {
-        buckets.set(authorUserId, recent)
-        return false
-      }
-      recent.push(now)
-      buckets.set(authorUserId, recent)
-      return true
-    },
-  }
-})()
+// Shared per-user write throttle for the agent's notify/task/pricing actions
+// (leave_note_for_user, create_task, record_pricing_recommendation). Redis-
+// backed so a model can't bypass it by being load-balanced across API nodes.
+// 15/min/user: a manager setting up a shift can fire off several tasks + notes
+// in a burst without tripping it, while a runaway/injected write loop is still
+// bounded.
+const leaveNoteRateLimit = createRedisRateLimiter(60_000, 15, 'leave-note')
 
 // Mirror of the controller-level throttle for the agent tool path so a
 // jailbroken model can't bypass it by going through chat.
-const SCHEDULE_REPORT_WINDOW_MS = 60_000
-const SCHEDULE_REPORT_LIMIT_PER_WINDOW = 5
-const scheduleReportRateLimit = (() => {
-  const buckets = new Map<string, number[]>()
-  return {
-    allow(userId: string): boolean {
-      const now = Date.now()
-      const cutoff = now - SCHEDULE_REPORT_WINDOW_MS
-      const recent = (buckets.get(userId) ?? []).filter((t) => t > cutoff)
-      if (recent.length >= SCHEDULE_REPORT_LIMIT_PER_WINDOW) {
-        buckets.set(userId, recent)
-        return false
-      }
-      recent.push(now)
-      buckets.set(userId, recent)
-      return true
-    },
-  }
-})()
+const scheduleReportRateLimit = createRedisRateLimiter(60_000, 5, 'schedule-report')
 
 @Injectable()
 export class ToolDispatcher {
@@ -187,16 +159,35 @@ export class ToolDispatcher {
           const expanded = await this.expandChecklistStepHits(result.data, ctx.orgId)
           return this.applyFindKnowledgeFormat(expanded, ctx.orgId)
         }
-        case 'get_stock_below_par':
-          return await this.mockOps.getStockBelowPar((parsed.data as { venueId: string }).venueId)
+        case 'get_stock_below_par': {
+          if (!ctx) return fail('error', 'get_stock_below_par requires an authenticated context')
+          const i = parsed.data as { venueId: string }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
+          return await this.mockOps.getStockBelowPar(i.venueId)
+        }
         case 'get_stock_by_name': {
+          if (!ctx) return fail('error', 'get_stock_by_name requires an authenticated context')
           const i = parsed.data as { venueId: string; name: string }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
           return await this.mockOps.getStockByName(i.venueId, i.name)
         }
-        case 'get_supplier_by_name':
-          return await this.mockOps.getSupplierByName((parsed.data as { name: string }).name)
+        case 'get_supplier_by_name': {
+          if (!ctx) return fail('error', 'get_supplier_by_name requires an authenticated context')
+          return await this.mockOps.getSupplierByName(
+            (parsed.data as { name: string }).name,
+            ctx.orgId,
+          )
+        }
         case 'get_upcoming_cutoffs': {
+          if (!ctx) return fail('error', 'get_upcoming_cutoffs requires an authenticated context')
           const i = parsed.data as { venueId: string; withinHours?: number }
+          if (!(await this.venueBelongsToOrg(i.venueId, ctx.orgId))) {
+            return fail('error', 'venue not found in your organisation')
+          }
           return await this.mockOps.getUpcomingCutoffs(i.venueId, i.withinHours)
         }
         case 'log_incident': {
@@ -342,8 +333,13 @@ export class ToolDispatcher {
             return fail('error', 'only managers or owners can add supplier notes')
           }
           const i = parsed.data as { supplierName: string; note: string }
+          // MockSupplier has no org column (TEMPORARY table) — scope through
+          // the stock relation so one org can't read/write another's suppliers.
           const matches = await prisma.mockSupplier.findMany({
-            where: { name: { contains: i.supplierName, mode: 'insensitive' } },
+            where: {
+              name: { contains: i.supplierName, mode: 'insensitive' },
+              mockStock: { some: { venue: { organizationId: ctx.orgId } } },
+            },
             select: { id: true, name: true, notes: true },
             take: 2,
           })
@@ -494,6 +490,7 @@ export class ToolDispatcher {
             const seed = await prisma.knowledgeItem.findFirst({
               where: {
                 organizationId: ctx.orgId,
+                supersededAt: null,
                 tabularColumns: { some: {} },
               },
               select: { id: true },
@@ -517,6 +514,7 @@ export class ToolDispatcher {
             where: {
               organizationId: ctx.orgId,
               id: { not: startingDocId },
+              supersededAt: null,
               tabularColumns: { some: {} },
             },
             select: { id: true },
@@ -630,6 +628,24 @@ export class ToolDispatcher {
             return fail('error', `deep_research failed: ${message}`)
           }
         }
+        case 'find_person': {
+          if (!ctx) {
+            return fail('error', 'find_person requires an authenticated context')
+          }
+          const i = parsed.data as { name: string }
+          const resolved = await findPerson(i.name, { orgId: ctx.orgId }, prisma)
+          // Redaction is applied to the RESULT (not the prompt) so a jailbroken
+          // model can't talk its way into another person's PII.
+          const scoped = redactPersonForRole(resolved, ctx.userRole)
+          if (
+            scoped.members.length === 0 &&
+            scoped.contacts.length === 0 &&
+            scoped.mentions.length === 0
+          ) {
+            return fail('no-data', `no one matching "${i.name}" in this organisation`)
+          }
+          return ok(scoped)
+        }
         case 'leave_note_for_user': {
           if (!ctx) {
             return fail('error', 'leave_note_for_user requires an authenticated context')
@@ -642,7 +658,7 @@ export class ToolDispatcher {
           // Per-author throttle. Prompt-injection from indexed knowledge could
           // otherwise drive the agent to mass-spam managers from a single
           // chat turn. Cap CREATE attempts (not lookups) at 5/min/author.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail(
               'error',
               'too many notes in a short window — slow down or compose from the bell menu',
@@ -803,7 +819,7 @@ export class ToolDispatcher {
           // Per-author throttle reuse — same window covers leave_note + tasks
           // since both are "agent writes a row addressed at another user". A
           // jailbroken prompt could otherwise drive the agent to spam tasks.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail(
               'error',
               'too many tasks in a short window — slow down or compose from the dashboard',
@@ -1038,7 +1054,7 @@ export class ToolDispatcher {
           if (!ctx) {
             return fail('error', 'schedule_report requires an authenticated context')
           }
-          if (!scheduleReportRateLimit.allow(ctx.userId)) {
+          if (!(await scheduleReportRateLimit.allow(ctx.userId))) {
             return fail('error', 'rate-limited: too many schedule creations — try again shortly')
           }
           const i = parsed.data as {
@@ -1167,7 +1183,7 @@ export class ToolDispatcher {
           }
           // Reuse the per-author throttle so a jailbroken prompt can't flood
           // the review queue. Same window as leave_note / create_task.
-          if (!leaveNoteRateLimit.allow(ctx.userId)) {
+          if (!(await leaveNoteRateLimit.allow(ctx.userId))) {
             return fail('error', 'too many pricing recommendations in a short window — slow down')
           }
           const i = parsed.data as {
@@ -1296,6 +1312,17 @@ export class ToolDispatcher {
         }),
       )
     }
+  }
+
+  /// Cross-tenant guard for tools that take a model-supplied venueId. The
+  /// model's inputs are attacker-influenced (prompt injection via uploaded
+  /// docs), so every venue-scoped read must confirm org ownership.
+  private async venueBelongsToOrg(venueId: string, orgId: string): Promise<boolean> {
+    const venue = await prisma.venue.findFirst({
+      where: { id: venueId, organizationId: orgId },
+      select: { id: true },
+    })
+    return venue !== null
   }
 
   /**

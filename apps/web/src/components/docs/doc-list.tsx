@@ -1,5 +1,6 @@
 'use client'
 
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   AlertTriangle,
   BookOpen,
@@ -11,7 +12,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,22 +25,10 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { DocListItemDto as DocListItem } from '@/generated/api'
+import { formatRelative } from '@/lib/format-relative'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
 import { cn } from '@/lib/utils'
-
-function formatRelative(iso: string): string {
-  const ts = new Date(iso).getTime()
-  const diffMs = Date.now() - ts
-  const mins = Math.round(diffMs / 60_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.round(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  const days = Math.round(hrs / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(iso).toLocaleDateString()
-}
 
 type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
 
@@ -99,7 +88,7 @@ function DeleteDocButton({ doc }: { doc: DocListItem }) {
         aria-label="Delete document"
         title="Delete document"
         onClick={() => setOpen(true)}
-        className="cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:opacity-100"
+        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:opacity-100 md:h-8 md:w-8"
       >
         <Trash2 className="h-4 w-4" aria-hidden />
       </button>
@@ -142,10 +131,10 @@ function DocRow({ doc }: { doc: DocListItem }) {
   const title = doc.title?.trim() || 'Untitled document'
 
   return (
-    <li
+    <div
       className={cn(
         'group relative flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-foreground/20 hover:bg-accent/40',
-        doc.processingStatus === 'failed' && 'border-red-500/20',
+        doc.processingStatus === 'failed' && 'border-destructive/20',
       )}
     >
       <div
@@ -161,7 +150,7 @@ function DocRow({ doc }: { doc: DocListItem }) {
           href={`/docs/${doc.id}`}
           className="block rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4 sm:text-[15px]">
+          <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4">
             {title}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground sm:text-sm">
@@ -177,10 +166,10 @@ function DocRow({ doc }: { doc: DocListItem }) {
           </p>
         </Link>
       </div>
-      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-100 transition-opacity md:opacity-0 md:focus-within:opacity-100 md:group-hover:opacity-100">
         <DeleteDocButton doc={doc} />
       </div>
-    </li>
+    </div>
   )
 }
 
@@ -201,6 +190,25 @@ function DocListSkeleton() {
   )
 }
 
+// Card height (~68px) plus the 8px inter-row gap baked into each wrapper's
+// bottom padding. Only the initial estimate — rows re-measure on mount.
+const ROW_ESTIMATE_PX = 76
+
+// The docs page scrolls through an ancestor container (see docs-body.tsx), not
+// a container owned by this list, so the virtualizer reads that ancestor as its
+// scroll element and offsets item positions by the list's distance from the
+// scroll origin (scrollMargin). Keeping the list at full height preserves the
+// load-more sentinel that lives just below it in library-tab.tsx.
+function getScrollParent(node: HTMLElement): HTMLElement | null {
+  let el: HTMLElement | null = node.parentElement
+  while (el) {
+    const overflowY = getComputedStyle(el).overflowY
+    if (overflowY === 'auto' || overflowY === 'scroll') return el
+    el = el.parentElement
+  }
+  return null
+}
+
 export function DocList({
   docs,
   isLoading,
@@ -210,9 +218,36 @@ export function DocList({
   isLoading: boolean
   searchQuery?: string
 }) {
+  const rows = docs ?? []
+  const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null)
+  const [scrollMargin, setScrollMargin] = useState(0)
+
+  // Callback ref: the list mounts only once data arrives (after the loading /
+  // empty branches), so a layout effect with [] deps would miss it. Computing
+  // here runs synchronously when the <ul> attaches.
+  const measureLayout = useCallback((node: HTMLUListElement | null) => {
+    if (!node) return
+    const parent = getScrollParent(node)
+    setScrollEl(parent)
+    if (parent) {
+      setScrollMargin(
+        node.getBoundingClientRect().top - parent.getBoundingClientRect().top + parent.scrollTop,
+      )
+    }
+  }, [])
+
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollEl,
+    estimateSize: () => ROW_ESTIMATE_PX,
+    overscan: 8,
+    scrollMargin,
+    getItemKey: (i) => rows[i]?.id ?? i,
+  })
+
   if (isLoading) return <DocListSkeleton />
 
-  if (!docs || docs.length === 0) {
+  if (rows.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card/40 px-6 py-10 text-center">
         <p className="text-sm text-muted-foreground">
@@ -223,10 +258,26 @@ export function DocList({
   }
 
   return (
-    <ul className="space-y-2">
-      {docs.map((d) => (
-        <DocRow key={d.id} doc={d} />
-      ))}
+    <ul
+      ref={measureLayout}
+      className="relative list-none"
+      style={{ height: virtualizer.getTotalSize() }}
+    >
+      {virtualizer.getVirtualItems().map((vi) => {
+        const d = rows[vi.index]
+        if (!d) return null
+        return (
+          <li
+            key={vi.key}
+            ref={virtualizer.measureElement}
+            data-index={vi.index}
+            className="absolute inset-x-0 top-0 pb-2"
+            style={{ transform: `translateY(${vi.start - scrollMargin}px)` }}
+          >
+            <DocRow doc={d} />
+          </li>
+        )
+      })}
     </ul>
   )
 }

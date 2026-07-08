@@ -53,6 +53,26 @@ import { SquareCommerceService } from './square-commerce.service'
 import { SquareCrmService } from './square-crm.service'
 import type { ScheduleWindowInput, WindowInput } from './square-window'
 
+/// Staff can see WHO is on the rota / who worked (team-visible coordination
+/// info), but not the pay attached to each shift. Null out hourlyRate +
+/// estimatedCost per row for staff callers; managers/owners get the full row.
+/// The labour-COST summary tools stay manager-only, so this is the only shift
+/// surface a staff member reaches. Belt-and-braces with the tool-surface filter:
+/// even if a staff caller reaches these tools, no pay leaves the API.
+export function redactShiftPayForStaff(
+  result: ToolResult<{ shifts: Array<{ hourlyRate: unknown; estimatedCost: unknown }> }>,
+  userRole: string,
+): ToolResult<unknown> {
+  if (userRole !== 'staff' || !result.ok) return result
+  return {
+    ok: true,
+    data: {
+      ...result.data,
+      shifts: result.data.shifts.map((s) => ({ ...s, hourlyRate: null, estimatedCost: null })),
+    },
+  }
+}
+
 /// SquareProvider self-registers with IntegrationRegistry on module init so
 /// future providers follow the same pattern (new file → register → tools
 /// available; no edits to chat-tools.ts).
@@ -123,11 +143,14 @@ export class SquareProvider implements IntegrationProvider, OnModuleInit {
           limit?: number
           teamMemberId?: string
         } & WindowInput
-        return this.square.listRecentShifts(ctx.orgId, i)
+        return redactShiftPayForStaff(
+          await this.square.listRecentShifts(ctx.orgId, i),
+          ctx.userRole,
+        )
       }
       case POS_GET_ACTIVE_SHIFTS: {
         const i = input as { venueId: string }
-        return this.square.getActiveShifts(ctx.orgId, i)
+        return redactShiftPayForStaff(await this.square.getActiveShifts(ctx.orgId, i), ctx.userRole)
       }
       case POS_GET_LABOR_SUMMARY: {
         const i = input as { venueId: string; teamMemberId?: string } & WindowInput
@@ -140,7 +163,10 @@ export class SquareProvider implements IntegrationProvider, OnModuleInit {
           teamMemberId?: string
           includeDrafts?: boolean
         } & ScheduleWindowInput
-        return this.square.listScheduledShifts(ctx.orgId, i)
+        return redactShiftPayForStaff(
+          await this.square.listScheduledShifts(ctx.orgId, i),
+          ctx.userRole,
+        )
       }
       case POS_GET_SCHEDULED_LABOR_SUMMARY: {
         const i = input as {

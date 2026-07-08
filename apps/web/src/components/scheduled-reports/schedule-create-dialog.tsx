@@ -1,7 +1,10 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Bell, Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import {
   Dialog,
   DialogContent,
@@ -10,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Form, FormField } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -53,6 +57,20 @@ const TIMEZONES = [
   'America/Los_Angeles',
 ]
 
+const FormSchema = z.object({
+  title: z.string().trim().min(1),
+  summary: z.string(),
+  frequency: z.enum(['daily', 'weekly', 'monthly']),
+  hourOfDay: z.number(),
+  dayOfWeek: z.number(),
+  dayOfMonth: z.number(),
+  timezone: z.string(),
+  venueId: z.string(),
+  prompt: z.string(),
+})
+
+type FormValues = z.infer<typeof FormSchema>
+
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -69,27 +87,38 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
     }
   }, [])
 
-  const [title, setTitle] = useState('')
-  const [summary, setSummary] = useState('')
-  const [frequency, setFrequency] = useState<ScheduleFrequency>('weekly')
-  const [hourOfDay, setHourOfDay] = useState(9)
-  const [dayOfWeek, setDayOfWeek] = useState(1)
-  const [dayOfMonth, setDayOfMonth] = useState(1)
-  const [timezone, setTimezone] = useState(() =>
-    TIMEZONES.includes(browserTz) ? browserTz : 'UTC',
-  )
-  const [venueId, setVenueId] = useState<string>('all')
-  const [prompt, setPrompt] = useState('')
+  const form = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      title: '',
+      summary: '',
+      frequency: 'weekly',
+      hourOfDay: 9,
+      dayOfWeek: 1,
+      dayOfMonth: 1,
+      timezone: TIMEZONES.includes(browserTz) ? browserTz : 'UTC',
+      venueId: 'all',
+      prompt: '',
+    },
+  })
 
+  const frequency = form.watch('frequency')
+  const title = form.watch('title')
+
+  // Timezone is intentionally preserved across resets — once a user picks one,
+  // it sticks for the next schedule they create in the same session.
   const reset = () => {
-    setTitle('')
-    setSummary('')
-    setFrequency('weekly')
-    setHourOfDay(9)
-    setDayOfWeek(1)
-    setDayOfMonth(1)
-    setVenueId('all')
-    setPrompt('')
+    form.reset({
+      title: '',
+      summary: '',
+      frequency: 'weekly',
+      hourOfDay: 9,
+      dayOfWeek: 1,
+      dayOfMonth: 1,
+      timezone: form.getValues('timezone'),
+      venueId: 'all',
+      prompt: '',
+    })
   }
 
   const handleOpenChange = (next: boolean) => {
@@ -97,20 +126,18 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
     onOpenChange(next)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) return
+  const handleSubmit = form.handleSubmit(async (values) => {
     const body: CreateScheduledReportBody = {
-      title: title.trim(),
-      summary: summary.trim() || undefined,
-      frequency,
-      hourOfDay,
-      timezone,
-      venueId: venueId === 'all' ? null : venueId,
-      prompt: prompt.trim() || undefined,
+      title: values.title.trim(),
+      summary: values.summary.trim() || undefined,
+      frequency: values.frequency,
+      hourOfDay: values.hourOfDay,
+      timezone: values.timezone,
+      venueId: values.venueId === 'all' ? null : values.venueId,
+      prompt: values.prompt.trim() || undefined,
     }
-    if (frequency === 'weekly') body.dayOfWeek = dayOfWeek
-    if (frequency === 'monthly') body.dayOfMonth = dayOfMonth
+    if (values.frequency === 'weekly') body.dayOfWeek = values.dayOfWeek
+    if (values.frequency === 'monthly') body.dayOfMonth = values.dayOfMonth
     try {
       await create.mutateAsync(body)
       reset()
@@ -118,7 +145,7 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
     } catch {
       // Surface via the inline error below — keep dialog open so user can edit.
     }
-  }
+  })
 
   const errorCopy =
     create.error instanceof ApiError
@@ -147,168 +174,237 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Field id="title" label="Title" required>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Weekly sales recap"
-              maxLength={200}
-              required
-              autoFocus
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <Field id="title" label="Title" required>
+                  <Input
+                    id="title"
+                    {...field}
+                    placeholder="Weekly sales recap"
+                    maxLength={200}
+                    required
+                    autoFocus
+                  />
+                </Field>
+              )}
             />
-          </Field>
 
-          <Field id="summary" label="Summary" hint="Optional — one line shown under the title.">
-            <Input
-              id="summary"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder="Sales, top items, labour — every Monday morning."
-              maxLength={500}
+            <FormField
+              control={form.control}
+              name="summary"
+              render={({ field }) => (
+                <Field
+                  id="summary"
+                  label="Summary"
+                  hint="Optional — one line shown under the title."
+                >
+                  <Input
+                    id="summary"
+                    {...field}
+                    placeholder="Sales, top items, labour — every Monday morning."
+                    maxLength={500}
+                  />
+                </Field>
+              )}
             />
-          </Field>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field id="frequency" label="Frequency">
-              <Select value={frequency} onValueChange={(v) => setFrequency(v as ScheduleFrequency)}>
-                <SelectTrigger id="frequency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="frequency"
+                render={({ field }) => (
+                  <Field id="frequency" label="Frequency">
+                    <Select
+                      value={field.value}
+                      onValueChange={(v) => field.onChange(v as ScheduleFrequency)}
+                    >
+                      <SelectTrigger id="frequency">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
 
-            <Field id="hour" label="Hour of day">
-              <Select value={String(hourOfDay)} onValueChange={(v) => setHourOfDay(Number(v))}>
-                <SelectTrigger id="hour">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {HOURS.map((h) => (
-                    <SelectItem key={h} value={String(h)}>
-                      {String(h).padStart(2, '0')}:00
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          </div>
+              <FormField
+                control={form.control}
+                name="hourOfDay"
+                render={({ field }) => (
+                  <Field id="hour" label="Hour of day">
+                    <Select
+                      value={String(field.value)}
+                      onValueChange={(v) => field.onChange(Number(v))}
+                    >
+                      <SelectTrigger id="hour">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HOURS.map((h) => (
+                          <SelectItem key={h} value={String(h)}>
+                            {String(h).padStart(2, '0')}:00
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
+            </div>
 
-          {frequency === 'weekly' ? (
-            <Field id="weekday" label="Day of week">
-              <Select value={String(dayOfWeek)} onValueChange={(v) => setDayOfWeek(Number(v))}>
-                <SelectTrigger id="weekday">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {WEEKDAYS.map((d) => (
-                    <SelectItem key={d.value} value={String(d.value)}>
-                      {d.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          ) : null}
+            {frequency === 'weekly' ? (
+              <FormField
+                control={form.control}
+                name="dayOfWeek"
+                render={({ field }) => (
+                  <Field id="weekday" label="Day of week">
+                    <Select
+                      value={String(field.value)}
+                      onValueChange={(v) => field.onChange(Number(v))}
+                    >
+                      <SelectTrigger id="weekday">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {WEEKDAYS.map((d) => (
+                          <SelectItem key={d.value} value={String(d.value)}>
+                            {d.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
+            ) : null}
 
-          {frequency === 'monthly' ? (
-            <Field id="dom" label="Day of month" hint="1–28, so February always works.">
-              <Select value={String(dayOfMonth)} onValueChange={(v) => setDayOfMonth(Number(v))}>
-                <SelectTrigger id="dom">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="max-h-72">
-                  {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                    <SelectItem key={d} value={String(d)}>
-                      {d}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-          ) : null}
+            {frequency === 'monthly' ? (
+              <FormField
+                control={form.control}
+                name="dayOfMonth"
+                render={({ field }) => (
+                  <Field id="dom" label="Day of month" hint="1–28, so February always works.">
+                    <Select
+                      value={String(field.value)}
+                      onValueChange={(v) => field.onChange(Number(v))}
+                    >
+                      <SelectTrigger id="dom">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                          <SelectItem key={d} value={String(d)}>
+                            {d}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
+            ) : null}
 
-          <Field id="tz" label="Timezone">
-            <Select value={timezone} onValueChange={setTimezone}>
-              <SelectTrigger id="tz">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TIMEZONES.map((tz) => (
-                  <SelectItem key={tz} value={tz}>
-                    {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-
-          <Field id="venue" label="Scope">
-            <Select value={venueId} onValueChange={setVenueId}>
-              <SelectTrigger id="venue">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All venues</SelectItem>
-                {(venues.data ?? []).map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
-                    {v.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-
-          <Field
-            id="prompt"
-            label="What should each run cover?"
-            hint="Plain English. The agent uses this to compose the report content."
-          >
-            <Textarea
-              id="prompt"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Focus on sales, top items, and labour for the last 7 days."
-              rows={3}
-              maxLength={1000}
+            <FormField
+              control={form.control}
+              name="timezone"
+              render={({ field }) => (
+                <Field id="tz" label="Timezone">
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="tz">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TIMEZONES.map((tz) => (
+                        <SelectItem key={tz} value={tz}>
+                          {tz}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
             />
-          </Field>
 
-          {errorCopy ? (
-            <p
-              role="alert"
-              className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive"
-            >
-              {errorCopy}
-            </p>
-          ) : null}
+            <FormField
+              control={form.control}
+              name="venueId"
+              render={({ field }) => (
+                <Field id="venue" label="Scope">
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="venue">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All venues</SelectItem>
+                      {(venues.data ?? []).map((v) => (
+                        <SelectItem key={v.id} value={v.id}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
 
-          <DialogFooter className="gap-2 sm:gap-0">
-            <button
-              type="button"
-              onClick={() => handleOpenChange(false)}
-              className="cursor-pointer rounded-md border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-accent"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={create.isPending || !title.trim()}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-foreground transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {create.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-              ) : null}
-              Create schedule
-            </button>
-          </DialogFooter>
-        </form>
+            <FormField
+              control={form.control}
+              name="prompt"
+              render={({ field }) => (
+                <Field
+                  id="prompt"
+                  label="What should each run cover?"
+                  hint="Plain English. The agent uses this to compose the report content."
+                >
+                  <Textarea
+                    id="prompt"
+                    {...field}
+                    placeholder="Focus on sales, top items, and labour for the last 7 days."
+                    rows={3}
+                    maxLength={1000}
+                  />
+                </Field>
+              )}
+            />
+
+            {errorCopy ? (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive"
+              >
+                {errorCopy}
+              </p>
+            ) : null}
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <button
+                type="button"
+                onClick={() => handleOpenChange(false)}
+                className="cursor-pointer rounded-md border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={create.isPending || !title.trim()}
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-foreground transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {create.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                ) : null}
+                Create schedule
+              </button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

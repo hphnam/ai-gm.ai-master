@@ -177,8 +177,8 @@ export function PricingRecommendationCard({ part }: ToolCardRendererProps) {
           <span
             className={
               data.recommendedPriceCents >= data.currentPriceCents
-                ? 'rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                : 'rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                ? 'rounded-md bg-success/10 px-1.5 py-0.5 text-[11px] font-medium text-success'
+                : 'rounded-md bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning'
             }
           >
             {delta}

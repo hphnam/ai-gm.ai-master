@@ -13,7 +13,8 @@ import {
   StickyNote,
   Users,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import { SearchOutcomesChart } from '@/components/dashboard/charts/search-outcomes-chart'
 import { WauChart } from '@/components/dashboard/charts/wau-chart'
 import {
@@ -25,10 +26,11 @@ import {
 } from '@/components/dashboard/format'
 import { KpiCard } from '@/components/dashboard/kpi-card'
 import { type RankItem, RankList } from '@/components/dashboard/rank-list'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PageContainer } from '@/components/ui/page-container'
 import {
   Select,
   SelectContent,
@@ -54,11 +56,19 @@ import { useVenues } from '@/lib/hooks/use-venues'
 
 const ALL_VENUES = 'all'
 
+const PRESET_VALUES = Object.keys(RANGE_PRESETS) as RangePreset[]
+
 export function DashboardBody() {
-  const [preset, setPreset] = useState<RangePreset>('30d')
+  const [preset, setPreset] = useQueryState(
+    'preset',
+    parseAsStringLiteral(PRESET_VALUES).withDefault('30d').withOptions({ clearOnDefault: true }),
+  )
   const { from, to } = useDashboardRange(preset)
   const venues = useVenues()
-  const [scope, setScope] = useState<string>(ALL_VENUES)
+  const [scope, setScope] = useQueryState(
+    'venue',
+    parseAsString.withDefault(ALL_VENUES).withOptions({ clearOnDefault: true }),
+  )
   const venueId = scope === ALL_VENUES ? undefined : scope
   const range = useMemo(() => ({ venueId, from, to }), [venueId, from, to])
 
@@ -86,12 +96,12 @@ export function DashboardBody() {
   )
 
   return (
-    <AppShell>
-      <PageHeader
+    <>
+      <SetPageHeader
         title="Dashboard"
         description={`Operational impact at a glance — ${RANGE_PRESETS[preset].label.toLowerCase()}.`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <RangePresetPicker value={preset} onChange={setPreset} />
             <VenueScopePicker
               value={scope}
@@ -104,7 +114,7 @@ export function DashboardBody() {
       />
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
+        <PageContainer width="wide" className="space-y-6">
           {isAuthError ? (
             <Card>
               <CardContent className="p-10">
@@ -292,9 +302,9 @@ export function DashboardBody() {
               </PanelCard>
             </>
           )}
-        </div>
+        </PageContainer>
       </div>
-    </AppShell>
+    </>
   )
 }
 
@@ -380,40 +390,20 @@ function PanelCard({
 }
 
 function EscalationKindBadge({ kind }: { kind: string | null }) {
-  // Three kinds today: incident, task, note. Anything else (or null) renders
-  // as a neutral "Handoff" so the row still parses.
   const meta =
     kind === 'incident'
-      ? {
-          icon: AlertTriangle,
-          label: 'Incident',
-          className: 'bg-chart-3/15 text-chart-3',
-        }
+      ? { icon: AlertTriangle, label: 'Incident', variant: 'urgent' as const }
       : kind === 'task'
-        ? {
-            icon: CheckSquare,
-            label: 'Task',
-            className: 'bg-chart-1/15 text-chart-1',
-          }
+        ? { icon: CheckSquare, label: 'Task', variant: 'neutral' as const }
         : kind === 'note'
-          ? {
-              icon: StickyNote,
-              label: 'Note',
-              className: 'bg-chart-2/15 text-chart-2',
-            }
-          : {
-              icon: AlertTriangle,
-              label: 'Handoff',
-              className: 'bg-muted text-muted-foreground',
-            }
+          ? { icon: StickyNote, label: 'Note', variant: 'neutral' as const }
+          : { icon: AlertTriangle, label: 'Handoff', variant: 'neutral' as const }
   const Icon = meta.icon
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${meta.className}`}
-    >
+    <Badge variant={meta.variant} size="sm">
       <Icon className="h-3 w-3" aria-hidden="true" />
       {meta.label}
-    </span>
+    </Badge>
   )
 }
 
@@ -426,7 +416,10 @@ function RangePresetPicker({
 }) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as RangePreset)}>
-      <SelectTrigger className="h-9 w-[160px]" aria-label="Filter by date range">
+      <SelectTrigger
+        className="h-9 min-w-0 flex-1 sm:w-[160px] sm:flex-none"
+        aria-label="Filter by date range"
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -455,7 +448,10 @@ function VenueScopePicker({
 }) {
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className="h-9 w-[200px]" aria-label="Filter by venue">
+      <SelectTrigger
+        className="h-9 min-w-0 flex-1 sm:w-[200px] sm:flex-none"
+        aria-label="Filter by venue"
+      >
         <SelectValue placeholder="Select venue" />
       </SelectTrigger>
       <SelectContent>
@@ -476,7 +472,7 @@ function ChartSkeleton() {
 
 function EmptyChart({ label }: { label: string }) {
   return (
-    <div className="flex h-[220px] items-center justify-center text-center">
+    <div className="flex h-[220px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-center">
       <p className="max-w-[24ch] text-sm text-muted-foreground">{label}</p>
     </div>
   )

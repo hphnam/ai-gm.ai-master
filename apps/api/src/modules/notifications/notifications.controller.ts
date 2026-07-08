@@ -80,6 +80,17 @@ export class NotificationsController {
     return { members }
   }
 
+  @Get(':id')
+  @ApiResponse({ status: 200, type: SimpleNotificationResponseDto })
+  async getOne(
+    @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @Param(new ZodValidationPipe(NotificationIdParamDto)) params: NotificationIdParamDto,
+  ): Promise<SimpleNotificationResponseDto> {
+    const notification = await this.service.getOne(org.id, user.id, params.id)
+    return { notification }
+  }
+
   @Patch(':id/read')
   @HttpCode(200)
   @ApiResponse({ status: 200, type: SimpleNotificationResponseDto })

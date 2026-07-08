@@ -2,8 +2,7 @@ export type AuthEnv = {
   secret: string
   baseURL: string
   webOrigins: string[]
-  // 01-02 audit-added: Resend config; undefined when dev console fallback is used
-  resend?: { apiKey: string; mailFrom: string }
+  smtp: { host: string; port: number; user: string; pass: string; from: string; secure: boolean }
   // 03-06 Twilio Conversations API. Auth token doubles as webhook signing key
   // (HMAC-SHA1 over PUBLIC_WEBHOOK_URL + sorted form params). publicWebhookUrl
   // must match the URL configured in the Twilio console — Twilio signs the
@@ -13,8 +12,9 @@ export type AuthEnv = {
     authToken: string
     conversationsServiceSid: string
     sender: string // "whatsapp:+E164"
+    verifyServiceSid: string // "VA..." — empty when Verify not configured
+    smsSender: string // "+E164" — empty when SMS not configured
     publicWebhookUrl: string
-    driverOverride: 'live' | 'console' | 'disabled' | undefined
   }
   // Phase 6 — Reducto extraction layer. Required for any document upload other
   // than image MIMEs (which still go through Claude vision). REDUCTO_BASE_URL
@@ -25,19 +25,18 @@ export type AuthEnv = {
   }
 }
 
-// Name <addr@domain> format per RFC 5322 shorthand — required by Resend's from field
+// Name <addr@domain> format per RFC 5322 shorthand — the SMTP From header value
 const MAIL_FROM_RE = /^.+<[^@\s]+@[^@\s]+>$/
 
 export function assertAuthEnv(): AuthEnv {
   const secret = process.env.BETTER_AUTH_SECRET
   const baseURL = process.env.BETTER_AUTH_URL
   const webOriginRaw = process.env.WEB_ORIGIN
-  const resendKey = process.env.RESEND_API_KEY
+  const smtpPass = process.env.SMTP_PASSWORD || process.env.PLUNK_API_KEY
+  const smtpHost = process.env.SMTP_HOST
+  const smtpUser = process.env.SMTP_USER
+  const smtpPortRaw = process.env.SMTP_PORT
   const mailFrom = process.env.MAIL_FROM
-  // 03-06: phone-verify driver override stays — gates console-mode vs live in
-  // WhatsappVerifyService independently of TWILIO_DRIVER_OVERRIDE so the OTP
-  // path can be kill-switched without disabling chat send.
-  const phoneVerifyOverrideRaw = process.env.PHONE_VERIFY_DRIVER_OVERRIDE
 
   const errs: string[] = []
   if (!secret || !/^[0-9a-f]{64}$/i.test(secret)) {
@@ -49,77 +48,73 @@ export function assertAuthEnv(): AuthEnv {
       'WEB_ORIGIN missing (e.g. http://localhost:3000) — required for CORS + better-auth trustedOrigins',
     )
   }
-  // 01-02 audit-added: MAIL_FROM required when RESEND_API_KEY is set
-  if (resendKey && !mailFrom) {
-    errs.push('MAIL_FROM is required when RESEND_API_KEY is set (format: "Name <addr@domain>")')
+  // No console fallback exists — SMTP is required everywhere so every email
+  // path (password reset, invites, note digests) actually sends.
+  const smtpPort = smtpPortRaw ? Number(smtpPortRaw) : NaN
+  if (!smtpPass) errs.push('SMTP_PASSWORD (or PLUNK_API_KEY) is required — emails always send live')
+  if (!smtpHost) errs.push('SMTP_HOST is required')
+  if (!smtpUser) errs.push('SMTP_USER is required')
+  if (!smtpPortRaw) errs.push('SMTP_PORT is required')
+  else if (!Number.isInteger(smtpPort) || smtpPort <= 0 || smtpPort > 65535) {
+    errs.push(`SMTP_PORT must be a valid port number, got "${smtpPortRaw}"`)
   }
-  if (resendKey && mailFrom && !MAIL_FROM_RE.test(mailFrom)) {
+  if (!mailFrom) {
+    errs.push('MAIL_FROM is required (format: "Name <addr@domain>")')
+  } else if (!MAIL_FROM_RE.test(mailFrom)) {
     errs.push(`MAIL_FROM has invalid format: got "${mailFrom}". Expected: "Name <addr@domain>"`)
-  }
-
-  const phoneVerifyOverride: 'live' | 'console' | 'disabled' | undefined =
-    phoneVerifyOverrideRaw === 'live' ||
-    phoneVerifyOverrideRaw === 'console' ||
-    phoneVerifyOverrideRaw === 'disabled'
-      ? phoneVerifyOverrideRaw
-      : undefined
-  if (phoneVerifyOverrideRaw && !phoneVerifyOverride) {
-    errs.push(
-      `PHONE_VERIFY_DRIVER_OVERRIDE must be one of live|console|disabled, got "${phoneVerifyOverrideRaw}"`,
-    )
   }
 
   const isProd = process.env.NODE_ENV === 'production'
 
-  // 03-06 Twilio Conversations env block — runs alongside Infobip during the
-  // migration window. Cutover commit removes Infobip; this block becomes the
-  // sole WhatsApp transport config.
+  // 03-06 Twilio Conversations env block — the sole WhatsApp/SMS transport config.
   const twAcct = process.env.TWILIO_ACCOUNT_SID
   const twToken = process.env.TWILIO_AUTH_TOKEN
   const twServiceSid = process.env.TWILIO_CONVERSATIONS_SERVICE_SID
   const twSender = process.env.TWILIO_WHATSAPP_SENDER
+  const twVerifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID
+  const twSmsSender = process.env.TWILIO_SMS_SENDER
   const twPublicUrl = process.env.PUBLIC_WEBHOOK_URL
-  const twOverrideRaw = process.env.TWILIO_DRIVER_OVERRIDE
-  const twOverride: 'live' | 'console' | 'disabled' | undefined =
-    twOverrideRaw === 'live' || twOverrideRaw === 'console' || twOverrideRaw === 'disabled'
-      ? twOverrideRaw
-      : undefined
-  if (twOverrideRaw && !twOverride) {
-    errs.push(`TWILIO_DRIVER_OVERRIDE must be one of live|console|disabled, got "${twOverrideRaw}"`)
-  }
-  if (isProd && twOverride === 'console') {
+  // Phone OTP now delivers a self-generated PIN over SMS (see phone-otp.ts), so
+  // prod needs a live SMS sender — without it sends silently fail and nobody can
+  // onboard / log in by phone.
+  if (isProd && !twSmsSender) {
     errs.push(
-      'TWILIO_DRIVER_OVERRIDE=console is not allowed in production (WhatsApp OTP + invite delivery requires live Twilio)',
+      'TWILIO_SMS_SENDER is required in production — phone OTP (invite onboarding + login) is delivered by SMS',
     )
   }
-  // Twilio block validates when SENDER is set; matches Infobip's gating pattern.
-  const twCredsOptional = twOverride === 'console' || twOverride === 'disabled'
+  const twAnyChannel = !!twSender || !!twVerifyServiceSid || !!twSmsSender
+  if (twAnyChannel) {
+    if (!twAcct || !/^AC[0-9a-fA-F]{32}$/.test(twAcct)) {
+      errs.push('TWILIO_ACCOUNT_SID must be set (AC + 32 hex chars) when any Twilio channel is set')
+    }
+    if (!twToken || twToken.length < 32) {
+      errs.push('TWILIO_AUTH_TOKEN must be set (≥32 chars) when any Twilio channel is set')
+    }
+  }
   if (twSender) {
     if (!/^whatsapp:\+[0-9]{6,20}$/.test(twSender)) {
       errs.push(
         `TWILIO_WHATSAPP_SENDER must be "whatsapp:+E164" (e.g. whatsapp:+14155238886), got "${twSender}"`,
       )
     }
-    if (!twCredsOptional) {
-      if (!twAcct || !/^AC[0-9a-fA-F]{32}$/.test(twAcct)) {
-        errs.push(
-          'TWILIO_ACCOUNT_SID must be set (AC + 32 hex chars) when TWILIO_WHATSAPP_SENDER is set',
-        )
-      }
-      if (!twToken || twToken.length < 32) {
-        errs.push('TWILIO_AUTH_TOKEN must be set (≥32 chars) when TWILIO_WHATSAPP_SENDER is set')
-      }
-      if (!twServiceSid || !/^IS[0-9a-fA-F]{32}$/.test(twServiceSid)) {
-        errs.push(
-          'TWILIO_CONVERSATIONS_SERVICE_SID must be set (IS + 32 hex chars) when TWILIO_WHATSAPP_SENDER is set',
-        )
-      }
-      if (!twPublicUrl || !/^https:\/\/.+/.test(twPublicUrl)) {
-        errs.push(
-          'PUBLIC_WEBHOOK_URL must be set to the https URL configured in Twilio console (signature validation rebuilds the signing string from this URL, not req.url)',
-        )
-      }
+    if (!twServiceSid || !/^IS[0-9a-fA-F]{32}$/.test(twServiceSid)) {
+      errs.push(
+        'TWILIO_CONVERSATIONS_SERVICE_SID must be set (IS + 32 hex chars) when TWILIO_WHATSAPP_SENDER is set',
+      )
     }
+    if (!twPublicUrl || !/^https:\/\/.+/.test(twPublicUrl)) {
+      errs.push(
+        'PUBLIC_WEBHOOK_URL must be set to the https URL configured in Twilio console (signature validation rebuilds the signing string from this URL, not req.url)',
+      )
+    }
+  }
+  if (twVerifyServiceSid && !/^VA[0-9a-fA-F]{32}$/.test(twVerifyServiceSid)) {
+    errs.push(
+      `TWILIO_VERIFY_SERVICE_SID must be "VA" + 32 hex chars (from Twilio Verify), got "${twVerifyServiceSid}"`,
+    )
+  }
+  if (twSmsSender && !/^\+[0-9]{6,20}$/.test(twSmsSender)) {
+    errs.push(`TWILIO_SMS_SENDER must be "+E164" (e.g. +447700900000), got "${twSmsSender}"`)
   }
 
   // 03-02 audit-added: ChatService test-mode knobs — probe-only, production-forbidden.
@@ -163,6 +158,18 @@ export function assertAuthEnv(): AuthEnv {
     }
   }
 
+  // Phase 6 — Reducto extraction. REDUCTO_API_KEY required at boot; the
+  // extractor path won't function without it (no soft fallbacks — if the key
+  // isn't there, uploads silently fail later, which is worse than refusing to
+  // start).
+  const reductoApiKey = process.env.REDUCTO_API_KEY
+  if (!reductoApiKey) {
+    errs.push(
+      'REDUCTO_API_KEY missing — required for document extraction (CSV / XLSX / PDF / DOCX / PPTX). Get a key at https://reducto.ai',
+    )
+  }
+  const reductoBaseUrl = process.env.REDUCTO_BASE_URL ?? 'https://platform.reducto.ai'
+
   if (errs.length) {
     process.stderr.write(
       `[auth] fail-fast startup:\n  - ${errs.join('\n  - ')}\n  See .env.example\n`,
@@ -187,6 +194,11 @@ export function assertAuthEnv(): AuthEnv {
         `[backfill] WARN: PROBE_BACKFILL_COST_CEILING_USD=${probeBackfillCeilingRaw} active — overrides BACKFILL_TENANT_COST_CEILING_USD (non-production only)\n`,
       )
     }
+    if (!twSmsSender) {
+      process.stderr.write(
+        '[phone] WARN: TWILIO_SMS_SENDER not set — phone OTP + invite SMS sends will fail (no console fallback exists)\n',
+      )
+    }
   }
 
   const webOrigins = webOriginRaw!
@@ -194,42 +206,31 @@ export function assertAuthEnv(): AuthEnv {
     .map((s) => s.trim())
     .filter(Boolean)
 
-  // 03-06: phoneVerifyOverride feeds WhatsappVerifyService; consumed via
-  // process.env at call-time, but referenced here to keep the validator above
-  // active. Marking unused void to satisfy lint without disabling the rule.
-  void phoneVerifyOverride
-
-  // 03-06: twilio block populated when SENDER is set or console override is explicit.
-  const twPopulated = !!twSender || twOverride === 'console'
-  const twilio = twPopulated
+  const twilio = twAnyChannel
     ? {
         accountSid: twAcct ?? '',
         authToken: twToken ?? '',
         conversationsServiceSid: twServiceSid ?? '',
         sender: twSender ?? '',
+        verifyServiceSid: twVerifyServiceSid ?? '',
+        smsSender: twSmsSender ?? '',
         publicWebhookUrl: twPublicUrl ?? '',
-        driverOverride: twOverride,
       }
     : undefined
-
-  // Phase 6 — Reducto extraction. REDUCTO_API_KEY required at boot; the
-  // extractor path won't function without it. Same fail-fast posture as the
-  // other Phase-1+ env requirements (no soft fallbacks — if the key isn't
-  // there, uploads silently fail later, which is worse than refusing to start).
-  const reductoApiKey = process.env.REDUCTO_API_KEY
-  if (!reductoApiKey) {
-    errs.push(
-      'REDUCTO_API_KEY missing — required for document extraction (CSV / XLSX / PDF / DOCX / PPTX). Get a key at https://reducto.ai',
-    )
-  }
-  const reductoBaseUrl = process.env.REDUCTO_BASE_URL ?? 'https://platform.reducto.ai'
 
   return {
     secret: secret!,
     baseURL: baseURL!,
     webOrigins,
-    resend: resendKey ? { apiKey: resendKey, mailFrom: mailFrom! } : undefined,
+    smtp: {
+      host: smtpHost!,
+      port: smtpPort,
+      user: smtpUser!,
+      pass: smtpPass!,
+      from: mailFrom!,
+      secure: smtpPort === 465 || smtpPort === 2465,
+    },
     twilio,
-    reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey ?? '' },
+    reducto: { baseUrl: reductoBaseUrl, apiKey: reductoApiKey! },
   }
 }

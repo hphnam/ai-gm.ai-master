@@ -22,7 +22,7 @@ export type MediaDownloadResult =
       mediaType?: string
     }
 
-// 03-04 Infobip migration — SSRF defense (03-03 audit M1): validate URL host against allowlist
+// SSRF defense (03-03 audit M1): validate URL host against allowlist
 // BEFORE any network call.
 //   - Production: WHATSAPP_MEDIA_HOST_ALLOWLIST env (comma-separated; falls back to DEFAULT)
 //   - Probe-only: PROBE_MEDIA_HOST_ALLOWLIST env (additive; ONLY when NODE_ENV !== 'production')

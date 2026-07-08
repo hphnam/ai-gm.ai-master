@@ -1,26 +1,43 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { Suspense, useCallback } from 'react'
 import { OnboardingShell } from './onboarding-shell'
 import { ProgressHeader } from './progress-header'
-import { StepBasics } from './step-basics'
+import { StepBasics, type VenueBasics } from './step-basics'
 import { StepDone } from './step-done'
 import { StepKnowledge } from './step-knowledge'
 import { StepOperations } from './step-operations'
 import { StepSafety } from './step-safety'
-import { type OnboardingStepId, prevStep } from './steps'
+import { ONBOARDING_STEPS, type OnboardingStepId, prevStep } from './steps'
 
 type Props = {
   initialStep: OnboardingStepId
   venueId: string | null
+  initialVenue: VenueBasics | null
   userName: string | null
 }
 
-export function WelcomeBody({ initialStep, venueId, userName }: Props) {
+export function WelcomeBody(props: Props) {
+  // Suspense boundary so useSearchParams() doesn't force a client-side render
+  // bailout independent of the page's force-dynamic flag.
+  return (
+    <Suspense fallback={<OnboardingShell header={null}>{null}</OnboardingShell>}>
+      <WelcomeBodyInner {...props} />
+    </Suspense>
+  )
+}
+
+function WelcomeBodyInner({ initialStep, venueId, initialVenue, userName }: Props) {
   const router = useRouter()
   const params = useSearchParams()
-  const step = (params.get('step') as OnboardingStepId | null) ?? initialStep
+  const rawStep = params.get('step')
+  // Steps beyond basics render nothing without a venue — fall back to the
+  // server-sanitized step rather than a blank body.
+  const step =
+    ONBOARDING_STEPS.some((s) => s.id === rawStep) && (rawStep === 'basics' || venueId)
+      ? (rawStep as OnboardingStepId)
+      : initialStep
 
   const go = useCallback(
     (nextStepId: OnboardingStepId, nextVenueId?: string | null) => {
@@ -40,19 +57,26 @@ export function WelcomeBody({ initialStep, venueId, userName }: Props) {
 
   return (
     <OnboardingShell header={<ProgressHeader current={step} />}>
-      {step === 'basics' && (
-        <StepBasics userName={userName} initialVenueId={venueId} onAdvance={go} />
-      )}
-      {step === 'operations' && venueId && (
-        <StepOperations venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'safety' && venueId && (
-        <StepSafety venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'knowledge' && venueId && (
-        <StepKnowledge venueId={venueId} onAdvance={go} onBack={onBack} />
-      )}
-      {step === 'done' && venueId && <StepDone venueId={venueId} />}
+      <div key={step} className="animate-in fade-in duration-300 motion-reduce:animate-none">
+        {step === 'basics' && (
+          <StepBasics
+            userName={userName}
+            initialVenueId={venueId}
+            initialVenue={initialVenue}
+            onAdvance={go}
+          />
+        )}
+        {step === 'operations' && venueId && (
+          <StepOperations venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'safety' && venueId && (
+          <StepSafety venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'knowledge' && venueId && (
+          <StepKnowledge venueId={venueId} onAdvance={go} onBack={onBack} />
+        )}
+        {step === 'done' && venueId && <StepDone venueId={venueId} />}
+      </div>
     </OnboardingShell>
   )
 }

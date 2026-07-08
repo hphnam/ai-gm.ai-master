@@ -2,179 +2,121 @@
 
 import { useChat } from '@ai-sdk/react'
 import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
-import { DefaultChatTransport, type UIMessage } from 'ai'
-import { ArrowRight, Check, Link2, Loader2, Lock, Plus, Store } from 'lucide-react'
+import { DefaultChatTransport } from 'ai'
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  Link2,
+  ListTodo,
+  Loader2,
+  Lock,
+  type LucideIcon,
+  MessageCircle,
+  Package,
+  Plus,
+  ShieldCheck,
+  Store,
+  TrendingUp,
+  Truck,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { SuggestionsSurface } from '@/components/chat/suggestions-surface'
 import { VenueChip } from '@/components/chat/venue-chip'
-import { AppShell } from '@/components/shell/app-shell'
-import { PageHeader } from '@/components/shell/page-header'
+import { SetPageHeader } from '@/components/shell/page-header-provider'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import type {
   ConversationResponseDto as ConversationResponse,
   VenueListItemDto as VenueListItem,
 } from '@/generated/api'
 import { API_URL } from '@/lib/api-client'
-import type { ChatMessageDto } from '@/lib/api-types'
 import { useSession } from '@/lib/auth-client'
-import { useChatStarters } from '@/lib/hooks/use-chat-starters'
+import { type StarterQuestion, useChatStarters } from '@/lib/hooks/use-chat-starters'
 import { useConversation } from '@/lib/hooks/use-conversation'
-import type { ConvListItem } from '@/lib/hooks/use-conversations-list'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useOnOpenSuggestions, useOnTurnSuggestions } from '@/lib/hooks/use-suggestions'
-import { useUpdateConversationVisibility } from '@/lib/hooks/use-update-conversation-visibility'
 import { useVenues } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 import { isMinted, markMinted } from '@/lib/minted-conv-ids'
 import { cn } from '@/lib/utils'
+import { dbToUIMessage, type GmUIMessage, uiMessageToText } from './message-mapping'
+import { useChatSubmit } from './use-chat-submit'
+import { useConversationDerivedState } from './use-conversation-derived-state'
+import { useOptimisticThreads } from './use-optimistic-threads'
+import { useShareConversation } from './use-share-conversation'
 
-type GmUIMessage = UIMessage
-
-type LegacyToolCallEntry = {
-  round?: number
-  toolUseId?: string
-  tool?: string
-  input?: unknown
-  result?: unknown
-}
-
-// Rebuild an assistant turn's UI parts from the DB row. The persisted `parts`
-// snapshot is just the final text part (the AI SDK ModelMessage→DB shape drops
-// the rich UI-message tool entries), so we rehydrate the interactive surface
-// from the columns that DO hold the history: `reasoning` (text) and
-// `toolCallLog` (array of {tool, toolUseId, input, result}). Order matters —
-// AssistantBody reads parts and renders reasoning → tool cards → final text.
-function assistantPartsFromDto(m: ChatMessageDto): GmUIMessage['parts'] {
-  const parts: GmUIMessage['parts'] = []
-  const reasoning = (m as unknown as { reasoning?: string | null }).reasoning
-  if (typeof reasoning === 'string' && reasoning.trim().length > 0) {
-    parts.push({
-      type: 'reasoning',
-      text: reasoning,
-      state: 'done',
-    } as unknown as GmUIMessage['parts'][number])
-  }
-  const log = (m as unknown as { toolCallLog?: LegacyToolCallEntry[] }).toolCallLog
-  if (Array.isArray(log)) {
-    for (const entry of log) {
-      if (!entry?.tool || !entry?.toolUseId) continue
-      parts.push({
-        type: `tool-${entry.tool}`,
-        toolCallId: entry.toolUseId,
-        state: 'output-available',
-        input: entry.input,
-        output: entry.result,
-      } as unknown as GmUIMessage['parts'][number])
-    }
-  }
-  parts.push({ type: 'text', text: m.content })
-  return parts
-}
-
-function dbToUIMessage(m: ChatMessageDto): GmUIMessage {
-  if (m.role === 'assistant') {
-    return { id: m.id, role: m.role, parts: assistantPartsFromDto(m) }
-  }
-  return {
-    id: m.id,
-    role: m.role,
-    parts: [{ type: 'text', text: m.content }],
-  }
-}
-
-function uiMessageToText(m: GmUIMessage): string {
-  return m.parts
-    .map((p) => (p.type === 'text' ? p.text : ''))
-    .join('')
-    .trim()
-}
-
-function ChatSkeleton() {
+function ThreadSkeleton() {
   return (
-    <div className="flex h-dvh items-center justify-center text-sm text-muted-foreground">
-      Loading…
+    <div
+      aria-hidden
+      className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6"
+    >
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-3/5 max-w-sm rounded-3xl rounded-br-lg" />
+      </div>
+      <div className="flex gap-3">
+        <Skeleton className="h-7 w-7 shrink-0 rounded-full" />
+        <div className="flex flex-1 flex-col gap-2 pt-1">
+          <Skeleton className="h-4 w-4/5" />
+          <Skeleton className="h-4 w-3/5" />
+          <Skeleton className="h-4 w-2/5" />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-2/5 max-w-xs rounded-3xl rounded-br-lg" />
+      </div>
     </div>
   )
 }
 
-// The conversations list lives in an infinite-query cache keyed by
-// ['chat-conversations', venueKey, { q, limit }] — there can be several
-// active entries (sidebar default, history page search, etc.). Both
-// optimistic helpers mutate every matching entry so the new/updated thread
-// appears immediately regardless of which surface is mounted.
-type ConvListInfinite = {
-  pages: Array<{ items: ConvListItem[]; nextCursor: string | null }>
-  pageParams: unknown[]
-}
-
-function listContains(data: ConvListInfinite | undefined, id: string): boolean {
-  return data?.pages.some((p) => p.items.some((it) => it.id === id)) ?? false
-}
-
-function prependOptimisticThread(qc: RqClient, entry: ConvListItem) {
-  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
-    if (!prev) return prev
-    if (listContains(prev, entry.id)) return prev
-    const [first, ...rest] = prev.pages
-    const head = first ?? { items: [], nextCursor: null }
-    return {
-      ...prev,
-      pages: [{ ...head, items: [entry, ...head.items] }, ...rest],
-    }
-  })
-}
-
-function bumpOptimisticThread(qc: RqClient, conversationId: string, preview: string) {
-  qc.setQueriesData<ConvListInfinite>({ queryKey: ['chat-conversations', '__all__'] }, (prev) => {
-    if (!prev) return prev
-    const now = new Date().toISOString()
-    return {
-      ...prev,
-      pages: prev.pages.map((p) => ({
-        ...p,
-        items: p.items.map((c) =>
-          c.id === conversationId ? { ...c, preview, lastMessageAt: now } : c,
-        ),
-      })),
-    }
-  })
+function ChatSkeleton() {
+  return (
+    <div className="flex h-dvh flex-col">
+      <span className="sr-only" aria-live="polite">
+        Loading chat
+      </span>
+      <ThreadSkeleton />
+    </div>
+  )
 }
 
 function ChatInner() {
   const params = useSearchParams()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { data: venues } = useVenues()
 
   const venueId = params.get('venue')
   const conversationId = params.get('conv')
 
   // Landing on /chat (no conv):
-  //   • no venue in the URL → stay on the empty landing surface. Clicking the
-  //     sidebar Chat link should NOT silently resume an old thread; resuming
-  //     is a deliberate sidebar action (Recent → pick a thread).
-  //   • venue pinned in the URL → mint a fresh chat for that venue. Do NOT
-  //     surface an old thread behind the user's back; resuming is a sidebar
-  //     action, not a side-effect of visiting a venue URL.
+  //   • no venue → stay on the venue-picker surface, UNLESS the user only has
+  //     one venue, in which case auto-select it and skip venue selection.
+  //   • venue pinned → mint a fresh chat for it. Do NOT surface an old thread
+  //     behind the user's back; resuming is a deliberate sidebar action.
   useEffect(() => {
     if (conversationId) return
-    if (!venueId) return
+    const soleVenue = venues?.length === 1 ? venues[0].id : null
+    const effectiveVenue = venueId ?? soleVenue
+    if (!effectiveVenue) return
     const freshId = crypto.randomUUID()
     markMinted(freshId)
-    router.replace(`/chat?venue=${venueId}&conv=${freshId}`)
-  }, [venueId, conversationId, router])
+    router.replace(`/chat?venue=${effectiveVenue}&conv=${freshId}`)
+  }, [venueId, conversationId, venues, router])
 
   return (
-    <AppShell>
-      <ChatSession
-        key={conversationId ?? 'landing'}
-        venueId={venueId}
-        conversationId={conversationId}
-        queryClient={queryClient}
-      />
-    </AppShell>
+    <ChatSession
+      key={conversationId ?? 'landing'}
+      venueId={venueId}
+      conversationId={conversationId}
+      queryClient={queryClient}
+    />
   )
 }
 
@@ -213,10 +155,11 @@ function ChatSession({
   if (conversationId && !fetchSettled) {
     return (
       <>
-        <PageHeader title="Chat" />
-        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-          Loading conversation…
-        </div>
+        <SetPageHeader title="Chat" />
+        <span className="sr-only" aria-live="polite">
+          Loading conversation
+        </span>
+        <ThreadSkeleton />
       </>
     )
   }
@@ -265,6 +208,7 @@ function ChatCore({
   const { data: venues } = useVenues()
   const { data: session } = useSession()
   const sessionUserId = session?.user?.id ?? null
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // Owner test: a fresh chat with no row yet (ownerUserId === null AND
   // visibility === null) is implicitly owned by the current user — they're
@@ -273,7 +217,7 @@ function ChatCore({
   // have no human owner and stay read-only on web.
   const conversationExists = visibility !== null
   const isOwner = !conversationExists ? true : ownerUserId !== null && ownerUserId === sessionUserId
-  const updateVisibility = useUpdateConversationVisibility()
+  const share = useShareConversation()
 
   // The transport closure captures these via refs — useChat freezes the
   // transport at construction.
@@ -368,166 +312,19 @@ function ChatCore({
     },
   })
 
-  const submit = useCallback(
-    async (text: string) => {
-      const venue = venueIdRef.current
-      const conv = convIdRef.current
-      if (!venue) {
-        toast.error('Pick a venue for this chat first.')
-        return
-      }
-      if (!conv) {
-        toast.error('No conversation is open — try again.')
-        return
-      }
+  const recordOptimisticThread = useOptimisticThreads(queryClient, venues)
+  const { submit, submitWithImage } = useChatSubmit({
+    venueIdRef,
+    convIdRef,
+    setPendingUserTexts,
+    recordOptimisticThread,
+    turnSuggestions,
+    sendMessage,
+    queryClient,
+  })
 
-      // 1. Show the user's message on the very next paint.
-      setPendingUserTexts((prev) => [...prev, text])
-
-      // 2. Sidebar: first message → prepend a new row at the conv UUID (server
-      //    will upsert with the same id). Subsequent messages → bump + preview.
-      //    The infinite-query cache may have multiple entries (different q/limit
-      //    on the history page) — checking just one is enough to decide
-      //    prepend-vs-bump because either branch fans out to all matching
-      //    entries via setQueriesData.
-      const lists = queryClient.getQueriesData<ConvListInfinite>({
-        queryKey: ['chat-conversations', '__all__'],
-      })
-      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
-      const preview = text.length > 80 ? `${text.slice(0, 79)}…` : text
-      if (!existsInSidebar) {
-        const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
-        prependOptimisticThread(queryClient, {
-          id: conv,
-          venueId: venue,
-          venueName,
-          lastMessageAt: new Date().toISOString(),
-          preview,
-        })
-      } else {
-        bumpOptimisticThread(queryClient, conv, preview)
-      }
-
-      // 3. Fire proactive suggestions in parallel with the send.
-      turnSuggestions
-        .mutateAsync({
-          venueId: venue,
-          userMessage: text,
-          conversationId: conv,
-        })
-        .catch(() => undefined)
-
-      // 4. Stream.
-      await sendMessage({ text })
-    },
-    [sendMessage, turnSuggestions, queryClient, venues],
-  )
-
-  // Phase G1 — image-attached send. Bypasses useChat (which doesn't support
-  // multipart) and POSTs to /chat/messages/with-image, then invalidates the
-  // conversation query so the new turn appears.
-  const submitWithImage = useCallback(
-    async (text: string, file: File) => {
-      const venue = venueIdRef.current
-      const conv = convIdRef.current
-      if (!venue) {
-        toast.error('Pick a venue for this chat first.')
-        return
-      }
-      if (!conv) {
-        toast.error('No conversation is open — try again.')
-        return
-      }
-      const previewText = text.trim().length > 0 ? text : '[image attached]'
-      setPendingUserTexts((prev) => [...prev, previewText])
-
-      const lists = queryClient.getQueriesData<ConvListInfinite>({
-        queryKey: ['chat-conversations', '__all__'],
-      })
-      const existsInSidebar = lists.some(([, data]) => listContains(data, conv))
-      const preview = previewText.length > 80 ? `${previewText.slice(0, 79)}…` : previewText
-      if (!existsInSidebar) {
-        const venueName = venues?.find((v) => v.id === venue)?.name ?? '—'
-        prependOptimisticThread(queryClient, {
-          id: conv,
-          venueId: venue,
-          venueName,
-          lastMessageAt: new Date().toISOString(),
-          preview,
-        })
-      } else {
-        bumpOptimisticThread(queryClient, conv, preview)
-      }
-
-      try {
-        const form = new FormData()
-        form.append('image', file)
-        form.append('venueId', venue)
-        form.append('userMessage', text)
-        form.append('conversationId', conv)
-        const res = await fetch(`${API_URL}/chat/messages/with-image`, {
-          method: 'POST',
-          credentials: 'include',
-          body: form,
-        })
-        if (!res.ok) {
-          const text = await res.text()
-          throw new Error(text || `HTTP ${res.status}`)
-        }
-        await queryClient.invalidateQueries({
-          queryKey: ['conversation', conv, venue],
-        })
-        await queryClient.invalidateQueries({ queryKey: ['chat-conversations'] })
-      } catch (err) {
-        toast.error(mapApiError(err))
-        setPendingUserTexts((prev) => prev.filter((t) => t !== previewText))
-      }
-    },
-    [queryClient, venues],
-  )
-
-  const lastAssistantFollowUps = useMemo<string[]>(() => {
-    if (!historyMessages) return []
-    if (status !== 'ready') return []
-    for (let i = historyMessages.length - 1; i >= 0; i--) {
-      const m = historyMessages[i]
-      if (m.role === 'assistant') return m.followUps ?? []
-    }
-    return []
-  }, [historyMessages, status])
-
-  // Persisted feedback indexed by assistant messageId — seeds the thumbs
-  // buttons so a thumbs-up survives a refresh.
-  const feedbackByMessageId = useMemo<Record<string, 'up' | 'down' | 'regenerate'>>(() => {
-    if (!historyMessages) return {}
-    const map: Record<string, 'up' | 'down' | 'regenerate'> = {}
-    for (const m of historyMessages) {
-      if (m.role === 'assistant' && m.feedbackKind) {
-        map[m.id] = m.feedbackKind
-      }
-    }
-    return map
-  }, [historyMessages])
-
-  // Wave-C auto-verify state, indexed by assistant messageId. Drives the
-  // small "verified" / "couldn't verify" badge under each answer.
-  type VerifyEntry = {
-    status: 'pending' | 'clean' | 'issues' | 'skipped' | 'error'
-    issueCount: number | null
-  }
-  const verifyByMessageId = useMemo<Record<string, VerifyEntry>>(() => {
-    if (!historyMessages) return {}
-    const map: Record<string, VerifyEntry> = {}
-    for (const m of historyMessages) {
-      if (m.role === 'assistant' && m.verifyStatus) {
-        map[m.id] = {
-          status: m.verifyStatus,
-          issueCount: m.verifyIssueCount ?? null,
-        }
-      }
-    }
-    return map
-  }, [historyMessages])
+  const { lastAssistantFollowUps, feedbackByMessageId, verifyByMessageId } =
+    useConversationDerivedState(historyMessages, status)
 
   // Merge pending-user with useChat messages, deduping by text.
   const displayMessages = useMemo<GmUIMessage[]>(() => {
@@ -600,48 +397,33 @@ function ChatCore({
   // is nothing to share until the first send creates the row.
   const showShareButton = isOwner && conversationExists && Boolean(venueId)
   const isShared = visibility === 'org'
-  const headerActions = (
-    <>
-      <VenueChip venueId={venueId} onChange={isOwner ? onPickVenue : undefined} />
-      {showShareButton && conversationId && venueId ? (
-        <ShareButton
-          conversationId={conversationId}
-          venueId={venueId}
-          isShared={isShared}
-          isPending={updateVisibility.isPending}
-          onToggle={async (next) => {
-            try {
-              await updateVisibility.mutateAsync({
-                conversationId,
-                venueId,
-                visibility: next,
-              })
-              if (next === 'org' && typeof window !== 'undefined') {
-                const url = `${window.location.origin}/chat?venue=${venueId}&conv=${conversationId}`
-                try {
-                  await navigator.clipboard.writeText(url)
-                  toast.success('Share link copied — anyone in your org can view')
-                } catch {
-                  toast.success('Sharing on — copy the URL from your address bar')
-                }
-              } else {
-                toast.success('Sharing off — only you can view this chat')
-              }
-            } catch (err) {
-              toast.error(mapApiError(err))
-            }
-          }}
-        />
-      ) : null}
-    </>
-  )
+  // Venue chip only makes sense when there's a choice to make: hide it with no
+  // venue yet (the empty state shows the big picker) AND when the user has just
+  // one venue (nothing to switch to). Share needs a venue + existing row.
+  const showVenueChip = Boolean(venueId) && (venues?.length ?? 0) > 1
+  const showShare = showShareButton && Boolean(conversationId)
+  const headerActions =
+    showVenueChip || showShare ? (
+      <>
+        {showVenueChip && venueId ? (
+          <VenueChip venueId={venueId} onChange={isOwner ? onPickVenue : undefined} />
+        ) : null}
+        {showShare && conversationId && venueId ? (
+          <ShareButton
+            isShared={isShared}
+            isPending={share.isPending}
+            onToggle={(next) => share.toggle({ conversationId, venueId, next })}
+          />
+        ) : null}
+      </>
+    ) : undefined
 
   return (
     <>
-      <PageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={headerActions} />
+      <SetPageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={headerActions} />
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="scrollbar-thin flex-1 overflow-y-auto">
+        <div ref={scrollRef} className="scrollbar-thin flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 sm:px-6">
             {!isOwner ? (
               <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
@@ -686,32 +468,33 @@ function ChatCore({
                 verifyByMessageId={verifyByMessageId}
                 onPrompt={isOwner ? submit : undefined}
                 venueId={venueId}
+                scrollContainerRef={scrollRef}
               />
             )}
           </div>
         </div>
 
-        <div className="border-t border-border bg-background/80 px-4 py-3 backdrop-blur-sm sm:px-6">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
-            <ChatComposer
-              onSubmit={submit}
-              onSubmitWithImage={submitWithImage}
-              isPending={isPending}
-              onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
-              initialValue={composerPrefill}
-              disabled={!isOwner || !venueId || !conversationId}
-              disabledReason={
-                !isOwner
-                  ? 'Read-only — shared by another user'
-                  : !venueId
-                    ? 'Pick a venue above to start'
+        {venueId ? (
+          <div className="border-t border-border bg-background px-4 pt-3 pb-3 sm:px-6">
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
+              <ChatComposer
+                onSubmit={submit}
+                onSubmitWithImage={submitWithImage}
+                isPending={isPending}
+                onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
+                initialValue={composerPrefill}
+                disabled={!isOwner || !conversationId}
+                disabledReason={
+                  !isOwner
+                    ? 'Read-only — shared by another user'
                     : !conversationId
                       ? 'Start a new chat'
                       : undefined
-              }
-            />
+                }
+              />
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </>
   )
@@ -730,14 +513,40 @@ function titleFor(messages: GmUIMessage[]): string | undefined {
 }
 
 // Fallback prompts shown while the AI-rotated starters haven't loaded yet OR
-// when the API call fails. The server has its own fallback too — this is a
-// belt-and-braces second layer so the empty state never flashes blank.
-const FALLBACK_PROMPTS: ReadonlyArray<{ text: string }> = [
-  { text: 'Which stock items are below par today?' },
-  { text: "What's on my list this week?" },
-  { text: 'Any certs expiring in the next 30 days?' },
-  { text: "Walk me through tonight's opening checklist." },
+// when the API call fails. Split by role so staff aren't nudged toward
+// commercial questions they're scoped out of, and managers get the
+// commercial + compliance angles. The server payload overrides these when
+// present.
+const STAFF_FALLBACK_PROMPTS: ReadonlyArray<StarterQuestion> = [
+  { text: "Walk me through tonight's opening checklist.", category: 'sop' },
+  { text: 'Which stock items are below par today?', category: 'stock' },
+  { text: "What's on my list this week?", category: 'tasks' },
+  { text: 'How do I log a cellar temperature check?', category: 'sop' },
 ]
+
+const MANAGER_FALLBACK_PROMPTS: ReadonlyArray<StarterQuestion> = [
+  { text: 'How did sales go last week?', category: 'sales' },
+  { text: 'Any certificates expiring in the next 30 days?', category: 'compliance' },
+  { text: "What's overdue across the team right now?", category: 'tasks' },
+  { text: 'Which stock items are below par today?', category: 'stock' },
+]
+
+const STARTER_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  stock: Package,
+  tasks: ListTodo,
+  compliance: ShieldCheck,
+  sop: BookOpen,
+  supplier: Truck,
+  sales: TrendingUp,
+}
+
+function starterIcon(category?: string): LucideIcon {
+  if (!category) return MessageCircle
+  const key = category.trim().toLowerCase()
+  return (
+    STARTER_CATEGORY_ICONS[key] ?? STARTER_CATEGORY_ICONS[key.replace(/s$/, '')] ?? MessageCircle
+  )
+}
 
 function EmptyState({
   needsVenue,
@@ -753,11 +562,13 @@ function EmptyState({
   onPickVenue?: (id: string) => void
 }) {
   const starters = useChatStarters(venueId)
+  const { isManager } = useCurrentMember()
   // Prefer the server's payload (generated or its own fallback) when we have
   // one. Only fall back to the static client list while the request is in
   // flight, OR if the request errored — keeps the surface populated even when
-  // /chat-starters returns 500.
-  const prompts = starters.data?.questions ?? FALLBACK_PROMPTS
+  // /chat-starters returns 500. The fallback is role-aware.
+  const prompts =
+    starters.data?.questions ?? (isManager ? MANAGER_FALLBACK_PROMPTS : STAFF_FALLBACK_PROMPTS)
 
   if (needsVenue) {
     return (
@@ -789,24 +600,31 @@ function EmptyState({
         </p>
       </header>
       <ul className="flex flex-col divide-y divide-border border-y border-border">
-        {prompts.map((p) => (
-          <li key={p.text}>
-            <button
-              type="button"
-              onClick={() => onPick?.(p.text)}
-              disabled={!onPick}
-              className="group flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-left text-[15px] text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <span>{p.text}</span>
-              <span
-                aria-hidden
-                className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+        {prompts.map((p) => {
+          const Icon = starterIcon(p.category)
+          return (
+            <li key={p.text}>
+              <button
+                type="button"
+                onClick={() => onPick?.(p.text)}
+                disabled={!onPick}
+                className="group flex min-h-11 w-full cursor-pointer items-center gap-3 py-3 text-left text-sm text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
-                →
-              </span>
-            </button>
-          </li>
-        ))}
+                <Icon
+                  className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
+                  aria-hidden
+                />
+                <span className="flex-1">{p.text}</span>
+                <span
+                  aria-hidden
+                  className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none"
+                >
+                  →
+                </span>
+              </button>
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
@@ -819,6 +637,8 @@ function VenuePickerList({
   venues: VenueListItem[] | undefined
   onPickVenue?: (id: string) => void
 }) {
+  const { isManager } = useCurrentMember()
+
   // A shared chat viewer should never see the no-venue empty state, but if a
   // malformed URL drops them here without ownership, hide the picker entirely
   // rather than render a confusing disabled list.
@@ -836,15 +656,17 @@ function VenuePickerList({
     return (
       <div className="flex flex-col gap-3 rounded-xl border border-dashed border-border bg-card/50 px-4 py-6 text-sm">
         <p className="text-muted-foreground">
-          You don&apos;t have any venues yet. Create one to start chatting.
+          You don&apos;t have any venues yet.
+          {isManager ? ' Create one to start chatting.' : ' Ask a manager to add one.'}
         </p>
-        <Link
-          href="/venues/new"
-          className="inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden />
-          New venue
-        </Link>
+        {isManager ? (
+          <Button asChild variant="outline" size="sm" className="w-fit">
+            <Link href="/venues/new">
+              <Plus aria-hidden />
+              New venue
+            </Link>
+          </Button>
+        ) : null}
       </div>
     )
   }
@@ -883,18 +705,23 @@ function VenuePickerList({
           </li>
         ))}
       </ul>
-      <Link
-        href="/venues/new"
-        className="group inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-accent hover:text-foreground"
-      >
-        <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-background group-hover:text-foreground"
-          aria-hidden
+      {isManager ? (
+        <Button
+          asChild
+          variant="outline"
+          className="group h-auto justify-start gap-2 rounded-xl border-dashed px-4 py-3 font-medium text-muted-foreground shadow-none hover:border-foreground/20 hover:text-foreground"
         >
-          <Plus className="h-4 w-4" />
-        </span>
-        <span className="font-medium">New venue</span>
-      </Link>
+          <Link href="/venues/new">
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-background group-hover:text-foreground"
+              aria-hidden
+            >
+              <Plus className="h-4 w-4" />
+            </span>
+            New venue
+          </Link>
+        </Button>
+      ) : null}
     </div>
   )
 }
@@ -904,8 +731,6 @@ function ShareButton({
   isPending,
   onToggle,
 }: {
-  conversationId: string
-  venueId: string
   isShared: boolean
   isPending: boolean
   onToggle: (next: 'private' | 'org') => Promise<void>

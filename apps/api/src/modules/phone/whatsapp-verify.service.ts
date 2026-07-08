@@ -1,41 +1,26 @@
 // Phone verification service.
 //
-// Sends a 6-digit OTP via WhatsApp using the existing Infobip WhatsApp adapter
-// (the same one Plan 03-01 uses for staff invites). OTP generated CSPRNG-side,
-// hashed with sha256, stored in-process with TTL + attempts, verified timing-safe.
-//
-// History: this used to send via Infobip's 2FA SMS API (own Application+Message
-// credentials, separate product). We replaced that with WhatsApp delivery so
-// the platform has one channel for verification + chat + invites — no separate
-// Portal setup required.
+// Sends a 6-digit OTP via the Twilio WhatsApp adapter. OTP generated
+// CSPRNG-side, hashed with sha256, stored in-process with TTL + attempts,
+// verified timing-safe.
 
 import { createHash, randomInt } from 'node:crypto'
 import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common'
 import { safeBufferEqual } from '../whatsapp/safe-equal'
 import { WhatsAppAdapter } from '../whatsapp/whatsapp.adapter'
 
-type DriverMode = 'console' | 'live' | 'disabled'
-
 type StartResult =
-  | { ok: true; mode: DriverMode }
+  | { ok: true }
   | {
       ok: false
       reason: 'phone-service-unavailable' | 'phone-invalid-format'
-      details?: { reason?: string; infobipCode?: string | null; infobipStatus?: number | null }
-    }
-
-type CheckResult =
-  | {
-      ok: true
-      approved: boolean
-      mode: DriverMode
       details?: { reason?: string }
     }
-  | {
-      ok: false
-      reason: 'phone-service-unavailable'
-      details?: { reason?: string; infobipCode?: string | null; infobipStatus?: number | null }
-    }
+
+type CheckResult = {
+  approved: boolean
+  details?: { reason?: string }
+}
 
 const PIN_LENGTH = 6
 const PIN_TTL_MS = 10 * 60 * 1000
@@ -66,14 +51,10 @@ function generatePin(): string {
 @Injectable()
 export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(WhatsappVerifyService.name)
-  private readonly baseMode: 'console' | 'live'
   private readonly pinCache = new Map<string /* phoneHash */, PinEntry>()
   private sweepHandle?: NodeJS.Timeout
 
-  constructor(private readonly adapter: WhatsAppAdapter) {
-    const override = process.env.PHONE_VERIFY_DRIVER_OVERRIDE
-    this.baseMode = override === 'console' ? 'console' : 'live'
-  }
+  constructor(private readonly adapter: WhatsAppAdapter) {}
 
   onModuleInit(): void {
     this.sweepHandle = setInterval(() => this.sweep(), SWEEP_INTERVAL_MS)
@@ -84,34 +65,14 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
     if (this.sweepHandle) clearInterval(this.sweepHandle)
   }
 
-  // 'disabled' wins at call-time so the kill-switch takes effect without restart.
-  get mode(): DriverMode {
-    if (process.env.PHONE_VERIFY_DRIVER_OVERRIDE === 'disabled') return 'disabled'
-    return this.baseMode
-  }
-
   async startVerification(phoneNumber: string, opts?: LogOpts): Promise<StartResult> {
     const phoneHash = hashPhone(phoneNumber)
     const requestId = opts?.requestId ?? null
 
-    if (this.mode === 'disabled') {
-      this.logger.warn(
-        JSON.stringify({ event: 'phone.driver_disabled', phoneHash, path: 'send', requestId }),
-      )
-      return { ok: false, reason: 'phone-service-unavailable', details: { reason: 'disabled' } }
-    }
-
     const code = generatePin()
     this.cachePin(phoneHash, sha256Hex(code))
 
-    if (this.mode === 'console') {
-      this.logger.log(
-        JSON.stringify({ event: 'phone.console_fallback', phoneHash, code, requestId }),
-      )
-      return { ok: true, mode: 'console' }
-    }
-
-    // Live — send via WhatsApp adapter. Infobip wants bare digits (no `+`).
+    // Send via WhatsApp adapter (accepts +E164 or bare digits).
     this.logger.log(JSON.stringify({ event: 'phone.send_attempted', phoneHash, requestId }))
     const to = phoneNumber.replace(/^\+/, '')
     const body = `Your GM AI verification code is ${code}. It expires in 10 minutes.`
@@ -154,23 +115,15 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
       JSON.stringify({
         event: 'phone.send_succeeded',
         phoneHash,
-        mode: sendResult.mode,
         requestId,
       }),
     )
-    return { ok: true, mode: 'live' }
+    return { ok: true }
   }
 
   async checkVerification(phoneNumber: string, code: string, opts?: LogOpts): Promise<CheckResult> {
     const phoneHash = hashPhone(phoneNumber)
     const requestId = opts?.requestId ?? null
-
-    if (this.mode === 'disabled') {
-      this.logger.warn(
-        JSON.stringify({ event: 'phone.driver_disabled', phoneHash, path: 'verify', requestId }),
-      )
-      return { ok: false, reason: 'phone-service-unavailable', details: { reason: 'disabled' } }
-    }
 
     const entry = this.pinCache.get(phoneHash)
     if (!entry) {
@@ -182,7 +135,7 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
           requestId,
         }),
       )
-      return { ok: true, approved: false, mode: this.mode, details: { reason: 'pin-not-found' } }
+      return { approved: false, details: { reason: 'pin-not-found' } }
     }
 
     if (entry.expiresAt < Date.now()) {
@@ -195,7 +148,7 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
           requestId,
         }),
       )
-      return { ok: true, approved: false, mode: this.mode, details: { reason: 'pin-expired' } }
+      return { approved: false, details: { reason: 'pin-expired' } }
     }
 
     // Normalise submitted digits — tolerate "123 456" / "123-456" copy-paste.
@@ -204,13 +157,11 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
       const newRemaining = entry.attemptsRemaining - 1
       if (newRemaining <= 0) {
         this.pinCache.delete(phoneHash)
-        return { ok: true, approved: false, mode: this.mode, details: { reason: 'pin-blocked' } }
+        return { approved: false, details: { reason: 'pin-blocked' } }
       }
       this.pinCache.set(phoneHash, { ...entry, attemptsRemaining: newRemaining })
       return {
-        ok: true,
         approved: false,
-        mode: this.mode,
         details: { reason: 'pin-verification-failed' },
       }
     }
@@ -228,11 +179,10 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
           event: 'phone.check_result',
           phoneHash,
           verified: true,
-          mode: this.mode,
           requestId,
         }),
       )
-      return { ok: true, approved: true, mode: this.mode }
+      return { approved: true }
     }
 
     const newRemaining = entry.attemptsRemaining - 1
@@ -244,11 +194,10 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
           phoneHash,
           verified: false,
           attemptsRemaining: 0,
-          mode: this.mode,
           requestId,
         }),
       )
-      return { ok: true, approved: false, mode: this.mode, details: { reason: 'pin-blocked' } }
+      return { approved: false, details: { reason: 'pin-blocked' } }
     }
 
     this.pinCache.set(phoneHash, { ...entry, attemptsRemaining: newRemaining })
@@ -258,14 +207,11 @@ export class WhatsappVerifyService implements OnModuleInit, OnModuleDestroy {
         phoneHash,
         verified: false,
         attemptsRemaining: newRemaining,
-        mode: this.mode,
         requestId,
       }),
     )
     return {
-      ok: true,
       approved: false,
-      mode: this.mode,
       details: { reason: 'pin-verification-failed' },
     }
   }

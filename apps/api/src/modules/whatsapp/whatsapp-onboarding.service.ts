@@ -150,7 +150,7 @@ export class WhatsappOnboardingService {
         state.phoneNumber,
         // The OTP plaintext is in the OTP message itself (sent by otps.requestOtp);
         // here we just confirm in-channel that something will arrive.
-        // Keeping the outbound minimal — Infobip sent the code separately.
+        // Keeping the outbound minimal — the code is sent separately.
         null,
         'otp_pending',
       )

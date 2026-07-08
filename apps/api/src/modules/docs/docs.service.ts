@@ -16,6 +16,8 @@ import {
   DocumentTypeDto,
   type DocumentTypeKind,
   DocumentTypeKindSchema,
+  type DocVersionHistoryEntry,
+  type DocVersionRef,
   type ProcessingStatus,
   type ProposedDocType,
   ProposedDocTypeSchema,
@@ -24,12 +26,14 @@ import {
   type UpdateDocRequest,
 } from '../../types'
 import { IngestService } from '../ingest/ingest.service'
+import { MemoryReconcileTrigger } from '../organization/memory-reconcile.trigger'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { ParsedDocument } from '../reducto/reducto.service'
 import { ReductoService } from '../reducto/reducto.service'
 import { RetrievalService } from '../retrieval/retrieval.service'
 import { ChecklistExtractorService } from './checklist-extractor.service'
 import { ClassifierService, VENUE_AUTO_ASSIGN_CONFIDENCE } from './classifier.service'
+import { ReconcileService } from './reconcile.service'
 
 function composeContent(description: string | undefined, body: string): string {
   const desc = description?.trim()
@@ -56,6 +60,13 @@ function titleFromMetadata(metadata: unknown): string | null {
   if (typeof m.title === 'string' && m.title.trim()) return m.title.trim()
   if (typeof m.docType === 'string' && m.docType.trim()) return m.docType.trim()
   return null
+}
+
+// Adjacent-version pointer for the doc-detail banners. Title falls back through
+// the same metadata path as the doc itself so an untitled neighbour still reads.
+function toVersionRef(row: { id: string; metadata: unknown } | null): DocVersionRef | null {
+  if (!row) return null
+  return { id: row.id, title: titleFromMetadata(row.metadata) }
 }
 
 // Library-list helpers. Cursor is base64(JSON({v, id})). `v` is whatever the
@@ -163,6 +174,8 @@ function toListItem(r: {
   aiSummary: string | null
   processingStatus: string
   processingError: string | null
+  version: number
+  supersededAt: Date | null
   createdAt: Date
   updatedAt: Date
   pendingTypeProposal: unknown
@@ -205,6 +218,8 @@ function toListItem(r: {
     isProcedural: documentType?.kind === 'procedural',
     processingStatus: coerceProcessingStatus(r.processingStatus),
     processingError: r.processingError,
+    version: r.version,
+    supersededAt: r.supersededAt ? r.supersededAt.toISOString() : null,
     createdAt: r.createdAt.toISOString(),
     updatedAt: r.updatedAt.toISOString(),
   }
@@ -214,6 +229,16 @@ export class DocNotFoundOrCrossOrgError extends Error {
   constructor() {
     super('venue-not-found')
     this.name = 'DocNotFoundOrCrossOrgError'
+  }
+}
+
+// Manual reconcile preconditions: the two docs are the same row, or one of them
+// is already archived. Distinct from not-found so the controller can map it to a
+// 409 rather than a 404.
+export class ReconcileConflictError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ReconcileConflictError'
   }
 }
 
@@ -323,6 +348,8 @@ export class DocsService {
     private readonly reducto: ReductoService,
     private readonly retrieval: RetrievalService,
     private readonly realtime: RealtimeGateway,
+    private readonly reconcile: ReconcileService,
+    private readonly memoryReconcile: MemoryReconcileTrigger,
   ) {}
 
   // Wraps a status update so callers don't have to remember to also push the
@@ -342,6 +369,9 @@ export class DocsService {
         },
       })
       .catch(() => undefined)
+    // A doc reaching 'ready' means the KB content changed — debounce-trigger a
+    // memory reconcile so stale agent-memory notes get pruned within minutes.
+    if (data.processingStatus === 'ready') this.memoryReconcile.onKbChanged(orgId)
     try {
       this.realtime.emitDocUpdated(orgId, {
         id: knowledgeItemId,
@@ -387,6 +417,8 @@ export class DocsService {
       aiSummary: string | null
       processingStatus: string
       processingError: string | null
+      version: number
+      supersededAt: Date | null
       createdAt: Date
       updatedAt: Date
       pendingTypeProposal: unknown
@@ -423,11 +455,15 @@ export class DocsService {
     })()
 
     const filtersSql = buildFiltersSql({ q, category, venue, status })
+    // Lifecycle gate. Superseded rows never appear in any listing — an archived
+    // version is reached only through its successor's version history.
+    const lifecycleSql = Prisma.sql`ki."supersededAt" IS NULL`
 
     const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
       SELECT
         ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
-        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."processingStatus", ki."processingError", ki.version, ki."supersededAt",
+        ki."createdAt", ki."updatedAt",
         ki."pendingTypeProposal",
         v.id AS venue_id, v.name AS venue_name,
         dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
@@ -437,6 +473,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ${lifecycleSql}
         AND ${filtersSql}
         AND ${cursorSql}
       ORDER BY ${orderBySql}
@@ -453,6 +490,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ${lifecycleSql}
         AND ${filtersSql}
     `)
     const total = Number(totalRow[0]?.total ?? 0)
@@ -484,6 +522,8 @@ export class DocsService {
         aiSummary: string | null
         processingStatus: string
         processingError: string | null
+        version: number
+        supersededAt: Date | null
         createdAt: Date
         updatedAt: Date
         pendingTypeProposal: unknown
@@ -498,7 +538,8 @@ export class DocsService {
     >(Prisma.sql`
       SELECT
         ki.id, ki."venueId", ki.content, ki.metadata, ki."aiSummary",
-        ki."processingStatus", ki."processingError", ki."createdAt", ki."updatedAt",
+        ki."processingStatus", ki."processingError", ki.version, ki."supersededAt",
+        ki."createdAt", ki."updatedAt",
         ki."pendingTypeProposal",
         v.id AS venue_id, v.name AS venue_name,
         dt.id AS dt_id, dt.name AS dt_name, dt.description AS dt_description,
@@ -508,6 +549,7 @@ export class DocsService {
       LEFT JOIN "document_types" dt ON dt.id = ki."documentTypeId"
       WHERE ki."organizationId" = ${orgId}
         AND ki."answerStatus" = 'answered'
+        AND ki."supersededAt" IS NULL
         AND (
           ki."processingStatus" = 'failed'
           OR (
@@ -822,11 +864,23 @@ export class DocsService {
         aiSummary: true,
         processingStatus: true,
         processingError: true,
+        version: true,
+        supersededAt: true,
         createdAt: true,
         updatedAt: true,
         venue: { select: { id: true, name: true } },
         documentType: {
           select: { id: true, name: true, description: true, schema: true, kind: true },
+        },
+        // Successor that archived this doc (if any).
+        supersededBy: { select: { id: true, metadata: true } },
+        // Predecessor(s) this doc replaced. Linear chains have one; manual
+        // reconcile can fold several older docs into one successor — surface the
+        // most-recently-archived as the "previous version" link.
+        supersedes: {
+          select: { id: true, metadata: true },
+          orderBy: { supersededAt: 'desc' },
+          take: 1,
         },
         pendingTypeProposal: true,
         // Plan 04-03 Task 1 — include 1-1 Checklist for procedural docs.
@@ -864,6 +918,11 @@ export class DocsService {
       : []
     const docType = typeof metadata.docType === 'string' ? metadata.docType : null
     const docPurpose = DocPurposeSchema.safeParse(metadata.docPurpose)
+    // Only walk the lineage when this doc is part of a chain — archived (has a
+    // successor) or a newer version (has a predecessor). Standalone docs skip
+    // the recursive query entirely.
+    const inChain = row.supersededAt !== null || row.supersedes.length > 0
+    const versionHistory = inChain ? await this.buildVersionHistory(row.id, orgId) : []
     return {
       id: row.id,
       title: titleFromMetadata(metadata),
@@ -880,9 +939,65 @@ export class DocsService {
       docPurpose: docPurpose.success ? docPurpose.data : null,
       processingStatus: coerceProcessingStatus(row.processingStatus),
       processingError: row.processingError,
+      version: row.version,
+      supersededAt: row.supersededAt ? row.supersededAt.toISOString() : null,
+      supersededBy: toVersionRef(row.supersededBy),
+      versionHistory,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     }
+  }
+
+  // Full version lineage for a doc, newest first. Walks the supersede chain in
+  // both directions from `docId` (successors via supersededById, predecessors
+  // via the reverse edge) with a recursive CTE, org-scoped at every hop so a
+  // chain can never cross a tenant boundary. Includes the doc itself.
+  private async buildVersionHistory(
+    docId: string,
+    orgId: string,
+  ): Promise<DocVersionHistoryEntry[]> {
+    const rows = await prisma.$queryRawUnsafe<
+      {
+        id: string
+        metadata: unknown
+        version: number
+        supersededAt: Date | null
+        updatedAt: Date
+      }[]
+    >(
+      `
+      WITH RECURSIVE chain AS (
+        SELECT id, "supersededById"
+        FROM "knowledge_items"
+        WHERE id = $1 AND "organizationId" = $2
+        UNION
+        SELECT k.id, k."supersededById"
+        FROM "knowledge_items" k
+        JOIN chain c ON (k.id = c."supersededById" OR k."supersededById" = c.id)
+        WHERE k."organizationId" = $2
+      )
+      SELECT ki.id,
+             ki.metadata,
+             ki.version,
+             ki."supersededAt",
+             ki."updatedAt"
+      FROM "knowledge_items" ki
+      JOIN chain ON chain.id = ki.id
+      ORDER BY (ki."supersededAt" IS NULL) DESC, ki.version DESC, ki."updatedAt" DESC
+      `,
+      docId,
+      orgId,
+    )
+    return rows.map((r) => ({
+      id: r.id,
+      // Same title/docType fallback the doc itself uses, so a titled-by-docType
+      // version doesn't render as "Untitled" in the history list.
+      title: titleFromMetadata(r.metadata),
+      version: r.version,
+      supersededAt: r.supersededAt ? r.supersededAt.toISOString() : null,
+      updatedAt: r.updatedAt.toISOString(),
+      isCurrent: r.id === docId,
+    }))
   }
 
   // Sync phase — inserts a minimal KnowledgeItem with status 'processing' so the
@@ -952,6 +1067,11 @@ export class DocsService {
       // this category — re-classifying would clobber their decision.
       preserveDocumentTypeId?: string | null
       preservePendingTypeProposal?: Record<string, unknown> | null
+      // Skip version reconciliation for this ingest regardless of whether a type
+      // is preserved. The restore (un-supersede) path sets this so a re-ingested
+      // doc can't be re-archived against its own successor — preserveDocumentTypeId
+      // alone wouldn't cover an archived doc that has no confirmed type.
+      skipReconcile?: boolean
       // When true AND no venueId is set, the classifier is asked to propose a
       // venue from the org's list. High-confidence proposals are auto-applied.
       autoDetectVenue?: boolean
@@ -1096,6 +1216,36 @@ export class DocsService {
           userId,
           kindSource: input.preserveDocumentTypeId ? 'accept-type' : 'matched',
         })
+      }
+
+      // Version reconciliation. A re-ingest (preserveDocumentTypeId) is an
+      // explicit in-place update of the same id — not a new version — so it's
+      // excluded. The doc is fully built by here; archiving the predecessor is
+      // best-effort and must not fail the upload.
+      if (
+        !input.preserveDocumentTypeId &&
+        !input.skipReconcile &&
+        process.env.DOC_RECONCILE_DISABLED !== '1'
+      ) {
+        try {
+          await this.reconcile.detectAndSupersede({
+            newItemId: id,
+            orgId,
+            venueId: input.venueId ?? null,
+            documentTypeId,
+            title: input.title ?? null,
+          })
+        } catch (err) {
+          this.logger.warn(
+            JSON.stringify({
+              level: 'warn',
+              event: 'docs.reconcile_failed',
+              knowledgeItemId: id,
+              orgId,
+              message: (err as Error)?.message ?? 'unknown',
+            }),
+          )
+        }
       }
 
       await this.setProcessingStatus(id, orgId, {
@@ -1495,10 +1645,10 @@ export class DocsService {
         // mutation lacks a portable "delete key" op; `jsonb - 'key'` is Postgres-native.
         // Treat null and non-null venueId symmetrically (IS NOT DISTINCT FROM).
         await tx.$executeRaw`
-          UPDATE knowledge_items
+          UPDATE "knowledge_items"
           SET metadata = metadata - 'docPurpose'
-          WHERE organization_id = ${orgId}
-            AND (venue_id IS NOT DISTINCT FROM ${nextVenueId})
+          WHERE "organizationId" = ${orgId}
+            AND ("venueId" IS NOT DISTINCT FROM ${nextVenueId})
             AND id <> ${id}::uuid
             AND metadata->>'docPurpose' = ${input.docPurpose}
         `
@@ -1690,6 +1840,143 @@ export class DocsService {
         knowledgeItemId,
       }),
     )
+  }
+
+  // Manual reconcile — an operator (or the backfill script's reviewed output)
+  // explicitly marks `keepId` as the version that supersedes `replacesId`.
+  // Bypasses the automatic path's similarity/title/expiry guards (those exist to
+  // avoid false positives when *guessing*; a human's explicit choice overrides
+  // them) but adds strict org-ownership validation on BOTH ids — the auto path
+  // can skip that because detection is already org-scoped; here the ids come
+  // from the caller.
+  async supersedeManually(
+    keepId: string,
+    replacesId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<void> {
+    if (keepId === replacesId) {
+      throw new ReconcileConflictError('a document cannot supersede itself')
+    }
+    const rows = await prisma.knowledgeItem.findMany({
+      where: { id: { in: [keepId, replacesId] }, organizationId: orgId },
+      select: { id: true, supersededAt: true, answerStatus: true },
+    })
+    const keep = rows.find((r) => r.id === keepId)
+    const old = rows.find((r) => r.id === replacesId)
+    // Either id missing or cross-org → 404 (don't disclose which). Gaps (pending
+    // questions) aren't real docs, so refuse to reconcile them too.
+    if (!keep || !old) throw new DocNotFoundOrCrossOrgError()
+    if (keep.answerStatus !== 'answered' || old.answerStatus !== 'answered') {
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    if (keep.supersededAt) {
+      throw new ReconcileConflictError('the new version is itself archived')
+    }
+    if (old.supersededAt) {
+      throw new ReconcileConflictError('that document is already archived')
+    }
+
+    const archived = await this.reconcile.supersede(replacesId, keepId, orgId)
+    if (!archived) {
+      throw new ReconcileConflictError('that document is already archived')
+    }
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.superseded_manually',
+        orgId,
+        actingUserId: userId,
+        keptId: keepId,
+        supersededId: replacesId,
+      }),
+    )
+  }
+
+  // Undo a supersede — bring an archived doc back to the live library. Clears the
+  // archive stamps (ReconcileService.unsupersede) then re-ingests the doc to
+  // rebuild the retrieval rows that archiveWithinTx dropped, so it re-enters
+  // search instead of returning as a dead row. Tabular structured rows can't be
+  // rebuilt without the original file, so a restored table-doc loses those — an
+  // accepted degradation on an undo.
+  async unsupersedeManually(
+    archivedId: string,
+    orgId: string,
+    userId: string | null,
+  ): Promise<void> {
+    const row = await prisma.knowledgeItem.findUnique({
+      where: { id: archivedId },
+      select: {
+        id: true,
+        organizationId: true,
+        answerStatus: true,
+        supersededAt: true,
+        supersededById: true,
+        content: true,
+        metadata: true,
+        venueId: true,
+        documentTypeId: true,
+        pendingTypeProposal: true,
+      },
+    })
+    if (!row || row.organizationId !== orgId) {
+      if (row && row.organizationId !== orgId) {
+        this.logger.warn(
+          JSON.stringify({
+            level: 'warn',
+            event: 'docs.cross_org_denied',
+            op: 'unsupersede',
+            targetRowId: archivedId,
+            actingOrgId: orgId,
+          }),
+        )
+      }
+      throw new DocNotFoundOrCrossOrgError()
+    }
+    // Gaps (pending questions) aren't real docs; refuse to restore them.
+    if (row.answerStatus !== 'answered') throw new DocNotFoundOrCrossOrgError()
+    if (!row.supersededAt || !row.supersededById) {
+      throw new ReconcileConflictError('that document is not archived')
+    }
+
+    const restored = await this.reconcile.unsupersede(archivedId, row.supersededById, orgId)
+    if (!restored) {
+      throw new ReconcileConflictError('that document is not archived')
+    }
+
+    this.logger.log(
+      JSON.stringify({
+        level: 'log',
+        event: 'docs.unsuperseded',
+        orgId,
+        actingUserId: userId,
+        restoredId: archivedId,
+        successorId: row.supersededById,
+      }),
+    )
+
+    // Re-ingest from the doc's stored content (no original file needed) to
+    // rebuild its sections/search index/checklist. preserveDocumentTypeId keeps
+    // the confirmed category when there is one (a manually-superseded doc may
+    // have none, which would otherwise re-classify it). skipReconcile guarantees
+    // the restore can't immediately re-archive itself against its own successor
+    // regardless of whether a type is preserved.
+    const metadata = (row.metadata ?? {}) as Record<string, unknown>
+    const enrichInput = {
+      title: titleFromMetadata(metadata) ?? '',
+      content: row.content,
+      venueId: row.venueId,
+      preserveDocumentTypeId: row.documentTypeId,
+      preservePendingTypeProposal: (row.pendingTypeProposal ?? null) as Record<
+        string,
+        unknown
+      > | null,
+      skipReconcile: true,
+    }
+    setImmediate(() => {
+      void this.enrichInBackground(archivedId, enrichInput, orgId, userId)
+    })
   }
 
   async remove(id: string, orgId: string): Promise<void> {

@@ -4,10 +4,8 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { fromNodeHeaders } from 'better-auth/node'
 import type { Request } from 'express'
 import type { ApiErrorResponse } from '../../types'
-import { auth } from './auth.config'
 
 export type AuthedRequest = Request & {
   requestId?: string
@@ -17,26 +15,16 @@ export type AuthedRequest = Request & {
   membership?: { role: string }
 }
 
+// OrgContextMiddleware runs globally before every guard and resolves the
+// session (one getSession/request) onto req. This guard just asserts the route
+// requires an authenticated user — no second session lookup.
 @Injectable()
 export class AuthGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<AuthedRequest>()
-    const headers = fromNodeHeaders(req.headers)
-    const result = await auth.api.getSession({ headers })
-    if (!result?.user || !result?.session) {
+    if (!req.user) {
       const body: ApiErrorResponse = { error: 'unauthorized' }
       throw new UnauthorizedException(body)
-    }
-    req.user = {
-      id: result.user.id,
-      email: result.user.email,
-      name: result.user.name ?? null,
-    }
-    req.session = {
-      id: result.session.id,
-      token: result.session.token,
-      activeOrganizationId:
-        (result.session as { activeOrganizationId?: string | null }).activeOrganizationId ?? null,
     }
     return true
   }

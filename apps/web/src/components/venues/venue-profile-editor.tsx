@@ -1,7 +1,6 @@
 'use client'
 
 import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -11,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import type { VenueDetailDto as VenueDetail } from '@/generated/api'
 import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
 import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
+import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useRunNudge, useUpdateVenueProfile } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
@@ -74,6 +74,7 @@ function formToProfile(values: FormValues): VenueProfile {
 export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
   const update = useUpdateVenueProfile()
   const runNudge = useRunNudge()
+  const { isManager } = useCurrentMember()
 
   // No client-side resolver — VenueProfileSchema runs at submit time inside
   // formToProfile() and on the server. The form fields are stringy mirrors of
@@ -84,10 +85,9 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
     mode: 'onChange',
   })
 
-  // Reset when venue changes (selector switch).
-  useEffect(() => {
-    form.reset(profileToForm(venue.profile))
-  }, [venue.id, venue.profile, form])
+  // Venue switches remount this component via `key` in VenueProfilesBody, so the form
+  // re-initialises from defaultValues — no reset effect needed (it would also clobber
+  // in-progress edits on background refetch).
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
@@ -119,11 +119,12 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <Section title="Operations" icon={<MapPin className="h-3.5 w-3.5" />}>
-        <Field
-          label="Opening hours"
-          hint="Plain English. Example: Mon–Thu 12:00–23:00, Fri/Sat 12:00–01:00, Sun 12:00–22:00"
-        >
-          <Input {...form.register('openingHours')} placeholder="Mon–Sun 12:00–23:00" />
+        <Field label="Opening hours" hint="One day per line. Plain English is fine.">
+          <Textarea
+            {...form.register('openingHours')}
+            rows={7}
+            placeholder={'Monday: Closed\nTuesday–Friday: 16:00 – 23:00\nSunday: 13:00 – 22:00'}
+          />
         </Field>
         <Field
           label="Layout notes"
@@ -199,40 +200,42 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
         </Field>
       </Section>
 
-      <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background/90 py-3 backdrop-blur-sm">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Bell className="h-3.5 w-3.5" />
-          <button
-            type="button"
-            onClick={onSendTestNudge}
-            disabled={runNudge.isPending}
-            className="underline-offset-2 hover:underline disabled:opacity-50"
-          >
-            {runNudge.isPending ? 'Sending nudge…' : 'Send a test nudge to the duty manager'}
-          </button>
+      {isManager ? (
+        <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background/90 py-3 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Bell className="h-3.5 w-3.5" />
+            <button
+              type="button"
+              onClick={onSendTestNudge}
+              disabled={runNudge.isPending}
+              className="underline-offset-2 hover:underline disabled:opacity-50"
+            >
+              {runNudge.isPending ? 'Sending nudge…' : 'Send a test nudge to the duty manager'}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={!dirty || isSaving}
+              onClick={() => form.reset(profileToForm(venue.profile))}
+            >
+              Discard
+            </Button>
+            <Button type="submit" size="sm" disabled={!dirty || isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Saving
+                </>
+              ) : (
+                'Save profile'
+              )}
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={!dirty || isSaving}
-            onClick={() => form.reset(profileToForm(venue.profile))}
-          >
-            Discard
-          </Button>
-          <Button type="submit" size="sm" disabled={!dirty || isSaving}>
-            {isSaving ? (
-              <>
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Saving
-              </>
-            ) : (
-              'Save profile'
-            )}
-          </Button>
-        </div>
-      </div>
+      ) : null}
     </form>
   )
 }
@@ -270,7 +273,7 @@ function Field({
     <div className="space-y-1.5">
       <Label className="text-xs font-medium">{label}</Label>
       {children}
-      {hint ? <p className="text-[11px] leading-snug text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className="text-xs leading-snug text-muted-foreground">{hint}</p> : null}
     </div>
   )
 }

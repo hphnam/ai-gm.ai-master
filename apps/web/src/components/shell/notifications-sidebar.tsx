@@ -3,20 +3,22 @@
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { useIsMobile } from '@/lib/hooks/use-is-mobile'
 import { cn } from '@/lib/utils'
 import { AlertsView } from './alerts-view'
 import { ConversationsView } from './conversations-view'
+import type { InboxFocus } from './inbox-provider'
 
 type SidebarTab = 'conversations' | 'alerts'
 
 export function NotificationsSidebar({
   open,
   onOpenChange,
-  focusId,
+  focus,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  focusId?: string | null
+  focus?: InboxFocus | null
 }) {
   // Default to Conversations — it's the day-to-day surface. Alerts is the
   // "your scheduled report / compliance reminder" backwater.
@@ -31,18 +33,22 @@ export function NotificationsSidebar({
     }
   }, [open])
 
-  // A focusId (set by clicking "View" on a toast) always points at an alert
-  // notification — chat events don't surface toasts. Switch to Alerts when
-  // a focusId arrives so the focused row is actually visible.
+  // A focus (toast "View" click or /notes/:id deep link) picks the tab: alert
+  // notifications live in Alerts; chat notes open their conversation thread.
   useEffect(() => {
-    if (open && focusId) setTab('alerts')
-  }, [open, focusId])
+    if (open && focus) setTab(focus.kind === 'thread' ? 'conversations' : 'alerts')
+  }, [open, focus])
+
+  const isMobile = useIsMobile()
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="gap-0 p-0 sm:max-w-[440px]"
-        side="right"
+        className={cn(
+          'gap-0 p-0 sm:max-w-[440px]',
+          isMobile && 'h-[85dvh] pb-[env(safe-area-inset-bottom)]',
+        )}
+        side={isMobile ? 'bottom' : 'right'}
         hideCloseButton
         onOpenAutoFocus={(e) => {
           // Skip auto-focus so the search input doesn't pop a mobile keyboard
@@ -53,7 +59,13 @@ export function NotificationsSidebar({
         <SheetTitle className="sr-only">Inbox</SheetTitle>
         <SidebarHeader />
         <SidebarTabs tab={tab} onTabChange={setTab} />
-        {tab === 'conversations' ? <ConversationsView /> : <AlertsView focusId={focusId ?? null} />}
+        {tab === 'conversations' ? (
+          <ConversationsView
+            initialOtherUserId={focus?.kind === 'thread' ? focus.otherUserId : null}
+          />
+        ) : (
+          <AlertsView focusId={focus?.kind === 'alert' ? focus.id : null} />
+        )}
       </SheetContent>
     </Sheet>
   )
@@ -61,13 +73,13 @@ export function NotificationsSidebar({
 
 function SidebarHeader() {
   return (
-    <div className="flex items-center justify-between border-b border-border px-4 py-3">
+    <div className="flex items-center justify-between border-b border-border px-4 py-2">
       <h2 className="font-semibold text-base text-foreground">Inbox</h2>
       <SheetClose
-        className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         aria-label="Close"
       >
-        <X className="h-4 w-4" aria-hidden />
+        <X className="h-5 w-5" aria-hidden />
       </SheetClose>
     </div>
   )
@@ -104,7 +116,7 @@ function Tab({ active, onClick, label }: { active: boolean; onClick: () => void;
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        'relative -mb-px cursor-pointer border-b-2 px-3 py-2 font-medium text-xs transition-colors',
+        'relative -mb-px inline-flex min-h-11 cursor-pointer items-center border-b-2 px-3 font-medium text-xs transition-colors',
         active
           ? 'border-foreground text-foreground'
           : 'border-transparent text-foreground/55 hover:text-foreground',
