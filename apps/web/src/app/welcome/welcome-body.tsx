@@ -9,7 +9,7 @@ import { StepDone } from './step-done'
 import { StepKnowledge } from './step-knowledge'
 import { StepOperations } from './step-operations'
 import { StepSafety } from './step-safety'
-import { type OnboardingStepId, prevStep } from './steps'
+import { ONBOARDING_STEPS, type OnboardingStepId, prevStep } from './steps'
 
 type Props = {
   initialStep: OnboardingStepId
@@ -31,7 +31,13 @@ export function WelcomeBody(props: Props) {
 function WelcomeBodyInner({ initialStep, venueId, initialVenue, userName }: Props) {
   const router = useRouter()
   const params = useSearchParams()
-  const step = (params.get('step') as OnboardingStepId | null) ?? initialStep
+  const rawStep = params.get('step')
+  // Steps beyond basics render nothing without a venue — fall back to the
+  // server-sanitized step rather than a blank body.
+  const step =
+    ONBOARDING_STEPS.some((s) => s.id === rawStep) && (rawStep === 'basics' || venueId)
+      ? (rawStep as OnboardingStepId)
+      : initialStep
 
   const go = useCallback(
     (nextStepId: OnboardingStepId, nextVenueId?: string | null) => {

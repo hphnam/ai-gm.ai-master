@@ -120,7 +120,9 @@ export class VenuesService {
       },
     })
 
-    const profile = VenueProfileSchema.parse(updated.profile ?? {})
+    // safeParse: a legacy profile row with stray keys must not 500 a rename.
+    const parsed = VenueProfileSchema.safeParse(updated.profile ?? {})
+    const profile = parsed.success ? parsed.data : {}
     // Name/type/address feed the profile embedding — keep retrieval in sync.
     await this.reindexProfile(orgId, updated, profile).catch((err) => {
       this.logger.warn(

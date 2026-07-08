@@ -68,7 +68,7 @@ export function StepDone({ venueId }: { venueId: string }) {
       eyebrow="You&rsquo;re set"
       title={
         <>
-          {venue?.name ?? 'Your venue'} is live.
+          {venue?.name ?? 'Your venue'} is ready.
           <br />
           <span className="text-muted-foreground">Try asking your AI GM&hellip;</span>
         </>
@@ -101,11 +101,11 @@ export function StepDone({ venueId }: { venueId: string }) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-5">
           <Link
             href="/docs"
-            className="cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-sm text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Add more files later
           </Link>
-          <Button type="button" onClick={() => startChat()}>
+          <Button type="button" onClick={() => startChat()} className="min-h-11">
             <MessageSquarePlus className="h-4 w-4" aria-hidden />
             Start chatting
           </Button>

@@ -17,7 +17,7 @@ export function BusinessLookup({
   disabled,
 }: {
   onSelect: (candidate: PlaceCandidate) => void
-  onManual: () => void
+  onManual?: () => void
   onUnavailable: () => void
   disabled?: boolean
 }) {
@@ -77,7 +77,7 @@ export function BusinessLookup({
                 type="button"
                 onClick={() => onSelect(c)}
                 disabled={disabled}
-                className="flex w-full cursor-pointer items-start gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
+                className="flex min-h-11 w-full cursor-pointer items-start gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
               >
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
                 <span className="min-w-0">
@@ -112,14 +112,16 @@ export function BusinessLookup({
         </p>
       ) : null}
 
-      <button
-        type="button"
-        onClick={onManual}
-        disabled={disabled}
-        className="cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-      >
-        Enter details manually
-      </button>
+      {onManual ? (
+        <button
+          type="button"
+          onClick={onManual}
+          disabled={disabled}
+          className="inline-flex min-h-11 cursor-pointer items-center rounded-sm text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Enter details manually
+        </button>
+      ) : null}
     </div>
   )
 }

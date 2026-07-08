@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, ChevronDown, MapPin, Plus, Store } from 'lucide-react'
+import { Check, ChevronDown, MapPin, Plus, RotateCcw, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -64,6 +64,22 @@ export function VenueProfilesBody() {
     <div className="space-y-5">
       <VenuePicker venues={venues.data} activeId={activeVenue.id} onSelect={setSelectedId} />
 
+      {isManager ? (
+        <div className="-mt-3 flex justify-end">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="min-h-11 gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Link href={`/welcome?venueId=${activeVenue.id}&step=basics`}>
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+              Re-run guided setup
+            </Link>
+          </Button>
+        </div>
+      ) : null}
+
       {detail.isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-6 w-1/3" />
@@ -109,7 +125,7 @@ function VenuePicker({
             <Store className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Editing
             </p>
             <p className="truncate text-sm font-medium text-foreground">{active.name}</p>
@@ -135,7 +151,7 @@ function VenuePicker({
         align="start"
         className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[280px]"
       >
-        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
           {count === 1 ? 'Your venue' : 'Switch venue'}
         </DropdownMenuLabel>
         {venues.map((v) => (

@@ -103,7 +103,7 @@ export function StepSafety({
     <StepShell
       eyebrow="Safety"
       title="The things that matter when something goes wrong."
-      intro="When a duty manager asks &ldquo;where&rsquo;s the fire escape?&rdquo; or &ldquo;what&rsquo;s the alarm code policy?&rdquo; — your AI will answer instantly instead of fudging."
+      intro="When someone asks &ldquo;where&rsquo;s the fire escape?&rdquo; or &ldquo;what&rsquo;s the alarm policy?&rdquo;, your AI answers instantly instead of fudging."
     >
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-6" noValidate>
@@ -156,8 +156,7 @@ export function StepSafety({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Alarm policy{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  Alarm policy <span className="font-normal text-muted-foreground">(optional)</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -179,7 +178,7 @@ export function StepSafety({
               <FormItem>
                 <FormLabel>
                   Key safe policy{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  <span className="font-normal text-muted-foreground">(optional)</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -204,7 +203,7 @@ export function StepSafety({
               <FormItem>
                 <FormLabel>
                   Accessibility{' '}
-                  <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  <span className="font-normal text-muted-foreground">(optional)</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -223,7 +222,7 @@ export function StepSafety({
             onBack={onBack}
             onSkip={onSkip}
             primary={
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="min-h-11">
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
