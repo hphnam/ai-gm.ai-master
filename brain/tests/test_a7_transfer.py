@@ -29,8 +29,19 @@ def test_transfer_wins_majority_at_cold_start():
     assert out["transfer_wins"] >= majority
 
 
-def test_foundation_dropped_per_ablation_when_absent():
+def test_foundation_dropped_per_ablation_when_absent(monkeypatch):
+    # Force the no-backbone branch deterministically, so the test holds whether or
+    # not a foundation backend is installed in the running venv (the eval venv has
+    # chronos; the runtime venv does not).
+    import builtins
+    real_import = builtins.__import__
+
+    def _no_backend(name, *args, **kwargs):
+        if name in ("chronos", "timesfm", "moirai"):
+            raise ImportError(name)
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _no_backend)
     abl = lovo._foundation_ablation()
-    # No backbone is installed in this environment -> dropped, not silently kept.
     assert abl["available"] is False
     assert "DROPPED" in abl["verdict"]

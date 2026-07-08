@@ -14,13 +14,14 @@ import pytest
 
 from models.intermittent import croston_classic, croston_sba
 
-# y = [0,2,0,0,3,0,5,0,0,4], alpha=0.1. Tracing S3 by hand:
-#   first demand y=2 -> zhat=2, phat=1, q=1
-#   t4 demand 3: zhat=2.1,  phat=1.2   (q was 3)
-#   t6 demand 5: zhat=2.39, phat=1.28  (q was 2)
-#   t9 demand 4: zhat=2.551, phat=1.452 (q was 3)  -> rate = 2.551/1.452
+# y = [0,2,0,0,3,0,5,0,0,4], alpha=0.1. Tracing S3 by hand, with phat initialised
+# from the first observed interval (first demand at index 1, so phat0 = 2):
+#   first demand y=2 -> zhat=2, phat=2, q=1
+#   t4 demand 3: zhat=2.1,   phat=2.1    (q was 3)
+#   t6 demand 5: zhat=2.39,  phat=2.09   (q was 2)
+#   t9 demand 4: zhat=2.551, phat=2.181  (q was 3)  -> rate = 2.551/2.181
 _HAND_SERIES = [0, 2, 0, 0, 3, 0, 5, 0, 0, 4]
-_HAND_CROSTON = 2.551 / 1.452
+_HAND_CROSTON = 2.551 / 2.181
 
 
 def test_croston_reproduces_hand_computed_example():

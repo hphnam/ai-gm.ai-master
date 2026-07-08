@@ -64,7 +64,7 @@ def _croston_core(y: np.ndarray, alpha: float, deflate: bool) -> tuple[float, np
 
     i0 = int(nonzero[0])
     zhat = float(y[i0])
-    phat = 1.0
+    phat = float(i0 + 1)  # first observed interval (periods to the first demand)
     q = 1
     factor = (1.0 - alpha / 2.0) if deflate else 1.0
     rate = zhat / phat

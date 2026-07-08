@@ -2,19 +2,24 @@
 # dependencies: the pipeline runs without these; the corresponding probes and
 # cross-checks self-skip (and say so) when an import fails.
 #
-#   pip install -r requirements-eval.txt
+# These are installed into a SEPARATE evaluation venv, brain/.venv-eval, built
+# on Python 3.12 (3.11 acceptable; never 3.13+, on which torch / chronos /
+# statsforecast / TSB-AD do not build). The runtime venv is left untouched.
+#
+#   uv venv --python 3.12 .venv-eval
+#   .venv-eval/bin/pip install -r requirements-eval.txt
 #
 # Notes:
-# - statsforecast is the Croston/SBA cross-check oracle (WP2 G2.2). It does not
-#   build on Python 3.14 (scipy/numba); the cross-check test skips with a reason.
-# - chronos-forecasting + torch (CPU) drive the Rung-4 zero-shot eval (WP4). The
-#   chronos-bolt-small weights download from Hugging Face on first use.
+# - statsforecast is the Croston/SBA cross-check oracle (WP2 G2.2).
+# - chronos-forecasting (2.x) + torch (CPU) drive the Rung-4 zero-shot eval. The
+#   Chronos-2 model is amazon/chronos-2 (fallback autogluon/chronos-2-small);
+#   weights download from Hugging Face on first use. Chronos2Pipeline needs 2.x.
 # - TSB-AD provides the pinned VUS-PR metric (WP5); vus is the pinned fallback.
 
 statsforecast>=1.7
 
-chronos-forecasting>=1.4
-torch>=2.2
+chronos-forecasting>=2.2
+torch>=2.5
 
 TSB-AD>=0.2
 vus>=1.0

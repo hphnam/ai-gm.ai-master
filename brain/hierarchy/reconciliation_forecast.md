@@ -36,16 +36,16 @@ Intermittent L3 nodes (ADI >= 1.32) scored on the held-out TEST_WEEKS block. cro
 | ITEM::Soft Drinks::Cordial & Soda | 1.384 | 1.549 | 1.807 | 2.022 | no |
 | ITEM::Soft Drinks::Fruit Shoot | 1.033 | 1.322 | 1.193 | 1.526 | no |
 | ITEM::Wine::Discovery Beach Zinfandel | 0.570 | 0.920 | 0.789 | 1.276 | no |
-| ITEM::Wine::Alpino Pinot Grigio | 0.000 | 0.641 | 0.000 | 0.646 | no |
-| ITEM::Wine::Aperol Spritz | 1.843 | 1.880 | 1.614 | 1.647 | no |
-| ITEM::Uncategorised::Centennial Summer Pale | 0.000 | 0.270 | 0.000 | 0.609 | no |
+| ITEM::Wine::Alpino Pinot Grigio | 0.000 | 0.641 | 0.000 | 0.645 | no |
+| ITEM::Wine::Aperol Spritz | 1.843 | 1.878 | 1.614 | 1.645 | no |
+| ITEM::Uncategorised::Centennial Summer Pale | 0.000 | 0.265 | 0.000 | 0.597 | no |
 | ITEM::Happy Hour::£4 Lager/Cider | 0.709 | 1.425 | 2.175 | 4.370 | no |
 | ITEM::Happy Hour::£3.50 Cask | 0.748 | 1.869 | 1.649 | 4.120 | no |
-| ITEM::Happy Hour::£15 FIZZ | 0.840 | 1.320 | 0.158 | 0.248 | no |
+| ITEM::Happy Hour::£15 FIZZ | 0.840 | 1.308 | 0.158 | 0.246 | no |
 | ITEM::Food::Nuts | 0.347 | 0.782 | 0.439 | 0.990 | no |
 | ITEM::Merchandise::Lunebrew T Shirt | 0.000 | 3.468 | 0.000 | 0.186 | no |
-| ITEM::Merchandise::Hire Fee | 0.654 | 1.501 | 0.035 | 0.081 | no |
-| ITEM::Merchandise::Pool Table deposit | 1.426 | 3.274 | 0.053 | 0.121 | no |
+| ITEM::Merchandise::Hire Fee | 0.654 | 1.150 | 0.035 | 0.062 | no |
+| ITEM::Merchandise::Pool Table deposit | 1.426 | 1.720 | 0.053 | 0.063 | no |
 
 ## Stock-consumption proxy
 - line: **Lager - BH** (2 node(s))
