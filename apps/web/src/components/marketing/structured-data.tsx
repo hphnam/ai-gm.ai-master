@@ -11,7 +11,7 @@ const GRAPH = {
       name: SITE_NAME,
       url: SITE_URL,
       description:
-        'AI operator copilot for independent brewpub, beerhall and craft-led pub managers.',
+        'AI operator copilot for hospitality: connect your POS, accounting and calendar to your venue’s own SOPs and ask anything in one chat.',
     },
     {
       '@type': 'SoftwareApplication',

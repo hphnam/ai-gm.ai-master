@@ -22,7 +22,7 @@ export const FEATURES: Feature[] = [
   {
     icon: PoundSterling,
     title: 'Live P&L from your POS',
-    body: 'Ask "what\'s my GP yesterday?" and get margin reconciled against COGS straight from Square, without the spreadsheet gymnastics or the wait on your accountant.',
+    body: 'Ask "what\'s my GP yesterday?" and get margin reconciled against COGS straight from your POS, without the spreadsheet gymnastics or the wait on your accountant.',
   },
   {
     icon: Clock,
@@ -32,12 +32,12 @@ export const FEATURES: Feature[] = [
   {
     icon: LineChart,
     title: 'Pricing intelligence',
-    body: 'Which beer to put the price up on, what the market rate is on an IPA, how a 30p rise lands against tonight’s volume. Every answer grounded in your actual till.',
+    body: 'Which lines to put the price up on, what the market rate is, how a small rise lands against tonight’s volume. Every answer grounded in your actual till.',
   },
   {
     icon: BookOpen,
-    title: 'Cellar & ops that knows beer',
-    body: 'Line-cleaning cycles, keg rotation, flat-pint troubleshooting, cellar temps. A starter library that already knows what a keg is.',
+    title: 'Ops that know your venue',
+    body: 'Prep routines, opening rituals, line-cleaning cycles, equipment troubleshooting. A starter library tuned to your venue type, whether that’s a kitchen, a floor or a cellar.',
   },
   {
     icon: FileText,
@@ -78,7 +78,7 @@ export const PROBLEMS: Problem[] = [
   {
     icon: LineChart,
     surface: 'Spreadsheets',
-    body: 'For everything POS doesn’t track: labour per shift, cellar logs, pricing history.',
+    body: 'For everything POS doesn’t track: labour per shift, stock counts, pricing history.',
   },
   {
     icon: Users,
@@ -96,6 +96,8 @@ export type Integration = { name: string; status: 'live' | 'next' | 'later' }
 
 export const INTEGRATIONS: Integration[] = [
   { name: 'Square', status: 'live' },
+  { name: 'Xero', status: 'next' },
+  { name: 'Google Calendar', status: 'next' },
   { name: 'GoTab', status: 'next' },
   { name: 'Arryved', status: 'next' },
   { name: 'Toast', status: 'later' },

@@ -22,9 +22,9 @@ const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] =
   {
     heading: 'Integrations',
     links: [
-      { href: '/features#integrations', label: 'Square' },
-      { href: '/features#integrations', label: 'GoTab' },
-      { href: '/features#integrations', label: 'Arryved' },
+      { href: '/features#integrations', label: 'POS' },
+      { href: '/features#integrations', label: 'Accounting' },
+      { href: '/features#integrations', label: 'Calendar' },
     ],
   },
 ]
@@ -37,8 +37,8 @@ export function SiteFooter() {
           <div className="space-y-3">
             <Wordmark />
             <p className="max-w-xs text-sm text-muted-foreground">
-              The AI operator for independent brewpub, beerhall and craft-led pub managers. Built
-              with a brewpub operator, in production at a four-pub craft group.
+              The AI operator for hospitality. Built with a real multi-venue operator and running in
+              production today.
             </p>
           </div>
           {COLUMNS.map((col) => (

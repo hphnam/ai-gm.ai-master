@@ -35,16 +35,17 @@ export function ForecastSection() {
           <ForecastBand />
         </div>
 
-        <div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map((point) => (
-            <div key={point.title} className="flex flex-col gap-2 bg-card p-6">
+            <div key={point.title} className="flex flex-col gap-3">
+              <span className="h-0.5 w-8 rounded-full bg-[var(--chart-2)]" aria-hidden />
               <h3 className="font-medium">{point.title}</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">{point.body}</p>
             </div>
           ))}
         </div>
 
-        <p className="max-w-3xl text-sm text-muted-foreground">
+        <p className="max-w-3xl border-l-2 border-border pl-4 text-sm text-muted-foreground">
           Tested against a year of real till data: the band caught a Saturday that took £2,262
           against a £1,550 ceiling and flagged it end to end, while holding its 90% confidence
           within a point of target.
