@@ -436,12 +436,19 @@ class RefreshRequest(BaseModel):
     venue: str | None = None
     force: bool = False
     refit: str = Field("auto", pattern="^(auto|force|never)$")
+    allow_fallback: bool = False
 
 
 @app.post("/refresh")
 def post_refresh(req: RefreshRequest) -> dict:
     """Operator / cron entry: run T2 refresh (+ conditional T3). Not on the model
-    surface — the agent gets read-only freshness, never a way to trigger a re-fit."""
+    surface — the agent gets read-only freshness, never a way to trigger a re-fit.
+
+    `allow_fallback` (WP12, default False): the operator's explicit, one-off
+    escape hatch when a Rung-4 served model needs re-promoting from a venv with
+    no chronos backend. Leave False for the nightly cron; True falls back to
+    rung2_ets and writes an audited ladder_selection row saying so."""
     from ingest.refresh import refresh as _refresh
 
-    return _refresh(req.venue, force=req.force, refit=req.refit)
+    return _refresh(req.venue, force=req.force, refit=req.refit,
+                    allow_fallback=req.allow_fallback)

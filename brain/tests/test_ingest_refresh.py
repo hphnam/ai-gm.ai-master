@@ -56,13 +56,18 @@ class FakeAdapter(SourceAdapter):
 
 
 def _reset_store() -> None:
-    """Rebuild line_items from the CSV and drop the append/refit bookkeeping, so an
-    append test starts from a clean ceiling (build() alone leaves the watermark)."""
+    """Rebuild line_items from the CSV and drop the append/refit/serving
+    bookkeeping, so an append test starts from a clean ceiling (build() alone
+    leaves the watermark). Clearing served_forecast matters from WP12 onward: a
+    real promotion run persists it in the same on-disk brain.duckdb the test
+    suite reads, and a leftover Rung-4 served model would trip the G12.4 guards
+    for tests (like G6) that are not exercising those guards."""
     warehouse.build()
     con = warehouse.connect()
     try:
         con.execute("DROP TABLE IF EXISTS data_watermark")
         con.execute("DROP TABLE IF EXISTS ladder_selection")
+        con.execute("DROP TABLE IF EXISTS served_forecast")
     finally:
         con.close()
 
@@ -197,10 +202,79 @@ def test_freshness_and_refresh_endpoints(store):
 # --- G6 beat-the-rung: forced re-fit writes a ladder_selection audit row ------
 
 def test_forced_refit_selects_rung_and_logs_selection(store):
+    _reset_store()   # no leftover served Rung-4 model to trip the G12.4 guard
     before = _count_selection("beer_hall")
     res = refresh._refit_ladder("beer_hall", "forced re-fit")
     assert res["new_rung"] is not None and res["new_mase"] is not None
     assert _count_selection("beer_hall") == before + 1
+
+
+# --- G12.4 environment guards: a chronos-less venv never demotes a served
+# Rung-4 model as a side effect -----------------------------------------------
+
+def _seed_served(venue: str, model: str, layer: str = "L1") -> None:
+    con = warehouse.connect()
+    try:
+        refresh._ensure_tables(con)
+        con.execute("DELETE FROM served_forecast WHERE venue=? AND layer=?", [venue, layer])
+        con.execute(
+            "INSERT INTO served_forecast (venue, layer, model, data_as_of, promoted_ts) "
+            "VALUES (?, ?, ?, CURRENT_DATE, now())", [venue, layer, model])
+    finally:
+        con.close()
+
+
+def test_is_rung4_matches_any_rung4_entrant():
+    assert refresh._is_rung4("rung4_chronos2_exo")
+    assert refresh._is_rung4("rung4_chronos_bolt")
+    assert not refresh._is_rung4("rung2_ets")
+    assert not refresh._is_rung4(None)
+
+
+def test_refit_guard_skips_loudly_with_no_audit_row_when_backend_absent(store, monkeypatch):
+    _reset_store()
+    _seed_served("beer_hall", "rung4_chronos2_exo")
+    monkeypatch.setattr("models.foundation.HAS_CHRONOS", False)
+    before = _count_selection("beer_hall")
+    res = refresh._refit_ladder("beer_hall", "forced re-fit")
+    assert res["skipped"] == "backend absent"
+    assert "rung4_chronos2_exo" in res["note"] and ".venv-forecast" in res["note"]
+    assert _count_selection("beer_hall") == before   # no audit row written
+
+
+def test_promotion_guard_skips_and_leaves_band_untouched_when_backend_absent(store, monkeypatch):
+    _reset_store()
+    _seed_served("beer_hall", "rung4_chronos2_exo")
+    monkeypatch.setattr("models.foundation.HAS_CHRONOS", False)
+    result = refresh._promote_and_serve("beer_hall", adopted_model="rung4_chronos2_exo")
+    assert result["skipped"] == "backend absent"
+    con = warehouse.connect(read_only=True)
+    try:
+        served, _ = refresh._served("beer_hall", con)
+    finally:
+        con.close()
+    assert served == "rung4_chronos2_exo"   # untouched, not silently swapped
+
+
+def test_operator_approved_fallback_writes_audited_selection_row(store, monkeypatch):
+    _reset_store()
+    _seed_served("beer_hall", "rung4_chronos2_exo")
+    monkeypatch.setattr("models.foundation.HAS_CHRONOS", False)
+    before = _count_selection("beer_hall")
+    result = refresh._promote_and_serve(
+        "beer_hall", adopted_model="rung4_chronos2_exo", allow_fallback=True)
+    assert result["model"] == "rung2_ets"
+    assert _count_selection("beer_hall") == before + 1
+    con = warehouse.connect(read_only=True)
+    try:
+        reason = con.execute(
+            "SELECT reason FROM ladder_selection WHERE venue='beer_hall' "
+            "ORDER BY ts DESC LIMIT 1").fetchone()[0]
+        served, _ = refresh._served("beer_hall", con)
+    finally:
+        con.close()
+    assert "operator-approved fallback to rung2_ets" in reason
+    assert served == "rung2_ets"
 
 
 def _count_selection(venue: str) -> int:

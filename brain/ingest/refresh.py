@@ -119,6 +119,12 @@ def _served(venue: str, con, layer: str = "L1") -> tuple[str | None, date | None
     return row[0], row[1]
 
 
+def _is_rung4(model_name: str | None) -> bool:
+    """WP12: true for any Rung-4 foundation entrant (chronos2, chronos2_exo,
+    chronos_bolt, and any future rung4_* addition) — the guard trigger."""
+    return bool(model_name) and model_name.startswith("rung4_")
+
+
 def freshness(venue: str, con) -> dict:
     """Per-venue currency: is this current, does it need a refresh? Never falsely
     stale on the CSV ceiling (G2) — a store with no watermark falls back to its
@@ -228,12 +234,30 @@ def _should_refit(venue: str, refit: str) -> tuple[bool, str]:
 def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
     """Re-fit the ladder on a rolling-origin backtest and re-select the winning
     rung by MASE, adopting it only if it beats the classical baselines (the Tan
-    adoption guard). Writes a `ladder_selection` audit row every time. Runs the
-    backtest FIRST with no connection open anywhere (the ladder opens its own read
-    connections); then a SINGLE write connection does both the incumbent read and
-    the audit insert — so there is never a read↔write connection open at once on the
-    store file (DuckDB permits only one open configuration)."""
+    adoption guard). Writes a `ladder_selection` audit row every time it actually
+    re-fits. Runs the backtest FIRST with no connection open anywhere (the ladder
+    opens its own read connections); then a SINGLE write connection does both the
+    incumbent read and the audit insert — so there is never a read↔write connection
+    open at once on the store file (DuckDB permits only one open configuration).
+
+    WP12 environment guard: if the currently served model is a Rung-4 foundation
+    entrant and this venv has no chronos backend, the re-fit is skipped entirely
+    (no backtest run, no audit row written) — a chronos-less venv must never
+    re-select among rungs 0-3 and silently demote a served Rung-4 model. Returns
+    a `"skipped"` dict instead; the served model is left untouched."""
     from models import ladder
+    from models.foundation import HAS_CHRONOS
+
+    con = connect(read_only=True)
+    try:
+        served_model, _ = _served(venue, con, layer)
+    finally:
+        con.close()
+    if _is_rung4(served_model) and not HAS_CHRONOS:
+        note = (f"T3 skipped: served model is {served_model} (rung-4) and the "
+                "chronos backend is absent in this venv; run the refresh from "
+                ".venv-forecast")
+        return {"skipped": "backend absent", "note": note}
 
     results, *_ = ladder.evaluate_rolling(venue, n_folds=4, horizon=7, with_prophet=False)
     best = ladder.select_best(results)
@@ -266,7 +290,8 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
 
 # --- Promote (regenerate the served forecast) --------------------------------
 
-def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | None = None) -> dict:
+def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | None = None,
+                       allow_fallback: bool = False) -> dict:
     """Regenerate the SERVED forecast, not just the signal layer, so /forecast and
     /stock/cover move with new data. This closes the v2 gap where 'beat the rung'
     was detect-only: detection audits `ladder_selection`; promotion re-persists the
@@ -277,6 +302,14 @@ def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | No
     and the Beer Hall keg forecast via `hierarchy.reconcile.reconcile`, then upserts
     `served_forecast`. Model served = the rung this cycle's T3 adopted, else the
     incumbent served model, else the venue default (respecting MAX_RUNG).
+
+    WP12 environment guard: if the resolved model is a Rung-4 foundation entrant
+    and this venv has no chronos backend, `wrap.evaluate` is never called (it would
+    raise on the missing predictor) — the persisted band is left exactly as-is,
+    nothing is upserted, and a loud note is returned. The only way to fall back to
+    rung2_ets from a chronos-less venv is the explicit `allow_fallback=True` flag,
+    which writes an operator-approved `ladder_selection` audit row before serving
+    the fallback. Never automatic.
 
     Connection discipline (the flaky-fix lesson): `wrap.evaluate` and `reconcile`
     open their own connections, so the heavy calls run with NO connection open here;
@@ -292,6 +325,29 @@ def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | No
 
     from conformal.wrap import default_model
     served_model = adopted_model or incumbent_model or default_model(venue)
+
+    from models.foundation import HAS_CHRONOS
+    if _is_rung4(served_model) and not HAS_CHRONOS:
+        if not allow_fallback:
+            return {"skipped": "backend absent", "model": served_model,
+                    "note": (f"promote skipped: resolved model {served_model} is "
+                            "rung-4 and the chronos backend is absent in this "
+                            "venv; run the refresh from .venv-forecast (band left "
+                            "as-is, nothing upserted)")}
+        fallback_model = "rung2_ets"
+        con = connect()
+        try:
+            _ensure_tables(con)
+            con.execute(
+                "INSERT INTO ladder_selection (venue, layer, old_rung, new_rung, "
+                "old_mase, new_mase, adopted, reason, ts) VALUES "
+                "(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [venue, layer, 4, 2, None, None, True,
+                 "backend unavailable, operator-approved fallback to rung2_ets",
+                 datetime.now()])
+        finally:
+            con.close()
+        served_model = fallback_model
 
     from conformal import wrap
     wrap.evaluate(venue, model_name=served_model)
@@ -316,21 +372,32 @@ def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | No
 
 # --- Orchestrator ------------------------------------------------------------
 
-def refresh(venue: str | None = None, *, force: bool = False, refit: str = "auto") -> dict:
+def refresh(venue: str | None = None, *, force: bool = False, refit: str = "auto",
+           allow_fallback: bool = False) -> dict:
     """Per-venue T2 append (+ conditional T3). Idempotent: no new data and not
-    `force` is a no-op. `refit` in {auto, force, never}."""
+    `force` is a no-op. `refit` in {auto, force, never}.
+
+    `allow_fallback` (WP12, default False): only relevant when the served model
+    is a Rung-4 foundation entrant and this venv has no chronos backend. False
+    (the default) leaves the persisted band as-is and skips loudly. True is an
+    explicit, operator-approved one-off: promotion falls back to rung2_ets and
+    writes an audited `ladder_selection` row recording exactly that. Never set
+    this in the nightly cron; it exists for a human running a one-off refresh
+    from a chronos-less venv who has decided the fallback is acceptable."""
     from config import FORECAST_VENUES
 
     venues = [venue] if venue else list(FORECAST_VENUES)
     adapter = get_adapter()
     summaries = {}
     for v in venues:
-        summaries[v] = _refresh_one(v, adapter, force=force, refit=refit)
+        summaries[v] = _refresh_one(v, adapter, force=force, refit=refit,
+                                    allow_fallback=allow_fallback)
     return {"source": adapter.name, "is_live": bool(adapter.is_live and config.LIVE_INGEST),
             "venues": summaries}
 
 
-def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
+def _refresh_one(venue: str, adapter, *, force: bool, refit: str,
+                 allow_fallback: bool = False) -> dict:
     notes: list[str] = []
     latest = adapter.latest_available_date()
 
@@ -364,7 +431,11 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
     if should:
         try:
             rung_change = _refit_ladder(venue, reason)
-            refit_done = True
+            if rung_change.get("skipped"):
+                notes.append(rung_change["note"])
+                rung_change = None       # WP12 guard fired: no fit occurred
+            else:
+                refit_done = True
         except Exception as exc:                          # pragma: no cover - defensive
             notes.append(f"re-fit failed: {type(exc).__name__}: {exc}")
     else:
@@ -379,8 +450,13 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str) -> dict:
     if force or n_added or adopted:
         adopted_model = rung_change.get("winner") if adopted else None
         try:
-            promote = _promote_and_serve(venue, adopted_model=adopted_model)
-            notes.append(f"promoted: serving {promote['model']} as of {promote['data_as_of']}")
+            result = _promote_and_serve(venue, adopted_model=adopted_model,
+                                        allow_fallback=allow_fallback)
+            if result.get("skipped"):
+                notes.append(result["note"])         # WP12 guard fired: band left as-is
+            else:
+                promote = result
+                notes.append(f"promoted: serving {promote['model']} as of {promote['data_as_of']}")
         except Exception as exc:                          # pragma: no cover - defensive
             notes.append(f"promote failed: {type(exc).__name__}: {exc}")
     else:
