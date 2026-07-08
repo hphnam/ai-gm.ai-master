@@ -23,6 +23,7 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { pipeUIMessageStreamToResponse } from 'ai'
 import type { Response } from 'express'
 import { ZodValidationPipe } from 'nestjs-zod'
 import { translateChatServiceError } from '../../common/translate-chat-error'
@@ -32,6 +33,7 @@ import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
 import { ConversationService } from '../chat-core/conversation.service'
 import { validateMultimodalAttachment } from '../chat-core/multimodal-validator'
+import { createRedisRateLimiter } from '../integrations/rate-limit'
 import { ChatService } from './chat.service'
 import {
   ConversationIdParamDto,
@@ -48,6 +50,19 @@ import {
 
 const MULTER_OUTER_CAP_BYTES = 15 * 1024 * 1024
 
+// Per-user cap on agent turns. Each send fires an expensive multi-round model
+// loop, so this bounds one authenticated user's cost/abuse without throttling
+// normal shift use (a busy GM sends bursts, not 30+ messages a minute). Redis-
+// backed so it holds across horizontally-scaled API nodes; fails open on a
+// Redis blip (self-targeted guard — a cache outage must not lock chat out).
+const CHAT_SEND_WINDOW_MS = 60_000
+const CHAT_SEND_MAX_PER_WINDOW = 30
+const chatSendLimiter = createRedisRateLimiter(
+  CHAT_SEND_WINDOW_MS,
+  CHAT_SEND_MAX_PER_WINDOW,
+  'chat-send',
+)
+
 @ApiTags('chat')
 @ApiBearerAuth()
 @Controller('chat')
@@ -60,6 +75,22 @@ export class ChatController {
     private readonly conversationService: ConversationService,
   ) {}
 
+  // Every send path — /messages, /messages/with-image, /stream — fires the same
+  // expensive agent loop, so all three share this cap or the guard is bypassable.
+  private async assertNotRateLimited(userId: string): Promise<void> {
+    if (!(await chatSendLimiter.allow(userId))) {
+      throw new HttpException(
+        {
+          error: {
+            code: 'rate-limited',
+            message: 'Too many messages in a short window — give it a moment and try again.',
+          },
+        },
+        429,
+      )
+    }
+  }
+
   @Post('messages')
   @HttpCode(200)
   @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
@@ -69,6 +100,7 @@ export class ChatController {
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
   ): Promise<SendChatMessageResponseDto> {
+    await this.assertNotRateLimited(user.id)
     try {
       const result = await this.chatService.sendMessage(body, org.id, user.id, role ?? 'staff', {
         name: user.name,
@@ -115,6 +147,7 @@ export class ChatController {
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
   ): Promise<SendChatMessageResponseDto> {
+    await this.assertNotRateLimited(user.id)
     const validation = validateMultimodalAttachment(file)
     if (!validation.ok) {
       const errorPayload: ApiErrorResponse = { error: 'invalid-input' }
@@ -187,22 +220,31 @@ export class ChatController {
     @CurrentRole() role: string | undefined,
     @Res() res: Response,
   ): Promise<void> {
+    await this.assertNotRateLimited(user.id)
+
     const abortController = new AbortController()
     res.on('close', () => {
       if (!abortController.signal.aborted) abortController.abort()
     })
 
     try {
-      const { conversationId, assistantMessageId, result } = await this.chatService.prepareStream({
-        venueId: body.venueId,
-        conversationId: body.conversationId,
-        userText: body.userMessage,
-        orgId: org.id,
-        userId: user.id,
-        userRole: role ?? 'staff',
-        userIdentity: { name: user.name, email: user.email },
-        abortSignal: abortController.signal,
-      })
+      const { conversationId, assistantMessageId, result, cannedStream } =
+        await this.chatService.prepareStream({
+          venueId: body.venueId,
+          conversationId: body.conversationId,
+          userText: body.userMessage,
+          orgId: org.id,
+          userId: user.id,
+          userRole: role ?? 'staff',
+          userIdentity: { name: user.name, email: user.email },
+          abortSignal: abortController.signal,
+        })
+      // Off-topic short-circuit: a hand-built UI message stream (no model run).
+      // Message + metadata are written inside the stream, so no options needed.
+      if (cannedStream) {
+        pipeUIMessageStreamToResponse({ response: res, stream: cannedStream })
+        return
+      }
       result.pipeUIMessageStreamToResponse(res, {
         generateMessageId: () => assistantMessageId,
         messageMetadata: ({ part }) => {

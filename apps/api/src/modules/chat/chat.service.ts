@@ -9,7 +9,9 @@ import type {
   ToolCallPart,
   ToolResultPart,
   ToolSet,
+  UIMessageChunk,
 } from 'ai'
+import { createUIMessageStream } from 'ai'
 import { prisma } from '../../database/prisma'
 import { VenueProfileSchema } from '../../types'
 // Plan 06-04 Task 1 — types relocated to apps/api/src/types/chat-message.ts.
@@ -36,7 +38,11 @@ import { loadOrganizationProfile } from '../organization/organization.service'
 import { RealtimeGateway } from '../realtime/realtime.gateway'
 import type { CompactableMessage } from './conversation-compactor.service'
 import { ConversationCompactorService } from './conversation-compactor.service'
-import { ConversationModeService, VALID_MODES } from './conversation-mode.service'
+import {
+  ConversationModeService,
+  type ConversationTriage,
+  VALID_MODES,
+} from './conversation-mode.service'
 import { deriveEscalation } from './escalation'
 import {
   type AgentMode,
@@ -47,6 +53,7 @@ import {
   type VenueSnapshot,
 } from './gm-agent'
 import { QuoteVerifierService } from './quote-verifier.service'
+import { OFF_TOPIC_REDIRECT } from './system-prompt'
 import type { DispatchContext } from './tool-dispatcher'
 import { ToolDispatcher } from './tool-dispatcher'
 import { UserProfileService } from './user-profile.service'
@@ -314,15 +321,16 @@ export class ChatService implements OnModuleInit {
     }
   }
 
-  /// Resolve the conversation mode for THIS turn. If the conversation already
-  /// has a non-default mode stored, reuse it. Otherwise return 'default' for
-  /// this turn and fire the Haiku classifier in the background — the result
-  /// persists on the conversation row, so subsequent turns see the right mode.
-  /// We never block the user-perceived turn on a Haiku call.
-  private async resolveConversationMode(
+  /// Per-turn blocking triage. Re-classifies the CURRENT message every turn
+  /// (not just the first) so a mid-thread emergency flips to incident this
+  /// turn. Returns the effective mode + whether the message is on-topic.
+  /// incident/handover stay sticky once set — a later calm turn keeps the
+  /// overlay — but this turn can always upgrade INTO incident. Persists the
+  /// mode when it changes. Blocks ~0.5-0.9s on Haiku (soft-fails on-topic).
+  private async resolveTurnTriage(
     conversationId: string,
-    firstUserMessage: string | null,
-  ): Promise<AgentMode> {
+    currentMessage: string,
+  ): Promise<ConversationTriage> {
     const existing = await prisma.chatConversation.findUnique({
       where: { id: conversationId },
       select: { mode: true },
@@ -334,21 +342,42 @@ export class ChatService implements OnModuleInit {
       storedRaw && (VALID_MODES as readonly string[]).includes(storedRaw)
         ? (storedRaw as AgentMode)
         : null
-    if (stored && stored !== 'default') {
-      return stored
-    }
-    if (!firstUserMessage) return stored ?? 'default'
 
-    void this.modeClassifier
-      .classify(firstUserMessage)
-      .then((classified) => {
-        if (classified === 'default') return
-        return prisma.chatConversation
-          .update({ where: { id: conversationId }, data: { mode: classified } })
-          .catch(() => undefined)
-      })
-      .catch(() => undefined)
-    return 'default'
+    const triaged = await this.modeClassifier.triage(currentMessage)
+    // This turn's triage wins when it's a non-default signal (incident upgrade
+    // or handover); otherwise fall back to the sticky stored mode.
+    let mode: AgentMode = triaged.mode
+    if (mode === 'default' && stored && stored !== 'default') mode = stored
+    // Safety always beats the off-topic gate.
+    const onTopic = triaged.onTopic || mode === 'incident'
+
+    if (mode !== stored) {
+      await prisma.chatConversation
+        .update({ where: { id: conversationId }, data: { mode } })
+        .catch(() => undefined)
+    }
+    return { mode, onTopic }
+  }
+
+  /// Persist + emit a canned assistant turn (the off-topic redirect) without
+  /// invoking the model. Reused by the streaming short-circuit; the row is a
+  /// plain content-only assistant message so reload renders it like any answer.
+  private async persistCannedAssistant(
+    conversationId: string,
+    assistantMessageId: string,
+    content: string,
+  ): Promise<void> {
+    await prisma.chatMessage.create({
+      data: {
+        id: assistantMessageId,
+        conversationId,
+        role: 'assistant',
+        content,
+        retrievedItemIds: [],
+        toolCallLog: [],
+        followUps: [],
+      },
+    })
   }
 
   /// Build the venue snapshot — top knowledge items + recently-answered KB
@@ -711,15 +740,18 @@ Assistant answer: ${assistantText}`,
     const toolCallsByMessageId = buildToolCallMap(filteredRaw)
 
     // Pre-amble — fan out everything the agent needs into one Promise.all so
-    // TTFB isn't paying for sequential awaits. Mode resolution stays in here
-    // (it's quick — just a DB read; the Haiku classifier fires in the background).
-    const [compaction, agentMode, venueContext, profileSummary, venueSnapshot] = await Promise.all([
+    // TTFB isn't paying for sequential awaits. Triage (blocking Haiku, ~0.5-0.9s)
+    // rides in here so it doesn't add a serial hop. This WhatsApp path uses only
+    // triage.mode — off-topic isn't short-circuited here (the SCOPE prompt block
+    // backstops it); the cost-saving short-circuit is streaming-only.
+    const [compaction, triage, venueContext, profileSummary, venueSnapshot] = await Promise.all([
       this.compactor.compactIfNeeded(conversationId, history),
-      this.resolveConversationMode(conversationId, input.userMessage),
+      this.resolveTurnTriage(conversationId, input.userMessage),
       this.buildVenueContext(venue),
       this.getUserProfileSummary(userId, orgId),
       this.buildVenueSnapshot(orgId, venue.id),
     ])
+    const agentMode = triage.mode
     const messages: ModelMessage[] = expandRecentToModelMessages(
       compaction.recent,
       toolCallsByMessageId,
@@ -762,6 +794,7 @@ Assistant answer: ${assistantText}`,
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx: { orgId, userId, userRole },
+      conversationId,
       activeProviderIds,
       businessProfile,
       integrationsSummary,
@@ -1145,12 +1178,21 @@ Assistant answer: ${assistantText}`,
     userRole: string
     userIdentity?: { name: string | null; email: string }
     abortSignal?: AbortSignal
-  }): Promise<{
-    conversationId: string
-    assistantMessageId: string
-    // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any runtime context + output schema
-    result: StreamTextResult<ToolSet, any, any>
-  }> {
+  }): Promise<
+    | {
+        conversationId: string
+        assistantMessageId: string
+        // biome-ignore lint/suspicious/noExplicitAny: AI SDK ToolSet generic accepts any runtime context + output schema
+        result: StreamTextResult<ToolSet, any, any>
+        cannedStream?: undefined
+      }
+    | {
+        conversationId: string
+        assistantMessageId: string
+        result?: undefined
+        cannedStream: ReadableStream<UIMessageChunk>
+      }
+  > {
     const venue = await prisma.venue.findFirst({
       where: { id: params.venueId, organizationId: params.orgId },
       select: {
@@ -1252,14 +1294,11 @@ Assistant answer: ${assistantText}`,
       userRole: params.userRole,
     }
 
-    // First user message in this thread for mode classification (if not already set).
-    const firstUserMessage =
-      streamHistory.find((m) => m.role === 'user')?.content ?? params.userText
-
-    // Pre-amble — fan out everything in parallel to minimise TTFB.
+    // Pre-amble — fan out everything in parallel to minimise TTFB. The triage
+    // (blocking Haiku, ~0.5-0.9s) rides in here so it doesn't add a serial hop.
     const [
       streamCompaction,
-      agentMode,
+      triage,
       venueContext,
       profileSummary,
       venueSnapshot,
@@ -1268,7 +1307,7 @@ Assistant answer: ${assistantText}`,
       integrationsSummary,
     ] = await Promise.all([
       this.compactor.compactIfNeeded(conversationId, streamHistory),
-      this.resolveConversationMode(conversationId, firstUserMessage),
+      this.resolveTurnTriage(conversationId, params.userText),
       this.buildVenueContext(venue),
       this.getUserProfileSummary(params.userId, params.orgId),
       this.buildVenueSnapshot(params.orgId, venue.id),
@@ -1276,6 +1315,38 @@ Assistant answer: ${assistantText}`,
       loadOrganizationProfile(params.orgId),
       this.integrations.describeActiveIntegrations(params.orgId),
     ])
+    const agentMode = triage.mode
+
+    // Off-topic short-circuit — skip the Sonnet agent entirely and stream a
+    // canned redirect. Never fires for incident mode (triage guarantees
+    // onTopic for safety), so an emergency always reaches the model.
+    if (!triage.onTopic) {
+      await this.persistCannedAssistant(conversationId, assistantMessageId, OFF_TOPIC_REDIRECT)
+      this.logger.log(
+        JSON.stringify({
+          event: 'chat.off_topic_shortcircuit',
+          conversationId,
+          assistantMessageId,
+        }),
+      )
+      const cannedStream = createUIMessageStream<never>({
+        execute: ({ writer }) => {
+          writer.write({
+            type: 'start',
+            messageId: assistantMessageId,
+            messageMetadata: { conversationId } as never,
+          })
+          writer.write({ type: 'start-step' })
+          writer.write({ type: 'text-start', id: '0' })
+          writer.write({ type: 'text-delta', id: '0', delta: OFF_TOPIC_REDIRECT })
+          writer.write({ type: 'text-end', id: '0' })
+          writer.write({ type: 'finish-step' })
+          writer.write({ type: 'finish' })
+        },
+      })
+      return { conversationId, assistantMessageId, cannedStream }
+    }
+
     const modelMessages: ModelMessage[] = expandRecentToModelMessages(
       streamCompaction.recent,
       streamToolCallsByMessageId,
@@ -1296,6 +1367,8 @@ Assistant answer: ${assistantText}`,
       dispatcher: this.dispatcher,
       integrations: this.integrations,
       ctx,
+      conversationId,
+      abortSignal: params.abortSignal,
       activeProviderIds,
       businessProfile,
       integrationsSummary,
