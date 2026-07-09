@@ -426,3 +426,26 @@ them into the append-only log so it is the continuous WP1-to-present record.
     2026-05-31. Deviations: MCP-SIM not LIVE-NEON; L1 via SalesUK aggregate not
     per-order; L3 not scored (item-taxonomy reconciliation deferred); briefing
     fatigue upper bound; attribution verbosity flagged; two commits not one.
+
+14. **G12.13 reconciled against the canonical Pass-1/Pass-2 specs; measured A-vs-B
+    split closed** (`23_G12_13_Canonical_Reconciliation_Report.md`). The canonical
+    `PRJ93_Spec_G12_13a_Pass1_Freeze.md` and `..._G12_13b_Pass2_Confront.md` arrived
+    after the passes were first run from the Pass-1 references embedded in the Pass-2
+    spec. Both passes stand as committed (`1d966be`, `c1b11d6`); the frozen artefact
+    was NOT re-generated (June actuals were seen in Pass 2, so a re-freeze would be
+    post-hoc). Closed the one substantive gap, canonical A13a.3's MEASURED L2/L3
+    split, blind on the pre-June held-out block (`sim/ab_split_measured.py`, L3 item
+    revenue MASE): Candidate A MinT-with-gate-winner-top vs Candidate B disaggregation
+    gave beer_hall 0.662 vs 0.734 (MinT), two_river_taps 0.810 vs 0.910 (MinT), ellel
+    0.746 vs 0.730 (disaggregation). The frozen uniform disaggregation matches the
+    measured winner only for Ellel; MinT would have bettered L2/L3 for BH and TRT by
+    ~10% each. No effect on the served pure-L1 top (both only redistribute within the
+    total); recorded as a forward recommendation for the real go-live re-freeze, not a
+    retro edit. Also recorded the starting provenance the canonical A13a.1 wants
+    (pre-Pass-1 HEAD `00fa5be`, store ceiling 2026-05-31, manifest sha256 5285...9026)
+    and rendered the human-readable `brain/sim/june2026_forecast_frozen.md` from the
+    committed artefact (canonical A13a.4). All other acceptance checks map PASS.
+    Incidental: the working tree had reverted several already-committed G12.13 files
+    (a sync/stash artefact); all restored from HEAD `c1b11d6`, no committed content
+    lost. Reconciliation is docs + blind pre-June analysis only; no served model, gate
+    criterion, or frozen number changed.

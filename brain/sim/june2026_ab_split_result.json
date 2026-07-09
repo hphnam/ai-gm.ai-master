@@ -1,0 +1,29 @@
+{
+  "beer_hall": {
+    "test_block": "2026-04-05..2026-05-31",
+    "n_item_nodes": 24,
+    "mase_A_mint": 0.662,
+    "mase_B_disaggregation": 0.734,
+    "winner": "A_mint",
+    "frozen_used": "B_disaggregation",
+    "frozen_matches_winner": false
+  },
+  "two_river_taps": {
+    "test_block": "2026-03-13..2026-05-08",
+    "n_item_nodes": 32,
+    "mase_A_mint": 0.81,
+    "mase_B_disaggregation": 0.91,
+    "winner": "A_mint",
+    "frozen_used": "B_disaggregation",
+    "frozen_matches_winner": false
+  },
+  "ellel": {
+    "test_block": "2026-03-28..2026-05-22",
+    "n_item_nodes": 16,
+    "mase_A_mint": 0.746,
+    "mase_B_disaggregation": 0.73,
+    "winner": "B_disaggregation",
+    "frozen_used": "B_disaggregation",
+    "frozen_matches_winner": true
+  }
+}
