@@ -253,7 +253,7 @@ longer error). No code change was needed to recover the files.
 
 ## Downstream rerun matrix (G12.9g)
 
-**See [`log/DOWNSTREAM.md`](log/DOWNSTREAM.md) for the full "run live or rerun" answer.**
+**See [`log/18_DOWNSTREAM.md`](log/18_DOWNSTREAM.md) for the full "run live or rerun" answer.**
 Headline: deviation, change-point, briefing, and reasoning all read the
 DOW-median residual stream, not the served L1 forecast, so they run live with
 no rerun after G12.9's promotion changes. Stock cover reads a separate
