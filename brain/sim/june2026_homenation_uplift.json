@@ -1,0 +1,329 @@
+{
+  "beer_hall": {
+    "mean_uplift_pct_by_class": {
+      "england": 130.0,
+      "no_match": 55.0,
+      "other_match": 57.0,
+      "scotland": 116.0
+    },
+    "n_by_class": {
+      "england": 3,
+      "scotland": 2,
+      "other_match": 15,
+      "no_match": 10
+    },
+    "match_day_detail": [
+      {
+        "date": "2026-06-11",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 566.0,
+        "dow_median": 648.0,
+        "uplift_pct": -13.0
+      },
+      {
+        "date": "2026-06-12",
+        "dow": "Fri",
+        "klass": "other_match",
+        "actual": 1243.0,
+        "dow_median": 796.0,
+        "uplift_pct": 56.0
+      },
+      {
+        "date": "2026-06-13",
+        "dow": "Sat",
+        "klass": "other_match",
+        "actual": 3518.0,
+        "dow_median": 1235.0,
+        "uplift_pct": 185.0
+      },
+      {
+        "date": "2026-06-14",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 1032.0,
+        "dow_median": 480.0,
+        "uplift_pct": 115.0
+      },
+      {
+        "date": "2026-06-15",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 1798.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-16",
+        "dow": "Tue",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-17",
+        "dow": "Wed",
+        "klass": "england",
+        "actual": 607.0,
+        "dow_median": 289.0,
+        "uplift_pct": 110.0
+      },
+      {
+        "date": "2026-06-18",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 863.0,
+        "dow_median": 648.0,
+        "uplift_pct": 33.0
+      },
+      {
+        "date": "2026-06-19",
+        "dow": "Fri",
+        "klass": "scotland",
+        "actual": 1181.0,
+        "dow_median": 796.0,
+        "uplift_pct": 48.0
+      },
+      {
+        "date": "2026-06-20",
+        "dow": "Sat",
+        "klass": "other_match",
+        "actual": 798.0,
+        "dow_median": 1235.0,
+        "uplift_pct": -35.0
+      },
+      {
+        "date": "2026-06-21",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 1030.0,
+        "dow_median": 480.0,
+        "uplift_pct": 115.0
+      },
+      {
+        "date": "2026-06-22",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-23",
+        "dow": "Tue",
+        "klass": "england",
+        "actual": 335.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-24",
+        "dow": "Wed",
+        "klass": "scotland",
+        "actual": 820.0,
+        "dow_median": 289.0,
+        "uplift_pct": 184.0
+      },
+      {
+        "date": "2026-06-25",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 835.0,
+        "dow_median": 648.0,
+        "uplift_pct": 29.0
+      },
+      {
+        "date": "2026-06-26",
+        "dow": "Fri",
+        "klass": "other_match",
+        "actual": 1720.0,
+        "dow_median": 796.0,
+        "uplift_pct": 116.0
+      },
+      {
+        "date": "2026-06-27",
+        "dow": "Sat",
+        "klass": "england",
+        "actual": 3082.0,
+        "dow_median": 1235.0,
+        "uplift_pct": 149.0
+      },
+      {
+        "date": "2026-06-28",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 338.0,
+        "dow_median": 480.0,
+        "uplift_pct": -29.0
+      },
+      {
+        "date": "2026-06-29",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 167.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-30",
+        "dow": "Tue",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      }
+    ]
+  },
+  "ellel": {
+    "mean_uplift_pct_by_class": {
+      "england": -100.0,
+      "no_match": -100.0,
+      "other_match": 278.0
+    },
+    "n_by_class": {
+      "england": 1,
+      "scotland": 1,
+      "other_match": 15,
+      "no_match": 13
+    },
+    "match_day_detail": [
+      {
+        "date": "2026-06-11",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-12",
+        "dow": "Fri",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-13",
+        "dow": "Sat",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 302.0,
+        "uplift_pct": -100.0
+      },
+      {
+        "date": "2026-06-14",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-15",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-18",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 51.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-19",
+        "dow": "Fri",
+        "klass": "scotland",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-20",
+        "dow": "Sat",
+        "klass": "other_match",
+        "actual": 2287.0,
+        "dow_median": 302.0,
+        "uplift_pct": 657.0
+      },
+      {
+        "date": "2026-06-21",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-22",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-23",
+        "dow": "Tue",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-25",
+        "dow": "Thu",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-26",
+        "dow": "Fri",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-27",
+        "dow": "Sat",
+        "klass": "england",
+        "actual": 0.0,
+        "dow_median": 302.0,
+        "uplift_pct": -100.0
+      },
+      {
+        "date": "2026-06-28",
+        "dow": "Sun",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-29",
+        "dow": "Mon",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      },
+      {
+        "date": "2026-06-30",
+        "dow": "Tue",
+        "klass": "other_match",
+        "actual": 0.0,
+        "dow_median": 0.0,
+        "uplift_pct": null
+      }
+    ]
+  }
+}
