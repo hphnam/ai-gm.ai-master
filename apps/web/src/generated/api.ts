@@ -67,6 +67,7 @@ export const ApiErrorResponseDtoError = {
   'checklist-extraction-failed': 'checklist-extraction-failed',
   'category-suggestion-unavailable': 'category-suggestion-unavailable',
   'reconcile-conflict': 'reconcile-conflict',
+  'invalid-venue-scope': 'invalid-venue-scope',
 } as const;
 
 export interface ApiErrorResponseDto {
@@ -2624,6 +2625,11 @@ export interface InviteBodyDto {
      */
   email: string;
   role: InviteBodyDtoRole;
+  /**
+     * @maxItems 200
+     * @items.pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+     */
+  venueIds?: string[];
 }
 
 export type CreateInvitationResponseDtoInvitationRole = typeof CreateInvitationResponseDtoInvitationRole[keyof typeof CreateInvitationResponseDtoInvitationRole];
@@ -2650,6 +2656,7 @@ export type CreateInvitationResponseDtoInvitation = {
   organizationId: string;
   organizationName: string;
   role: CreateInvitationResponseDtoInvitationRole;
+  venueIds: string[];
   status: CreateInvitationResponseDtoInvitationStatus;
   inviterId: string;
   inviterName: string | null;
@@ -2688,6 +2695,7 @@ export type ListInvitationsResponseDtoInvitationsItem = {
   organizationId: string;
   organizationName: string;
   role: ListInvitationsResponseDtoInvitationsItemRole;
+  venueIds: string[];
   status: ListInvitationsResponseDtoInvitationsItemStatus;
   inviterId: string;
   inviterName: string | null;
@@ -2751,6 +2759,7 @@ export type ListOrgMembersResponseDtoMembersItem = {
   email: string | null;
   phoneNumber: string | null;
   role: string;
+  venueIds: string[];
   isSelf: boolean;
   joinedAt: string;
 };
@@ -2762,6 +2771,19 @@ export interface ListOrgMembersResponseDto {
 export interface RemoveMemberResponseDto {
   ok: true;
   deletedUser: boolean;
+}
+
+export interface UpdateMemberVenuesBodyDto {
+  /**
+     * @maxItems 200
+     * @items.pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+     */
+  venueIds?: string[];
+}
+
+export interface UpdateMemberVenuesResponseDto {
+  ok: true;
+  venueIds: string[];
 }
 
 export type OrganizationProfileResponseDtoProfile = {
@@ -2818,6 +2840,10 @@ export interface UpdateOrganizationProfileDto {
   currency?: string;
 }
 
+export interface GeneratedDescriptionResponseDto {
+  description: string;
+}
+
 export interface SendPhoneCodeBodyDto {
   phoneNumber: string;
 }
@@ -2867,6 +2893,7 @@ export type PlacesSearchResponseDtoCandidatesItem = {
   currency: string | null;
   timezone: string | null;
   openingHours: string | null;
+  description: string | null;
 };
 
 export interface PlacesSearchResponseDto {
@@ -2880,6 +2907,14 @@ export interface RunNudgeResponseDto {
   reason?: string;
   preview?: string;
 }
+
+export type ChatStartersPayloadDtoAudience = typeof ChatStartersPayloadDtoAudience[keyof typeof ChatStartersPayloadDtoAudience];
+
+
+export const ChatStartersPayloadDtoAudience = {
+  staff: 'staff',
+  manager: 'manager',
+} as const;
 
 export type ChatStartersPayloadDtoQuestionsItem = {
   /**
@@ -2904,6 +2939,7 @@ export const ChatStartersPayloadDtoSource = {
 
 export interface ChatStartersPayloadDto {
   venueId: string;
+  audience: ChatStartersPayloadDtoAudience;
   /**
      * @minItems 1
      * @maxItems 8
@@ -12770,6 +12806,84 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getOrgMembersControllerRemoveMutationOptions(options), queryClient);
     }
 
+export type orgMembersControllerUpdateVenuesResponse200 = {
+  data: UpdateMemberVenuesResponseDto
+  status: 200
+}
+
+export type orgMembersControllerUpdateVenuesResponseSuccess = (orgMembersControllerUpdateVenuesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type orgMembersControllerUpdateVenuesResponse = (orgMembersControllerUpdateVenuesResponseSuccess)
+
+export const getOrgMembersControllerUpdateVenuesUrl = (userId: string,) => {
+
+
+
+
+  return `/org/members/${userId}/venues`
+}
+
+export const orgMembersControllerUpdateVenues = async (userId: string,
+    updateMemberVenuesBodyDto: UpdateMemberVenuesBodyDto, options?: RequestInit): Promise<orgMembersControllerUpdateVenuesResponse> => {
+
+  return orvalMutator<orgMembersControllerUpdateVenuesResponse>(getOrgMembersControllerUpdateVenuesUrl(userId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateMemberVenuesBodyDto)
+  }
+);}
+
+
+
+
+
+export const getOrgMembersControllerUpdateVenuesMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext> => {
+
+const mutationKey = ['orgMembersControllerUpdateVenues'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, {userId: string;data: UpdateMemberVenuesBodyDto}> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  orgMembersControllerUpdateVenues(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrgMembersControllerUpdateVenuesMutationResult = NonNullable<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>>
+    export type OrgMembersControllerUpdateVenuesMutationBody = UpdateMemberVenuesBodyDto
+    export type OrgMembersControllerUpdateVenuesMutationError = unknown
+
+    export const useOrgMembersControllerUpdateVenues = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>,
+        TError,
+        {userId: string;data: UpdateMemberVenuesBodyDto},
+        TContext
+      > => {
+      return useMutation(getOrgMembersControllerUpdateVenuesMutationOptions(options), queryClient);
+    }
+
 export type organizationControllerGetProfileResponse200 = {
   data: OrganizationProfileResponseDto
   status: 200
@@ -12952,6 +13066,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getOrganizationControllerUpdateProfileMutationOptions(options), queryClient);
+    }
+
+export type organizationControllerDescribeResponse200 = {
+  data: GeneratedDescriptionResponseDto
+  status: 200
+}
+
+export type organizationControllerDescribeResponseSuccess = (organizationControllerDescribeResponse200) & {
+  headers: Headers;
+};
+;
+
+export type organizationControllerDescribeResponse = (organizationControllerDescribeResponseSuccess)
+
+export const getOrganizationControllerDescribeUrl = () => {
+
+
+
+
+  return `/org/profile/describe`
+}
+
+export const organizationControllerDescribe = async ( options?: RequestInit): Promise<organizationControllerDescribeResponse> => {
+
+  return orvalMutator<organizationControllerDescribeResponse>(getOrganizationControllerDescribeUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrganizationControllerDescribeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext> => {
+
+const mutationKey = ['organizationControllerDescribe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationControllerDescribe>>, void> = () => {
+
+
+          return  organizationControllerDescribe(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrganizationControllerDescribeMutationResult = NonNullable<Awaited<ReturnType<typeof organizationControllerDescribe>>>
+
+    export type OrganizationControllerDescribeMutationError = unknown
+
+    export const useOrganizationControllerDescribe = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof organizationControllerDescribe>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getOrganizationControllerDescribeMutationOptions(options), queryClient);
     }
 
 export type phoneControllerSendResponse200 = {

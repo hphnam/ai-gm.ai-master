@@ -3586,11 +3586,16 @@ export const invitationsControllerCreateBodyEmailMax = 254;
 
 
 export const invitationsControllerCreateBodyEmailRegExp = new RegExp('^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_\'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$');
+export const invitationsControllerCreateBodyVenueIdsItemRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const invitationsControllerCreateBodyVenueIdsDefault = [];
+export const invitationsControllerCreateBodyVenueIdsMax = 200;
+
 
 
 export const InvitationsControllerCreateBody = zod.object({
   "email": zod.email().max(invitationsControllerCreateBodyEmailMax).regex(invitationsControllerCreateBodyEmailRegExp),
-  "role": zod.enum(['manager', 'staff'])
+  "role": zod.enum(['manager', 'staff']),
+  "venueIds": zod.array(zod.string().regex(invitationsControllerCreateBodyVenueIdsItemRegExp)).max(invitationsControllerCreateBodyVenueIdsMax).default(invitationsControllerCreateBodyVenueIdsDefault)
 })
 
 export const InvitationsControllerCreateResponse = zod.object({
@@ -3600,6 +3605,7 @@ export const InvitationsControllerCreateResponse = zod.object({
   "organizationId": zod.string(),
   "organizationName": zod.string(),
   "role": zod.enum(['manager', 'staff']),
+  "venueIds": zod.array(zod.string()),
   "status": zod.enum(['pending', 'accepted', 'revoked', 'expired']),
   "inviterId": zod.string(),
   "inviterName": zod.union([zod.string(),zod.null()]),
@@ -3633,6 +3639,7 @@ export const InvitationsControllerListResponse = zod.object({
   "organizationId": zod.string(),
   "organizationName": zod.string(),
   "role": zod.enum(['manager', 'staff']),
+  "venueIds": zod.array(zod.string()),
   "status": zod.enum(['pending', 'accepted', 'revoked', 'expired']),
   "inviterId": zod.string(),
   "inviterName": zod.union([zod.string(),zod.null()]),
@@ -3689,6 +3696,7 @@ export const OrgMembersControllerListResponse = zod.object({
   "email": zod.union([zod.string(),zod.null()]),
   "phoneNumber": zod.union([zod.string(),zod.null()]),
   "role": zod.string(),
+  "venueIds": zod.array(zod.string()),
   "isSelf": zod.boolean(),
   "joinedAt": zod.string()
 }))
@@ -3702,6 +3710,26 @@ export const OrgMembersControllerRemoveParams = zod.object({
 export const OrgMembersControllerRemoveResponse = zod.object({
   "ok": zod.boolean(),
   "deletedUser": zod.boolean()
+})
+
+
+export const OrgMembersControllerUpdateVenuesParams = zod.object({
+  "userId": zod.string()
+})
+
+export const orgMembersControllerUpdateVenuesBodyVenueIdsItemRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
+export const orgMembersControllerUpdateVenuesBodyVenueIdsDefault = [];
+export const orgMembersControllerUpdateVenuesBodyVenueIdsMax = 200;
+
+
+
+export const OrgMembersControllerUpdateVenuesBody = zod.object({
+  "venueIds": zod.array(zod.string().regex(orgMembersControllerUpdateVenuesBodyVenueIdsItemRegExp)).max(orgMembersControllerUpdateVenuesBodyVenueIdsMax).default(orgMembersControllerUpdateVenuesBodyVenueIdsDefault)
+})
+
+export const OrgMembersControllerUpdateVenuesResponse = zod.object({
+  "ok": zod.boolean(),
+  "venueIds": zod.array(zod.string())
 })
 
 
@@ -3792,6 +3820,11 @@ export const OrganizationControllerUpdateProfileResponse = zod.object({
 })
 
 
+export const OrganizationControllerDescribeResponse = zod.object({
+  "description": zod.string()
+})
+
+
 export const PhoneControllerSendBody = zod.object({
   "phoneNumber": zod.string()
 })
@@ -3872,7 +3905,8 @@ export const PlacesControllerSearchResponse = zod.object({
   "country": zod.union([zod.string(),zod.null()]),
   "currency": zod.union([zod.string(),zod.null()]),
   "timezone": zod.union([zod.string(),zod.null()]),
-  "openingHours": zod.union([zod.string(),zod.null()])
+  "openingHours": zod.union([zod.string(),zod.null()]),
+  "description": zod.union([zod.string(),zod.null()])
 })),
   "error": zod.literal("lookup-failed").optional()
 })
@@ -3910,6 +3944,7 @@ export const chatStartersControllerGetResponseQuestionsMax = 8;
 
 export const ChatStartersControllerGetResponse = zod.object({
   "venueId": zod.string(),
+  "audience": zod.enum(['staff', 'manager']),
   "questions": zod.array(zod.object({
   "text": zod.string().min(chatStartersControllerGetResponseQuestionsItemTextMin).max(chatStartersControllerGetResponseQuestionsItemTextMax),
   "category": zod.string().min(1).max(chatStartersControllerGetResponseQuestionsItemCategoryMax).optional()

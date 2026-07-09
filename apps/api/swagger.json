@@ -3998,6 +3998,51 @@
         ]
       }
     },
+    "/org/members/{userId}/venues": {
+      "patch": {
+        "operationId": "OrgMembersController_updateVenues",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberVenuesBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMemberVenuesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "org-members"
+        ]
+      }
+    },
     "/org/profile": {
       "get": {
         "operationId": "OrganizationController_getProfile",
@@ -4043,6 +4088,32 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OrganizationProfileResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "organization"
+        ]
+      }
+    },
+    "/org/profile/describe": {
+      "post": {
+        "operationId": "OrganizationController_describe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedDescriptionResponseDto"
                 }
               }
             }
@@ -5171,7 +5242,8 @@
               "type-name-conflict",
               "checklist-extraction-failed",
               "category-suggestion-unavailable",
-              "reconcile-conflict"
+              "reconcile-conflict",
+              "invalid-venue-scope"
             ]
           },
           "details": {
@@ -12861,6 +12933,15 @@
               "manager",
               "staff"
             ]
+          },
+          "venueIds": {
+            "default": [],
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
           }
         },
         "required": [
@@ -12892,6 +12973,12 @@
                   "manager",
                   "staff"
                 ]
+              },
+              "venueIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "status": {
                 "type": "string",
@@ -12928,6 +13015,7 @@
               "organizationId",
               "organizationName",
               "role",
+              "venueIds",
               "status",
               "inviterId",
               "inviterName",
@@ -12983,6 +13071,12 @@
                     "staff"
                   ]
                 },
+                "venueIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
                 "status": {
                   "type": "string",
                   "enum": [
@@ -13018,6 +13112,7 @@
                 "organizationId",
                 "organizationName",
                 "role",
+                "venueIds",
                 "status",
                 "inviterId",
                 "inviterName",
@@ -13178,6 +13273,12 @@
                 "role": {
                   "type": "string"
                 },
+                "venueIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
                 "isSelf": {
                   "type": "boolean"
                 },
@@ -13191,6 +13292,7 @@
                 "email",
                 "phoneNumber",
                 "role",
+                "venueIds",
                 "isSelf",
                 "joinedAt"
               ]
@@ -13218,6 +13320,41 @@
         "required": [
           "ok",
           "deletedUser"
+        ]
+      },
+      "UpdateMemberVenuesBodyDto": {
+        "type": "object",
+        "properties": {
+          "venueIds": {
+            "default": [],
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        }
+      },
+      "UpdateMemberVenuesResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true,
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "venueIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          }
+        },
+        "required": [
+          "ok",
+          "venueIds"
         ]
       },
       "OrganizationProfileResponseDto": {
@@ -13307,6 +13444,17 @@
             "x-nestjs_zod-parent-additional-properties": false
           }
         }
+      },
+      "GeneratedDescriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ]
       },
       "SendPhoneCodeBodyDto": {
         "type": "object",
@@ -13516,6 +13664,16 @@
                       "type": "null"
                     }
                   ]
+                },
+                "description": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -13527,7 +13685,8 @@
                 "country",
                 "currency",
                 "timezone",
-                "openingHours"
+                "openingHours",
+                "description"
               ]
             },
             "x-nestjs_zod-uses-3-point-1-syntax": true
@@ -13565,6 +13724,14 @@
         "properties": {
           "venueId": {
             "type": "string",
+            "x-nestjs_zod-uses-3-point-1-syntax": true
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "staff",
+              "manager"
+            ],
             "x-nestjs_zod-uses-3-point-1-syntax": true
           },
           "questions": {
@@ -13614,6 +13781,7 @@
         },
         "required": [
           "venueId",
+          "audience",
           "questions",
           "source",
           "generatedAt"

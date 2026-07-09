@@ -18,6 +18,7 @@ const PlaceCandidateSchema = z.object({
   currency: z.string().nullable(),
   timezone: z.string().nullable(),
   openingHours: z.string().nullable(),
+  description: z.string().nullable(),
 })
 
 export const PlacesSearchResponseSchema = z.object({

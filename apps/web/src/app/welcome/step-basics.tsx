@@ -114,8 +114,9 @@ export function StepBasics({
     const tasks: Promise<unknown>[] = []
     const profileData = orgProfile.data ?? (await orgProfile.refetch()).data
     if (profileData) {
-      // Picking a candidate is explicit intent — overwrite these three; the
-      // written profile (description/goals/constraints) stays untouched.
+      // Picking a candidate is explicit intent — overwrite these three; goals
+      // and constraints stay untouched. Google's blurb only fills a description
+      // the user hasn't written, so a hand-typed one is never clobbered.
       const current = profileData.profile
       tasks.push(
         updateOrgProfile.mutateAsync({
@@ -123,6 +124,7 @@ export function StepBasics({
           businessType: candidate.businessType ?? current.businessType,
           country: candidate.country ?? current.country,
           currency: candidate.currency ?? current.currency,
+          description: current.description || candidate.description || undefined,
         }),
       )
     }

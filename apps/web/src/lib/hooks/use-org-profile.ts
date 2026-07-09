@@ -45,3 +45,11 @@ export function useUpdateOrgProfile(opts?: { silent?: boolean }) {
     },
   })
 }
+
+export function useGenerateOrgDescription() {
+  return useMutation<{ description: string }, Error>({
+    mutationFn: () =>
+      apiFetch<{ description: string }>('/org/profile/describe', { method: 'POST' }),
+    onError: (err) => toast.error(mapApiError(err)),
+  })
+}
