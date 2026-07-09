@@ -676,7 +676,8 @@ export class SquareService {
     const window = resolveScheduleWindow(args)
     try {
       const resp = await resolved.client.labor.searchScheduledShifts({
-        limit: Math.min(args.limit ?? 50, 200),
+        // searchScheduledShifts caps `limit` at 50 (Square 400s VALUE_TOO_HIGH above it).
+        limit: Math.min(args.limit ?? 50, 50),
         query: {
           filter: {
             locationIds: [resolved.locationId],
@@ -731,8 +732,10 @@ export class SquareService {
     const resolved = await this.resolveForVenue(orgId, args.venueId)
     if (!('client' in resolved)) return resolved
     const window = resolveScheduleWindow(args)
-    const PAGE_LIMIT = 200
-    const MAX_PAGES = 5
+    // searchScheduledShifts caps `limit` at 50 (unlike the actual-shifts search
+    // which allows 200) — Square 400s VALUE_TOO_HIGH above it.
+    const PAGE_LIMIT = 50
+    const MAX_PAGES = 10
     try {
       let cursor: string | undefined
       let pages = 0

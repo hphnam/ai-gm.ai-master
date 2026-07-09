@@ -67,6 +67,7 @@ type ToolStep = {
   id: string
   name: string
   status: 'active' | 'done' | 'error'
+  input?: unknown
 }
 
 type AssistantClassification = {
@@ -96,13 +97,15 @@ function classifyAssistantParts(parts: UIMessage['parts']): AssistantClassificat
       const name = getToolName(p)
       const settled = p.state === 'output-available' || p.state === 'output-error'
       const status = p.state === 'output-error' ? 'error' : settled ? 'done' : 'active'
+      const input = 'input' in p ? p.input : undefined
       const prev = toolSteps[toolSteps.length - 1]
       if (prev?.name === name) {
         // Consecutive calls to the same tool collapse into one step; an error
         // only sticks if the whole run errored.
         if (status !== 'error' || prev.status === 'error') prev.status = status
+        prev.input = input
       } else {
-        toolSteps.push({ id: p.toolCallId ?? `${name}-${idx}`, name, status })
+        toolSteps.push({ id: p.toolCallId ?? `${name}-${idx}`, name, status, input })
       }
       if (settled && hasToolCard(name)) toolCardParts.push(p as unknown as ToolPart)
       return
@@ -354,7 +357,8 @@ export function ChatMessage({
 
   const liveSteps: TraceStep[] = toolSteps.map((s) => ({
     id: s.id,
-    label: s.status === 'active' ? toolStatusPhrase(s.name) : toolDonePhrase(s.name),
+    label:
+      s.status === 'active' ? toolStatusPhrase(s.name, s.input) : toolDonePhrase(s.name, s.input),
     status: s.status,
   }))
   if (isStreaming && answerChunks.length === 0 && !liveSteps.some((s) => s.status === 'active')) {
@@ -366,7 +370,7 @@ export function ChatMessage({
   }
   const settledSteps: TraceStep[] = toolSteps.map((s) => ({
     id: s.id,
-    label: toolDonePhrase(s.name),
+    label: toolDonePhrase(s.name, s.input),
     status: s.status === 'error' ? 'error' : 'done',
   }))
 
