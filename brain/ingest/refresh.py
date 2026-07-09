@@ -211,12 +211,39 @@ def _has_changepoint_since(venue: str, since: datetime | None, con) -> bool:
     return bool((pd.to_datetime(df["onset_date"]) > pd.Timestamp(since)).any())
 
 
+def _in_event_window(venue: str, as_of: datetime | None = None,
+                     con=None) -> tuple[bool, str | None]:
+    """G12.15d: is `venue` inside a flagged high-volatility event window now, so the
+    T3 cadence should tighten. Reads the SAME schedule the forecast uses: a World Cup
+    match in trading hours, or a curated local event, within EVENT_WINDOW_LOOKAHEAD_DAYS
+    ahead. Calendar-triggered, not hard-coded to any one event."""
+    if not config.EVENT_AWARE_REFRESH_ENABLED:
+        return False, None
+    import pandas as pd
+    from ingest.local_events import read_events
+    from ingest.world_cup import world_cup_features
+
+    lo = pd.Timestamp(as_of or datetime.now()).normalize()
+    hi = lo + pd.Timedelta(days=config.EVENT_WINDOW_LOOKAHEAD_DAYS)
+    dates = pd.date_range(lo, hi)
+    wc = world_cup_features(venue, dates, con=con)
+    if int(wc["wc_match_in_hours"].sum()) > 0:
+        return True, "World Cup match within trading hours in the lookahead window"
+    ev = read_events(con=con)
+    if not ev.empty:
+        ed = pd.to_datetime(ev["event_date"])
+        if ((ed >= lo) & (ed <= hi)).any():
+            return True, "curated local event in the lookahead window"
+    return False, None
+
+
 def _should_refit(venue: str, refit: str) -> tuple[bool, str]:
-    """The T3 guard. `never`/`force` are explicit; `auto` fires only on a weekly
-    cadence boundary or a confirmed change-point since the last recorded fit — so a
-    single new closed day never triggers it (the cost guarantee). Opens and closes
-    its own read connection so no connection is held into the (own-connection)
-    backtest that follows."""
+    """The T3 guard. `never`/`force` are explicit; `auto` fires only on a cadence
+    boundary or a confirmed change-point since the last recorded fit — so a single
+    new closed day never triggers it (the cost guarantee). The cadence is the weekly
+    RETRAIN_CADENCE_DAYS, tightened to EVENT_REFRESH_CADENCE_DAYS inside a flagged
+    event window (G12.15d). Opens and closes its own read connection so no connection
+    is held into the (own-connection) backtest that follows."""
     if refit == "never":
         return False, "refit disabled (never)"
     if refit == "force":
@@ -227,11 +254,17 @@ def _should_refit(venue: str, refit: str) -> tuple[bool, str]:
         if last_refit is None:
             return False, "no prior fit on record; auto defers to the weekly force cron"
         age_days = (datetime.now() - last_refit).days
-        if age_days >= config.RETRAIN_CADENCE_DAYS:
-            return True, f"weekly cadence boundary ({age_days}d since last fit)"
+        event_active, event_reason = _in_event_window(venue, con=con)
+        cadence = (config.EVENT_REFRESH_CADENCE_DAYS if event_active
+                   else config.RETRAIN_CADENCE_DAYS)
+        if age_days >= cadence:
+            tag = (f"event-window cadence {cadence}d ({event_reason})" if event_active
+                   else "weekly cadence boundary")
+            return True, f"{tag} ({age_days}d since last fit)"
         if config.RETRAIN_ON_CHANGEPOINT and _has_changepoint_since(venue, last_refit, con):
             return True, "confirmed change-point since the last fit"
-        return False, f"no cadence boundary ({age_days}d) or new change-point"
+        window = " [event window]" if event_active else ""
+        return False, f"no cadence boundary ({age_days}d vs {cadence}d{window}) or new change-point"
     finally:
         con.close()
 
