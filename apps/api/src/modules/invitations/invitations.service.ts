@@ -22,6 +22,7 @@ import {
   type InviteRoleType,
   MAX_PENDING_INVITATIONS_PER_ORG,
 } from '../../types'
+import { isVenueScoped, type VenueScope } from '../auth/venue-scope'
 import { isPhoneTempEmail } from '../phone/consume-phone-invite'
 export type InvitationErrorCode =
   | 'invitation-not-found'
@@ -32,6 +33,7 @@ export type InvitationErrorCode =
   | 'invitation-limit-reached'
   | 'already-a-member'
   | 'email-not-verified'
+  | 'invalid-venue-scope'
 
 export class InvitationError extends Error {
   constructor(
@@ -62,6 +64,12 @@ function hashEmail(email: string): string {
   return createHash('sha256').update(email.toLowerCase()).digest('hex').slice(0, 16)
 }
 
+function arraysEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false
+  const set = new Set(a)
+  return b.every((x) => set.has(x))
+}
+
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@')
   if (!domain) return '***'
@@ -74,6 +82,7 @@ function toDTO(row: {
   email: string
   organizationId: string
   role: string
+  venueIds: string[]
   status: string
   inviterId: string
   expiresAt: Date
@@ -87,12 +96,49 @@ function toDTO(row: {
     organizationId: row.organizationId,
     organizationName: row.organization.name,
     role: row.role as InviteRoleType,
+    venueIds: row.venueIds,
     status: row.status as InvitationStatus,
     inviterId: row.inviterId,
     inviterName: row.inviter?.name ?? null,
     expiresAt: row.expiresAt.toISOString(),
     createdAt: row.createdAt.toISOString(),
   }
+}
+
+// Reduce a caller-supplied venue selection to a validated scope for the target
+// `role`. Semantics (fail-closed — an empty result only ever means "all venues"
+// when the caller actually asked for all):
+//   - Owner target ⇒ always [] (owners see everything).
+//   - Empty request ⇒ "all venues". If the ACTOR is themselves venue-scoped,
+//     "all" collapses to everything the actor can see (a scoped manager can't
+//     grant access they don't have).
+//   - Non-empty request ⇒ keep only ids in the org AND (for a scoped actor)
+//     within the actor's own scope. If that intersection is empty, the request
+//     was entirely un-grantable — throw rather than silently widening to "all".
+export async function sanitizeVenueScope(
+  organizationId: string,
+  role: string,
+  venueIds: string[],
+  actorScope?: VenueScope,
+): Promise<string[]> {
+  if (role === 'owner') return []
+  const actorScoped = actorScope ? isVenueScoped(actorScope) : false
+
+  if (venueIds.length === 0) {
+    return actorScoped ? [...(actorScope as VenueScope).venueIds] : []
+  }
+
+  const rows = await prisma.venue.findMany({
+    where: { organizationId, id: { in: venueIds } },
+    select: { id: true },
+  })
+  let allowed = rows.map((v) => v.id)
+  if (actorScoped) {
+    const actorSet = new Set((actorScope as VenueScope).venueIds)
+    allowed = allowed.filter((id) => actorSet.has(id))
+  }
+  if (allowed.length === 0) throw new InvitationError('invalid-venue-scope')
+  return allowed
 }
 
 @Injectable()
@@ -129,7 +175,9 @@ export class InvitationsService {
     organizationId: string
     email: string
     role: InviteRoleType
+    venueIds: string[]
     inviterId: string
+    actorScope?: VenueScope
   }): Promise<{ row: InvitationDTO; reissued: boolean }> {
     // Defence-in-depth — zodPipe already blocks owner; service boundary re-asserts (M4)
     // InviteRoleType is 'manager'|'staff' so a non-matching string would already fail TS;
@@ -139,6 +187,12 @@ export class InvitationsService {
     }
 
     const email = input.email.trim().toLowerCase()
+    const venueIds = await sanitizeVenueScope(
+      input.organizationId,
+      input.role,
+      input.venueIds,
+      input.actorScope,
+    )
 
     // Lazy GC before count — ensures cap counts only TRULY pending rows
     await this.expireStaleInvitations({ organizationId: input.organizationId })
@@ -188,14 +242,25 @@ export class InvitationsService {
       },
     })
     if (existingPending) {
+      // Refresh the venue scope so re-inviting with a changed selection wins.
+      const refreshed = arraysEqual(existingPending.venueIds, venueIds)
+        ? existingPending
+        : await prisma.invitation.update({
+            where: { id: existingPending.id },
+            data: { venueIds },
+            include: {
+              organization: { select: { name: true } },
+              inviter: { select: { name: true } },
+            },
+          })
       this.logger.log(
         JSON.stringify({
           event: 'invitation.reissued',
-          invitationId: existingPending.id,
+          invitationId: refreshed.id,
           organizationId: input.organizationId,
         }),
       )
-      return { row: toDTO(existingPending), reissued: true }
+      return { row: toDTO(refreshed), reissued: true }
     }
 
     const row = await prisma.invitation.create({
@@ -203,6 +268,7 @@ export class InvitationsService {
         email,
         organizationId: input.organizationId,
         role: input.role,
+        venueIds,
         status: 'pending',
         inviterId: input.inviterId,
         expiresAt: new Date(Date.now() + INVITE_TTL_MS),
@@ -278,6 +344,7 @@ export class InvitationsService {
       email: string | null
       phoneNumber: string | null
       role: string
+      venueIds: string[]
       isSelf: boolean
       joinedAt: string
     }>
@@ -293,6 +360,7 @@ export class InvitationsService {
       select: {
         userId: true,
         role: true,
+        venueIds: true,
         createdAt: true,
         user: { select: { name: true, email: true, phoneNumber: true } },
       },
@@ -309,6 +377,7 @@ export class InvitationsService {
         email: isPhoneTempEmail(m.user.email) ? null : m.user.email,
         phoneNumber: m.user.phoneNumber,
         role: m.role,
+        venueIds: m.venueIds,
         isSelf: m.userId === input.currentUserId,
         joinedAt: m.createdAt.toISOString(),
       }))
@@ -397,6 +466,58 @@ export class InvitationsService {
       }),
     )
     return { deletedUser }
+  }
+
+  /// Update a member's venue scope. Permission mirrors removeMember: owner may
+  /// edit managers + staff; manager may edit staff only; owners are never
+  /// venue-scoped (they always see all venues) and nobody scopes themselves.
+  /// Unknown/cross-tenant venue ids are dropped by sanitizeVenueScope; an empty
+  /// result means "all venues".
+  async updateMemberVenues(input: {
+    organizationId: string
+    actorUserId: string
+    actorRole: string
+    actorScope?: VenueScope
+    targetUserId: string
+    venueIds: string[]
+  }): Promise<{ venueIds: string[] }> {
+    if (input.targetUserId === input.actorUserId) {
+      throw new MemberActionError('cannot-remove-self')
+    }
+    const key = {
+      userId_organizationId: {
+        userId: input.targetUserId,
+        organizationId: input.organizationId,
+      },
+    }
+    const target = await prisma.organizationMember.findUnique({
+      where: key,
+      select: { role: true },
+    })
+    if (!target) throw new MemberActionError('member-not-found')
+    if (target.role === 'owner') throw new MemberActionError('cannot-remove-owner')
+    if (input.actorRole !== 'owner' && target.role !== 'staff') {
+      throw new MemberActionError('insufficient-role-for-target')
+    }
+
+    const venueIds = await sanitizeVenueScope(
+      input.organizationId,
+      target.role,
+      input.venueIds,
+      input.actorScope,
+    )
+    await prisma.organizationMember.update({ where: key, data: { venueIds } })
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'org_member.venues_updated',
+        organizationId: input.organizationId,
+        actorUserId: input.actorUserId,
+        targetUserId: input.targetUserId,
+        venueCount: venueIds.length,
+      }),
+    )
+    return { venueIds }
   }
 
   async getInvitationPreview(id: string): Promise<InvitationPreview> {
@@ -495,6 +616,7 @@ export class InvitationsService {
         email: true,
         organizationId: true,
         role: true,
+        venueIds: true,
         status: true,
         expiresAt: true,
       },
@@ -545,6 +667,7 @@ export class InvitationsService {
           userId: input.currentUser.id,
           organizationId: invitation.organizationId,
           role: invitation.role,
+          venueIds: invitation.venueIds,
           onboardingStartedAt: onboardingAnchor,
         },
         update: {},

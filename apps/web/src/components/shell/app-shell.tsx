@@ -7,6 +7,7 @@ import { InboxProvider } from './inbox-provider'
 import { MobileTabBar } from './mobile-tab-bar'
 import { PwaInstallBanner } from './pwa-install-banner'
 import { Sidebar } from './sidebar'
+import type { SidebarUserInfo } from './sidebar-user'
 
 type ShellCtx = { openMobileSidebar: () => void }
 const Ctx = createContext<ShellCtx | null>(null)
@@ -17,7 +18,15 @@ export function useAppShell(): ShellCtx {
   return v
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  initialUser,
+}: {
+  children: ReactNode
+  // Server-resolved identity from the (app) layout, so the sidebar profile
+  // paints on first render instead of popping in after a client session fetch.
+  initialUser: SidebarUserInfo
+}) {
   const [mobileOpen, setMobileOpen] = useState(false)
   // Realtime listeners. All share one socket via acquireSocket() so we don't
   // multi-connect. Each hook subscribes to its domain's events and invalidates
@@ -31,7 +40,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     <Ctx.Provider value={ctxValue}>
       <InboxProvider>
         <div className="flex h-dvh w-full bg-background">
-          <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
+          <Sidebar
+            mobileOpen={mobileOpen}
+            onMobileClose={() => setMobileOpen(false)}
+            initialUser={initialUser}
+          />
           <div className="flex min-w-0 flex-1 flex-col">
             {children}
             <PwaInstallBanner />

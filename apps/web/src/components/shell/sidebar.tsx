@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import {
   AlertTriangle,
   BookOpen,
@@ -22,9 +23,10 @@ import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useOpenIncidentsCount } from '@/lib/hooks/use-incidents'
 import { useOpenTasksCount } from '@/lib/hooks/use-tasks'
 import { markMinted } from '@/lib/minted-conv-ids'
+import { prefetchRoute } from '@/lib/prefetch'
 import { cn } from '@/lib/utils'
 import { SidebarThreads } from './sidebar-threads'
-import { SidebarUser } from './sidebar-user'
+import { SidebarUser, type SidebarUserInfo } from './sidebar-user'
 
 type NavChild = {
   label: string
@@ -100,12 +102,15 @@ const primaryNav: NavItem[] = [
 type Props = {
   mobileOpen?: boolean
   onMobileClose?: () => void
+  initialUser: SidebarUserInfo
 }
 
-export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
+export function Sidebar({ mobileOpen = false, onMobileClose, initialUser }: Props) {
   const pathname = usePathname() ?? '/'
   const params = useSearchParams()
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const warm = (href: string) => prefetchRoute(queryClient, href)
   const isChat = pathname.startsWith('/chat')
   const activeVenue = params.get('venue')
   // Aggregate Knowledge urgency badge. The counts come from the same hooks
@@ -246,6 +251,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
               <div key={item.label}>
                 <Link
                   href={item.href}
+                  onMouseEnter={() => warm(item.href)}
+                  onFocus={() => warm(item.href)}
                   className={cn(
                     'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors',
                     active
@@ -332,7 +339,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
 
         <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-2">
           <Link
-            href="/settings/organization"
+            href="/settings"
             className={cn(
               'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors',
               settingsActive
@@ -345,7 +352,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: Props) {
             Settings
           </Link>
           <span className="mt-1 px-1">
-            <SidebarUser />
+            <SidebarUser initialUser={initialUser} />
           </span>
         </div>
       </aside>

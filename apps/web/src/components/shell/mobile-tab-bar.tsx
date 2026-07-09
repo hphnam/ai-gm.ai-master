@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { Bell, CheckSquare, LayoutDashboard, MessageSquare, MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -7,6 +8,7 @@ import { useState } from 'react'
 import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useUnreadNotificationsCount } from '@/lib/hooks/use-notifications'
 import { useOpenTasksCount } from '@/lib/hooks/use-tasks'
+import { prefetchRoute } from '@/lib/prefetch'
 import { cn } from '@/lib/utils'
 import { MobileMoreSheet, matchesMoreDestination } from './mobile-more-sheet'
 import { NotificationsSidebar } from './notifications-sidebar'
@@ -82,9 +84,11 @@ type TabVisualProps = {
 }
 
 function TabLink({ href, ...rest }: TabVisualProps & { href: string }) {
+  const queryClient = useQueryClient()
   return (
     <Link
       href={href}
+      onPointerDown={() => prefetchRoute(queryClient, href)}
       className={tabClass(rest.active)}
       aria-current={rest.active ? 'page' : undefined}
     >

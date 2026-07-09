@@ -7,7 +7,7 @@ import {
   type ToolName,
   type ToolResult,
 } from '../../types'
-import { ToolDispatcher } from '../chat/tool-dispatcher'
+import { type DispatchContext, ToolDispatcher } from '../chat/tool-dispatcher'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const DISPATCH_TIMEOUT_MS = 3000
@@ -42,7 +42,8 @@ export class SuggestionsService {
 
   constructor(private readonly toolDispatcher: ToolDispatcher) {}
 
-  async onConversationOpen(venueId: string, orgId: string): Promise<ProactiveSuggestion[]> {
+  async onConversationOpen(venueId: string, ctx: DispatchContext): Promise<ProactiveSuggestion[]> {
+    const orgId = ctx.orgId
     const startedAt = Date.now()
     if (!UUID_RE.test(venueId)) {
       this.logger.warn(
@@ -74,8 +75,8 @@ export class SuggestionsService {
     const cutoffInput = { venueId, withinHours: CUTOFF_WITHIN_HOURS }
 
     const [belowPar, cutoff] = await Promise.all([
-      this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId),
-      this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId),
+      this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId, ctx),
+      this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId, ctx),
     ])
 
     const suggestions = this.composeSuggestions(
@@ -101,9 +102,10 @@ export class SuggestionsService {
   async onTurn(
     venueId: string,
     userMessage: string,
-    orgId: string,
+    ctx: DispatchContext,
     conversationId?: string,
   ): Promise<ProactiveSuggestion[]> {
+    const orgId = ctx.orgId
     const startedAt = Date.now()
     if (!userMessage || userMessage.trim().length === 0) return []
     if (!UUID_RE.test(venueId)) return []
@@ -148,15 +150,17 @@ export class SuggestionsService {
 
     if (stockMatched) {
       invoked.push(
-        this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId).then((r) => {
-          belowParResult = r
-          return r
-        }),
+        this.runDispatchWithTimeout('get_stock_below_par', belowParInput, venueId, ctx).then(
+          (r) => {
+            belowParResult = r
+            return r
+          },
+        ),
       )
     }
     if (cutoffMatched) {
       invoked.push(
-        this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId).then((r) => {
+        this.runDispatchWithTimeout('get_upcoming_cutoffs', cutoffInput, venueId, ctx).then((r) => {
           cutoffResult = r
           return r
         }),
@@ -212,6 +216,7 @@ export class SuggestionsService {
     tool: ToolName,
     input: Record<string, unknown>,
     venueId: string,
+    ctx: DispatchContext,
   ): Promise<ToolResult<unknown>> {
     let timer: NodeJS.Timeout | undefined
     const timeoutPromise = new Promise<ToolResult<unknown>>((resolve) => {
@@ -228,7 +233,7 @@ export class SuggestionsService {
       }, DISPATCH_TIMEOUT_MS)
     })
     try {
-      return await Promise.race([this.toolDispatcher.dispatch(tool, input), timeoutPromise])
+      return await Promise.race([this.toolDispatcher.dispatch(tool, input, ctx), timeoutPromise])
     } finally {
       if (timer) clearTimeout(timer)
     }

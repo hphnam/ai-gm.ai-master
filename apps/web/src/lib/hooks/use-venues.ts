@@ -8,14 +8,20 @@ import type {
   VenueListItemDto as VenueListItem,
 } from '@/generated/api'
 import type { ApiErrorCode } from '@/lib/api-errors'
+import { venuesListQuery } from '@/lib/queries/keys'
 import { API_URL, ApiError, apiFetch, apiPost } from '../api-client'
 
-export function useVenues() {
-  return useQuery({
-    queryKey: ['venues'],
-    queryFn: ({ signal }) => apiFetch<VenueListItem[]>('/venues', { signal }),
+export function venuesOptions() {
+  return {
+    queryKey: venuesListQuery.queryKey,
+    queryFn: ({ signal }: { signal?: AbortSignal }) =>
+      apiFetch<VenueListItem[]>(venuesListQuery.path, { signal }),
     staleTime: 5 * 60_000,
-  })
+  }
+}
+
+export function useVenues() {
+  return useQuery(venuesOptions())
 }
 
 export function useVenue(id: string | null) {

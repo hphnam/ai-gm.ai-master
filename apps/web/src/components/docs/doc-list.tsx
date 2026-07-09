@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   AlertTriangle,
@@ -28,6 +29,7 @@ import type { DocListItemDto as DocListItem } from '@/generated/api'
 import { formatRelative } from '@/lib/format-relative'
 import { useDeleteDoc } from '@/lib/hooks/use-docs'
 import { mapApiError } from '@/lib/map-api-error'
+import { prefetchDoc } from '@/lib/prefetch'
 import { cn } from '@/lib/utils'
 
 type StatusTone = 'muted' | 'info' | 'warning' | 'danger'
@@ -129,6 +131,8 @@ function DocRow({ doc }: { doc: DocListItem }) {
   const status = statusFor(doc)
   const venueLabel = doc.venueName ?? 'All venues'
   const title = doc.title?.trim() || 'Untitled document'
+  const queryClient = useQueryClient()
+  const warm = () => prefetchDoc(queryClient, doc.id)
 
   return (
     <div
@@ -148,6 +152,8 @@ function DocRow({ doc }: { doc: DocListItem }) {
       <div className="min-w-0 flex-1">
         <Link
           href={`/docs/${doc.id}`}
+          onMouseEnter={warm}
+          onFocus={warm}
           className="block rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4">

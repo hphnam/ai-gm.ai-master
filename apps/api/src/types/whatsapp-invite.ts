@@ -35,9 +35,14 @@ export type InviteWhatsappRole = z.infer<typeof InviteWhatsappRoleSchema>
 export const InviteStatusSchema = z.enum(['pending', 'redeemed', 'revoked', 'exhausted', 'expired'])
 export type InviteStatus = z.infer<typeof InviteStatusSchema>
 
+// Per-member venue scope. Empty/omitted = all venues; non-empty restricts to
+// exactly these venue ids (validated against the org at capture time).
+export const InviteVenueIdsSchema = z.array(z.string().uuid()).max(200).default([])
+
 export const CreateInviteInputSchema = z.object({
   phoneNumber: z.string().regex(E164_PHONE_REGEX, 'phoneNumber must be E.164'),
   role: InviteWhatsappRoleSchema,
+  venueIds: InviteVenueIdsSchema,
   note: z.string().max(120).optional(),
   targetUserId: z.string().uuid().optional(),
 })
@@ -47,6 +52,7 @@ export const InvitePublicSchema = z.object({
   id: z.string().uuid(),
   phoneNumberMasked: z.string(),
   role: InviteWhatsappRoleSchema,
+  venueIds: z.array(z.string()),
   note: z.string().nullable(),
   expiresAt: z.string().datetime(),
   status: InviteStatusSchema,

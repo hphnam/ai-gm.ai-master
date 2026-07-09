@@ -1,8 +1,10 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { Building2, ChevronsUpDown, LogOut, Phone, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -16,6 +18,8 @@ import {
 import { authClient, useSession } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 
+export type SidebarUserInfo = { name: string | null; email: string }
+
 function initials(name: string | null | undefined, email: string): string {
   const source = name?.trim() || email.split('@')[0] || '?'
   return (
@@ -27,15 +31,28 @@ function initials(name: string | null | undefined, email: string): string {
   )
 }
 
-export function SidebarUser() {
+export function SidebarUser({ initialUser }: { initialUser: SidebarUserInfo }) {
   const router = useRouter()
-  const { data: session, isPending } = useSession()
+  const queryClient = useQueryClient()
+  const { data: session } = useSession()
+  const [signingOut, setSigningOut] = useState(false)
 
-  if (isPending || !session?.user) return null
-  const user = session.user
+  // Paint from the server-resolved identity immediately; once the client
+  // session resolves it takes over (keeps name/email fresh after an in-tab
+  // account change). No loading gate, so the profile never pops in.
+  const user = session?.user ?? initialUser
+
+  // While signing out, useSession() flips to null and would fall back to the
+  // stale initialUser for a frame before the redirect unmounts us — hide
+  // instead so the just-signed-out identity doesn't flash.
+  if (signingOut) return null
 
   async function handleSignOut() {
+    setSigningOut(true)
     await authClient.signOut()
+    // Drop the in-memory cache so the next account on this tab can't read the
+    // previous user's data from React Query before its own fetches land.
+    queryClient.clear()
     toast.success('Signed out')
     router.replace('/auth/sign-in')
     router.refresh()
@@ -75,7 +92,7 @@ export function SidebarUser() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/settings/organization">
+          <Link href="/settings/general">
             <Building2 className="h-4 w-4" aria-hidden />
             Organisation
           </Link>

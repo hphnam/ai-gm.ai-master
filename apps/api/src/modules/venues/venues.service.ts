@@ -9,6 +9,7 @@ import {
   type VenueProfile,
   VenueProfileSchema,
 } from '../../types'
+import { canAccessVenue, isVenueScoped, type VenueScope } from '../auth/venue-scope'
 import { IndexerService } from '../indexer/indexer.service'
 
 @Injectable()
@@ -17,15 +18,23 @@ export class VenuesService {
 
   constructor(private readonly indexer: IndexerService) {}
 
-  async listByOrg(orgId: string): Promise<VenueListItem[]> {
+  // A venue-scoped member only sees/reaches their allowed venues. Omitting scope
+  // (internal callers, org-wide jobs) keeps the previous org-wide behaviour.
+  async listByOrg(orgId: string, scope?: VenueScope): Promise<VenueListItem[]> {
     return prisma.venue.findMany({
-      where: { organizationId: orgId },
+      where: {
+        organizationId: orgId,
+        ...(scope && isVenueScoped(scope) && { id: { in: scope.venueIds } }),
+      },
       orderBy: [{ name: 'asc' }, { id: 'asc' }],
       select: { id: true, name: true, address: true, type: true, timezone: true },
     })
   }
 
-  async getById(id: string, orgId: string): Promise<VenueDetail | null> {
+  async getById(id: string, orgId: string, scope?: VenueScope): Promise<VenueDetail | null> {
+    // Out-of-scope venues read as not-found (enumeration-safe, matches the
+    // cross-tenant guard).
+    if (scope && !canAccessVenue(scope, id)) return null
     const row = await prisma.venue.findFirst({
       where: { id, organizationId: orgId },
       select: {
@@ -56,7 +65,10 @@ export class VenuesService {
     id: string,
     orgId: string,
     squareLocationId: string | null,
+    scope?: VenueScope,
   ): Promise<VenueDetail> {
+    if (scope && !canAccessVenue(scope, id))
+      throw new NotFoundException({ error: 'venue-not-found' })
     const existing = await prisma.venue.findFirst({
       where: { id, organizationId: orgId },
       select: { id: true },
@@ -92,7 +104,14 @@ export class VenuesService {
     })
   }
 
-  async update(id: string, orgId: string, patch: UpdateVenueBody): Promise<VenueDetail> {
+  async update(
+    id: string,
+    orgId: string,
+    patch: UpdateVenueBody,
+    scope?: VenueScope,
+  ): Promise<VenueDetail> {
+    if (scope && !canAccessVenue(scope, id))
+      throw new NotFoundException({ error: 'venue-not-found' })
     const existing = await prisma.venue.findFirst({
       where: { id, organizationId: orgId },
       select: { id: true },
@@ -148,7 +167,14 @@ export class VenuesService {
   /// Phase D — patch the venue profile. Merges over the existing profile JSON,
   /// re-validates the full shape, and re-indexes into SearchableEntity so the
   /// agent can find profile contents semantically (fire escapes, hours, etc.).
-  async updateProfile(id: string, orgId: string, patch: UpdateVenueProfile): Promise<VenueDetail> {
+  async updateProfile(
+    id: string,
+    orgId: string,
+    patch: UpdateVenueProfile,
+    scope?: VenueScope,
+  ): Promise<VenueDetail> {
+    if (scope && !canAccessVenue(scope, id))
+      throw new NotFoundException({ error: 'venue-not-found' })
     const existing = await prisma.venue.findFirst({
       where: { id, organizationId: orgId },
       select: {

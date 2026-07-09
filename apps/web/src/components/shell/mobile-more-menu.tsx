@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import {
   BookOpen,
   FileText,
@@ -25,6 +26,7 @@ import { markMinted } from '@/lib/minted-conv-ids'
 
 export function MobileMoreMenu() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const venue = useSearchParams().get('venue')
 
   const onNewChat = () => {
@@ -38,6 +40,7 @@ export function MobileMoreMenu() {
 
   const onSignOut = async () => {
     await authClient.signOut()
+    queryClient.clear()
     toast.success('Signed out')
     router.replace('/auth/sign-in')
     router.refresh()

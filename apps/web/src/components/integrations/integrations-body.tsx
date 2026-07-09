@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import {
   INTEGRATION_PROVIDERS,
@@ -41,9 +42,18 @@ export function IntegrationsBody() {
 
   if (roleLoading || integrations.isLoading) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Loading integrations…
+      <div className="space-y-3" aria-busy="true">
+        {INTEGRATION_PROVIDERS.map((meta) => (
+          <div key={meta.id} className="rounded-lg border bg-card p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-64 max-w-full" />
+              </div>
+              <Skeleton className="h-8 w-24 rounded-md" />
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
@@ -356,10 +366,14 @@ function SquareVenueMapping() {
 
   if (venues.isLoading || locations.isLoading) {
     return (
-      <div className="flex items-center gap-2 rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Loading venues and Square locations…
-      </div>
+      <section className="rounded-lg border bg-card p-4 shadow-sm" aria-busy="true">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="mt-2 h-3 w-72 max-w-full" />
+        <div className="mt-3 space-y-2">
+          <Skeleton className="h-9 w-full rounded-md" />
+          <Skeleton className="h-9 w-full rounded-md" />
+        </div>
+      </section>
     )
   }
 

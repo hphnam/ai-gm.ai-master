@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { apiFetch } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
+import { orgProfileQuery } from '@/lib/queries/keys'
 
 export interface OrganizationProfile {
   businessType?: string
@@ -20,8 +21,8 @@ interface OrgProfileResponse {
 
 export function useOrgProfile() {
   return useQuery<OrgProfileResponse>({
-    queryKey: ['org-profile'],
-    queryFn: () => apiFetch<OrgProfileResponse>('/org/profile'),
+    queryKey: orgProfileQuery.queryKey,
+    queryFn: () => apiFetch<OrgProfileResponse>(orgProfileQuery.path),
     refetchOnWindowFocus: false,
     retry: false,
   })
@@ -37,7 +38,7 @@ export function useUpdateOrgProfile(opts?: { silent?: boolean }) {
         body: JSON.stringify(body),
       }),
     onSuccess: (res) => {
-      queryClient.setQueryData(['org-profile'], res)
+      queryClient.setQueryData(orgProfileQuery.queryKey, res)
       if (!silent) toast.success('Business profile saved')
     },
     onError: (err) => {

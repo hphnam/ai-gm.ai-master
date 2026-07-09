@@ -8,24 +8,40 @@ import {
 import Redis from 'ioredis'
 import { prisma } from '../../database/prisma'
 import { parseRedisUrl } from '../../redis-connection'
-import { CHAT_STARTERS_TTL_SECONDS } from './chat-starters.queue'
+import { CHAT_STARTERS_TTL_SECONDS, type ChatStartersAudience } from './chat-starters.queue'
 import { ChatStartersPayloadSchema, type StarterQuestion } from './dto/chat-starters.dto'
 
 /// Generic hospitality fallbacks — shown when Redis has no payload for the
-/// venue (cold start, before the first weekly fanout has run, or after a
+/// venue+audience (cold start, before the first fanout has run, or after a
 /// generation failure that exhausted the TTL). Deliberately broad so they
-/// don't feel like dead canned suggestions for any specific venue.
-const FALLBACK_QUESTIONS: ReadonlyArray<StarterQuestion> = [
-  { text: 'What stock is below par right now?', category: 'stock' },
-  { text: "What's on my list this week?", category: 'tasks' },
-  { text: 'Any certs expiring in the next 30 days?', category: 'compliance' },
+/// don't feel like dead canned suggestions for any specific venue. Split by
+/// role: staff see operational rituals only; managers additionally see
+/// commercial / compliance / oversight prompts. Mirrors the web fallbacks.
+const STAFF_FALLBACK_QUESTIONS: ReadonlyArray<StarterQuestion> = [
   { text: 'Walk me through the opening checklist.', category: 'sop' },
+  { text: 'What stock is below par right now?', category: 'stock' },
+  { text: "What's on my task list today?", category: 'tasks' },
+  { text: 'Run me through the closing checklist.', category: 'sop' },
   { text: 'Who do I call if the ice machine is down?', category: 'supplier' },
-  { text: 'What happened on the last shift I missed?', category: 'general' },
+  { text: 'How do I log a maintenance issue?', category: 'incident' },
 ]
+
+const MANAGER_FALLBACK_QUESTIONS: ReadonlyArray<StarterQuestion> = [
+  { text: 'How did sales go yesterday?', category: 'general' },
+  { text: 'Any certs expiring in the next 30 days?', category: 'compliance' },
+  { text: 'What stock is below par right now?', category: 'stock' },
+  { text: "Who's on the rota this week?", category: 'rota' },
+  { text: 'Which supplier orders need placing before cut-off?', category: 'supplier' },
+  { text: 'Walk me through the opening checklist.', category: 'sop' },
+]
+
+function fallbackFor(audience: ChatStartersAudience): ReadonlyArray<StarterQuestion> {
+  return audience === 'manager' ? MANAGER_FALLBACK_QUESTIONS : STAFF_FALLBACK_QUESTIONS
+}
 
 export type StoredStartersPayload = {
   venueId: string
+  audience: ChatStartersAudience
   questions: StarterQuestion[]
   source: 'generated' | 'fallback'
   generatedAt: string | null
@@ -74,7 +90,11 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
   /// NotFoundException for a venueId that doesn't belong to the caller. The
   /// controller surfaces the 404, which keeps cross-org reads from being
   /// indistinguishable from "no data yet".
-  async getForVenue(orgId: string, venueId: string): Promise<StoredStartersPayload> {
+  async getForVenue(
+    orgId: string,
+    venueId: string,
+    audience: ChatStartersAudience,
+  ): Promise<StoredStartersPayload> {
     const venue = await prisma.venue.findFirst({
       where: { id: venueId, organizationId: orgId },
       select: { id: true },
@@ -82,14 +102,16 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
     if (!venue) {
       throw new NotFoundException('venue-not-found')
     }
-    const raw = await this.redis.get(this.keyFor(orgId, venueId)).catch(() => null)
-    if (!raw) return this.fallback(venueId)
+    const raw = await this.redis.get(this.keyFor(orgId, venueId, audience)).catch(() => null)
+    if (!raw) return this.fallback(venueId, audience)
     try {
       const parsed = ChatStartersPayloadSchema.parse(JSON.parse(raw))
       // Defensive: an attacker who somehow wrote into Redis would still be
-      // bounded by the zod parser; if their payload's venueId doesn't match
-      // the requested key, drop and fall back.
-      if (parsed.venueId !== venueId) return this.fallback(venueId)
+      // bounded by the zod parser; if the payload's venueId / audience don't
+      // match the requested key, drop and fall back.
+      if (parsed.venueId !== venueId || parsed.audience !== audience) {
+        return this.fallback(venueId, audience)
+      }
       return parsed
     } catch (err) {
       this.logger.warn(
@@ -97,10 +119,11 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
           event: 'chat_starters.parse_failed',
           orgId,
           venueId,
+          audience,
           message: (err as Error)?.message ?? 'unknown',
         }),
       )
-      return this.fallback(venueId)
+      return this.fallback(venueId, audience)
     }
   }
 
@@ -110,16 +133,18 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
   async store(
     orgId: string,
     venueId: string,
+    audience: ChatStartersAudience,
     questions: StarterQuestion[],
   ): Promise<StoredStartersPayload> {
     const payload: StoredStartersPayload = {
       venueId,
+      audience,
       questions,
       source: 'generated',
       generatedAt: new Date().toISOString(),
     }
     await this.redis.set(
-      this.keyFor(orgId, venueId),
+      this.keyFor(orgId, venueId, audience),
       JSON.stringify(payload),
       'EX',
       CHAT_STARTERS_TTL_SECONDS,
@@ -129,6 +154,7 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
         event: 'chat_starters.stored',
         orgId,
         venueId,
+        audience,
         count: questions.length,
         ttlSeconds: CHAT_STARTERS_TTL_SECONDS,
       }),
@@ -136,14 +162,15 @@ export class ChatStartersService implements OnModuleInit, OnModuleDestroy {
     return payload
   }
 
-  private keyFor(orgId: string, venueId: string): string {
-    return `chat:starters:${orgId}:${venueId}`
+  private keyFor(orgId: string, venueId: string, audience: ChatStartersAudience): string {
+    return `chat:starters:${orgId}:${venueId}:${audience}`
   }
 
-  private fallback(venueId: string): StoredStartersPayload {
+  private fallback(venueId: string, audience: ChatStartersAudience): StoredStartersPayload {
     return {
       venueId,
-      questions: [...FALLBACK_QUESTIONS],
+      audience,
+      questions: [...fallbackFor(audience)],
       source: 'fallback',
       generatedAt: null,
     }

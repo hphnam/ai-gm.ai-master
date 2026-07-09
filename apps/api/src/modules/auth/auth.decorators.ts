@@ -16,5 +16,13 @@ export const CurrentRole = createParamDecorator(
     ctx.switchToHttp().getRequest<AuthedRequest>().membership?.role,
 )
 
+// Full venue scope for the active membership — { role, venueIds }. Feed to
+// venue-scope.ts helpers (canAccessVenue / resolveAccessibleVenueIds). Defaults
+// to an all-access staff scope when no membership resolved (guards still gate).
+export const CurrentVenueScope = createParamDecorator((_data: unknown, ctx: ExecutionContext) => {
+  const m = ctx.switchToHttp().getRequest<AuthedRequest>().membership
+  return { role: (m?.role ?? 'staff') as Role, venueIds: m?.venueIds ?? [] }
+})
+
 export const REQUIRE_ROLE_KEY = 'requireRole'
 export const RequireRole = (...roles: Role[]) => SetMetadata(REQUIRE_ROLE_KEY, roles)

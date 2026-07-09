@@ -1,5 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
+import { resolveClientForRequest } from './venue-context'
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
@@ -27,12 +28,14 @@ function getClient(): PrismaClient {
   return globalForPrisma.prisma
 }
 
-// Lazy proxy — resolves the real client on first property access, so env vars
-// loaded AFTER this module imports (common with tsx + ESM hoisting) still
-// reach the PrismaPg adapter.
+// Lazy proxy — resolves the real client on first property access (so env vars
+// loaded AFTER this module imports still reach the adapter) AND swaps in the
+// per-request venue-scoped client when the caller is a venue-scoped member. The
+// resolution happens INSIDE the request's ALS context, so the scope is visible
+// here even though it isn't inside Prisma's own extension hook.
 export const prisma = new Proxy({} as PrismaClient, {
   get(_t, prop) {
-    const client = getClient()
+    const client = resolveClientForRequest(getClient())
     const value = Reflect.get(client, prop, client)
     return typeof value === 'function'
       ? (value as (...args: never[]) => unknown).bind(client)

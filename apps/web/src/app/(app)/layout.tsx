@@ -25,9 +25,9 @@ export default async function AppLayout({
   children: ReactNode
   header: ReactNode
 }) {
-  await requireAppAccess()
+  const session = await requireAppAccess()
   return (
-    <AppShell>
+    <AppShell initialUser={{ name: session.user.name, email: session.user.email }}>
       <PageHeaderProvider>
         {header}
         {children}

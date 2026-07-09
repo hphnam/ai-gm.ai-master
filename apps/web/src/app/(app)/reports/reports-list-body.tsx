@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { CalendarClock, FileBarChart, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -11,9 +12,11 @@ import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { useReports } from '@/lib/hooks/use-reports'
+import { prefetchReport } from '@/lib/prefetch'
 
 export function ReportsListBody() {
   const list = useReports()
+  const queryClient = useQueryClient()
   const rows = useMemo(() => list.data?.pages.flatMap((p) => p.reports) ?? [], [list.data?.pages])
   const total = list.data?.pages[0]?.total ?? rows.length
 
@@ -32,7 +35,12 @@ export function ReportsListBody() {
               {rows.map((r) => (
                 <li key={r.id}>
                   <ListRow asChild interactive>
-                    <Link href={`/reports/${r.id}`} className="group block">
+                    <Link
+                      href={`/reports/${r.id}`}
+                      onMouseEnter={() => prefetchReport(queryClient, r.id)}
+                      onFocus={() => prefetchReport(queryClient, r.id)}
+                      className="group block"
+                    >
                       <div className="flex items-start gap-3">
                         <div
                           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"

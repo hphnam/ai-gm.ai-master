@@ -2,6 +2,7 @@
 
 import {
   type InfiniteData,
+  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -79,6 +80,21 @@ type ReportsPage = {
   nextOffset: number | null
 }
 
+export function reportsListOptions(venueId: string | null = null, pageSize = REPORTS_PAGE_SIZE) {
+  return {
+    queryKey: ['reports', 'list', { venueId, pageSize }] as const,
+    initialPageParam: 0,
+    queryFn: ({ pageParam, signal }: { pageParam?: number; signal?: AbortSignal }) => {
+      const qs = new URLSearchParams()
+      if (venueId) qs.set('venueId', venueId)
+      qs.set('limit', String(pageSize))
+      qs.set('offset', String(pageParam ?? 0))
+      return apiFetch<ReportsPage>(`/reports?${qs.toString()}`, { signal })
+    },
+    getNextPageParam: (last: ReportsPage) => last.nextOffset ?? undefined,
+  }
+}
+
 export function useReports(opts?: { venueId?: string | null; pageSize?: number }) {
   const venueId = opts?.venueId ?? null
   const pageSize = opts?.pageSize ?? REPORTS_PAGE_SIZE
@@ -89,24 +105,22 @@ export function useReports(opts?: { venueId?: string | null; pageSize?: number }
     readonly unknown[],
     number
   >({
-    queryKey: ['reports', 'list', { venueId, pageSize }],
-    initialPageParam: 0,
-    queryFn: ({ pageParam, signal }) => {
-      const qs = new URLSearchParams()
-      if (venueId) qs.set('venueId', venueId)
-      qs.set('limit', String(pageSize))
-      qs.set('offset', String(pageParam))
-      return apiFetch(`/reports?${qs.toString()}`, { signal })
-    },
-    getNextPageParam: (last) => last.nextOffset ?? undefined,
-    staleTime: 30_000,
+    ...reportsListOptions(venueId, pageSize),
+    placeholderData: keepPreviousData,
   })
+}
+
+export function reportDetailOptions(id: string) {
+  return {
+    queryKey: ['reports', 'one', id] as const,
+    queryFn: ({ signal }: { signal?: AbortSignal }) =>
+      apiFetch<Report>(`/reports/${id}`, { signal }),
+  }
 }
 
 export function useReport(id: string | null) {
   return useQuery<Report>({
-    queryKey: ['reports', 'one', id],
-    queryFn: ({ signal }) => apiFetch(`/reports/${id}`, { signal }),
+    ...reportDetailOptions(id ?? ''),
     enabled: typeof id === 'string' && id.length > 0,
     staleTime: 60_000,
   })

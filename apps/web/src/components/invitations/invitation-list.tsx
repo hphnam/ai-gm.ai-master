@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { ListInvitationsResponseDto as ListInvitationsResponse } from '@/generated/api'
 import type { InvitationDto as InvitationDTO } from '@/lib/api-types'
 import { useRevokeInvitation } from '@/lib/hooks/use-invitations'
@@ -73,9 +74,27 @@ function StatusBadge({ status }: { status: InvitationDTO['status'] }) {
   )
 }
 
-export function InvitationList({ data }: { data: ListInvitationsResponse | undefined }) {
+export function InvitationList({
+  data,
+  isLoading,
+}: {
+  data: ListInvitationsResponse | undefined
+  isLoading?: boolean
+}) {
   const [confirmRevoke, setConfirmRevoke] = useState<InvitationDTO | null>(null)
   const revokeMutation = useRevokeInvitation()
+
+  if (isLoading && !data) {
+    return (
+      <section className="space-y-4 rounded-lg border bg-card p-4 shadow-sm sm:p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Invitations
+        </h2>
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </section>
+    )
+  }
 
   if (!data || data.invitations.length === 0) {
     return (

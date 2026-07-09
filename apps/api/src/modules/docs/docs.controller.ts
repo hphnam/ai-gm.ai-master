@@ -28,9 +28,10 @@ import {
   type ClassifyDocRequest,
   ClassifyDocRequestSchema,
 } from '../../types'
-import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentUser, CurrentVenueScope, RequireRole } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import { canAccessVenue, type VenueScope } from '../auth/venue-scope'
 import { createRateLimiter } from '../integrations/rate-limit'
 import { ReductoError, ReductoService } from '../reducto/reducto.service'
 import {
@@ -342,6 +343,7 @@ export class DocsController {
     @CurrentOrg() org: { id: string },
     // Plan 04-03 audit-M8 — actingUserId threaded for extractor audit log.
     @CurrentUser() user: { id: string } | null,
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<CreateDocResponseDto> {
     if (!file) {
       throw new BadRequestException({ error: 'invalid-input' } satisfies ApiErrorResponse)
@@ -403,6 +405,11 @@ export class DocsController {
       rawOverride.length > 0 ? rawOverride.slice(0, 200) : sanitizeUploadTitle(file.originalname)
     const venueId =
       typeof body?.venueId === 'string' && body.venueId.trim().length > 0 ? body.venueId : null
+    // Multipart body isn't parsed until FileInterceptor runs (after the global
+    // VenueScopeGuard), so pin-to-venue is re-checked here for scoped members.
+    if (venueId && !canAccessVenue(scope, venueId)) {
+      throw new NotFoundException({ error: 'venue-not-found' } satisfies ApiErrorResponse)
+    }
     const description =
       typeof body?.description === 'string' && body.description.trim().length > 0
         ? body.description.trim().slice(0, 1_000)

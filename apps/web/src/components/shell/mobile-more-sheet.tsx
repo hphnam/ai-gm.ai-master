@@ -39,7 +39,7 @@ const MORE_DESTINATIONS: MoreDestination[] = [
   },
   {
     label: 'Settings',
-    href: '/settings/organization',
+    href: '/settings',
     icon: Settings,
     match: (p) => p.startsWith('/settings'),
   },

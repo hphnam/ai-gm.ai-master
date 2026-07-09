@@ -20,7 +20,7 @@ const env = assertAuthEnv()
 // Shared with OrgContextMiddleware so both sides agree on the shape.
 export type SessionOrgContext = {
   activeOrganization: { id: string; name: string; slug: string } | null
-  membership: { role: string } | null
+  membership: { role: string; venueIds: string[] } | null
 }
 
 const webOrigin = env.webOrigins[0]
@@ -159,12 +159,13 @@ export const auth = betterAuth({
         orderBy: activeOrgId ? undefined : { createdAt: 'asc' },
         select: {
           role: true,
+          venueIds: true,
           organization: { select: { id: true, name: true, slug: true } },
         },
       })
       const orgContext: SessionOrgContext = {
         activeOrganization: membership?.organization ?? null,
-        membership: membership ? { role: membership.role } : null,
+        membership: membership ? { role: membership.role, venueIds: membership.venueIds } : null,
       }
       return { user, session, ...orgContext }
     }),

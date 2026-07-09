@@ -1,16 +1,20 @@
 'use client'
 
-import { Users } from 'lucide-react'
+import { MapPin, SlidersHorizontal, Users } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Alert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
+import { SettingCard } from '@/components/ui/setting-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { type OrgMember, useOrgMembers, useRemoveOrgMember } from '@/lib/hooks/use-org-members'
 import { cn } from '@/lib/utils'
+import { MemberAccessDialog } from './member-access-dialog'
+import { useShouldShowVenueAccess } from './venue-access-picker'
 
 // Actor is always owner or manager here (server-gated read). Mirror the server
 // rule so we only show Remove where the action would succeed: owner removes
@@ -18,6 +22,18 @@ import { cn } from '@/lib/utils'
 function canRemove(member: OrgMember, actorRole: string | undefined): boolean {
   if (member.isSelf || member.role === 'owner') return false
   return actorRole === 'owner' || member.role === 'staff'
+}
+
+// Same permission matrix as removeMember — owners are never venue-scoped, and
+// only owner/staff-of-manager combos are editable (see updateMemberVenues).
+function canEditAccess(member: OrgMember, actorRole: string | undefined): boolean {
+  if (member.isSelf || member.role === 'owner') return false
+  return actorRole === 'owner' || member.role === 'staff'
+}
+
+function venueScopeLabel(member: OrgMember): string {
+  if (member.role === 'owner' || member.venueIds.length === 0) return 'All venues'
+  return `${member.venueIds.length} ${member.venueIds.length === 1 ? 'venue' : 'venues'}`
 }
 
 function memberLabel(member: OrgMember): string {
@@ -44,17 +60,19 @@ const MEMBERS_SKELETON_KEYS = ['a', 'b', 'c']
 export function MembersList() {
   const query = useOrgMembers()
   const removeMember = useRemoveOrgMember()
+  const showVenueAccess = useShouldShowVenueAccess()
   const [pendingRemove, setPendingRemove] = useState<OrgMember | null>(null)
+  const [pendingAccess, setPendingAccess] = useState<OrgMember | null>(null)
 
   if (query.isLoading) {
     return (
-      <section className="rounded-lg border bg-card p-4 shadow-sm sm:p-5">
+      <SettingCard title="Team">
         <div className="space-y-3">
           {MEMBERS_SKELETON_KEYS.map((k) => (
             <Skeleton key={k} className="h-12 w-full" />
           ))}
         </div>
-      </section>
+      </SettingCard>
     )
   }
 
@@ -81,18 +99,15 @@ export function MembersList() {
   }
 
   return (
-    <section className="rounded-lg border bg-card shadow-sm" aria-labelledby="members-heading">
-      <header className="flex items-baseline justify-between border-b px-5 py-3">
-        <h3
-          id="members-heading"
-          className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-        >
-          Team
-        </h3>
+    <SettingCard
+      title="Team"
+      action={
         <span className="text-xs text-muted-foreground tabular-nums">
           {members.length} {members.length === 1 ? 'person' : 'people'}
         </span>
-      </header>
+      }
+      bodyClassName="p-0"
+    >
       <ul className="divide-y">
         {members.map((m) => (
           <li key={m.userId} className="flex items-center gap-3 px-5 py-3">
@@ -116,13 +131,34 @@ export function MembersList() {
                   </Badge>
                 ) : null}
               </p>
-              {m.name && (m.phoneNumber || m.email) ? (
-                <p className="truncate text-xs text-muted-foreground">{m.phoneNumber ?? m.email}</p>
-              ) : null}
+              <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+                {m.name && (m.phoneNumber || m.email) ? (
+                  <span className="truncate">{m.phoneNumber ?? m.email}</span>
+                ) : null}
+                {showVenueAccess ? (
+                  <>
+                    {m.name && (m.phoneNumber || m.email) ? <span aria-hidden>·</span> : null}
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="h-3 w-3" aria-hidden />
+                      {venueScopeLabel(m)}
+                    </span>
+                  </>
+                ) : null}
+              </p>
             </div>
             <span className="shrink-0 text-xs text-muted-foreground">
               {ROLE_LABEL[m.role] ?? m.role}
             </span>
+            {showVenueAccess && canEditAccess(m, actorRole) ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={`Edit venue access for ${memberLabel(m)}`}
+                onClick={() => setPendingAccess(m)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+              </Button>
+            ) : null}
             {canRemove(m, actorRole) ? (
               <DeleteButton
                 size="icon"
@@ -133,6 +169,12 @@ export function MembersList() {
           </li>
         ))}
       </ul>
+      <MemberAccessDialog
+        member={pendingAccess}
+        onOpenChange={(open) => {
+          if (!open) setPendingAccess(null)
+        }}
+      />
       <ConfirmDeleteDialog
         open={pendingRemove !== null}
         onOpenChange={(open) => {
@@ -162,6 +204,6 @@ export function MembersList() {
           }
         }}
       />
-    </section>
+    </SettingCard>
   )
 }

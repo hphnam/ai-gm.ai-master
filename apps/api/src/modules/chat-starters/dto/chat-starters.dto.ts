@@ -16,6 +16,9 @@ export type StarterQuestion = z.infer<typeof StarterQuestionSchema>
 
 export const ChatStartersPayloadSchema = z.object({
   venueId: z.string(),
+  /// Role bucket this set is tailored to. Staff see operational rituals only;
+  /// managers additionally see commercial / compliance / oversight prompts.
+  audience: z.enum(['staff', 'manager']),
   questions: z.array(StarterQuestionSchema).min(1).max(8),
   /// Where this payload came from — used by the UI for a subtle freshness
   /// indicator and by tests to assert that lazy fallbacks work.

@@ -1,17 +1,25 @@
+import { HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
+import { SettingsPageHeader } from '@/components/ui/setting-card'
 import { VenueProfilesBody } from '@/components/venues/venue-profiles-body'
+import { venuesListQuery } from '@/lib/queries/keys'
+import { dehydrateSpecs } from '@/lib/server-prefetch'
 import { getServerSession, isManagerRole } from '@/lib/server-session'
 
 export default async function VenueProfilesPage() {
   const session = await getServerSession()
   if (!isManagerRole(session?.membership?.role)) redirect('/settings/phone')
 
+  const state = await dehydrateSpecs([venuesListQuery])
   return (
-    <section aria-labelledby="venues-settings-title">
-      <h2 id="venues-settings-title" className="sr-only">
-        Venue profiles
-      </h2>
-      <VenueProfilesBody />
-    </section>
+    <div>
+      <SettingsPageHeader
+        title="Venues"
+        description="Manage your sites and the operational details GM uses per venue."
+      />
+      <HydrationBoundary state={state}>
+        <VenueProfilesBody />
+      </HydrationBoundary>
+    </div>
   )
 }
