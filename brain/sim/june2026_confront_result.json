@@ -1,0 +1,162 @@
+{
+  "stage1": {
+    "l1": {
+      "beer_hall": {
+        "june_actual_total": 26890.0,
+        "june_frozen_total": 13917.0,
+        "mase_all": 1.643,
+        "mae_all": 478.4,
+        "mase_trading": 1.952,
+        "band_coverage": 0.833,
+        "backtest_mase": 0.745,
+        "n_days": 30,
+        "n_trading": 25
+      },
+      "two_river_taps": {
+        "june_actual_total": 0.0,
+        "june_frozen_total": 5329.0,
+        "mase_all": 1.182,
+        "mae_all": 177.6,
+        "mase_trading": 1.611,
+        "band_coverage": 0.667,
+        "backtest_mase": 0.597,
+        "n_days": 30,
+        "n_trading": 22
+      },
+      "ellel": {
+        "june_actual_total": 2338.0,
+        "june_frozen_total": 604.0,
+        "mase_all": 0.485,
+        "mae_all": 88.0,
+        "mase_trading": 2.913,
+        "band_coverage": 0.967,
+        "backtest_mase": 0.572,
+        "n_days": 30,
+        "n_trading": 5
+      }
+    },
+    "l2": {
+      "beer_hall": {
+        "mae_category_total": 1660.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 9227.0,
+            "actual": 13102.0
+          },
+          {
+            "category": "Food",
+            "frozen": 93.0,
+            "actual": 30.0
+          },
+          {
+            "category": "Happy Hour",
+            "frozen": 451.0,
+            "actual": 705.0
+          },
+          {
+            "category": "Merchandise",
+            "frozen": 57.0,
+            "actual": 778.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 925.0,
+            "actual": 1633.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 1326.0,
+            "actual": 4563.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 190.0,
+            "actual": 2324.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 1648.0,
+            "actual": 3935.0
+          }
+        ]
+      },
+      "ellel": {
+        "mae_category_total": 347.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 247.0,
+            "actual": 1429.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 58.0,
+            "actual": 289.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 180.0,
+            "actual": 189.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 4.0,
+            "actual": 216.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 115.0,
+            "actual": 214.0
+          }
+        ]
+      }
+    },
+    "world_cup": {
+      "beer_hall_england_dates": [
+        {
+          "date": "2026-06-17",
+          "dow": "Wed",
+          "fixture": "England v Croatia 21:00",
+          "actual": 607.0,
+          "frozen_yhat": 300.0,
+          "dow_median": 289.0
+        },
+        {
+          "date": "2026-06-23",
+          "dow": "Tue",
+          "fixture": "England v Ghana 21:00",
+          "actual": 335.0,
+          "frozen_yhat": 39.0,
+          "dow_median": 0.0
+        },
+        {
+          "date": "2026-06-27",
+          "dow": "Sat",
+          "fixture": "Panama v England 22:00",
+          "actual": 3082.0,
+          "frozen_yhat": 1083.0,
+          "dow_median": 1235.0
+        }
+      ],
+      "note": "One June, 3 England dates: directional only, no power."
+    }
+  },
+  "stage2": {
+    "beer_hall": {
+      "rolling_mase": 1.471,
+      "rolling_mae": 428.4,
+      "n_days": 30
+    },
+    "two_river_taps": {
+      "rolling_mase": 0.317,
+      "rolling_mae": 47.6,
+      "n_days": 30
+    },
+    "ellel": {
+      "rolling_mase": 0.485,
+      "rolling_mae": 88.0,
+      "n_days": 30
+    }
+  }
+}

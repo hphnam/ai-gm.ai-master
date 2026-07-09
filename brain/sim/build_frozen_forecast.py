@@ -80,10 +80,11 @@ def _weather_climatology(cell: str) -> dict[str, float]:
     }
 
 
-def _build_future_frame(venue: str) -> pd.DataFrame:
-    """The June target frame: dates + every known-future covariate, no NaN, blind
-    to June actuals. Weather is climatology; wc_* is the fixed fixture calendar."""
-    dates = _june_dates()
+def build_future_frame(venue: str, dates: pd.DatetimeIndex | None = None) -> pd.DataFrame:
+    """A target frame: dates + every known-future covariate, no NaN, blind to
+    actuals. Weather is climatology; wc_* is the fixed fixture calendar. Default
+    horizon is all of June; a custom `dates` range drives the weekly-rolling view."""
+    dates = _june_dates() if dates is None else dates
     fut = pd.DataFrame({"date": dates})
     fut["value"] = np.nan
     fut["dow"] = fut["date"].dt.dayofweek
@@ -202,7 +203,7 @@ def build() -> dict:
     for venue in config.FORECAST_VENUES:
         feats = trim_to_active(build_features(venue), venue)
         ceiling = pd.Timestamp(feats["date"].max()).normalize()
-        fut = _build_future_frame(venue)
+        fut = build_future_frame(venue)
         yhat = _l1_point(venue, feats, fut)
         half = _band_halfwidth(venue, feats)
         lo = np.clip(yhat - half, 0.0, None)
