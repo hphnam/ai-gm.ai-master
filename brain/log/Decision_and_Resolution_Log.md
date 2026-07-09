@@ -167,3 +167,201 @@ runtime venv and its dependencies are untouched.
      denominator is the conformal half-band of the served band") does not
      hold for this codebase; promoting any model, including Chronos-2, cannot
      change alert sensitivity through this path.
+
+## Section C: Post-WP12 milestones (G12.9 to G12.11)
+
+Continuation of the Section B numbering (rows 6 to 10), authored on
+`brain-construction`. These record the fold unification, the `is_ellel_event`
+leak fix, the full exo set, the Neon adapter, the World Cup fixtures, the store
+flags, and the G12.11 corrections. They were first written self-contained in the
+numbered reports (`17_G12_9_Report.md`, `19_G12_10_Report.md`); this section folds
+them into the append-only log so it is the continuous WP1-to-present record.
+
+6. **G12.9: rolling-fold count unified at 6, per-fold MASE audit added, Ellel
+   uncapped, weather cells made per-venue precise** (`17_G12_9_Report.md`,
+   `PRJ93_Spec_G12_9.md` gates a to g). Served models unchanged; no commits at
+   report time.
+   - **a, fold unification.** `ingest.refresh._refit_ladder` now evaluates at
+     `n_folds=6` (was 4), so the real T3 re-fit and the `models.ladder` CLI
+     backtest agree on fold count. This resolves the WP12 divergence flagged in
+     Section B row 5 (the 4-fold T3 picked `rung4_chronos2` while the 6-fold CLI
+     preview picked `rung4_chronos2_exo`); the fold-count reconciliation left open
+     for Nam there is now made, on the side of 6.
+   - **b, per-fold audit.** `ladder_selection` gains `per_fold_mase VARCHAR` and
+     `n_folds INTEGER` (idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`),
+     populated from the winner's per-fold vector, so a single-fold-dominant win is
+     visible in the audit row instead of hidden behind the mean.
+   - **c, Ellel uncap.** `config.MAX_RUNG = {}` (was `{"ellel": 1}`): Ellel is no
+     longer capped at Rung 1. Real run: the milestone gate is met on Ellel by
+     `rung3_gbm` at rolling MASE 0.533, so the cap hypothesis is falsified (a rung
+     above Rung 1 IS adoptable on Ellel's ~64 trading days). NOTE that 0.533 GBM
+     win was later found to be a leak artifact and retired at G12.10a2 (row 7); the
+     surviving G12.9c finding is that uncapping was correct, not that GBM
+     specifically won. `EVENT_ONLY_VENUES` was found never to have gated the
+     ladder cap (only `MAX_RUNG` did), so no code split was needed, only a
+     docstring clarification.
+   - **d, self-leak (first cut).** `is_ellel_event` is a near-deterministic
+     self-signal on Ellel's own frame. G12.9 added `exo_cols_for_venue(venue)` to
+     drop the column from the Chronos-2-exo entrant for Ellel only, threaded
+     through both the ladder backtest and the served path (`conformal.wrap`). This
+     entrant-level exclusion was superseded at G12.10a2 by a source-level fix once
+     Ellel's uncapping exposed the same leak in the GBM rungs too.
+   - **e, weather precision.** `WEATHER_CELLS`/`WEATHER_CELL_COORDS` gave each
+     venue its own cell and precise coordinate; TRT's cell was renamed `trt_south`
+     to `preston` with a Preston city-centre placeholder coordinate (the exact
+     street coordinate was not supplied; `FLAG-FE-TRTLOC` left resolved-pending).
+     The placeholder was corrected to the real TRT coordinate at G12.10a (row 7).
+   - **f/g.** Two known gaps logged in `FLAGS.md` (`FLAG-G12.9-1` Ellel-event
+     dormant-forward gap; `FLAG-G12.9-2` TRT `rung3_global_gbm` serving bug, traced
+     to a `ValueError` in `conformal.wrap._predictor`, not the spec's assumed
+     `KeyError`); the downstream rerun matrix written to `18_DOWNSTREAM.md`, with
+     V5/V6 verified by reading the code (`signals.residual` and
+     `signals.stock_inventory` never read `served_forecast`, so uncapping Ellel
+     cannot shift deviation or stock outputs).
+
+7. **G12.10: TRT coordinate corrected, `is_ellel_event` leak fixed at source, full
+   exo factor set fed to the Chronos-2 entrant, Neon adapter wired, World Cup 2026
+   fixtures added, store persistence flags** (`19_G12_10_Report.md`,
+   `PRJ93_Spec_G12_10.md`, executed a to a2 to c to d to e to b to f). Served
+   models unchanged.
+   - **a, TRT coordinate.** `WEATHER_CELLS["two_river_taps"]` re-keyed to the venue
+     name (uniform with BH/Ellel) and `WEATHER_CELL_COORDS["two_river_taps"] =
+     (53.875094..., -2.759934...)`, the Nam-confirmed venue coordinate; the G12.9
+     `preston` placeholder removed and `FLAG-FE-TRTLOC` marked RESOLVED. Committed
+     TRT ladder numbers are unchanged (its winner `rung2_ets` consumes no weather);
+     the coordinate now feeds the fat exo entrant, where TRT's `rung4_chronos2_exo`
+     moved 0.623 to 0.612.
+   - **a2, leak fixed at source (material finding).** `is_ellel_event` is set to
+     constant 0 on the Ellel frame in `build_features` (kept for schema stability),
+     genuine spillover elsewhere. This protects EVERY Ellel rung that reads the
+     frame, not just the Chronos entrant, which is why the fix had to move from the
+     entrant (G12.9d) to the source once Ellel was uncapped and the GBM rungs began
+     consuming the leak. Effect: Ellel's rolling `rung3_gbm` fell from the
+     leak-inflated 0.533 (G12.9c) to an honest 0.813 (`rung3_global_gbm` to 0.936).
+     The spurious result is the GBM win specifically; the G12.9c hypothesis that a
+     foundation model competes on a sparse venue without per-venue training SURVIVES
+     (`rung4_chronos2` 0.581, essentially tied with the baseline, not collapsed).
+     See row 8 for the corrected milestone reading.
+   - **b, full exo universe.** `CHRONOS2_EXO_COLS` is now the full known-future set
+     (calendar + inert-not-excluded `is_ellel_event` + civic `exo_fixture_nearby` +
+     four `wc_*` + weather `exo_temp_c`/`exo_rain_mm`/`exo_sunshine_hrs`/
+     `exo_is_dry`); `chronos2_exo_cols(venue)` returns it for all venues (the G12.9d
+     Ellel special-case removed, the source fix is the single point of truth).
+     Weather is admitted as known-future ONLY on a forecast serving basis: the
+     entrant raises if `WEATHER_TRAIN_BASIS == "observed"` (that would leak the ERA5
+     upper bound) and records the basis (`hindcast`). Real rerun: the fuller set
+     helps the anchor (BH 0.779 to 0.745), is neutral for TRT (0.623 to 0.612), and
+     slightly worsens the sparse Ellel exo entrant (0.570 to 0.591); the gate
+     decides adoption as always.
+   - **c, adapter-only ingestion + Neon.** `NeonAdapter.latest_available_date` and
+     `fetch_transactions(since)` implemented read-only against `brain_txn` (psycopg
+     v3 imported inside the method, DSN from `BRAIN_NEON_DSN`, `since` parameterised),
+     inert while `LIVE_INGEST=0`, raising loudly if live-but-unprovisioned;
+     `_to_txn_schema` maps to `TXN_COLUMNS` deriving only config-known columns, never
+     fabricating transaction facts. NOT integration-tested against live Neon (Ryan
+     owns the DSN and schema); per the spec no June rows were simulated to pass a
+     test. `FLAGS.md` records the committed-seed ceiling 2026-05-31, that June-onward
+     data lives in Ryan's Neon, and that manual CSV injection is retired
+     (`FLAG-INGEST-NEON`).
+   - **d, World Cup fixtures, code-derived relevance.** New `ingest/world_cup.py`
+     parses all 104 matches from Nam's `world_cup_schedule.md` by column meaning,
+     derives each venue's per-DOW trading window as a robust 1st/99th-percentile
+     envelope from real transaction timestamps (persisted to `venue_trading_hours`),
+     and emits four un-ranked `wc_*` covariates per venue per date by
+     kickoff-vs-trading-hours overlap (2h assumed duration), scoped to BH + Ellel
+     (TRT all-zero). No hand-set rank or fixed hour cap: a 02:00 kickoff is excluded
+     automatically because no venue trades then. `signals.residual.attribute` now
+     names the specific coincident fixture (strict coincidence). On the committed
+     store all `wc_*` are 0 (the tournament, 11 Jun to 19 Jul 2026, is entirely
+     after the 2026-05-31 seed ceiling), the honest forward-looking state; they fire
+     once June arrives.
+   - **e, June-vs-World-Cup probe.** `eval/worldcup_fixture_probe.py` is report-only
+     and precondition-checks the local watermark; on this store (`MAX(date) =
+     2026-05-31`) it reports "June not present, test deferred" and fabricates
+     nothing. Re-checked at G12.11 Part B: still no June in the active DuckDB (the
+     only store on disk; `BRAIN_STORE_DIR` unset), so the probe did not run. The
+     fixture-effect and `wc_*` retention question stays open pending a June-inclusive
+     store (see row 9).
+   - **f, store persistence.** `STORE_DIR` now reads a `BRAIN_STORE_DIR` env override
+     (default identical to the in-repo `brain/store`) so the live service can point
+     DuckDB at a mounted volume (`FLAG-STORE-ENV`); the DuckDB-derived-store vs
+     Neon-SOR topology documented as a Ryan decision (`FLAG-STORE-SOR`).
+
+8. **G12.11: Ellel milestone reading corrected; the a2 leak fix retired an
+   incidental GBM artifact, not the G12.9c decision** (docs-only; recorded in
+   `19_G12_10_Report.md` as row B6). After the G12.10a2 source fix neutralised the
+   `is_ellel_event` self-leak, Ellel's rolling `rung3_gbm` fell from a
+   leakage-inflated 0.533 (G12.9c) to an honest 0.813 (`rung3_global_gbm` to 0.936).
+   Reading the corrected 6-fold milestone table: robust DOW wins at 0.572, with
+   `rung4_chronos2` a near-tie at 0.581 (within 1.6%, zero-shot, on a ~64-day sparse
+   venue), `rung4_chronos2_exo` 0.591, `rung4_chronos_bolt` 0.601; the classical and
+   ML rungs trail (STL 0.629, GBM 0.813, ETS 0.825). Conclusion: Ellel serves Rung 1
+   because the cheap baseline is marginally best here, honestly, NOT because the
+   foundation models failed (Chronos ties DOW, it does not beat it). What was
+   spurious is the GBM win specifically; what survives G12.9c is the core hypothesis
+   that a foundation model competes on a sparse venue without per-venue training.
+   Uncapping sparse venues is vindicated for foundation rungs (they stay
+   competitive) but not for classical or ML rungs, and the uncap also acted as a
+   leak detector by surfacing the latent GBM `is_ellel_event` dependency. Served
+   models unchanged (report-only correction).
+
+9. **G12.11: World Cup fixture probe deferred, no June in the local store**
+   (recorded in `19_G12_10_Report.md` as row B7). The `wc_*` fixture-effect question
+   needs a June-inclusive store (the tournament, 11 Jun to 19 Jul 2026, is entirely
+   after the committed CSV seed ceiling of 2026-05-31). Re-checked in Nam's local
+   checkout: the active DuckDB (the only store on disk; `BRAIN_STORE_DIR` unset)
+   still ends 2026-05-31 for Beer Hall (Ellel 2026-05-22, TRT 2026-05-08).
+   June-onward rows are not in the active store (they live in Ryan's Neon per
+   FLAG-INGEST-NEON, or a local file not loaded into this DuckDB). Per the stop
+   condition the probe did not run and nothing was fabricated; the retention decision
+   for the `wc_*` features (kept in the served exo covariate set, or dropped from the
+   forecast and kept only for the reasoning/attribution path) stays open pending that
+   data. Served models unchanged.
+
+10. **G12.11: PRJ93 reports plus the decision log consolidated into `brain/log/`,
+    numbered by implementation order** (recorded in `19_G12_10_Report.md` as row B8).
+    All 17 archival WP1 to WP12 reports and this decision log (previously at repo
+    root on `feat/chronos2-promotion`) plus this branch's G12.9, G12.10, and
+    DOWNSTREAM reports were gathered into `brain/log/` on `brain-construction`,
+    renamed with a two-digit implementation-order prefix (traced by each report's
+    first-commit date) and the `PRJ93_` prefix dropped (`01_Phase2_Build_Report`
+    through `19_G12_10_Report`; this cross-cutting log left un-numbered).
+    `brain/log/README.md` is the authoritative index and states the ordering caveat
+    (a few late-committed docs sit by commit date, not strict work-package order,
+    e.g. `12_WorldCup_LiveProbe` predates `16_Chronos2_Promotion` though it builds on
+    the promotion). Rationale: the brain now carries one self-contained, up-to-date
+    log folder rather than depending on a diverging archival branch. Docs-only; no
+    code, served model, or gate criteria touched. Two follow-ups were recorded in the
+    report: (a) appending the G12.9-onward rows to this log to make it a continuous
+    record, which is now done by rows 6 to 10 of this section; (b) internal
+    cross-references inside the archival reports still use the old `PRJ93_*`
+    filenames (historical snapshots, left unaltered), so only the live
+    `brain/FLAGS.md` link was repointed (to `log/18_DOWNSTREAM.md`).
+
+11. **G12.12: go-live June forecast attempted, clean STOP at gate a (June absent,
+    Neon not provisioned)** (`20_G12_12_GoLive_Forecast_Report.md`,
+    `PRJ93_Spec_G12_12_GoLive.md`). The go-live config was to serve each venue's
+    gate winner pure at L1 (BH `rung4_chronos2_exo` 0.745, TRT `rung2_ets` 0.597,
+    Ellel `rung1_robust_dow` 0.572), produce a June-inclusive forward horizon with
+    the full known-future exo set, and connect L2/L3 to the accurate top by a
+    MEASURED choice (Candidate A MinT-with-Chronos-top vs Candidate B
+    forecast-proportion disaggregation, per-venue lower held-out L3 item MASE wins;
+    served venue total stays pure L1, never reconciled downward). Corrected MinT
+    reasoning stands for when it runs: reconciliation (Wickramasuriya, Athanasopoulos
+    & Hyndman 2019) adjusts ALL levels including the top so the reconciled top is a
+    blend not the preserved Chronos number, its "no worse than base" guarantee
+    assumes unbiased bases and the DOW-median L2/L3 base is biased, and top-down
+    disaggregation introduces its own bias, so the A-vs-B tension is measured not
+    asserted. **None of this executed:** the gate-a precondition (June in the
+    readable store) failed. The only DuckDB on disk (`BRAIN_STORE_DIR` unset) tops
+    out at 2026-05-31 for Beer Hall (Ellel 2026-05-22, TRT 2026-05-08); the May seed
+    is unchanged. Neon could not advance the watermark here: `BRAIN_NEON_DSN` unset,
+    no dotenv, and `psycopg` absent from `.venv-forecast`, so the `NeonAdapter`
+    cannot connect. Per the spec's stop condition the run STOPped and fabricated
+    nothing: no model promoted, no forecast persisted. Sole unblocker: Ryan
+    provisioning the Neon `brain_txn` source (DSN + schema + driver) so `NeonAdapter`
+    ingests June leak-free (`INGEST_SOURCE=neon LIVE_INGEST=1 python -m
+    ingest.refresh`), after which the spec re-runs from gate a. Incidental finding
+    recorded for that re-run: the on-disk BH `served_forecast` is currently
+    `rung2_ets`, not the gate winner `rung4_chronos2_exo` (store reset since WP12);
+    correcting it is the first step of the blocked gate b.

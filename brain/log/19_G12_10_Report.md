@@ -108,17 +108,17 @@ New: `ingest/world_cup.py`, `eval/worldcup_fixture_probe.py`,
 ## Decision-log entries (G12.11)
 
 These are the decision-log rows G12.11c and G12.11e call for. **Placement note
-(updated after the G12.11 log consolidation, see B8):** the decision log now lives
-in-branch at `brain/log/Decision_and_Resolution_Log.md` (brought over from
+(updated after the G12.11 log consolidation, see B8, and the subsequent
+reconciliation):** the decision log now lives in-branch at
+`brain/log/Decision_and_Resolution_Log.md` (brought over from
 `feat/chronos2-promotion`, where it had been the archival home after commit
-`c8bd2c9` removed it from `brain-construction`). Its content is still the archival
-WP1 to WP12 record: Section B stops at row 5 (WP12 promotion) and does not yet
-carry any G12.9 / G12.10 / G12.11 rows. Those decisions live in the numbered
-reports here (`17_G12_9_Report.md`, `19_G12_10_Report.md`) and `brain/FLAGS.md`.
-The B6 / B7 / B8 rows below are recorded here, self-contained, until the
-consolidated log is reconciled by appending the intervening G12.9-onward rows to
-it (a separate call, since a lone G12.11 row would jump WP12 to G12.11 and
-reference decisions the log body never carried).
+`c8bd2c9` removed it from `brain-construction`). It has since been made continuous:
+a new "Section C: Post-WP12 milestones (G12.9 to G12.11)" appends the intervening
+G12.9 and G12.10 rows plus the three G12.11 rows below, continuing the Section B
+numbering as rows 6 to 10. The three G12.11 rows recorded here as B6 / B7 / B8 are
+those log rows 8, 9, and 10 respectively; they remain reproduced below (self-
+contained) because this report is the primary write-up, with the log as the
+consolidated cross-cutting record.
 
 **B6. Ellel milestone reading corrected; the a2 leak fix retired an incidental GBM
 artifact, not the G12.9c decision.** After the G12.10a2 source fix neutralised the
@@ -162,8 +162,9 @@ by commit date, not strict work-package order, e.g. `12_WorldCup_LiveProbe`
 predates `16_Chronos2_Promotion` though it builds on the promotion). Rationale: the
 brain now carries one self-contained, up-to-date log folder rather than depending
 on a diverging archival branch. Docs-only; no code, served model, or gate criteria
-touched. Two follow-ups recorded: (a) the consolidated decision log still needs the
-G12.9-onward rows appended to become a continuous record (see the placement note
-above); (b) internal cross-references inside the archival reports still use the old
-`PRJ93_*` filenames (historical snapshots, left unaltered), so only the live
-`brain/FLAGS.md` link was repointed (to `log/18_DOWNSTREAM.md`).
+touched. Two follow-ups recorded: (a) the consolidated decision log needed the G12.9-onward
+rows appended to become a continuous record: DONE, they are now Section C rows 6 to
+10 of `Decision_and_Resolution_Log.md` (see the placement note above); (b) internal
+cross-references inside the archival reports still use the old `PRJ93_*` filenames
+(historical snapshots, left unaltered), so only the live `brain/FLAGS.md` link was
+repointed (to `log/18_DOWNSTREAM.md`).

@@ -33,6 +33,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 17 | `17_G12_9_Report.md` | 2026-07-08 | G12.9: fold unification, Ellel uncap, weather precision |
 | 18 | `18_DOWNSTREAM.md` | 2026-07-08 | G12.9g downstream rerun matrix |
 | 19 | `19_G12_10_Report.md` | 2026-07-08 | G12.10: TRT coord, is_ellel_event leak, full exo set, World Cup, Neon adapter; plus the G12.11 Ellel narrative correction and decision-log rows |
+| 20 | `20_G12_12_GoLive_Forecast_Report.md` | 2026-07-09 | G12.12: go-live forecast attempt; clean STOP at gate a (June absent from store, Neon not provisioned) |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single
@@ -49,8 +50,9 @@ sequence is preferred over commit date.
 
 ## Decision log coverage
 
-`Decision_and_Resolution_Log.md` is the archival decision log; its Section B ends
-at row 5 (WP12 promotion). It does NOT record G12.9, G12.10, or G12.11: those
-decisions live in `17_G12_9_Report.md`, `19_G12_10_Report.md` (see its
-"Decision-log entries (G12.11)" section for rows B6 and B7), and `brain/FLAGS.md`.
-Reconciling the archival log with the G12.9-onward lineage is an open task.
+`Decision_and_Resolution_Log.md` is the continuous WP1-to-present decision log.
+Section A covers the fidelity corrections, Section B the WP8 to WP12 addendum and
+Chronos-2 closeout (rows 1 to 5), and Section C the post-WP12 milestones G12.9 to
+G12.11 (rows 6 to 10), reconciled in from `17_G12_9_Report.md` and
+`19_G12_10_Report.md`. The three G12.11 rows the G12.10 report labels B6/B7/B8 are
+Section C rows 8, 9, and 10. `brain/FLAGS.md` remains the live flag ledger.
