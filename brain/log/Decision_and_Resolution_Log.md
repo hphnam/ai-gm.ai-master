@@ -365,3 +365,30 @@ them into the append-only log so it is the continuous WP1-to-present record.
     recorded for that re-run: the on-disk BH `served_forecast` is currently
     `rung2_ets`, not the gate winner `rung4_chronos2_exo` (store reset since WP12);
     correcting it is the first step of the blocked gate b.
+
+12. **G12.13a: forward June 2026 forecast frozen and pre-registered, blind to
+    actuals** (`21_G12_13a_Frozen_Forecast_Report.md`, Pass 1 of the derived
+    G12.13 two-pass confrontation; no standalone G12.13a spec existed, so Pass 1 was
+    derived from the Pass-1 references in `PRJ93_Spec_G12_13b_Pass2_Confront.md` with
+    operator authorisation). `sim/build_frozen_forecast.py` produced a genuine
+    forward 1 to 30 June horizon from data on or before each venue's store ceiling
+    (<= 2026-05-31), serving each gate winner PURE at L1 (beer_hall
+    `rung4_chronos2_exo` June total GBP 13,917 band +/- 627; two_river_taps
+    `rung2_ets` GBP 5,329; ellel `rung1_robust_dow` GBP 604) and disaggregating
+    coherently to L2/L3 by recent 120-day ex-VAT revenue share (verified L2 sums to
+    L1 exactly, L3 to L2). Known-future covariates are calendar + term + bank
+    holiday + the four `wc_*` fixture flags (computed forward), `is_ellel_event`=0
+    forward, and CLIMATOLOGY weather (prior-June mean) because there is no skilful
+    weather forecast beyond ~16 days: the day-8-to-30 extrapolation caveat. The
+    frozen Beer Hall rows pre-commit to three June England fixtures (17 Jun v
+    Croatia, 23 Jun v Ghana, 27 Jun v Panama, all evening) flagged
+    `wc_england_in_hours=1`, the dates Pass 2 tests the fixture effect on. Nothing
+    was fit to June; no June actual was read; the artefact
+    (`brain/sim/june2026_forecast_frozen.{parquet,json}`, 3030 rows) is committed in
+    this pass so `git log` proves it predates the confrontation (A13b.0). Deviations:
+    derived spec (op-authorised); climatology weather beyond horizon;
+    is_ellel_event=0 forward; L2/L3 by revenue-share disaggregation not MinT (the
+    G12.12c A-vs-B deferred, disaggregation preserving the pure L1 top); L3 scoped to
+    top-3 items/category + OTHER; TRT INACTIVE in Square so its forecast may confront
+    a closed venue (retained as honest material); two commits not one, so the frozen
+    forecast provably predates Pass 2.

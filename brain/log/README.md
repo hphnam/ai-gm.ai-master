@@ -34,6 +34,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 18 | `18_DOWNSTREAM.md` | 2026-07-08 | G12.9g downstream rerun matrix |
 | 19 | `19_G12_10_Report.md` | 2026-07-08 | G12.10: TRT coord, is_ellel_event leak, full exo set, World Cup, Neon adapter; plus the G12.11 Ellel narrative correction and decision-log rows |
 | 20 | `20_G12_12_GoLive_Forecast_Report.md` | 2026-07-09 | G12.12: go-live forecast attempt; clean STOP at gate a (June absent from store, Neon not provisioned) |
+| 21 | `21_G12_13a_Frozen_Forecast_Report.md` | 2026-07-09 | G12.13a (Pass 1): forward June 2026 forecast frozen and pre-registered, blind to actuals |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single
