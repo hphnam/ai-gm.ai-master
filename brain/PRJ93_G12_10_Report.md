@@ -87,7 +87,7 @@ backend is absent). Execution order followed the spec: a → a2 → c → d → 
 
 - `.venv-eval/bin/python -m pytest`: **258 passed** (full suite incl. all new/updated tests).
 - `.venv/bin/python -m pytest` (runtime, no chronos): **250 passed, 8 skipped** (chronos-gated), confirming byte-identical behaviour where the backend is absent.
-- `.venv-forecast/bin/python -m models.ladder --all-venues`: beer_hall PASS (exit gate), two_river_taps PASS, ellel FAIL (valid, Rung 1 served); reports committed.
+- `.venv-forecast/bin/python -m models.ladder --all-venues`: beer_hall PASS (exit gate), two_river_taps PASS, ellel serves Rung 1 (DOW 0.572 marginally best, `rung4_chronos2` 0.581 near-tie, not a foundation failure); reports committed.
 - World Cup loader: 104 matches parsed; assertion dates confirmed (2026-06-17 England → in-hours=1; 02:00-only → 0).
 - Weather re-pulled for the corrected TRT coordinate; zero exo NaN across every venue's active span.
 - `eval.worldcup_fixture_probe`: defers cleanly (June absent), no fabrication.
@@ -104,3 +104,45 @@ Modified: `config.py`, `features/build_features.py`, `models/foundation.py`,
 New: `ingest/world_cup.py`, `eval/worldcup_fixture_probe.py`,
 `tests/test_world_cup.py`, `tests/test_config_store_env.py`,
 `ingest/world_cup_schedule.md` (Nam's raw calendar), this report.
+
+## Decision-log entries (G12.11)
+
+These are the decision-log rows G12.11c and G12.11e call for. **Placement note:**
+`PRJ93_Decision_and_Resolution_Log.md` was deliberately removed from
+`brain-construction` (commit `c8bd2c9`), and the copy on `feat/chronos2-promotion`
+is stale (its Section B stops at row 5, WP12 promotion; it never recorded G12.9 or
+G12.10). Appending a G12.11 row there would jump WP12 → G12.11 and reference
+G12.9c / G12.10a2 / G12.10b decisions the log never carried, fabricating false
+continuity. So the rows are recorded here, on the working trunk where the
+G12.9/G12.10/G12.11 lineage actually lives, written self-contained. If Nam wants
+the archival log reconciled, that is a separate call (it needs the intervening
+G12.9/G12.10 rows first, not a lone G12.11 row).
+
+**B6. Ellel milestone reading corrected; the a2 leak fix retired an incidental GBM
+artifact, not the G12.9c decision.** After the G12.10a2 source fix neutralised the
+`is_ellel_event` self-leak, Ellel's rolling `rung3_gbm` fell from a leakage-inflated
+0.533 (G12.9c) to an honest 0.813 (`rung3_global_gbm` to 0.936). Reading the
+corrected 6-fold milestone table: robust DOW wins at 0.572, with `rung4_chronos2`
+a near-tie at 0.581 (within 1.6%, zero-shot, on a ~64-day sparse venue),
+`rung4_chronos2_exo` 0.591, `rung4_chronos_bolt` 0.601; the classical/ML rungs
+trail (STL 0.629, GBM 0.813, ETS 0.825). Conclusion: Ellel serves Rung 1 because
+the cheap baseline is marginally best here, honestly, NOT because the foundation
+models failed (Chronos ties DOW, it does not beat it). What was spurious is the
+GBM win specifically; what survives G12.9c is the core hypothesis that a foundation
+model competes on a sparse venue without per-venue training. Discussion point:
+uncapping sparse venues is vindicated for foundation rungs (they stay competitive)
+but not for classical/ML rungs, and the uncap also acted as a leak detector by
+surfacing the latent GBM `is_ellel_event` dependency. Served models unchanged
+(report-only correction).
+
+**B7. World Cup fixture probe (G12.10e/G12.11d-e) deferred: no June in the local
+store.** The `wc_*` fixture-effect question needs a June-inclusive store (the
+tournament, 11 Jun to 19 Jul 2026, is entirely after the committed CSV seed
+ceiling of 2026-05-31). Re-checked per G12.11d in Nam's local checkout: the active
+DuckDB (the only store on disk; `BRAIN_STORE_DIR` unset) still ends 2026-05-31 for
+Beer Hall (Ellel 2026-05-22, TRT 2026-05-08). June-onward rows are not in the
+active store (they live in Ryan's Neon per FLAG-INGEST-NEON, or a local file not
+loaded into this DuckDB). Per the stop condition the probe did not run and nothing
+was fabricated; the retention decision for the `wc_*` features (kept in the served
+exo covariate set, or dropped from the forecast and kept only for the
+reasoning/attribution path) stays open pending that data. Served models unchanged.
