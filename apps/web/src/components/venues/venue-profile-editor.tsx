@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea'
 import type { VenueDetailDto as VenueDetail } from '@/generated/api'
 import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
 import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
-import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useRunNudge, useUpdateVenueProfile } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
 
@@ -71,10 +70,15 @@ function formToProfile(values: FormValues): VenueProfile {
   })
 }
 
-export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
+export function VenueProfileEditor({
+  venue,
+  isManager,
+}: {
+  venue: VenueDetail
+  isManager: boolean
+}) {
   const update = useUpdateVenueProfile()
   const runNudge = useRunNudge()
-  const { isManager } = useCurrentMember()
 
   // No client-side resolver — VenueProfileSchema runs at submit time inside
   // formToProfile() and on the server. The form fields are stringy mirrors of

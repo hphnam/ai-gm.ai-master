@@ -2,8 +2,7 @@ import { HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 import { SettingsPageHeader } from '@/components/ui/setting-card'
 import { VenueProfilesBody } from '@/components/venues/venue-profiles-body'
-import { venuesListQuery } from '@/lib/queries/keys'
-import { dehydrateSpecs } from '@/lib/server-prefetch'
+import { dehydrateVenues } from '@/lib/server-prefetch'
 import { getServerSession, isManagerRole } from '@/lib/server-session'
 
 export default async function VenueProfilesPage() {
@@ -11,7 +10,7 @@ export default async function VenueProfilesPage() {
   const isManager = isManagerRole(session?.membership?.role)
   if (!isManager) redirect('/settings/phone')
 
-  const state = await dehydrateSpecs([venuesListQuery])
+  const state = await dehydrateVenues() // list + first venue's detail
   return (
     <div>
       <SettingsPageHeader

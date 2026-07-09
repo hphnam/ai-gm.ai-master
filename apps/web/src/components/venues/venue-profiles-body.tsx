@@ -90,7 +90,7 @@ export function VenueProfilesBody({ isManager }: { isManager: boolean }) {
           <Skeleton className="h-32 w-full" />
         </div>
       ) : detail.data ? (
-        <VenueProfileEditor key={detail.data.id} venue={detail.data} />
+        <VenueProfileEditor key={detail.data.id} venue={detail.data} isManager={isManager} />
       ) : null}
     </div>
   )
