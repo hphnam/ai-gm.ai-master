@@ -449,3 +449,33 @@ them into the append-only log so it is the continuous WP1-to-present record.
     (a sync/stash artefact); all restored from HEAD `c1b11d6`, no committed content
     lost. Reconciliation is docs + blind pre-June analysis only; no served model, gate
     criterion, or frozen number changed.
+
+15. **G12.15: refresh cadence, MPS device, home-nation fixtures, event-aware policy**
+    (`24_G12_15_Report.md`, `PRJ93_Spec_G12_15_v2.md`; committed per gate a9d147f /
+    39610aa / 0564389 / b96747e / ec78d4d). **(a)** Chronos loads resolve their torch
+    device via `_resolve_device()` (mps on this Mac, cpu fallback, never cuda;
+    `BRAIN_TORCH_DEVICE` override; `PYTORCH_ENABLE_MPS_FALLBACK=1`). MPS-vs-CPU parity
+    GBP 0.0002, served numbers unchanged. Honest deviation: MPS is SLOWER than CPU for
+    these small single-series forecasts (~3.2s vs ~0.6s); daily refresh is still cheap
+    but because the model is fast, not the GPU. **(b)** Added `wc_scotland_in_hours` +
+    `wc_home_nation_in_hours` raw to `WC_FEATURE_COLS`/`CHRONOS2_EXO_COLS`. Measured
+    June uplift (actual vs DOW-median), Beer Hall: England +130% (n=3), Scotland +116%
+    (n=2), other-match +57%, no-match +55%. Both home nations drive footfall, generic
+    matches do not; recommend the home-nation flag over England-only, all three kept
+    raw. Power caveat: 3+2 dates, directional. **(c)** Cadence sweep (cold/7/3/daily,
+    on MPS, L1 + L2): Beer Hall best at 7-day (L1 MASE 1.45; gain is cold 1.645 ->
+    weekly, sub-weekly 1.56/1.60 does NOT help, contradicting "daily is better"); Two
+    River Taps monotonic to daily 0.09 but only by learning the closure faster; Ellel
+    flat 0.485 (DOW model ignores recent context). First fixture unforecastable from
+    cadence; L2 mirrors L1 (fixed-share disaggregation); L3 item vs actuals still the
+    taxonomy gap. Daily refresh <=4s. **(d)** Event-aware refresh: T3 cadence tightens
+    7d -> 2d inside a flagged window (World Cup match in-hours or curated local event
+    within a 3-day lookahead), calendar-triggered not hard-coded, owner-controllable
+    (`BRAIN_EVENT_REFRESH_DISABLED=1`), reason string states the override, cost
+    guarantee preserved (`_in_event_window`/`_should_refit`, FLAG-EVENT-REFRESH).
+    **(e)** Stock untouched (git-verified); FLAG-STOCK-STATUS records real-data-but-
+    pending-James (menu-to-stock mapping + delivery dates) and the downstream link.
+    Design note recorded: bespoke World Cup features -> agent-generated forward event
+    covariates is the next research milestone (enrichment from explanation to
+    anticipation), not built here. Frozen artefact (`1d966be`) untouched; both suites
+    green (.venv-forecast 258 passed 1 skip, .venv 251 passed 8 skip).

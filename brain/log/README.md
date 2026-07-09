@@ -37,6 +37,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 21 | `21_G12_13a_Frozen_Forecast_Report.md` | 2026-07-09 | G12.13a (Pass 1): forward June 2026 forecast frozen and pre-registered, blind to actuals |
 | 22 | `22_G12_13b_June_Simulation_Report.md` | 2026-07-09 | G12.13b (Pass 2): frozen forecast confronted with real held-out June actuals (MCP-SIM); full brain run over June; leak-free |
 | 23 | `23_G12_13_Canonical_Reconciliation_Report.md` | 2026-07-09 | G12.13 reconciled against the canonical Pass-1/Pass-2 specs; measured A-vs-B split closed (MinT wins BH/TRT L2/L3); provenance + reasoned .md added |
+| 24 | `24_G12_15_Report.md` | 2026-07-10 | G12.15: Chronos on MPS (parity, CPU faster for small runs), home-nation fixture flags (Scotland matters), cadence sweep (BH 7-day sweet spot), event-aware refresh policy, stock flagged |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single
