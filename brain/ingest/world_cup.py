@@ -48,10 +48,15 @@ MATCH_DURATION_HOURS = 2.0
 # catchment). TRT is closed and out of scope (isolation rule).
 WORLD_CUP_VENUES = ("beer_hall", "ellel")
 
+# G12.15b: home-nation flags kept RAW alongside the existing england flag, so the
+# model and the analysis (not a hard-coded assumption) decide which drives footfall.
+# Scotland also qualified (Group C); wc_home_nation_in_hours = England OR Scotland.
 WC_FEATURE_COLS = ("wc_match_in_hours", "wc_england_in_hours",
+                   "wc_scotland_in_hours", "wc_home_nation_in_hours",
                    "wc_n_matches_in_hours", "wc_any_match")
 
 _ENGLAND = "england"
+_SCOTLAND = "scotland"
 
 
 # --- Schedule parsing --------------------------------------------------------
@@ -282,18 +287,16 @@ def _overlaps(kickoff: time, window: tuple[float, float]) -> bool:
 
 def world_cup_features(venue: str, dates, con=None,
                        schedule: pd.DataFrame | None = None) -> pd.DataFrame:
-    """Return a frame [date, wc_match_in_hours, wc_england_in_hours,
-    wc_n_matches_in_hours, wc_any_match] for the given dates and venue.
+    """Return a frame [date, *WC_FEATURE_COLS] for the given dates and venue
+    (wc_match_in_hours, wc_england_in_hours, wc_scotland_in_hours,
+    wc_home_nation_in_hours, wc_n_matches_in_hours, wc_any_match).
 
     Relevance is code-derived: a match counts as "in hours" when its kickoff
     window overlaps the venue's derived trading window for that date's DOW. No
     hand-set rank, no fixed hour cap. Out-of-scope venues (not in
     WORLD_CUP_VENUES) and an absent schedule both yield all-zero features."""
     idx = pd.to_datetime(pd.Index(dates)).normalize()
-    zero = pd.DataFrame({
-        "date": idx,
-        "wc_match_in_hours": 0, "wc_england_in_hours": 0,
-        "wc_n_matches_in_hours": 0, "wc_any_match": 0})
+    zero = pd.DataFrame({"date": idx, **{c: 0 for c in WC_FEATURE_COLS}})
     if venue not in WORLD_CUP_VENUES:
         return zero
 
@@ -310,18 +313,22 @@ def world_cup_features(venue: str, dates, con=None,
     for d in idx:
         day = by_date.get(d)
         if day is None or day.empty:
-            recs.append((d, 0, 0, 0, 0))
+            recs.append((d, 0, 0, 0, 0, 0, 0))
             continue
         any_match = 1
         window = windows.get(int(d.dayofweek))
-        n_in, eng_in = 0, 0
+        n_in, eng_in, scot_in = 0, 0, 0
         if window is not None:
             for _, m in day.iterrows():
                 if _overlaps(m["kickoff_london"], window):
                     n_in += 1
-                    if _ENGLAND in (str(m["home"]).lower(), str(m["away"]).lower()):
+                    teams = (str(m["home"]).lower(), str(m["away"]).lower())
+                    if _ENGLAND in teams:
                         eng_in = 1
-        recs.append((d, int(n_in > 0), eng_in, n_in, any_match))
+                    if _SCOTLAND in teams:
+                        scot_in = 1
+        home_in = int(bool(eng_in or scot_in))
+        recs.append((d, int(n_in > 0), eng_in, scot_in, home_in, n_in, any_match))
     return pd.DataFrame(recs, columns=["date", *WC_FEATURE_COLS])
 
 

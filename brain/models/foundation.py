@@ -64,9 +64,10 @@ RESOURCE_GUARD_SECONDS = 120
 #     the entrant raise (the guard checks missing/NaN, not zero variance). No
 #     entrant-level special-case; the source fix is the single point of truth.
 #   * civic events: exo_fixture_nearby (curated Lancaster anchors, unchanged).
-#   * World Cup (G12.10d, code-derived, raw/un-ranked): wc_match_in_hours,
-#     wc_england_in_hours, wc_n_matches_in_hours, wc_any_match. Known-future
-#     because the fixture calendar is fixed.
+#   * World Cup (G12.10d/G12.15b, code-derived, raw/un-ranked): wc_match_in_hours,
+#     wc_england_in_hours, wc_scotland_in_hours, wc_home_nation_in_hours,
+#     wc_n_matches_in_hours, wc_any_match. Known-future because the fixture
+#     calendar is fixed; home-nation flags kept raw so the model weighs them.
 #   * weather: exo_temp_c, exo_rain_mm, exo_sunshine_hrs, exo_is_dry. Known-future
 #     at serving time BECAUSE config serves on a forecast basis
 #     (WEATHER_TRAIN_BASIS='hindcast', WEATHER_FORECAST_MAX_DAYS=16 covers the
@@ -77,7 +78,9 @@ RESOURCE_GUARD_SECONDS = 120
 _CALENDAR_EXO = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
                  "exo_is_uni_term"]
 _EVENT_EXO = ["exo_fixture_nearby"]
+# G12.15b: home-nation flags added raw; the model weighs them, the analysis decides.
 _WORLD_CUP_EXO = ["wc_match_in_hours", "wc_england_in_hours",
+                  "wc_scotland_in_hours", "wc_home_nation_in_hours",
                   "wc_n_matches_in_hours", "wc_any_match"]
 _WEATHER_EXO = ["exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs", "exo_is_dry"]
 
