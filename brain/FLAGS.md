@@ -333,10 +333,11 @@ does.
   P&L. Live COGS, labour, and net profit come from the existing Track-B Square tools;
   the brain supplies "is that normal, what's the forecast, and why". No P&L is
   re-warehoused.
-- **FLAG-LI5 (deferred).** Stock is mock (live stock needs Square inventory via the
-  adapter). The intraday-expectation curve for "is tonight-so-far unusual" is a
-  bounded next step — end-of-day snapshots of Square's hourly profile per closed day
-  (still closed-day history, never a live moving figure), not built here.
+- **FLAG-LI5 (CORRECTED, G12.15e).** Superseded by FLAG-STOCK-STATUS below: stock is
+  NO LONGER mock, real stock data now exists. The intraday-expectation curve for "is
+  tonight-so-far unusual" remains a bounded next step (end-of-day snapshots of
+  Square's hourly profile per closed day, still closed-day history, never a live
+  moving figure), not built here.
 - **FLAG-LI6 (localhost trust boundary).** `/refresh` mutates the store and has no
   auth; it relies on the localhost bind. Keep `BRAIN_HOST` off `0.0.0.0` in deploy.
 - **FLAG-LI7 (promote-and-serve, v2.1).** `refresh()` now regenerates the SERVED
@@ -389,3 +390,12 @@ does.
   disable with `BRAIN_EVENT_REFRESH_DISABLED=1`. Cost guarantee preserved: it still
   fires only on real new closed days and a re-fit is inference-only zero-shot, so a
   tighter cadence adds fits within the event, never per-request work.
+- **FLAG-STOCK-STATUS (G12.15e, scope boundary).** Real stock data now exists (no
+  longer mock, correcting FLAG-LI5). But the item forecast is NOT yet wired into a
+  stock reorder because two inputs from James are still pending: the
+  menu-item-to-stock-name mapping and the supplier delivery dates. Stock is a
+  DOWNSTREAM FALLBACK CONSUMER of the sale-item demand forecast, not a driver of it;
+  `signals/stock_inventory.py` and the reorder logic are deliberately untouched by
+  G12.15 (this spec improves the sale-item demand forecast; the stock benefit follows
+  once James's mapping + delivery dates land). Connecting the two is future work
+  gated on that data.
