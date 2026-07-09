@@ -23,7 +23,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import {
   INTEGRATION_PROVIDERS,
   type IntegrationProviderMeta,
@@ -36,11 +35,10 @@ import {
 } from '@/lib/hooks/use-integrations'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 
-export function IntegrationsBody() {
+export function IntegrationsBody({ isManager }: { isManager: boolean }) {
   const integrations = useIntegrations()
-  const { isManager, isLoading: roleLoading } = useCurrentMember()
 
-  if (roleLoading || integrations.isLoading) {
+  if (integrations.isLoading) {
     return (
       <div className="space-y-3" aria-busy="true">
         {INTEGRATION_PROVIDERS.map((meta) => (

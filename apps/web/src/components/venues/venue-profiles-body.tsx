@@ -14,14 +14,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 import { VenueProfileEditor } from './venue-profile-editor'
 
-export function VenueProfilesBody() {
+export function VenueProfilesBody({ isManager }: { isManager: boolean }) {
   const venues = useVenues()
-  const { isManager } = useCurrentMember()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // Fall back to the first venue during render rather than writing derived state in an effect.
   const activeId = selectedId ?? venues.data?.[0]?.id ?? null
@@ -62,7 +60,12 @@ export function VenueProfilesBody() {
 
   return (
     <div className="space-y-5">
-      <VenuePicker venues={venues.data} activeId={activeVenue.id} onSelect={setSelectedId} />
+      <VenuePicker
+        venues={venues.data}
+        activeId={activeVenue.id}
+        onSelect={setSelectedId}
+        isManager={isManager}
+      />
 
       {isManager ? (
         <div className="-mt-3 flex justify-end">
@@ -97,12 +100,13 @@ function VenuePicker({
   venues,
   activeId,
   onSelect,
+  isManager,
 }: {
   venues: Array<{ id: string; name: string; address?: string | null }>
   activeId: string
   onSelect: (id: string) => void
+  isManager: boolean
 }) {
-  const { isManager } = useCurrentMember()
   const active = venues.find((v) => v.id === activeId)
   if (!active) return null
   const count = venues.length

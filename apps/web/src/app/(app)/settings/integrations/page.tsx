@@ -8,7 +8,8 @@ import { getServerSession, isManagerRole } from '@/lib/server-session'
 
 export default async function IntegrationsSettingsPage() {
   const session = await getServerSession()
-  if (!isManagerRole(session?.membership?.role)) redirect('/settings/phone')
+  const isManager = isManagerRole(session?.membership?.role)
+  if (!isManager) redirect('/settings/phone')
 
   const state = await dehydrateSpecs([integrationsListQuery])
   return (
@@ -18,7 +19,7 @@ export default async function IntegrationsSettingsPage() {
         description="Connect your POS and other tools so GM can read live numbers."
       />
       <HydrationBoundary state={state}>
-        <IntegrationsBody />
+        <IntegrationsBody isManager={isManager} />
       </HydrationBoundary>
     </div>
   )

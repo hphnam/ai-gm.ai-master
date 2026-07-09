@@ -8,7 +8,8 @@ import { getServerSession, isManagerRole } from '@/lib/server-session'
 
 export default async function VenueProfilesPage() {
   const session = await getServerSession()
-  if (!isManagerRole(session?.membership?.role)) redirect('/settings/phone')
+  const isManager = isManagerRole(session?.membership?.role)
+  if (!isManager) redirect('/settings/phone')
 
   const state = await dehydrateSpecs([venuesListQuery])
   return (
@@ -18,7 +19,7 @@ export default async function VenueProfilesPage() {
         description="Manage your sites and the operational details GM uses per venue."
       />
       <HydrationBoundary state={state}>
-        <VenueProfilesBody />
+        <VenueProfilesBody isManager={isManager} />
       </HydrationBoundary>
     </div>
   )
