@@ -107,16 +107,18 @@ New: `ingest/world_cup.py`, `eval/worldcup_fixture_probe.py`,
 
 ## Decision-log entries (G12.11)
 
-These are the decision-log rows G12.11c and G12.11e call for. **Placement note:**
-`PRJ93_Decision_and_Resolution_Log.md` was deliberately removed from
-`brain-construction` (commit `c8bd2c9`), and the copy on `feat/chronos2-promotion`
-is stale (its Section B stops at row 5, WP12 promotion; it never recorded G12.9 or
-G12.10). Appending a G12.11 row there would jump WP12 → G12.11 and reference
-G12.9c / G12.10a2 / G12.10b decisions the log never carried, fabricating false
-continuity. So the rows are recorded here, on the working trunk where the
-G12.9/G12.10/G12.11 lineage actually lives, written self-contained. If Nam wants
-the archival log reconciled, that is a separate call (it needs the intervening
-G12.9/G12.10 rows first, not a lone G12.11 row).
+These are the decision-log rows G12.11c and G12.11e call for. **Placement note
+(updated after the G12.11 log consolidation, see B8):** the decision log now lives
+in-branch at `brain/log/Decision_and_Resolution_Log.md` (brought over from
+`feat/chronos2-promotion`, where it had been the archival home after commit
+`c8bd2c9` removed it from `brain-construction`). Its content is still the archival
+WP1 to WP12 record: Section B stops at row 5 (WP12 promotion) and does not yet
+carry any G12.9 / G12.10 / G12.11 rows. Those decisions live in the numbered
+reports here (`17_G12_9_Report.md`, `19_G12_10_Report.md`) and `brain/FLAGS.md`.
+The B6 / B7 / B8 rows below are recorded here, self-contained, until the
+consolidated log is reconciled by appending the intervening G12.9-onward rows to
+it (a separate call, since a lone G12.11 row would jump WP12 to G12.11 and
+reference decisions the log body never carried).
 
 **B6. Ellel milestone reading corrected; the a2 leak fix retired an incidental GBM
 artifact, not the G12.9c decision.** After the G12.10a2 source fix neutralised the
@@ -146,3 +148,22 @@ loaded into this DuckDB). Per the stop condition the probe did not run and nothi
 was fabricated; the retention decision for the `wc_*` features (kept in the served
 exo covariate set, or dropped from the forecast and kept only for the
 reasoning/attribution path) stays open pending that data. Served models unchanged.
+
+**B8. PRJ93 reports + the decision log consolidated into `brain/log/`, numbered by
+implementation order.** All 17 archival WP1 to WP12 reports and the decision log
+(previously at repo root on `feat/chronos2-promotion`) plus this branch's G12.9,
+G12.10, and DOWNSTREAM reports were gathered into `brain/log/` on
+`brain-construction`, renamed with a two-digit implementation-order prefix (traced
+by each report's first-commit date) and the `PRJ93_` prefix dropped
+(`01_Phase2_Build_Report` through `19_G12_10_Report`; the cross-cutting
+`Decision_and_Resolution_Log.md` left un-numbered). `brain/log/README.md` is the
+authoritative index and states the ordering caveat (a few late-committed docs sit
+by commit date, not strict work-package order, e.g. `12_WorldCup_LiveProbe`
+predates `16_Chronos2_Promotion` though it builds on the promotion). Rationale: the
+brain now carries one self-contained, up-to-date log folder rather than depending
+on a diverging archival branch. Docs-only; no code, served model, or gate criteria
+touched. Two follow-ups recorded: (a) the consolidated decision log still needs the
+G12.9-onward rows appended to become a continuous record (see the placement note
+above); (b) internal cross-references inside the archival reports still use the old
+`PRJ93_*` filenames (historical snapshots, left unaltered), so only the live
+`brain/FLAGS.md` link was repointed (to `log/18_DOWNSTREAM.md`).
