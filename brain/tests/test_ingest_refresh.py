@@ -207,9 +207,24 @@ def test_cadence_boundary_fires_auto_refit(store, monkeypatch):
 
 def test_changepoint_fires_auto_refit(store, monkeypatch):
     monkeypatch.setattr(config, "RETRAIN_CADENCE_DAYS", 100_000)   # isolate change-point
+    # Neutralise the G12.15d event-window path so this test isolates the
+    # change-point trigger (the run date may itself sit inside a fixture window).
+    monkeypatch.setattr(config, "EVENT_AWARE_REFRESH_ENABLED", False)
     _seed_refit("beer_hall", datetime(2025, 11, 1))               # before the BH onset
     should, reason = refresh._should_refit("beer_hall", "auto")
     assert should is True and "change-point" in reason
+
+
+def test_event_window_tightens_cadence(store, monkeypatch):
+    monkeypatch.setattr(config, "RETRAIN_ON_CHANGEPOINT", False)   # isolate cadence
+    _seed_refit("beer_hall", datetime.now() - timedelta(days=3))   # 3d since last fit
+    # Outside an event window the weekly cadence (7d) holds: 3d does not refit.
+    monkeypatch.setattr(refresh, "_in_event_window", lambda *a, **k: (False, None))
+    assert refresh._should_refit("beer_hall", "auto")[0] is False
+    # Inside a flagged event window the cadence tightens to 2d, so 3d refits.
+    monkeypatch.setattr(refresh, "_in_event_window", lambda *a, **k: (True, "test fixture"))
+    should, reason = refresh._should_refit("beer_hall", "auto")
+    assert should is True and "event-window" in reason
 
 
 # --- G8 serving surface: /freshness + /refresh + freshness block -------------

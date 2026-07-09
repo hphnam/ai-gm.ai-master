@@ -332,6 +332,19 @@ INGEST_STALENESS_DAYS = 1        # source ahead of the watermark by > this → s
 RETRAIN_CADENCE_DAYS = 7         # T3 weekly boundary since the last fit
 RETRAIN_ON_CHANGEPOINT = True    # T3 also fires on a confirmed change-point onset
 
+# G12.15d: event-aware refresh. Within a flagged high-volatility window (a World
+# Cup match in trading hours, or a curated local event, within the lookahead) the
+# T3 cadence tightens from RETRAIN_CADENCE_DAYS to EVENT_REFRESH_CADENCE_DAYS so the
+# served forecast tracks the event; outside the window the weekly default stands.
+# Calendar-triggered, NOT hard-coded to the World Cup: any future flagged event in
+# the same schedule fires it identically. Owner-controllable (default ON). The cost
+# guarantee holds: _should_refit still only fires on real new closed days, and a
+# re-fit is inference-only zero-shot, so a tighter cadence adds fits, not per-request
+# work. Override via BRAIN_EVENT_REFRESH_DISABLED=1.
+EVENT_AWARE_REFRESH_ENABLED = os.environ.get("BRAIN_EVENT_REFRESH_DISABLED") != "1"
+EVENT_REFRESH_CADENCE_DAYS = 2   # tightened T3 cadence within an event window (1 to 3)
+EVENT_WINDOW_LOOKAHEAD_DAYS = 3  # a flagged event this many days ahead opens the window
+
 # --- Agent evaluation framework (offline; briefing usefulness, not accuracy) --
 # Evaluates whether the proactive briefing surfaces/ranks/attributes the right
 # insights. Read-only over the briefing + signals; runs on historical data with

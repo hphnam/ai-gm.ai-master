@@ -367,3 +367,25 @@ does.
   preferred), NOT a heavier "brain maintains its own warehoused Neon copy" plan.
   This is a Ryan conversation, named here so it is a recorded decision, not an
   accident. No code beyond this note (the `NeonAdapter` read path is FLAG-INGEST-NEON).
+
+## Device + event-aware refresh (G12.15)
+
+- **FLAG-DEVICE-MPS (G12.15a).** Chronos loads resolve their torch device via
+  `_resolve_device()` in `models/foundation.py`: `BRAIN_TORCH_DEVICE` overrides,
+  else Apple-GPU `mps` when available, else `cpu` (never `cuda` on this Mac).
+  `PYTORCH_ENABLE_MPS_FALLBACK=1` is set before the torch import so unsupported ops
+  fall back to CPU. MPS-vs-CPU parity verified (max abs diff GBP 0.0002, served
+  numbers unchanged beyond float noise). Measured caveat: for the small single-series
+  forecasts here MPS is SLOWER than CPU (transfer/fixup overhead ~3s vs ~0.6s); MPS
+  pays off for larger batched work, not these. The device is recorded in
+  `chronos2_runtime_info()`.
+- **FLAG-EVENT-REFRESH (G12.15d).** The T3 auto cadence tightens from
+  `RETRAIN_CADENCE_DAYS` (7) to `EVENT_REFRESH_CADENCE_DAYS` (2) inside a flagged
+  high-volatility window: a World Cup match in trading hours, or a curated local
+  event, within `EVENT_WINDOW_LOOKAHEAD_DAYS` (3) ahead (`_in_event_window` in
+  `ingest/refresh.py`, reading the SAME schedule the forecast uses). Calendar-triggered,
+  NOT hard-coded to the World Cup: any future flagged event fires it identically. The
+  `_should_refit` reason string states the override. Owner-controllable, default ON;
+  disable with `BRAIN_EVENT_REFRESH_DISABLED=1`. Cost guarantee preserved: it still
+  fires only on real new closed days and a re-fit is inference-only zero-shot, so a
+  tighter cadence adds fits within the event, never per-request work.
