@@ -14,14 +14,14 @@ Pinned per the Chronos paper's declared codebase
 (https://github.com/amazon-science/chronos-forecasting):
   * Chronos-Bolt (WP4), tensor API:
         from chronos import BaseChronosPipeline
-        pipeline = BaseChronosPipeline.from_pretrained(CHRONOS_MODEL_ID, device_map="cpu")
+        pipeline = BaseChronosPipeline.from_pretrained(CHRONOS_MODEL_ID, device_map=_resolve_device())
         quantiles, mean = pipeline.predict_quantiles(
             inputs=<1D float tensor>, prediction_length=H, quantile_levels=[...])
     quantiles shape [batch, H, n_levels]; the point forecast is the 0.5 row. (The
     2.x line renamed the first argument from `context` to `inputs`.)
   * Chronos-2 (WP9), README-canonical dataframe API:
         from chronos import Chronos2Pipeline
-        pipeline = Chronos2Pipeline.from_pretrained(CHRONOS2_MODEL_ID, device_map="cpu")
+        pipeline = Chronos2Pipeline.from_pretrained(CHRONOS2_MODEL_ID, device_map=_resolve_device())
         pred_df = pipeline.predict_df(context_df, prediction_length=H,
             quantile_levels=[0.1, 0.5, 0.9], id_column="id",
             timestamp_column="timestamp", target="target")
@@ -39,6 +39,7 @@ Pinned per the Chronos paper's declared codebase
 
 from __future__ import annotations
 
+import os
 import signal
 from contextlib import contextmanager
 
@@ -83,6 +84,11 @@ _WEATHER_EXO = ["exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs", "exo_is_dry"]
 # The auditable full universe, in one place.
 CHRONOS2_EXO_COLS = _CALENDAR_EXO + _EVENT_EXO + _WORLD_CUP_EXO + _WEATHER_EXO
 
+# G12.15a: some T5/Chronos ops are not yet MPS-native. Enabling the CPU fallback
+# BEFORE torch is imported keeps an MPS run correct (unsupported ops fall back to
+# CPU) rather than raising. setdefault so an explicit operator override wins.
+os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+
 try:
     import torch
     from chronos import BaseChronosPipeline, Chronos2Pipeline
@@ -91,25 +97,41 @@ try:
 except Exception:  # pragma: no cover - optional heavy backend
     HAS_CHRONOS = False
 
+
+def _resolve_device() -> str:
+    """G12.15a: the torch device for Chronos loads. `BRAIN_TORCH_DEVICE` overrides
+    (portability); otherwise prefer Apple-GPU `mps` when available, else `cpu`.
+    Never `cuda` on this host. Recorded in the entrant runtime info."""
+    override = os.environ.get("BRAIN_TORCH_DEVICE")
+    if override:
+        return override
+    if HAS_CHRONOS and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
 _PIPELINE = None
 # Chronos-2 process-level state: the loaded pipelines, the model id actually
 # loaded, the API path last used, whether the resource guard substituted the
-# small fallback model, and the weather serving basis the exo entrant used.
+# small fallback model, the weather serving basis the exo entrant used, and the
+# torch device the pipeline loaded on (G12.15a).
 _CHRONOS2: dict = {"pipe": None, "base": None, "model_id": None,
-                   "api": None, "substituted": False, "weather_basis": None}
+                   "api": None, "substituted": False, "weather_basis": None,
+                   "device": None}
 
 
 def _pipeline():
-    """Load the pinned Chronos-Bolt pipeline once per process (CPU inference)."""
+    """Load the pinned Chronos-Bolt pipeline once per process (device auto-resolved,
+    G12.15a: MPS on this Mac, else CPU)."""
     global _PIPELINE
     if _PIPELINE is None:
         _PIPELINE = BaseChronosPipeline.from_pretrained(
-            CHRONOS_MODEL_ID, device_map="cpu")
+            CHRONOS_MODEL_ID, device_map=_resolve_device())
     return _PIPELINE
 
 
 def chronos2_runtime_info() -> dict:
-    """Version / model id / API path / substitution flag for the report line."""
+    """Version / model id / API path / substitution flag / device for the report."""
     try:
         from importlib.metadata import version
         pkg = version("chronos-forecasting")
@@ -117,7 +139,9 @@ def chronos2_runtime_info() -> dict:
         pkg = "unknown"
     return {"version": pkg, "model_id": _CHRONOS2["model_id"],
             "api": _CHRONOS2["api"], "substituted": _CHRONOS2["substituted"],
-            "weather_basis": _CHRONOS2["weather_basis"]}
+            "weather_basis": _CHRONOS2["weather_basis"],
+            "device": _CHRONOS2["device"],
+            "mps_fallback_enabled": os.environ.get("PYTORCH_ENABLE_MPS_FALLBACK")}
 
 
 def chronos_bolt_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
@@ -164,11 +188,12 @@ def _chronos2_pipeline():
     if _CHRONOS2["pipe"] is not None:
         return _CHRONOS2["pipe"]
     errors = []
+    device = _resolve_device()
     for mid in (CHRONOS2_MODEL_ID, CHRONOS2_FALLBACK_MODEL_ID):
         try:
             with _time_limit(RESOURCE_GUARD_SECONDS):
-                pipe = Chronos2Pipeline.from_pretrained(mid, device_map="cpu")
-            _CHRONOS2.update(pipe=pipe, model_id=mid,
+                pipe = Chronos2Pipeline.from_pretrained(mid, device_map=device)
+            _CHRONOS2.update(pipe=pipe, model_id=mid, device=device,
                              substituted=(mid != CHRONOS2_MODEL_ID))
             return pipe
         except (_GuardTimeout, Exception) as exc:  # noqa: B014 - guard + load errors
@@ -182,7 +207,8 @@ def _chronos2_base_pipeline():
     if _CHRONOS2["base"] is not None:
         return _CHRONOS2["base"]
     mid = _CHRONOS2["model_id"] or CHRONOS2_MODEL_ID
-    _CHRONOS2["base"] = BaseChronosPipeline.from_pretrained(mid, device_map="cpu")
+    _CHRONOS2["base"] = BaseChronosPipeline.from_pretrained(
+        mid, device_map=_resolve_device())
     return _CHRONOS2["base"]
 
 
