@@ -130,6 +130,148 @@
   --chart-5: oklch(0.92 0.003 80);
 }
 
+/*
+ * Ledger theme — the marketing site's "Publican's Ledger" system.
+ *
+ * Scoped to `.ledger-theme` (set on the marketing route-group wrapper) so the
+ * warm paper/ink/brass palette + serif-display type never leak into the app
+ * surface. Remaps the shadcn semantic tokens to ledger values so shared
+ * primitives (Button, Container) inherit the look, and exposes the bespoke
+ * ledger colours dark sections paint with explicitly. Font family vars come
+ * from next/font on the same wrapper.
+ */
+.ledger-theme {
+  color-scheme: light;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+
+  --background: #f5efe3;
+  --foreground: #201a12;
+  --card: #fdfbf5;
+  --card-foreground: #201a12;
+  --popover: #fdfbf5;
+  --popover-foreground: #201a12;
+  --primary: #8f6b1f;
+  --primary-foreground: #f5efe3;
+  --secondary: #ede4d2;
+  --secondary-foreground: #201a12;
+  --muted: #ede4d2;
+  --muted-foreground: #5c5340;
+  --accent: #ede4d2;
+  --accent-foreground: #201a12;
+  --border: rgba(32, 26, 18, 0.14);
+  --input: rgba(32, 26, 18, 0.2);
+  --ring: #8f6b1f;
+  --radius: 0.75rem;
+
+  /* Bespoke ledger tokens */
+  --paper: #f5efe3;
+  --paper-2: #ede4d2;
+  --ledger-card: #fdfbf5;
+  --ink: #191510;
+  --ink-2: #221d15;
+  --ink-text: #201a12;
+  --ink-muted: #5c5340;
+  --mono-muted: #8a7d63;
+  --brass: #8f6b1f;
+  --brass-shadow: #75561a;
+  --brass-dark: #b08a2e;
+  --clay: #9a4b2c;
+  --ledger-green: #2f5d3d;
+  --ledger-green-ink: #7fb08a;
+  --cream: #efe6d4;
+  --cream-hi: #f5efe3;
+  --cream-soft: #b3a588;
+  --cream-mid: #c9b98f;
+  --cream-muted: #9a8c6e;
+  --ink-hairline: #352d1f;
+  --ink-hairline-2: #2c251a;
+  --hairline: rgba(32, 26, 18, 0.14);
+  --hairline-strong: rgba(32, 26, 18, 0.2);
+  --hairline-soft: rgba(32, 26, 18, 0.1);
+
+  /* Signature textures */
+  --ledger-rule: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 35px,
+    rgba(143, 107, 31, 0.07) 35px,
+    rgba(143, 107, 31, 0.07) 36px
+  );
+
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink-text);
+}
+
+.ledger-theme ::selection {
+  background: #8f6b1f;
+  color: #f5efe3;
+}
+
+/* Ledger display + mono families as utilities (font-news / font-mono-ledger). */
+.font-news {
+  font-family: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  font-optical-sizing: auto;
+}
+.font-mono-ledger {
+  font-family: var(--font-spline-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@keyframes gmMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes gmRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes gmCaret {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes gmDot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Kill every ledger motion — marquee, entrance rises, caret, thinking dots.
+   * The hero chat already jumps straight to a settled answer for these users;
+   * this stops the decorative animations the JS can't reach. */
+  .ledger-theme .gm-marquee,
+  .ledger-theme *[class*="gmRise"],
+  .ledger-theme *[class*="gmCaret"],
+  .ledger-theme *[class*="gmDot"] {
+    /* biome-ignore lint/complexity/noImportantStyles: must beat arbitrary-value animation utilities */
+    animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reveal-once elements start at opacity:0 */
+    opacity: 1 !important;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -222,6 +364,7 @@
   [role="button"] {
     touch-action: manipulation;
   }
+  /* biome-ignore lint/style/noDescendingSpecificity: intentional — .ledger-theme scopes its own brass selection above; this is the app-wide default */
   ::selection {
     background: color-mix(in oklch, var(--foreground) 12%, transparent);
   }

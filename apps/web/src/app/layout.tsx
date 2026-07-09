@@ -20,10 +20,10 @@ const geist = Geist({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'gm-ai — AI operator for brewpub & beerhall managers',
+    default: 'AI-GM — the AI operator for hospitality',
     template: `%s · ${SITE_NAME}`,
   },
-  description: 'General Manager AI for hospitality operations',
+  description: 'A general manager in a chat box for hospitality operations',
   applicationName: SITE_NAME,
   appleWebApp: { capable: true, statusBarStyle: 'default', title: SITE_NAME },
   // Stop mobile browsers auto-linkifying phone numbers into <a href="tel:"> — it

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 
 // Public marketing origin. Override per environment with NEXT_PUBLIC_SITE_URL;
 // the default matches the contact domain used across the marketing site.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://gm-ai.app'
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ai-gm.ai'
 
-export const SITE_NAME = 'gm-ai'
+export const SITE_NAME = 'AI-GM'
 
 // Per-page metadata for the marketing site. Sets a canonical URL and mirrors
 // the title/description into OpenGraph + Twitter so shares render correctly.

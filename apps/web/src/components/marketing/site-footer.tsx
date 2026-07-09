@@ -1,77 +1,39 @@
 import Link from 'next/link'
+import { SITE_NAME, SITE_URL } from '@/lib/seo'
 import { Wordmark } from './wordmark'
 
-const COLUMNS: { heading: string; links: { href: string; label: string }[] }[] = [
-  {
-    heading: 'Product',
-    links: [
-      { href: '/features', label: 'Features' },
-      { href: '/pricing', label: 'Pricing' },
-      { href: '/changelog', label: 'Changelog' },
-      { href: '/auth/sign-up', label: 'Start free trial' },
-    ],
-  },
-  {
-    heading: 'Company',
-    links: [
-      { href: '/about', label: 'About' },
-      { href: '/blog', label: 'Blog' },
-      { href: 'mailto:hello@gm-ai.app', label: 'Contact' },
-    ],
-  },
-  {
-    heading: 'Integrations',
-    links: [
-      { href: '/features#integrations', label: 'POS' },
-      { href: '/features#integrations', label: 'Accounting' },
-      { href: '/features#integrations', label: 'Calendar' },
-    ],
-  },
+const LINKS: { href: string; label: string }[] = [
+  { href: '/features', label: 'Features' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/about', label: 'About' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/changelog', label: 'Changelog' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
 ]
 
 export function SiteFooter() {
+  const host = SITE_URL.replace(/^https?:\/\//, '')
   return (
-    <footer className="border-t border-border">
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div className="space-y-3">
-            <Wordmark />
-            <p className="max-w-xs text-sm text-muted-foreground">
-              The AI operator for hospitality. Built with a real multi-venue operator and running in
-              production today.
-            </p>
-          </div>
-          {COLUMNS.map((col) => (
-            <div key={col.heading}>
-              <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {col.heading}
-              </h3>
-              <ul className="mt-4 space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-foreground/80 transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+    <footer className="bg-[var(--ink)] text-[var(--cream-muted)]">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-6 px-7 py-12">
+        <Link href="/" aria-label={`${SITE_NAME} home`}>
+          <Wordmark variant="dark" />
+        </Link>
+        <nav className="flex flex-wrap gap-6 text-[13px] font-medium" aria-label="Footer">
+          {LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[var(--cream-muted)] transition-colors hover:text-[var(--cream)]"
+            >
+              {link.label}
+            </Link>
           ))}
-        </div>
-        <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} gm-ai. UK-built for hospitality operators.</p>
-          <div className="flex gap-5">
-            <Link href="/privacy" className="hover:text-foreground">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-foreground">
-              Terms
-            </Link>
-          </div>
-        </div>
+        </nav>
+        <p className="font-mono-ledger w-full text-[12px] leading-none sm:w-auto">
+          © {new Date().getFullYear()} {SITE_NAME} · {host} · read-only · venue-scoped · cited
+        </p>
       </div>
     </footer>
   )

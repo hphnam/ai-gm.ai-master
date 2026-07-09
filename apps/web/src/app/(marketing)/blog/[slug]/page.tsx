@@ -48,7 +48,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <span>{post.readingTime}</span>
           </div>
 
-          <h1 className="mt-4 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+          <h1 className="font-news mt-4 text-balance text-[clamp(2rem,3.5vw,2.75rem)] font-extrabold leading-[1.1] tracking-[-0.025em]">
             {post.title}
           </h1>
 
