@@ -1,0 +1,192 @@
+{
+  "provenance": {
+    "source": "Square Reporting API (MCP-SIM mode), view SalesUK, measure net_sales_minus_auto_gratuity (ex-VAT net sales)",
+    "merchant_id": "ML1FFAGJMQBTZ",
+    "query": "SalesUK net_sales_minus_auto_gratuity + total_collected_amount + sales_tax + order_count, dims location_name + local_date, timeDim local_reporting_timestamp day, dateRange 2026-06-01..2026-06-30",
+    "last_refresh_time": "2026-07-09T21:46:48.068Z",
+    "note": "Held-out evaluation actuals only. NEVER written to served_forecast/forecasts/l1_daily. VAT: net_sales excludes tax; flat 20% confirmed (tax=gross/6). Two River Taps returned zero rows for June (INACTIVE/closed). Events venue excluded from brain scope.",
+    "unit": "GBP ex-VAT net sales, per venue per local date"
+  },
+  "rows": [
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-01",
+      "net_exvat": 166.67,
+      "gross": 200.0,
+      "orders": 1
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-03",
+      "net_exvat": 445.97,
+      "gross": 535.22,
+      "orders": 95
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-04",
+      "net_exvat": 769.72,
+      "gross": 923.7,
+      "orders": 122
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-05",
+      "net_exvat": 1342.11,
+      "gross": 1594.32,
+      "orders": 146
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-06",
+      "net_exvat": 3301.06,
+      "gross": 3961.18,
+      "orders": 110
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-07",
+      "net_exvat": 630.62,
+      "gross": 741.84,
+      "orders": 79
+    },
+    { "venue": "beer_hall", "date": "2026-06-08", "net_exvat": 41.25, "gross": 41.25, "orders": 2 },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-10",
+      "net_exvat": 258.74,
+      "gross": 310.47,
+      "orders": 49
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-11",
+      "net_exvat": 565.88,
+      "gross": 679.08,
+      "orders": 109
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-12",
+      "net_exvat": 1242.62,
+      "gross": 1491.17,
+      "orders": 163
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-13",
+      "net_exvat": 3518.5,
+      "gross": 4217.04,
+      "orders": 396
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-14",
+      "net_exvat": 1031.94,
+      "gross": 1238.31,
+      "orders": 103
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-15",
+      "net_exvat": 1798.44,
+      "gross": 2157.95,
+      "orders": 300
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-17",
+      "net_exvat": 607.09,
+      "gross": 728.61,
+      "orders": 101
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-18",
+      "net_exvat": 863.4,
+      "gross": 1025.95,
+      "orders": 135
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-19",
+      "net_exvat": 1180.74,
+      "gross": 1406.89,
+      "orders": 134
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-20",
+      "net_exvat": 798.5,
+      "gross": 953.18,
+      "orders": 122
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-21",
+      "net_exvat": 1030.2,
+      "gross": 1236.21,
+      "orders": 127
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-23",
+      "net_exvat": 334.93,
+      "gross": 394.42,
+      "orders": 44
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-24",
+      "net_exvat": 819.92,
+      "gross": 978.91,
+      "orders": 93
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-25",
+      "net_exvat": 835.41,
+      "gross": 1002.54,
+      "orders": 124
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-26",
+      "net_exvat": 1720.03,
+      "gross": 2063.93,
+      "orders": 219
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-27",
+      "net_exvat": 3081.5,
+      "gross": 3697.65,
+      "orders": 337
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-28",
+      "net_exvat": 338.33,
+      "gross": 405.98,
+      "orders": 50
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-06-29",
+      "net_exvat": 166.67,
+      "gross": 200.0,
+      "orders": 1
+    },
+    { "venue": "ellel", "date": "2026-06-18", "net_exvat": 51.36, "gross": 61.61, "orders": 12 },
+    {
+      "venue": "ellel",
+      "date": "2026-06-20",
+      "net_exvat": 2286.82,
+      "gross": 2743.91,
+      "orders": 309
+    }
+  ],
+  "closed_venues_june": {
+    "two_river_taps": "zero June rows in SalesUK; venue INACTIVE in Square locations list"
+  }
+}

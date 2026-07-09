@@ -35,6 +35,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 19 | `19_G12_10_Report.md` | 2026-07-08 | G12.10: TRT coord, is_ellel_event leak, full exo set, World Cup, Neon adapter; plus the G12.11 Ellel narrative correction and decision-log rows |
 | 20 | `20_G12_12_GoLive_Forecast_Report.md` | 2026-07-09 | G12.12: go-live forecast attempt; clean STOP at gate a (June absent from store, Neon not provisioned) |
 | 21 | `21_G12_13a_Frozen_Forecast_Report.md` | 2026-07-09 | G12.13a (Pass 1): forward June 2026 forecast frozen and pre-registered, blind to actuals |
+| 22 | `22_G12_13b_June_Simulation_Report.md` | 2026-07-09 | G12.13b (Pass 2): frozen forecast confronted with real held-out June actuals (MCP-SIM); full brain run over June; leak-free |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single
@@ -53,7 +54,9 @@ sequence is preferred over commit date.
 
 `Decision_and_Resolution_Log.md` is the continuous WP1-to-present decision log.
 Section A covers the fidelity corrections, Section B the WP8 to WP12 addendum and
-Chronos-2 closeout (rows 1 to 5), and Section C the post-WP12 milestones G12.9 to
-G12.11 (rows 6 to 10), reconciled in from `17_G12_9_Report.md` and
-`19_G12_10_Report.md`. The three G12.11 rows the G12.10 report labels B6/B7/B8 are
-Section C rows 8, 9, and 10. `brain/FLAGS.md` remains the live flag ledger.
+Chronos-2 closeout (rows 1 to 5), and Section C the post-WP12 milestones: G12.9 to
+G12.11 (rows 6 to 10, reconciled in from `17_G12_9_Report.md` and
+`19_G12_10_Report.md`), G12.12 (row 11), and the G12.13 June confrontation (row 12
+G12.13a pre-registration, row 13 G12.13b out-of-sample result). The three G12.11
+rows the G12.10 report labels B6/B7/B8 are Section C rows 8, 9, and 10.
+`brain/FLAGS.md` remains the live flag ledger.

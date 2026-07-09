@@ -392,3 +392,37 @@ them into the append-only log so it is the continuous WP1-to-present record.
     top-3 items/category + OTHER; TRT INACTIVE in Square so its forecast may confront
     a closed venue (retained as honest material); two commits not one, so the frozen
     forecast provably predates Pass 2.
+
+13. **G12.13b: frozen June forecast confronted with real held-out actuals; full
+    brain run over June; leak-free** (`22_G12_13b_June_Simulation_Report.md`, Pass 2
+    of 2). Mode MCP-SIM (Square Reporting API `SalesUK` view via the Claude Code
+    connector, a labelled stand-in for Ryan's `NeonAdapter`, NOT that path). A13b.0
+    held: the frozen commit `1d966be` (2026-07-09 22:41:58 +0100) provably predates
+    the actuals refresh (22:46:48 +0100), and the forecast was loaded from the
+    committed parquet, not regenerated. **Pre-registered cold 30-day L1 out-of-sample
+    (MASE all-days / trading-days vs 7-day backtest):** beer_hall 1.64 / 1.95 (vs
+    0.745), actual GBP 26,890 vs frozen GBP 13,917 (June ran much bigger than a
+    May-trained cold horizon could see: the cold-start ceiling, not a regression);
+    two_river_taps forecast GBP 5,329 vs actual GBP 0 (venue INACTIVE/closed, the
+    key go-live lesson: no liveness gate); ellel 0.49 all-days but 2.91 trading (a
+    GBP 2,287 private event on 20 Jun it could not know; all-days flattered by joint
+    zeros). **Realistic weekly-rolling (progressive actuals, labelled separately):**
+    beer_hall 1.47, TRT 0.32 (learns the closure), ellel 0.49 - better than cold,
+    the honest two-sided picture. **World Cup fixture effect (BH England dates,
+    directional, power caveat):** positive on all three: 17 Jun v Croatia actual GBP
+    607 vs DOW-median GBP 289 (+110%), 23 Jun v Ghana opened on a normally-closed
+    Tuesday (GBP 335 vs GBP 0), 27 Jun v Panama GBP 3,082 vs GBP 1,235 (+150%); the
+    frozen `wc_*` flags marked the days but the cold magnitude under-shot. **Full
+    brain over June (existing modules, store COPY, served store untouched):**
+    deviation flagged the four World Cup Saturdays (BH) + six closed-venue days (TRT)
+    + the Ellel event, no ordinary-day false positives; change-point recorded 0 new
+    June onsets (the closure and the Dec cold-snap onset earlier, carried as
+    continuing, correct); briefing never went silent on eventful June. Two go-live
+    gaps surfaced and FLAGGED not built (simulation adds no detector): attribution
+    lists every coincident fixture (needs ranking), and per-day briefing without a
+    persisted `briefing_runs` chain over-counts continuing items (fatigue number is
+    an upper bound). Leak-free verified: actuals only in `brain/sim/` eval files,
+    never in served_forecast/forecasts/l1_daily; served `l1_daily` still ends
+    2026-05-31. Deviations: MCP-SIM not LIVE-NEON; L1 via SalesUK aggregate not
+    per-order; L3 not scored (item-taxonomy reconciliation deferred); briefing
+    fatigue upper bound; attribution verbosity flagged; two commits not one.

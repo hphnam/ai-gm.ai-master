@@ -1,0 +1,713 @@
+{
+  "store": "/private/tmp/claude-501/-Users-hapuna-Library-CloudStorage-OneDrive-LancasterUniversity-Placement-Project-ai-gm-ai-master/57de8901-98f1-4266-be80-08ad3f7dd8d9/scratchpad/june_store",
+  "venues": {
+    "beer_hall": {
+      "deviation": {
+        "june_days_scanned": 20,
+        "n_deviation": 4,
+        "flagged": [
+          {
+            "date": "2026-06-06",
+            "actual": 3301.06,
+            "expected": 1235.34,
+            "z": 3.73,
+            "direction": "up",
+            "severity": "high"
+          },
+          {
+            "date": "2026-06-13",
+            "actual": 3518.5,
+            "expected": 1245.19,
+            "z": 4.07,
+            "direction": "up",
+            "severity": "high"
+          },
+          {
+            "date": "2026-06-26",
+            "actual": 1720.03,
+            "expected": 813.16,
+            "z": 1.62,
+            "direction": "up",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-27",
+            "actual": 3081.5,
+            "expected": 1245.19,
+            "z": 3.26,
+            "direction": "up",
+            "severity": "high"
+          }
+        ]
+      },
+      "attribution": [
+        {
+          "date": "2026-06-06",
+          "direction": "up",
+          "coincides_with": [
+            "coincides with Mexico vs South Africa, 20:00 kickoff, within trading hours",
+            "coincides with Canada vs Bosnia and Herzegovina, 20:00 kickoff, within trading hours",
+            "coincides with Qatar vs Switzerland, 20:00 kickoff, within trading hours",
+            "coincides with Brazil vs Morocco, 23:00 kickoff, within trading hours"
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "direction": "up",
+          "coincides_with": [
+            "coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+            "coincides with Mexico vs South Africa, 20:00 kickoff, within trading hours",
+            "coincides with Canada vs Bosnia and Herzegovina, 20:00 kickoff, within trading hours",
+            "coincides with Qatar vs Switzerland, 20:00 kickoff, within trading hours",
+            "coincides with Brazil vs Morocco, 23:00 kickoff, within trading hours",
+            "coincides with Germany vs Cura\u00e7ao, 18:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Japan, 21:00 kickoff, within trading hours",
+            "coincides with Spain vs Cape Verde, 17:00 kickoff, within trading hours",
+            "coincides with Belgium vs Egypt, 20:00 kickoff, within trading hours",
+            "coincides with France vs Senegal, 20:00 kickoff, within trading hours",
+            "coincides with Portugal vs DR Congo, 18:00 kickoff, within trading hours",
+            "coincides with Czech Republic vs South Africa, 17:00 kickoff, within trading hours",
+            "coincides with Switzerland vs Bosnia and Herzegovina, 20:00 kickoff, within trading hours",
+            "coincides with Scotland vs Morocco, 23:00 kickoff, within trading hours",
+            "coincides with Germany vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Sweden, 18:00 kickoff, within trading hours",
+            "weather unavailable for this date, not checked"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "direction": "up",
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "coincides with England vs Ghana, 21:00 kickoff, within trading hours",
+            "coincides with Panama vs England, 22:00 kickoff, within trading hours",
+            "coincides with England vs DR Congo, 17:00 kickoff, within trading hours",
+            "coincides with Scotland vs Morocco, 23:00 kickoff, within trading hours",
+            "coincides with Germany vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Sweden, 18:00 kickoff, within trading hours",
+            "coincides with Spain vs Saudi Arabia, 17:00 kickoff, within trading hours",
+            "coincides with Belgium vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with France vs Iraq, 22:00 kickoff, within trading hours",
+            "coincides with Argentina vs Austria, 18:00 kickoff, within trading hours",
+            "coincides with Portugal vs Uzbekistan, 18:00 kickoff, within trading hours",
+            "coincides with Scotland vs Brazil, 23:00 kickoff, within trading hours",
+            "coincides with Morocco vs Haiti, 23:00 kickoff, within trading hours",
+            "coincides with South Africa vs South Korea, 20:00 kickoff, within trading hours",
+            "coincides with Czech Republic vs Mexico, 20:00 kickoff, within trading hours",
+            "coincides with Bosnia and Herzegovina vs Qatar, 20:00 kickoff, within trading hours",
+            "coincides with Switzerland vs Canada, 20:00 kickoff, within trading hours",
+            "coincides with Cura\u00e7ao vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Ecuador vs Germany, 21:00 kickoff, within trading hours",
+            "coincides with Paraguay vs Australia, 21:00 kickoff, within trading hours",
+            "coincides with Turkey vs United States, 21:00 kickoff, within trading hours",
+            "coincides with Japan vs Sweden, 21:00 kickoff, within trading hours",
+            "coincides with Tunisia vs Netherlands, 21:00 kickoff, within trading hours",
+            "coincides with Senegal vs Iraq, 20:00 kickoff, within trading hours",
+            "coincides with Norway vs France, 20:00 kickoff, within trading hours",
+            "coincides with Egypt vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with New Zealand vs Belgium, 20:00 kickoff, within trading hours",
+            "coincides with Cape Verde vs Saudi Arabia, 20:00 kickoff, within trading hours",
+            "coincides with Uruguay vs Spain, 20:00 kickoff, within trading hours",
+            "coincides with Croatia vs Ghana, 22:00 kickoff, within trading hours",
+            "coincides with Algeria vs Austria, 22:00 kickoff, within trading hours",
+            "coincides with Jordan vs Argentina, 22:00 kickoff, within trading hours",
+            "coincides with Colombia vs Portugal, 22:00 kickoff, within trading hours",
+            "coincides with Congo DR vs Uzbekistan, 22:00 kickoff, within trading hours",
+            "coincides with South Africa vs Canada, 20:00 kickoff, within trading hours",
+            "coincides with Germany vs Paraguay, 21:30 kickoff, within trading hours",
+            "coincides with Netherlands vs Morocco, 18:00 kickoff, within trading hours",
+            "coincides with Brazil vs Japan, 21:00 kickoff, within trading hours",
+            "coincides with France vs Sweden, 22:00 kickoff, within trading hours",
+            "coincides with Ivory Coast vs Norway, 18:00 kickoff, within trading hours",
+            "coincides with Mexico vs Ecuador, 21:00 kickoff, within trading hours",
+            "coincides with Belgium vs Senegal, 21:00 kickoff, within trading hours",
+            "coincides with Spain vs Austria, 20:00 kickoff, within trading hours",
+            "coincides with Argentina vs Cape Verde, 23:00 kickoff, within trading hours",
+            "coincides with Australia vs Egypt, 19:00 kickoff, within trading hours",
+            "weather unavailable for this date, not checked"
+          ]
+        },
+        {
+          "date": "2026-06-27",
+          "direction": "up",
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "coincides with England vs Ghana, 21:00 kickoff, within trading hours",
+            "coincides with Panama vs England, 22:00 kickoff, within trading hours",
+            "coincides with England vs DR Congo, 17:00 kickoff, within trading hours",
+            "coincides with Germany vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Sweden, 18:00 kickoff, within trading hours",
+            "coincides with Spain vs Saudi Arabia, 17:00 kickoff, within trading hours",
+            "coincides with Belgium vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with France vs Iraq, 22:00 kickoff, within trading hours",
+            "coincides with Argentina vs Austria, 18:00 kickoff, within trading hours",
+            "coincides with Portugal vs Uzbekistan, 18:00 kickoff, within trading hours",
+            "coincides with Scotland vs Brazil, 23:00 kickoff, within trading hours",
+            "coincides with Morocco vs Haiti, 23:00 kickoff, within trading hours",
+            "coincides with South Africa vs South Korea, 20:00 kickoff, within trading hours",
+            "coincides with Czech Republic vs Mexico, 20:00 kickoff, within trading hours",
+            "coincides with Bosnia and Herzegovina vs Qatar, 20:00 kickoff, within trading hours",
+            "coincides with Switzerland vs Canada, 20:00 kickoff, within trading hours",
+            "coincides with Cura\u00e7ao vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Ecuador vs Germany, 21:00 kickoff, within trading hours",
+            "coincides with Paraguay vs Australia, 21:00 kickoff, within trading hours",
+            "coincides with Turkey vs United States, 21:00 kickoff, within trading hours",
+            "coincides with Japan vs Sweden, 21:00 kickoff, within trading hours",
+            "coincides with Tunisia vs Netherlands, 21:00 kickoff, within trading hours",
+            "coincides with Senegal vs Iraq, 20:00 kickoff, within trading hours",
+            "coincides with Norway vs France, 20:00 kickoff, within trading hours",
+            "coincides with Egypt vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with New Zealand vs Belgium, 20:00 kickoff, within trading hours",
+            "coincides with Cape Verde vs Saudi Arabia, 20:00 kickoff, within trading hours",
+            "coincides with Uruguay vs Spain, 20:00 kickoff, within trading hours",
+            "coincides with Croatia vs Ghana, 22:00 kickoff, within trading hours",
+            "coincides with Algeria vs Austria, 22:00 kickoff, within trading hours",
+            "coincides with Jordan vs Argentina, 22:00 kickoff, within trading hours",
+            "coincides with Colombia vs Portugal, 22:00 kickoff, within trading hours",
+            "coincides with Congo DR vs Uzbekistan, 22:00 kickoff, within trading hours",
+            "coincides with South Africa vs Canada, 20:00 kickoff, within trading hours",
+            "coincides with Germany vs Paraguay, 21:30 kickoff, within trading hours",
+            "coincides with Netherlands vs Morocco, 18:00 kickoff, within trading hours",
+            "coincides with Brazil vs Japan, 21:00 kickoff, within trading hours",
+            "coincides with France vs Sweden, 22:00 kickoff, within trading hours",
+            "coincides with Ivory Coast vs Norway, 18:00 kickoff, within trading hours",
+            "coincides with Mexico vs Ecuador, 21:00 kickoff, within trading hours",
+            "coincides with Belgium vs Senegal, 21:00 kickoff, within trading hours",
+            "coincides with Spain vs Austria, 20:00 kickoff, within trading hours",
+            "coincides with Argentina vs Cape Verde, 23:00 kickoff, within trading hours",
+            "coincides with Australia vs Egypt, 19:00 kickoff, within trading hours",
+            "coincides with Paraguay vs France, 22:00 kickoff, within trading hours",
+            "coincides with Canada vs Morocco, 18:00 kickoff, within trading hours",
+            "weather unavailable for this date, not checked"
+          ]
+        }
+      ],
+      "change_point": {
+        "n_june_onsets": 0,
+        "onsets": []
+      }
+    },
+    "two_river_taps": {
+      "deviation": {
+        "june_days_scanned": 20,
+        "n_deviation": 6,
+        "flagged": [
+          {
+            "date": "2026-06-05",
+            "actual": 0.0,
+            "expected": 671.79,
+            "z": -1.4,
+            "direction": "down",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-06",
+            "actual": 0.0,
+            "expected": 564.88,
+            "z": -1.18,
+            "direction": "down",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-12",
+            "actual": 0.0,
+            "expected": 665.2,
+            "z": -1.36,
+            "direction": "down",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-13",
+            "actual": 0.0,
+            "expected": 549.97,
+            "z": -1.05,
+            "direction": "down",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-19",
+            "actual": 0.0,
+            "expected": 658.62,
+            "z": -1.26,
+            "direction": "down",
+            "severity": "medium"
+          },
+          {
+            "date": "2026-06-26",
+            "actual": 0.0,
+            "expected": 654.84,
+            "z": -1.25,
+            "direction": "down",
+            "severity": "medium"
+          }
+        ]
+      },
+      "attribution": [
+        {
+          "date": "2026-06-05",
+          "direction": "down",
+          "coincides_with": [
+            "coincides with a school term\u2194holiday transition",
+            "weather unavailable for this date, not checked"
+          ]
+        },
+        {
+          "date": "2026-06-06",
+          "direction": "down",
+          "coincides_with": [
+            "no coincident calendar/event/promo signal; weather unavailable for this date, not checked \u2014 likely an operational or competitive change worth investigating"
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "direction": "down",
+          "coincides_with": [
+            "no coincident calendar/event/promo signal; weather unavailable for this date, not checked \u2014 likely an operational or competitive change worth investigating"
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "direction": "down",
+          "coincides_with": [
+            "no coincident calendar/event/promo signal; weather unavailable for this date, not checked \u2014 likely an operational or competitive change worth investigating"
+          ]
+        },
+        {
+          "date": "2026-06-19",
+          "direction": "down",
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "weather unavailable for this date, not checked"
+          ]
+        },
+        {
+          "date": "2026-06-26",
+          "direction": "down",
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "weather unavailable for this date, not checked"
+          ]
+        }
+      ],
+      "change_point": {
+        "n_june_onsets": 0,
+        "onsets": []
+      }
+    },
+    "ellel": {
+      "deviation": {
+        "june_days_scanned": 3,
+        "n_deviation": 1,
+        "flagged": [
+          {
+            "date": "2026-06-20",
+            "actual": 2286.82,
+            "expected": 15.0,
+            "z": 5.64,
+            "direction": "up",
+            "severity": "high"
+          }
+        ]
+      },
+      "attribution": [
+        {
+          "date": "2026-06-20",
+          "direction": "up",
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "coincides with Panama vs England, 22:00 kickoff, within trading hours",
+            "coincides with Qatar vs Switzerland, 20:00 kickoff, within trading hours",
+            "coincides with Brazil vs Morocco, 23:00 kickoff, within trading hours",
+            "coincides with Germany vs Cura\u00e7ao, 18:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Japan, 21:00 kickoff, within trading hours",
+            "coincides with Spain vs Cape Verde, 17:00 kickoff, within trading hours",
+            "coincides with Belgium vs Egypt, 20:00 kickoff, within trading hours",
+            "coincides with Czech Republic vs South Africa, 17:00 kickoff, within trading hours",
+            "coincides with Switzerland vs Bosnia and Herzegovina, 20:00 kickoff, within trading hours",
+            "coincides with Canada vs Qatar, 23:00 kickoff, within trading hours",
+            "coincides with Scotland vs Morocco, 23:00 kickoff, within trading hours",
+            "coincides with Germany vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Netherlands vs Sweden, 18:00 kickoff, within trading hours",
+            "coincides with Spain vs Saudi Arabia, 17:00 kickoff, within trading hours",
+            "coincides with Belgium vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with Argentina vs Austria, 18:00 kickoff, within trading hours",
+            "coincides with Portugal vs Uzbekistan, 18:00 kickoff, within trading hours",
+            "coincides with Cura\u00e7ao vs Ivory Coast, 21:00 kickoff, within trading hours",
+            "coincides with Ecuador vs Germany, 21:00 kickoff, within trading hours",
+            "coincides with Paraguay vs Australia, 21:00 kickoff, within trading hours",
+            "coincides with Turkey vs United States, 21:00 kickoff, within trading hours",
+            "coincides with Japan vs Sweden, 21:00 kickoff, within trading hours",
+            "coincides with Tunisia vs Netherlands, 21:00 kickoff, within trading hours",
+            "coincides with Senegal vs Iraq, 20:00 kickoff, within trading hours",
+            "coincides with Norway vs France, 20:00 kickoff, within trading hours",
+            "coincides with Egypt vs Iran, 20:00 kickoff, within trading hours",
+            "coincides with New Zealand vs Belgium, 20:00 kickoff, within trading hours",
+            "coincides with Cape Verde vs Saudi Arabia, 20:00 kickoff, within trading hours",
+            "coincides with Uruguay vs Spain, 20:00 kickoff, within trading hours",
+            "coincides with Croatia vs Ghana, 22:00 kickoff, within trading hours",
+            "coincides with Algeria vs Austria, 22:00 kickoff, within trading hours",
+            "coincides with Jordan vs Argentina, 22:00 kickoff, within trading hours",
+            "coincides with Colombia vs Portugal, 22:00 kickoff, within trading hours",
+            "coincides with Congo DR vs Uzbekistan, 22:00 kickoff, within trading hours",
+            "weather unavailable for this date, not checked"
+          ]
+        }
+      ],
+      "change_point": {
+        "n_june_onsets": 0,
+        "onsets": []
+      }
+    }
+  },
+  "briefing": {
+    "june_days": 30,
+    "days_with_surface": 30,
+    "surface_rate": 1.0,
+    "total_items": 300,
+    "items_per_week": 70.0,
+    "surfaced": [
+      {
+        "date": "2026-06-01",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-02",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-03",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-04",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-05",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-06",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-07",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-08",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-09",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2026-05-28 (85% above normal); coincides with a school term\u2194holiday transition"
+        ]
+      },
+      {
+        "date": "2026-06-10",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-11",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-12",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-13",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-14",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-15",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-16",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-17",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-18",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-19",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-20",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-21",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-22",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-23",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: \u00a33,518 above band on 2026-06-13; coincides with England vs Croatia, 21:00 kickoff, within trading hours",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        ]
+      },
+      {
+        "date": "2026-06-24",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-25",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-26",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-27",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-28",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-29",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      },
+      {
+        "date": "2026-06-30",
+        "n_items": 10,
+        "headlines": [
+          "The Beer Hall: \u00a33,082 above band on 2026-06-27; coincides with a university term\u2194vacation transition",
+          "The Beer Hall: lunebrew caravan of love low \u2014 0.0d cover, reorder 1 keg(s)",
+          "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+          "Two River Taps: sustained shift since 2026-05-08 (71% below normal); coincides with Two River Taps's closure (structural break)"
+        ]
+      }
+    ]
+  },
+  "stock_cover_beer_hall": [
+    {
+      "product": "lunebrew caravan of love",
+      "days_of_cover": 0.0,
+      "reorder": true
+    },
+    {
+      "product": "accidental guest",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "alcohol free",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "becks vier keg",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "bud light keg",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "delerium red",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "lunebrew guest",
+      "days_of_cover": null,
+      "reorder": null
+    },
+    {
+      "product": "lunebrew lune valley gold",
+      "days_of_cover": null,
+      "reorder": null
+    }
+  ]
+}
