@@ -1,0 +1,131 @@
+{
+  "device": "mps",
+  "venues": {
+    "beer_hall": {
+      "cold_30": {
+        "mase_all": 1.645,
+        "mase_fixture_days": 1.89,
+        "mase_later_fixture_days": 1.974,
+        "l2_category_mase": 1.796,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 90.0,
+        "n_days": 30,
+        "wall_clock_s": 0.9
+      },
+      "7_day": {
+        "mase_all": 1.45,
+        "mase_fixture_days": 1.6,
+        "mase_later_fixture_days": 1.658,
+        "l2_category_mase": 1.802,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 145.0,
+        "n_days": 30,
+        "wall_clock_s": 0.7
+      },
+      "3_day": {
+        "mase_all": 1.56,
+        "mase_fixture_days": 1.779,
+        "mase_later_fixture_days": 1.849,
+        "l2_category_mase": 1.848,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 134.0,
+        "n_days": 30,
+        "wall_clock_s": 1.3
+      },
+      "daily": {
+        "mase_all": 1.599,
+        "mase_fixture_days": 1.833,
+        "mase_later_fixture_days": 1.908,
+        "l2_category_mase": 1.84,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 121.0,
+        "n_days": 30,
+        "wall_clock_s": 3.8
+      }
+    },
+    "two_river_taps": {
+      "cold_30": {
+        "mase_all": 1.182,
+        "mase_fixture_days": null,
+        "mase_later_fixture_days": null,
+        "l2_category_mase": null,
+        "first_fixture_day": null,
+        "first_fixture_abs_err": null,
+        "n_days": 30,
+        "wall_clock_s": 0.1
+      },
+      "7_day": {
+        "mase_all": 0.317,
+        "mase_fixture_days": null,
+        "mase_later_fixture_days": null,
+        "l2_category_mase": null,
+        "first_fixture_day": null,
+        "first_fixture_abs_err": null,
+        "n_days": 30,
+        "wall_clock_s": 0.3
+      },
+      "3_day": {
+        "mase_all": 0.128,
+        "mase_fixture_days": null,
+        "mase_later_fixture_days": null,
+        "l2_category_mase": null,
+        "first_fixture_day": null,
+        "first_fixture_abs_err": null,
+        "n_days": 30,
+        "wall_clock_s": 0.6
+      },
+      "daily": {
+        "mase_all": 0.09,
+        "mase_fixture_days": null,
+        "mase_later_fixture_days": null,
+        "l2_category_mase": null,
+        "first_fixture_day": null,
+        "first_fixture_abs_err": null,
+        "n_days": 30,
+        "wall_clock_s": 2.0
+      }
+    },
+    "ellel": {
+      "cold_30": {
+        "mase_all": 0.485,
+        "mase_fixture_days": 0.808,
+        "mase_later_fixture_days": 0.858,
+        "l2_category_mase": 0.267,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 0.0,
+        "n_days": 30,
+        "wall_clock_s": 0.0
+      },
+      "7_day": {
+        "mase_all": 0.485,
+        "mase_fixture_days": 0.808,
+        "mase_later_fixture_days": 0.858,
+        "l2_category_mase": 0.267,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 0.0,
+        "n_days": 30,
+        "wall_clock_s": 0.3
+      },
+      "3_day": {
+        "mase_all": 0.485,
+        "mase_fixture_days": 0.808,
+        "mase_later_fixture_days": 0.858,
+        "l2_category_mase": 0.267,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 0.0,
+        "n_days": 30,
+        "wall_clock_s": 0.6
+      },
+      "daily": {
+        "mase_all": 0.485,
+        "mase_fixture_days": 0.808,
+        "mase_later_fixture_days": 0.858,
+        "l2_category_mase": 0.267,
+        "first_fixture_day": "2026-06-11",
+        "first_fixture_abs_err": 0.0,
+        "n_days": 30,
+        "wall_clock_s": 1.8
+      }
+    }
+  }
+}
