@@ -1,0 +1,158 @@
+{
+  "artefact": "july2026_w2b_forecast_frozen",
+  "origin": "B",
+  "cutoff": "2026-07-07",
+  "horizon_days_ahead": "1 to 7 (true)",
+  "created_utc": "2026-07-10T09:55:56.158397+00:00",
+  "horizon": {
+    "start": "2026-07-08",
+    "end": "2026-07-14",
+    "days": 7
+  },
+  "as_of": "2026-07-07",
+  "blind": "produced 2026-07-10 before any 8 to 14 July 2026 actual existed; 11 to 14 July are in the future. Cutoff 2026-07-07 (production 7-day cadence), so the 1 July England fixture and its observed uplift are IN the model context. Weather is the real hindcast forecast basis for 8 to 14 July, is_ellel_event=0 forward, wc_* from the fixed fixture calendar",
+  "level_conf": 0.9,
+  "origin_a": {
+    "artefact": "july2026_w2_forecast_frozen",
+    "commit": "a590f91",
+    "cutoff": "2026-06-30",
+    "note": "9 to 15 day-ahead, no July fixture in context; stands untouched"
+  },
+  "corrects": "report 28 horizon inconsistency: Origin B is the true 7-day-ahead forecast the live system serves; differs from Origin A ONLY by cutoff",
+  "sharpening_hypothesis": {
+    "beer_hall_jul11_origin_a_lift": 311.57,
+    "beer_hall_jul11_origin_b_lift": 308.88,
+    "b_minus_a": -2.69,
+    "origin_b_sharpens_england_anticipation": false
+  },
+  "liveness_gate": {
+    "dormant_venues": [
+      "two_river_taps"
+    ],
+    "lookback_days": 21
+  },
+  "weather_basis": "hindcast",
+  "l2_l3_method": "measured split (report 23): MinT for beer_hall, revenue-share disaggregation for ellel, on the refreshed node set",
+  "venues": {
+    "beer_hall": {
+      "dormant": false,
+      "model": "rung4_chronos2_exo",
+      "train_ceiling": "2026-07-07",
+      "l2_l3_split": "mint",
+      "band_halfwidth": 718.35,
+      "window_l1_total": 4468.93,
+      "jul11_yhat": 1558.28,
+      "fixture_expectations": {
+        "2026-07-11": {
+          "label": "england_qf_in_hours",
+          "yhat": 1558.28,
+          "dow_baseline": 1249.4,
+          "lift_over_baseline": 308.88,
+          "anticipates_lift": true,
+          "origin_a_yhat": 1565.19,
+          "origin_a_lift": 311.57,
+          "b_minus_a_lift": -2.69
+        },
+        "2026-07-09": {
+          "label": "generic_france_morocco",
+          "yhat": 766.89,
+          "dow_baseline": 657.69,
+          "lift_over_baseline": 109.2,
+          "anticipates_lift": true,
+          "origin_a_yhat": 735.35,
+          "origin_a_lift": 77.58,
+          "b_minus_a_lift": 31.62
+        },
+        "2026-07-10": {
+          "label": "generic_spain_belgium",
+          "yhat": 1103.0,
+          "dow_baseline": 862.89,
+          "lift_over_baseline": 240.11,
+          "anticipates_lift": true,
+          "origin_a_yhat": 1021.23,
+          "origin_a_lift": 182.84,
+          "b_minus_a_lift": 57.27
+        }
+      }
+    },
+    "two_river_taps": {
+      "dormant": true,
+      "reason": "no trading in the 21 days to 2026-07-07; liveness gate withholds a positive forecast"
+    },
+    "ellel": {
+      "dormant": false,
+      "model": "rung1_robust_dow",
+      "train_ceiling": "2026-07-04",
+      "l2_l3_split": "disaggregation",
+      "band_halfwidth": 259.33,
+      "window_l1_total": 56.3,
+      "jul11_yhat": 56.3,
+      "fixture_expectations": {
+        "2026-07-11": {
+          "label": "england_qf_in_hours",
+          "yhat": 56.3,
+          "dow_baseline": 832.11,
+          "lift_over_baseline": -775.8,
+          "anticipates_lift": false,
+          "origin_a_yhat": 56.3,
+          "origin_a_lift": -797.12,
+          "b_minus_a_lift": 21.32
+        },
+        "2026-07-09": {
+          "label": "generic_france_morocco",
+          "yhat": 0.0,
+          "dow_baseline": 431.29,
+          "lift_over_baseline": -431.29,
+          "anticipates_lift": false,
+          "origin_a_yhat": 0.0,
+          "origin_a_lift": -701.68,
+          "b_minus_a_lift": 270.39
+        },
+        "2026-07-10": {
+          "label": "generic_spain_belgium",
+          "yhat": 0.0,
+          "dow_baseline": 214.57,
+          "lift_over_baseline": -214.57,
+          "anticipates_lift": false,
+          "origin_a_yhat": 0.0,
+          "origin_a_lift": -214.57,
+          "b_minus_a_lift": 0.0
+        }
+      }
+    }
+  },
+  "chronos_runtime": {
+    "version": "2.3.1",
+    "model_id": "amazon/chronos-2",
+    "api": null,
+    "substituted": false,
+    "weather_basis": "hindcast",
+    "device": "mps",
+    "mps_fallback_enabled": "1"
+  },
+  "caveats": [
+    "true 7-day-ahead horizon, the regime the system actually serves (unlike Origin A).",
+    "hindcast weather is a forecast product; for 11 to 14 July it is the live forward forecast retrieved 2026-07-10.",
+    "two in-hours England dates (1 Jul + 11 Jul) is still a small sample; the in-context signal stays directional. C2 scores both origins against the held-out actuals."
+  ],
+  "reasons": {
+    "beer_hall": {
+      "2026-07-08": "weekday",
+      "2026-07-09": "World Cup match(es) in trading hours (France v Morocco); weekday",
+      "2026-07-10": "World Cup match(es) in trading hours (Spain v Belgium); weekday",
+      "2026-07-11": "England fixture in trading hours (Norway v England 22:00); expect uplift; weekend",
+      "2026-07-12": "weekend",
+      "2026-07-13": "weekday",
+      "2026-07-14": "World Cup match(es) in trading hours (Winner Match 97 v Winner Match 98); weekday"
+    },
+    "ellel": {
+      "2026-07-08": "weekday",
+      "2026-07-09": "World Cup match(es) in trading hours (France v Morocco); weekday",
+      "2026-07-10": "World Cup match(es) in trading hours (Spain v Belgium); weekday",
+      "2026-07-11": "England fixture in trading hours (Norway v England 22:00); expect uplift; weekend",
+      "2026-07-12": "weekend",
+      "2026-07-13": "weekday",
+      "2026-07-14": "weekday"
+    }
+  }
+}

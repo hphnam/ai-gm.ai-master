@@ -59,5 +59,16 @@
     "as_of": "2026-06-30",
     "venues": ["beer_hall", "ellel"],
     "note": "Two River Taps closed since 2026-05-08 (no June rows). June L1 tracks the SalesUK pull within a small VAT/rounding gap; L1/L2/L3 are mutually coherent (rebuilt from the item pull)."
+  },
+  "july2026_w1_ingest": {
+    "ingested_at": "2026-07-10T11:07:00.539104",
+    "mode": "MCP-SIM aggregate (Neon not provisioned)",
+    "grain": "one line per venue/date/category/item from the held-out ProductMix item pull; aggregate-sourced, no intraday or tax breakdown",
+    "source_file": "sim/july2026_actuals_l3_raw.json",
+    "rows_inserted": 204,
+    "store_ceiling": "2026-07-07",
+    "as_of": "2026-07-07",
+    "venues": ["beer_hall", "ellel"],
+    "note": "Advances the operational clock to the production 7-day-cadence cutoff (7 July) so the 8 to 14 July re-freeze (Origin B) is a true 7-day-ahead forecast. 1 to 7 July are past and already scored held-out in G12.17b; now observed history. Two River Taps dormant (no July rows)."
   }
 }

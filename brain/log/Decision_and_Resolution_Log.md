@@ -600,3 +600,28 @@ them into the append-only log so it is the continuous WP1-to-present record.
     exogenous weather tables were extended (covariate input, not actuals); `1d966be`,
     `7d103aa` and `stock_inventory.py` untouched. Step C2 confronts this artefact in a
     later session strictly after 2026-07-14.
+
+20. **G12.17c-b (Corrected C1): production-faithful 7-day-cadence freeze of 8 to 14
+    July (Origin B)** (`29_G12_17cb_Corrected_Freeze_Report.md`,
+    `PRJ93_Spec_G12_17cb_Corrected_Freeze.md`). Corrects the horizon inconsistency Nam
+    caught in report 28: Origin A forecast 8 to 14 July from a 29-June cutoff (9 to 15
+    day-ahead), but the live system refreshes every 7 days, so by 8 July it would
+    forecast 8 to 14 July from a 7 July cutoff (true 7-day-ahead) with the 1 July
+    England fixture observed. Advanced the clock: ingested 1 to 7 July as observed
+    history (`sim/ingest_july_w1_actuals.py`, same aggregate path as June; watermark
+    2026-07-07; reconcile Ellel GBP 0.00, Beer Hall +GBP 29.36; all 7 days present).
+    Re-froze 8 to 14 July from the 7 July cutoff (`sim/build_july_w2b_forecast.py`,
+    Origin B): same standing winners/config as Origin A, differing ONLY in cutoff.
+    Beer Hall Chronos-exo + MinT GBP 4,469 (11 Jul GBP 1,558), Ellel robust-DOW GBP 56,
+    TRT dormant; flags re-asserted; coherent, 462 rows. Still pre-registered (11 to 14
+    July are future). **Pre-registered B-vs-A finding:** Origin B does NOT sharpen the
+    11 July England anticipation (lift +GBP 309 vs A's +GBP 312, delta -GBP 3 - the
+    model already had June's fixtures in context), but the extra week RAISES the generic
+    match anticipation (9 Jul +GBP 32, 10 Jul +GBP 57), narrowing the home-nation
+    premium at the expectation level. Honest null on sharpening, real testable shift in
+    the generic-vs-home-nation gap; C2 scores both origins against the held-out actuals.
+    Deviation: the spec's sharpening hypothesis is reported as an honest null, not
+    forced. No 8 to 14 July actual read; store max 2026-07-07 with zero rows on/after 8
+    July; Origin A (`a590f91`), `7d103aa`, `1d966be` and `stock_inventory.py` untouched;
+    both suites green (store rebuilt by pytest then re-ingested to restore the advanced
+    state). C2 (after 2026-07-14) scores Origin A and Origin B together.
