@@ -1,0 +1,1643 @@
+{
+  "provenance": {
+    "source": "Square Reporting API (MCP-SIM), ProductMixReport, net_sales ex-VAT + units",
+    "merchant_id": "ML1FFAGJMQBTZ",
+    "last_refresh_time": "2026-07-10T02:31:20.569Z",
+    "note": "Held-out July 1-7 L3 actuals. Active venues only (TRT dormant, Events out of scope). NEVER written to served store. Square Uncategorized kept verbatim (taxonomy map applies at read).",
+    "unit": "GBP ex-VAT + units per venue/category/item/date"
+  },
+  "rows": [
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 50.63,
+      "units": 14.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 25.91,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Delirium Red",
+      "net_exvat": 4.16,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Frank The Tank",
+      "net_exvat": 22.5,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Guinness Can",
+      "net_exvat": 20.0,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 65.68,
+      "units": 18.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "No Worries AF",
+      "net_exvat": 4.83,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 16.51,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Pineapple IPA",
+      "net_exvat": 4.5,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 19.28,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Food",
+      "item": "RayGray Pork Bites",
+      "net_exvat": 3.95,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Food",
+      "item": "Serious Pig Truffle (GF)",
+      "net_exvat": 2.71,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Happy Hour",
+      "item": "\u00a33.50 Cask",
+      "net_exvat": 17.5,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Happy Hour",
+      "item": "\u00a34 Lager/Cider",
+      "net_exvat": 151.63,
+      "units": 47.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "Cordial Splash",
+      "net_exvat": 1.68,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "Fruit Shoot",
+      "net_exvat": 11.72,
+      "units": 8.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "J20",
+      "net_exvat": 2.5,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "Orange Juice",
+      "net_exvat": 4.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 15.17,
+      "units": 10.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 33.25,
+      "units": 14.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Dark Rum",
+      "net_exvat": 9.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Della Riveria Limoncello",
+      "net_exvat": 5.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Espresso Martini / Passion Fruit Martini",
+      "net_exvat": 6.66,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Glenfiddich",
+      "net_exvat": 12.75,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Kraken",
+      "net_exvat": 3.74,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "Malibu",
+      "net_exvat": 9.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 2.1,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Uncategorized",
+      "item": "Breeze Pale Ale",
+      "net_exvat": 26.57,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Uncategorized",
+      "item": "Galway Irish Stout",
+      "net_exvat": 93.4,
+      "units": 19.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Uncategorized",
+      "item": "Lancashire  crisps",
+      "net_exvat": 5.37,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Wine",
+      "item": "Merlot",
+      "net_exvat": 6.49,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Wine",
+      "item": "Pinot Grigio",
+      "net_exvat": 28.05,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Wine",
+      "item": "Pinot Grigio Rose",
+      "net_exvat": 25.16,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Wine",
+      "item": "Sauvignon Blanc",
+      "net_exvat": 46.66,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 9.37,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 9.26,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Delirium Red",
+      "net_exvat": 0.0,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Frank The Tank",
+      "net_exvat": 13.5,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Guinness Can",
+      "net_exvat": 3.6,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Lune Valley Gold",
+      "net_exvat": 63.0,
+      "units": 17.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 118.35,
+      "units": 33.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "No Worries AF",
+      "net_exvat": 4.35,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Pale Ale",
+      "net_exvat": 47.06,
+      "units": 14.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 7.84,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Pineapple IPA",
+      "net_exvat": 54.45,
+      "units": 15.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 4.33,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Food",
+      "item": "RayGray Pork Bites",
+      "net_exvat": 6.24,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Food",
+      "item": "Serious Pig Rosemary",
+      "net_exvat": 2.06,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Apple Juice",
+      "net_exvat": 2.08,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Cordial & Soda",
+      "net_exvat": 5.67,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "J20",
+      "net_exvat": 5.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Orange Juice",
+      "net_exvat": 2.08,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 1.67,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 13.42,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Baby Lager",
+      "net_exvat": 20.84,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Disaronno",
+      "net_exvat": 3.33,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 2.1,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Tequila Rose",
+      "net_exvat": 2.08,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Whitley Neill",
+      "net_exvat": 8.66,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "item": "Breeze Pale Ale",
+      "net_exvat": 8.5,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "item": "Galway Irish Stout",
+      "net_exvat": 48.22,
+      "units": 11.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "item": "Lancashire  crisps",
+      "net_exvat": 2.48,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "item": null,
+      "net_exvat": 1.41,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Wine",
+      "item": "Merlot",
+      "net_exvat": 13.7,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Wine",
+      "item": "Sauvignon Blanc",
+      "net_exvat": 16.08,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 41.24,
+      "units": 12.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 13.88,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Delirium Red",
+      "net_exvat": 54.07,
+      "units": 13.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Frank The Tank",
+      "net_exvat": 25.0,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Lune Valley Gold",
+      "net_exvat": 43.88,
+      "units": 12.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 202.61,
+      "units": 50.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "No Worries AF",
+      "net_exvat": 45.66,
+      "units": 11.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Old Mout Cider / Old Mout Cider 0%",
+      "net_exvat": 17.33,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Pale Ale",
+      "net_exvat": 104.82,
+      "units": 28.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Pineapple IPA",
+      "net_exvat": 20.25,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 4.33,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Food",
+      "item": "RayGray Pork Bites",
+      "net_exvat": 2.08,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Food",
+      "item": "Serious Pig Rosemary",
+      "net_exvat": 2.06,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Happy Hour",
+      "item": "\u00a33.50 Cask",
+      "net_exvat": 24.82,
+      "units": 9.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Happy Hour",
+      "item": "\u00a34 Lager/Cider",
+      "net_exvat": 58.97,
+      "units": 19.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "Cordial & Soda",
+      "net_exvat": 3.08,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "Fruit Shoot",
+      "net_exvat": 3.08,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "J20",
+      "net_exvat": 12.25,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "Orange Juice",
+      "net_exvat": 2.08,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 1.67,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 41.26,
+      "units": 19.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Baby Lager",
+      "net_exvat": 32.51,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Bacardi",
+      "net_exvat": 7.9,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Della Riveria Limoncello",
+      "net_exvat": 9.16,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Espresso Martini / Passion Fruit Martini",
+      "net_exvat": 6.66,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Hendricks",
+      "net_exvat": 5.42,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Hugo Spritz",
+      "net_exvat": 13.34,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Jack Daniels",
+      "net_exvat": 5.16,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Morgan's Spiced",
+      "net_exvat": 4.99,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "SMIRNOFF",
+      "net_exvat": 24.75,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 8.39,
+      "units": 20.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Whitley Neil Dry",
+      "net_exvat": 5.17,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "item": "Whitley Neill",
+      "net_exvat": 36.31,
+      "units": 8.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Uncategorized",
+      "item": "Breeze Pale Ale",
+      "net_exvat": 55.5,
+      "units": 14.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Uncategorized",
+      "item": "Galway Irish Stout",
+      "net_exvat": 19.67,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Uncategorized",
+      "item": "Lancashire  crisps",
+      "net_exvat": 8.27,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Discovery Beach Zinfandel",
+      "net_exvat": 6.62,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Limoncello Spritz",
+      "net_exvat": 6.67,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Malbec",
+      "net_exvat": 4.46,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Merlot",
+      "net_exvat": 25.24,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Pinot Grigio",
+      "net_exvat": 5.21,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "item": "Pinot Grigio Rose",
+      "net_exvat": 20.32,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 32.26,
+      "units": 9.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Caked",
+      "net_exvat": 22.39,
+      "units": 8.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 20.81,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Delirium Red",
+      "net_exvat": 4.16,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Frank The Tank",
+      "net_exvat": 31.87,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Lune Valley Gold",
+      "net_exvat": 76.79,
+      "units": 22.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 211.16,
+      "units": 57.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "No Worries AF",
+      "net_exvat": 19.81,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Old Mout Cider / Old Mout Cider 0%",
+      "net_exvat": 8.66,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Pale Ale",
+      "net_exvat": 84.41,
+      "units": 24.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 4.13,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 30.31,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Stout - Noir Hive",
+      "net_exvat": 3.25,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Food",
+      "item": "RayGray Pork Bites",
+      "net_exvat": 1.88,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Merchandise",
+      "item": "Caravan T-shirt",
+      "net_exvat": 50.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Cordial & Soda",
+      "net_exvat": 3.33,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Fruit Shoot",
+      "net_exvat": 1.54,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "J20",
+      "net_exvat": 1.88,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Orange Juice",
+      "net_exvat": 4.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 1.67,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 24.75,
+      "units": 10.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Glenfiddich",
+      "net_exvat": 12.75,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Hugo Spritz",
+      "net_exvat": 13.34,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Jack Daniels",
+      "net_exvat": 3.5,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "SMIRNOFF",
+      "net_exvat": 17.5,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 2.52,
+      "units": 6.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Whitley Neil Dry",
+      "net_exvat": 5.16,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Uncategorized",
+      "item": "Breeze Pale Ale",
+      "net_exvat": 28.68,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Uncategorized",
+      "item": "Lancashire  crisps",
+      "net_exvat": 1.38,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Wine",
+      "item": "Pinot Grigio Rose",
+      "net_exvat": 7.21,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Wine",
+      "item": "Prosecco",
+      "net_exvat": 9.17,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Wine",
+      "item": "Sauvignon Blanc",
+      "net_exvat": 61.94,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 14.25,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Caked",
+      "net_exvat": 1.57,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 12.48,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Frank The Tank",
+      "net_exvat": 2.5,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Guinness Can",
+      "net_exvat": 8.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Lune Valley Gold",
+      "net_exvat": 22.12,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 141.06,
+      "units": 37.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Old Mout Cider / Old Mout Cider 0%",
+      "net_exvat": 21.66,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Pale Ale",
+      "net_exvat": 11.24,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 4.13,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 40.72,
+      "units": 10.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Food",
+      "item": "RayGray Pork Bites",
+      "net_exvat": 4.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Soft Drinks",
+      "item": "Cordial & Soda",
+      "net_exvat": 3.33,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Soft Drinks",
+      "item": "Fruit Shoot",
+      "net_exvat": 1.54,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 3.34,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 35.67,
+      "units": 15.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Spirits",
+      "item": "3 Wheel",
+      "net_exvat": 4.58,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 0.42,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Uncategorized",
+      "item": "Breeze Pale Ale",
+      "net_exvat": 27.19,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Wine",
+      "item": "Chardonnay",
+      "net_exvat": 25.75,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Wine",
+      "item": "Merlot",
+      "net_exvat": 31.37,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Wine",
+      "item": "Pinot Grigio",
+      "net_exvat": 7.21,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Wine",
+      "item": "Serena Spumante (Fizz)",
+      "net_exvat": 17.24,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Amarillo Armegeddon",
+      "net_exvat": 25.49,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Caked",
+      "net_exvat": 12.51,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 9.24,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Guinness Can",
+      "net_exvat": 16.0,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Lune Valley Gold",
+      "net_exvat": 3.75,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 164.06,
+      "units": 38.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 45.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "item": "Session IPA",
+      "net_exvat": 12.99,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 3.33,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 10.92,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Spirits",
+      "item": "Disaronno",
+      "net_exvat": 9.5,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 2.05,
+      "units": 5.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Spirits",
+      "item": "Whitley Neil Dry",
+      "net_exvat": 12.99,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Wine",
+      "item": "Serena Spumante (Fizz)",
+      "net_exvat": 56.51,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-07",
+      "category": "Merchandise",
+      "item": "Hire Fee",
+      "net_exvat": 500.0,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "Cider - BH",
+      "net_exvat": 4.6,
+      "units": 2.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 37.04,
+      "units": 12.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 9.17,
+      "units": 4.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Glenmorangie",
+      "net_exvat": 12.5,
+      "units": 2.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Jack Daniels",
+      "net_exvat": 13.83,
+      "units": 3.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Jameson's",
+      "net_exvat": 9.99,
+      "units": 2.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "Malibu",
+      "net_exvat": 3.25,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "SMIRNOFF",
+      "net_exvat": 59.23,
+      "units": 13.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 7.54,
+      "units": 18.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "item": "Famous Grouse",
+      "net_exvat": 3.75,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Corona",
+      "net_exvat": 3.75,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Guinness Can",
+      "net_exvat": 4.0,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "LuneBrew Pilsner",
+      "net_exvat": 20.63,
+      "units": 5.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Old Mout Cider / Old Mout Cider 0%",
+      "net_exvat": 21.66,
+      "units": 5.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Pale Ale",
+      "net_exvat": 4.08,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "item": "Peroni",
+      "net_exvat": 24.75,
+      "units": 6.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Fruit Shoot",
+      "net_exvat": 1.54,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "J20",
+      "net_exvat": 27.5,
+      "units": 11.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Pop Can",
+      "net_exvat": 6.67,
+      "units": 4.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "item": "Postmix",
+      "net_exvat": 63.33,
+      "units": 26.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Baby Guinness",
+      "net_exvat": 27.5,
+      "units": 3.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Gordon's Pink",
+      "net_exvat": 6.67,
+      "units": 2.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Malibu",
+      "net_exvat": 13.75,
+      "units": 3.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Morgan's Spiced",
+      "net_exvat": 5.0,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "SMIRNOFF",
+      "net_exvat": 40.25,
+      "units": 9.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "SPLASH",
+      "net_exvat": 6.7,
+      "units": 16.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "item": "Tequila Rose",
+      "net_exvat": 6.25,
+      "units": 3.0
+    }
+  ]
+}

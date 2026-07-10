@@ -1,0 +1,100 @@
+{
+  "store_copy": "/private/tmp/claude-501/-Users-hapuna-Library-CloudStorage-OneDrive-LancasterUniversity-Placement-Project-ai-gm-ai-master/57de8901-98f1-4266-be80-08ad3f7dd8d9/scratchpad/brain_july_copy",
+  "july_rows_inserted": 204,
+  "fatigue_new_items_per_week": {
+    "beer_hall": 0,
+    "two_river_taps": 0,
+    "ellel": 0
+  },
+  "trt_closed_note": "Two River Taps is_closed; the briefing marks its closure dormant (no routine deviation items) and the persisted chain labels it continuing, not a daily new alarm (contrast June's 6 downward deviations).",
+  "jul1_fixture_deviation": null,
+  "deviation": {
+    "beer_hall": {
+      "n_deviation": 0,
+      "flagged": []
+    },
+    "two_river_taps": {
+      "n_deviation": 1,
+      "flagged": [
+        {
+          "date": "2026-07-03",
+          "direction": "down",
+          "z": -1.26,
+          "coincides_with": [
+            "coincides with a university term\u2194vacation transition",
+            "weather unavailable for this date, not checked"
+          ]
+        }
+      ]
+    },
+    "ellel": {
+      "n_deviation": 0,
+      "flagged": []
+    }
+  },
+  "daily": [
+    {
+      "as_of": "2026-07-01",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-02",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-03",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-04",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-05",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-06",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    },
+    {
+      "as_of": "2026-07-07",
+      "counts": {
+        "new": 0,
+        "continuing": 8,
+        "resolved": 0
+      },
+      "new_items": []
+    }
+  ]
+}

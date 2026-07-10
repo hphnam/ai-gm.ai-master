@@ -40,6 +40,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 24 | `24_G12_15_Report.md` | 2026-07-10 | G12.15: Chronos on MPS (parity, CPU faster for small runs), home-nation fixture flags (Scotland matters), cadence sweep (BH 7-day sweet spot), event-aware refresh policy, stock flagged |
 | 25 | `25_G12_16_Report.md` | 2026-07-10 | G12.16: Square-to-brain taxonomy map (`ingest/taxonomy_map.md`); mapped L2 re-score (unchanged); item-grain June pull (reconciles GBP 0.00); first real L3 item MASE (BH median 1.33, Ellel 0.24); finding is taxonomy drift not name misalignment (FLAG-TAXONOMY-DRIFT) |
 | 26 | `26_G12_17a_July_Pass1_Report.md` | 2026-07-10 | G12.17a (Pass 1): advance clock (June ingested), liveness gate (TRT dormant), taxonomy refresh (LuneBrew Pilsner now tracked), June-inclusive refit (robust-DOW edges Chronos-exo, not adopted), frozen blind July 1-7 forecast committed as pre-registration |
+| 27 | `27_G12_17b_July_Pass2_Report.md` | 2026-07-10 | G12.17b (Pass 2): July 1-7 confronted (BH L1 MASE 0.39, beats backtest class); in-context test (1 Jul lifted above baseline in anticipation, single-case); drift decomposition (Ellel named coverage +38pp); brain over July (0 new-items/week fatigue, TRT no alarm spam, liveness gate confirmed vs reality) |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single

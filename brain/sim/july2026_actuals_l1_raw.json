@@ -1,0 +1,74 @@
+{
+  "provenance": {
+    "source": "Square Reporting API (MCP-SIM), view SalesUK, measure net_sales_minus_auto_gratuity (ex-VAT)",
+    "merchant_id": "ML1FFAGJMQBTZ",
+    "last_refresh_time": "2026-07-10T02:30:33.650Z",
+    "note": "Held-out July 1-7 L1 actuals. NEVER written to served store. Two River Taps returned zero July rows (dormant, liveness-gate confirmed). Events out of scope.",
+    "unit": "GBP ex-VAT net sales per venue per local date"
+  },
+  "rows": [
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "net_exvat": 746.99,
+      "gross": 895.53,
+      "orders": 109
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "net_exvat": 500.73,
+      "gross": 600.85,
+      "orders": 85
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "net_exvat": 1036.14,
+      "gross": 1243.23,
+      "orders": 133
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "net_exvat": 802.37,
+      "gross": 952.78,
+      "orders": 92
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "net_exvat": 441.53,
+      "gross": 529.83,
+      "orders": 71
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "net_exvat": 366.53,
+      "gross": 439.71,
+      "orders": 54
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-07",
+      "net_exvat": 500.0,
+      "gross": 600.0,
+      "orders": 1
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "net_exvat": 160.9,
+      "gross": 193.08,
+      "orders": 1
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "net_exvat": 284.03,
+      "gross": 340.8,
+      "orders": 50
+    }
+  ]
+}

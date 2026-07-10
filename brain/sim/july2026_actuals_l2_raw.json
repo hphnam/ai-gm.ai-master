@@ -1,0 +1,326 @@
+{
+  "provenance": {
+    "source": "Square Reporting API (MCP-SIM), ProductMixReport, net_sales ex-VAT + units",
+    "merchant_id": "ML1FFAGJMQBTZ",
+    "last_refresh_time": "2026-07-10T02:31:20.569Z",
+    "note": "Held-out July 1-7 L2 actuals. Active venues only (TRT dormant, Events out of scope). NEVER written to served store. Square Uncategorized kept verbatim (taxonomy map applies at read).",
+    "unit": "GBP ex-VAT + units per venue/category/date"
+  },
+  "rows": [
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Beer",
+      "net_exvat": 234.0,
+      "units": 61.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Food",
+      "net_exvat": 6.66,
+      "units": 3.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Happy Hour",
+      "net_exvat": 169.13,
+      "units": 53.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Soft Drinks",
+      "net_exvat": 68.48,
+      "units": 39.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Spirits",
+      "net_exvat": 48.57,
+      "units": 15.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Uncategorized",
+      "net_exvat": 125.34,
+      "units": 30.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-01",
+      "category": "Wine",
+      "net_exvat": 106.36,
+      "units": 12.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "net_exvat": 335.11,
+      "units": 93.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Food",
+      "net_exvat": 8.3,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "net_exvat": 29.92,
+      "units": 15.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "net_exvat": 37.01,
+      "units": 12.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "net_exvat": 60.61,
+      "units": 16.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-02",
+      "category": "Wine",
+      "net_exvat": 29.779999999999998,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Beer",
+      "net_exvat": 573.07,
+      "units": 144.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Food",
+      "net_exvat": 4.140000000000001,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Happy Hour",
+      "net_exvat": 83.78999999999999,
+      "units": 28.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Soft Drinks",
+      "net_exvat": 63.42,
+      "units": 31.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Spirits",
+      "net_exvat": 159.76,
+      "units": 49.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Uncategorized",
+      "net_exvat": 83.44,
+      "units": 24.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-03",
+      "category": "Wine",
+      "net_exvat": 68.52,
+      "units": 12.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "net_exvat": 550.01,
+      "units": 150.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Food",
+      "net_exvat": 1.88,
+      "units": 1.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Merchandise",
+      "net_exvat": 50.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "net_exvat": 37.33,
+      "units": 18.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "net_exvat": 54.769999999999996,
+      "units": 17.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Uncategorized",
+      "net_exvat": 30.06,
+      "units": 8.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-04",
+      "category": "Wine",
+      "net_exvat": 78.32,
+      "units": 10.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Beer",
+      "net_exvat": 279.73,
+      "units": 74.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Food",
+      "net_exvat": 4.16,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Soft Drinks",
+      "net_exvat": 43.88,
+      "units": 20.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Spirits",
+      "net_exvat": 5.0,
+      "units": 2.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Uncategorized",
+      "net_exvat": 27.19,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-05",
+      "category": "Wine",
+      "net_exvat": 81.57,
+      "units": 15.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Beer",
+      "net_exvat": 289.04,
+      "units": 60.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Soft Drinks",
+      "net_exvat": 14.25,
+      "units": 7.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Spirits",
+      "net_exvat": 24.54,
+      "units": 10.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-06",
+      "category": "Wine",
+      "net_exvat": 56.51,
+      "units": 4.0
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-07",
+      "category": "Merchandise",
+      "net_exvat": 500.0,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Beer",
+      "net_exvat": 41.64,
+      "units": 14.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Soft Drinks",
+      "net_exvat": 9.17,
+      "units": 4.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Spirits",
+      "net_exvat": 106.34,
+      "units": 39.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-02",
+      "category": "Uncategorized",
+      "net_exvat": 3.75,
+      "units": 1.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Beer",
+      "net_exvat": 78.87,
+      "units": 19.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Soft Drinks",
+      "net_exvat": 99.03999999999999,
+      "units": 42.0
+    },
+    {
+      "venue": "ellel",
+      "date": "2026-07-04",
+      "category": "Spirits",
+      "net_exvat": 106.12,
+      "units": 37.0
+    }
+  ]
+}

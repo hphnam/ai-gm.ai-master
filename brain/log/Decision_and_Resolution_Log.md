@@ -541,3 +541,32 @@ them into the append-only log so it is the continuous WP1-to-present record.
     live World Cup. No July sales actual read; `1d966be` and `stock_inventory.py`
     untouched; both suites green (.venv-forecast 269 passed 1 skip). Pass 2 (G12.17b)
     confronts this artefact with July reality.
+
+18. **G12.17b (Pass 2 of 2): confront July reality, in-context test, run the brain**
+    (`27_G12_17b_July_Pass2_Report.md`, `PRJ93_Spec_G12_17b_July_Pass2.md`; cites
+    Pass-1 SHA 7d103aaa). Held-out July 1 to 7 actuals pulled (MCP-SIM: SalesUK L1 +
+    ProductMix item L2/L3, ex-VAT, `sim/july2026_actuals_*.json`, never in the served
+    store; reconciles to GBP 0.00 Ellel / GBP 29 Beer Hall). **Stage 1** the 7-day
+    horizon lands Beer Hall L1 at MASE 0.386 (band cover 1.00), inside the 0.745
+    backtest class and far better than June's 30-day 1.64; Ellel 0.070; L3 all-node
+    MASE median Beer Hall 0.72, Ellel 0.08; TRT produced no forecast and no actual
+    (liveness gate's fix of June's 5,329-vs-0, confirmed). **Stage 2 in-context test:**
+    the July forecast lifted 1 Jul GBP 191 ABOVE the Wednesday baseline (frozen 487 vs
+    median 296, actual 747) in anticipation of England v DR Congo, where June's first
+    in-hours fixture sat at baseline (report 22) - June's fixture days, now in training,
+    taught the Chronos-exo `wc_england_in_hours` effect. Single in-hours date,
+    directional not significant, magnitude under-shot; caveated as such. **Stage 3
+    drift decomposition:** refreshed-taxonomy named coverage jumps Ellel +38pp
+    (15%->53%), Beer Hall +3.6pp; July L3 MASE far below June (confounded with the
+    shorter horizon, so the clean drift signal is the coverage jump; new-July items
+    still fall to OTHER). **Stage 4 brain over July** (existing detectors + PERSISTED
+    briefing chain, store copy, served store untouched): real fatigue 0 new items per
+    week (8 standing items all continuing, suppressed), vs report 22's per-day upper
+    bound; TRT no alarm spam (one within-noise blip suppressed by the closed-venue
+    path, vs June's 6); 1 Jul did NOT surface as a deviation (z=0.78, within Beer Hall
+    variance) - correct: forecastable fixture structure, not an anomaly. Deviation
+    logged: the June ingest is not durable across `warehouse.build()` (a mid-pass
+    pytest rebuilt the store from the May parquet and dropped June; re-ingested and
+    Stages 1-4 re-run June-inclusive; the Pass-1 artefact predates the wipe and is
+    unaffected; production `NeonAdapter` makes it durable). Served store max stays
+    2026-06-29, zero July rows; `1d966be` and `stock_inventory.py` untouched.
