@@ -1,0 +1,97 @@
+{
+  "coverage": {
+    "square_categories": [
+      "Beer",
+      "Food",
+      "Happy Hour",
+      "Merchandise",
+      "Soft Drinks",
+      "Spirits",
+      "Uncategorized",
+      "Wine"
+    ],
+    "mapped_net_sales_fraction": 1.0,
+    "dropped_categories": []
+  },
+  "l2": {
+    "beer_hall": {
+      "mae_category_total": 1660.0,
+      "raw_string_mae_report22": 1660.0,
+      "unchanged_by_map": true,
+      "table": [
+        {
+          "category": "Beer",
+          "frozen": 9227.0,
+          "actual": 13102.0
+        },
+        {
+          "category": "Food",
+          "frozen": 93.0,
+          "actual": 30.0
+        },
+        {
+          "category": "Happy Hour",
+          "frozen": 451.0,
+          "actual": 705.0
+        },
+        {
+          "category": "Merchandise",
+          "frozen": 57.0,
+          "actual": 778.0
+        },
+        {
+          "category": "Soft Drinks",
+          "frozen": 925.0,
+          "actual": 1633.0
+        },
+        {
+          "category": "Spirits",
+          "frozen": 1326.0,
+          "actual": 4563.0
+        },
+        {
+          "category": "Uncategorised",
+          "frozen": 190.0,
+          "actual": 2324.0
+        },
+        {
+          "category": "Wine",
+          "frozen": 1648.0,
+          "actual": 3935.0
+        }
+      ]
+    },
+    "ellel": {
+      "mae_category_total": 347.0,
+      "raw_string_mae_report22": 347.0,
+      "unchanged_by_map": true,
+      "table": [
+        {
+          "category": "Beer",
+          "frozen": 247.0,
+          "actual": 1429.0
+        },
+        {
+          "category": "Soft Drinks",
+          "frozen": 58.0,
+          "actual": 289.0
+        },
+        {
+          "category": "Spirits",
+          "frozen": 180.0,
+          "actual": 189.0
+        },
+        {
+          "category": "Uncategorised",
+          "frozen": 4.0,
+          "actual": 216.0
+        },
+        {
+          "category": "Wine",
+          "frozen": 115.0,
+          "actual": 214.0
+        }
+      ]
+    }
+  }
+}
