@@ -3,20 +3,20 @@
 Climb one rung at a time; **adopt a rung only if it beats the rung below** on
 held-out MASE. Two evaluation regimes are reported:
 
-  * **static**  — one forecast of the last 8 weeks, multi-step from the train
+  * **static**, one forecast of the last 8 weeks, multi-step from the train
     origin (the GBM feeds its own predictions back as lags). A stress test; the
     robust DOW profile is very hard to beat over such a long static horizon.
-  * **rolling** — expanding-window rolling-origin, 7-day horizon (methodology
+  * **rolling**, expanding-window rolling-origin, 7-day horizon (methodology
     §3.1). This is the operational regime the brief actually needs ("next
     week's keg order") and the **milestone gate**: a model is adopted only if
     it beats both seasonal-naive and robust DOW here, on strictly held-out
     folds.
 
-    Rung 0  seasonal-naive (lag-7)             — the MASE denominator
-    Rung 1  robust DOW x seasonal index        — the interpretable baseline
-    Rung 2  STL / ETS / Prophet                — classical decomposition
-    Rung 3  gradient boosting (+ global pool)  — non-linear, partial pooling
-    Rung 4  foundation models                  — optional; adopted only if it
+    Rung 0  seasonal-naive (lag-7), the MASE denominator
+    Rung 1  robust DOW x seasonal index, the interpretable baseline
+    Rung 2  STL / ETS / Prophet, classical decomposition
+    Rung 3  gradient boosting (+ global pool), non-linear, partial pooling
+    Rung 4  foundation models, optional; adopted only if it
                                                   beats rung3_global_gbm on
                                                   held-out rolling MASE. Tan et
                                                   al. (2024) motivates scepticism
@@ -74,7 +74,7 @@ def _report_path(venue: str):
 def _load_feats(venue: str) -> pd.DataFrame:
     """Build features, then trim to the venue's active trading span so a closed
     venue's zero-tail (e.g. TRT after 2026-05-08) is never the held-out test
-    block — otherwise every model trivially 'wins' by predicting zero."""
+    block, otherwise every model trivially 'wins' by predicting zero."""
     return trim_to_active(build_features(venue), venue)
 
 try:
@@ -207,7 +207,7 @@ def rung2_prophet(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.n
 # --- Rung 3 ------------------------------------------------------------------
 
 def _fit_gbm(X: pd.DataFrame, y: np.ndarray) -> HistGradientBoostingRegressor:
-    # HistGradientBoosting is a native (libomp-free) GBM — the same family as
+    # HistGradientBoosting is a native (libomp-free) GBM, the same family as
     # XGBoost/LightGBM, used here so the rung runs without an OpenMP runtime.
     model = HistGradientBoostingRegressor(
         max_iter=400, learning_rate=0.05, max_leaf_nodes=31,
@@ -434,7 +434,7 @@ def milestone(results: list[RungResult], cap: int = 99) -> tuple[bool, dict]:
     if cap <= 1:
         # Capped venue (e.g. Ellel): the ladder stops at Rung 1, so the
         # adoption criterion is "robust DOW (Rung 1) beats seasonal-naive (Rung
-        # 0)" — there is no higher rung that could beat Rung 1.
+        # 0)", there is no higher rung that could beat Rung 1.
         passed = dow.metrics["MASE"] < naive.metrics["MASE"]
         gate = "Rung 1 (robust DOW) beats seasonal-naive"
         best = dow
@@ -617,7 +617,7 @@ def ets_prophet_diagnostic(venue: str) -> list[str]:
 
 
 def spillover_importance(venue: str) -> list[str]:
-    """FIX-8: permutation importance of is_ellel_event in the Beer Hall GBM —
+    """FIX-8: permutation importance of is_ellel_event in the Beer Hall GBM
     does an Ellel event night spill over into Beer Hall demand?"""
     from sklearn.inspection import permutation_importance
 

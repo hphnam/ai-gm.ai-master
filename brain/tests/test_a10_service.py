@@ -1,4 +1,4 @@
-"""A10 tests — every endpoint returns valid JSON and OpenAPI is served, and all
+"""A10 tests, every endpoint returns valid JSON and OpenAPI is served, and all
 three forecast venues are actually served (the regression guard for FIX-4: all
 venues are forecast targets, not just the Beer Hall)."""
 
@@ -76,7 +76,7 @@ def test_deviation_check_unknown_venue_returns_not_found_envelope(client):
 
 @pytest.mark.parametrize("venue", list(FORECAST_VENUES))
 def test_forecast_served_for_every_venue(client, venue):
-    """FIX-4: all three venues are forecast targets — /forecast must not 404."""
+    """FIX-4: all three venues are forecast targets, /forecast must not 404."""
     r = client.get(f"/forecast?venue={venue}&layer=L1&level=0.9")
     assert r.status_code == 200
     body = r.json()

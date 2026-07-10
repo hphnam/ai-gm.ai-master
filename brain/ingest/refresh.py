@@ -9,7 +9,7 @@ touching them.
 
 The cost guarantee (G-live-d): a transaction only ever reaches T2, a cheap append.
 The expensive T3 re-fit (ladder backtest + rung re-select) fires ONLY on a weekly
-cadence boundary or a confirmed change-point since the last fit — never per
+cadence boundary or a confirmed change-point since the last fit, never per
 transaction, never per single day. Every re-fit writes a `ladder_selection` audit
 row; no silent rung swap (G-live-c).
 
@@ -126,18 +126,18 @@ def _served(venue: str, con, layer: str = "L1") -> tuple[str | None, date | None
 
 def _is_rung4(model_name: str | None) -> bool:
     """WP12: true for any Rung-4 foundation entrant (chronos2, chronos2_exo,
-    chronos_bolt, and any future rung4_* addition) — the guard trigger."""
+    chronos_bolt, and any future rung4_* addition), the guard trigger."""
     return bool(model_name) and model_name.startswith("rung4_")
 
 
 def freshness(venue: str, con) -> dict:
     """Per-venue currency: is this current, does it need a refresh? Never falsely
-    stale on the CSV ceiling (G2) — a store with no watermark falls back to its
+    stale on the CSV ceiling (G2), a store with no watermark falls back to its
     data max and reports staleness 0 against the source's own latest date.
 
     `last_refit` (from ladder_selection) is when the rung was last RE-SELECTED;
     `served_model`/`served_as_of` (from served_forecast) is what is CURRENTLY served
-    and as of when — the surface distinguishes the two."""
+    and as of when, the surface distinguishes the two."""
     adapter = get_adapter()
     latest = adapter.latest_available_date()
     wm = read_watermark(venue, con)
@@ -239,7 +239,7 @@ def _in_event_window(venue: str, as_of: datetime | None = None,
 
 def _should_refit(venue: str, refit: str) -> tuple[bool, str]:
     """The T3 guard. `never`/`force` are explicit; `auto` fires only on a cadence
-    boundary or a confirmed change-point since the last recorded fit — so a single
+    boundary or a confirmed change-point since the last recorded fit, so a single
     new closed day never triggers it (the cost guarantee). The cadence is the weekly
     RETRAIN_CADENCE_DAYS, tightened to EVENT_REFRESH_CADENCE_DAYS inside a flagged
     event window (G12.15d). Opens and closes its own read connection so no connection
@@ -275,12 +275,12 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
     adoption guard). Writes a `ladder_selection` audit row every time it actually
     re-fits. Runs the backtest FIRST with no connection open anywhere (the ladder
     opens its own read connections); then a SINGLE write connection does both the
-    incumbent read and the audit insert — so there is never a read↔write connection
+    incumbent read and the audit insert, so there is never a read↔write connection
     open at once on the store file (DuckDB permits only one open configuration).
 
     WP12 environment guard: if the currently served model is a Rung-4 foundation
     entrant and this venv has no chronos backend, the re-fit is skipped entirely
-    (no backtest run, no audit row written) — a chronos-less venv must never
+    (no backtest run, no audit row written), a chronos-less venv must never
     re-select among rungs 0-3 and silently demote a served Rung-4 model. Returns
     a `"skipped"` dict instead; the served model is left untouched."""
     import json
@@ -352,7 +352,7 @@ def _promote_and_serve(venue: str, layer: str = "L1", *, adopted_model: str | No
 
     WP12 environment guard: if the resolved model is a Rung-4 foundation entrant
     and this venv has no chronos backend, `wrap.evaluate` is never called (it would
-    raise on the missing predictor) — the persisted band is left exactly as-is,
+    raise on the missing predictor), the persisted band is left exactly as-is,
     nothing is upserted, and a loud note is returned. The only way to fall back to
     rung2_ets from a chronos-less venv is the explicit `allow_fallback=True` flag,
     which writes an operator-approved `ladder_selection` audit row before serving
@@ -448,7 +448,7 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str,
     notes: list[str] = []
     latest = adapter.latest_available_date()
 
-    # Phase 1 — ingest (write connection only).
+    # Phase 1, ingest (write connection only).
     con = connect()
     try:
         _ensure_tables(con)
@@ -466,13 +466,13 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str,
     finally:
         con.close()
 
-    # Phase 2 — enrich (own connections), only when new closed days landed.
+    # Phase 2, enrich (own connections), only when new closed days landed.
     exog_dates, features_built, weather_gap = 0, False, []
     if n_added:
         exog_dates, weather_gap = _auto_exog(notes)
         features_built = _rebuild_features(venue, notes)
 
-    # Phase 3 — conditional T3 re-fit (each helper manages its own connection).
+    # Phase 3, conditional T3 re-fit (each helper manages its own connection).
     refit_done, rung_change = False, None
     should, reason = _should_refit(venue, refit)
     if should:
@@ -488,7 +488,7 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str,
     else:
         notes.append(f"T3 skipped: {reason}")
 
-    # Phase 4 — promote: regenerate the served forecast so /forecast and
+    # Phase 4, promote: regenerate the served forecast so /forecast and
     # /stock/cover reflect the new data (or a newly adopted rung). Fires only on new
     # closed days or an adoption (a force refresh always promotes); never per
     # transaction. Rides the closed-day cadence: at most one fit per venue per cycle.
@@ -518,7 +518,7 @@ def _refresh_one(venue: str, adapter, *, force: bool, refit: str,
 def _auto_exog(notes: list[str]) -> tuple[int, list]:
     """Pull exogenous for the new span incrementally, then assert coverage. Returns
     (dates_added, weather_gap). Forecast-neutral while the adopted exo set is empty
-    (G-live-b) — it serves reasoning/attribution, not the forecast. A missing-weather
+    (G-live-b), it serves reasoning/attribution, not the forecast. A missing-weather
     span is recorded as a structured `weather_gap`, never a swallowed 'skipped' note
     (B3): a genuine network failure produces a loud gap, not silence, and does not
     crash the refresh."""

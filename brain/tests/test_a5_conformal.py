@@ -1,4 +1,4 @@
-"""A5 tests — the conformal quantile is valid and Mondrian is group-conditional."""
+"""A5 tests, the conformal quantile is valid and Mondrian is group-conditional."""
 
 from __future__ import annotations
 

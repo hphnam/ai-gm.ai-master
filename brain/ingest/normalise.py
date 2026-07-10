@@ -3,7 +3,7 @@
 Reads the UTF-16LE / TAB-separated Square item export, produces a tidy long
 table at line-item grain (one row per source line item), and writes a manifest
 recording counts, span, null rates and dropped rows. Nothing is silently
-coerced — anything that cannot be parsed is dropped *with a reason* and counted
+coerced, anything that cannot be parsed is dropped *with a reason* and counted
 in the manifest.
 
 Run:
@@ -104,7 +104,7 @@ def _read_raw() -> pd.DataFrame:
 
 
 def normalise() -> tuple[pd.DataFrame, dict]:
-    """Return (tidy_long_table, manifest_dict). Pure — does not write files."""
+    """Return (tidy_long_table, manifest_dict). Pure, does not write files."""
     raw = _read_raw()
     total_source_rows = len(raw)
 

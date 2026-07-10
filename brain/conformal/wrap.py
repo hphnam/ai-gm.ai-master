@@ -1,4 +1,4 @@
-"""A5 · Conformal wrapper — the deliverable of Objective 1 (methodology §2/§5).
+"""A5 · Conformal wrapper, the deliverable of Objective 1 (methodology §2/§5).
 
 Wraps the selected L1 forecaster so it emits a **calibrated band**, not a
 point. The band is split conformal (the finite-sample quantile of absolute
@@ -146,7 +146,7 @@ def evaluate(
     deployable deliverable.
     """
     # Trim to the active trading span so a closed venue's zero-tail (TRT) is not
-    # calibrated/validated against — the closure is a structural break.
+    # calibrated/validated against, the closure is a structural break.
     feats = trim_to_active(build_features(venue), venue)
     cols = feature_columns(feats)
     full = rolling_point_forecasts(feats, model_name, cols, horizon=7, venue=venue)
@@ -345,7 +345,7 @@ def _run_one(venue: str, layer: str, model: str | None) -> bool:
               f"(Mondrian coverage within ±{COVERAGE_TOL_PP}pp at 80% and 90%)")
     else:
         # Secondary venues: the deliverable is a persisted, calibrated band.
-        # Coverage is reported honestly — any miss here is over-coverage (the
+        # Coverage is reported honestly, any miss here is over-coverage (the
         # conservative/safe direction for a closed or sparse venue).
         worst = max(abs(out["levels"][lvl]["mondrian"]["coverage"] * 100 - lvl * 100)
                     for lvl in CONFORMAL_LEVELS)

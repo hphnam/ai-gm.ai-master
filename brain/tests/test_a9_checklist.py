@@ -1,4 +1,4 @@
-"""A9 tests — template parse, weighting, conditional exclusion, Sunday rule."""
+"""A9 tests, template parse, weighting, conditional exclusion, Sunday rule."""
 
 from __future__ import annotations
 

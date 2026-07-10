@@ -2,13 +2,13 @@
 
 Scores each briefing item on a fixed rubric (correctness given the day's numbers,
 actionability, clarity of the "why", appropriately calibrated confidence). The
-decisive move — and the answer to the open supervisor question ("is LLM-as-judge
-acceptable as a substitute for manager feedback?") — is to CALIBRATE the judge
+decisive move, and the answer to the open supervisor question ("is LLM-as-judge
+acceptable as a substitute for manager feedback?"), is to CALIBRATE the judge
 against the human anchor (`eval.labels`) and report a measured agreement (Cohen's
 kappa), not to trust it blind.
 
 Reproducibility: the model, rubric, and prompt are pinned (`JUDGE_MODEL`, the
-constants below). The judge runs offline — an eval script calling the Anthropic
+constants below). The judge runs offline, an eval script calling the Anthropic
 API. When API access is not available (the default), the module EMITS judge-ready
 prompts + a scoring schema for an offline or human judge to fill, the same honest
 seam the project uses elsewhere (Voyage → TF-IDF, live-ingest → inert). It never
@@ -171,7 +171,7 @@ def calibrate(scores: list[dict], con=None) -> dict:
 
 def evaluate(surfaced: dict, con=None) -> dict:
     """Score the surfaced items and (if a human anchor exists) calibrate. Default
-    mode is the offline emit-prompts seam — no fabricated numbers."""
+    mode is the offline emit-prompts seam, no fabricated numbers."""
     return _evaluate_dicts(_flatten(surfaced), con=con)
 
 

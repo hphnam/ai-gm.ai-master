@@ -1,4 +1,4 @@
-"""A10 · FastAPI service — exposes the brain to Track B (the AI-GM agent).
+"""A10 · FastAPI service, exposes the brain to Track B (the AI-GM agent).
 
 A localhost service reading from the DuckDB store and the signal modules.
 Endpoints (typed JSON):
@@ -205,7 +205,7 @@ def deviation_check(req: DeviationRequest) -> dict:
     the classified day, or a `found=false` envelope (200, never an error) when the
     requested day is not a trading day in the stream (closed / non-trading / beyond
     data / too little history)."""
-    # NOTE: function-local import — defers the heavy pandas/signal graph off module
+    # NOTE: function-local import, defers the heavy pandas/signal graph off module
     # load (same lazy pattern as the sop-gaps handler).
     from signals.deviation import check_point
 
@@ -349,7 +349,7 @@ def briefing(venue: str = "all", as_of: date | None = None, layer: str = "L1",
     """The proactive-briefing capstone: the four signals composed into one ranked,
     de-duplicated, attributed daily feed with new/continuing/resolved status. A
     quiet day returns `items: []` at 200; a closed / unknown venue never 500s.
-    Read-only — the daily `run()` (CLI/cron) is what persists `briefing_runs`.
+    Read-only, the daily `run()` (CLI/cron) is what persists `briefing_runs`.
     `freshness=live` does a capped T2 top-up first (never a T3 re-fit)."""
     # NOTE: function-local import defers the signal graph off module load.
     from signals.briefing import build
@@ -442,7 +442,7 @@ class RefreshRequest(BaseModel):
 @app.post("/refresh")
 def post_refresh(req: RefreshRequest) -> dict:
     """Operator / cron entry: run T2 refresh (+ conditional T3). Not on the model
-    surface — the agent gets read-only freshness, never a way to trigger a re-fit.
+    surface, the agent gets read-only freshness, never a way to trigger a re-fit.
 
     `allow_fallback` (WP12, default False): the operator's explicit, one-off
     escape hatch when a Rung-4 served model needs re-promoting from a venv with

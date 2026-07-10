@@ -4,7 +4,7 @@ Builds a coherent venue -> category -> item units hierarchy for the Beer Hall,
 forecasts every node independently (robust DOW-median base forecasts), then
 reconciles them with **MinT** (Wickramasuriya et al. 2019; WLS with a diagonal
 error-covariance) so item/category/venue forecasts are coherent. MinT output is
-coherent by construction — Σ(item) = category = venue exactly — which we verify.
+coherent by construction, Σ(item) = category = venue exactly, which we verify.
 
 The reconciled item-unit forecast is the **stock-consumption proxy**: forecast
 pints of `Lager - BH` -> implied keg depletion, serving the ordering use-case
@@ -147,7 +147,7 @@ def mint_reconcile(Ybase: np.ndarray, S: np.ndarray, w: np.ndarray) -> np.ndarra
 def node_quantiles(
     node_series: dict, nodes: list[str], test_start: pd.Timestamp
 ) -> dict[tuple[str, float], float]:
-    """Split-conformal quantile per non-VENUE node per level — the single band
+    """Split-conformal quantile per non-VENUE node per level, the single band
     source of truth for A6 (used by BOTH the coverage check and persistence).
 
     Score = |actual - DOW-median| on each node's pre-test training span, which
@@ -287,7 +287,7 @@ def _croston_comparison(node_series, nodes, test_dates, test_start, intermittent
 
 def _read_stock_position() -> list[dict]:
     """Read mapped days-of-cover rows from the A12 `stock_cover` table, if it
-    exists. Returns [] when stock has not been ingested — keeping A6 headless."""
+    exists. Returns [] when stock has not been ingested, keeping A6 headless."""
     con = connect(read_only=True)
     try:
         exists = con.execute(
@@ -324,7 +324,7 @@ def _consumption_proxy(node_series, nodes, recon, bottom_nodes, test_dates) -> d
 
 def _persist(venue, nodes, recon, test_dates, node_q) -> None:
     """Persist forecasts + bands. The band is the SAME conformal band whose
-    coverage reconcile() validates — `recon[i] ± node_q[(node, level)]` — so the
+    coverage reconcile() validates, `recon[i] ± node_q[(node, level)]`, so the
     rows the /forecast API serves are exactly the rows that were coverage-checked.
     """
     fc_rows, band_rows = [], []

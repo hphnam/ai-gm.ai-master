@@ -1,4 +1,4 @@
-"""A3 tests — features reconcile, are leak-free, and carry the activated seam."""
+"""A3 tests, features reconcile, are leak-free, and carry the activated seam."""
 
 from __future__ import annotations
 

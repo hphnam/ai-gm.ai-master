@@ -1,10 +1,10 @@
-"""A2 · Evaluation harness — built *before* any model (methodology §3).
+"""A2 · Evaluation harness, built *before* any model (methodology §3).
 
 Everything a rung is scored on lives here so every rung is judged identically:
 time-aware splits, an expanding-window rolling-origin backtest, a leave-one-
 venue-out scaffold for the transfer claim, and the metric battery (MASE,
 MAE/RMSE, sMAPE, interval coverage, Winkler, mean pinball, mean width). Leakage
-guards are explicit — `assert_no_leakage` raises if any train fold contains a
+guards are explicit, `assert_no_leakage` raises if any train fold contains a
 date at/after its test fold.
 
 Run:
@@ -179,7 +179,7 @@ def mean_width(lo: np.ndarray, hi: np.ndarray) -> float:
 
 def winkler(y_true: np.ndarray, lo: np.ndarray, hi: np.ndarray, level: float) -> float:
     """Mean Winkler interval score for a central (level) interval. Lower is
-    better — penalises width plus 2/alpha * miss distance."""
+    better, penalises width plus 2/alpha * miss distance."""
     alpha = 1.0 - level
     y_true = np.asarray(y_true, float)
     lo = np.asarray(lo, float)

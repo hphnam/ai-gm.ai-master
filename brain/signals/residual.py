@@ -3,7 +3,7 @@
 The standardised conformal residual stream, the conformal band scale, and the
 A14-seam attribution are common to BOTH the per-day point-deviation primitive
 (`signals.deviation`) and the sustained change-point detector
-(`signals.change_point`). They live here so neither signal imports the other —
+(`signals.change_point`). They live here so neither signal imports the other
 the dependency flows residual ← {deviation, change_point}, never deviation ↔
 change_point.
 
@@ -15,7 +15,7 @@ span, trading days only. The per-day point check and the sustained change-point
 detector both read this same yardstick, so point-anomaly severity and
 change-point evidence share a scale.
 
-This module changes no forecast — it reads existing store data only.
+This module changes no forecast. It reads existing store data only.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ WEATHER_BASELINE_DAYS = 120
 def build_residual_stream(venue: str, con=None) -> pd.DataFrame:
     """Leakage-free one-step-ahead standardised residual stream over the active
     span. expected = expanding DOW-median (Rung-1 baseline); scale = conformal
-    half-band-width (level CP_LEVEL) of the training residuals — the shared scale
+    half-band-width (level CP_LEVEL) of the training residuals, the shared scale
     the point-deviation and change-point detectors both read. Detection runs on
     trading days only (DOW-median > 0), so structural-zero closed days don't
     distort the stream."""
@@ -184,7 +184,7 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
             if not sw.empty:
                 hits.append((50, "coincides with a discount/promo day (not necessarily a true demand shift)"))
 
-        # Stock-out on a downward shift (BH) — only if the snapshot is near the
+        # Stock-out on a downward shift (BH), only if the snapshot is near the
         # onset (stock_cover holds a single latest snapshot, not a daily series).
         sc = _table(con, "stock_cover")
         if sc is not None and direction == "down":

@@ -1,7 +1,7 @@
-"""T1 live facts — current partial-period aggregates, read on demand and cached.
+"""T1 live facts, current partial-period aggregates, read on demand and cached.
 
 The owner's questions are dominated by "how are we doing tonight?" and "staff cost
-this week Mon to now" — partial-period figures a nightly-only pull cannot serve.
+this week Mon to now", partial-period figures a nightly-only pull cannot serve.
 T1 reads those live from Square and caches them per (venue, metric, window) for
 `LIVE_CACHE_TTL_MIN`, so the bursty follow-ups in one conversation hit the cache,
 not Square.
@@ -22,7 +22,7 @@ import config
 from ingest.sources.base import NotProvisionedError
 
 # In-process read-through TTL cache: key (venue, metric, window) → (value, expiry).
-# Per-process, no external store — right for bursty single-conversation follow-ups.
+# Per-process, no external store, right for bursty single-conversation follow-ups.
 _CACHE: dict[tuple[str, str, str], tuple[dict, float]] = {}
 
 _METRICS = ("sales", "labour_cost", "cogs")

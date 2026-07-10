@@ -1,18 +1,18 @@
 """Agent-evaluation orchestrator + metrics (spec §2/§5/§6/§7).
 
-Answers "is the proactive briefing USEFUL?" — not "is the forecast accurate?" (A2
+Answers "is the proactive briefing USEFUL?", not "is the forecast accurate?" (A2
 owns that). It runs the REAL detectors (`change_point.cusum`/`persistence`,
 `deviation._classify`) and the REAL briefing synthesis (`briefing._cluster` /
 `_build_item` / `_score`) over the injected residual streams from `eval.inject`,
 then scores what the briefing surfaces against the injection truth.
 
 Axes:
-  * detection   — precision / recall / F1 on catching the injected event
-  * ranking     — NDCG + Spearman on a multi-event day (shift ranked above spike)
-  * attribution — top-1 cause, INCLUDING the honest-null case (no planted cause)
-  * latency     — days from injected onset to first surfaced (regime shift)
-  * fatigue     — surfacing rate on un-injected windows (a false-alarm upper bound)
-  * cost        — Ask-F1 miss:false-alarm sweep (how the cost reading moves)
+  * detection, precision / recall / F1 on catching the injected event
+  * ranking, NDCG + Spearman on a multi-event day (shift ranked above spike)
+  * attribution, top-1 cause, INCLUDING the honest-null case (no planted cause)
+  * latency, days from injected onset to first surfaced (regime shift)
+  * fatigue, surfacing rate on un-injected windows (a false-alarm upper bound)
+  * cost, Ask-F1 miss:false-alarm sweep (how the cost reading moves)
 Plus two named probes (aged regime-shift recency decay; sparse-cluster down-weight
 escape) and every aggregate reported with its N and a confidence interval.
 
@@ -46,7 +46,7 @@ REPORT_MD = config.STORE_DIR.parent.parent / "PRJ93_Agent_Eval_Report.md"
 
 def _signals_from_stream(venue: str, stream: pd.DataFrame, layer: str, con) -> list[briefing.Signal]:
     """Normalise the injected stream to `Signal`s using the REAL detectors, exactly
-    as `briefing.collect` does from the store — but over the perturbed stream."""
+    as `briefing.collect` does from the store, but over the perturbed stream."""
     z = stream["z"].to_numpy()
     dates = stream["date"].reset_index(drop=True)
     sigs: list[briefing.Signal] = []
@@ -113,7 +113,7 @@ def _all_signals(item: briefing.BriefingItem) -> list[briefing.Signal]:
 def item_covers(item: briefing.BriefingItem, truth: TruthRecord) -> bool:
     """An item covers a truth if it carries a signal of the right family and direction
     near the onset. A regime shift PERSISTS to the window end, so any qualifying signal
-    at or after its onset (within tolerance on the early side) is the same event — its
+    at or after its onset (within tolerance on the early side) is the same event, its
     later days are not spurious. A spike/stock is a point, matched within ±tolerance."""
     tol = config.EVAL_ONSET_TOLERANCE_DAYS
     sustained = truth.kind in ("regime_shift", "exo_coincident")
@@ -146,7 +146,7 @@ def prf(tp: int, fp: int, fn: int) -> dict:
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
-    """Wilson score interval for a proportion — honest for the small n here."""
+    """Wilson score interval for a proportion, honest for the small n here."""
     if n == 0:
         return (float("nan"), float("nan"))
     p = k / n
@@ -176,7 +176,7 @@ def spearman(order_pred: list[float], order_true: list[float]) -> float:
 
 def build_corpus(con) -> list[Injection]:
     """The injected-scenario corpus. Beer Hall carries all four kinds; Ellel adds a
-    sparse deviation window. Small by design (a ~270-day estate) — reported with N."""
+    sparse deviation window. Small by design (a ~270-day estate), reported with N."""
     bh = "beer_hall"
     corpus = [
         inject.inject_regime_shift(bh, con=con, direction="down"),
@@ -188,10 +188,10 @@ def build_corpus(con) -> list[Injection]:
 
 
 def _clean(inj_s: Injection, con) -> Injection:
-    """The same held-out window with the injection removed — the background the
+    """The same held-out window with the injection removed, the background the
     briefing would surface anyway. Truncated at the fold's as-of so its deviation
     tail-scan and change-point set align with the (fold-truncated) injected stream,
-    not the dataset end — otherwise non-final-fold background is not subtracted and
+    not the dataset end, otherwise non-final-fold background is not subtracted and
     precision is understated."""
     full = inject.base_stream(inj_s.venue, con=con)
     fold = full[full["date"] <= pd.Timestamp(inj_s.as_of)].reset_index(drop=True)
@@ -200,8 +200,8 @@ def _clean(inj_s: Injection, con) -> Injection:
 
 def detection_metrics(corpus: list[Injection], con) -> dict:
     """Recall is over the injected truth (did the briefing catch it). Precision is
-    judged only on INJECTION-ATTRIBUTABLE items — those absent from the same window
-    un-injected — so genuine real-data signals in the window are not miscounted as
+    judged only on INJECTION-ATTRIBUTABLE items, those absent from the same window
+    un-injected, so genuine real-data signals in the window are not miscounted as
     false positives (they feed the separate fatigue rate instead)."""
     covered_n = missed_n = spurious_n = attributable_n = 0
     per_scenario = []
@@ -235,7 +235,7 @@ def attribution_metrics(corpus: list[Injection], con) -> dict:
 
     The planted weather cause is tested at the DRAUGHT layer (L3), where the A14b
     finding says the weather signal actually lives (at venue-revenue L1 the
-    attribution rightly down-weights weather below calendar structure — reported as
+    attribution rightly down-weights weather below calendar structure, reported as
     its own finding). The honest-null control uses a verified-quiet onset at L1."""
     correct = total = 0
     detail = []
@@ -327,7 +327,7 @@ def fatigue_metrics(con, venues=("beer_hall", "two_river_taps", "ellel")) -> dic
 def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
     """Weighted cost = ratio·misses + 1·false-alarms, swept over the miss:false-alarm
     ratios. This is a separate cost sweep, not the Ask-F1. A fixed-threshold detector
-    has a fixed operating point; what MOVES is which failure dominates the cost —
+    has a fixed operating point; what MOVES is which failure dominates the cost
     reported so the reader sees the trade, not a single hard-coded number (spec §5)."""
     fn = detection["fn"]
     fa = fatigue["items"]
@@ -341,7 +341,7 @@ def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
 
 # --- Scaled run: the venue × kind × magnitude × onset × fold × direction grid ---
 # The point is the sensitivity FLOOR (how subtle an event is still caught), reported
-# per (kind, venue, magnitude) with N and a Wilson interval — not one pooled F1 that
+# per (kind, venue, magnitude) with N and a Wilson interval, not one pooled F1 that
 # large easy events would flatter. Exhaustive + deterministic (no RNG), so it needs
 # no seed; the seed lives in the Part B day sampler where sampling actually happens.
 _SCALED_VENUE_KINDS = {
@@ -359,7 +359,7 @@ class _StubAttribution:
     """Stub `attribute()` for the scaled run. Attribution is a per-DB-query cost, and a
     strong sustained injection makes CUSUM re-alarm many times → many attribution calls
     per surface. But NO scaled metric reads the attribution reason (detection, latency,
-    ranking, and fatigue use onset / direction / severity only — attribution top-1 is an
+    ranking, and fatigue use onset / direction / severity only, attribution top-1 is an
     axis of the smoke run), so stubbing it is exact for every scaled number and ~10×
     faster. Patches the `attribute` reference in this module and in `briefing` (which
     `_build_item` calls) for the run's duration, then restores it."""
@@ -383,7 +383,7 @@ class _StubAttribution:
 
 
 def _usable_folds(venue: str, stream: pd.DataFrame, con):
-    """Injection windows for a venue. For a closed venue, only PRE-closure folds — a
+    """Injection windows for a venue. For a closed venue, only PRE-closure folds, a
     post-closure window is all structural zeros and the closure dominates (respect
     closure, GA1)."""
     fs = inject.folds(stream)
@@ -498,7 +498,7 @@ def scaled_detection(records: list[dict]) -> dict:
 
 
 def latency_distribution(records: list[dict]) -> dict:
-    """Regime/exo detection delay by magnitude bin — bigger shifts should detect
+    """Regime/exo detection delay by magnitude bin, bigger shifts should detect
     faster; report the distribution (median + IQR), not one number."""
     out: dict = {}
     delays = [r for r in records if r["kind"] in ("regime_shift", "exo_coincident")
@@ -514,7 +514,7 @@ def latency_distribution(records: list[dict]) -> dict:
 
 def scaled_ranking(con) -> dict:
     """NDCG + Spearman across MANY synthetic multi-event days (one per usable fold per
-    net-sales venue), with N — a shift should rank above a coincident spike."""
+    net-sales venue), with N, a shift should rank above a coincident spike."""
     ndcgs, rhos = [], []
     for venue in ("beer_hall", "two_river_taps"):
         stream = inject.base_stream(venue, con=con)
@@ -654,7 +654,7 @@ def _vus_pr_section(vus: dict) -> list[str]:
 
 
 def _write_scaled_report(out: dict) -> None:
-    """Append (idempotently) the scaled section to the report — truncates any prior
+    """Append (idempotently) the scaled section to the report, truncates any prior
     scaled section first, so re-runs don't duplicate. The N=4 smoke sections above stay
     as the quick self-test; this is what the Results chapter cites."""
     base = REPORT_MD.read_text().split(_SCALED_MARKER)[0] if REPORT_MD.exists() else ""
@@ -741,7 +741,7 @@ def _write_scaled_report(out: dict) -> None:
 def aged_regime_shift_probe() -> dict:
     """Quantify whether an aged-but-unactioned regime shift sinks below a fresh minor
     item as the briefing's recency decay bites (the recalibration-aware-recency flag).
-    Analytic over the real `_score` — the shift is 'continuing'; the minor item is a
+    Analytic over the real `_score`, the shift is 'continuing'; the minor item is a
     fresh 'new' medium deviation."""
     onset = date(2026, 1, 1)
     shift = briefing.Signal("change_point", "beer_hall", onset, "down", "high", 20.0,
@@ -768,7 +768,7 @@ def sparse_cluster_probe(con) -> dict:
     """Ellel clustered vs isolated bookings: does the clustered case's higher score
     reflect real actionability, or is it the narrow-band artefact escaping the
     single-day down-weight? `_baseline_trust` only fires for a SINGLE deviation, so a
-    clustered run keeps full weight — quantify that gap (G5b)."""
+    clustered run keeps full weight, quantify that gap (G5b)."""
     onset = date(2026, 3, 1)
     layer = "L1"
     as_of = onset + timedelta(days=1)

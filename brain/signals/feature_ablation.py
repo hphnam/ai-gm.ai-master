@@ -3,7 +3,7 @@
 Every enriched feature must EARN its place: a column ships only if it improves
 held-out MASE on the rolling-origin backtest without degrading conformal coverage.
 The Rung-3 GBM is the only ladder model that consumes engineered features, so the
-ablation is run on it (expanding-window, 6 folds, 7-day horizon — the operational
+ablation is run on it (expanding-window, 6 folds, 7-day horizon, the operational
 regime A4 is judged in).
 
 Also runs the weather train/serve consistency study (§4): at inference only a
@@ -127,7 +127,7 @@ def weather_study() -> dict:
     # The true oracle/upper bound: weather perfectly known at train AND serve.
     oracle_mase = _sweep(frames["observed"], frames["observed"])
 
-    # Q3 — forecast-vs-observed skill at the lead time (lancaster cell).
+    # Q3, forecast-vs-observed skill at the lead time (lancaster cell).
     cell = WEATHER_CELLS[ANCHOR]
     obs = read_basis("observed"); lead = read_basis("leadmatched")
     obs = obs[obs["cell"] == cell]; lead = lead[lead["cell"] == cell]

@@ -1,4 +1,4 @@
-"""A7 tests — donor shape is unit-mean and transfer wins at cold-start."""
+"""A7 tests, donor shape is unit-mean and transfer wins at cold-start."""
 
 from __future__ import annotations
 

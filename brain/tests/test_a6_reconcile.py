@@ -1,4 +1,4 @@
-"""A6 tests — MinT makes incoherent base forecasts coherent, and the persisted
+"""A6 tests, MinT makes incoherent base forecasts coherent, and the persisted
 band is the same conformal band whose coverage is reported (FIX-1 guard)."""
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def reconciled_store():
 
 
 def test_persisted_l2_band_matches_conformal_quantile(reconciled_store):
-    """The band the /forecast API serves must equal recon ± node_q — NOT a
+    """The band the /forecast API serves must equal recon ± node_q, NOT a
     parametric Gaussian z·sd. Fails on the pre-FIX-1 code, passes after."""
     venue = reconciled_store
     node_series, _S, nodes, _bn, _cob = build_hierarchy(venue)

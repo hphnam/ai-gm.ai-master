@@ -1,12 +1,12 @@
-"""A13 · Change-point detector validation (spec §8) — honest characterisation.
+"""A13 · Change-point detector validation (spec §8), honest characterisation.
 
 Four evidence pieces, reusing the A13 detectors and the BH residual stream:
-  1. ARL0 calibration — sweep CUSUM h, measure mean trading-days between false
+  1. ARL0 calibration, sweep CUSUM h, measure mean trading-days between false
      alarms on noise matched to the BH stable span; pick h for the target ARL0.
-  2. TRT closure — detection delay against the ground-truth structural break.
-  3. Synthetic injection — inject δ∈{0.5,1,2} band-unit shifts, measure detection
+  2. TRT closure, detection delay against the ground-truth structural break.
+  3. Synthetic injection, inject δ∈{0.5,1,2} band-unit shifts, measure detection
      delay vs false-alarm rate over a (k,h)/(m,n) sweep.
-  4. BOCPD benchmark — same stream, compared to the simple detectors.
+  4. BOCPD benchmark, same stream, compared to the simple detectors.
 
 Writes eval/change_point_eval.md. Reports the operating point honestly (cf. A14b);
 a detector that over/under-fires is stated, not hidden.

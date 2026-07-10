@@ -1,9 +1,9 @@
-"""A7 · Onboarding-transfer capability (methodology §2/§7) — the target outcome.
+"""A7 · Onboarding-transfer capability (methodology §2/§7), the target outcome.
 
 A newly onboarded venue does not get its own fitted model from day one. It
 borrows the **normalised day-of-week shape** from the data-rich donor venues and
 **anchors it on its own level** (partial pooling: shape shared, level venue-
-specific). We prove this with **leave-one-venue-out** — hold each venue out in
+specific). We prove this with **leave-one-venue-out**, hold each venue out in
 turn to simulate onboarding, give it only a short cold-start window to estimate
 its level, and forecast the rest from the donor shape.
 
@@ -43,8 +43,8 @@ def _series(venue: str) -> pd.DataFrame:
 
 
 def _active_series(venue: str) -> pd.DataFrame:
-    """Trim leading/trailing all-zero stretches — e.g. Two River Taps' closure
-    tail — so onboarding-transfer is judged on days the venue actually trades
+    """Trim leading/trailing all-zero stretches, e.g. Two River Taps' closure
+    tail, so onboarding-transfer is judged on days the venue actually trades
     (the closure is a known structural break, not a forecast target here).
     Delegates to the shared store.active_span definition used by A4/A5/A7."""
     return trim_to_active(_series(venue), venue)
@@ -135,7 +135,7 @@ def run(cold_days: int = 14) -> dict:
     """Run the LOVO transfer evaluation across all venues.
 
     GATE DECISION (recorded, not implicit): the A7 gate is **majority-of-venues**
-    (≥2 of 3) beating per-venue-naïve at the cold-start window — NOT unanimous.
+    (≥2 of 3) beating per-venue-naïve at the cold-start window, NOT unanimous.
     Two River Taps loses its fold (transfer 1.19 vs naïve 0.70 MASE) and is not
     held to the unanimity bar: at the point of measurement TRT is a declining /
     closing venue with an atypical DOW shape, so the donor-shape assumption is

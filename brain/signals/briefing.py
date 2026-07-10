@@ -1,11 +1,11 @@
-"""Proactive briefing — the synthesis capstone (PRJ93 briefing spec).
+"""Proactive briefing, the synthesis capstone (PRJ93 briefing spec).
 
 One daily note per estate that answers a single question: what changed since
 yesterday, ranked by how much it matters, de-duplicated, each with the likely
 reason. It invents no new detection maths. It composes the four signals that
-already exist — point deviation (`signals.deviation.scan`), change-point
+already exist, point deviation (`signals.deviation.scan`), change-point
 (`signals.change_point.detect`), stock cover (the `stock_cover` table), and
-checklist/SOP (`signals.checklist_discipline`) — into one ranked, non-redundant,
+checklist/SOP (`signals.checklist_discipline`), into one ranked, non-redundant,
 attributed feed, remembers what it said last run (`briefing_runs`) so each item
 is labelled new / continuing / resolved, and surfaces via `GET /briefing` and the
 Track-B tool `brain_daily_briefing`.
@@ -16,10 +16,10 @@ transparent config-driven ranking, and the honesty gates that stop template or
 small-sample artefacts reaching a manager as real alerts.
 
 Out of scope (stated so it is not mistaken for missing work):
-  - No delivery channel (no email/Slack/push) — a queryable artefact + agent tool.
-  - No new detection maths — compose existing signals only.
-  - No live checklist wiring — `CHECKLIST_LIVE=False` gates template data out (G5a).
-  - Stock is a single latest snapshot, not a daily series — "new reorder since
+  - No delivery channel (no email/Slack/push), a queryable artefact + agent tool.
+  - No new detection maths, compose existing signals only.
+  - No live checklist wiring, `CHECKLIST_LIVE=False` gates template data out (G5a).
+  - Stock is a single latest snapshot, not a daily series, "new reorder since
     last run" is knowable ONLY through the `briefing_runs` diff.
 
 Dependency direction (G0): this module imports the four signals + the store; no
@@ -261,7 +261,7 @@ def _recency_factor(onset: date, as_of: date) -> float:
 
 
 def _baseline_trust(head: Signal, cluster: list[Signal]) -> tuple[float, bool]:
-    """0.5 for a single-day deviation on a sparse (event-only) venue — a narrow
+    """0.5 for a single-day deviation on a sparse (event-only) venue, a narrow
     band inflates z there (G5b). Change-points are unaffected (they need
     persistence, not one day)."""
     sparse_single = (head.source == "deviation"
@@ -453,7 +453,7 @@ def _persist(env: dict) -> None:
     """Write this run's ACTIVE items (new/continuing). Resolved items are not
     persisted, so a cleared story is announced once and not re-resolved forever.
     An empty run still writes a sentinel marker row, so the NEXT run's prior
-    (MAX(generated_at)) is this empty run — not the last run that still held the
+    (MAX(generated_at)) is this empty run, not the last run that still held the
     now-cleared key, which would otherwise re-resolve it on every empty run."""
     active = [it for it in env["items"] if it["status"] in ("new", "continuing")]
     con = connect()

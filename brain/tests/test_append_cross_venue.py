@@ -1,7 +1,7 @@
 """Regression: `_append_transactions` must be strictly venue-local (FA1).
 
 The earlier idempotence gate (G-live-d) only exercised the single-venue path, so a
-multi-venue frame — or a fresh store where venues sit at different date ceilings —
+multi-venue frame, or a fresh store where venues sit at different date ceilings
 could pass one venue's rows through gated by another venue's ceiling. This lands a
 two-venue frame into a store whose venues have different ceilings and asserts the
 append never crosses venues, never duplicates, and re-runs as a clean no-op.

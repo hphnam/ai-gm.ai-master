@@ -7,7 +7,7 @@ missed mandatory step, skipped/unsigned checklist, abnormally late completion.
 
 Runs in **template-only mode** against a synthetic completion log until Ryan's
 new mobile checklist-capture system starts producing real timestamped completion
-rows (standing dependency — see FLAGS.md; this supersedes the earlier assumption
+rows (standing dependency, see FLAGS.md; this supersedes the earlier assumption
 that the old `ChecklistStepCompletion` table would be the source). Swapping in
 the real log means replacing `synthetic_log()`.
 
@@ -25,7 +25,7 @@ from config import checklist_md, STORE_DIR
 
 RESULTS_MD = STORE_DIR.parent / "signals" / "checklist_discipline.md"
 
-# Criticality weights — high-consequence steps must outweigh "refill straws".
+# Criticality weights, high-consequence steps must outweigh "refill straws".
 W_CRITICAL, W_HIGH, W_NORMAL, W_CONDITIONAL = 5, 3, 1, 0
 
 _CONDITIONAL_RE = re.compile(
@@ -151,11 +151,11 @@ def synthetic_log(checklists: dict[str, list[Step]]) -> list[dict]:
         {"name": "Wed close — gas-off missed",
          "checklist": "closing", "dow": 2,
          "completed": cl_mand_wed - {8}, "minutes": 70},
-        # 3) Non-Sunday close without step 31 — must NOT flag (Sunday rule).
+        # 3) Non-Sunday close without step 31, must NOT flag (Sunday rule).
         {"name": "Thu close — chairs-up (#31) absent on a weekday",
          "checklist": "closing", "dow": 3, "completed": set(cl_mand_wed),
          "minutes": 80},
-        # 4) Sunday close without step 31 — must flag.
+        # 4) Sunday close without step 31, must flag.
         {"name": "Sun close — chairs-up (#31) missed on Sunday",
          "checklist": "closing", "dow": 6, "completed": cl_mand_sun - {31},
          "minutes": 85},

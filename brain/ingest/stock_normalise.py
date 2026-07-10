@@ -3,7 +3,7 @@
 Reads the monthly Beer Hall bar-stock `.xlsx` sheets, produces a tidy long
 panel (one row per snapshot × product line), and derives a product master and
 per-snapshot aggregate. Brewery (Lune Brew Co. production) stocktakes share the
-directory but are a different entity — they are cleaned into a standalone
+directory but are a different entity, they are cleaned into a standalone
 `brewery_inventory` table with NO join into the venue brain (spec §9, FLAG-8).
 
 Nothing is silently coerced: stale operator footers are flagged not gate-forced,
@@ -35,7 +35,7 @@ from config import (
 )
 from store.warehouse import connect
 
-# Category (L1) header canonicalisation — the eight bar-sheet section headers.
+# Category (L1) header canonicalisation, the eight bar-sheet section headers.
 _L1_CANON = {
     "spirits": "Spirits", "wine": "Wine", "soft drinks/mixers": "Soft Drinks/Mixers",
     "canned/bottled": "Canned/Bottled", "cask": "Cask", "draught": "Draught",
@@ -74,7 +74,7 @@ def _keg_litres(name: str) -> float | None:
 
 
 def _dates(df: pd.DataFrame, path: str):
-    """(snapshot_date, internal_date, file_date) — filename-primary (§5.2)."""
+    """(snapshot_date, internal_date, file_date), filename-primary (§5.2)."""
     bn = os.path.basename(path)
     file_dt = internal_dt = None
     m = _FILE_DATE_RE.search(bn)
@@ -244,7 +244,7 @@ def build_snapshot_agg(panel: pd.DataFrame) -> pd.DataFrame:
     return agg
 
 
-# --- Brewery (out of scope; clean only — §9) ---------------------------------
+# --- Brewery (out of scope; clean only, §9) ---------------------------------
 
 def parse_brewery(path: str) -> pd.DataFrame:
     sheet = pd.ExcelFile(path, engine="openpyxl").sheet_names[0]
@@ -353,7 +353,7 @@ def main() -> int:
 
     # G1 asserts a clean parse of all 10 snapshots. The footer reconciliation is
     # a DIAGNOSTIC, not a hard gate: the hand-typed `TOTAL CASH` footers are
-    # advisory and 3 of them (Feb/Apr/May) are stale — line-item sums are
+    # advisory and 3 of them (Feb/Apr/May) are stale, line-item sums are
     # authoritative (FLAG-6). The spec assumed 2 stale footers; the data has 3
     # (Feb confirmed a stale footer, not a double-count). Documented, not coerced.
     g1 = (recon["n_snapshots"] == 10 and panel["l1"].isna().sum() == 0

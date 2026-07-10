@@ -1,20 +1,20 @@
 """A13 · Change-point / regime-shift detection + attribution (spec A13).
 
-The shipped `/deviation/check` is a per-day point-anomaly detector — memoryless, so
+The shipped `/deviation/check` is a per-day point-anomaly detector, memoryless, so
 a one-off spike and the first day of a permanent shift look identical. A13 adds the
 second half of "detect meaningful deviations": **sustained** regime shifts in the
 trading rhythm, dated to an onset, and **attributed** to coincident real-world
-signals using the A14 exogenous seam (its explanatory home — A14b showed those
+signals using the A14 exogenous seam (its explanatory home, A14b showed those
 features are explanatorily real but predictively inert).
 
 Detect on the standardised conformal residual stream:
     expected_t = DOW-median baseline (Rung-1)         residual_t = actual_t − expected_t
     scale_t    = conformal half-band at CP_LEVEL      z_t = residual_t / max(scale_t, eps)
-Two production detectors on z_t — two-sided **CUSUM** (drift) + **k-of-n persistence**
-(abrupt) — with **BOCPD** as a benchmark. Validated against the TRT closure
+Two production detectors on z_t, two-sided **CUSUM** (drift) + **k-of-n persistence**
+(abrupt), with **BOCPD** as a benchmark. Validated against the TRT closure
 (ground-truth structural break) and synthetic injections (see change_point_eval.md).
 
-This module changes no forecast — it reads existing store data only.
+This module changes no forecast. It reads existing store data only.
 
 Run:
     python -m signals.change_point
@@ -97,7 +97,7 @@ def persistence(z: np.ndarray, m: int = CP_RUN_M, n: int = CP_RUN_N) -> list[dic
 
 def bocpd(z: np.ndarray, hazard: float = CP_BOCPD_HAZARD) -> np.ndarray:
     """Bayesian Online Change-point Detection (Adams & MacKay 2007), Normal-
-    inverse-gamma conjugate predictive. Returns per-step P(run length resets) — a
+    inverse-gamma conjugate predictive. Returns per-step P(run length resets), a
     principled benchmark, not the production signal."""
     n = len(z)
     if n == 0:

@@ -1,7 +1,7 @@
 """T1 live-fact + cache tests (PRJ93 live-ingest spec, G7 / G-live-a / G-live-e).
 
 The cache mechanics (TTL, per-metric key, force-bypass) and the inert-while-off
-envelope are exercised with an injected fake fetcher — no Square, no network.
+envelope are exercised with an injected fake fetcher, no Square, no network.
 """
 
 from __future__ import annotations

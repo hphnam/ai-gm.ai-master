@@ -4,7 +4,7 @@ The grid enumerates venue × kind × magnitude × onset × fold × direction und
 venue constraints (Ellel spike-only, Two River Taps no stock and pre-closure folds
 only), the injectors honour magnitude/onset/window, every fold is leakage-checked,
 and the day sampler is deterministic and stratified. The full `run_scaled` battery is
-a CLI, not run here (it is minutes of CPU) — these cover the enumeration and the
+a CLI, not run here (it is minutes of CPU), these cover the enumeration and the
 sampler, which are the parts that need pinning.
 """
 

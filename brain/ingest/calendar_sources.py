@@ -1,4 +1,4 @@
-"""PRJ93 · A14 calendar sources — Lancashire school terms + Lancaster Uni terms.
+"""PRJ93 · A14 calendar sources, Lancashire school terms + Lancaster Uni terms.
 
 Drop-in module for `brain/ingest/calendar_sources.py`. Pure-stdlib (no deps).
 Feeds the exogenous calendar features in `features/build_features.py`:
@@ -30,7 +30,7 @@ DateLike = Union[date, datetime, str]
 
 
 # ---------------------------------------------------------------------------
-# Lancashire school HOLIDAYS — closed intervals [start, end] inclusive.
+# Lancashire school HOLIDAYS, closed intervals [start, end] inclusive.
 # Derived from the published term boundaries (holiday = day after a term ends
 # through the day before the next term starts), plus half-terms and May Day.
 # CONFIRMED for 2024/25 .. 2027/28.
@@ -76,7 +76,7 @@ SCHOOL_COVERAGE_TO = date(2028, 7, 21)  # last confirmed term end
 
 
 # ---------------------------------------------------------------------------
-# Lancaster University TERM intervals — open intervals [start, end] inclusive,
+# Lancaster University TERM intervals, open intervals [start, end] inclusive,
 # phase-labelled. is_uni_term = date in any interval. Welcome Week is folded
 # into Michaelmas (students present).
 # ---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ def is_school_holiday(d: DateLike) -> bool:
 
 def is_school_term(d: DateLike) -> bool:
     """True on days schools are in session (i.e. not a holiday). Weekends in
-    term are still term — the DOW features carry the weekend effect."""
+    term are still term, the DOW features carry the weekend effect."""
     return not is_school_holiday(d)
 
 

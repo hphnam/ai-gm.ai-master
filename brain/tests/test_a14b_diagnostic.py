@@ -1,4 +1,4 @@
-"""A14b tests — the weather/calendar diagnostic computes its pieces and adopts
+"""A14b tests, the weather/calendar diagnostic computes its pieces and adopts
 nothing (spec gates G1/G3/G5/G7). The GBM-heavy tests A/C are exercised by the
 module run, not the unit suite (kept fast)."""
 

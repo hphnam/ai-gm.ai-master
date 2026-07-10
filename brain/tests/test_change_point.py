@@ -1,4 +1,4 @@
-"""A13 tests — change-point detectors fire on real shifts, stay quiet on noise,
+"""A13 tests, change-point detectors fire on real shifts, stay quiet on noise,
 recover the TRT closure ground truth, respect closure dormancy, and attribute
 against the A14 seam (spec gates G2/G3/G4/G8/G9/G11)."""
 

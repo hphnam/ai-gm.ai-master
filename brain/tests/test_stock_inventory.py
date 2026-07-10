@@ -1,4 +1,4 @@
-"""A11/A12 tests — stock ingest, panel integrity, and the days-of-cover signal
+"""A11/A12 tests, stock ingest, panel integrity, and the days-of-cover signal
 (spec §10 gates G1–G9)."""
 
 from __future__ import annotations

@@ -2,7 +2,7 @@
 
 Derives `is_spike_day` per (venue, date) from the discount share already parsed
 in A0 (`discounts` / `gross_sales`). A spike day is one where an unusually large
-share of gross sales was discounted — a promo/event the model could not have
+share of gross sales was discounted, a promo/event the model could not have
 known in advance.
 
 CRITICAL: `is_spike_day` is **retrospective**. It is NOT a forward regressor and
