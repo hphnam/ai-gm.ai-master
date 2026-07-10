@@ -1,0 +1,377 @@
+{
+  "beer_hall": {
+    "n_frozen_nodes": 29,
+    "n_named": 23,
+    "n_missed_other_nodes": 2,
+    "n_scored": 23,
+    "n_unscoreable_degenerate": 8,
+    "mase_named_mean": 1.61,
+    "mase_named_median": 1.246,
+    "mase_all_mean": 1.695,
+    "mase_all_median": 1.33,
+    "named_share_of_actual": 0.264,
+    "conservation_ok": true,
+    "venue_actual_total": 27071.0,
+    "table": [
+      {
+        "node": "Beer::OTHER",
+        "june_actual": 11511.63,
+        "june_frozen": 5742.0,
+        "in_frozen": true,
+        "mase": 1.936
+      },
+      {
+        "node": "Spirits::OTHER",
+        "june_actual": 3382.26,
+        "june_frozen": 825.0,
+        "in_frozen": true,
+        "mase": 1.813
+      },
+      {
+        "node": "Wine::OTHER",
+        "june_actual": 2836.68,
+        "june_frozen": 782.0,
+        "in_frozen": true,
+        "mase": 1.696
+      },
+      {
+        "node": "Beer::Paulaner Helles Lager",
+        "june_actual": 1575.31,
+        "june_frozen": 951.0,
+        "in_frozen": true,
+        "mase": 2.553
+      },
+      {
+        "node": "Uncategorised::OTHER",
+        "june_actual": 1126.52,
+        "june_frozen": 57.0,
+        "in_frozen": true,
+        "mase": 1.243
+      },
+      {
+        "node": "Uncategorised::Breeze Pale Ale",
+        "june_actual": 1077.7,
+        "june_frozen": 38.0,
+        "in_frozen": true,
+        "mase": null
+      },
+      {
+        "node": "Soft Drinks::Postmix",
+        "june_actual": 960.93,
+        "june_frozen": 725.0,
+        "in_frozen": true,
+        "mase": 0.891
+      },
+      {
+        "node": "Spirits::SMIRNOFF",
+        "june_actual": 784.57,
+        "june_frozen": 272.0,
+        "in_frozen": true,
+        "mase": 1.142
+      },
+      {
+        "node": "Wine::Sauvignon Blanc",
+        "june_actual": 548.94,
+        "june_frozen": 385.0,
+        "in_frozen": true,
+        "mase": 3.236
+      },
+      {
+        "node": "Soft Drinks::OTHER",
+        "june_actual": 539.8,
+        "june_frozen": 101.0,
+        "in_frozen": true,
+        "mase": 4.594
+      },
+      {
+        "node": "Merchandise::OTHER",
+        "june_actual": 422.5,
+        "june_frozen": 0.0,
+        "in_frozen": false,
+        "mase": null
+      },
+      {
+        "node": "Wine::Pinot Grigio",
+        "june_actual": 394.46,
+        "june_frozen": 298.0,
+        "in_frozen": true,
+        "mase": 2.0
+      },
+      {
+        "node": "Merchandise::Hire Fee",
+        "june_actual": 356.0,
+        "june_frozen": 51.0,
+        "in_frozen": true,
+        "mase": 3.812
+      },
+      {
+        "node": "Happy Hour::\u00a33.50 Cask",
+        "june_actual": 291.35,
+        "june_frozen": 183.0,
+        "in_frozen": true,
+        "mase": 1.882
+      },
+      {
+        "node": "Happy Hour::\u00a34 Lager/Cider",
+        "june_actual": 285.7,
+        "june_frozen": 229.0,
+        "in_frozen": true,
+        "mase": 1.232
+      },
+      {
+        "node": "Spirits::Gordons",
+        "june_actual": 265.71,
+        "june_frozen": 116.0,
+        "in_frozen": true,
+        "mase": 1.101
+      },
+      {
+        "node": "Wine::Malbec",
+        "june_actual": 155.27,
+        "june_frozen": 184.0,
+        "in_frozen": true,
+        "mase": 2.091
+      },
+      {
+        "node": "Spirits::Gordon's Pink",
+        "june_actual": 130.26,
+        "june_frozen": 113.0,
+        "in_frozen": true,
+        "mase": 0.974
+      },
+      {
+        "node": "Uncategorised::Lancashire  crisps",
+        "june_actual": 119.69,
+        "june_frozen": 61.0,
+        "in_frozen": true,
+        "mase": null
+      },
+      {
+        "node": "Soft Drinks::Cordial & Soda",
+        "june_actual": 100.3,
+        "june_frozen": 57.0,
+        "in_frozen": true,
+        "mase": 1.442
+      },
+      {
+        "node": "Happy Hour::OTHER",
+        "june_actual": 78.3,
+        "june_frozen": 0.0,
+        "in_frozen": false,
+        "mase": null
+      },
+      {
+        "node": "Happy Hour::\u00a315 FIZZ",
+        "june_actual": 50.0,
+        "june_frozen": 39.0,
+        "in_frozen": true,
+        "mase": 1.072
+      },
+      {
+        "node": "Soft Drinks::Fruit Shoot",
+        "june_actual": 31.89,
+        "june_frozen": 42.0,
+        "in_frozen": true,
+        "mase": 0.802
+      },
+      {
+        "node": "Food::OTHER",
+        "june_actual": 30.11,
+        "june_frozen": 0.0,
+        "in_frozen": true,
+        "mase": 0.343
+      },
+      {
+        "node": "Beer::Lager - BH",
+        "june_actual": 14.86,
+        "june_frozen": 1626.0,
+        "in_frozen": true,
+        "mase": 1.246
+      },
+      {
+        "node": "Beer::Caravan of Love",
+        "june_actual": 0.0,
+        "june_frozen": 908.0,
+        "in_frozen": true,
+        "mase": 1.33
+      },
+      {
+        "node": "Food::Nobby's Nuts",
+        "june_actual": 0.0,
+        "june_frozen": 32.0,
+        "in_frozen": true,
+        "mase": null
+      },
+      {
+        "node": "Food::Pork Scratchings",
+        "june_actual": 0.0,
+        "june_frozen": 19.0,
+        "in_frozen": true,
+        "mase": 0.56
+      },
+      {
+        "node": "Food::Seabrook Crisps",
+        "june_actual": 0.0,
+        "june_frozen": 41.0,
+        "in_frozen": true,
+        "mase": null
+      },
+      {
+        "node": "Merchandise::Pool Table deposit",
+        "june_actual": 0.0,
+        "june_frozen": 7.0,
+        "in_frozen": true,
+        "mase": null
+      },
+      {
+        "node": "Uncategorised::Ascension Cider",
+        "june_actual": 0.0,
+        "june_frozen": 34.0,
+        "in_frozen": true,
+        "mase": null
+      }
+    ]
+  },
+  "ellel": {
+    "n_frozen_nodes": 17,
+    "n_named": 13,
+    "n_missed_other_nodes": 1,
+    "n_scored": 18,
+    "n_unscoreable_degenerate": 0,
+    "mase_named_mean": 0.28,
+    "mase_named_median": 0.183,
+    "mase_all_mean": 0.414,
+    "mase_all_median": 0.241,
+    "named_share_of_actual": 0.153,
+    "conservation_ok": true,
+    "venue_actual_total": 2338.0,
+    "table": [
+      {
+        "node": "Beer::OTHER",
+        "june_actual": 1349.24,
+        "june_frozen": 96.0,
+        "in_frozen": true,
+        "mase": 1.116
+      },
+      {
+        "node": "Uncategorised::OTHER",
+        "june_actual": 215.98,
+        "june_frozen": 0.0,
+        "in_frozen": false,
+        "mase": 0.985
+      },
+      {
+        "node": "Soft Drinks::OTHER",
+        "june_actual": 212.97,
+        "june_frozen": 7.0,
+        "in_frozen": true,
+        "mase": 1.366
+      },
+      {
+        "node": "Spirits::OTHER",
+        "june_actual": 104.42,
+        "june_frozen": 97.0,
+        "in_frozen": true,
+        "mase": 0.154
+      },
+      {
+        "node": "Wine::OTHER",
+        "june_actual": 97.68,
+        "june_frozen": 51.0,
+        "in_frozen": true,
+        "mase": 0.183
+      },
+      {
+        "node": "Beer::Guinness Can",
+        "june_actual": 80.0,
+        "june_frozen": 37.0,
+        "in_frozen": true,
+        "mase": 0.367
+      },
+      {
+        "node": "Wine::Pinot Grigio",
+        "june_actual": 79.3,
+        "june_frozen": 22.0,
+        "in_frozen": true,
+        "mase": 0.999
+      },
+      {
+        "node": "Spirits::SMIRNOFF",
+        "june_actual": 50.5,
+        "june_frozen": 46.0,
+        "in_frozen": true,
+        "mase": 0.299
+      },
+      {
+        "node": "Soft Drinks::J20",
+        "june_actual": 49.37,
+        "june_frozen": 14.0,
+        "in_frozen": true,
+        "mase": 0.314
+      },
+      {
+        "node": "Wine::Prosecco",
+        "june_actual": 33.74,
+        "june_frozen": 11.0,
+        "in_frozen": true,
+        "mase": 0.315
+      },
+      {
+        "node": "Spirits::Gordons",
+        "june_actual": 31.65,
+        "june_frozen": 15.0,
+        "in_frozen": true,
+        "mase": 0.458
+      },
+      {
+        "node": "Soft Drinks::Postmix",
+        "june_actual": 25.41,
+        "june_frozen": 34.0,
+        "in_frozen": true,
+        "mase": 0.117
+      },
+      {
+        "node": "Wine::Serena Spumante (Fizz)",
+        "june_actual": 3.75,
+        "june_frozen": 31.0,
+        "in_frozen": true,
+        "mase": 0.173
+      },
+      {
+        "node": "Spirits::Baby Guinness",
+        "june_actual": 2.5,
+        "june_frozen": 22.0,
+        "in_frozen": true,
+        "mase": 0.129
+      },
+      {
+        "node": "Soft Drinks::Cordial & Soda",
+        "june_actual": 1.67,
+        "june_frozen": 3.0,
+        "in_frozen": true,
+        "mase": 0.082
+      },
+      {
+        "node": "Beer::Caravan of Love",
+        "june_actual": 0.0,
+        "june_frozen": 20.0,
+        "in_frozen": true,
+        "mase": 0.183
+      },
+      {
+        "node": "Beer::Lager - BH",
+        "june_actual": 0.0,
+        "june_frozen": 94.0,
+        "in_frozen": true,
+        "mase": 0.138
+      },
+      {
+        "node": "Uncategorised::Vodka Cans",
+        "june_actual": 0.0,
+        "june_frozen": 4.0,
+        "in_frozen": true,
+        "mase": 0.071
+      }
+    ]
+  }
+}
