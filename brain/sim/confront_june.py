@@ -23,13 +23,13 @@ import numpy as np
 import pandas as pd
 
 import config
+from ingest.taxonomy import map_category
 from sim.build_frozen_forecast import GATE_WINNER, build_future_frame
 from store.warehouse import connect, read_series
 
 SIM_DIR = config.BRAIN_DIR / "sim"
 JUNE = pd.date_range("2026-06-01", "2026-06-30", freq="D")
 BACKTEST_MASE = {"beer_hall": 0.745, "two_river_taps": 0.597, "ellel": 0.572}
-CAT_FIX = {"Uncategorized": "Uncategorised"}  # Square -> brain spelling
 
 
 def _load_frozen() -> pd.DataFrame:
@@ -47,7 +47,9 @@ def _load_actuals_l2() -> pd.DataFrame:
     raw = json.loads((SIM_DIR / "june2026_actuals_l2_raw.json").read_text())
     df = pd.DataFrame(raw["rows"])
     df["date"] = pd.to_datetime(df["date"])
-    df["category"] = df["category"].replace(CAT_FIX)
+    # Align Square categories to brain L2 nodes through the canonical map (loud-fail
+    # on an unmapped category), replacing the old raw-string spelling fix.
+    df["category"] = df["category"].map(map_category)
     return df
 
 
