@@ -83,3 +83,35 @@ def map_category(square_category: str) -> str | None:
         )
     brain = cmap[key]
     return None if _norm(brain) == _norm(_DROP) else brain
+
+
+@lru_cache(maxsize=1)
+def _item_map() -> dict[tuple[str, str], str]:
+    """(brain_category, normalised square_item) -> brain_item (a named node)."""
+    text = MAP_PATH.read_text()
+    out: dict[tuple[str, str], str] = {}
+    for cells in _parse_table(text, "Item map"):
+        if len(cells) < 3:
+            continue
+        square_cat, square_item, brain_item = cells[0], cells[1], cells[2]
+        bcat = map_category(square_cat)  # loud-fail on an unmapped category
+        if bcat is None:
+            continue  # DROP category: item is not scored
+        out[(bcat, _norm(square_item))] = brain_item
+    return out
+
+
+def map_item(square_item: str, square_category: str) -> str | None:
+    """Brain L3 node (`brain_category::brain_item`) for a Square item.
+
+    Resolves the category first (raises on an unmapped category, returns None for a
+    DROP category). A Square item listed in the Item map lands on its named node;
+    anything else in a mapped category falls to that category's `OTHER` node, so
+    item revenue is conserved. Venue-agnostic: a caller scoring one venue keeps only
+    the nodes in that venue's frozen set and folds the rest into `OTHER`.
+    """
+    bcat = map_category(square_category)  # loud-fail on unmapped category
+    if bcat is None:
+        return None
+    brain_item = _item_map().get((bcat, _norm(square_item)), "OTHER")
+    return f"{bcat}::{brain_item}"
