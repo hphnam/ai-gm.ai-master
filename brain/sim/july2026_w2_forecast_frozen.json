@@ -1,0 +1,129 @@
+{
+  "artefact": "july2026_w2_forecast_frozen",
+  "created_utc": "2026-07-10T09:28:32.649399+00:00",
+  "horizon": {
+    "start": "2026-07-08",
+    "end": "2026-07-14",
+    "days": 7
+  },
+  "as_of": "2026-06-30",
+  "blind": "produced 2026-07-10 before any 8 to 14 July 2026 actual existed; 11 to 14 July are genuinely in the future, so the pre-registration is airtight by calendar. Weather is the real hindcast forecast basis for 8 to 14 July, is_ellel_event=0 forward, wc_* from the fixed fixture calendar",
+  "level_conf": 0.9,
+  "sibling_window": {
+    "artefact": "july2026_forecast_frozen",
+    "commit": "7d103aa",
+    "note": "the 1 to 7 July freeze; same models, same config, same June-inclusive cutoff, comparable"
+  },
+  "liveness_gate": {
+    "dormant_venues": [
+      "two_river_taps"
+    ],
+    "lookback_days": 21
+  },
+  "weather_basis": "hindcast",
+  "l2_l3_method": "measured split (report 23): MinT for beer_hall, revenue-share disaggregation for ellel, on the refreshed node set",
+  "venues": {
+    "beer_hall": {
+      "dormant": false,
+      "model": "rung4_chronos2_exo",
+      "train_ceiling": "2026-06-29",
+      "l2_l3_split": "mint",
+      "band_halfwidth": 746.0,
+      "window_l1_total": 4292.65,
+      "jul11_yhat": 1565.19,
+      "fixture_expectations": {
+        "2026-07-11": {
+          "label": "england_qf_in_hours",
+          "yhat": 1565.19,
+          "dow_baseline": 1253.62,
+          "lift_over_baseline": 311.57,
+          "anticipates_lift": true
+        },
+        "2026-07-09": {
+          "label": "generic_france_morocco",
+          "yhat": 735.35,
+          "dow_baseline": 657.76,
+          "lift_over_baseline": 77.58,
+          "anticipates_lift": true
+        },
+        "2026-07-10": {
+          "label": "generic_spain_belgium",
+          "yhat": 1021.23,
+          "dow_baseline": 838.39,
+          "lift_over_baseline": 182.84,
+          "anticipates_lift": true
+        }
+      }
+    },
+    "two_river_taps": {
+      "dormant": true,
+      "reason": "no trading in the 21 days to 2026-06-30; liveness gate withholds a positive forecast"
+    },
+    "ellel": {
+      "dormant": false,
+      "model": "rung1_robust_dow",
+      "train_ceiling": "2026-06-20",
+      "l2_l3_split": "disaggregation",
+      "band_halfwidth": 274.95,
+      "window_l1_total": 56.3,
+      "jul11_yhat": 56.3,
+      "fixture_expectations": {
+        "2026-07-11": {
+          "label": "england_qf_in_hours",
+          "yhat": 56.3,
+          "dow_baseline": 853.43,
+          "lift_over_baseline": -797.12,
+          "anticipates_lift": false
+        },
+        "2026-07-09": {
+          "label": "generic_france_morocco",
+          "yhat": 0.0,
+          "dow_baseline": 701.68,
+          "lift_over_baseline": -701.68,
+          "anticipates_lift": false
+        },
+        "2026-07-10": {
+          "label": "generic_spain_belgium",
+          "yhat": 0.0,
+          "dow_baseline": 214.57,
+          "lift_over_baseline": -214.57,
+          "anticipates_lift": false
+        }
+      }
+    }
+  },
+  "chronos_runtime": {
+    "version": "2.3.1",
+    "model_id": "amazon/chronos-2",
+    "api": null,
+    "substituted": false,
+    "weather_basis": "hindcast",
+    "device": "mps",
+    "mps_fallback_enabled": "1"
+  },
+  "caveats": [
+    "same June-inclusive cutoff as the 1 to 7 freeze: an 9 to 15 day-ahead horizon, longer than the reliable 7-day regime, chosen for comparability not accuracy.",
+    "hindcast weather is a forecast product; for 11 to 14 July it is the live forward forecast retrieved 2026-07-10.",
+    "two in-hours England dates (1 Jul + 11 Jul) is still a small sample; the in-context signal stays directional, never a proven effect."
+  ],
+  "reasons": {
+    "beer_hall": {
+      "2026-07-08": "weekday",
+      "2026-07-09": "World Cup match(es) in trading hours (France v Morocco); weekday",
+      "2026-07-10": "World Cup match(es) in trading hours (Spain v Belgium); weekday",
+      "2026-07-11": "England fixture in trading hours (Norway v England 22:00); expect uplift; weekend",
+      "2026-07-12": "weekend",
+      "2026-07-13": "weekday",
+      "2026-07-14": "World Cup match(es) in trading hours (Winner Match 97 v Winner Match 98); weekday"
+    },
+    "ellel": {
+      "2026-07-08": "weekday",
+      "2026-07-09": "World Cup match(es) in trading hours (France v Morocco); weekday",
+      "2026-07-10": "World Cup match(es) in trading hours (Spain v Belgium); weekday",
+      "2026-07-11": "England fixture in trading hours (Norway v England 22:00); expect uplift; weekend",
+      "2026-07-12": "weekend",
+      "2026-07-13": "weekday",
+      "2026-07-14": "weekday"
+    }
+  }
+}
