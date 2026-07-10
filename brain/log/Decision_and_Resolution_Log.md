@@ -479,3 +479,33 @@ them into the append-only log so it is the continuous WP1-to-present record.
     covariates is the next research milestone (enrichment from explanation to
     anticipation), not built here. Frozen artefact (`1d966be`) untouched; both suites
     green (.venv-forecast 258 passed 1 skip, .venv 251 passed 8 skip).
+
+16. **G12.16: item and category taxonomy reconciliation (Square to brain L2/L3)**
+    (`25_G12_16_Report.md`, `PRJ93_Spec_G12_16_Taxonomy.md`; committed per gate
+    0a21c75 / 85b209b / 1b8fb88). Builds the canonical Square-to-brain evaluation map
+    (`ingest/taxonomy_map.md` + `ingest/taxonomy.py`, loud-fail on unmapped category)
+    and closes the standing L3 gap from reports 22 and 24. **(a)** Category map: all 8
+    June Square categories map (100 percent net-sales coverage), sole non-identity row
+    `Uncategorized` to `Uncategorised`; re-scoring the June L2 confront THROUGH the map
+    reproduces report 22 exactly (BH MAE 1660, Ellel 347), so names-only realignment
+    moves no number. **(b)** Pulled June at ITEM grain held-out
+    (`june2026_actuals_l3_raw.json`, 867 daily rows, BH+Ellel; TRT closed, Events out
+    of scope), reconciling to the L2 pull exactly (max diff GBP 0.00). Item map is 41
+    named nodes, all identity, zero aliases. First real L3 revenue MASE
+    (`sim/score_l3.py`): Beer Hall all-node median 1.33 (mean 1.70), Ellel 0.24;
+    per-venue actuals conserve to the L1 total. **Finding: taxonomy DRIFT, not name
+    misalignment.** The frozen historical top-3 captured only 26 percent (BH) / 15
+    percent (Ellel) of June revenue; the historical number-one node `Lager - BH` sold
+    GBP 14.86 after being split into branded lines (`LuneBrew Pilsner` GBP 3,484, all
+    in OTHER). The OTHER buckets are large and under-forecast. Fix is refreshing the
+    top-k node selection before the next freeze (FLAG-TAXONOMY-DRIFT), not more
+    aliases. **(c)** Wired the map into `confront_june` (replaces the raw-string
+    `CAT_FIX`) as the single eval source of truth; `tests/test_taxonomy.py` (7 tests:
+    resolution, loud-fail, OTHER routing, revenue conservation). Deviations logged in
+    the report: degenerate-scale nodes excluded from MASE aggregates (median is the
+    robust headline); scored the union of frozen and actual-landing nodes for exact
+    conservation; TRT categories pre-mapped for July. This EVAL map (Square sales items
+    to brain forecast items) is distinct from James's STOCK map (brain/menu items to
+    keg lines); named separately in FLAG-TAXONOMY-MAP. Frozen artefact (`1d966be`) and
+    `stock_inventory.py` untouched; both suites green (.venv-forecast 265 passed 1
+    skip, .venv 258 passed 8 skip).

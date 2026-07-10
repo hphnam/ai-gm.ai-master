@@ -399,3 +399,31 @@ does.
   G12.15 (this spec improves the sale-item demand forecast; the stock benefit follows
   once James's mapping + delivery dates land). Connecting the two is future work
   gated on that data.
+
+## Item taxonomy / L3 evaluation (G12.16)
+
+- **FLAG-TAXONOMY-MAP (G12.16, RESOLVES the L3-not-scored gap).** The standing gap in
+  reports 22 and 24 (no canonical map from Square item/category names to brain nodes,
+  so L3 could not be scored) is closed. `ingest/taxonomy_map.md` (human-editable) plus
+  `ingest/taxonomy.py` (`map_category` / `map_item`, loud-fail on an unmapped
+  category) are the single source of truth the confront/eval scripts use. Category
+  coverage is 100 percent (sole non-identity row `Uncategorized` to `Uncategorised`);
+  the item map is 41 named nodes, all identity, zero aliases. First real L3 revenue
+  MASE landed (Beer Hall all-node median 1.33, Ellel 0.24). This EVAL map aligns
+  Square-SALES-items to brain-FORECAST-items. It is DISTINCT from James's STOCK map,
+  which aligns brain/menu items to stock keg lines (`STOCK_A6_NODE_MAP` in
+  `config.py`, and the pending menu-item-to-stock-name mapping in FLAG-STOCK-STATUS /
+  the "A6 to stock mapping depth" flag). Do not conflate them: this one conserves
+  sales revenue across nodes; his joins demand to kegs.
+- **FLAG-TAXONOMY-DRIFT (G12.16, the DOWNGRADED remainder).** L3 item accuracy is
+  limited not by name alignment (identity everywhere) but by taxonomy DRIFT: the
+  frozen node set is the brain's HISTORICAL top-3 per category, and June's menu had
+  moved. Named nodes captured only 26 percent (Beer Hall) / 15 percent (Ellel) of
+  June revenue; the rest fell to large, under-forecast `OTHER` buckets, and the
+  historical number-one node `Lager - BH` sold GBP 14.86 after being split into
+  branded lines (`LuneBrew Pilsner` GBP 3,484). Two Beer Hall categories (Merchandise,
+  Happy Hour) had no frozen `OTHER` node at all. Fix: refresh the top-k node selection
+  from recent sales before the next freeze (a build-time change to
+  `hierarchy/reconcile.py` node construction), NOT more aliases and NOT a change to the
+  eval map, which must mirror the frozen taxonomy for scoring. Owner decision: how far
+  to raise top-k versus keeping OTHER as an explicit residual.
