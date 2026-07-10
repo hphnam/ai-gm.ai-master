@@ -44,11 +44,18 @@ _EPS = 1e-6
 
 # --- Hierarchy construction --------------------------------------------------
 
-def build_hierarchy(venue: str = ANCHOR_VENUE, top_k: int = 3):
+def build_hierarchy(venue: str = ANCHOR_VENUE, top_k: int = 3, since=None):
     """Return (node_series, S, nodes, bottom_nodes, cat_of_bottom).
 
     Nodes are ordered [VENUE, CAT::*, ITEM::*]; bottom = item nodes (top-k per
     category plus an OTHER residual so items sum to their category exactly).
+
+    `since` (G12.17a-2, taxonomy refresh): when given, the top-k ITEM ranking and the
+    category ordering are computed from rows on/after that date, so the node set
+    tracks the CURRENT menu rather than the whole-history top sellers (the June
+    confront proved the historical set drifts). The node SERIES still span the full
+    calendar; only the SELECTION uses the recent window. `since=None` keeps the
+    original whole-history behaviour.
     """
     con = connect(read_only=True)
     try:
@@ -62,7 +69,8 @@ def build_hierarchy(venue: str = ANCHOR_VENUE, top_k: int = 3):
 
     calendar = pd.to_datetime(l1["date"])
     item["date"] = pd.to_datetime(item["date"])
-    cats = item.groupby("category")["units"].sum().sort_values(ascending=False).index
+    rank_src = item if since is None else item[item["date"] >= pd.Timestamp(since)]
+    cats = rank_src.groupby("category")["units"].sum().sort_values(ascending=False).index
 
     node_series: dict[str, pd.Series] = {}
     cat_nodes: list[str] = []
@@ -78,7 +86,8 @@ def build_hierarchy(venue: str = ANCHOR_VENUE, top_k: int = 3):
         cat_nodes.append(cat_id)
         venue_total = venue_total + cat_daily
 
-        totals = sub.groupby("item")["units"].sum().sort_values(ascending=False)
+        rank_sub = rank_src[rank_src["category"] == c]
+        totals = rank_sub.groupby("item")["units"].sum().sort_values(ascending=False)
         used = pd.Series(0.0, index=calendar)
         for it in totals.index[:top_k]:
             s = sub[sub["item"] == it].groupby("date")["units"].sum().reindex(

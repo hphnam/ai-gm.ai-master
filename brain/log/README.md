@@ -39,6 +39,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 23 | `23_G12_13_Canonical_Reconciliation_Report.md` | 2026-07-09 | G12.13 reconciled against the canonical Pass-1/Pass-2 specs; measured A-vs-B split closed (MinT wins BH/TRT L2/L3); provenance + reasoned .md added |
 | 24 | `24_G12_15_Report.md` | 2026-07-10 | G12.15: Chronos on MPS (parity, CPU faster for small runs), home-nation fixture flags (Scotland matters), cadence sweep (BH 7-day sweet spot), event-aware refresh policy, stock flagged |
 | 25 | `25_G12_16_Report.md` | 2026-07-10 | G12.16: Square-to-brain taxonomy map (`ingest/taxonomy_map.md`); mapped L2 re-score (unchanged); item-grain June pull (reconciles GBP 0.00); first real L3 item MASE (BH median 1.33, Ellel 0.24); finding is taxonomy drift not name misalignment (FLAG-TAXONOMY-DRIFT) |
+| 26 | `26_G12_17a_July_Pass1_Report.md` | 2026-07-10 | G12.17a (Pass 1): advance clock (June ingested), liveness gate (TRT dormant), taxonomy refresh (LuneBrew Pilsner now tracked), June-inclusive refit (robust-DOW edges Chronos-exo, not adopted), frozen blind July 1-7 forecast committed as pre-registration |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single

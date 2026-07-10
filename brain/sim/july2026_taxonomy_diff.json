@@ -1,0 +1,39 @@
+{
+  "beer_hall": {
+    "n_old": 29,
+    "n_new": 32,
+    "added": [
+      "Beer::LuneBrew Pilsner",
+      "Happy Hour::OTHER",
+      "Merchandise::CREME POP ART   T-shirt copy copy",
+      "Merchandise::Caravan T-shirt",
+      "Merchandise::OTHER",
+      "Soft Drinks::Pop Can",
+      "Spirits::Baby Guinness",
+      "Spirits::Espresso Martini / Passion Fruit Martini",
+      "Uncategorised::Galway Irish Stout",
+      "Wine::Aperol Spritz"
+    ],
+    "removed": [
+      "Beer::Caravan of Love",
+      "Merchandise::Pool Table deposit",
+      "Soft Drinks::Fruit Shoot",
+      "Spirits::Gordon's Pink",
+      "Spirits::Gordons",
+      "Uncategorised::Ascension Cider",
+      "Wine::Malbec"
+    ]
+  },
+  "ellel": {
+    "n_old": 17,
+    "n_new": 19,
+    "added": [
+      "Beer::LuneBrew Pilsner",
+      "Soft Drinks::Pop Can",
+      "Spirits::Morgan's Spiced",
+      "Uncategorised::Breeze Pale Ale",
+      "Uncategorised::Famous Grouse"
+    ],
+    "removed": ["Beer::Caravan of Love", "Soft Drinks::Cordial & Soda", "Spirits::Gordons"]
+  }
+}

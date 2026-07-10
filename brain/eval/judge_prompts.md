@@ -104,8 +104,8 @@ Rubric (score each 1 (poor) to 5 (excellent)):
 Briefing item:
 {
   "venue": "The Beer Hall",
-  "headline": "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
-  "reason": "coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)",
+  "headline": "The Beer Hall: sustained shift since 2025-12-27 (29% below normal); coincides with a cold snap (~6\u00b0C vs 11\u00b0C avg)",
+  "reason": "coincides with a cold snap (~6\u00b0C vs 11\u00b0C avg)",
   "severity": "medium",
   "direction": "down",
   "status": "new",
@@ -122,7 +122,7 @@ Briefing item:
       "magnitude_pct": -28.84677238692987,
       "detector": "persistence",
       "attribution": [
-        "coincides with a cold snap (~6\u00b0C vs 13\u00b0C avg)"
+        "coincides with a cold snap (~6\u00b0C vs 11\u00b0C avg)"
       ],
       "detected_date": "2026-01-03",
       "note": null

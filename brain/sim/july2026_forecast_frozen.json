@@ -1,0 +1,76 @@
+{
+  "artefact": "july2026_forecast_frozen",
+  "created_utc": "2026-07-10T02:10:31.893185+00:00",
+  "horizon": {
+    "start": "2026-07-01",
+    "end": "2026-07-07",
+    "days": 7
+  },
+  "as_of": "2026-06-30",
+  "blind": "produced before any July 2026 actual was read; weather is the real hindcast forecast basis for Jul 1 to 7, is_ellel_event=0 forward, wc_* from the fixed fixture calendar",
+  "level_conf": 0.9,
+  "liveness_gate": {
+    "dormant_venues": ["two_river_taps"],
+    "lookback_days": 21
+  },
+  "taxonomy_refresh": "L2/L3 top-3 nodes reselected from the recent 120-day window ending at the cutoff (see july2026_taxonomy_diff.json)",
+  "l2_l3_method": "measured split (report 23): MinT for beer_hall, revenue-share disaggregation for ellel, on the refreshed node set",
+  "venues": {
+    "beer_hall": {
+      "dormant": false,
+      "model": "rung4_chronos2_exo",
+      "train_ceiling": "2026-06-29",
+      "l2_l3_split": "mint",
+      "band_halfwidth": 746.0,
+      "july_l1_total": 3917.14,
+      "jul1_yhat": 487.05
+    },
+    "two_river_taps": {
+      "dormant": true,
+      "reason": "no trading in the 21 days to 2026-06-30; liveness gate withholds a positive forecast"
+    },
+    "ellel": {
+      "dormant": false,
+      "model": "rung1_robust_dow",
+      "train_ceiling": "2026-06-20",
+      "l2_l3_split": "disaggregation",
+      "band_halfwidth": 274.95,
+      "july_l1_total": 56.3,
+      "jul1_yhat": 0.0
+    }
+  },
+  "chronos_runtime": {
+    "version": "2.3.1",
+    "model_id": "amazon/chronos-2",
+    "api": null,
+    "substituted": false,
+    "weather_basis": "hindcast",
+    "device": "mps",
+    "mps_fallback_enabled": "1"
+  },
+  "caveats": [
+    "7-day horizon: the reliable regime (unlike June's 30-day cold freeze).",
+    "hindcast weather is a forecast product; the archived historical-forecast may reflect issues a few days before each date rather than strictly at the cutoff.",
+    "the 1 Jul in-context anticipation rests on a single in-hours England date."
+  ],
+  "reasons": {
+    "beer_hall": {
+      "2026-07-01": "England fixture in trading hours (England v DR Congo 17:00; Belgium v Senegal 21:00); expect uplift; weekday",
+      "2026-07-02": "World Cup match(es) in trading hours (United States v Bosnia and Herzegovina; Portugal v Croatia; Spain v Austria); weekday",
+      "2026-07-03": "World Cup match(es) in trading hours (Switzerland v Algeria; Argentina v Cape Verde; Australia v Egypt); weekday",
+      "2026-07-04": "World Cup match(es) in trading hours (Colombia v Ghana; Paraguay v France; Canada v Morocco); weekend",
+      "2026-07-05": "World Cup match(es) in trading hours (Brazil v Norway); weekend",
+      "2026-07-06": "World Cup match(es) in trading hours (Mexico v England; Portugal v Spain); weekday",
+      "2026-07-07": "World Cup match(es) in trading hours (United States v Belgium; Argentina v Egypt; Switzerland v Colombia); weekday"
+    },
+    "ellel": {
+      "2026-07-01": "weekday",
+      "2026-07-02": "World Cup match(es) in trading hours (United States v Bosnia and Herzegovina; Portugal v Croatia; Spain v Austria); weekday",
+      "2026-07-03": "World Cup match(es) in trading hours (Switzerland v Algeria; Argentina v Cape Verde; Australia v Egypt); weekday",
+      "2026-07-04": "World Cup match(es) in trading hours (Colombia v Ghana; Paraguay v France; Canada v Morocco); weekend",
+      "2026-07-05": "World Cup match(es) in trading hours (Brazil v Norway); weekend",
+      "2026-07-06": "World Cup match(es) in trading hours (Mexico v England; Portugal v Spain); weekday",
+      "2026-07-07": "World Cup match(es) in trading hours (United States v Belgium; Argentina v Egypt; Switzerland v Colombia); weekday"
+    }
+  }
+}

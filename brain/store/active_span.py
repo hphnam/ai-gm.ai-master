@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import pandas as pd
 
+import config
 from config import EVENT_ONLY_VENUES, FORECAST_VENUES
 from store.warehouse import read_series
 
@@ -58,3 +59,25 @@ def is_closed(venue: str, con=None) -> bool:
     if venue in EVENT_ONLY_VENUES:
         return False
     return active_trading_end(venue, con=con) < dataset_max_date(con=con)
+
+
+def is_dormant(venue: str, as_of=None, con=None, days: int | None = None) -> bool:
+    """True when a venue has had ZERO trading for the last `days` consecutive days
+    ending at `as_of` (the liveness gate, G12.17a-1).
+
+    Distinct from `is_closed`: dormancy is judged against a fixed recent window
+    ending at the operational as-of date, not against the dataset-global max, and it
+    applies to every venue uniformly (no event-venue exemption) because a genuinely
+    dark venue must not be served a positive forecast whatever its type. Reactivation
+    is automatic: one trading day inside the window flips it back to live. `as_of`
+    defaults to the dataset-global max; `days` to `config.DORMANCY_LOOKBACK_DAYS`.
+    """
+    days = config.DORMANCY_LOOKBACK_DAYS if days is None else days
+    as_of = dataset_max_date(con=con) if as_of is None else pd.Timestamp(as_of)
+    s = read_series(venue, "L1", value="revenue_exvat", fill_calendar=True, con=con)
+    traded = s.loc[s["value"] > 0, "date"]
+    if traded.empty:
+        return True  # never traded: not a live forecaster
+    window_start = as_of - pd.Timedelta(days=days - 1)
+    in_window = traded[(traded >= window_start) & (traded <= as_of)]
+    return in_window.empty

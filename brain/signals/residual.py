@@ -44,6 +44,9 @@ from store.active_span import (
 from store.warehouse import connect, read_series
 
 _EPS = 1e-6
+# Trailing seasonal window for the weather-anomaly baseline (a warm/cold spell is
+# judged against the recent season, not the full-year mean).
+WEATHER_BASELINE_DAYS = 120
 
 
 # --- Residual stream ---------------------------------------------------------
@@ -136,9 +139,15 @@ def attribute(venue: str, onset: pd.Timestamp, direction: str, layer: str,
             wx = wx[wx["cell"] == cell]
             win = wx[(wx["date"] >= lo) & (wx["date"] <= hi)]
             weather_available = not win.empty
-            if weather_available and len(wx) > 30:
-                t_mean, t_win = wx["exo_temp_c"].mean(), win["exo_temp_c"].mean()
-                t_sd = wx["exo_temp_c"].std() or 1.0
+            # Baseline on a recent SEASONAL trailing window ending at the onset window,
+            # not the whole table: a warm spell is an anomaly against the current
+            # season, and an annual mean (mixing winter and summer, the latter now in
+            # the store after G12.17a) inflates the SD and masks a real spring spell.
+            base = wx[(wx["date"] <= hi) &
+                      (wx["date"] >= hi - pd.Timedelta(days=WEATHER_BASELINE_DAYS))]
+            if weather_available and len(base) > 30:
+                t_mean, t_win = base["exo_temp_c"].mean(), win["exo_temp_c"].mean()
+                t_sd = base["exo_temp_c"].std() or 1.0
                 if abs(t_win - t_mean) > t_sd:
                     word = "warm spell" if t_win > t_mean else "cold snap"
                     weight = (70 if is_draught else 40) + (direction == "up" and t_win > t_mean) * 5

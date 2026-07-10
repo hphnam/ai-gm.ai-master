@@ -509,3 +509,35 @@ them into the append-only log so it is the continuous WP1-to-present record.
     keg lines); named separately in FLAG-TAXONOMY-MAP. Frozen artefact (`1d966be`) and
     `stock_inventory.py` untouched; both suites green (.venv-forecast 265 passed 1
     skip, .venv 258 passed 8 skip).
+
+17. **G12.17a (Pass 1 of 2): advance to end-June, refresh, freeze the July forecast**
+    (`26_G12_17a_July_Pass1_Report.md`, `PRJ93_Spec_G12_17a_July_Pass1.md`; this
+    pre-registration commit adds `sim/july2026_forecast_frozen.*`). Advances the
+    operational clock one period. **(0)** June ingested into the served store at
+    aggregate grain (MCP-SIM, Neon not provisioned): 867 rows, ceiling 2026-06-29
+    (no trade on the 30th; as-of/watermark 2026-06-30), Ellel reconciles to SalesUK to
+    GBP 0.00, Beer Hall within GBP 180/month; weather tables extended over June + Jul
+    1 to 7 so the training frame has no NaN exo. **(1)** Liveness gate
+    `active_span.is_dormant` (zero trading for `DORMANCY_LOOKBACK_DAYS=21` to the
+    as-of, generic, reactivation automatic): Two River Taps DORMANT, Beer Hall + Ellel
+    live; consulted at the freeze so TRT is not forecast (fixes June's GBP 5,329-vs-0
+    miss); 4 tests. **(2)** Taxonomy refresh (`build_hierarchy` `since` window): Beer
+    Hall 29 to 32 nodes, `Beer::LuneBrew Pilsner` now tracked (June's GBP 3,484 item
+    that was all OTHER), stale `Caravan of Love` drops; Ellel 17 to 19. Stale-node fix
+    is real; the new-item residual is irreducible. **(3)** 6-fold June-inclusive refit:
+    robust-DOW edges Chronos-exo at Beer Hall (1.228 vs 1.375, Chronos-exo 4th, exo
+    margin turns negative) and Chronos-bolt edges robust-DOW at Ellel (0.608 vs 0.633);
+    both marginal single-refit deltas over a volatile World Cup June, RECORDED
+    flagged-not-adopted (a promoted model is not hot-swapped, per the ladder_selection
+    adoption gate), so the standing winners are served (keeping Beer Hall fixture-aware
+    for the Pass 2 test). **(4)** Frozen blind July 1 to 7 (`sim/build_july_forecast`):
+    Beer Hall Chronos-exo + MinT GBP 3,917 (1 Jul GBP 487, above the Wed median GBP
+    296), Ellel robust-DOW + disaggregation GBP 56, TRT dormant; real hindcast weather;
+    the 1 Jul England v DR Congo (17:00) fixture flag fires for Beer Hall only and the
+    6 Jul 02:00 match does not; all levels coherent; 462 rows. Deviations: ceiling is
+    the 29th; refit not adopted; the agent-eval weather baseline is now seasonal
+    (trailing window) and the injection oracle is pinned to its calibration ceiling
+    (`AGENT_EVAL_STREAM_CEILING`) so advancing the store does not slide it into the
+    live World Cup. No July sales actual read; `1d966be` and `stock_inventory.py`
+    untouched; both suites green (.venv-forecast 269 passed 1 skip). Pass 2 (G12.17b)
+    confronts this artefact with July reality.
