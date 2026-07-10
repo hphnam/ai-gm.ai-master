@@ -345,12 +345,22 @@ EVENT_AWARE_REFRESH_ENABLED = os.environ.get("BRAIN_EVENT_REFRESH_DISABLED") != 
 EVENT_REFRESH_CADENCE_DAYS = 2   # tightened T3 cadence within an event window (1 to 3)
 EVENT_WINDOW_LOOKAHEAD_DAYS = 3  # a flagged event this many days ahead opens the window
 
+# Liveness gate (G12.17a-1): a venue with zero trading for this many consecutive days
+# ending at the as-of date is DORMANT and is not served a positive forecast (distinct
+# from the staleness `is_closed`). Reactivation on the next trading day is automatic.
+DORMANCY_LOOKBACK_DAYS = 21
+
 # --- Agent evaluation framework (offline; briefing usefulness, not accuracy) --
 # Evaluates whether the proactive briefing surfaces/ranks/attributes the right
 # insights. Read-only over the briefing + signals; runs on historical data with
 # LIVE_INGEST off. Triangulates three ground-truth sources: a synthetic-injection
 # oracle, a small human-labelled anchor, and an LLM-judge calibrated to the anchor.
 EVAL_ONSET_TOLERANCE_DAYS = 3     # a surfaced onset within ±this of truth = a hit
+# The injection-oracle agent eval is a CONTROLLED experiment: it must run on a fixed
+# clean window, not slide with the operational clock into live events. Pinned to the
+# pre-live-ingest ceiling (G12.17a advanced the store into the live World Cup, whose
+# real exo signal would otherwise confound the synthetic exo-attribution scenario).
+AGENT_EVAL_STREAM_CEILING = os.environ.get("BRAIN_AGENT_EVAL_CEILING", "2026-05-31")
 EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units) — smoke run
 EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units) — smoke run
 # Scaled run: the magnitude sweep that exposes the sensitivity FLOOR (how subtle an

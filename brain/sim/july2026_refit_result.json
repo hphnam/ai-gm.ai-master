@@ -1,0 +1,123 @@
+{
+  "as_of": "2026-06-30",
+  "venues": {
+    "beer_hall": {
+      "dormant": false,
+      "n_folds": 6,
+      "served_winner": "rung4_chronos2_exo",
+      "refit_winner": "rung1_robust_dow",
+      "refit_winner_mase": 1.2278,
+      "winner_changed": true,
+      "chronos_exo_mase": 1.3747,
+      "exo_margin_vs_best_non_foundation": -0.1469,
+      "rung_table": [
+        {
+          "rung": "rung1_robust_dow",
+          "mase": 1.2278,
+          "folds": 6
+        },
+        {
+          "rung": "rung2_ets",
+          "mase": 1.3159,
+          "folds": 6
+        },
+        {
+          "rung": "rung4_chronos_bolt",
+          "mase": 1.3677,
+          "folds": 6
+        },
+        {
+          "rung": "rung4_chronos2_exo",
+          "mase": 1.3747,
+          "folds": 6
+        },
+        {
+          "rung": "rung2_stl",
+          "mase": 1.4471,
+          "folds": 6
+        },
+        {
+          "rung": "rung4_chronos2",
+          "mase": 1.4583,
+          "folds": 6
+        },
+        {
+          "rung": "rung3_global_gbm",
+          "mase": 1.468,
+          "folds": 6
+        },
+        {
+          "rung": "rung3_gbm",
+          "mase": 1.5644,
+          "folds": 6
+        },
+        {
+          "rung": "rung0_seasonal_naive",
+          "mase": 1.5645,
+          "folds": 6
+        }
+      ]
+    },
+    "two_river_taps": {
+      "dormant": true,
+      "note": "not refit (liveness gate)"
+    },
+    "ellel": {
+      "dormant": false,
+      "n_folds": 6,
+      "served_winner": "rung1_robust_dow",
+      "refit_winner": "rung4_chronos_bolt",
+      "refit_winner_mase": 0.6078,
+      "winner_changed": true,
+      "chronos_exo_mase": 0.6454,
+      "exo_margin_vs_best_non_foundation": -0.0376,
+      "rung_table": [
+        {
+          "rung": "rung4_chronos_bolt",
+          "mase": 0.6078,
+          "folds": 6
+        },
+        {
+          "rung": "rung1_robust_dow",
+          "mase": 0.633,
+          "folds": 6
+        },
+        {
+          "rung": "rung4_chronos2_exo",
+          "mase": 0.6454,
+          "folds": 6
+        },
+        {
+          "rung": "rung4_chronos2",
+          "mase": 0.6464,
+          "folds": 6
+        },
+        {
+          "rung": "rung2_stl",
+          "mase": 0.6959,
+          "folds": 6
+        },
+        {
+          "rung": "rung0_seasonal_naive",
+          "mase": 0.7914,
+          "folds": 6
+        },
+        {
+          "rung": "rung2_ets",
+          "mase": 0.8513,
+          "folds": 6
+        },
+        {
+          "rung": "rung3_global_gbm",
+          "mase": 0.8887,
+          "folds": 6
+        },
+        {
+          "rung": "rung3_gbm",
+          "mase": 0.9561,
+          "folds": 6
+        }
+      ]
+    }
+  }
+}

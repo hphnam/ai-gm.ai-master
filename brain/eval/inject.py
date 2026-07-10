@@ -67,7 +67,15 @@ class Injection:
 # --- Held-out window ---------------------------------------------------------
 
 def base_stream(venue: str, con=None) -> pd.DataFrame:
-    return build_residual_stream(venue, con=con)
+    """Residual stream for the injection oracle, capped at
+    `config.AGENT_EVAL_STREAM_CEILING` so this controlled experiment runs on its fixed
+    calibration window rather than sliding with the operational clock (G12.17a
+    advanced the store into the live World Cup, a real exo confound)."""
+    s = build_residual_stream(venue, con=con)
+    ceil = config.AGENT_EVAL_STREAM_CEILING
+    if ceil:
+        s = s[s["date"] <= pd.Timestamp(ceil)].reset_index(drop=True)
+    return s
 
 
 def folds(stream: pd.DataFrame, n_folds: int | None = None) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
