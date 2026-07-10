@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { roleMeetsMinRole } from './integration-provider'
-import { redactShiftPayForStaff } from './square/square.provider'
+import { redactShiftPayForStaff, redactTopItemsRevenueForStaff } from './square/square.provider'
 
 describe('roleMeetsMinRole', () => {
   it('lets any role reach a staff-floor tool', () => {
@@ -50,5 +50,47 @@ describe('redactShiftPayForStaff', () => {
   it('passes a failed result through untouched', () => {
     const failure = { ok: false as const, reason: 'error' as const, detail: 'boom' }
     assert.equal(redactShiftPayForStaff(failure, 'staff'), failure)
+  })
+})
+
+describe('redactTopItemsRevenueForStaff', () => {
+  const topItems = {
+    items: [
+      {
+        name: 'Pilsner',
+        quantitySold: 240,
+        grossSales: { value: 1240, currency: 'GBP' },
+        variations: [
+          { name: 'pint', quantitySold: 240, grossSales: { value: 1240, currency: 'GBP' } },
+        ],
+      },
+    ],
+  }
+
+  it('nulls revenue but keeps units for a staff caller', () => {
+    const out = redactTopItemsRevenueForStaff({ ok: true, data: { ...topItems } }, 'staff')
+    assert.deepEqual((out as { data: typeof topItems }).data.items[0], {
+      name: 'Pilsner',
+      quantitySold: 240,
+      grossSales: null,
+      variations: [{ name: 'pint', quantitySold: 240, grossSales: null }],
+    })
+  })
+
+  it('preserves revenue for a manager caller', () => {
+    const out = redactTopItemsRevenueForStaff({ ok: true, data: { ...topItems } }, 'manager')
+    const rows = (out as { data: typeof topItems }).data.items
+    assert.deepEqual(rows[0].grossSales, { value: 1240, currency: 'GBP' })
+  })
+
+  it('nulls revenue for an unexpected role (fail-closed)', () => {
+    const out = redactTopItemsRevenueForStaff({ ok: true, data: { ...topItems } }, 'contractor')
+    const rows = (out as { data: typeof topItems }).data.items
+    assert.equal(rows[0].grossSales, null)
+  })
+
+  it('passes a failed result through untouched', () => {
+    const failure = { ok: false as const, reason: 'error' as const, detail: 'boom' }
+    assert.equal(redactTopItemsRevenueForStaff(failure, 'staff'), failure)
   })
 })
