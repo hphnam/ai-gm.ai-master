@@ -570,3 +570,33 @@ them into the append-only log so it is the continuous WP1-to-present record.
     Stages 1-4 re-run June-inclusive; the Pass-1 artefact predates the wipe and is
     unaffected; production `NeonAdapter` makes it durable). Served store max stays
     2026-06-29, zero July rows; `1d966be` and `stock_inventory.py` untouched.
+
+19. **G12.17c (Step C1 of 2): freeze a second blind July window, 8 to 14 July**
+    (`28_G12_17c_July_Window2_Freeze_Report.md`, `PRJ93_Spec_G12_17c_July_Extension.md`).
+    Pre-registers an 8 to 14 July 2026 forecast from the SAME June-inclusive cutoff,
+    standing gate winners and config as the 1 to 7 freeze (`7d103aa`), so the two
+    windows are comparable, and commits it before any 8 to 14 July actual exists. The
+    window is chosen for its fixtures: the England quarter-final (Norway v England, 11
+    Jul 22:00, in-hours for the Beer Hall) plus two in-hours non-home-nation matches
+    (France v Morocco 9 Jul, Spain v Belgium 10 Jul), to add a second England date to
+    the in-context evidence and test the home-nation-vs-generic prior forward. Because
+    11 to 14 July are genuinely in the future at freeze time (today 2026-07-10), the
+    pre-registration is airtight by CALENDAR, stronger than the already-elapsed 1 to 7
+    run. Store precondition verified June-inclusive (`line_items` max 2026-06-29, 867
+    June rows) before and after. `sim/build_july_w2_forecast.py`: Beer Hall
+    Chronos-exo + MinT GBP 4,293 (11 Jul GBP 1,565), Ellel robust-DOW + disaggregation
+    GBP 56, TRT dormant; real hindcast weather retrieved for 8 to 14 July; all levels
+    coherent, 462 rows. Fixture flags asserted: 11 Jul fires England + home-nation
+    in-hours for the Beer Hall, 9/10 Jul fire generic match-in-hours only, the 12 Jul
+    02:00 match fires nothing. **Pre-registered expectation:** the Beer Hall model
+    lifts every in-hours match date above its weekday baseline and lifts the England QF
+    most (+GBP 312 / +25% vs the generics' +12% and +22%) - the forward home-nation
+    test C2 will score. Deviations: **(1)** Ellel's 11 Jul England flag fires (the spec
+    assumed it would not) because Ellel's data-derived Saturday window runs to ~23:42
+    and overlaps the 22:00 match; reported not hand-forced, and inert since Ellel's
+    robust-DOW model reads no `wc_*` covariate. **(2)** A 9 to 15 day-ahead horizon,
+    beyond the reliable 7-day regime, taken for comparability and disclosed. No 8 to 14
+    July actual read; served store max stays 2026-06-29, zero July rows; only the
+    exogenous weather tables were extended (covariate input, not actuals); `1d966be`,
+    `7d103aa` and `stock_inventory.py` untouched. Step C2 confronts this artefact in a
+    later session strictly after 2026-07-14.

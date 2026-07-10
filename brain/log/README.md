@@ -41,6 +41,7 @@ prefix has been dropped. Two provenances are gathered here:
 | 25 | `25_G12_16_Report.md` | 2026-07-10 | G12.16: Square-to-brain taxonomy map (`ingest/taxonomy_map.md`); mapped L2 re-score (unchanged); item-grain June pull (reconciles GBP 0.00); first real L3 item MASE (BH median 1.33, Ellel 0.24); finding is taxonomy drift not name misalignment (FLAG-TAXONOMY-DRIFT) |
 | 26 | `26_G12_17a_July_Pass1_Report.md` | 2026-07-10 | G12.17a (Pass 1): advance clock (June ingested), liveness gate (TRT dormant), taxonomy refresh (LuneBrew Pilsner now tracked), June-inclusive refit (robust-DOW edges Chronos-exo, not adopted), frozen blind July 1-7 forecast committed as pre-registration |
 | 27 | `27_G12_17b_July_Pass2_Report.md` | 2026-07-10 | G12.17b (Pass 2): July 1-7 confronted (BH L1 MASE 0.39, beats backtest class); in-context test (1 Jul lifted above baseline in anticipation, single-case); drift decomposition (Ellel named coverage +38pp); brain over July (0 new-items/week fatigue, TRT no alarm spam, liveness gate confirmed vs reality) |
+| 28 | `28_G12_17c_July_Window2_Freeze_Report.md` | 2026-07-10 | G12.17c (Step C1): freeze a second blind July window (8-14 July) from the same June-inclusive cutoff, carrying the England QF (11 Jul, in-hours) + two generic matches; airtight-by-calendar pre-registration (11-14 Jul still future); BH lifts every match date, England most (+GBP 312 vs generics); flags asserted; deviation: Ellel's late Saturday window fires its 11 Jul England flag (inert, robust-DOW reads no wc). Step C2 (confront) awaits after 2026-07-14 |
 
 `Decision_and_Resolution_Log.md` is intentionally un-numbered: it is a
 cross-cutting, append-only record spanning WP1 to WP12, not a single
@@ -61,7 +62,9 @@ sequence is preferred over commit date.
 Section A covers the fidelity corrections, Section B the WP8 to WP12 addendum and
 Chronos-2 closeout (rows 1 to 5), and Section C the post-WP12 milestones: G12.9 to
 G12.11 (rows 6 to 10, reconciled in from `17_G12_9_Report.md` and
-`19_G12_10_Report.md`), G12.12 (row 11), and the G12.13 June confrontation (row 12
-G12.13a pre-registration, row 13 G12.13b out-of-sample result). The three G12.11
+`19_G12_10_Report.md`), G12.12 (row 11), the G12.13 June confrontation (row 12
+G12.13a pre-registration, row 13 G12.13b out-of-sample result), and the G12.17 July
+work (row 17 G12.17a Pass-1 freeze, row 18 G12.17b Pass-2 confront, row 19 G12.17c
+Step-C1 second-window freeze). The three G12.11
 rows the G12.10 report labels B6/B7/B8 are Section C rows 8, 9, and 10.
 `brain/FLAGS.md` remains the live flag ledger.
