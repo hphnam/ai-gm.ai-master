@@ -5,9 +5,9 @@ exist to study train/serve consistency (spec §4): at inference only a forecast 
 the weather is known, so training on clean reanalysis ("observed") may not be the
 best basis when serving on forecast.
 
-    exog_weather_observed     ERA5 reanalysis (archive)            — ground truth / upper bound
-    exog_weather_hindcast     historical-forecast (matches serve)  — realistic training basis
-    exog_weather_leadmatched  previous-runs, issued N days ahead   — forecast as actually issued
+    exog_weather_observed     ERA5 reanalysis (archive), ground truth / upper bound
+    exog_weather_hindcast     historical-forecast (matches serve), realistic training basis
+    exog_weather_leadmatched  previous-runs, issued N days ahead, forecast as actually issued
 
 Each venue has its own precise grid cell keyed by venue name (G12.9e / G12.10a;
 `config.WEATHER_CELLS`): `beer_hall`, `ellel`, `two_river_taps`. Beer Hall and

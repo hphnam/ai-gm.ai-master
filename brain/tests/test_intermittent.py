@@ -3,7 +3,7 @@
 (a) the recursion reproduces a hand-computed 10-point example;
 (b) cross-check gate: final forecast matches statsforecast CrostonClassic/SBA on
     Bernoulli-gap series (skipped with a clear reason when statsforecast is not
-    importable — it does not build on this Python 3.14 venv);
+    importable, it does not build on this Python 3.14 venv);
 (c) SBA output equals 0.95 times Croston output at alpha 0.1.
 """
 

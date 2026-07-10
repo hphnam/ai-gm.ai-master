@@ -1,4 +1,4 @@
-"""A12 · Stock inventory — days-of-cover reorder signal (spec §7).
+"""A12 · Stock inventory, days-of-cover reorder signal (spec §7).
 
 Joins the latest bar-stock snapshot (physical on-hand, from A11) to the A6
 reconciled demand forecast (pints/day) to produce an inventory-aware reorder
@@ -8,7 +8,7 @@ signal:
     reorder when  days_of_cover < lead_time + safety
 
 Stock is a *level*, not a flow (deliveries are unobserved), so consumption comes
-from the sales-side A6 forecast — never from stock differences (FLAG-2). Cover is
+from the sales-side A6 forecast, never from stock differences (FLAG-2). Cover is
 computed only for **core** keg/cask lines that map to a forecast A6 node; unmapped
 lines carry NULL demand, never a guess. Two secondary readouts fall out of the
 same panel: a working-capital / dead-stock summary, and a mix-confounded cost note.
@@ -143,7 +143,7 @@ def working_capital(con=None) -> dict:
 
 
 def dead_stock(con=None, limit: int = 8) -> pd.DataFrame:
-    """Non-core lines carrying value, or core lines that sit near-zero — the
+    """Non-core lines carrying value, or core lines that sit near-zero, the
     working-capital-tied-up / dead-listing candidates."""
     own = con is None
     con = con or connect(read_only=True)

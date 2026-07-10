@@ -68,7 +68,7 @@ WC_COLUMNS = list(_WC_FEATURE_COLS)
 # Exogenous columns ADOPTED as model features. This set is EMPTY by the A14
 # ablation's verdict (signals/feature_ablation.py): against the strong
 # autoregressive baseline (lag-7/14, roll-28, DOW), no exo feature improves
-# held-out MASE on the operational rolling-origin window — calendar flags are
+# held-out MASE on the operational rolling-origin window, calendar flags are
 # near-constant within the recent test folds (so add only overfitting), weather
 # overfits ~270 days, and events have no in-window anchors. The whole seam is
 # still POPULATED (below) for deviation attribution and the weather train/serve
@@ -90,7 +90,7 @@ def _uk_bank_holidays(years: range) -> set:
 
 
 def _ellel_event_dates(con) -> set:
-    """Dates on which Ellel traded — the spillover-hypothesis event calendar."""
+    """Dates on which Ellel traded, the spillover-hypothesis event calendar."""
     df = read_series("ellel", "L1", con=con)
     return set(df.loc[df["value"] > 0, "date"].dt.date)
 
@@ -160,19 +160,19 @@ def _attach_exog(df: pd.DataFrame, venue: str, basis: str = WEATHER_TRAIN_BASIS,
     never cross-applied across cities."""
     d = df["date"]
 
-    # Deterministic calendar — known in advance, safe at any horizon.
+    # Deterministic calendar, known in advance, safe at any horizon.
     df["exo_is_school_term"] = d.map(cal.is_school_term).astype(int)
     df["exo_is_uni_term"] = d.map(cal.is_uni_term).astype(int)
     df["exo_uni_phase"] = d.map(cal.uni_phase)
 
-    # Weather — the chosen training basis for this venue's grid cell.
+    # Weather, the chosen training basis for this venue's grid cell.
     cell = WEATHER_CELLS.get(venue)
     wx = read_basis(basis, con=con)
     wx = wx[wx["cell"] == cell][["date", "exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs"]]
     df = df.merge(wx, on="date", how="left")
     df["exo_is_dry"] = (df["exo_rain_mm"] < WEATHER_DRY_MM).astype("float")
 
-    # Local events — only this venue's scope(s); fixture flag + max rank.
+    # Local events, only this venue's scope(s); fixture flag + max rank.
     scopes = set(EVENT_SCOPE.get(venue, ())) | {"all"}
     ev = read_events(con=con)
     ev = ev[ev["venue_scope"].isin(scopes)]

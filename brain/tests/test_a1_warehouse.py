@@ -1,4 +1,4 @@
-"""A1 tests — store round-trips at all three layers, BH reconciles, forecast
+"""A1 tests, store round-trips at all three layers, BH reconciles, forecast
 and band writes persist and read back coherently.
 """
 

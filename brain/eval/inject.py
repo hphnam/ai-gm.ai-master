@@ -4,16 +4,16 @@ Plants KNOWN, controlled events into held-out copies of the standardised residua
 stream, so the briefing can be scored against truth with no human labelling and
 full reproducibility. Four event kinds are supported:
 
-  * regime_shift     — a step change in z from a known onset (sustained shift)
-  * spike            — a single-day |z| excursion (point anomaly, no persistence)
-  * stock_drawdown   — a keg line crossing the reorder threshold (days_of_cover ≤ 0)
-  * exo_coincident   — a downward shift anchored on a real weather anomaly, so the
+  * regime_shift, a step change in z from a known onset (sustained shift)
+  * spike, a single-day |z| excursion (point anomaly, no persistence)
+  * stock_drawdown, a keg line crossing the reorder threshold (days_of_cover ≤ 0)
+  * exo_coincident, a downward shift anchored on a real weather anomaly, so the
                        attribution SHOULD name weather (a planted cause, not a null)
 
 Leakage (G-eval-e): the injection window is a held-out fold from
 `harness.rolling_origin`, so injected days are never in any training portion the
 detectors standardise against; `assert_no_leakage` guards every fold. This module
-reads the store read-only and INVENTS NO DETECTION MATHS — it perturbs inputs; the
+reads the store read-only and INVENTS NO DETECTION MATHS, it perturbs inputs; the
 real detectors and the real briefing synthesis (in `agent_eval`) do the work.
 """
 
@@ -48,7 +48,7 @@ class TruthRecord:
     magnitude: float          # z-units (shift/spike) | 0 (stock drawdown)
     expected_cause: str | None  # "weather" for exo_coincident; None → honest-null case
     relevance: float = 1.0    # intended IMPORTANCE for ranking (a sustained shift > a
-    #                           one-day spike), not raw z — the briefing's design intent
+    #                           one-day spike), not raw z, the briefing's design intent
 
 
 @dataclass
@@ -79,7 +79,7 @@ def base_stream(venue: str, con=None) -> pd.DataFrame:
 
 
 def folds(stream: pd.DataFrame, n_folds: int | None = None) -> list[tuple[pd.DataFrame, pd.DataFrame]]:
-    """Leakage-checked (train, test) folds from the harness — different historical
+    """Leakage-checked (train, test) folds from the harness, different historical
     contexts for the scaled run. Falls back to a single tail split when the series is
     too short for a full rolling-origin fold."""
     n = n_folds if n_folds is not None else config.EVAL_SCALED_FOLDS
@@ -104,7 +104,7 @@ def _onset(test: pd.DataFrame, offset: int = _ONSET_OFFSET_DAYS) -> pd.Timestamp
 
 def _position_offset(test: pd.DataFrame, position: str) -> int:
     """Onset position within the held-out window: early (room to persist), mid
-    (isolated), or late (the hard case — little room before the window ends)."""
+    (isolated), or late (the hard case, little room before the window ends)."""
     n = len(test)
     if position == "mid":
         return n // 2
@@ -154,7 +154,7 @@ def inject_regime_shift(venue: str, con=None, *, direction: str = "down",
 
 def inject_spike(venue: str, con=None, *, direction: str = "up", z: float | None = None,
                  stream=None, window=None, onset: str = "mid") -> Injection:
-    """A single-day |z| excursion — a point anomaly with no persistence."""
+    """A single-day |z| excursion, a point anomaly with no persistence."""
     stream, train, test = _resolve(venue, con, stream, window)
     at = _onset(test, _position_offset(test, onset))
     dz = (z if z is not None else config.EVAL_INJECT_SPIKE_Z) * (-1 if direction == "down" else 1)
@@ -212,7 +212,7 @@ def inject_exo_coincident(venue: str, con=None, *, direction: str = "down",
 
 def _weather_anomaly_date(venue: str, test: pd.DataFrame, con) -> pd.Timestamp | None:
     """The held-out-window date whose temperature most exceeds the series mean by
-    more than one SD — the same anomaly the attribution scans for."""
+    more than one SD, the same anomaly the attribution scans for."""
     cell = config.WEATHER_CELLS.get(venue)
     if not cell or not _has_table(con, "exog_weather_leadmatched"):
         return None
@@ -247,7 +247,7 @@ def multi_event(venue: str, con=None, *, stream=None, window=None) -> Injection:
 
 
 def quiet_onset(venue: str, con=None, direction: str = "down") -> date | None:
-    """A held-out-window date the attribution finds NO coincident signal for — the
+    """A held-out-window date the attribution finds NO coincident signal for, the
     honest-null control for the attribution axis. None if the estate has no such date
     (a real finding on a calendar-dense estate, not an error)."""
     from signals.residual import attribute

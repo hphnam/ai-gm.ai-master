@@ -1,4 +1,4 @@
-"""A4 tests — rung predictors and the milestone/selection logic (fast, on a
+"""A4 tests, rung predictors and the milestone/selection logic (fast, on a
 synthetic series; the full real-data ladder is exercised by the CLI artefact).
 """
 
@@ -72,7 +72,7 @@ def test_milestone_fails_when_baseline_is_best():
 
 
 def test_capped_milestone_gate_is_rung1_beats_naive():
-    # A capped venue (cap=1) is adopted when Rung 1 beats Rung 0 — there is no
+    # A capped venue (cap=1) is adopted when Rung 1 beats Rung 0, there is no
     # higher rung to beat Rung 1 with.
     results = [
         RungResult("rung0_seasonal_naive", 0, metrics={"MASE": 0.92}),

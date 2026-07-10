@@ -1,4 +1,4 @@
-"""A0 tests — ingest reconciles to the profiled audit figures, no leakage of
+"""A0 tests, ingest reconciles to the profiled audit figures, no leakage of
 unparseable rows, VAT rule applied.
 """
 

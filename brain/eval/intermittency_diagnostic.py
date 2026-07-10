@@ -93,7 +93,7 @@ def diagnose(venue: str = ANCHOR_VENUE, top_k: int = 3) -> list[dict]:
 
 
 def intermittent_nodes(venue: str = ANCHOR_VENUE, top_k: int = 3) -> list[str]:
-    """Non-OTHER L3 nodes classified intermittent (ADI >= 1.32) — the trigger
+    """Non-OTHER L3 nodes classified intermittent (ADI >= 1.32), the trigger
     set for the conditional Croston/SBA comparison (G2.2)."""
     return [r["node"] for r in diagnose(venue, top_k)
             if r["intermittent"] and not r["is_other"]]

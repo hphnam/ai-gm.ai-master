@@ -6,7 +6,7 @@ item) a labeller records `keep` (worth surfacing) / `drop` (noise), a `priority_
 and a free-text note; `missing` insights the briefing failed to surface are recorded
 as their own rows with `verdict='missing'`.
 
-This is an OFFLINE label store, not a live manager A/B trial — no real managers are
+This is an OFFLINE label store, not a live manager A/B trial, no real managers are
 surveyed here; it is a small anchor a labeller fills in. Metrics against it are
 reported with N and a confidence interval, and the honest caveat that N is small.
 
@@ -179,7 +179,7 @@ def _day_strata(venue: str, con) -> dict:
 def sample_days(n_per_stratum: int = 5, seed: int | None = None, con=None) -> pd.DataFrame:
     """A deterministic stratified sample of (day, venue) across quiet / deviation /
     change-point / stock strata, so the labelled set is neither all quiet nor all noise.
-    Sparse strata return fewer than requested — the achieved N is reported, not padded."""
+    Sparse strata return fewer than requested, the achieved N is reported, not padded."""
     seed = seed if seed is not None else config.EVAL_SCALED_SEED
     rng = np.random.default_rng(seed)
     own = con is None
@@ -204,7 +204,7 @@ def sample_days(n_per_stratum: int = 5, seed: int | None = None, con=None) -> pd
 
 
 def sample_report(sample: pd.DataFrame) -> dict:
-    """Achieved N per stratum (sparse venues will be small — say so)."""
+    """Achieved N per stratum (sparse venues will be small, say so)."""
     if sample.empty:
         return {"total": 0, "per_stratum": {}, "per_venue": {}}
     return {"total": int(len(sample)),
@@ -216,7 +216,7 @@ def sample_report(sample: pd.DataFrame) -> dict:
 
 def render_raw_day(day, venue: str, con=None) -> str:
     """The raw numbers a labeller forms an independent view from BEFORE seeing the
-    briefing (pass 1) — the anti-anchoring half of the instrument."""
+    briefing (pass 1), the anti-anchoring half of the instrument."""
     from signals.residual import build_residual_stream
     own = con is None
     con = con or connect(read_only=True)

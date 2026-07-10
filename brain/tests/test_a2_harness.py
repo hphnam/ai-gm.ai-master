@@ -1,4 +1,4 @@
-"""A2 tests — metrics behave correctly and the splits never leak."""
+"""A2 tests, metrics behave correctly and the splits never leak."""
 
 from __future__ import annotations
 

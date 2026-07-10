@@ -1,4 +1,4 @@
-"""Point-deviation signal — the per-day primitive (PRJ93 point-deviation spec).
+"""Point-deviation signal, the per-day primitive (PRJ93 point-deviation spec).
 
 Flags when a SINGLE trading day falls outside its 90% conformal band, with
 direction, severity, and a coincident reason. Point deviation is the primitive;
@@ -9,7 +9,7 @@ foundation (`signals.residual`); neither imports the other.
     z_t = (actual_t − DOW-median_t) / conformal half-band@CP_LEVEL
     |z| ≤ DEV_BAND_K → normal ;  |z| > DEV_BAND_K → deviation (|z| > DEV_SEVERE_K → high)
 
-The stream is leakage-free (expanding one-step-ahead), trading days only — so a
+The stream is leakage-free (expanding one-step-ahead), trading days only, so a
 booking-driven venue's structural-zero days never raise a false deviation.
 
 Run:
@@ -40,7 +40,7 @@ RESULTS_MD = STORE_DIR.parent / "eval" / "deviation_eval.md"
 
 def _classify(z: float) -> tuple[str, str, str | None]:
     """(status, direction, severity). Band-multiple rule (FLAG-PD2): deliberately
-    distinct from change-point's persistence-aware severity — a point has no run
+    distinct from change-point's persistence-aware severity, a point has no run
     length. severity is None for a normal day."""
     direction = "up" if z > 0 else "down"
     if abs(z) <= DEV_BAND_K:

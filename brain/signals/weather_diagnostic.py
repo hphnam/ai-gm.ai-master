@@ -1,4 +1,4 @@
-"""A14b · Weather/calendar signal diagnostic (spec A14b) — DIAGNOSTIC ONLY.
+"""A14b · Weather/calendar signal diagnostic (spec A14b), DIAGNOSTIC ONLY.
 
 The A14 L1 ablation found no exogenous lift. A venue-total null does not prove no
 signal: a real weather effect on draught/cask can be washed out at the aggregate,
@@ -6,10 +6,10 @@ calendar flags were near-constant in the operational folds, and weather may simp
 be redundant with the seasonality already in the model. Four cheap tests separate
 "no signal here" from "signal hidden by aggregation / eval design":
 
-    A  L2 (+ draught L3) weather ablation   — is lift hidden by aggregation?
-    B  physiology-matched weather features  — is raw temp too redundant with season?
-    C  transition-aware folds for calendar  — were the flags untestable in-window?
-    D  residual-on-weather regression        — does weather explain variance beyond season?
+    A  L2 (+ draught L3) weather ablation, is lift hidden by aggregation?
+    B  physiology-matched weather features, is raw temp too redundant with season?
+    C  transition-aware folds for calendar, were the flags untestable in-window?
+    D  residual-on-weather regression, does weather explain variance beyond season?
 
 This module **adopts nothing**: `_ADOPTED_EXO` is untouched, the live ladder is
 unchanged. Any positive finding is logged as a *candidate* for a later, gated
@@ -53,7 +53,7 @@ _WX_B = ["exo_beer_garden_day", "exo_temp_anomaly"]
 
 def _climatology() -> pd.Series:
     """Smoothed day-of-year mean temperature from ERA5 observed (lancaster cell).
-    Fragile on ~1 summer of data — FLAG-WD1; the threshold flag is the robust one."""
+    Fragile on ~1 summer of data, FLAG-WD1; the threshold flag is the robust one."""
     obs = read_basis("observed")
     obs = obs[obs["cell"] == WEATHER_CELLS[ANCHOR]].copy()
     if obs.empty:
@@ -130,7 +130,7 @@ def _l2_series(venue: str) -> dict[str, pd.DataFrame]:
 
 def _draught_l3_series(venue: str) -> dict[str, pd.DataFrame]:
     """The actual draught/cask demand lives in L3 items inside the 'Beer' category
-    (Lager - BH, Cider - BH) — the on-target series for the weather hypothesis."""
+    (Lager - BH, Cider - BH), the on-target series for the weather hypothesis."""
     con = connect(read_only=True)
     try:
         df = con.execute(
@@ -245,7 +245,7 @@ def test_c(climo) -> dict:
 # --- Test D: residual-on-weather regression (decisive) -----------------------
 
 def _dow_season_residual(feats: pd.DataFrame) -> pd.Series:
-    """value minus its in-sample day-of-week median — the season-stripped residual."""
+    """value minus its in-sample day-of-week median, the season-stripped residual."""
     med = feats.groupby(feats["date"].dt.dayofweek)["value"].transform("median")
     return feats["value"] - med
 

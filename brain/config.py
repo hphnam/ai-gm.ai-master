@@ -1,7 +1,7 @@
 """Central configuration for the Proactive Brain (Track A).
 
 Paths, the canonical venue map, the VAT rule, and modelling constants live here
-so every module reads the same source of truth. No secrets — the Voyage key is
+so every module reads the same source of truth. No secrets, the Voyage key is
 read from the environment at call time (signals/chatlog_kb_gap.py).
 """
 
@@ -83,7 +83,7 @@ ANCHOR_VENUE = "beer_hall"
 # Excluded from forecasting (too sparse, not a trading venue in the usual sense).
 EXCLUDED_VENUES = frozenset({"events"})
 
-# Forecast targets — the three real venues.
+# Forecast targets, the three real venues.
 FORECAST_VENUES = ("beer_hall", "two_river_taps", "ellel")
 
 # Per-venue ladder rung cap. Previously capped Ellel at Rung 1 (robust DOW ×
@@ -101,7 +101,7 @@ FORECAST_VENUES = ("beer_hall", "two_river_taps", "ellel")
 MAX_RUNG: dict[str, int] = {}
 
 # Booking/event-driven venues whose "structural zero" is not a fixed weekday
-# (Mon/Tue) but *any* zero-revenue day — they simply have no sales most days.
+# (Mon/Tue) but *any* zero-revenue day, they simply have no sales most days.
 # G12.9c: this flag governs the detector path and two other decoupled seams
 # ONLY. It has never gated the ladder's rung cap (that was MAX_RUNG alone, now
 # uncapped for Ellel above). After G12.9c, EVENT_ONLY_VENUES still controls:
@@ -125,7 +125,7 @@ EXPECTED_ROW_COUNTS: dict[str, int] = {
 }
 EXPECTED_TOTAL_ROWS = 92329
 
-# The audit's Beer Hall L1 net-sales (ex-VAT) total — A1/A3 reconcile to this.
+# The audit's Beer Hall L1 net-sales (ex-VAT) total, A1/A3 reconcile to this.
 BH_NET_SALES_TOTAL = 202491.0
 # Reconciliation tolerance as a fraction of the target (rounding + dropped rows).
 RECONCILE_TOL = 0.01
@@ -134,7 +134,7 @@ RECONCILE_TOL = 0.01
 # Two River Taps `Net Sales` is treated as VAT-INCLUSIVE; deflate by 1/1.2
 # before any cross-venue / group-level use. The Beer Hall and Ellel `Net Sales`
 # are already ex-VAT. This is a working assumption pending owner confirmation
-# (standing flag — see FLAGS.md).
+# (standing flag, see FLAGS.md).
 VAT_RATE = 0.20
 VAT_INCLUSIVE_VENUES = frozenset({"two_river_taps"})
 
@@ -170,7 +170,7 @@ CHATLOG_FAILURE_BASELINE = 0.189
 VOYAGE_MODEL = "voyage-3.5"
 
 # --- Stock / inventory (PRJ93 stock-integration spec) ------------------------
-# Raw monthly bar-stock sheets live here (Beer Hall only — no TRT/Ellel sheets
+# Raw monthly bar-stock sheets live here (Beer Hall only, no TRT/Ellel sheets
 # exist, FLAG-5). Brewery stocktakes share the dir but are cleaned to a separate
 # out-of-scope table (FLAG-8).
 STOCK_DIR = DATA_DIR / "stock"
@@ -178,7 +178,7 @@ STOCK_DIR = DATA_DIR / "stock"
 # Days-of-cover reorder rule. Lead time + safety are working assumptions pending
 # supplier confirmation (FLAG-3); reorder_cycle extends the order target ~1 week
 # beyond the cover horizon.
-STOCK_LEAD_TIME_DAYS = 3        # supplier lead time — CONFIRM with Ryan/James (FLAG-3)
+STOCK_LEAD_TIME_DAYS = 3        # supplier lead time, CONFIRM with Ryan/James (FLAG-3)
 STOCK_SAFETY_DAYS = 2          # buffer
 STOCK_REORDER_CYCLE_DAYS = 7   # order to ~1 week beyond the cover horizon
 
@@ -201,7 +201,7 @@ VENUES_WITH_STOCK = ("beer_hall",)
 # (forecast pints/day from A6) to on-hand (kegs from the latest stock snapshot).
 # Evidence-based, clean brand matches that are actually in A6's forecast node set
 # only. Generic sales items ("Lager - BH", "Cider - BH") span multiple keg brands,
-# and items A6 buckets into OTHER are not forecast — both are left unmapped so the
+# and items A6 buckets into OTHER are not forecast, both are left unmapped so the
 # cover line carries NULL demand rather than a guessed attribution (spec §4.4/G5).
 STOCK_A6_NODE_MAP: dict[tuple[str, str], str] = {
     ("lunebrew caravan of love", "Draught"): "Caravan of Love",
@@ -240,7 +240,7 @@ WEATHER_DRY_MM = 1.0                      # exo_is_dry threshold
 EVENT_SCOPE = {
     "beer_hall": ("lancaster",), "ellel": ("lancaster",), "two_river_taps": ("preston",),
 }
-# PredictHQ token is read from os.environ["PREDICTHQ_TOKEN"] at call time — never
+# PredictHQ token is read from os.environ["PREDICTHQ_TOKEN"] at call time, never
 # stored or committed here. Absent -> the curated local_events table is used.
 
 PROPHET_USE_REGRESSORS = False
@@ -249,11 +249,11 @@ ENRICH_FEATURES = (
     "exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs", "exo_is_dry",
     "exo_is_school_term", "exo_is_uni_term", "exo_fixture_nearby",
 )
-# is_spike_day threshold (Σdiscounts / Σgross_sales). Retrospective only — never
+# is_spike_day threshold (Σdiscounts / Σgross_sales). Retrospective only, never
 # a forward regressor (FLAG-FE9).
 SPIKE_DISCOUNT_SHARE = 0.95
 
-# --- Weather/calendar diagnostic (A14b) — diagnostic only, adopts nothing ----
+# --- Weather/calendar diagnostic (A14b), diagnostic only, adopts nothing ----
 BEER_GARDEN_TEMP_C = 20.0     # exo_beer_garden_day threshold (with WEATHER_DRY_MM)
 WD_CLIMATOLOGY_WIN = 15       # ± days for the day-of-year temperature climatology
 WD_L2_CATEGORIES = ()         # () = auto-pick top-volume beer_hall L2 categories
@@ -281,7 +281,7 @@ VENUES_FOR_CHANGEPOINT = ("beer_hall", "two_river_taps")  # Ellel persistence-on
 # The per-day primitive: is a single trading day outside its 90% conformal band?
 # Reuses CP_LEVEL (one confidence level) and the shared residual stream, so point
 # severity and change-point evidence are on the same z-scale. Band-multiple rule
-# (distinct from change-point's persistence-aware severity — FLAG-PD2).
+# (distinct from change-point's persistence-aware severity, FLAG-PD2).
 DEV_BAND_K = 1.0        # |z| > 1 → outside the 90% conformal band
 DEV_SEVERE_K = 2.0      # |z| > 2 → high severity
 DEV_SCAN_WINDOW = 14    # trading days returned by scan()
@@ -292,13 +292,13 @@ VENUES_FOR_DEVIATION = ("beer_hall", "ellel", "two_river_taps")
 # --- Proactive briefing (capstone) ------------------------------------------
 # The synthesis layer: composes the four signals (point deviation, change-point,
 # stock cover, checklist/SOP) into one ranked, de-duplicated, attributed daily
-# feed. No new detection maths — every constant below is a knob on the synthesis
+# feed. No new detection maths, every constant below is a knob on the synthesis
 # (de-dup window, ranking weights, honesty gates), printed in the report so a
 # reviewer can reproduce the ordering.
 BRIEFING_VENUES = FORECAST_VENUES            # the three real venues
 BRIEFING_MERGE_WINDOW_DAYS = CP_RUN_N        # cluster same-direction onsets within 7 days
 
-# G5a — checklist/SOP data is template-only until Ryan's completion export lands.
+# G5a, checklist/SOP data is template-only until Ryan's completion export lands.
 # While False, checklist and SOP signals are excluded from the ranked feed and
 # from scoring (never counted as a real miss). Flipping to True is a one-liner.
 CHECKLIST_LIVE = False
@@ -314,7 +314,7 @@ BRIEFING_SEVERITY_MULT = {
 }
 BRIEFING_NOVELTY_FACTOR = {"new": 1.25, "continuing": 0.80, "resolved": 0.50}
 BRIEFING_DIRECTION_BUMP = {"down": 1.10, "up": 1.00, "na": 1.00}
-# G5b — a single-day deviation on a sparse (event-only) venue gets a narrow band
+# G5b, a single-day deviation on a sparse (event-only) venue gets a narrow band
 # that inflates z; down-weight and caveat it (the Ellel z=+6.22 reading).
 BRIEFING_BASELINE_TRUST_SPARSE = 0.5
 BRIEFING_RECENCY_FLOOR = 0.5                 # recency_factor floor at the window edge
@@ -361,10 +361,10 @@ EVAL_ONSET_TOLERANCE_DAYS = 3     # a surfaced onset within ±this of truth = a 
 # pre-live-ingest ceiling (G12.17a advanced the store into the live World Cup, whose
 # real exo signal would otherwise confound the synthetic exo-attribution scenario).
 AGENT_EVAL_STREAM_CEILING = os.environ.get("BRAIN_AGENT_EVAL_CEILING", "2026-05-31")
-EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units) — smoke run
-EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units) — smoke run
+EVAL_INJECT_SHIFT_Z = 1.6         # regime-shift step size (band-half units), smoke run
+EVAL_INJECT_SPIKE_Z = 3.0         # single-day spike/dip size (band-half units), smoke run
 # Scaled run: the magnitude sweep that exposes the sensitivity FLOOR (how subtle an
-# event the brain catches before it misses) — the headline result, not a pooled F1.
+# event the brain catches before it misses), the headline result, not a pooled F1.
 # z spans near-threshold (|z|~1, the band edge) to large; stock sweeps days-of-cover
 # from mildly low to clearly out. The grid crosses venue × kind × magnitude × onset ×
 # fold × direction; a fixed seed makes it reproducible.

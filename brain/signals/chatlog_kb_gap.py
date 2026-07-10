@@ -5,7 +5,7 @@ The chat stream is too short and sparse for volume forecasting; its value is a
 
   1. monitor the share of unproduceable answers (baseline ≈ 18.9%);
   2. embed user turns (Voyage → sentence-transformers → TF-IDF fallback),
-     cluster them, and rank clusters by *failure density × repeat-ask count* —
+     cluster them, and rank clusters by *failure density × repeat-ask count*
      a dense, repeatedly-failing cluster is the SOP gap to surface.
 
 The stream is estate-wide / single-owner (web channel, ~6 weeks). Venue is
@@ -146,7 +146,7 @@ def _is_substantive(text: str) -> bool:
 def rank_gaps(turns: pd.DataFrame, n_clusters: int = 12) -> tuple[pd.DataFrame, str]:
     from sklearn.cluster import KMeans
 
-    # Cluster substantive turns only — trivial confirmations are a different
+    # Cluster substantive turns only, trivial confirmations are a different
     # failure mode (the assistant choking on an ack), not a missing SOP.
     turns = turns[turns["content"].map(_is_substantive)].reset_index(drop=True)
     texts = turns["content"].tolist()

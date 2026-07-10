@@ -3,7 +3,7 @@
 A DuckDB database that holds the tidy line items plus the three forecasting
 layers as views, and persistent tables for the brain's own forecasts and
 calibrated bands. This *is* the warehoused history the production architecture
-lacks — the methodology's stated design contribution.
+lacks, the methodology's stated design contribution.
 
 Layers:
     L1  venue-daily          revenue ex-VAT (the spine)
@@ -238,7 +238,7 @@ def _upsert(
     con = con or connect()
     try:
         con.register("_payload", payload)
-        # Delete colliding rows, then append — a portable upsert.
+        # Delete colliding rows, then append, a portable upsert.
         key_cols = [c for c in cols if c not in ("yhat", "lo", "hi")]
         join = " AND ".join(
             f"(t.{c} = p.{c} OR (t.{c} IS NULL AND p.{c} IS NULL))" for c in key_cols

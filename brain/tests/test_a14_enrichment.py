@@ -1,4 +1,4 @@
-"""A14 tests — feature enrichment: calendar correctness, event scoping, the
+"""A14 tests, feature enrichment: calendar correctness, event scoping, the
 retrospective spike flag, weather bases, and the honest adoption verdict
 (spec §9 gates G1/G2/G3/G7/G8/G10)."""
 

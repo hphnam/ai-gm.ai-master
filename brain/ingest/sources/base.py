@@ -1,4 +1,4 @@
-"""Source adapters — the pluggable T2 history seam.
+"""Source adapters, the pluggable T2 history seam.
 
 One interface, three backends: the CSV export working today (default, the test
 fixture), plus Neon (the intended system-of-record) and Square (the direct
@@ -72,7 +72,7 @@ class SourceAdapter(ABC):
     @abstractmethod
     def fetch_transactions(self, since: date | None) -> pd.DataFrame:
         """Closed-day line-item rows with `date > since` (all rows when None),
-        in the `TXN_COLUMNS` schema. Only completed trading days — never a partial
+        in the `TXN_COLUMNS` schema. Only completed trading days, never a partial
         intraday figure (that is served live at T1 and never warehoused)."""
 
     @abstractmethod

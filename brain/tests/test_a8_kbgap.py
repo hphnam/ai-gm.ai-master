@@ -1,4 +1,4 @@
-"""A8 tests — failure detection, baseline reproduction, gap ranking."""
+"""A8 tests, failure detection, baseline reproduction, gap ranking."""
 
 from __future__ import annotations
 
