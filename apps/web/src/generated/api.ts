@@ -3657,6 +3657,13 @@ export type ChatStartersControllerGetParams = {
 venueId: string;
 };
 
+export type DailySummaryControllerGetForVenueParams = {
+/**
+ * @minLength 1
+ */
+venueId: string;
+};
+
 export type MetricsControllerGetWauParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
@@ -14228,6 +14235,227 @@ export function useSquareControllerListLocations<TData = Awaited<ReturnType<type
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getSquareControllerListLocationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type dailySummaryControllerGetForVenueResponse200 = {
+  data: void
+  status: 200
+}
+
+export type dailySummaryControllerGetForVenueResponseSuccess = (dailySummaryControllerGetForVenueResponse200) & {
+  headers: Headers;
+};
+;
+
+export type dailySummaryControllerGetForVenueResponse = (dailySummaryControllerGetForVenueResponseSuccess)
+
+export const getDailySummaryControllerGetForVenueUrl = (params: DailySummaryControllerGetForVenueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/daily-summary?${stringifiedParams}` : `/daily-summary`
+}
+
+export const dailySummaryControllerGetForVenue = async (params: DailySummaryControllerGetForVenueParams, options?: RequestInit): Promise<dailySummaryControllerGetForVenueResponse> => {
+
+  return orvalMutator<dailySummaryControllerGetForVenueResponse>(getDailySummaryControllerGetForVenueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDailySummaryControllerGetForVenueQueryKey = (params?: DailySummaryControllerGetForVenueParams,) => {
+    return [
+    `/daily-summary`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDailySummaryControllerGetForVenueQueryOptions = <TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDailySummaryControllerGetForVenueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>> = ({ signal }) => dailySummaryControllerGetForVenue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DailySummaryControllerGetForVenueQueryResult = NonNullable<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>>
+export type DailySummaryControllerGetForVenueQueryError = unknown
+
+
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDailySummaryControllerGetForVenueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type dailySummaryControllerGetGroupResponse200 = {
+  data: void
+  status: 200
+}
+
+export type dailySummaryControllerGetGroupResponseSuccess = (dailySummaryControllerGetGroupResponse200) & {
+  headers: Headers;
+};
+;
+
+export type dailySummaryControllerGetGroupResponse = (dailySummaryControllerGetGroupResponseSuccess)
+
+export const getDailySummaryControllerGetGroupUrl = () => {
+
+
+
+
+  return `/daily-summary/group`
+}
+
+export const dailySummaryControllerGetGroup = async ( options?: RequestInit): Promise<dailySummaryControllerGetGroupResponse> => {
+
+  return orvalMutator<dailySummaryControllerGetGroupResponse>(getDailySummaryControllerGetGroupUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDailySummaryControllerGetGroupQueryKey = () => {
+    return [
+    `/daily-summary/group`
+    ] as const;
+    }
+
+
+export const getDailySummaryControllerGetGroupQueryOptions = <TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDailySummaryControllerGetGroupQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>> = ({ signal }) => dailySummaryControllerGetGroup({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DailySummaryControllerGetGroupQueryResult = NonNullable<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>>
+export type DailySummaryControllerGetGroupQueryError = unknown
+
+
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDailySummaryControllerGetGroupQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

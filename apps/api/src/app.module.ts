@@ -10,6 +10,7 @@ import { ChatModule } from './modules/chat/chat.module'
 import { ChatCoreModule } from './modules/chat-core/chat-core.module'
 import { ChatStartersModule } from './modules/chat-starters/chat-starters.module'
 import { ComplianceModule } from './modules/compliance/compliance.module'
+import { DailySummaryModule } from './modules/daily-summary/daily-summary.module'
 import { DebugModule } from './modules/debug/debug.module'
 import { DocsModule } from './modules/docs/docs.module'
 import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
@@ -71,6 +72,7 @@ import { parseRedisUrl } from './redis-connection'
     IntegrationsModule,
     SquareModule,
     BrewwModule,
+    DailySummaryModule,
     MetricsModule,
     OnboardingMetricsModule,
     IncidentsModule,

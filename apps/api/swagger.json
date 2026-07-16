@@ -4483,6 +4483,54 @@
         ]
       }
     },
+    "/daily-summary": {
+      "get": {
+        "operationId": "DailySummaryController_getForVenue",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "daily-summary"
+        ]
+      }
+    },
+    "/daily-summary/group": {
+      "get": {
+        "operationId": "DailySummaryController_getGroup",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "daily-summary"
+        ]
+      }
+    },
     "/metrics/wau": {
       "get": {
         "operationId": "MetricsController_getWau",

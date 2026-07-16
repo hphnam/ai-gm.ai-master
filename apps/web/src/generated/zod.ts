@@ -3968,6 +3968,19 @@ export const SquareControllerListLocationsResponse = zod.object({
 })
 
 
+
+
+
+export const DailySummaryControllerGetForVenueQueryParams = zod.object({
+  "venueId": zod.string().min(1)
+})
+
+export const DailySummaryControllerGetForVenueResponse = zod.unknown()
+
+
+export const DailySummaryControllerGetGroupResponse = zod.unknown()
+
+
 export const metricsControllerGetWauQueryVenueIdRegExp = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$');
 export const metricsControllerGetWauQueryWeeksDefault = 12;
 export const metricsControllerGetWauQueryWeeksMax = 52;
