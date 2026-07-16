@@ -145,6 +145,37 @@ Open questions and caveats that were flagged rather than silently coerced.
 If a code near a `/chat` or `/feedback` endpoint looks like a pipeline step, it
 isn't — it's a test case.
 
+## Statistical and methodological terms
+
+The sections above decode the project's own short codes. These are the technical
+terms the code and reports use without expanding, drafted in G12.18 (report 30) and
+merged here rather than into a second file: report 30 asked where a glossary should
+live and recorded that none existed, which was wrong — this file already did, and
+`brain/FLAGS.md` and `brain/README.md` already link to it. Terms already covered
+above (`L1`/`L2`/`L3`, `T1`–`T3`, `rung`/`ladder`) are not repeated.
+
+| Term | Means |
+|---|---|
+| **MASE** | Mean absolute scaled error. The forecast accuracy metric, scaled by the seasonal-naive (lag-7) in-sample error: below 1 beats seasonal-naive, lower is better. **Not comparable across venues** — the denominator is per-series, so Ellel's and Beer Hall's MASE are different rulers (FLAG-MASE-INTERMITTENT). |
+| **MinT** | Minimum-trace hierarchical reconciliation (Wickramasuriya et al. 2019). Makes L1/L2/L3 forecasts sum coherently. Note it adjusts **all** levels, so it does not preserve the base top; the served venue total is kept pure. |
+| **WLSv** | Weighted least squares with a diagonal per-node residual-variance weight matrix — the MinT variant actually used. |
+| **DOW** | Day of week. The `robust DOW` baseline is a per-day-of-week median scaled by a monthly index. |
+| **ex-VAT** | Net of value-added tax. The L1 revenue basis throughout (`net_sales_exvat`). |
+| **conformal** | Split-conformal prediction bands: distribution-free, finite-sample coverage, no Gaussian assumption (sales are skewed). |
+| **Mondrian** | Group-conditional conformal — separate quantiles per group, here active vs structural-zero (closed) days, so a closed venue's near-zero residuals do not shrink a busy day's band. |
+| **exo** | Exogenous covariate: outside the sales history and **known-future**, so it can legitimately condition a forward forecast (weather, calendar, World Cup flags). See `CHRONOS2_EXO_COLS`. |
+| **hindcast / leadmatched / observed** | The three weather bases. `hindcast` is the historical-forecast product that matches serving (and is the training basis); `observed` is ERA5 reanalysis and is an **oracle** that leaks; `leadmatched` is the forecast as issued N days ahead. |
+| **CUSUM** | Cumulative-sum change detector. Accumulates evidence above a slack, so it catches sustained drift and ignores a one-off spike. The production detector. |
+| **BOCPD** | Bayesian online change-point detection (Adams & MacKay 2007). Run-length posterior. Benchmark only, not production. |
+| **ARL0** | Average run length to first false alarm — the change-point calibration target. |
+| **ADI** | Average demand interval. The intermittency measure gating sparse L3 nodes. |
+| **NDCG** | Normalised discounted cumulative gain. The briefing ranking metric. |
+| **LOVO** | Leave-one-venue-out. The onboarding-transfer evaluation guard. Donors are cross-venue **within one estate**, so it does not solve cold start for a new single-venue org. |
+| **is_ellel_event** | The Ellel booking-day flag. Derived from Ellel's own trading days, so it is a near-deterministic self-signal and is neutralised to constant 0 on the Ellel frame to prevent leakage. |
+| **MCP-SIM** | The labelled Square-connector stand-in for the production `NeonAdapter`, used for simulation pulls where Neon is not provisioned. It does **not** exercise the production ingest path, and every simulation report says so. |
+| **structural zero** | A day the venue is closed by design (`STRUCTURAL_ZERO_DOW = {0, 1}`, Mon/Tue for the Beer Hall) — a real zero, not missing data. |
+| **pre-registration** | The two-pass evaluation standard: freeze the forecast to a committed artefact before any actual is seen (Pass 1), then pull actuals and score (Pass 2). Frozen artefacts are immutable. |
+
 ## PRJ93 report index
 
 The build/analysis reports at the repo root, and what each covers:

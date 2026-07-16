@@ -358,8 +358,21 @@ does.
   tonight-so-far unusual" remains a bounded next step (end-of-day snapshots of
   Square's hourly profile per closed day, still closed-day history, never a live
   moving figure), not built here.
-- **FLAG-LI6 (localhost trust boundary).** `/refresh` mutates the store and has no
-  auth; it relies on the localhost bind. Keep `BRAIN_HOST` off `0.0.0.0` in deploy.
+- **FLAG-LI6 (localhost trust boundary), RESOLVED with a named remainder (087d20a).**
+  Was: `/refresh` mutates the store, has no auth, and relies on the localhost bind.
+  Now: every route requires a shared-secret bearer (`service/auth.py`, constant-time
+  over bytes), the service refuses to boot unauthenticated unless `BRAIN_ALLOW_INSECURE=1`
+  is set explicitly, and the `POST /refresh` route is deleted. The bind is no longer the
+  boundary, so `BRAIN_HOST=0.0.0.0` is survivable behind the private network.
+  **Remainder, stated because the first version of this flag's fix claimed otherwise:**
+  refresh is NOT off the HTTP surface. `?freshness=live` on `/forecast`, `/briefing` and
+  `/deviation/check` still reaches `refresh(refit="never")` through `_live_topup`, which
+  opens a WRITE connection, driven by an LLM-supplied tool parameter. It is bounded (no
+  re-fit, one venue, validated against `FORECAST_VENUES`, 60s per-venue throttle), not
+  absent. It also collides with DuckDB's cross-process single-writer lock, so a live
+  top-up and the nightly `python -m ingest.refresh` can lock each other out: a chat
+  message can fail a cron refit. Retires when the API owns ingest and compute goes
+  stateless.
 - **FLAG-LI7 (promote-and-serve, v2.1).** `refresh()` now regenerates the SERVED
   forecast, not just the signal layer: after new closed days land or a T3 adopts a rung,
   `_promote_and_serve` re-persists L1 `forecasts`/`bands` (via `conformal.wrap.evaluate`)
@@ -447,3 +460,108 @@ does.
   `hierarchy/reconcile.py` node construction), NOT more aliases and NOT a change to the
   eval map, which must mirror the frozen taxonomy for scoring. Owner decision: how far
   to raise top-k versus keeping OTHER as an explicit residual.
+  > **Wiring status, checked 2026-07-16 (this was an open question, and the answer is
+  > no).** The fix seam exists and is HALF wired. `hierarchy.build_hierarchy` takes a
+  > `since=` argument (G12.17a-2) that ranks top-k from recent rows, and the freeze
+  > scripts pass it (`sim/build_july_w2b_forecast.py` derives `since` from
+  > `SHARE_WINDOW_DAYS`). **The standing build does not.** `hierarchy.reconcile()` calls
+  > `build_hierarchy(venue, top_k)` with no `since`, and no caller anywhere passes one
+  > (`reconcile()`, `tests/test_a6_reconcile.py`, `eval/intermittency_diagnostic.py` all
+  > default to `since=None`, which the docstring states "keeps the original
+  > whole-history behaviour"). So the SERVICE path still selects nodes by whole-history
+  > totals and still drifts.
+  >
+  > This is measurable now that June and July are in the store. Beer Hall:
+  > `since=None` and `since=2026-05-01` both yield 32 bottom nodes, but different ones -
+  > the recent window includes `LuneBrew Pilsner`, `Paulaner Helles Lager`, `Session
+  > IPA` and `Nobby's Nuts`, which whole-history misses. Ellel: 21 bottom nodes vs 19,
+  > again different membership. `LuneBrew Pilsner` is the exact item report 25 named as
+  > the smoking gun (GBP 3,484 in June, while the historical number-one `Lager - BH`
+  > sold GBP 14.86), and the standing path still drops it into OTHER, because
+  > whole-history ranks two years of `Lager - BH` above two months of Pilsner. Adding
+  > June/July to the store did NOT fix this and partly masks it: node COUNTS move, so a
+  > count check reads as progress while the membership is still wrong.
+  >
+  > Fix is one argument at `hierarchy/reconcile.py:171`. Not made here: it changes the
+  > served L2/L3 node set, which is a forecast-affecting change and wants its own gate
+  > and its own before/after measurement, not a drive-by edit inside a hardening pass.
+
+---
+
+## G12.17c Step C2 (report 31) — the fixture layer
+
+- **FLAG-FIXTURE-ANTICIPATION (G12.17c, OPEN, the honest negative).** The served model's
+  home-nation fixture anticipation is **not established, and its one out-of-sample test
+  failed**. Both frozen 8 to 14 July origins expected roughly +GBP 310 over the
+  day-of-week baseline for the 11 July England quarter-final; the realised lift was
+  **-GBP 265**, wrong in SIGN, not merely in magnitude. With report 27's 1 July case
+  (+GBP 191 anticipated, +GBP 451 realised, right direction) the two-case record is 1
+  for 2. The realised England-minus-generic premium was **negative** (-GBP 316 / -GBP
+  299) against a pre-registered +GBP 181 / +GBP 134.
+  > **The obvious explanation is refuted; do not re-propose it without new evidence.**
+  > Kickoff time does not explain 11 July. Norway v England kicked off 22:00 against a
+  > Saturday envelope closing 23:27 (~1.5h in hours), which looks decisive until you
+  > check 27 June: Panama v England, **also Saturday, also 22:00**, returned the LARGEST
+  > home-nation lift on record (+234% over its DOW median). Day of week and kickoff hour
+  > are held constant across the two cases and the outcomes invert.
+  >
+  > Measured lifts, actual vs the median of the 8 prior same-DOW days:
+  > 17 Jun England v Croatia 21:00 Wed +124% · 23 Jun England v Ghana 21:00 Tue +177% ·
+  > 27 Jun Panama v England 22:00 Sat **+234%** · 1 Jul England v DR Congo 17:00 Wed
+  > +125% · 11 Jul Norway v England 22:00 Sat **-21%**.
+  >
+  > The 11 July shortfall is **unexplained by `CHRONOS2_EXO_COLS`**. Untested
+  > hypotheses, in priority order, none asserted: (1) **weather on 11 July** - the only
+  > exo family not yet compared across the two Saturdays, and absent from the feature
+  > frame because the date is held out, so it needs its own pull; (2) **estate
+  > cannibalisation** - 11 July also carries an Events booking of GBP 779.94 and an
+  > Ellel event of GBP 385.12, both absent on 27 June, and the brain models venues
+  > independently with no cross-venue substitution term; (3) **tournament stage** -
+  > group-stage dead rubber vs knockout. Supersedes FLAG-WC's implicit premise that the
+  > tournament effect becomes cleanly estimable once June is observed: it is estimable
+  > and it is unstable.
+  >
+  > Consequence for the exo set: no change made. The covariates stay raw and unranked
+  > (that decision is unaffected and is the reason the model could be wrong in a
+  > legible way). But the served BH model weighs `wc_england_in_hours` and on this
+  > evidence that weighting does not generalise, which is a finding, not a defect to
+  > patch. The fixture-day-specific promotion-grade re-evaluation already flagged in the
+  > state log should now score fixture days against this two-case record before any exo
+  > promotion.
+
+- **FLAG-MASE-INTERMITTENT (G12.17c, methodological, applies to every Ellel number).**
+  MASE flatters intermittent, booking-driven series and must not be quoted alone for
+  Ellel. C2 scored Ellel at **MASE 0.096** while the model forecast **GBP 56.30 against
+  GBP 574.63 actual** - a 90.2% under-forecast that breached the band. Both are correct;
+  the scaled metric hides the failure because Ellel's seasonal-naive denominator (mean
+  |y_t - y_{t-7}|) is large on a series that is mostly zero with occasional event
+  spikes, so real absolute errors divide down to near nothing. Report every Ellel result
+  with its absolute error and band coverage alongside MASE, and never rank Ellel against
+  Beer Hall on MASE - the denominators are not comparable rulers.
+
+- **FLAG-STORE-DURABILITY (OPEN, operational, mitigated not fixed).** The store is
+  derived and disposable by design, and that design has a sharp edge: `warehouse.build()`
+  rebuilds from the committed CSV seed, which ends **2026-05-31**, so it silently drops
+  the aggregate-ingested June and 1 to 7 July rows and resets the operational clock five
+  weeks. **Any pytest run does this** - `tests/test_a10_service.py` calls
+  `warehouse.build()` in a module-scoped autouse fixture. Nothing warns. The store does
+  not break, it quietly becomes stale, and the next thing that reads it is wrong rather
+  than failing.
+  > This is not theoretical: it fired **twice in one session** (2026-07-16) while running
+  > the suite during the hardening pass, and the second time it was caught only because
+  > `sim/confront_july_w2.py` asserts the ceiling before scoring and refused to run.
+  > Without that guard, C2 would have scored the July forecasts against a May-seed store
+  > and produced plausible, wrong numbers.
+  >
+  > Mitigation: `sim/restore_clock.py` chains `ingest_june_actuals` then
+  > `ingest_july_w1_actuals` (that order - July W1 refuses against a June-less store),
+  > verifies ceiling 2026-07-07 with 7 July-W1 days, and asserts the held-out 8 to 14
+  > July window is still empty. Idempotent, no network, reads committed artefacts only,
+  > and no-ops when the clock is already right. Run it after any pytest run or manual
+  > rebuild.
+  >
+  > Not fixed, because the fix is upstream: any script reading the store for a
+  > date-sensitive result should assert its own ceiling (the C2 confront is the pattern),
+  > and the whole problem retires when Neon is the system of record and the clock is not
+  > reconstructible-by-accident local state. Until then, treat "I ran the tests" as
+  > "I reset the clock".
