@@ -19,25 +19,66 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import date
+from contextlib import contextmanager
+from contextvars import ContextVar
+from pathlib import Path
 
 import duckdb
 import pandas as pd
 
+import config
 from config import (
     BH_NET_SALES_TOTAL,
-    DUCKDB_PATH,
     RECONCILE_TOL,
-    STORE_DIR,
 )
 from ingest.normalise import LINE_ITEMS_PARQUET
 
 LAYERS = ("L1", "L2", "L3")
 
+# Per-request scratch store, the seam that makes the analytics layer stateless.
+#
+# The engine is being prepared to run as pure compute inside gm-ai: a dataset goes in,
+# a bundle comes out, and nothing persists. Roughly 157 call sites across ~25 modules
+# reach the store through connect(), so rewriting each to take an injected frame is a
+# large, risky change. Instead the store becomes ephemeral: `scratch_store()` points
+# connect() at a temporary database for the duration of one request, the existing
+# analytics run against it unchanged, and it is discarded afterwards.
+#
+# A ContextVar rather than a module global: it is safe under threads (Starlette runs
+# sync endpoints in a threadpool) and under async, and it resets exactly.
+_SCRATCH_DB: ContextVar[Path | None] = ContextVar("brain_scratch_db", default=None)
+
+
+def current_db_path() -> Path:
+    """The database connect() will open.
+
+    Resolved at CALL time, deliberately. `from config import DUCKDB_PATH` binds the
+    value at import, so a module-level constant here could never be swapped per request
+    and could not be monkeypatched in tests either. Reading through the `config` module
+    keeps both working.
+    """
+    scratch = _SCRATCH_DB.get()
+    return scratch if scratch is not None else config.DUCKDB_PATH
+
+
+@contextmanager
+def scratch_store(path: Path):
+    """Point connect() at `path` for the duration of the block.
+
+    The caller owns `path` and its cleanup: compute wants a tempdir it discards, while
+    a test may want to inspect the result. Nested blocks work and unwind in order.
+    """
+    token = _SCRATCH_DB.set(Path(path))
+    try:
+        yield Path(path)
+    finally:
+        _SCRATCH_DB.reset(token)
+
 
 def connect(read_only: bool = False) -> duckdb.DuckDBPyConnection:
-    STORE_DIR.mkdir(parents=True, exist_ok=True)
-    return duckdb.connect(str(DUCKDB_PATH), read_only=read_only)
+    path = current_db_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return duckdb.connect(str(path), read_only=read_only)
 
 
 def _create_views(con: duckdb.DuckDBPyConnection) -> None:
@@ -329,7 +370,7 @@ def main() -> int:
     print("A1 · time-series store")
     if args.build:
         build()
-        print(f"  built             : {DUCKDB_PATH}")
+        print(f"  built             : {current_db_path()}")
     ok = True
     if args.check:
         ok = check()
