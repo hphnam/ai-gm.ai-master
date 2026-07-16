@@ -2,7 +2,10 @@
 name = "proactive-brain"
 version = "0.1.0"
 description = "PRJ93 Proactive Brain — standalone Python forecasting & signals engine (Track A)"
-requires-python = ">=3.11"
+# 3.12 is the real floor: .venv-forecast and .venv-eval are both 3.12 and the
+# runtime venv is 3.14. Nothing installs this on 3.11, and ruff's target-version
+# below would rewrite to 3.12-only syntax regardless.
+requires-python = ">=3.12"
 
 [tool.pytest.ini_options]
 # Run pytest from brain/ — this puts the workspace root on sys.path so the
@@ -11,3 +14,33 @@ requires-python = ">=3.11"
 pythonpath = ["."]
 addopts = "-q"
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"        # the floor across the three venvs (runtime 3.14, forecast + eval 3.12)
+extend-exclude = ["sim", ".venv", ".venv-eval", ".venv-forecast"]
+
+[tool.ruff.lint]
+# Deliberately a starting set, not the full catalogue: this lands on a 19k-line
+# research codebase, and a rule sweep that rewrites hundreds of lines would bury
+# the integration diff and put the frozen results at risk. Widen once the
+# statelessness work has settled.
+select = ["E", "F", "I", "UP", "B"]
+ignore = [
+    "E501",     # line length is formatter's business; the tables in comments are wide
+    "B008",     # FastAPI's Depends()/Query() in defaults is the framework idiom
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402"]            # tests import after fixtures/env setup by design
+
+[tool.mypy]
+python_version = "3.12"
+files = ["config.py", "service", "ingest", "store"]
+ignore_missing_imports = true   # duckdb/chronos/statsmodels ship no or partial stubs
+# Research code is not annotated end-to-end, so the strict flags stay off until the
+# compute contract is typed. This gates real errors without a 19k-line annotation debt.
+# `files` already excludes sim/ and tests/, so no per-module override is needed.
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true

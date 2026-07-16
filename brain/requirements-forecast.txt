@@ -18,5 +18,10 @@
 # asymmetry versus .venv-eval is the same one documented as D25 in the
 # addendum report; it is intentional, not an oversight.
 
-chronos-forecasting>=2.3
-torch>=2.5
+# chronos-forecasting is hard-pinned, unlike everything else in the brain: it is
+# the reproducibility anchor for the served Beer Hall model (rung4_chronos2_exo,
+# backtest MASE 0.745). A minor bump can move zero-shot output, which would
+# silently invalidate the frozen pre-registration artefacts in sim/ that the
+# published results are scored against. Change it only with a deliberate re-freeze.
+chronos-forecasting==2.3.1
+torch>=2.12,<3

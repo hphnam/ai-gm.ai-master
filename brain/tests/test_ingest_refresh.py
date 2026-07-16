@@ -227,9 +227,9 @@ def test_event_window_tightens_cadence(store, monkeypatch):
     assert should is True and "event-window" in reason
 
 
-# --- G8 serving surface: /freshness + /refresh + freshness block -------------
+# --- G8 serving surface: /freshness + freshness block -------------------------
 
-def test_freshness_and_refresh_endpoints(store):
+def test_freshness_and_forecast_endpoints(store):
     from fastapi.testclient import TestClient
 
     from service.app import app
@@ -237,10 +237,16 @@ def test_freshness_and_refresh_endpoints(store):
     client = TestClient(app)
     fr = client.get("/freshness?venue=all")
     assert fr.status_code == 200 and len(fr.json()["venues"]) == 3
-    rf = client.post("/refresh", json={"venue": "beer_hall", "refit": "never"})
-    assert rf.status_code == 200 and rf.json()["venues"]["beer_hall"]["refit"] is False
     # every serving envelope carries its own currency
     assert "freshness" in client.get("/forecast?venue=beer_hall").json()
+
+
+def test_refresh_without_refit_appends_without_refitting(store):
+    """Refresh left the HTTP surface (M1), so the contract is driven through the
+    function the operator/cron and the API both call."""
+    from ingest.refresh import refresh
+
+    assert refresh("beer_hall", refit="never")["venues"]["beer_hall"]["refit"] is False
 
 
 # --- G6 beat-the-rung: forced re-fit writes a ladder_selection audit row ------

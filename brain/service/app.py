@@ -1,9 +1,9 @@
 """A10 · FastAPI service, exposes the brain to Track B (the AI-GM agent).
 
-A localhost service reading from the DuckDB store and the signal modules.
-Endpoints (typed JSON):
+A service reading from the DuckDB store and the signal modules. Endpoints (typed
+JSON), all bearer-authenticated except /health:
 
-    GET  /health                health + store status
+    GET  /health                health + store status (unauthenticated)
     GET  /forecast              point + calibrated band per date (A5/A6)
     POST /deviation/check       per-day band check on the residual stream (point primitive)
     POST /deviation/scan        last N trading days, classified (briefing feed)
@@ -13,22 +13,26 @@ Endpoints (typed JSON):
     GET  /stock/cover           days-of-cover reorder lines per venue (A12)
     GET  /briefing              ranked, de-duplicated, attributed daily feed (capstone)
     GET  /freshness             per-venue currency (source, staleness, last re-fit)
-    POST /refresh               operator/cron T2 refresh (+ conditional T3)
+
+There is no /refresh route, but `?freshness=live` still reaches a bounded write
+through `_live_topup`; both are documented at the foot of this module.
 
 Run:
-    uvicorn service.app:app --port 8088     # http://127.0.0.1:8088/docs
+    uvicorn service.app:app --port 8088     # http://127.0.0.1:8088/docs (dev only)
 """
 
 from __future__ import annotations
 
+import time
 from datetime import date
 from functools import lru_cache
 
 import duckdb
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
+import config
 from config import (
     DEV_SCAN_WINDOW,
     DUCKDB_PATH,
@@ -36,9 +40,17 @@ from config import (
     VENUES_FOR_CHANGEPOINT,
     VENUES_WITH_STOCK,
 )
+from service.auth import assert_auth_configured, require_auth
 from signals.checklist_discipline import evaluate as checklist_evaluate
 from signals.checklist_discipline import expected_mandatory, parse_checklists
 from store import warehouse
+
+assert_auth_configured()   # no secret and no explicit opt-out => do not serve
+
+
+# Minimum gap between two `freshness=live` top-ups for the same venue (M1 bound).
+LIVE_TOPUP_MIN_INTERVAL_S = 60.0
+_LAST_TOPUP: dict[str, float] = {}
 
 
 def _f(v) -> float | None:
@@ -49,10 +61,20 @@ def _f(v) -> float | None:
 def _b(v) -> bool | None:
     return None if v is None or pd.isna(v) else bool(v)
 
+# A hardened brain serves no endpoint map: /docs, /redoc and /openapi.json are the
+# reconnaissance surface an unauthenticated scan would otherwise get for free (M3).
+# Nulling the URLs is what enforces this, NOT the dependency below: FastAPI mounts
+# those three through Starlette's router directly, so app-level dependencies never
+# run for them. Local development (BRAIN_ALLOW_INSECURE=1) keeps them, since the
+# interactive docs are how the engine is driven by hand.
 app = FastAPI(
     title="Proactive Brain",
     version="0.1.0",
     description="PRJ93 Phase-2 forecasting & signals engine (Track A).",
+    docs_url=None if config.HARDENED else "/docs",
+    redoc_url=None if config.HARDENED else "/redoc",
+    openapi_url=None if config.HARDENED else "/openapi.json",
+    dependencies=[Depends(require_auth)],
 )
 
 
@@ -86,6 +108,23 @@ class ChangePointRequest(BaseModel):
 
 
 # --- Cached, read-only resources --------------------------------------------
+#
+# These are flagged as a cross-org leak, and the cache is NOT the leak. Both
+# functions take no org argument and read process-global paths, so there is no
+# tenant dimension for a single slot to confuse: one org's result cannot be keyed
+# into another's, because there is only one org. The leak arrives with the org
+# dimension, not before it.
+#
+# The fix therefore belongs with the orgId threading work, and it is the same edit:
+# once these take an org_id, `lru_cache` keys on it correctly and `maxsize=1`
+# becomes `maxsize=N`. Dropping the cache now would buy no isolation and cost a lot
+# - `_sop_gaps_cached` reaches `embed()`, which calls the Voyage API or loads a
+# ~90MB SentenceTransformer, per request, against the client's 4s timeout
+# (BRAIN_TIMEOUT_MS). Uncached, a transient Voyage failure also silently changes
+# `embedding_backend` and the clusters between two calls on the same corpus; the
+# cache is what freezes one answer per process.
+#
+# TODO(nam): key both on org_id when orgId is threaded through the compute surface.
 
 @lru_cache(maxsize=1)
 def _checklists():
@@ -115,9 +154,18 @@ def _sop_gaps_cached():
     }
 
 
+def _unavailable(dev_detail: str) -> HTTPException:
+    """503 that tells an operator what to run, but tells a caller nothing (L4).
+
+    The development body names the command to run; a hardened brain says only that
+    the service is unavailable, since internal paths and commands are reconnaissance.
+    """
+    return HTTPException(503, "service unavailable" if config.HARDENED else dev_detail)
+
+
 def _read_only() -> duckdb.DuckDBPyConnection:
     if not DUCKDB_PATH.exists():
-        raise HTTPException(503, "store not built — run `python -m store.warehouse --build`")
+        raise _unavailable("store not built — run `python -m store.warehouse --build`")
     return warehouse.connect(read_only=True)
 
 
@@ -406,9 +454,36 @@ def _live_topup(venue: str, freshness: str) -> None:
     watermark), NEVER a T3 re-fit (D1). Inert and a no-op while INGEST_SOURCE=csv
     sits at the ceiling. Never fails the read: a swallowed top-up failure cannot
     stamp a false 'fresh' answer, because the freshness block is computed AFTER this
-    from the store's actual watermark, so it still reports the true staleness."""
+    from the store's actual watermark, so it still reports the true staleness.
+
+    Throttled per venue because `freshness` is an LLM-supplied tool parameter
+    (brain.tools.ts) and this path opens a WRITE connection: without a bound, a chat
+    loop can drive unbounded state-mutating refreshes, which is finding M1 arriving
+    through the read surface instead of the deleted /refresh route. The throttle is
+    process-local and not thread-safe by design - it is a bound, not a lock, and it
+    retires when the API owns ingest and compute goes stateless.
+    """
     if freshness != "live" or venue == "all":
         return
+
+    # Throttle only what it can actually bound. `venue` is caller-supplied, so an
+    # unrecognised string would mint a fresh throttle slot per variation (defeating
+    # the bound) and grow _LAST_TOPUP without limit - and it takes the EXPENSIVE
+    # branch, since refresh() on a venue with no watermark reads full history. The
+    # zod enum in brain.tools.ts constrains this today, but a bound that relies on
+    # its caller is not a bound.
+    from config import FORECAST_VENUES
+    if venue not in FORECAST_VENUES:
+        return
+
+    now = time.monotonic()
+    # -inf, not 0.0: time.monotonic()'s reference point is documented as undefined,
+    # so a 0.0 default would suppress the FIRST top-up for 60s wherever the clock
+    # starts near zero at process start.
+    if now - _LAST_TOPUP.get(venue, float("-inf")) < LIVE_TOPUP_MIN_INTERVAL_S:
+        return
+    _LAST_TOPUP[venue] = now      # stamped before the attempt: a failing top-up
+                                  # must not become a free retry loop
     try:
         from ingest.refresh import refresh as _refresh
         _refresh(venue, refit="never")
@@ -432,23 +507,8 @@ def get_freshness(venue: str = "all") -> dict:
         con.close()
 
 
-class RefreshRequest(BaseModel):
-    venue: str | None = None
-    force: bool = False
-    refit: str = Field("auto", pattern="^(auto|force|never)$")
-    allow_fallback: bool = False
-
-
-@app.post("/refresh")
-def post_refresh(req: RefreshRequest) -> dict:
-    """Operator / cron entry: run T2 refresh (+ conditional T3). Not on the model
-    surface, the agent gets read-only freshness, never a way to trigger a re-fit.
-
-    `allow_fallback` (WP12, default False): the operator's explicit, one-off
-    escape hatch when a Rung-4 served model needs re-promoting from a venv with
-    no chronos backend. Leave False for the nightly cron; True falls back to
-    rung2_ets and writes an audited ladder_selection row saying so."""
-    from ingest.refresh import refresh as _refresh
-
-    return _refresh(req.venue, force=req.force, refit=req.refit,
-                    allow_fallback=req.allow_fallback)
+# The POST /refresh route is gone (M1): it was unauthenticated, unbounded,
+# state-mutating compute reachable by anyone who could reach the port, including a
+# forced T3 re-fit. A full refresh now runs only via `python -m ingest.refresh`
+# (operator / cron) or gm-ai's API, which orchestrates and bounds the nightly refit.
+# Refresh is NOT off the HTTP surface entirely, though - see `_live_topup`.

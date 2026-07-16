@@ -14,6 +14,7 @@ stays standalone and DB-free at import.
 
 from __future__ import annotations
 
+import os
 from abc import ABC, abstractmethod
 from datetime import date
 

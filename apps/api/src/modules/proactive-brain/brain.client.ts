@@ -209,6 +209,7 @@ export class BrainClient {
     '',
   )
   private readonly timeoutMs = Number(process.env.BRAIN_TIMEOUT_MS ?? 4000)
+  private readonly sharedSecret = process.env.BRAIN_SHARED_SECRET || null
 
   get enabled(): boolean {
     return process.env.BRAIN_ENABLED !== '0'
@@ -272,14 +273,32 @@ export class BrainClient {
     return this.request<T>('POST', path, body)
   }
 
+  /**
+   * Bearer for the API-to-brain hop. Absent in local dev, where the brain runs
+   * with BRAIN_ALLOW_INSECURE=1; a hardened brain refuses to boot without a secret,
+   * so a live brain is never reachable unauthenticated (see brain/service/auth.py).
+   *
+   * Note the asymmetry: the brain fails closed on a missing secret, this side fails
+   * soft. If BRAIN_SHARED_SECRET is unset here but set on the brain, every call 401s
+   * into BrainUnavailableError and the agent degrades to "brain unavailable" rather
+   * than reporting a misconfiguration.
+   */
+  private headers(hasBody: boolean): Record<string, string> | undefined {
+    const headers: Record<string, string> = {}
+    if (hasBody) headers['content-type'] = 'application/json'
+    if (this.sharedSecret) headers.authorization = `Bearer ${this.sharedSecret}`
+    return Object.keys(headers).length > 0 ? headers : undefined
+  }
+
   private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
+    const hasBody = body !== undefined
     try {
       const res = await fetch(`${this.baseUrl}${path}`, {
         method,
-        headers: body ? { 'content-type': 'application/json' } : undefined,
-        body: body ? JSON.stringify(body) : undefined,
+        headers: this.headers(hasBody),
+        body: hasBody ? JSON.stringify(body) : undefined,
         signal: controller.signal,
       })
       if (!res.ok) {

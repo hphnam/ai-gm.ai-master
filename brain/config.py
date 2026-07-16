@@ -387,3 +387,26 @@ JUDGE_KAPPA_THRESHOLD = 0.6       # pre-registered: kappa ≥ this → judge may
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
+
+# Hardening posture for the service (auth, /docs, error verbosity). Secure by
+# DEFAULT, opting out explicitly - never the reverse.
+#
+# This deliberately does NOT key off an env name like BRAIN_ENV=production. That
+# direction fails open: an unset or misspelled value ("prod", "Production") boots
+# with authentication silently disabled, and every test still passes. For a switch
+# that gates auth, the only safe default is the one where forgetting it is loud.
+# So: no BRAIN_ALLOW_INSECURE means hardened, and hardened means the service will
+# not start without a secret (asserted in service/auth.py, not here, so the
+# research CLIs and sim/ scripts can import config without needing a token).
+BRAIN_ALLOW_INSECURE = os.environ.get("BRAIN_ALLOW_INSECURE") == "1"
+
+# Shared secret for the API-to-brain hop, the brain's only legitimate caller.
+BRAIN_SHARED_SECRET = os.environ.get("BRAIN_SHARED_SECRET") or None
+
+# A configured secret implies hardened, even alongside the opt-out. Without that
+# clause the two settings together produce the worst combination: auth enforced (so
+# every smoke test passes) while /docs and /openapi.json stay public. A leftover
+# BRAIN_ALLOW_INSECURE=1 in a hosted env would then reopen the endpoint-map leak
+# silently. Nobody holding a real secret wants the docs served, so the opt-out only
+# means anything when there is no secret to opt out of.
+HARDENED = not BRAIN_ALLOW_INSECURE or BRAIN_SHARED_SECRET is not None
