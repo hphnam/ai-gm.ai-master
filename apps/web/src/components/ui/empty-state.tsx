@@ -34,17 +34,17 @@ export function EmptyState({
         {Icon ? (
           <div
             className={cn(
-              'mx-auto mb-5 flex items-center justify-center rounded-full bg-primary/10 text-primary',
-              isCompact ? 'h-10 w-10' : 'h-12 w-12',
+              'mx-auto mb-5 flex items-center justify-center rounded-2xl bg-[var(--paper-2)] text-[var(--ink-muted)]',
+              isCompact ? 'h-11 w-11' : 'h-[52px] w-[52px]',
             )}
           >
-            <Icon className={cn(isCompact ? 'h-4 w-4' : 'h-5 w-5')} aria-hidden />
+            <Icon className={cn(isCompact ? 'h-5 w-5' : 'h-6 w-6')} aria-hidden />
           </div>
         ) : null}
         <h2
           className={cn(
             'font-semibold tracking-tight',
-            isCompact ? 'text-base sm:text-lg' : 'text-xl sm:text-2xl',
+            isCompact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl',
           )}
         >
           {title}

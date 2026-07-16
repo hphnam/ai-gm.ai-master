@@ -1320,7 +1320,15 @@ Assistant answer: ${assistantText}`,
     // Off-topic short-circuit — skip the Sonnet agent entirely and stream a
     // canned redirect. Never fires for incident mode (triage guarantees
     // onTopic for safety), so an emergency always reaches the model.
-    if (!triage.onTopic) {
+    //
+    // Only fires on a cold open. The classifier sees the current message in
+    // isolation, so a terse mid-thread follow-up to the assistant's own answer
+    // ("£5.90", "& £ GP?", "in £") reads as off-topic and was wrongly
+    // canned-redirected (verified against prod chats). Once the thread has a
+    // prior assistant turn, let the model — which has the full transcript + the
+    // SCOPE prompt block — decline off-topic asks itself.
+    const hasPriorAssistantTurn = streamHistory.some((m) => m.role === 'assistant')
+    if (!triage.onTopic && !hasPriorAssistantTurn) {
       await this.persistCannedAssistant(conversationId, assistantMessageId, OFF_TOPIC_REDIRECT)
       this.logger.log(
         JSON.stringify({

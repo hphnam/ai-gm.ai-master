@@ -13,6 +13,7 @@ const FIELD_MASK = [
   'places.regularOpeningHours.weekdayDescriptions',
   'places.timeZone',
   'places.businessStatus',
+  'places.editorialSummary',
 ].join(',')
 const TIMEOUT_MS = 10_000
 

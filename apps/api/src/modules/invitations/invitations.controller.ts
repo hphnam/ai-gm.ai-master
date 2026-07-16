@@ -21,9 +21,10 @@ import type { Request } from 'express'
 import { ZodValidationPipe } from 'nestjs-zod'
 import { type ApiErrorResponse, InvitationIdParamSchema } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
-import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentUser, CurrentVenueScope, RequireRole } from '../auth/auth.decorators'
 import { type AuthedRequest, AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import type { VenueScope } from '../auth/venue-scope'
 import {
   AcceptInvitationResponseDto,
   CreateInvitationResponseDto,
@@ -66,6 +67,8 @@ function mapInvitationError(code: InvitationError['code'], details?: unknown): H
       return new ForbiddenException(body)
     case 'invalid-invitation-role':
       return new BadRequestException(body)
+    case 'invalid-venue-scope':
+      return new BadRequestException(body)
     case 'invitation-limit-reached':
       return new HttpException(body, HttpStatus.TOO_MANY_REQUESTS)
     case 'already-a-member':
@@ -101,13 +104,16 @@ export class InvitationsController {
     @Body() body: InviteBodyDto,
     @CurrentUser() user: { id: string; name: string | null },
     @CurrentOrg() org: { id: string; name: string; slug: string },
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<CreateInvitationResponseDto> {
     try {
       const { row, reissued } = await this.service.createInvitation({
         organizationId: org.id,
         email: body.email,
         role: body.role,
+        venueIds: body.venueIds ?? [],
         inviterId: user.id,
+        actorScope: scope,
       })
       const inviteUrl = `${this.webOrigin}/auth/accept-invitation/${row.id}`
       const mail = await this.mail.sendInvitationEmail({

@@ -36,21 +36,23 @@ export function ConversationListRow({
   return (
     <li
       className={cn(
-        'group relative border-b border-border/40 last:border-b-0',
-        unreadCount > 0 && 'bg-muted/30',
+        'group relative rounded-xl border transition-shadow hover:shadow-[0_3px_10px_-6px_rgba(32,26,18,0.3)]',
+        unreadCount > 0
+          ? 'border-[rgba(143,107,31,0.35)] bg-[#fbf6ea]'
+          : 'border-[var(--hairline)] bg-[var(--ledger-card)]',
       )}
     >
       <button
         type="button"
         onClick={onClick}
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 pr-12 text-left transition-colors hover:bg-accent/40"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 pr-11 text-left"
       >
-        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-medium text-[11px] text-foreground/75 uppercase tracking-tight">
+        <span className="relative flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full border border-[var(--hairline)] bg-[var(--paper-2)] font-semibold text-[11px] text-[#6b6250] uppercase tracking-tight">
           {initials(otherParty)}
           {unreadCount > 0 ? (
             <span
               role="status"
-              className="-right-1 -top-1 absolute inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-foreground px-1 font-semibold text-[10px] text-background leading-none ring-2 ring-background"
+              className="-right-1 -top-1 absolute inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[var(--brass)] px-1 font-mono-ledger font-semibold text-[10px] text-[var(--cream-hi)] leading-none ring-2 ring-background"
               aria-label={`${unreadCount} unread`}
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -61,10 +63,8 @@ export function ConversationListRow({
           <div className="flex items-baseline justify-between gap-2">
             <span
               className={cn(
-                'truncate text-sm',
-                unreadCount > 0
-                  ? 'font-semibold text-foreground'
-                  : 'font-medium text-foreground/85',
+                'truncate text-sm text-foreground',
+                unreadCount > 0 ? 'font-bold' : 'font-semibold',
               )}
             >
               {partyDisplayName(otherParty)}
@@ -72,8 +72,8 @@ export function ConversationListRow({
             <time
               dateTime={latestAt}
               className={cn(
-                'shrink-0 text-[10px]',
-                unreadCount > 0 ? 'font-medium text-foreground/70' : 'text-foreground/50',
+                'shrink-0 font-mono-ledger text-[10px]',
+                unreadCount > 0 ? 'text-[var(--mono-muted)]' : 'text-[var(--ink-faint)]',
               )}
               title={new Date(latestAt).toLocaleString()}
             >
@@ -85,7 +85,7 @@ export function ConversationListRow({
             <p
               className={cn(
                 'min-w-0 truncate text-xs',
-                unreadCount > 0 ? 'text-foreground/85' : 'text-foreground/55',
+                unreadCount > 0 ? 'text-[#3a3327]' : 'text-[var(--mono-muted)]',
               )}
             >
               {previewPrefix}
@@ -101,7 +101,7 @@ export function ConversationListRow({
             <button
               type="button"
               aria-label={`Actions for ${partyDisplayName(otherParty)}`}
-              className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground/55 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-[var(--mono-muted)] hover:bg-[var(--paper-2)] hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
               // Stop the row's onClick from firing when opening the menu.
               onClick={(e) => e.stopPropagation()}
             >
@@ -114,7 +114,7 @@ export function ConversationListRow({
                 e.preventDefault()
                 setConfirmOpen(true)
               }}
-              className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950/30"
+              className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
             >
               <Trash2 className="mr-2 h-3.5 w-3.5" aria-hidden />
               Delete chat

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
+import { whatsappInvitesQuery } from '@/lib/queries/keys'
 
 // ─── Types ──────────────────────────────────────────────────────────────
 // Mirrored from apps/api/src/types/whatsapp-invite.ts. Kept inline because
@@ -16,6 +17,7 @@ export type WhatsappInviteStatus = 'pending' | 'redeemed' | 'revoked' | 'exhaust
 export type CreateWhatsappInviteInput = {
   phoneNumber: string
   role: WhatsappInviteRole
+  venueIds?: string[]
   note?: string
 }
 
@@ -23,6 +25,7 @@ export type WhatsappInvitePublic = {
   id: string
   phoneNumberMasked: string
   role: WhatsappInviteRole
+  venueIds: string[]
   note: string | null
   expiresAt: string
   status: WhatsappInviteStatus
@@ -38,14 +41,14 @@ export type ListWhatsappInvitesResponse = {
   invites: WhatsappInvitePublic[]
 }
 
-const QUERY_KEY = ['whatsapp-invites'] as const
+const QUERY_KEY = whatsappInvitesQuery.queryKey
 
 // ─── Hooks ──────────────────────────────────────────────────────────────
 
 export function useWhatsappInvites() {
   return useQuery<ListWhatsappInvitesResponse>({
     queryKey: QUERY_KEY,
-    queryFn: () => apiFetch<ListWhatsappInvitesResponse>('/whatsapp/invites'),
+    queryFn: () => apiFetch<ListWhatsappInvitesResponse>(whatsappInvitesQuery.path),
     refetchOnWindowFocus: false,
     retry: false,
   })

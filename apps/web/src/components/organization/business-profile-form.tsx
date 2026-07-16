@@ -1,7 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { Loader2, Plus, Sparkles, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Alert } from '@/components/ui/alert'
@@ -23,11 +24,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SettingCard } from '@/components/ui/setting-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { ApiError } from '@/lib/api-client'
 import {
   type OrganizationProfile,
+  useGenerateOrgDescription,
   useOrgProfile,
   useUpdateOrgProfile,
 } from '@/lib/hooks/use-org-profile'
@@ -71,18 +74,26 @@ const COUNTRIES = Object.keys(CURRENCY_BY_COUNTRY)
   .map((code) => ({ code, name: regionName(code) }))
   .sort((a, b) => a.name.localeCompare(b.name))
 
+const currencyNames = new Intl.DisplayNames(['en'], { type: 'currency' })
+const currencyName = (code: string) =>
+  /^[A-Za-z]{3}$/.test(code) ? (currencyNames.of(code.toUpperCase()) ?? code) : code
+const CURRENCIES = Array.from(new Set(Object.values(CURRENCY_BY_COUNTRY)))
+  .map((code) => ({ code, name: currencyName(code) }))
+  .sort((a, b) => a.code.localeCompare(b.code))
+
 const NO_COUNTRY = 'none'
+const NO_CURRENCY = 'none'
+
+const CARD_TITLE = 'Business profile'
+const CARD_DESCRIPTION =
+  'Tell GM about your business so it gives advice that fits how you actually operate.'
 
 const profileFormSchema = z.object({
   businessType: z.string().max(120, 'Keep this under 120 characters.'),
   description: z.string().max(2000, 'Keep this under 2000 characters.'),
   goals: z
-    .string()
-    .refine((value) => splitGoals(value).length <= 8, 'Add up to 8 goals.')
-    .refine(
-      (value) => splitGoals(value).every((goal) => goal.length <= 120),
-      'Keep each goal under 120 characters.',
-    ),
+    .array(z.string().max(120, 'Keep each goal under 120 characters.'))
+    .max(8, 'Add up to 8 goals.'),
   constraints: z.string().max(1000, 'Keep this under 1000 characters.'),
   country: z
     .string()
@@ -97,18 +108,11 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-function splitGoals(value: string): string[] {
-  return value
-    .split(',')
-    .map((goal) => goal.trim())
-    .filter(Boolean)
-}
-
 function toFormValues(profile: OrganizationProfile | undefined): ProfileFormValues {
   return {
     businessType: profile?.businessType ?? '',
     description: profile?.description ?? '',
-    goals: profile?.goals?.join(', ') ?? '',
+    goals: profile?.goals ?? [],
     constraints: profile?.constraints ?? '',
     country: profile?.country ?? '',
     currency: profile?.currency ?? '',
@@ -116,7 +120,7 @@ function toFormValues(profile: OrganizationProfile | undefined): ProfileFormValu
 }
 
 function toPayload(values: ProfileFormValues): OrganizationProfile {
-  const goals = splitGoals(values.goals)
+  const goals = values.goals.map((goal) => goal.trim()).filter(Boolean)
   const country = values.country.trim()
   const currency = values.currency.trim()
   return {
@@ -132,6 +136,8 @@ function toPayload(values: ProfileFormValues): OrganizationProfile {
 export function BusinessProfileForm() {
   const query = useOrgProfile()
   const mutation = useUpdateOrgProfile()
+  const generateDescription = useGenerateOrgDescription()
+  const [goalDraft, setGoalDraft] = useState('')
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: toFormValues(undefined),
@@ -144,7 +150,18 @@ export function BusinessProfileForm() {
   }, [profile, reset])
 
   if (query.isLoading) {
-    return <Skeleton className="h-72 w-full rounded-lg" />
+    return (
+      <SettingCard title={CARD_TITLE} description={CARD_DESCRIPTION}>
+        <div className="flex flex-col gap-4">
+          {['a', 'b', 'c', 'd'].map((k) => (
+            <div key={k} className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+          ))}
+        </div>
+      </SettingCard>
+    )
   }
 
   if (query.isError) {
@@ -155,26 +172,21 @@ export function BusinessProfileForm() {
   }
 
   const onSubmit = form.handleSubmit(async (values) => {
+    const pending = goalDraft.trim()
+    const goals =
+      pending && values.goals.length < 8 && !values.goals.includes(pending)
+        ? [...values.goals, pending]
+        : values.goals
+    if (goals !== values.goals) setGoalDraft('')
     try {
-      await mutation.mutateAsync(toPayload(values))
+      await mutation.mutateAsync(toPayload({ ...values, goals }))
     } catch {
       /* onError toast handles user feedback */
     }
   })
 
   return (
-    <section
-      className="rounded-lg border bg-card p-4 shadow-sm sm:p-5"
-      aria-labelledby="business-profile-heading"
-    >
-      <header className="mb-4">
-        <h3 id="business-profile-heading" className="text-sm font-semibold tracking-tight">
-          Business profile
-        </h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Tell GM about your business so it gives advice that fits how you actually operate.
-        </p>
-      </header>
+    <SettingCard title={CARD_TITLE} description={CARD_DESCRIPTION}>
       <Form {...form}>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <FormField
@@ -195,7 +207,31 @@ export function BusinessProfileForm() {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>About your business</FormLabel>
+                <div className="flex items-center justify-between gap-2">
+                  <FormLabel>About your business</FormLabel>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1.5 px-2 text-xs"
+                    disabled={generateDescription.isPending}
+                    onClick={async () => {
+                      try {
+                        const result = await generateDescription.mutateAsync()
+                        form.setValue('description', result.description, { shouldDirty: true })
+                      } catch {
+                        /* onError toast handles user feedback */
+                      }
+                    }}
+                  >
+                    {generateDescription.isPending ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    {field.value.trim() ? 'Rewrite with AI' : 'Generate with AI'}
+                  </Button>
+                </div>
                 <FormControl>
                   <Textarea
                     rows={4}
@@ -204,6 +240,10 @@ export function BusinessProfileForm() {
                     {...field}
                   />
                 </FormControl>
+                <FormDescription>
+                  GM uses this to understand your business. Generate a draft from what we know, then
+                  edit.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -211,18 +251,73 @@ export function BusinessProfileForm() {
           <FormField
             control={form.control}
             name="goals"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Goals</FormLabel>
-                <FormControl>
-                  <Input placeholder="grow taproom revenue, cut COGS, reduce waste" {...field} />
-                </FormControl>
-                <FormDescription>
-                  What you optimise for. Separate goals with commas (up to 8).
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const addGoal = () => {
+                const goal = goalDraft.trim()
+                if (!goal || field.value.length >= 8 || field.value.includes(goal)) return
+                field.onChange([...field.value, goal])
+                setGoalDraft('')
+              }
+              const removeGoal = (index: number) => {
+                field.onChange(field.value.filter((_, i) => i !== index))
+              }
+              return (
+                <FormItem>
+                  <FormLabel>Goals</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input
+                        value={goalDraft}
+                        onChange={(event) => setGoalDraft(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault()
+                            addGoal()
+                          }
+                        }}
+                        maxLength={120}
+                        placeholder="grow taproom revenue"
+                        disabled={field.value.length >= 8}
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={addGoal}
+                      disabled={!goalDraft.trim() || field.value.length >= 8}
+                      aria-label="Add goal"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {field.value.length > 0 ? (
+                    <ul className="mt-2 flex flex-col gap-2">
+                      {field.value.map((goal, index) => (
+                        <li
+                          key={goal}
+                          className="flex items-center justify-between gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm"
+                        >
+                          <span className="min-w-0 break-words">{goal}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeGoal(index)}
+                            className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+                            aria-label={`Remove ${goal}`}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <FormDescription>
+                    What you optimise for. Add up to 8 ({field.value.length}/8).
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
           <FormField
             control={form.control}
@@ -286,24 +381,46 @@ export function BusinessProfileForm() {
               control={form.control}
               name="currency"
               render={({ field }) => (
-                <FormItem className="sm:w-40">
+                <FormItem className="sm:w-56">
                   <FormLabel>Currency</FormLabel>
-                  <FormControl>
-                    <Input maxLength={3} autoCapitalize="characters" placeholder="USD" {...field} />
-                  </FormControl>
-                  <FormDescription>3-letter code (optional).</FormDescription>
+                  <Select
+                    value={field.value || NO_CURRENCY}
+                    onValueChange={(value) => field.onChange(value === NO_CURRENCY ? '' : value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Not set" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_CURRENCY}>Not set</SelectItem>
+                      {field.value && !CURRENCIES.some((c) => c.code === field.value) ? (
+                        <SelectItem value={field.value}>{currencyName(field.value)}</SelectItem>
+                      ) : null}
+                      {CURRENCIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.code} — {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>Default currency for figures.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
           <div>
-            <Button type="submit" disabled={mutation.isPending}>
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="shadow-[0_2px_0_var(--brass-shadow)]"
+            >
               {mutation.isPending ? 'Saving…' : 'Save profile'}
             </Button>
           </div>
         </form>
       </Form>
-    </section>
+    </SettingCard>
   )
 }

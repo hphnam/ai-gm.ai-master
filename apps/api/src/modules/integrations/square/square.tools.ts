@@ -971,9 +971,12 @@ const BASE_SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> = [
 // are customer-facing; stock/devices/locations are operational; tonight's
 // bookings are team-visible (names, no money); the shift-LISTING tools show
 // who's on / the rota (the provider redacts hourlyRate/estimatedCost per row
-// for staff — see redactShiftPayForStaff). Everything with revenue, cost,
-// margin, payouts, disputes, customer PII, the team roster, or a labour-COST
-// summary is intentionally absent and therefore manager-only.
+// for staff — see redactShiftPayForStaff). Top-items is here for the popularity
+// question a staff member fields on the floor ("what's our best/most popular
+// X") — the provider nulls grossSales + pins the sort to quantity for staff
+// (redactTopItemsRevenueForStaff), so units surface but revenue never does.
+// Everything with revenue, cost, margin, payouts, disputes, customer PII, the
+// team roster, or a labour-COST summary is intentionally absent and manager-only.
 const STAFF_VISIBLE_POS_TOOLS: ReadonlySet<string> = new Set<string>([
   POS_SEARCH_ITEMS,
   POS_GET_ITEM_INVENTORY,
@@ -983,6 +986,7 @@ const STAFF_VISIBLE_POS_TOOLS: ReadonlySet<string> = new Set<string>([
   POS_LIST_RECENT_SHIFTS,
   POS_GET_ACTIVE_SHIFTS,
   POS_LIST_SCHEDULED_SHIFTS,
+  POS_GET_TOP_ITEMS,
 ])
 
 export const SQUARE_TOOL_DEFINITIONS: ReadonlyArray<IntegrationToolDefinition> =

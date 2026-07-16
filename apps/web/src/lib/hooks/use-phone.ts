@@ -11,11 +11,12 @@ import type {
 } from '@/generated/api'
 import { apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
+import { phoneStatusQuery } from '@/lib/queries/keys'
 
 export function usePhoneStatus() {
   return useQuery<PhoneStatusResponse>({
-    queryKey: ['phone', 'status'],
-    queryFn: () => apiFetch<PhoneStatusResponse>('/auth/phone/status'),
+    queryKey: phoneStatusQuery.queryKey,
+    queryFn: () => apiFetch<PhoneStatusResponse>(phoneStatusQuery.path),
     refetchOnWindowFocus: false,
     retry: false,
   })

@@ -67,6 +67,7 @@ export const ApiErrorResponseDtoError = {
   'checklist-extraction-failed': 'checklist-extraction-failed',
   'category-suggestion-unavailable': 'category-suggestion-unavailable',
   'reconcile-conflict': 'reconcile-conflict',
+  'invalid-venue-scope': 'invalid-venue-scope',
 } as const;
 
 export interface ApiErrorResponseDto {
@@ -2624,6 +2625,11 @@ export interface InviteBodyDto {
      */
   email: string;
   role: InviteBodyDtoRole;
+  /**
+     * @maxItems 200
+     * @items.pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+     */
+  venueIds?: string[];
 }
 
 export type CreateInvitationResponseDtoInvitationRole = typeof CreateInvitationResponseDtoInvitationRole[keyof typeof CreateInvitationResponseDtoInvitationRole];
@@ -2650,6 +2656,7 @@ export type CreateInvitationResponseDtoInvitation = {
   organizationId: string;
   organizationName: string;
   role: CreateInvitationResponseDtoInvitationRole;
+  venueIds: string[];
   status: CreateInvitationResponseDtoInvitationStatus;
   inviterId: string;
   inviterName: string | null;
@@ -2688,6 +2695,7 @@ export type ListInvitationsResponseDtoInvitationsItem = {
   organizationId: string;
   organizationName: string;
   role: ListInvitationsResponseDtoInvitationsItemRole;
+  venueIds: string[];
   status: ListInvitationsResponseDtoInvitationsItemStatus;
   inviterId: string;
   inviterName: string | null;
@@ -2751,6 +2759,7 @@ export type ListOrgMembersResponseDtoMembersItem = {
   email: string | null;
   phoneNumber: string | null;
   role: string;
+  venueIds: string[];
   isSelf: boolean;
   joinedAt: string;
 };
@@ -2762,6 +2771,19 @@ export interface ListOrgMembersResponseDto {
 export interface RemoveMemberResponseDto {
   ok: true;
   deletedUser: boolean;
+}
+
+export interface UpdateMemberVenuesBodyDto {
+  /**
+     * @maxItems 200
+     * @items.pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+     */
+  venueIds?: string[];
+}
+
+export interface UpdateMemberVenuesResponseDto {
+  ok: true;
+  venueIds: string[];
 }
 
 export type OrganizationProfileResponseDtoProfile = {
@@ -2818,6 +2840,10 @@ export interface UpdateOrganizationProfileDto {
   currency?: string;
 }
 
+export interface GeneratedDescriptionResponseDto {
+  description: string;
+}
+
 export interface SendPhoneCodeBodyDto {
   phoneNumber: string;
 }
@@ -2867,6 +2893,7 @@ export type PlacesSearchResponseDtoCandidatesItem = {
   currency: string | null;
   timezone: string | null;
   openingHours: string | null;
+  description: string | null;
 };
 
 export interface PlacesSearchResponseDto {
@@ -2880,6 +2907,14 @@ export interface RunNudgeResponseDto {
   reason?: string;
   preview?: string;
 }
+
+export type ChatStartersPayloadDtoAudience = typeof ChatStartersPayloadDtoAudience[keyof typeof ChatStartersPayloadDtoAudience];
+
+
+export const ChatStartersPayloadDtoAudience = {
+  staff: 'staff',
+  manager: 'manager',
+} as const;
 
 export type ChatStartersPayloadDtoQuestionsItem = {
   /**
@@ -2904,6 +2939,7 @@ export const ChatStartersPayloadDtoSource = {
 
 export interface ChatStartersPayloadDto {
   venueId: string;
+  audience: ChatStartersPayloadDtoAudience;
   /**
      * @minItems 1
      * @maxItems 8
@@ -3617,6 +3653,13 @@ t: string;
 export type ChatStartersControllerGetParams = {
 /**
  * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+ */
+venueId: string;
+};
+
+export type DailySummaryControllerGetForVenueParams = {
+/**
+ * @minLength 1
  */
 venueId: string;
 };
@@ -12770,6 +12813,84 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getOrgMembersControllerRemoveMutationOptions(options), queryClient);
     }
 
+export type orgMembersControllerUpdateVenuesResponse200 = {
+  data: UpdateMemberVenuesResponseDto
+  status: 200
+}
+
+export type orgMembersControllerUpdateVenuesResponseSuccess = (orgMembersControllerUpdateVenuesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type orgMembersControllerUpdateVenuesResponse = (orgMembersControllerUpdateVenuesResponseSuccess)
+
+export const getOrgMembersControllerUpdateVenuesUrl = (userId: string,) => {
+
+
+
+
+  return `/org/members/${userId}/venues`
+}
+
+export const orgMembersControllerUpdateVenues = async (userId: string,
+    updateMemberVenuesBodyDto: UpdateMemberVenuesBodyDto, options?: RequestInit): Promise<orgMembersControllerUpdateVenuesResponse> => {
+
+  return orvalMutator<orgMembersControllerUpdateVenuesResponse>(getOrgMembersControllerUpdateVenuesUrl(userId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateMemberVenuesBodyDto)
+  }
+);}
+
+
+
+
+
+export const getOrgMembersControllerUpdateVenuesMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext> => {
+
+const mutationKey = ['orgMembersControllerUpdateVenues'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, {userId: string;data: UpdateMemberVenuesBodyDto}> = (props) => {
+          const {userId,data} = props ?? {};
+
+          return  orgMembersControllerUpdateVenues(userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrgMembersControllerUpdateVenuesMutationResult = NonNullable<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>>
+    export type OrgMembersControllerUpdateVenuesMutationBody = UpdateMemberVenuesBodyDto
+    export type OrgMembersControllerUpdateVenuesMutationError = unknown
+
+    export const useOrgMembersControllerUpdateVenues = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>, TError,{userId: string;data: UpdateMemberVenuesBodyDto}, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof orgMembersControllerUpdateVenues>>,
+        TError,
+        {userId: string;data: UpdateMemberVenuesBodyDto},
+        TContext
+      > => {
+      return useMutation(getOrgMembersControllerUpdateVenuesMutationOptions(options), queryClient);
+    }
+
 export type organizationControllerGetProfileResponse200 = {
   data: OrganizationProfileResponseDto
   status: 200
@@ -12952,6 +13073,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getOrganizationControllerUpdateProfileMutationOptions(options), queryClient);
+    }
+
+export type organizationControllerDescribeResponse200 = {
+  data: GeneratedDescriptionResponseDto
+  status: 200
+}
+
+export type organizationControllerDescribeResponseSuccess = (organizationControllerDescribeResponse200) & {
+  headers: Headers;
+};
+;
+
+export type organizationControllerDescribeResponse = (organizationControllerDescribeResponseSuccess)
+
+export const getOrganizationControllerDescribeUrl = () => {
+
+
+
+
+  return `/org/profile/describe`
+}
+
+export const organizationControllerDescribe = async ( options?: RequestInit): Promise<organizationControllerDescribeResponse> => {
+
+  return orvalMutator<organizationControllerDescribeResponse>(getOrganizationControllerDescribeUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getOrganizationControllerDescribeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+): UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext> => {
+
+const mutationKey = ['organizationControllerDescribe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof organizationControllerDescribe>>, void> = () => {
+
+
+          return  organizationControllerDescribe(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OrganizationControllerDescribeMutationResult = NonNullable<Awaited<ReturnType<typeof organizationControllerDescribe>>>
+
+    export type OrganizationControllerDescribeMutationError = unknown
+
+    export const useOrganizationControllerDescribe = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof organizationControllerDescribe>>, TError,void, TContext>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof organizationControllerDescribe>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getOrganizationControllerDescribeMutationOptions(options), queryClient);
     }
 
 export type phoneControllerSendResponse200 = {
@@ -14037,6 +14235,227 @@ export function useSquareControllerListLocations<TData = Awaited<ReturnType<type
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getSquareControllerListLocationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type dailySummaryControllerGetForVenueResponse200 = {
+  data: void
+  status: 200
+}
+
+export type dailySummaryControllerGetForVenueResponseSuccess = (dailySummaryControllerGetForVenueResponse200) & {
+  headers: Headers;
+};
+;
+
+export type dailySummaryControllerGetForVenueResponse = (dailySummaryControllerGetForVenueResponseSuccess)
+
+export const getDailySummaryControllerGetForVenueUrl = (params: DailySummaryControllerGetForVenueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/daily-summary?${stringifiedParams}` : `/daily-summary`
+}
+
+export const dailySummaryControllerGetForVenue = async (params: DailySummaryControllerGetForVenueParams, options?: RequestInit): Promise<dailySummaryControllerGetForVenueResponse> => {
+
+  return orvalMutator<dailySummaryControllerGetForVenueResponse>(getDailySummaryControllerGetForVenueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDailySummaryControllerGetForVenueQueryKey = (params?: DailySummaryControllerGetForVenueParams,) => {
+    return [
+    `/daily-summary`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDailySummaryControllerGetForVenueQueryOptions = <TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDailySummaryControllerGetForVenueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>> = ({ signal }) => dailySummaryControllerGetForVenue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DailySummaryControllerGetForVenueQueryResult = NonNullable<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>>
+export type DailySummaryControllerGetForVenueQueryError = unknown
+
+
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDailySummaryControllerGetForVenue<TData = Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError = unknown>(
+ params: DailySummaryControllerGetForVenueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetForVenue>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDailySummaryControllerGetForVenueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type dailySummaryControllerGetGroupResponse200 = {
+  data: void
+  status: 200
+}
+
+export type dailySummaryControllerGetGroupResponseSuccess = (dailySummaryControllerGetGroupResponse200) & {
+  headers: Headers;
+};
+;
+
+export type dailySummaryControllerGetGroupResponse = (dailySummaryControllerGetGroupResponseSuccess)
+
+export const getDailySummaryControllerGetGroupUrl = () => {
+
+
+
+
+  return `/daily-summary/group`
+}
+
+export const dailySummaryControllerGetGroup = async ( options?: RequestInit): Promise<dailySummaryControllerGetGroupResponse> => {
+
+  return orvalMutator<dailySummaryControllerGetGroupResponse>(getDailySummaryControllerGetGroupUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDailySummaryControllerGetGroupQueryKey = () => {
+    return [
+    `/daily-summary/group`
+    ] as const;
+    }
+
+
+export const getDailySummaryControllerGetGroupQueryOptions = <TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDailySummaryControllerGetGroupQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>> = ({ signal }) => dailySummaryControllerGetGroup({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DailySummaryControllerGetGroupQueryResult = NonNullable<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>>
+export type DailySummaryControllerGetGroupQueryError = unknown
+
+
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>,
+          TError,
+          Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDailySummaryControllerGetGroup<TData = Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dailySummaryControllerGetGroup>>, TError, TData>>, request?: SecondParameter<typeof orvalMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDailySummaryControllerGetGroupQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

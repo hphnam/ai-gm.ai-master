@@ -18,6 +18,7 @@ function place(overrides: Partial<GooglePlace> = {}): GooglePlace {
     },
     timeZone: { id: 'Europe/London' },
     businessStatus: 'OPERATIONAL',
+    editorialSummary: { text: 'A traditional London pub serving cask ales and pub food.' },
     ...overrides,
   }
 }
@@ -34,7 +35,13 @@ describe('normalizePlace', () => {
       currency: 'GBP',
       timezone: 'Europe/London',
       openingHours: 'Monday: 12:00 – 11:00 PM\nTuesday: 12:00 – 11:00 PM',
+      description: 'A traditional London pub serving cask ales and pub food.',
     })
+  })
+
+  it('leaves description null when Google has no editorial summary', () => {
+    const candidate = normalizePlace(place({ editorialSummary: undefined }))
+    assert.equal(candidate?.description, null)
   })
 
   it('maps pub ahead of bar and restaurant when types overlap', () => {
@@ -117,6 +124,7 @@ describe('normalizePlace', () => {
         regularOpeningHours: undefined,
         timeZone: undefined,
         primaryTypeDisplayName: undefined,
+        editorialSummary: undefined,
         types: [],
       }),
     )
@@ -130,6 +138,7 @@ describe('normalizePlace', () => {
       currency: null,
       timezone: null,
       openingHours: null,
+      description: null,
     })
   })
 

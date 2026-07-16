@@ -66,7 +66,7 @@ export function ComplianceBody() {
             ariaLabel="Filter compliance records"
             trailing={
               records.data ? (
-                <span className="text-xs text-muted-foreground">
+                <span className="font-mono-ledger text-xs text-[var(--mono-muted)]">
                   {records.data.activeCount} active
                   {records.data.overdueCount > 0 ? ` · ${records.data.overdueCount} overdue` : ''}
                   {records.data.within30dCount > 0
@@ -132,7 +132,7 @@ function ComplianceLoading() {
   return (
     <div className="flex flex-col gap-3">
       {COMPLIANCE_SKELETON_KEYS.map((k) => (
-        <ListRow key={k} className="flex items-start gap-3">
+        <ListRow key={k} className="flex items-start gap-3 rounded-xl px-4 py-3.5 shadow-none">
           <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-2/3" />
@@ -157,18 +157,23 @@ function RecordGroup({
 }) {
   return (
     <section aria-label={label}>
-      <h2
-        className={cn(
-          'mb-2 text-xs font-semibold uppercase tracking-wider',
-          tone === 'danger'
-            ? 'text-destructive'
-            : tone === 'warn'
-              ? 'text-warning'
-              : 'text-muted-foreground',
-        )}
-      >
-        {label}
-      </h2>
+      <div className="mb-2.5 flex items-center gap-2">
+        <h2
+          className={cn(
+            'font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em]',
+            tone === 'danger'
+              ? 'text-destructive'
+              : tone === 'warn'
+                ? 'text-warning'
+                : 'text-[var(--mono-muted)]',
+          )}
+        >
+          {label}
+        </h2>
+        <span className="font-mono-ledger rounded-full bg-[rgba(32,26,18,0.06)] px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground tabular-nums">
+          {records.length}
+        </span>
+      </div>
       <ul className="flex flex-col gap-2">
         {records.map((r) => (
           <RecordRow key={r.id} record={r} muted={muted} tone={tone} />
@@ -198,7 +203,7 @@ function RecordRow({
     <ListRow
       asChild
       className={cn(
-        'flex items-start gap-3',
+        'flex items-start gap-3 rounded-xl px-4 py-3.5 shadow-none',
         tone === 'danger' && 'border-destructive/25 bg-destructive/5',
         tone === 'warn' && 'border-warning/30 bg-warning/5',
         muted && 'opacity-70',
@@ -221,16 +226,18 @@ function RecordRow({
           >
             {record.title}
           </p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono-ledger text-xs text-[var(--mono-muted)]">
             <ExpiryLabel expiresAt={record.expiresAt} closed={isClosed} />
-            <span>· {category}</span>
-            {record.personName ? <span>· {record.personName}</span> : null}
-            {record.assetName ? <span>· {record.assetName}</span> : null}
+            <Badge variant="brand" size="sm">
+              {category}
+            </Badge>
+            {record.personName ? <span>{record.personName}</span> : null}
+            {record.assetName ? <span>{record.assetName}</span> : null}
             {record.renewalCostGbp !== null ? (
-              <span>· £{record.renewalCostGbp.toFixed(2)}</span>
+              <span>£{record.renewalCostGbp.toFixed(2)}</span>
             ) : null}
             {record.extractionConfidence !== null && record.extractionConfidence < 0.8 ? (
-              <span className="text-warning">· verify (auto-extracted)</span>
+              <span className="text-warning">verify · auto-extracted</span>
             ) : null}
           </div>
         </div>

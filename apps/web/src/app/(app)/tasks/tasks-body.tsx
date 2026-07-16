@@ -1,15 +1,12 @@
 'use client'
 
-import { Check, CircleAlert, Inbox } from 'lucide-react'
+import { Check, CircleAlert, ClipboardCheck, Clock, X } from 'lucide-react'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
-import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { ListRow } from '@/components/ui/list-row'
 import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
-import { type TabItem, Tabs } from '@/components/ui/tabs'
 import { type Task, useDeleteTask, useTasks, useUpdateTask } from '@/lib/hooks/use-tasks'
 import { useTasksSocket } from '@/lib/hooks/use-tasks-socket'
 import { cn } from '@/lib/utils'
@@ -18,7 +15,7 @@ type Filter = 'open' | 'done' | 'all'
 
 const FILTER_VALUES = ['open', 'done', 'all'] as const
 
-const FILTERS: TabItem<Filter>[] = [
+const FILTERS: { id: Filter; label: string }[] = [
   { id: 'open', label: 'Open' },
   { id: 'done', label: 'Done' },
   { id: 'all', label: 'All' },
@@ -37,27 +34,52 @@ export function TasksBody() {
   return (
     <div className="scrollbar-thin flex-1 overflow-y-auto">
       <PageContainer width="prose">
-        <Tabs
-          items={FILTERS}
-          value={filter}
-          onValueChange={setFilter}
-          ariaLabel="Filter tasks"
-          trailing={
-            tasks.data ? (
-              <span className="text-xs text-muted-foreground">
-                {tasks.data.openCount} open
-                {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
-              </span>
-            ) : null
-          }
-        />
+        {/* Mobile hero title — the page header (which carries it on desktop) is
+            hidden on this route on mobile. */}
+        <h1 className="mb-4 font-news text-[28px] font-normal leading-[1.15] tracking-[-0.01em] text-[var(--ink-text)] md:hidden">
+          Tasks
+        </h1>
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <div
+            role="tablist"
+            aria-label="Filter tasks"
+            className="inline-flex gap-[3px] rounded-[10px] bg-[var(--paper-2)] p-[3px]"
+          >
+            {FILTERS.map(({ id, label }) => {
+              const selected = filter === id
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setFilter(id)}
+                  className={cn(
+                    'inline-flex cursor-pointer items-center gap-[7px] rounded-[7px] px-3.5 py-[7px] text-[13px] transition-colors',
+                    selected
+                      ? 'bg-[#fcfaf3] font-semibold text-[var(--ink-text)] shadow-[0_1px_2px_rgba(32,26,18,0.06)]'
+                      : 'text-[var(--ink-muted)] hover:text-[var(--ink-text)]',
+                  )}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+          {tasks.data ? (
+            <span className="font-mono-ledger text-xs text-[var(--mono-muted)]">
+              {tasks.data.openCount} open
+              {tasks.data.overdueCount > 0 ? ` · ${tasks.data.overdueCount} overdue` : ''}
+            </span>
+          ) : null}
+        </div>
 
         {tasks.isLoading ? (
           <TasksLoading />
         ) : tasks.data && tasks.data.tasks.length === 0 ? (
           <TasksEmpty filter={filter} />
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-[26px]">
             {grouped.overdue.length > 0 ? (
               <TaskGroup label="Overdue" tone="urgent" tasks={grouped.overdue} />
             ) : null}
@@ -91,16 +113,29 @@ function TasksEmpty({ filter }: { filter: Filter }) {
       : filter === 'done'
         ? 'Tasks you finish will appear here.'
         : 'Your tasks will show up here once the agent captures them.'
-  return <EmptyState icon={Inbox} title={title} description={description} />
+  return (
+    <div className="flex flex-col items-center gap-3.5 px-5 py-[74px] text-center">
+      <span className="grid size-[52px] place-items-center rounded-[13px] bg-[var(--paper-2)] text-[var(--ink-faint)]">
+        <ClipboardCheck className="h-6 w-6" aria-hidden />
+      </span>
+      <div className="text-[17px] font-semibold leading-tight text-foreground">{title}</div>
+      <p className="max-w-[340px] text-[13px] leading-relaxed text-[var(--ink-muted)]">
+        {description}
+      </p>
+    </div>
+  )
 }
 
 const TASK_SKELETON_KEYS = ['a', 'b', 'c', 'd']
 
 function TasksLoading() {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {TASK_SKELETON_KEYS.map((k) => (
-        <ListRow key={k} className="flex items-start gap-3">
+        <ListRow
+          key={k}
+          className="flex items-start gap-[13px] rounded-[11px] border-[var(--hairline)] bg-[#fdfbf5] px-[15px] py-[13px] shadow-none"
+        >
           <Skeleton className="mt-0.5 h-5 w-5 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-3/4" />
@@ -125,14 +160,19 @@ function TaskGroup({
 }) {
   return (
     <section aria-label={label}>
-      <h2
-        className={cn(
-          'mb-2 text-xs font-semibold uppercase tracking-wider',
-          tone === 'urgent' ? 'text-destructive' : 'text-muted-foreground',
-        )}
-      >
-        {label}
-      </h2>
+      <div className="mb-[11px] flex items-center gap-2">
+        <h2
+          className={cn(
+            'font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em]',
+            tone === 'urgent' ? 'text-[var(--clay)]' : 'text-[var(--mono-muted)]',
+          )}
+        >
+          {label}
+        </h2>
+        <span className="font-mono-ledger rounded-full bg-[rgba(32,26,18,0.06)] px-[7px] py-[3px] text-[10px] font-semibold text-[var(--ink-faint)]">
+          {tasks.length}
+        </span>
+      </div>
       <ul className="flex flex-col gap-2">
         {tasks.map((t) => (
           <TaskRow key={t.id} task={t} muted={muted} tone={tone} />
@@ -160,8 +200,8 @@ function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'u
     <ListRow
       asChild
       className={cn(
-        'flex items-start gap-3',
-        tone === 'urgent' && 'border-destructive/25 bg-destructive/5',
+        'flex items-start gap-[13px] rounded-[11px] border-[var(--hairline)] bg-[#fdfbf5] p-[13px_15px] shadow-none transition-shadow hover:shadow-[0_3px_10px_-5px_rgba(32,26,18,0.22)]',
+        tone === 'urgent' && 'border-[rgba(154,75,44,0.25)] bg-[rgba(154,75,44,0.05)]',
         muted && 'opacity-70',
       )}
     >
@@ -172,10 +212,10 @@ function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'u
           onClick={isDone ? onReopen : onComplete}
           disabled={update.isPending}
           className={cn(
-            "relative mt-0.5 flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors before:absolute before:-inset-3 before:content-['']",
+            "relative mt-px flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors before:absolute before:-inset-3 before:content-['']",
             isDone
-              ? 'border-foreground/30 bg-foreground text-background'
-              : 'border-foreground/40 hover:border-foreground/80',
+              ? 'border-[var(--ledger-green)] bg-[var(--ledger-green)] text-[var(--cream-hi)]'
+              : 'border-[var(--hairline-strong)] hover:border-[var(--ink-text)]',
             update.isPending && 'opacity-50',
           )}
         >
@@ -184,25 +224,35 @@ function TaskRow({ task, muted, tone }: { task: Task; muted?: boolean; tone?: 'u
         <div className="min-w-0 flex-1">
           <p
             className={cn(
-              'text-sm',
+              'text-[14.5px] leading-[1.45] text-foreground',
               (isDone || isCancelled) && 'text-muted-foreground line-through',
             )}
           >
             {task.body}
           </p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="mt-2 flex flex-wrap items-center gap-x-[9px] gap-y-1">
             {task.dueAt ? <DueLabel dueAt={task.dueAt} done={isDone} /> : null}
-            {task.category ? <span>· {task.category}</span> : null}
+            {task.category ? (
+              <span className="font-mono-ledger rounded-full bg-[rgba(143,107,31,0.1)] px-[9px] py-1 text-[10.5px] text-[var(--brass)]">
+                {task.category}
+              </span>
+            ) : null}
             {task.creator && task.creator.userId !== task.assignee.userId ? (
-              <span>· from {task.creator.name ?? task.creator.email}</span>
+              <span className="text-[11px] text-[var(--ink-faint)]">
+                from {task.creator.name ?? task.creator.email}
+              </span>
             ) : null}
           </div>
         </div>
-        <DeleteButton
+        <button
+          type="button"
           onClick={() => setConfirmOpen(true)}
           disabled={del.isPending}
           aria-label={`Delete task: ${task.body}`}
-        />
+          className="grid size-[26px] shrink-0 cursor-pointer place-items-center rounded-md text-[var(--ink-faint)] transition-colors hover:bg-[rgba(154,75,44,0.1)] hover:text-[var(--clay)] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <X className="h-3.5 w-3.5" aria-hidden />
+        </button>
         <ConfirmDeleteDialog
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
@@ -237,13 +287,18 @@ function DueLabel({ dueAt, done }: { dueAt: string; done: boolean }) {
           })()
   if (overdue) {
     return (
-      <Badge variant="urgent" size="sm">
+      <span className="font-mono-ledger inline-flex items-center gap-1.5 rounded-full bg-[rgba(154,75,44,0.12)] px-[9px] py-1 text-[10.5px] font-semibold text-[var(--clay)]">
         <CircleAlert className="h-3 w-3" aria-hidden />
         {label}
-      </Badge>
+      </span>
     )
   }
-  return <span className="inline-flex items-center gap-1">{label}</span>
+  return (
+    <span className="font-mono-ledger inline-flex items-center gap-1.5 text-[11px] text-[var(--mono-muted)]">
+      <Clock className="h-3 w-3" aria-hidden />
+      {label}
+    </span>
+  )
 }
 
 function groupByDue(tasks: Task[]) {

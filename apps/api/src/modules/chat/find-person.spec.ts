@@ -169,19 +169,62 @@ describe('redactPersonForRole', () => {
     mentions: [{ knowledgeItemId: 'ki-1', title: 'Cellar SOP' }],
   }
 
-  it('strips other-person phone and email for a staff caller', () => {
+  it('keeps a team member work email for a staff caller', () => {
     const out = redactPersonForRole(full, 'staff')
+    assert.equal(out.members[0].email, 'sam@lune.test')
+  })
+
+  it('keeps an emergency contact phone for a staff caller', () => {
+    const out = redactPersonForRole(full, 'staff')
+    assert.equal(out.contacts[0].phone, '07700 900000')
+  })
+
+  it('strips an emergency contact email for a staff caller', () => {
+    const out = redactPersonForRole(full, 'staff')
+    assert.equal(out.contacts[0].email, null)
+  })
+
+  it('strips a non-emergency contact phone and email for a staff caller', () => {
+    const supplier: FindPersonResult = {
+      ...full,
+      contacts: [
+        {
+          name: 'Acme Cellars',
+          role: 'Supplier',
+          phone: '07700 900111',
+          email: 'orders@acme.test',
+          isEmergencyContact: false,
+        },
+      ],
+    }
+    const out = redactPersonForRole(supplier, 'staff')
     assert.deepEqual(out.contacts[0], {
-      name: 'Sam Field',
-      role: 'Cellar engineer',
+      name: 'Acme Cellars',
+      role: 'Supplier',
       phone: null,
       email: null,
-      isEmergencyContact: true,
+      isEmergencyContact: false,
     })
   })
 
   it('preserves contact phone and email for a manager caller', () => {
     const out = redactPersonForRole(full, 'manager')
     assert.equal(out.contacts[0].phone, '07700 900000')
+  })
+
+  it('nulls a synthetic phone-only member email for any role', async () => {
+    const prisma = makePrisma({
+      members: [
+        {
+          organizationId: ORG,
+          userId: 'usr-3',
+          role: 'staff',
+          name: 'Mark',
+          email: 'ph+447536451191@phone.gm-ai.local',
+        },
+      ],
+    })
+    const result = await findPerson('Mark', { orgId: ORG }, prisma)
+    assert.equal(result.members[0].email, null)
   })
 })

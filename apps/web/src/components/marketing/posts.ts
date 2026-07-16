@@ -22,7 +22,7 @@ export const POSTS: Post[] = [
     body: [
       'A GM’s hardest questions aren’t about procedure. They’re about money. “What’s my margin?” “Where am I overspending on labour?” “Which line can take a price rise?” None of those can be answered from a document. They need the till.',
       'That’s the line between a knowledge tool and an operator copilot. Knowledge tools retrieve SOPs. An operator copilot reconciles your sales against COGS, reads your labour against your shifts, and grounds every recommendation in what actually happened last night.',
-      'We made the call early: gm-ai connects to your POS first, then your documents. The documents make the POS data legible. A price recommendation cites your pricing ladder; an ops answer cites your prep routine. Together they answer the question the way the GM would ask it.',
+      'We made the call early: AI-GM connects to your POS first, then your documents. The documents make the POS data legible. A price recommendation cites your pricing ladder; an ops answer cites your prep routine. Together they answer the question the way the GM would ask it.',
     ],
   },
   {
@@ -49,7 +49,7 @@ export const POSTS: Post[] = [
     category: 'Trust',
     body: [
       'When an AI says “clean down the station every night,” the GM has no way to know if that’s your policy or a guess. Over time, guesses become procedure, and procedure drifts.',
-      'gm-ai cites the source document on every operational claim. The GM can open the exact SOP an answer came from, and if it’s wrong or out of date, fix it in the same chat.',
+      'AI-GM cites the source document on every operational claim. The GM can open the exact SOP an answer came from, and if it’s wrong or out of date, fix it in the same chat.',
       'Verifiable beats confident. It’s slower to build and it’s the right default for a tool people make real decisions from.',
     ],
   },

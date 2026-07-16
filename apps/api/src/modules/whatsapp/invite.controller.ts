@@ -34,9 +34,10 @@ import {
   type ListInvitesResponse,
 } from '../../types'
 import { assertAuthEnv } from '../auth/assert-auth-env'
-import { CurrentOrg, CurrentUser, RequireRole } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentUser, CurrentVenueScope, RequireRole } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import type { VenueScope } from '../auth/venue-scope'
 import { InviteService } from './invite.service'
 import { checkRedeemRateLimit } from './invite-redeem-rate-limit'
 import { verifyInviteToken } from './invite-token'
@@ -54,10 +55,14 @@ export class InviteController {
     @Body(zodPipe(CreateInviteInputSchema)) input: CreateInviteInput,
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
     @Query('force') forceRaw?: string,
   ): Promise<CreateInviteResponse> {
     const force = forceRaw === 'true'
-    const { invite, code } = await this.invites.create(org.id, user.id, input, { force })
+    const { invite, code } = await this.invites.create(org.id, user.id, input, {
+      force,
+      actorScope: scope,
+    })
     return {
       invite: { ...invite, code },
       oneTimeDisplay: true,

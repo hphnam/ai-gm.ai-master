@@ -10,3 +10,10 @@ export const OrganizationProfileResponseSchema = z.object({
 export class OrganizationProfileResponseDto extends createZodDto(
   OrganizationProfileResponseSchema,
 ) {}
+
+export const GeneratedDescriptionResponseSchema = z.object({
+  description: z.string(),
+})
+export class GeneratedDescriptionResponseDto extends createZodDto(
+  GeneratedDescriptionResponseSchema,
+) {}

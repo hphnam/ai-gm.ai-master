@@ -155,16 +155,16 @@ export function ConversationThread({
 
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+      <div className="flex items-center gap-2 border-b border-[var(--hairline)] px-3 py-2">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-[var(--mono-muted)] transition-colors hover:bg-[var(--paper-2)] hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           aria-label="Back to conversations"
         >
           <ArrowLeft className="h-5 w-5" aria-hidden />
         </button>
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-medium text-[10px] text-foreground/75 uppercase tracking-tight">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--hairline)] bg-[var(--paper-2)] font-semibold text-[10px] text-[#6b6250] uppercase tracking-tight">
           {initials(otherParty)}
         </span>
         <div className="flex min-w-0 flex-col">
@@ -172,7 +172,7 @@ export function ConversationThread({
             {partyDisplayName(otherParty)}
           </h2>
           {otherParty.name && otherParty.email ? (
-            <p className="truncate text-[10px] text-foreground/50">{otherParty.email}</p>
+            <p className="truncate text-[10px] text-[var(--mono-muted)]">{otherParty.email}</p>
           ) : null}
         </div>
       </div>
@@ -188,9 +188,11 @@ export function ConversationThread({
           <ListSkeleton />
         ) : flat.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 px-4 py-8 text-center">
-            <MessageCircle className="h-6 w-6 text-foreground/25" aria-hidden />
-            <p className="text-foreground/60 text-sm">No messages yet.</p>
-            <p className="text-foreground/40 text-xs">Send a message to start the conversation.</p>
+            <MessageCircle className="h-6 w-6 text-[var(--ink-faint)]" aria-hidden />
+            <p className="text-[var(--ink-muted)] text-sm">No messages yet.</p>
+            <p className="text-[var(--mono-muted)] text-xs">
+              Send a message to start the conversation.
+            </p>
           </div>
         ) : (
           <ul className="relative" style={{ height: virtualizer.getTotalSize() }}>
@@ -230,7 +232,7 @@ export function ConversationThread({
 
       <form
         onSubmit={onSubmit}
-        className="flex items-end gap-2 border-t border-border bg-background px-3 py-2.5"
+        className="flex items-end gap-2 border-t border-[var(--hairline)] bg-background px-3 py-2.5"
       >
         <textarea
           value={draft}
@@ -248,13 +250,13 @@ export function ConversationThread({
           rows={1}
           maxLength={2000}
           disabled={send.isPending}
-          className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-border bg-background px-2.5 py-1.5 text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
+          className="max-h-32 min-h-9 flex-1 resize-none rounded-lg border border-[var(--hairline)] bg-[var(--ledger-card)] px-2.5 py-1.5 text-sm placeholder:text-[var(--ink-faint)] focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
         <button
           type="submit"
           disabled={send.isPending || draft.trim().length === 0}
           aria-label="Send message"
-          className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md bg-foreground text-background transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[var(--brass)] text-[var(--cream-hi)] shadow-[0_2px_0_var(--brass-shadow)] transition-colors hover:bg-[var(--brass-shadow)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {send.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

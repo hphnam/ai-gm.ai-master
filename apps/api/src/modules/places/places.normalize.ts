@@ -8,6 +8,7 @@ export type GooglePlace = {
   regularOpeningHours?: { weekdayDescriptions?: string[] }
   timeZone?: { id?: string }
   businessStatus?: string
+  editorialSummary?: { text?: string }
 }
 
 export type PlaceCandidate = {
@@ -20,6 +21,7 @@ export type PlaceCandidate = {
   currency: string | null
   timezone: string | null
   openingHours: string | null
+  description: string | null
 }
 
 // Superset of the server's CURRENCY_BY_COUNTRY (types/organization.ts), matching
@@ -61,6 +63,7 @@ const NAME_MAX = 120
 const ADDRESS_MAX = 240
 const BUSINESS_TYPE_MAX = 120
 const OPENING_HOURS_MAX = 500
+const DESCRIPTION_MAX = 2000
 
 const CLOSED_STATUSES = new Set(['CLOSED_TEMPORARILY', 'CLOSED_PERMANENTLY'])
 
@@ -122,6 +125,11 @@ function openingHoursFrom(place: GooglePlace): string | null {
   return lines.length > 0 ? lines.join('\n') : null
 }
 
+function descriptionFrom(place: GooglePlace): string | null {
+  const summary = place.editorialSummary?.text?.trim()
+  return summary ? clamp(summary, DESCRIPTION_MAX) : null
+}
+
 export function normalizePlace(place: GooglePlace): PlaceCandidate | null {
   if (!place.id || !place.displayName?.text) return null
   if (place.businessStatus && CLOSED_STATUSES.has(place.businessStatus)) return null
@@ -142,6 +150,7 @@ export function normalizePlace(place: GooglePlace): PlaceCandidate | null {
     currency: country ? (CURRENCY_BY_COUNTRY[country] ?? null) : null,
     timezone: place.timeZone?.id ?? null,
     openingHours: openingHoursFrom(place),
+    description: descriptionFrom(place),
   }
 }
 

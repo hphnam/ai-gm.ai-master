@@ -16,7 +16,7 @@ export default function BlogIndexPage() {
       <Container className="flex flex-col gap-12">
         <div className="flex flex-col gap-4">
           <Eyebrow>Blog</Eyebrow>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="font-news text-balance text-[clamp(2.5rem,4vw,3.25rem)] font-extrabold tracking-[-0.03em]">
             Notes from the floor.
           </h1>
           <p className="max-w-xl text-pretty text-lg text-muted-foreground">
@@ -39,7 +39,7 @@ export default function BlogIndexPage() {
                   <span>{formatPostDate(post.date)}</span>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <h2 className="text-xl font-medium tracking-tight group-hover:underline">
+                  <h2 className="font-news text-[22px] font-bold tracking-[-0.01em] group-hover:underline">
                     {post.title}
                   </h2>
                   <p className="text-pretty text-sm leading-relaxed text-muted-foreground">

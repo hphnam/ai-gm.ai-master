@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { getPerson } from '../chat-core/tools/get-person.tool'
+import { isPhoneTempEmail } from '../phone/consume-phone-invite'
 
 export type PersonMember = {
   userId: string
@@ -84,7 +85,9 @@ export async function findPerson(
     members: memberRows.map((m) => ({
       userId: m.userId,
       name: m.user.name,
-      email: m.user.email,
+      // Phone-only members have a synthetic ph+<e164>@phone.gm-ai.local
+      // placeholder — never a routable address, so don't surface it as an email.
+      email: isPhoneTempEmail(m.user.email) ? null : m.user.email,
       role: m.role,
     })),
     contacts,
@@ -95,16 +98,21 @@ export async function findPerson(
   }
 }
 
-// Cross-person PII (phone / email / other members' emails) is manager/owner
-// only, matching the project's data-scoping convention. Fail-closed: any role
-// that isn't literally 'owner' or 'manager' is treated as staff. Staff keep the
-// name + role/relationship + doc references so "who is X" still answers.
+// Staff-visible contact policy (owner/manager always see everything). Fail-
+// closed: any role that isn't literally 'owner' or 'manager' is treated as staff.
+//   • Team MEMBERS — work email + role are internal directory info a colleague
+//     can look up, so staff keep them. (Members carry no phone in this shape.)
+//   • EMERGENCY contacts — staff keep the phone; reaching someone fast is
+//     safety-critical. Their email stays gated.
+//   • Other CONTACTS (suppliers/contractors/etc.) — manager/owner only; fully
+//     stripped for staff.
 export function redactPersonForRole(result: FindPersonResult, role: string): FindPersonResult {
   if (role === 'owner' || role === 'manager') return result
   return {
     ...result,
-    members: result.members.map((m) => ({ ...m, email: null })),
-    contacts: result.contacts.map((c) => ({ ...c, phone: null, email: null })),
+    contacts: result.contacts.map((c) =>
+      c.isEmergencyContact ? { ...c, email: null } : { ...c, phone: null, email: null },
+    ),
   }
 }
 

@@ -15,14 +15,15 @@ import {
 const FANOUT_ACTIVITY_WINDOW_DAYS = 30
 
 /// Two job kinds:
-///   - chat-starters.fanout — repeatable, weekly. Enumerates venues with
-///     ANY chat activity OR ANY KnowledgeItem in the last 30 days. Inactive
-///     venues are skipped to keep the Haiku budget tight and the Redis cache
-///     from filling with stale generated payloads.
-///   - chat-starters.generate — per-venue Haiku call + Redis write.
+///   - chat-starters.fanout — repeatable, every few days. Enumerates venues
+///     with ANY chat activity OR ANY KnowledgeItem in the last 30 days.
+///     Inactive venues are skipped to keep the Haiku budget tight and the
+///     Redis cache from filling with stale generated payloads.
+///   - chat-starters.generate — per-venue Haiku call (both role sets) + Redis
+///     writes.
 ///
-/// `concurrency: 3` caps the worker so a weekly fanout across many venues
-/// doesn't hammer the Anthropic API rate limit in parallel. Tune up only if
+/// `concurrency: 3` caps the worker so a fanout across many venues doesn't
+/// hammer the Anthropic API rate limit in parallel. Tune up only if
 /// the org count grows past a few hundred — at that point a token-bucket on
 /// the Anthropic key is the right next move.
 @Processor(CHAT_STARTERS_QUEUE_NAME, { concurrency: 3 })
@@ -41,17 +42,34 @@ export class ChatStartersProcessor extends WorkerHost implements OnApplicationBo
       this.logger.log('chat starters cron disabled via CHAT_STARTERS_CRON_DISABLED')
       return
     }
-    await this.queue.add(
-      CHAT_STARTERS_JOB_FANOUT,
+    // Purge any legacy repeatable first. Wave 3 originally scheduled this via
+    // queue.add(name, data, { repeat: { every }, jobId }) whose repeat key
+    // embeds the interval — it does NOT share an id with upsertJobScheduler's
+    // scheduler, so on an env that already ran the old 7-day cron both would
+    // fire (double fanouts / Haiku spend) until the stale key is removed. Same
+    // cleanup pattern as scheduled-reports.processor.
+    const existing = await this.queue.getRepeatableJobs()
+    for (const r of existing) {
+      if (r.name === CHAT_STARTERS_JOB_FANOUT) {
+        await this.queue.removeRepeatableByKey(r.key)
+      }
+    }
+    // upsertJobScheduler (not queue.add + repeat): replaces by scheduler id
+    // regardless of interval, so a future change to
+    // CHAT_STARTERS_FANOUT_INTERVAL_MS takes effect cleanly on next deploy.
+    await this.queue.upsertJobScheduler(
+      'chat-starters.fanout.repeatable',
+      { every: CHAT_STARTERS_FANOUT_INTERVAL_MS },
       {
-        triggeredAt: new Date().toISOString(),
-        reason: 'cron',
-      } satisfies ChatStartersFanoutJobData,
-      {
-        repeat: { every: CHAT_STARTERS_FANOUT_INTERVAL_MS },
-        jobId: 'chat-starters.fanout.repeatable',
-        removeOnComplete: { age: 7 * 86_400, count: 50 },
-        removeOnFail: { age: 30 * 86_400, count: 100 },
+        name: CHAT_STARTERS_JOB_FANOUT,
+        data: {
+          triggeredAt: new Date().toISOString(),
+          reason: 'cron',
+        } satisfies ChatStartersFanoutJobData,
+        opts: {
+          removeOnComplete: { age: 7 * 86_400, count: 50 },
+          removeOnFail: { age: 30 * 86_400, count: 100 },
+        },
       },
     )
     this.logger.log(

@@ -1,7 +1,8 @@
 import { Injectable, Logger, type NestMiddleware, NotFoundException } from '@nestjs/common'
 import { fromNodeHeaders } from 'better-auth/node'
 import type { NextFunction, Response } from 'express'
-import type { ApiErrorResponse } from '../../types'
+import { runWithVenueContext } from '../../database/venue-context'
+import type { ApiErrorResponse, Role } from '../../types'
 import { auth, type SessionOrgContext } from './auth.config'
 import type { AuthedRequest } from './auth.guard'
 
@@ -56,7 +57,10 @@ export class OrgContextMiddleware implements NestMiddleware {
     }
 
     req.organization = enriched.activeOrganization
-    req.membership = { role: enriched.membership.role }
+    req.membership = {
+      role: enriched.membership.role,
+      venueIds: enriched.membership.venueIds ?? [],
+    }
 
     this.logger.log(
       JSON.stringify({
@@ -68,6 +72,12 @@ export class OrgContextMiddleware implements NestMiddleware {
       }),
     )
 
-    next()
+    // Run the rest of the request inside the venue-scope store so every DB query
+    // this member makes is auto-narrowed to their accessible venues (the Prisma
+    // extension is a no-op for owners / unscoped members).
+    runWithVenueContext(
+      { role: req.membership.role as Role, venueIds: req.membership.venueIds },
+      () => next(),
+    )
   }
 }

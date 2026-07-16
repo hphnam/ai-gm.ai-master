@@ -242,10 +242,10 @@ export function HistoryBody() {
 function SectionHeader({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex items-baseline gap-2 px-1 pt-4 pb-2">
-      <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <h2 className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
         {label}
       </h2>
-      <span className="text-[11px] text-muted-foreground/70">{count}</span>
+      <span className="font-mono-ledger text-[11px] text-[var(--mono-muted)]/70">{count}</span>
     </div>
   )
 }
@@ -275,7 +275,7 @@ function HistoryRow({
           <Store className="h-3 w-3" aria-hidden />
           <span className="truncate">{item.venueName}</span>
           <span>·</span>
-          <span>{formatTimestamp(item.lastMessageAt)}</span>
+          <span className="font-mono-ledger">{formatTimestamp(item.lastMessageAt)}</span>
         </span>
       </button>
       <button

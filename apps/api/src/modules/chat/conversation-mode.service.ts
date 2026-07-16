@@ -75,6 +75,7 @@ mode:
 
 onTopic — is this about running the business (a hospitality / service venue)?
   - true for ANYTHING about operations, stock, staff, suppliers, menu/service, bookings, compliance, a rude customer, specials ideas, rota or staffing policy, "how do other venues do X", using this app, AND anything about safety, first aid, injury or an emergency.
+  - true for any question about a person by name ("who is Sam?", "what's Priya's number?") — assume they're a team member, supplier, or contact the assistant can look up. Only famous-figure trivia ("who is Napoleon?") is off-topic.
   - false ONLY when clearly unrelated: writing or debugging code, general trivia / world facts, homework or maths puzzles, personal-life advice, unrelated content, or acting as a general-purpose chatbot.
   - When unsure, choose true. Never mark a real work question off-topic.
 

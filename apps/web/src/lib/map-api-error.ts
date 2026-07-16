@@ -66,6 +66,8 @@ export function mapApiError(err: unknown): string {
         return "You've hit the pending-invite limit. Revoke old invites or wait for them to expire."
       case 'already-a-member':
         return 'That email is already a member of this organisation.'
+      case 'invalid-venue-scope':
+        return "None of the chosen venues can be granted. Pick venues you have access to, or choose 'All venues'."
       case 'email-not-verified':
         return 'Verify your email first before accepting this invitation.'
       // v0.2 Phase 1 — Phone linking (01-03)

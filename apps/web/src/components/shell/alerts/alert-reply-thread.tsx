@@ -43,26 +43,28 @@ export function AlertReplyThread({
 
   const rows = replies.data?.replies ?? []
   return (
-    <div className="border-t border-border/40 bg-muted/15 px-4 py-3">
+    <div className="border-t border-[var(--hairline-soft)] bg-[var(--paper-2)]/40 px-4 py-3">
       {note.automated && replyTarget ? (
-        <p className="mb-2 text-[10px] text-foreground/55">
-          Replies go to <span className="font-medium text-foreground/75">{replyTarget}</span>
+        <p className="mb-2 text-[10px] text-[var(--ink-muted)]">
+          Replies go to <span className="font-semibold text-foreground">{replyTarget}</span>
         </p>
       ) : null}
       {replies.isLoading && rows.length === 0 ? (
-        <p className="text-[11px] text-foreground/50 italic">Loading replies…</p>
+        <p className="text-[11px] text-[var(--mono-muted)] italic">Loading replies…</p>
       ) : rows.length > 0 ? (
         <ul className="mb-2 flex flex-col gap-2">
           {rows.map((r) => (
             <li
               key={r.id}
-              className="flex flex-col gap-0.5 rounded-md bg-background px-2.5 py-1.5 text-sm shadow-sm"
+              className="flex flex-col gap-0.5 rounded-lg border border-[var(--hairline-soft)] bg-[var(--ledger-card)] px-2.5 py-1.5 text-sm"
             >
-              <div className="flex items-baseline justify-between gap-2 text-[10px] text-foreground/60">
-                <span className="font-medium text-foreground/80">
+              <div className="flex items-baseline justify-between gap-2 text-[10px]">
+                <span className="font-semibold text-foreground">
                   {r.author.name ?? r.author.email}
                 </span>
-                <time dateTime={r.createdAt}>{formatRelative(r.createdAt)}</time>
+                <time dateTime={r.createdAt} className="font-mono-ledger text-[var(--ink-faint)]">
+                  {formatRelative(r.createdAt)}
+                </time>
               </div>
               <p className="whitespace-pre-wrap break-words text-foreground text-sm leading-snug">
                 {r.body}
@@ -71,8 +73,8 @@ export function AlertReplyThread({
           ))}
         </ul>
       ) : (
-        <div className="mb-2 rounded-md border border-dashed border-border/60 py-3 text-center">
-          <p className="text-xs text-muted-foreground">No replies yet</p>
+        <div className="mb-2 rounded-lg border border-dashed border-[var(--hairline)] py-3 text-center">
+          <p className="text-xs text-[var(--mono-muted)]">No replies yet</p>
         </div>
       )}
 
@@ -84,12 +86,12 @@ export function AlertReplyThread({
           rows={1}
           maxLength={2000}
           disabled={compose.isPending}
-          className="max-h-32 min-h-9 flex-1 resize-none rounded-md border border-border bg-background px-2.5 py-1.5 text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
+          className="max-h-32 min-h-9 flex-1 resize-none rounded-lg border border-[var(--hairline)] bg-[var(--ledger-card)] px-2.5 py-1.5 text-sm placeholder:text-[var(--ink-faint)] focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
         <button
           type="submit"
           disabled={compose.isPending || draft.trim().length === 0}
-          className="inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-md bg-foreground px-3 font-medium text-background text-xs transition-opacity hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-lg bg-[var(--brass)] px-3 font-semibold text-[var(--cream-hi)] text-xs shadow-[0_2px_0_var(--brass-shadow)] transition-colors hover:bg-[var(--brass-shadow)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {compose.isPending ? 'Sending…' : 'Send'}
         </button>

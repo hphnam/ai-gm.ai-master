@@ -86,14 +86,31 @@ const TOOL_DONE_PHRASES: Record<string, string> = {
   pos_list_team_members: 'Listed your team',
 }
 
-export function toolStatusPhrase(toolName: string, _input?: unknown): string {
+// The Anthropic memory tool issues a `view` (read) at the start of most turns.
+// Labelling that as a write ("Updated my notes") is misleading, so branch on the
+// command: only the mutating commands claim an update.
+function memoryCommand(input: unknown): string | undefined {
+  if (input && typeof input === 'object' && 'command' in input) {
+    const command = (input as { command?: unknown }).command
+    if (typeof command === 'string') return command
+  }
+  return undefined
+}
+
+export function toolStatusPhrase(toolName: string, input?: unknown): string {
+  if (toolName === 'memory') {
+    return memoryCommand(input) === 'view' ? 'Checking my notes' : 'Updating my notes'
+  }
   const phrase = TOOL_STATUS_PHRASES[toolName]
   if (phrase) return phrase
   if (toolName.startsWith('pos_')) return 'Getting data from your POS'
   return 'Working'
 }
 
-export function toolDonePhrase(toolName: string): string {
+export function toolDonePhrase(toolName: string, input?: unknown): string {
+  if (toolName === 'memory') {
+    return memoryCommand(input) === 'view' ? 'Checked my notes' : 'Updated my notes'
+  }
   const phrase = TOOL_DONE_PHRASES[toolName]
   if (phrase) return phrase
   if (toolName.startsWith('pos_')) return 'Got data from your POS'

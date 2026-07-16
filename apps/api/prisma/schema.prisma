@@ -207,6 +207,10 @@ model OrganizationMember {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           String
+  /// Per-member venue scope. Empty = access to every venue in the org (the
+  /// default). Non-empty = restricted to exactly these Venue ids. Owners always
+  /// resolve to all venues regardless of this field. See resolveAccessibleVenueIds.
+  venueIds       String[]     @default([])
   /// Phase F — lazy GM profile cache (gmProfile sub-object: summary,
   /// likelyShiftRole, commonTopics, languageHints, refreshedAt, sourceMessageCount).
   metadata       Json         @default("{}")
@@ -227,6 +231,8 @@ model Invitation {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role           String
+  /// Venue scope carried from invite → membership on accept. Empty = all venues.
+  venueIds       String[]     @default([])
   status         String       @default("pending")
   inviterId      String
   inviter        User         @relation("inviter", fields: [inviterId], references: [id])
@@ -249,6 +255,8 @@ model WhatsappInvite {
   issuedByUserId String
   targetUserId   String? // optional pre-binding to existing User; null = first match wins on OTP
   role           String // staff | manager — what membership to grant on redemption
+  /// Venue scope carried onto the membership at redemption. Empty = all venues.
+  venueIds       String[]  @default([])
   note           String?
   expiresAt      DateTime
   status         String    @default("pending") // pending | redeemed | revoked | exhausted | expired

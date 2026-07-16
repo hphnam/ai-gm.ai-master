@@ -59,7 +59,7 @@ export function KpiGroupSection({ title, kpis }: { title?: string; kpis: Kpi[] }
   return (
     <div className="flex flex-col gap-2">
       {title ? (
-        <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
           {title}
         </h4>
       ) : null}
@@ -89,41 +89,53 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
         : ArrowRight
   const trendTone =
     kpi.trend?.direction === 'up'
-      ? 'text-success'
+      ? 'text-[var(--ledger-green)]'
       : kpi.trend?.direction === 'down'
-        ? 'text-destructive'
-        : 'text-muted-foreground'
+        ? 'text-[var(--clay)]'
+        : 'text-[var(--mono-muted)]'
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-background/40 p-3">
-      <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="flex min-w-0 flex-col gap-1.5 rounded-lg border border-[var(--hairline)] bg-[#fcfaf3] p-[14px]">
+      <span className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--mono-muted)]">
         {kpi.label}
       </span>
-      <span className="text-[18px] font-semibold leading-tight tabular-nums text-foreground">
+      <span className="font-mono-ledger text-[24px] font-bold leading-none tracking-[-0.5px] text-[var(--ink-text)] break-words">
         {fmtKpi(kpi.value)}
       </span>
       {kpi.trend ? (
-        <span className={cn('inline-flex items-center gap-1 text-[11px] font-medium', trendTone)}>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 font-mono-ledger text-[11px] font-medium',
+            trendTone,
+          )}
+        >
           <TrendIcon className="h-3 w-3" aria-hidden />
           {kpi.trend.percent != null
             ? `${kpi.trend.percent > 0 ? '+' : ''}${kpi.trend.percent}%`
             : ''}
           {kpi.trend.label ? (
-            <span className="ml-0.5 text-muted-foreground">{kpi.trend.label}</span>
+            <span className="ml-0.5 font-sans text-[var(--mono-muted)]">{kpi.trend.label}</span>
           ) : null}
         </span>
       ) : null}
       {kpi.sublabel && !kpi.trend ? (
-        <span className="text-[11px] text-muted-foreground">{kpi.sublabel}</span>
+        <span className="text-[11px] text-[var(--mono-muted)]">{kpi.sublabel}</span>
       ) : null}
     </div>
   )
 }
 
 const TONE_CLASSES: Record<NonNullable<BarRow['tone']>, string> = {
-  neutral: 'bg-foreground/70',
-  positive: 'bg-success',
-  warning: 'bg-warning',
-  negative: 'bg-destructive',
+  neutral: 'bg-[var(--brass)]',
+  positive: 'bg-[var(--ledger-green)]',
+  warning: 'bg-[var(--warning)]',
+  negative: 'bg-[var(--clay)]',
+}
+
+const TONE_TRACK: Record<NonNullable<BarRow['tone']>, string> = {
+  neutral: 'bg-[rgba(143,107,31,0.14)]',
+  positive: 'bg-[rgba(47,93,61,0.14)]',
+  warning: 'bg-[rgba(181,138,62,0.16)]',
+  negative: 'bg-[rgba(154,75,44,0.14)]',
 }
 
 export function BarSection({
@@ -143,32 +155,32 @@ export function BarSection({
   return (
     <div className="flex flex-col gap-2">
       {title ? (
-        <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
           {title}
         </h4>
       ) : null}
-      {caption ? <p className="text-[11.5px] text-muted-foreground">{caption}</p> : null}
-      <ul className="flex flex-col gap-1.5">
+      {caption ? <p className="text-[11.5px] text-[var(--mono-muted)]">{caption}</p> : null}
+      <ul className="flex flex-col gap-2">
         {rows.map((r, i) => {
           const widthPct = Math.max(2, (Math.abs(r.value) / max) * 100)
           const tone = r.tone ?? 'neutral'
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: bar rows render from a frozen spec; order is fixed
-            <li key={`bar-${i}`} className="flex flex-col gap-0.5">
-              <div className="flex items-baseline justify-between gap-2 text-[12.5px]">
-                <span className="truncate font-medium text-foreground">{r.label}</span>
-                <span className="shrink-0 tabular-nums text-foreground">
+            <li key={`bar-${i}`} className="flex flex-col gap-1">
+              <div className="flex items-baseline justify-between gap-2 text-[13px]">
+                <span className="truncate text-[var(--ink-text)]">{r.label}</span>
+                <span className="shrink-0 font-mono-ledger text-[var(--ink-text)]">
                   {formatValue ? (
                     formatValue(r.value)
                   ) : (
                     <>
                       {r.value.toLocaleString()}
-                      {unit ? <span className="ml-0.5 text-muted-foreground">{unit}</span> : null}
+                      {unit ? <span className="ml-1 text-[var(--mono-muted)]">{unit}</span> : null}
                     </>
                   )}
                 </span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className={cn('h-1 w-full overflow-hidden rounded-full', TONE_TRACK[tone])}>
                 <div
                   className={cn(
                     'h-full rounded-full transition-all duration-300',
@@ -179,7 +191,7 @@ export function BarSection({
                 />
               </div>
               {r.sublabel ? (
-                <span className="text-[11px] text-muted-foreground">{r.sublabel}</span>
+                <span className="text-[11px] text-[var(--mono-muted)]">{r.sublabel}</span>
               ) : null}
             </li>
           )
@@ -201,18 +213,21 @@ export function TableSection({
   return (
     <div className="flex flex-col gap-2">
       {title ? (
-        <h4 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <h4 className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
           {title}
         </h4>
       ) : null}
-      <div className="overflow-x-auto rounded-md border border-border/60">
-        <table className="w-full border-collapse text-[12.5px]">
-          <thead className="bg-muted/40 text-foreground">
-            <tr>
-              {columns.map((col) => (
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-[13px]">
+          <thead>
+            <tr className="border-b border-[var(--hairline)]">
+              {columns.map((col, j) => (
                 <th
                   key={col}
-                  className="px-3 py-1.5 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+                  className={cn(
+                    'px-2 py-1.5 font-mono-ledger text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--mono-muted)]',
+                    j === 0 ? 'text-left' : 'text-right',
+                  )}
                 >
                   {col}
                 </th>
@@ -222,16 +237,18 @@ export function TableSection({
           <tbody>
             {rows.map((row, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: table rows render from a frozen spec; order is fixed
-              <tr key={`r-${i}`} className="border-t border-border/60">
+              <tr key={`r-${i}`} className="border-b border-[var(--hairline-soft)] last:border-b-0">
                 {row.map((cell, j) => (
                   <td
                     key={columns[j] ?? String(cell ?? '')}
                     className={cn(
-                      'px-3 py-1.5 align-top',
-                      typeof cell === 'number' && 'text-right tabular-nums',
+                      'px-2 py-2 align-top',
+                      j === 0
+                        ? 'text-[var(--ink-muted)]'
+                        : 'text-right font-mono-ledger text-[var(--ink-text)]',
                     )}
                   >
-                    {cell === null ? <span className="text-muted-foreground">—</span> : cell}
+                    {cell === null ? <span className="text-[var(--mono-muted)]">—</span> : cell}
                   </td>
                 ))}
               </tr>

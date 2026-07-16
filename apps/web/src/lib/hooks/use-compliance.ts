@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch, apiPost } from '@/lib/api-client'
 
 export type ExpiryStatus = 'active' | 'renewed' | 'expired' | 'dismissed'
@@ -64,19 +64,24 @@ export type ListExpiryRecordsResponse = {
 const LIST_KEY = (status: string) => ['compliance', 'list', { status }] as const
 const SUMMARY_KEY = ['compliance', 'summary'] as const
 
-export function useExpiryRecords(opts?: {
-  status?: 'active' | 'renewed' | 'expired' | 'dismissed' | 'all'
-  enabled?: boolean
-}) {
-  const status = opts?.status ?? 'active'
-  return useQuery<ListExpiryRecordsResponse>({
+type ExpiryStatusFilter = 'active' | 'renewed' | 'expired' | 'dismissed' | 'all'
+
+export function expiryRecordsOptions(status: ExpiryStatusFilter = 'active') {
+  return {
     queryKey: LIST_KEY(status),
-    queryFn: ({ signal }) =>
+    queryFn: ({ signal }: { signal?: AbortSignal }) =>
       apiFetch<ListExpiryRecordsResponse>(`/compliance/expiry-records?status=${status}&limit=200`, {
         signal,
       }),
+  }
+}
+
+export function useExpiryRecords(opts?: { status?: ExpiryStatusFilter; enabled?: boolean }) {
+  const status = opts?.status ?? 'active'
+  return useQuery<ListExpiryRecordsResponse>({
+    ...expiryRecordsOptions(status),
     enabled: opts?.enabled ?? true,
-    staleTime: 30_000,
+    placeholderData: keepPreviousData,
   })
 }
 

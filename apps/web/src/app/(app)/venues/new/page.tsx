@@ -18,7 +18,7 @@ export default async function NewVenuePage() {
           <BackLink href="/chat" className="mb-4">
             Back to chat
           </BackLink>
-          <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <VenueForm />
           </div>
         </div>

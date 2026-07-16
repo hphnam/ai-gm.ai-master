@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { Building2, LogOut, Phone, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -29,6 +30,7 @@ function initials(name: string | null | undefined, email: string): string {
 
 export function UserMenu() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: session, isPending } = useSession()
 
   if (isPending || !session?.user) return null
@@ -37,6 +39,7 @@ export function UserMenu() {
 
   async function handleSignOut() {
     await authClient.signOut()
+    queryClient.clear()
     toast.success('Signed out')
     router.replace('/auth/sign-in')
     router.refresh()
@@ -65,7 +68,7 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/settings/organization">
+          <Link href="/settings/general">
             <Building2 className="h-4 w-4" aria-hidden />
             Organisation settings
           </Link>

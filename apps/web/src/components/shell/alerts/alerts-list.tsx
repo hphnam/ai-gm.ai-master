@@ -90,12 +90,12 @@ export function AlertsList({
   if (query.isError) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-12 text-center">
-        <Inbox className="h-6 w-6 text-foreground/30" aria-hidden />
-        <p className="text-foreground/60 text-sm">Couldn't load alerts.</p>
+        <Inbox className="h-6 w-6 text-[var(--ink-faint)]" aria-hidden />
+        <p className="text-[var(--ink-muted)] text-sm">Couldn't load alerts.</p>
         <button
           type="button"
           onClick={() => query.refetch()}
-          className="cursor-pointer text-foreground/70 text-xs underline-offset-4 hover:underline"
+          className="cursor-pointer text-[var(--brass)] text-xs underline-offset-4 hover:underline"
         >
           Try again
         </button>
@@ -106,9 +106,11 @@ export function AlertsList({
   if (items.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-16 text-center">
-        <Inbox className="h-7 w-7 text-foreground/25" aria-hidden />
-        <p className="text-foreground/70 text-sm">No alerts.</p>
-        <p className="text-foreground/45 text-xs">
+        <span className="flex h-11 w-11 items-center justify-center rounded-[11px] bg-[var(--paper-2)] text-[var(--ink-faint)]">
+          <Inbox className="h-5 w-5" aria-hidden />
+        </span>
+        <p className="font-medium text-foreground text-sm">No alerts.</p>
+        <p className="max-w-[260px] text-[var(--mono-muted)] text-xs">
           Reports, compliance reminders and tasks will show up here.
         </p>
       </div>
@@ -116,7 +118,7 @@ export function AlertsList({
   }
 
   return (
-    <div ref={scrollRef} className="scrollbar-thin flex-1 overflow-y-auto">
+    <div ref={scrollRef} className="scrollbar-thin flex-1 overflow-y-auto pt-3.5">
       <ul className="relative" style={{ height: virtualizer.getTotalSize() }}>
         {virtualItems.map((vi) => {
           const n = items[vi.index]
@@ -126,7 +128,7 @@ export function AlertsList({
               key={n.id}
               ref={virtualizer.measureElement}
               data-index={vi.index}
-              className="absolute inset-x-0"
+              className="absolute inset-x-0 px-4 pb-2"
               style={{ transform: `translateY(${vi.start}px)` }}
             >
               <AlertRow

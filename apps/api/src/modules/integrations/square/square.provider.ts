@@ -73,6 +73,39 @@ export function redactShiftPayForStaff(
   }
 }
 
+/// "Best seller" splits into popularity (units — operational, staff-visible) and
+/// revenue (money — manager-only). Staff reach top-items so they can answer
+/// "what's our most popular X" for a customer, but every grossSales figure is
+/// nulled here so no revenue leaves the API. The dispatch also forces
+/// sortBy:'quantity' for staff, since a revenue ranking is meaningless once £ is
+/// stripped. Managers/owners get the full row.
+type TopItemsShape = {
+  items: Array<{
+    grossSales: unknown
+    variations: Array<{ grossSales: unknown }>
+  }>
+}
+export function redactTopItemsRevenueForStaff(
+  result: ToolResult<TopItemsShape>,
+  userRole: string,
+): ToolResult<unknown> {
+  // Fail closed: only owner/manager see revenue. Any other role string (staff,
+  // or an unexpected/future tier) gets the popularity view with £ stripped.
+  const privileged = userRole === 'owner' || userRole === 'manager'
+  if (privileged || !result.ok) return result
+  return {
+    ok: true,
+    data: {
+      ...result.data,
+      items: result.data.items.map((r) => ({
+        ...r,
+        grossSales: null,
+        variations: r.variations.map((v) => ({ ...v, grossSales: null })),
+      })),
+    },
+  }
+}
+
 /// SquareProvider self-registers with IntegrationRegistry on module init so
 /// future providers follow the same pattern (new file → register → tools
 /// available; no edits to chat-tools.ts).
@@ -191,7 +224,15 @@ export class SquareProvider implements IntegrationProvider, OnModuleInit {
           sortBy?: 'revenue' | 'quantity'
           limit?: number
         } & WindowInput
-        return this.square.getTopItems(ctx.orgId, i)
+        // Non-privileged callers only ever see the popularity ranking (revenue is
+        // redacted below), so pin the sort to quantity regardless of what the
+        // model asked — a revenue ranking on stripped £ would leak ordinal info.
+        const privileged = ctx.userRole === 'owner' || ctx.userRole === 'manager'
+        const scoped = privileged ? i : { ...i, sortBy: 'quantity' as const }
+        return redactTopItemsRevenueForStaff(
+          await this.square.getTopItems(ctx.orgId, scoped),
+          ctx.userRole,
+        )
       }
       case POS_GET_PAYMENT_BREAKDOWN: {
         const i = input as { venueId: string } & WindowInput

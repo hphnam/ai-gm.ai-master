@@ -39,15 +39,24 @@ export function Tabs<T extends string>({
   ...rest
 }: TabsProps<T>) {
   return (
-    <div className={cn('mb-6 flex items-center gap-3 border-b', className)} {...rest}>
-      <div role="tablist" aria-label={ariaLabel} className="flex flex-1 gap-1">
+    <div
+      className={cn('mb-6 flex min-w-0 items-center justify-between gap-3', className)}
+      {...rest}
+    >
+      <div
+        role="tablist"
+        aria-label={ariaLabel}
+        // min-w-0 + overflow-x-auto lets the strip scroll instead of overflowing
+        // the row when the labels + trailing action exceed a phone's width.
+        className="flex min-w-0 gap-[3px] overflow-x-auto rounded-[10px] bg-[var(--paper-2)] p-[3px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {items.map(({ id, label, icon: Icon, count, urgent, href }) => {
           const selected = value === id
           const tabClasses = cn(
-            'relative -mb-px flex cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition-colors',
+            'relative flex shrink-0 cursor-pointer items-center gap-2 rounded-[7px] px-3.5 py-2 text-[13px] transition-colors',
             selected
-              ? 'border-foreground font-medium text-foreground'
-              : 'border-transparent text-muted-foreground hover:text-foreground',
+              ? 'bg-[#fcfaf3] font-semibold text-[var(--ink-text)] shadow-[0_1px_2px_rgba(32,26,18,0.06)]'
+              : 'font-medium text-[var(--ink-muted)] hover:text-[var(--ink-text)]',
           )
           const inner = (
             <>
@@ -56,14 +65,15 @@ export function Tabs<T extends string>({
               {typeof count === 'number' && count > 0 ? (
                 <span
                   className={cn(
-                    'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums',
-                    selected
-                      ? 'bg-foreground/10 text-foreground'
-                      : 'bg-muted text-muted-foreground',
+                    'font-mono-ledger inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
+                    selected ? 'text-[var(--ink-text)]' : 'text-[var(--mono-muted)]',
                   )}
                 >
                   {urgent ? (
-                    <span className="inline-block h-1 w-1 rounded-full bg-amber-500" aria-hidden />
+                    <span
+                      className="inline-block h-1 w-1 rounded-full bg-[var(--clay)]"
+                      aria-hidden
+                    />
                   ) : null}
                   {count}
                 </span>
@@ -104,7 +114,7 @@ export function Tabs<T extends string>({
           )
         })}
       </div>
-      {trailing ? <div className="shrink-0 pb-2">{trailing}</div> : null}
+      {trailing ? <div className="shrink-0">{trailing}</div> : null}
     </div>
   )
 }

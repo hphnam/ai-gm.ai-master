@@ -13,6 +13,7 @@ export interface PlaceCandidate {
   currency: string | null
   timezone: string | null
   openingHours: string | null
+  description: string | null
 }
 
 export interface PlacesSearchResponse {

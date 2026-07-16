@@ -50,6 +50,7 @@ export type AuthOrganization = {
 export type AuthMembership = {
   organizationId: string
   role: Role
+  venueIds: string[]
 }
 
 // audit-added S1+S2: password min 12, max 72 (bcrypt byte ceiling)
@@ -85,9 +86,19 @@ export type SignInBody = z.infer<typeof SignInBodySchema>
 
 // --- 01-02 Invitations (audit-hardened) ---
 
+// Per-member venue scope. Empty/omitted = all venues. Non-empty = restrict to
+// exactly these venue ids (validated against the org at capture time). Venue ids
+// are app-generated uuids, so uuid-validate them (unlike better-auth ids).
+export const VenueIdsSchema = z
+  .array(z.string().regex(UUID_RE, 'invalid venue id'))
+  .max(200)
+  .default([])
+export type VenueIds = z.infer<typeof VenueIdsSchema>
+
 export const InviteBodySchema = z.object({
   email: EmailSchema,
   role: InviteRole,
+  venueIds: VenueIdsSchema,
 })
 export type InviteBody = z.infer<typeof InviteBodySchema>
 
@@ -109,6 +120,7 @@ export type InvitationDTO = {
   organizationId: string
   organizationName: string
   role: InviteRoleType
+  venueIds: string[]
   status: InvitationStatus
   inviterId: string
   inviterName: string | null

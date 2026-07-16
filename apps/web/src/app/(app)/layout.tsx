@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { AppShell } from '@/components/shell/app-shell'
+import { MobileHeaderGate } from '@/components/shell/mobile-header-gate'
 import { PageHeaderProvider } from '@/components/shell/page-header-provider'
 import { requireAppAccess } from '@/lib/require-app-access'
 
@@ -25,11 +26,14 @@ export default async function AppLayout({
   children: ReactNode
   header: ReactNode
 }) {
-  await requireAppAccess()
+  const session = await requireAppAccess()
   return (
-    <AppShell>
+    <AppShell initialUser={{ name: session.user.name, email: session.user.email }}>
       <PageHeaderProvider>
-        {header}
+        {/* The header shows on desktop everywhere; on mobile it's hidden on the
+            hero routes (Today/Tasks/Alerts) where MobileTopBar + an in-content
+            title take over, and kept everywhere else (chat, docs, settings…). */}
+        <MobileHeaderGate>{header}</MobileHeaderGate>
         {children}
       </PageHeaderProvider>
     </AppShell>

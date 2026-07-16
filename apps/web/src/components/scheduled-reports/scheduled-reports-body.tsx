@@ -10,12 +10,12 @@ import {
   Play,
   Plus,
   Sparkles,
-  Sun,
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog, DeleteButton } from '@/components/ui/confirm-delete-dialog'
 import {
@@ -69,7 +69,11 @@ export function ScheduledReportsBody() {
         onValueChange={setFilter}
         ariaLabel="Filter schedules by status"
         trailing={
-          <Button size="sm" onClick={() => setCreateOpen(true)} className="cursor-pointer gap-1.5">
+          <Button
+            size="sm"
+            onClick={() => setCreateOpen(true)}
+            className="cursor-pointer gap-1.5 shadow-[0_2px_0_var(--brass-shadow)] active:translate-y-px"
+          >
             <Plus className="h-3.5 w-3.5" aria-hidden />
             New schedule
           </Button>
@@ -84,7 +88,7 @@ export function ScheduledReportsBody() {
         <SchedulesEmpty filter={filter} onCreate={() => setCreateOpen(true)} />
       ) : (
         <>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2">
             {rows.map((s) => (
               <li key={s.id}>
                 <ScheduleRow schedule={s} />
@@ -92,7 +96,7 @@ export function ScheduledReportsBody() {
             ))}
           </ul>
           <div className="mt-5 flex items-center justify-between gap-3">
-            <p className="text-[11px] text-muted-foreground tabular-nums">
+            <p className="font-mono-ledger text-[11px] text-[var(--mono-muted)] tabular-nums">
               Showing {rows.length} of {total}
             </p>
             {list.hasNextPage ? (
@@ -127,29 +131,29 @@ function ScheduleRow({ schedule }: { schedule: ScheduledReport }) {
   return (
     <article
       className={cn(
-        'group flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-colors',
-        'hover:border-foreground/25',
+        'group flex flex-col gap-3 rounded-xl border border-[var(--hairline)] bg-card p-[17px] transition-colors',
+        'hover:border-[var(--hairline-strong)] hover:shadow-[0_4px_14px_-7px_rgba(32,26,18,0.28)]',
         schedule.status === 'cancelled' && 'opacity-70',
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3.5">
         <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-muted text-[var(--mono-muted)]"
           aria-hidden
         >
-          <CalendarClock className="h-4 w-4" />
+          <CalendarClock className="h-[17px] w-[17px]" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate font-display text-base leading-tight text-foreground">
+            <h3 className="truncate text-[15px] font-semibold leading-[1.3] text-foreground">
               {schedule.title}
             </h3>
             <StatusPill status={schedule.status} />
           </div>
           {schedule.summary ? (
-            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{schedule.summary}</p>
+            <p className="mt-1 line-clamp-2 text-xs text-[var(--ink-muted)]">{schedule.summary}</p>
           ) : null}
-          <dl className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+          <dl className="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1 font-mono-ledger text-[11px] text-[var(--mono-muted)]">
             <Meta icon={<CalendarRange className="h-3 w-3" aria-hidden />}>
               {formatCadence(schedule)}
             </Meta>
@@ -159,9 +163,9 @@ function ScheduleRow({ schedule }: { schedule: ScheduledReport }) {
                 : `Next: ${formatNextRun(schedule.nextRunAt, schedule.timezone)}`}
             </Meta>
             {schedule.runCount > 0 ? (
-              <Meta icon={<Sun className="h-3 w-3" aria-hidden />}>
+              <span className="whitespace-nowrap text-[var(--ink-faint)]">
                 {schedule.runCount} {schedule.runCount === 1 ? 'run' : 'runs'}
-              </Meta>
+              </span>
             ) : null}
             {schedule.prompt ? (
               <Meta icon={<Sparkles className="h-3 w-3" aria-hidden />}>
@@ -242,21 +246,11 @@ function Meta({ icon, children }: { icon: React.ReactNode; children: React.React
 }
 
 function StatusPill({ status }: { status: ScheduleStatus }) {
-  const styles =
-    status === 'active'
-      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300'
-      : status === 'paused'
-        ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300'
-        : 'border-border bg-muted text-muted-foreground'
+  const variant = status === 'active' ? 'success' : status === 'paused' ? 'warning' : 'neutral'
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide',
-        styles,
-      )}
-    >
+    <Badge variant={variant} size="sm">
       {status}
-    </span>
+    </Badge>
   )
 }
 
@@ -297,7 +291,11 @@ function SchedulesEmpty({ filter, onCreate }: { filter: Filter; onCreate: () => 
       description={copy.body}
       action={
         copy.showCta ? (
-          <Button size="sm" onClick={onCreate} className="cursor-pointer gap-1.5">
+          <Button
+            size="sm"
+            onClick={onCreate}
+            className="cursor-pointer gap-1.5 shadow-[0_2px_0_var(--brass-shadow)] active:translate-y-px"
+          >
             <Plus className="h-3.5 w-3.5" aria-hidden />
             New schedule
           </Button>
@@ -311,10 +309,13 @@ const SCHEDULES_SKELETON_KEYS = ['a', 'b', 'c']
 
 function SchedulesLoading() {
   return (
-    <ul className="space-y-2.5">
+    <ul className="space-y-2">
       {SCHEDULES_SKELETON_KEYS.map((k) => (
-        <li key={k} className="flex items-start gap-3 rounded-lg border bg-card p-4 shadow-sm">
-          <Skeleton className="h-9 w-9 rounded-full" />
+        <li
+          key={k}
+          className="flex items-start gap-3.5 rounded-xl border border-[var(--hairline)] bg-card p-[17px]"
+        >
+          <Skeleton className="h-9 w-9 rounded-[9px]" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-2/5" />
             <Skeleton className="h-3 w-2/3" />

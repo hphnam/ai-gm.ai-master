@@ -11,11 +11,12 @@ import type {
 } from '@/generated/api'
 import { type ApiError, apiFetch, apiPost } from '@/lib/api-client'
 import { mapApiError } from '@/lib/map-api-error'
+import { invitationsQuery } from '@/lib/queries/keys'
 
 export function useInvitations() {
   return useQuery<ListInvitationsResponse>({
-    queryKey: ['invitations'],
-    queryFn: () => apiFetch<ListInvitationsResponse>('/org/invitations'),
+    queryKey: invitationsQuery.queryKey,
+    queryFn: () => apiFetch<ListInvitationsResponse>(invitationsQuery.path),
     refetchOnWindowFocus: false,
     retry: false,
   })
@@ -36,6 +37,69 @@ export function useCreateInvitation() {
       }
     },
     onError: (err) => toast.error(mapApiError(err)),
+  })
+}
+
+export type InviteChannel = 'email' | 'phone'
+
+export type BatchInviteRow = {
+  channel: InviteChannel
+  // Email address, or an E.164-normalised phone number depending on `channel`.
+  value: string
+  role: 'manager' | 'staff'
+  venueIds: string[]
+}
+
+export type BatchInviteResult = {
+  index: number
+  ok: boolean
+  error?: string
+  // Fulfilled email invites can still carry the single-invite path's signals:
+  // the row was saved but the email didn't send, or it re-sent an existing one.
+  warning?: 'mail-send-failed'
+  reissued?: boolean
+}
+
+// Sends every row independently to its channel's endpoint and reports a
+// per-row outcome so the form can keep only the rows that failed. One shared
+// invalidation of both invite lists at the end; no per-row toasts (the caller
+// shows a single summary).
+export function useBatchInvite() {
+  const queryClient = useQueryClient()
+  return useMutation<BatchInviteResult[], Error, BatchInviteRow[]>({
+    mutationFn: async (rows) => {
+      const settled = await Promise.allSettled(
+        rows.map((row) =>
+          row.channel === 'email'
+            ? apiPost<CreateInvitationResponse>('/org/invitations', {
+                email: row.value,
+                role: row.role,
+                venueIds: row.venueIds,
+              })
+            : apiPost('/whatsapp/invites', {
+                phoneNumber: row.value,
+                role: row.role,
+                venueIds: row.venueIds,
+              }),
+        ),
+      )
+      return settled.map((res, index): BatchInviteResult => {
+        if (res.status !== 'fulfilled') {
+          return { index, ok: false, error: mapApiError(res.reason) }
+        }
+        const email = res.value as Partial<CreateInvitationResponse>
+        return {
+          index,
+          ok: true,
+          warning: email.warning === 'mail-send-failed' ? 'mail-send-failed' : undefined,
+          reissued: email.reissued ?? undefined,
+        }
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invitations'] })
+      queryClient.invalidateQueries({ queryKey: ['whatsapp-invites'] })
+    },
   })
 }
 

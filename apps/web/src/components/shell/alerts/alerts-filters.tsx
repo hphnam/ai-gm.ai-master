@@ -22,10 +22,10 @@ export function AlertsFilters({
     )
   }
   return (
-    <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto border-b border-border px-4 py-2.5">
+    <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto border-b border-[var(--hairline)] px-4 py-2.5">
       <Chip active={status === 'all'} onClick={() => onStatusChange('all')} label="All" />
       <Chip active={status === 'unread'} onClick={() => onStatusChange('unread')} label="Unread" />
-      <span className="mx-1 h-4 w-px shrink-0 bg-border" aria-hidden />
+      <span className="mx-1 h-4 w-px shrink-0 bg-[var(--hairline-strong)]" aria-hidden />
       {ALERT_CATEGORY_ORDER.map((c) => (
         <Chip
           key={c}

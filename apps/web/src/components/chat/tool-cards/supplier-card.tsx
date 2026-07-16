@@ -35,16 +35,20 @@ async function copy(text: string, label: string) {
 
 function SupplierRow({ supplier }: { supplier: Supplier }) {
   return (
-    <div className="flex flex-col gap-1.5 rounded-md border border-border/60 bg-background/40 p-2.5">
+    <div className="flex flex-col gap-1.5 rounded-lg border border-[var(--hairline)] bg-[#fcfaf3] p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-[13.5px] font-semibold text-foreground">{supplier.name}</p>
+          <p className="truncate text-[13.5px] font-semibold text-[var(--ink-text)]">
+            {supplier.name}
+          </p>
           {supplier.contactName ? (
-            <p className="truncate text-[11.5px] text-muted-foreground">{supplier.contactName}</p>
+            <p className="truncate text-[11.5px] text-[var(--mono-muted)]">
+              {supplier.contactName}
+            </p>
           ) : null}
         </div>
         {typeof supplier.leadTimeDays === 'number' ? (
-          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-[rgba(143,107,31,0.1)] px-2 py-0.5 font-mono-ledger text-[11px] font-medium text-[var(--brass)]">
             {supplier.leadTimeDays}d lead
           </span>
         ) : null}
@@ -53,7 +57,7 @@ function SupplierRow({ supplier }: { supplier: Supplier }) {
         {supplier.phone ? (
           <a
             href={`tel:${supplier.phone}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1 text-[11.5px] font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-1.5 rounded-md border border-[var(--hairline)] bg-[#fdfbf5] px-2 py-1 font-mono-ledger text-[11.5px] font-medium text-[var(--ink-text)] transition-colors hover:bg-[var(--paper-2)]"
           >
             <Phone className="h-3 w-3" aria-hidden />
             {supplier.phone}
@@ -62,7 +66,7 @@ function SupplierRow({ supplier }: { supplier: Supplier }) {
         {supplier.email ? (
           <a
             href={`mailto:${supplier.email}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1 text-[11.5px] font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-1.5 rounded-md border border-[var(--hairline)] bg-[#fdfbf5] px-2 py-1 font-mono-ledger text-[11.5px] font-medium text-[var(--ink-text)] transition-colors hover:bg-[var(--paper-2)]"
           >
             <Mail className="h-3 w-3" aria-hidden />
             {supplier.email}
@@ -72,7 +76,7 @@ function SupplierRow({ supplier }: { supplier: Supplier }) {
           <button
             type="button"
             onClick={() => copy(supplier.phone ?? supplier.email ?? '', 'Contact')}
-            className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[11.5px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[11.5px] text-[var(--mono-muted)] transition-colors hover:bg-[var(--paper-2)] hover:text-[var(--ink-text)]"
             aria-label="Copy contact"
           >
             <Copy className="h-3 w-3" aria-hidden />
@@ -80,7 +84,7 @@ function SupplierRow({ supplier }: { supplier: Supplier }) {
         ) : null}
       </div>
       {supplier.notes ? (
-        <p className="text-[12px] italic leading-snug text-muted-foreground">{supplier.notes}</p>
+        <p className="text-[12px] italic leading-snug text-[var(--ink-muted)]">{supplier.notes}</p>
       ) : null}
     </div>
   )

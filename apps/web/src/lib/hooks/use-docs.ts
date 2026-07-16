@@ -2,6 +2,7 @@
 
 import {
   type InfiniteData,
+  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -76,8 +77,18 @@ import { API_URL, ApiError, apiFetch, apiPost } from '@/lib/api-client'
 // the query key so React Query caches each combination separately. Realtime
 // (useKbSocket) invalidates the entire ['docs'] prefix, so cross-filter
 // caches refresh on doc.updated without needing a single shared cache.
-export function useDocs(filters?: DocsFilters) {
+export function docsListOptions(filters?: DocsFilters) {
   const norm = normaliseFilters(filters)
+  return {
+    queryKey: ['docs', 'list', norm] as const,
+    queryFn: ({ signal, pageParam }: { signal?: AbortSignal; pageParam?: string | null }) =>
+      apiFetch<DocListPage>(`/docs${buildDocsQs(norm, pageParam ?? null)}`, { signal }),
+    initialPageParam: null,
+    getNextPageParam: (last: DocListPage) => last.nextCursor,
+  }
+}
+
+export function useDocs(filters?: DocsFilters) {
   return useInfiniteQuery<
     DocListPage,
     Error,
@@ -85,14 +96,8 @@ export function useDocs(filters?: DocsFilters) {
     readonly unknown[],
     string | null
   >({
-    queryKey: ['docs', 'list', norm] as const,
-    queryFn: ({ signal, pageParam }) =>
-      apiFetch<DocListPage>(`/docs${buildDocsQs(norm, pageParam ?? null)}`, {
-        signal,
-      }),
-    initialPageParam: null,
-    getNextPageParam: (last) => last.nextCursor,
-    staleTime: 30_000,
+    ...docsListOptions(filters),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -124,12 +129,18 @@ export function useInbox() {
   })
 }
 
+export function docDetailOptions(id: string) {
+  return {
+    queryKey: ['docs', id] as const,
+    queryFn: ({ signal }: { signal?: AbortSignal }) =>
+      apiFetch<DocDetail>(`/docs/${id}`, { signal }),
+  }
+}
+
 export function useDoc(id: string | null) {
   return useQuery<DocDetail>({
-    queryKey: ['docs', id],
-    queryFn: ({ signal }) => apiFetch<DocDetail>(`/docs/${id!}`, { signal }),
+    ...docDetailOptions(id ?? ''),
     enabled: Boolean(id),
-    staleTime: 30_000,
   })
 }
 

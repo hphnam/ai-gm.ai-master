@@ -12,9 +12,10 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ZodValidationPipe } from 'nestjs-zod'
-import { CurrentOrg, RequireRole } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentVenueScope, RequireRole } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import type { VenueScope } from '../auth/venue-scope'
 import {
   CreateVenueBodyDto,
   UpdateVenueBodyDto,
@@ -35,8 +36,11 @@ export class VenuesController {
 
   @Get()
   @ApiResponse({ status: 200, type: [VenueListItemDto] })
-  list(@CurrentOrg() org: { id: string }): Promise<VenueListItemDto[]> {
-    return this.venuesService.listByOrg(org.id) as Promise<VenueListItemDto[]>
+  list(
+    @CurrentOrg() org: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
+  ): Promise<VenueListItemDto[]> {
+    return this.venuesService.listByOrg(org.id, scope) as Promise<VenueListItemDto[]>
   }
 
   @Get(':id')
@@ -44,8 +48,9 @@ export class VenuesController {
   async get(
     @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
     @CurrentOrg() org: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<VenueDetailDto> {
-    const venue = await this.venuesService.getById(params.id, org.id)
+    const venue = await this.venuesService.getById(params.id, org.id, scope)
     if (!venue) throw new NotFoundException({ error: 'venue-not-found' })
     return venue as VenueDetailDto
   }
@@ -69,8 +74,9 @@ export class VenuesController {
     @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
     @Body(new ZodValidationPipe(UpdateVenueBodyDto)) body: UpdateVenueBodyDto,
     @CurrentOrg() org: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<VenueDetailDto> {
-    return this.venuesService.update(params.id, org.id, body) as Promise<VenueDetailDto>
+    return this.venuesService.update(params.id, org.id, body, scope) as Promise<VenueDetailDto>
   }
 
   @Patch(':id/profile')
@@ -81,8 +87,14 @@ export class VenuesController {
     @Param(new ZodValidationPipe(VenueIdParamDto)) params: VenueIdParamDto,
     @Body() body: UpdateVenueProfileDto,
     @CurrentOrg() org: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<VenueDetailDto> {
-    return this.venuesService.updateProfile(params.id, org.id, body) as Promise<VenueDetailDto>
+    return this.venuesService.updateProfile(
+      params.id,
+      org.id,
+      body,
+      scope,
+    ) as Promise<VenueDetailDto>
   }
 
   /// Map (or unmap) a venue to a Square location id. Manager-only.
@@ -96,11 +108,13 @@ export class VenuesController {
     @Body(new ZodValidationPipe(UpdateVenueSquareLocationBodyDto))
     body: UpdateVenueSquareLocationBodyDto,
     @CurrentOrg() org: { id: string },
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<VenueDetailDto> {
     return this.venuesService.updateSquareLocation(
       params.id,
       org.id,
       body.squareLocationId,
+      scope,
     ) as Promise<VenueDetailDto>
   }
 }

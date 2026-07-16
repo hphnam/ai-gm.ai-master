@@ -14,56 +14,42 @@ import { cn } from '@/lib/utils'
 
 type Tone = 'attention' | 'suggestion' | 'failed'
 
-function InboxCard({
+function InboxRow({
   tone,
   icon,
   title,
-  body,
-  primary,
-  secondary,
+  note,
+  action,
 }: {
   tone: Tone
   icon: React.ReactNode
-  title: React.ReactNode
-  body: React.ReactNode
-  primary: React.ReactNode
-  secondary?: React.ReactNode
+  title: string
+  note: string
+  action: React.ReactNode
 }) {
-  // Single restrained card style. Severity is communicated via icon glyph
-  // and copy — not via tinted backgrounds. The destructive tone earns a
-  // colored left-rule because it represents a true alarm; the other tones
-  // stay neutral.
+  // Single clean row. Severity reads from the glyph + note copy; the failed
+  // tone earns a destructive-tinted tile because it's a true alarm.
   return (
-    <div
-      className={cn(
-        'rounded-2xl border border-border bg-card p-5',
-        tone === 'failed' && 'border-l-2 border-l-destructive',
-      )}
-    >
-      <div className="flex items-start gap-4">
-        <div
-          className={cn(
-            'flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground',
-            tone === 'failed' && 'text-destructive',
-          )}
-        >
-          {icon}
-        </div>
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <p className="text-[15px] font-medium leading-snug text-foreground">{title}</p>
-          <p className="text-sm leading-relaxed text-muted-foreground">{body}</p>
-          <div className="flex flex-wrap gap-2 pt-2">
-            {primary}
-            {secondary}
-          </div>
-        </div>
+    <div className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3.5">
+      <span
+        className={cn(
+          'flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground',
+          tone === 'failed' && 'bg-destructive/10 text-destructive',
+        )}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-foreground">{title}</p>
+        <p className="mt-1 truncate font-mono-ledger text-[11.5px] text-[#a5987c]">{note}</p>
       </div>
+      <div className="shrink-0">{action}</div>
     </div>
   )
 }
 
 function docLabel(doc: DocListItem): string {
-  return doc.title?.trim() || 'this document'
+  return doc.title?.trim() || 'Untitled document'
 }
 
 function ProposalCard({ doc }: { doc: DocListItem }) {
@@ -72,28 +58,19 @@ function ProposalCard({ doc }: { doc: DocListItem }) {
   const proposal = doc.pendingTypeProposal
   return (
     <>
-      <InboxCard
+      <InboxRow
         tone="suggestion"
         icon={<Sparkles className="h-4 w-4" aria-hidden />}
-        title={
-          <>
-            Is <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span> a{' '}
-            {proposal.name.toLowerCase()}?
-          </>
-        }
-        body={
-          proposal.description
-            ? `Our AI thinks so. ${proposal.description} Confirm so we file similar docs the same way next time.`
-            : 'Our AI thinks so. Confirm and we’ll file similar docs the same way next time.'
-        }
-        primary={
-          <Button size="sm" onClick={() => setOpen(true)} className="cursor-pointer">
-            Review &amp; confirm
-          </Button>
-        }
-        secondary={
-          <Button size="sm" variant="ghost" asChild className="cursor-pointer">
-            <Link href={`/docs/${doc.id}`}>Open document</Link>
+        title={docLabel(doc)}
+        note={`AI thinks this is a ${proposal.name.toLowerCase()}`}
+        action={
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            className="cursor-pointer"
+          >
+            Review
           </Button>
         }
       />
@@ -113,24 +90,19 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <InboxCard
+      <InboxRow
         tone="attention"
         icon={<Tag className="h-4 w-4" aria-hidden />}
-        title={
-          <>
-            What kind of document is{' '}
-            <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span>?
-          </>
-        }
-        body="Pick a category so the AI and your team know how to use it. Takes about ten seconds."
-        primary={
-          <Button size="sm" onClick={() => setOpen(true)} className="cursor-pointer">
+        title={docLabel(doc)}
+        note="Needs a category so the AI knows how to use it"
+        action={
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            className="cursor-pointer"
+          >
             Pick a category
-          </Button>
-        }
-        secondary={
-          <Button size="sm" variant="ghost" asChild className="cursor-pointer">
-            <Link href={`/docs/${doc.id}`}>Open document</Link>
           </Button>
         }
       />
@@ -141,20 +113,16 @@ function UnclassifiedCard({ doc }: { doc: DocListItem }) {
 
 function FailedCard({ doc }: { doc: DocListItem }) {
   return (
-    <InboxCard
+    <InboxRow
       tone="failed"
       icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
-      title={
-        <>
-          We couldn’t read <span className="text-foreground">&ldquo;{docLabel(doc)}&rdquo;</span>
-        </>
-      }
-      body={
+      title={docLabel(doc)}
+      note={
         doc.processingError
-          ? `${doc.processingError}. Try uploading a Word doc, or paste the text directly.`
-          : 'It might be a scanned image or password-protected PDF. Try uploading a Word doc, or paste the text directly.'
+          ? `${doc.processingError} — try a Word doc or paste the text`
+          : 'Couldn’t read this file — try a Word doc or paste the text'
       }
-      primary={
+      action={
         <Button size="sm" variant="outline" asChild className="cursor-pointer">
           <Link href={`/docs/${doc.id}`}>See details</Link>
         </Button>
@@ -182,20 +150,24 @@ export function useInboxCount(): number {
 
 function Section({
   title,
-  hint,
+  count,
   children,
 }: {
   title: string
-  hint?: string
+  count: number
   children: React.ReactNode
 }) {
   return (
-    <section className="space-y-2">
-      <header className="flex items-baseline gap-2 px-1">
-        <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
-        {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+    <section className="space-y-2.5">
+      <header className="flex items-center gap-2">
+        <span className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
+          {title}
+        </span>
+        <span className="font-mono-ledger rounded-full bg-[rgba(32,26,18,0.06)] px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground tabular-nums">
+          {count}
+        </span>
       </header>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-2">{children}</div>
     </section>
   )
 }
@@ -218,9 +190,9 @@ export function InboxTab() {
 
   if (docs.isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {INBOX_SKELETON_KEYS.map((k) => (
-          <Skeleton key={k} className="h-24 w-full rounded-2xl" />
+          <Skeleton key={k} className="h-[62px] w-full rounded-xl" />
         ))}
       </div>
     )
@@ -232,10 +204,7 @@ export function InboxTab() {
   return (
     <div className="space-y-6">
       {failed.length > 0 ? (
-        <Section
-          title="Couldn’t read"
-          hint={`${failed.length} ${failed.length === 1 ? 'document' : 'documents'} need a different format`}
-        >
+        <Section title="Couldn’t read" count={failed.length}>
           {failed.map((d) => (
             <FailedCard key={d.id} doc={d} />
           ))}
@@ -243,10 +212,7 @@ export function InboxTab() {
       ) : null}
 
       {proposals.length > 0 ? (
-        <Section
-          title="AI suggestions to review"
-          hint={`${proposals.length} ${proposals.length === 1 ? 'category' : 'categories'} waiting on you`}
-        >
+        <Section title="AI suggestions to review" count={proposals.length}>
           {proposals.map((d) => (
             <ProposalCard key={d.id} doc={d} />
           ))}
@@ -254,10 +220,7 @@ export function InboxTab() {
       ) : null}
 
       {unclassified.length > 0 ? (
-        <Section
-          title="Need a category"
-          hint={`${unclassified.length} ${unclassified.length === 1 ? 'document' : 'documents'} to file`}
-        >
+        <Section title="Need a category" count={unclassified.length}>
           {unclassified.map((d) => (
             <UnclassifiedCard key={d.id} doc={d} />
           ))}

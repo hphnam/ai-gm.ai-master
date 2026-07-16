@@ -19,10 +19,10 @@ export function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors',
+        'inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
         active
-          ? 'border-foreground bg-foreground text-background'
-          : 'border-border bg-background text-foreground/70 hover:border-foreground/40 hover:text-foreground',
+          ? 'border-[var(--brass)] bg-[var(--brass)] text-[var(--cream-hi)]'
+          : 'border-[var(--hairline)] bg-transparent text-[var(--ink-muted)] hover:border-[var(--hairline-strong)] hover:text-foreground',
       )}
     >
       {icon}
