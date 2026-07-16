@@ -14,14 +14,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCurrentMember } from '@/lib/hooks/use-current-member'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
 import { cn } from '@/lib/utils'
 import { VenueProfileEditor } from './venue-profile-editor'
 
-export function VenueProfilesBody() {
+export function VenueProfilesBody({ isManager }: { isManager: boolean }) {
   const venues = useVenues()
-  const { isManager } = useCurrentMember()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // Fall back to the first venue during render rather than writing derived state in an effect.
   const activeId = selectedId ?? venues.data?.[0]?.id ?? null
@@ -62,7 +60,12 @@ export function VenueProfilesBody() {
 
   return (
     <div className="space-y-5">
-      <VenuePicker venues={venues.data} activeId={activeVenue.id} onSelect={setSelectedId} />
+      <VenuePicker
+        venues={venues.data}
+        activeId={activeVenue.id}
+        onSelect={setSelectedId}
+        isManager={isManager}
+      />
 
       {isManager ? (
         <div className="-mt-3 flex justify-end">
@@ -87,7 +90,7 @@ export function VenueProfilesBody() {
           <Skeleton className="h-32 w-full" />
         </div>
       ) : detail.data ? (
-        <VenueProfileEditor key={detail.data.id} venue={detail.data} />
+        <VenueProfileEditor key={detail.data.id} venue={detail.data} isManager={isManager} />
       ) : null}
     </div>
   )
@@ -97,12 +100,13 @@ function VenuePicker({
   venues,
   activeId,
   onSelect,
+  isManager,
 }: {
   venues: Array<{ id: string; name: string; address?: string | null }>
   activeId: string
   onSelect: (id: string) => void
+  isManager: boolean
 }) {
-  const { isManager } = useCurrentMember()
   const active = venues.find((v) => v.id === activeId)
   if (!active) return null
   const count = venues.length
@@ -114,18 +118,18 @@ function VenuePicker({
           type="button"
           aria-label={`Switch venue — currently editing ${active.name}`}
           className={cn(
-            'group flex w-full cursor-pointer items-center gap-3 rounded-lg border bg-card px-4 py-3 text-left shadow-sm transition-colors',
+            'group flex w-full cursor-pointer items-center gap-3 rounded-xl border bg-card px-4 py-3 text-left shadow-sm transition-colors',
             'hover:border-foreground/30',
           )}
         >
           <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground"
             aria-hidden
           >
             <Store className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
               Editing
             </p>
             <p className="truncate text-sm font-medium text-foreground">{active.name}</p>

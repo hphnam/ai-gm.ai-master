@@ -52,6 +52,9 @@ export const API_ERROR_CODES = [
   'category-suggestion-unavailable',
   // Manual doc reconcile — same id, or one side already archived.
   'reconcile-conflict',
+  // Per-member venue scoping — a non-empty selection resolved to zero grantable
+  // venues (all unknown/cross-tenant, or outside a scoped actor's own venues).
+  'invalid-venue-scope',
 ] as const
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]
 export type ApiErrorResponse = { error: ApiErrorCode; details?: unknown }

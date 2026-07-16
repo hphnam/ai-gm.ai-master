@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { CurrentOrg } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentRole, CurrentUser } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
 import {
@@ -23,10 +23,14 @@ export class SuggestionsController {
   onOpen(
     @Body() body: SuggestionsOnOpenRequestDto,
     @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @CurrentRole() role: string | undefined,
   ): Promise<ProactiveSuggestionDto[]> {
-    return this.suggestionsService.onConversationOpen(body.venueId, org.id) as Promise<
-      ProactiveSuggestionDto[]
-    >
+    return this.suggestionsService.onConversationOpen(body.venueId, {
+      orgId: org.id,
+      userId: user.id,
+      userRole: role ?? 'staff',
+    }) as Promise<ProactiveSuggestionDto[]>
   }
 
   @Post('on-turn')
@@ -35,11 +39,13 @@ export class SuggestionsController {
   onTurn(
     @Body() body: SuggestionsOnTurnRequestDto,
     @CurrentOrg() org: { id: string },
+    @CurrentUser() user: { id: string },
+    @CurrentRole() role: string | undefined,
   ): Promise<ProactiveSuggestionDto[]> {
     return this.suggestionsService.onTurn(
       body.venueId,
       body.userMessage,
-      org.id,
+      { orgId: org.id, userId: user.id, userRole: role ?? 'staff' },
       body.conversationId,
     ) as Promise<ProactiveSuggestionDto[]>
   }

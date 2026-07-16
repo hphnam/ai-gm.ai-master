@@ -7,12 +7,13 @@ import { useUnreadNotificationsCount } from '@/lib/hooks/use-notifications'
 import { useNotificationsSocket } from '@/lib/hooks/use-notifications-socket'
 import { cn } from '@/lib/utils'
 import { useInbox } from './inbox-provider'
-import { NotificationsSidebar } from './notifications-sidebar'
 
 const TOAST_BODY_PREVIEW_CHARS = 140
 
 export function NotificationsBell() {
-  const { open, focus, openInbox, setOpen } = useInbox()
+  // The inbox sheet is mounted once at the shell root (InboxSheetHost); the bell
+  // just triggers it via InboxProvider so there's a single sheet instance.
+  const { open, openInbox } = useInbox()
   const { data: countData } = useUnreadNotificationsCount()
 
   const unread = countData?.count ?? 0
@@ -45,33 +46,29 @@ export function NotificationsBell() {
   })
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => openInbox()}
-        className={cn(
-          'relative inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md transition-colors',
-          'text-muted-foreground hover:bg-muted hover:text-foreground',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40',
-        )}
-        aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-      >
-        <Bell className="h-5 w-5" aria-hidden />
-        {unread > 0 ? (
-          <span
-            className={cn(
-              'absolute top-1 right-1 inline-flex h-4 min-w-[1rem] items-center justify-center',
-              'rounded-full bg-foreground px-1 text-[10px] font-semibold leading-none text-background',
-            )}
-          >
-            {unread > 99 ? '99+' : unread}
-          </span>
-        ) : null}
-      </button>
-
-      <NotificationsSidebar open={open} onOpenChange={setOpen} focus={focus} />
-    </>
+    <button
+      type="button"
+      onClick={() => openInbox()}
+      className={cn(
+        'relative inline-flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-lg transition-colors',
+        'text-[var(--ink-muted)] hover:bg-black/5 hover:text-[var(--ink-text)]',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brass)]/40',
+      )}
+      aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
+      aria-haspopup="dialog"
+      aria-expanded={open}
+    >
+      <Bell className="h-[17px] w-[17px]" aria-hidden />
+      {unread > 0 ? (
+        <span
+          className={cn(
+            'font-mono-ledger absolute top-0.5 right-0.5 inline-flex h-[15px] min-w-[15px] items-center justify-center',
+            'rounded-full border-[1.5px] border-[var(--paper-2)] bg-[var(--clay)] px-1 text-[9px] font-bold leading-none text-[var(--cream-hi)]',
+          )}
+        >
+          {unread > 99 ? '99+' : unread}
+        </span>
+      ) : null}
+    </button>
   )
 }

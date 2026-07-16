@@ -12,7 +12,7 @@ export type AuthedRequest = Request & {
   user?: { id: string; email: string; name: string | null }
   session?: { id: string; token: string; activeOrganizationId: string | null }
   organization?: { id: string; name: string; slug: string }
-  membership?: { role: string }
+  membership?: { role: string; venueIds: string[] }
 }
 
 // OrgContextMiddleware runs globally before every guard and resolves the

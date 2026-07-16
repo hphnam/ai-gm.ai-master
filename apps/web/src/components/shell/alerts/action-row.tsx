@@ -48,7 +48,7 @@ export function ActionRow({
       {href ? (
         <Link
           href={href}
-          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 font-medium text-[11px] text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[var(--hairline)] bg-[var(--ledger-card)] px-3 py-1.5 font-semibold text-[11px] text-foreground transition-colors hover:border-[var(--hairline-strong)]"
         >
           {openLabel ?? 'Open'}
         </Link>
@@ -66,7 +66,7 @@ export function ActionRow({
               },
             )
           }}
-          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border bg-background px-2 py-1 font-medium text-[11px] text-foreground/80 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[var(--hairline)] bg-[var(--ledger-card)] px-3 py-1.5 font-semibold text-[11px] text-foreground transition-colors hover:border-[var(--hairline-strong)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {updateTask.isPending ? (
             <Loader2 className="h-3 w-3 animate-spin" aria-hidden />

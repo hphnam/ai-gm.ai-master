@@ -142,7 +142,11 @@ export function PricingRecommendationCard({ part }: ToolCardRendererProps) {
     const price = adoptedAt ?? data.recommendedPriceCents
     return (
       <CardShell icon={Check} title="Adopted" subtitle={data.sourceItemLabel} tone="success">
-        <p className="text-[13px] leading-snug text-foreground" role="status" aria-live="polite">
+        <p
+          className="text-[13px] leading-snug text-[var(--ink-text)]"
+          role="status"
+          aria-live="polite"
+        >
           Recorded the new price at {formatPriceGBP(price)}. Update it in Square (or your POS) when
           you&apos;re ready — we&apos;ll measure uplift over the next 30 days.
         </p>
@@ -154,7 +158,7 @@ export function PricingRecommendationCard({ part }: ToolCardRendererProps) {
     return (
       <CardShell icon={X} title="Dismissed" subtitle={data.sourceItemLabel}>
         <p
-          className="text-[13px] leading-snug text-muted-foreground"
+          className="text-[13px] leading-snug text-[var(--ink-muted)]"
           role="status"
           aria-live="polite"
         >
@@ -167,31 +171,31 @@ export function PricingRecommendationCard({ part }: ToolCardRendererProps) {
 
   return (
     <CardShell icon={TrendingUp} title="Pricing suggestion" subtitle={data.sourceItemLabel}>
-      <div className="flex items-baseline gap-2 text-[15px] font-semibold text-foreground">
-        <span className="text-muted-foreground line-through decoration-muted-foreground/60">
+      <div className="flex items-baseline gap-2 font-mono-ledger text-[16px] font-semibold text-[var(--ink-text)]">
+        <span className="text-[var(--mono-muted)] line-through decoration-[var(--mono-muted)]/60">
           {formatPriceGBP(data.currentPriceCents)}
         </span>
-        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-[var(--mono-muted)]" aria-hidden />
         <span>{formatPriceGBP(data.recommendedPriceCents)}</span>
         {delta ? (
           <span
             className={
               data.recommendedPriceCents >= data.currentPriceCents
-                ? 'rounded-md bg-success/10 px-1.5 py-0.5 text-[11px] font-medium text-success'
-                : 'rounded-md bg-warning/10 px-1.5 py-0.5 text-[11px] font-medium text-warning'
+                ? 'rounded-md bg-[rgba(47,93,61,0.12)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--ledger-green)]'
+                : 'rounded-md bg-[rgba(154,75,44,0.12)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--clay)]'
             }
           >
             {delta}
           </span>
         ) : null}
       </div>
-      <p className="mt-2 text-[13px] leading-snug text-foreground/90">{data.rationale}</p>
+      <p className="mt-2 text-[13px] leading-snug text-[var(--ink-muted)]">{data.rationale}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={handleAdopt}
           disabled={inFlight}
-          className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-[12.5px] font-medium text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md bg-[var(--brass)] px-3 py-1.5 text-[12.5px] font-semibold text-[var(--cream-hi)] shadow-[0_2px_0_var(--brass-shadow)] transition-colors hover:bg-[var(--brass-shadow)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Check className="h-3.5 w-3.5" aria-hidden />
           Adopt
@@ -200,7 +204,7 @@ export function PricingRecommendationCard({ part }: ToolCardRendererProps) {
           type="button"
           onClick={handleDismiss}
           disabled={inFlight}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[12.5px] font-medium text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--hairline)] bg-[#fcfaf3] px-3 py-1.5 text-[12.5px] font-medium text-[var(--ink-text)] transition-colors hover:bg-[var(--paper-2)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <X className="h-3.5 w-3.5" aria-hidden />
           Dismiss

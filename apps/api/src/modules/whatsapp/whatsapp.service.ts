@@ -248,10 +248,11 @@ export class WhatsappService {
 
         if (isNewSession) {
           try {
-            const suggestions = await this.suggestions.onConversationOpen(
-              venue.id,
-              member.organizationId,
-            )
+            const suggestions = await this.suggestions.onConversationOpen(venue.id, {
+              orgId: member.organizationId,
+              userId: user.id,
+              userRole: member.role,
+            })
             if (suggestions.length > 0) {
               const openerText = composeOpenerText(suggestions)
               await this.adapter.sendText(result.from, openerText)

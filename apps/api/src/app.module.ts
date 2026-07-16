@@ -1,13 +1,16 @@
 import { BullModule } from '@nestjs/bullmq'
 import { type MiddlewareConsumer, Module, type NestModule } from '@nestjs/common'
+import { APP_GUARD } from '@nestjs/core'
 import { AppController } from './app.controller'
 import { AdaptationModule } from './modules/adaptation/adaptation.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { OrgContextMiddleware } from './modules/auth/org-context.middleware'
+import { VenueScopeGuard } from './modules/auth/venue-scope.guard'
 import { ChatModule } from './modules/chat/chat.module'
 import { ChatCoreModule } from './modules/chat-core/chat-core.module'
 import { ChatStartersModule } from './modules/chat-starters/chat-starters.module'
 import { ComplianceModule } from './modules/compliance/compliance.module'
+import { DailySummaryModule } from './modules/daily-summary/daily-summary.module'
 import { DebugModule } from './modules/debug/debug.module'
 import { DocsModule } from './modules/docs/docs.module'
 import { EmbeddingsModule } from './modules/embeddings/embeddings.module'
@@ -70,6 +73,7 @@ import { parseRedisUrl } from './redis-connection'
     IntegrationsModule,
     SquareModule,
     BrewwModule,
+    DailySummaryModule,
     MetricsModule,
     OnboardingMetricsModule,
     IncidentsModule,
@@ -77,6 +81,10 @@ import { parseRedisUrl } from './redis-connection'
     ProactiveBrainModule,
   ],
   controllers: [AppController],
+  // Global backstop: hard-deny any request whose venueId target is outside the
+  // caller's per-member venue scope. Runs after OrgContextMiddleware resolves
+  // req.membership. Owners / unscoped members pass through untouched.
+  providers: [{ provide: APP_GUARD, useClass: VenueScopeGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

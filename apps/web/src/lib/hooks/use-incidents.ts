@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/api-client'
 
 export type IncidentSeverity = 'minor' | 'major' | 'critical'
@@ -49,14 +49,20 @@ function buildQuery(opts: ListIncidentsFilter): string {
   return p.toString()
 }
 
-export function useIncidents(filter: ListIncidentsFilter) {
-  return useQuery<ListIncidentsResponse>({
-    queryKey: ['incidents', filter],
-    queryFn: ({ signal }) => {
+export function incidentsListOptions(filter: ListIncidentsFilter = {}) {
+  return {
+    queryKey: ['incidents', filter] as const,
+    queryFn: ({ signal }: { signal?: AbortSignal }) => {
       const q = buildQuery(filter)
       return apiFetch<ListIncidentsResponse>(`/incidents${q ? `?${q}` : ''}`, { signal })
     },
-    staleTime: 30_000,
+  }
+}
+
+export function useIncidents(filter: ListIncidentsFilter) {
+  return useQuery<ListIncidentsResponse>({
+    ...incidentsListOptions(filter),
+    placeholderData: keepPreviousData,
     retry: false,
   })
 }

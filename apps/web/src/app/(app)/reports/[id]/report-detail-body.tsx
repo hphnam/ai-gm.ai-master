@@ -57,15 +57,6 @@ export function ReportDetailBody({ id }: { id: string }) {
                 }}
                 compact={false}
               />
-              {data.createdByName ? (
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Created by {data.createdByName} ·{' '}
-                  {new Date(data.createdAt).toLocaleString(undefined, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  })}
-                </p>
-              ) : null}
               <ReportFooterActions report={data} />
             </>
           ) : null}
@@ -95,25 +86,40 @@ function ReportFooterActions({ report }: { report: Report }) {
     router.push(`/chat${venueQs}`)
   }
 
+  const createdLine = report.createdByName
+    ? `Created by ${report.createdByName} · ${new Date(report.createdAt).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })}`
+    : `Created ${new Date(report.createdAt).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })}`
+
   return (
     <>
-      <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-4 print:hidden">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleRerun}
-          title="Opens chat with a prefilled prompt to regenerate this report with fresh data. The original stays put."
-          className="cursor-pointer gap-1.5"
-        >
-          <RefreshCcw className="h-3.5 w-3.5" aria-hidden />
-          Re-run in chat
-        </Button>
-        <DeleteButton
-          variant="destructive"
-          onClick={() => setConfirmOpen(true)}
-          label="Delete report"
-        />
+      <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-[var(--hairline)] pt-4">
+        <span className="min-w-0 flex-1 font-mono-ledger text-[11px] leading-[1.4] text-[var(--ink-faint)]">
+          {createdLine}
+        </span>
+        <div className="flex items-center gap-2 print:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleRerun}
+            title="Opens chat with a prefilled prompt to regenerate this report with fresh data. The original stays put."
+            className="cursor-pointer gap-1.5"
+          >
+            <RefreshCcw className="h-3.5 w-3.5" aria-hidden />
+            Re-run in chat
+          </Button>
+          <DeleteButton
+            variant="destructive"
+            onClick={() => setConfirmOpen(true)}
+            label="Delete report"
+          />
+        </div>
       </div>
 
       <ConfirmDeleteDialog

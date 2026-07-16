@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { VenueDetailDto } from '@/generated/api'
 import { API_URL, type ApiError, apiFetch, apiPost } from '../api-client'
+import { integrationsListQuery } from '../queries/keys'
 
 /// Provider catalog the UI surfaces. Adding a new provider is a single entry
 /// here + the backend module — the rest of the UI fans out automatically
@@ -56,14 +57,14 @@ export type SquareLocation = {
   address: string | null
 }
 
-const LIST_KEY = ['integrations', 'list'] as const
+const LIST_KEY = integrationsListQuery.queryKey
 const SQUARE_LOCATIONS_KEY = ['integrations', 'square', 'locations'] as const
 
 export function useIntegrations() {
   return useQuery({
     queryKey: LIST_KEY,
     queryFn: ({ signal }) =>
-      apiFetch<{ integrations: IntegrationSummary[] }>('/integrations', { signal }),
+      apiFetch<{ integrations: IntegrationSummary[] }>(integrationsListQuery.path, { signal }),
     staleTime: 30_000,
   })
 }

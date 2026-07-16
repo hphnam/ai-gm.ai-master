@@ -33,21 +33,25 @@ function StockTable({
   highlightBelowPar?: boolean
 }) {
   return (
-    <ul className="-mx-1 -my-1 divide-y divide-border/60">
+    <ul className="-my-2 divide-y divide-[var(--hairline-soft)]">
       {items.map((item, i) => {
         const below =
           highlightBelowPar && typeof item.parLevel === 'number' && item.currentQty < item.parLevel
         const unit = item.unit ? ` ${item.unit}` : ''
         return (
-          <li key={item.id ?? `${item.name}-${i}`} className="flex items-center gap-3 px-1 py-2">
+          <li key={item.id ?? `${item.name}-${i}`} className="flex items-center gap-3 py-2.5">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[13.5px] font-medium text-foreground">{item.name}</p>
-              <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] text-muted-foreground">
-                <span className={below ? 'font-semibold text-destructive' : ''}>
+              <p className="truncate text-[13.5px] font-medium text-[var(--ink-text)]">
+                {item.name}
+              </p>
+              <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 font-mono-ledger text-[11.5px] text-[var(--mono-muted)]">
+                <span
+                  className={below ? 'font-semibold text-[var(--clay)]' : 'text-[var(--ink-muted)]'}
+                >
                   {item.currentQty}
                   {unit}
                   {typeof item.parLevel === 'number' ? (
-                    <span className="text-muted-foreground/70">
+                    <span className="text-[var(--mono-muted)]">
                       {' '}
                       / {item.parLevel}
                       {unit} par
@@ -68,7 +72,7 @@ function StockTable({
               <button
                 type="button"
                 onClick={() => onPrompt(`I need to update the stock count for ${item.name}.`)}
-                className="shrink-0 rounded-md border border-border bg-background px-2 py-1 text-[11.5px] font-medium text-foreground transition-colors hover:bg-accent"
+                className="shrink-0 rounded-md border border-[var(--hairline)] bg-[#fcfaf3] px-2.5 py-1 text-[11.5px] font-medium text-[var(--ink-text)] transition-colors hover:bg-[var(--paper-2)]"
               >
                 Update
               </button>

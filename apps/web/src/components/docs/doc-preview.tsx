@@ -41,7 +41,7 @@ export function DocPreview({ docId }: { docId: string }) {
   return (
     <div className="flex min-w-0 flex-col gap-3">
       <div className="space-y-2">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        <p className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
           Document preview
         </p>
         <p className="break-words text-sm font-semibold leading-snug sm:text-base">{title}</p>
@@ -50,7 +50,7 @@ export function DocPreview({ docId }: { docId: string }) {
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono-ledger text-xs text-[var(--mono-muted)]">
         <span className="inline-flex items-center gap-1">
           <MapPin className="h-3 w-3" aria-hidden />
           {data.venueName ?? 'All venues'}
@@ -68,7 +68,7 @@ export function DocPreview({ docId }: { docId: string }) {
       </div>
 
       <div className="overflow-hidden rounded-md border bg-background">
-        <div className="flex items-center gap-1.5 border-b bg-muted/30 px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="flex items-center gap-1.5 border-b bg-muted/30 px-3 py-1.5 font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
           <FileText className="h-3 w-3" aria-hidden />
           Content
         </div>
@@ -82,7 +82,7 @@ export function DocPreview({ docId }: { docId: string }) {
           </p>
         )}
         {truncated ? (
-          <div className="border-t bg-muted/20 px-3 py-1.5 text-[11px] text-muted-foreground">
+          <div className="border-t bg-muted/20 px-3 py-1.5 font-mono-ledger text-[11px] text-[var(--mono-muted)]">
             Showing first {PREVIEW_CHAR_LIMIT.toLocaleString()} characters of{' '}
             {content.length.toLocaleString()}.
           </div>

@@ -113,7 +113,7 @@ export function LibraryTab() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-base font-semibold tracking-tight">All documents</h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="font-mono-ledger text-xs text-[var(--mono-muted)]">
               {docs.isLoading
                 ? 'Loading…'
                 : total === 0
@@ -164,7 +164,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-category"
-                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                  className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]"
                 >
                   Category
                 </label>
@@ -193,7 +193,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-venue"
-                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                  className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]"
                 >
                   Venue
                 </label>
@@ -220,7 +220,7 @@ export function LibraryTab() {
               <div className="space-y-1">
                 <label
                   htmlFor="filter-status"
-                  className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                  className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]"
                 >
                   Status
                 </label>

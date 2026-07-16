@@ -3,7 +3,7 @@
 import { CheckCircle2, ClipboardCheck, RotateCcw, Square, SquareCheck } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from '@/lib/auth-client'
-import { CardEmpty, CardShell } from './card-shell'
+import { CardEmpty, CardShell, LedgerDiamond, SOURCE_CHIP_CLASS } from './card-shell'
 import { isToolFail, isToolOk, type ToolCardRendererProps } from './types'
 
 type ChecklistStep = { index: number; content: string }
@@ -131,7 +131,7 @@ function InteractiveChecklist({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-mono-ledger text-[11px] text-[var(--mono-muted)] transition-colors hover:bg-[var(--paper-2)] hover:text-[var(--ink-text)]"
             aria-label="Reset checklist"
           >
             <RotateCcw className="h-3 w-3" aria-hidden />
@@ -140,9 +140,9 @@ function InteractiveChecklist({
         ) : undefined
       }
     >
-      <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+      <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-[rgba(143,107,31,0.14)]">
         <div
-          className="h-full bg-foreground transition-all duration-300"
+          className="h-full bg-[var(--brass)] transition-all duration-300"
           style={{ width: `${progressPct}%` }}
           aria-hidden
         />
@@ -155,26 +155,26 @@ function InteractiveChecklist({
               <button
                 type="button"
                 onClick={() => toggle(step.index)}
-                className="group flex w-full items-start gap-2.5 rounded-md px-1.5 py-1.5 text-left transition-colors hover:bg-accent/50"
+                className="group flex w-full items-start gap-2.5 rounded-md px-1.5 py-1.5 text-left transition-colors hover:bg-[var(--paper-2)]/60"
                 aria-pressed={isTicked}
               >
                 <span
                   className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center transition-colors ${
                     isTicked
-                      ? 'text-success'
-                      : 'text-muted-foreground/70 group-hover:text-foreground'
+                      ? 'text-[var(--ledger-green)]'
+                      : 'text-[var(--mono-muted)] group-hover:text-[var(--ink-text)]'
                   }`}
                   aria-hidden
                 >
                   {isTicked ? <SquareCheck className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                 </span>
                 <span className="flex min-w-0 items-baseline gap-2">
-                  <span className="shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground">
+                  <span className="shrink-0 font-mono-ledger text-[11px] font-medium text-[var(--mono-muted)]">
                     {step.index + 1}.
                   </span>
                   <span
                     className={`text-[13.5px] leading-snug ${
-                      isTicked ? 'text-muted-foreground line-through' : 'text-foreground'
+                      isTicked ? 'text-[var(--mono-muted)] line-through' : 'text-[var(--ink-text)]'
                     }`}
                   >
                     {step.content}
@@ -186,7 +186,7 @@ function InteractiveChecklist({
         })}
       </ol>
       {allDone ? (
-        <div className="mt-2 flex items-center gap-1.5 rounded-md bg-success/10 px-3 py-1.5 text-xs font-medium text-success">
+        <div className="mt-2 flex items-center gap-1.5 rounded-md bg-[rgba(47,93,61,0.1)] px-3 py-1.5 text-xs font-medium text-[var(--ledger-green)]">
           <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
           All steps done — nice work.
         </div>
@@ -196,9 +196,10 @@ function InteractiveChecklist({
           href={sourceHref}
           target="_blank"
           rel="noreferrer noopener"
-          className="mt-2 inline-block text-[11px] text-muted-foreground underline decoration-muted-foreground/40 underline-offset-2 hover:text-foreground"
+          className={`mt-3 ${SOURCE_CHIP_CLASS}`}
         >
-          Open source document →
+          <LedgerDiamond />
+          Open source document
         </a>
       ) : null}
     </CardShell>

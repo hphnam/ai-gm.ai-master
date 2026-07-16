@@ -261,6 +261,7 @@ export class WhatsappOnboardingService {
       organizationId: string
       phoneNumber: string
       role: string
+      venueIds: string[]
       targetUserId: string | null
     },
     phoneNumber: string,
@@ -316,6 +317,7 @@ export class WhatsappOnboardingService {
           userId: user.id,
           organizationId: invite.organizationId,
           role: invite.role,
+          venueIds: invite.venueIds,
           onboardingStartedAt: now,
         },
         update: {},

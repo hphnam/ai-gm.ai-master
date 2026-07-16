@@ -52,7 +52,7 @@ function NoDataRow({ query }: { query: NoDataQuery }) {
 
       <div className="min-w-0">
         <p className="break-words text-sm leading-snug text-foreground">{query.query}</p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono-ledger text-xs text-[var(--mono-muted)]">
           <span className={cn('tabular-nums', hot && 'font-medium text-warning')}>
             asked {query.askCount}×
           </span>

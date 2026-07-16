@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
 
@@ -21,7 +22,10 @@ export function isManagerRole(role: string | null | undefined): boolean {
   return role === 'owner' || role === 'manager'
 }
 
-export async function getServerSession(): Promise<ServerSession | null> {
+// Wrapped in React `cache()` so the (app) layout, the settings layout, and a
+// settings page all share ONE /api/auth/get-session round-trip per request
+// instead of re-fetching the session on each render pass.
+export const getServerSession = cache(async (): Promise<ServerSession | null> => {
   const cookieStore = await cookies()
   const cookieHeader = cookieStore
     .getAll()
@@ -45,4 +49,4 @@ export async function getServerSession(): Promise<ServerSession | null> {
   } catch {
     return null
   }
-}
+})

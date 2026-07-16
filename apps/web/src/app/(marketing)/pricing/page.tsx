@@ -60,7 +60,7 @@ const TIERS: Tier[] = [
     price: 'Custom',
     cadence: '',
     blurb: 'Larger estates, mixed venue types, or a specialist POS.',
-    cta: { label: 'Talk to us', href: 'mailto:hello@gm-ai.app' },
+    cta: { label: 'Talk to us', href: 'mailto:hello@ai-gm.ai' },
     features: [
       'Everything in Group',
       'Custom & specialist integrations',
@@ -74,7 +74,7 @@ const TIERS: Tier[] = [
 const FAQS: { q: string; a: string }[] = [
   {
     q: 'Do I need to connect my POS?',
-    a: 'Yes. gm-ai’s edge is that it grounds answers in your real sales and labour data. Your POS connects in minutes, read-only. Without a POS connected you lose half the product, so we don’t sell a SOP-only tier.',
+    a: 'Yes. AI-GM’s edge is that it grounds answers in your real sales and labour data. Your POS connects in minutes, read-only. Without a POS connected you lose half the product, so we don’t sell a SOP-only tier.',
   },
   {
     q: 'What does the free trial include?',
@@ -102,7 +102,7 @@ export default function PricingPage() {
           <Eyebrow>
             <span>Pricing</span>
           </Eyebrow>
-          <h1 className="max-w-2xl text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="font-news max-w-2xl text-balance text-[clamp(2.5rem,4vw,3.25rem)] font-extrabold leading-[1.05] tracking-[-0.03em]">
             Priced per venue. Built for independents.
           </h1>
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
@@ -120,12 +120,12 @@ export default function PricingPage() {
               className={cn(
                 'flex flex-col rounded-2xl border bg-card p-7',
                 tier.featured
-                  ? 'border-foreground shadow-lg shadow-foreground/[0.06]'
+                  ? 'border-[var(--brass)] shadow-[0_24px_60px_-24px_rgba(143,107,31,0.35)]'
                   : 'border-border',
               )}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-medium">{tier.name}</h2>
+                <h2 className="font-news text-[22px] font-bold tracking-[-0.01em]">{tier.name}</h2>
                 {tier.featured ? (
                   <span className="rounded-full bg-primary px-2.5 py-1 text-[11px] font-medium text-primary-foreground">
                     Most popular
@@ -133,7 +133,7 @@ export default function PricingPage() {
                 ) : null}
               </div>
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-4xl font-semibold tracking-tight tabular-nums">
+                <span className="font-mono-ledger text-4xl font-bold tracking-tight tabular-nums">
                   {tier.price}
                 </span>
                 {tier.cadence ? (

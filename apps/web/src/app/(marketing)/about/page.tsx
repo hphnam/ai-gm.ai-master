@@ -6,7 +6,7 @@ import { pageMetadata } from '@/lib/seo'
 export const metadata: Metadata = pageMetadata({
   title: 'About',
   description:
-    'gm-ai is built with a working multi-venue operator, for hospitality managers. Why the category is empty, and why now.',
+    'AI-GM is built with a working multi-venue operator, for hospitality managers. Why the category is empty, and why now.',
   path: '/about',
 })
 
@@ -21,7 +21,7 @@ const PRINCIPLES = [
   },
   {
     title: 'Built with an operator, not for a persona',
-    body: 'Our design partner runs four venues and a brewery, and uses gm-ai daily. He builds the corpus and finds the gaps for us. We’re not guessing before launch; we’re launching with a customer already doing real work.',
+    body: 'Our design partner runs four venues and a brewery, and uses AI-GM daily. He builds the corpus and finds the gaps for us. We’re not guessing before launch; we’re launching with a customer already doing real work.',
   },
   {
     title: 'Trust is verifiable',
@@ -35,13 +35,13 @@ export default function AboutPage() {
       <section className="border-b border-border">
         <Container className="flex max-w-3xl flex-col gap-6 py-16 sm:py-24">
           <Eyebrow>About</Eyebrow>
-          <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="font-news text-balance text-[clamp(2.5rem,4vw,3.25rem)] font-extrabold leading-[1.05] tracking-[-0.03em]">
             The operator copilot for hospitality.
           </h1>
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
             Independent hospitality operators run the business hands-on. They own the P&amp;L
             conversation daily, not weekly. They want last night’s margin this morning, the right
-            SOP without leaving chat, and the supplier’s number without scrolling WhatsApp. gm-ai is
+            SOP without leaving chat, and the supplier’s number without scrolling WhatsApp. AI-GM is
             the one place to ask.
           </p>
         </Container>
@@ -90,7 +90,9 @@ export default function AboutPage() {
                 key={item.label}
                 className="flex flex-col gap-2 rounded-xl border border-border bg-card p-6"
               >
-                <span className="text-2xl font-semibold tracking-tight">{item.stat}</span>
+                <span className="font-news text-[28px] font-extrabold tracking-[-0.01em]">
+                  {item.stat}
+                </span>
                 <span className="text-sm leading-relaxed text-muted-foreground">{item.label}</span>
               </div>
             ))}
@@ -100,7 +102,7 @@ export default function AboutPage() {
 
       <CtaBand
         title="See yourself in this?"
-        subtitle="If you run a bar, restaurant, pub or hotel, gm-ai was built for your day. Start free and connect your POS."
+        subtitle="If you run a bar, restaurant, pub or hotel, AI-GM was built for your day. Start free and connect your POS."
       />
     </>
   )

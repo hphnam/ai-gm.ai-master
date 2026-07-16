@@ -19,6 +19,6 @@ import { SquareCrmService } from './square-crm.service'
     SquareCrmService,
     SquareProvider,
   ],
-  exports: [SquareService],
+  exports: [SquareService, SquareCogsService],
 })
 export class SquareModule {}

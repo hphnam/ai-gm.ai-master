@@ -69,15 +69,15 @@
   },
   "devDependencies": {
     "@better-auth/cli": "^1.4.21",
-    "@nestjs/cli": "latest",
-    "@swc/cli": "latest",
-    "@swc/core": "latest",
+    "@nestjs/cli": "11.0.23",
+    "@swc/cli": "0.8.1",
+    "@swc/core": "1.15.43",
     "@types/express": "latest",
     "@types/multer": "latest",
     "@types/node": "latest",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "latest",
     "tsx": "latest",
-    "typescript": "latest"
+    "typescript": "6.0.3"
   }
 }

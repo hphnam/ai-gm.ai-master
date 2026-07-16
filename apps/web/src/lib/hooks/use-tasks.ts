@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ApiError, apiFetch, apiPost } from '@/lib/api-client'
 
@@ -37,6 +37,14 @@ const LIST_KEY = (status: TasksStatusFilter, scope: TasksScope) =>
   ['tasks', 'list', { status, scope }] as const
 const OPEN_COUNT_KEY = ['tasks', 'open-count'] as const
 
+export function tasksListOptions(status: TasksStatusFilter = 'open', scope: TasksScope = 'mine') {
+  return {
+    queryKey: LIST_KEY(status, scope),
+    queryFn: ({ signal }: { signal?: AbortSignal }) =>
+      apiFetch<ListTasksResponse>(`/tasks?status=${status}&scope=${scope}&limit=100`, { signal }),
+  }
+}
+
 export function useTasks(opts?: {
   status?: TasksStatusFilter
   scope?: TasksScope
@@ -45,13 +53,9 @@ export function useTasks(opts?: {
   const status = opts?.status ?? 'open'
   const scope = opts?.scope ?? 'mine'
   return useQuery<ListTasksResponse>({
-    queryKey: LIST_KEY(status, scope),
-    queryFn: ({ signal }) =>
-      apiFetch<ListTasksResponse>(`/tasks?status=${status}&scope=${scope}&limit=100`, {
-        signal,
-      }),
+    ...tasksListOptions(status, scope),
     enabled: opts?.enabled ?? true,
-    staleTime: 15_000,
+    placeholderData: keepPreviousData,
   })
 }
 

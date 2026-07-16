@@ -1,12 +1,12 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'gm-ai — AI operator for brewpub & beerhall managers'
+export const alt = 'AI-GM — the AI operator for hospitality'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-// Default share card in the warm editorial palette (hex approximations of the
-// app's oklch tokens, since next/og can't resolve CSS variables). Any page
-// without its own opengraph-image inherits this one.
+// Default share card in the "Publican's Ledger" palette (hex literals — next/og
+// can't resolve CSS variables). Any page without its own opengraph-image
+// inherits this one. Ledger-rule stripes + brass wordmark tag + serif headline.
 export default function OpengraphImage() {
   return new ImageResponse(
     <div
@@ -16,41 +16,70 @@ export default function OpengraphImage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        background: '#F6F5F1',
-        color: '#26241F',
+        backgroundColor: '#F5EFE3',
+        backgroundImage:
+          'repeating-linear-gradient(to bottom, transparent 0px, transparent 47px, rgba(143,107,31,0.09) 47px, rgba(143,107,31,0.09) 48px)',
+        color: '#201A12',
         padding: '72px',
-        fontFamily: 'sans-serif',
+        fontFamily: 'serif',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+        <div
+          style={{
+            fontSize: '48px',
+            fontWeight: 800,
+            letterSpacing: '-3px',
+            fontFamily: 'sans-serif',
+          }}
+        >
+          GM
+        </div>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '56px',
-            height: '56px',
-            borderRadius: '12px',
-            background: '#26241F',
-            color: '#F6F5F1',
-            fontSize: '32px',
+            marginTop: '6px',
+            padding: '6px 8px',
+            borderRadius: '5px',
+            background: '#8F6B1F',
+            color: '#F5EFE3',
+            fontSize: '18px',
             fontWeight: 700,
+            fontFamily: 'monospace',
           }}
         >
-          G
+          AI
         </div>
-        <div style={{ fontSize: '30px', fontWeight: 600 }}>gm-ai</div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <div
-          style={{ fontSize: '68px', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.05 }}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            fontSize: '78px',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.02,
+          }}
         >
-          Your AI operator for the brewpub.
+          <span>Last night&apos;s&nbsp;</span>
+          <span style={{ fontStyle: 'italic', color: '#8F6B1F' }}>margin,</span>
+          <span>&nbsp;this morning.</span>
         </div>
-        <div style={{ fontSize: '30px', color: '#6B675E', maxWidth: '900px', lineHeight: 1.3 }}>
-          Today’s margin, tonight’s labour, last week’s cellar log. One chat, grounded in your POS
-          and your own SOPs.
+        <div
+          style={{
+            fontSize: '30px',
+            color: '#5C5340',
+            maxWidth: '920px',
+            lineHeight: 1.35,
+            fontFamily: 'sans-serif',
+          }}
+        >
+          Ask in plain English. AI-GM answers from your till, your labour and your own operating
+          docs — every claim cited back to its source.
         </div>
       </div>
 
@@ -59,14 +88,20 @@ export default function OpengraphImage() {
           display: 'flex',
           alignItems: 'center',
           gap: '14px',
-          fontSize: '24px',
-          color: '#6B675E',
+          fontSize: '22px',
+          color: '#8A7D63',
+          fontFamily: 'monospace',
         }}
       >
         <div
-          style={{ width: '10px', height: '10px', borderRadius: '999px', background: '#6E8B5B' }}
+          style={{
+            width: '10px',
+            height: '10px',
+            background: '#8F6B1F',
+            transform: 'rotate(45deg)',
+          }}
         />
-        Square-grounded · built with a brewpub operator
+        read-only · venue-scoped · cited
       </div>
     </div>,
     size,

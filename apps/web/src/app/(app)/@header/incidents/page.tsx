@@ -4,7 +4,7 @@ export default function IncidentsHeader() {
   return (
     <PageHeaderView
       title="Incidents"
-      description="Triage incidents the AI has logged from chat — acknowledge, comment, close."
+      description="Safety and operational events GM-AI logs from chat — triage, comment and close."
     />
   )
 }

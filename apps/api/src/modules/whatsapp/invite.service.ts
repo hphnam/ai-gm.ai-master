@@ -28,6 +28,8 @@ import {
 } from '../../types'
 import { maskPhone } from '../../types/auth'
 import { assertAuthEnv } from '../auth/assert-auth-env'
+import type { VenueScope } from '../auth/venue-scope'
+import { InvitationError, sanitizeVenueScope } from '../invitations/invitations.service'
 import { issuePhoneOtp } from '../phone/phone-otp'
 import { sendSms } from '../phone/twilio-verify'
 import { signInviteToken } from './invite-token'
@@ -75,7 +77,7 @@ export class InviteService {
     organizationId: string,
     issuedByUserId: string,
     input: CreateInviteInput,
-    options: { force?: boolean } = {},
+    options: { force?: boolean; actorScope?: VenueScope } = {},
   ): Promise<{ invite: InvitePublic; code: string }> {
     if (!E164_PHONE_REGEX.test(input.phoneNumber)) {
       throw new HttpException(
@@ -146,6 +148,20 @@ export class InviteService {
 
     const code = await this.generateUniqueCode()
     const expiresAt = new Date(Date.now() + WHATSAPP_INVITE_TTL_MS)
+    let venueIds: string[]
+    try {
+      venueIds = await sanitizeVenueScope(
+        organizationId,
+        input.role,
+        input.venueIds ?? [],
+        options.actorScope,
+      )
+    } catch (err) {
+      if (err instanceof InvitationError && err.code === 'invalid-venue-scope') {
+        throw new HttpException({ error: 'invalid-venue-scope' }, HttpStatus.BAD_REQUEST)
+      }
+      throw err
+    }
 
     const row = await prisma.whatsappInvite.create({
       data: {
@@ -155,6 +171,7 @@ export class InviteService {
         issuedByUserId,
         targetUserId: input.targetUserId ?? null,
         role: input.role,
+        venueIds,
         note: input.note ?? null,
         expiresAt,
         status: 'pending',
@@ -405,6 +422,7 @@ export class InviteService {
       id: row.id,
       phoneNumberMasked: maskPhone(row.phoneNumber),
       role: row.role as 'staff' | 'manager',
+      venueIds: row.venueIds,
       note: row.note,
       expiresAt: row.expiresAt.toISOString(),
       status: row.status as InviteStatus,

@@ -28,9 +28,10 @@ import type { Response } from 'express'
 import { ZodValidationPipe } from 'nestjs-zod'
 import { translateChatServiceError } from '../../common/translate-chat-error'
 import type { ApiErrorResponse } from '../../types'
-import { CurrentOrg, CurrentRole, CurrentUser } from '../auth/auth.decorators'
+import { CurrentOrg, CurrentRole, CurrentUser, CurrentVenueScope } from '../auth/auth.decorators'
 import { AuthGuard } from '../auth/auth.guard'
 import { RoleGuard } from '../auth/role.guard'
+import { canAccessVenue, type VenueScope } from '../auth/venue-scope'
 import { ConversationService } from '../chat-core/conversation.service'
 import { validateMultimodalAttachment } from '../chat-core/multimodal-validator'
 import { createRedisRateLimiter } from '../integrations/rate-limit'
@@ -91,6 +92,14 @@ export class ChatController {
     }
   }
 
+  // Venue-scoped members can only chat against venues they're granted. Out-of-
+  // scope reads as not-found (enumeration-safe, matches the cross-tenant guard).
+  private assertVenueInScope(scope: VenueScope, venueId: string): void {
+    if (!canAccessVenue(scope, venueId)) {
+      throw new NotFoundException({ error: 'venue-not-found' } satisfies ApiErrorResponse)
+    }
+  }
+
   @Post('messages')
   @HttpCode(200)
   @ApiResponse({ status: 200, type: SendChatMessageResponseDto })
@@ -146,6 +155,7 @@ export class ChatController {
     @CurrentOrg() org: { id: string },
     @CurrentUser() user: { id: string; email: string; name: string | null },
     @CurrentRole() role: string | undefined,
+    @CurrentVenueScope() scope: VenueScope,
   ): Promise<SendChatMessageResponseDto> {
     await this.assertNotRateLimited(user.id)
     const validation = validateMultimodalAttachment(file)
@@ -176,6 +186,7 @@ export class ChatController {
         error: 'invalid-input',
       } satisfies ApiErrorResponse)
     }
+    this.assertVenueInScope(scope, venueId)
     const userMessage =
       typeof body.userMessage === 'string' && body.userMessage.trim().length > 0
         ? body.userMessage.trim().slice(0, 8000)

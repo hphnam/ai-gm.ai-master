@@ -32,8 +32,8 @@ export function ConversationsList({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
-        <span className="text-foreground/60 text-xs">
+      <div className="flex items-center justify-between gap-2 border-b border-[var(--hairline)] px-4 py-2">
+        <span className="text-[var(--mono-muted)] text-xs">
           {query.data
             ? `${query.data.conversations.length} ${query.data.conversations.length === 1 ? 'conversation' : 'conversations'}`
             : ''}
@@ -41,17 +41,17 @@ export function ConversationsList({
         <button
           type="button"
           onClick={onNewConversation}
-          className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-foreground/70 text-xs transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 font-semibold text-[var(--brass)] text-xs transition-colors hover:bg-[rgba(143,107,31,0.1)]"
         >
           <MessageSquarePlus className="h-3.5 w-3.5" aria-hidden />
           <span>New</span>
         </button>
       </div>
 
-      <div className="border-b border-border px-4 py-2.5">
+      <div className="border-b border-[var(--hairline)] px-4 py-2.5">
         <div className="relative">
           <Search
-            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 text-foreground/40"
+            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 text-[var(--ink-faint)]"
             aria-hidden
           />
           <input
@@ -60,14 +60,14 @@ export function ConversationsList({
             onChange={(e) => setRawQuery(e.target.value)}
             placeholder="Search conversations"
             aria-label="Search conversations"
-            className="w-full rounded-md border border-border bg-background py-1.5 pr-7 pl-8 text-sm placeholder:text-foreground/40 focus:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-lg border border-[var(--hairline)] bg-[var(--ledger-card)] py-2 pr-7 pl-8 text-sm placeholder:text-[var(--ink-faint)] focus:border-[var(--brass)]/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
           {rawQuery ? (
             <button
               type="button"
               onClick={() => setRawQuery('')}
               aria-label="Clear search"
-              className="-translate-y-1/2 absolute top-1/2 right-1.5 inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-foreground/40 hover:bg-muted hover:text-foreground"
+              className="-translate-y-1/2 absolute top-1/2 right-1.5 inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-[var(--ink-faint)] hover:bg-[var(--paper-2)] hover:text-foreground"
             >
               <X className="h-3 w-3" aria-hidden />
             </button>
@@ -81,12 +81,12 @@ export function ConversationsList({
         </div>
       ) : query.isError ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-12 text-center">
-          <MessageCircle className="h-6 w-6 text-foreground/30" aria-hidden />
-          <p className="text-foreground/60 text-sm">Couldn't load conversations.</p>
+          <MessageCircle className="h-6 w-6 text-[var(--ink-faint)]" aria-hidden />
+          <p className="text-[var(--ink-muted)] text-sm">Couldn't load conversations.</p>
           <button
             type="button"
             onClick={() => query.refetch()}
-            className="cursor-pointer text-foreground/70 text-xs underline-offset-4 hover:underline"
+            className="cursor-pointer text-[var(--brass)] text-xs underline-offset-4 hover:underline"
           >
             Try again
           </button>
@@ -98,7 +98,7 @@ export function ConversationsList({
         />
       ) : (
         <div className="scrollbar-thin flex-1 overflow-y-auto">
-          <ul className="flex flex-col">
+          <ul className="flex flex-col gap-2 px-4 py-3.5">
             {filtered.map((c) => (
               <ConversationListRow
                 key={c.otherParty.id}

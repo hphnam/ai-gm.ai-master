@@ -164,7 +164,7 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-display text-lg">New scheduled report</DialogTitle>
+          <DialogTitle className="text-lg">New scheduled report</DialogTitle>
           <DialogDescription className="flex items-start gap-1.5">
             <Bell className="mt-0.5 h-3.5 w-3.5 shrink-0 text-foreground/60" aria-hidden />
             <span>
@@ -212,7 +212,7 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="frequency"
@@ -395,7 +395,7 @@ export function ScheduleCreateDialog({ open, onOpenChange }: Props) {
               <button
                 type="submit"
                 disabled={create.isPending || !title.trim()}
-                className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-foreground transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-sm font-semibold text-brand-foreground shadow-[0_2px_0_var(--brass-shadow)] transition-colors hover:bg-[var(--brass-shadow)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {create.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />

@@ -1,18 +1,19 @@
 'use client'
 
-import { Bell, Loader2, MapPin, ShieldAlert } from 'lucide-react'
+import { MapPin, ShieldAlert } from 'lucide-react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { VenueDetailDto as VenueDetail } from '@/generated/api'
 import { VenuesControllerUpdateProfileBody as VenueProfileSchema } from '@/generated/zod'
 import type { VenueProfileDto as VenueProfile } from '@/lib/api-types'
-import { useCurrentMember } from '@/lib/hooks/use-current-member'
-import { useRunNudge, useUpdateVenueProfile } from '@/lib/hooks/use-venues'
+import { useUpdateVenueProfile } from '@/lib/hooks/use-venues'
 import { mapApiError } from '@/lib/map-api-error'
+
+const SAVE_TOAST_ID = 'venue-profile-save'
 
 type FormValues = {
   layoutNotes: string
@@ -71,10 +72,14 @@ function formToProfile(values: FormValues): VenueProfile {
   })
 }
 
-export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
+export function VenueProfileEditor({
+  venue,
+  isManager,
+}: {
+  venue: VenueDetail
+  isManager: boolean
+}) {
   const update = useUpdateVenueProfile()
-  const runNudge = useRunNudge()
-  const { isManager } = useCurrentMember()
 
   // No client-side resolver — VenueProfileSchema runs at submit time inside
   // formToProfile() and on the server. The form fields are stringy mirrors of
@@ -89,35 +94,57 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
   // re-initialises from defaultValues — no reset effect needed (it would also clobber
   // in-progress edits on background refetch).
 
-  const onSubmit = form.handleSubmit(async (values) => {
+  // Auto-save: no manual save button. Persist a debounced snapshot when the
+  // manager stops typing, and immediately on blur so leaving a field commits.
+  // savingRef is a synchronous in-flight guard (update.isPending lags a render,
+  // so debounce+blur firing in the same tick would otherwise double-submit).
+  const savingRef = useRef(false)
+  const persist = useCallback(async () => {
+    if (!isManager || !form.formState.isDirty || savingRef.current) return
+    savingRef.current = true
+    const values = form.getValues()
     try {
       const patch = formToProfile(values)
       await update.mutateAsync({ id: venue.id, patch })
-      toast.success('Profile saved — indexed and ready for chat.')
-      form.reset(values)
+      // keepDirtyValues avoids clobbering keystrokes typed during the request;
+      // those stay dirty and the trailing watch fires one more save.
+      form.reset(values, { keepDirtyValues: true })
+      toast.success('Changes saved', { id: SAVE_TOAST_ID, duration: 1600 })
     } catch (err) {
-      toast.error(mapApiError(err))
+      toast.error(mapApiError(err), { id: SAVE_TOAST_ID })
+    } finally {
+      savingRef.current = false
     }
+  }, [form, isManager, update, venue.id])
+
+  // Latest-persist ref so the watch subscription can stay mount-only — coupling
+  // the debounce timer's lifetime to persist's identity would let a re-render
+  // mid-save cancel a pending save and drop the edit.
+  const persistRef = useRef(persist)
+  useEffect(() => {
+    persistRef.current = persist
   })
 
-  const onSendTestNudge = async () => {
-    try {
-      const result = await runNudge.mutateAsync(venue.id)
-      if (result.sent) {
-        toast.success('Nudge sent — check the duty manager phone.')
-      } else {
-        toast.message(`No nudge sent: ${result.reason ?? 'nothing actionable'}`)
-      }
-    } catch (err) {
-      toast.error(mapApiError(err))
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!isManager) return
+    const sub = form.watch(() => {
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      saveTimer.current = setTimeout(() => void persistRef.current(), 1200)
+    })
+    return () => {
+      sub.unsubscribe()
+      if (saveTimer.current) clearTimeout(saveTimer.current)
     }
+  }, [form, isManager])
+
+  const commitNow = () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    void persistRef.current()
   }
 
-  const dirty = form.formState.isDirty
-  const isSaving = update.isPending
-
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onBlur={commitNow} className="space-y-6">
       <Section title="Operations" icon={<MapPin className="h-3.5 w-3.5" />}>
         <Field label="Opening hours" hint="One day per line. Plain English is fine.">
           <Textarea
@@ -199,43 +226,6 @@ export function VenueProfileEditor({ venue }: { venue: VenueDetail }) {
           />
         </Field>
       </Section>
-
-      {isManager ? (
-        <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-background/90 py-3 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Bell className="h-3.5 w-3.5" />
-            <button
-              type="button"
-              onClick={onSendTestNudge}
-              disabled={runNudge.isPending}
-              className="underline-offset-2 hover:underline disabled:opacity-50"
-            >
-              {runNudge.isPending ? 'Sending nudge…' : 'Send a test nudge to the duty manager'}
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={!dirty || isSaving}
-              onClick={() => form.reset(profileToForm(venue.profile))}
-            >
-              Discard
-            </Button>
-            <Button type="submit" size="sm" disabled={!dirty || isSaving}>
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  Saving
-                </>
-              ) : (
-                'Save profile'
-              )}
-            </Button>
-          </div>
-        </div>
-      ) : null}
     </form>
   )
 }
@@ -250,8 +240,8 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section className="rounded-lg border bg-card p-4 sm:p-5 shadow-sm">
-      <header className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <section className="rounded-xl border bg-card p-4 sm:p-5 shadow-sm">
+      <header className="font-mono-ledger mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
         {icon}
         <span>{title}</span>
       </header>

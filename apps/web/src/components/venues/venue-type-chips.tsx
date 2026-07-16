@@ -39,7 +39,7 @@ export function VenueTypeChips({
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               disabled ? 'cursor-default' : 'cursor-pointer',
               active
-                ? 'border-foreground bg-foreground text-background'
+                ? 'border-[var(--brass)] bg-[var(--brass)] text-[var(--cream-hi)]'
                 : 'border-border bg-background text-foreground hover:bg-accent',
               disabled && !active && 'opacity-50',
             )}

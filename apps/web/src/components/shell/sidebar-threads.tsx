@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { MessagesSquare, Store, Trash2 } from 'lucide-react'
 import Link from 'next/link'
@@ -8,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useConversationsList, useDeleteConversation } from '@/lib/hooks/use-conversations-list'
+import { prefetchConversation } from '@/lib/prefetch'
 import { cn } from '@/lib/utils'
 
 function formatRelative(iso: string): string {
@@ -30,6 +32,7 @@ const ROW_ESTIMATE_PX = 52
 
 export function SidebarThreads() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const params = useSearchParams()
   const currentConv = params.get('conv')
   const { items, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -115,6 +118,8 @@ export function SidebarThreads() {
                   <button
                     type="button"
                     onClick={() => router.push(`/chat?venue=${c.venueId}&conv=${c.id}`)}
+                    onMouseEnter={() => prefetchConversation(queryClient, c.id, c.venueId)}
+                    onFocus={() => prefetchConversation(queryClient, c.id, c.venueId)}
                     className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-0.5 text-left"
                   >
                     <span

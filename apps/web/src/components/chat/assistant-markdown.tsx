@@ -29,10 +29,10 @@ const MARKDOWN_COMPONENTS: Components = {
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   code: ({ children }) => (
-    <code className="rounded bg-muted px-1 py-0.5 text-[13px] font-mono">{children}</code>
+    <code className="rounded bg-muted px-1 py-0.5 font-mono-ledger text-[13px]">{children}</code>
   ),
   pre: ({ children }) => (
-    <pre className="mb-2 overflow-x-auto rounded-md border border-border bg-muted/50 p-3 font-mono text-xs last:mb-0 [&_code]:rounded-none [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-xs">
+    <pre className="mb-2 overflow-x-auto rounded-md border border-border bg-muted/50 p-3 font-mono-ledger text-xs last:mb-0 [&_code]:rounded-none [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-xs">
       {children}
     </pre>
   ),
@@ -80,7 +80,7 @@ const MARKDOWN_COMPONENTS: Components = {
 export function AssistantMarkdown({ text }: { text: string }) {
   const rewritten = rewriteCitations(text)
   return (
-    <div className="text-[15px] leading-relaxed text-foreground">
+    <div className="text-[16px] leading-[1.72] text-[var(--ink-text)]">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
         {rewritten}
       </ReactMarkdown>

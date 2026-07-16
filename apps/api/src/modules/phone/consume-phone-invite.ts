@@ -38,6 +38,7 @@ export async function consumeInviteForVerifiedPhone(userId: string, phone: strin
         userId,
         organizationId: invite.organizationId,
         role: invite.role,
+        venueIds: invite.venueIds,
         onboardingStartedAt: anchor,
       },
       update: {},

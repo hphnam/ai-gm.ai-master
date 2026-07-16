@@ -3,13 +3,14 @@
 import {
   AlertCircle,
   AlertTriangle,
-  Brain,
+  Check,
   CheckSquare,
   Clock,
   MessageSquare,
+  PoundSterling,
   Search,
   ShieldCheck,
-  Sparkles,
+  Star,
   StickyNote,
   Users,
 } from 'lucide-react'
@@ -53,6 +54,7 @@ import {
   useVenueWau,
 } from '@/lib/hooks/use-dashboard'
 import { useVenues } from '@/lib/hooks/use-venues'
+import { cn } from '@/lib/utils'
 
 const ALL_VENUES = 'all'
 
@@ -114,7 +116,7 @@ export function DashboardBody() {
       />
 
       <div className="scrollbar-thin flex-1 overflow-y-auto">
-        <PageContainer width="wide" className="space-y-6">
+        <PageContainer width="wide" className="space-y-[18px]">
           {isAuthError ? (
             <Card>
               <CardContent className="p-10">
@@ -137,8 +139,9 @@ export function DashboardBody() {
 
               <PanelCard
                 title="Search outcomes"
-                description="Daily breakdown of staff queries — answered, no-data, or errored."
+                description="Daily staff queries — answered, no-data, or errored."
                 icon={Search}
+                trailing={<SearchOutcomesLegend />}
               >
                 {outcomes.isLoading ? (
                   <ChartSkeleton />
@@ -154,6 +157,7 @@ export function DashboardBody() {
                   title="Top knowledge gaps"
                   description="Questions staff asked that the AI couldn't answer."
                   icon={AlertCircle}
+                  iconTone="clay"
                 >
                   <RankList
                     isLoading={noData.isLoading}
@@ -178,7 +182,8 @@ export function DashboardBody() {
                 <PanelCard
                   title="Top questions asked"
                   description="What your team actually relies on the AI for."
-                  icon={Sparkles}
+                  icon={Star}
+                  iconTone="green"
                 >
                   <RankList
                     isLoading={topQuestions.isLoading}
@@ -235,13 +240,13 @@ export function DashboardBody() {
                               ? `/chat?venue=${e.venueId}&conv=${e.conversationId}`
                               : undefined,
                         primary: (
-                          <span className="flex items-center gap-2">
+                          <span className="flex min-w-0 items-center gap-2">
                             <EscalationKindBadge kind={e.escalationKind} />
-                            <span className="text-foreground">
+                            <span className="truncate text-foreground">
                               {e.staffName ?? 'WhatsApp guest'}
                             </span>
-                            <span className="text-muted-foreground">at</span>
-                            <span className="text-muted-foreground">{e.venueName}</span>
+                            <span className="shrink-0 text-muted-foreground">at</span>
+                            <span className="truncate text-muted-foreground">{e.venueName}</span>
                           </span>
                         ),
                         secondary: e.escalatedToName
@@ -322,7 +327,7 @@ function KpiStrip({
   isLoading: boolean
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
       <KpiCard
         icon={Clock}
         label="Hours recovered"
@@ -331,7 +336,7 @@ function KpiStrip({
         isLoading={isLoading}
       />
       <KpiCard
-        icon={Brain}
+        icon={PoundSterling}
         label="Value saved"
         value={formatGbpFromCents(valueGbpCents)}
         hint="Baseline £25/hr × hours recovered"
@@ -345,20 +350,28 @@ function KpiStrip({
         isLoading={isLoading}
       />
       <KpiCard
-        icon={Brain}
-        label="AI resolution rate"
+        icon={Check}
+        label="Resolution rate"
         value={formatPercent(resolutionRate)}
         hint="Assistant turns handled without escalation"
         isLoading={isLoading}
+        positive
       />
     </div>
   )
 }
 
+const PANEL_ICON_TONE = {
+  muted: 'bg-[var(--paper-2)] text-[var(--ink-muted)]',
+  clay: 'bg-[rgba(154,75,44,0.1)] text-[var(--clay)]',
+  green: 'bg-[rgba(47,93,61,0.1)] text-[var(--ledger-green)]',
+} as const
+
 function PanelCard({
   title,
   description,
   icon: Icon,
+  iconTone = 'muted',
   trailing,
   className,
   children,
@@ -366,25 +379,40 @@ function PanelCard({
   title: string
   description: string
   icon: React.ComponentType<{ className?: string }>
+  iconTone?: keyof typeof PANEL_ICON_TONE
   trailing?: React.ReactNode
   className?: string
   children: React.ReactNode
 }) {
   return (
-    <Card className={className}>
-      <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0 pb-2">
+    <Card
+      className={cn(
+        'rounded-xl border-[var(--hairline)] bg-[var(--ledger-card)] shadow-none',
+        className,
+      )}
+    >
+      <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0 p-[22px] pb-4">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <span
+            className={cn(
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
+              PANEL_ICON_TONE[iconTone],
+            )}
+          >
             <Icon className="h-4 w-4" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <CardTitle className="text-sm font-semibold tracking-tight">{title}</CardTitle>
-            <CardDescription className="mt-0.5 text-xs">{description}</CardDescription>
+            <CardTitle className="text-[13.5px] font-bold tracking-tight text-[var(--ink-text)]">
+              {title}
+            </CardTitle>
+            <CardDescription className="mt-0.5 text-[11.5px] text-[var(--mono-muted)]">
+              {description}
+            </CardDescription>
           </div>
         </div>
         {trailing ? <div className="text-xs">{trailing}</div> : null}
       </CardHeader>
-      <CardContent className="pt-2">{children}</CardContent>
+      <CardContent className="px-[22px] pb-[22px] pt-0">{children}</CardContent>
     </Card>
   )
 }
@@ -417,7 +445,7 @@ function RangePresetPicker({
   return (
     <Select value={value} onValueChange={(v) => onChange(v as RangePreset)}>
       <SelectTrigger
-        className="h-9 min-w-0 flex-1 sm:w-[160px] sm:flex-none"
+        className="h-9 min-w-0 flex-1 rounded-lg border-[var(--hairline-strong)] bg-[#fcfaf3] text-[12.5px] text-[var(--ink-text)] sm:w-[160px] sm:flex-none"
         aria-label="Filter by date range"
       >
         <SelectValue />
@@ -449,7 +477,7 @@ function VenueScopePicker({
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger
-        className="h-9 min-w-0 flex-1 sm:w-[200px] sm:flex-none"
+        className="h-9 min-w-0 flex-1 rounded-lg border-[var(--hairline-strong)] bg-[#fcfaf3] text-[12.5px] text-[var(--ink-text)] sm:w-[200px] sm:flex-none"
         aria-label="Filter by venue"
       >
         <SelectValue placeholder="Select venue" />
@@ -463,6 +491,29 @@ function VenueScopePicker({
         ))}
       </SelectContent>
     </Select>
+  )
+}
+
+const SEARCH_LEGEND = [
+  { label: 'Answered', color: 'var(--chart-1)' },
+  { label: 'No data', color: 'var(--chart-2)' },
+  { label: 'Errored', color: 'var(--chart-3)' },
+] as const
+
+function SearchOutcomesLegend() {
+  return (
+    <div className="flex items-center gap-4 text-[11px] font-medium text-[var(--ink-muted)]">
+      {SEARCH_LEGEND.map((s) => (
+        <span key={s.label} className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden="true"
+            className="size-[9px] shrink-0 rounded-[2px]"
+            style={{ background: s.color }}
+          />
+          {s.label}
+        </span>
+      ))}
+    </div>
   )
 }
 

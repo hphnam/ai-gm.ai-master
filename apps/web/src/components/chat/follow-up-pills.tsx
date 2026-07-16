@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 
 type Props = {
   followUps: string[] | undefined
@@ -27,20 +26,19 @@ export function FollowUpPills({ followUps, onSelect, disabled }: Props) {
   return (
     <section
       aria-label="Suggested follow-ups"
-      className="mt-2 flex flex-wrap gap-2 duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
+      className="mt-2 flex flex-col border-t border-[var(--hairline-soft)] pt-1 duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
     >
       {followUps.map((q) => (
-        <Button
+        <button
           key={q}
           type="button"
-          variant="outline"
-          size="sm"
           disabled={disabled || Boolean(picked)}
           onClick={() => handle(q)}
-          className="h-auto whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-normal"
+          className="group flex min-h-11 w-full cursor-pointer items-center gap-[11px] py-[11px] text-left text-[14px] leading-[1.3] text-[var(--ink-muted)] transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {q}
-        </Button>
+          <span aria-hidden className="size-1 shrink-0 rotate-45 bg-[var(--brass)]" />
+          <span className="flex-1">{q}</span>
+        </button>
       ))}
     </section>
   )

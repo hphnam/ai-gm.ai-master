@@ -6,6 +6,7 @@ import {
   InviteBodySchema,
   InviteRole,
   ListInvitationsQuerySchema,
+  VenueIdsSchema,
 } from '../../../types'
 
 export class InviteBodyDto extends createZodDto(InviteBodySchema) {}
@@ -18,6 +19,7 @@ const InvitationSchema = z.object({
   organizationId: z.string(),
   organizationName: z.string(),
   role: InviteRole,
+  venueIds: z.array(z.string()),
   status: InvitationStatusSchema,
   inviterId: z.string(),
   inviterName: z.string().nullable(),
@@ -77,6 +79,8 @@ export const OrgMemberSchema = z.object({
   email: z.string().nullable(),
   phoneNumber: z.string().nullable(),
   role: z.string(),
+  // Empty = access to all venues; non-empty = restricted to these venue ids.
+  venueIds: z.array(z.string()),
   isSelf: z.boolean(),
   joinedAt: z.string(),
 })
@@ -99,3 +103,14 @@ export const RemoveMemberResponseSchema = z.object({
   deletedUser: z.boolean(),
 })
 export class RemoveMemberResponseDto extends createZodDto(RemoveMemberResponseSchema) {}
+
+// PATCH /org/members/:userId/venues — set a member's venue scope. Empty array =
+// all venues. Unknown/cross-tenant ids are dropped server-side.
+export const UpdateMemberVenuesBodySchema = z.object({ venueIds: VenueIdsSchema })
+export class UpdateMemberVenuesBodyDto extends createZodDto(UpdateMemberVenuesBodySchema) {}
+
+export const UpdateMemberVenuesResponseSchema = z.object({
+  ok: z.literal(true),
+  venueIds: z.array(z.string()),
+})
+export class UpdateMemberVenuesResponseDto extends createZodDto(UpdateMemberVenuesResponseSchema) {}

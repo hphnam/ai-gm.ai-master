@@ -4,7 +4,7 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Changelog',
-  description: 'What’s new in gm-ai: shipped improvements for hospitality operators.',
+  description: 'What’s new in AI-GM: shipped improvements for hospitality operators.',
   path: '/changelog',
 })
 
@@ -63,7 +63,7 @@ export default function ChangelogPage() {
       <Container className="max-w-3xl">
         <div className="flex flex-col gap-4">
           <Eyebrow>Changelog</Eyebrow>
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="font-news text-balance text-[clamp(2.5rem,4vw,3.25rem)] font-extrabold tracking-[-0.03em]">
             What’s new.
           </h1>
           <p className="max-w-xl text-pretty text-lg text-muted-foreground">
@@ -79,8 +79,12 @@ export default function ChangelogPage() {
                 aria-hidden
               />
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-semibold tabular-nums">v{release.version}</span>
-                <span className="text-sm text-muted-foreground">{release.date}</span>
+                <span className="font-mono-ledger text-sm font-semibold tabular-nums">
+                  v{release.version}
+                </span>
+                <span className="font-mono-ledger text-sm text-muted-foreground">
+                  {release.date}
+                </span>
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${TAG_STYLE[release.tag]}`}
                 >

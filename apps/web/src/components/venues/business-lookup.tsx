@@ -101,6 +101,12 @@ export function BusinessLookup({
         </ul>
       ) : null}
 
+      {candidates.length > 0 ? (
+        <p className="text-xs text-[var(--mono-muted)]">
+          Powered by Google Business Profile · pick your venue to autofill its name and address.
+        </p>
+      ) : null}
+
       {showEmpty ? (
         <p className="text-sm text-muted-foreground">
           No matches found — try adding the town, or enter details manually.

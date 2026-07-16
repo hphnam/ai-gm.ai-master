@@ -280,7 +280,7 @@ export function ClassifyDocModal({
                         'inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors',
                         suggesting
                           ? 'cursor-wait text-muted-foreground'
-                          : 'cursor-pointer text-sky-700 hover:bg-sky-500/10 dark:text-sky-300',
+                          : 'cursor-pointer text-primary hover:bg-primary/10',
                         busy ? 'cursor-not-allowed opacity-60' : '',
                       )}
                     >
@@ -310,7 +310,7 @@ export function ClassifyDocModal({
                     autoFocus
                   />
                   {suggestionHint ? (
-                    <p className="text-xs text-amber-700 dark:text-amber-400">{suggestionHint}</p>
+                    <p className="text-xs text-warning">{suggestionHint}</p>
                   ) : fuzzyMatch ? (
                     <p className="text-xs text-muted-foreground">
                       Did you mean{' '}

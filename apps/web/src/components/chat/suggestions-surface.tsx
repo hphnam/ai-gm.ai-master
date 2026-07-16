@@ -37,7 +37,7 @@ export function SuggestionsSurface({ suggestions, isLoading }: Props) {
                 )}
               />
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
                   {label} · {s.kind}
                 </span>
                 <span>{s.text}</span>
