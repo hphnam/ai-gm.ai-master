@@ -1,0 +1,64 @@
+{
+  "provenance": {
+    "source": "Square Reporting API (MCP-SIM), view SalesUK, measure net_sales_minus_auto_gratuity (ex-VAT)",
+    "merchant_id": "ML1FFAGJMQBTZ",
+    "pulled_utc": "2026-07-16T22:54:23.682Z",
+    "last_refresh_time": "2026-07-16T22:54:23.682Z",
+    "window": "2026-07-08 to 2026-07-14",
+    "unit": "GBP ex-VAT net sales per venue per local date",
+    "note": "Held-out July 8-14 L1 actuals for the G12.17c Step-C2 confrontation of Origin A (july2026_w2_forecast_frozen, commit a590f91) and Origin B (july2026_w2b_forecast_frozen, commit 9dd9028). NEVER written to the served store: the store ceiling stays 2026-07-07, the Origin B cutoff. Pulled 2026-07-16, strictly after the 2026-07-14 window close, so both freezes remain airtight by calendar.",
+    "rows_are_as_returned": "Absent (venue, date) pairs are absent from the API response and are NOT zero-filled here; the confront reindexes the full horizon and treats a missing trading day as 0.0. 2026-07-14 (Tue) returned no rows for any venue.",
+    "structural_zeros": "STRUCTURAL_ZERO_DOW = {0, 1} (Mon, Tue): the Beer Hall is closed by design. 2026-07-13 (Mon) returned a small GBP 102.28 residual; 2026-07-14 (Tue) returned nothing.",
+    "events_excluded": "The 'Events' location returned GBP 779.94 on 2026-07-11 and is retained below for auditability only. config.EXCLUDED_VENUES excludes it from forecasting, so the confront drops it (same treatment as the July 1-7 pull).",
+    "two_river_taps": "Zero rows returned across the window: dormant since 2026-05-08, liveness-gate confirmed again."
+  },
+  "rows": [
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-08",
+      "net_exvat": 442.1,
+      "gross": 530.46,
+      "orders": 74
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-09",
+      "net_exvat": 450.61,
+      "gross": 540.69,
+      "orders": 64
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-10",
+      "net_exvat": 1138.87,
+      "gross": 1366.65,
+      "orders": 147
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-11",
+      "net_exvat": 984.62,
+      "gross": 1181.53,
+      "orders": 141
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-12",
+      "net_exvat": 603.88,
+      "gross": 724.68,
+      "orders": 82
+    },
+    {
+      "venue": "beer_hall",
+      "date": "2026-07-13",
+      "net_exvat": 102.28,
+      "gross": 122.72,
+      "orders": 18
+    },
+    { "venue": "ellel", "date": "2026-07-10", "net_exvat": 189.51, "gross": 227.41, "orders": 24 },
+    { "venue": "ellel", "date": "2026-07-11", "net_exvat": 385.12, "gross": 462.08, "orders": 55 }
+  ],
+  "excluded_rows": [
+    { "venue": "events", "date": "2026-07-11", "net_exvat": 779.94, "gross": 935.93, "orders": 1 }
+  ]
+}

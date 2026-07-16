@@ -462,7 +462,12 @@ them into the append-only log so it is the continuous WP1-to-present record.
     June uplift (actual vs DOW-median), Beer Hall: England +130% (n=3), Scotland +116%
     (n=2), other-match +57%, no-match +55%. Both home nations drive footfall, generic
     matches do not; recommend the home-nation flag over England-only, all three kept
-    raw. Power caveat: 3+2 dates, directional. **(c)** Cadence sweep (cold/7/3/daily,
+    raw. Power caveat: 3+2 dates, directional. **SUPERSEDED by row 21(e):** the 11 July
+    England QF realised a lift BELOW its DOW baseline while the same window's generic
+    Friday fixture beat its own, inverting this ordering out-of-sample. The power caveat
+    was the right one; n=3 did not generalise. The covariates stay raw and unranked (that
+    decision is unaffected), but "England +130%, generic within noise" must not be quoted
+    as a finding. **(c)** Cadence sweep (cold/7/3/daily,
     on MPS, L1 + L2): Beer Hall best at 7-day (L1 MASE 1.45; gain is cold 1.645 ->
     weekly, sub-weekly 1.56/1.60 does NOT help, contradicting "daily is better"); Two
     River Taps monotonic to daily 0.09 but only by learning the closure faster; Ellel
@@ -625,3 +630,50 @@ them into the append-only log so it is the continuous WP1-to-present record.
     July; Origin A (`a590f91`), `7d103aa`, `1d966be` and `stock_inventory.py` untouched;
     both suites green (store rebuilt by pytest then re-ingested to restore the advanced
     state). C2 (after 2026-07-14) scores Origin A and Origin B together.
+    **Scored in row 21.**
+
+21. **G12.17c Step C2: both 8 to 14 July origins confronted**
+    (`31_G12_17c_C2_Confront_Report.md`). Discharges rows 19 and 20. Actuals pulled
+    2026-07-16 (Square MCP-SIM, view SalesUK, `net_sales_minus_auto_gratuity` ex-VAT,
+    `sim/july2026_w2_actuals_l1_raw.json`), strictly after the 2026-07-14 window close;
+    both freezes predate every target date, so the pre-registration is airtight **by
+    calendar**, not merely by commit ordering. Both frozen artefacts byte-identical;
+    actuals never written to the served store (`sim/confront_july_w2.py` asserts store
+    ceiling 2026-07-07 and zero held-out rows before scoring, and the assert passed).
+    **(a) Accuracy holds:** Beer Hall L1 per-day MASE **0.285** (Origin A) / **0.287**
+    (Origin B) on the same seasonal-naive ruler as the 1 to 7 confront, beating that
+    window's 0.386 and far below the 0.745 backtest class; band coverage **1.00** for
+    both - every day in-band, including the 11 July point miss of +GBP 574. The band
+    held exactly where the point forecast did not. **(b) Origin B does not beat Origin
+    A** (0.287 vs 0.285, and worse on the window total: +GBP 747 vs +GBP 570 over). An
+    honest null that independently corroborates row 15(c): error is flat below weekly,
+    so a fresher origin buys responsiveness, not accuracy. Two separate lines of
+    evidence now agree. **(c) The England anticipation does NOT generalise.** Both
+    origins anticipated ~+GBP 310 over the DOW baseline for the 11 July QF; the realised
+    lift was **-GBP 265 to -269**, wrong in SIGN. With report 27's 1 July case (+GBP 191
+    anticipated, +GBP 451 realised, right direction) the two-case record is 1 for 2. The
+    in-context fixture anticipation is bounded, not established. **(d) The obvious
+    explanation is refuted.** The kickoff-time story (Norway v England 22:00 leaving
+    ~1.5h inside the Saturday envelope, close 23:27) is falsified by 27 June: Panama v
+    England, also Saturday, also 22:00, returned the LARGEST home-nation lift on record
+    (+234% over its DOW median). Day-of-week and kickoff hour are held constant and the
+    outcomes invert. The 11 July shortfall is **unexplained by `CHRONOS2_EXO_COLS`**;
+    named untested hypotheses, in order: 11 July weather (the one exo family not yet
+    compared across the two Saturdays, absent from the feature frame because the date is
+    held out), estate cannibalisation (11 July also carries an Events booking of GBP
+    779.94 and an Ellel event of GBP 385.12, both absent on 27 June), tournament stage.
+    **(e) Supersedes row 15(b):** the realised England-minus-generic premium is
+    **negative** (-GBP 316 Origin A, -GBP 299 Origin B) against a pre-registered
+    expectation of +GBP 181 / +GBP 134; on this window the generic Friday fixture beat
+    its baseline (+GBP 300) while the England Saturday fell below it. Row 15(b)'s
+    "England +130%, generic within noise" does not survive as stated; it was n=3 and
+    labelled directional, and the fourth and fifth England dates split. Row 20's
+    expectation (Origin B narrows the premium at the expectation level) is CONFIRMED
+    (+181 -> +134) even though reality inverted the sign for both. **(f)** Liveness gate
+    held a third time: TRT dormant, no forecast issued, no false alarm. **Honest
+    caveat:** Ellel's MASE of 0.096 is a MASE ARTEFACT, not accuracy - the model
+    forecast GBP 56.30 against GBP 574.63 actual (90.2% under, band breached); the
+    booking-driven series has a large seasonal-naive scale that flatters small absolute
+    errors. Do not quote it. Deviation from row 20's framing: C2 was expected to score
+    the sharpening question; it does, but the headline result is the falsification of
+    the home-nation anticipation, which was not the pre-registered focus.
