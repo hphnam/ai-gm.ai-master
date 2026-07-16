@@ -126,10 +126,19 @@ longer error). No code change was needed to recover the files.
 ## Feature enrichment (A14 — spec FLAG register §10)
 
 - **FLAG-FE1 (weather basis).** Adopted training basis = `WEATHER_TRAIN_BASIS`
-  (`hindcast`), but weather is **not adopted as a model feature** (FLAG-FE10). The
-  train/serve study (signals/feature_ablation.md) shows the **lead-matched**
-  forecast basis predicts best under forecast serving (MASE 0.816), the ERA5
-  **observed/oracle basis is the worst** (0.969) — the train/serve shift is real.
+  (`hindcast`). Weather **is** a live input to the served Beer Hall model — see the
+  scope correction in FLAG-FE10. The train/serve study (signals/feature_ablation.md)
+  shows the **lead-matched** forecast basis predicts best under forecast serving
+  (MASE 0.816), the ERA5 **observed/oracle basis is the worst** (0.969) — the
+  train/serve shift is real.
+  > Corrected 2026-07-16. This flag previously read "weather is **not adopted as a
+  > model feature** (FLAG-FE10)", stated unscoped. That was the Rung-3 GBM's verdict
+  > quoted as if it governed the served model, and it is false for `rung4_chronos2_exo`,
+  > which consumes 4 weather columns. The scope note added to
+  > `signals/feature_ablation.md` at `7d8bfbd` did not reach this ledger. It has since
+  > been quoted back as fact in downstream planning (the gm-ai production integration
+  > brief read weather as "attribution-only"), which is what a live ledger carrying a
+  > stale claim causes.
 - **FLAG-FE2 (weather horizon).** Live forecast ≤16 d; weather applies to the
   reorder horizon, not the full 8-week eval.
 - **FLAG-FE3 (shared grid cell), RESOLVED (G12.9e, corrected G12.10a).** Beer
@@ -152,14 +161,25 @@ longer error). No code change was needed to recover the files.
 - **FLAG-FE9 (spike flag retrospective).** `is_spike_day` (≥0.95 discount share)
   is in its own `spike_days` table, **never joined to the feature table** — it is
   not a forward regressor. Forward hook: the empty `promo_calendar` table.
-- **FLAG-FE10 (no exo feature adopted — the honest result).** The A14 ablation
-  rejected **every** exogenous feature for the BH GBM: against the autoregressive
-  baseline (MASE 0.816) calendar flags hurt slightly (school −2%, uni −6%), weather
-  overfits (−20%), events are null. Cause: the 6-week operational test folds sit
-  inside one term, so calendar flags are near-constant there and add only an
-  overfitting split. The seam is **populated for attribution + the weather study**,
-  not adopted. Re-run the ablation on a longer horizon spanning term boundaries to
-  reconsider. Curated event anchors are also limited — the two biggest recurring
+- **FLAG-FE10 (no exo feature adopted *by the Rung-3 GBM* — the honest result).**
+  > **Scope — read before quoting.** This verdict binds the **Rung-3 GBM only**. It is
+  > NOT a ruling on the exogenous set and does NOT govern the served model. The served
+  > Beer Hall model is `rung4_chronos2_exo` (MASE 0.745), which consumes the full
+  > `CHRONOS2_EXO_COLS` set: **15 columns** (4 calendar + 1 event + 6 World Cup + **4
+  > weather**). Weather and events are live inputs to the served forecast, not
+  > attribution-only. The two results do not conflict: the GBM consumes engineered
+  > columns and lost to its own autoregressive lags on ~270 days, while Chronos-2
+  > conditions on covariates zero-shot and earned its rung at the gate. The exo entrant
+  > was widened from 4 calendar flags to the full set at G12.10b, *after* this ablation
+  > was written. Full argument: `signals/feature_ablation.md`.
+
+  The A14 ablation rejected **every** exogenous feature for the BH GBM: against the
+  autoregressive baseline (MASE 0.816) calendar flags hurt slightly (school −2%, uni
+  −6%), weather overfits (−20%), events are null. Cause: the 6-week operational test
+  folds sit inside one term, so calendar flags are near-constant there and add only an
+  overfitting split. For **the GBM** the seam is populated for attribution + the weather
+  study, not adopted. Re-run the ablation on a longer horizon spanning term boundaries
+  to reconsider. Curated event anchors are also limited — the two biggest recurring
   Lancaster festivals (Music Festival, Highest Point) **did not run in-window**.
 - **FLAG-FE-TRTLOC, RESOLVED (G12.10a).** TRT is keyed to its own venue
   coordinate (53.8751, −2.7599), confirmed by Nam. The cell is named
