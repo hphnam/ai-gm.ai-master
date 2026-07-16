@@ -146,6 +146,22 @@ def weather_study() -> dict:
 def _write_report(ab: dict, wx: dict) -> None:
     lines = [
         "# A14 · Feature-enrichment ablation\n",
+        "> **Scope — read before quoting the verdict.** This ablation judges the "
+        "**Rung-3 GBM only**, and its verdict binds only that model. It is *not* a "
+        "ruling on the exogenous set in general, and in particular it does **not** "
+        "govern the served model.\n>\n"
+        "> The served Beer Hall model is `rung4_chronos2_exo` (rolling MASE 0.745; "
+        "see `models/ladder_results_L1_beer_hall.md`). It consumes the full "
+        "known-future set `CHRONOS2_EXO_COLS` (`models/foundation.py`): 15 columns, "
+        "being 4 calendar + 1 event + 6 World Cup + **4 weather** (`exo_temp_c`, "
+        "`exo_rain_mm`, `exo_sunshine_hrs`, `exo_is_dry`). Weather and events are "
+        "live inputs to the served forecast, not attribution-only.\n>\n"
+        "> The two results do not conflict. Different model, different feature "
+        "mechanism: the GBM consumes engineered columns and was beaten by its own "
+        "autoregressive lags on ~270 days; Chronos-2 conditions on covariates "
+        "zero-shot through the context/future frames and earned its rung at the "
+        "gate. The exo entrant was widened from four calendar flags to the full set "
+        "at G12.10b, *after* this ablation was written.\n",
         f"Venue: **{ANCHOR}**. Model: Rung-3 GBM (the only ladder model that "
         f"consumes engineered features), expanding-window rolling-origin, "
         f"{N_FOLDS} folds, {HORIZON}-day horizon. A column ships only if it cuts "
@@ -194,7 +210,7 @@ def _write_report(ab: dict, wx: dict) -> None:
         "(short-lead temp is accurate — the basis barely matters for it).",
         f"- precipitation MAE: **{wx['q3']['rain_mae']:.2f} mm** "
         "(rain is the noisier signal — where basis choice matters most).",
-        "\n## Verdict (honest negative — adoption gated by evidence)",
+        "\n## Verdict (honest negative — adoption gated by evidence, Rung-3 GBM only)",
         "**No exogenous feature is adopted as a GBM model feature.** Against the "
         "strong autoregressive baseline (lag-7/14, roll-28, DOW), every candidate "
         "*increases* held-out MASE on this operational window: the deterministic "
@@ -214,10 +230,14 @@ def _write_report(ab: dict, wx: dict) -> None:
         "principle predicts. But the best weather configuration only *matches* the "
         "no-weather baseline (≈0.82) and the oracle (perfect weather, both ends) is "
         "no better, so on this ~270-day single-venue sample weather carries **no net "
-        "forecast signal** above the autoregressive features — the basis-level gaps "
-        "are partly small-sample overfitting. The study's value is the method and "
-        "the clear train/serve-shift direction, not an adopted weather feature. See "
-        "FLAG-FE1..FE10.",
+        "forecast signal** above the autoregressive features **of the Rung-3 GBM** — "
+        "the basis-level gaps are partly small-sample overfitting. The study's value "
+        "is the method and the clear train/serve-shift direction, not an adopted "
+        "*GBM* weather feature. See FLAG-FE1..FE10.\n",
+        "This says nothing about weather under Chronos-2, which reaches its "
+        "covariates by a different mechanism and is judged at the same gate on the "
+        "same folds. That entrant carries the weather columns and is the served "
+        "Beer Hall model (see the scope note at the top).",
     ]
     RESULTS_MD.write_text("\n".join(lines))
 

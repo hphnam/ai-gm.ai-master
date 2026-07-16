@@ -8,11 +8,19 @@ regime shifts, low stock, and gaps in the staff SOPs. The main product (the
 NestJS API under `apps/api`, referred to as "Track B" in older notes) calls it
 over HTTP; the brain itself is "Track A."
 
-It runs on its own. There is no PostgreSQL dependency — it reads the supplied
-Square CSV exports and keeps its own time-series memory in a local **DuckDB +
-Parquet** store next to the code. That store *is* the point: the design
-contribution of the project is that the system supplies the historical memory the
-rest of the architecture doesn't have.
+It runs on its own today: no PostgreSQL dependency, reading the supplied Square
+CSV exports and keeping its own time-series memory in a local **DuckDB + Parquet**
+store next to the code.
+
+Be precise about what is the contribution here, because the two get conflated and
+it matters for anyone integrating this. The contribution is that **the system has
+historical memory at all** — the rest of the architecture is stateless and
+request-scoped, so nothing else can say what Tuesday usually looks like. The
+DuckDB store is the *current implementation* of that memory, chosen so the engine
+runs standalone. It is not itself the point, and it is replaceable: moving the
+memory into Postgres, or having it handed in per request, leaves the contribution
+intact. See [What is served, and what it needs](#what-is-served-and-what-it-needs)
+before changing where the memory lives — some of it is not sales history.
 
 Every step prints an explicit `PASS`/`FAIL` and writes a file you can check.
 
@@ -30,6 +38,52 @@ detectors on top. The last step is an HTTP service (`A10`) that serves forecasts
 and signals to the main API. Full step-by-step is under
 [Pipeline](#pipeline-each-step-gates-the-next); the name and owning module of
 every `A<n>` step is in the glossary.
+
+## What is served, and what it needs
+
+This section exists because the answer is distributed across ~106 files and is
+easy to get wrong by reading any one of them. If you are moving the store,
+defining a data contract, or deciding what to hand the engine, start here.
+
+**Served model per venue** (gate-selected on 6-fold rolling MASE; a rung is
+adopted only if it beats *both* seasonal-naïve and robust-DOW):
+
+| Venue | Served model | MASE |
+|---|---|---|
+| Beer Hall | `rung4_chronos2_exo` | 0.745 |
+| Two River Taps | `rung2_ets` | 0.597 (dormant via the liveness gate) |
+| Ellel | `rung1_robust_dow` | 0.572 |
+
+**Daily sales alone will not reproduce these forecasts.** The served Beer Hall
+model consumes `CHRONOS2_EXO_COLS` (`models/foundation.py`) — 15 known-future
+columns: 4 calendar, 1 event, 6 World Cup, 4 weather. Three consequences:
+
+- **Weather is a forecast input, not attribution.** It is warehoused in three
+  bases (`exog_weather_observed` / `_hindcast` / `_leadmatched`) and served on
+  the hindcast basis. The `signals/feature_ablation.md` verdict ("no exogenous
+  feature adopted") binds the **Rung-3 GBM only** and does not govern the served
+  model — see the scope note at the top of that report.
+- **Some inputs are intraday.** `ingest.world_cup.derive_trading_hours` takes a
+  1st/99th-percentile envelope of transaction *time-of-day* per (venue, DOW) and
+  persists it to `venue_trading_hours`. That envelope is what makes the World Cup
+  columns code-derived by kickoff overlap rather than hardcoded. A daily rollup
+  (`venue × date × category × item`) discards the timestamps it needs.
+- **Some inputs arrive over the network.** `ingest/exog_weather.py` calls
+  Open-Meteo; the A8 SOP-gap signal calls Voyage. Neither is tenant data, but
+  neither is free either.
+
+**State held that is not sales history.** Retiring the store means these have to
+live somewhere, or the behaviour they gate is lost:
+
+| Table | Gates |
+|---|---|
+| `briefing_runs` | the new/continuing/resolved novelty chain — the false-alarm control. Without it every standing item re-fires daily. |
+| `change_points` | closure dormancy, so a closed venue stops re-alarming |
+| `forecasts` / `bands` | conformal calibration reads residuals from prior blocks |
+| `served_forecast` | which model is live per series |
+| `data_watermark` | per-venue ingest progress; drives the refit cadence |
+| `ladder_selection` | per-fold MASE audit trail for adoption decisions |
+| `venue_trading_hours`, `spike_days`, `local_events`, `exog_weather_*` | the exogenous frame above |
 
 ## Setup
 
