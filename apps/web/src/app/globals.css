@@ -172,6 +172,10 @@
   --ink-text: #201a12;
   --ink-muted: #5c5340;
   --mono-muted: #8a7d63;
+  /* Faintest text tier — de-emphasised meta/timestamps/placeholders. Darkened
+   * from the mockup's #a5987c (2.48:1 on paper, sub-AA) to clear 4.5:1 while
+   * staying visibly lighter than --ink-muted. */
+  --ink-faint: #736a4e;
   --brass: #8f6b1f;
   --brass-shadow: #75561a;
   --brass-dark: #b08a2e;
@@ -188,6 +192,34 @@
   --hairline: rgba(32, 26, 18, 0.14);
   --hairline-strong: rgba(32, 26, 18, 0.2);
   --hairline-soft: rgba(32, 26, 18, 0.1);
+
+  /* App-surface remaps. The marketing pages barely touch these, but the app
+   * shell paints with brand / sidebar / status / chart tokens on every screen,
+   * so point them all at ledger values here (the app wrapper reuses this class).
+   * Brand = brass; success = ledger green; warning = brass-dark amber; the
+   * destructive/error hue is clay. Chart series match the dashboard legend:
+   * answered (green) · no-data (amber) · errored (clay). */
+  --brand: #8f6b1f;
+  --brand-foreground: #f5efe3;
+  --destructive: #9a4b2c;
+  --destructive-foreground: #f5efe3;
+  --success: #2f5d3d;
+  --success-foreground: #f5efe3;
+  --warning: #b58a3e;
+  --warning-foreground: #201a12;
+
+  --sidebar: #ede4d2;
+  --sidebar-foreground: #201a12;
+  --sidebar-muted: #8a7d63;
+  --sidebar-accent: rgba(32, 26, 18, 0.06);
+  --sidebar-accent-foreground: #201a12;
+  --sidebar-border: rgba(32, 26, 18, 0.14);
+
+  --chart-1: #2f5d3d;
+  --chart-2: #b58a3e;
+  --chart-3: #9a4b2c;
+  --chart-4: #8a7d63;
+  --chart-5: #201a12;
 
   /* Signature textures */
   --ledger-rule: repeating-linear-gradient(

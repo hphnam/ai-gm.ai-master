@@ -79,10 +79,10 @@ export function ReportSurface({ data, compact = true }: { data: ReportData; comp
           <SectionRenderer key={`section-${i}`} section={section} />
         ))}
         {compact ? (
-          <div className="mt-1 flex items-center justify-end border-t border-border/60 pt-3">
+          <div className="mt-1 flex items-center justify-end border-t border-[var(--hairline-soft)] pt-3">
             <Link
               href={data.url}
-              className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-[filter] hover:brightness-110"
+              className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md bg-[var(--brass)] px-3 py-1.5 text-xs font-semibold text-[var(--cream-hi)] shadow-[0_2px_0_var(--brass-shadow)] transition-colors hover:bg-[var(--brass-shadow)] active:translate-y-px"
             >
               <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               Open full report
@@ -122,7 +122,7 @@ function SectionRenderer({ section }: { section: Section }) {
 
 function TextSection({ body }: { body: string }) {
   return (
-    <div className="text-[13.5px] leading-relaxed text-foreground">
+    <div className="text-[13.5px] leading-relaxed text-[var(--ink-text)]">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -144,14 +144,14 @@ function TextSection({ body }: { body: string }) {
 }
 
 function DividerSection({ label }: { label?: string }) {
-  if (!label) return <hr className="border-border/60" />
+  if (!label) return <hr className="border-[var(--hairline-soft)]" />
   return (
     <div className="flex items-center gap-3">
-      <hr className="flex-1 border-border/60" />
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <hr className="flex-1 border-[var(--hairline-soft)]" />
+      <span className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
         {label}
       </span>
-      <hr className="flex-1 border-border/60" />
+      <hr className="flex-1 border-[var(--hairline-soft)]" />
     </div>
   )
 }

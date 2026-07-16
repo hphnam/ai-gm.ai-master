@@ -3,7 +3,9 @@
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { useConversations } from '@/lib/hooks/use-conversations'
 import { useIsMobile } from '@/lib/hooks/use-is-mobile'
+import { useUnreadNotificationsCount } from '@/lib/hooks/use-notifications'
 import { cn } from '@/lib/utils'
 import { AlertsView } from './alerts-view'
 import { ConversationsView } from './conversations-view'
@@ -73,10 +75,10 @@ export function NotificationsSidebar({
 
 function SidebarHeader() {
   return (
-    <div className="flex items-center justify-between border-b border-border px-4 py-2">
-      <h2 className="font-semibold text-base text-foreground">Inbox</h2>
+    <div className="flex items-center justify-between border-b border-[var(--hairline)] px-4 py-3">
+      <h2 className="font-bold text-base text-foreground tracking-[-0.01em]">Inbox</h2>
       <SheetClose
-        className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-[var(--mono-muted)] transition-colors hover:bg-[var(--paper-2)] hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         aria-label="Close"
       >
         <X className="h-5 w-5" aria-hidden />
@@ -92,23 +94,56 @@ function SidebarTabs({
   tab: SidebarTab
   onTabChange: (t: SidebarTab) => void
 }) {
+  // Per-tab unread badges from real counts: conversations = sum of each
+  // thread's unread; alerts = total unread minus conversation unread (chat
+  // notes and alert notes share the one unread-count endpoint). Clamped and
+  // left undefined until both operands load, so the badge only shows on real
+  // data and never renders a fabricated or negative number.
+  const { data: convData } = useConversations()
+  const { data: countData } = useUnreadNotificationsCount()
+  const convosUnread = convData
+    ? convData.conversations.reduce((n, c) => n + c.unreadCount, 0)
+    : undefined
+  const totalUnread = countData?.count
+  const alertsUnread =
+    totalUnread != null && convosUnread != null
+      ? Math.max(0, totalUnread - convosUnread)
+      : undefined
   return (
-    <div
-      className="flex items-center gap-0 border-b border-border px-4"
-      role="tablist"
-      aria-label="Conversations or alerts"
-    >
-      <Tab
-        active={tab === 'conversations'}
-        onClick={() => onTabChange('conversations')}
-        label="Conversations"
-      />
-      <Tab active={tab === 'alerts'} onClick={() => onTabChange('alerts')} label="Alerts" />
+    <div className="border-b border-[var(--hairline)] px-4 py-3">
+      <div
+        className="flex gap-[3px] rounded-[10px] bg-[var(--paper-2)] p-[3px]"
+        role="tablist"
+        aria-label="Conversations or alerts"
+      >
+        <Tab
+          active={tab === 'conversations'}
+          onClick={() => onTabChange('conversations')}
+          label="Conversations"
+          count={convosUnread}
+        />
+        <Tab
+          active={tab === 'alerts'}
+          onClick={() => onTabChange('alerts')}
+          label="Alerts"
+          count={alertsUnread}
+        />
+      </div>
     </div>
   )
 }
 
-function Tab({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function Tab({
+  active,
+  onClick,
+  label,
+  count,
+}: {
+  active: boolean
+  onClick: () => void
+  label: string
+  count?: number
+}) {
   return (
     <button
       type="button"
@@ -116,13 +151,23 @@ function Tab({ active, onClick, label }: { active: boolean; onClick: () => void;
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        'relative -mb-px inline-flex min-h-11 cursor-pointer items-center border-b-2 px-3 font-medium text-xs transition-colors',
+        'inline-flex min-h-9 flex-1 cursor-pointer items-center justify-center gap-[7px] rounded-[7px] px-3 py-2 text-xs transition-colors',
         active
-          ? 'border-foreground text-foreground'
-          : 'border-transparent text-foreground/55 hover:text-foreground',
+          ? 'bg-[var(--ledger-card)] font-semibold text-foreground shadow-[0_1px_2px_rgba(32,26,18,0.06)]'
+          : 'font-medium text-[var(--ink-muted)] hover:text-foreground',
       )}
     >
       {label}
+      {count != null && count > 0 ? (
+        <span
+          className={cn(
+            'font-mono-ledger text-[11px] font-semibold leading-none',
+            active ? 'text-[var(--brass)]' : 'text-[var(--ink-faint)]',
+          )}
+        >
+          {count > 99 ? '99+' : count}
+        </span>
+      ) : null}
     </button>
   )
 }

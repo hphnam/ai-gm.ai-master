@@ -5,6 +5,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   AlertTriangle,
   BookOpen,
+  ChevronRight,
   ClipboardList,
   FileQuestion,
   FileText,
@@ -51,14 +52,14 @@ const toneClass: Record<StatusTone, string> = {
 
 function DocIcon({ doc }: { doc: DocListItem }) {
   if (doc.processingStatus === 'processing')
-    return <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-  if (doc.processingStatus === 'failed') return <AlertTriangle className="h-5 w-5" aria-hidden />
-  if (doc.pendingTypeProposal) return <Sparkles className="h-5 w-5" aria-hidden />
+    return <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+  if (doc.processingStatus === 'failed') return <AlertTriangle className="h-4 w-4" aria-hidden />
+  if (doc.pendingTypeProposal) return <Sparkles className="h-4 w-4" aria-hidden />
   if (doc.documentType?.kind === 'procedural' || doc.isProcedural)
-    return <ClipboardList className="h-5 w-5" aria-hidden />
-  if (doc.documentType?.kind === 'reference') return <BookOpen className="h-5 w-5" aria-hidden />
-  if (!doc.documentType) return <FileQuestion className="h-5 w-5" aria-hidden />
-  return <FileText className="h-5 w-5" aria-hidden />
+    return <ClipboardList className="h-4 w-4" aria-hidden />
+  if (doc.documentType?.kind === 'reference') return <BookOpen className="h-4 w-4" aria-hidden />
+  if (!doc.documentType) return <FileQuestion className="h-4 w-4" aria-hidden />
+  return <FileText className="h-4 w-4" aria-hidden />
 }
 
 function iconWrapClass(doc: DocListItem): string {
@@ -137,13 +138,13 @@ function DocRow({ doc }: { doc: DocListItem }) {
   return (
     <div
       className={cn(
-        'group relative flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-colors hover:border-foreground/20 hover:bg-accent/40',
+        'group relative flex items-center gap-3 rounded-xl border bg-card px-4 py-3.5 transition-shadow hover:shadow-[0_3px_10px_-5px_rgba(32,26,18,0.22)]',
         doc.processingStatus === 'failed' && 'border-destructive/20',
       )}
     >
       <div
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
+          'flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg',
           iconWrapClass(doc),
         )}
       >
@@ -159,21 +160,24 @@ function DocRow({ doc }: { doc: DocListItem }) {
           <p className="truncate text-sm font-medium text-foreground group-hover:underline group-hover:underline-offset-4">
             {title}
           </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground sm:text-sm">
+          <p className="mt-1 truncate font-mono-ledger text-[11.5px] text-[#a5987c]">
             <span className={toneClass[status.tone]}>{status.text}</span>
-            <span className="mx-1.5 text-muted-foreground/40" aria-hidden>
+            <span className="mx-1.5" aria-hidden>
               ·
             </span>
             <span>{venueLabel}</span>
-            <span className="mx-1.5 text-muted-foreground/40" aria-hidden>
+            <span className="mx-1.5" aria-hidden>
               ·
             </span>
             <span>Updated {formatRelative(doc.updatedAt)}</span>
           </p>
         </Link>
       </div>
-      <div className="ml-2 flex shrink-0 items-center gap-1 opacity-100 transition-opacity md:opacity-0 md:focus-within:opacity-100 md:group-hover:opacity-100">
-        <DeleteDocButton doc={doc} />
+      <div className="ml-1 flex shrink-0 items-center gap-0.5">
+        <div className="opacity-100 transition-opacity md:opacity-0 md:focus-within:opacity-100 md:group-hover:opacity-100">
+          <DeleteDocButton doc={doc} />
+        </div>
+        <ChevronRight className="h-4 w-4 text-[#b7a98a]" aria-hidden />
       </div>
     </div>
   )
@@ -184,8 +188,8 @@ function DocListSkeleton() {
     <ul className="space-y-2" aria-busy="true" aria-label="Loading documents">
       {Array.from({ length: 4 }).map((_, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholder, no real data
-        <li key={i} className="flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5">
-          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+        <li key={i} className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3.5">
+          <Skeleton className="h-[34px] w-[34px] shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-1/3" />
             <Skeleton className="h-3 w-2/3" />

@@ -146,9 +146,13 @@ export function MembersList() {
                 ) : null}
               </p>
             </div>
-            <span className="shrink-0 text-xs text-muted-foreground">
+            <Badge
+              variant={m.role === 'owner' ? 'brand' : 'neutral'}
+              size="sm"
+              className="shrink-0"
+            >
               {ROLE_LABEL[m.role] ?? m.role}
-            </span>
+            </Badge>
             {showVenueAccess && canEditAccess(m, actorRole) ? (
               <Button
                 variant="ghost"

@@ -411,7 +411,11 @@ export function BusinessProfileForm() {
             />
           </div>
           <div>
-            <Button type="submit" disabled={mutation.isPending}>
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="shadow-[0_2px_0_var(--brass-shadow)]"
+            >
               {mutation.isPending ? 'Saving…' : 'Save profile'}
             </Button>
           </div>

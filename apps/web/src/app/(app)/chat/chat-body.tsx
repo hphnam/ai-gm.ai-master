@@ -3,26 +3,10 @@
 import { useChat } from '@ai-sdk/react'
 import { type QueryClient as RqClient, useQueryClient } from '@tanstack/react-query'
 import { DefaultChatTransport } from 'ai'
-import {
-  ArrowRight,
-  BookOpen,
-  Check,
-  Link2,
-  ListTodo,
-  Loader2,
-  Lock,
-  type LucideIcon,
-  MessageCircle,
-  Package,
-  Plus,
-  ShieldCheck,
-  Store,
-  TrendingUp,
-  Truck,
-} from 'lucide-react'
+import { ArrowRight, Check, Link2, Loader2, Lock, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ChatThread } from '@/components/chat/chat-thread'
@@ -426,46 +410,81 @@ function ChatCore({
       </>
     ) : undefined
 
+  // Empty/new state centers a hero (greeting → composer → starters → footer)
+  // mid-screen; the composer lives INLINE there. Once a conversation exists it
+  // moves to the bottom bar. Only one position mounts at a time.
+  const showEmpty = isEmpty && !isPending
+  const showInlineComposer = showEmpty && Boolean(venueId)
+
+  const renderComposer = (initialValue?: string) => (
+    <ChatComposer
+      onSubmit={submit}
+      onSubmitWithImage={submitWithImage}
+      isPending={isPending}
+      onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
+      initialValue={initialValue}
+      disabled={!isOwner || !conversationId}
+      disabledReason={
+        !isOwner
+          ? 'Read-only — shared by another user'
+          : !conversationId
+            ? 'Start a new chat'
+            : undefined
+      }
+    />
+  )
+
+  const readonlyBanner = !isOwner ? (
+    <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+      <Lock className="h-3.5 w-3.5" aria-hidden />
+      <span>Read-only — this chat was shared with you.</span>
+    </div>
+  ) : null
+
+  const errorBanner = error ? (
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm">
+      <span>Something went wrong.</span>
+      <button
+        type="button"
+        className="text-xs font-medium underline underline-offset-4"
+        onClick={() => regenerate()}
+      >
+        Retry
+      </button>
+    </div>
+  ) : null
+
   return (
     <>
       <SetPageHeader title={titleFor(displayMessages) ?? 'Chat'} actions={headerActions} />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div ref={scrollRef} className="scrollbar-thin flex-1 overflow-y-auto">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 sm:px-6">
-            {!isOwner ? (
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-                <Lock className="h-3.5 w-3.5" aria-hidden />
-                <span>Read-only — this chat was shared with you.</span>
-              </div>
-            ) : null}
-
-            {activeSuggestions && activeSuggestions.length > 0 ? (
-              <SuggestionsSurface suggestions={activeSuggestions} isLoading={false} />
-            ) : null}
-
-            {error ? (
-              <div className="flex items-center justify-between gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm">
-                <span>Something went wrong.</span>
-                <button
-                  type="button"
-                  className="text-xs font-medium underline underline-offset-4"
-                  onClick={() => regenerate()}
-                >
-                  Retry
-                </button>
-              </div>
-            ) : null}
-
-            {isEmpty && !isPending ? (
+          {showEmpty ? (
+            <div className="mx-auto flex min-h-full w-full max-w-[640px] flex-col px-6 py-6">
+              {readonlyBanner ? <div className="mb-4">{readonlyBanner}</div> : null}
+              {activeSuggestions && activeSuggestions.length > 0 ? (
+                <div className="mb-4">
+                  <SuggestionsSurface suggestions={activeSuggestions} isLoading={false} />
+                </div>
+              ) : null}
+              {errorBanner ? <div className="mb-4">{errorBanner}</div> : null}
               <EmptyState
                 needsVenue={!venueId}
                 venueId={venueId}
                 onPick={submit}
                 venues={venues}
                 onPickVenue={isOwner ? onPickVenue : undefined}
+                composerSlot={showInlineComposer ? renderComposer(composerPrefill) : null}
               />
-            ) : (
+            </div>
+          ) : (
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 sm:px-6">
+              {readonlyBanner}
+              {activeSuggestions && activeSuggestions.length > 0 ? (
+                <SuggestionsSurface suggestions={activeSuggestions} isLoading={false} />
+              ) : null}
+              {errorBanner}
               <ChatThread
                 messages={displayMessages}
                 status={status}
@@ -478,28 +497,14 @@ function ChatCore({
                 venueId={venueId}
                 scrollContainerRef={scrollRef}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {venueId ? (
-          <div className="border-t border-border bg-background px-4 pt-3 pb-3 sm:px-6">
+        {venueId && !showInlineComposer ? (
+          <div className="bg-background px-4 pt-3 pb-3 sm:px-6">
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
-              <ChatComposer
-                onSubmit={submit}
-                onSubmitWithImage={submitWithImage}
-                isPending={isPending}
-                onStop={status === 'streaming' || status === 'submitted' ? stop : undefined}
-                initialValue={composerPrefill}
-                disabled={!isOwner || !conversationId}
-                disabledReason={
-                  !isOwner
-                    ? 'Read-only — shared by another user'
-                    : !conversationId
-                      ? 'Start a new chat'
-                      : undefined
-                }
-              />
+              {renderComposer(undefined)}
             </div>
           </div>
         ) : null}
@@ -539,21 +544,11 @@ const MANAGER_FALLBACK_PROMPTS: ReadonlyArray<StarterQuestion> = [
   { text: 'Which stock items are below par today?', category: 'stock' },
 ]
 
-const STARTER_CATEGORY_ICONS: Record<string, LucideIcon> = {
-  stock: Package,
-  tasks: ListTodo,
-  compliance: ShieldCheck,
-  sop: BookOpen,
-  supplier: Truck,
-  sales: TrendingUp,
-}
-
-function starterIcon(category?: string): LucideIcon {
-  if (!category) return MessageCircle
-  const key = category.trim().toLowerCase()
-  return (
-    STARTER_CATEGORY_ICONS[key] ?? STARTER_CATEGORY_ICONS[key.replace(/s$/, '')] ?? MessageCircle
-  )
+function greetingWord(date: Date): string {
+  const h = date.getHours()
+  if (h < 12) return 'Morning'
+  if (h < 18) return 'Afternoon'
+  return 'Evening'
 }
 
 function EmptyState({
@@ -562,15 +557,18 @@ function EmptyState({
   onPick,
   venues,
   onPickVenue,
+  composerSlot,
 }: {
   needsVenue: boolean
   venueId: string | null
   onPick?: (text: string) => void | Promise<void>
   venues: VenueListItem[] | undefined
   onPickVenue?: (id: string) => void
+  composerSlot?: ReactNode
 }) {
   const starters = useChatStarters(venueId)
   const { isManager } = useCurrentMember()
+  const { data: session } = useSession()
   // Prefer the server's payload (generated or its own fallback) when we have
   // one. Only fall back to the static client list while the request is in
   // flight, OR if the request errored — keeps the surface populated even when
@@ -580,9 +578,9 @@ function EmptyState({
 
   if (needsVenue) {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-16">
+      <div className="flex flex-1 flex-col justify-center gap-8 py-10">
         <header className="space-y-3">
-          <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl">
+          <h2 className="font-news text-[34px] leading-[1.1] tracking-[-0.5px] text-foreground sm:text-[40px]">
             Start a chat
           </h2>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -594,46 +592,55 @@ function EmptyState({
     )
   }
 
+  const now = new Date()
+  const firstName = session?.user?.name?.trim().split(/\s+/)[0] ?? ''
+  const dateLabel = now.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+  const venueCount = venues?.length ?? 0
+  const eyebrow = venueCount
+    ? `${dateLabel} · ${venueCount} ${venueCount === 1 ? 'venue' : 'venues'}`
+    : dateLabel
+
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-10 py-16">
-      <header className="space-y-3">
-        <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl">
-          How would you like
-          <br />
-          <span className="text-foreground/50">to start?</span>
-        </h2>
-        <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-          Ask about stock, ordering, SOPs, or suppliers. I&apos;ll pull from your knowledge base and
-          venue data.
-        </p>
-      </header>
-      <ul className="flex flex-col divide-y divide-border border-y border-border">
-        {prompts.map((p) => {
-          const Icon = starterIcon(p.category)
-          return (
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col justify-center">
+        <div className="duration-500 animate-in fade-in slide-in-from-bottom-2 motion-reduce:animate-none">
+          <p className="mb-4 font-mono-ledger text-[12px] tracking-[0.04em] text-[var(--ink-faint)]">
+            {eyebrow}
+          </p>
+          <h2 className="mb-9 font-news text-[34px] leading-[1.1] tracking-[-0.5px] text-foreground sm:text-[40px]">
+            {greetingWord(now)}
+            {firstName ? `, ${firstName}` : ''}.{' '}
+            <span className="text-[var(--ink-faint)]">What do you need to know?</span>
+          </h2>
+        </div>
+        {composerSlot ? (
+          <div className="duration-500 animate-in fade-in slide-in-from-bottom-2 motion-reduce:animate-none">
+            {composerSlot}
+          </div>
+        ) : null}
+        <ul className="mt-7 flex flex-col">
+          {prompts.map((p) => (
             <li key={p.text}>
               <button
                 type="button"
                 onClick={() => onPick?.(p.text)}
                 disabled={!onPick}
-                className="group flex min-h-11 w-full cursor-pointer items-center gap-3 py-3 text-left text-sm text-foreground/80 transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+                className="group flex min-h-11 w-full cursor-pointer items-center gap-3 border-t border-[var(--hairline-soft)] px-1 py-[15px] text-left text-[15px] text-[var(--ink-muted)] transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Icon
-                  className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-colors group-hover:text-primary"
-                  aria-hidden
-                />
+                <span aria-hidden className="size-1.5 shrink-0 rotate-45 bg-[var(--brass)]" />
                 <span className="flex-1">{p.text}</span>
-                <span
-                  aria-hidden
-                  className="text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none"
-                >
-                  →
-                </span>
               </button>
             </li>
-          )
-        })}
-      </ul>
+          ))}
+        </ul>
+      </div>
+      <p className="mt-8 pb-2 text-center text-[11.5px] text-[var(--ink-faint)]">
+        Grounded in your venue data and SOPs · every answer cited
+      </p>
     </div>
   )
 }

@@ -123,7 +123,11 @@ export function PhoneLinkForm() {
               {sendError}
             </p>
           ) : null}
-          <Button type="submit" disabled={sendMutation.isPending}>
+          <Button
+            type="submit"
+            disabled={sendMutation.isPending}
+            className="shadow-[0_2px_0_var(--brass-shadow)]"
+          >
             {sendMutation.isPending ? 'Sending…' : 'Send code'}
           </Button>
         </form>
@@ -169,7 +173,11 @@ export function PhoneLinkForm() {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={verifyMutation.isPending}>
+          <Button
+            type="submit"
+            disabled={verifyMutation.isPending}
+            className="shadow-[0_2px_0_var(--brass-shadow)]"
+          >
             {verifyMutation.isPending ? 'Verifying…' : 'Verify'}
           </Button>
           <button

@@ -320,7 +320,7 @@ function VersionRow({ version }: { version: DocDetailDto['versionHistory'][numbe
         version.isCurrent ? 'bg-background ring-1 ring-border' : 'hover:bg-background/60',
       )}
     >
-      <span className="inline-flex h-6 min-w-[2.25rem] shrink-0 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">
+      <span className="inline-flex h-6 min-w-[2.25rem] shrink-0 items-center justify-center rounded-md bg-muted px-1.5 font-mono-ledger text-xs font-semibold tabular-nums text-muted-foreground">
         v{version.version}
       </span>
       <div className="min-w-0 flex-1">
@@ -332,7 +332,7 @@ function VersionRow({ version }: { version: DocDetailDto['versionHistory'][numbe
         >
           {version.title?.trim() || 'Untitled'}
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="font-mono-ledger text-[11px] text-[var(--mono-muted)]">
           {version.supersededAt
             ? `Archived ${formatRelative(version.supersededAt)}`
             : `Updated ${formatRelative(version.updatedAt)}`}
@@ -488,7 +488,7 @@ function DocActions({
 
 function MetaLine({ doc }: { doc: DocDetailDto }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono-ledger text-xs text-[var(--mono-muted)] sm:text-sm">
       <span className="inline-flex items-center gap-1">
         <MapPin className="h-3.5 w-3.5" aria-hidden />
         {doc.venueName ?? 'All venues'}
@@ -525,7 +525,7 @@ function ContentCard({ content }: { content: string }) {
       aria-label="Document content"
       className="overflow-hidden rounded-xl border bg-card shadow-sm"
     >
-      <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <header className="flex items-center gap-2 border-b bg-muted/30 px-4 py-2.5 font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
         <FileText className="h-3.5 w-3.5" aria-hidden />
         Document content
       </header>
@@ -545,13 +545,15 @@ function ChecklistBody({ checklist }: { checklist: Checklist }) {
     <div className="space-y-5">
       <dl className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <dt className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
             When
           </dt>
           <dd className="text-sm">{formatScheduleLine(checklist.schedule)}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Who</dt>
+          <dt className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
+            Who
+          </dt>
           <dd className="flex flex-wrap items-center gap-1.5">
             {roles.length > 0 ? (
               roles.map((r) => <RolePill key={r} role={r} />)
@@ -570,7 +572,7 @@ function ChecklistBody({ checklist }: { checklist: Checklist }) {
             key={s.index}
             className="flex items-start gap-3 rounded-lg border bg-background/40 p-3"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums text-muted-foreground">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted font-mono-ledger text-xs font-semibold tabular-nums text-muted-foreground">
               {idx + 1}
             </span>
             <div className="min-w-0 flex-1">
@@ -716,7 +718,7 @@ export function DocDetailBody({ id }: { id: string }) {
             {data.tags.map((t) => (
               <span
                 key={t}
-                className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                className="rounded-full bg-muted px-2 py-0.5 font-mono-ledger text-[11px] text-[var(--mono-muted)]"
               >
                 {t}
               </span>

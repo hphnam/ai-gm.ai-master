@@ -171,9 +171,9 @@ export function ChatComposer({
       </label>
       <div
         className={cn(
-          'relative flex flex-col gap-1 rounded-3xl border border-border bg-background',
-          'px-2 py-2 shadow-sm transition-colors duration-150',
-          'focus-within:border-foreground/40 focus-within:ring-2 focus-within:ring-foreground/10',
+          'relative flex flex-col gap-1 rounded-[18px] border border-[var(--hairline)] bg-[#fcfaf3]',
+          'px-2 py-2 shadow-[0_2px_10px_-4px_rgba(32,26,18,0.12)] transition-colors duration-150',
+          'focus-within:border-[var(--brass)]/45 focus-within:ring-2 focus-within:ring-[var(--brass)]/10',
         )}
       >
         <input
@@ -258,7 +258,7 @@ export function ChatComposer({
               onClick={() => onStop?.()}
               aria-label="Stop generating"
               title="Stop"
-              className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive text-destructive-foreground transition-all hover:brightness-110 active:scale-95"
+              className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground transition-all hover:brightness-110 active:scale-95"
             >
               <Square className="h-3.5 w-3.5 fill-current" aria-hidden />
             </button>
@@ -268,9 +268,9 @@ export function ChatComposer({
               disabled={!canSend}
               aria-label={isPending ? 'Sending' : 'Send'}
               className={cn(
-                'ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-150',
+                'ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-150',
                 canSend
-                  ? 'bg-brand text-brand-foreground hover:brightness-110 active:scale-95 cursor-pointer'
+                  ? 'bg-[var(--brass)] text-[var(--cream-hi)] shadow-[0_2px_0_var(--brass-shadow)] hover:bg-[var(--brass-shadow)] active:translate-y-px cursor-pointer'
                   : 'bg-muted text-muted-foreground cursor-not-allowed',
               )}
             >

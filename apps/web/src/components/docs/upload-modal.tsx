@@ -475,9 +475,9 @@ function StatusIcon({ status }: { status: QueueStatus }) {
       <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" aria-hidden />
     )
   if (status === 'done')
-    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+    return <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" aria-hidden />
   if (status === 'error')
-    return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-600" aria-hidden />
+    return <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" aria-hidden />
   return <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
 }
 

@@ -44,8 +44,10 @@ export function SettingsPageHeader({
 }) {
   return (
     <div className="mb-5">
-      <h1 className="text-xl font-semibold tracking-tight text-foreground">{title}</h1>
-      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      <h1 className="font-news text-[21px] font-semibold tracking-[-0.01em] text-foreground">
+        {title}
+      </h1>
+      {description && <p className="mt-1 text-sm text-[var(--mono-muted)]">{description}</p>}
     </div>
   )
 }

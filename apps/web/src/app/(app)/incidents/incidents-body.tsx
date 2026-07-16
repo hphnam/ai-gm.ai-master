@@ -84,7 +84,7 @@ export function IncidentsBody() {
               ariaLabel="Filter incidents"
               trailing={
                 data ? (
-                  <span className="text-foreground/55 text-xs tabular-nums">
+                  <span className="font-mono-ledger text-[var(--mono-muted)] text-xs">
                     {data.openCount} open
                   </span>
                 ) : null
@@ -144,7 +144,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
 
   return (
     <li>
-      <Card className="group/card overflow-hidden">
+      <Card className="group/card overflow-hidden rounded-xl border-[var(--hairline)]">
         <CardContent className="p-0">
           {/* ── Header ─────────────────────────────────────── */}
           <div className="space-y-3 px-6 pt-6">
@@ -152,13 +152,13 @@ function IncidentCard({ incident }: { incident: Incident }) {
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <SeverityBadge severity={incident.severity} />
                 <StatusBadge status={incident.status} />
-                <span className="text-foreground/55 text-xs">{incident.venueName}</span>
-                <span className="text-foreground/35 text-xs" aria-hidden>
+                <span className="text-[var(--ink-muted)] text-xs">{incident.venueName}</span>
+                <span className="text-[var(--mono-muted)] text-xs" aria-hidden>
                   ·
                 </span>
                 <time
                   dateTime={incident.createdAt}
-                  className="text-foreground/55 text-xs tabular-nums"
+                  className="font-mono-ledger text-[var(--mono-muted)] text-xs"
                   title={new Date(incident.createdAt).toLocaleString()}
                 >
                   {formatRelative(incident.createdAt)}
@@ -169,7 +169,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
                 {incident.sourceConversationId ? (
                   <Link
                     href={`/chat?venue=${incident.venueId}&conv=${incident.sourceConversationId}`}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-md text-foreground/55 text-xs transition-colors hover:text-foreground"
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-md text-[var(--brass)] text-xs font-medium transition-colors hover:text-[var(--brass-shadow)]"
                     aria-label="View source conversation"
                   >
                     <MessageSquare className="h-3.5 w-3.5" aria-hidden />
@@ -204,17 +204,17 @@ function IncidentCard({ incident }: { incident: Incident }) {
               </div>
             </div>
 
-            <p className="text-sm text-foreground leading-relaxed">{incident.summary}</p>
-            <p className="text-foreground/50 text-xs">
+            <p className="text-[15px] text-foreground leading-relaxed">{incident.summary}</p>
+            <p className="text-[var(--ink-faint)] text-xs">
               Logged by{' '}
-              <span className="text-foreground/75">
+              <span className="text-[var(--ink-muted)]">
                 {incident.loggedBy?.name ?? incident.loggedBy?.email ?? 'unknown user'}
               </span>
             </p>
           </div>
 
           <div className="px-6 pt-5">
-            <div className="h-px bg-border/60" aria-hidden />
+            <div className="h-px bg-[var(--hairline-soft)]" aria-hidden />
           </div>
 
           {/* ── Activity + composer ───────────────────────── */}
@@ -308,7 +308,7 @@ function Activity({ incident }: { incident: Incident }) {
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="flex w-full cursor-pointer items-center gap-2 px-6 py-4 text-left text-foreground/55 text-xs transition-colors hover:bg-muted/30 hover:text-foreground"
+          className="flex w-full cursor-pointer items-center gap-2 border-t border-[var(--hairline-soft)] px-6 py-4 text-left text-[var(--ink-muted)] text-xs transition-colors hover:bg-muted/30 hover:text-foreground"
         >
           <MessageSquare className="h-3.5 w-3.5" aria-hidden />
           Show {incident.commentCount} {incident.commentCount === 1 ? 'update' : 'updates'}
@@ -332,7 +332,7 @@ function Activity({ incident }: { incident: Incident }) {
             // dot-on-rail per entry. No bubbles, no avatars, no left/right
             // split — typography hierarchy carries the difference between
             // a system event and a comment.
-            <ol className="relative space-y-5 before:absolute before:top-2 before:bottom-2 before:left-[5px] before:w-px before:bg-border/60">
+            <ol className="relative space-y-5 before:absolute before:top-2 before:bottom-2 before:left-[5px] before:w-px before:bg-[var(--hairline)]">
               {rows.map((c) =>
                 c.kind === 'status_change' ? (
                   <StatusEvent key={c.id} comment={c} />
@@ -346,10 +346,10 @@ function Activity({ incident }: { incident: Incident }) {
       ) : null}
 
       {/* Composer */}
-      <div className={cn('bg-muted/15 border-border/60 border-t px-6 py-5')}>
+      <div className={cn('bg-muted/20 border-t border-[var(--hairline-soft)] px-6 py-5')}>
         {isClosed ? (
           <div className="flex items-center justify-between gap-3">
-            <p className="text-foreground/55 text-xs">
+            <p className="text-[var(--ink-muted)] text-xs">
               This incident is closed. Reopen to add new comments.
             </p>
             <Button
@@ -409,14 +409,16 @@ function Activity({ incident }: { incident: Incident }) {
               ) : null}
 
               <span className="ml-auto inline-flex flex-wrap items-center gap-2">
-                <span className="text-xs text-foreground/40 tabular-nums">{body.length}/2000</span>
+                <span className="font-mono-ledger text-[var(--mono-muted)] text-xs">
+                  {body.length}/2000
+                </span>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={commentAndClose}
                   disabled={!hasBody || anyPending}
-                  className="cursor-pointer gap-1.5 border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/15 hover:text-destructive"
+                  className="cursor-pointer gap-1.5 border-success/30 bg-success/10 text-success hover:bg-success/15 hover:text-success"
                   title={
                     hasBody
                       ? 'Post your comment as the resolution and close this incident'
@@ -462,7 +464,7 @@ function RailDot({ tone = 'muted' }: { tone?: 'muted' | 'solid' }) {
     <span
       aria-hidden
       className={cn(
-        'relative z-10 mt-1.5 h-[11px] w-[11px] shrink-0 rounded-full border-2 bg-background',
+        'relative z-10 mt-1.5 h-[11px] w-[11px] shrink-0 rounded-full border-2 bg-card',
         tone === 'solid' ? 'border-foreground/70' : 'border-foreground/35',
       )}
     />
@@ -477,12 +479,12 @@ function StatusEvent({ comment }: { comment: IncidentComment }) {
     <li className="flex gap-4 pl-1">
       <RailDot tone="muted" />
       <div className="flex min-w-0 flex-1 items-baseline gap-2">
-        <p className="min-w-0 flex-1 text-sm text-foreground/70">
-          <span className="font-medium text-foreground/90">{author}</span> {verb}
+        <p className="min-w-0 flex-1 text-sm text-[var(--ink-muted)]">
+          <span className="font-medium text-foreground">{author}</span> {verb}
         </p>
         <time
           dateTime={comment.createdAt}
-          className="shrink-0 text-foreground/45 text-xs tabular-nums"
+          className="shrink-0 font-mono-ledger text-[var(--mono-muted)] text-xs"
           title={new Date(comment.createdAt).toLocaleString()}
         >
           {formatRelative(comment.createdAt)}
@@ -523,7 +525,7 @@ function CommentRow({ comment, incidentId }: { comment: IncidentComment; inciden
           <span className="truncate font-medium text-foreground text-sm">{author}</span>
           <time
             dateTime={comment.createdAt}
-            className="shrink-0 text-foreground/50 text-xs tabular-nums"
+            className="shrink-0 font-mono-ledger text-[var(--mono-muted)] text-xs"
             title={new Date(comment.createdAt).toLocaleString()}
           >
             {formatRelative(comment.createdAt)}
@@ -539,7 +541,7 @@ function CommentRow({ comment, incidentId }: { comment: IncidentComment; inciden
             </button>
           ) : null}
         </div>
-        <p className="whitespace-pre-wrap break-words text-sm text-foreground/90 leading-relaxed">
+        <p className="whitespace-pre-wrap break-words text-sm text-[var(--ink-muted)] leading-relaxed">
           {comment.body}
         </p>
       </div>
@@ -576,7 +578,7 @@ function ListSkeleton() {
     <ul className="space-y-5">
       {['a', 'b', 'c'].map((k) => (
         <li key={k}>
-          <Skeleton className="h-64 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full rounded-xl" />
         </li>
       ))}
     </ul>
@@ -592,7 +594,6 @@ function SeverityBadge({ severity }: { severity: IncidentSeverity }) {
         : { label: 'Minor', variant: 'neutral' as const }
   return (
     <Badge variant={meta.variant} size="sm">
-      <AlertTriangle className="h-3 w-3" aria-hidden />
       {meta.label}
     </Badge>
   )

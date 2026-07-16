@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'General Manager AI for hospitality operations',
     start_url: '/chat',
     display: 'standalone',
-    background_color: '#f8f6f3',
-    theme_color: '#f8f6f3',
+    background_color: '#f5efe3',
+    theme_color: '#f5efe3',
     icons: [
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/apple-icon.png', sizes: '180x180', type: 'image/png' },

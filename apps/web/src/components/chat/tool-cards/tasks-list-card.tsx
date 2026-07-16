@@ -80,7 +80,7 @@ export function TasksListCard({ part }: ToolCardRendererProps) {
 
   return (
     <CardShell icon={ListChecks} title={scopeLabel(scope)} subtitle={subtitle}>
-      <ul className="-mx-1 -my-1 divide-y divide-border/60">
+      <ul className="-my-2 divide-y divide-[var(--hairline-soft)]">
         {tasks.map((t) => (
           <TaskRow key={t.id} task={t} />
         ))}
@@ -108,14 +108,16 @@ function TaskRow({ task }: { task: ListTask }) {
   }
 
   return (
-    <li className="group flex items-start gap-2.5 px-1 py-2">
+    <li className="group flex items-start gap-2.5 py-2.5">
       <button
         type="button"
         onClick={toggle}
         disabled={localDone || isPending}
         className={cn(
           'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors',
-          localDone ? 'text-success' : 'text-muted-foreground hover:text-foreground',
+          localDone
+            ? 'text-[var(--ledger-green)]'
+            : 'text-[var(--mono-muted)] hover:text-[var(--ink-text)]',
           isPending && 'animate-pulse',
         )}
         aria-label={localDone ? 'Marked done' : 'Mark task done'}
@@ -129,25 +131,25 @@ function TaskRow({ task }: { task: ListTask }) {
       <div className="min-w-0 flex-1">
         <p
           className={cn(
-            'text-[13.5px] leading-snug text-foreground',
-            localDone && 'text-muted-foreground line-through',
+            'text-[13.5px] leading-snug text-[var(--ink-text)]',
+            localDone && 'text-[var(--mono-muted)] line-through',
           )}
         >
           {task.body}
         </p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono-ledger text-[11px] text-[var(--mono-muted)]">
           {due ? (
             <span
               className={cn(
                 'inline-flex items-center gap-1',
-                due.overdue && !localDone && 'text-destructive',
+                due.overdue && !localDone && 'text-[var(--clay)]',
               )}
             >
               <Clock className="h-3 w-3" aria-hidden />
               {due.label}
             </span>
           ) : null}
-          {task.category ? <span>#{task.category}</span> : null}
+          {task.category ? <span className="text-[var(--brass)]">#{task.category}</span> : null}
           {task.assigneeName ? <span>· {task.assigneeName}</span> : null}
         </div>
       </div>

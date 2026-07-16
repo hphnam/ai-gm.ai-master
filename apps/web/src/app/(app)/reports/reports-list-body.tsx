@@ -1,18 +1,18 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { CalendarClock, FileBarChart, Loader2 } from 'lucide-react'
+import { BarChart3, CalendarClock, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
-import { ListRow } from '@/components/ui/list-row'
 import { PageContainer } from '@/components/ui/page-container'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ApiError } from '@/lib/api-client'
 import { useReports } from '@/lib/hooks/use-reports'
 import { prefetchReport } from '@/lib/prefetch'
+import { cn } from '@/lib/utils'
 
 export function ReportsListBody() {
   const list = useReports()
@@ -23,6 +23,7 @@ export function ReportsListBody() {
   return (
     <div className="scrollbar-thin flex-1 overflow-y-auto">
       <PageContainer width="prose">
+        <ReportsViewSwitch active="library" />
         {list.isLoading ? (
           <ReportsLoading />
         ) : list.isError ? (
@@ -31,42 +32,38 @@ export function ReportsListBody() {
           <ReportsEmpty />
         ) : (
           <>
-            <ul className="space-y-2.5">
+            <ul className="flex flex-col gap-2">
               {rows.map((r) => (
                 <li key={r.id}>
-                  <ListRow asChild interactive>
-                    <Link
-                      href={`/reports/${r.id}`}
-                      onMouseEnter={() => prefetchReport(queryClient, r.id)}
-                      onFocus={() => prefetchReport(queryClient, r.id)}
-                      className="group block"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
-                          aria-hidden
-                        >
-                          <FileBarChart className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-display text-base leading-tight text-foreground">
-                            {r.title}
-                          </h3>
-                          {r.summary ? (
-                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                              {r.summary}
-                            </p>
-                          ) : null}
-                          <p className="mt-2 text-xs text-muted-foreground">
-                            {new Date(r.createdAt).toLocaleString(undefined, {
-                              dateStyle: 'medium',
-                              timeStyle: 'short',
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </ListRow>
+                  <Link
+                    href={`/reports/${r.id}`}
+                    onMouseEnter={() => prefetchReport(queryClient, r.id)}
+                    onFocus={() => prefetchReport(queryClient, r.id)}
+                    className="group flex items-start gap-3.5 rounded-xl border border-[var(--hairline)] bg-card p-[15px] transition-[box-shadow,border-color] hover:border-[var(--hairline-strong)] hover:shadow-[0_4px_14px_-7px_rgba(32,26,18,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-muted text-brand">
+                      <BarChart3 className="h-[17px] w-[17px]" aria-hidden />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-[15px] font-semibold leading-[1.35] text-foreground">
+                        {r.title}
+                      </h3>
+                      {r.summary ? (
+                        <p className="mt-1 line-clamp-2 text-[12.5px] leading-[1.5] text-[var(--ink-muted)]">
+                          {r.summary}
+                        </p>
+                      ) : null}
+                      <p className="mt-2 font-mono-ledger text-[10.5px] text-[var(--ink-faint)]">
+                        {new Date(r.createdAt).toLocaleDateString(undefined, {
+                          dateStyle: 'medium',
+                        })}
+                      </p>
+                    </div>
+                    <ChevronRight
+                      className="mt-1.5 h-[15px] w-[15px] shrink-0 text-[var(--ink-faint)]"
+                      aria-hidden
+                    />
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -80,6 +77,24 @@ export function ReportsListBody() {
           </>
         )}
       </PageContainer>
+    </div>
+  )
+}
+
+// Library / Schedules segmented switch — Link tabs so each view keeps its own
+// route. Mirrored on the schedules page.
+export function ReportsViewSwitch({ active }: { active: 'library' | 'schedules' }) {
+  const tab = 'rounded-[7px] px-3.5 py-2 text-[13px] transition-colors'
+  const on = 'bg-[#fcfaf3] font-semibold text-foreground shadow-[0_1px_2px_rgba(32,26,18,0.06)]'
+  const off = 'font-medium text-[var(--ink-muted)] hover:text-foreground'
+  return (
+    <div className="mb-[22px] inline-flex gap-[3px] rounded-[10px] bg-muted p-[3px]">
+      <Link href="/reports" className={cn(tab, active === 'library' ? on : off)}>
+        Library
+      </Link>
+      <Link href="/reports/schedules" className={cn(tab, active === 'schedules' ? on : off)}>
+        Schedules
+      </Link>
     </div>
   )
 }
@@ -99,7 +114,7 @@ function PagerFooter({
 }) {
   return (
     <div className="mt-5 flex items-center justify-between gap-3">
-      <p className="text-xs text-muted-foreground tabular-nums">
+      <p className="font-mono-ledger text-[11px] tabular-nums text-[var(--mono-muted)]">
         Showing {shown} of {total}
       </p>
       {hasNext ? (
@@ -122,7 +137,7 @@ function PagerFooter({
 function ReportsEmpty() {
   return (
     <EmptyState
-      icon={FileBarChart}
+      icon={BarChart3}
       title="No reports yet"
       description="Ask the chat for a weekly recap, monthly P&L, or any breakdown — it'll save here with a permalink."
       action={
@@ -146,18 +161,19 @@ const REPORTS_SKELETON_KEYS = ['a', 'b', 'c', 'd']
 
 function ReportsLoading() {
   return (
-    <ul className="space-y-2.5">
+    <ul className="flex flex-col gap-2">
       {REPORTS_SKELETON_KEYS.map((k) => (
-        <ListRow asChild key={k}>
-          <li className="flex items-start gap-3">
-            <Skeleton className="h-9 w-9 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-3 w-3/4" />
-              <Skeleton className="h-3 w-24" />
-            </div>
-          </li>
-        </ListRow>
+        <li
+          key={k}
+          className="flex items-start gap-3.5 rounded-xl border border-[var(--hairline)] bg-card p-[15px]"
+        >
+          <Skeleton className="h-9 w-9 shrink-0 rounded-[9px]" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-3.5 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-2.5 w-24" />
+          </div>
+        </li>
       ))}
     </ul>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Check, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -93,18 +93,19 @@ export function VenueForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
             {selected ? (
-              <div className="rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm">
-                Found <span className="font-medium">{selected.name}</span>. Not right? Edit below,
-                or{' '}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-medium text-success">
+                  <Check className="h-3 w-3" aria-hidden />
+                  Pulled from Google Business
+                </span>
                 <button
                   type="button"
                   onClick={onSearchAgain}
                   disabled={submitting}
-                  className="cursor-pointer underline underline-offset-4 hover:text-foreground"
+                  className="cursor-pointer text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
                 >
-                  search again
+                  Search again
                 </button>
-                .
               </div>
             ) : null}
 
@@ -179,7 +180,11 @@ export function VenueForm() {
               )}
             />
             <div className="flex justify-end">
-              <Button type="submit" disabled={submitting}>
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="shadow-[0_2px_0_var(--brass-shadow)]"
+              >
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

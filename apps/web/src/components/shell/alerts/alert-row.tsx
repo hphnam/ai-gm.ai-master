@@ -24,6 +24,22 @@ function stripInternalLinks(body: string): string {
   return body.replace(INTERNAL_LINK_RE, '$1')
 }
 
+// Per-category colour: compliance ("closes a venue if you miss it") is clay,
+// tasks green, system a muted ink, everything else the assistant's brass. The
+// glyph tile and the little category chip share the same tint.
+function categoryTone(category: Notification['category']): { bg: string; text: string } {
+  switch (category) {
+    case 'compliance':
+      return { bg: 'bg-[rgba(154,75,44,0.12)]', text: 'text-[var(--clay)]' }
+    case 'task':
+      return { bg: 'bg-[rgba(47,93,61,0.1)]', text: 'text-[var(--ledger-green)]' }
+    case 'system':
+      return { bg: 'bg-[rgba(32,26,18,0.07)]', text: 'text-[var(--mono-muted)]' }
+    default:
+      return { bg: 'bg-[rgba(143,107,31,0.1)]', text: 'text-[var(--brass)]' }
+  }
+}
+
 export function AlertRow({
   note,
   expanded,
@@ -42,26 +58,35 @@ export function AlertRow({
   const action =
     note.category === 'report' || note.category === 'task' ? extractActionLink(note.body) : null
   const bodyPreview = stripInternalLinks(note.body)
+  const tone = categoryTone(note.category)
   return (
     <div
       className={cn(
-        'group border-b border-border/40 transition-colors last:border-b-0',
-        note.status === 'unread' && 'bg-muted/30',
-        isFocused && 'ring-2 ring-foreground/20 ring-inset',
+        'group overflow-hidden rounded-xl border transition-shadow',
+        note.status === 'unread'
+          ? 'border-[rgba(143,107,31,0.35)] bg-[#fbf6ea]'
+          : 'border-[var(--hairline)] bg-[var(--ledger-card)]',
+        isFocused && 'ring-2 ring-[var(--brass)]/30',
       )}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="flex w-full cursor-pointer items-start gap-2.5 px-4 py-3 text-left transition-colors hover:bg-accent/40"
+        className="flex w-full cursor-pointer items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-[var(--paper-2)]/40"
       >
-        <span className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-foreground/70">
+        <span
+          className={cn(
+            'relative mt-0.5 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-[rgba(32,26,18,0.1)]',
+            tone.bg,
+            tone.text,
+          )}
+        >
           {/* Automated rows wear the gm wordmark in place of the category */}
           {/* icon so the recipient reads it as "the assistant reminding me" */}
           {/* rather than "Elliot sent me a message". */}
           {note.automated ? (
-            <span className="font-display font-semibold text-[10px] text-foreground/80 leading-none tracking-tight">
+            <span className="font-display font-semibold text-[10px] leading-none tracking-tight">
               gm
             </span>
           ) : (
@@ -71,7 +96,7 @@ export function AlertRow({
             <span
               role="status"
               aria-label="Unread"
-              className="-top-0.5 -right-0.5 absolute h-2 w-2 rounded-full bg-amber-500 ring-2 ring-background"
+              className="-top-0.5 -right-0.5 absolute h-2 w-2 rounded-full bg-[var(--brass)] ring-2 ring-background"
             />
           ) : null}
         </span>
@@ -80,25 +105,31 @@ export function AlertRow({
             <span className="flex min-w-0 items-baseline gap-1.5">
               {note.automated ? (
                 <>
-                  <span className="shrink-0 font-medium text-foreground text-xs">gm</span>
+                  <span className="shrink-0 font-semibold text-foreground text-xs">gm</span>
                   {note.author ? (
-                    <span className="min-w-0 truncate text-[10px] text-foreground/50">
+                    <span className="min-w-0 truncate text-[10px] text-[var(--ink-faint)]">
                       · {note.category === 'task' ? 'task by' : 'set up by'} {authorLabel(note)}
                     </span>
                   ) : null}
                 </>
               ) : (
-                <span className="truncate font-medium text-foreground text-xs">
+                <span className="truncate font-semibold text-foreground text-xs">
                   {authorLabel(note)}
                 </span>
               )}
-              <span className="shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] text-foreground/55 uppercase tracking-wider">
+              <span
+                className={cn(
+                  'shrink-0 rounded font-mono-ledger px-1.5 py-0.5 text-[8.5px] uppercase tracking-[0.05em]',
+                  tone.bg,
+                  tone.text,
+                )}
+              >
                 {CATEGORY_LABELS[note.category]}
               </span>
             </span>
             <time
               dateTime={note.createdAt}
-              className="shrink-0 text-[10px] text-foreground/50"
+              className="shrink-0 font-mono-ledger text-[10px] text-[var(--ink-faint)]"
               title={new Date(note.createdAt).toLocaleString()}
             >
               {formatRelative(note.createdAt)}
@@ -106,7 +137,7 @@ export function AlertRow({
           </div>
           <p
             className={cn(
-              'whitespace-pre-wrap break-words text-foreground/85 text-sm',
+              'whitespace-pre-wrap break-words text-[#3a3327] text-sm',
               expanded ? '' : 'line-clamp-3',
             )}
           >

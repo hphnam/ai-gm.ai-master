@@ -1,8 +1,9 @@
 'use client'
 
-import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Plug, Unplug } from 'lucide-react'
-import { useState } from 'react'
+import { AlertCircle, ChevronDown, ExternalLink, Loader2, Plug, Unplug } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import {
@@ -34,6 +35,7 @@ import {
   useUpdateVenueSquareLocation,
 } from '@/lib/hooks/use-integrations'
 import { useVenue, useVenues } from '@/lib/hooks/use-venues'
+import { cn } from '@/lib/utils'
 
 export function IntegrationsBody({ isManager }: { isManager: boolean }) {
   const integrations = useIntegrations()
@@ -42,7 +44,7 @@ export function IntegrationsBody({ isManager }: { isManager: boolean }) {
     return (
       <div className="space-y-3" aria-busy="true">
         {INTEGRATION_PROVIDERS.map((meta) => (
-          <div key={meta.id} className="rounded-lg border bg-card p-4 shadow-sm">
+          <div key={meta.id} className="rounded-xl border bg-card p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-32" />
@@ -66,14 +68,10 @@ export function IntegrationsBody({ isManager }: { isManager: boolean }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        {INTEGRATION_PROVIDERS.map((meta) => (
-          <ProviderCard key={meta.id} meta={meta} integration={byProvider.get(meta.id) ?? null} />
-        ))}
-      </div>
-
-      {byProvider.get('square')?.status === 'active' ? <SquareVenueMapping /> : null}
+    <div className="space-y-3">
+      {INTEGRATION_PROVIDERS.map((meta) => (
+        <ProviderCard key={meta.id} meta={meta} integration={byProvider.get(meta.id) ?? null} />
+      ))}
     </div>
   )
 }
@@ -92,45 +90,56 @@ function ProviderCard({
   const status = integration?.status ?? null
   const isActive = status === 'active'
   const isError = status === 'error'
+  // Surface the detail by default when there's something worth seeing (live
+  // connection meta + venue mapping, or an error to act on).
+  const [expanded, setExpanded] = useState(isActive || isError)
+  // Re-reveal on a transition into active/error (e.g. right after connecting)
+  // so the Square venue mapping isn't left collapsed on this still-mounted card.
+  const prevStatus = useRef(status)
+  useEffect(() => {
+    const was = prevStatus.current
+    prevStatus.current = status
+    if (status !== was && (status === 'active' || status === 'error')) setExpanded(true)
+  }, [status])
+  const bodyId = `integration-${meta.id}-detail`
 
   return (
-    <article className="rounded-lg border bg-card p-4 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold tracking-tight">{meta.label}</h3>
+    <article className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3.5">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-controls={expanded ? bodyId : undefined}
+          className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left"
+        >
+          <span
+            className="font-mono-ledger flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-muted text-[17px] font-bold text-muted-foreground"
+            aria-hidden
+          >
+            {meta.label.charAt(0)}
+          </span>
+          <span className="flex min-w-0 flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold tracking-tight text-foreground">
+              {meta.label}
+            </span>
             <StatusPill status={status} />
             {integration?.environment && integration.environment !== 'production' ? (
-              <span className="rounded-full border bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              <Badge variant="outline" size="sm">
                 {integration.environment}
-              </span>
+              </Badge>
             ) : null}
-          </div>
-          <p className="mt-1 max-w-xl text-xs text-muted-foreground">{meta.description}</p>
+          </span>
+          <ChevronDown
+            className={cn(
+              'ml-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform',
+              expanded && 'rotate-180',
+            )}
+            aria-hidden
+          />
+        </button>
 
-          {isActive && integration ? (
-            <div className="mt-2 space-y-0.5 text-[11px] text-muted-foreground">
-              {integration.externalAccountId ? (
-                <p>
-                  Connected as <span className="font-mono">{integration.externalAccountId}</span>
-                </p>
-              ) : null}
-              <p>Connected {new Date(integration.connectedAt).toLocaleString()}</p>
-              {integration.lastSyncedAt ? (
-                <p>Last used {new Date(integration.lastSyncedAt).toLocaleString()}</p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {isError && integration?.lastError ? (
-            <p className="mt-2 flex items-start gap-1.5 text-[11px] text-destructive">
-              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span>{integration.lastError}</span>
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 max-sm:w-full max-sm:justify-end">
           {isActive ? (
             <>
               <Button
@@ -152,13 +161,44 @@ function ProviderCard({
               </Button>
             </>
           ) : (
-            <Button size="sm" onClick={() => setConnectOpen(true)}>
+            <Button
+              size="sm"
+              onClick={() => setConnectOpen(true)}
+              className="shadow-[0_2px_0_var(--brass-shadow)]"
+            >
               <Plug className="mr-1.5 h-3.5 w-3.5" aria-hidden />
               Connect
             </Button>
           )}
         </div>
       </div>
+
+      {expanded ? (
+        <div id={bodyId} className="border-t px-4 py-4">
+          <p className="max-w-xl text-sm text-muted-foreground">{meta.description}</p>
+
+          {isActive && integration ? (
+            <p className="font-mono-ledger mt-2 text-[11px] text-muted-foreground">
+              {integration.externalAccountId
+                ? `Connected as ${integration.externalAccountId} · `
+                : ''}
+              since {new Date(integration.connectedAt).toLocaleDateString()}
+              {integration.lastSyncedAt
+                ? ` · last used ${new Date(integration.lastSyncedAt).toLocaleDateString()}`
+                : ''}
+            </p>
+          ) : null}
+
+          {isError && integration?.lastError ? (
+            <p className="mt-2 flex items-start gap-1.5 text-[11px] text-destructive">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>{integration.lastError}</span>
+            </p>
+          ) : null}
+
+          {isActive && meta.id === 'square' ? <SquareVenueMapping /> : null}
+        </div>
+      ) : null}
 
       <ConnectPatDialog
         open={connectOpen}
@@ -183,31 +223,31 @@ function ProviderCard({
 function StatusPill({ status }: { status: string | null }) {
   if (status === 'active') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
-        <CheckCircle2 className="h-3 w-3" aria-hidden />
+      <Badge variant="success" size="sm">
+        <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
         Connected
-      </span>
+      </Badge>
     )
   }
   if (status === 'error') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-medium text-destructive">
+      <Badge variant="urgent" size="sm">
         <AlertCircle className="h-3 w-3" aria-hidden />
         Error
-      </span>
+      </Badge>
     )
   }
   if (status === 'disconnected') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+      <Badge variant="neutral" size="sm">
         Disconnected
-      </span>
+      </Badge>
     )
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+    <Badge variant="neutral" size="sm">
       Not connected
-    </span>
+    </Badge>
   )
 }
 
@@ -332,7 +372,11 @@ function ConnectPatDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={connect.isPending || accessToken.trim().length < 8}>
+            <Button
+              type="submit"
+              disabled={connect.isPending || accessToken.trim().length < 8}
+              className="shadow-[0_2px_0_var(--brass-shadow)]"
+            >
               {connect.isPending ? (
                 <>
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" aria-hidden />
@@ -364,14 +408,14 @@ function SquareVenueMapping() {
 
   if (venues.isLoading || locations.isLoading) {
     return (
-      <section className="rounded-lg border bg-card p-4 shadow-sm" aria-busy="true">
-        <Skeleton className="h-4 w-32" />
+      <div className="mt-4 border-t pt-4" aria-busy="true">
+        <Skeleton className="h-3 w-28" />
         <Skeleton className="mt-2 h-3 w-72 max-w-full" />
         <div className="mt-3 space-y-2">
           <Skeleton className="h-9 w-full rounded-md" />
           <Skeleton className="h-9 w-full rounded-md" />
         </div>
-      </section>
+      </div>
     )
   }
 
@@ -379,17 +423,19 @@ function SquareVenueMapping() {
   const locationError = locations.data?.error ?? null
 
   return (
-    <section className="rounded-lg border bg-card p-4 shadow-sm">
+    <div className="mt-4 border-t pt-4">
       <header className="mb-3">
-        <h3 className="text-sm font-semibold tracking-tight">Venue mapping</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
+        <h3 className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
+          Venue mapping
+        </h3>
+        <p className="mt-1.5 text-xs text-muted-foreground">
           Map each venue to a Square location so the chat agent knows which till's data to read when
           staff ask about prices, stock, or sales.
         </p>
       </header>
 
       {locationError ? (
-        <p className="mb-3 flex items-start gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
+        <p className="mb-3 flex items-start gap-1.5 rounded-md border border-warning/30 bg-warning/10 p-2 text-xs text-warning">
           <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
           <span>{locationError}</span>
         </p>
@@ -417,7 +463,7 @@ function SquareVenueMapping() {
           />
         ))}
       </div>
-    </section>
+    </div>
   )
 }
 
@@ -440,7 +486,7 @@ function VenueMappingRow({
   const current = detail?.squareLocationId ?? null
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-md border bg-background p-3 text-sm">
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-muted/40 px-3 py-2.5 text-sm">
       <div className="flex-1">
         <p className="font-medium">{venueName}</p>
         {current ? (
@@ -449,13 +495,13 @@ function VenueMappingRow({
           <p className="mt-0.5 text-[11px] text-muted-foreground">No Square location mapped</p>
         )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-1 items-center gap-2 sm:flex-none">
         <Select
           value={current ?? '__clear__'}
           onValueChange={onChange}
           disabled={saving || locationOptions.length === 0}
         >
-          <SelectTrigger className="h-8 w-56 text-xs">
+          <SelectTrigger className="h-8 w-full text-xs sm:w-56">
             <SelectValue placeholder="Pick a location" />
           </SelectTrigger>
           <SelectContent>

@@ -8,7 +8,7 @@ import { apiErrorLabel } from '../notifications-shared'
 export function AlertsHeader() {
   const markAllRead = useMarkAllNotificationsRead()
   return (
-    <div className="flex items-center justify-end gap-1 border-b border-border px-4 py-2">
+    <div className="flex items-center justify-end gap-1 border-b border-[var(--hairline)] px-4 py-2">
       <button
         type="button"
         onClick={() =>
@@ -26,7 +26,7 @@ export function AlertsHeader() {
           })
         }
         disabled={markAllRead.isPending}
-        className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-foreground/70 text-xs transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-[var(--ink-muted)] text-xs transition-colors hover:bg-[var(--paper-2)] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
         title="Mark all as read"
       >
         <CheckCheck className="h-3.5 w-3.5" aria-hidden />

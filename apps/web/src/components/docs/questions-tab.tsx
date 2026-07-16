@@ -48,12 +48,15 @@ export function QuestionsTab() {
     <div className="space-y-6">
       {gapsList.length > 0 ? <GapList gaps={gapsList} /> : null}
       {noDataList.length > 0 ? (
-        <section aria-labelledby="no-data-heading" className="space-y-2">
-          <header className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-1">
-            <h3 id="no-data-heading" className="text-sm font-semibold tracking-tight">
+        <section aria-labelledby="no-data-heading" className="space-y-2.5">
+          <header className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span
+              id="no-data-heading"
+              className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]"
+            >
               Searches with no results
-            </h3>
-            <span className="text-xs text-muted-foreground">
+            </span>
+            <span className="font-mono-ledger text-xs text-[#a5987c]">
               {noDataList.length} unique · last 30 days · add the useful ones to your questions
             </span>
           </header>

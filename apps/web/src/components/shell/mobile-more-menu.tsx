@@ -85,7 +85,7 @@ export function MobileMoreMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/settings">
+          <Link href="/settings/general">
             <Settings className="h-4 w-4" aria-hidden />
             Settings
           </Link>

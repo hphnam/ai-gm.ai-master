@@ -42,10 +42,16 @@ type Props = {
   showBar?: boolean
 }
 
-const TONE_BG: Record<Tone, string> = {
-  positive: 'bg-chart-1/15',
-  warning: 'bg-chart-2/15',
-  neutral: 'bg-muted',
+const TONE_TRACK: Record<Tone, string> = {
+  positive: 'bg-[rgba(47,93,61,0.14)]',
+  warning: 'bg-[rgba(154,75,44,0.14)]',
+  neutral: 'bg-[var(--hairline-soft)]',
+}
+
+const TONE_FILL: Record<Tone, string> = {
+  positive: 'bg-[var(--ledger-green)]',
+  warning: 'bg-[var(--clay)]',
+  neutral: 'bg-[var(--mono-muted)]',
 }
 
 /// Generic ranked-bar list. The "Top no-data queries" pattern, extracted —
@@ -80,35 +86,41 @@ export function RankList({
   }
   const max = items.reduce((m, it) => Math.max(m, it.weight), 1)
   return (
-    <ol className="scrollbar-thin space-y-1.5 overflow-y-auto pr-1" style={{ maxHeight }}>
+    <ol className="scrollbar-thin space-y-[13px] overflow-y-auto pr-1" style={{ maxHeight }}>
       {items.map((it) => {
-        const fill = showBar ? `${Math.max(6, (it.weight / max) * 100)}%` : '0%'
+        const fill = `${Math.max(6, (it.weight / max) * 100)}%`
         const inner = (
           <>
-            {showBar ? (
-              <div
-                aria-hidden="true"
-                className={`absolute inset-y-0 left-0 ${TONE_BG[tone]} transition-[width]`}
-                style={{ width: fill }}
-              />
-            ) : null}
-            <div className="relative flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 flex-col">
-                <span className="line-clamp-1 text-sm text-foreground">{it.primary}</span>
+                <span className="line-clamp-1 text-[13px] text-[var(--ink-text)]">
+                  {it.primary}
+                </span>
                 {it.secondary ? (
-                  <span className="line-clamp-1 text-xs text-muted-foreground">{it.secondary}</span>
+                  <span className="line-clamp-1 text-[11.5px] text-[var(--mono-muted)]">
+                    {it.secondary}
+                  </span>
                 ) : null}
               </div>
-              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+              <span className="shrink-0 whitespace-nowrap font-mono-ledger text-[12px] text-[var(--mono-muted)] tabular-nums">
                 {it.trailing}
               </span>
             </div>
+            {showBar ? (
+              <div
+                aria-hidden="true"
+                className={`mt-[6px] h-1 overflow-hidden rounded-full ${TONE_TRACK[tone]}`}
+              >
+                <div
+                  className={`h-full rounded-full ${TONE_FILL[tone]} transition-[width]`}
+                  style={{ width: fill }}
+                />
+              </div>
+            ) : null}
           </>
         )
         const interactiveClass =
-          'group relative block w-full cursor-pointer overflow-hidden rounded-md border border-border bg-background px-3 py-2 text-left transition-colors hover:border-foreground/30'
-        const staticClass =
-          'group relative overflow-hidden rounded-md border border-border bg-background px-3 py-2'
+          'group -mx-2 block w-full cursor-pointer rounded-md px-2 py-1.5 text-left transition-colors hover:bg-[var(--paper-2)]'
         return (
           <li key={it.key}>
             {it.href ? (
@@ -120,7 +132,7 @@ export function RankList({
                 {inner}
               </button>
             ) : (
-              <div className={staticClass}>{inner}</div>
+              <div>{inner}</div>
             )}
           </li>
         )

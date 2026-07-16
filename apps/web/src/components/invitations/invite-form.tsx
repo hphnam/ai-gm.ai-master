@@ -179,7 +179,11 @@ export function InviteForm() {
               <Plus className="h-3.5 w-3.5" aria-hidden />
               Add another
             </Button>
-            <Button type="submit" disabled={batch.isPending}>
+            <Button
+              type="submit"
+              disabled={batch.isPending}
+              className="shadow-[0_2px_0_var(--brass-shadow)]"
+            >
               {batch.isPending ? 'Sending…' : count > 1 ? `Send ${count} invites` : 'Send invite'}
             </Button>
           </div>

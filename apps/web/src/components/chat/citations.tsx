@@ -70,7 +70,7 @@ export function CitationChip({ docId, children }: { docId: string; children: Rea
             <button
               type="button"
               aria-label="View source document"
-              className="mx-0.5 inline-flex h-[18px] min-w-[18px] cursor-pointer items-center justify-center rounded-md bg-muted px-1 align-[-0.15em] text-[11px] font-semibold leading-none tracking-tight text-foreground/75 transition-colors hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              className="mx-0.5 inline-flex h-[18px] min-w-[18px] cursor-pointer items-center justify-center rounded-[4px] border border-[rgba(143,107,31,0.35)] bg-[rgba(143,107,31,0.08)] px-1 align-[-0.15em] font-mono-ledger text-[11px] font-medium leading-none tracking-tight text-[var(--brass)] transition-colors hover:bg-[var(--brass)] hover:text-[var(--cream-hi)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brass)]"
             >
               {children}
             </button>
@@ -121,7 +121,7 @@ function CitationTooltipBody({ docId, index }: { docId: string; index: React.Rea
   const updated = data?.updatedAt ? formatRelativeUpdated(data.updatedAt) : null
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+      <span className="font-mono-ledger text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--mono-muted)]">
         Source {index}
       </span>
       <span className="line-clamp-2 text-[12.5px] font-medium leading-snug text-foreground">
@@ -132,7 +132,7 @@ function CitationTooltipBody({ docId, index }: { docId: string; index: React.Rea
       ) : null}
       {sections.length > 0 ? (
         <div className="mt-1 border-t border-border/60 pt-1">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          <span className="font-mono-ledger text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--mono-muted)]">
             {sections.length === 1 ? 'Section read' : 'Sections read'}
           </span>
           <ul className="mt-0.5 space-y-0.5">

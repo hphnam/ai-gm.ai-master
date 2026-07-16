@@ -16,20 +16,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { authClient, useSession } from '@/lib/auth-client'
+import { initials } from '@/lib/initials'
 import { cn } from '@/lib/utils'
 
 export type SidebarUserInfo = { name: string | null; email: string }
-
-function initials(name: string | null | undefined, email: string): string {
-  const source = name?.trim() || email.split('@')[0] || '?'
-  return (
-    source
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
-      .join('') || '?'
-  )
-}
 
 export function SidebarUser({ initialUser }: { initialUser: SidebarUserInfo }) {
   const router = useRouter()

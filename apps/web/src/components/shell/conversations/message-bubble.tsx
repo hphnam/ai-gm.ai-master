@@ -44,7 +44,9 @@ export function MessageBubble({
         className={cn('flex max-w-[78%] flex-col gap-0.5', fromMe ? 'items-end' : 'items-start')}
       >
         {showAuthor && author ? (
-          <span className="px-1 text-[10px] text-foreground/55">{author.name ?? author.email}</span>
+          <span className="px-1 text-[10px] text-[var(--mono-muted)]">
+            {author.name ?? author.email}
+          </span>
         ) : null}
         <div className={cn('flex items-center gap-1', fromMe ? 'flex-row' : 'flex-row-reverse')}>
           <DropdownMenu>
@@ -52,7 +54,7 @@ export function MessageBubble({
               <button
                 type="button"
                 aria-label="Message actions"
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground/40 opacity-100 transition-opacity hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-[var(--ink-faint)] opacity-100 transition-opacity hover:bg-[var(--paper-2)] hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
               >
                 <MoreVertical className="h-4 w-4" aria-hidden />
               </button>
@@ -60,7 +62,7 @@ export function MessageBubble({
             <DropdownMenuContent align={fromMe ? 'end' : 'start'} className="min-w-[180px]">
               <DropdownMenuItem
                 onSelect={() => handleDelete('self')}
-                className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950/30"
+                className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" aria-hidden />
                 Delete for me
@@ -71,7 +73,7 @@ export function MessageBubble({
                     e.preventDefault()
                     setConfirmAllOpen(true)
                   }}
-                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700 dark:focus:bg-red-950/30"
+                  className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-3.5 w-3.5" aria-hidden />
                   Delete for everyone
@@ -82,8 +84,10 @@ export function MessageBubble({
 
           <div
             className={cn(
-              'rounded-2xl px-3 py-1.5 text-sm leading-snug shadow-sm',
-              fromMe ? 'bg-foreground text-background' : 'bg-muted text-foreground',
+              'rounded-2xl px-3 py-1.5 text-sm leading-snug shadow-[0_1px_2px_rgba(32,26,18,0.08)]',
+              fromMe
+                ? 'bg-[#ece3d2] text-foreground'
+                : 'border border-[var(--hairline-soft)] bg-[var(--ledger-card)] text-foreground',
             )}
           >
             <p className="whitespace-pre-wrap break-words">{body}</p>
@@ -91,11 +95,15 @@ export function MessageBubble({
         </div>
         <div
           className={cn(
-            'flex items-center gap-1.5 px-1 text-[10px] text-foreground/45',
+            'flex items-center gap-1.5 px-1 text-[10px] text-[var(--ink-faint)]',
             fromMe ? 'flex-row-reverse' : '',
           )}
         >
-          <time dateTime={sentAt} title={new Date(sentAt).toLocaleString()}>
+          <time
+            dateTime={sentAt}
+            title={new Date(sentAt).toLocaleString()}
+            className="font-mono-ledger"
+          >
             {formatRelative(sentAt)}
           </time>
           {viaAi ? <GmMonogram /> : null}
@@ -103,7 +111,9 @@ export function MessageBubble({
             <span
               className={cn(
                 'font-medium',
-                message.status === 'read' ? 'text-chart-1' : 'text-foreground/55',
+                message.status === 'read'
+                  ? 'text-[var(--ledger-green)]'
+                  : 'text-[var(--mono-muted)]',
               )}
             >
               {message.status === 'read' ? 'Read' : 'Sent'}

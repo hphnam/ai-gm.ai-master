@@ -118,18 +118,18 @@ function VenuePicker({
           type="button"
           aria-label={`Switch venue — currently editing ${active.name}`}
           className={cn(
-            'group flex w-full cursor-pointer items-center gap-3 rounded-lg border bg-card px-4 py-3 text-left shadow-sm transition-colors',
+            'group flex w-full cursor-pointer items-center gap-3 rounded-xl border bg-card px-4 py-3 text-left shadow-sm transition-colors',
             'hover:border-foreground/30',
           )}
         >
           <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground"
             aria-hidden
           >
             <Store className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--mono-muted)]">
               Editing
             </p>
             <p className="truncate text-sm font-medium text-foreground">{active.name}</p>

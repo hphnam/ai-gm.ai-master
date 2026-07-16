@@ -89,14 +89,14 @@ export function SettingsShell({
                       'flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
                       'md:gap-3',
                       selected
-                        ? 'bg-muted font-medium text-foreground'
-                        : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+                        ? 'bg-[#fcfaf3] font-semibold text-[var(--ink-text)] shadow-[0_1px_2px_rgba(32,26,18,0.05)]'
+                        : 'text-[var(--ink-muted)] hover:bg-black/5 hover:text-[var(--ink-text)]',
                     )}
                   >
                     <Icon className="h-4 w-4 shrink-0" aria-hidden />
                     <span className="flex flex-col">
                       <span className="leading-tight">{label}</span>
-                      <span className="hidden text-xs font-normal text-muted-foreground md:block">
+                      <span className="hidden text-xs font-normal text-[var(--mono-muted)] md:block">
                         {description}
                       </span>
                     </span>

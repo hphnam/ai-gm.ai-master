@@ -28,7 +28,7 @@ export function NoteCard({ part, ctx }: ToolCardRendererProps) {
   if (data.status === 'no-match') {
     return (
       <CardShell icon={Users} title="No match" tone="warning">
-        <p className="text-[13px] leading-snug text-foreground">
+        <p className="text-[13px] leading-snug text-[var(--ink-text)]">
           Couldn&apos;t find that person. Try a different name.
         </p>
       </CardShell>
@@ -39,7 +39,7 @@ export function NoteCard({ part, ctx }: ToolCardRendererProps) {
     const body = data.body
     return (
       <CardShell icon={Users} title="Which one?" subtitle={`${data.candidates.length} matches`}>
-        <p className="mb-2 text-[12.5px] leading-snug text-muted-foreground">
+        <p className="mb-2 text-[12.5px] leading-snug text-[var(--ink-muted)]">
           Tap who you meant — I&apos;ll send the note.
         </p>
         <div className="flex flex-col gap-1">
@@ -52,11 +52,11 @@ export function NoteCard({ part, ctx }: ToolCardRendererProps) {
                   `Send that note to @[${sanitizeMentionName(c.name)}](${c.userId}): ${body}`,
                 )
               }
-              className="flex items-center justify-between gap-2 rounded-md border border-border bg-background px-3 py-2 text-left text-[13px] transition-colors hover:bg-accent"
+              className="flex items-center justify-between gap-2 rounded-md border border-[var(--hairline)] bg-[#fcfaf3] px-3 py-2 text-left text-[13px] text-[var(--ink-text)] transition-colors hover:bg-[var(--paper-2)]"
             >
               <span className="font-medium">{c.name}</span>
               {c.role ? (
-                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                <span className="font-mono-ledger text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--mono-muted)]">
                   {c.role}
                 </span>
               ) : null}
@@ -75,9 +75,9 @@ export function NoteCard({ part, ctx }: ToolCardRendererProps) {
       tone="success"
     >
       {data.body ? (
-        <p className="text-[13.5px] leading-snug text-foreground">{data.body}</p>
+        <p className="text-[13.5px] leading-snug text-[var(--ink-text)]">{data.body}</p>
       ) : (
-        <p className="text-[12.5px] text-muted-foreground">They&apos;ll see it in their inbox.</p>
+        <p className="text-[12.5px] text-[var(--ink-muted)]">They&apos;ll see it in their inbox.</p>
       )}
     </CardShell>
   )

@@ -338,7 +338,7 @@ export function ChatMessage({
         aria-label="Your message"
         className="flex w-full justify-end duration-300 animate-in fade-in slide-in-from-bottom-1 motion-reduce:animate-none"
       >
-        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-muted px-4 py-2.5 text-[15px] leading-relaxed text-foreground">
+        <div className="max-w-[85%] rounded-[18px] bg-[#ece3d2] px-[17px] py-3 text-[15px] leading-[1.5] text-[var(--ink-text)]">
           <MentionedText text={text} className="whitespace-pre-wrap break-words" />
         </div>
       </article>
