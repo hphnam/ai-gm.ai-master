@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 from compute.contract import (
     ComputeDataset,
+    ExogenousRow,
     OrgProfile,
     PriorState,
     SalesRow,
@@ -193,6 +194,76 @@ def test_a_failing_venue_does_not_lose_the_bundle():
     )
     bundle = run(ds)
     assert any("forecast failed" in d for d in bundle.diagnostics)
+
+
+# --- Supplied-but-unconsumed fields are reported, not dropped ----------------
+
+def test_supplied_exogenous_is_reported_as_unconsumed():
+    """extra="forbid" stops a caller believing it sent an UNKNOWN field. A KNOWN field
+    that validates and is then ignored is the same lie with better manners."""
+    ds = _dataset()
+    ds.exogenous = [ExogenousRow(venue="ghost_bar", date=date(2026, 1, 1),
+                                 values={"exo_temp_c": 12.0})]
+    bundle = run(ds)
+    assert any("exogenous" in d and "NOT consumed" in d for d in bundle.diagnostics)
+
+
+def test_supplied_horizon_is_reported_as_unhonoured():
+    bundle = run(_dataset(horizon_days=14))
+    assert any("horizon_days=14" in d for d in bundle.diagnostics)
+
+
+def test_per_venue_profile_is_reported_as_unhonoured():
+    """The contract carries structural_zero_dow but Lune's globals still win, so a
+    tenant that sets it must not be left believing it took effect."""
+    ds = ComputeDataset(
+        org_profile=OrgProfile(org_id="o", venues=[
+            VenueProfile(venue_id="v", slug="ghost_bar", structural_zero_dow=[0, 1])]),
+        sales_daily=_sales("ghost_bar"),
+        prior_state=PriorState(served_model={"ghost_bar": "rung2_ets"}),
+    )
+    bundle = run(ds)
+    assert any("per-venue profile" in d for d in bundle.diagnostics)
+
+
+def test_a_default_dataset_reports_no_false_unconsumed_warnings():
+    """The warnings must mean something: a caller sending nothing extra gets silence."""
+    bundle = run(_dataset())
+    assert not [d for d in bundle.diagnostics if "NOT consumed" in d or "NOT honoured" in d]
+
+
+# --- Prior state round-trips -------------------------------------------------
+
+def test_briefing_chain_survives_the_round_trip():
+    """Drop it and every standing item re-fires daily: the false-alarm control is gone."""
+    chain = [{"id": "stock-low", "status": "continuing"}]
+    bundle = run(_dataset(prior_state=PriorState(
+        served_model={"ghost_bar": "rung2_ets"}, briefing_chain=chain)))
+    assert bundle.briefing_chain == chain
+
+
+def test_change_point_state_survives_the_round_trip():
+    """Drop it and a closed venue re-alarms every day."""
+    state = {"ghost_bar": {"dormant_since": "2026-05-08"}}
+    bundle = run(_dataset(prior_state=PriorState(
+        served_model={"ghost_bar": "rung2_ets"}, change_point_state=state)))
+    assert bundle.change_point_state == state
+
+
+# --- Scratch residue ----------------------------------------------------------
+
+def test_sweep_removes_a_stranded_scratch_directory():
+    """TemporaryDirectory does not unwind on SIGKILL, and an OOM kill is how this
+    process realistically dies, stranding one org's sales in TMPDIR."""
+    import tempfile as _tf
+    from pathlib import Path as _P
+
+    from compute.engine import SCRATCH_PREFIX, sweep_stale_scratch
+
+    stranded = _P(_tf.mkdtemp(prefix=SCRATCH_PREFIX))
+    (stranded / "scratch.duckdb").write_bytes(b"one org's sales")
+    assert sweep_stale_scratch() >= 1
+    assert not stranded.exists()
 
 
 # --- The dataset contract is strict ------------------------------------------

@@ -22,10 +22,14 @@ from fastapi import Depends, FastAPI, HTTPException
 
 import config
 from compute.contract import ComputeBundle, ComputeDataset
-from compute.engine import run
+from compute.engine import run, sweep_stale_scratch
 from service.auth import assert_auth_configured, require_auth
 
 assert_auth_configured()   # no secret and no explicit opt-out => do not serve
+
+# An OOM kill strands a scratch DuckDB holding one org's sales in TMPDIR, and they
+# accumulate across restarts. Boot is the only moment we know none of ours is live.
+_SWEPT = sweep_stale_scratch()
 
 app = FastAPI(
     title="Proactive Brain · compute",

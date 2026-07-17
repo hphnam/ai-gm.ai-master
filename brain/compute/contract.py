@@ -194,14 +194,27 @@ class DormantVenue(_Strict):
 class ComputeBundle(_Strict):
     """Everything the API persists. Compute writes none of it."""
 
-    org_id: str
+    org_id: str = Field(
+        description="ECHOED from the request, never decided here, and NOT an "
+                    "authorization statement. The caller MUST persist under the orgId "
+                    "it already authorized and assert `bundle.org_id == expectedOrgId` "
+                    "rather than trusting this value: it is only ever as trustworthy as "
+                    "whatever sent the dataset. It exists so an async caller can match a "
+                    "bundle to its request, not to tell the caller whose data this is.")
     forecasts: list[ForecastRow] = Field(default_factory=list)
     bands: list[BandRow] = Field(default_factory=list)
     served: list[ServedRow] = Field(default_factory=list)
     watermark: date | None = None
     ladder_selection: list[LadderSelectionRow] = Field(default_factory=list)
     dormant: list[DormantVenue] = Field(default_factory=list)
+    # State the API must persist and hand back next call, or the behaviour it gates is
+    # lost. Both are currently ECHOED from prior_state rather than advanced, because the
+    # engine does not run the briefing or the change-point detector yet; echoing keeps
+    # the round-trip intact so wiring them later is not also a schema change. Dropping
+    # either would silently restore the failure it prevents: daily re-firing of every
+    # standing item, and a closed venue re-alarming every day.
     briefing_chain: list[dict] = Field(default_factory=list)
+    change_point_state: dict[str, dict] = Field(default_factory=dict)
     diagnostics: list[str] = Field(
         default_factory=list,
         description="Weather gaps, refit reasons, degradation notes. Surfaced, never "

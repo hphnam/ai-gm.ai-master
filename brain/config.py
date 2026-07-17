@@ -326,7 +326,10 @@ BRIEFING_RECENCY_FLOOR = 0.5                 # recency_factor floor at the windo
 # is INERT by default: the brain warehouses from the CSVs, not Square/Neon, until
 # Ryan provisions access and LIVE_INGEST flips.
 LIVE_INGEST = os.environ.get("LIVE_INGEST", "0") == "1"   # master gate; False today
-INGEST_SOURCE = os.environ.get("INGEST_SOURCE", "csv")    # csv | neon | square
+# csv is the only source: the neon/square adapters are deleted, not disabled. The brain
+# does not fetch its own history; gm-ai's API supplies an org's rows per request and
+# compute/loader.py loads them. This selects the RESEARCH bootstrap only.
+INGEST_SOURCE = os.environ.get("INGEST_SOURCE", "csv")    # csv
 LIVE_CACHE_TTL_MIN = 10          # T1 per-(venue,metric,window) cache TTL (minutes)
 INGEST_STALENESS_DAYS = 1        # source ahead of the watermark by > this → stale
 RETRAIN_CADENCE_DAYS = 7         # T3 weekly boundary since the last fit

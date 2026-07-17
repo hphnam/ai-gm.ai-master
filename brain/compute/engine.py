@@ -15,6 +15,8 @@ API needs it back to persist the bundle, never because compute decided it.
 
 from __future__ import annotations
 
+import os
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -29,19 +31,52 @@ from compute.contract import (
 )
 from store import warehouse
 
+SCRATCH_PREFIX = "brain-compute-"
+
+
+def sweep_stale_scratch() -> int:
+    """Delete scratch directories a previous process left behind. Returns the count.
+
+    TemporaryDirectory unwinds on exception but NOT on SIGKILL, and an OOM kill is the
+    realistic way this process dies: it holds Chronos plus several GB and the compute
+    route has no concurrency cap of its own. Each kill would otherwise strand a DuckDB
+    containing one org's sales in TMPDIR, and they accumulate across restarts.
+
+    Called at service import (service/compute.py), which is the only moment we know no
+    scratch of ours is live.
+    """
+    swept = 0
+    for path in Path(tempfile.gettempdir()).glob(f"{SCRATCH_PREFIX}*"):
+        if not path.is_dir():
+            continue
+        try:
+            shutil.rmtree(path)
+            swept += 1
+        except OSError:
+            # Another user's directory, or a live one from a sibling process. Not ours
+            # to force, and not worth failing a boot over.
+            continue
+    return swept
+
 
 def run(dataset: ComputeDataset) -> ComputeBundle:
     """Compute one org's forecasts. Never touches the served store."""
-    with tempfile.TemporaryDirectory(prefix="brain-compute-") as tmp:
+    with tempfile.TemporaryDirectory(prefix=SCRATCH_PREFIX) as tmp:
+        # 0o700: the scratch holds one org's sales in the clear, and the default umask
+        # would let any local user read it. Narrows the blast radius of a stranded
+        # directory to the same user.
+        os.chmod(tmp, 0o700)
         scratch = Path(tmp) / "scratch.duckdb"
         with warehouse.scratch_store(scratch):
             loader.load(dataset)
             return _compute(dataset)
-    # TemporaryDirectory removes the scratch on exit, including on exception.
+    # TemporaryDirectory removes the scratch on exit, including on exception. It does
+    # NOT run on SIGKILL, which is what sweep_stale_scratch() covers.
 
 
 def _compute(dataset: ComputeDataset) -> ComputeBundle:
     bundle = ComputeBundle(org_id=dataset.org_profile.org_id)
+    _report_unconsumed(dataset, bundle)
     live = _live_venues(dataset, bundle)
 
     for venue in live:
@@ -55,8 +90,51 @@ def _compute(dataset: ComputeDataset) -> ComputeBundle:
                 f"{venue}: forecast failed ({type(exc).__name__}: {exc})")
 
     bundle.watermark = _watermark(dataset)
+    # Echoed, not advanced: the briefing and change-point detectors are not driven from
+    # this path yet. Returning them keeps the API's round-trip whole, so the state
+    # survives a call instead of being dropped and silently reset.
     bundle.briefing_chain = list(dataset.prior_state.briefing_chain)
+    bundle.change_point_state = dict(dataset.prior_state.change_point_state)
     return bundle
+
+
+def _report_unconsumed(dataset: ComputeDataset, bundle: ComputeBundle) -> None:
+    """Say out loud which supplied fields this engine does not read yet.
+
+    The contract forbids UNKNOWN fields so a caller cannot believe it sent something it
+    did not. Accepting a KNOWN field and dropping it on the floor is the same failure
+    wearing a different hat, and it is worse, because the field validated. Until these
+    are wired, a caller that sends them learns so from the bundle instead of from a
+    forecast that quietly ignored its covariates.
+
+    Each of these is a real gap, not a shrug:
+      * exogenous  - the served Beer Hall entrant consumes 15 known-future covariates.
+                     Without them it cannot be the served model, whatever prior state says.
+      * exo_enabled - "sports and local events are opt-in" is only a promise while
+                     nothing reads the toggle.
+      * horizon_days - the engine currently emits whatever the analytics produce.
+      * per-venue profile - structural_zero_dow / is_event_driven / VAT are still taken
+                     from Lune's module globals for every tenant (Phase 3).
+    """
+    if dataset.exogenous:
+        bundle.diagnostics.append(
+            f"exogenous: {len(dataset.exogenous)} rows supplied but NOT consumed; the "
+            "forecast is univariate regardless of the served model named")
+    if dataset.horizon_days != 7:
+        bundle.diagnostics.append(
+            f"horizon_days={dataset.horizon_days} supplied but NOT honoured; the "
+            "analytics emit their own horizon")
+    if set(dataset.org_profile.exo_enabled) != {"calendar", "weather"}:
+        bundle.diagnostics.append(
+            f"exo_enabled={dataset.org_profile.exo_enabled} supplied but NOT honoured; "
+            "the covariate universe is still global")
+    per_venue = [v.slug for v in dataset.org_profile.venues
+                 if v.structural_zero_dow or v.is_event_driven or v.vat_inclusive]
+    if per_venue:
+        bundle.diagnostics.append(
+            f"per-venue profile for {per_venue} supplied but NOT honoured; "
+            "structural zeros, event-driven capping and VAT still come from Lune's "
+            "module globals (Phase 3)")
 
 
 def _live_venues(dataset: ComputeDataset, bundle: ComputeBundle) -> list[str]:
