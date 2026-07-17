@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 import org_profile
-from compute.contract import BandRow, ComputeDataset, ForecastRow
+from compute.contract import MAX_HORIZON_DAYS, BandRow, ComputeDataset, ForecastRow
 from config import BAND_CALIB_DAYS, CONFORMAL_LEVELS
 from conformal.wrap import (
     _mondrian_quantiles,
@@ -40,6 +40,22 @@ from conformal.wrap import (
 # anything - it is the max of a handful of errors. A point forecast with an honestly
 # absent band beats one carrying a band that means nothing.
 MIN_CALIB_RESIDUALS = 30
+
+# The block size the residual stream is built from: every residual is a <=7-step-ahead
+# error. This is a property of the CALIBRATION METHOD and is deliberately NOT the same
+# symbol as `contract.MAX_HORIZON_DAYS`, which is a SERVING limit that happens to equal
+# it today. Aliasing them reads tidy and runs the wrong way: raising the contract cap to
+# 30 once FLAG-BAND-HORIZON is closed would silently rebuild the stream from 30-day
+# blocks (3 blocks x 30 = 90 residuals, still over MIN_CALIB_RESIDUALS, so nothing raises
+# and no test fails) - the banding method changed as a side effect of a contract edit.
+_CALIB_BLOCK_DAYS = 7
+
+# The cap may never outrun what the blocks calibrate. Whoever lifts one must confront the
+# other, which is the whole point of FLAG-BAND-HORIZON.
+assert MAX_HORIZON_DAYS <= _CALIB_BLOCK_DAYS, (
+    f"horizon_days is capped at {MAX_HORIZON_DAYS} but the band is calibrated on "
+    f"{_CALIB_BLOCK_DAYS}-day blocks: the served band would be uncalibrated past day "
+    f"{_CALIB_BLOCK_DAYS}. See FLAG-BAND-HORIZON.")
 
 # Weather columns the frame must carry for the exo entrant. Named here because they are
 # the ones compute CANNOT derive: they come from the request or not at all.
@@ -72,9 +88,8 @@ def project(dataset: ComputeDataset, venue: str, model_name: str,
     # two-row request. The window is also the statistically right answer, and the one the
     # frozen research forecasts already use (`sim/build_frozen_forecast._band_halfwidth`).
     residuals = rolling_point_forecasts(
-        feats, model_name, cols, horizon=7, venue=venue,
+        feats, model_name, cols, horizon=_CALIB_BLOCK_DAYS, venue=venue,
         first_target=last - pd.Timedelta(days=BAND_CALIB_DAYS))
-    _report_band_horizon(horizon, notes, venue)
     forecasts = [
         ForecastRow(venue=venue, layer="L1", key=None, target_date=d.date(),
                     model=model_name, yhat=float(y))
@@ -124,28 +139,6 @@ def _future_frame(dataset: ComputeDataset, venue: str, dates: pd.DatetimeIndex,
     fut = _attach_exog(fut, venue)
     _report_horizon_gaps(fut, venue, notes)
     return fut
-
-
-def _report_band_horizon(horizon: int, notes: list[str], venue: str) -> None:
-    """State the extrapolation caveat when the horizon outruns the calibration.
-
-    The residual stream is built on 7-day blocks, so every residual is a <=7-step-ahead
-    error - but the band is applied unchanged to step 8, 14, 30. Error grows with
-    step-ahead, so beyond a week the band is a **nominal floor**, not a calibrated
-    interval, and it degrades quietly: measured on a drifting series, coverage falls from
-    ~93% at step 7 to ~79% at step 30 against a nominal 90% and a +/-3pp project gate.
-
-    `sim/build_frozen_forecast._band_halfwidth` documented exactly this ("the band is a
-    nominal floor (the extrapolation caveat)") and the port dropped the caveat while
-    keeping the method. Per-step conformal is the real fix and is a research change with
-    its own gate, not something to invent inside an integration phase - so this says so
-    rather than pretending.
-    """
-    if horizon > 7:
-        notes.append(
-            f"{venue}: horizon_days={horizon} exceeds the 7-day calibration blocks, so "
-            "the band is a NOMINAL FLOOR beyond day 7, not a calibrated interval - "
-            "coverage degrades with step-ahead and is not gate-checked past a week")
 
 
 def _report_horizon_gaps(fut: pd.DataFrame, venue: str, notes: list[str]) -> None:

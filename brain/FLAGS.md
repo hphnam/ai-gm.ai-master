@@ -539,6 +539,34 @@ does.
   with its absolute error and band coverage alongside MASE, and never rank Ellel against
   Beer Hall on MASE - the denominators are not comparable rulers.
 
+- **FLAG-BAND-HORIZON (OPEN, research work package; G14).** The served conformal band is
+  calibrated on **≤7-step-ahead errors** and is only valid there. The residual stream
+  (`conformal.wrap.rolling_point_forecasts`) walks the series in 7-day blocks, so every
+  residual is at most a 7-step error; applying that quantile unchanged to day 14 or 30
+  understates the interval, because error grows with step-ahead.
+
+  Measured (drifting weekly series, 900 days, `rung1_robust_dow`, 26 residuals per step,
+  pooled 90% band applied across steps): coverage **100.0% @ step 1, 96.2% @ 7, 84.6% @ 14,
+  88.5% @ 21, 80.8% @ 30**, against nominal 90% and the project's ±3pp gate. The direction matters: at ≤7 it
+  **over**-covers, which is split conformal's safe failure mode; past 7 it silently
+  **under**-covers, which is not.
+
+  **Mitigation (G14): `contract.MAX_HORIZON_DAYS = 7`** — compute refuses a horizon it
+  cannot band rather than answering with an interval whose stated confidence is wrong.
+  The contract previously advertised `le=30`. Every result in this project (reports 26,
+  28, 31; MASE 0.285) is a 7-day horizon, so nothing evidenced is lost; the 30-day June
+  freeze (report 22) carried its own explicit extrapolation caveat.
+
+  **The fix, when it is done properly:** per-step conformal calibration. The same
+  measurement gives 96.2% coverage at *every* step, with the half-width growing 181 → 224.
+  It is not done here because it changes the banding **method**, and this project adopts a
+  method only when it beats a gate on held-out folds — inventing one inside an integration
+  phase is exactly what the ladder exists to prevent. It needs: a calibration window that
+  scales with the horizon (blocks = window/H, so ~30 residuals per step needs H×30 days),
+  a decision on how per-step interacts with the **Mondrian** grouping (both partition the
+  same sample; at H=7 they are confounded, since disjoint 7-day blocks put each step on a
+  fixed weekday), and a coverage gate per step.
+
 - **FLAG-STORE-DURABILITY (OPEN, operational, mitigated not fixed).** The store is
   derived and disposable by design, and that design has a sharp edge: `warehouse.build()`
   rebuilds from the committed CSV seed, which ends **2026-05-31**, so it silently drops

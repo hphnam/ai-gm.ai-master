@@ -22,6 +22,7 @@ from pathlib import Path
 
 import pandas as pd
 
+import config
 import org_profile
 from compute import forward, loader
 from compute.contract import (
@@ -85,15 +86,20 @@ def _compute(dataset: ComputeDataset, notes: list[str]) -> ComputeBundle:
     _report_unconsumed(dataset, bundle)
     live = _live_venues(dataset, bundle)
 
+    # Once per request, not once per venue: the spillover calendar is a property of the
+    # estate, so recomputing it inside every build_features is V x E identical
+    # aggregations for one answer.
+    event_nights = _event_nights(live)
+
     for venue in live:
         try:
-            _forecast_venue(dataset, venue, bundle)
+            _forecast_venue(dataset, venue, bundle, event_nights)
         except Exception as exc:
             # One venue's failure must not lose the rest of the org's forecasts, but it
             # must be visible: a silent per-venue drop is indistinguishable from a venue
             # that legitimately produced nothing.
             bundle.diagnostics.append(
-                f"{venue}: forecast failed ({type(exc).__name__}: {exc})")
+                f"{venue}: forecast failed ({_redact(exc)})")
 
     bundle.watermark = _watermark(dataset)
     # Echoed, not advanced: the briefing and change-point detectors are not driven from
@@ -102,6 +108,18 @@ def _compute(dataset: ComputeDataset, notes: list[str]) -> ComputeBundle:
     bundle.briefing_chain = list(dataset.prior_state.briefing_chain)
     bundle.change_point_state = dict(dataset.prior_state.change_point_state)
     return bundle
+
+
+def _redact(exc: Exception) -> str:
+    """The exception type, plus its message only when not hardened.
+
+    `service/compute.py` already withholds internals from the 503 body under `HARDENED`;
+    the 200 path was handing the same internals back in `diagnostics`, which is the same
+    leak through the door that succeeded. Exception text here carries scratch tempdir
+    paths and library internals, and `diagnostics` also echoes caller-controlled strings,
+    so the type alone is what travels. The detail belongs in the logs.
+    """
+    return type(exc).__name__ if config.HARDENED else f"{type(exc).__name__}: {exc}"
 
 
 def _report_unconsumed(dataset: ComputeDataset, bundle: ComputeBundle) -> None:
@@ -149,7 +167,17 @@ def _watermark(dataset: ComputeDataset):
     return max(dates) if dates else dataset.prior_state.watermark
 
 
-def _forecast_venue(dataset: ComputeDataset, venue: str, bundle: ComputeBundle) -> None:
+def _event_nights(live: list[str]) -> set:
+    """The estate's spillover calendar, or an empty set when nothing can spill over."""
+    from features.build_features import event_venue_dates
+
+    if not live:
+        return set()
+    return event_venue_dates()
+
+
+def _forecast_venue(dataset: ComputeDataset, venue: str, bundle: ComputeBundle,
+                    event_nights: set) -> None:
     """Produce the L1 forward point forecast + conformal band for one venue.
 
     Model choice honours prior state: a model the API says is already served stays
@@ -167,12 +195,25 @@ def _forecast_venue(dataset: ComputeDataset, venue: str, bundle: ComputeBundle) 
         bundle.diagnostics.append(
             f"{venue}: no served model supplied, cold-starting on {served}")
 
-    feats = trim_to_active(build_features(venue), venue)
+    feats = trim_to_active(build_features(venue, event_nights=event_nights), venue)
     forecasts, bands, notes = forward.project(dataset, venue, served, feats)
 
     bundle.forecasts.extend(forecasts)
     bundle.bands.extend(bands)
     bundle.diagnostics.extend(notes)
     bundle.served.append(ServedRow(
-        venue=venue, layer="L1", model=served,
+        venue=venue, layer="L1", model=served, rung=_rung_of(served),
         data_as_of=pd.Timestamp(feats["date"].max()).date() if not feats.empty else None))
+
+
+def _rung_of(model_name: str) -> int | None:
+    """The ladder rung a served model sits on, from the registry rather than its name.
+
+    `ServedRow.rung` was in the contract and always came back None, so the API had a
+    column it could never populate and an operator could not see which rung was live
+    without parsing the model string. Reading `PREDICTORS` keeps it honest: a model the
+    ladder does not know returns None rather than a guess from the `rungN_` prefix.
+    """
+    from models.ladder import PREDICTORS
+
+    return next((r for name, r, _fn, _avail in PREDICTORS if name == model_name), None)

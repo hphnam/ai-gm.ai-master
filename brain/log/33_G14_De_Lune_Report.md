@@ -60,17 +60,21 @@ rows for dates AFTER history : 7
 rows for dates <= history    : 0
 ```
 
-and `horizon_days=14` yields 14 days. It reuses the validated pieces rather than
-inventing a second forecaster: the same `rolling_point_forecasts` residual stream
+and `horizon_days` drives the count (3 gives 3). It reuses the validated pieces rather
+than inventing a second forecaster: the same `rolling_point_forecasts` residual stream
 `evaluate` builds, the same Mondrian grouping, the same `conformal_quantile`, and - after
 review caught the first cut hand-rolling its own - the same `calendar_features` and
 `_attach_exog` that build the training frame (§7).
+
+`horizon_days` is capped at **7**, not the 30 the contract used to advertise: 7 is what
+the band is calibrated for, and it is what every result in this project is evidence for
+(§7.3).
 
 ---
 
 ## 2. The seam: unbound is Lune, bound is total
 
-`org_profile.py` (164 lines). One ContextVar, bound per request beside the scratch store,
+`org_profile.py` (172 lines). One ContextVar, bound per request beside the scratch store,
 plus accessors that the analytics read instead of `config`.
 
 ```
@@ -120,7 +124,7 @@ the config value was decorative on the path that matters most.
 | `WEATHER_CELLS` | slug→cell map | `lat`/`lon` presence | yes - weather join |
 | `EVENT_SCOPE` | Lancaster/Preston | `{"all"}` for tenants | yes - event join |
 | bank holidays | `UnitedKingdom(subdiv="England")` | `country_holidays(profile.country)` | yes |
-| `_ellel_event_dates` | hardcoded `"ellel"` slug | any `is_event_driven` venue | yes |
+| `_ellel_event_dates` | hardcoded `"ellel"` slug | `event_venue_dates()`, any `is_event_driven` venue | yes |
 
 After the pass, the only `STRUCTURAL_ZERO_DOW` left under `features/ conformal/ store/
 compute/ models/` is inside a comment. The remaining `FORECAST_VENUES` are all CLI
@@ -263,12 +267,12 @@ Every fix was verified by re-running the reviewer's own measurement, not by asse
 | # | After |
 |---|---|
 | 1 | `TRAIN [1.0] == SERVE [1.0]`, and 0.0mm rain now actually reads as dry. A caller-supplied `exo_is_dry` survives the derivation. |
-| 2 | Diagnostic: `horizon_days=N exceeds the 7-day calibration blocks, so the band is a NOMINAL FLOOR beyond day 7`. Per-step conformal is the real fix and is a research change with its own gate, not something to invent inside an integration phase. |
+| 2 | `horizon_days` **capped at 7** — see §7.3; a diagnostic was the first answer and it was not good enough. |
 | 3 | `rung0/1/2/3_gbm` all return 7 forecasts + 14 bands. |
 | 4 | `TRAIN wc=0`, `SERVE wc=0` — a consistent off-switch. |
 | 5 | Floor applied **per group**; a thin group falls back to the marginal quantile (a real quantile of a real sample) and says so. |
 | 6 | A bound profile asked about an unknown slug now **raises**, naming the profile it checked. |
-| 7 | Calibration bounded to `BAND_CALIB_DAYS` (90) via `first_target` — which is also the statistically right answer and the one the frozen research forecasts already use. **14 predictor calls, 0.4s** (was ~9,272 / 17min+); the normal case is unchanged at 12 calls. |
+| 7 | Calibration bounded to `BAND_CALIB_DAYS` (90) via `first_target` — which is also the statistically right answer and the one the frozen research forecasts already use. **14 predictor calls, 0.4s** (was ~9,272 / 17min+); the normal case is unchanged at 12 calls. **But this fixed the wrong half** — see §7.3. |
 
 Fixes 1, 3 and 4 came from deleting the parallel implementations: `calendar_features` was
 extracted from `build_features` and `_attach_exog` is now called by both frames. The
@@ -282,7 +286,137 @@ specifically so "derived" stays distinguishable from "the caller supplied 0". A 
 asserting only train==serve would have passed both times, which is why
 `test_dry_weather_actually_reads_as_dry` exists next to it.
 
-### 7.3 What review cleared
+### 7.3 A second pass: two findings whose first fix was the wrong fix
+
+Two of the seven were closed with a report rather than a repair. Re-examined, both were
+worse than the review said.
+
+**The typo'd year was never a performance bug.** The security review framed finding 7 as
+a denial of service — ~9,272 re-fits from a two-row request — and bounding the
+calibration walk fixed that. It also made the bug *more* dangerous. `trim_to_active`
+trims only ZERO endpoints, so a nonzero row dated 2202 survives, becomes
+`feats["date"].max()`, and **takes the forecast origin with it**. Measured, after the
+DoS fix:
+
+```
+real history ends : 2026-07-19
+ONE typo'd row at : 2202-01-15
+forecast is for   : 2202-01-16 .. 2202-01-22
+watermark returned: 2202-01-15
+```
+
+Seven banded, model-named forecast rows for January 2202, a watermark to match, no error.
+Before the fix that request hung for 17 minutes, which at least looks like a problem.
+After it, the same request returns nonsense in 0.4 seconds.
+
+**And the first guard for it was wrong — both reviewers caught it independently.** I
+added a check on the history *span* (`> MAX_HISTORY_DAYS`, ~20 years) and wrote in its
+docstring: *"This is not a size check wearing a date's clothing."* It was exactly that.
+Span is a relative measure of a failure that is absolute. Measured against it:
+
+| typo | span guard | result |
+|---|---|---|
+| `2026 → 2027` | **accepted** | forecasts 2027-01-16..22, watermark 2027-01-15 |
+| `2026 → 2036` | **accepted** | forecasts 2036-01-16..22, watermark 2036-01-15 |
+| `2026 → 2202` | rejected | — |
+| whole export stamped 2202 (span 199 days) | **accepted** | forecasts 2202-07-20..26 |
+
+It caught the one typo it had been measured against and missed the likelier ones. A
+one-digit slip is a single keystroke; 2202 is two. And the systematic case — every row
+mis-stamped, span a perfectly ordinary 199 days — is invisible to a span check *by
+construction*.
+
+The right invariant was in the contract the whole time: **`sales_daily` is closed
+history**, so any row dated after today is a typo, whatever the span. `MAX_FUTURE_DAYS`
+(7 days of slack for business-date/UTC boundaries) now catches all four cases, and
+`MAX_HISTORY_DAYS` is demoted to what it always was — a cost knob bounding the calendar
+the feature build densifies. Both errors name the offending date, because the caller has
+to find one bad row among 200,000.
+
+It compounds, which is why it is worth this much text: the API persists the poisoned
+watermark and hands it back as `prior_state.watermark` on the next call, so the cadence
+stays wrong after the bad row is gone.
+
+**The band caveat was a diagnostic where a refusal belonged.** Finding 2 was closed by
+emitting `the band is a NOMINAL FLOOR beyond day 7`. That is honest and it is not a fix:
+the contract still advertised `le=30`, so an API could ask for a month and receive an
+interval whose stated confidence was wrong by 9pp, with the correction buried in a
+diagnostics list. Re-measured:
+
+| step | 1 | 7 | 14 | 21 | 30 |
+|---|---|---|---|---|---|
+| pooled 90% band coverage | 100.0% | 96.2% | 84.6% | 88.5% | **80.8%** |
+| per-step 90% band coverage | 96.2% | 96.2% | 96.2% | 96.2% | **96.2%** |
+
+The direction is what decides it. At ≤7 the band **over**-covers — split conformal's safe
+failure mode, which `conformal/wrap.py` documents. Past 7 it **under**-covers silently.
+And every result in this project (reports 26, 28, 31; MASE 0.285) is a 7-day horizon, so
+`le=30` was advertising a capability nothing here evidences.
+
+Per-step calibration demonstrably fixes it (96.2% at every step, half-width growing
+181 → 224; n=26 per step, so the finite-sample quantile is conservative by construction). It is **not** adopted, and that is the point: it changes the banding *method*,
+and this project adopts a method only when it beats a gate on held-out folds. Inventing
+one inside an integration phase is exactly the move the ladder exists to prevent. So
+`horizon_days` is capped at `MAX_HORIZON_DAYS = 7` — compute refuses a horizon it cannot
+band — and per-step conformal is logged as **FLAG-BAND-HORIZON** with the measurement,
+the sample-size arithmetic, and the open question of how per-step interacts with the
+Mondrian grouping (both partition the same residuals; at H=7 they are confounded, since
+disjoint 7-day blocks put every step on a fixed weekday).
+
+### 7.4 The rest of the round-two list
+
+- **Dead contract fields.** `vat_inclusive`/`vat_rate` were removed in the first pass for
+  being fields nothing reads — then `timezone` and `currency` were left in, which is the
+  same trap with a different name. A caller setting `timezone` would expect its 2am trade
+  to land on the previous business day; the analytics are date-grain and would not honour
+  it. Both removed.
+- **`ServedRow.rung` was always `None`.** A contract field the API could never populate.
+  Now read from the ladder's `PREDICTORS` registry rather than parsed off the `rungN_`
+  prefix, so an unknown model returns `None` instead of a guess.
+- **Exception text on the 200 path.** `service/compute.py` already withholds internals
+  from the 503 body when `HARDENED`; `diagnostics` was handing the same scratch tempdir
+  paths and library internals back through the door that succeeded. Now the type alone
+  travels when hardened, detail when not.
+- **Unbounded dimensions.** `venues`, `sales_daily`, `exogenous`, `trading_hours`,
+  `expected_totals` and the per-row `values` dict all had no cap on a shared service with
+  no concurrency limit of its own. Bounded generously — for scale, Lune's entire two-year
+  corpus is 92,329 line items. The `venues` cap also bounds the O(V²) store reads review
+  flagged in `event_venue_dates`.
+- **The honest report was itself an amplifier.** Capping `values` at 64 keys made this
+  reachable rather than fixing it: the unknown-covariate diagnostic echoed *every*
+  unknown name into one string, so a request inside every new bound (500k exogenous rows
+  × 64 distinct keys) would collect tens of millions of caller-controlled names and
+  render them into a multi-gigabyte diagnostic. Measured at 3,384 chars from a single
+  row; now 10 names and a "(first few)" marker, 642 chars, bounded regardless of input.
+  Worth noting how it was found: not by review, but by asking what the *fix* made
+  possible.
+- **`PriorState` was bounded by nothing at all** — the one part of the contract the first
+  bounding pass forgot, and every field in it is as caller-controlled as the rest.
+  `served_model` drives one INSERT per key (20,000 keys accepted, 20,000 INSERTs, 4.6s);
+  `briefing_chain` and `change_point_state` are echoed verbatim into the bundle and took
+  200,000 entries. `country` was unbounded too and is echoed once *per venue*, so a long
+  string is amplified by the venue count. All bounded.
+- **A cap above the failure point is not a cap.** `MAX_SALES_ROWS` was set to 2,000,000
+  with a comment claiming it turns an absurd request into a 422 rather than an OOM. It
+  cannot: pydantic validates every item and checks `max_length` *afterwards*, so 2.2M
+  rows are fully materialised into 2.2M models before the check fires — ~278MB RSS at
+  200k rows, so the cap sat well above the point the process dies. Lowered to 200,000
+  (~5× Lune's entire estate) and the comment now says what a row cap can and cannot do:
+  the real guard is a request-size limit at the ingress, which is the API's.
+- **One symbol, two meanings.** `MAX_HORIZON_DAYS` was used both as the contract's
+  serving cap and as the residual stream's block size, "so the two cannot drift apart".
+  The coupling ran the wrong way: closing FLAG-BAND-HORIZON and raising the cap to 30
+  would silently rebuild the stream from 30-day blocks (3 blocks × 30 = 90 residuals,
+  still over the floor, so nothing raises and no test fails) — the banding *method*
+  changed as a side effect of a contract edit. Split into `_CALIB_BLOCK_DAYS` with an
+  assertion that the cap may never outrun it.
+- **A venue-independent computation, per venue.** `event_venue_dates` is a property of
+  the estate, not of the venue being built, yet `build_features` recomputed it every
+  call: V × E identical aggregations for one answer, ~10,000 at the venue cap. The engine
+  now computes it once per request and passes it; the research path recomputes exactly as
+  before.
+
+### 7.5 What review cleared
 
 Worth recording, because these are the load-bearing claims:
 
@@ -336,8 +470,8 @@ forecasts; that was over-claimed, and the frame hash is the check it should have
 
 | | before | after | delta |
 |---|---|---|---|
-| `.venv` (3.14) | 307 passed / 8 skipped | **356 / 8** | +49 |
-| `.venv-forecast` (3.12) | 314 / 1 | **363 / 1** | +49 |
+| `.venv` (3.14) | 307 passed / 8 skipped | **370 / 8** | +63 |
+| `.venv-forecast` (3.12) | 314 / 1 | **377 / 1** | +63 |
 
 `.venv-eval` (the third venv, TSB-AD/statsforecast, numpy<2.0) still imports the seam and
 resolves to Lune's venues - checked, because a previous pass broke it by changing
@@ -362,20 +496,28 @@ exactly this class of error. The flag has been narrowed as a result (below).
 ## 9. Not done
 
 - **The ladder never re-runs** (new open decision 6). Verified against the engine, not
-  assumed: `bundle.ladder_selection` comes back `[]` on every call and `ServedRow.rung` is
-  always `None`. Compute honours `prior_state.served_model` and cold-starts on
-  `default_model`, so promotion is *continuous* - but a tenant's served model is whatever
-  it started as, for ever. The re-fit cadence (`_should_refit`, `RETRAIN_CADENCE_DAYS`,
-  the event-aware tightening) is still wired to the research store's watermark, not to the
-  injected `prior_state`.
+  assumed: `bundle.ladder_selection` comes back `[]` on every call. Compute honours
+  `prior_state.served_model` and cold-starts on `default_model`, so promotion is
+  *continuous* - but a tenant's served model is whatever it started as, for ever. The
+  re-fit cadence (`_should_refit`, `RETRAIN_CADENCE_DAYS`, the event-aware tightening) is
+  still wired to the research store's watermark, not to the injected `prior_state`.
+  (`ServedRow.rung` was also always `None`; that half is fixed - §7.4.)
 - **L1 only** (new open decision 7). Verified: `{f.layer for f in bundle.forecasts} ==
   {"L1"}`. The measured A-vs-B split (report 23 - MinT for Beer Hall, revenue-share
   disaggregation for Ellel) lives in `sim/`, is `GATE_WINNER`-keyed by Lune slug, and has
   no per-tenant equivalent.
+- **Horizons beyond 7 days.** Refused, not served - the band is calibrated on 7-day
+  blocks and nothing here evidences longer (§7.3). Per-step conformal is the work package
+  that would lift it: **FLAG-BAND-HORIZON**.
 - **`stock_enabled`** is accepted and **reported as unhonoured**: the pipeline reads
   monthly bar-stock spreadsheets off disk (`config.STOCK_DIR`) and has no injected path.
-- **`timezone` / `currency`** accepted and unread. The analytics are date-grain, so
-  `timezone` is inert until an intraday path exists; `currency` is presentational.
+  It is now the ONLY field in that category - `timezone`, `currency`, `vat_inclusive` and
+  `vat_rate` were removed rather than left accepted-and-unread (§7.4).
+- **A request-size limit.** `max_length` on `sales_daily` cannot be an OOM guard: pydantic
+  validates every item and only then checks the length, so an oversized body is fully
+  materialised before the cap fires. The cap is lowered to something that means
+  something (200k rows, ~5x Lune's whole estate), but the actual guard is a body-size
+  limit at the ingress, which is the API's to set. Contract open decision 4.
 - **The briefing and change-point detectors** are still echoed, not advanced (Phase 2's
   position, unchanged).
 - The 227->263 `print()` calls, `sim/` -> `.dockerignore`, the PII purge (Ryan's), and
@@ -396,17 +538,19 @@ Carried forward from report 32 §7, plus Phase 3's:
    raises rather than degrading to univariate.
 5. **`structural_zero_dow=[]` means no closed days.** There is no "unset".
 6. **Read `diagnostics`.** Absent weather, unknown covariates, a dataset that does not
-   reconcile, a cold-started model, a band beyond its calibration and a thin Mondrian
-   group are all reported there and nowhere else.
-7. **`horizon_days > 7` gets a nominal-floor band**, not a calibrated interval. Compute
-   reports it rather than pretending; coverage past a week is not gate-checked.
-8. **`sales_daily` should carry a plausible date span.** Compute bounds its own
-   calibration walk so a bad date cannot drive unbounded re-fits, but a typo'd year still
-   densifies the feature frame and moves the forecast origin. The API is the only layer
-   that can tell a typo from history.
-9. **Do not start a bare thread inside compute.** The per-request store and profile are
-   ContextVars; a `threading.Thread` starts with an empty context and would fall back to
-   Lune's real database. Propagate with `contextvars.copy_context()` or do not thread.
+   reconcile, a cold-started model and a thin Mondrian group are all reported there and
+   nowhere else.
+7. **`horizon_days` is capped at 7** and a longer ask is a 422, not a wide band. If you
+   need a month, that is FLAG-BAND-HORIZON, not a config change.
+8. **Dates in `sales_daily` are closed history.** A row after today is refused, because
+   it would otherwise become the forecast origin and the watermark. The API is the only
+   layer that can tell a typo from history — and note the watermark compounds: persist a
+   poisoned one and it comes back as `prior_state` next call.
+9. **Set a request-size limit at the ingress.** Compute's row caps fire only after
+   pydantic has materialised every row, so they bound absurdity, not memory.
+10. **Do not start a bare thread inside compute.** The per-request store and profile are
+    ContextVars; a `threading.Thread` starts with an empty context and would fall back to
+    Lune's real database. Propagate with `contextvars.copy_context()` or do not thread.
 
 ---
 

@@ -114,21 +114,33 @@ def _world_cup_frame(venue: str, dates: pd.Series, families: frozenset[str],
     return zeros
 
 
-def _event_venue_dates(con) -> set:
+def event_venue_dates(con=None) -> set:
     """Dates on which any booking-led venue traded: the spillover event calendar.
 
     Lune's hypothesis is that an Ellel function night lifts the Beer Hall next door. The
     signal is "did the event venue trade", which generalises to any estate with a
     booking-led room; it was hardcoded to the `ellel` slug, so a tenant got a
     silently-empty calendar and a permanently-zero covariate.
+
+    NOTE the answer does not depend on which venue is being built - it is a property of
+    the estate. `build_features` therefore takes it as an argument so a caller looping
+    venues can compute it ONCE: recomputed per venue it is V x E `read_series` calls over
+    a request, and at the contract's venue cap that is ~10,000 full aggregations of the
+    same data for the same answer.
     """
-    dates: set = set()
-    for v in org_profile.venues():
-        if not org_profile.is_event_driven(v):
-            continue
-        df = read_series(v, "L1", con=con)
-        dates |= set(df.loc[df["value"] > 0, "date"].dt.date)
-    return dates
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        dates: set = set()
+        for v in org_profile.venues():
+            if not org_profile.is_event_driven(v):
+                continue
+            df = read_series(v, "L1", con=con)
+            dates |= set(df.loc[df["value"] > 0, "date"].dt.date)
+        return dates
+    finally:
+        if own:
+            con.close()
 
 
 def calendar_features(df: pd.DataFrame, venue: str, event_nights: set) -> pd.DataFrame:
@@ -180,14 +192,22 @@ def calendar_features(df: pd.DataFrame, venue: str, event_nights: set) -> pd.Dat
 
 
 def build_features(venue: str = ANCHOR_VENUE,
-                   weather_basis: str = WEATHER_TRAIN_BASIS) -> pd.DataFrame:
-    """Return the leak-free daily feature table for one venue. `weather_basis`
-    selects which weather table populates the weather columns (the A14 train/serve
-    study sweeps it); the default is config.WEATHER_TRAIN_BASIS."""
+                   weather_basis: str = WEATHER_TRAIN_BASIS,
+                   *, event_nights: set | None = None) -> pd.DataFrame:
+    """Return the leak-free daily feature table for one venue.
+
+    `weather_basis` selects which weather table populates the weather columns (the A14
+    train/serve study sweeps it); the default is config.WEATHER_TRAIN_BASIS.
+
+    `event_nights` is the estate's spillover calendar. It is the same for every venue, so
+    a caller looping venues should pass it once (`event_venue_dates()`) rather than pay
+    for it per venue; None recomputes it, which is what every research CLI does.
+    """
     con = connect(read_only=True)
     try:
         series = read_series(venue, "L1", fill_calendar=True, con=con)
-        event_nights = _event_venue_dates(con)
+        if event_nights is None:
+            event_nights = event_venue_dates(con)
     finally:
         con.close()
 

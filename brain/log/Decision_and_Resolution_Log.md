@@ -826,8 +826,65 @@ them into the append-only log so it is the continuous WP1-to-present record.
     store); no reachable path from a tenant to Lune DATA (the fallbacks hand over
     constants, and the scratch store holds no Lune tables); no SQL injection in
     `exog_supplied` (column names are row data behind an allowlist, venue parameterised).
-    Suites 356/8 and 363/1 (+49/+49 from 307/8 and 314/1); tree ruff 71 -> 70; 263 prints
-    unchanged. FLAG-STORE-DURABILITY fired a THIRD time and nearly corrupted the
+    **(j) A second pass: two of those fixes were the WRONG fix.** The security review
+    framed the typo'd year as a DoS; bounding the calibration walk fixed the cost and made
+    the bug MORE dangerous. `trim_to_active` trims only ZERO endpoints, so a nonzero row
+    dated 2202 survives, becomes the series max and **takes the forecast origin with it** -
+    measured after the DoS fix: seven banded, model-named rows for January 2202 and a
+    watermark to match, in 0.4s, no error. Before the fix it hung for 17 minutes, which at
+    least looks like a problem. `ComputeDataset` now rejects a span beyond
+    `MAX_HISTORY_DAYS` (~20y) and NAMES BOTH DATES, because the caller has to find one bad
+    row in a million. And the band caveat was a diagnostic where a refusal belonged: the
+    contract still advertised `le=30`, so an API could ask for a month and get an interval
+    whose stated confidence was wrong by 9pp with the correction buried in a list.
+    Re-measured, pooled 90% band coverage by step: 100/96/85/88/**81**% at steps
+    1/7/14/21/30; per-step calibration gives ~96% at every step (half-width 181 -> 224).
+    The DIRECTION decides it: at <=7 it OVER-covers (split conformal's safe failure mode,
+    which wrap.py documents), past 7 it silently UNDER-covers. Per-step conformal is NOT
+    adopted - it changes the banding METHOD and this project adopts a method only when it
+    beats a gate on held-out folds; inventing one inside an integration phase is exactly
+    what the ladder exists to prevent. So `horizon_days` is capped at `MAX_HORIZON_DAYS=7`
+    (every result in the project - reports 26/28/31, MASE 0.285 - is a 7-day horizon, so
+    nothing evidenced is lost) and per-step conformal is logged as **FLAG-BAND-HORIZON**
+    with the measurement, the sample-size arithmetic, and the open question of how per-step
+    interacts with Mondrian (both partition the same residuals; at H=7 they are confounded,
+    since disjoint 7-day blocks put every step on a fixed weekday). Also closed: `timezone`
+    and `currency` removed (fields nothing reads - the same trap `vat_inclusive` was
+    removed for in the first pass, left in by inconsistency); `ServedRow.rung` populated
+    from the ladder's PREDICTORS registry rather than parsed off the name prefix (it was
+    always None, so the API had a column it could never fill); exception text on the 200
+    path redacted to the type when HARDENED (the 503 path already did, so diagnostics was
+    the same leak through the door that succeeded); and every caller-controlled list
+    bounded. **The fix's own hazard, found by asking what the fix made possible rather
+    than by review:** capping `values` at 64 keys made a multi-GB diagnostic REACHABLE -
+    the unknown-covariate report echoed every name into one string, so 500k rows x 64
+    distinct keys renders tens of millions of them. Now 10 names + a marker, 642 chars,
+    bounded. Suites 370/8 and 377/1 (+63/+63 from 307/8 and 314/1); tree ruff 71 -> 70; 263 prints
+    unchanged. **(k) A third pass, because the round-2 guard was wrong and both reviewers
+    caught it independently.** The span check (`> MAX_HISTORY_DAYS`) whose docstring said
+    "this is not a size check wearing a date's clothing" was exactly that: measured, it
+    ACCEPTED `2026 -> 2027` and `2026 -> 2036` (one-keystroke slips, likelier than 2202)
+    and accepted a wholly mis-stamped export (every row at 2202, span a normal 199 days -
+    invisible to a span check BY CONSTRUCTION), while rejecting only the one typo it had
+    been measured against. Span is a relative measure of an absolute failure. The right
+    invariant was in the contract all along - `sales_daily` is CLOSED HISTORY - so
+    `MAX_FUTURE_DAYS` (7d slack) now rejects any row dated after today and
+    `MAX_HISTORY_DAYS` is demoted to the cost knob it always was. It compounds: the API
+    persists the poisoned watermark and hands it back as `prior_state` next call. Also
+    round-3: `PriorState` was bounded by nothing (served_model = one INSERT per key, 20k
+    keys = 4.6s; briefing_chain/change_point_state took 200k entries and are echoed
+    verbatim into the bundle) and `country` was unbounded while echoed once PER VENUE;
+    `MAX_SALES_ROWS=2M` was a cap ABOVE the failure point (pydantic validates every item
+    then checks max_length, so 2.2M rows are fully materialised first - ~278MB RSS at
+    200k) so it is now 200k, with the comment saying what a row cap can and cannot do (the
+    real guard is an ingress body limit, the API's); `MAX_HORIZON_DAYS` was aliased as both
+    the serving cap AND the residual block size, so raising it later would silently change
+    the banding METHOD - split into `_CALIB_BLOCK_DAYS` with an assert; `event_venue_dates`
+    is venue-INDEPENDENT but was recomputed per venue (~10,000 identical aggregations at
+    the venue cap), now computed once per request. And the report's own SS9/SS10 still
+    described the pre-fix behaviour that SS7 said was fixed - the exact stale-document
+    error this project has now found three times (Ryan's brief, our own CONTRACT.md, our
+    own report). FLAG-STORE-DURABILITY fired a THIRD time and nearly corrupted the
     frame-hash check built to catch this class of error; its trigger is now narrowed by
     measurement (targeted runs are free, only suites collecting `test_a10_service` /
     `test_a1_warehouse` rebuild).

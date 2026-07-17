@@ -13,13 +13,85 @@ authority is the caller's session, upstream.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+# Bounds. Compute is a shared service with no per-request concurrency cap of its own, so
+# every list a caller controls is a resource dimension. These are deliberately generous -
+# they exist to turn an absurd request into a 422 rather than an OOM, not to police a
+# real one. For scale: Lune's whole two-year corpus is 92,329 line items, which aggregate
+# to roughly 40k rows at this grain.
+MAX_VENUES = 100
+MAX_EXOGENOUS_ROWS = 500_000
+MAX_TRADING_HOURS_ROWS = MAX_VENUES * 7
+MAX_EXO_KEYS_PER_ROW = 64
+# The briefing chain is one entry per standing item, not per day: an estate with a
+# hundred venues does not have ten thousand live concerns.
+MAX_BRIEFING_CHAIN = 10_000
+
+# `max_length` on a list is NOT an OOM guard, and it was first set as though it were.
+# Pydantic validates every item and only then checks the length, so a 2.2M-row body is
+# fully parsed into 2.2M `SalesRow` models before the cap fires - measured at ~278MB RSS
+# for 200k rows, so a 2M cap sits well above the point the process dies. The cap has to
+# be low enough to mean something on its own, and the real guard for an oversized body is
+# a request-size limit at the ingress, which is the API's to set (CONTRACT.md open
+# decision 4). 200k rows is ~5x Lune's entire two-year estate (92,329 line items,
+# aggregating to roughly 40k rows at this grain), so a tenant hitting it is batching
+# wrong, not trading hard.
+MAX_SALES_ROWS = 200_000
+
+# The widest history span compute will accept, in days (~20 years). A COST knob, and only
+# that: it bounds the calendar `read_series(fill_calendar=True)` densifies. The
+# correctness guard is MAX_FUTURE_DAYS below - see the note there, because the first cut
+# of this conflated the two and caught the wrong bug.
+MAX_HISTORY_DAYS = 366 * 20
+
+# How far past today a sales row may be dated before the dataset is refused.
+#
+# `sales_daily` is CLOSED HISTORY by contract, so nothing in it should postdate today at
+# all; the slack absorbs business-date-vs-UTC boundaries and clock skew, not real data.
+#
+# This is the correctness guard, and it exists because the first attempt was a SPAN check
+# that failed on the likelier typo. `trim_to_active` trims only ZERO endpoints, so a
+# nonzero row with a mistyped year survives, becomes `feats["date"].max()`, and the
+# forecast origin moves with it. Measured against the span guard:
+#
+#   2026 -> 2027  ACCEPTED -> seven banded rows for January 2027, watermark to match
+#   2026 -> 2036  ACCEPTED -> seven banded rows for January 2036, watermark to match
+#   2026 -> 2202  rejected
+#   whole export mis-stamped 2202 (span only 199 days)  ACCEPTED -> forecasts 2202-07-20
+#
+# A one-digit slip is likelier than 2202 and sailed straight through, because span is a
+# relative measure of a failure that is absolute. It compounds, too: the API persists the
+# poisoned watermark and hands it back as `prior_state` on the next call, so the cadence
+# stays wrong after the bad row is gone. An absolute bound catches every future-dated
+# typo including 2202, and leaves MAX_HISTORY_DAYS as the pure size knob it should have
+# been.
+MAX_FUTURE_DAYS = 7
+
+# The furthest ahead compute will forecast. Seven, because seven is what the band is
+# calibrated for and what every result in the project is evidence for: the residual
+# stream is built from 7-day rolling blocks, so every residual is a <=7-step-ahead error.
+#
+# The contract used to advertise 30. Measured on a drifting weekly series, the pooled
+# 90% band applied unchanged across steps covers 100.0% at step 1, 96.2% at step 7, 84.6%
+# at step 14 and 80.8% at step 30 - against a nominal 90% and a project gate of +/-3pp. Note
+# the direction: at <=7 it OVER-covers, which is split conformal's safe failure mode
+# (conformal/wrap.py says so); past 7 it silently under-covers, which is not.
+#
+# Per-step calibration fixes it - the same measurement gives 96.2% at every step, with the
+# half-width growing 181 -> 224 - but that is a change to the banding METHOD, and this
+# project adopts a method only when it beats a gate on held-out folds. Inventing one
+# inside an integration phase would be exactly the move the ladder exists to prevent. So
+# the horizon is capped at what is evidenced, and per-step conformal is logged as a
+# research work package (FLAGS.md, FLAG-BAND-HORIZON) rather than smuggled in here.
+MAX_HORIZON_DAYS = 7
 
 
 # --- Dataset in ---------------------------------------------------------------
@@ -27,17 +99,22 @@ class _Strict(BaseModel):
 class VenueProfile(_Strict):
     """Per-venue config, replacing the Lune constants frozen in config.py.
 
-    There is deliberately no `vat_inclusive` / `vat_rate` here. `sales_daily` is ex-VAT
-    by contract (see CONTRACT.md §2, decision closed in Phase 3), so the brain applies no
-    VAT rule of its own and has nothing to do with these values. Carrying them would be
-    worse than useless: a caller setting `vat_inclusive=True` would reasonably expect
-    deflation, get none, and mix bases across venues - which is unrecoverable downstream
-    and shows up as a wrong number rather than an error.
+    There is deliberately no `vat_inclusive` / `vat_rate` here, and no `timezone`.
+    `sales_daily` is ex-VAT by contract (see CONTRACT.md §2, decision closed in Phase 3),
+    so the brain applies no VAT rule of its own; and every series it builds is date-grain,
+    so a venue timezone has nothing to act on - the API resolves business dates before it
+    aggregates.
+
+    All three were fields nothing read, which is worse than an absent field rather than
+    harmless. A caller setting `vat_inclusive=True` would reasonably expect deflation,
+    receive none, and mix bases across venues; a caller setting `timezone` would expect
+    its 2am trade to land on the previous business day. Both surface as a plausible wrong
+    number rather than an error - the exact failure `extra="forbid"` exists to prevent,
+    which a field that validates and does nothing quietly reintroduces.
     """
 
     venue_id: str
     slug: str = Field(description="The brain works in slugs; the API maps venueId <-> slug.")
-    timezone: str = "Europe/London"
     lat: float | None = None
     lon: float | None = None
     structural_zero_dow: list[int] = Field(
@@ -53,10 +130,17 @@ class VenueProfile(_Strict):
 
 
 class OrgProfile(_Strict):
+    """The tenant. No `currency`: compute emits no formatted money, only floats in
+    whatever unit `sales_daily` arrived in, so a currency code here would be a field
+    nothing reads - see the note on VenueProfile."""
+
     org_id: str
-    venues: list[VenueProfile]
-    currency: str = "GBP"
-    country: str = "GB"
+    venues: list[VenueProfile] = Field(max_length=MAX_VENUES)
+    country: str = Field(
+        "GB", min_length=2, max_length=2,
+        description="ISO 3166-1 alpha-2. Drives the public-holiday calendar. Length-"
+                    "bounded because it is echoed into a diagnostic once per venue, so "
+                    "an unbounded string is amplified by the venue count.")
     exo_enabled: list[str] = Field(
         default_factory=lambda: ["calendar", "weather"],
         description="Covariate families that are live. Sports and local events are "
@@ -64,7 +148,7 @@ class OrgProfile(_Strict):
     stock_enabled: bool = Field(
         False, description="Brewpub-specific; off by default for other verticals.")
     expected_totals: dict[str, float] | None = Field(
-        None,
+        None, max_length=MAX_VENUES,
         description="Optional per-venue reconciliation target. None skips the check - "
                     "an org without audited totals must still build.")
 
@@ -114,9 +198,11 @@ class ExogenousRow(_Strict):
     venue: str
     date: date
     values: dict[str, float] = Field(
-        default_factory=dict,
+        default_factory=dict, max_length=MAX_EXO_KEYS_PER_ROW,
         description="Covariate name -> value, e.g. exo_temp_c. Names must match "
-                    "CHRONOS2_EXO_COLS for the served entrant to consume them.")
+                    "CHRONOS2_EXO_COLS EXACTLY for the served entrant to consume them; "
+                    "unknown names are ignored and reported in diagnostics, because "
+                    "extra=forbid guards this model's fields but not inside this dict.")
 
 
 class PriorState(_Strict):
@@ -129,24 +215,69 @@ class PriorState(_Strict):
 
     watermark: date | None = None
     served_model: dict[str, str] = Field(
-        default_factory=dict, description="venue -> model name currently live.")
+        default_factory=dict, max_length=MAX_VENUES,
+        description="venue -> model name currently live.")
     last_refit_ts: datetime | None = None
     briefing_chain: list[dict] = Field(
-        default_factory=list,
+        default_factory=list, max_length=MAX_BRIEFING_CHAIN,
         description="The new/continuing/resolved chain. Drop it and fatigue returns.")
     change_point_state: dict[str, dict] = Field(
-        default_factory=dict, description="venue -> detector state, incl. closure dormancy.")
+        default_factory=dict, max_length=MAX_VENUES,
+        description="venue -> detector state, incl. closure dormancy.")
 
 
 class ComputeDataset(_Strict):
     """Everything one compute call gets. One org, one request."""
 
     org_profile: OrgProfile
-    sales_daily: list[SalesRow]
-    trading_hours: list[TradingHoursRow] = Field(default_factory=list)
-    exogenous: list[ExogenousRow] = Field(default_factory=list)
+    sales_daily: list[SalesRow] = Field(max_length=MAX_SALES_ROWS)
+    trading_hours: list[TradingHoursRow] = Field(
+        default_factory=list, max_length=MAX_TRADING_HOURS_ROWS)
+    exogenous: list[ExogenousRow] = Field(
+        default_factory=list, max_length=MAX_EXOGENOUS_ROWS)
     prior_state: PriorState = Field(default_factory=PriorState)
-    horizon_days: int = Field(7, ge=1, le=30)
+    horizon_days: int = Field(
+        7, ge=1, le=MAX_HORIZON_DAYS,
+        description="Capped at the horizon the band is actually calibrated for. Asking "
+                    "for more is refused rather than answered with an uncalibrated "
+                    "interval - see MAX_HORIZON_DAYS.")
+
+    @model_validator(mode="after")
+    def _reject_implausible_dates(self) -> ComputeDataset:
+        """Two guards, and they are guarding different things.
+
+        The FUTURE bound is the correctness one. `sales_daily` is closed history, so a row
+        dated after today is a typo; left alone it becomes `feats["date"].max()` and takes
+        the forecast origin and the watermark with it, silently. It is checked absolutely
+        rather than by span because the failure is absolute: a `2026 -> 2036` slip is one
+        keystroke and a 3,666-day span, well inside any tolerable window.
+
+        The SPAN bound is the cost one: it caps the calendar the feature build densifies.
+
+        Both name the offending date. That matters more than the refusal - the caller has
+        to find one bad row among a million, and "span too wide" would not help them.
+        """
+        if not self.sales_daily:
+            return self
+        lo = min(r.date for r in self.sales_daily)
+        hi = max(r.date for r in self.sales_daily)
+
+        horizon_of_sanity = date.today() + timedelta(days=MAX_FUTURE_DAYS)
+        if hi > horizon_of_sanity:
+            raise ValueError(
+                f"sales_daily contains {hi}, which is after today "
+                f"({date.today()}) plus {MAX_FUTURE_DAYS} days of slack. sales_daily is "
+                "closed history, so this is a mistyped date; left alone it would become "
+                "the forecast origin and the watermark rather than raise.")
+
+        span = (hi - lo).days
+        if span > MAX_HISTORY_DAYS:
+            raise ValueError(
+                f"sales_daily spans {span} days ({lo} to {hi}), beyond the "
+                f"{MAX_HISTORY_DAYS}-day limit. The oldest row is the likely typo: a "
+                "history this long densifies to a calendar the feature build has to walk "
+                "day by day.")
+        return self
 
 
 # --- Bundle out ---------------------------------------------------------------

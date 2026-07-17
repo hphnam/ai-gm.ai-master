@@ -106,6 +106,24 @@ def test_a_misspelled_covariate_is_reported():
                for d in bundle.diagnostics)
 
 
+def test_the_unknown_covariate_report_is_bounded():
+    """The honest report is itself an amplifier: every name is caller-controlled and they
+    are joined into one string. Inside every contract bound (500k rows x 64 keys, all
+    distinct) an unbounded report would render tens of millions of names."""
+    from ingest.exog_supplied import MAX_REPORTED_UNKNOWN
+
+    junk = {f"exo_{'x' * 40}_{i}": 1.0 for i in range(64)}
+    bundle = run(_dataset(exogenous=_exo(junk, days=3)))
+    report = [d for d in bundle.diagnostics if "unknown covariate" in d][0]
+    assert report.count("exo_xxx") <= MAX_REPORTED_UNKNOWN
+
+
+def test_a_truncated_unknown_report_says_it_is_truncated():
+    junk = {f"exo_bogus_{i}": 1.0 for i in range(64)}
+    bundle = run(_dataset(exogenous=_exo(junk, days=3)))
+    assert any("first few" in d for d in bundle.diagnostics)
+
+
 def test_a_known_covariate_raises_no_unknown_warning():
     bundle = run(_dataset(exogenous=_exo({"exo_temp_c": 12.0})))
     assert not [d for d in bundle.diagnostics if "unknown covariate" in d]
@@ -262,18 +280,24 @@ def test_the_forward_frame_carries_every_training_feature_column():
     assert len(bundle.forecasts) == 7
 
 
-# --- The band ------------------------------------------------------------------
+# --- The band is only sold where it is calibrated ------------------------------
 
-def test_a_horizon_beyond_the_calibration_blocks_is_flagged():
-    """Residuals are <=7-step-ahead errors; the band is applied unchanged to day 30.
-    The research original documented this ("a nominal floor"); the port dropped it."""
-    bundle = run(_dataset(horizon_days=30))
-    assert any("NOMINAL FLOOR" in d for d in bundle.diagnostics)
+def test_a_horizon_beyond_the_calibration_is_refused_not_answered():
+    """The contract advertised 30 days. Measured on a drifting series, the pooled band
+    covers 96% at step 7 but 81% at step 30 against a nominal 90% - and it UNDER-covers,
+    which is not split conformal's safe direction. Per-step calibration fixes it but is a
+    change to the banding method, and this project adopts a method only when it beats a
+    gate. So the horizon is capped at what is evidenced."""
+    import pytest
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        _dataset(horizon_days=30)
 
 
-def test_a_seven_day_horizon_is_not_flagged():
-    bundle = run(_dataset())
-    assert not [d for d in bundle.diagnostics if "NOMINAL FLOOR" in d]
+def test_the_evidenced_horizon_is_still_served():
+    bundle = run(_dataset(horizon_days=7))
+    assert len({f.target_date for f in bundle.forecasts}) == 7
 
 
 # --- expected_totals ----------------------------------------------------------

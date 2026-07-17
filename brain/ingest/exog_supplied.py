@@ -40,6 +40,10 @@ KNOWN_EXO_COLS: frozenset[str] = frozenset({
 
 _TABLE = "exog_supplied"
 
+# How many distinct unknown covariate names are worth echoing back. The point of the
+# report is to name the mistake, not to inventory it.
+MAX_REPORTED_UNKNOWN = 10
+
 
 def write_supplied(con, rows) -> tuple[int, list[str]]:
     """Materialise supplied covariates into the scratch store, long-form.
@@ -49,13 +53,20 @@ def write_supplied(con, rows) -> tuple[int, list[str]]:
     which stops a caller inventing a top-level field - does not reach inside it. A
     caller that sends `exo_tempc` would otherwise get silence and a univariate forecast
     wearing the exo model's name. The engine reports them back instead.
+
+    The unknown set is capped. Every name is caller-controlled and they are joined into
+    one diagnostic string, so the honest report is itself an amplifier: a request inside
+    every contract bound (500k exogenous rows x 64 keys, all distinct) would otherwise
+    collect tens of millions of names and render them into a multi-gigabyte string. A
+    handful names the mistake; the rest only repeat it.
     """
     long: list[dict] = []
     unknown: set[str] = set()
     for r in rows:
         for col, value in r.values.items():
             if col not in KNOWN_EXO_COLS:
-                unknown.add(col)
+                if len(unknown) < MAX_REPORTED_UNKNOWN:
+                    unknown.add(col)
                 continue
             long.append({"venue": r.venue, "date": pd.Timestamp(r.date).normalize(),
                          "col": col, "value": float(value)})

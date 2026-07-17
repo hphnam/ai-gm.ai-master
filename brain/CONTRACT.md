@@ -18,9 +18,13 @@
 >    contract described a cap the code retired a fortnight earlier.
 > 2. **VAT is closed** (§2): the API sends ex-VAT, the brain assumes nothing, and
 >    `vat_inclusive` / `vat_rate` are **removed** from `VenueProfile` rather than left
->    as fields nothing reads.
+>    as fields nothing reads. `timezone` and `currency` are removed for the same reason
+>    — the analytics are date-grain and compute emits no formatted money, so both were
+>    fields a caller could set and nothing would honour.
 > 3. **Weather is supplied, not fetched** (§4): the recommendation was that compute
 >    keep one outbound call. It does not. See the decision note in §4.
+> 4. **`horizon_days` is capped at 7, not 30** — the horizon the band is actually
+>    calibrated for. See §Bundle out.
 
 ## The shape
 
@@ -44,11 +48,10 @@ per-venue block:
 |---|---|
 | `org_id` | server-set by the API, never model-supplied |
 | `venues[].venue_id` / `.slug` | the brain works in slugs; the API maps `venueId ↔ slug` at assembly. No persisted slug column needed. |
-| `venues[].timezone` | accepted; the analytics are date-grain, so nothing reads it yet |
 | `venues[].lat` / `.lon` | presence means "this venue has a weather cell"; absent ⇒ `weather_cell` is `None` and weather must arrive via `exogenous` |
 | `venues[].structural_zero_dow` | days closed by design. Feeds the `is_structural_zero` feature **and** the Mondrian conformal grouping. **Empty means none** — never "unset, use Lune's Mon/Tue" |
 | `venues[].is_event_driven` | booking-led venue. Never judged "closed" on a trailing lull; its own trading nights are the spillover signal for siblings. **Does not cap the rung** |
-| `currency`, `country` | `country` drives the public-holiday calendar (`holidays.country_holidays`); `currency` is accepted and unread |
+| `country` | drives the public-holiday calendar (`holidays.country_holidays`) |
 | `exo_enabled` | which covariate families are live — see §Exogenous |
 | `stock_enabled` | brewpub-specific; **off by default**. Accepted and **reported as unhonoured** — the stock pipeline reads spreadsheets off disk and has no injected path |
 | `expected_totals` | optional reconciliation target; `null` = skip the check |
@@ -203,10 +206,32 @@ before Phase 3: the engine returned `conformal.wrap.evaluate`'s **backtest** —
 at 57 rows, every one for a day already inside the supplied history, none after it. A
 caller persisting those would have been storing predictions about the past.
 
+**`horizon_days` is capped at 7** (`contract.MAX_HORIZON_DAYS`), and 7 is not a round
+number — it is what the band is calibrated for. The residual stream is built from 7-day
+rolling blocks, so every residual is a ≤7-step-ahead error. Measured on a drifting weekly
+series, the pooled 90% band applied unchanged across steps:
+
+| step | 1 | 7 | 14 | 21 | 30 |
+|---|---|---|---|---|---|
+| coverage (nominal 90%) | 100.0% | 96.2% | 84.6% | 88.5% | **80.8%** |
+
+Note the direction. At ≤7 it **over**-covers, which is split conformal's safe failure
+mode (`conformal/wrap.py` says so). Past 7 it silently **under**-covers, which is not,
+and the project's gate is ±3pp. The contract previously advertised `le=30`, so an API
+could have asked for a month and been given an interval whose stated confidence was
+wrong by 9pp with nothing said.
+
+Per-step calibration fixes this — the same measurement gives 96.2% at every step, with the
+half-width growing 181 → 224 — but that changes the banding **method**, and this project
+adopts a method only when it beats a gate on held-out folds. Inventing one inside an
+integration phase is precisely the move the ladder exists to prevent, so the horizon is
+capped at what is evidenced and per-step conformal is logged as a research work package
+(`FLAGS.md`, FLAG-BAND-HORIZON).
+
 | Key | Shape | Contents |
 |---|---|---|
 | `forecasts` | upsert | `venue, layer, key, target_date, model, yhat` — forward-dated |
-| `bands` | upsert | `+ level, lo, hi` — `level` is part of the grain (0.80 and 0.90 coexist). **Calibrated on ≤7-step-ahead errors**: beyond day 7 the band is a nominal floor, not a calibrated interval, and compute says so in `diagnostics` |
+| `bands` | upsert | `+ level, lo, hi` — `level` is part of the grain (0.80 and 0.90 coexist) |
 | `served_forecast` | upsert | `venue, layer, model, rung, data_as_of, selected_at` |
 | `watermark` | upsert | new per-venue position |
 | `ladder_selection` | append | `old/new rung, old/new MASE, per-fold MASE, n_folds, reason` |

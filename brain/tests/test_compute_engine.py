@@ -206,8 +206,8 @@ def test_the_forecast_is_for_dates_after_the_supplied_history():
 
 
 def test_horizon_days_drives_the_number_of_forecast_days():
-    bundle = run(_dataset(horizon_days=14))
-    assert len({f.target_date for f in bundle.forecasts}) == 14
+    bundle = run(_dataset(horizon_days=3))
+    assert len({f.target_date for f in bundle.forecasts}) == 3
 
 
 def test_the_forecast_starts_the_day_after_the_last_observation():
@@ -287,6 +287,103 @@ def test_unknown_dataset_fields_are_rejected():
     """A silently-dropped field is how a caller comes to believe it sent something."""
     with pytest.raises(ValidationError):
         OrgProfile(org_id="o", venues=[], not_a_real_field=1)
+
+
+def _with_typo(year: int) -> list[SalesRow]:
+    return _sales("ghost_bar") + [
+        SalesRow(venue="ghost_bar", date=date(year, 1, 15), category="Beer",
+                 item="Test IPA", units=1.0, revenue_exvat=100.0)]
+
+
+@pytest.mark.parametrize("year", [2027, 2036, 2202])
+def test_a_future_dated_row_is_refused_whatever_the_year(year):
+    """`sales_daily` is closed history, so a future date is a typo. `trim_to_active`
+    trims only ZERO endpoints, so it survives, becomes the series maximum and takes the
+    forecast origin and watermark with it - silently.
+
+    Parametrised because the first guard was a SPAN check: it rejected 2202 and ACCEPTED
+    2027 and 2036, which are one-keystroke slips and therefore likelier. Span is a
+    relative measure of a failure that is absolute.
+    """
+    with pytest.raises(ValidationError):
+        _dataset(sales=_with_typo(year))
+
+
+def test_a_wholly_mis_stamped_export_is_refused_despite_a_normal_span():
+    """The case a span guard cannot see: every row shifted to 2202, so the span is a
+    perfectly ordinary 199 days. It forecast 2202-07-20 before this."""
+    rows = _sales("ghost_bar", n=200, start=date(2202, 1, 1))
+    with pytest.raises(ValidationError):
+        _dataset(sales=rows)
+
+
+def test_the_date_error_names_the_offending_row_so_it_is_findable():
+    """"Too far ahead" alone leaves the caller hunting one row in 200,000."""
+    with pytest.raises(ValidationError, match="2036-01-15"):
+        _dataset(sales=_with_typo(2036))
+
+
+def test_a_normal_two_year_history_is_not_refused():
+    """The guard must not fire on real history."""
+    rows = _sales("ghost_bar", n=730, start=date(2024, 1, 1))
+    assert len(_dataset(sales=rows).sales_daily) == 730
+
+
+def test_an_absurdly_old_row_is_refused_on_span():
+    """The cost half of the guard: span still bounds the calendar the feature build
+    densifies, and an ancient row is not caught by the future check."""
+    rows = _sales("ghost_bar", n=5, start=date(1900, 1, 1)) + _sales("ghost_bar", n=5)
+    with pytest.raises(ValidationError, match="spans"):
+        _dataset(sales=rows)
+
+
+def test_an_absurd_venue_count_is_refused():
+    """Every list a caller controls is a resource dimension on a shared service with no
+    concurrency cap of its own."""
+    from compute.contract import MAX_VENUES
+
+    venues = [VenueProfile(venue_id=f"v{i}", slug=f"bar_{i}")
+              for i in range(MAX_VENUES + 1)]
+    with pytest.raises(ValidationError):
+        OrgProfile(org_id="o", venues=venues)
+
+
+def test_a_hardened_service_reports_the_error_type_without_internals(monkeypatch):
+    """`service/compute.py` already withholds internals from the 503 body when hardened.
+    The 200 path was handing the same scratch paths and library internals back in
+    diagnostics - the identical leak, through the door that succeeded.
+
+    The suite runs with BRAIN_ALLOW_INSECURE=1 (conftest), so hardening must be forced
+    here; that is the posture a deployed brain actually runs in.
+    """
+    import config
+
+    monkeypatch.setattr(config, "HARDENED", True)
+    bundle = run(_dataset(prior_state=PriorState(
+        served_model={"ghost_bar": "no_such_model"})))
+    failed = [d for d in bundle.diagnostics if "forecast failed" in d]
+    assert failed == ["ghost_bar: forecast failed (ValueError)"]
+
+
+def test_an_unhardened_service_keeps_the_detail_for_local_debugging():
+    bundle = run(_dataset(prior_state=PriorState(
+        served_model={"ghost_bar": "no_such_model"})))
+    assert any("unknown model" in d for d in bundle.diagnostics)
+
+
+def test_the_served_rung_is_populated():
+    """`ServedRow.rung` was in the contract and always came back None, so the API had a
+    column it could never fill."""
+    bundle = run(_dataset(prior_state=PriorState(
+        served_model={"ghost_bar": "rung1_robust_dow"})))
+    assert [s.rung for s in bundle.served] == [1]
+
+
+def test_an_unknown_model_reports_no_rung_rather_than_guessing():
+    """Read from the ladder registry, not parsed off the `rungN_` prefix."""
+    from compute.engine import _rung_of
+
+    assert _rung_of("rung9_invented") is None
 
 
 def test_trading_hours_round_trip_into_the_scratch_store():
