@@ -41,6 +41,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 
+import org_profile
 from config import (
     ANCHOR_VENUE,
     FORECAST_VENUES,
@@ -52,8 +53,8 @@ from config import (
 from eval import harness
 from features.build_features import build_features, feature_columns
 from models.foundation import (
-    CHRONOS_MODEL_ID,
     CHRONOS2_MODEL_ID,
+    CHRONOS_MODEL_ID,
     HAS_CHRONOS,
     chronos2_exo_predict,
     chronos2_predict,
@@ -250,10 +251,16 @@ def global_gbm_predict(
 
     Trained only on rows up to the fold's train end, so it is leakage-safe when
     reused inside the rolling backtest and in A7's LOVO transfer.
+
+    Pools the CURRENT tenant's venues, not Lune's three slugs. This is not reachable from
+    compute today (`rung3_global_gbm` is not in `PREDICTORS`, so `_predictor` rejects it),
+    but it is the tripwire under CONTRACT.md open decision 6: the moment the ladder re-fit
+    is wired into compute, a Lune-keyed loop here would call `build_features("beer_hall")`
+    inside a tenant's scratch store and pool three empty frames.
     """
     cutoff = train["date"].max()
     frames = []
-    for v in FORECAST_VENUES:
+    for v in org_profile.venues():
         vf = build_features(v)
         vf = vf[vf["date"] <= cutoff].dropna(subset=["lag_14", "roll28_median"])
         frames.append(vf)

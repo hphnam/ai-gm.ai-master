@@ -22,21 +22,19 @@ import holidays
 import numpy as np
 import pandas as pd
 
+import org_profile
 from config import (
     ANCHOR_VENUE,
     BH_NET_SALES_TOTAL,
-    EVENT_SCOPE,
     HAPPY_HOUR_DAYS,
     PRICE_REGIME_BREAK,
     RECONCILE_TOL,
     STORE_DIR,
-    STRUCTURAL_ZERO_DOW,
-    WEATHER_CELLS,
-    WEATHER_DRY_MM,
     WEATHER_TRAIN_BASIS,
 )
 from ingest import calendar_sources as cal
-from ingest.exog_weather import read_basis
+from ingest.exog_supplied import overlay as overlay_supplied
+from ingest.exog_weather import derive_is_dry, read_basis
 from ingest.local_events import read_events
 from ingest.world_cup import WC_FEATURE_COLS as _WC_FEATURE_COLS
 from ingest.world_cup import world_cup_features
@@ -84,34 +82,71 @@ _NON_FEATURE = ({"date", "venue", "value"}
                 | set(WC_COLUMNS))
 
 
-def _uk_bank_holidays(years: range) -> set:
-    cal = holidays.UnitedKingdom(subdiv="England", years=list(years))
-    return set(cal.keys())
+def _bank_holidays(years: range, country: str = "GB") -> set:
+    """Public holidays for the tenant's country.
 
-
-def _ellel_event_dates(con) -> set:
-    """Dates on which Ellel traded, the spillover-hypothesis event calendar."""
-    df = read_series("ellel", "L1", con=con)
-    return set(df.loc[df["value"] > 0, "date"].dt.date)
-
-
-def build_features(venue: str = ANCHOR_VENUE,
-                   weather_basis: str = WEATHER_TRAIN_BASIS) -> pd.DataFrame:
-    """Return the leak-free daily feature table for one venue. `weather_basis`
-    selects which weather table populates the weather columns (the A14 train/serve
-    study sweeps it); the default is config.WEATHER_TRAIN_BASIS."""
-    con = connect(read_only=True)
+    Lune is England, and `subdiv="England"` matters there (Scotland and Northern Ireland
+    keep different days). Outside GB the subdivision is meaningless, so it is only
+    applied where it means something; an unsupported country degrades to no holidays
+    rather than raising, and `build_features` reports it.
+    """
+    if country == "GB":
+        return set(holidays.UnitedKingdom(subdiv="England", years=list(years)).keys())
     try:
-        series = read_series(venue, "L1", fill_calendar=True, con=con)
-        ellel_events = _ellel_event_dates(con)
-    finally:
-        con.close()
+        return set(holidays.country_holidays(country, years=list(years)).keys())
+    except (NotImplementedError, KeyError):
+        return set()
 
-    df = series[["date", "value"]].copy()
-    df["venue"] = venue
+
+def _world_cup_frame(venue: str, dates: pd.Series, families: frozenset[str],
+                     con=None) -> pd.DataFrame:
+    """The six World Cup covariates, or all-zero when the tenant did not opt in.
+
+    Off by default for a tenant: the schedule is a fixed 2026 fixture list read from disk
+    and the home-nation flags are England/Scotland. An org that never asked for a World
+    Cup must not receive six columns of another country's football.
+    """
+    if "sports" in families:
+        return world_cup_features(venue, dates, con=con)
+    zeros = pd.DataFrame({"date": pd.DatetimeIndex(dates)})
+    for c in _WC_FEATURE_COLS:
+        zeros[c] = 0
+    return zeros
+
+
+def _event_venue_dates(con) -> set:
+    """Dates on which any booking-led venue traded: the spillover event calendar.
+
+    Lune's hypothesis is that an Ellel function night lifts the Beer Hall next door. The
+    signal is "did the event venue trade", which generalises to any estate with a
+    booking-led room; it was hardcoded to the `ellel` slug, so a tenant got a
+    silently-empty calendar and a permanently-zero covariate.
+    """
+    dates: set = set()
+    for v in org_profile.venues():
+        if not org_profile.is_event_driven(v):
+            continue
+        df = read_series(v, "L1", con=con)
+        dates |= set(df.loc[df["value"] > 0, "date"].dt.date)
+    return dates
+
+
+def calendar_features(df: pd.DataFrame, venue: str, event_nights: set) -> pd.DataFrame:
+    """Deterministic per-date features, knowable at ANY horizon. Mutates and returns df.
+
+    Shared by the training frame (below) and the forward frame (`compute/forward.py`).
+    That sharing is the point, not tidiness: `compute/forward` previously hand-rolled its
+    own parallel versions of these, which is train/serve skew by construction - the model
+    is fit on one definition of a column and served another, and nothing errors. It also
+    left 13 of these columns out of the forward frame entirely, so `rung3_gbm` raised
+    KeyError instead of forecasting.
+
+    Assignment order is deliberate and must not be rearranged: it fixes the column order
+    of the training frame, and tree-model split ties break on feature index, so reordering
+    silently changes a forecast. `tests/test_org_profile.py` and the frame-hash check in
+    report 33 pin it.
+    """
     d = df["date"]
-
-    # --- Deterministic calendar features (known in advance) -----------------
     df["dow"] = d.dt.dayofweek
     df["is_weekend"] = (df["dow"] >= 5).astype(int)
     for k in range(7):
@@ -123,22 +158,44 @@ def build_features(venue: str = ANCHOR_VENUE,
     df["weekofyear"] = d.dt.isocalendar().week.astype(int)
 
     df["is_happy_hour_day"] = df["dow"].isin(HAPPY_HOUR_DAYS).astype(int)
-    df["is_structural_zero"] = df["dow"].isin(STRUCTURAL_ZERO_DOW).astype(int)
+    df["is_structural_zero"] = df["dow"].isin(
+        org_profile.structural_zero_dow(venue)).astype(int)
 
-    bh_holidays = _uk_bank_holidays(range(d.dt.year.min(), d.dt.year.max() + 1))
+    bh_holidays = _bank_holidays(range(d.dt.year.min(), d.dt.year.max() + 1),
+                                 org_profile.country(venue))
     df["is_bank_holiday"] = d.dt.date.isin(bh_holidays).astype(int)
-    # G12.10a2: `is_ellel_event` is a spillover signal ("did Ellel trade that
-    # day") for forecasting OTHER venues from Ellel's rhythm. On Ellel's own
-    # frame it is 1 exactly when Ellel had revenue > 0, i.e. a near-deterministic
-    # function of Ellel's own forecast target: a self-leak that reaches every
-    # rung reading this frame (GBM included, now that Ellel is uncapped). Neutralise
-    # it at source: constant 0 on the Ellel frame (column kept for schema/
-    # ENRICH_FEATURES stability), genuine spillover elsewhere.
-    if venue == "ellel":
+    # G12.10a2: `is_ellel_event` is a spillover signal ("did the booking-led venue trade
+    # that day") for forecasting OTHER venues from its rhythm. On the event venue's OWN
+    # frame it is 1 exactly when that venue had revenue > 0, i.e. a near-deterministic
+    # function of its own forecast target: a self-leak that reaches every rung reading
+    # this frame (GBM included, now that Ellel is uncapped). Neutralise it at source:
+    # constant 0 on the event venue's own frame (column kept for schema/ENRICH_FEATURES
+    # stability), genuine spillover elsewhere. The name is Lune's; the rule is not.
+    if org_profile.is_event_driven(venue):
         df["is_ellel_event"] = 0
     else:
-        df["is_ellel_event"] = d.dt.date.isin(ellel_events).astype(int)
+        df["is_ellel_event"] = d.dt.date.isin(event_nights).astype(int)
     df["price_regime"] = (d >= pd.Timestamp(PRICE_REGIME_BREAK)).astype(int)
+    return df
+
+
+def build_features(venue: str = ANCHOR_VENUE,
+                   weather_basis: str = WEATHER_TRAIN_BASIS) -> pd.DataFrame:
+    """Return the leak-free daily feature table for one venue. `weather_basis`
+    selects which weather table populates the weather columns (the A14 train/serve
+    study sweeps it); the default is config.WEATHER_TRAIN_BASIS."""
+    con = connect(read_only=True)
+    try:
+        series = read_series(venue, "L1", fill_calendar=True, con=con)
+        event_nights = _event_venue_dates(con)
+    finally:
+        con.close()
+
+    df = series[["date", "value"]].copy()
+    df["venue"] = venue
+
+    # --- Deterministic calendar features (known in advance) -----------------
+    df = calendar_features(df, venue, event_nights)
 
     # --- Strictly-past statistics (shifted so today is never used) ----------
     df["lag_7"] = df["value"].shift(7)
@@ -156,8 +213,16 @@ def _attach_exog(df: pd.DataFrame, venue: str, basis: str = WEATHER_TRAIN_BASIS,
                  con=None) -> pd.DataFrame:
     """Populate the exo_* columns by LEFT-JOINing the deterministic calendar
     (leakage-free at any horizon), the chosen weather basis, and curated local
-    events. Venue→cell and venue→event-scope maps come from config; events are
-    never cross-applied across cities."""
+    events. Venue→cell and venue→event-scope maps come from the profile; events are
+    never cross-applied across cities.
+
+    Family gating happens HERE rather than in the caller, because both the training frame
+    and the forward frame come through this function. Gating only the forward frame -
+    which is what Phase 3 first did - meant a tenant without `sports` trained on Lune's
+    World Cup schedule (read off disk, 35 flagged days) and served zeros: a clean
+    off-switch on one side and skew on the other.
+    """
+    families = org_profile.exo_families()
     d = df["date"]
 
     # Deterministic calendar, known in advance, safe at any horizon.
@@ -165,17 +230,24 @@ def _attach_exog(df: pd.DataFrame, venue: str, basis: str = WEATHER_TRAIN_BASIS,
     df["exo_is_uni_term"] = d.map(cal.is_uni_term).astype(int)
     df["exo_uni_phase"] = d.map(cal.uni_phase)
 
-    # Weather, the chosen training basis for this venue's grid cell.
-    cell = WEATHER_CELLS.get(venue)
+    # Weather, the chosen training basis for this venue's grid cell. A venue with no cell
+    # matches nothing and lands NaN, which the supplied-covariate overlay then fills.
+    cell = org_profile.weather_cell(venue) if "weather" in families else None
     wx = read_basis(basis, con=con)
     wx = wx[wx["cell"] == cell][["date", "exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs"]]
     df = df.merge(wx, on="date", how="left")
-    df["exo_is_dry"] = (df["exo_rain_mm"] < WEATHER_DRY_MM).astype("float")
+    # A placeholder, not a value: it fixes the column's position and nothing else.
+    # `derive_is_dry` fills it AFTER the overlay, from the final rain. Deriving it here
+    # would bake in the pre-overlay rain - NaN for a tenant, so `NaN < 1.0` is False and
+    # every training row would read "not dry" while the horizon read the real flag.
+    # NaN rather than 0.0 specifically so that "derived" stays distinguishable from
+    # "the caller supplied exo_is_dry=0", which must survive the derivation.
+    df["exo_is_dry"] = np.nan
 
     # Local events, only this venue's scope(s); fixture flag + max rank.
-    scopes = set(EVENT_SCOPE.get(venue, ())) | {"all"}
-    ev = read_events(con=con)
-    ev = ev[ev["venue_scope"].isin(scopes)]
+    ev = read_events(con=con) if "events" in families else pd.DataFrame()
+    if not ev.empty:
+        ev = ev[ev["venue_scope"].isin(org_profile.event_scopes(venue))]
     if not ev.empty:
         rank_by_date = ev.groupby("event_date")["rank"].max()
         df["exo_event_rank"] = df["date"].map(rank_by_date).fillna(0).astype(float)
@@ -186,10 +258,20 @@ def _attach_exog(df: pd.DataFrame, venue: str, basis: str = WEATHER_TRAIN_BASIS,
     # World Cup fixtures (G12.10d): raw wc_* covariates, code-derived relevance
     # (kickoff vs derived trading hours). Lancaster catchment (BH/Ellel); TRT and
     # any other venue get all-zero. Absent schedule -> all-zero with a logged note.
-    wc = world_cup_features(venue, df["date"], con=con)
+    wc = _world_cup_frame(venue, df["date"], families, con)
     df = df.merge(wc, on="date", how="left")
     for c in _WC_FEATURE_COLS:
         df[c] = df[c].fillna(0).astype(int)
+
+    # Caller-supplied covariates win over everything derived above. No-op on the
+    # research path (no scratch table), so Lune's frame is unchanged.
+    df = overlay_supplied(df, venue, con=con)
+
+    # AFTER the overlay, and the horizon frame does the same, in the same order, via the
+    # same helper. Deriving it above (from the pre-overlay rain) while `compute/forward`
+    # derived it below was live train/serve skew on a served covariate. The earlier
+    # assignment stays only to fix the column's position in the frame.
+    df = derive_is_dry(df)
 
     return df[[c for c in df.columns if c != "exo_uni_phase"] + ["exo_uni_phase"]]
 

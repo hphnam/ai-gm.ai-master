@@ -27,6 +27,8 @@ from __future__ import annotations
 import pandas as pd
 
 from compute.contract import ComputeDataset
+from config import RECONCILE_TOL
+from ingest.exog_supplied import write_supplied
 from store import warehouse
 
 # The columns `line_items` must carry for the L1/L2/L3 views to aggregate cleanly,
@@ -105,8 +107,8 @@ def _trading_hours_frame(dataset: ComputeDataset) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["venue", "dow", "open_hour", "close_hour", "n"])
 
 
-def load(dataset: ComputeDataset) -> None:
-    """Populate the CURRENT scratch store from `dataset`.
+def load(dataset: ComputeDataset) -> list[str]:
+    """Populate the CURRENT scratch store from `dataset`. Returns any diagnostics.
 
     Must be called inside a `warehouse.scratch_store(...)` block; it deliberately does
     not open one itself, so the caller owns the lifetime and nothing can accidentally
@@ -127,9 +129,49 @@ def load(dataset: ComputeDataset) -> None:
         con.execute("CREATE OR REPLACE TABLE venue_trading_hours AS SELECT * FROM _th")
         con.unregister("_th")
 
+        _, unknown = write_supplied(con, dataset.exogenous)
         _load_prior_state(con, dataset)
     finally:
         con.close()
+
+    notes = _reconcile_totals(dataset)
+    if unknown:
+        notes.append(
+            f"exogenous: unknown covariate(s) {unknown} ignored; "
+            "ExogenousRow.values is a free dict, so a misspelled name validates "
+            "and then does nothing")
+    return notes
+
+
+def _reconcile_totals(dataset: ComputeDataset) -> list[str]:
+    """Check the dataset against the caller's own expected per-venue totals.
+
+    Lune's equivalent (`BH_NET_SALES_TOTAL`, 202491.0) is a hard assert against an
+    audited figure, and it lives on the CSV bootstrap, not here - so there was nothing
+    to delete from the compute path, only a contract field with no job.
+
+    This is the job. The failure it catches is the API's, not the brain's: a paged sales
+    query that drops rows hands compute a short series, and a short series does not
+    error, it forecasts low. That is the "plausible wrong number" the bundle's
+    diagnostics exist to prevent. `None` skips it - an org without audited totals must
+    still build.
+    """
+    expected = dataset.org_profile.expected_totals
+    if not expected:
+        return []
+    actual: dict[str, float] = {}
+    for r in dataset.sales_daily:
+        actual[r.venue] = actual.get(r.venue, 0.0) + r.revenue_exvat
+
+    notes = []
+    for venue, target in expected.items():
+        got = actual.get(venue, 0.0)
+        if abs(got - target) > abs(target) * RECONCILE_TOL:
+            notes.append(
+                f"{venue}: supplied sales total {got:,.2f} does not reconcile to the "
+                f"expected {target:,.2f} (tolerance {RECONCILE_TOL:.0%}); the dataset "
+                "may be incomplete and the forecast is computed on what arrived")
+    return notes
 
 
 def _ensure_state_tables(con) -> None:

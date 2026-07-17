@@ -164,6 +164,18 @@ SEASONAL_PERIOD = 7      # weekly seasonality for the seasonal-naive denominator
 CONFORMAL_LEVELS = (0.80, 0.90)
 COVERAGE_TOL_PP = 3.0    # allowed deviation from nominal coverage, percentage pts
 
+# Rolling-origin calibration window for a FORWARD conformal band (compute/forward.py).
+# Two reasons it is bounded rather than "all of history". Statistically: a forward band
+# should reflect the model's recent error scale, which drifts; this mirrors what the
+# frozen research forecasts already do (`sim/build_frozen_forecast.BAND_CALIB_DAYS`,
+# pinned separately at 90 so the committed artefacts stay reproducible from their own
+# constant). Operationally: `rolling_point_forecasts` re-fits the model once per 7-day
+# block it walks, so an unbounded window makes the work scale with the SPAN of whatever
+# history arrives. One typo'd year in a tenant's POS export ("2202" for "2022") densifies
+# to ~65k daily rows and ~9,300 re-fits from a two-row request - a denial of service
+# written by a fat finger rather than an attacker.
+BAND_CALIB_DAYS = 90
+
 # --- Signals -----------------------------------------------------------------
 # Observed chat-log failure-rate baseline (methodology §4.1).
 CHATLOG_FAILURE_BASELINE = 0.189

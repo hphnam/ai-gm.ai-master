@@ -20,13 +20,14 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from compute import loader
+import pandas as pd
+
+import org_profile
+from compute import forward, loader
 from compute.contract import (
-    BandRow,
     ComputeBundle,
     ComputeDataset,
     DormantVenue,
-    ForecastRow,
     ServedRow,
 )
 from store import warehouse
@@ -67,15 +68,20 @@ def run(dataset: ComputeDataset) -> ComputeBundle:
         # directory to the same user.
         os.chmod(tmp, 0o700)
         scratch = Path(tmp) / "scratch.duckdb"
-        with warehouse.scratch_store(scratch):
-            loader.load(dataset)
-            return _compute(dataset)
+        # Both bindings are per-request ContextVars, so two orgs in one process cannot
+        # see each other's store OR each other's profile. Profile is bound around the
+        # load as well as the compute: the loader's frames are venue-shaped too.
+        with warehouse.scratch_store(scratch), \
+                org_profile.bind_profile(dataset.org_profile):
+            notes = loader.load(dataset)
+            return _compute(dataset, notes)
     # TemporaryDirectory removes the scratch on exit, including on exception. It does
     # NOT run on SIGKILL, which is what sweep_stale_scratch() covers.
 
 
-def _compute(dataset: ComputeDataset) -> ComputeBundle:
+def _compute(dataset: ComputeDataset, notes: list[str]) -> ComputeBundle:
     bundle = ComputeBundle(org_id=dataset.org_profile.org_id)
+    bundle.diagnostics.extend(notes)
     _report_unconsumed(dataset, bundle)
     live = _live_venues(dataset, bundle)
 
@@ -99,42 +105,23 @@ def _compute(dataset: ComputeDataset) -> ComputeBundle:
 
 
 def _report_unconsumed(dataset: ComputeDataset, bundle: ComputeBundle) -> None:
-    """Say out loud which supplied fields this engine does not read yet.
+    """Say out loud which supplied fields this engine still does not read.
 
     The contract forbids UNKNOWN fields so a caller cannot believe it sent something it
     did not. Accepting a KNOWN field and dropping it on the floor is the same failure
-    wearing a different hat, and it is worse, because the field validated. Until these
-    are wired, a caller that sends them learns so from the bundle instead of from a
-    forecast that quietly ignored its covariates.
+    wearing a different hat, and it is worse, because the field validated.
 
-    Each of these is a real gap, not a shrug:
-      * exogenous  - the served Beer Hall entrant consumes 15 known-future covariates.
-                     Without them it cannot be the served model, whatever prior state says.
-      * exo_enabled - "sports and local events are opt-in" is only a promise while
-                     nothing reads the toggle.
-      * horizon_days - the engine currently emits whatever the analytics produce.
-      * per-venue profile - structural_zero_dow / is_event_driven / VAT are still taken
-                     from Lune's module globals for every tenant (Phase 3).
+    Phase 3 wired the rest: `exogenous` overlays both the training and horizon frames,
+    `horizon_days` drives a real forward projection, `exo_enabled` gates the Lune-shaped
+    families, and the per-venue profile now reaches the structural zeros, the Mondrian
+    grouping and the liveness rules. What remains is `stock_enabled`, whose pipeline
+    reads monthly spreadsheets that only exist for one venue of one estate.
     """
-    if dataset.exogenous:
+    if dataset.org_profile.stock_enabled:
         bundle.diagnostics.append(
-            f"exogenous: {len(dataset.exogenous)} rows supplied but NOT consumed; the "
-            "forecast is univariate regardless of the served model named")
-    if dataset.horizon_days != 7:
-        bundle.diagnostics.append(
-            f"horizon_days={dataset.horizon_days} supplied but NOT honoured; the "
-            "analytics emit their own horizon")
-    if set(dataset.org_profile.exo_enabled) != {"calendar", "weather"}:
-        bundle.diagnostics.append(
-            f"exo_enabled={dataset.org_profile.exo_enabled} supplied but NOT honoured; "
-            "the covariate universe is still global")
-    per_venue = [v.slug for v in dataset.org_profile.venues
-                 if v.structural_zero_dow or v.is_event_driven or v.vat_inclusive]
-    if per_venue:
-        bundle.diagnostics.append(
-            f"per-venue profile for {per_venue} supplied but NOT honoured; "
-            "structural zeros, event-driven capping and VAT still come from Lune's "
-            "module globals (Phase 3)")
+            "stock_enabled=True supplied but NOT honoured; the stock pipeline reads "
+            "monthly bar-stock sheets from disk (config.STOCK_DIR) and has no injected "
+            "path, so days-of-cover is unavailable to a tenant")
 
 
 def _live_venues(dataset: ComputeDataset, bundle: ComputeBundle) -> list[str]:
@@ -163,14 +150,16 @@ def _watermark(dataset: ComputeDataset):
 
 
 def _forecast_venue(dataset: ComputeDataset, venue: str, bundle: ComputeBundle) -> None:
-    """Produce the L1 point forecast + conformal band for one venue.
+    """Produce the L1 forward point forecast + conformal band for one venue.
 
     Model choice honours prior state: a model the API says is already served stays
     served, so promotion is continuous across calls rather than re-decided every run.
     Falling back to `default_model` is a cold-start path, and it is recorded as a
     diagnostic so a silent fallback cannot masquerade as a decision.
     """
-    from conformal.wrap import default_model, evaluate
+    from conformal.wrap import default_model
+    from features.build_features import build_features
+    from store.active_span import trim_to_active
 
     served = dataset.prior_state.served_model.get(venue)
     if served is None:
@@ -178,42 +167,12 @@ def _forecast_venue(dataset: ComputeDataset, venue: str, bundle: ComputeBundle) 
         bundle.diagnostics.append(
             f"{venue}: no served model supplied, cold-starting on {served}")
 
-    result = evaluate(venue, served)
-    _drain_outputs(venue, served, bundle, result)
+    feats = trim_to_active(build_features(venue), venue)
+    forecasts, bands, notes = forward.project(dataset, venue, served, feats)
 
-
-def _drain_outputs(venue: str, model: str, bundle: ComputeBundle,
-                   result: dict) -> None:
-    """Read the rows the analytics just wrote into the scratch store into the bundle.
-
-    The existing code persists forecasts and bands as its output contract. Rather than
-    rewrite that, compute lets it write to the scratch database and drains the result
-    here, which keeps the analytics untouched and still returns everything to the API.
-    """
-    con = warehouse.connect(read_only=True)
-    try:
-        fc = con.execute(
-            "SELECT venue, layer, key, target_date, model, yhat FROM forecasts "
-            "WHERE venue = ?", [venue]).df()
-        bd = con.execute(
-            "SELECT venue, layer, key, target_date, model, level, lo, hi FROM bands "
-            "WHERE venue = ?", [venue]).df()
-    finally:
-        con.close()
-
-    for _, r in fc.iterrows():
-        bundle.forecasts.append(ForecastRow(
-            venue=r.venue, layer=r.layer,
-            key=None if r.key is None or r.key != r.key else str(r.key),
-            target_date=r.target_date, model=r.model, yhat=float(r.yhat)))
-
-    for _, r in bd.iterrows():
-        bundle.bands.append(BandRow(
-            venue=r.venue, layer=r.layer,
-            key=None if r.key is None or r.key != r.key else str(r.key),
-            target_date=r.target_date, model=r.model,
-            level=float(r.level), lo=float(r.lo), hi=float(r.hi)))
-
+    bundle.forecasts.extend(forecasts)
+    bundle.bands.extend(bands)
+    bundle.diagnostics.extend(notes)
     bundle.served.append(ServedRow(
-        venue=venue, layer="L1", model=model,
-        data_as_of=result.get("data_as_of") if isinstance(result, dict) else None))
+        venue=venue, layer="L1", model=served,
+        data_as_of=pd.Timestamp(feats["date"].max()).date() if not feats.empty else None))

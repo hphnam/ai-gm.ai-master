@@ -33,6 +33,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
+import org_profile
 from config import (
     ANCHOR_VENUE,
     CONFORMAL_LEVELS,
@@ -107,6 +108,12 @@ def rolling_point_forecasts(
     start = first_target or (feats["date"].min() + pd.Timedelta(days=min_train_days))
     end = last_target or feats["date"].max()
 
+    # The Mondrian group. This read the literal (0, 1) rather than a constant, so
+    # Lune's own `STRUCTURAL_ZERO_DOW` never actually reached the grouping it defines:
+    # editing config would have moved the feature and left the band calibrated on
+    # Mon/Tue. Per-venue now, and honest about where the days come from.
+    zero_dow = org_profile.structural_zero_dow(venue)
+
     rows = []
     block_start = pd.Timestamp(start).normalize()
     while block_start <= end:
@@ -118,7 +125,7 @@ def rolling_point_forecasts(
             for (_, r), p in zip(block.iterrows(), preds):
                 rows.append({
                     "date": r["date"], "y": r["value"], "yhat": float(p),
-                    "is_zero": int(r["date"].dayofweek in (0, 1))})
+                    "is_zero": int(r["date"].dayofweek in zero_dow)})
         block_start = block_end + pd.Timedelta(days=1)
     return pd.DataFrame(rows)
 
@@ -210,7 +217,8 @@ def _persist_standby_forward(venue, model_name, feats, full) -> None:
         "date": pd.date_range(last + pd.Timedelta(days=1), periods=STANDBY_DAYS, freq="D")
     })
     yhat = fn(feats, future, feature_columns(feats))
-    grp = (future["date"].dt.dayofweek.isin((0, 1))).astype(int).to_numpy()
+    grp = (future["date"].dt.dayofweek.isin(
+        org_profile.structural_zero_dow(venue))).astype(int).to_numpy()
     ar, ag = full["res"].to_numpy(), full["is_zero"].to_numpy()
 
     fc_rows, band_rows = [], []

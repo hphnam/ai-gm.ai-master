@@ -25,20 +25,31 @@ class _Strict(BaseModel):
 # --- Dataset in ---------------------------------------------------------------
 
 class VenueProfile(_Strict):
-    """Per-venue config, replacing the Lune constants frozen in config.py."""
+    """Per-venue config, replacing the Lune constants frozen in config.py.
+
+    There is deliberately no `vat_inclusive` / `vat_rate` here. `sales_daily` is ex-VAT
+    by contract (see CONTRACT.md §2, decision closed in Phase 3), so the brain applies no
+    VAT rule of its own and has nothing to do with these values. Carrying them would be
+    worse than useless: a caller setting `vat_inclusive=True` would reasonably expect
+    deflation, get none, and mix bases across venues - which is unrecoverable downstream
+    and shows up as a wrong number rather than an error.
+    """
 
     venue_id: str
     slug: str = Field(description="The brain works in slugs; the API maps venueId <-> slug.")
     timezone: str = "Europe/London"
     lat: float | None = None
     lon: float | None = None
-    vat_inclusive: bool = False
-    vat_rate: float = 0.20
     structural_zero_dow: list[int] = Field(
         default_factory=list,
-        description="Days closed by design (Mon=0..Sun=6). Keeps the band off the floor.")
+        description="Days closed by design (Mon=0..Sun=6). Feeds the is_structural_zero "
+                    "feature AND the Mondrian conformal grouping. An EMPTY list means "
+                    "this venue has no closed days - it does NOT mean 'unset'.")
     is_event_driven: bool = Field(
-        False, description="Booking-led venues are capped at Rung 1.")
+        False,
+        description="Booking-led venue: sparse by nature, never judged 'closed' on a "
+                    "trailing lull, and its own trading nights are the spillover signal "
+                    "for sibling venues. Does NOT cap the ladder rung.")
 
 
 class OrgProfile(_Strict):

@@ -735,3 +735,99 @@ them into the append-only log so it is the continuous WP1-to-present record.
     remotes). Suites 307/8 and 314/1 (+45/+45 from 262/8 and 269/1); tree ruff 72 -> 71;
     **the C2 confront reproduces bit-for-bit through every change (0.285/0.287,
     generalises False)**, tagged `prj93-research-frozen` beforehand.
+23. **G14: de-Lune, and the forecast that was not there**
+    (`33_G14_De_Lune_Report.md`). Phase 3, the pass report 32 §6 deferred. **(a) The
+    headline is not the de-Lune.** `compute/engine._forecast_venue` called
+    `conformal.wrap.evaluate`, which is a **backtest**, and drained its rows: measured on
+    the Phase 2 engine, 57 forecast rows returned, 57 for dates already inside the
+    supplied history, **0 after it**. The API would have persisted predictions about days
+    that had already happened, banded and named with a served model, indistinguishable at
+    row level from a forecast. The Phase 2 diagnostic ("horizon_days supplied but NOT
+    honoured; the analytics emit their own horizon") was true and misleading - the
+    analytics emitted no horizon at all - which is the very failure `_report_unconsumed`
+    was written to prevent. It survived because the Phase 2 tests asserted the venue set
+    and the band levels, both of which pass on a backtest; nothing asserted a target_date
+    was in the future. `compute/forward.py` fixes it (7 rows for horizon 7, 14 for 14, 0
+    backtest), reusing the validated residual stream, Mondrian grouping and conformal
+    quantile rather than inventing a second forecaster. **(b) The seam:** `org_profile.py`,
+    one ContextVar bound per request beside the scratch store. UNBOUND = `config.py`
+    (Lune) so `sim/`, the CLIs and the suite reproduce; BOUND = the profile **entirely**,
+    including empty values - a per-field fallback would hand Lune's Mon/Tue closure to a
+    seven-day tenant and would reach the **Mondrian grouping**, surfacing as a
+    miscalibrated band rather than an error. **(c) A latent bug the seam exposed:**
+    `conformal/wrap.py` grouped the Mondrian band on the **literal** `(0, 1)` in two
+    places, so `config.STRUCTURAL_ZERO_DOW` never reached the grouping it defines - the
+    feature and the band would have diverged silently on any edit. **(d) Two Lune reads
+    were silent wrongness, not crashes:** `dataset_max_date` iterated Lune's three slugs,
+    so inside a tenant's store every read missed, `.max()` returned `NaT`, and `NaT`
+    poisoned `max()` into an arbitrary answer - `is_closed` returned False for every
+    tenant venue **by accident**; and `_ellel_event_dates` read the literal slug, so a
+    tenant's spillover covariate was permanently zero. **(e) The hole under
+    `extra="forbid"`:** `ExogenousRow.values` is a free `dict[str, float]`, so `exo_tempc`
+    validates and does nothing - the strict contract's own failure mode, one level down.
+    Unknown keys now report. The overlay is shared by the training AND horizon frames
+    deliberately: a covariate meaning different things at fit and serve time is
+    train/serve skew, invisible until the forecast is quietly wrong. **(f)
+    `expected_totals` had nothing to translate:** Lune's asserts live on the CSV
+    bootstrap, not the compute path, so the field had no job; it now catches **the
+    caller's** failure (a paged sales query dropping rows forecasts low, it does not
+    error). **(g) The contract was wrong in three places, corrected in the document:**
+    `is_event_driven` never capped the rung (that was `MAX_RUNG`, emptied by G12.9c a
+    fortnight earlier - the same species of stale-document error report 32 found in
+    Ryan's brief, this time in this project's own contract); VAT closed (API sends ex-VAT,
+    `vat_inclusive`/`vat_rate` **removed** rather than left as fields nothing reads);
+    weather fetch decided **against** the contract's own recommendation - building it
+    showed "one outbound call" is a round trip per venue per request, since a per-request
+    scratch store has no cache to amortise against. **(h) Evidence, and a correction to
+    report 32's gate:** C2 `confront_july_w2` **re-scores a frozen artefact**, it does not
+    regenerate the forecast, so "C2 reproduces bit-for-bit" never proved forecast
+    generation was unchanged - report 32 over-claimed it. The right check is the training
+    frame hash (contents + column order, since tree split ties depend on order): all three
+    Lune venues byte-identical pre/post (`59c83586f06c8359`, `fb388ce32d02fdab`,
+    `a3c110bbc72be722`). C2 still re-scores clean (0.285/0.287, coverage 1.00,
+    `generalises` False). **New open decisions, both verified not assumed:** the ladder
+    never re-runs (`ladder_selection` is `[]` and `ServedRow.rung` is `None` on every
+    call, so a tenant's served model is whatever it started as, for ever) and compute
+    emits **L1 only**. **(i) Review found seven defects, and three were the module
+    breaking its own stated rule.** `compute/forward.py`'s docstring says every covariate
+    must be built by the function that builds the training column of that name; the first
+    cut then hand-rolled parallel calendar/event/World-Cup/weather implementations. Both
+    reviewers independently found the worst one first: **`exo_is_dry` inverted between
+    train and serve** (training derived it BEFORE the supplied-covariate overlay, the
+    horizon frame after, so a tenant supplying rain trained on 0.0 for every row - `NaN <
+    1.0` is False - and served the real flag). It is excluded from the GBM by the A14
+    verdict but IS one of the 15 `CHRONOS2_EXO_COLS`, so it fed Lune's own flagship served
+    entrant and nothing failed: silent, plausible, wrong - the exact failure the strict
+    contract is celebrated for preventing. Also: the band is calibrated on <=7-step errors
+    and applied unchanged to day 30 (coverage 78.9% at step 30 vs nominal 90%, gate +/-3pp)
+    and **`sim/build_frozen_forecast` documents that caveat in its own docstring** - the
+    port copied the method and dropped the caveat; the forward frame omitted 13 training
+    columns so `rung3_gbm` raised KeyError; `exo_enabled` gated the horizon frame only, so
+    a tenant without `sports` trained on Lune's World Cup schedule (read off disk, 35
+    flagged days) and served zeros; the calibration floor was checked on the pooled count
+    then Mondrian-split, so a group of 4 silently became a "90% quantile"; a bound profile
+    asked about an unknown slug fell back to Lune's Mon/Tue (fail-open on the one seam
+    whose contract is "bound is total"); and (security, HIGH) `sales_daily` was unbounded
+    in span, so one typo'd year in a POS export (`2202` for `2022`) densified to ~65k rows
+    and **~9,272 re-fits / 17min+ from a 2-row request** - a DoS written by a fat finger.
+    All fixed and RE-MEASURED against the reviewers' own numbers (train==serve==1.0 for dry;
+    rung3_gbm 7 forecasts; wc 0/0; 14 predictor calls / 0.4s). Fixes 1/3/4 came from
+    DELETING the parallel implementations - `calendar_features` extracted from
+    `build_features`, `_attach_exog` now called by both frames - so the forward frame is
+    smaller and does more. **A bug in my own fix, caught by measuring rather than
+    testing:** the first `exo_is_dry` fix made train and serve agree - on 0.0 for 0.0mm
+    rain, which is wrong; the pre-overlay assignment produced 0.0 not NaN, so "preserve a
+    caller-supplied value" preserved a derived one. A test asserting only train==serve
+    passes both times, which is why `test_dry_weather_actually_reads_as_dry` sits next to
+    it. **Review cleared** the load-bearing claims empirically: no ContextVar bleed (six
+    threads, alternating profiles, each saw only its own) - with the caveat that the
+    invariant holds BY ABSENCE (no ThreadPoolExecutor/joblib anywhere in the analytics; a
+    bare `threading.Thread` starts with an empty context and would fall back to Lune's real
+    store); no reachable path from a tenant to Lune DATA (the fallbacks hand over
+    constants, and the scratch store holds no Lune tables); no SQL injection in
+    `exog_supplied` (column names are row data behind an allowlist, venue parameterised).
+    Suites 356/8 and 363/1 (+49/+49 from 307/8 and 314/1); tree ruff 71 -> 70; 263 prints
+    unchanged. FLAG-STORE-DURABILITY fired a THIRD time and nearly corrupted the
+    frame-hash check built to catch this class of error; its trigger is now narrowed by
+    measurement (targeted runs are free, only suites collecting `test_a10_service` /
+    `test_a1_warehouse` rebuild).

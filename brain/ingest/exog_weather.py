@@ -32,6 +32,7 @@ from config import (
     FORECAST_VENUES,
     WEATHER_CELL_COORDS,
     WEATHER_CELLS,
+    WEATHER_DRY_MM,
     WEATHER_LEAD_DAYS,
 )
 from store.warehouse import connect, read_series
@@ -290,6 +291,28 @@ def main() -> int:
     print(f"A14-weather RESULT: {'PASS' if ok else 'FAIL'} "
           f"(3 bases populated; forecast basis differs from reanalysis)")
     return 0 if ok else 1
+
+
+def derive_is_dry(df: pd.DataFrame) -> pd.DataFrame:
+    """Set `exo_is_dry` from `exo_rain_mm`, keeping any value the caller supplied.
+
+    **Must run AFTER the supplied-covariate overlay**, in every frame, or `exo_is_dry`
+    means different things at fit and serve time. It did: the training frame derived it
+    before the overlay and the horizon frame after, so a tenant supplying rain but not
+    `exo_is_dry` trained on 0.0 for every row (NaN < 1.0 is False) and served 1.0 on dry
+    days. `exo_is_dry` is not a GBM feature - it is excluded by the A14 ablation verdict -
+    but it IS one of the 15 `CHRONOS2_EXO_COLS`, so the skew landed on the served entrant
+    and on nothing that would have failed.
+
+    Existing values are preserved where present, so a caller that has its own definition
+    of "dry" is not overruled by a threshold it never chose.
+    """
+    derived = (df["exo_rain_mm"] < WEATHER_DRY_MM).astype(float)
+    if "exo_is_dry" in df:
+        df["exo_is_dry"] = df["exo_is_dry"].where(df["exo_is_dry"].notna(), derived)
+    else:
+        df["exo_is_dry"] = derived
+    return df
 
 
 if __name__ == "__main__":

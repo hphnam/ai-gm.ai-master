@@ -15,7 +15,6 @@ from pydantic import ValidationError
 
 from compute.contract import (
     ComputeDataset,
-    ExogenousRow,
     OrgProfile,
     PriorState,
     SalesRow,
@@ -196,34 +195,50 @@ def test_a_failing_venue_does_not_lose_the_bundle():
     assert any("forecast failed" in d for d in bundle.diagnostics)
 
 
+# --- The forward horizon: the forecast the service exists to produce ---------
+
+def test_the_forecast_is_for_dates_after_the_supplied_history():
+    """Phase 2 returned a BACKTEST: 57 rows, every one for a day already in the
+    dataset. A prediction about the past is not what the caller asked for."""
+    bundle = run(_dataset())
+    last_history = max(r.date for r in _sales("ghost_bar"))
+    assert all(f.target_date > last_history for f in bundle.forecasts)
+
+
+def test_horizon_days_drives_the_number_of_forecast_days():
+    bundle = run(_dataset(horizon_days=14))
+    assert len({f.target_date for f in bundle.forecasts}) == 14
+
+
+def test_the_forecast_starts_the_day_after_the_last_observation():
+    bundle = run(_dataset())
+    last_history = max(r.date for r in _sales("ghost_bar"))
+    assert min(f.target_date for f in bundle.forecasts) == last_history + timedelta(days=1)
+
+
+def test_bands_cover_every_forecast_date():
+    """A point without a band is not a deliverable: Objective 1 is the interval."""
+    bundle = run(_dataset())
+    assert ({b.target_date for b in bundle.bands}
+            == {f.target_date for f in bundle.forecasts})
+
+
+def test_a_band_too_thin_to_calibrate_is_withheld_not_faked():
+    """Below the calibration floor the conformal quantile is the max of a handful of
+    errors. An honestly absent band beats a meaningless one."""
+    bundle = run(_dataset(sales=_sales("ghost_bar", n=125)))
+    assert bundle.bands == [] and bundle.forecasts
+
+
 # --- Supplied-but-unconsumed fields are reported, not dropped ----------------
 
-def test_supplied_exogenous_is_reported_as_unconsumed():
-    """extra="forbid" stops a caller believing it sent an UNKNOWN field. A KNOWN field
-    that validates and is then ignored is the same lie with better manners."""
+def test_stock_enabled_is_reported_as_unhonoured():
+    """The one field Phase 3 leaves unwired: the stock pipeline reads spreadsheets off
+    disk and has no injected path."""
     ds = _dataset()
-    ds.exogenous = [ExogenousRow(venue="ghost_bar", date=date(2026, 1, 1),
-                                 values={"exo_temp_c": 12.0})]
+    ds.org_profile.stock_enabled = True
     bundle = run(ds)
-    assert any("exogenous" in d and "NOT consumed" in d for d in bundle.diagnostics)
-
-
-def test_supplied_horizon_is_reported_as_unhonoured():
-    bundle = run(_dataset(horizon_days=14))
-    assert any("horizon_days=14" in d for d in bundle.diagnostics)
-
-
-def test_per_venue_profile_is_reported_as_unhonoured():
-    """The contract carries structural_zero_dow but Lune's globals still win, so a
-    tenant that sets it must not be left believing it took effect."""
-    ds = ComputeDataset(
-        org_profile=OrgProfile(org_id="o", venues=[
-            VenueProfile(venue_id="v", slug="ghost_bar", structural_zero_dow=[0, 1])]),
-        sales_daily=_sales("ghost_bar"),
-        prior_state=PriorState(served_model={"ghost_bar": "rung2_ets"}),
-    )
-    bundle = run(ds)
-    assert any("per-venue profile" in d for d in bundle.diagnostics)
+    assert any("stock_enabled" in d and "NOT honoured" in d for d in bundle.diagnostics)
 
 
 def test_a_default_dataset_reports_no_false_unconsumed_warnings():
@@ -285,14 +300,14 @@ def test_trading_hours_round_trip_into_the_scratch_store():
     import compute.engine as engine
     original = engine._compute
 
-    def spy(dataset):
+    def spy(dataset, notes):
         con = warehouse.connect(read_only=True)
         try:
             captured["rows"] = con.execute(
                 "SELECT COUNT(*) FROM venue_trading_hours").fetchone()[0]
         finally:
             con.close()
-        return original(dataset)
+        return original(dataset, notes)
 
     engine._compute = spy
     try:

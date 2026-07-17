@@ -1,0 +1,213 @@
+"""The forward projection: the forecast the service exists to produce.
+
+Phase 2 wired compute to `conformal.wrap.evaluate`, which is a **backtest**. It walks
+the series in 7-day blocks, bands each block from residuals accumulated strictly before
+it, and persists the last `TEST_WEEKS` as its deliverable. Those are forecasts for days
+that have already happened - the coverage evidence for report 31's gate, and exactly
+what Objective 1 needed. What it is not is a prediction. Measured on the Phase 2 engine:
+57 rows returned, 57 for dates inside the supplied history, 0 for any date after it.
+
+So `horizon_days` was not merely "not honoured" (the Phase 2 diagnostic's wording): the
+engine had no forward horizon to honour it with. The caller's field asking for a 7-day
+forecast addressed a code path that produced none.
+
+This module is that path. It reuses the pieces already validated rather than inventing a
+second forecaster: the same `rolling_point_forecasts` residual stream `evaluate` builds,
+the same Mondrian grouping, the same conformal quantile, and - after review caught the
+first cut breaking its own rule - the same `calendar_features` and `_attach_exog` that
+build the TRAINING frame. That rule is the module's whole premise: every covariate must
+be produced by the SAME function that produced the training column of that name. A
+forward frame that computes `exo_is_school_term` its own way is train/serve skew wearing
+a helper's clothing, and the model is then scored on one definition and served another.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+
+import org_profile
+from compute.contract import BandRow, ComputeDataset, ForecastRow
+from config import BAND_CALIB_DAYS, CONFORMAL_LEVELS
+from conformal.wrap import (
+    _mondrian_quantiles,
+    _predictor,
+    conformal_quantile,
+    rolling_point_forecasts,
+)
+
+# Below this many calibrated residuals the conformal quantile is not a quantile of
+# anything - it is the max of a handful of errors. A point forecast with an honestly
+# absent band beats one carrying a band that means nothing.
+MIN_CALIB_RESIDUALS = 30
+
+# Weather columns the frame must carry for the exo entrant. Named here because they are
+# the ones compute CANNOT derive: they come from the request or not at all.
+_WEATHER_COLS = ("exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs")
+
+
+def project(dataset: ComputeDataset, venue: str, model_name: str,
+            feats: pd.DataFrame) -> tuple[list[ForecastRow], list[BandRow], list[str]]:
+    """Forecast `horizon_days` forward from the venue's last observed day.
+
+    Returns (forecasts, bands, diagnostics). Raises rather than returning a degraded
+    forecast: a caller that gets rows back must be able to trust them, and the engine
+    turns a raise into a per-venue diagnostic without losing the rest of the org.
+    """
+    notes: list[str] = []
+    horizon = dataset.horizon_days
+    last = pd.Timestamp(feats["date"].max()).normalize()
+    dates = pd.date_range(last + pd.Timedelta(days=1), periods=horizon, freq="D")
+
+    fut = _future_frame(dataset, venue, dates, notes)
+    cols = _feature_cols(feats)
+
+    fn = _predictor(model_name, venue)
+    yhat = np.clip(np.asarray(fn(feats, fut, cols), dtype=float), 0.0, None)
+
+    # first_target bounds the calibration walk to the recent window. Without it,
+    # `rolling_point_forecasts` re-fits once per 7-day block across the WHOLE history, so
+    # the work scales with the span of whatever arrives: one typo'd year in a tenant's
+    # export ("2202" for "2022") densifies to ~65k daily rows and ~9,300 re-fits from a
+    # two-row request. The window is also the statistically right answer, and the one the
+    # frozen research forecasts already use (`sim/build_frozen_forecast._band_halfwidth`).
+    residuals = rolling_point_forecasts(
+        feats, model_name, cols, horizon=7, venue=venue,
+        first_target=last - pd.Timedelta(days=BAND_CALIB_DAYS))
+    _report_band_horizon(horizon, notes, venue)
+    forecasts = [
+        ForecastRow(venue=venue, layer="L1", key=None, target_date=d.date(),
+                    model=model_name, yhat=float(y))
+        # strict: a predictor returning the wrong number of points is a silent
+        # truncation of the horizon, not something to discover in the bundle.
+        for d, y in zip(dates, yhat, strict=True)
+    ]
+    bands = _bands(venue, model_name, dates, yhat, residuals, notes)
+    return forecasts, bands, notes
+
+
+def _feature_cols(feats: pd.DataFrame) -> list[str]:
+    from features.build_features import feature_columns
+    return feature_columns(feats)
+
+
+def _future_frame(dataset: ComputeDataset, venue: str, dates: pd.DatetimeIndex,
+                  notes: list[str]) -> pd.DataFrame:
+    """Known-future covariates over `dates`, blind to any actual.
+
+    Every column is built by the SAME function that builds the training column of that
+    name - `calendar_features` then `_attach_exog`, exactly as `build_features` does.
+    This module used to hand-roll its own versions, which is train/serve skew by
+    construction, and it also silently omitted 13 columns so `rung3_gbm` raised KeyError
+    instead of forecasting.
+
+    Two things are deliberately different from training, and only two:
+      * `value` is NaN - there is no observation inside the horizon;
+      * `event_nights` is empty, so `is_ellel_event` is 0 forward. A forecaster standing
+        at the cutoff does not know the event venue's future bookings. Same convention as
+        every frozen research freeze (`sim/build_frozen_forecast.py`).
+    Weather lands NaN from `_attach_exog` (the scratch store has no weather table) and is
+    filled by the caller's `exogenous`, or reported missing.
+    """
+    from features.build_features import _attach_exog, calendar_features
+
+    country = org_profile.country(venue)
+    if country != "GB":
+        notes.append(f"{venue}: country={country!r} but exo_is_school_term / "
+                     "exo_is_uni_term come from a curated UK academic calendar; supply "
+                     "them via exogenous to override")
+
+    fut = pd.DataFrame({"date": pd.DatetimeIndex(dates)})
+    fut["value"] = np.nan
+    fut["venue"] = venue
+    fut = calendar_features(fut, venue, event_nights=set())
+    fut = _attach_exog(fut, venue)
+    _report_horizon_gaps(fut, venue, notes)
+    return fut
+
+
+def _report_band_horizon(horizon: int, notes: list[str], venue: str) -> None:
+    """State the extrapolation caveat when the horizon outruns the calibration.
+
+    The residual stream is built on 7-day blocks, so every residual is a <=7-step-ahead
+    error - but the band is applied unchanged to step 8, 14, 30. Error grows with
+    step-ahead, so beyond a week the band is a **nominal floor**, not a calibrated
+    interval, and it degrades quietly: measured on a drifting series, coverage falls from
+    ~93% at step 7 to ~79% at step 30 against a nominal 90% and a +/-3pp project gate.
+
+    `sim/build_frozen_forecast._band_halfwidth` documented exactly this ("the band is a
+    nominal floor (the extrapolation caveat)") and the port dropped the caveat while
+    keeping the method. Per-step conformal is the real fix and is a research change with
+    its own gate, not something to invent inside an integration phase - so this says so
+    rather than pretending.
+    """
+    if horizon > 7:
+        notes.append(
+            f"{venue}: horizon_days={horizon} exceeds the 7-day calibration blocks, so "
+            "the band is a NOMINAL FLOOR beyond day 7, not a calibrated interval - "
+            "coverage degrades with step-ahead and is not gate-checked past a week")
+
+
+def _report_horizon_gaps(fut: pd.DataFrame, venue: str, notes: list[str]) -> None:
+    """Say which horizon dates still have no weather after the overlay.
+
+    Weather is the covariate compute cannot derive, so a gap here is the difference
+    between the served exo entrant and a model that raises. Naming the dates makes the
+    fix obvious; leaving it to the exo entrant's assertion makes it a stack trace.
+    """
+    missing = [c for c in _WEATHER_COLS if fut[c].isna().any()]
+    if not missing:
+        return
+    gap_dates = sorted({d.date() for c in missing
+                        for d in fut.loc[fut[c].isna(), "date"]})
+    notes.append(
+        f"{venue}: no weather for {len(gap_dates)} of {len(fut)} horizon dates "
+        f"({missing[0]} first missing {gap_dates[0]}); supply it via exogenous or the "
+        "exo entrant cannot be served")
+
+
+def _bands(venue: str, model_name: str, dates: pd.DatetimeIndex, yhat: np.ndarray,
+           residuals: pd.DataFrame, notes: list[str]) -> list[BandRow]:
+    """Split-conformal band, Mondrian-grouped on the venue's structural-zero days.
+
+    Grouping matters more than it looks: closed days are deterministically near zero, so
+    pooling their tiny residuals with trading days' drags the marginal quantile down and
+    under-covers the days that carry the money.
+    """
+    if residuals.empty or len(residuals) < MIN_CALIB_RESIDUALS:
+        notes.append(
+            f"{venue}: {len(residuals)} calibration residuals (< {MIN_CALIB_RESIDUALS}); "
+            "point forecast returned WITHOUT a band rather than with a meaningless one")
+        return []
+
+    abs_res = np.abs(residuals["y"].to_numpy() - residuals["yhat"].to_numpy())
+    groups = residuals["is_zero"].to_numpy()
+    zero_dow = org_profile.structural_zero_dow(venue)
+    target_grp = np.array([int(d.dayofweek in zero_dow) for d in dates])
+
+    out: list[BandRow] = []
+    for level in CONFORMAL_LEVELS:
+        marginal = conformal_quantile(abs_res, level)
+        by_grp = _mondrian_quantiles(abs_res, groups, level)
+        # The floor has to apply PER GROUP, not to the pool. Mondrian splits the
+        # residuals after the pooled check, so a venue closed one day a week can clear 30
+        # pooled and leave 4 in the closed group - and `conformal_quantile` clamps k to n
+        # rather than failing, so that group's "90% quantile" is silently the max of 4
+        # errors. Falling back to the marginal quantile is a real quantile of a real
+        # sample; it is less conditional, and it is reported.
+        thin = {g for g, n in zip(*np.unique(groups, return_counts=True), strict=True)
+                if n < MIN_CALIB_RESIDUALS}
+        for g in sorted(thin):
+            by_grp.pop(g, None)
+        if thin and level == CONFORMAL_LEVELS[0]:
+            notes.append(
+                f"{venue}: Mondrian group(s) {sorted(int(g) for g in thin)} have fewer "
+                f"than {MIN_CALIB_RESIDUALS} residuals; those days fall back to the "
+                "marginal band rather than a quantile of a handful of errors")
+        q = np.array([by_grp.get(g, marginal) for g in target_grp])
+        for d, y, half in zip(dates, yhat, q, strict=True):
+            out.append(BandRow(
+                venue=venue, layer="L1", key=None, target_date=d.date(),
+                model=model_name, level=float(level),
+                lo=float(max(y - half, 0.0)), hi=float(y + half)))
+    return out

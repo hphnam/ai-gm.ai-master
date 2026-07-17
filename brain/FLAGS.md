@@ -543,21 +543,30 @@ does.
   derived and disposable by design, and that design has a sharp edge: `warehouse.build()`
   rebuilds from the committed CSV seed, which ends **2026-05-31**, so it silently drops
   the aggregate-ingested June and 1 to 7 July rows and resets the operational clock five
-  weeks. **Any pytest run does this** - `tests/test_a10_service.py` calls
-  `warehouse.build()` in a module-scoped autouse fixture. Nothing warns. The store does
-  not break, it quietly becomes stale, and the next thing that reads it is wrong rather
-  than failing.
+  weeks. Two modules call `warehouse.build()` in a module-scoped autouse fixture -
+  `tests/test_a10_service.py` and `tests/test_a1_warehouse.py` - so **any run that
+  collects either of them resets the clock**. Nothing warns. The store does not break, it
+  quietly becomes stale, and the next thing that reads it is wrong rather than failing.
   > This is not theoretical: it fired **twice in one session** (2026-07-16) while running
   > the suite during the hardening pass, and the second time it was caught only because
   > `sim/confront_july_w2.py` asserts the ceiling before scoring and refused to run.
   > Without that guard, C2 would have scored the July forecasts against a May-seed store
-  > and produced plausible, wrong numbers.
+  > and produced plausible, wrong numbers. It fired **again on 2026-07-17** (G14).
+  >
+  > **Refined trigger (G14, measured).** The earlier wording - "any pytest run does this",
+  > "treat 'I ran the tests' as 'I reset the clock'" - is broader than the truth, and an
+  > over-broad flag is its own hazard: it makes the safe case look unsafe and stops being
+  > read. Measured directly, ceiling before and after each run: a **targeted** run of
+  > `tests/test_compute_engine.py`, `tests/test_org_profile.py` or
+  > `tests/test_exog_supplied.py` leaves the ceiling at 2026-07-07 untouched. It is the
+  > **full suite** (or any selection collecting those two modules) that rebuilds. So:
+  > targeted runs during development are free; restore after a full run.
   >
   > Mitigation: `sim/restore_clock.py` chains `ingest_june_actuals` then
   > `ingest_july_w1_actuals` (that order - July W1 refuses against a June-less store),
   > verifies ceiling 2026-07-07 with 7 July-W1 days, and asserts the held-out 8 to 14
   > July window is still empty. Idempotent, no network, reads committed artefacts only,
-  > and no-ops when the clock is already right. Run it after any pytest run or manual
+  > and no-ops when the clock is already right. Run it after a full-suite run or a manual
   > rebuild.
   >
   > Not fixed, because the fix is upstream: any script reading the store for a

@@ -14,7 +14,7 @@ from __future__ import annotations
 import pandas as pd
 
 import config
-from config import EVENT_ONLY_VENUES, FORECAST_VENUES
+import org_profile
 from store.warehouse import read_series
 
 
@@ -40,23 +40,37 @@ def trim_to_active(feats: pd.DataFrame, venue: str, con=None) -> pd.DataFrame:
 
 
 def dataset_max_date(con=None) -> pd.Timestamp:
-    """Latest L1 date seen across ALL forecast venues, the 'today' reference a
+    """Latest L1 date seen across ALL of the tenant's venues, the 'today' reference a
     closed venue's tail is measured against. `read_series` reindexes each venue
     onto its OWN min..max calendar, so a venue's own max is just its last
-    transaction; closure has to be judged against the dataset-wide max instead."""
+    transaction; closure has to be judged against the dataset-wide max instead.
+
+    Venue list comes from the profile: this iterated Lune's three slugs, so inside a
+    tenant's store every read missed and the max came back NaT - which made `is_closed`
+    return False for everyone by accident rather than by reasoning.
+    """
     ends = [pd.Timestamp(read_series(v, "L1", value="revenue_exvat",
                                      fill_calendar=True, con=con)["date"].max())
-            for v in FORECAST_VENUES]
+            for v in org_profile.venues()]
+    # A venue with no rows reads back NaT, and NaT silently poisons max() into an
+    # arbitrary answer rather than an error. With nothing anywhere, "today" has no
+    # defensible value: `is_dormant` would subtract its lookback from the sentinel and
+    # overflow, so say so here instead of propagating a wrong date.
+    ends = [e for e in ends if pd.notna(e)]
+    if not ends:
+        raise ValueError(
+            "dataset_max_date: no venue in the current profile has any L1 data, so "
+            "there is no reference 'today' to judge closure against")
     return max(ends)
 
 
 def is_closed(venue: str, con=None) -> bool:
     """True when a continuously-trading venue stopped before the dataset-global
-    max (a genuine closure, like Two River Taps). Event/booking-driven venues
-    (`EVENT_ONLY_VENUES`, e.g. Ellel) are never "closed": a trailing gap is
-    expected sparsity between bookings, not a closure, judging them against the
-    global max would misclassify a normal booking lull as a shutdown."""
-    if venue in EVENT_ONLY_VENUES:
+    max (a genuine closure, like Two River Taps). Booking-driven venues are never
+    "closed": a trailing gap is expected sparsity between bookings, not a closure, and
+    judging them against the global max would misclassify a normal booking lull as a
+    shutdown."""
+    if org_profile.is_event_driven(venue):
         return False
     return active_trading_end(venue, con=con) < dataset_max_date(con=con)
 
