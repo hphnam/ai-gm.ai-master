@@ -264,10 +264,11 @@ capped at what is evidenced and per-step conformal is logged as a research work 
 6. **[OPEN]** Who runs the ladder. Compute honours `prior_state.served_model` and
    cold-starts on `default_model` when it is absent, so promotion is continuous — but
    nothing in the compute path ever *re-runs* the gate. Verified against the engine:
-   `ladder_selection` comes back `[]` on every call and `ServedRow.rung` is always
-   `None`. A tenant's served model is therefore whatever it started as, for ever. The
-   re-fit cadence (`_should_refit`, `RETRAIN_CADENCE_DAYS`, the event-aware tightening)
-   is still wired to the research store's watermark, not to the injected `prior_state`.
+   `ladder_selection` comes back `[]` on every call. A tenant's served model is therefore
+   whatever it started as, for ever. The re-fit cadence (`_should_refit`,
+   `RETRAIN_CADENCE_DAYS`, the event-aware tightening) is still wired to the research
+   store's watermark, not to the injected `prior_state`. (`ServedRow.rung` was also always
+   `None`; that half is fixed — it now reads the ladder's `PREDICTORS` registry.)
 7. **[OPEN]** L2/L3. Compute emits L1 only. The measured A-vs-B split (report 23 — MinT
    for Beer Hall, revenue-share disaggregation for Ellel) lives in `sim/`, is
    `GATE_WINNER`-keyed by Lune slug, and has no per-tenant equivalent.

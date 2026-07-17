@@ -52,10 +52,14 @@ _CALIB_BLOCK_DAYS = 7
 
 # The cap may never outrun what the blocks calibrate. Whoever lifts one must confront the
 # other, which is the whole point of FLAG-BAND-HORIZON.
-assert MAX_HORIZON_DAYS <= _CALIB_BLOCK_DAYS, (
-    f"horizon_days is capped at {MAX_HORIZON_DAYS} but the band is calibrated on "
-    f"{_CALIB_BLOCK_DAYS}-day blocks: the served band would be uncalibrated past day "
-    f"{_CALIB_BLOCK_DAYS}. See FLAG-BAND-HORIZON.")
+#
+# A `raise`, not an `assert`: asserts are stripped under `python -O`, and a guard that
+# disappears in the configuration most likely to be production is not a guard.
+if MAX_HORIZON_DAYS > _CALIB_BLOCK_DAYS:
+    raise RuntimeError(
+        f"horizon_days is capped at {MAX_HORIZON_DAYS} but the band is calibrated on "
+        f"{_CALIB_BLOCK_DAYS}-day blocks: the served band would be uncalibrated past day "
+        f"{_CALIB_BLOCK_DAYS}. See FLAG-BAND-HORIZON.")
 
 # Weather columns the frame must carry for the exo entrant. Named here because they are
 # the ones compute CANNOT derive: they come from the request or not at all.

@@ -45,28 +45,32 @@ _TABLE = "exog_supplied"
 MAX_REPORTED_UNKNOWN = 10
 
 
-def write_supplied(con, rows) -> tuple[int, list[str]]:
+def write_supplied(con, rows) -> tuple[int, list[str], int]:
     """Materialise supplied covariates into the scratch store, long-form.
 
-    Returns (n_rows, unknown_column_names). Unknown names are NOT written and NOT an
-    error: `ExogenousRow.values` is a free `dict[str, float]`, so `extra="forbid"` -
-    which stops a caller inventing a top-level field - does not reach inside it. A
-    caller that sends `exo_tempc` would otherwise get silence and a univariate forecast
-    wearing the exo model's name. The engine reports them back instead.
+    Returns (n_rows, sample_of_unknown_names, more_were_truncated). Unknown names are NOT
+    written and NOT an error: `ExogenousRow.values` is a free `dict[str, float]`, so
+    `extra="forbid"` - which stops a caller inventing a top-level field - does not reach
+    inside it. A caller that sends `exo_tempc` would otherwise get silence and a
+    univariate forecast wearing the exo model's name. The engine reports them back.
 
-    The unknown set is capped. Every name is caller-controlled and they are joined into
-    one diagnostic string, so the honest report is itself an amplifier: a request inside
-    every contract bound (500k exogenous rows x 64 keys, all distinct) would otherwise
-    collect tens of millions of names and render them into a multi-gigabyte string. A
-    handful names the mistake; the rest only repeat it.
+    The names are capped and a FLAG says whether the cap bit, so "exactly ten typos" and
+    "ten of thousands" are distinguishable - the earlier version marked "(first few)"
+    whenever it had ten, truncated or not. A flag rather than an exact total on purpose:
+    counting distinct names means holding them all, and each is caller-controlled, which
+    is the amplification this cap exists to stop. Knowing there are more is enough to act
+    on; knowing there are 4,312 is not worth an unbounded set of a caller's strings.
     """
     long: list[dict] = []
     unknown: set[str] = set()
+    truncated = False
     for r in rows:
         for col, value in r.values.items():
             if col not in KNOWN_EXO_COLS:
                 if len(unknown) < MAX_REPORTED_UNKNOWN:
                     unknown.add(col)
+                elif col not in unknown:
+                    truncated = True
                 continue
             long.append({"venue": r.venue, "date": pd.Timestamp(r.date).normalize(),
                          "col": col, "value": float(value)})
@@ -80,7 +84,7 @@ def write_supplied(con, rows) -> tuple[int, list[str]]:
     con.register("_exog_supplied", frame)
     con.execute(f"CREATE OR REPLACE TABLE {_TABLE} AS SELECT * FROM _exog_supplied")
     con.unregister("_exog_supplied")
-    return len(frame), sorted(unknown)
+    return len(frame), sorted(unknown), truncated
 
 
 def read_supplied(venue: str, con) -> pd.DataFrame:

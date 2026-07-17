@@ -28,7 +28,7 @@ import pandas as pd
 
 from compute.contract import ComputeDataset
 from config import RECONCILE_TOL
-from ingest.exog_supplied import MAX_REPORTED_UNKNOWN, write_supplied
+from ingest.exog_supplied import write_supplied
 from store import warehouse
 
 # The columns `line_items` must carry for the L1/L2/L3 views to aggregate cleanly,
@@ -129,14 +129,14 @@ def load(dataset: ComputeDataset) -> list[str]:
         con.execute("CREATE OR REPLACE TABLE venue_trading_hours AS SELECT * FROM _th")
         con.unregister("_th")
 
-        _, unknown = write_supplied(con, dataset.exogenous)
+        _, unknown, truncated = write_supplied(con, dataset.exogenous)
         _load_prior_state(con, dataset)
     finally:
         con.close()
 
     notes = _reconcile_totals(dataset)
     if unknown:
-        more = " (first few)" if len(unknown) >= MAX_REPORTED_UNKNOWN else ""
+        more = " and others" if truncated else ""
         notes.append(
             f"exogenous: unknown covariate(s) {unknown}{more} ignored; "
             "ExogenousRow.values is a free dict, so a misspelled name validates "

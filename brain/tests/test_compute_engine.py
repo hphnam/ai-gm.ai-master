@@ -289,52 +289,91 @@ def test_unknown_dataset_fields_are_rejected():
         OrgProfile(org_id="o", venues=[], not_a_real_field=1)
 
 
-def _with_typo(year: int) -> list[SalesRow]:
-    return _sales("ghost_bar") + [
-        SalesRow(venue="ghost_bar", date=date(year, 1, 15), category="Beer",
-                 item="Test IPA", units=1.0, revenue_exvat=100.0)]
+# Dates are derived from today, never hard-coded. An absolute `2027` case plus a
+# `date.today()` validator is a test that passes now and fails for ever from 2027-01-08 -
+# a time bomb, and one review caught in exactly these tests.
+_RECENT = date.today() - timedelta(days=210)
 
 
-@pytest.mark.parametrize("year", [2027, 2036, 2202])
-def test_a_future_dated_row_is_refused_whatever_the_year(year):
-    """`sales_daily` is closed history, so a future date is a typo. `trim_to_active`
-    trims only ZERO endpoints, so it survives, becomes the series maximum and takes the
-    forecast origin and watermark with it - silently.
+def _recent_sales(n: int = 200) -> list[SalesRow]:
+    return _sales("ghost_bar", n=n, start=_RECENT)
 
-    Parametrised because the first guard was a SPAN check: it rejected 2202 and ACCEPTED
-    2027 and 2036, which are one-keystroke slips and therefore likelier. Span is a
-    relative measure of a failure that is absolute.
+
+def _with_typo(years_off: int) -> list[SalesRow]:
+    """A one-keystroke year slip in an otherwise clean history. Negative = into the past."""
+    bad = _RECENT.replace(year=_RECENT.year + years_off)
+    return _recent_sales() + [
+        SalesRow(venue="ghost_bar", date=bad, category="Beer", item="Test IPA",
+                 units=1.0, revenue_exvat=100.0)]
+
+
+@pytest.mark.parametrize("years_off", [1, 10, 176, -1, -10, -176])
+def test_a_mistyped_year_is_refused_in_either_direction(years_off):
+    """The guard has to be as symmetric as the argument for it.
+
+    The first attempt was a SPAN check: it rejected +176 (2202) and accepted +1 and +10,
+    which are likelier. The second was an absolute FUTURE bound: it rejected every
+    forward slip and accepted every backward one - and a backward slip is worse, because
+    it does not announce itself with an absurd date. It buries the real history under
+    years of calendar-filled zeros and `rung1_robust_dow` returns 0.00 across the horizon,
+    banded, with the served model's name on it.
     """
     with pytest.raises(ValidationError):
-        _dataset(sales=_with_typo(year))
+        _dataset(sales=_with_typo(years_off))
 
 
 def test_a_wholly_mis_stamped_export_is_refused_despite_a_normal_span():
-    """The case a span guard cannot see: every row shifted to 2202, so the span is a
-    perfectly ordinary 199 days. It forecast 2202-07-20 before this."""
-    rows = _sales("ghost_bar", n=200, start=date(2202, 1, 1))
+    """The case a span guard cannot see: every row shifted, so the span is a perfectly
+    ordinary 199 days and there is no internal gap either. Only the future bound catches
+    it."""
+    rows = _sales("ghost_bar", n=200, start=_RECENT.replace(year=_RECENT.year + 176))
     with pytest.raises(ValidationError):
         _dataset(sales=rows)
 
 
 def test_the_date_error_names_the_offending_row_so_it_is_findable():
     """"Too far ahead" alone leaves the caller hunting one row in 200,000."""
-    with pytest.raises(ValidationError, match="2036-01-15"):
-        _dataset(sales=_with_typo(2036))
+    bad = _RECENT.replace(year=_RECENT.year + 10)
+    with pytest.raises(ValidationError, match=str(bad)):
+        _dataset(sales=_with_typo(10))
+
+
+def test_the_isolation_error_names_the_stranded_row():
+    bad = _RECENT.replace(year=_RECENT.year - 10)
+    with pytest.raises(ValidationError, match=str(bad)):
+        _dataset(sales=_with_typo(-10))
 
 
 def test_a_normal_two_year_history_is_not_refused():
     """The guard must not fire on real history."""
-    rows = _sales("ghost_bar", n=730, start=date(2024, 1, 1))
+    rows = _sales("ghost_bar", n=730, start=date.today() - timedelta(days=740))
     assert len(_dataset(sales=rows).sales_daily) == 730
 
 
-def test_an_absurdly_old_row_is_refused_on_span():
-    """The cost half of the guard: span still bounds the calendar the feature build
-    densifies, and an ancient row is not caught by the future check."""
-    rows = _sales("ghost_bar", n=5, start=date(1900, 1, 1)) + _sales("ghost_bar", n=5)
-    with pytest.raises(ValidationError, match="spans"):
-        _dataset(sales=rows)
+def test_a_short_closure_inside_the_history_is_not_a_typo():
+    """A refurb is a hole, not a fat finger."""
+    rows = (_sales("ghost_bar", n=60, start=date.today() - timedelta(days=300))
+            + _sales("ghost_bar", n=60, start=date.today() - timedelta(days=180)))
+    assert len(_dataset(sales=rows).sales_daily) == 120
+
+
+def test_a_brand_new_tenants_short_history_is_not_mistaken_for_a_typo():
+    """The cold-start path, and the first thing a new org hits. A ten-day history is not
+    "stranded from the rest of the history" - it IS the history. An earlier cut of the
+    isolation rule refused it, because it applied a minimum-segment size to a dataset with
+    only one segment."""
+    rows = _sales("ghost_bar", n=10, start=date.today() - timedelta(days=20))
+    assert len(_dataset(sales=rows).sales_daily) == 10
+
+
+def test_a_seasonal_venue_is_not_mistaken_for_a_typo():
+    """The case that killed the gap threshold. A beach bar shuts for six months every
+    year, and for it the calendar-filled zeros are CORRECT - it really did take nothing in
+    February. Any rule that refuses long holes refuses a whole business model to catch a
+    fat finger. Two large blocks are a season; a speck and a continent are a typo."""
+    rows = (_sales("ghost_bar", n=150, start=date.today() - timedelta(days=545))
+            + _sales("ghost_bar", n=150, start=date.today() - timedelta(days=180)))
+    assert len(_dataset(sales=rows).sales_daily) == 300
 
 
 def test_an_absurd_venue_count_is_refused():

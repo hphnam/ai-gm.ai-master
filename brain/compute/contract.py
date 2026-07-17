@@ -14,6 +14,7 @@ authority is the caller's session, upstream.
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
+from itertools import pairwise
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -23,28 +24,40 @@ class _Strict(BaseModel):
 
 
 # Bounds. Compute is a shared service with no per-request concurrency cap of its own, so
-# every list a caller controls is a resource dimension. These are deliberately generous -
-# they exist to turn an absurd request into a 422 rather than an OOM, not to police a
-# real one. For scale: Lune's whole two-year corpus is 92,329 line items, which aggregate
-# to roughly 40k rows at this grain.
-MAX_VENUES = 100
-MAX_EXOGENOUS_ROWS = 500_000
+# every list a caller controls is a resource dimension.
+#
+# The venue cap and the row cap are DERIVED from one another rather than picked
+# separately, because picked separately they contradicted: 100 venues and 200,000 rows
+# sounds generous twice and means "100 venues with 68 days of history each". Measured on
+# this project's own store, `l3_item_daily` holds 18,994 rows over 650 venue-days at the
+# `venue x date x category x item` grain - about 29 rows per venue-day - so a request's
+# size is roughly venues x days x 30 and the two knobs are one knob.
+#
+# 25 venues is ~6x Lune's estate and a substantial group; lifting it is not a config
+# change but CONTRACT.md open decision 4 (transport), because two years of item-grain
+# rows for a large chain is not a JSON body.
+MAX_VENUES = 25
+_TWO_YEARS = 730
+_ROWS_PER_VENUE_DAY = 30          # measured 29.2 on `l3_item_daily`
+MAX_SALES_ROWS = MAX_VENUES * _TWO_YEARS * _ROWS_PER_VENUE_DAY
+
+MAX_EXOGENOUS_ROWS = MAX_VENUES * _TWO_YEARS      # one row per venue-day, not per item
 MAX_TRADING_HOURS_ROWS = MAX_VENUES * 7
 MAX_EXO_KEYS_PER_ROW = 64
-# The briefing chain is one entry per standing item, not per day: an estate with a
-# hundred venues does not have ten thousand live concerns.
-MAX_BRIEFING_CHAIN = 10_000
+# One entry per standing item, not per day: an estate does not have ten thousand live
+# concerns.
+MAX_BRIEFING_CHAIN = 1_000
 
-# `max_length` on a list is NOT an OOM guard, and it was first set as though it were.
-# Pydantic validates every item and only then checks the length, so a 2.2M-row body is
-# fully parsed into 2.2M `SalesRow` models before the cap fires - measured at ~278MB RSS
-# for 200k rows, so a 2M cap sits well above the point the process dies. The cap has to
-# be low enough to mean something on its own, and the real guard for an oversized body is
-# a request-size limit at the ingress, which is the API's to set (CONTRACT.md open
-# decision 4). 200k rows is ~5x Lune's entire two-year estate (92,329 line items,
-# aggregating to roughly 40k rows at this grain), so a tenant hitting it is batching
-# wrong, not trading hard.
-MAX_SALES_ROWS = 200_000
+# What a row cap does and does not buy, because the first version of this comment was
+# wrong in the flattering direction. Measured on pydantic 2.13.4: given `max_length=10`
+# and 1,000 items, it constructs **11** and stops - so the cap DOES bound model
+# construction, and lowering it from 2,000,000 genuinely bounds ~2.8GB of `SalesRow`
+# objects down to a few hundred MB.
+#
+# What it does not bound is the body itself: the JSON is parsed into a list of dicts
+# before any model is built, so an oversized request is already in memory by the time the
+# cap is consulted. That guard is a request-size limit at the ingress, and it is the
+# API's to set - noted as an obligation rather than pretended away here.
 
 # The widest history span compute will accept, in days (~20 years). A COST knob, and only
 # that: it bounds the calendar `read_series(fill_calendar=True)` densifies. The
@@ -57,23 +70,65 @@ MAX_HISTORY_DAYS = 366 * 20
 # `sales_daily` is CLOSED HISTORY by contract, so nothing in it should postdate today at
 # all; the slack absorbs business-date-vs-UTC boundaries and clock skew, not real data.
 #
-# This is the correctness guard, and it exists because the first attempt was a SPAN check
-# that failed on the likelier typo. `trim_to_active` trims only ZERO endpoints, so a
-# nonzero row with a mistyped year survives, becomes `feats["date"].max()`, and the
-# forecast origin moves with it. Measured against the span guard:
+# This exists because the first attempt was a SPAN check, which failed on the likelier
+# typo. `trim_to_active` trims only ZERO endpoints, so a nonzero row with a mistyped year
+# survives, becomes `feats["date"].max()`, and the forecast origin moves with it. Measured
+# against that span guard:
 #
 #   2026 -> 2027  ACCEPTED -> seven banded rows for January 2027, watermark to match
 #   2026 -> 2036  ACCEPTED -> seven banded rows for January 2036, watermark to match
 #   2026 -> 2202  rejected
 #   whole export mis-stamped 2202 (span only 199 days)  ACCEPTED -> forecasts 2202-07-20
 #
-# A one-digit slip is likelier than 2202 and sailed straight through, because span is a
-# relative measure of a failure that is absolute. It compounds, too: the API persists the
-# poisoned watermark and hands it back as `prior_state` on the next call, so the cadence
-# stays wrong after the bad row is gone. An absolute bound catches every future-dated
-# typo including 2202, and leaves MAX_HISTORY_DAYS as the pure size knob it should have
-# been.
+# It caught the one case it had been measured against. It compounds, too: the API persists
+# the poisoned watermark and hands it back as `prior_state` next call, so the cadence stays
+# wrong after the bad row is gone.
 MAX_FUTURE_DAYS = 7
+
+# The widest hole allowed INSIDE the history, in days.
+#
+# The reason this exists is the second half of the same lesson, and it took a third review
+# round to see. The argument against the span check - "a one-digit slip is likelier than
+# 2202" - is SYMMETRIC, and the future bound above is not: `2026 -> 2016` is exactly as
+# much a one-keystroke slip, spans 3,653 days, sits comfortably under MAX_HISTORY_DAYS,
+# and postdates nothing. Measured, one such row added to an otherwise clean 200-day
+# history:
+#
+#   rung1_robust_dow  clean      yhat=[300.0, 350.0, 400.0, 100.0, 150.0, 200.0, 250.0]
+#   rung1_robust_dow  2016 typo  yhat=[  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0]
+#
+# Seven rows of GBP 0.00 with fourteen conformal bands, the right watermark, the served
+# model's name on them, and no error. Worse than the future case, which at least announces
+# itself with an absurd date: this is a plausible zero for a live venue - the
+# "GBP 5,329 for a dead venue" failure the liveness gate exists for, running backwards.
+#
+# Mechanism: `read_series(fill_calendar=True)` densifies 2016..2026 into ~3,840 daily rows,
+# ~3,450 of them fabricated zeros; `trim_to_active` trims to first-nonzero..last-nonzero,
+# and the typo row IS nonzero, so it becomes the start and the fabricated zeros sit in the
+# MIDDLE of the frame rather than at an endpoint where they would be trimmed. A robust
+# per-DOW median over a span that is 90% zeros is zero.
+#
+# Span cannot express this and neither can an endpoint bound. The property that separates
+# a typo from history is ISOLATION: a tiny fragment of data cut off from the body by a
+# long emptiness.
+#
+# It has to be isolation and not simply "a long gap", because a long gap is a legitimate
+# trading pattern. A seasonal venue - a beach bar, a festival site - is shut for six
+# months every year, and for IT the calendar-filled zeros are correct: it really did take
+# nothing in February, and a model that learns that is right. Rejecting year-long holes
+# outright would refuse a whole business model to catch a typo.
+#
+# What a typo looks like that a season does not: ONE row, or a handful, stranded years
+# from everything else. A season leaves two large blocks; a fat finger leaves a speck and
+# a continent. So the dataset is split into segments at gaps wider than MAX_DATA_GAP_DAYS,
+# and a segment too small to be a trading period is the fault.
+#
+# The 365-day near-miss that forced this: `2026 -> 2025` is the likeliest past slip of all,
+# and it produces a gap of EXACTLY 365 days - it slipped a `> 365` threshold by one day.
+# Tuning the number would have been the third version of the same mistake: fitting the
+# guard to the example in front of me.
+MAX_DATA_GAP_DAYS = 90
+MIN_SEGMENT_DAYS = 14
 
 # The furthest ahead compute will forecast. Seven, because seven is what the band is
 # calibrated for and what every result in the project is evidence for: the residual
@@ -92,6 +147,20 @@ MAX_FUTURE_DAYS = 7
 # the horizon is capped at what is evidenced, and per-step conformal is logged as a
 # research work package (FLAGS.md, FLAG-BAND-HORIZON) rather than smuggled in here.
 MAX_HORIZON_DAYS = 7
+
+
+def _segments(dates: list[date]) -> list[list[date]]:
+    """Split sorted dates wherever the history goes quiet for longer than a quarter.
+
+    A season leaves two large blocks; a fat finger leaves a speck and a continent. The
+    split is what lets the validator tell them apart without punishing the season.
+    """
+    out: list[list[date]] = [[dates[0]]]
+    for prev, cur in pairwise(dates):
+        if (cur - prev).days > MAX_DATA_GAP_DAYS:
+            out.append([])
+        out[-1].append(cur)
+    return out
 
 
 # --- Dataset in ---------------------------------------------------------------
@@ -244,39 +313,76 @@ class ComputeDataset(_Strict):
 
     @model_validator(mode="after")
     def _reject_implausible_dates(self) -> ComputeDataset:
-        """Two guards, and they are guarding different things.
+        """Three guards. They catch different things and only one is about size.
 
-        The FUTURE bound is the correctness one. `sales_daily` is closed history, so a row
-        dated after today is a typo; left alone it becomes `feats["date"].max()` and takes
-        the forecast origin and the watermark with it, silently. It is checked absolutely
-        rather than by span because the failure is absolute: a `2026 -> 2036` slip is one
-        keystroke and a 3,666-day span, well inside any tolerable window.
+        FUTURE - `sales_daily` is closed history, so a row after today is a typo; left
+        alone it becomes `feats["date"].max()` and takes the forecast origin and the
+        watermark with it.
 
-        The SPAN bound is the cost one: it caps the calendar the feature build densifies.
+        ISOLATION - the same failure pointing backwards, which is the half the first two
+        attempts missed. A mistyped PAST year postdates nothing and spans little, but it
+        becomes `active_trading_start` and buries the real history under years of
+        fabricated zeros, and a robust per-DOW median over that is 0.00. What marks it out
+        is not the gap - a seasonal venue has those legitimately - but the speck of data
+        on the far side of one.
 
-        Both name the offending date. That matters more than the refusal - the caller has
-        to find one bad row among a million, and "span too wide" would not help them.
+        SPAN - the only cost check: it caps the calendar the feature build must densify
+        even when the history is contiguous.
+
+        Every message names the offending date(s). That matters more than the refusal:
+        the caller has to find one bad row among 200,000, and "span too wide" would not
+        help them do it.
         """
+        today = date.today()
+        # The watermark is checked even with no sales rows, because that is precisely the
+        # case that let a poisoned one through: the engine echoes `prior_state.watermark`
+        # back out when it has nothing better, so a bad one persisted by a previous call
+        # would round-trip for ever. This closes the compounding loop the future bound
+        # above describes.
+        wm = self.prior_state.watermark
+        if wm is not None and wm > today + timedelta(days=MAX_FUTURE_DAYS):
+            raise ValueError(
+                f"prior_state.watermark is {wm}, after today ({today}) plus "
+                f"{MAX_FUTURE_DAYS} days of slack. A watermark is a closed day that was "
+                "observed; this one was most likely persisted from an earlier dataset "
+                "carrying a mistyped date, and it would round-trip indefinitely.")
+
         if not self.sales_daily:
             return self
-        lo = min(r.date for r in self.sales_daily)
-        hi = max(r.date for r in self.sales_daily)
+        dates = sorted({r.date for r in self.sales_daily})
+        lo, hi = dates[0], dates[-1]
 
-        horizon_of_sanity = date.today() + timedelta(days=MAX_FUTURE_DAYS)
-        if hi > horizon_of_sanity:
+        if hi > today + timedelta(days=MAX_FUTURE_DAYS):
             raise ValueError(
-                f"sales_daily contains {hi}, which is after today "
-                f"({date.today()}) plus {MAX_FUTURE_DAYS} days of slack. sales_daily is "
-                "closed history, so this is a mistyped date; left alone it would become "
-                "the forecast origin and the watermark rather than raise.")
+                f"sales_daily contains {hi}, which is after today ({today}) plus "
+                f"{MAX_FUTURE_DAYS} days of slack. sales_daily is closed history, so this "
+                "is a mistyped date; left alone it would become the forecast origin and "
+                "the watermark rather than raise.")
+
+        # Only meaningful with something to be isolated FROM. A single short history is a
+        # new tenant, not a typo - the cold-start case, and the first thing a new org
+        # hits; an earlier cut of this refused ten days of data as "stranded from the rest
+        # of the history", where it WAS the history.
+        segments = _segments(dates)
+        if len(segments) > 1:
+            for segment in segments:
+                if len(segment) < MIN_SEGMENT_DAYS:
+                    raise ValueError(
+                        f"sales_daily has {len(segment)} day(s) around {segment[0]} "
+                        f"stranded more than {MAX_DATA_GAP_DAYS} days from the rest of the "
+                        f"history ({lo} to {hi}). A fragment that small and that far out is "
+                        "a mistyped year, not a trading period - and it would not merely be "
+                        "ignored: the calendar fill turns the emptiness between into "
+                        "zero-revenue rows inside the training span, and the forecast "
+                        "follows them to zero.")
 
         span = (hi - lo).days
         if span > MAX_HISTORY_DAYS:
             raise ValueError(
                 f"sales_daily spans {span} days ({lo} to {hi}), beyond the "
-                f"{MAX_HISTORY_DAYS}-day limit. The oldest row is the likely typo: a "
-                "history this long densifies to a calendar the feature build has to walk "
-                "day by day.")
+                f"{MAX_HISTORY_DAYS}-day limit. This one is about cost, not correctness: "
+                "a history this long densifies to a calendar the feature build walks day "
+                "by day.")
         return self
 
 

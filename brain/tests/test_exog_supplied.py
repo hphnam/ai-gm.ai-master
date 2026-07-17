@@ -121,7 +121,14 @@ def test_the_unknown_covariate_report_is_bounded():
 def test_a_truncated_unknown_report_says_it_is_truncated():
     junk = {f"exo_bogus_{i}": 1.0 for i in range(64)}
     bundle = run(_dataset(exogenous=_exo(junk, days=3)))
-    assert any("first few" in d for d in bundle.diagnostics)
+    assert any("and others" in d for d in bundle.diagnostics)
+
+
+def test_an_untruncated_unknown_report_does_not_claim_there_are_more():
+    """The marker fired on any list of ten, truncated or not - so "exactly ten typos" and
+    "ten of thousands" read identically."""
+    bundle = run(_dataset(exogenous=_exo({"exo_bogus_1": 1.0, "exo_bogus_2": 2.0})))
+    assert not [d for d in bundle.diagnostics if "and others" in d]
 
 
 def test_a_known_covariate_raises_no_unknown_warning():
@@ -298,6 +305,35 @@ def test_a_horizon_beyond_the_calibration_is_refused_not_answered():
 def test_the_evidenced_horizon_is_still_served():
     bundle = run(_dataset(horizon_days=7))
     assert len({f.target_date for f in bundle.forecasts}) == 7
+
+
+def test_a_thin_mondrian_group_falls_back_to_the_marginal_band():
+    """The floor was checked on the POOLED count and the residuals were then split by
+    group, so a venue closed one day a week could clear 30 pooled and leave a handful in
+    the closed group - and `conformal_quantile` clamps k to n rather than failing, so that
+    group's "90% quantile" was silently the max of a few errors."""
+    ds = ComputeDataset(
+        org_profile=OrgProfile(org_id="o", venues=[
+            VenueProfile(venue_id="v", slug="tenant_bar", structural_zero_dow=[6])]),
+        sales_daily=_sales(),
+        prior_state=PriorState(served_model={"tenant_bar": "rung1_robust_dow"}),
+    )
+    bundle = run(ds)
+    assert any("fall back to the marginal band" in d for d in bundle.diagnostics)
+
+
+def test_a_thin_group_still_gets_a_band_rather_than_none():
+    """Falling back to the marginal quantile is a real quantile of a real sample; the
+    Sunday still needs an interval."""
+    ds = ComputeDataset(
+        org_profile=OrgProfile(org_id="o", venues=[
+            VenueProfile(venue_id="v", slug="tenant_bar", structural_zero_dow=[6])]),
+        sales_daily=_sales(),
+        prior_state=PriorState(served_model={"tenant_bar": "rung1_robust_dow"}),
+    )
+    bundle = run(ds)
+    assert ({b.target_date for b in bundle.bands}
+            == {f.target_date for f in bundle.forecasts})
 
 
 # --- expected_totals ----------------------------------------------------------
