@@ -677,3 +677,61 @@ them into the append-only log so it is the continuous WP1-to-present record.
     errors. Do not quote it. Deviation from row 20's framing: C2 was expected to score
     the sharpening question; it does, but the headline result is the falsification of
     the home-nation anticipation, which was not the pre-registered focus.
+22. **G13: production integration - hardening and stateless compute**
+    (`32_G13_Production_Integration_Report.md`; commits `087d20a`, `a4e5fa3`, `284663f`,
+    `0f9b511`, `b5fb3a7`, `04b3bf1`). Prepares the engine to run as a per-org service
+    inside gm-ai per Ryan's integration brief. **(a) The brief was verified, not
+    accepted.** Substantially correct and its central call - the brain stops touching a
+    database and becomes pure compute, the API owns persistence - is right and adopted;
+    it deletes more work than it creates (the store is retired, not ported). Three claims
+    are wrong: "67 print() calls" (actual **260**, 227 excluding sim/tests); "nothing
+    reads intraday detail" (false - `derive_trading_hours` reads `line_items.ts` and six
+    World Cup covariates depend on it, so the proposed aggregate grain would have
+    silently broken the served BH model); and "weather is attribution-only, rejected by
+    A14" (false, and self-contradictory with the brief's own §9.5). **(b) The third error
+    traces to this project, not the reader.** `7d8bfbd` scoped the A14 verdict in the
+    report, its generator and the README but never reached `FLAGS.md`, the live ledger,
+    which still asserted the corrected claim. Ryan read the ledger. Had it stood, §9.5
+    would have changed the served model on the strength of it. A correction that lands in
+    reports but not the ledger is not a correction. **(c) Hardening** (`087d20a`): bearer
+    auth on every route, compare_digest over BYTES (the str form 500s on a non-ASCII
+    token because Starlette latin-1-decodes headers); posture secure-by-default via
+    `BRAIN_ALLOW_INSECURE` after the first cut keyed on `BRAIN_ENV == "production"` and
+    **failed open** on a typo with every test still green; `/docs` nulled when hardened
+    (the app-level dependency does not cover it - FastAPI mounts those via Starlette's
+    router); `POST /refresh` deleted. Honest remainder: refresh is NOT off the HTTP
+    surface - `?freshness=live` still reaches a write through `_live_topup` from an
+    LLM-supplied parameter; now allowlist-validated and throttled, a bound not absence
+    (FLAG-LI6). Dependency ceilings only, never floors: `.venv-eval` pins numpy<2.0 via
+    TSB-AD, so raising floors would strand the venv behind the pinned VUS-PR numbers.
+    **(d) Stateless compute** (`0f9b511`, `b5fb3a7`): built on a per-request scratch-store
+    seam rather than rewriting ~157 call sites - `connect()` now resolves at CALL time
+    (it could not: `from config import DUCKDB_PATH` binds at import), overridden by a
+    **ContextVar**, which is load-bearing (mutating it to a module global makes a
+    background thread read a request's scratch path). `compute/engine.run(dataset)` ->
+    bundle; contract strict; Neon/Square adapters and the psycopg path **deleted, not
+    disabled** (`base.py` 245 -> 109 lines), so `INGEST_SOURCE=neon` fails loudly instead
+    of silently serving the CSV seed - which also retires security finding L3 by removal.
+    **(e) The isolation claim survived an adversarial review** that was asked to falsify
+    it: 8 concurrent requests kept distinct scratch paths across a forced overlap; a
+    planted leak on a provably-reused anyio worker thread did not survive; a fabricated
+    org left the served store byte-identical. **(f) Two bugs found by building, not
+    planning:** an org with no sales returned 503 (empty frame carries no dtypes, DuckDB
+    infers `date` as INTEGER, the L1 view fails to bind - the first thing a new tenant
+    hits); and the contract accepted `exogenous`/`horizon_days`/per-venue profile and
+    dropped them on the floor, so a caller could name `rung4_chronos2_exo`, send its 15
+    covariates and receive a univariate forecast with nothing said - the exact failure
+    `extra="forbid"` legislates against, inverted. Each unconsumed field now reports
+    itself. **(g) Open questions answered wrong on file, corrected:** the glossary already
+    existed (report 30 said none did; the recommendation would have created a second one
+    and orphaned two links); taxonomy drift is NOT wired into the standing build (`since=`
+    exists and the freezes pass it, `reconcile()` does not and no caller does - the
+    standing path still drops the GBP 3,484 `LuneBrew Pilsner` into OTHER); the store
+    hazard had no flag and fired twice in one session, caught only by the C2 confront's
+    ceiling assert (`FLAG-STORE-DURABILITY`, `sim/restore_clock.py`). **Not done and
+    stated:** Phase 3 de-Lune (the per-venue profile is accepted and reported-as-ignored,
+    not honoured), the 227 prints (Phase 3 rewrites the files holding 54 of them), sim/
+    relocation (it is the evidence chain, not dead code), the PII purge (Ryan's, two
+    remotes). Suites 307/8 and 314/1 (+45/+45 from 262/8 and 269/1); tree ruff 72 -> 71;
+    **the C2 confront reproduces bit-for-bit through every change (0.285/0.287,
+    generalises False)**, tagged `prj93-research-frozen` beforehand.
