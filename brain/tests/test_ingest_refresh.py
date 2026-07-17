@@ -9,14 +9,14 @@ from __future__ import annotations
 
 import ast
 import inspect
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pandas as pd
 import pytest
 
 import config
 from ingest import refresh
-from ingest.sources import CsvAdapter, NeonAdapter, SourceAdapter, get_adapter
+from ingest.sources import CsvAdapter, SourceAdapter, get_adapter
 from store import warehouse
 
 
@@ -107,38 +107,21 @@ def test_default_adapter_is_csv():
     assert get_adapter().name == "csv" and isinstance(get_adapter(), CsvAdapter)
 
 
-def test_live_adapters_inert_while_off():
-    # LIVE_INGEST is False by default → neon reports no data, never raises.
-    assert NeonAdapter().latest_available_date() is None
+def test_only_the_csv_adapter_is_registered():
+    """The Neon and Square backends are deleted, not disabled. The brain does not fetch
+    its own history any more: the API supplies an org's rows in the request and
+    compute/loader.py loads them. A registry that still advertised a `neon` source would
+    imply a DSN path that no longer exists."""
+    from ingest.sources.base import _ADAPTERS
+
+    assert list(_ADAPTERS) == ["csv"]
 
 
-# --- G12.10c: Neon adapter wiring (inert until provisioned) ------------------
-
-def test_neon_fetch_transactions_raises_while_inert():
-    from ingest.sources.base import NotProvisionedError
-
-    with pytest.raises(NotProvisionedError):
-        NeonAdapter().fetch_transactions(since=None)
-
-
-def test_neon_to_txn_schema_derives_config_columns_only():
-    """The brain_txn -> TXN_COLUMNS mapping derives venue_label / net_sales_exvat /
-    excluded from config, never fabricating transaction facts, and keeps only the
-    known TXN_COLUMNS so a thinner Neon schema still appends cleanly."""
-    from ingest.sources.base import TXN_COLUMNS, _to_txn_schema
-
-    raw = pd.DataFrame({
-        "transaction_id": ["t1"], "venue": ["two_river_taps"], "category": ["Draught"],
-        "item": ["Lager"], "qty": [1.0], "net_sales": [12.0], "gross_sales": [12.0],
-        "discounts": [0.0], "tax": [0.0],
-        "ts": [pd.Timestamp("2026-06-15 20:00:00", tz="Europe/London")],
-        "date": [date(2026, 6, 15)]})
-    out = _to_txn_schema(raw)
-    assert set(out.columns) <= set(TXN_COLUMNS)
-    assert out.loc[0, "venue_label"] == config.VENUE_LABELS["two_river_taps"]
-    # TRT is VAT-inclusive: net_sales_exvat = net_sales / 1.2.
-    assert abs(out.loc[0, "net_sales_exvat"] - 10.0) < 1e-9
-    assert bool(out.loc[0, "excluded"]) is False
+def test_asking_for_a_deleted_backend_fails_loudly():
+    """INGEST_SOURCE=neon must not silently fall back to the CSV seed: that would serve
+    the committed bootstrap export while the operator believed they were live."""
+    with pytest.raises(ValueError, match="unknown INGEST_SOURCE"):
+        get_adapter("neon")
 
 
 # --- G2 watermark: fresh store is not falsely stale --------------------------

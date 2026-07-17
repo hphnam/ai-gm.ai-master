@@ -131,6 +131,17 @@ def _create_views(con: duckdb.DuckDBPyConnection) -> None:
     )
 
 
+def create_schema(con: duckdb.DuckDBPyConnection) -> None:
+    """Create the L1/L2/L3 views and the output tables over an existing `line_items`.
+
+    Public because `build()` is not the only legitimate way to get a store any more:
+    stateless compute materialises `line_items` from an injected dataset and then needs
+    exactly this schema over it, without the parquet read `build()` does.
+    """
+    _create_views(con)
+    _create_output_tables(con)
+
+
 def _create_output_tables(con: duckdb.DuckDBPyConnection) -> None:
     # Persisted brain outputs. `key` holds the category (L2) or item (L3), NULL
     # at L1. (venue, layer, key, target_date, model) is the logical PK we

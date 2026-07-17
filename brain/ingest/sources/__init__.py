@@ -1,20 +1,19 @@
-"""Pluggable ingest sources (the T2 history seam).
+"""Ingest sources for the research history path.
 
-`get_adapter()` returns the `SourceAdapter` named by `config.INGEST_SOURCE`
-(default `csv`). Selection is configuration, never the model. Neon/Square are
-inert behind `LIVE_INGEST` until Ryan provisions access.
+`get_adapter()` returns the `SourceAdapter` named by `config.INGEST_SOURCE` (default,
+and now only, `csv`). Selection is configuration, never the model.
+
+The Neon and Square backends are gone: the brain no longer fetches its own history. In
+production gm-ai's API supplies an org's rows in the request and `compute/loader.py`
+loads them into a per-request scratch store. This package is the research bootstrap that
+keeps the local pipeline and the frozen artefacts reproducible.
 """
 
 from ingest.sources.base import (
     CsvAdapter,
-    NeonAdapter,
     NotProvisionedError,
     SourceAdapter,
-    SquareAdapter,
     get_adapter,
 )
 
-__all__ = [
-    "SourceAdapter", "CsvAdapter", "NeonAdapter", "SquareAdapter",
-    "NotProvisionedError", "get_adapter",
-]
+__all__ = ["SourceAdapter", "CsvAdapter", "NotProvisionedError", "get_adapter"]
