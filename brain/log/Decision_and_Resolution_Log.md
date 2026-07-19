@@ -888,3 +888,87 @@ them into the append-only log so it is the continuous WP1-to-present record.
     frame-hash check built to catch this class of error; its trigger is now narrowed by
     measurement (targeted runs are free, only suites collecting `test_a10_service` /
     `test_a1_warehouse` rebuild).
+
+24. **G15a: the 11 July shortfall diagnosed, and both testable hypotheses came back
+    negative** (`36_G15a_Fixture_Shortfall_Diagnostics.md`). Report 31 falsified the
+    home-nation fixture anticipation and named three untested hypotheses; chapter 4 of
+    the dissertation is that falsification and could not be written honestly while the
+    top-ranked ones sat untested. **Everything in this row is POST HOC AND EXPLORATORY**
+    - the 11 July actual was seen before these hypotheses were specified, so they may
+    explain and may not confirm, and none may be written up beside the pre-registered
+    results without that label. The pre-registered numbers are untouched (0.285/0.287,
+    coverage 1.00, `generalises: False`). **(a) Weather: REFUTED**, and refuted the same
+    way kickoff time was, by the 27 June control. On what actually occurred, 11 July was
+    **2.1 C warmer, 0.90 hrs sunnier and equally dry** than the Saturday that produced
+    the largest home-nation lift on record; `exo_is_dry` was 1 on both, so that covariate
+    carried no contrast at all. For weather to explain the swing it would have to act
+    against its own sign on all three continuous covariates at once. Separately and
+    smaller: the model's CONDITIONING weather for 11 July was **2.0 C warm and 1.05 hrs
+    dull** against what occurred, a forecast-of-a-covariate error and a distinct failure
+    mode, named rather than folded in - but the same 2 C gap sits on 27 June, the day the
+    model got right. A revision control the spec did not ask for (the hindcast as the API
+    answers it today) reproduces what was persisted, so the gap is genuinely
+    forecast-versus-reanalysis and not a later data correction; limitation 9 confirmed
+    with a measured size. **(b) The finding that was in no report: `is_ellel_event` is a
+    train/serve asymmetry.** It is one of the 15 served `CHRONOS2_EXO_COLS`, populated
+    from observed trading on the Beer Hall frame and **pinned to 0 on every forecast
+    horizon** - so the served model is fit on a covariate informative on 66 of 399
+    training days and constant on every day it forecasts. Same species as report 33's
+    `exo_is_dry` defect, documented rather than hidden, which is better but not harmless.
+    Ellel traded on 11 July (GBP 385.12) and both freezes were conditioned on 0.
+    **(c) Direction is SUBSTITUTION, not spillover**, refuting Lune's own hypothesis as
+    written into `features/build_features.py` ("an Ellel function night lifts the Beer
+    Hall next door"). Fourth refuted belief. Two independent measurements agree on sign
+    and order of magnitude: DOW-matched historical effect **GBP -23.40** (n = 66 active /
+    333 quiet), served-model single-date perturbation **GBP -25 to -39 on every horizon
+    day**. **(d) The estimator trap, which is dissertation material on its own:** the
+    POOLED comparison reads **+GBP 500.18** against the matched **-GBP 23.40** - a GBP
+    523 swing and a SIGN INVERSION from the estimator alone, because Ellel books weekends
+    (45 of 66 active days Fri/Sat/Sun) and Beer Hall revenue is strongly day-of-week
+    driven. The naive estimate confirms the hypothesis the matched one refutes.
+    **(e) The counterfactual bounds the hypothesis rather than supporting it.** Origin B's
+    configuration with the flag set on 11 July only: **1558.28 to 1530.78**, closing **GBP
+    27.50 of a GBP 573.66 over-forecast, 4.8%**. Mechanism real, correctly signed,
+    consumed by the served model, and an order of magnitude too small. Told the truth
+    about Ellel, the model still over-forecasts by GBP 546. The useful part is the
+    ceiling: it bounds how much of the miss the hypothesis could EVER have carried.
+    **A deviation that changed the answer:** the spec asked for sensitivity with the flag
+    forced across the horizon; Chronos-2 conditions on the whole future covariate path,
+    so a constant column is a different regime, and that arm reports **+47.37** on 11 July
+    where the single-date spike reports **-27.50**. Opposite signs. Running only the
+    specified arm would have put a wrong-signed number in the dissertation; both are
+    reported. **(f) The control arm reproduced the committed Origin B forecast to 0.00** -
+    the first evidence in this project that forecast GENERATION is bit-reproducible from
+    the store, which report 33 was explicit the C2 re-score never proved. **(g) Events arm
+    UNTESTABLE, stated as a non-test:** confirmed independently from the seed export,
+    **203 line items across 2 distinct dates** (both the last two days of the window)
+    against 47,644 for the Beer Hall. n=2 does not support a comparison and the project
+    does not report what n cannot carry. **(h) `EXCLUDED_VENUES` was dead and had already
+    misled a committed artefact.** Exactly one occurrence in the tree, its own definition;
+    the real exclusion is the `FORECAST_VENUES` allowlist. Third instance of the pattern
+    after `vat_inclusive`, `timezone` and `currency`, and the first caught propagating a
+    FALSE CLAIM into an artefact - `sim/july2026_w2_actuals_l1_raw.json` credits the
+    exclusion to it. Deleted, not wired: a denylist fails open, the allowlist already
+    there fails closed. The false claim in the actuals artefact was **deliberately left in
+    place** - it is pre-registration evidence and editing its prose to make the project
+    look more correct is a worse failure than the stale claim; the correction lives in the
+    report, FLAGS.md and here. **(i) `DISSERTATION_NOTES.md` limitation 4 was overstated
+    and is corrected.** "No cross-venue substitution term, venues are modelled
+    independently" is wrong: the term exists, is served, and is consumed. Rewritten to
+    what is true (presence not magnitude, pinned to 0 on the horizon, nothing at all for
+    Events), with limitations 10 and 11 added and section 3.1 rewritten with the post-hoc
+    status table. An overstated limitation is as much a defect as an overstated finding,
+    and this one fails badly at viva: a reader greps `CHRONOS2_EXO_COLS` and finds the
+    term in thirty seconds. **(j) The hash gate was never runnable.** Hard invariant 3
+    pins three sha256 prefixes; `git log -S` finds them in reports 33, 34, 35 and this log
+    and **in no script in any commit**. The check the project leans on for "did this move
+    a Lune number" could not be run by anyone, including its author - the same
+    stale-document failure mode, applied to the check built to catch it. The `ellel`
+    dimensions do not reproduce either (reports 386 x 40, canonical store **392 x 40**,
+    six July W1 rows), consistent with FLAG-STORE-DURABILITY firing unnoticed during
+    report 33. Closed by committing `sim/frame_hash.py` with a baseline re-measured at tip
+    `44a0f08`. Report 33's before/after claim is unaffected; its published VALUES are
+    session-local. New flags: FLAG-CROSS-VENUE-BLIND (open, structural),
+    FLAG-DEAD-CONSTANT (instance closed, pattern open), FLAG-HASH-GATE-UNRUNNABLE
+    (closed). FLAG-FIXTURE-ANTICIPATION updated with the tested/refuted/untestable table
+    and its own superseded cross-venue claim corrected in place.

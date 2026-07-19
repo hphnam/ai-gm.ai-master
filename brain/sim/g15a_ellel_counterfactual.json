@@ -1,0 +1,221 @@
+{
+  "package": "G15a.2",
+  "status": "POST HOC AND EXPLORATORY",
+  "venue": "beer_hall",
+  "flag": "is_ellel_event",
+  "served_model": "rung4_chronos2_exo",
+  "cutoff": "2026-07-07",
+  "event_nights_in_history": 66,
+  "ellel_on_target_date": {
+    "in_store": false,
+    "note": "held out of the store by design; report 31 records GBP 385.12 on 55 orders from the evaluation-only actuals pull"
+  },
+  "step1_unconditional": {
+    "per_dow": [
+      {
+        "dow": "Mon",
+        "n_active": 2,
+        "n_quiet": 55,
+        "mean_active": 0.0,
+        "mean_quiet": 125.05,
+        "sd_active": 0.0,
+        "sd_quiet": 460.28,
+        "median_active": 0.0,
+        "median_quiet": 0.0,
+        "diff_mean": -125.05,
+        "diff_median": 0.0
+      },
+      {
+        "dow": "Tue",
+        "n_active": 2,
+        "n_quiet": 55,
+        "mean_active": 0.0,
+        "mean_quiet": 24.18,
+        "sd_active": 0.0,
+        "sd_quiet": 89.64,
+        "median_active": 0.0,
+        "median_quiet": 0.0,
+        "diff_mean": -24.18,
+        "diff_median": 0.0
+      },
+      {
+        "dow": "Wed",
+        "n_active": 0,
+        "n_quiet": 57,
+        "mean_active": null,
+        "mean_quiet": 359.36,
+        "sd_active": null,
+        "sd_quiet": 285.24,
+        "median_active": null,
+        "median_quiet": 295.69,
+        "diff_mean": null,
+        "diff_median": null
+      },
+      {
+        "dow": "Thu",
+        "n_active": 4,
+        "n_quiet": 53,
+        "mean_active": 753.16,
+        "mean_quiet": 673.26,
+        "sd_active": 420.46,
+        "sd_quiet": 250.23,
+        "median_active": 682.07,
+        "median_quiet": 657.69,
+        "diff_mean": 79.9,
+        "diff_median": 24.38
+      },
+      {
+        "dow": "Fri",
+        "n_active": 15,
+        "n_quiet": 42,
+        "mean_active": 865.92,
+        "mean_quiet": 992.29,
+        "sd_active": 371.38,
+        "sd_quiet": 518.14,
+        "median_active": 887.39,
+        "median_quiet": 825.78,
+        "diff_mean": -126.37,
+        "diff_median": 61.61
+      },
+      {
+        "dow": "Sat",
+        "n_active": 30,
+        "n_quiet": 27,
+        "mean_active": 1406.04,
+        "mean_quiet": 1440.93,
+        "sd_active": 713.86,
+        "sd_quiet": 938.15,
+        "median_active": 1249.41,
+        "median_quiet": 1207.73,
+        "diff_mean": -34.89,
+        "diff_median": 41.68
+      },
+      {
+        "dow": "Sun",
+        "n_active": 13,
+        "n_quiet": 44,
+        "mean_active": 615.85,
+        "mean_quiet": 509.95,
+        "sd_active": 298.52,
+        "sd_quiet": 241.79,
+        "median_active": 577.37,
+        "median_quiet": 456.69,
+        "diff_mean": 105.9,
+        "diff_median": 120.68
+      }
+    ],
+    "n_active_total": 66,
+    "n_quiet_total": 333,
+    "pooled_mean_active": 1002.86,
+    "pooled_mean_quiet": 502.68,
+    "pooled_sd_active": 675.8,
+    "pooled_sd_quiet": 583.61,
+    "pooled_diff_mean": 500.18,
+    "dow_matched_effect_mean": -23.4,
+    "sign": "negative (substitution / cannibalisation)"
+  },
+  "step2_serving_sensitivity": {
+    "constant_arm_per_day": [
+      {
+        "date": "2026-07-08",
+        "yhat_flag_1": 338.25,
+        "yhat_flag_0": 364.05,
+        "delta": -25.8
+      },
+      {
+        "date": "2026-07-09",
+        "yhat_flag_1": 737.4,
+        "yhat_flag_0": 766.89,
+        "delta": -29.49
+      },
+      {
+        "date": "2026-07-10",
+        "yhat_flag_1": 1086.1,
+        "yhat_flag_0": 1103.0,
+        "delta": -16.9
+      },
+      {
+        "date": "2026-07-11",
+        "yhat_flag_1": 1605.65,
+        "yhat_flag_0": 1558.28,
+        "delta": 47.37
+      },
+      {
+        "date": "2026-07-12",
+        "yhat_flag_1": 477.32,
+        "yhat_flag_0": 513.66,
+        "delta": -36.34
+      },
+      {
+        "date": "2026-07-13",
+        "yhat_flag_1": 25.96,
+        "yhat_flag_0": 44.95,
+        "delta": -18.99
+      },
+      {
+        "date": "2026-07-14",
+        "yhat_flag_1": 118.08,
+        "yhat_flag_0": 118.1,
+        "delta": -0.02
+      }
+    ],
+    "window_total_flag_1": 4388.76,
+    "window_total_flag_0": 4468.93,
+    "window_total_delta": -80.16,
+    "max_abs_daily_delta": 47.37,
+    "spike_arm_per_day": [
+      {
+        "date": "2026-07-08",
+        "yhat_spike": 329.83,
+        "delta_vs_baseline": -34.21
+      },
+      {
+        "date": "2026-07-09",
+        "yhat_spike": 732.75,
+        "delta_vs_baseline": -34.14
+      },
+      {
+        "date": "2026-07-10",
+        "yhat_spike": 1067.84,
+        "delta_vs_baseline": -35.15
+      },
+      {
+        "date": "2026-07-11",
+        "yhat_spike": 1530.78,
+        "delta_vs_baseline": -27.5
+      },
+      {
+        "date": "2026-07-12",
+        "yhat_spike": 474.96,
+        "delta_vs_baseline": -38.7
+      },
+      {
+        "date": "2026-07-13",
+        "yhat_spike": 19.43,
+        "delta_vs_baseline": -25.52
+      },
+      {
+        "date": "2026-07-14",
+        "yhat_spike": 91.57,
+        "delta_vs_baseline": -26.53
+      }
+    ],
+    "spike_mean_delta": -31.68,
+    "spike_max_abs_delta": 38.7,
+    "arms_agree_in_sign": false,
+    "inert": false
+  },
+  "step3_counterfactual": {
+    "date": "2026-07-11",
+    "actual": 984.62,
+    "frozen_origin_b_yhat": 1558.28,
+    "control_yhat_flag_0": 1558.28,
+    "counterfactual_yhat_flag_1": 1530.78,
+    "reproduction_gap_vs_frozen": 0.0,
+    "reproduces_frozen": true,
+    "residual_control": 573.66,
+    "residual_counterfactual": 546.16,
+    "shortfall_closed": 27.5,
+    "frozen_residual": 573.66
+  }
+}

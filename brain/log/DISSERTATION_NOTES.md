@@ -138,18 +138,40 @@ returned the **largest home-nation lift on record**, +234% over its DOW median.
 Day of week and kickoff hour are held constant across the two Saturday cases and the
 outcomes invert. Neither explains 11 July.
 
-The chapter should say plainly: **the shortfall is unexplained by the covariate set.**
-Untested hypotheses, named and ranked, none asserted: (1) weather on 11 July, the only
-exo family not yet compared across the two Saturdays; (2) estate cannibalisation — 11
-July also carries an Events booking of GBP 779.94 and an Ellel event of GBP 385.12, both
-absent on 27 June, and the brain models venues independently with no substitution term;
-(3) tournament stage.
+The chapter should say plainly: **the shortfall is unexplained by the covariate set**,
+and it stays unexplained after the diagnostics were actually run.
 
-Hypothesis (2) is the most interesting and the most publishable: **the model has no
-cross-venue substitution term at all.** Every venue is forecast independently. If the
-estate cannibalises itself when Ellel runs an event, that is a structural limitation of
-the whole architecture, not a covariate gap — and it would be invisible to any
-single-venue evaluation. Flag it as future work with a named mechanism.
+Report 36 (2026-07-19) tested the two ranked hypotheses. Everything in it is **post
+hoc**: the 11 July actual was seen before the hypotheses were specified, so it may
+explain and may not confirm, and it must never appear beside the pre-registered results
+without that label on the same page.
+
+| Hypothesis | Status after report 36 | Evidence |
+|---|---|---|
+| (1) weather | **refuted** | 11 Jul was warmer (25.2 vs 23.1 C), sunnier (16.13 vs 15.23 hrs) and equally dry. The better Saturday underperformed. |
+| (2a) Ellel substitution | **tested, real, insufficient** | Effect exists and is consumed: GBP 27.50 of a GBP 573.66 over-forecast, 4.8%. |
+| (2b) Events booking | **untestable** | 203 rows over 2 dates in the whole seed history. |
+| (3) tournament stage | still untested | n=2 stages; the same n problem. |
+
+Hypothesis (2a) is still the most publishable part, but the honest version is sharper
+and less flattering than the original framing. The claim is **not** that the model has
+no cross-venue term. It has one, `is_ellel_event`, it is served, and the model uses it.
+The claim is that the term is **structurally impoverished at exactly the moment it
+matters**: binary rather than magnitude-carrying, and **pinned to 0 on every forecast
+horizon** because a forecaster at the cutoff does not know the event venue's future
+bookings. So the model is fit on a covariate it can never observe when it serves. That
+is a train/serve asymmetry of the same species as report 33's `exo_is_dry` defect, and
+the difference, that this one is documented rather than hidden, is worth stating,
+because a documented asymmetry is still an asymmetry.
+
+The measured direction is **substitution, not spillover**, which inverts Lune's own
+stated hypothesis that an Ellel function night lifts the Beer Hall next door
+(`features/build_features.py`). That is a fourth refuted belief, and it arrived with a
+methodological trap attached: the **pooled** comparison reads **+GBP 500** and the
+day-of-week-matched one reads **-GBP 23**. Ellel books weekends and the Beer Hall is
+busiest at weekends, so the naive pooled estimate reports the day-of-week effect with
+the wrong name and the wrong sign. Write that up: it is a compact, self-contained
+confounding example and it nearly confirmed a false finding.
 
 ### 3.2 What this supersedes
 
@@ -244,9 +266,18 @@ State these; do not let a reader find them.
    Beer Hall (~302 days after the June/July ingest) is the only venue with a real series.
 3. **Fixture effects are unstable and unexplained.** Section 3. The one out-of-sample
    test of the anticipation failed and the mechanism is unknown.
-4. **No cross-venue substitution term.** Venues are modelled independently. Estate
-   cannibalisation is a candidate explanation for the biggest miss in the project and
-   the architecture cannot express it.
+4. **The cross-venue term is present but impoverished, and blind on the horizon.**
+   Corrected 2026-07-19 by report 36; the earlier wording ("no cross-venue substitution
+   term, venues are modelled independently") was overstated and is wrong. What is
+   actually true: `is_ellel_event` is a cross-venue term on the Beer Hall frame, it is
+   one of the 15 served `CHRONOS2_EXO_COLS`, and the served entrant demonstrably
+   consumes it (GBP -25 to -39 per lit day, measured). But it carries **presence, not
+   magnitude** - a GBP 200 booking and a GBP 3,000 booking are the same 1 - it is
+   **pinned to 0 across every forecast horizon** by design, so the model trains on an
+   informative column and serves it constant, and **no term of any kind exists for the
+   Events location**. The architecture can express estate substitution weakly in
+   training and not at all at serving. See also the measured effect size in limitation
+   10: the term is real and it is nowhere near large enough to carry the 11 July miss.
 5. **MASE is the gate and it flatters intermittent series** (4.1). The gate is sound on
    Beer Hall and unreliable on Ellel.
 6. **MinT's guarantee does not formally hold here.** "At least as good" assumes
@@ -260,7 +291,21 @@ State these; do not let a reader find them.
    W2 window. The L2/L3 story for that window is not scored.
 9. **Weather is a forecast product, not truth.** For 11-14 July the "hindcast" basis is
    the live forward forecast retrieved 2026-07-10. Real serving conditions, but not
-   reanalysis.
+   reanalysis. Report 36 quantified the gap for 11 July: the model was conditioned on
+   27.2 C against 25.2 C observed and 15.09 sunshine hours against 16.13. Small, and in
+   the direction that would inflate a forecast, so it is a named contributor and not an
+   explanation.
+10. **The Events arm of the cannibalisation hypothesis is untestable, not untested.**
+    The committed seed carries **203 Events line items across 2 distinct dates**
+    (2026-05-30, 2026-05-31) in the whole 2025-06-04 to 2026-05-31 history, against
+    47,644 Beer Hall rows. The GBP 779.94 Events booking on 11 July has no comparison
+    set. Report 31 named it as part of hypothesis 2; it cannot be scored at n=2 and the
+    project does not report what n cannot carry.
+11. **The 11 July shortfall remains unexplained after diagnosis.** Report 36 tested the
+    two ranked hypotheses post hoc. Weather is refuted as an explanation (11 July was
+    warmer, sunnier and equally dry). The Ellel substitution mechanism is real, is
+    consumed by the served model, and closes GBP 27.50 of a GBP 573.66 over-forecast -
+    4.8%. Both are honest negative results and neither rescues the fixture anticipation.
 
 ---
 

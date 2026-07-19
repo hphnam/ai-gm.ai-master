@@ -1,0 +1,65 @@
+{
+  "package": "G15a.1",
+  "status": "POST HOC AND EXPLORATORY",
+  "venue": "beer_hall",
+  "cell": "beer_hall",
+  "dry_threshold_mm": 1.0,
+  "conditioning_basis": "hindcast",
+  "note": "model_saw is the persisted hindcast basis; for 2026-07-11 that is a FORWARD forecast retrieved 2026-07-10, not reanalysis",
+  "cells": {
+    "2026-06-27": {
+      "fixture": "Panama v England, Sat 22:00, +234% (largest lift on record)",
+      "model_saw": {
+        "exo_temp_c": 25.6,
+        "exo_rain_mm": 0.1,
+        "exo_sunshine_hrs": 15.0,
+        "exo_is_dry": 1.0
+      },
+      "occurred": {
+        "exo_temp_c": 23.1,
+        "exo_rain_mm": 0.5,
+        "exo_sunshine_hrs": 15.23158888888889,
+        "exo_is_dry": 1.0
+      },
+      "hindcast_today": {
+        "exo_temp_c": 25.6,
+        "exo_rain_mm": 0.1,
+        "exo_sunshine_hrs": 15.0,
+        "exo_is_dry": 1.0
+      }
+    },
+    "2026-07-11": {
+      "fixture": "Norway v England, Sat 22:00, -21% (the shortfall)",
+      "model_saw": {
+        "exo_temp_c": 27.2,
+        "exo_rain_mm": 0.0,
+        "exo_sunshine_hrs": 15.086302777777778,
+        "exo_is_dry": 1.0
+      },
+      "occurred": {
+        "exo_temp_c": 25.2,
+        "exo_rain_mm": 0.0,
+        "exo_sunshine_hrs": 16.132538888888888,
+        "exo_is_dry": 1.0
+      },
+      "hindcast_today": {
+        "exo_temp_c": 27.3,
+        "exo_rain_mm": 0.0,
+        "exo_sunshine_hrs": 15.130944444444445,
+        "exo_is_dry": 1.0
+      }
+    }
+  },
+  "observed_difference_11jul_minus_27jun": {
+    "exo_temp_c": 2.1,
+    "exo_rain_mm": -0.5,
+    "exo_sunshine_hrs": 0.9009,
+    "exo_is_dry": 0.0
+  },
+  "conditioning_error_11jul_saw_minus_occurred": {
+    "exo_temp_c": 2.0,
+    "exo_rain_mm": 0.0,
+    "exo_sunshine_hrs": -1.0462,
+    "exo_is_dry": 0.0
+  }
+}

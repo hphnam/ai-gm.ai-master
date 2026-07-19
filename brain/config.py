@@ -80,10 +80,20 @@ VENUE_LABELS: dict[str, str] = {
 # The donor of rhythm shape (richest, cleanest series).
 ANCHOR_VENUE = "beer_hall"
 
-# Excluded from forecasting (too sparse, not a trading venue in the usual sense).
-EXCLUDED_VENUES = frozenset({"events"})
-
-# Forecast targets, the three real venues.
+# Forecast targets, the three real venues. This tuple is the ONLY thing that decides
+# what gets forecast, and it is an allowlist on purpose: a location that appears in
+# VENUE_MAP but not here is never forecast, so adding a venue upstream cannot silently
+# enrol it. `events` is absent because it is not a trading venue in the usual sense -
+# 203 line items across 2 distinct dates in the whole seed window, against 47,644 for
+# `beer_hall` (G15a.3).
+#
+# G15a.3 removed a sibling `EXCLUDED_VENUES = frozenset({"events"})` that lived here
+# and was read by nothing: grep found exactly one hit, its own definition. It was the
+# third constant on this project to look authoritative and govern nothing (after
+# `vat_inclusive`, `timezone` and `currency` on the contract), and it had already
+# misled a committed artefact - `sim/july2026_w2_actuals_l1_raw.json` credits the
+# exclusion to `config.EXCLUDED_VENUES`, which never performed it. A denylist was also
+# the wrong shape: it fails open, the allowlist above fails closed.
 FORECAST_VENUES = ("beer_hall", "two_river_taps", "ellel")
 
 # Per-venue ladder rung cap. Previously capped Ellel at Rung 1 (robust DOW ×

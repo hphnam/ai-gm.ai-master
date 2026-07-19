@@ -510,16 +510,31 @@ does.
   > 27 Jun Panama v England 22:00 Sat **+234%** · 1 Jul England v DR Congo 17:00 Wed
   > +125% · 11 Jul Norway v England 22:00 Sat **-21%**.
   >
-  > The 11 July shortfall is **unexplained by `CHRONOS2_EXO_COLS`**. Untested
-  > hypotheses, in priority order, none asserted: (1) **weather on 11 July** - the only
-  > exo family not yet compared across the two Saturdays, and absent from the feature
-  > frame because the date is held out, so it needs its own pull; (2) **estate
-  > cannibalisation** - 11 July also carries an Events booking of GBP 779.94 and an
-  > Ellel event of GBP 385.12, both absent on 27 June, and the brain models venues
-  > independently with no cross-venue substitution term; (3) **tournament stage** -
-  > group-stage dead rubber vs knockout. Supersedes FLAG-WC's implicit premise that the
-  > tournament effect becomes cleanly estimable once June is observed: it is estimable
-  > and it is unstable.
+  > The 11 July shortfall is **unexplained by `CHRONOS2_EXO_COLS`**, and it STAYS
+  > unexplained after the named diagnostics were run (report 36, 2026-07-19). Every
+  > verdict below is **POST HOC AND EXPLORATORY**: the 11 July actual was seen before
+  > these hypotheses were specified, so they may explain and may not confirm, and none
+  > may be written up beside the pre-registered results without that label attached.
+  >
+  > | Hypothesis | Verdict | Number |
+  > |---|---|---|
+  > | (1) weather | **REFUTED** | 11 Jul was 2.1 C warmer, 0.9 hrs sunnier, equally dry. The better Saturday underperformed. |
+  > | (2a) Ellel substitution | **TESTED: real, consumed, insufficient** | closes GBP 27.50 of GBP 573.66, **4.8%** |
+  > | (2b) Events booking | **UNTESTABLE** | 203 rows over **2 distinct dates** in the whole seed history |
+  > | (3) tournament stage | still untested | n=2 stages, same n problem as (2b) |
+  >
+  > **Do not re-propose weather either.** It is now the second obvious explanation
+  > refuted by the 27 June control, and refuted the same way: 11 July was warmer,
+  > sunnier and equally dry than the Saturday that produced the largest lift on record.
+  > `exo_is_dry` was 1 on both days, so that covariate carried no contrast at all. A
+  > separate and smaller finding: the model's CONDITIONING weather for 11 July was 2.0 C
+  > warm and 1.05 hrs dull against what occurred (a forecast-of-a-covariate error,
+  > distinct from the fixture effect), but the same 2 C gap sits on 27 June, the day the
+  > model got right.
+  >
+  > **Supersedes the claim in this flag's own earlier text that "the brain models venues
+  > independently with no cross-venue substitution term."** That was wrong. See
+  > FLAG-CROSS-VENUE-BLIND below.
   >
   > Consequence for the exo set: no change made. The covariates stay raw and unranked
   > (that decision is unaffected and is the reason the model could be wrong in a
@@ -528,6 +543,76 @@ does.
   > patch. The fixture-day-specific promotion-grade re-evaluation already flagged in the
   > state log should now score fixture days against this two-case record before any exo
   > promotion.
+
+- **FLAG-CROSS-VENUE-BLIND (G15a, OPEN, structural; report 36).** The estate substitution
+  term exists, is served, and is **blind on every horizon it serves**.
+  `is_ellel_event` is one of the 15 `CHRONOS2_EXO_COLS`. On the Beer Hall frame it is
+  populated from observed trading (`features/build_features.py`); on **every** forecast
+  horizon it is pinned to 0 (`compute/forward.py`, and every research freeze), on the
+  sound reasoning that a forecaster at the cutoff does not know the event venue's future
+  bookings. So the served model is **fit on a covariate informative on 66 of 399
+  training days and constant at 0 on every day it forecasts.** Train and serve disagree
+  on a column the model was fit on: the same species as report 33's `exo_is_dry` defect,
+  documented rather than hidden, but documented is not harmless.
+  > **Measured, post hoc (report 36).** Direction is **SUBSTITUTION, not spillover**,
+  > which refutes Lune's own hypothesis as written into the source ("an Ellel function
+  > night lifts the Beer Hall next door"). Two independent measurements agree on sign and
+  > magnitude: DOW-matched historical effect **GBP -23.40** (n = 66 active / 333 quiet),
+  > served-model single-date perturbation **GBP -25 to -39 on every horizon day**.
+  >
+  > **The estimator trap, and quote this one.** The POOLED comparison reads **+GBP
+  > 500.18** and the DOW-matched one reads **-GBP 23.40**: a GBP 523 swing and a sign
+  > inversion from the estimator alone. Ellel books weekends (45 of 66 active days are
+  > Fri/Sat/Sun) and Beer Hall revenue is strongly day-of-week driven, so the pooled
+  > estimate reports the day-of-week effect under the name "spillover". The naive version
+  > CONFIRMS the hypothesis the matched version refutes.
+  >
+  > **Sensitivity must be measured as a single-date spike, not a constant.** Chronos-2
+  > conditions on the whole future covariate path, so forcing the flag to 1 on every
+  > horizon day is a constant column carrying no within-horizon contrast. That arm
+  > reports **+47.37** on 11 July; the single-date arm reports **-27.50**. Opposite
+  > signs. The spike arm is the operative one.
+  >
+  > **What is actually wrong, in order:** (i) the flag carries **presence, not
+  > magnitude** (a GBP 200 booking and a GBP 3,000 booking are both 1); (ii) it is
+  > **pinned to 0 across every horizon**; (iii) **no term of any kind exists for the
+  > Events location**. `DISSERTATION_NOTES.md` limitation 4 previously said there was no
+  > cross-venue term at all and has been corrected.
+  >
+  > **Not a defect to patch mid-dissertation.** Any fix requires a magnitude-carrying
+  > forward-known booking covariate, which means an events-diary feed the project does
+  > not have. Named research work package.
+
+- **FLAG-DEAD-CONSTANT (G15a, CLOSED for this instance, PATTERN OPEN; report 36).**
+  `config.EXCLUDED_VENUES = frozenset({"events"})` had **exactly one occurrence in the
+  tree, its own definition.** Nothing read it; the real exclusion is
+  `config.FORECAST_VENUES`, an explicit allowlist. Third instance of this pattern after
+  `vat_inclusive`, `timezone` and `currency` on the contract, and the **first one caught
+  actively propagating a false claim into a committed artefact**:
+  `sim/july2026_w2_actuals_l1_raw.json` credits the exclusion to `EXCLUDED_VENUES`,
+  which never performed it. Deleted, with the real mechanism documented at
+  `FORECAST_VENUES`; it was NOT wired in, because a denylist fails open and the
+  allowlist already there fails closed. **The false claim in the actuals artefact was
+  deliberately left in place**: it is pre-registration evidence and editing its prose to
+  make the project look more correct is a worse failure than the stale claim. Before
+  adding any constant that reads as authoritative, grep for a second reader.
+
+- **FLAG-HASH-GATE-UNRUNNABLE (G15a, CLOSED; report 36).** The training-frame hash is
+  the project's real gate for "did this change move a Lune number" (report 33 correctly
+  demoted "C2 reproduces", which re-scores a FROZEN artefact and never exercised
+  forecast generation). **The script that produced it was never committed.** `git log -S`
+  finds the three published prefixes in reports 33, 34, 35 and the decision log, and in
+  no script in any commit, so the gate was not runnable by anyone including its author.
+  The `ellel` dimensions do not reproduce either: reports say 386 x 40, the canonical
+  restored store gives **392 x 40** (six July W1 rows), consistent with
+  FLAG-STORE-DURABILITY firing unnoticed during report 33. Closed by committing
+  `sim/frame_hash.py` with a baseline re-measured at tip `44a0f08`: `beer_hall`
+  399 x 40 `8c8a8be9d8dc5791`, `two_river_taps` 331 x 40 `b6339032a219213c`, `ellel`
+  392 x 40 `ea28bcacbf1825e4`. Report 33's before/after claim is unaffected (it was
+  within-session); its published VALUES should be read as session-local. A side result
+  worth keeping: the G15a counterfactual's control arm reproduced the committed Origin B
+  forecast to **0.00**, the first evidence in this project that forecast GENERATION is
+  bit-reproducible from the store.
 
 - **FLAG-MASE-INTERMITTENT (G12.17c, methodological, applies to every Ellel number).**
   MASE flatters intermittent, booking-driven series and must not be quoted alone for
