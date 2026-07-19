@@ -48,6 +48,11 @@ MAX_EXO_KEYS_PER_ROW = 64
 # concerns.
 MAX_BRIEFING_CHAIN = 1_000
 
+# Price changes are a business event, not a data stream. Two years of monthly repricing
+# is 24; this is generous and still bounded, because every caller-controlled list is a
+# resource dimension on a shared service (the lesson of the round-3 bounds pass).
+MAX_PRICE_CHANGE_DATES = 100
+
 # What a row cap does and does not buy, because the first version of this comment was
 # wrong in the flattering direction. Measured on pydantic 2.13.4: given `max_length=10`
 # and 1,000 items, it constructs **11** and stops - so the cap DOES bound model
@@ -261,6 +266,15 @@ class OrgProfile(_Strict):
                     "opt-in: they are Lune-shaped and must not default on.")
     stock_enabled: bool = Field(
         False, description="Brewpub-specific; off by default for other verticals.")
+    price_change_dates: list[date] = Field(
+        default_factory=list, max_length=MAX_PRICE_CHANGE_DATES,
+        description="Dates on which this org changed its prices. Feeds the "
+                    "`price_regime` feature, which counts how many changes precede each "
+                    "row so a model can separate pre- and post-change trading. EMPTY "
+                    "means 'no known price changes', and produces a flat regime - it "
+                    "does NOT mean 'unset'. Additive and optional: an absent value is "
+                    "not a behaviour change. Unbound, the research path resolves to "
+                    "Lune's single `config.PRICE_REGIME_BREAK`.")
     expected_totals: dict[str, float] | None = Field(
         None, max_length=MAX_VENUES,
         description="Optional per-venue reconciliation target. None skips the check - "

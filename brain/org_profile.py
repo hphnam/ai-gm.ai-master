@@ -158,6 +158,33 @@ def country(venue: str) -> str:
 
 # --- Org-wide facts -----------------------------------------------------------
 
+def price_change_dates() -> tuple[str, ...]:
+    """Dates this org changed its prices, ascending, as ISO strings.
+
+    Feeds the `price_regime` feature, which counts how many of these precede each row.
+
+    UNBOUND resolves to Lune's single `config.PRICE_REGIME_BREAK`, which is what keeps
+    the three training-frame hashes byte-identical: one date makes the counter 0/1, the
+    same values the old `(date >= PRICE_REGIME_BREAK)` flip produced. That equivalence is
+    the entire point of the seam and it is verified, not assumed
+    (`tests/test_org_profile.py`, plus `sim/frame_hash.py`).
+
+    BOUND is total, as everywhere on this seam. An empty list means *this org has no
+    known price changes* and produces a flat regime column; it does NOT mean "unset, use
+    Lune's". Falling back per-field would stamp a Lancaster brewpub's Q2-2025 repricing
+    onto an unrelated tenant's feature frame, which is a plausible wrong number rather
+    than an error - the failure mode this seam exists to prevent.
+
+    G15d added this. Before it, `PRICE_REGIME_BREAK` was a hardcoded Lune date reached on
+    the tenant path: `build_features` stamped a `price_regime` column that flipped at
+    2025-07-01 for every org's frame. Phase 3's de-Lune table missed it.
+    """
+    p = _ACTIVE.get()
+    if p is not None:
+        return tuple(sorted(d.isoformat() for d in p.price_change_dates))
+    return (config.PRICE_REGIME_BREAK,)
+
+
 def exo_families() -> frozenset[str]:
     """Covariate families that are live for this tenant.
 

@@ -55,12 +55,21 @@ per-venue block:
 | `exo_enabled` | which covariate families are live — see §Exogenous |
 | `stock_enabled` | brewpub-specific; **off by default**. Accepted and **reported as unhonoured** — the stock pipeline reads spreadsheets off disk and has no injected path |
 | `expected_totals` | optional reconciliation target; `null` = skip the check |
+| `price_change_dates` | **ADDED G15d, additive and optional.** Dates this org changed its prices. Feeds the `price_regime` feature, which counts how many changes precede each row. Defaults to `[]`, so **an absent value is not a behaviour change**. **Empty means "no known price changes"** and gives a flat column, never "unset, use Lune's". Bounded at `MAX_PRICE_CHANGE_DATES` (100) |
 
 Resolution is **all-or-nothing per request**, not per field: with a profile bound the
 profile wins entirely, and with none bound (the research CLIs, `sim/`, the test suite)
 every value falls back to `config.py`. That fallback is what keeps report 31's
 pre-registered July result reproducible from shipped code — `tests/test_org_profile.py`
 pins both halves.
+
+**`price_change_dates` is the one field added since the integration brief** (G15d,
+report 39). It is deliberately **additive and optional** and needs no action from the
+API: omit it and nothing changes. It closes the last hardcoded Lune date on the tenant
+path: `PRICE_REGIME_BREAK = "2025-07-01"` was stamped into **every** org's feature frame
+by `build_features`, which Phase 3's de-Lune table missed. Unbound it still resolves to
+that single date, which is why the three training-frame hashes are byte-identical after
+the change; verified, not assumed (`sim/frame_hash.py`).
 
 **Reconciliation.** `config.EXPECTED_TOTAL_ROWS` (92329) and
 `BH_NET_SALES_TOTAL` (202491.0) are hard asserts against Lune's audited figures — but

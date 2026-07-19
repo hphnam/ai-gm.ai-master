@@ -27,7 +27,6 @@ from config import (
     ANCHOR_VENUE,
     BH_NET_SALES_TOTAL,
     HAPPY_HOUR_DAYS,
-    PRICE_REGIME_BREAK,
     RECONCILE_TOL,
     STORE_DIR,
     WEATHER_TRAIN_BASIS,
@@ -187,7 +186,13 @@ def calendar_features(df: pd.DataFrame, venue: str, event_nights: set) -> pd.Dat
         df["is_ellel_event"] = 0
     else:
         df["is_ellel_event"] = d.dt.date.isin(event_nights).astype(int)
-    df["price_regime"] = (d >= pd.Timestamp(PRICE_REGIME_BREAK)).astype(int)
+    # How many known price changes precede each row. Unbound that is Lune's single
+    # `PRICE_REGIME_BREAK`, so the column is the same 0/1 flip it has always been and the
+    # frame hashes do not move; bound, it is the tenant's own list, and an empty one
+    # gives a flat column rather than another org's repricing date. See
+    # `org_profile.price_change_dates`.
+    breaks = [pd.Timestamp(b) for b in org_profile.price_change_dates()]
+    df["price_regime"] = sum((d >= b).astype(int) for b in breaks) if breaks else 0
     return df
 
 

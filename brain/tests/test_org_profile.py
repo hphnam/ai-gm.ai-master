@@ -217,3 +217,64 @@ def test_a_seven_day_tenant_gets_no_structural_zero_days_flagged():
     )
     bundle = run(ds)
     assert bundle.forecasts
+
+
+# --- G15d: the price-regime seam ---------------------------------------------
+
+def _regime(dates: list, **profile_kw):
+    """The `price_regime` column `calendar_features` stamps, for the given dates."""
+    import pandas as pd
+
+    from features.build_features import calendar_features
+
+    df = pd.DataFrame({"date": pd.to_datetime(dates)})
+    if profile_kw.pop("bind", True):
+        with org_profile.bind_profile(_profile(**profile_kw)):
+            return calendar_features(df, "tenant_bar", set())["price_regime"].tolist()
+    return calendar_features(df, config.ANCHOR_VENUE, set())["price_regime"].tolist()
+
+
+_SPAN = ["2025-06-01", "2025-07-01", "2026-01-01"]
+
+
+def test_unbound_price_regime_still_flips_at_lunes_single_date():
+    """The whole point of the seam: unbound reproduces Lune exactly, so the three
+    training-frame hashes and every research number stay put. One date makes the counter
+    0/1, which is byte-identical to the old `date >= PRICE_REGIME_BREAK` flip."""
+    assert _regime(_SPAN, bind=False) == [0, 1, 1]
+
+
+def test_unbound_price_change_dates_are_lunes_one_date():
+    assert org_profile.price_change_dates() == (config.PRICE_REGIME_BREAK,)
+
+
+def test_a_bound_profile_with_no_price_changes_gets_a_flat_regime():
+    """Additive and optional means an absent value is not a behaviour change, and it also
+    means an EMPTY list is not "unset". A tenant that never repriced must not inherit a
+    Lancaster brewpub's Q2-2025 step change - that is a plausible wrong number, not an
+    error, which is the failure this seam exists to prevent."""
+    assert _regime(_SPAN) == [0, 0, 0]
+
+
+def test_a_bound_profile_counts_its_own_price_changes():
+    """Two changes give three regimes, so a model can separate the trading periods."""
+    assert _regime(_SPAN, price_change_dates=[date(2025, 7, 1), date(2025, 12, 1)]) \
+        == [0, 1, 2]
+
+
+def test_a_bound_profile_ignores_lunes_date_entirely():
+    """Bound is TOTAL on this seam: Lune's 2025-07-01 must not leak in alongside."""
+    assert _regime(_SPAN, price_change_dates=[date(2026, 1, 1)]) == [0, 0, 1]
+
+
+def test_price_change_dates_are_bounded():
+    """Every caller-controlled list is a resource dimension, the round-3 lesson."""
+    import pytest
+    from pydantic import ValidationError
+
+    from compute.contract import MAX_PRICE_CHANGE_DATES
+
+    too_many = [date(2020, 1, 1) + timedelta(days=i)
+                for i in range(MAX_PRICE_CHANGE_DATES + 1)]
+    with pytest.raises(ValidationError):
+        _profile(price_change_dates=too_many)

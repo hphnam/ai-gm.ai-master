@@ -1117,3 +1117,37 @@ them into the append-only log so it is the continuous WP1-to-present record.
     fact worse than ambiguous. FLAG-TAXONOMY-DRIFT restated as a standing limitation and
     `DISSERTATION_NOTES.md` 4.3 rewritten to match. Artefact
     `sim/g15c_taxonomy_drift.json`; read-only, no forecast or band row written.
+
+27. **G15d: the last hardcoded Lune date on the tenant path, closed additively**
+    (`39_G15d_Price_Regime_Seam.md`). `config.PRICE_REGIME_BREAK = "2025-07-01"` is a
+    Lune fact (the Q2-2025 `Lager - BH` step change) and it was REACHED on the tenant
+    path: `features.build_features.calendar_features` stamped a `price_regime` column
+    that flipped at that date into **every** org's feature frame. Phase 3's de-Lune table
+    missed it and report 35 surfaced it to Ryan as an open item. Same species as the two
+    Lune reads report 33 caught - not a crash, a **plausible wrong number**: a spurious
+    regime flip is a free split point for `rung3_gbm` and a covariate for the Chronos exo
+    entrant, and nothing would have said so. Closed with `OrgProfile.price_change_dates`,
+    a per-org optional list, and a `org_profile.price_change_dates()` accessor following
+    the seam's existing rule. The feature generalises from a binary flip to a **count of
+    price changes preceding each row**, which is the smallest generalisation that can
+    carry a list (two changes have three regimes; collapsing them to 0/1 would discard
+    the second) and which **degenerates exactly to the old column at n=1**. Both
+    constraints met and verified rather than assumed: **additive and optional**
+    (`default_factory=list`, so an absent value is not a behaviour change and the API
+    need do nothing), and **unbound still resolves to Lune's single date** - the three
+    training-frame hashes are byte-identical AFTER the change (`8c8a8be9d8dc5791`,
+    `b6339032a219213c`, `ea28bcacbf1825e4`). A bound profile with an EMPTY list produces
+    a flat column, verified end to end through `calendar_features` rather than only at
+    the accessor, because "empty means none, not unset" is the rule the whole seam rests
+    on and getting it wrong here would hand a tenant Lune's repricing date exactly as the
+    pre-G15d code did. List bounded at `MAX_PRICE_CHANGE_DATES = 100` (every
+    caller-controlled list is a resource dimension, the round-3 lesson applied without
+    being asked). `CONTRACT.md` updated and the field flagged as the one addition since
+    the integration brief, additive and needing no action from the API. `EXCLUDED_VENUES`
+    was resolved in G15a.3 (row 24), not here. One thing found while doing it: removing
+    the flip left `PRICE_REGIME_BREAK` imported and used by nothing, a dead import created
+    by the change that closed a dead constant; removed in the same commit. Suites
+    **391/8** and **398/1** (+6/+6). C2 re-scores 0.285 / 0.287, coverage 1.00,
+    `generalises: False`. **Ruff was not run**: it is not installed in either venv on this
+    machine, so the ruff counts in this report's lineage are unverified here and should
+    not be quoted forward without re-running them somewhere it exists.
