@@ -127,7 +127,52 @@ MAX_FUTURE_DAYS = 7
 # and it produces a gap of EXACTLY 365 days - it slipped a `> 365` threshold by one day.
 # Tuning the number would have been the third version of the same mistake: fitting the
 # guard to the example in front of me.
+#
+# G15b (round 4) found the fourth version of the same mistake, in the fix above. Every
+# word of the reasoning is about ONE venue's history - "it becomes active_trading_start
+# and buries the real history" - and the harm really is per-venue: `read_series`,
+# `trim_to_active` and the whole feature build run per venue. But the check was applied to
+# the dates of the WHOLE REQUEST, pooled across venues, so a sibling venue trading through
+# the hole closes the gap and the isolation disappears. Measured, same typo row every time:
+#
+#   single venue, one 2016-typo row                    REJECT   the fix works
+#   + a sibling venue spanning 2016..today             ACCEPT   the fix is gone
+#   + a sibling of ONE ROW EVERY 60 DAYS (64 rows)     ACCEPT   64 rows defeat it
+#
+# So the guard did not fire on any multi-venue org, which is every real one - Lune has
+# three. It is now segmented PER VENUE, which is the grain the harm has.
+#
+# This is not free and the cost is stated rather than discovered later: it also removes the
+# accidental cover a sibling gave a genuinely intermittent venue, so a pop-up or a
+# just-reopened venue inside a multi-venue estate now hits MIN_SEGMENT_DAYS where before it
+# was masked. That false REJECT is real, it is measured in report 37, and it is deliberately
+# NOT patched here - see the note on MIN_SEGMENT_DAYS.
 MAX_DATA_GAP_DAYS = 90
+
+# A segment smaller than this, on the far side of a gap, is read as a mistyped date.
+#
+# KNOWN FALSE POSITIVE, open on purpose (report 37, FLAG-SEGMENT-FALSE-REJECT). This
+# refuses shapes that are neither a season nor a speck. Measured:
+#
+#   reopened after 8 months with 21 days trade   ACCEPT
+#   reopened after 8 months with 13 days trade   REJECT   <- legitimate, refused
+#   reopened after 8 months, day 1 back          REJECT   <- legitimate, refused
+#   pop-up trading 4 days a quarter              REJECT   <- legitimate, refused
+#
+# A venue that genuinely reopens is refused for its first 13 trading days, and the whole
+# org's request fails with it.
+#
+# It is left open because every discriminator tried reopens a worse hole. The obvious one -
+# exempt the LAST segment, since a reopening is always at the end - was measured and
+# rejected: a venue whose real history ended months ago plus one mistyped recent row is
+# also a one-day trailing segment, and exempting it restores the forecast origin poisoning
+# AND relights a dormant venue, which is the "GBP 5,329 for a dead venue" failure the
+# liveness gate exists for. A day-1 reopening is genuinely indistinguishable from a typo
+# from inside a single request; the information that separates them (does this venue keep
+# trading tomorrow) is not in the dataset.
+#
+# An honest open item beats a change that cannot be defended, and this project has now
+# shipped three consecutive fixes that were each worse than the defect.
 MIN_SEGMENT_DAYS = 14
 
 # The furthest ahead compute will forecast. Seven, because seven is what the band is
@@ -359,22 +404,38 @@ class ComputeDataset(_Strict):
                 "is a mistyped date; left alone it would become the forecast origin and "
                 "the watermark rather than raise.")
 
+        # PER VENUE, because that is the grain the harm has: the feature build, the
+        # calendar fill and `trim_to_active` all run on one venue's series. Pooled across
+        # the request, a sibling venue trading through the hole bridges it and the guard
+        # silently stops existing - measured, 64 sibling rows were enough. See the note on
+        # MAX_DATA_GAP_DAYS.
+        #
         # Only meaningful with something to be isolated FROM. A single short history is a
         # new tenant, not a typo - the cold-start case, and the first thing a new org
         # hits; an earlier cut of this refused ten days of data as "stranded from the rest
         # of the history", where it WAS the history.
-        segments = _segments(dates)
-        if len(segments) > 1:
+        by_venue: dict[str, set[date]] = {}
+        for row in self.sales_daily:
+            by_venue.setdefault(row.venue, set()).add(row.date)
+
+        for venue, venue_dates in sorted(by_venue.items()):
+            ordered = sorted(venue_dates)
+            segments = _segments(ordered)
+            if len(segments) == 1:
+                continue
             for segment in segments:
                 if len(segment) < MIN_SEGMENT_DAYS:
                     raise ValueError(
-                        f"sales_daily has {len(segment)} day(s) around {segment[0]} "
-                        f"stranded more than {MAX_DATA_GAP_DAYS} days from the rest of the "
-                        f"history ({lo} to {hi}). A fragment that small and that far out is "
-                        "a mistyped year, not a trading period - and it would not merely be "
-                        "ignored: the calendar fill turns the emptiness between into "
-                        "zero-revenue rows inside the training span, and the forecast "
-                        "follows them to zero.")
+                        f"sales_daily has {len(segment)} day(s) around {segment[0]} for "
+                        f"venue {venue!r}, stranded more than {MAX_DATA_GAP_DAYS} days "
+                        f"from the rest of THAT VENUE's history ({ordered[0]} to "
+                        f"{ordered[-1]}). Most often this is a mistyped year: the calendar "
+                        "fill turns the emptiness between into zero-revenue rows inside "
+                        "the training span and the forecast follows them to zero. If the "
+                        "venue genuinely reopened after a long closure, or trades in short "
+                        f"bursts, it needs {MIN_SEGMENT_DAYS} days on both sides of the "
+                        "gap before it can be forecast - a known limitation, not a "
+                        "judgement that your data is wrong.")
 
         span = (hi - lo).days
         if span > MAX_HISTORY_DAYS:

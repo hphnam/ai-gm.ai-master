@@ -50,7 +50,7 @@
   },
   "reconciles": true,
   "june2026_ingest": {
-    "ingested_at": "2026-07-17T11:36:51.816416",
+    "ingested_at": "2026-07-19T19:07:48.287160",
     "mode": "MCP-SIM aggregate (Neon not provisioned)",
     "grain": "one line per venue/date/category/item from the held-out ProductMix item pull; aggregate-sourced, no intraday or tax breakdown",
     "source_file": "sim/june2026_actuals_l3_raw.json",
@@ -61,7 +61,7 @@
     "note": "Two River Taps closed since 2026-05-08 (no June rows). June L1 tracks the SalesUK pull within a small VAT/rounding gap; L1/L2/L3 are mutually coherent (rebuilt from the item pull)."
   },
   "july2026_w1_ingest": {
-    "ingested_at": "2026-07-17T11:36:51.865204",
+    "ingested_at": "2026-07-19T19:07:48.327659",
     "mode": "MCP-SIM aggregate (Neon not provisioned)",
     "grain": "one line per venue/date/category/item from the held-out ProductMix item pull; aggregate-sourced, no intraday or tax breakdown",
     "source_file": "sim/july2026_actuals_l3_raw.json",

@@ -55,11 +55,26 @@ _CALIB_BLOCK_DAYS = 7
 #
 # A `raise`, not an `assert`: asserts are stripped under `python -O`, and a guard that
 # disappears in the configuration most likely to be production is not a guard.
-if MAX_HORIZON_DAYS > _CALIB_BLOCK_DAYS:
+#
+# G15b (round 4): the guard used to read `MAX_HORIZON_DAYS > _CALIB_BLOCK_DAYS`, which
+# fires on the path that was TESTED (raising the contract cap to 30) and not on the
+# symmetric one. Raising `_CALIB_BLOCK_DAYS` to 30 instead gives `7 > 30`, no raise, and
+# `rolling_point_forecasts(horizon=30)` rebuilds the residual stream from 30-day blocks -
+# every residual becomes a <=30-step error and the BANDING METHOD changes underneath a
+# 7-day horizon, silently, which is the exact side effect splitting the two symbols was
+# meant to make impossible. The drift is toward over-coverage, split conformal's safe
+# direction, so nothing would have failed and nothing would have looked wrong.
+#
+# Equality, not inequality: the two are only in a defensible state when they agree.
+# Testing the symmetric case of an asymmetric guard is how the third round's defect
+# should have been caught, so it is now done by construction.
+if MAX_HORIZON_DAYS != _CALIB_BLOCK_DAYS:
     raise RuntimeError(
         f"horizon_days is capped at {MAX_HORIZON_DAYS} but the band is calibrated on "
-        f"{_CALIB_BLOCK_DAYS}-day blocks: the served band would be uncalibrated past day "
-        f"{_CALIB_BLOCK_DAYS}. See FLAG-BAND-HORIZON.")
+        f"{_CALIB_BLOCK_DAYS}-day blocks. These must agree: serving past the block size "
+        "leaves the band uncalibrated, and calibrating on blocks wider than the horizon "
+        "changes the banding method without changing any result that would show it. "
+        "See FLAG-BAND-HORIZON.")
 
 # Weather columns the frame must carry for the exo entrant. Named here because they are
 # the ones compute CANNOT derive: they come from the request or not at all.

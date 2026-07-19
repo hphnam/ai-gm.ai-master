@@ -614,6 +614,49 @@ does.
   forecast to **0.00**, the first evidence in this project that forecast GENERATION is
   bit-reproducible from the store.
 
+- **FLAG-SEGMENT-FALSE-REJECT (G15b, OPEN by design; report 37).** The isolation guard
+  in `compute/contract.py` refuses shapes that are neither a season nor a speck.
+  Measured: a venue reopening after an 8-month closure is ACCEPTED at 21 days of trade
+  and **REJECTED at 13**, and **rejected on day 1 back**; a pop-up trading four days a
+  quarter is **rejected outright**. The validator raises on `ComputeDataset`, so one
+  reopening venue takes down the forecast for **every sibling in the request**. The
+  cold-start carve-out does not help: it is `len(segments) == 1` and a reopening venue
+  has two by construction.
+  > **Do not "fix" this with a trailing-segment exemption.** It is the obvious move (a
+  > reopening is always at the end of the history) and it was measured and rejected: a
+  > venue whose real history ended months ago PLUS one mistyped recent row is also a
+  > one-day trailing segment, so exempting it restores forecast-origin poisoning and
+  > **relights a dormant venue** - the "GBP 5,329 for a dead venue" failure the liveness
+  > gate exists for, arriving through the front door.
+  >
+  > A day-1 reopening is genuinely **indistinguishable from a typo from inside a single
+  > request**; the information that separates them (does this venue trade tomorrow) is
+  > not in the dataset. Any discriminator built here would be the fourth version of the
+  > same mistake: fitting the guard to the example in front of it. Pinned by
+  > `test_a_venue_reopening_after_a_long_closure_is_refused_a_known_limitation`, which
+  > says what a replacement must prove.
+
+- **FLAG-PRIORSTATE-CONTENT-UNBOUNDED (G15b, OPEN, contract sync; report 37).** Round 3
+  bounded `PriorState`, and the caps landed on the CONTAINERS while the elements are
+  `dict` with no bound at all. Measured: `briefing_chain` at 1,000 entries x one 100 KB
+  string is **accepted at 100.0 MB**; `change_point_state` the same shape at 2.5 MB. Both
+  are **echoed verbatim into `ComputeBundle`**, whose fields carry no `max_length`, so the
+  payload is accepted, held and handed back. Same shape as round 3's own sharpest finding
+  (capping `values` at 64 keys is what made a multi-GB diagnostic reachable): bounding a
+  list while leaving its elements free is that lesson half-applied.
+  > **NOT implemented, deliberately.** `PriorState` is state the API round-trips from its
+  > own store, so a new size rule could reject the API's own persisted state - a change
+  > Ryan would have to build against, on a contract he has not built against yet. A moving
+  > contract is worse than a known defect. This is input to the contract sync, not a
+  > unilateral tightening. Carry it into the next note to Ryan.
+
+- **FLAG-VALIDATOR-WALL-CLOCK (G15b, minor, noted; report 37).** `_reject_implausible_dates`
+  calls `date.today()`, so a fixed dataset changes verdict over wall-clock time: one that
+  validates today is refused when replayed 8 days later, and there is no frozen-clock seam
+  for a recorded test fixture or a replayed request. Not a defect today (nothing replays
+  datasets yet) and not fixed, because injecting a clock is contract surface. Noted for the
+  contract sync.
+
 - **FLAG-MASE-INTERMITTENT (G12.17c, methodological, applies to every Ellel number).**
   MASE flatters intermittent, booking-driven series and must not be quoted alone for
   Ellel. C2 scored Ellel at **MASE 0.096** while the model forecast **GBP 56.30 against

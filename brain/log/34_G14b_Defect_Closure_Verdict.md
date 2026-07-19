@@ -19,8 +19,8 @@ fixes each contained a defect as bad as the one being fixed, and review found al
 | Closed but only checkable by reading (a doc, a symbol split) | 2 |
 | Open **by design**, as a research work package | **1** (FLAG-BAND-HORIZON) |
 | Handed to the caller as a contract obligation | **1** (ingress body limit) |
-| **Fix rounds that contained a wrong fix** | **3 of 3 reviewed** |
-| Rounds where the wrong fix was *worse* than the original | **2 of 3** |
+| **Fix rounds that contained a wrong fix** | **4 of 4 reviewed** (round 4 added by report 37) |
+| Rounds where the wrong fix was *worse* than the original | **2 of 4** |
 
 The three:
 
@@ -230,7 +230,20 @@ Contract obligation 9.
 | 1 | Phase 3 (`52a3864`) | 7 code + 3 security | — |
 | 2 | round-1 fixes | 4 code + 4 security | **2** (span guard; band diagnostic) |
 | 3 | round-2 fixes (`872eb6c`) | 5 code | **1** (the one-sided date bound) |
-| 4 | round-3 fixes | not yet run | — |
+| 4 | round-3 fixes | 2 code + 3 lesser + 1 doc | **2** (pooled isolation guard; asymmetric band guard) |
+
+Round 4 was run at G15b, 2026-07-19; see `37_G15b_Round4_Review.md`. **It was not
+clean, so the record is now four rounds and four rounds with hits** - the yield curve
+has still not turned over, and this project cannot yet claim its fixes converge.
+
+Its headline defect is the same shape as the previous three, and worse in reach: the
+round-3 isolation guard was applied to the **pooled** dates of the whole request rather
+than per venue, though every word of its reasoning and all of the harm is per-venue. The
+identical typo row was REJECTED in a single-venue org and **ACCEPTED as soon as any
+second venue spanned the gap** - 64 sibling rows were enough. So the guard built to stop
+a poisoned forecast **did not fire on any multi-venue org**, which is every real one.
+Lune has three venues. Report 34 closed it as measured and tested; both were true,
+against the one configuration it was measured in.
 
 Yield is not falling as fast as it should. Three observations worth keeping:
 

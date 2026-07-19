@@ -376,6 +376,106 @@ def test_a_seasonal_venue_is_not_mistaken_for_a_typo():
     assert len(_dataset(sales=rows).sales_daily) == 300
 
 
+def _multi_venue(sales: list[SalesRow]) -> ComputeDataset:
+    """A two-venue org. The isolation guard reasons per venue, so it needs a sibling."""
+    slugs = sorted({r.venue for r in sales})
+    return ComputeDataset(
+        org_profile=OrgProfile(
+            org_id="org_test",
+            venues=[VenueProfile(venue_id=f"v{i}", slug=s) for i, s in enumerate(slugs)]),
+        sales_daily=sales,
+        prior_state=PriorState(served_model={s: "rung2_ets" for s in slugs}))
+
+
+def _sibling_spanning_the_hole() -> list[SalesRow]:
+    """A second venue whose history covers the years the typo is stranded in."""
+    return _sales("sibling_bar", n=200, start=_RECENT.replace(year=_RECENT.year - 10))
+
+
+def test_a_mistyped_year_is_still_refused_when_a_sibling_venue_spans_the_gap():
+    """Round 4. The isolation guard was applied to the dates of the WHOLE REQUEST, pooled
+    across venues, while every word of its reasoning - and all of the harm - is per venue.
+
+    So a sibling trading through the hole bridged it and the guard silently stopped
+    existing. Measured before the fix: the identical typo row was REJECTED in a
+    single-venue org and ACCEPTED once any second venue spanned the gap, which is every
+    real org. Lune has three venues.
+    """
+    with pytest.raises(ValidationError):
+        _multi_venue(_with_typo(-10) + _sibling_spanning_the_hole())
+
+
+def test_a_sparse_sibling_is_enough_to_have_defeated_the_pooled_guard():
+    """The sibling did not need a real history, only enough rows to keep any single gap
+    under MAX_DATA_GAP_DAYS. Sixty-four rows, one every 60 days, defeated the pooled
+    version. This pins the property that made it cheap to defeat."""
+    bridge, day = [], _RECENT.replace(year=_RECENT.year - 10)
+    while day <= date.today():
+        bridge.append(SalesRow(venue="sibling_bar", date=day, category="Beer",
+                               item="Test IPA", units=1.0, revenue_exvat=1.0))
+        day += timedelta(days=60)
+    with pytest.raises(ValidationError):
+        _multi_venue(_with_typo(-10) + bridge)
+
+
+def test_the_isolation_error_names_the_venue_it_is_judging():
+    """Per-venue guard, per-venue message: with 25 venues in a request, "somewhere in
+    sales_daily" is not a finding the caller can act on."""
+    with pytest.raises(ValidationError, match="ghost_bar"):
+        _multi_venue(_with_typo(-10) + _sibling_spanning_the_hole())
+
+
+def test_a_venue_reopening_after_a_long_closure_is_refused_a_known_limitation():
+    """A KNOWN FALSE POSITIVE, pinned so it stays visible rather than being rediscovered.
+
+    A venue that genuinely reopens after an eight-month closure is refused for its first
+    MIN_SEGMENT_DAYS of trading, and the whole org's request fails with it. It is left
+    open because every discriminator tried reopens a worse hole: exempting the trailing
+    segment - the obvious fix, since a reopening is always at the end - also exempts a
+    dormant venue plus one mistyped recent row, which relights a dead venue and poisons
+    the forecast origin. See FLAG-SEGMENT-FALSE-REJECT.
+
+    Change this test only with a measurement that shows the replacement does not.
+    """
+    reopened = (_sales("ghost_bar", n=200, start=date.today() - timedelta(days=600))
+                + _sales("ghost_bar", n=13, start=date.today() - timedelta(days=13)))
+    with pytest.raises(ValidationError, match="known limitation"):
+        _dataset(sales=reopened)
+
+
+def test_the_reopening_message_does_not_call_legitimate_data_a_typo():
+    """The round-3 message told a reopening venue its data was "a mistyped year, not a
+    trading period". It is unactionable and it is false."""
+    reopened = (_sales("ghost_bar", n=200, start=date.today() - timedelta(days=600))
+                + _sales("ghost_bar", n=13, start=date.today() - timedelta(days=13)))
+    with pytest.raises(ValidationError) as exc:
+        _dataset(sales=reopened)
+    assert "genuinely reopened" in str(exc.value)
+
+
+def test_the_band_calibration_guard_is_symmetric():
+    """Round 4. The guard read `MAX_HORIZON_DAYS > _CALIB_BLOCK_DAYS`, so it fired on the
+    path that was tested (raising the contract cap) and not on the symmetric one: raising
+    `_CALIB_BLOCK_DAYS` instead rebuilds the residual stream from wider blocks and changes
+    the BANDING METHOD under an unchanged horizon, silently and toward over-coverage, so
+    nothing fails and nothing looks wrong. The two must simply agree.
+    """
+    import importlib
+
+    import compute.contract as contract_module
+    import compute.forward as forward_module
+
+    original = contract_module.MAX_HORIZON_DAYS
+    try:
+        for probe in (original + 1, original - 1):
+            contract_module.MAX_HORIZON_DAYS = probe
+            with pytest.raises(RuntimeError, match="must agree"):
+                importlib.reload(forward_module)
+    finally:
+        contract_module.MAX_HORIZON_DAYS = original
+        importlib.reload(forward_module)
+
+
 def test_an_absurd_venue_count_is_refused():
     """Every list a caller controls is a resource dimension on a shared service with no
     concurrency cap of its own."""

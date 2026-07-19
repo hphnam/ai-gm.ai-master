@@ -972,3 +972,86 @@ them into the append-only log so it is the continuous WP1-to-present record.
     FLAG-DEAD-CONSTANT (instance closed, pattern open), FLAG-HASH-GATE-UNRUNNABLE
     (closed). FLAG-FIXTURE-ANTICIPATION updated with the tested/refuted/untestable table
     and its own superseded cross-venue claim corrected in place.
+
+25. **G15b: round 4 was run, and it was not clean either**
+    (`37_G15b_Round4_Review.md`). Report 34 recorded the round-3 fixes as unreviewed and
+    called it a real residual risk rather than a formality. It was right. **The record is
+    now four rounds and four rounds with hits**, so the yield curve has still not turned
+    over and this project cannot yet claim its fixes converge. **(a) The severe one, and
+    the same shape as the previous three: the isolation guard did not fire on any real
+    org.** Every word of the round-3 reasoning is about ONE venue's history ("it becomes
+    active_trading_start and buries the real history"), and the harm really is per-venue -
+    `read_series`, the calendar fill and `trim_to_active` all run per venue. But the check
+    ran on `sorted({r.date for r in self.sales_daily})`, the dates of the WHOLE REQUEST
+    pooled across venues, and `_segments` never reads `row.venue`. Measured with the
+    identical typo row: single venue **REJECT**, plus a sibling spanning the hole
+    **ACCEPT**, plus a sibling of **one row every 60 days (64 rows) ACCEPT**. On the
+    helper directly: 2 segments sizes [1, 200] on the venue's own dates, **1 segment** on
+    the pooled ones. So the guard built to stop a poisoned forecast was inert on every
+    multi-venue org, which is every real one - Lune has three, the contract allows 25.
+    Report 34 closed it as measured and tested; both were true, against the single
+    configuration it was ever measured in. Fixed to segment per venue. **The fix's own
+    blast radius, found by the same method and stated rather than discovered later:**
+    pooling was also giving intermittent venues accidental cover, so a pop-up or a
+    just-reopened venue inside a multi-venue estate now hits `MIN_SEGMENT_DAYS` where it
+    was previously masked - two regressions, both instances of (c). Nothing else moved
+    (clean single, clean multi, seasonal two-block, cold-start, three-venue staggered all
+    still ACCEPT); cost at the full contract cap of 547,500 rows is **0.31 s and 5 MB**.
+    **(b) The band-calibration guard was asymmetric, exactly as the spec predicted.** It
+    read `MAX_HORIZON_DAYS > _CALIB_BLOCK_DAYS`, which fires on the path that was TESTED
+    (raising the contract cap to 30) and not on the symmetric one: raising
+    `_CALIB_BLOCK_DAYS` instead gives `7 > 30`, no raise, and
+    `rolling_point_forecasts(horizon=30)` rebuilds the residual stream from 30-day blocks
+    so every residual becomes a <=30-step error - **the banding method changes under an
+    unchanged horizon**, which is the exact side effect splitting the two symbols was
+    created to prevent, reached from the other symbol. It drifts toward OVER-coverage,
+    split conformal's safe direction, so no test fails and nothing looks wrong. Now `!=`:
+    the two are only defensible when they agree, and equality has no asymmetric case to
+    miss. **(c) A defect found, measured, and deliberately LEFT OPEN.** The guard refuses
+    shapes that are neither a season nor a speck: a venue reopening after 8 months is
+    ACCEPTED at 21 days of trade and **REJECTED at 13**, rejected on **day 1 back**, and a
+    pop-up trading four days a quarter is rejected outright - and because the validator
+    raises on `ComputeDataset`, one reopening venue takes down the forecast for every
+    sibling in the request. The cold-start carve-out cannot help (`len(segments) == 1`,
+    and a reopening has two). Not fixed because every discriminator tried reopens a worse
+    hole: the obvious trailing-segment exemption was measured and rejected, since a
+    dormant venue PLUS one mistyped recent row is also a one-day trailing segment, so
+    exempting it restores forecast-origin poisoning and **relights a dead venue** - the
+    "GBP 5,329 for a dead venue" failure running through the front door. A day-1 reopening
+    is genuinely indistinguishable from a typo inside a single request. Given three
+    consecutive rounds of fixes each worse than the defect, shipping a fourth on reasoning
+    alone is the failure mode, not the remedy. FLAG-SEGMENT-FALSE-REJECT, pinned by a test
+    that states what a replacement must prove. **(d) The error message called legitimate
+    data a typo** ("a mistyped year, not a trading period", shown to a venue that
+    genuinely reopened): false and unactionable. It now names the venue it is judging -
+    with 25 venues in a request, "somewhere in sales_daily" is not actionable either -
+    hedges the typo claim, and states the reopening limitation as a limitation.
+    **(e) `PriorState` bounds the LIST and not the CONTENT, and this one is NOT
+    implemented.** Round 3's caps landed on the containers while the elements are `dict`
+    with no bound: measured, `briefing_chain` at 1,000 entries x one 100 KB string is
+    **accepted at 100.0 MB**, and both it and `change_point_state` are ECHOED VERBATIM
+    into `ComputeBundle`, whose fields carry no `max_length` at all. Same shape as round
+    3's own sharpest finding (capping `values` at 64 keys made a multi-GB diagnostic
+    reachable) - bounding a list while leaving its elements free is that lesson
+    half-applied. Recorded and stopped, per the G15b stop condition: `PriorState` is state
+    the API round-trips from its own store, so a size rule could reject the API's own
+    persisted state, and a moving contract is worse than a known defect while Ryan has not
+    built yet. FLAG-PRIORSTATE-CONTENT-UNBOUNDED, for the contract sync.
+    **(f) Findings that did not survive contact, recorded because a review that only
+    reports hits is not a review:** the `country` per-venue amplification IS bounded by
+    the venue cap (2 x 25 = 50 chars, both bounds enforced under test); `MAX_FUTURE_DAYS`
+    survives a non-UK caller (7 days against a real maximum offset of about one, and the
+    brain works at date grain so removing `timezone` does not interact); and
+    `event_venue_dates` really is hoisted to once per request. One observation, not a
+    defect: the validator calls `date.today()`, so a fixed dataset changes verdict over
+    wall-clock time and there is no frozen-clock seam (FLAG-VALIDATOR-WALL-CLOCK).
+    **(g) Forward pointer, correcting row 22(k) above rather than editing it:** that row
+    says `MAX_SALES_ROWS` "is now 200k". It is **547,500**, re-derived at report 34's C19
+    as `MAX_VENUES x 730 days x 30 rows/venue-day`; the derivation superseded the 200k
+    figure and the row was never updated. Measured so the cap carries a number: `SalesRow`
+    costs 1,105 B constructed, so the cap admits ~0.60 GB of models, and `contract.py`
+    already names the ingress body limit as the API's obligation. Suites **385/8** and
+    **392/1** (+6/+6, all six the new round-4 tests, each verified to FAIL against the
+    stashed pre-fix code). Frame hashes unchanged; C2 re-scores 0.285 / 0.287, coverage
+    1.00, `generalises: False`. FLAG-STORE-DURABILITY fired twice more, both times from
+    the full suites, both restored and re-verified before any gate was read.
