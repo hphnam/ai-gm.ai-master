@@ -1,0 +1,1248 @@
+{
+  "package": "G15c",
+  "cutoff": "2026-05-31",
+  "held_out": ["2026-06-01", "2026-06-30"],
+  "top_k": 3,
+  "default_lookback_days": 120,
+  "l1_check": {
+    "persist_writes_layers": ["L2", "L3"],
+    "persist_skips_venue_node": true,
+    "l1_written_by_reconcile": false
+  },
+  "venues": {
+    "beer_hall": {
+      "standing_membership_today": {
+        "n_nodes": 41,
+        "n_bottom": 32,
+        "n_named": 24,
+        "named": [
+          "ITEM::Beer::Cider - BH",
+          "ITEM::Beer::Lager - BH",
+          "ITEM::Beer::Lune Valley Gold",
+          "ITEM::Food::Crisps",
+          "ITEM::Food::Nuts",
+          "ITEM::Food::Seabrook Crisps",
+          "ITEM::Happy Hour::\u00a31 SHOTS ( Antica Sambuca / J\u00e4germe\u00edster / Blue Agave )",
+          "ITEM::Happy Hour::\u00a33.50 Cask",
+          "ITEM::Happy Hour::\u00a34 Lager/Cider",
+          "ITEM::Merchandise::Caravan T-shirt",
+          "ITEM::Merchandise::Hire Fee",
+          "ITEM::Merchandise::Lunebrew T Shirt",
+          "ITEM::Soft Drinks::Cordial & Soda",
+          "ITEM::Soft Drinks::Fruit Shoot",
+          "ITEM::Soft Drinks::Postmix",
+          "ITEM::Spirits::Gordons",
+          "ITEM::Spirits::SMIRNOFF",
+          "ITEM::Spirits::SPLASH",
+          "ITEM::Uncategorised::Breeze Pale Ale",
+          "ITEM::Uncategorised::Centennial Summer Pale",
+          "ITEM::Uncategorised::Lager - BH",
+          "ITEM::Wine::Aperol Spritz",
+          "ITEM::Wine::Discovery Beach Zinfandel",
+          "ITEM::Wine::Sauvignon Blanc"
+        ]
+      },
+      "blind_standing": {
+        "named": [
+          "Beer::Lager - BH",
+          "Beer::Cider - BH",
+          "Beer::Caravan of Love",
+          "Spirits::SPLASH",
+          "Spirits::SMIRNOFF",
+          "Spirits::Whitley Neil",
+          "Soft Drinks::Postmix",
+          "Soft Drinks::Cordial & Soda",
+          "Soft Drinks::Fruit Shoot",
+          "Wine::Discovery Beach Zinfandel",
+          "Wine::Alpino Pinot Grigio",
+          "Wine::Aperol Spritz",
+          "Uncategorised::Lager - BH",
+          "Uncategorised::Centennial Summer Pale",
+          "Uncategorised::Lancashire  crisps",
+          "Happy Hour::\u00a34 Lager/Cider",
+          "Happy Hour::\u00a33.50 Cask",
+          "Happy Hour::\u00a315 FIZZ",
+          "Food::Crisps",
+          "Food::Nuts",
+          "Food::Seabrook Crisps",
+          "Merchandise::Lunebrew T Shirt",
+          "Merchandise::Hire Fee",
+          "Merchandise::Pool Table deposit"
+        ],
+        "capture": {
+          "window_revenue": 27047.58,
+          "captured_by_named": 5226.22,
+          "capture_pct": 19.3,
+          "to_other": 21821.36,
+          "new_item_revenue": 3406.42,
+          "new_item_pct_of_total": 12.6,
+          "irreducible_other_pct": 12.6
+        },
+        "score": {
+          "n_nodes": 32,
+          "n_scoreable": 26,
+          "median_mase_all": 0.852,
+          "median_mase_named": 0.742,
+          "beats_seasonal_naive": true,
+          "per_node": [
+            {
+              "node": "Beer::OTHER",
+              "held_out_revenue": 12180.81,
+              "mase": 2.316
+            },
+            {
+              "node": "Spirits::OTHER",
+              "held_out_revenue": 3584.23,
+              "mase": 1.955
+            },
+            {
+              "node": "Wine::OTHER",
+              "held_out_revenue": 2817.05,
+              "mase": 1.554
+            },
+            {
+              "node": "Uncategorised::OTHER",
+              "held_out_revenue": 2181.06,
+              "mase": 6.11
+            },
+            {
+              "node": "Soft Drinks::Postmix",
+              "held_out_revenue": 960.93,
+              "mase": 0.747
+            },
+            {
+              "node": "Beer::Cider - BH",
+              "held_out_revenue": 906.13,
+              "mase": 0.855
+            },
+            {
+              "node": "Wine::Aperol Spritz",
+              "held_out_revenue": 796.75,
+              "mase": 4.319
+            },
+            {
+              "node": "Spirits::SMIRNOFF",
+              "held_out_revenue": 784.57,
+              "mase": 1.081
+            },
+            {
+              "node": "Soft Drinks::OTHER",
+              "held_out_revenue": 539.8,
+              "mase": 5.117
+            },
+            {
+              "node": "Merchandise::OTHER",
+              "held_out_revenue": 410.0,
+              "mase": null
+            },
+            {
+              "node": "Merchandise::Hire Fee",
+              "held_out_revenue": 356.0,
+              "mase": 3.395
+            },
+            {
+              "node": "Wine::Discovery Beach Zinfandel",
+              "held_out_revenue": 321.55,
+              "mase": 1.003
+            }
+          ]
+        }
+      },
+      "refreshed": {
+        "56": {
+          "named": [
+            "Beer::Lager - BH",
+            "Beer::Paulaner Helles Lager",
+            "Beer::Session IPA",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Fruit Shoot",
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordon's Pink",
+            "Wine::Sauvignon Blanc",
+            "Wine::Pinot Grigio",
+            "Wine::Aperol Spritz",
+            "Uncategorised::Lancashire  crisps",
+            "Uncategorised::Seabrook Crisps",
+            "Uncategorised::Breeze Pale Ale",
+            "Happy Hour::\u00a34 Lager/Cider",
+            "Happy Hour::\u00a33.50 Cask",
+            "Happy Hour::\u00a315 FIZZ",
+            "Food::Nobby's Nuts",
+            "Food::Pork Scratchings",
+            "Merchandise::Pool Table deposit",
+            "Merchandise::Hire Fee"
+          ],
+          "changed_from_standing": [
+            "Beer::Caravan of Love",
+            "Beer::Cider - BH",
+            "Beer::Paulaner Helles Lager",
+            "Beer::Session IPA",
+            "Food::Crisps",
+            "Food::Nobby's Nuts",
+            "Food::Nuts",
+            "Food::Pork Scratchings",
+            "Food::Seabrook Crisps",
+            "Merchandise::Lunebrew T Shirt",
+            "Spirits::Gordon's Pink",
+            "Spirits::Whitley Neil",
+            "Uncategorised::Breeze Pale Ale",
+            "Uncategorised::Centennial Summer Pale",
+            "Uncategorised::Lager - BH",
+            "Uncategorised::Seabrook Crisps",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Wine::Pinot Grigio",
+            "Wine::Sauvignon Blanc"
+          ],
+          "capture": {
+            "window_revenue": 27047.58,
+            "captured_by_named": 8607.66,
+            "capture_pct": 31.8,
+            "to_other": 18439.92,
+            "new_item_revenue": 3406.42,
+            "new_item_pct_of_total": 12.6,
+            "irreducible_other_pct": 12.6
+          },
+          "score": {
+            "n_nodes": 30,
+            "n_scoreable": 23,
+            "median_mase_all": 1.16,
+            "median_mase_named": 1.073,
+            "beats_seasonal_naive": false,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 10616.68,
+                "mase": 1.596
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 3453.97,
+                "mase": 1.75
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 2195.2,
+                "mase": 1.16
+              },
+              {
+                "node": "Beer::Paulaner Helles Lager",
+                "held_out_revenue": 1575.31,
+                "mase": 2.754
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 1103.36,
+                "mase": 1.218
+              },
+              {
+                "node": "Uncategorised::Breeze Pale Ale",
+                "held_out_revenue": 1077.7,
+                "mase": null
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 960.93,
+                "mase": 0.747
+              },
+              {
+                "node": "Beer::Session IPA",
+                "held_out_revenue": 894.95,
+                "mase": 2.043
+              },
+              {
+                "node": "Wine::Aperol Spritz",
+                "held_out_revenue": 796.75,
+                "mase": 4.319
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 784.57,
+                "mase": 1.081
+              },
+              {
+                "node": "Wine::Sauvignon Blanc",
+                "held_out_revenue": 548.94,
+                "mase": 3.65
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 539.8,
+                "mase": 5.117
+              }
+            ]
+          }
+        },
+        "90": {
+          "named": [
+            "Beer::Lager - BH",
+            "Beer::Paulaner Helles Lager",
+            "Beer::Caravan of Love",
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordon's Pink",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Fruit Shoot",
+            "Wine::Sauvignon Blanc",
+            "Wine::Pinot Grigio",
+            "Wine::Aperol Spritz",
+            "Happy Hour::\u00a34 Lager/Cider",
+            "Happy Hour::\u00a33.50 Cask",
+            "Happy Hour::\u00a315 FIZZ",
+            "Uncategorised::Lancashire  crisps",
+            "Uncategorised::Seabrook Crisps",
+            "Uncategorised::Breeze Pale Ale",
+            "Food::Seabrook Crisps",
+            "Food::Nobby's Nuts",
+            "Food::Pork Scratchings",
+            "Merchandise::Pool Table deposit",
+            "Merchandise::Hire Fee"
+          ],
+          "changed_from_standing": [
+            "Beer::Cider - BH",
+            "Beer::Paulaner Helles Lager",
+            "Food::Crisps",
+            "Food::Nobby's Nuts",
+            "Food::Nuts",
+            "Food::Pork Scratchings",
+            "Merchandise::Lunebrew T Shirt",
+            "Spirits::Gordon's Pink",
+            "Spirits::Whitley Neil",
+            "Uncategorised::Breeze Pale Ale",
+            "Uncategorised::Centennial Summer Pale",
+            "Uncategorised::Lager - BH",
+            "Uncategorised::Seabrook Crisps",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Wine::Pinot Grigio",
+            "Wine::Sauvignon Blanc"
+          ],
+          "capture": {
+            "window_revenue": 27047.58,
+            "captured_by_named": 7712.71,
+            "capture_pct": 28.5,
+            "to_other": 19334.87,
+            "new_item_revenue": 3406.42,
+            "new_item_pct_of_total": 12.6,
+            "irreducible_other_pct": 12.6
+          },
+          "score": {
+            "n_nodes": 31,
+            "n_scoreable": 23,
+            "median_mase_all": 1.081,
+            "median_mase_named": 1.0,
+            "beats_seasonal_naive": false,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 11511.63,
+                "mase": 2.02
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 3453.97,
+                "mase": 1.75
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 2195.2,
+                "mase": 1.16
+              },
+              {
+                "node": "Beer::Paulaner Helles Lager",
+                "held_out_revenue": 1575.31,
+                "mase": 2.754
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 1103.36,
+                "mase": 1.218
+              },
+              {
+                "node": "Uncategorised::Breeze Pale Ale",
+                "held_out_revenue": 1077.7,
+                "mase": null
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 960.93,
+                "mase": 0.747
+              },
+              {
+                "node": "Wine::Aperol Spritz",
+                "held_out_revenue": 796.75,
+                "mase": 4.319
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 784.57,
+                "mase": 1.081
+              },
+              {
+                "node": "Wine::Sauvignon Blanc",
+                "held_out_revenue": 548.94,
+                "mase": 3.65
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 539.8,
+                "mase": 5.117
+              },
+              {
+                "node": "Merchandise::OTHER",
+                "held_out_revenue": 422.5,
+                "mase": null
+              }
+            ]
+          }
+        },
+        "120": {
+          "named": [
+            "Beer::Lager - BH",
+            "Beer::Caravan of Love",
+            "Beer::Paulaner Helles Lager",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Fruit Shoot",
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Wine::Sauvignon Blanc",
+            "Wine::Pinot Grigio",
+            "Wine::Aperol Spritz",
+            "Happy Hour::\u00a34 Lager/Cider",
+            "Happy Hour::\u00a33.50 Cask",
+            "Happy Hour::\u00a315 FIZZ",
+            "Uncategorised::Lancashire  crisps",
+            "Uncategorised::Seabrook Crisps",
+            "Uncategorised::Breeze Pale Ale",
+            "Food::Seabrook Crisps",
+            "Food::Nobby's Nuts",
+            "Food::Pork Scratchings",
+            "Merchandise::Pool Table deposit",
+            "Merchandise::Hire Fee"
+          ],
+          "changed_from_standing": [
+            "Beer::Cider - BH",
+            "Beer::Paulaner Helles Lager",
+            "Food::Crisps",
+            "Food::Nobby's Nuts",
+            "Food::Nuts",
+            "Food::Pork Scratchings",
+            "Merchandise::Lunebrew T Shirt",
+            "Spirits::Gordons",
+            "Spirits::Whitley Neil",
+            "Uncategorised::Breeze Pale Ale",
+            "Uncategorised::Centennial Summer Pale",
+            "Uncategorised::Lager - BH",
+            "Uncategorised::Seabrook Crisps",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Wine::Pinot Grigio",
+            "Wine::Sauvignon Blanc"
+          ],
+          "capture": {
+            "window_revenue": 27047.58,
+            "captured_by_named": 7848.16,
+            "capture_pct": 29.0,
+            "to_other": 19199.42,
+            "new_item_revenue": 3406.42,
+            "new_item_pct_of_total": 12.6,
+            "irreducible_other_pct": 12.6
+          },
+          "score": {
+            "n_nodes": 31,
+            "n_scoreable": 23,
+            "median_mase_all": 1.16,
+            "median_mase_named": 1.073,
+            "beats_seasonal_naive": false,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 11511.63,
+                "mase": 2.02
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 3318.52,
+                "mase": 1.764
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 2195.2,
+                "mase": 1.16
+              },
+              {
+                "node": "Beer::Paulaner Helles Lager",
+                "held_out_revenue": 1575.31,
+                "mase": 2.754
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 1103.36,
+                "mase": 1.218
+              },
+              {
+                "node": "Uncategorised::Breeze Pale Ale",
+                "held_out_revenue": 1077.7,
+                "mase": null
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 960.93,
+                "mase": 0.747
+              },
+              {
+                "node": "Wine::Aperol Spritz",
+                "held_out_revenue": 796.75,
+                "mase": 4.319
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 784.57,
+                "mase": 1.081
+              },
+              {
+                "node": "Wine::Sauvignon Blanc",
+                "held_out_revenue": 548.94,
+                "mase": 3.65
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 539.8,
+                "mase": 5.117
+              },
+              {
+                "node": "Merchandise::OTHER",
+                "held_out_revenue": 422.5,
+                "mase": null
+              }
+            ]
+          }
+        },
+        "180": {
+          "named": [
+            "Beer::Lager - BH",
+            "Beer::Caravan of Love",
+            "Beer::Paulaner Helles Lager",
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Cordial Splash",
+            "Wine::Sauvignon Blanc",
+            "Wine::Pinot Grigio",
+            "Wine::Aperol Spritz",
+            "Happy Hour::\u00a34 Lager/Cider",
+            "Happy Hour::\u00a33.50 Cask",
+            "Happy Hour::\u00a315 FIZZ",
+            "Uncategorised::Lager - BH",
+            "Uncategorised::Lancashire  crisps",
+            "Uncategorised::Seabrook Crisps",
+            "Food::Crisps",
+            "Food::Seabrook Crisps",
+            "Food::Nobby's Nuts",
+            "Merchandise::Pool Table deposit",
+            "Merchandise::Hire Fee"
+          ],
+          "changed_from_standing": [
+            "Beer::Cider - BH",
+            "Beer::Paulaner Helles Lager",
+            "Food::Nobby's Nuts",
+            "Food::Nuts",
+            "Merchandise::Lunebrew T Shirt",
+            "Soft Drinks::Cordial Splash",
+            "Soft Drinks::Fruit Shoot",
+            "Spirits::Gordons",
+            "Spirits::Whitley Neil",
+            "Uncategorised::Centennial Summer Pale",
+            "Uncategorised::Seabrook Crisps",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Wine::Pinot Grigio",
+            "Wine::Sauvignon Blanc"
+          ],
+          "capture": {
+            "window_revenue": 27047.58,
+            "captured_by_named": 6745.27,
+            "capture_pct": 24.9,
+            "to_other": 20302.31,
+            "new_item_revenue": 3406.42,
+            "new_item_pct_of_total": 12.6,
+            "irreducible_other_pct": 12.6
+          },
+          "score": {
+            "n_nodes": 31,
+            "n_scoreable": 23,
+            "median_mase_all": 1.16,
+            "median_mase_named": 1.073,
+            "beats_seasonal_naive": false,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 11511.63,
+                "mase": 2.02
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 3318.52,
+                "mase": 1.764
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 2195.2,
+                "mase": 1.16
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 2181.06,
+                "mase": 4.448
+              },
+              {
+                "node": "Beer::Paulaner Helles Lager",
+                "held_out_revenue": 1575.31,
+                "mase": 2.754
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 960.93,
+                "mase": 0.747
+              },
+              {
+                "node": "Wine::Aperol Spritz",
+                "held_out_revenue": 796.75,
+                "mase": 4.319
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 784.57,
+                "mase": 1.081
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 564.99,
+                "mase": 4.143
+              },
+              {
+                "node": "Wine::Sauvignon Blanc",
+                "held_out_revenue": 548.94,
+                "mase": 3.65
+              },
+              {
+                "node": "Merchandise::OTHER",
+                "held_out_revenue": 422.5,
+                "mase": null
+              },
+              {
+                "node": "Wine::Pinot Grigio",
+                "held_out_revenue": 394.46,
+                "mase": 2.561
+              }
+            ]
+          }
+        }
+      },
+      "smoking_gun": {
+        "item": "LuneBrew Pilsner",
+        "top_k": 3,
+        "by_lookback": {
+          "whole": {
+            "units_rank": 21,
+            "revenue_rank": 19,
+            "selected_at_top_k": false
+          },
+          "56": {
+            "units_rank": 5,
+            "revenue_rank": 6,
+            "selected_at_top_k": false
+          },
+          "90": {
+            "units_rank": 9,
+            "revenue_rank": 10,
+            "selected_at_top_k": false
+          },
+          "120": {
+            "units_rank": 10,
+            "revenue_rank": 10,
+            "selected_at_top_k": false
+          },
+          "180": {
+            "units_rank": 13,
+            "revenue_rank": 12,
+            "selected_at_top_k": false
+          }
+        },
+        "ever_selected": false
+      }
+    },
+    "ellel": {
+      "standing_membership_today": {
+        "n_nodes": 28,
+        "n_bottom": 21,
+        "n_named": 16,
+        "named": [
+          "ITEM::Beer::Cider - BH",
+          "ITEM::Beer::Guinness Can",
+          "ITEM::Beer::Lager - BH",
+          "ITEM::Happy Hour::\u00a315 FIZZ",
+          "ITEM::Soft Drinks::J20",
+          "ITEM::Soft Drinks::Pop Can",
+          "ITEM::Soft Drinks::Postmix",
+          "ITEM::Spirits::SMIRNOFF",
+          "ITEM::Spirits::SPLASH",
+          "ITEM::Spirits::Spirit & Splash",
+          "ITEM::Uncategorised::Breeze Pale Ale",
+          "ITEM::Uncategorised::Lager - BH",
+          "ITEM::Uncategorised::Vodka Cans",
+          "ITEM::Wine::Alpino Pinot Grigio",
+          "ITEM::Wine::Pinot Grigio",
+          "ITEM::Wine::Prosecco"
+        ]
+      },
+      "blind_standing": {
+        "named": [
+          "Beer::Lager - BH",
+          "Beer::Guinness Can",
+          "Beer::Cider - BH",
+          "Spirits::SPLASH",
+          "Spirits::Spirit & Splash",
+          "Spirits::SMIRNOFF",
+          "Soft Drinks::Postmix",
+          "Soft Drinks::J20",
+          "Soft Drinks::Pop Can",
+          "Wine::Alpino Pinot Grigio",
+          "Wine::Prosecco",
+          "Wine::Discovery Beach Zinfandel",
+          "Uncategorised::Lager - BH",
+          "Uncategorised::Vodka Cans",
+          "Uncategorised::Guinness Can",
+          "Happy Hour::\u00a315 FIZZ"
+        ],
+        "capture": {
+          "window_revenue": 2338.18,
+          "captured_by_named": 730.79,
+          "capture_pct": 31.3,
+          "to_other": 1607.39,
+          "new_item_revenue": 999.51,
+          "new_item_pct_of_total": 42.7,
+          "irreducible_other_pct": 42.7
+        },
+        "score": {
+          "n_nodes": 22,
+          "n_scoreable": 18,
+          "median_mase_all": 0.224,
+          "median_mase_named": 0.167,
+          "beats_seasonal_naive": true,
+          "per_node": [
+            {
+              "node": "Beer::OTHER",
+              "held_out_revenue": 1051.86,
+              "mase": 0.915
+            },
+            {
+              "node": "Beer::Cider - BH",
+              "held_out_revenue": 297.38,
+              "mase": 1.199
+            },
+            {
+              "node": "Uncategorised::OTHER",
+              "held_out_revenue": 215.98,
+              "mase": null
+            },
+            {
+              "node": "Soft Drinks::Pop Can",
+              "held_out_revenue": 157.34,
+              "mase": 2.761
+            },
+            {
+              "node": "Wine::OTHER",
+              "held_out_revenue": 152.48,
+              "mase": 0.247
+            },
+            {
+              "node": "Spirits::OTHER",
+              "held_out_revenue": 129.77,
+              "mase": 0.174
+            },
+            {
+              "node": "Beer::Guinness Can",
+              "held_out_revenue": 80.0,
+              "mase": 0.293
+            },
+            {
+              "node": "Soft Drinks::OTHER",
+              "held_out_revenue": 57.3,
+              "mase": 0.424
+            },
+            {
+              "node": "Spirits::SMIRNOFF",
+              "held_out_revenue": 50.5,
+              "mase": 0.202
+            },
+            {
+              "node": "Soft Drinks::J20",
+              "held_out_revenue": 49.37,
+              "mase": 0.277
+            },
+            {
+              "node": "Wine::Prosecco",
+              "held_out_revenue": 33.74,
+              "mase": 0.263
+            },
+            {
+              "node": "Wine::Discovery Beach Zinfandel",
+              "held_out_revenue": 28.25,
+              "mase": 0.278
+            }
+          ]
+        }
+      },
+      "refreshed": {
+        "56": {
+          "named": [
+            "Beer::Lager - BH",
+            "Beer::Guinness Can",
+            "Beer::Session IPA",
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::J20",
+            "Soft Drinks::Cordial & Soda",
+            "Wine::Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Wine::Prosecco",
+            "Uncategorised::Vodka Cans"
+          ],
+          "changed_from_standing": [
+            "Beer::Cider - BH",
+            "Beer::Session IPA",
+            "Happy Hour::\u00a315 FIZZ",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Pop Can",
+            "Spirits::Gordons",
+            "Spirits::Spirit & Splash",
+            "Uncategorised::Guinness Can",
+            "Uncategorised::Lager - BH",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Pinot Grigio"
+          ],
+          "capture": {
+            "window_revenue": 2338.18,
+            "captured_by_named": 388.69,
+            "capture_pct": 16.6,
+            "to_other": 1949.49,
+            "new_item_revenue": 999.51,
+            "new_item_pct_of_total": 42.7,
+            "irreducible_other_pct": 42.7
+          },
+          "score": {
+            "n_nodes": 18,
+            "n_scoreable": 18,
+            "median_mase_all": 0.233,
+            "median_mase_named": 0.202,
+            "beats_seasonal_naive": true,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 1349.24,
+                "mase": 1.102
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 215.98,
+                "mase": 1.011
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 212.97,
+                "mase": 1.374
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 98.12,
+                "mase": 0.11
+              },
+              {
+                "node": "Beer::Guinness Can",
+                "held_out_revenue": 80.0,
+                "mase": 0.293
+              },
+              {
+                "node": "Wine::Pinot Grigio",
+                "held_out_revenue": 79.3,
+                "mase": 0.89
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 73.18,
+                "mase": 0.11
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 50.5,
+                "mase": 0.202
+              },
+              {
+                "node": "Soft Drinks::J20",
+                "held_out_revenue": 49.37,
+                "mase": 0.277
+              },
+              {
+                "node": "Wine::Prosecco",
+                "held_out_revenue": 33.74,
+                "mase": 0.263
+              },
+              {
+                "node": "Spirits::Gordons",
+                "held_out_revenue": 31.65,
+                "mase": 0.348
+              },
+              {
+                "node": "Wine::Discovery Beach Zinfandel",
+                "held_out_revenue": 28.25,
+                "mase": 0.278
+              }
+            ]
+          }
+        },
+        "90": {
+          "named": [
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Beer::Lager - BH",
+            "Beer::Guinness Can",
+            "Beer::Caravan of Love",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::J20",
+            "Soft Drinks::Cordial & Soda",
+            "Wine::Serena Spumante (Fizz)",
+            "Wine::Pinot Grigio",
+            "Wine::Discovery Beach Zinfandel",
+            "Uncategorised::Vodka Cans"
+          ],
+          "changed_from_standing": [
+            "Beer::Caravan of Love",
+            "Beer::Cider - BH",
+            "Happy Hour::\u00a315 FIZZ",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Pop Can",
+            "Spirits::Gordons",
+            "Spirits::Spirit & Splash",
+            "Uncategorised::Guinness Can",
+            "Uncategorised::Lager - BH",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Pinot Grigio",
+            "Wine::Prosecco",
+            "Wine::Serena Spumante (Fizz)"
+          ],
+          "capture": {
+            "window_revenue": 2338.18,
+            "captured_by_named": 358.7,
+            "capture_pct": 15.3,
+            "to_other": 1979.48,
+            "new_item_revenue": 999.51,
+            "new_item_pct_of_total": 42.7,
+            "irreducible_other_pct": 42.7
+          },
+          "score": {
+            "n_nodes": 18,
+            "n_scoreable": 18,
+            "median_mase_all": 0.175,
+            "median_mase_named": 0.133,
+            "beats_seasonal_naive": true,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 1349.24,
+                "mase": 1.14
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 215.98,
+                "mase": 1.011
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 212.97,
+                "mase": 1.374
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 103.17,
+                "mase": 0.149
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 98.12,
+                "mase": 0.11
+              },
+              {
+                "node": "Beer::Guinness Can",
+                "held_out_revenue": 80.0,
+                "mase": 0.293
+              },
+              {
+                "node": "Wine::Pinot Grigio",
+                "held_out_revenue": 79.3,
+                "mase": 0.89
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 50.5,
+                "mase": 0.202
+              },
+              {
+                "node": "Soft Drinks::J20",
+                "held_out_revenue": 49.37,
+                "mase": 0.277
+              },
+              {
+                "node": "Spirits::Gordons",
+                "held_out_revenue": 31.65,
+                "mase": 0.348
+              },
+              {
+                "node": "Wine::Discovery Beach Zinfandel",
+                "held_out_revenue": 28.25,
+                "mase": 0.278
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 25.41,
+                "mase": 0.098
+              }
+            ]
+          }
+        },
+        "120": {
+          "named": [
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Beer::Lager - BH",
+            "Beer::Guinness Can",
+            "Beer::Caravan of Love",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::J20",
+            "Soft Drinks::Cordial & Soda",
+            "Wine::Pinot Grigio",
+            "Wine::Serena Spumante (Fizz)",
+            "Wine::Discovery Beach Zinfandel",
+            "Uncategorised::Vodka Cans"
+          ],
+          "changed_from_standing": [
+            "Beer::Caravan of Love",
+            "Beer::Cider - BH",
+            "Happy Hour::\u00a315 FIZZ",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Pop Can",
+            "Spirits::Gordons",
+            "Spirits::Spirit & Splash",
+            "Uncategorised::Guinness Can",
+            "Uncategorised::Lager - BH",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Pinot Grigio",
+            "Wine::Prosecco",
+            "Wine::Serena Spumante (Fizz)"
+          ],
+          "capture": {
+            "window_revenue": 2338.18,
+            "captured_by_named": 358.7,
+            "capture_pct": 15.3,
+            "to_other": 1979.48,
+            "new_item_revenue": 999.51,
+            "new_item_pct_of_total": 42.7,
+            "irreducible_other_pct": 42.7
+          },
+          "score": {
+            "n_nodes": 18,
+            "n_scoreable": 18,
+            "median_mase_all": 0.175,
+            "median_mase_named": 0.133,
+            "beats_seasonal_naive": true,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 1349.24,
+                "mase": 1.14
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 215.98,
+                "mase": 1.011
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 212.97,
+                "mase": 1.374
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 103.17,
+                "mase": 0.149
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 98.12,
+                "mase": 0.11
+              },
+              {
+                "node": "Beer::Guinness Can",
+                "held_out_revenue": 80.0,
+                "mase": 0.293
+              },
+              {
+                "node": "Wine::Pinot Grigio",
+                "held_out_revenue": 79.3,
+                "mase": 0.89
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 50.5,
+                "mase": 0.202
+              },
+              {
+                "node": "Soft Drinks::J20",
+                "held_out_revenue": 49.37,
+                "mase": 0.277
+              },
+              {
+                "node": "Spirits::Gordons",
+                "held_out_revenue": 31.65,
+                "mase": 0.348
+              },
+              {
+                "node": "Wine::Discovery Beach Zinfandel",
+                "held_out_revenue": 28.25,
+                "mase": 0.278
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 25.41,
+                "mase": 0.098
+              }
+            ]
+          }
+        },
+        "180": {
+          "named": [
+            "Spirits::SPLASH",
+            "Spirits::SMIRNOFF",
+            "Spirits::Gordons",
+            "Beer::Lager - BH",
+            "Beer::Guinness Can",
+            "Beer::Caravan of Love",
+            "Soft Drinks::Postmix",
+            "Soft Drinks::J20",
+            "Soft Drinks::Cordial & Soda",
+            "Wine::Pinot Grigio",
+            "Wine::Serena Spumante (Fizz)",
+            "Wine::Discovery Beach Zinfandel",
+            "Uncategorised::Vodka Cans",
+            "Uncategorised::Lager - BH",
+            "Uncategorised::Vodka Cans (Voided)"
+          ],
+          "changed_from_standing": [
+            "Beer::Caravan of Love",
+            "Beer::Cider - BH",
+            "Happy Hour::\u00a315 FIZZ",
+            "Soft Drinks::Cordial & Soda",
+            "Soft Drinks::Pop Can",
+            "Spirits::Gordons",
+            "Spirits::Spirit & Splash",
+            "Uncategorised::Guinness Can",
+            "Uncategorised::Vodka Cans (Voided)",
+            "Wine::Alpino Pinot Grigio",
+            "Wine::Pinot Grigio",
+            "Wine::Prosecco",
+            "Wine::Serena Spumante (Fizz)"
+          ],
+          "capture": {
+            "window_revenue": 2338.18,
+            "captured_by_named": 358.7,
+            "capture_pct": 15.3,
+            "to_other": 1979.48,
+            "new_item_revenue": 999.51,
+            "new_item_pct_of_total": 42.7,
+            "irreducible_other_pct": 42.7
+          },
+          "score": {
+            "n_nodes": 20,
+            "n_scoreable": 18,
+            "median_mase_all": 0.141,
+            "median_mase_named": 0.116,
+            "beats_seasonal_naive": true,
+            "per_node": [
+              {
+                "node": "Beer::OTHER",
+                "held_out_revenue": 1349.24,
+                "mase": 1.14
+              },
+              {
+                "node": "Uncategorised::OTHER",
+                "held_out_revenue": 215.98,
+                "mase": null
+              },
+              {
+                "node": "Soft Drinks::OTHER",
+                "held_out_revenue": 212.97,
+                "mase": 1.374
+              },
+              {
+                "node": "Wine::OTHER",
+                "held_out_revenue": 103.17,
+                "mase": 0.149
+              },
+              {
+                "node": "Spirits::OTHER",
+                "held_out_revenue": 98.12,
+                "mase": 0.11
+              },
+              {
+                "node": "Beer::Guinness Can",
+                "held_out_revenue": 80.0,
+                "mase": 0.293
+              },
+              {
+                "node": "Wine::Pinot Grigio",
+                "held_out_revenue": 79.3,
+                "mase": 0.89
+              },
+              {
+                "node": "Spirits::SMIRNOFF",
+                "held_out_revenue": 50.5,
+                "mase": 0.202
+              },
+              {
+                "node": "Soft Drinks::J20",
+                "held_out_revenue": 49.37,
+                "mase": 0.277
+              },
+              {
+                "node": "Spirits::Gordons",
+                "held_out_revenue": 31.65,
+                "mase": 0.348
+              },
+              {
+                "node": "Wine::Discovery Beach Zinfandel",
+                "held_out_revenue": 28.25,
+                "mase": 0.278
+              },
+              {
+                "node": "Soft Drinks::Postmix",
+                "held_out_revenue": 25.41,
+                "mase": 0.098
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

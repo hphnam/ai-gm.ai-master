@@ -240,11 +240,40 @@ Measurable consequence: the standing path still selects `Lager - BH` (two years 
 history, GBP 14.86 in June) over `LuneBrew Pilsner` (GBP 3,484 in June) and drops the
 latter into OTHER. That is the exact item report 25 named as the smoking gun.
 
-Ingesting June and July did **not** fix this and partly masks it — node counts move, so a
-count check reads as progress while membership is still wrong. If the dissertation
-claims the drift finding was addressed, that claim is currently false for the served
-path. Either wire it (one argument, with its own gate and before/after measurement,
-because it changes the served node set) or state the limitation.
+Ingesting June and July did **not** fix this and partly masks it: node counts move, so a
+count check reads as progress while membership is still wrong.
+
+**Decided 2026-07-19 (report 38): the limitation is stated, not fixed.** The gated
+before/after was run and the answer is do-not-wire. State it in the dissertation in
+these terms, because the sharp version is better than the original framing:
+
+- **Refreshing degrades the metric.** Beer Hall L3 revenue MASE, blind, one ruler:
+  **0.852 standing to 1.08-1.16 refreshed**, crossing from beating seasonal-naive to
+  losing to it. The two venues also move in opposite directions on capture (Beer Hall
+  19.3% to 29.0%, **Ellel 31.3% down to 15.3%**).
+- **The prescription does not fix the named symptom.** `LuneBrew Pilsner` is **never
+  selected at any lookback**, by units or revenue: it is 5th at best under a 56-day
+  window and only three items per category are ever named. **The binding constraint is
+  `top_k`, not the ranking window.** So the open question ("is `since=` wired?") had a
+  false premise, and wiring it would have raised capture, read as progress, and left the
+  named item in OTHER. That is worth writing up: it is the count-check trap one level
+  deeper, found only by testing the fix against the specific case rather than the
+  aggregate.
+- **The metric finding underneath it.** Refreshing swaps stable long-history lines for
+  recent ones; a recent item has a shorter noisier history, so its base forecast is
+  worse **and** its seasonal-naive denominator is smaller, and MASE is punished twice.
+  **The node set that scores best is the node set that matters least.** Pair this with
+  4.1 in one methodological subsection: there MASE flattered a 90% under-forecast, here
+  it rewards forecasting the commercially irrelevant items well. Both say the gate the
+  whole ladder rests on is **blind to relevance**.
+- **Most of Ellel's OTHER is not drift at all.** Held-out revenue from items never sold
+  before the cutoff: **beer_hall 12.6%, ellel 42.7%**. Irreducible by any ranking window.
+  Report 25's 15% Ellel capture must be read against that.
+
+Report 25's 26% / 15% is updated to **19.3% / 31.3%** on a different basis: report 25
+measured the frozen, revenue-ranked node set, this measures the standing, units-ranked
+one. Two different hierarchies, never previously compared. Quote whichever you mean and
+say which.
 
 ### 4.4 The L3 result and what MASE 1.33 means
 

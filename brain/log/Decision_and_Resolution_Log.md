@@ -1055,3 +1055,65 @@ them into the append-only log so it is the continuous WP1-to-present record.
     stashed pre-fix code). Frame hashes unchanged; C2 re-scores 0.285 / 0.287, coverage
     1.00, `generalises: False`. FLAG-STORE-DURABILITY fired twice more, both times from
     the full suites, both restored and re-verified before any gate was read.
+
+26. **G15c: taxonomy drift measured on the standing path, and the decision is NO**
+    (`38_G15c_Taxonomy_Drift_Decision.md`). The previous state log carried "confirm
+    `since=` is wired into the standing build" as an open question. It is not wired:
+    `hierarchy.reconcile()` calls `build_hierarchy(venue, top_k)` and no caller anywhere
+    passes `since=`, so the served L2/L3 node set is still ranked over the whole history.
+    That much is confirmed. **The fix was then gated like a rung promotion, with a blind
+    before/after, and refused. (a) It degrades the metric.** Beer Hall L3 revenue MASE,
+    node selection and base forecaster both blind to anything after the 2026-05-31 cutoff
+    with June held out and one ruler across both arms: **0.852 standing to 1.08-1.16
+    refreshed**, at every lookback tested (56/90/120/180 days). It crosses from beating
+    seasonal-naive to losing to it. **(b) The two venues move in opposite directions.**
+    Beer Hall capture 19.3% to 29.0%; **Ellel 31.3% DOWN to 15.3%**. **(c) And the finding
+    that actually decided it: the prescription does not fix the symptom it was prescribed
+    for.** `LuneBrew Pilsner` - report 25's named smoking gun, GBP 3,484 in June dropped
+    into OTHER - is **never selected at any lookback, by units or by revenue**: rank 21
+    on whole history, **5 at a 56-day window, and still outside a top-3**. The item is in
+    OTHER because only THREE items per category are ever named. **The binding constraint
+    is `top_k`, not the ranking window**, so the open question had a false premise. Wiring
+    `since=` and re-checking an aggregate would have raised capture ten points, read as
+    progress, and left the named item exactly where it was - the same trap the flag
+    already warned about ("node COUNTS move, so a count check reads as progress"), one
+    level deeper, and findable only by testing the fix against the specific case.
+    **`top_k` was not raised either**: it is the correctly identified next experiment, not
+    a fix to smuggle in, and (a) predicts widening the node set would push MASE further
+    up. **(d) The metric finding underneath it, which is dissertation material.**
+    Refreshing swaps long-history stable lines (`Cider - BH`, `Centennial Summer Pale`)
+    for recent ones (`Paulaner Helles Lager`, `Breeze Pale Ale`); a recent item has a
+    short noisy pre-cutoff history, so its DOW-median base forecast is worse AND its
+    seasonal-naive denominator is smaller, and **MASE is punished twice**. So **the node
+    set that scores best is the node set that matters least, and MASE cannot see the
+    difference.** Sibling to FLAG-MASE-INTERMITTENT: there the ruler flattered a 90%
+    under-forecast, here it rewards forecasting the commercially irrelevant items well.
+    Both say the gate the ladder rests on is blind to relevance, and they belong in one
+    methodological subsection. This is also why the verdict is "do not wire" rather than
+    "refreshing is wrong": refreshing improves what a GM cares about (capture) and
+    degrades what the project gates on (MASE), and with no relevance-aware metric to
+    adjudicate, adopting it would be a change the project cannot defend on its own stated
+    criteria. **(e) The new-item problem kept separate throughout**, because conflating it
+    inflates the drift: held-out revenue from items never sold before the cutoff is
+    **12.6% (beer_hall) and 42.7% (ellel)**. Nearly half of Ellel's held-out revenue
+    cannot be reached by any ranking window and is irreducible OTHER by design, so report
+    25's 15% Ellel capture must be read against it. `LuneBrew Pilsner` is NOT a new item
+    (first sale 2025-06-21, GBP 1,337 pre-cutoff) - it is genuine drift that `since=`
+    cannot reach. **(f) Report 25's capture figures updated, not corrected:** 26% / 15%
+    becomes **19.3% / 31.3%**, on a different basis - report 25 measured the FROZEN
+    node set (revenue-ranked via `_revenue_hierarchy`), this measures the STANDING
+    `reconcile()` set (**units**-ranked via `build_hierarchy`). Two different hierarchies
+    whose numbers had never been put side by side. The units-vs-revenue difference was
+    checked directly and is negligible (ranks agree within one or two places at every
+    lookback), reported as checked and small rather than promoted into a finding it
+    cannot carry. **(g) Lookback swept rather than assumed:** 120 days would have been the
+    choice, matching `SHARE_WINDOW_DAYS` in the freeze scripts so one knob governs L2/L3
+    recency instead of two that can disagree; 56 days tracks the menu hardest and is
+    least stable (20 of 24 nodes change), 180 is steadiest and captures least. The sweep
+    also shows the knob does not matter, since every setting lands at MASE 1.08-1.16 and
+    none selects the named item. Served L1 unaffected and asserted: `reconcile._persist`
+    skips the VENUE node and writes L2/L3 only, and nothing was wired in any case. Stop
+    condition "do not wire on an ambiguous result" reached and honoured; the result was in
+    fact worse than ambiguous. FLAG-TAXONOMY-DRIFT restated as a standing limitation and
+    `DISSERTATION_NOTES.md` 4.3 rewritten to match. Artefact
+    `sim/g15c_taxonomy_drift.json`; read-only, no forecast or band row written.

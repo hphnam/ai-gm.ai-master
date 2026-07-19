@@ -485,6 +485,72 @@ does.
   > Fix is one argument at `hierarchy/reconcile.py:171`. Not made here: it changes the
   > served L2/L3 node set, which is a forecast-affecting change and wants its own gate
   > and its own before/after measurement, not a drive-by edit inside a hardening pass.
+  >
+  > **DECIDED 2026-07-19 (G15c, report 38): DO NOT WIRE. This is now a standing
+  > limitation, not a pending fix.** The gated before/after was run and the answer is no
+  > on three independent grounds, the third of which invalidates the premise of
+  > everything above it.
+  >
+  > **(1) It makes the metric worse.** Beer Hall L3 revenue MASE, blind (node selection
+  > and base forecaster see nothing after the 2026-05-31 cutoff, June held out, one
+  > ruler for both arms): **0.852 standing to 1.08-1.16 refreshed**, at every lookback
+  > tested (56/90/120/180 d). It crosses from beating seasonal-naive to losing to it.
+  >
+  > **(2) The two venues move in opposite directions.** Beer Hall capture 19.3% to
+  > 29.0%; **Ellel 31.3% DOWN to 15.3%**.
+  >
+  > **(3) It does not fix `LuneBrew Pilsner`, and that is the finding.** The prescription
+  > was tested against the item this flag names rather than against an aggregate:
+  >
+  > | lookback | units rank | revenue rank | selected at top_k=3 |
+  > |---|---|---|---|
+  > | whole | 21 | 19 | no |
+  > | 56 d | **5** | 6 | **no** |
+  > | 90 d | 9 | 10 | no |
+  > | 120 d | 10 | 10 | no |
+  > | 180 d | 13 | 12 | no |
+  >
+  > **Never selected, at any lookback, by either ranking.** The item lands in OTHER
+  > because only THREE items per category are ever named and it is fifth at best. **The
+  > binding constraint is `top_k`, not the ranking window**, so "wire `since=`" was the
+  > wrong prescription for the symptom this flag was raised about. Wiring it and
+  > re-checking an aggregate would have raised capture, looked like progress, and left
+  > the named item exactly where it was - the same trap this flag already warns about
+  > ("node COUNTS move, so a count check reads as progress"), one level deeper.
+  >
+  > **`top_k` was NOT raised either.** It is the correctly identified next experiment,
+  > not a fix to smuggle in: it widens the served node set far more aggressively than a
+  > re-ranking, and finding (1) says the node set that is easiest to forecast is not the
+  > one that matters commercially, so widening it would likely push MASE further up.
+  >
+  > **Why refreshing degrades MASE, and the metric finding in it.** Refreshing swaps
+  > long-history stable lines (`Cider - BH`, `Centennial Summer Pale`) for recent ones
+  > (`Paulaner Helles Lager`, `Breeze Pale Ale`). A recent item has a short noisy
+  > pre-cutoff history, so its DOW-median base forecast is worse AND its seasonal-naive
+  > denominator is smaller: MASE is punished twice. **So the node set that scores best is
+  > the node set that matters least, and MASE cannot see the difference.** Sibling to
+  > FLAG-MASE-INTERMITTENT - there the ruler flattered a 90% under-forecast, here it
+  > rewards forecasting the wrong items well. Both say the gate the ladder is scored on
+  > is blind to relevance.
+  >
+  > **Kept separate: the new-item problem is most of Ellel's OTHER.** Held-out revenue
+  > from items never sold before the cutoff: **beer_hall 12.6%, ellel 42.7%**. Those
+  > items cannot be selected by ANY ranking window, land in OTHER by design, and are
+  > irreducible. Read Ellel's capture figures against that. `LuneBrew Pilsner` is NOT one
+  > of them (first sale 2025-06-21, GBP 1,337 pre-cutoff) - it is genuine drift that
+  > `since=` cannot reach.
+  >
+  > **Report 25's 26% / 15% updated to 19.3% / 31.3%, on a different basis.** Report 25
+  > measured the FROZEN node set (revenue-ranked, `_revenue_hierarchy`); this measures
+  > the STANDING `reconcile()` set (**units**-ranked, `build_hierarchy`). Two different
+  > hierarchies whose numbers had never been placed side by side. The units-vs-revenue
+  > difference itself was checked and is negligible (ranks agree within one or two places
+  > at every lookback), so it is reported as checked and small, not promoted.
+  >
+  > Served L1 is unaffected and provably so: `reconcile._persist` skips the VENUE node
+  > and writes layers L2/L3 only. Nothing was wired, so the question is moot in the
+  > strongest form. Artefact `sim/g15c_taxonomy_drift.json`, reproduce with
+  > `.venv-forecast/bin/python -m sim.g15c_taxonomy_drift`.
 
 ---
 
