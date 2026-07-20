@@ -1285,3 +1285,51 @@ them into the append-only log so it is the continuous WP1-to-present record.
     Evidence: `brain/log/42_G17a_Metric_Integrity.md`, `sim/ruler_comparison.md`,
     FLAG-MASE-RULER and FLAG-L2-DENOMINATOR in `brain/FLAGS.md`,
     `tests/test_a2_metric_ruler.py`.
+
+31. **S2 G17b: fold count lifted from 6 to 273/260/205, dispersion attached, and the served
+    winners tested for the first time.** Every served-model decision rested on six rolling
+    origins over 42 days, and at six folds with a 7-day horizon the Harvey-Leybourne-Newbold
+    small-sample correction is **algebraically zero** (numerator `6 + 1 - 14 + 7 = 0`), so no
+    Diebold-Mariano variant was computable: selection had no available significance test, not a
+    weak one. `rolling_origin` gained a `step_days` parameter (None reproduces the historical
+    disjoint-window behaviour exactly); at step 1 the ladder was re-run across every rung and
+    venue, lifting Beer Hall to 273 origins (HLN 0.976), Ellel to 260, TRT to 205, at which a
+    test becomes computable in S3.
+    **The refactor is behaviour-identical, proven three ways** (report 43 section 2): a verbatim
+    copy of the pre-refactor function yields byte-identical fold boundaries across five configs;
+    Two River Taps, frozen since 2026-05-08, reproduces the committed table to the digit on every
+    deterministic rung at the current ceiling; and all three venues reproduce it exactly at the
+    seed ceiling. The apparent G1 failure at the current ceiling is the **report 42 `as_of`
+    defect on the ladder**: the committed tables were computed at the 2026-05-31 seed and a
+    rolling-origin result moves with the store's last day, so "reproduce the committed tables"
+    is unsatisfiable without a pinned reference. Only `rung4_chronos2_exo` fails to reproduce
+    even at a fixed ceiling (<=0.010), which is pre-existing Chronos covariate-path
+    non-determinism.
+    **Winner outcome, controlled for ceiling** (the naive committed-vs-step1 comparison confounds
+    fold count with store growth, so report 43 section 3 holds the ceiling fixed): **Beer Hall
+    and TRT confirm their served models** (`chronos2_exo`, `ets`) at 273 and 205 origins; Beer
+    Hall is the clean Major-4 demonstration, because at the current ceiling the 42-day six-fold
+    window picks `robust_dow` and only 273 origins recover the served `chronos2_exo`. **Ellel's
+    argmin changes from the served `rung1_robust_dow` to `rung4_chronos_bolt`** (0.585 -> 0.575),
+    which **triggers the stop condition**: reported, served model **unchanged**. Two reasons:
+    the change is a ceiling effect not a fold-count effect (the flip is already present at
+    6-fold@0707, and adding folds keeps `chronos_bolt`), and the gap is **0.0084, which is 0.18
+    of one standard error** against a fold sd of 0.71 - four rungs tied within noise. Prediction
+    recorded before S3: the Ellel MCS will contain `chronos_bolt`, `chronos2_exo`, `robust_dow`
+    and `chronos2`, so no model change is warranted and the correct outcome is a wide set.
+    **Deliverables:** per-fold MASE and RMSSE vectors persisted to `eval/fold_vectors_L1_*.json`
+    with each value carrying its fold **index** (a rung that skips a fold - Ellel `chronos2_exo`
+    missed 14 June folds on `MissingCovariateError` - otherwise yields a silently misaligned
+    vector; `aligned_pair` is the safe differencer and the file itself carries the
+    overlap/independence warning for S3). Ellel is **260 origins not the spec's 266**: the frame
+    is 386 rows because `trim_to_active` drops the 2025-06-08 sale-and-reversal mis-ring and its
+    six dead days, the same leading span behind the S1 G2 erratum. Gates: G2 counts exact (Ellel
+    on the corrected 260), G3 leakage guard fires on a constructed overlapping case and no step-1
+    fold leaks, G4 round-trip and alignment tested, G5 suites 419->449 and 426->456 skips
+    unchanged, G6 served models and frozen artefacts untouched and ceiling restored to
+    2026-07-07. Evidence: `brain/log/43_G17b_Fold_Count.md`, `eval/fold_vectors.py`,
+    `tests/test_a2_fold_count.py`.
+    **Carried correction to row 30 (append-only, not an edit):** the S1 quality check noted that
+    0.772 against a backtest of 0.745 is slightly **worse** than the backtest class, not equal to
+    it. The defensible claim, adopted in report 42 and here, is that serving-horizon performance
+    is **consistent with** the backtest; "matched" overstated it.

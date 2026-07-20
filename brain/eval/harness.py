@@ -75,19 +75,54 @@ def rolling_origin(
     df: pd.DataFrame,
     *,
     date_col: str = "date",
-    n_folds: int = 4,
+    n_folds: int | None = 4,
     horizon_days: int = 14,
     min_train_days: int = 90,
+    step_days: int | None = None,
 ) -> Iterator[tuple[pd.DataFrame, pd.DataFrame]]:
     """Expanding-window backtest: train grows, test is the next horizon.
 
-    Yields (train, test) per fold, latest folds first omitted so the final
-    horizon always has data. Each fold is leakage-checked before being yielded.
+    Yields (train, test) oldest fold first, latest folds first omitted so the
+    final horizon always has data. Each fold is leakage-checked before yielding.
+
+    `step_days` is how far the origin advances between folds. When it is None the
+    origin advances by `horizon_days`, which is the historical behaviour and is
+    preserved exactly: six folds at a seven-day horizon gives six disjoint test
+    windows over 42 days. That cap is severe. At six folds the
+    Harvey-Leybourne-Newbold small-sample correction is exactly zero, so no
+    Diebold-Mariano variant is computable at all, and selection had no available
+    test rather than a weak one (report 43).
+
+    Setting `step_days` smaller than `horizon_days` makes consecutive test windows
+    OVERLAP, which lifts Beer Hall from 39 origins to 273. That is the point, and
+    it has a cost: **loss differentials from overlapping windows are serially
+    correlated and must not be treated as independent.** Anything inferential
+    downstream needs a block bootstrap or an autocorrelation-robust variance; S3
+    owns that.
+
+    `n_folds` keeps its meaning under both settings: the count of the MOST RECENT
+    origins to take, still yielded oldest first. Pass `n_folds=None` with
+    `step_days` set to take every origin the frame supports.
     """
+    if n_folds is None and step_days is None:
+        raise ValueError("rolling_origin needs n_folds, step_days, or both")
+
     df = df.sort_values(date_col).reset_index(drop=True)
     last = df[date_col].max()
-    for k in range(n_folds, 0, -1):
-        test_end = last - pd.Timedelta(days=horizon_days * (k - 1))
+    step = horizon_days if step_days is None else step_days
+    if step <= 0:
+        raise ValueError(f"step_days must be positive, got {step_days!r}")
+
+    if n_folds is None:
+        # Every origin the span supports; the guards below discard the ones with
+        # too little training history or an empty test window.
+        span_days = int((last - df[date_col].min()).days)
+        k_max = span_days // step + 1
+    else:
+        k_max = n_folds
+
+    for k in range(k_max, 0, -1):
+        test_end = last - pd.Timedelta(days=step * (k - 1))
         test_start = test_end - pd.Timedelta(days=horizon_days)
         train = df[df[date_col] <= test_start]
         test = df[(df[date_col] > test_start) & (df[date_col] <= test_end)]

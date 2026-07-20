@@ -379,19 +379,50 @@ def evaluate_static(venue: str = ANCHOR_VENUE):
     return results, split, cols
 
 
+def _dispersion(prefix: str, vals: list[float]) -> dict:
+    """Mean, sd, standard error, min and max for a per-fold vector.
+
+    Selection at six folds reported a mean and nothing else, which is how a 0.054
+    gap between two models came to look decisive against a fold sd of 0.226
+    (report 43). Dispersion travels with the mean from here on.
+    """
+    if not vals:
+        return {}
+    a = np.asarray(vals, dtype=float)
+    n = int(a.size)
+    sd = float(np.std(a, ddof=1)) if n > 1 else 0.0
+    return {
+        f"{prefix}_mean": float(a.mean()),
+        f"{prefix}_sd": sd,
+        f"{prefix}_se": sd / float(np.sqrt(n)),
+        f"{prefix}_min": float(a.min()),
+        f"{prefix}_max": float(a.max()),
+        f"{prefix}_folds": n,
+    }
+
+
 def evaluate_rolling(
-    venue: str = ANCHOR_VENUE, *, n_folds: int = 6, horizon: int = 7,
-    with_prophet: bool = True,
+    venue: str = ANCHOR_VENUE, *, n_folds: int | None = 6, horizon: int = 7,
+    with_prophet: bool = True, step_days: int | None = None,
 ):
+    """Rolling-origin ladder evaluation.
+
+    `step_days` passes straight through to `harness.rolling_origin`; None keeps
+    the historical disjoint-window behaviour exactly. The per-fold training slice
+    supplies the MASE scale, which is the correct ex-ante choice and is not to be
+    swapped for a fixed `as_of`: the confrontation scripts needed pinning, the
+    ladder never did (report 43).
+    """
     feats = _load_feats(venue)
     cols = feature_columns(feats)
     folds = list(harness.rolling_origin(
-        feats, n_folds=n_folds, horizon_days=horizon, min_train_days=120))
+        feats, n_folds=n_folds, horizon_days=horizon, min_train_days=120,
+        step_days=step_days))
 
-    acc: dict[str, list[float]] = {}
+    acc: dict[str, list[tuple[int, float, float]]] = {}
     rungs: dict[str, int] = {}
     notes: dict[str, str] = {}
-    for tr, te in folds:
+    for i, (tr, te) in enumerate(folds):
         ytr, yte = tr["value"].to_numpy(), te["value"].to_numpy()
         for name, rung, preds, note in _predict_all(
             venue, tr, te, cols, with_prophet=with_prophet
@@ -400,17 +431,35 @@ def evaluate_rolling(
             if preds is None:
                 notes[name] = note
             else:
-                acc.setdefault(name, []).append(
-                    harness.mase(yte, preds, ytr, basis="calendar_lag7"))
+                # The fold INDEX is carried, not just the value. A rung that fails
+                # on one fold otherwise yields a shorter vector that still looks
+                # aligned with the fold list, and S3's bootstrap would pair the
+                # wrong windows together without ever erroring.
+                acc.setdefault(name, []).append((
+                    i,
+                    harness.mase(yte, preds, ytr, basis="calendar_lag7"),
+                    harness.rmsse(yte, preds, ytr, basis="calendar_lag7"),
+                ))
 
     results = []
     for name, rung in sorted(rungs.items(), key=lambda x: (x[1], x[0])):
-        vals = [v for v in acc.get(name, []) if np.isfinite(v)]
+        scored = [(i, m, r) for i, m, r in acc.get(name, []) if np.isfinite(m)]
+        vals = [m for _, m, _ in scored]
+        # per_fold_rmsse stays index-aligned to per_fold_mase and fold_index BY
+        # CONSTRUCTION (same `scored` list, no independent filter), so S3's
+        # bootstrap can trust the three vectors line up. Finiteness of RMSSE is
+        # coupled to MASE's via the shared ruler today; the dispersion call below
+        # is what filters non-finite values out of the summary, not this vector.
+        rvals = [r for _, _, r in scored]
+        idx = [i for i, _, _ in scored]
         if vals:
             results.append(RungResult(
                 name, rung,
                 metrics={"MASE": float(np.mean(vals)), "folds": len(vals),
-                        "per_fold_mase": vals}))
+                         "per_fold_mase": vals, "per_fold_rmsse": rvals,
+                         "fold_index": idx,
+                         **_dispersion("mase", vals),
+                         **_dispersion("rmsse", [r for r in rvals if np.isfinite(r)])}))
         else:
             results.append(RungResult(name, rung, available=False,
                                       note=notes.get(name, "")))
