@@ -353,11 +353,22 @@ State these; do not let a reader find them.
 | Refutation control | 27 Jun, Sat 22:00, +234% | report 31 |
 | Liveness gate | GBP 5,329 forecast for a dead venue -> none | reports 22, 27, 31 |
 | Briefing fatigue | 0 new items/week, 8 suppressed | report 27 |
-| Taxonomy drift | named nodes captured 26% / 15% of June revenue | report 25 |
+| Taxonomy drift, frozen revenue-ranked nodes | captured 26% (BH) / 15% (Ellel) of June revenue | report 25 |
+| Taxonomy drift, standing units-ranked nodes | captured 19.3% (BH) / 31.3% (Ellel) | report 38 |
+| Irreducible new-item share of OTHER | BH 12.6%, Ellel 42.7% | report 38 |
+| Ellel substitution effect on the Beer Hall | DOW-matched **-GBP 23.40** (n 66 active / 333 quiet) | report 36 |
+| Ceiling on the 11 Jul substitution explanation | GBP 27.50 of GBP 573.66, **4.8%** | report 36 |
 | MPS vs CPU | MPS slower (~3.2s vs ~0.6s), parity GBP 0.0002 | report 24 |
 
+**The two taxonomy rows are different hierarchies and are not a before/after.** Report 25
+measured the frozen, revenue-ranked node set; report 38 the standing, units-ranked one.
+Section 4.3 carries the full account. Quote whichever you mean and name the basis on the
+same line, and never present 26% -> 19.3% as movement.
+
 Do not quote: Ellel MASE 0.096 (4.1); "England +130%" without the row-21 pointer (3.2);
-"no exo feature adopted" as if it governed the served model (4.2).
+"no exo feature adopted" as if it governed the served model (4.2); the **pooled** Ellel
+spillover of +GBP 500.18, which is the day-of-week effect wearing a spillover label and
+carries the opposite sign to the matched estimate (3.1, report 36).
 
 ---
 

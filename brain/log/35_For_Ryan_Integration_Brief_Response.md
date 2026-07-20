@@ -515,6 +515,21 @@ cold-start privacy). Two the brain side can answer now:
   | `two_river_taps` | 331 × 40 | `fb388ce32d02fdab` (unchanged) |
   | `ellel` | 386 × 40 | `a3c110bbc72be722` (unchanged) |
 
+  > **LATER ANNOTATION, added 2026-07-20 (G16a). This is the table you were asked to trust
+  > the de-Lune on, and at the time it was written it was not runnable.** The three
+  > prefixes exist in no script in any commit (report 36 section 6(a)), so nobody could
+  > re-measure them, and the `ellel` row count is six short of the canonical store's 392.
+  >
+  > **The conclusion held.** G16a built a portable baseline: both trees measured against
+  > one store copy with one interpreter, by a shim first validated to reproduce the current
+  > gate. `2cc97e7` (pre-de-Lune, before `org_profile.py` existed and 205 changed lines ago
+  > in the feature builder) and `c008651` agree on all three frames at
+  > `8c8a8be9d8dc5791` / `b6339032a219213c` / `ea28bcacbf1825e4`, 399 / 331 / 392 rows. The
+  > de-Lune is now verified portably rather than session-locally, which is a stronger claim
+  > than this report was able to make. Full account and everything else that has changed
+  > since: `log/40_G16_Portable_Baseline_and_Corrections.md` and
+  > `log/41_For_Ryan_Addendum_Post_G15.md`.
+
 - **C2 confrontation reproduces** — BH L1 MASE **0.285 / 0.287**, band coverage @90 **1.00**,
   England-QF `generalises: False`. (Honest caveat: C2 *re-scores a frozen artefact*, so it
   validates the store and scoring, not forecast generation — the frame hashes are what cover
@@ -570,6 +585,14 @@ cold-start privacy). Two the brain side can answer now:
 ---
 
 ## The handshake — caller obligations you now own
+
+> **LATER ANNOTATION, added 2026-07-20 (G16c). Build against `CONTRACT.md`, not against
+> this list.** These eleven were correct on 2026-07-19 and this report keeps them as the
+> record of the handover, but a report is a dated snapshot and the contract is the joint
+> item. `CONTRACT.md` now carries the canonical list, plus a **twelfth** obligation that
+> post-dates this document: a venue reopening after a long closure is refused and **takes
+> the whole request down with it** (FLAG-SEGMENT-FALSE-REJECT), which is an availability
+> decision that is yours. See `log/41_For_Ryan_Addendum_Post_G15.md`.
 
 These are in the contract schema, not just docstrings, because they belong in the caller
 and no caller exists yet:

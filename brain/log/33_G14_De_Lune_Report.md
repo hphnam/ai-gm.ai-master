@@ -449,6 +449,20 @@ split ties depend on order) for each Lune venue, with and without Phase 3.
 
 Byte-identical. The de-Lune changed no Lune number.
 
+> **LATER ANNOTATION, added 2026-07-20 (G16a). Read the three values above as
+> session-local.** The script that produced them was never committed, so this table was
+> not reproducible by anyone, including its author (report 36 section 6(a)). The `ellel`
+> row count is also six short: the canonical store gives 392, and 386 implies a ceiling of
+> 2026-06-28, i.e. FLAG-STORE-DURABILITY firing unnoticed during the session that wrote
+> this report.
+>
+> **The claim this table makes is nonetheless now confirmed, portably.** G16a re-measured
+> both trees against one store with one interpreter, using a shim validated to reproduce
+> the current baseline first: `2cc97e7` (pre-de-Lune) and `c008651` agree on all three
+> frames, `8c8a8be9d8dc5791` / `b6339032a219213c` / `ea28bcacbf1825e4`, 399 / 331 / 392
+> rows. See `log/40_G16_Portable_Baseline_and_Corrections.md`. The finding stands; only
+> these prefixes are retired.
+
 **C2 still reproduces** (store restored to 2026-07-07, held-out window intact, 0 rows):
 
 | | Origin A | Origin B |
@@ -476,6 +490,11 @@ forecasts; that was over-claimed, and the frame hash is the check it should have
 `.venv-eval` (the third venv, TSB-AD/statsforecast, numpy<2.0) still imports the seam and
 resolves to Lune's venues - checked, because a previous pass broke it by changing
 dependency floors without noticing it existed.
+
+<!-- LATER ANNOTATION 2026-07-20 (G16b.4): the "70" endpoint below re-measures at **70**
+     under **ruff 0.15.22** at tip `c008651` (`uvx ruff check .` from `brain/`). The "71"
+     start point is not re-measurable, since it is a pre-Phase-3 tree under whichever ruff
+     `uvx` fetched in July. Quote the endpoint with its version; do not quote the delta. -->
 
 **Lint:** tree ruff 71 -> **70** (one pre-existing `I001` fixed in `ladder.py`, which
 Phase 3 touched anyway; the new files are clean). A `ruff --fix` over `ingest/` also
@@ -526,6 +545,12 @@ exactly this class of error. The flag has been narrowed as a result (below).
 ---
 
 ## 10. Obligations handed to the caller
+
+> **LATER ANNOTATION, added 2026-07-20 (G16c). The canonical list now lives in
+> `CONTRACT.md`**, which is the joint item the API is built against; this section and
+> report 35's are dated records of what was handed over and when. Where they disagree,
+> `CONTRACT.md` wins. It also carries a twelfth obligation these lists predate: a
+> reopening venue fails the whole request (FLAG-SEGMENT-FALSE-REJECT).
 
 Carried forward from report 32 §7, plus Phase 3's:
 

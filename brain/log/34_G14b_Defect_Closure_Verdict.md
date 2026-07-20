@@ -270,6 +270,14 @@ order (tree split ties break on feature index), before and after, on the restore
 Identical to the pre-Phase-3 baseline. Nothing in three rounds of fixes moved a Lune
 number.
 
+> **LATER ANNOTATION, added 2026-07-20 (G16a). These three prefixes are session-local and
+> were never reproducible**; the script producing them was not committed (report 36
+> section 6(a)), and the `ellel` row count is six short of the canonical store's 392. The
+> current, committed and portable baseline is `8c8a8be9d8dc5791` /
+> `b6339032a219213c` / `ea28bcacbf1825e4` at 399 / 331 / 392 rows
+> (`sim/frame_hash.py`), and G16a confirmed it holds at `2cc97e7` too. The claim above is
+> unaffected. See `log/40_G16_Portable_Baseline_and_Corrections.md`.
+
 **C2 re-scores clean** (store at 2026-07-07, held-out window 0 rows): BH L1 MASE
 **0.285** (A) / **0.287** (B), coverage 1.00, `generalises: False`. Recorded with the
 standing caveat from report 33 §8: `confront_july_w2` re-scores a **frozen artefact** and
@@ -278,6 +286,12 @@ hashes are what cover generation.
 
 **Suites:** `.venv` **379 passed / 8 skipped**; `.venv-forecast` **386 / 1** (from 307/8
 and 314/1 at the start of Phase 3). `.venv-eval` still imports the seam. Tree ruff **70** (from 71);
+<!-- LATER ANNOTATION 2026-07-20 (G16b.4): re-measured at tip `c008651` with **ruff 0.15.22**
+     via `uvx ruff check .` from `brain/`: **70**, matching this figure exactly. Report 39
+     recorded the ruff counts as unverified because ruff is in neither venv; that was an
+     under-investigation, since `uvx` was available all along and report 33 section 9 says
+     so. The count is version-sensitive, so quote it as "70 under ruff 0.15.22". -->
+
 the new files are clean. A `ruff --fix` over `tests/` briefly showed 62 by fixing seven
 files Phase 3 has no business in — reverted, and 70 is the honest number.
 

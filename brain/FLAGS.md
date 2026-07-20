@@ -677,8 +677,15 @@ does.
   392 x 40 `ea28bcacbf1825e4`. Report 33's before/after claim is unaffected (it was
   within-session); its published VALUES should be read as session-local. A side result
   worth keeping: the G15a counterfactual's control arm reproduced the committed Origin B
-  forecast to **0.00**, the first evidence in this project that forecast GENERATION is
-  bit-reproducible from the store.
+  forecast **to the penny** (gap 0.00 on `beer_hall`, 11 July), the first evidence in this
+  project that forecast GENERATION is reproducible from the store at all. Scoped down from
+  "bit-reproducible" by G16b.1: it is one venue-day, not a generation path proven bit for
+  bit, and the stronger claim needs full-precision output over seven days and three venues.
+  Closed by G16a, which measured a PORTABLE baseline: `2cc97e7` (pre-de-Lune) and
+  `c008651` produce identical hashes on all three frames, using
+  `sim/g16a_portable_baseline.py` against one store copy with one interpreter, validated
+  against the current gate first. The de-Lune's safety claim no longer rests on a
+  comparison nobody can re-run.
 
 - **FLAG-SEGMENT-FALSE-REJECT (G15b, OPEN by design; report 37).** The isolation guard
   in `compute/contract.py` refuses shapes that are neither a season nor a speck.

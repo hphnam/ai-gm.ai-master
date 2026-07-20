@@ -244,11 +244,19 @@ identical. **A counterfactual on a frozen artefact, not a re-freeze**: written t
 file, with `sim/july2026_w2b_forecast_frozen.*` and
 `sim/july2026_w2_confront_result.json` untouched and `git status` clean on both.
 
-**The control arm reproduces the committed Origin B forecast exactly: 1558.28, gap
-0.00.** That matters more than the counterfactual. It is the first demonstration in this
-project that the forecast **generation** path is bit-reproducible from the store - and
+**The control arm reproduces the committed Origin B forecast to the penny: 1558.28, gap
+0.00.** That matters more than the counterfactual. It is the first evidence in this
+project that the forecast **generation** path is reproducible from the store at all, and
 report 33 was explicit that the C2 confront re-scores a frozen artefact and therefore
 never proved this. The delta below is trustworthy because of it.
+
+> **Scope of that claim, corrected 2026-07-20 (G16b.1).** What was measured is agreement
+> to the penny on **one venue-day**, `beer_hall` on 11 July. It is not bit-level
+> reproduction of a generation path, and this report originally called it
+> "bit-reproducible", which is the same species of over-claim report 33 corrected report
+> 32 for. The stronger claim needs full-precision output across all seven horizon days and
+> all three venues, which is a measurement nobody has run, not an edit. Substance
+> unchanged: the reproduction is real and it is what makes the GBP 27.50 delta readable.
 
 | | forecast | residual vs GBP 984.62 actual |
 |---|---|---|

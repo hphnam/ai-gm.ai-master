@@ -1151,3 +1151,75 @@ them into the append-only log so it is the continuous WP1-to-present record.
     `generalises: False`. **Ruff was not run**: it is not installed in either venv on this
     machine, so the ruff counts in this report's lineage are unverified here and should
     not be quoted forward without re-running them somewhere it exists.
+
+28. **G16a: the de-Lune's safety claim is now portable, and it holds**
+    (`40_G16_Portable_Baseline_and_Corrections.md`). Report 36 6(a) established that the
+    three frame hashes reports 33 to 35 published exist in no script in any commit, and
+    treated the pre-de-Lune comparison as permanently lost. It was not lost: the tree is
+    still in git and the store is restorable. Measured via a detached worktree at
+    `2cc97e7` (report 32, Phase 3 not started, no `org_profile.py`, 205 changed lines ago
+    in `features/build_features.py`) against `c008651`, both reading ONE copied store at
+    ceiling 2026-07-07 through ONE interpreter, by a shim
+    (`sim/g16a_portable_baseline.py`) first validated to reproduce the current gate.
+    **All three frames identical across the de-Lune**: `beer_hall` 399 x 40
+    `8c8a8be9d8dc5791`, `two_river_taps` 331 x 40 `b6339032a219213c`, `ellel` 392 x 40
+    `ea28bcacbf1825e4`. Outcome 1 of the three the spec named; the STOP outcome (a hash
+    moving on identical dimensions) did not occur. This is a **stronger** statement than
+    report 33 could make: not "a comparison run once in one session by an uncommitted
+    script", but one anybody can re-run. Report 36's diagnosis of the `ellel` discrepancy
+    is also confirmed **by arithmetic rather than assertion**: Ellel spans 2025-06-08 to
+    2026-07-04 = **392** calendar days under `fill_calendar`, truncating at 2026-06-28
+    gives **386**, and the six-day difference is exactly the two July W1 trading rows
+    (2026-07-02, 2026-07-04) that FLAG-STORE-DURABILITY dropped from report 33's session.
+    Reports 33, 34 and 35 annotated at each hash table, dated and pointing forward, with
+    their original values left in place; report 35 carries the fullest annotation because
+    it went to Ryan and offered those hashes as the reason to trust the de-Lune. The
+    working clone's store and tree were never touched (worktree removed; `git status`
+    clean on all frozen artefacts).
+
+29. **G16b: four precision corrections, and one of them was itself wrong**
+    (`40_G16_Portable_Baseline_and_Corrections.md`). **(a) "Bit-reproducible" was an
+    over-claim, corrected to "to the penny".** Row 24(f), report 36 2.3, `log/README.md`
+    row 36 and `FLAGS.md` all called the G15a control arm's 0.00 gap evidence that
+    forecast generation is bit-reproducible. What was measured is agreement to the penny
+    on ONE venue-day (`beer_hall`, 11 July). The stronger claim needs full-precision
+    output over seven horizon days and three venues, which is a measurement nobody has
+    run, not an edit. Same species as the over-claim report 33 corrected report 32 for,
+    repeated one report later in the report that congratulates itself for catching stale
+    claims. This row corrects **row 24(f)**; row 24 is not edited. **(b) The "six tests
+    verified to FAIL" claim in row 25 is literally true and evidentially conflated, and
+    the spec's stated proof of the opposite is falsified.** The spec asserted that
+    `test_a_venue_reopening_after_a_long_closure_is_refused_a_known_limitation` "passes
+    before and after and could never have failed pre-fix", since D3 was deliberately left
+    open. **Measured instead of assumed**: reverting `compute/contract.py` AND
+    `compute/forward.py` to `af11c81`, all **six** fail. But they fail in two different
+    ways, which is the real distinction: **four fail on BEHAVIOUR** (the three D1 tests
+    DID NOT RAISE at all; D2's `test_the_band_calibration_guard_is_symmetric` does not
+    raise on the `MAX_HORIZON_DAYS - 1` probe, verified directly since the loop aborts on
+    the wording mismatch first), and **two fail only on the ERROR STRING** (both reopening
+    tests raise identically before and after; only the wording changed from "a mistyped
+    year, not a trading period" to "genuinely reopened" / "known limitation"). So report
+    37's scoping to "the three D1 tests and the D2 test" is **exactly right**, and row
+    25's "all six" inflates the claim, though not by the mechanism the spec predicted. The
+    general point stands and is sharper for being measured: **a test that fails pre-fix on
+    a message string is not evidence that a defect was fixed**, and a test pinning a known
+    limitation is evidence of a third kind again. This row corrects **row 25**; row 25 is
+    not edited. **(c) `DISSERTATION_NOTES.md` numbers-to-quote table corrected and
+    audited in full.** Line 356 still read "named nodes captured 26% / 15%" with no
+    qualifier while section 4.3 already carried report 38's 19.3% / 31.3% on a different
+    basis: two rows of the same document disagreeing, in the table the dissertation will
+    be written from. Both now appear as separate rows with their hierarchies named, with
+    an explicit warning that 26% -> 19.3% is **not** movement. The rest of the table was
+    checked against reports 36 to 39: no other row moved, and three rows were ADDED that
+    G15 established (the DOW-matched substitution effect, the 4.8% ceiling on the 11 July
+    explanation, the irreducible new-item share). The **pooled** +GBP 500.18 spillover was
+    added to the "do not quote" line, since it is the day-of-week effect wearing a
+    spillover label and carries the opposite sign to the matched estimate. **(d) Ruff
+    resolved by measurement, not by a marker, and report 39's deviation (b) was an
+    under-investigation.** Report 39 recorded the counts as unverified because ruff is in
+    neither venv. True but insufficient: `uvx` is on this machine and report 33 section 9
+    states outright that `uvx ruff` was how the original counts were taken. Re-measured at
+    tip `c008651`: **70 errors under ruff 0.15.22**, matching report 34's quoted 70
+    exactly. Reports 33 and 34 annotated with the count and the version. The 71 start
+    point is not re-measurable (pre-Phase-3 tree, unknown ruff), so the endpoint may be
+    quoted with its version and the delta may not.

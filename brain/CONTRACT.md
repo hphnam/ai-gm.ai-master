@@ -249,6 +249,61 @@ capped at what is evidenced and per-step conformal is logged as a research work 
 | `stock_cover` | upsert | only when `stock.enabled` |
 | `diagnostics` | — | weather gap, refit reason, degradation notes. Never silently swallowed. |
 
+## Caller obligations
+
+**This list is canonical.** It lived only in `log/33_G14_De_Lune_Report.md` section 10 and
+`log/35_For_Ryan_Integration_Brief_Response.md`, which are dated records of a step, while
+this file is the joint item the API is built against. Those two keep their copies as the
+record of what was handed over and when; when they disagree with this list, this list wins.
+Moved here by G16c, which changed no wire shape.
+
+1. **`bundle.org_id` is echoed, never an authorization statement.** Assert
+   `bundle.org_id === expectedOrgId` and persist under the orgId you already authorized.
+2. **Weather must be hindcast-basis.** ERA5/observed will not error; it will flatter the
+   backtest by leaking the future into it. (Section 4.)
+3. **`sales_daily` must be ex-VAT.** The brain applies no VAT rule, and mixing bases
+   across venues is unrecoverable downstream. (Section 2.)
+4. **`exogenous` must span the training history AND the full horizon**, or the exo entrant
+   raises rather than degrading to univariate. (Section 4.)
+5. **`structural_zero_dow=[]` means this venue has no closed days.** There is no "unset".
+   The same rule now governs `price_change_dates` (section 1).
+6. **Supply `trading_hours`.** It is the intraday envelope the served Chronos-2 model's
+   covariates depend on, and compute cannot derive it from a daily aggregate. (Section 3.)
+7. **`sales_daily` dates are closed history.** Any row after today is refused: it would
+   otherwise become the forecast origin and the watermark, and a poisoned watermark
+   compounds because it returns as `prior_state` on the next call. Only the API can tell a
+   typo from history.
+8. **`horizon_days` is capped at 7.** A longer ask is a 422, not a wide band. If you need a
+   month, that is FLAG-BAND-HORIZON, not a config change.
+9. **Set a request-size limit at the ingress.** Compute's row caps are `max_length`, which
+   pydantic checks only after materialising every row, so they bound absurdity rather than
+   memory. This one is genuinely yours.
+10. **Do not start a bare thread inside compute.** The per-request store and profile are
+    ContextVars; a `threading.Thread` starts with an empty context and would fall back to
+    Lune's real database inside a tenant's request. Propagate with
+    `contextvars.copy_context()` or do not thread.
+11. **Read `diagnostics`.** Absent weather, unknown covariates, a dataset that does not
+    reconcile to `expected_totals`, a cold-started model, a thin Mondrian group and an
+    unhonoured `stock_enabled` are all reported there and nowhere else.
+12. **Decide how to handle a reopening venue, because it fails the whole request.** A venue
+    that resumes trading after a long closure is refused for its first `MIN_SEGMENT_DAYS`
+    of trade, and since the validator raises on `ComputeDataset`, **one reopening venue
+    takes down the forecast for every sibling in the same call.** Measured: accepted at 21
+    days back, rejected at 13, rejected on day 1. This is a known limitation with a named
+    flag (**FLAG-SEGMENT-FALSE-REJECT**) and it is **open by design**: every discriminator
+    tried reopens a worse hole, and the obvious one (exempt the trailing segment, since a
+    reopening is always at the end) also exempts a dormant venue plus one mistyped recent
+    row, which relights a dead venue and poisons the forecast origin. Your options are
+    per-venue requests, retry-minus-the-offender, or surfacing the refusal to the operator.
+    That is an availability decision and it is yours.
+
+    > **Note that the G15b fix made this MORE likely, not less.** Before it, the isolation
+    > guard validated the pooled dates of the whole request, so a sibling venue trading
+    > through the gap accidentally masked the refusal. Removing that mask was correct, since
+    > it was hiding true positives too, but it means legitimate reopenings now fail where
+    > they previously slipped through. From where you stand that reads as a regression, and
+    > in availability terms it is one.
+
 ## Decisions closed in Phase 3
 
 1. ~~VAT basis~~ → **API sends ex-VAT**; `vat_inclusive`/`vat_rate` removed. (§2)
@@ -281,3 +336,20 @@ capped at what is evidenced and per-step conformal is logged as a research work 
 7. **[OPEN]** L2/L3. Compute emits L1 only. The measured A-vs-B split (report 23 — MinT
    for Beer Hall, revenue-share disaggregation for Ellel) lives in `sim/`, is
    `GATE_WINNER`-keyed by Lune slug, and has no per-tenant equivalent.
+
+## Contract-sync inputs, not decisions taken
+
+Two findings from G15b that would change the contract's shape, recorded here as input to
+the sync conversation rather than implemented. Both hit a stop condition deliberately.
+
+8. **[SYNC] `PriorState` content is unbounded.** The shape is validated; the contents are
+   not. A 100 MB `briefing_chain` is accepted and echoed back verbatim, measured. Not
+   implemented, and the reason is not laziness: `PriorState` is state the API round-trips
+   from its own store, so a size rule invented here could reject the caller's own
+   legitimate persisted state. Whether it is bounded, and at what, is a joint decision.
+   Decision 6 forbids touching `PriorState`'s shape in the meantime.
+9. **[SYNC] `_reject_implausible_dates` depends on wall-clock.** It calls `date.today()`,
+   so an unchanged dataset changes verdict as time passes and there is no frozen-clock
+   seam. A replayed request or a recorded fixture is therefore not reproducible across
+   days, which matters for the API's own regression tests more than for production. The
+   fix is an injectable clock on the contract, which is a shape change.

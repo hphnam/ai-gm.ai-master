@@ -12,6 +12,11 @@ its code. G15a committed this and re-baselined against the canonical restored st
 The hash covers contents AND column order: tree split ties break on feature index, so a
 reordering silently changes a forecast while every value stays identical.
 
+G16a made the baseline PORTABLE: `sim/g16a_portable_baseline.py` measures the same three
+hashes against any tree in this repository's history, and confirmed that `2cc97e7`
+(pre-de-Lune) produces all three values below. So the de-Lune's "changed no Lune number"
+is no longer a comparison nobody can re-run. See `log/40_G16_Portable_Baseline_and_Corrections.md`.
+
 Baseline recorded 2026-07-19 at tip `44a0f08`, store ceiling 2026-07-07 (restore with
 `.venv-forecast/bin/python -m sim.restore_clock` first - a pytest run that collects
 `tests/test_a10_service.py` or `tests/test_a1_warehouse.py` rebuilds the store from the
