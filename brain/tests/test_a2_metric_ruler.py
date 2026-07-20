@@ -109,6 +109,25 @@ def test_rmsse_matches_the_hand_computed_value():
     assert got == pytest.approx(expected, abs=1e-12)
 
 
+def test_m5_denominator_is_the_mean_squared_lag_one_difference():
+    # diffs 10, 10, -30, 0, 0, 0, 13, 13, 13 -> squares sum 1607 over 9
+    assert harness.naive_squared_scale(HAND) == pytest.approx(1607.0 / 9.0)
+
+
+def test_rmsse_m5_matches_the_hand_computed_value():
+    expected = float(np.sqrt(6.5 / (1607.0 / 9.0)))
+    got = harness.rmsse_m5(HAND_TRUE, HAND_PRED, HAND)
+    assert got == pytest.approx(expected, abs=1e-12)
+
+
+def test_rmsse_m5_differs_from_the_shared_ruler_rmsse():
+    """Both are reported, labelled, precisely because they are not the same number
+    on a series with closed days: the lag-1 denominator is inflated by every
+    open-to-closed transition."""
+    shared = harness.rmsse(HAND_TRUE, HAND_PRED, HAND, basis="calendar_lag7")
+    assert harness.rmsse_m5(HAND_TRUE, HAND_PRED, HAND) != pytest.approx(shared)
+
+
 def test_mase_matches_the_hand_computed_value_on_the_same_series():
     # mean |error| 2.5, scale (3 + 6 + 9) / 3 = 6
     got = harness.mase(HAND_TRUE, HAND_PRED, HAND, basis="calendar_lag7")
@@ -189,6 +208,14 @@ def test_metric_row_carries_every_basis_and_names_the_one_it_reports():
     truth, pred = np.array([10.0, 12.0]), np.array([8.0, 15.0])
     row = harness.venue_metric_row(r, truth, pred, reported_basis="calendar_lag7")
     assert set(row["mase"]) == set(harness.SCALE_BASES)
+
+
+def test_metric_row_reports_both_rmsse_variants():
+    r = _ruler()
+    row = harness.venue_metric_row(
+        r, np.array([10.0, 12.0]), np.array([8.0, 15.0]),
+        reported_basis="calendar_lag7")
+    assert {"rmsse", "rmsse_m5"} <= set(row)
     assert row["reported_basis"] == "calendar_lag7"
     assert row["scale"] == pytest.approx(4.0)
 

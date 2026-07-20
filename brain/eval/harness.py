@@ -113,7 +113,7 @@ def assert_no_leakage(
     test_min = test[date_col].min()
     if train_max >= test_min:
         raise LeakageError(
-            f"train ends {train_max} but test starts {test_min} — future leak."
+            f"train ends {train_max} but test starts {test_min} - future leak."
         )
 
 
@@ -311,15 +311,46 @@ def rmsse(
     basis: str,
     n_calendar_days: int | None = None,
 ) -> float:
-    """Root mean squared scaled error.
+    """Root mean squared scaled error, on the SAME ruler as the MASE beside it.
 
     Squared scaled errors optimise for the mean rather than the median, which is
     why M5 adopted RMSSE for a 73 percent intermittent corpus. It does not reward
     the flatline forecast that MASE rewards.
+
+    The denominator uses the basis's own lag, not M5's lag 1, because the claim
+    being made is that MASE and RMSSE differ in LOSS FUNCTION, and that only holds
+    if the ruler is shared. `rmsse_m5` is the literal M5 statistic; report both,
+    labelled (report 42 section 3).
     """
     denom = seasonal_naive_squared_scale(
         y_train, basis=basis, n_calendar_days=n_calendar_days
     )
+    if not np.isfinite(denom):
+        return float("nan")
+    err = np.asarray(y_true, float) - np.asarray(y_pred, float)
+    return float(np.sqrt(float(np.mean(err ** 2)) / denom))
+
+
+def naive_squared_scale(y_train: np.ndarray, *, lag: int = 1) -> float:
+    """M5's RMSSE denominator: mean squared lag-1 difference, no masking."""
+    y = np.asarray(y_train, dtype=float)
+    if y.size <= lag:
+        return float("nan")
+    scale = float(np.mean((y[lag:] - y[:-lag]) ** 2))
+    return scale if scale > 0 else float("nan")
+
+
+def rmsse_m5(
+    y_true: np.ndarray, y_pred: np.ndarray, y_train: np.ndarray
+) -> float:
+    """RMSSE exactly as the M5 competition defined it: lag-1 naive denominator.
+
+    Reported alongside `rmsse` so the answer to "is this M5's RMSSE" is "both, and
+    here is each". On a series with closed days the lag-1 denominator is inflated
+    by every open-to-closed transition, which is why it is the secondary figure
+    here and not the primary one.
+    """
+    denom = naive_squared_scale(y_train)
     if not np.isfinite(denom):
         return float("nan")
     err = np.asarray(y_true, float) - np.asarray(y_pred, float)
@@ -365,6 +396,9 @@ class VenueRuler:
     def rmsse(self, y_true: np.ndarray, y_pred: np.ndarray, basis: str) -> float:
         return rmsse(y_true, y_pred, self.series_for(basis), basis=basis,
                      n_calendar_days=self.n_calendar_days)
+
+    def rmsse_m5(self, y_true: np.ndarray, y_pred: np.ndarray, basis: str) -> float:
+        return rmsse_m5(y_true, y_pred, self.series_for(basis))
 
     def scale_block(self) -> dict:
         """The scale half of a metric row: every basis, and the counts behind it."""
@@ -463,6 +497,7 @@ def venue_metric_row(
     row: dict = {
         "mase": {b: round(ruler.mase(y_true, y_pred, b), 3) for b in SCALE_BASES},
         "rmsse": round(ruler.rmsse(y_true, y_pred, reported_basis), 3),
+        "rmsse_m5": round(ruler.rmsse_m5(y_true, y_pred, reported_basis), 3),
         "mae": round(mae(y_true, y_pred), 1),
         "rmse": round(rmse(y_true, y_pred), 1),
         "n_days": int(np.asarray(y_true).size),

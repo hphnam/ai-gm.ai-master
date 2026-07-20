@@ -12,6 +12,7 @@
           "calendar_lag7_active": 0.629
         },
         "rmsse": 0.498,
+        "rmsse_m5": 0.399,
         "mae": 243.5,
         "rmse": 288.2,
         "n_days": 7,
@@ -47,6 +48,7 @@
           "calendar_lag7_active": 0.074
         },
         "rmsse": 0.209,
+        "rmsse_m5": 0.185,
         "mae": 55.5,
         "rmse": 105.4,
         "n_days": 7,

@@ -818,8 +818,10 @@ does.
   deflate the denominator. Neither is a correct seasonal naive.
   > **The published July W1 figure of 0.386 was computed on `trading_lag7`.** On the
   > backtest's own basis, `calendar_lag7`, the same forecast scores **0.772** against a
-  > backtest MASE of 0.745. The live forecast matched the backtest; it did not beat it by
-  > half. Any quotation of 0.386 as evidence of live outperformance is void.
+  > backtest MASE of 0.745, which is slightly WORSE than its backtest class, not equal to it
+  > and certainly not half better. The defensible claim is that serving-horizon performance is
+  > consistent with the backtest. Any quotation of 0.386 as evidence of live outperformance is
+  > void.
   >
   > Resolved by `eval.harness.seasonal_naive_scale`, now the only L1 implementation, with
   > a required `basis` argument over four documented values and no default. All three

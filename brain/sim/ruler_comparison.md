@@ -91,8 +91,9 @@ backtest itself uses it is **0.772**.
 | backtest MASE, same basis | 0.745 |
 
 That is the substantive consequence. The headline was not "the live forecast beat the backtest
-by nearly half"; it was "the live forecast matched the backtest", 0.772 against 0.745. The
-apparent outperformance was a change of ruler, not a change of accuracy.
+by nearly half"; it was that performance at the serving horizon is consistent with the
+backtest, 0.772 against 0.745 - in fact slightly worse than its backtest class, not equal to
+it. The apparent outperformance was a change of ruler, not a change of accuracy.
 
 ## 4. Coverage now travels with width
 

@@ -19,8 +19,11 @@ backtest's own basis it is **0.772**, against a backtest MASE of 0.745.
 | backtest, same basis | 0.745 |
 
 The claim the number was carrying - that the live forecast beat its own backtest by nearly
-half - does not survive. The correct claim is that it **matched** the backtest, 0.772 against
-0.745, which is a perfectly good result and is the one the dissertation can defend.
+half - does not survive. Nor is the replacement claim "it matched": 0.772 against 0.745 is
+**slightly worse** than its backtest class, not equal to it. The defensible sentence is that
+**performance at the serving horizon is consistent with the backtest**, which is a real and
+reportable result, and the honest direction of the small residual is stated rather than rounded
+away.
 
 G3 was the load-bearing gate precisely because 0.385 reproducing 0.386 is what proves the
 diagnosis is the ruler and not something else. It reproduced to three decimal places.
@@ -288,13 +291,25 @@ which returns four definitions in `eval/harness.py`, `_l2_actuals_and_scale` in
 lag-difference expression itself, which found exactly one, the flagged L2 one at
 `sim/cadence_sweep.py:86`. No fifth implementation exists.
 
-**(b) RMSSE differences at the basis lag, not at lag 1.** The spec gives the M5 formula, whose
-denominator is `(y_t - y_{t-1})`, and in the next clause requires the denominator to be
-"computed in-sample on the same basis as the MASE scale". Those are different instructions.
-The second was followed: `seasonal_naive_squared_scale` uses the basis's own pairs, squared, so
-MASE and RMSSE are read off one ruler and are directly comparable - which is the entire point
-of the package. The cost is that these are not M5's RMSSE numbers and should not be quoted as
-such. Changing it is a one-line edit to that function if the M5 comparison is wanted instead.
+**(b) RMSSE is emitted twice, on both readings of a contradictory instruction.** The spec gives
+the M5 formula, whose denominator is `(y_t - y_{t-1})`, and in the next clause requires the
+denominator to be "computed in-sample on the same basis as the MASE scale". Those are different
+instructions, so both are now reported and labelled. `rmsse` is primary and uses the basis's own
+pairs, squared, because the argument being made is that MASE and RMSSE differ in **loss
+function**, and that only holds if the ruler is shared. `rmsse_m5` is the literal M5 statistic,
+so the examiner's question "is this M5's RMSSE" answers itself.
+
+They are not close, and the gap is informative:
+
+| venue, July W1 | `rmsse` (shared ruler) | `rmsse_m5` (lag 1) |
+|---|---|---|
+| `beer_hall` | 0.498 | 0.399 |
+| `ellel` | 0.209 | 0.185 |
+
+The M5 figure is the flattering one at both venues, because on a series with closed days the
+lag-1 denominator is inflated by every open-to-closed transition, and a bigger denominator makes
+the forecast look better. That is the same deflation pathology as `calendar_lag7`, arriving by a
+different route, which is the reason it is the secondary figure and not the primary one.
 
 **(c) `confront_june.stage2` cannot run and this predates S1.** It fails inside Chronos with a
 future-frame timestamp mismatch. Verified to fail identically at `d40dea7` with the changes
