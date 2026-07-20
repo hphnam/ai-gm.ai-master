@@ -29,7 +29,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import FORECAST_VENUES, SEASONAL_PERIOD, STORE_DIR, VENUE_LABELS
+from config import FORECAST_VENUES, STORE_DIR, VENUE_LABELS
 from eval import harness
 from store.active_span import trim_to_active
 from store.warehouse import read_series
@@ -105,8 +105,8 @@ def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
         "holdout": holdout,
         "donors": donors,
         "n_test": len(test),
-        "mase_transfer": harness.mase(y_true, transfer, y_scale, SEASONAL_PERIOD),
-        "mase_naive": harness.mase(y_true, naive, y_scale, SEASONAL_PERIOD),
+        "mase_transfer": harness.mase(y_true, transfer, y_scale, basis="calendar_lag7"),
+        "mase_naive": harness.mase(y_true, naive, y_scale, basis="calendar_lag7"),
         "anchor_level": round(anchor, 1),
     }
 

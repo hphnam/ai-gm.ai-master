@@ -1223,3 +1223,65 @@ them into the append-only log so it is the continuous WP1-to-present record.
     exactly. Reports 33 and 34 annotated with the count and the version. The 71 start
     point is not re-measurable (pre-Phase-3 tree, unknown ruff), so the endpoint may be
     quoted with its version and the delta may not.
+
+30. **S1 G17a: one L1 scale ruler, and the July headline restated.** Four private
+    seasonal-naive denominators existed, not the three the spec named: `_seasonal_scale` in
+    `sim/confront_july.py`, `sim/confront_july_w2.py` and `sim/cadence_sweep.py`, plus
+    `_seasonal_naive_scale` in `sim/confront_june.py`, which the original G1 grep could not
+    match. The July pair read the `l1_daily` view, which omits closed days, so a lag-7
+    difference reaches back 1.34 calendar weeks at Beer Hall and lands on the wrong weekday;
+    the June and cadence pair read `read_series(fill_calendar=True)`, where closed days are
+    structural zeros and 21 percent of Beer Hall's and 74 percent of Ellel's lag-7 differences
+    are exactly zero and deflate the denominator. Neither is a correct seasonal naive, and at
+    Ellel the choice is worth a factor of **4.5** on the same forecast.
+    **The correction:** `eval.harness.seasonal_naive_scale` is now the only L1 implementation,
+    with a required `basis` argument over four documented values (`calendar_lag7`,
+    `trading_lag7`, `trading_same_weekday`, `calendar_lag7_active`), no default, and a raise on
+    anything else; RMSSE joins MASE; and all three confrontations emit MASE on every basis plus
+    RMSSE, MAE, RMSE, Winkler, mean width and empirical coverage, written to new
+    `*_confront_rescored.json` files so the pre-registered records stay byte-identical.
+    **The basis the dissertation reports is `calendar_lag7`** - not because it is the best of
+    the four (it is deflated by structural zeros) but because it is the only one on which both
+    the ladder backtest and all three confrontations already exist, and S1 is forbidden from
+    re-running the ladder; reporting a better ruler on half the chain would recreate the defect
+    elsewhere. `calendar_lag7_active`, the only basis that is both weekday-aligned and
+    undeflated, is the intended successor and is assigned to S4.
+    **The substantive consequence:** the published July W1 figure of **0.386 was a
+    `trading_lag7` number**, reproduced here at 0.385. On the backtest's own basis the same
+    forecast scores **0.772** against a backtest MASE of 0.745. The forecast **matched** its
+    backtest; it did not beat it by nearly half, and 0.386 must not be quoted as evidence of
+    live outperformance.
+    **The claim is scoped, deliberately.** This establishes one scale implementation **for L1
+    venue-level accuracy**, with **L2 explicitly out of scope and flagged**:
+    `sim/cadence_sweep.py:86` still computes a per-category denominator inline on an
+    undocumented basis, so any L2 figure from that script inherits an unverified ruler
+    (FLAG-L2-DENOMINATOR, assigned to S4, where category-level zeros get their proper
+    treatment). It was left rather than fixed because a category denominator carries
+    category-level intermittency on top of the venue's structural zeros, making its correct
+    basis an open question rather than a substitution, and because changing it would move
+    report 24's published cadence finding inside a measurement package. This row states the
+    scoped claim; an unscoped one would repeat the overclaim that row 29 corrected row 25 for.
+    **Two findings beyond the spec.** (a) A basis alone does not pin a scale: the denominator
+    is also a function of the store ceiling, so June's committed figures do not reproduce from
+    today's store (Beer Hall 1.643 -> 1.515 as its scale grew 291.2 -> 315.7). Two River Taps,
+    closed since 2026-05-08 and therefore unchanged, reproduces exactly and is the control that
+    isolates the cause to store growth rather than code. `venue_ruler` now takes an `as_of`
+    argument, unused by default; pinning is S3's. (b) The 302/68 versus 301/66 trading-day gap
+    is three explainable days - one fully comped Beer Hall day that was genuinely open, one
+    Ellel sale reversed on the spot, and one Ellel batch of 20 voided lines. Recommended
+    definition for S4's occurrence gate is **non-zero net revenue**, since `E[revenue | trade]`
+    is undefined on a zero-revenue day whatever the cause; at Ellel the 2 disputed days are
+    3.0 percent of a series that is only 16.8 percent dense, so S4 must decide it explicitly.
+    **A sample-size caveat attaches to the S4 recommendation.** `calendar_lag7_active` keeps a
+    lag pair only when both endpoints are trading days, which is 70.4 percent of pairs at Beer
+    Hall but **7.3 percent at Ellel, 28 differences**. The basis that is cleanest in principle
+    is the noisiest in practice at exactly the venue whose intermittency motivates it, so S4
+    needs a variance argument before adopting it and the answer may be a different basis per
+    venue. The count is published as `active_lag7_pairs` and is deliberately not derivable from
+    the zero-difference diagnostic: a difference is zero when both endpoints are closed OR when
+    two trading days are equal, while the active basis drops a pair when EITHER is closed, so
+    subtracting suggests 101 pairs at Ellel where the truth is 28.
+    Gates G1 to G6 all pass; suites rise 391 to 415 and 398 to 422 with skips unchanged.
+    Evidence: `brain/log/42_G17a_Metric_Integrity.md`, `sim/ruler_comparison.md`,
+    FLAG-MASE-RULER and FLAG-L2-DENOMINATOR in `brain/FLAGS.md`,
+    `tests/test_a2_metric_ruler.py`.

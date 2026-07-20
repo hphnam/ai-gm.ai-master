@@ -33,6 +33,7 @@ import numpy as np
 import pandas as pd
 
 import config
+from eval import harness
 from store.warehouse import connect
 
 SIM_DIR = config.BRAIN_DIR / "sim"
@@ -84,20 +85,6 @@ def _assert_store_unpolluted() -> str:
     return ceiling
 
 
-def _seasonal_scale(venue: str) -> float:
-    """Same ruler as sim/confront_july.py: mean |y_t - y_{t-7}| over the venue's history."""
-    con = connect(read_only=True)
-    try:
-        s = con.execute(
-            "SELECT date, revenue_exvat v FROM l1_daily WHERE venue=? ORDER BY date",
-            [venue]).df()
-    finally:
-        con.close()
-    y = s["v"].to_numpy(float)
-    d = np.abs(y[config.SEASONAL_PERIOD:] - y[:-config.SEASONAL_PERIOD])
-    return float(np.mean(d)) if d.size else float("nan")
-
-
 def _actuals() -> dict[str, pd.Series]:
     """Per-venue daily actuals over the full horizon; an absent trading day is 0.0."""
     raw = json.loads((SIM_DIR / "july2026_w2_actuals_l1_raw.json").read_text())
@@ -116,7 +103,9 @@ def _actuals() -> dict[str, pd.Series]:
 def _frozen_l1(tag: str) -> pd.DataFrame:
     """Per-day frozen L1 forecast + band. The parquet carries the daily vector the JSON
     summarises, so MASE here is per-day and directly comparable to the 1 to 7 July
-    confront's 0.386 - not a window-total proxy."""
+    confront - not a window-total proxy. Both now score on every basis in
+    `harness.SCALE_BASES`, so the comparison is like-for-like by construction; the
+    old 0.386 was a `trading_lag7` figure (report 42, FLAG-MASE-RULER)."""
     d = pd.read_parquet(SIM_DIR / ORIGINS[tag]["file"].replace(".json", ".parquet"))
     return d[d.level == "L1"].assign(date=lambda x: pd.to_datetime(x.date))
 
@@ -124,6 +113,7 @@ def _frozen_l1(tag: str) -> pd.DataFrame:
 def stage1(actuals: dict[str, pd.Series]) -> dict:
     """Per-day L1 accuracy per origin per venue, plus dormancy confirmation."""
     out: dict = {}
+    rulers: dict[str, harness.VenueRuler] = {}
     for tag, meta in ORIGINS.items():
         frozen = json.loads((SIM_DIR / meta["file"]).read_text())
         l1 = _frozen_l1(tag)
@@ -143,15 +133,17 @@ def stage1(actuals: dict[str, pd.Series]) -> dict:
             f = l1[l1.venue == venue].set_index("date").reindex(HORIZON)
             yhat = f.yhat.to_numpy(float)
             a = act.to_numpy(float)
-            scale = _seasonal_scale(venue)
-            covered = ((a >= f.lo.to_numpy(float)) & (a <= f.hi.to_numpy(float)))
+            lo, hi = f.lo.to_numpy(float), f.hi.to_numpy(float)
+            if venue not in rulers:
+                rulers[venue] = harness.venue_ruler(venue)
+            covered = ((a >= lo) & (a <= hi))
 
             per_venue[venue] = {
                 "dormant": False,
                 "model": blk["model"],
-                "mase_per_day": round(float(np.mean(np.abs(a - yhat))) / scale, 3)
-                if scale and np.isfinite(scale) else None,
-                "band_coverage_at_90": round(float(covered.mean()), 3),
+                **harness.venue_metric_row(rulers[venue], a, yhat, lo, hi,
+                                           reported_basis=harness.REPORTED_BASIS,
+                                           level=LEVEL),
                 "days_outside_band": int((~covered).sum()),
                 "forecast_window_total": round(float(np.nansum(yhat)), 2),
                 "actual_window_total": round(actual_total, 2),
@@ -278,7 +270,8 @@ def run() -> dict:
         "stage3_england_minus_generic": stage3(actuals),
     }
     print(json.dumps(result, indent=2))
-    (SIM_DIR / "july2026_w2_confront_result.json").write_text(
+    # New file, not an edit: see sim/confront_july.py and S1 G5.
+    (SIM_DIR / "july2026_w2_confront_rescored.json").write_text(
         json.dumps(result, indent=2) + "\n")
     return result
 

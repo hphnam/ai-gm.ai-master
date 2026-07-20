@@ -152,7 +152,7 @@ def run() -> dict:
                 if nodes[i].endswith("::OTHER"):
                     continue
                 ytr = ns[nodes[i]][ns[nodes[i]].index < test_start].to_numpy(float)
-                mase = harness.mase(actual[i], pred_of(i), ytr, config.SEASONAL_PERIOD)
+                mase = harness.mase(actual[i], pred_of(i), ytr, basis="calendar_lag7")
                 if np.isfinite(mase):
                     vals.append(mase)
             return float(np.mean(vals)) if vals else float("nan")

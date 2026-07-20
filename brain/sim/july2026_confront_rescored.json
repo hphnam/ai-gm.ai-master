@@ -1,0 +1,593 @@
+{
+  "pass1_sha": "7d103aaa",
+  "stage1": {
+    "l1": {
+      "beer_hall": {
+        "july_actual_total": 4394.0,
+        "july_frozen_total": 3917.0,
+        "mase": {
+          "calendar_lag7": 0.772,
+          "trading_lag7": 0.385,
+          "trading_same_weekday": 0.534,
+          "calendar_lag7_active": 0.629
+        },
+        "rmsse": 0.498,
+        "mae": 243.5,
+        "rmse": 288.2,
+        "n_days": 7,
+        "reported_basis": "calendar_lag7",
+        "scale": 315.7,
+        "scales": {
+          "calendar_lag7": 315.7,
+          "trading_lag7": 631.8,
+          "trading_same_weekday": 456.5,
+          "calendar_lag7_active": 386.9
+        },
+        "same_weekday_lag": 5,
+        "n_trading_days": 302,
+        "n_calendar_days": 399,
+        "trading_days_per_week": 5.3,
+        "zero_lag7_diffs": 78,
+        "total_lag7_diffs": 392,
+        "active_lag7_pairs": 276,
+        "winkler": 1207.3,
+        "mean_width": 1207.3,
+        "empirical_coverage": 1.0,
+        "level": 0.9,
+        "backtest_mase": 0.745,
+        "backtest_basis": "calendar_lag7"
+      },
+      "ellel": {
+        "july_actual_total": 445.0,
+        "july_frozen_total": 56.0,
+        "mase": {
+          "calendar_lag7": 0.308,
+          "trading_lag7": 0.072,
+          "trading_same_weekday": 0.069,
+          "calendar_lag7_active": 0.074
+        },
+        "rmsse": 0.209,
+        "mae": 55.5,
+        "rmse": 105.4,
+        "n_days": 7,
+        "reported_basis": "calendar_lag7",
+        "scale": 180.1,
+        "scales": {
+          "calendar_lag7": 180.1,
+          "trading_lag7": 770.8,
+          "trading_same_weekday": 806.2,
+          "calendar_lag7_active": 754.0
+        },
+        "same_weekday_lag": 1,
+        "n_trading_days": 68,
+        "n_calendar_days": 392,
+        "trading_days_per_week": 1.21,
+        "zero_lag7_diffs": 284,
+        "total_lag7_diffs": 385,
+        "active_lag7_pairs": 28,
+        "winkler": 283.0,
+        "mean_width": 283.0,
+        "empirical_coverage": 1.0,
+        "level": 0.9,
+        "backtest_mase": 0.572,
+        "backtest_basis": "calendar_lag7"
+      }
+    },
+    "l2": {
+      "beer_hall": {
+        "mae_category_total": 154.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 2488.0,
+            "actual": 2261.0
+          },
+          {
+            "category": "Food",
+            "frozen": 26.0,
+            "actual": 25.0
+          },
+          {
+            "category": "Happy Hour",
+            "frozen": 121.0,
+            "actual": 253.0
+          },
+          {
+            "category": "Merchandise",
+            "frozen": 9.0,
+            "actual": 550.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 220.0,
+            "actual": 257.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 463.0,
+            "actual": 330.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 173.0,
+            "actual": 327.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 417.0,
+            "actual": 421.0
+          }
+        ]
+      },
+      "ellel": {
+        "mae_category_total": 82.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 24.0,
+            "actual": 121.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 5.0,
+            "actual": 108.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 16.0,
+            "actual": 212.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 1.0,
+            "actual": 4.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 10.0,
+            "actual": 0.0
+          }
+        ]
+      }
+    },
+    "l3": {
+      "beer_hall": {
+        "basis": "calendar_lag7",
+        "n_scored": 25,
+        "mase_all_mean": 1.681,
+        "mase_all_median": 0.723,
+        "rmsse_all_mean": 0.875,
+        "rmsse_all_median": 0.47,
+        "named_share_of_actual": 0.3,
+        "conservation_ok": true,
+        "table": [
+          {
+            "node": "Beer::OTHER",
+            "actual": 2260.96,
+            "frozen": 2012.0,
+            "mase": 0.675,
+            "rmsse": 0.548
+          },
+          {
+            "node": "Merchandise::Hire Fee",
+            "actual": 500.0,
+            "frozen": 8.0,
+            "mase": 13.79,
+            "rmsse": 5.733
+          },
+          {
+            "node": "Spirits::OTHER",
+            "actual": 287.4,
+            "frozen": 370.0,
+            "mase": 0.51,
+            "rmsse": 0.348
+          },
+          {
+            "node": "Wine::OTHER",
+            "actual": 255.91,
+            "frozen": 396.0,
+            "mase": 0.876,
+            "rmsse": 0.584
+          },
+          {
+            "node": "Happy Hour::\u00a34 Lager/Cider",
+            "actual": 210.6,
+            "frozen": 65.0,
+            "mase": 2.348,
+            "rmsse": 1.948
+          },
+          {
+            "node": "Uncategorised::OTHER",
+            "actual": 162.7,
+            "frozen": 168.0,
+            "mase": 0.867,
+            "rmsse": 0.47
+          },
+          {
+            "node": "Soft Drinks::Postmix",
+            "actual": 159.27,
+            "frozen": 190.0,
+            "mase": 0.723,
+            "rmsse": 0.625
+          },
+          {
+            "node": "Uncategorised::Breeze Pale Ale",
+            "actual": 146.44,
+            "frozen": 4.0,
+            "mase": 7.207,
+            "rmsse": 2.031
+          },
+          {
+            "node": "Wine::Sauvignon Blanc",
+            "actual": 124.68,
+            "frozen": 7.0,
+            "mase": 2.839,
+            "rmsse": 1.736
+          },
+          {
+            "node": "Soft Drinks::OTHER",
+            "actual": 55.75,
+            "frozen": 23.0,
+            "mase": 1.35,
+            "rmsse": 1.126
+          },
+          {
+            "node": "Merchandise::OTHER",
+            "actual": 50.0,
+            "frozen": 1.0,
+            "mase": 4.366,
+            "rmsse": 2.918
+          },
+          {
+            "node": "Happy Hour::\u00a33.50 Cask",
+            "actual": 42.32,
+            "frozen": 53.0,
+            "mase": 0.244,
+            "rmsse": 0.18
+          },
+          {
+            "node": "Spirits::SMIRNOFF",
+            "actual": 42.25,
+            "frozen": 74.0,
+            "mase": 0.307,
+            "rmsse": 0.173
+          },
+          {
+            "node": "Wine::Pinot Grigio",
+            "actual": 40.47,
+            "frozen": 4.0,
+            "mase": 0.992,
+            "rmsse": 0.735
+          },
+          {
+            "node": "Soft Drinks::Pop Can",
+            "actual": 26.85,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Food::OTHER",
+            "actual": 25.14,
+            "frozen": 23.0,
+            "mase": 0.832,
+            "rmsse": 0.593
+          },
+          {
+            "node": "Uncategorised::Lancashire  crisps",
+            "actual": 17.5,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Soft Drinks::Cordial & Soda",
+            "actual": 15.41,
+            "frozen": 7.0,
+            "mase": 0.565,
+            "rmsse": 0.43
+          },
+          {
+            "node": "Beer::Lager - BH",
+            "actual": 0.0,
+            "frozen": 375.0,
+            "mase": 1.342,
+            "rmsse": 0.711
+          },
+          {
+            "node": "Beer::LuneBrew Pilsner",
+            "actual": 0.0,
+            "frozen": 63.0,
+            "mase": 0.93,
+            "rmsse": 0.193
+          },
+          {
+            "node": "Beer::Paulaner Helles Lager",
+            "actual": 0.0,
+            "frozen": 37.0,
+            "mase": 0.235,
+            "rmsse": 0.135
+          },
+          {
+            "node": "Food::Nobby's Nuts",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Food::Pork Scratchings",
+            "actual": 0.0,
+            "frozen": 2.0,
+            "mase": 0.268,
+            "rmsse": 0.323
+          },
+          {
+            "node": "Food::Seabrook Crisps",
+            "actual": 0.0,
+            "frozen": 1.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Happy Hour::OTHER",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Happy Hour::\u00a315 FIZZ",
+            "actual": 0.0,
+            "frozen": 2.0,
+            "mase": 0.096,
+            "rmsse": 0.031
+          },
+          {
+            "node": "Merchandise::CREME POP ART   T-shirt copy copy",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Merchandise::Caravan T-shirt",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": 0.036,
+            "rmsse": 0.008
+          },
+          {
+            "node": "Spirits::Baby Guinness",
+            "actual": 0.0,
+            "frozen": 16.0,
+            "mase": 0.304,
+            "rmsse": 0.172
+          },
+          {
+            "node": "Spirits::Espresso Martini / Passion Fruit Martini",
+            "actual": 0.0,
+            "frozen": 3.0,
+            "mase": 0.132,
+            "rmsse": 0.033
+          },
+          {
+            "node": "Uncategorised::Galway Irish Stout",
+            "actual": 0.0,
+            "frozen": 1.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Wine::Aperol Spritz",
+            "actual": 0.0,
+            "frozen": 11.0,
+            "mase": 0.193,
+            "rmsse": 0.08
+          }
+        ]
+      },
+      "ellel": {
+        "basis": "calendar_lag7",
+        "n_scored": 18,
+        "mase_all_mean": 0.32,
+        "mase_all_median": 0.08,
+        "rmsse_all_mean": 0.18,
+        "rmsse_all_median": 0.038,
+        "named_share_of_actual": 0.534,
+        "conservation_ok": true,
+        "table": [
+          {
+            "node": "Beer::OTHER",
+            "actual": 116.51,
+            "frozen": 12.0,
+            "mase": 0.334,
+            "rmsse": 0.181
+          },
+          {
+            "node": "Spirits::SMIRNOFF",
+            "actual": 99.48,
+            "frozen": 4.0,
+            "mase": 1.693,
+            "rmsse": 0.647
+          },
+          {
+            "node": "Spirits::OTHER",
+            "actual": 85.48,
+            "frozen": 8.0,
+            "mase": 0.34,
+            "rmsse": 0.178
+          },
+          {
+            "node": "Soft Drinks::Postmix",
+            "actual": 72.5,
+            "frozen": 2.0,
+            "mase": 0.876,
+            "rmsse": 0.786
+          },
+          {
+            "node": "Soft Drinks::J20",
+            "actual": 27.5,
+            "frozen": 1.0,
+            "mase": 0.654,
+            "rmsse": 0.589
+          },
+          {
+            "node": "Spirits::Baby Guinness",
+            "actual": 27.5,
+            "frozen": 2.0,
+            "mase": 0.794,
+            "rmsse": 0.437
+          },
+          {
+            "node": "Soft Drinks::Pop Can",
+            "actual": 6.67,
+            "frozen": 1.0,
+            "mase": 0.393,
+            "rmsse": 0.123
+          },
+          {
+            "node": "Beer::Guinness Can",
+            "actual": 4.0,
+            "frozen": 3.0,
+            "mase": 0.018,
+            "rmsse": 0.016
+          },
+          {
+            "node": "Uncategorised::OTHER",
+            "actual": 3.75,
+            "frozen": 0.0,
+            "mase": 0.08,
+            "rmsse": 0.038
+          },
+          {
+            "node": "Soft Drinks::OTHER",
+            "actual": 1.54,
+            "frozen": 1.0,
+            "mase": 0.022,
+            "rmsse": 0.021
+          },
+          {
+            "node": "Beer::Lager - BH",
+            "actual": 0.0,
+            "frozen": 7.0,
+            "mase": 0.049,
+            "rmsse": 0.036
+          },
+          {
+            "node": "Beer::LuneBrew Pilsner",
+            "actual": 0.0,
+            "frozen": 2.0,
+            "mase": 0.187,
+            "rmsse": 0.026
+          },
+          {
+            "node": "Spirits::Morgan's Spiced",
+            "actual": 0.0,
+            "frozen": 1.0,
+            "mase": 0.073,
+            "rmsse": 0.036
+          },
+          {
+            "node": "Uncategorised::Breeze Pale Ale",
+            "actual": 0.0,
+            "frozen": 1.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Uncategorised::Famous Grouse",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": null,
+            "rmsse": null
+          },
+          {
+            "node": "Uncategorised::Vodka Cans",
+            "actual": 0.0,
+            "frozen": 0.0,
+            "mase": 0.025,
+            "rmsse": 0.012
+          },
+          {
+            "node": "Wine::OTHER",
+            "actual": 0.0,
+            "frozen": 4.0,
+            "mase": 0.028,
+            "rmsse": 0.023
+          },
+          {
+            "node": "Wine::Pinot Grigio",
+            "actual": 0.0,
+            "frozen": 2.0,
+            "mase": 0.081,
+            "rmsse": 0.039
+          },
+          {
+            "node": "Wine::Prosecco",
+            "actual": 0.0,
+            "frozen": 1.0,
+            "mase": 0.04,
+            "rmsse": 0.021
+          },
+          {
+            "node": "Wine::Serena Spumante (Fizz)",
+            "actual": 0.0,
+            "frozen": 3.0,
+            "mase": 0.079,
+            "rmsse": 0.042
+          }
+        ]
+      }
+    },
+    "dormant": {
+      "beer_hall": {
+        "forecast": true,
+        "any_july_actual": true
+      },
+      "two_river_taps": {
+        "forecast": false,
+        "any_july_actual": false
+      },
+      "ellel": {
+        "forecast": true,
+        "any_july_actual": true
+      }
+    }
+  },
+  "stage2_incontext": {
+    "date": "2026-07-01",
+    "fixture": "England v DR Congo 17:00 (only in-hours England date)",
+    "frozen_yhat": 487.0,
+    "dow_median_wed": 296.0,
+    "actual": 747.0,
+    "anticipated_above_baseline": true,
+    "lift_over_baseline": 191.0,
+    "actual_uplift_over_baseline": 451.0,
+    "june_first_fixture_report22": {
+      "date": "2026-06-17",
+      "frozen": 300,
+      "dow_median": 289,
+      "actual": 607,
+      "anticipated": false
+    },
+    "caveat": "single in-hours England date; directional, not significant. A real in-context claim needs many fixture dates across venues and seasons."
+  },
+  "stage3_drift": {
+    "beer_hall": {
+      "june_named_share": 0.264,
+      "july_named_share": 0.3,
+      "june_l3_mase_median": 1.33,
+      "july_l3_mase_median": 0.723,
+      "named_coverage_jump": 0.036
+    },
+    "ellel": {
+      "june_named_share": 0.153,
+      "july_named_share": 0.534,
+      "june_l3_mase_median": 0.241,
+      "july_l3_mase_median": 0.08,
+      "named_coverage_jump": 0.381
+    },
+    "note": "June used the stale taxonomy (report 25), July the refreshed one. A rise in named-node coverage quantifies how much June L3 degradation was drift, not model error. Residual: items new in July still fall to OTHER (the irreducible new-item problem), so coverage will not reach 100%."
+  }
+}

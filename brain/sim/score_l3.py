@@ -116,8 +116,8 @@ def run() -> dict:
                                   named_by_cat.get(cat, []))
             # Degenerate scale (a near-constant pre-June node) makes MASE blow up on a
             # near-zero denominator; exclude those from aggregates and count them.
-            scale = harness.seasonal_naive_scale(train, config.SEASONAL_PERIOD)
-            m = harness.mase(actual, frozen, train, config.SEASONAL_PERIOD)
+            scale = harness.seasonal_naive_scale(train, basis="calendar_lag7")
+            m = harness.mase(actual, frozen, train, basis="calendar_lag7")
             scoreable = np.isfinite(m) and np.isfinite(scale) and scale >= 1.0
             in_frozen = node in nodes
             row = {"node": node, "june_actual": round(float(actual.sum()), 2),

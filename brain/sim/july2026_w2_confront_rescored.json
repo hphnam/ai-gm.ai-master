@@ -1,0 +1,543 @@
+{
+  "artefact": "july2026_w2_confront_result",
+  "store_ceiling_at_confront": "2026-07-07",
+  "horizon": {
+    "start": "2026-07-08",
+    "end": "2026-07-14"
+  },
+  "actuals_source": "sim/july2026_w2_actuals_l1_raw.json (Square MCP-SIM, pulled 2026-07-16)",
+  "pre_registration": "both origins frozen 2026-07-10, before any actual existed; airtight by calendar",
+  "stage1_l1_accuracy": {
+    "A": {
+      "cutoff": "2026-06-30",
+      "commit": "a590f91",
+      "venues": {
+        "beer_hall": {
+          "dormant": false,
+          "model": "rung4_chronos2_exo",
+          "mase": {
+            "calendar_lag7": 0.571,
+            "trading_lag7": 0.285,
+            "trading_same_weekday": 0.395,
+            "calendar_lag7_active": 0.466
+          },
+          "rmsse": 0.44,
+          "mae": 180.3,
+          "rmse": 254.5,
+          "n_days": 7,
+          "reported_basis": "calendar_lag7",
+          "scale": 315.7,
+          "scales": {
+            "calendar_lag7": 315.7,
+            "trading_lag7": 631.8,
+            "trading_same_weekday": 456.5,
+            "calendar_lag7_active": 386.9
+          },
+          "same_weekday_lag": 5,
+          "n_trading_days": 302,
+          "n_calendar_days": 399,
+          "trading_days_per_week": 5.3,
+          "zero_lag7_diffs": 78,
+          "total_lag7_diffs": 392,
+          "active_lag7_pairs": 276,
+          "winkler": 1202.9,
+          "mean_width": 1202.9,
+          "empirical_coverage": 1.0,
+          "level": 0.9,
+          "days_outside_band": 0,
+          "forecast_window_total": 4292.65,
+          "actual_window_total": 3722.36,
+          "window_error_gbp": 570.29,
+          "window_abs_pct_error": 15.3,
+          "direction": "over",
+          "per_day": [
+            {
+              "date": "2026-07-08",
+              "dow": "Wed",
+              "yhat": 383.29,
+              "actual": 442.1,
+              "error": -58.81,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-09",
+              "dow": "Thu",
+              "yhat": 735.35,
+              "actual": 450.61,
+              "error": 284.74,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-10",
+              "dow": "Fri",
+              "yhat": 1021.23,
+              "actual": 1138.87,
+              "error": -117.64,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-11",
+              "dow": "Sat",
+              "yhat": 1565.19,
+              "actual": 984.62,
+              "error": 580.57,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-12",
+              "dow": "Sun",
+              "yhat": 498.82,
+              "actual": 603.88,
+              "error": -105.06,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-13",
+              "dow": "Mon",
+              "yhat": 37.77,
+              "actual": 102.28,
+              "error": -64.51,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-14",
+              "dow": "Tue",
+              "yhat": 51.01,
+              "actual": 0.0,
+              "error": 51.01,
+              "in_band": true
+            }
+          ]
+        },
+        "two_river_taps": {
+          "dormant": true,
+          "actual_window_total": 0.0,
+          "no_forecast_issued": true,
+          "false_alarm": false
+        },
+        "ellel": {
+          "dormant": false,
+          "model": "rung1_robust_dow",
+          "mase": {
+            "calendar_lag7": 0.411,
+            "trading_lag7": 0.096,
+            "trading_same_weekday": 0.092,
+            "calendar_lag7_active": 0.098
+          },
+          "rmsse": 0.285,
+          "mae": 74.0,
+          "rmse": 143.4,
+          "n_days": 7,
+          "reported_basis": "calendar_lag7",
+          "scale": 180.1,
+          "scales": {
+            "calendar_lag7": 180.1,
+            "trading_lag7": 770.8,
+            "trading_same_weekday": 806.2,
+            "calendar_lag7_active": 754.0
+          },
+          "same_weekday_lag": 1,
+          "n_trading_days": 68,
+          "n_calendar_days": 392,
+          "trading_days_per_week": 1.21,
+          "zero_lag7_diffs": 284,
+          "total_lag7_diffs": 385,
+          "active_lag7_pairs": 28,
+          "winkler": 436.9,
+          "mean_width": 283.0,
+          "empirical_coverage": 0.857,
+          "level": 0.9,
+          "days_outside_band": 1,
+          "forecast_window_total": 56.3,
+          "actual_window_total": 574.63,
+          "window_error_gbp": -518.33,
+          "window_abs_pct_error": 90.2,
+          "direction": "under",
+          "per_day": [
+            {
+              "date": "2026-07-08",
+              "dow": "Wed",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-09",
+              "dow": "Thu",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-10",
+              "dow": "Fri",
+              "yhat": 0.0,
+              "actual": 189.51,
+              "error": -189.51,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-11",
+              "dow": "Sat",
+              "yhat": 56.3,
+              "actual": 385.12,
+              "error": -328.81,
+              "in_band": false
+            },
+            {
+              "date": "2026-07-12",
+              "dow": "Sun",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-13",
+              "dow": "Mon",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-14",
+              "dow": "Tue",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            }
+          ]
+        }
+      }
+    },
+    "B": {
+      "cutoff": "2026-07-07",
+      "commit": "9dd9028",
+      "venues": {
+        "beer_hall": {
+          "dormant": false,
+          "model": "rung4_chronos2_exo",
+          "mase": {
+            "calendar_lag7": 0.575,
+            "trading_lag7": 0.287,
+            "trading_same_weekday": 0.397,
+            "calendar_lag7_active": 0.469
+          },
+          "rmsse": 0.444,
+          "mae": 181.4,
+          "rmse": 256.9,
+          "n_days": 7,
+          "reported_basis": "calendar_lag7",
+          "scale": 315.7,
+          "scales": {
+            "calendar_lag7": 315.7,
+            "trading_lag7": 631.8,
+            "trading_same_weekday": 456.5,
+            "calendar_lag7_active": 386.9
+          },
+          "same_weekday_lag": 5,
+          "n_trading_days": 302,
+          "n_calendar_days": 399,
+          "trading_days_per_week": 5.3,
+          "zero_lag7_diffs": 78,
+          "total_lag7_diffs": 392,
+          "active_lag7_pairs": 276,
+          "winkler": 1174.9,
+          "mean_width": 1174.9,
+          "empirical_coverage": 1.0,
+          "level": 0.9,
+          "days_outside_band": 0,
+          "forecast_window_total": 4468.93,
+          "actual_window_total": 3722.36,
+          "window_error_gbp": 746.57,
+          "window_abs_pct_error": 20.1,
+          "direction": "over",
+          "per_day": [
+            {
+              "date": "2026-07-08",
+              "dow": "Wed",
+              "yhat": 364.05,
+              "actual": 442.1,
+              "error": -78.05,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-09",
+              "dow": "Thu",
+              "yhat": 766.89,
+              "actual": 450.61,
+              "error": 316.28,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-10",
+              "dow": "Fri",
+              "yhat": 1103.0,
+              "actual": 1138.87,
+              "error": -35.87,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-11",
+              "dow": "Sat",
+              "yhat": 1558.28,
+              "actual": 984.62,
+              "error": 573.66,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-12",
+              "dow": "Sun",
+              "yhat": 513.66,
+              "actual": 603.88,
+              "error": -90.22,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-13",
+              "dow": "Mon",
+              "yhat": 44.95,
+              "actual": 102.28,
+              "error": -57.33,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-14",
+              "dow": "Tue",
+              "yhat": 118.1,
+              "actual": 0.0,
+              "error": 118.1,
+              "in_band": true
+            }
+          ]
+        },
+        "two_river_taps": {
+          "dormant": true,
+          "actual_window_total": 0.0,
+          "no_forecast_issued": true,
+          "false_alarm": false
+        },
+        "ellel": {
+          "dormant": false,
+          "model": "rung1_robust_dow",
+          "mase": {
+            "calendar_lag7": 0.411,
+            "trading_lag7": 0.096,
+            "trading_same_weekday": 0.092,
+            "calendar_lag7_active": 0.098
+          },
+          "rmsse": 0.285,
+          "mae": 74.0,
+          "rmse": 143.4,
+          "n_days": 7,
+          "reported_basis": "calendar_lag7",
+          "scale": 180.1,
+          "scales": {
+            "calendar_lag7": 180.1,
+            "trading_lag7": 770.8,
+            "trading_same_weekday": 806.2,
+            "calendar_lag7_active": 754.0
+          },
+          "same_weekday_lag": 1,
+          "n_trading_days": 68,
+          "n_calendar_days": 392,
+          "trading_days_per_week": 1.21,
+          "zero_lag7_diffs": 284,
+          "total_lag7_diffs": 385,
+          "active_lag7_pairs": 28,
+          "winkler": 465.9,
+          "mean_width": 267.4,
+          "empirical_coverage": 0.857,
+          "level": 0.9,
+          "days_outside_band": 1,
+          "forecast_window_total": 56.3,
+          "actual_window_total": 574.63,
+          "window_error_gbp": -518.33,
+          "window_abs_pct_error": 90.2,
+          "direction": "under",
+          "per_day": [
+            {
+              "date": "2026-07-08",
+              "dow": "Wed",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-09",
+              "dow": "Thu",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-10",
+              "dow": "Fri",
+              "yhat": 0.0,
+              "actual": 189.51,
+              "error": -189.51,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-11",
+              "dow": "Sat",
+              "yhat": 56.3,
+              "actual": 385.12,
+              "error": -328.81,
+              "in_band": false
+            },
+            {
+              "date": "2026-07-12",
+              "dow": "Sun",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-13",
+              "dow": "Mon",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            },
+            {
+              "date": "2026-07-14",
+              "dow": "Tue",
+              "yhat": 0.0,
+              "actual": 0.0,
+              "error": 0.0,
+              "in_band": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "stage2_england_anticipation": {
+    "case_1_jul01_england_r32_report27": {
+      "dow_baseline": 296.0,
+      "forecast": 487.0,
+      "anticipated_lift": 191.0,
+      "actual": 746.99,
+      "realised_lift_over_baseline": 450.99,
+      "verdict": "under-shot the magnitude, moved the right way"
+    },
+    "case_2_jul11_england_qf": {
+      "A": {
+        "label": "england_qf_in_hours",
+        "dow_baseline": 1253.62,
+        "forecast": 1565.19,
+        "anticipated_lift": 311.57,
+        "actual": 984.62,
+        "realised_lift_over_baseline": -269.0,
+        "forecast_error": 580.57,
+        "anticipated_direction_correct": false
+      },
+      "B": {
+        "label": "england_qf_in_hours",
+        "dow_baseline": 1249.4,
+        "forecast": 1558.28,
+        "anticipated_lift": 308.88,
+        "actual": 984.62,
+        "realised_lift_over_baseline": -264.78,
+        "forecast_error": 573.66,
+        "anticipated_direction_correct": false
+      }
+    },
+    "generalises": false,
+    "kickoff_time_hypothesis": {
+      "hypothesis": "the 11 Jul lift failed because Norway v England kicked off 22:00, leaving only ~1.5h inside the Saturday trading envelope (close 23:27)",
+      "control": {
+        "2026-06-17": {
+          "fixture": "England v Croatia",
+          "kickoff": "21:00",
+          "dow": "Wed",
+          "actual": 607.09,
+          "dow_median": 271.15,
+          "lift_pct": 124
+        },
+        "2026-06-23": {
+          "fixture": "England v Ghana",
+          "kickoff": "21:00",
+          "dow": "Tue",
+          "actual": 334.93,
+          "dow_median": 120.77,
+          "lift_pct": 177
+        },
+        "2026-06-27": {
+          "fixture": "Panama v England",
+          "kickoff": "22:00",
+          "dow": "Sat",
+          "actual": 3081.5,
+          "dow_median": 921.47,
+          "lift_pct": 234
+        },
+        "2026-07-01": {
+          "fixture": "England v DR Congo",
+          "kickoff": "17:00",
+          "dow": "Wed",
+          "actual": 758.54,
+          "dow_median": 336.83,
+          "lift_pct": 125
+        },
+        "2026-07-11": {
+          "fixture": "Norway v England",
+          "kickoff": "22:00",
+          "dow": "Sat",
+          "actual": 984.62,
+          "dow_median": null,
+          "lift_pct": -21,
+          "note": "held out of the store; lift is vs the frozen DOW baseline"
+        }
+      },
+      "verdict": "REFUTED. 27 Jun (Panama v England) was also a Saturday, also a 22:00 kickoff, and returned the LARGEST home-nation lift on record (+234% over its DOW median). Day-of-week and kickoff hour are held constant across the two cases and the outcomes invert, so neither explains the 11 Jul failure.",
+      "open": "The 11 Jul shortfall is unexplained by the covariates in CHRONOS2_EXO_COLS. Next diagnostics, in order: weather on 11 Jul (the one exo family not yet compared across the two Saturdays, and not in the feature frame because 11 Jul is held out); estate cannibalisation (11 Jul also carries an Events booking of GBP 779.94 and an Ellel event of GBP 385.12, absent on 27 Jun); and tournament-stage effects (group-stage dead rubber vs knockout)."
+    }
+  },
+  "stage3_england_minus_generic": {
+    "A": {
+      "england_expected_lift": 311.57,
+      "england_realised_lift": -269.0,
+      "generic_expected_lift_mean": 130.21,
+      "generic_realised_lift_mean": 46.66,
+      "expected_premium": 181.36,
+      "realised_premium": -315.66,
+      "per_generic": {
+        "2026-07-09": {
+          "expected_lift": 77.58,
+          "realised_lift": -207.15
+        },
+        "2026-07-10": {
+          "expected_lift": 182.84,
+          "realised_lift": 300.48
+        }
+      }
+    },
+    "B": {
+      "england_expected_lift": 308.88,
+      "england_realised_lift": -264.78,
+      "generic_expected_lift_mean": 174.66,
+      "generic_realised_lift_mean": 34.45,
+      "expected_premium": 134.22,
+      "realised_premium": -299.23,
+      "per_generic": {
+        "2026-07-09": {
+          "expected_lift": 109.2,
+          "realised_lift": -207.08
+        },
+        "2026-07-10": {
+          "expected_lift": 240.11,
+          "realised_lift": 275.98
+        }
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import SEASONAL_PERIOD, STORE_DIR
+from config import STORE_DIR
 from eval import harness
 from features.build_features import build_features
 from models.foundation import CHRONOS2_MODEL_ID, HAS_CHRONOS, _chronos2_pipeline
@@ -69,8 +69,8 @@ def probe() -> dict:
         cov = _point_forecast(pipe, tr, te, KNOWN_FUTURE)
         rows.append({
             "fold": k,
-            "mase_univariate": harness.mase(yte, uni, ytr, SEASONAL_PERIOD),
-            "mase_covariate": harness.mase(yte, cov, ytr, SEASONAL_PERIOD)})
+            "mase_univariate": harness.mase(yte, uni, ytr, basis="calendar_lag7"),
+            "mase_covariate": harness.mase(yte, cov, ytr, basis="calendar_lag7")})
     uni_mean = float(np.mean([r["mase_univariate"] for r in rows]))
     cov_mean = float(np.mean([r["mase_covariate"] for r in rows]))
     return {"rows": rows, "uni_mean": uni_mean, "cov_mean": cov_mean}

@@ -27,7 +27,6 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-import config
 from eval import harness
 from features.build_features import build_features
 from ingest.world_cup import WC_FEATURE_COLS, read_world_cup_schedule
@@ -60,7 +59,7 @@ def _fold_mase(venue: str, feats: pd.DataFrame, exo_cols: list[str],
                 continue
         pred = chronos2_exo_predict(tr, te, venue=venue, exo_cols=exo_cols)
         out.append(harness.mase(te["value"].to_numpy(), pred,
-                                tr["value"].to_numpy(), config.SEASONAL_PERIOD))
+                                tr["value"].to_numpy(), basis="calendar_lag7"))
     return [v for v in out if np.isfinite(v)]
 
 

@@ -1,0 +1,243 @@
+{
+  "stage1": {
+    "l1": {
+      "beer_hall": {
+        "june_actual_total": 26890.0,
+        "june_frozen_total": 13917.0,
+        "mase": {
+          "calendar_lag7": 1.515,
+          "trading_lag7": 0.757,
+          "trading_same_weekday": 1.048,
+          "calendar_lag7_active": 1.236
+        },
+        "rmsse": 1.422,
+        "mae": 478.4,
+        "rmse": 822.0,
+        "n_days": 30,
+        "reported_basis": "calendar_lag7",
+        "scale": 315.7,
+        "scales": {
+          "calendar_lag7": 315.7,
+          "trading_lag7": 631.8,
+          "trading_same_weekday": 456.5,
+          "calendar_lag7_active": 386.9
+        },
+        "same_weekday_lag": 5,
+        "n_trading_days": 302,
+        "n_calendar_days": 399,
+        "trading_days_per_week": 5.3,
+        "zero_lag7_diffs": 78,
+        "total_lag7_diffs": 392,
+        "active_lag7_pairs": 276,
+        "winkler": 5062.9,
+        "mean_width": 989.3,
+        "empirical_coverage": 0.833,
+        "level": 0.9,
+        "mase_trading_days_only": {
+          "calendar_lag7": 1.8,
+          "trading_lag7": 0.899,
+          "trading_same_weekday": 1.245,
+          "calendar_lag7_active": 1.469
+        },
+        "backtest_mase": 0.745,
+        "backtest_basis": "calendar_lag7",
+        "n_trading_horizon": 25
+      },
+      "two_river_taps": {
+        "june_actual_total": 0.0,
+        "june_frozen_total": 5329.0,
+        "mase": {
+          "calendar_lag7": 1.182,
+          "trading_lag7": 0.805,
+          "trading_same_weekday": 0.729,
+          "calendar_lag7_active": 1.025
+        },
+        "rmsse": 0.883,
+        "mae": 177.6,
+        "rmse": 231.6,
+        "n_days": 30,
+        "reported_basis": "calendar_lag7",
+        "scale": 150.3,
+        "scales": {
+          "calendar_lag7": 150.3,
+          "trading_lag7": 220.7,
+          "trading_same_weekday": 243.7,
+          "calendar_lag7_active": 173.2
+        },
+        "same_weekday_lag": 6,
+        "n_trading_days": 280,
+        "n_calendar_days": 331,
+        "trading_days_per_week": 5.92,
+        "zero_lag7_diffs": 44,
+        "total_lag7_diffs": 324,
+        "active_lag7_pairs": 268,
+        "winkler": 1190.5,
+        "mean_width": 376.3,
+        "empirical_coverage": 0.667,
+        "level": 0.9,
+        "mase_trading_days_only": {
+          "calendar_lag7": 1.611,
+          "trading_lag7": 1.097,
+          "trading_same_weekday": 0.994,
+          "calendar_lag7_active": 1.398
+        },
+        "backtest_mase": 0.597,
+        "backtest_basis": "calendar_lag7",
+        "n_trading_horizon": 22
+      },
+      "ellel": {
+        "june_actual_total": 2338.0,
+        "june_frozen_total": 604.0,
+        "mase": {
+          "calendar_lag7": 0.489,
+          "trading_lag7": 0.114,
+          "trading_same_weekday": 0.109,
+          "calendar_lag7_active": 0.117
+        },
+        "rmsse": 0.781,
+        "mae": 88.0,
+        "rmse": 393.0,
+        "n_days": 30,
+        "reported_basis": "calendar_lag7",
+        "scale": 180.1,
+        "scales": {
+          "calendar_lag7": 180.1,
+          "trading_lag7": 770.8,
+          "trading_same_weekday": 806.2,
+          "calendar_lag7_active": 754.0
+        },
+        "same_weekday_lag": 1,
+        "n_trading_days": 68,
+        "n_calendar_days": 392,
+        "trading_days_per_week": 1.21,
+        "zero_lag7_diffs": 284,
+        "total_lag7_diffs": 385,
+        "active_lag7_pairs": 28,
+        "winkler": 1578.2,
+        "mean_width": 422.7,
+        "empirical_coverage": 0.967,
+        "level": 0.9,
+        "mase_trading_days_only": {
+          "calendar_lag7": 2.931,
+          "trading_lag7": 0.685,
+          "trading_same_weekday": 0.655,
+          "calendar_lag7_active": 0.7
+        },
+        "backtest_mase": 0.572,
+        "backtest_basis": "calendar_lag7",
+        "n_trading_horizon": 5
+      }
+    },
+    "l2": {
+      "beer_hall": {
+        "mae_category_total": 1660.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 9227.0,
+            "actual": 13102.0
+          },
+          {
+            "category": "Food",
+            "frozen": 93.0,
+            "actual": 30.0
+          },
+          {
+            "category": "Happy Hour",
+            "frozen": 451.0,
+            "actual": 705.0
+          },
+          {
+            "category": "Merchandise",
+            "frozen": 57.0,
+            "actual": 778.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 925.0,
+            "actual": 1633.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 1326.0,
+            "actual": 4563.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 190.0,
+            "actual": 2324.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 1648.0,
+            "actual": 3935.0
+          }
+        ]
+      },
+      "ellel": {
+        "mae_category_total": 347.0,
+        "table": [
+          {
+            "category": "Beer",
+            "frozen": 247.0,
+            "actual": 1429.0
+          },
+          {
+            "category": "Soft Drinks",
+            "frozen": 58.0,
+            "actual": 289.0
+          },
+          {
+            "category": "Spirits",
+            "frozen": 180.0,
+            "actual": 189.0
+          },
+          {
+            "category": "Uncategorised",
+            "frozen": 4.0,
+            "actual": 216.0
+          },
+          {
+            "category": "Wine",
+            "frozen": 115.0,
+            "actual": 214.0
+          }
+        ]
+      }
+    },
+    "world_cup": {
+      "beer_hall_england_dates": [
+        {
+          "date": "2026-06-17",
+          "dow": "Wed",
+          "fixture": "England v Croatia 21:00",
+          "actual": 607.0,
+          "frozen_yhat": 300.0,
+          "dow_median": 296.0
+        },
+        {
+          "date": "2026-06-23",
+          "dow": "Tue",
+          "fixture": "England v Ghana 21:00",
+          "actual": 335.0,
+          "frozen_yhat": 39.0,
+          "dow_median": 0.0
+        },
+        {
+          "date": "2026-06-27",
+          "dow": "Sat",
+          "fixture": "Panama v England 22:00",
+          "actual": 3082.0,
+          "frozen_yhat": 1083.0,
+          "dow_median": 1245.0
+        }
+      ],
+      "note": "One June, 3 England dates: directional only, no power."
+    }
+  },
+  "stage2": {
+    "unavailable": "store-ceiling-advanced-past-forecast-origin",
+    "store_ceiling": "2026-07-07",
+    "requires_ceiling_at_or_before": "2026-05-31"
+  }
+}

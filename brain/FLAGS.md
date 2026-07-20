@@ -803,3 +803,58 @@ does.
   > and the whole problem retires when Neon is the system of record and the clock is not
   > reconstructible-by-accident local state. Until then, treat "I ran the tests" as
   > "I reset the clock".
+
+## S1 G17a metric integrity (report 42)
+
+- **FLAG-MASE-RULER (RESOLVED for L1, 20 Jul 2026).** Three private
+  `_seasonal_scale` implementations (`sim/confront_july.py`, `sim/confront_july_w2.py`,
+  `sim/cadence_sweep.py`) plus a fourth, `_seasonal_naive_scale` in
+  `sim/confront_june.py`, each computed the MASE denominator on a different basis and
+  none recorded which. The July/W2 pair read the `l1_daily` view, which is grouped by
+  trading date and omits closed days, so a lag-7 difference reaches back 1.34 calendar
+  weeks at Beer Hall and lands on the wrong weekday. The June/cadence pair read
+  `read_series(..., fill_calendar=True)`, where closed days are structural zeros, so 21
+  percent of Beer Hall's and 74 percent of Ellel's lag-7 differences are exactly zero and
+  deflate the denominator. Neither is a correct seasonal naive.
+  > **The published July W1 figure of 0.386 was computed on `trading_lag7`.** On the
+  > backtest's own basis, `calendar_lag7`, the same forecast scores **0.772** against a
+  > backtest MASE of 0.745. The live forecast matched the backtest; it did not beat it by
+  > half. Any quotation of 0.386 as evidence of live outperformance is void.
+  >
+  > Resolved by `eval.harness.seasonal_naive_scale`, now the only L1 implementation, with
+  > a required `basis` argument over four documented values and no default. All three
+  > confrontations emit MASE on every basis plus RMSSE, MAE, RMSE, Winkler, mean width and
+  > empirical coverage. Full table in `sim/ruler_comparison.md`.
+  >
+  > **Residual, not fixed:** a basis alone does not pin a scale, because the denominator is
+  > also a function of the store ceiling. June's committed figures were computed against a
+  > 2026-05-31 ceiling and do not reproduce from today's store (Beer Hall 1.643 -> 1.515 as
+  > its scale grew 291.2 -> 315.7). `venue_ruler` takes an `as_of` argument for this but
+  > does not use it by default. Pinning belongs with the environment work in S3.
+
+- **FLAG-L2-DENOMINATOR (OPEN, assigned to S4).** `sim/cadence_sweep.py:86`, inside
+  `_l2_actuals_and_scale`, computes a **per-category** seasonal-naive denominator inline.
+  It is not the L1 ruler in `eval.harness`, its basis is undocumented, and **any L2
+  accuracy figure quoted from that script inherits an unverified ruler** - including the
+  `l2_category_mase` column of `sim/june2026_cadence_sweep.json`.
+  > Deliberately left in place by S1, which scopes itself to L1. It is not a naming
+  > cleanup: at venue level the structural zeros are closed days, but at category level the
+  > denominator additionally carries categories that sell nothing on days the venue is
+  > open, so the correct basis is an open question rather than a mechanical substitution.
+  > Changing it inside a measurement-integrity package would also move report 24's
+  > published cadence finding (weekly is the accuracy sweet spot), confounding a
+  > measurement change with a result.
+  >
+  > Assigned to **S4**, the intermittency and occurrence-gate package, because that is
+  > where category-level zeros get their proper treatment. Not S2, which is fold count and
+  > has nothing to do with denominators.
+
+- **FLAG-JUNE-STAGE2-UNRUNNABLE (OPEN, pre-existing, not introduced by S1).**
+  `sim/confront_june.py` `stage2` (the weekly-rolling operation, explicitly labelled NOT
+  the pre-registered number) cannot run against a store whose ceiling has advanced past its
+  first forecast origin: the June rows are now observed history, so `build_features`
+  returns a frame already containing the target dates and Chronos rejects the future frame.
+  Verified to fail identically at `d40dea7` before any S1 edit. S1 converts the vendor
+  timestamp error into a stated precondition and records `stage2` as unavailable rather
+  than emitting a wrong number; re-scoring it needs the pinned store S3 introduces. Stage 1,
+  the pre-registered cold forecast, is unaffected and is re-scored in full.

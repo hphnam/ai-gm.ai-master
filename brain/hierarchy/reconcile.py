@@ -25,7 +25,6 @@ import pandas as pd
 from config import (
     ANCHOR_VENUE,
     CONFORMAL_LEVELS,
-    SEASONAL_PERIOD,
     STORE_DIR,
     TEST_WEEKS,
 )
@@ -264,8 +263,8 @@ def _croston_comparison(node_series, nodes, test_dates, test_start, intermittent
         dow_pred = Ybase[i].copy()
         cro_pred = np.full(len(test_dates), croston_sba(ytr, alpha=0.1), float)
 
-        mase_dow = harness.mase(y_true, dow_pred, ytr, SEASONAL_PERIOD)
-        mase_sba = harness.mase(y_true, cro_pred, ytr, SEASONAL_PERIOD)
+        mase_dow = harness.mase(y_true, dow_pred, ytr, basis="calendar_lag7")
+        mase_sba = harness.mase(y_true, cro_pred, ytr, basis="calendar_lag7")
         adopt = bool(np.isfinite(mase_dow) and np.isfinite(mase_sba)
                      and mase_sba < mase_dow)
         if adopt:

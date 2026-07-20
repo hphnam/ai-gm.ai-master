@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 
 import config
+from eval import harness
 from ingest.taxonomy import map_category
 from sim.build_frozen_forecast import GATE_WINNER, build_future_frame
 from store.warehouse import connect, read_series
@@ -30,6 +31,8 @@ from store.warehouse import connect, read_series
 SIM_DIR = config.BRAIN_DIR / "sim"
 JUNE = pd.date_range("2026-06-01", "2026-06-30", freq="D")
 BACKTEST_MASE = {"beer_hall": 0.745, "two_river_taps": 0.597, "ellel": 0.572}
+BAND_LEVEL = 0.90
+STAGE2_MAX_CEILING = "2026-05-31"       # stage2's first forecast origin
 
 
 def _load_frozen() -> pd.DataFrame:
@@ -51,25 +54,6 @@ def _load_actuals_l2() -> pd.DataFrame:
     # on an unmapped category), replacing the old raw-string spelling fix.
     df["category"] = df["category"].map(map_category)
     return df
-
-
-def _seasonal_naive_scale(venue: str) -> float:
-    """In-sample seasonal-naive MAE (period 7) on the training series - the MASE
-    denominator, computed on the served store (history <= ceiling)."""
-    con = connect(read_only=True)
-    try:
-        s = read_series(venue, "L1", fill_calendar=True, con=con)
-    finally:
-        con.close()
-    y = s["value"].to_numpy(float)
-    diff = np.abs(y[config.SEASONAL_PERIOD:] - y[:-config.SEASONAL_PERIOD])
-    return float(np.mean(diff)) if diff.size else float("nan")
-
-
-def _mase(actual: np.ndarray, pred: np.ndarray, scale: float) -> float:
-    if not np.isfinite(scale) or scale <= 0:
-        return float("nan")
-    return float(np.mean(np.abs(actual - pred)) / scale)
 
 
 def _build_actuals_eval(frozen, a1, a2):
@@ -101,20 +85,25 @@ def stage1(frozen, a1, a2) -> dict:
         actual = np.array([av.get(d, 0.0) for d in fz["date"]], float)
         yhat = fz["yhat"].to_numpy(float)
         lo, hi = fz["lo"].to_numpy(float), fz["hi"].to_numpy(float)
-        scale = _seasonal_naive_scale(venue)
+        ruler = harness.venue_ruler(venue)
         # Trading-days mask: exclude structural-closed days (both forecast small
         # AND no actual) to report an active-day view alongside the full horizon.
         trading = ~((actual == 0.0) & (yhat < 60))
         res = {
             "june_actual_total": round(float(actual.sum()), 0),
             "june_frozen_total": round(float(yhat.sum()), 0),
-            "mase_all": round(_mase(actual, yhat, scale), 3),
-            "mae_all": round(float(np.mean(np.abs(actual - yhat))), 1),
-            "mase_trading": round(_mase(actual[trading], yhat[trading], scale), 3)
-            if trading.any() else None,
-            "band_coverage": round(float(np.mean((actual >= lo) & (actual <= hi))), 3),
+            **harness.venue_metric_row(ruler, actual, yhat, lo, hi,
+                                       reported_basis=harness.REPORTED_BASIS,
+                                       level=BAND_LEVEL),
+            "mase_trading_days_only": {
+                b: round(ruler.mase(actual[trading], yhat[trading], b), 3)
+                for b in harness.SCALE_BASES
+            } if trading.any() else None,
             "backtest_mase": BACKTEST_MASE[venue],
-            "n_days": int(len(fz)), "n_trading": int(trading.sum()),
+            "backtest_basis": harness.REPORTED_BASIS,
+            # Active days in the June HORIZON, distinct from the venue-history
+            # `n_trading_days` the metric row carries.
+            "n_trading_horizon": int(trading.sum()),
         }
         out["l1"][venue] = res
 
@@ -163,11 +152,32 @@ def stage1(frozen, a1, a2) -> dict:
 def stage2() -> dict:
     """Realistic weekly-rolling 7-day-ahead: each week forecast from history plus
     June actuals up to the prior week. USES PROGRESSIVE ACTUALS - not the
-    pre-registered number. Same gate winner per venue."""
+    pre-registered number. Same gate winner per venue.
+
+    Requires a store whose ceiling is at or before the first forecast origin. Once
+    the clock advanced to 2026-07-07 the June rows became observed history, so
+    `build_features` returns a frame that already contains the target dates and
+    Chronos rejects the future frame. Stated as a precondition here because the
+    vendor error it otherwise raises names timestamps, not the cause. Pre-existing
+    at d40dea7 and unchanged by S1: re-scoring it needs the pinned store that S3
+    introduces.
+    """
     from models.foundation import CHRONOS2_EXO_COLS, chronos2_exo_predict
     from models.ladder import rung1_robust_dow, rung2_ets
     from store.active_span import trim_to_active
     from features.build_features import build_features
+
+    con = connect(read_only=True)
+    try:
+        ceiling = str(con.execute("SELECT MAX(date) FROM l1_daily").fetchone()[0])
+    finally:
+        con.close()
+    if ceiling > STAGE2_MAX_CEILING:
+        return {
+            "unavailable": "store-ceiling-advanced-past-forecast-origin",
+            "store_ceiling": ceiling,
+            "requires_ceiling_at_or_before": STAGE2_MAX_CEILING,
+        }
 
     a1 = _load_actuals_l1()
     boundaries = [pd.Timestamp("2026-05-31"), pd.Timestamp("2026-06-07"),
@@ -177,8 +187,8 @@ def stage2() -> dict:
     for venue in config.FORECAST_VENUES:
         feats = trim_to_active(build_features(venue), venue)
         av = a1[a1["venue"] == venue].set_index("date")["net_exvat"]
-        scale = _seasonal_naive_scale(venue)
-        errs, preds_all, acts_all = [], [], []
+        ruler = harness.venue_ruler(venue)
+        preds_all, acts_all = [], []
         for b in boundaries:
             block = pd.date_range(b + pd.Timedelta(days=1),
                                   min(b + pd.Timedelta(days=7), JUNE[-1]), freq="D")
@@ -205,13 +215,10 @@ def stage2() -> dict:
             preds_all.extend(pred.tolist())
             acts_all.extend(act.tolist())
         acts_all = np.array(acts_all); preds_all = np.array(preds_all)
-        out[venue] = {
-            "rolling_mase": round(_mase(acts_all, preds_all, scale), 3)
-            if len(acts_all) else None,
-            "rolling_mae": round(float(np.mean(np.abs(acts_all - preds_all))), 1)
-            if len(acts_all) else None,
-            "n_days": int(len(acts_all)),
-        }
+        out[venue] = harness.venue_metric_row(
+            ruler, acts_all, preds_all,
+            reported_basis=harness.REPORTED_BASIS) if len(acts_all) else {
+            "n_days": 0}
     return out
 
 
@@ -220,7 +227,9 @@ def main() -> dict:
     a1, a2 = _load_actuals_l1(), _load_actuals_l2()
     _build_actuals_eval(frozen, a1, a2)
     result = {"stage1": stage1(frozen, a1, a2), "stage2": stage2()}
-    (SIM_DIR / "june2026_confront_result.json").write_text(json.dumps(result, indent=2))
+    # New file, not an edit: see sim/confront_july.py and S1 G5.
+    (SIM_DIR / "june2026_confront_rescored.json").write_text(
+        json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
     return result
 

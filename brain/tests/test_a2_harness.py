@@ -26,7 +26,7 @@ def test_mase_of_perfect_forecast_is_zero():
     rng = np.random.default_rng(0)
     train = rng.normal(100, 20, size=60)  # non-degenerate -> positive scale
     y = np.array([110.0, 95.0])
-    assert harness.mase(y, y, train, season=7) == 0.0
+    assert harness.mase(y, y, train, basis="calendar_lag7") == 0.0
 
 
 def test_coverage_counts_points_inside_band():

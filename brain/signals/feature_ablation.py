@@ -64,7 +64,8 @@ def _fold_eval(train, test, cols, level=LEVEL):
     resid = np.abs(fit_cal["value"].to_numpy() - cal_pred)
     q = float(np.quantile(resid, level)) if len(resid) else 0.0
     pred = _recursive_gbm_predict(model, train, test, cols)
-    mase = harness.mase(test["value"].to_numpy(), pred, train["value"].to_numpy())
+    mase = harness.mase(test["value"].to_numpy(), pred, train["value"].to_numpy(),
+                        basis="calendar_lag7")
     cov = harness.coverage(test["value"].to_numpy(),
                            np.clip(pred - q, 0, None), pred + q)
     return mase, cov

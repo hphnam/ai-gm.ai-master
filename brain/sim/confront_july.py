@@ -30,6 +30,7 @@ SIM_DIR = config.BRAIN_DIR / "sim"
 JULY = pd.date_range("2026-07-01", "2026-07-07", freq="D")
 PASS1_SHA = "7d103aaa"
 BACKTEST_MASE = {"beer_hall": 0.745, "ellel": 0.572}
+BAND_LEVEL = 0.90
 
 
 def _load(name: str) -> pd.DataFrame:
@@ -39,26 +40,10 @@ def _load(name: str) -> pd.DataFrame:
     return df
 
 
-def _seasonal_scale(venue: str) -> float:
-    con = connect(read_only=True)
-    try:
-        s = con.execute(
-            "SELECT date, revenue_exvat v FROM l1_daily WHERE venue=? ORDER BY date",
-            [venue]).df()
-    finally:
-        con.close()
-    y = s["v"].to_numpy(float)
-    d = np.abs(y[config.SEASONAL_PERIOD:] - y[:-config.SEASONAL_PERIOD])
-    return float(np.mean(d)) if d.size else float("nan")
-
-
-def _mase(actual, pred, scale):
-    return float(np.mean(np.abs(actual - pred)) / scale) if scale and np.isfinite(scale) else float("nan")
-
-
 def stage1(frozen, a1, a2, a3) -> dict:
     out = {"l1": {}, "l2": {}, "l3": {}, "dormant": {}}
     live = ("beer_hall", "ellel")
+    rulers = {v: harness.venue_ruler(v) for v in live}
 
     for venue in live:
         fz = frozen[(frozen.venue == venue) & (frozen.level == "L1")].sort_values("date")
@@ -66,14 +51,14 @@ def stage1(frozen, a1, a2, a3) -> dict:
         actual = np.array([av.get(d, 0.0) for d in fz["date"]], float)
         yhat = fz["yhat"].to_numpy(float)
         lo, hi = fz["lo"].to_numpy(float), fz["hi"].to_numpy(float)
-        scale = _seasonal_scale(venue)
         out["l1"][venue] = {
             "july_actual_total": round(float(actual.sum()), 0),
             "july_frozen_total": round(float(yhat.sum()), 0),
-            "mase": round(_mase(actual, yhat, scale), 3),
-            "mae": round(float(np.mean(np.abs(actual - yhat))), 1),
-            "band_coverage": round(float(np.mean((actual >= lo) & (actual <= hi))), 3),
+            **harness.venue_metric_row(rulers[venue], actual, yhat, lo, hi,
+                                       reported_basis=harness.REPORTED_BASIS,
+                                       level=BAND_LEVEL),
             "backtest_mase": BACKTEST_MASE[venue],
+            "backtest_basis": harness.REPORTED_BASIS,
         }
 
     # L2 category MASE through the map (per-day per-category).
@@ -82,15 +67,12 @@ def stage1(frozen, a1, a2, a3) -> dict:
         a2v["bcat"] = a2v["category"].map(map_category)
         fz = frozen[(frozen.venue == venue) & (frozen.level == "L2")]
         cats = sorted(set(fz["key"]) | set(a2v["bcat"]))
-        maces, tbl = [], []
+        tbl = []
         for c in cats:
             fzc = fz[fz.key == c].set_index("date")["yhat"].reindex(JULY, fill_value=0.0).to_numpy()
             ac = a2v[a2v.bcat == c].groupby("date")["net_exvat"].sum().reindex(JULY, fill_value=0.0).to_numpy()
-            m = _mase(ac, fzc, _seasonal_scale(venue))  # venue-level scale as a common ruler
             tbl.append({"category": c, "frozen": round(float(fzc.sum()), 0),
                         "actual": round(float(ac.sum()), 0)})
-            if np.isfinite(m):
-                maces.append(m)
         out["l2"][venue] = {"mae_category_total": round(
             float(np.mean([abs(r["frozen"] - r["actual"]) for r in tbl])), 0),
             "table": tbl}
@@ -122,29 +104,39 @@ def _score_l3(frozen, a3) -> dict:
         actual_nodes = _actual_by_node(a3[a3.venue == venue], venue_named)
         all_nodes = sorted(set(nodes) | set(actual_nodes))
 
-        mases, table, named_actual, total_actual = [], [], 0.0, 0.0
+        mases, rmsses, table, named_actual, total_actual = [], [], [], 0.0, 0.0
         for node in all_nodes:
             cat, item = node.split("::", 1)
             frozen_d = l3[l3.key == node].set_index("date")["yhat"].reindex(JULY, fill_value=0.0).to_numpy()
             actual_d = actual_nodes.get(node, pd.Series(0.0, index=JULY)).to_numpy()
             is_other = item == "OTHER"
             train = _train_series(store, cal, cat, None if is_other else item, named_by_cat.get(cat, []))
-            scale = harness.seasonal_naive_scale(train, config.SEASONAL_PERIOD)
-            m = harness.mase(actual_d, frozen_d, train, config.SEASONAL_PERIOD)
+            # An L3 node series is already calendar-reindexed, so `calendar_lag7`
+            # is the only basis defined for it: there is no trading-day index at
+            # node grain (report 42 section 4).
+            scale = harness.seasonal_naive_scale(train, basis="calendar_lag7")
+            m = harness.mase(actual_d, frozen_d, train, basis="calendar_lag7")
+            r = harness.rmsse(actual_d, frozen_d, train, basis="calendar_lag7")
             scoreable = np.isfinite(m) and np.isfinite(scale) and scale >= 1.0
             total_actual += float(actual_d.sum())
             if not is_other:
                 named_actual += float(actual_d.sum())
             if scoreable:
                 mases.append(m)
+                if np.isfinite(r):
+                    rmsses.append(r)
             table.append({"node": node, "actual": round(float(actual_d.sum()), 2),
                           "frozen": round(float(frozen_d.sum()), 0),
-                          "mase": round(float(m), 3) if scoreable else None})
+                          "mase": round(float(m), 3) if scoreable else None,
+                          "rmsse": round(float(r), 3) if scoreable and np.isfinite(r) else None})
         venue_total = float(a3[a3.venue == venue]["net_exvat"].sum())
         result[venue] = {
+            "basis": "calendar_lag7",
             "n_scored": len(mases),
             "mase_all_mean": round(float(np.mean(mases)), 3) if mases else None,
             "mase_all_median": round(float(np.median(mases)), 3) if mases else None,
+            "rmsse_all_mean": round(float(np.mean(rmsses)), 3) if rmsses else None,
+            "rmsse_all_median": round(float(np.median(rmsses)), 3) if rmsses else None,
             "named_share_of_actual": round(named_actual / venue_total, 3) if venue_total else None,
             "conservation_ok": abs(sum(r["actual"] for r in table) - venue_total) < 1.0,
             "table": sorted(table, key=lambda r: -r["actual"]),
@@ -253,7 +245,10 @@ def main() -> dict:
     result = {"pass1_sha": PASS1_SHA, "stage1": s1,
               "stage2_incontext": stage2_incontext(frozen, a1),
               "stage3_drift": stage3_drift(s1["l3"])}
-    (SIM_DIR / "july2026_confront_result.json").write_text(
+    # A NEW file, deliberately. `july2026_confront_result.json` is the committed
+    # pre-registered scoring record and stays byte-identical; re-scoring on the
+    # documented ruler is an additional artefact, not an edit to the chain (S1 G5).
+    (SIM_DIR / "july2026_confront_rescored.json").write_text(
         json.dumps(result, indent=2, allow_nan=False) + "\n")
     print(json.dumps({"l1": s1["l1"], "incontext": result["stage2_incontext"],
                       "drift": result["stage3_drift"]}, indent=2))

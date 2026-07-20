@@ -155,8 +155,8 @@ def _score(df: pd.DataFrame, selection: dict) -> dict:
         train = _node_series(df, cat, item, named_by_cat.get(cat, []), cal)
         actual = _node_series(df, cat, item, named_by_cat.get(cat, []), HELD_OUT)
         yhat = _dow_median(train, cal, HELD_OUT)
-        scale = harness.seasonal_naive_scale(train, config.SEASONAL_PERIOD)
-        m = harness.mase(actual, yhat, train, config.SEASONAL_PERIOD)
+        scale = harness.seasonal_naive_scale(train, basis="calendar_lag7")
+        m = harness.mase(actual, yhat, train, basis="calendar_lag7")
         # A near-constant pre-cutoff node divides by ~0 and blows MASE up; excluded
         # from the aggregate and counted, exactly as sim/score_l3 does.
         scoreable = bool(np.isfinite(m) and np.isfinite(scale) and scale >= 1.0)

@@ -372,7 +372,7 @@ def evaluate_static(venue: str = ANCHOR_VENUE):
         else:
             results.append(RungResult(
                 name, rung,
-                metrics=harness.point_metrics(yte, preds, ytr, season=SEASONAL_PERIOD),
+                metrics=harness.point_metrics(yte, preds, ytr, basis="calendar_lag7"),
                 predictions=preds))
     if not HAS_CHRONOS:
         results.append(_rung4_foundation())
@@ -401,7 +401,7 @@ def evaluate_rolling(
                 notes[name] = note
             else:
                 acc.setdefault(name, []).append(
-                    harness.mase(yte, preds, ytr, SEASONAL_PERIOD))
+                    harness.mase(yte, preds, ytr, basis="calendar_lag7"))
 
     results = []
     for name, rung in sorted(rungs.items(), key=lambda x: (x[1], x[0])):

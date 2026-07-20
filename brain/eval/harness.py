@@ -144,13 +144,146 @@ def smape(
     return float(200.0 * np.mean(np.abs(y_true - y_pred) / denom))
 
 
-def seasonal_naive_scale(y_train: np.ndarray, season: int = SEASONAL_PERIOD) -> float:
-    """MASE denominator: mean in-sample seasonal-naive absolute error."""
-    y_train = np.asarray(y_train, dtype=float)
-    if y_train.size <= season:
+# --- The scale ruler ---------------------------------------------------------
+#
+# Every scaled accuracy figure the project reports comes through here, on one of
+# four named bases. The basis is required and never defaulted: three private
+# copies of this denominator previously disagreed by up to a factor of two, so
+# the same forecast scored anywhere between 0.385 and 0.771 depending on which
+# file computed it (report 42, FLAG-MASE-RULER).
+
+SCALE_BASES = (
+    "calendar_lag7",          # calendar-filled series, lag 7
+    "trading_lag7",           # trading-days-only series, lag 7
+    "trading_same_weekday",   # trading-days-only, lag = rounded trading days/week
+    "calendar_lag7_active",   # calendar-filled lag 7, structural-zero pairs dropped
+)
+
+
+# The basis the dissertation quotes. `calendar_lag7` is not the methodologically
+# best of the four (it is deflated by structural zeros, see report 42), but it is
+# the only one on which BOTH the ladder backtest and every confrontation already
+# exist, and S1 is forbidden from re-running the ladder. Comparability across the
+# pre-registration chain beats a better ruler applied to only half of it.
+# `calendar_lag7_active` is the intended successor, to be adopted in S4 when the
+# ladder can be re-scored alongside it.
+REPORTED_BASIS = "calendar_lag7"
+
+
+class UnknownBasisError(ValueError):
+    """Raised when a caller names a scale basis that does not exist."""
+
+
+def same_weekday_lag(n_trading_days: int, n_calendar_days: int) -> int:
+    """The lag that lands on the same weekday once closed days are compressed out.
+
+    A trading-days-only index has no fixed period: lag 7 reaches back 1.34
+    calendar weeks at Beer Hall and 5.8 at Ellel, both landing on the wrong
+    weekday. The rounded mean trading days per week is the closest available
+    integer. Derived from the data, never hard-coded, because it is 5 at Beer
+    Hall and 1 at Ellel.
+    """
+    if n_calendar_days <= 0:
+        raise ValueError("n_calendar_days must be positive to derive a lag")
+    return max(int(round(n_trading_days / (n_calendar_days / 7.0))), 1)
+
+
+def _scale_pairs(
+    y_train: np.ndarray,
+    *,
+    basis: str,
+    n_calendar_days: int | None = None,
+) -> tuple[np.ndarray, np.ndarray, int]:
+    """The (later, earlier) endpoint pairs a basis differences over, plus its lag.
+
+    The caller supplies the series the basis names: calendar-filled for the
+    `calendar_*` bases, trading-days-only for the `trading_*` ones.
+    """
+    if basis not in SCALE_BASES:
+        raise UnknownBasisError(
+            f"unknown scale basis {basis!r}; expected one of {SCALE_BASES}"
+        )
+    y = np.asarray(y_train, dtype=float)
+    if basis == "trading_same_weekday":
+        if n_calendar_days is None:
+            raise ValueError(
+                "basis 'trading_same_weekday' needs n_calendar_days to derive its lag"
+            )
+        lag = same_weekday_lag(y.size, n_calendar_days)
+    else:
+        lag = SEASONAL_PERIOD
+    if y.size <= lag:
+        return np.empty(0), np.empty(0), lag
+    later, earlier = y[lag:], y[:-lag]
+    if basis == "calendar_lag7_active":
+        # A closed day is stored as a structural zero, so a difference with a
+        # closed endpoint measures the closure, not the week-on-week move.
+        keep = (later != 0.0) & (earlier != 0.0)
+        later, earlier = later[keep], earlier[keep]
+    return later, earlier, lag
+
+
+def structural_zero_diffs(y_train: np.ndarray, season: int = SEASONAL_PERIOD) -> tuple[int, int]:
+    """(exactly-zero lag differences, total lag differences) on a filled series.
+
+    The deflation diagnostic: on a calendar-filled series most zero differences are
+    closed-day against closed-day. NOTE this counts a DIFFERENT population from the
+    one `calendar_lag7_active` keeps, and the two must not be subtracted from each
+    other. A difference is zero when both endpoints are zero OR when two trading
+    days happen to be equal; the active basis drops a pair when EITHER endpoint is
+    zero. At Ellel that is 284 zero differences of 385 but only 28 pairs retained,
+    not 101. Use `active_pair_count` for the sample size the active basis actually
+    used.
+    """
+    y = np.asarray(y_train, dtype=float)
+    if y.size <= season:
+        return 0, 0
+    diffs = y[season:] - y[:-season]
+    return int(np.sum(diffs == 0.0)), int(diffs.size)
+
+
+def active_pair_count(y_train: np.ndarray) -> int:
+    """How many lag pairs `calendar_lag7_active` keeps: both endpoints trading."""
+    later, _, _ = _scale_pairs(y_train, basis="calendar_lag7_active")
+    return int(later.size)
+
+
+def seasonal_naive_scale(
+    y_train: np.ndarray,
+    *,
+    basis: str,
+    n_calendar_days: int | None = None,
+) -> float:
+    """MASE denominator: mean in-sample seasonal-naive absolute error on `basis`."""
+    later, earlier, _ = _scale_pairs(
+        y_train, basis=basis, n_calendar_days=n_calendar_days
+    )
+    if later.size == 0:
         return float("nan")
-    diffs = np.abs(y_train[season:] - y_train[:-season])
-    scale = float(np.mean(diffs))
+    scale = float(np.mean(np.abs(later - earlier)))
+    return scale if scale > 0 else float("nan")
+
+
+def seasonal_naive_squared_scale(
+    y_train: np.ndarray,
+    *,
+    basis: str,
+    n_calendar_days: int | None = None,
+) -> float:
+    """RMSSE denominator: mean in-sample seasonal-naive SQUARED error on `basis`.
+
+    The same pairs as `seasonal_naive_scale`, squared rather than absolute, so
+    MASE and RMSSE are read off one ruler. This departs from M5's published
+    RMSSE, which differences at lag 1; here the lag is the basis's own, which
+    keeps the two metrics comparable at the cost of not being the M5 number
+    (report 42 section 3).
+    """
+    later, earlier, _ = _scale_pairs(
+        y_train, basis=basis, n_calendar_days=n_calendar_days
+    )
+    if later.size == 0:
+        return float("nan")
+    scale = float(np.mean((later - earlier) ** 2))
     return scale if scale > 0 else float("nan")
 
 
@@ -158,12 +291,193 @@ def mase(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     y_train: np.ndarray,
-    season: int = SEASONAL_PERIOD,
+    *,
+    basis: str,
+    n_calendar_days: int | None = None,
 ) -> float:
-    scale = seasonal_naive_scale(y_train, season)
+    scale = seasonal_naive_scale(
+        y_train, basis=basis, n_calendar_days=n_calendar_days
+    )
     if not np.isfinite(scale):
         return float("nan")
     return mae(np.asarray(y_true, float), np.asarray(y_pred, float)) / scale
+
+
+def rmsse(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    y_train: np.ndarray,
+    *,
+    basis: str,
+    n_calendar_days: int | None = None,
+) -> float:
+    """Root mean squared scaled error.
+
+    Squared scaled errors optimise for the mean rather than the median, which is
+    why M5 adopted RMSSE for a 73 percent intermittent corpus. It does not reward
+    the flatline forecast that MASE rewards.
+    """
+    denom = seasonal_naive_squared_scale(
+        y_train, basis=basis, n_calendar_days=n_calendar_days
+    )
+    if not np.isfinite(denom):
+        return float("nan")
+    err = np.asarray(y_true, float) - np.asarray(y_pred, float)
+    return float(np.sqrt(float(np.mean(err ** 2)) / denom))
+
+
+# --- The venue ruler ---------------------------------------------------------
+
+@dataclass
+class VenueRuler:
+    """One venue's L1 scale on all four bases, plus the counts that derive them.
+
+    Built once per venue and handed to every scorer, so a confrontation cannot
+    quietly pick a different denominator from the backtest that preceded it.
+    """
+
+    venue: str
+    n_trading_days: int
+    n_calendar_days: int
+    same_weekday_lag: int
+    zero_lag7_diffs: int
+    total_lag7_diffs: int
+    active_lag7_pairs: int
+    scales: dict[str, float]
+    trading: np.ndarray
+    calendar: np.ndarray
+
+    @property
+    def trading_days_per_week(self) -> float:
+        return self.n_trading_days / (self.n_calendar_days / 7.0)
+
+    def series_for(self, basis: str) -> np.ndarray:
+        if basis not in SCALE_BASES:
+            raise UnknownBasisError(
+                f"unknown scale basis {basis!r}; expected one of {SCALE_BASES}"
+            )
+        return self.trading if basis.startswith("trading_") else self.calendar
+
+    def mase(self, y_true: np.ndarray, y_pred: np.ndarray, basis: str) -> float:
+        return mase(y_true, y_pred, self.series_for(basis), basis=basis,
+                    n_calendar_days=self.n_calendar_days)
+
+    def rmsse(self, y_true: np.ndarray, y_pred: np.ndarray, basis: str) -> float:
+        return rmsse(y_true, y_pred, self.series_for(basis), basis=basis,
+                     n_calendar_days=self.n_calendar_days)
+
+    def scale_block(self) -> dict:
+        """The scale half of a metric row: every basis, and the counts behind it."""
+        return {
+            "scales": {b: round(self.scales[b], 1) for b in SCALE_BASES},
+            "same_weekday_lag": self.same_weekday_lag,
+            "n_trading_days": self.n_trading_days,
+            "n_calendar_days": self.n_calendar_days,
+            "trading_days_per_week": round(self.trading_days_per_week, 2),
+            "zero_lag7_diffs": self.zero_lag7_diffs,
+            "total_lag7_diffs": self.total_lag7_diffs,
+            # Not total minus zero: see `structural_zero_diffs`. This is the sample
+            # size `calendar_lag7_active` was actually estimated from.
+            "active_lag7_pairs": self.active_lag7_pairs,
+        }
+
+
+def venue_ruler(venue: str, con=None, as_of: str | None = None) -> VenueRuler:
+    """Build a venue's ruler from the served store.
+
+    `as_of` truncates the history to a stated date. It defaults to None, meaning
+    the whole store, which is what S1's gates are defined on. Be aware that this
+    makes an unpinned scale a function of the store ceiling: the June
+    confrontation's published denominator was computed against a 2026-05-31
+    ceiling and is not reproducible from today's store without pinning here
+    (report 42 section 5). Pinning the confrontations is S3's environment work,
+    not S1's.
+
+    The store import is function-local, as in `main()`: this module is the metric
+    definition and is imported by code that has no warehouse, so the dependency
+    is paid only by callers that actually want a venue's scale.
+    """
+    from store.warehouse import connect, read_series
+
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        sql = "SELECT revenue_exvat AS v FROM l1_daily WHERE venue = ?"
+        params: list = [venue]
+        if as_of is not None:
+            sql += " AND date <= ?"
+            params.append(as_of)
+        trading = con.execute(sql + " ORDER BY date", params).df()["v"].to_numpy(float)
+        cal_df = read_series(venue, "L1", fill_calendar=True, con=con)
+        if as_of is not None:
+            cal_df = cal_df[cal_df["date"] <= pd.Timestamp(as_of)]
+            # `fill_calendar` spans the venue's own first to last row, so filtering
+            # a venue that stopped trading before `as_of` leaves a tail of
+            # structural zeros the original run never saw. Trim back to the last
+            # trading day so the pin reproduces the ruler as it stood that day.
+            nonzero = cal_df.index[cal_df["value"] != 0.0]
+            if len(nonzero):
+                cal_df = cal_df.loc[:nonzero[-1]]
+        calendar = cal_df["value"].to_numpy(float)
+    finally:
+        if own:
+            con.close()
+
+    n_calendar = int(calendar.size)
+    lag_sw = same_weekday_lag(int(trading.size), n_calendar)
+    zero_diffs, total_diffs = structural_zero_diffs(calendar)
+    scales = {
+        "calendar_lag7": seasonal_naive_scale(calendar, basis="calendar_lag7"),
+        "trading_lag7": seasonal_naive_scale(trading, basis="trading_lag7"),
+        "trading_same_weekday": seasonal_naive_scale(
+            trading, basis="trading_same_weekday", n_calendar_days=n_calendar),
+        "calendar_lag7_active": seasonal_naive_scale(
+            calendar, basis="calendar_lag7_active"),
+    }
+    return VenueRuler(
+        venue=venue,
+        n_trading_days=int(trading.size),
+        n_calendar_days=n_calendar,
+        same_weekday_lag=lag_sw,
+        zero_lag7_diffs=zero_diffs,
+        total_lag7_diffs=total_diffs,
+        active_lag7_pairs=active_pair_count(calendar),
+        scales=scales,
+        trading=trading,
+        calendar=calendar,
+    )
+
+
+def venue_metric_row(
+    ruler: VenueRuler,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    lo: np.ndarray | None = None,
+    hi: np.ndarray | None = None,
+    *,
+    reported_basis: str,
+    level: float = 0.90,
+) -> dict:
+    """The full metric set S1 requires: MASE on all four bases, RMSSE, MAE, RMSE,
+    the interval trio, n_days, and the scale that produced the reported figure."""
+    row: dict = {
+        "mase": {b: round(ruler.mase(y_true, y_pred, b), 3) for b in SCALE_BASES},
+        "rmsse": round(ruler.rmsse(y_true, y_pred, reported_basis), 3),
+        "mae": round(mae(y_true, y_pred), 1),
+        "rmse": round(rmse(y_true, y_pred), 1),
+        "n_days": int(np.asarray(y_true).size),
+        "reported_basis": reported_basis,
+        "scale": round(ruler.scales[reported_basis], 1),
+        **ruler.scale_block(),
+    }
+    if lo is not None and hi is not None:
+        row.update({
+            "winkler": round(winkler(y_true, lo, hi, level), 1),
+            "mean_width": round(mean_width(lo, hi), 1),
+            "empirical_coverage": round(coverage(y_true, lo, hi), 3),
+            "level": level,
+        })
+    return row
 
 
 # --- Interval metrics --------------------------------------------------------
@@ -216,10 +530,14 @@ def point_metrics(
     y_pred: np.ndarray,
     y_train: np.ndarray,
     *,
-    season: int = SEASONAL_PERIOD,
+    basis: str,
+    n_calendar_days: int | None = None,
 ) -> dict[str, float]:
     return {
-        "MASE": mase(y_true, y_pred, y_train, season),
+        "MASE": mase(y_true, y_pred, y_train, basis=basis,
+                     n_calendar_days=n_calendar_days),
+        "RMSSE": rmsse(y_true, y_pred, y_train, basis=basis,
+                       n_calendar_days=n_calendar_days),
         "MAE": mae(y_true, y_pred),
         "RMSE": rmse(y_true, y_pred),
         "sMAPE": smape(y_true, y_pred),
@@ -261,7 +579,8 @@ def main() -> int:
 
     y_pred = _dummy_seasonal_naive(split.train, split.test)
     y_true = split.test["value"].to_numpy()
-    pm = point_metrics(y_true, y_pred, split.train["value"].to_numpy())
+    pm = point_metrics(y_true, y_pred, split.train["value"].to_numpy(),
+                       basis="calendar_lag7")
     print("  point metrics     : "
           + ", ".join(f"{k}={v:.3f}" for k, v in pm.items()))
 

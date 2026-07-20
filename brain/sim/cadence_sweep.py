@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 
 import config
+from eval import harness
 from features.build_features import build_features
 from ingest.world_cup import world_cup_features
 from models.foundation import (
@@ -32,7 +33,7 @@ from models.foundation import (
 from models.ladder import rung1_robust_dow, rung2_ets
 from sim.build_frozen_forecast import GATE_WINNER, build_future_frame
 from store.active_span import trim_to_active
-from store.warehouse import connect, read_series
+from store.warehouse import connect
 
 SIM_DIR = config.BRAIN_DIR / "sim"
 JUNE = pd.date_range("2026-06-01", "2026-06-30", freq="D")
@@ -48,19 +49,17 @@ def _actuals_l1(venue: str) -> pd.Series:
     return df.set_index("date")["net_exvat"].reindex(JUNE, fill_value=0.0)
 
 
-def _seasonal_scale(venue: str) -> float:
-    con = connect(read_only=True)
-    try:
-        s = read_series(venue, "L1", fill_calendar=True, con=con)
-    finally:
-        con.close()
-    y = s["value"].to_numpy(float)
-    d = np.abs(y[config.SEASONAL_PERIOD:] - y[:-config.SEASONAL_PERIOD])
-    return float(np.mean(d)) if d.size else float("nan")
-
-
 def _l2_actuals_and_scale(venue: str):
-    """June L2 category actuals + per-category seasonal-naive scale + recent share."""
+    """June L2 category actuals + per-category seasonal-naive scale + recent share.
+
+    NOTE: the per-category denominator below is computed inline and is NOT the
+    L1 ruler in `eval.harness`. Its basis is undocumented and it carries
+    category-level intermittency on top of the venue's structural zeros, so any
+    L2 figure from this script inherits an unverified ruler. Deliberately left
+    as-is by S1, which is scoped to L1: fixing it here would move report 24's
+    published cadence finding inside a measurement-integrity package. See
+    FLAG-L2-DENOMINATOR; it is assigned to S4 with the occurrence gate.
+    """
     raw = json.loads((SIM_DIR / "june2026_actuals_l2_raw.json").read_text())["rows"]
     a = pd.DataFrame([r for r in raw if r["venue"] == venue])
     con = connect(read_only=True)
@@ -111,7 +110,8 @@ def _mase(a, p, scale):
 def _sweep_venue(venue: str) -> dict:
     feats = trim_to_active(build_features(venue), venue)
     av = _actuals_l1(venue)
-    scale = _seasonal_scale(venue)
+    ruler = harness.venue_ruler(venue)
+    scale = ruler.scales[harness.REPORTED_BASIS]
     l2_shares, l2_scales, l2_actuals = _l2_actuals_and_scale(venue)
     wc = world_cup_features(venue, JUNE).set_index("date")
     fixture_days = [d for d in JUNE if int(wc.loc[d, "wc_match_in_hours"]) == 1]
