@@ -1,0 +1,23 @@
+{
+  "artefact": "occurrence_gate_beer_hall",
+  "store_ceiling": "2026-07-07",
+  "venue": "beer_hall",
+  "basis": "calendar_lag7",
+  "n_folds": 273,
+  "mean_mase": {
+    "gated": 0.7872,
+    "ungated": 0.8032
+  },
+  "mcs": {
+    "set_0.10": ["gated", "ungated"],
+    "set_0.25": ["gated", "ungated"],
+    "mcs_pvalue": {
+      "gated": 1.0,
+      "ungated": 0.391
+    }
+  },
+  "base_model": "rung1_robust_dow",
+  "seed": 93,
+  "block_len": 7,
+  "n_boot": 1000
+}

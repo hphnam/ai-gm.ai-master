@@ -33,7 +33,7 @@ from models.foundation import (
 from models.ladder import rung1_robust_dow, rung2_ets
 from sim.build_frozen_forecast import GATE_WINNER, build_future_frame
 from store.active_span import trim_to_active
-from store.warehouse import connect
+from store.warehouse import assert_store_ceiling, connect
 
 SIM_DIR = config.BRAIN_DIR / "sim"
 JUNE = pd.date_range("2026-06-01", "2026-06-30", freq="D")
@@ -83,8 +83,15 @@ def _l2_actuals_and_scale(venue: str):
     for c, g in hist.groupby("category"):
         s = g.set_index("date")["revenue_exvat"].reindex(
             pd.date_range(g["date"].min(), ceiling), fill_value=0.0).to_numpy(float)
-        d = np.abs(s[config.SEASONAL_PERIOD:] - s[:-config.SEASONAL_PERIOD])
-        scales[c] = float(np.mean(d)) if d.size else float("nan")
+        # S4 Part 3: the per-category denominator now goes through the single harness
+        # ruler with an explicit basis instead of the old undocumented inline. This is
+        # byte-identical to that inline (mean absolute lag-7 difference on the
+        # calendar-filled category series), so no cadence number moves; the only
+        # behaviour difference is that a degenerate all-zero category returns nan (which
+        # skips it) rather than a zero denominator. The basis inherits the same
+        # structural-zero deflation as L1's reported `calendar_lag7` (report 42, and the
+        # bootstrap in S4 Part 2), now a documented property rather than an unnamed one.
+        scales[c] = harness.seasonal_naive_scale(s, basis="calendar_lag7")
         shares[c] = float(recent[recent["category"] == c]["revenue_exvat"].sum()) / tot
         actuals[c] = a[a["category"] == c].set_index("date")["net_exvat"].reindex(
             JUNE, fill_value=0.0)
@@ -170,7 +177,8 @@ def _sweep_venue(venue: str) -> dict:
 
 
 def run() -> dict:
-    result = {"device": None, "venues": {}}
+    ceiling = assert_store_ceiling()  # a cadence re-score at a reset store is silently wrong
+    result = {"store_ceiling": ceiling, "device": None, "venues": {}}
     for venue in config.FORECAST_VENUES:
         result["venues"][venue] = _sweep_venue(venue)
         print(f"\n=== {venue} ({GATE_WINNER[venue]}) ===")

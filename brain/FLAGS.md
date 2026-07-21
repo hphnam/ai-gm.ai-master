@@ -852,8 +852,20 @@ does.
   > 2026-05-31 ceiling and do not reproduce from today's store (Beer Hall 1.643 -> 1.515 as
   > its scale grew 291.2 -> 315.7). `venue_ruler` takes an `as_of` argument for this but
   > does not use it by default. Pinning belongs with the environment work in S3.
+  >
+  > **The successor basis, decided (S4, report 45).** S1 named `calendar_lag7_active` the intended
+  > successor "when the ladder can be re-scored alongside it". S4 settled it by bootstrap (B =
+  > 10000) rather than by argument, and the answer differs by venue for a measured reason:
+  > **Beer Hall and Two River Taps adopt `calendar_lag7_active`** (adequate sample, 276 / 268 lag
+  > pairs, ~30% interval, and it is the only basis both weekday-aligned and undeflated); **Ellel
+  > adopts no scaled-error basis at all** - its active basis rests on 28 pairs with a 66% interval,
+  > its deflated `calendar_lag7` induces a MASE spanning 0.32 to 0.55, and its trading bases give a
+  > spurious ~0.09 - so at 1.2 trading days a week scaled error is the wrong instrument and Ellel is
+  > reported on unscaled or cost-weighted error (`chatfield_all-zero_2007`). Decision log row 37.
+  > The `as_of` half of this flag is closed by S3 (the confrontations are pinned and the environment
+  > version-locked); the basis half is closed here.
 
-- **FLAG-L2-DENOMINATOR (OPEN, assigned to S4).** `sim/cadence_sweep.py:86`, inside
+- **FLAG-L2-DENOMINATOR (RE-SCOPED, S4 report 45, 21 Jul 2026).** `sim/cadence_sweep.py`, inside
   `_l2_actuals_and_scale`, computes a **per-category** seasonal-naive denominator inline.
   It is not the L1 ruler in `eval.harness`, its basis is undocumented, and **any L2
   accuracy figure quoted from that script inherits an unverified ruler** - including the
@@ -869,6 +881,19 @@ does.
   > Assigned to **S4**, the intermittency and occurrence-gate package, because that is
   > where category-level zeros get their proper treatment. Not S2, which is fold count and
   > has nothing to do with denominators.
+  >
+  > **Re-scoped (S4, report 45), not merely cleared.** The inline is replaced by
+  > `harness.seasonal_naive_scale(s, basis="calendar_lag7")` - the one documented ruler with an
+  > explicit basis. Verified byte-identical across every L2 category of all three venues (0
+  > mismatches vs the old formula, no degenerate zero-scale), so no cadence number moves and
+  > report 24's "weekly is the sweet spot" conclusion survives; it is in any case basis-invariant
+  > because the denominator is constant across cadences for a category. The **undocumented-basis**
+  > defect is therefore closed: the basis is now named and single-sourced. What remains is not a
+  > defect but a documented property - the L2 denominator inherits the same `calendar_lag7`
+  > structural-zero deflation as L1's reported basis, whose magnitude and per-category thin-sample
+  > risk the S4 Part 2 bootstrap now characterises (report 45, decision row 37). A per-category
+  > active basis would face the Ellel-style 28-pair problem, so it is not adopted blindly. The
+  > residual is tracked under FLAG-MASE-RULER, not here.
 
 - **FLAG-JUNE-STAGE2-UNRUNNABLE (OPEN, pre-existing, not introduced by S1).**
   `sim/confront_june.py` `stage2` (the weekly-rolling operation, explicitly labelled NOT
@@ -906,3 +931,25 @@ does.
   > restricts to the 246 folds all rungs share, which drops exactly this recent block; the run
   > is therefore reported alongside the full 260-fold run excluding chronos2_exo, and both
   > agree that `rung1_robust_dow` is retained (row 35).
+
+## S4 G17d intermittency, scale basis, occurrence gate (report 45)
+
+- **FLAG-ELLEL-DIARY (OPEN, missing input, seam built and inert).** The occurrence gate
+  (`signals/occurrence.py`) needs Ellel's per-day trading occurrence, which is a booking diary the
+  venue holds and which **has not arrived**. The gate `yhat = P(trade) x E[revenue|trade]` depends
+  on P(trade) being *observed*; for the Beer Hall that is the known weekly calendar, but Ellel is
+  event-driven and has no weekday schedule, so its occurrence can only come from the diary.
+  > The seam is built and left inert behind `ELLEL_DIARY_LIVE = False` (the `CHECKLIST_LIVE`
+  > pattern): `occurrence_label("ellel", ...)` returns all-NaN, the hurdle degrades to the ungated
+  > forecast, and the gate is reported as untestable at Ellel rather than faked. **Critically, the
+  > self-leak is impossible by construction, not by convention:** `ellel_diary_occurrence` takes a
+  > diary map and never a revenue series, so there is no argument or branch that could reconstruct
+  > Ellel's occurrence from its own trading days - the `is_ellel_event` self-leak killed in
+  > `features/build_features.py` cannot return here. Proven by the G5 tests
+  > (`tests/test_occurrence_gate.py`).
+  >
+  > This is the highest-value input the project is still missing: with the diary, Ellel's occurrence
+  > gate becomes the primary result of the hurdle work rather than a scaffold. Resolving it is a
+  > diary ingest plus flipping the flag; it must NEVER be resolved by proxying from Ellel revenue.
+  > Owner-gated (Elliot's diary), tracked here so the dependency sits in the ledger, not only in a
+  > report.

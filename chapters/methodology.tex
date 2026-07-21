@@ -1,0 +1,103 @@
+% Methodology chapter. Section 1 is the metric-ruler argument, moved from report 42
+% (S1 metric integrity) and extended with the S4 bootstrap of the denominator (report 45).
+% Written to be \input into the thesis body; it assumes a bibliography with the keys cited
+% below (chapters/ref.bib carries stubs for them).
+
+\chapter{Methodology}
+\label{chap:methodology}
+
+\section{Measuring accuracy on an intermittent series: the scaled-error ruler}
+\label{sec:metric-ruler}
+
+The three venues in this study trade on very different rhythms. The Beer Hall trades on
+roughly five days in seven; Two River Taps on close to six; the village hall at Ellel on
+about one and a fifth. Any accuracy figure that is to be compared \emph{across} those
+venues, or against a backtest of the same venue, must therefore be scale-free. The Mean
+Absolute Scaled Error (MASE) of \citet{hyndman_another_2006} is the natural choice: it
+divides the forecast's mean absolute error by the in-sample mean absolute error of a naive
+benchmark, so a value below one means the forecast beats that benchmark and the units of
+revenue cancel.
+
+The difficulty is that on a series with closed days the naive benchmark's denominator is
+not unique, and the choices disagree by enough to reverse a conclusion. The seasonal-naive
+benchmark differences the series at the seasonal lag; but ``the series'' can be read in more
+than one way when a venue is shut for part of the week. This work makes the choice explicit
+by naming four candidate bases and computing all four:
+
+\begin{itemize}
+  \item \texttt{calendar\_lag7}: the calendar-filled series (closed days entered as zero),
+        differenced at lag seven.
+  \item \texttt{trading\_lag7}: the trading-days-only series, differenced at lag seven.
+  \item \texttt{trading\_same\_weekday}: the trading-days-only series differenced at the
+        lag that lands on the same weekday once closures are compressed out.
+  \item \texttt{calendar\_lag7\_active}: the calendar-filled series at lag seven, with any
+        pair that has a closed endpoint dropped.
+\end{itemize}
+
+These are not cosmetic variants. On the Beer Hall the scale ranges from 316 to 632 across
+the four; at Ellel it ranges from 180 to 806, a spread of four and a half to one. The same
+forecast can be made to look four and a half times better or worse at Ellel by the choice of
+denominator alone, and the earlier implementations recorded nowhere which choice had been
+made.
+
+The two natural implementations fail in opposite directions, which is why no single naive
+repair would have sufficed. Compressing the closed days out (\texttt{trading\_lag7}) barely
+shortens a series that already trades five days a week, so at the Beer Hall lag seven on the
+trading index lands on the wrong weekday and roughly doubles the scale. Filling the closed
+days with zeros (\texttt{calendar\_lag7}) has the opposite effect at Ellel: at one and a
+fifth trading days a week, seventy-four per cent of the calendar lag-seven differences are
+zero against zero, and the denominator collapses to about a quarter of its honest value.
+The consequence for the headline is concrete. A live July forecast that had been published
+at MASE $0.386$ was, on inspection, computed on \texttt{trading\_lag7}; on the reported
+\texttt{calendar\_lag7} basis the same forecast scores $0.772$ against a backtest of
+$0.745$, so the claim that it beat its own backtest by nearly half does not survive, and the
+defensible statement is only that serving-horizon performance is consistent with the
+backtest.
+
+Two consequences follow for how a scaled metric must be reported. First, the basis must be
+named and fixed: an unnamed MASE is uninterpretable, and comparing a forecast scored on one
+basis with a backtest scored on another is the specific error above. This study fixes
+\texttt{calendar\_lag7} as the reported basis, not because it is the most defensible of the
+four (it is deflated by structural zeros) but because it is the only basis on which both the
+rolling backtest and every out-of-sample confrontation already exist, so comparability
+across the pre-registration chain is preserved. Second, and less obviously, a scaled metric
+is a function of \emph{two} coordinates, not one: the denominator depends on the basis
+\emph{and} on the training window it is estimated over. Because the store accumulates history,
+the same basis yields a different scale as the window grows, so a published scaled figure is
+reproducible only when both the basis and the training ceiling (an \texttt{as\_of} date) are
+pinned. The confrontations in this work are therefore reported against a stated ceiling, and
+the environment that produced them is version-pinned, so that a scaled number can be
+regenerated exactly rather than approximately.
+
+\subsection{How thin is the honest denominator? A bootstrap}
+\label{sec:ruler-bootstrap}
+
+The basis \texttt{calendar\_lag7\_active}, which drops closed-day pairs, is the most
+defensible in principle: it is both weekday-aligned and undeflated. It is also the thinnest
+in practice at exactly the venue whose intermittency motivates it. Of the lag-seven pairs it
+keeps two hundred and seventy-six of three hundred and ninety-two at the Beer Hall, but only
+twenty-eight of three hundred and eighty-five at Ellel. Whether a denominator estimated from
+twenty-eight numbers can carry a gate is not a question argument can settle, so it is settled
+by resampling.
+
+For each venue and basis the absolute lag-difference vector, the numbers averaged into the
+denominator, is resampled with replacement ten thousand times, and the scale's point
+estimate, ninety-five per cent interval and interval width are recorded; that uncertainty is
+then propagated into the venue's most recent confrontation MASE with the error numerator held
+fixed. At the Beer Hall and Two River Taps every basis is estimated from a few hundred pairs
+and the intervals are moderate, near thirty per cent of the point, so
+\texttt{calendar\_lag7\_active} is adopted there: it is the cleanest basis and it is not, at
+those venues, the noisiest. At Ellel the picture inverts. The active basis rests on twenty-
+eight pairs and its ninety-five per cent scale interval spans plus or minus a third of the
+point; the calendar basis, though wider-sampled, is deflated and induces a MASE whose own
+interval runs from roughly $0.32$ to $0.55$ on scale uncertainty alone; and the trading bases
+produce a denominator so large, because lag seven on the trading index reaches back almost
+six weeks of highly variable demand, that the induced MASE falls near $0.09$ and reads as a
+spurious near-perfect forecast. No basis is defensible at Ellel. At barely over one trading
+day a week the seasonal-naive concept has no purchase, and the honest conclusion is that
+scaled error is the wrong instrument there. This is precisely the case \citet{chatfield_all-zero_2007}
+identify for highly intermittent series, where the lowest forecasting error need not give the
+lowest system cost; at Ellel the reported quantity should be an unscaled error or a
+cost-weighted one, not a MASE gate. The categorisation that motivates this treatment, and the
+corrected constants used to apply it, are those of \citet{syntetos_categorization_2005} as
+amended by \citet{kostenko_note_2006}.

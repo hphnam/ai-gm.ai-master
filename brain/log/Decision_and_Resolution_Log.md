@@ -1444,3 +1444,71 @@ them into the append-only log so it is the continuous WP1-to-present record.
     was noise - both models sit inside the Ellel set and are statistically indistinguishable, which
     is what the pre-registration predicted. Applied as written; not reinterpreted in light of the
     result.
+
+36. **S4 Part 1: the intermittency cutoff constants corrected, and the first L1 diagnostic.** The
+    diagnostic classified on ADI >= 1.32 and CV-squared >= 0.49, both arithmetic errors in
+    Syntetos-Boylan-Croston. Kostenko-Hyndman (`kostenko_note_2006`) give the crossover as
+    **p = 4/3 = 1.3333** and the CV-squared boundary as **0.5**. Both pairs are now named constants
+    and the diagnostic reports under each. Run at L1 for the first time, the two-by-two (two
+    demand-day definitions x two cutoff sets) shows **the Beer Hall flips from lumpy to erratic**
+    across the correction (ADI 1.327, inside the [1.32, 1.3333) band the error moved), under both
+    demand-day definitions; Two River Taps is erratic and Ellel lumpy under both, unambiguously.
+    **No stop:** the L3 Croston trigger `intermittent_nodes` now gates on 4/3, and no L3 node lies
+    in the affected band (nearest intermittent 1.4129), so the trigger set, the Croston comparison
+    and every adoption are byte-identical; the Beer Hall L1 flip is diagnostic only (the venue is
+    served by `rung4_chronos2_exo`, not by an intermittency label). Evidence:
+    `eval/intermittency_L1.md`, report 45 Part 1.
+
+37. **S4 Part 2: the scale basis policy, settled by bootstrap and differing by venue for a measured
+    reason.** For each venue and each of the four bases the absolute lag-difference vector was
+    resampled with replacement (B = 10000), ruler pinned `as_of = 2026-07-07` so the point scales
+    reproduce the most recent confrontation exactly. **Policy:**
+    > **Beer Hall and Two River Taps adopt `calendar_lag7_active`** - the only basis that is both
+    > weekday-aligned and undeflated - because its sample is adequate (276 and 268 pairs) and its
+    > 95% interval (~30%) is no worse than the deflated `calendar_lag7`. **At Ellel no scaled-error
+    > basis is defensible**: `calendar_lag7_active` rests on 28 pairs (66% interval), the deflated
+    > `calendar_lag7` induces a MASE spanning 0.32 to 0.55 on scale uncertainty alone, and the
+    > trading bases give a spurious MASE ~0.09 off a ~770-806 denominator. Ellel is reported on
+    > **unscaled error (MAE/RMSE) or a cost-weighted metric** (`chatfield_all-zero_2007`), never a
+    > MASE gate.
+    This confirms the pre-registered prediction (no basis defensible at Ellel; scaled error is the
+    wrong instrument at 1.2 trading days/week). It supersedes S1 row 30's tentative "`calendar_lag7`
+    reported, `calendar_lag7_active` the intended successor": the successor is adopted at two venues
+    and rejected at the third, with the reason measured. Evidence: `eval/scale_bootstrap_L1.json`,
+    report 45 Part 2. FLAG-MASE-RULER updated.
+
+38. **S4 Part 3: the L2 cadence denominator routed through the harness; report 24 survives.**
+    `sim/cadence_sweep.py` now computes its per-category seasonal-naive denominator through
+    `harness.seasonal_naive_scale(basis="calendar_lag7")` instead of an undocumented inline. Verified
+    **byte-identical** across every L2 category of all three venues (0 mismatches vs the old formula,
+    no degenerate zero-scale), so **no cadence number moves and report 24's "weekly is the sweet
+    spot" conclusion survives** - and it is in any case basis-invariant, because the denominator is
+    constant across cadences for a category. `FLAG-L2-DENOMINATOR` is **re-scoped, not merely
+    cleared**: the basis is now explicit and single-sourced, and the deflation it inherits is the
+    documented `calendar_lag7` property Part 2 characterises. Evidence: report 45 Part 3, FLAGS.
+
+39. **S4 Part 4: the observed-occurrence hurdle gate, built and measured; Ellel scaffold only.**
+    `yhat = P(trade) * E[revenue|trade]` with **P(trade) observed, not estimated** (`signals/occurrence.py`).
+    The occurrence label is exogenous and never read from a venue's revenue: the known weekly
+    calendar for the Beer Hall, the booking diary for Ellel. A **comped open day** is representable
+    as a trading day (occurrence 1, amount 0, P=1, E=0), distinct from a scheduled closure (G4). At
+    the Beer Hall, gated vs ungated `rung1_robust_dow` over 273 origins, judged by the **S3 Model
+    Confidence Set** (not a mean): both sit in the 90% set (gated mean 0.787, ungated 0.803), so **the
+    gate does not measurably help** where the day-of-week features already carry the closures. At
+    Ellel the gate is **inert behind `ELLEL_DIARY_LIVE = False`** pending the booking diary; the
+    `is_ellel_event` self-leak is impossible by construction - `ellel_diary_occurrence` takes a diary
+    map, never a revenue series (G5). `FLAG-ELLEL-DIARY` opened. No served model changed. Evidence:
+    `eval/occurrence_gate_beer_hall.json`, `tests/test_occurrence_gate.py`, report 45 Part 4.
+
+40. **S4 Part 5: the Finding 3 flip is refuted, and it was the external assessment's.** There is no
+    forward minor to bump to (scikit-learn 1.9.0 and statsmodels 0.14.6 are the latest available), so
+    the decisive test reproduces the rerun's own versions: scikit-learn **1.8.0** (one minor below the
+    pin, exactly the rerun's) with statsmodels 0.14.6, Two River Taps six folds, seed ceiling
+    reproduced by the frozen frame. Result: **ETS 0.597 (not the claimed 0.617), GBM 0.601, winner
+    ETS - no flip.** The rerun's GBM 0.601 reproduces (a genuine scikit-learn 1.8.0 vs 1.9.0 effect of
+    one thousandth), but its ETS 0.617 is impossible: ETS is a statsmodels model and statsmodels was
+    identical in both runs, so ETS is 0.597 by construction. The 0.617 was a harness artefact of the
+    external reconstruction, not a library effect. **The reproducibility finding stands** (unpinned
+    `>=` bounds with no lockfile were a real defect, fixed in S3); only the "flips on a library bump"
+    illustration is withdrawn. This corrects the external assessment, not this work. Evidence: report
+    45 Part 5.

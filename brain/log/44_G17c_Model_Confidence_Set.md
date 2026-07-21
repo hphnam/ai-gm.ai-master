@@ -191,14 +191,25 @@ Per-fold MASE, common-fold restriction, bootstrap seed 93, `l = 7`, `B = 1000`. 
 Chronos entrants tie the served ETS. Identical at alpha 0.25 and under RMSSE. `rung0_seasonal_naive`
 and `rung3_gbm` fall at p = 0.05; `rung2_stl`, `rung1_robust_dow`, `rung3_global_gbm` below.
 
-**Ellel, two runs (spec 4c).** Primary, common-fold n = 246: 90% set (5) `rung4_chronos_bolt`
-(1.000), **`rung1_robust_dow`** (0.575), `rung4_chronos2_exo` (0.28), `rung4_chronos2` (0.43),
-`rung0_seasonal_naive` (0.10, borderline - it drops at B = 5000). Secondary, full n = 260 excluding
-`chronos2_exo`: 90% set (3) `rung4_chronos_bolt`, **`rung1_robust_dow`**, `rung4_chronos2`. **The
-served DOW model is retained in both alignments and under RMSSE.** The 246-fold restriction drops
-the contiguous June block of FLAG-ELLEL-JUNE-EXO - the most recent period, not a random sample -
-and the caveat is stated: because the two runs agree on `robust_dow`, the June block is not doing
-the work and no ambiguity halt is forced.
+**Ellel, two runs (spec 4c).** The bracketed numbers here are **MCS p-values** (dimensionless
+retention probabilities), NOT MASE. That distinction matters at Ellel because of a coincidence a
+reader would otherwise trip on: `rung1_robust_dow`'s MCS p-value below is **0.575**, numerically
+identical to `rung4_chronos_bolt`'s *six-fold MASE* of 0.575 reported in row 31 / report 43. They
+are different quantities that happen to share three digits. Primary, common-fold n = 246: 90% set
+(5) `rung4_chronos_bolt` (p 1.000), **`rung1_robust_dow`** (p 0.575), `rung4_chronos2_exo`
+(p 0.28), `rung4_chronos2` (p 0.43), `rung0_seasonal_naive` (p 0.10). Secondary, full n = 260
+excluding `chronos2_exo`: 90% set (3) `rung4_chronos_bolt`, **`rung1_robust_dow`**,
+`rung4_chronos2`. **The served DOW model is retained in both alignments and under RMSSE.** The
+246-fold restriction drops the contiguous June block of FLAG-ELLEL-JUNE-EXO - the most recent
+period, not a random sample - and the caveat is stated: because the two runs agree on
+`robust_dow`, the June block is not doing the work and no ambiguity halt is forced.
+
+**Set membership at the margin is not stable in B, and that does not matter here.** Ellel's
+`rung0_seasonal_naive` sits at p = 0.10 at B = 1000 and drops out at B = 5000, so the 246-fold set
+is five models at B = 1000 and four at B = 5000. That single marginal model is the only thing that
+moves; the decision is untouched because `rung1_robust_dow` sits at p = 0.575, nowhere near the
+0.10 boundary, in every configuration. A model at the boundary is exactly where bootstrap noise
+should show, and it is the only place it does.
 
 **A wide set is a valid result.** At Two River Taps and Beer Hall the data cannot separate the
 served model from the Chronos entrants on accuracy; the served choice rests on cold-start
