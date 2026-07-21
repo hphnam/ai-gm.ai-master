@@ -56,10 +56,12 @@ defect seen from two angles: six disjoint 7-day windows are 42 days, and 42 days
 **Note on the counts.** The S2 spec quoted step-1 origins of 273 / 266 / 205. Beer Hall and TRT
 reproduce exactly; **Ellel is 260, not 266.** The frame is 386 rows, not 392: its raw calendar
 opens on 2025-06-08 with the single sale-and-reversal mis-ring identified in report 42 section 6,
-followed by six dead days, and `trim_to_active` correctly discards all seven. `386 - 7 - 120 + 1
-= 260`. The erratum is the frame length; the arithmetic and the HLN factor (0.9750) are right for
-the true count. This is the same over-count that produced the S1 G2 day-count erratum, from the
-same leading dead span.
+followed by five genuinely dead days (2025-06-09 to 2025-06-13), and `trim_to_active` correctly
+discards **all six**, so the first active day is 2025-06-14. That leaves `392 - 6 = 386` rows, and
+the origin count is `386 - 7 - 120 + 1 = 260`, where the 7 is the horizon and 120 the minimum
+training window, **not** the discard count. The erratum is the frame length; the arithmetic and
+the HLN factor (0.9750) are right for the true count. This is the same over-count that produced
+the S1 G2 day-count erratum, from the same leading dead span.
 
 # 2. What `step_days` does, and the proof it changed nothing
 

@@ -1333,3 +1333,30 @@ them into the append-only log so it is the continuous WP1-to-present record.
     0.772 against a backtest of 0.745 is slightly **worse** than the backtest class, not equal to
     it. The defensible claim, adopted in report 42 and here, is that serving-horizon performance
     is **consistent with** the backtest; "matched" overstated it.
+
+32. **Pre-registered: the Ellel served-model decision rule, fixed before S3's Model Confidence
+    Set is computed.** S2 (row 31) found that at 260 origins the Ellel argmin moves off the served
+    `rung1_robust_dow` to `rung4_chronos_bolt`, by 0.0084 MASE, which is 0.18 of one standard
+    error against a fold sd of 0.71 - four rungs tied within noise. The decision on whether to
+    change what is served is deferred to S3's MCS, and the rule is written down **now**, before
+    that set exists, so it cannot be accused of being chosen to fit the result (the same
+    pre-registration discipline the project applies to forecast freezes):
+    > **If the 90% Model Confidence Set at Ellel contains `rung1_robust_dow`, it stays served**,
+    > because the data cannot discriminate it from the alternatives and the incumbent is the
+    > parsimonious choice. **If the set excludes `rung1_robust_dow`, the served model changes** to
+    > the retained model of lowest mean MASE, and all three confrontations are re-scored against
+    > the new served model.
+    The prediction, also recorded in advance, is that the set will contain `robust_dow` (alongside
+    `chronos_bolt`, `chronos2_exo` and `chronos2`), so the incumbent stays. This row binds the
+    action to the set regardless of which way it falls.
+    **Two carries into S3.** (a) `rung4_chronos2_exo` scored only 246 of Ellel's 260 folds,
+    failing on the **contiguous** June block (folds 246 to 259) with `MissingCovariateError`: S3
+    must establish whether the lead-matched weather exo is a genuine upstream data gap or a bug in
+    the covariate join, because if it is a bug it contaminates S6's entire weather ablation. (b)
+    The store-durability fix (FLAG-STORE-DURABILITY) is folded into S3 as agreed.
+    **Correction to row 31 (append-only, not an edit):** row 31 describes the Ellel leading span as
+    "the 2025-06-08 mis-ring and its six dead days", which reads as seven days dropped. The true
+    count is **six days total** - the 2025-06-08 mis-ring plus **five** dead days (2025-06-09 to
+    2025-06-13) - so `392 - 6 = 386`, first active 2025-06-14. The load-bearing numbers in row 31
+    (frame 386, origins 260, HLN 0.9750) are correct; only the descriptive "six dead days" was off
+    by one. Report 43 section 1 is corrected in full.
