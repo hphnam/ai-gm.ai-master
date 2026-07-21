@@ -18,6 +18,7 @@ Run:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -56,9 +57,17 @@ def current_db_path() -> Path:
     value at import, so a module-level constant here could never be swapped per request
     and could not be monkeypatched in tests either. Reading through the `config` module
     keeps both working.
+
+    Precedence: a per-request `scratch_store()` wins (the stateless-compute seam);
+    then the `BRAIN_DUCKDB_PATH` environment override (FLAG-STORE-DURABILITY / S3),
+    which the test suite points at a tmp database so `pytest` can never rebuild the
+    real working store out from under a developer; then the configured default.
     """
     scratch = _SCRATCH_DB.get()
-    return scratch if scratch is not None else config.DUCKDB_PATH
+    if scratch is not None:
+        return scratch
+    override = os.environ.get("BRAIN_DUCKDB_PATH")
+    return Path(override) if override else config.DUCKDB_PATH
 
 
 @contextmanager
@@ -193,6 +202,51 @@ def build() -> None:
         _create_output_tables(con)
     finally:
         con.close()
+
+
+# --- Ceiling guard (FLAG-STORE-DURABILITY) -----------------------------------
+
+class StoreCeilingError(RuntimeError):
+    """The store's last day is not the expected operational ceiling.
+
+    Raised loudly rather than letting a reported number be computed against a store
+    that a test run silently reset to the seed. The message names the one command
+    that fixes it.
+    """
+
+
+def store_ceiling(con: duckdb.DuckDBPyConnection | None = None) -> str | None:
+    """The store's last L1 date as an ISO string, or None on an empty/schemaless store."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        try:
+            row = con.execute("SELECT MAX(date) FROM l1_daily").fetchone()
+        except duckdb.Error:
+            row = None
+    finally:
+        if own:
+            con.close()
+    return str(row[0]) if row and row[0] is not None else None
+
+
+def assert_store_ceiling(expected: str | None = None) -> str:
+    """Guard the store's ceiling; call at the head of any reported-number entrypoint.
+
+    A pytest run rebuilds the store to the seed (2026-05-31) via an autouse fixture, so
+    without this the next thing to read the store gets five weeks of stale May data and
+    a plausible, wrong answer. Fails loudly and names the fix instead.
+
+    `expected` defaults to `config.EXPECTED_STORE_CEILING` read at CALL time (not bound
+    at import), so a test may drive it by monkeypatching the config value.
+    """
+    expected = expected if expected is not None else config.EXPECTED_STORE_CEILING
+    actual = store_ceiling()
+    if actual != expected:
+        raise StoreCeilingError(
+            f"store ceiling is {actual}, expected {expected}.\n"
+            "Run: python -m sim.restore_clock")
+    return actual
 
 
 # --- Read helpers ------------------------------------------------------------

@@ -24,4 +24,10 @@
 # silently invalidate the frozen pre-registration artefacts in sim/ that the
 # published results are scored against. Change it only with a deliberate re-freeze.
 chronos-forecasting==2.3.1
-torch>=2.12,<3
+# torch pinned exactly (S3): Rung-4 zero-shot output depends on the torch build, and
+# 2.12.1 is the version the committed tables reproduce under. The exact HF weight
+# revisions are pinned in models/foundation.py (CHRONOS2_REVISION / CHRONOS_REVISION),
+# and the full forecast-venv resolution is captured in requirements-forecast.lock.txt -
+# the reproducibility anchor for the six-fold ladder tables the served-model decision
+# rests on (Two River Taps ETS 0.597 vs GBM 0.602; selection is version-dependent).
+torch==2.12.1

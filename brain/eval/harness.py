@@ -640,8 +640,9 @@ def _dummy_seasonal_naive(train: pd.DataFrame, test: pd.DataFrame) -> np.ndarray
 
 
 def main() -> int:
-    from store.warehouse import read_series
+    from store.warehouse import assert_store_ceiling, read_series
 
+    assert_store_ceiling()  # the harness CLI reports metrics; guard the store it reads
     print("A2 · evaluation harness (dummy = seasonal-naive)")
     series = read_series("beer_hall", "L1", fill_calendar=True)
     split = time_split(series)

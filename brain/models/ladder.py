@@ -62,6 +62,7 @@ from models.foundation import (
     chronos_bolt_predict,
 )
 from store.active_span import active_trading_end, is_closed, trim_to_active
+from store.warehouse import assert_store_ceiling
 
 warnings.filterwarnings("ignore")
 
@@ -746,6 +747,7 @@ def main() -> int:
     ap.add_argument("--all-venues", action="store_true",
                     help="run every FORECAST_VENUES venue (the canonical pipeline)")
     args = ap.parse_args()
+    assert_store_ceiling()  # a reported number computed against a reset store is silently wrong
 
     venues = list(FORECAST_VENUES) if args.all_venues else [args.venue]
     # The anchor (Beer Hall) is the milestone gate; closed/capped venues report

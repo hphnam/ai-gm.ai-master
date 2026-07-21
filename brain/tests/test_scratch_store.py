@@ -19,6 +19,14 @@ import config
 from store import warehouse
 
 
+@pytest.fixture(autouse=True)
+def _use_the_real_default_store(monkeypatch):
+    """This module tests the ContextVar seam against the CONFIGURED default path, so it
+    opts out of the suite-wide BRAIN_DUCKDB_PATH isolation (conftest). Every read here
+    is read-only, so the working store is not mutated."""
+    monkeypatch.delenv("BRAIN_DUCKDB_PATH", raising=False)
+
+
 def test_default_path_is_the_configured_store():
     assert warehouse.current_db_path() == config.DUCKDB_PATH
 

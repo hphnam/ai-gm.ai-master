@@ -1,0 +1,1315 @@
+{
+  "artefact": "mcs_L1_results",
+  "store_ceiling": "2026-07-07",
+  "seed": 93,
+  "alphas": [0.1, 0.25],
+  "block_len_primary": 7,
+  "n_boot_primary": 1000,
+  "pre_registration": "decision log row 33; sets computed after, procedure fixed before",
+  "venues": {
+    "beer_hall": {
+      "venue": "beer_hall",
+      "store_ceiling": "2026-07-07",
+      "fold_counts": {
+        "rung0_seasonal_naive": 273,
+        "rung1_robust_dow": 273,
+        "rung2_ets": 273,
+        "rung2_stl": 273,
+        "rung3_gbm": 273,
+        "rung3_global_gbm": 273,
+        "rung4_chronos2": 273,
+        "rung4_chronos2_exo": 273,
+        "rung4_chronos_bolt": 273
+      },
+      "short_rungs": [],
+      "top4_by_mean_mase": [
+        "rung4_chronos2_exo",
+        "rung4_chronos_bolt",
+        "rung4_chronos2",
+        "rung2_ets"
+      ],
+      "paired_variance_top4": [
+        {
+          "pair": ["rung4_chronos2_exo", "rung4_chronos_bolt"],
+          "mean_diff": -0.0158,
+          "sd_paired": 0.151,
+          "sd_independent": 0.6613,
+          "paired_to_independent": 0.228,
+          "se_paired": 0.0091,
+          "acf_lag1_10": [0.501, 0.154, 0.053, 0.079, 0.137, 0.171, 0.183, 0.156, 0.054, 0.025]
+        },
+        {
+          "pair": ["rung4_chronos2_exo", "rung4_chronos2"],
+          "mean_diff": -0.0179,
+          "sd_paired": 0.1491,
+          "sd_independent": 0.6814,
+          "paired_to_independent": 0.219,
+          "se_paired": 0.009,
+          "acf_lag1_10": [
+            0.483, 0.176, 0.179, -0.023, -0.006, -0.007, -0.038, 0.025, -0.028, -0.039
+          ]
+        },
+        {
+          "pair": ["rung4_chronos2_exo", "rung2_ets"],
+          "mean_diff": -0.036,
+          "sd_paired": 0.179,
+          "sd_independent": 0.6527,
+          "paired_to_independent": 0.274,
+          "se_paired": 0.0108,
+          "acf_lag1_10": [0.669, 0.464, 0.361, 0.216, 0.22, 0.252, 0.194, 0.129, -0.017, -0.101]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung4_chronos2"],
+          "mean_diff": -0.0021,
+          "sd_paired": 0.1097,
+          "sd_independent": 0.6763,
+          "paired_to_independent": 0.162,
+          "se_paired": 0.0066,
+          "acf_lag1_10": [0.363, 0.319, 0.22, 0.208, 0.184, 0.094, 0.075, 0.141, 0.195, 0.113]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung2_ets"],
+          "mean_diff": -0.0203,
+          "sd_paired": 0.1439,
+          "sd_independent": 0.6474,
+          "paired_to_independent": 0.222,
+          "se_paired": 0.0087,
+          "acf_lag1_10": [0.595, 0.397, 0.227, 0.064, 0.002, -0.12, -0.138, -0.072, 0.032, 0.074]
+        },
+        {
+          "pair": ["rung4_chronos2", "rung2_ets"],
+          "mean_diff": -0.0182,
+          "sd_paired": 0.1817,
+          "sd_independent": 0.668,
+          "paired_to_independent": 0.272,
+          "se_paired": 0.011,
+          "acf_lag1_10": [0.707, 0.489, 0.301, 0.12, 0.015, -0.068, -0.121, 0.012, 0.076, 0.117]
+        }
+      ],
+      "mcs_primary_mase": {
+        "common_fold": {
+          "n_folds": 273,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": [
+              "rung4_chronos2_exo",
+              "rung4_chronos_bolt",
+              "rung4_chronos2",
+              "rung2_ets",
+              "rung1_robust_dow"
+            ],
+            "0.25": ["rung4_chronos2_exo", "rung4_chronos_bolt", "rung4_chronos2"]
+          },
+          "set_sizes": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 6.230092518577271,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 5.561781124901003,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.002,
+              "mcs_pvalue": 0.002,
+              "t_range": 4.528532860154867,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.002,
+              "mcs_pvalue": 0.002,
+              "t_range": 4.222444809222478,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.111,
+              "mcs_pvalue": 0.111,
+              "t_range": 2.3974538929442195,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.224,
+              "mcs_pvalue": 0.224,
+              "t_range": 1.8968149427934615,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.38,
+              "mcs_pvalue": 0.38,
+              "t_range": 1.2913692325432293,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung4_chronos_bolt",
+              "step_pvalue": 0.235,
+              "mcs_pvalue": 0.38,
+              "t_range": 1.1663354367035907,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.002,
+            "rung1_robust_dow": 0.111,
+            "rung2_ets": 0.224,
+            "rung2_stl": 0.002,
+            "rung3_gbm": 0.0,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.38,
+            "rung4_chronos2_exo": 1.0,
+            "rung4_chronos_bolt": 0.38
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.9375,
+            "rung1_robust_dow": 0.8032,
+            "rung2_ets": 0.7524,
+            "rung2_stl": 0.871,
+            "rung3_gbm": 0.883,
+            "rung3_global_gbm": 0.8647,
+            "rung4_chronos2": 0.7342,
+            "rung4_chronos2_exo": 0.7163,
+            "rung4_chronos_bolt": 0.7321
+          }
+        }
+      },
+      "mcs_secondary_rmsse": {
+        "common_fold": {
+          "n_folds": 273,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": [
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung2_ets",
+              "rung4_chronos2",
+              "rung1_robust_dow"
+            ],
+            "0.25": ["rung4_chronos_bolt", "rung4_chronos2_exo", "rung2_ets"]
+          },
+          "set_sizes": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "elimination": [
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.006,
+              "mcs_pvalue": 0.006,
+              "t_range": 3.7704985283619963,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.004,
+              "mcs_pvalue": 0.006,
+              "t_range": 3.7407342596667204,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.004,
+              "mcs_pvalue": 0.006,
+              "t_range": 3.7337596767994374,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.005,
+              "mcs_pvalue": 0.006,
+              "t_range": 3.671580219173232,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.191,
+              "mcs_pvalue": 0.191,
+              "t_range": 2.0533458179479753,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.17,
+              "mcs_pvalue": 0.191,
+              "t_range": 1.9846848246714628,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.547,
+              "mcs_pvalue": 0.547,
+              "t_range": 1.012850288144692,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung4_chronos2_exo",
+              "step_pvalue": 0.991,
+              "mcs_pvalue": 0.991,
+              "t_range": 0.016417853409082913,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.006,
+            "rung1_robust_dow": 0.191,
+            "rung2_ets": 0.547,
+            "rung2_stl": 0.006,
+            "rung3_gbm": 0.006,
+            "rung3_global_gbm": 0.006,
+            "rung4_chronos2": 0.191,
+            "rung4_chronos2_exo": 0.991,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.7612,
+            "rung1_robust_dow": 0.6421,
+            "rung2_ets": 0.6017,
+            "rung2_stl": 0.6577,
+            "rung3_gbm": 0.6818,
+            "rung3_global_gbm": 0.6646,
+            "rung4_chronos2": 0.6077,
+            "rung4_chronos2_exo": 0.5902,
+            "rung4_chronos_bolt": 0.59
+          }
+        }
+      },
+      "sensitivity_mase_common": [
+        {
+          "block_len": 2,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 3,
+            "0.25": 1
+          },
+          "set_0.10": ["rung4_chronos2_exo", "rung4_chronos_bolt", "rung4_chronos2"]
+        },
+        {
+          "block_len": 2,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 3,
+            "0.25": 1
+          },
+          "set_0.10": ["rung4_chronos2_exo", "rung4_chronos_bolt", "rung4_chronos2"]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 5
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 5
+          },
+          "set_0.10": [
+            "rung4_chronos2_exo",
+            "rung4_chronos_bolt",
+            "rung4_chronos2",
+            "rung2_ets",
+            "rung1_robust_dow"
+          ]
+        }
+      ]
+    },
+    "two_river_taps": {
+      "venue": "two_river_taps",
+      "store_ceiling": "2026-07-07",
+      "fold_counts": {
+        "rung0_seasonal_naive": 205,
+        "rung1_robust_dow": 205,
+        "rung2_ets": 205,
+        "rung2_stl": 205,
+        "rung3_gbm": 205,
+        "rung3_global_gbm": 205,
+        "rung4_chronos2": 205,
+        "rung4_chronos2_exo": 205,
+        "rung4_chronos_bolt": 205
+      },
+      "short_rungs": [],
+      "top4_by_mean_mase": [
+        "rung2_ets",
+        "rung4_chronos_bolt",
+        "rung4_chronos2_exo",
+        "rung4_chronos2"
+      ],
+      "paired_variance_top4": [
+        {
+          "pair": ["rung2_ets", "rung4_chronos_bolt"],
+          "mean_diff": -0.0111,
+          "sd_paired": 0.2294,
+          "sd_independent": 0.5118,
+          "paired_to_independent": 0.448,
+          "se_paired": 0.016,
+          "acf_lag1_10": [0.513, 0.29, 0.198, 0.104, -0.033, -0.163, -0.258, -0.221, -0.256, -0.223]
+        },
+        {
+          "pair": ["rung2_ets", "rung4_chronos2_exo"],
+          "mean_diff": -0.0226,
+          "sd_paired": 0.18,
+          "sd_independent": 0.489,
+          "paired_to_independent": 0.368,
+          "se_paired": 0.0126,
+          "acf_lag1_10": [0.597, 0.287, 0.178, 0.159, 0.056, -0.116, -0.194, -0.2, -0.257, -0.288]
+        },
+        {
+          "pair": ["rung2_ets", "rung4_chronos2"],
+          "mean_diff": -0.0231,
+          "sd_paired": 0.1732,
+          "sd_independent": 0.4723,
+          "paired_to_independent": 0.367,
+          "se_paired": 0.0121,
+          "acf_lag1_10": [0.613, 0.367, 0.233, 0.163, 0.05, -0.122, -0.218, -0.198, -0.267, -0.278]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung4_chronos2_exo"],
+          "mean_diff": -0.0115,
+          "sd_paired": 0.1468,
+          "sd_independent": 0.512,
+          "paired_to_independent": 0.287,
+          "se_paired": 0.0103,
+          "acf_lag1_10": [0.419, 0.229, 0.203, 0.068, 0.03, 0.014, -0.015, -0.038, -0.086, -0.055]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung4_chronos2"],
+          "mean_diff": -0.0119,
+          "sd_paired": 0.1367,
+          "sd_independent": 0.496,
+          "paired_to_independent": 0.276,
+          "se_paired": 0.0095,
+          "acf_lag1_10": [0.517, 0.33, 0.298, 0.198, 0.165, 0.152, 0.136, 0.093, 0.034, 0.014]
+        },
+        {
+          "pair": ["rung4_chronos2_exo", "rung4_chronos2"],
+          "mean_diff": -0.0004,
+          "sd_paired": 0.069,
+          "sd_independent": 0.4724,
+          "paired_to_independent": 0.146,
+          "se_paired": 0.0048,
+          "acf_lag1_10": [0.59, 0.361, 0.29, 0.254, 0.239, 0.237, 0.314, 0.228, 0.113, 0.111]
+        }
+      ],
+      "mcs_primary_mase": {
+        "common_fold": {
+          "n_folds": 205,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"],
+            "0.25": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+          },
+          "set_sizes": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 5.221371331438178,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.001,
+              "mcs_pvalue": 0.001,
+              "t_range": 4.412968342410156,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.003,
+              "mcs_pvalue": 0.003,
+              "t_range": 4.009974401814339,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.05,
+              "mcs_pvalue": 0.05,
+              "t_range": 2.7799869755847935,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.05,
+              "mcs_pvalue": 0.05,
+              "t_range": 2.674348892846037,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.682,
+              "mcs_pvalue": 0.682,
+              "t_range": 1.1049932453372655,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2_exo",
+              "step_pvalue": 0.526,
+              "mcs_pvalue": 0.682,
+              "t_range": 1.0906328615586907,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung4_chronos_bolt",
+              "step_pvalue": 0.672,
+              "mcs_pvalue": 0.682,
+              "t_range": 0.4349460436733267,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.05,
+            "rung1_robust_dow": 0.001,
+            "rung2_ets": 1.0,
+            "rung2_stl": 0.003,
+            "rung3_gbm": 0.05,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.682,
+            "rung4_chronos2_exo": 0.682,
+            "rung4_chronos_bolt": 0.682
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.7182,
+            "rung1_robust_dow": 0.8351,
+            "rung2_ets": 0.6478,
+            "rung2_stl": 0.7814,
+            "rung3_gbm": 0.7409,
+            "rung3_global_gbm": 0.8969,
+            "rung4_chronos2": 0.6709,
+            "rung4_chronos2_exo": 0.6705,
+            "rung4_chronos_bolt": 0.659
+          }
+        }
+      },
+      "mcs_secondary_rmsse": {
+        "common_fold": {
+          "n_folds": 205,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": ["rung4_chronos2", "rung4_chronos2_exo", "rung4_chronos_bolt", "rung2_ets"],
+            "0.25": ["rung4_chronos2", "rung4_chronos2_exo", "rung4_chronos_bolt"]
+          },
+          "set_sizes": {
+            "0.1": 4,
+            "0.25": 3
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 5.1906201399403535,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.001,
+              "mcs_pvalue": 0.001,
+              "t_range": 4.259793940832636,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.027,
+              "mcs_pvalue": 0.027,
+              "t_range": 3.2094772782844023,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.023,
+              "mcs_pvalue": 0.027,
+              "t_range": 3.1140453516807494,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.079,
+              "mcs_pvalue": 0.079,
+              "t_range": 2.521142918539165,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.201,
+              "mcs_pvalue": 0.201,
+              "t_range": 1.887585440735132,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos_bolt",
+              "step_pvalue": 0.908,
+              "mcs_pvalue": 0.908,
+              "t_range": 0.42426558265057185,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung4_chronos2_exo",
+              "step_pvalue": 0.798,
+              "mcs_pvalue": 0.908,
+              "t_range": 0.2542768345234653,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.079,
+            "rung1_robust_dow": 0.001,
+            "rung2_ets": 0.201,
+            "rung2_stl": 0.027,
+            "rung3_gbm": 0.027,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 1.0,
+            "rung4_chronos2_exo": 0.908,
+            "rung4_chronos_bolt": 0.908
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.5674,
+            "rung1_robust_dow": 0.582,
+            "rung2_ets": 0.5139,
+            "rung2_stl": 0.5682,
+            "rung3_gbm": 0.5491,
+            "rung3_global_gbm": 0.7143,
+            "rung4_chronos2": 0.4817,
+            "rung4_chronos2_exo": 0.4832,
+            "rung4_chronos_bolt": 0.486
+          }
+        }
+      },
+      "sensitivity_mase_common": [
+        {
+          "block_len": 2,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 2,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 3
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": ["rung2_ets", "rung4_chronos_bolt", "rung4_chronos2_exo", "rung4_chronos2"]
+        }
+      ]
+    },
+    "ellel": {
+      "venue": "ellel",
+      "store_ceiling": "2026-07-07",
+      "fold_counts": {
+        "rung0_seasonal_naive": 260,
+        "rung1_robust_dow": 260,
+        "rung2_ets": 260,
+        "rung2_stl": 260,
+        "rung3_gbm": 260,
+        "rung3_global_gbm": 260,
+        "rung4_chronos2": 260,
+        "rung4_chronos2_exo": 246,
+        "rung4_chronos_bolt": 260
+      },
+      "short_rungs": ["rung4_chronos2_exo"],
+      "top4_by_mean_mase": [
+        "rung4_chronos_bolt",
+        "rung4_chronos2_exo",
+        "rung1_robust_dow",
+        "rung4_chronos2"
+      ],
+      "paired_variance_top4": [
+        {
+          "pair": ["rung4_chronos_bolt", "rung4_chronos2_exo"],
+          "mean_diff": -0.0246,
+          "sd_paired": 0.1142,
+          "sd_independent": 1.0169,
+          "paired_to_independent": 0.112,
+          "se_paired": 0.0073,
+          "acf_lag1_10": [0.799, 0.635, 0.492, 0.361, 0.205, 0.037, -0.109, -0.07, -0.041, -0.017]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung1_robust_dow"],
+          "mean_diff": -0.0109,
+          "sd_paired": 0.141,
+          "sd_independent": 1.0101,
+          "paired_to_independent": 0.14,
+          "se_paired": 0.009,
+          "acf_lag1_10": [0.805, 0.686, 0.595, 0.486, 0.43, 0.307, 0.188, 0.18, 0.199, 0.206]
+        },
+        {
+          "pair": ["rung4_chronos_bolt", "rung4_chronos2"],
+          "mean_diff": -0.0263,
+          "sd_paired": 0.1602,
+          "sd_independent": 1.0157,
+          "paired_to_independent": 0.158,
+          "se_paired": 0.0102,
+          "acf_lag1_10": [0.783, 0.625, 0.5, 0.327, 0.178, 0.037, -0.114, -0.085, -0.035, 0.013]
+        },
+        {
+          "pair": ["rung4_chronos2_exo", "rung1_robust_dow"],
+          "mean_diff": 0.0137,
+          "sd_paired": 0.1019,
+          "sd_independent": 0.9929,
+          "paired_to_independent": 0.103,
+          "se_paired": 0.0065,
+          "acf_lag1_10": [0.763, 0.687, 0.601, 0.448, 0.383, 0.281, 0.238, 0.174, 0.127, 0.126]
+        },
+        {
+          "pair": ["rung4_chronos2_exo", "rung4_chronos2"],
+          "mean_diff": -0.0017,
+          "sd_paired": 0.0545,
+          "sd_independent": 0.9986,
+          "paired_to_independent": 0.055,
+          "se_paired": 0.0035,
+          "acf_lag1_10": [0.661, 0.489, 0.416, 0.175, 0.051, 0.032, -0.115, -0.107, -0.033, 0.041]
+        },
+        {
+          "pair": ["rung1_robust_dow", "rung4_chronos2"],
+          "mean_diff": -0.0154,
+          "sd_paired": 0.1208,
+          "sd_independent": 0.9917,
+          "paired_to_independent": 0.122,
+          "se_paired": 0.0077,
+          "acf_lag1_10": [0.748, 0.645, 0.548, 0.363, 0.254, 0.141, 0.094, 0.038, 0.005, 0.042]
+        }
+      ],
+      "mcs_primary_mase": {
+        "common_fold": {
+          "n_folds": 246,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": [
+              "rung4_chronos_bolt",
+              "rung1_robust_dow",
+              "rung4_chronos2_exo",
+              "rung4_chronos2",
+              "rung0_seasonal_naive"
+            ],
+            "0.25": [
+              "rung4_chronos_bolt",
+              "rung1_robust_dow",
+              "rung4_chronos2_exo",
+              "rung4_chronos2"
+            ]
+          },
+          "set_sizes": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 6.2180583445922055,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 6.116186651313332,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.004,
+              "mcs_pvalue": 0.004,
+              "t_range": 3.8009411863575293,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.005,
+              "mcs_pvalue": 0.005,
+              "t_range": 3.6305333896818675,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.103,
+              "mcs_pvalue": 0.103,
+              "t_range": 2.306395398486275,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung4_chronos2_exo",
+              "step_pvalue": 0.277,
+              "mcs_pvalue": 0.277,
+              "t_range": 1.6039694098127073,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.426,
+              "mcs_pvalue": 0.426,
+              "t_range": 1.2257375494489637,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.575,
+              "mcs_pvalue": 0.575,
+              "t_range": 0.5569936205804195,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.103,
+            "rung1_robust_dow": 0.575,
+            "rung2_ets": 0.004,
+            "rung2_stl": 0.005,
+            "rung3_gbm": 0.0,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.426,
+            "rung4_chronos2_exo": 0.277,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.8177,
+            "rung1_robust_dow": 0.5694,
+            "rung2_ets": 0.7123,
+            "rung2_stl": 0.7189,
+            "rung3_gbm": 0.8941,
+            "rung3_global_gbm": 0.9055,
+            "rung4_chronos2": 0.5848,
+            "rung4_chronos2_exo": 0.5831,
+            "rung4_chronos_bolt": 0.5585
+          }
+        },
+        "full_excluding_short": {
+          "n_folds": 260,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"],
+            "0.25": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"]
+          },
+          "set_sizes": {
+            "0.1": 3,
+            "0.25": 3
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 6.283969626063369,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.0,
+              "mcs_pvalue": 0.0,
+              "t_range": 6.192902869190197,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.002,
+              "mcs_pvalue": 0.002,
+              "t_range": 3.9213502746274127,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.002,
+              "mcs_pvalue": 0.002,
+              "t_range": 3.833980074224873,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.022,
+              "mcs_pvalue": 0.022,
+              "t_range": 2.7344718498481013,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.374,
+              "mcs_pvalue": 0.374,
+              "t_range": 1.3649557285264424,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.579,
+              "mcs_pvalue": 0.579,
+              "t_range": 0.5579860972323588,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.022,
+            "rung1_robust_dow": 0.579,
+            "rung2_ets": 0.002,
+            "rung2_stl": 0.002,
+            "rung3_gbm": 0.0,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.374,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.8687,
+            "rung1_robust_dow": 0.5852,
+            "rung2_ets": 0.7281,
+            "rung2_stl": 0.7309,
+            "rung3_gbm": 0.9116,
+            "rung3_global_gbm": 0.9196,
+            "rung4_chronos2": 0.6023,
+            "rung4_chronos_bolt": 0.5747
+          }
+        }
+      },
+      "mcs_secondary_rmsse": {
+        "common_fold": {
+          "n_folds": 246,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": [
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung1_robust_dow",
+              "rung4_chronos2",
+              "rung2_stl",
+              "rung2_ets",
+              "rung0_seasonal_naive"
+            ],
+            "0.25": [
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung1_robust_dow",
+              "rung4_chronos2"
+            ]
+          },
+          "set_sizes": {
+            "0.1": 7,
+            "0.25": 4
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.04,
+              "mcs_pvalue": 0.04,
+              "t_range": 3.0437764525306283,
+              "set_size_before": 9
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.092,
+              "mcs_pvalue": 0.092,
+              "t_range": 2.617298502360043,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.137,
+              "mcs_pvalue": 0.137,
+              "t_range": 2.3831961054261637,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.123,
+              "mcs_pvalue": 0.137,
+              "t_range": 2.3296569527373987,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.157,
+              "mcs_pvalue": 0.157,
+              "t_range": 2.0530472084313662,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.851,
+              "mcs_pvalue": 0.851,
+              "t_range": 0.656241262331114,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2_exo",
+              "step_pvalue": 0.956,
+              "mcs_pvalue": 0.956,
+              "t_range": 0.29777258937723067,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.783,
+              "mcs_pvalue": 0.956,
+              "t_range": 0.2915657289081765,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.157,
+            "rung1_robust_dow": 0.956,
+            "rung2_ets": 0.137,
+            "rung2_stl": 0.137,
+            "rung3_gbm": 0.092,
+            "rung3_global_gbm": 0.04,
+            "rung4_chronos2": 0.851,
+            "rung4_chronos2_exo": 0.956,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.6169,
+            "rung1_robust_dow": 0.4654,
+            "rung2_ets": 0.5314,
+            "rung2_stl": 0.5111,
+            "rung3_gbm": 0.5791,
+            "rung3_global_gbm": 0.5781,
+            "rung4_chronos2": 0.4681,
+            "rung4_chronos2_exo": 0.4643,
+            "rung4_chronos_bolt": 0.4605
+          }
+        },
+        "full_excluding_short": {
+          "n_folds": 260,
+          "block_len": 7,
+          "n_boot": 1000,
+          "sets": {
+            "0.1": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"],
+            "0.25": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"]
+          },
+          "set_sizes": {
+            "0.1": 3,
+            "0.25": 3
+          },
+          "elimination": [
+            {
+              "model": "rung3_global_gbm",
+              "step_pvalue": 0.031,
+              "mcs_pvalue": 0.031,
+              "t_range": 3.0121150133145274,
+              "set_size_before": 8
+            },
+            {
+              "model": "rung3_gbm",
+              "step_pvalue": 0.072,
+              "mcs_pvalue": 0.072,
+              "t_range": 2.6369767771638,
+              "set_size_before": 7
+            },
+            {
+              "model": "rung0_seasonal_naive",
+              "step_pvalue": 0.077,
+              "mcs_pvalue": 0.077,
+              "t_range": 2.502152208371942,
+              "set_size_before": 6
+            },
+            {
+              "model": "rung2_ets",
+              "step_pvalue": 0.098,
+              "mcs_pvalue": 0.098,
+              "t_range": 2.351584926323727,
+              "set_size_before": 5
+            },
+            {
+              "model": "rung2_stl",
+              "step_pvalue": 0.089,
+              "mcs_pvalue": 0.098,
+              "t_range": 2.2849510269981392,
+              "set_size_before": 4
+            },
+            {
+              "model": "rung4_chronos2",
+              "step_pvalue": 0.837,
+              "mcs_pvalue": 0.837,
+              "t_range": 0.550431198815615,
+              "set_size_before": 3
+            },
+            {
+              "model": "rung1_robust_dow",
+              "step_pvalue": 0.757,
+              "mcs_pvalue": 0.837,
+              "t_range": 0.33150630247457213,
+              "set_size_before": 2
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.077,
+            "rung1_robust_dow": 0.837,
+            "rung2_ets": 0.098,
+            "rung2_stl": 0.098,
+            "rung3_gbm": 0.072,
+            "rung3_global_gbm": 0.031,
+            "rung4_chronos2": 0.837,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.6719,
+            "rung1_robust_dow": 0.4837,
+            "rung2_ets": 0.5482,
+            "rung2_stl": 0.5269,
+            "rung3_gbm": 0.5962,
+            "rung3_global_gbm": 0.5948,
+            "rung4_chronos2": 0.4877,
+            "rung4_chronos_bolt": 0.4784
+          }
+        }
+      },
+      "sensitivity_mase_common": [
+        {
+          "block_len": 2,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 3,
+            "0.25": 2
+          },
+          "set_0.10": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"]
+        },
+        {
+          "block_len": 2,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 3,
+            "0.25": 2
+          },
+          "set_0.10": ["rung4_chronos_bolt", "rung1_robust_dow", "rung4_chronos2"]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2",
+            "rung0_seasonal_naive"
+          ]
+        },
+        {
+          "block_len": 7,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2"
+          ]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2",
+            "rung0_seasonal_naive"
+          ]
+        },
+        {
+          "block_len": 14,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2",
+            "rung0_seasonal_naive"
+          ]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 1000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2",
+            "rung0_seasonal_naive"
+          ]
+        },
+        {
+          "block_len": 21,
+          "n_boot": 5000,
+          "set_size": {
+            "0.1": 5,
+            "0.25": 4
+          },
+          "set_0.10": [
+            "rung4_chronos_bolt",
+            "rung1_robust_dow",
+            "rung4_chronos2_exo",
+            "rung4_chronos2",
+            "rung0_seasonal_naive"
+          ]
+        }
+      ],
+      "excluded_for_full": ["rung4_chronos2_exo"]
+    }
+  }
+}

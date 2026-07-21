@@ -1360,3 +1360,87 @@ them into the append-only log so it is the continuous WP1-to-present record.
     2025-06-13) - so `392 - 6 = 386`, first active 2025-06-14. The load-bearing numbers in row 31
     (frame 386, origins 260, HLN 0.9750) are correct; only the descriptive "six dead days" was off
     by one. Report 43 section 1 is corrected in full.
+
+33. **Pre-registered: the Model Confidence Set procedure and its parameters, fixed before the set
+    is computed (S3 G17c, Part 4a).** S2 (row 31) lifted the fold count to 273/260/205 overlapping
+    origins, at which a significance test on the served-model decision becomes computable for the
+    first time. The procedure is the Model Confidence Set of Hansen, Lunde and Nason (2011), and
+    every choice below is written down **now**, before the set exists, so it cannot be accused of
+    being tuned to the answer:
+    - **Primary loss: per-fold MASE** - the loss the committed gate used, so the MCS audits the
+      decision actually made. **Secondary loss: per-fold RMSSE** as a robustness check; if the two
+      disagree on membership that is itself a finding.
+    - **Statistic: T_R** (the range), `max_{i,j} |t_ij|`, with the matched elimination rule
+      **e_R = argmax_i sup_j t_ij**. T_R answers the question being asked: is model i distinguishable
+      from model j.
+    - **Bootstrap: moving block.** Consecutive origins at step 1 share six of seven days, so the
+      loss differentials are serially correlated by construction and are not iid draws; an iid
+      resample or a plain t-test over these folds is invalid. **Block length l = 7 primary** (the
+      horizon is the mechanical source of the overlap), sensitivity at l in {2, 7, 14, 21}.
+      **B = 1000 primary** (Hansen-Lunde-Nason use 1000), repeated at B = 5000.
+    - **Levels: alpha = 0.10 primary, 0.25 secondary.** NOT 0.05: at these sample sizes the
+      procedure has no power there and the choice would read as post hoc.
+    - **Alignment.** The MCS requires every model scored on identical data, so Ellel is run TWICE:
+      a **common-fold restriction** to the 246 folds `rung4_chronos2_exo` scored (primary), and the
+      **full 260 folds excluding `chronos2_exo`** (secondary). The 246 restriction drops a
+      *contiguous* June block (the most recent period, not a random sample); if the two runs
+      disagree on `rung1_robust_dow`'s membership the June block is doing the work, and that is
+      reported rather than smoothed.
+    - **Implementation gate (G4).** The MCS is verified on two synthetic truths before any real set
+      is trusted: one uniformly dominant model must collapse the set to itself, and identically
+      distributed models must all be retained. A single elimination sequence is computed and
+      thresholded at each alpha, so the 0.25 set is a subset of the 0.10 set BY CONSTRUCTION - the
+      stop-condition ordering "retained at 0.25 but eliminated at 0.10" is made structurally
+      impossible rather than merely asserted. Bootstrap seed fixed at 93.
+    **The prediction, recorded before the run** (it binds either way): at Beer Hall the top four
+    rungs sit within 0.036 MASE against a marginal se near 0.029, so the 90% set retains at least
+    the top three and eliminates `rung0_seasonal_naive` and `rung3_gbm`; at Ellel the set retains
+    `rung1_robust_dow`; at Two River Taps it retains `rung2_ets`. The paired variance measured in
+    Part 4b decides it: if the paired differences are much tighter than the marginal errors, the
+    sets are narrower than predicted and the data discriminates better than the report-43 tables
+    suggest. Either outcome is reportable; neither is a reason to change the procedure. The
+    pre-registered Ellel *action* rule is row 32; its application is recorded in a later row.
+
+34. **S3 G17c result: the significance test runs, and every served model is inside its 90%
+    Model Confidence Set.** The test uncomputable at six folds (row 31: HLN algebraically zero)
+    is now computed on 273/260/205 origins. **The pre-registered prediction (row 33) holds at all
+    three venues.** Sets (MASE, common-fold, alpha 0.10 unless noted; served model in **bold**):
+    - **Beer Hall (n=273):** {**rung4_chronos2_exo** (MCS-p 1.000), rung4_chronos_bolt, rung4_chronos2,
+      rung2_ets, rung1_robust_dow} - 5 of 9. At alpha 0.25 it tightens to the three Chronos entrants.
+      `rung0_seasonal_naive`, `rung3_gbm`, `rung3_global_gbm` and `rung2_stl` are eliminated with
+      p <= 0.002 - **exactly the prediction** (retain the top three, drop naive and GBM). RMSSE
+      returns the same five.
+    - **Two River Taps (n=205):** {**rung2_ets** (1.000), rung4_chronos_bolt, rung4_chronos2_exo,
+      rung4_chronos2} - 4 of 9; the three Chronos entrants tie the served ETS at MCS-p 0.682. The
+      set is identical at alpha 0.25 and under RMSSE.
+    - **Ellel (n=246 common-fold):** {rung4_chronos_bolt (1.000), **rung1_robust_dow** (0.575),
+      rung4_chronos2_exo, rung4_chronos2, rung0_seasonal_naive} - 5 of 9. The full 260-fold run
+      excluding `chronos2_exo` gives {rung4_chronos_bolt, **rung1_robust_dow**, rung4_chronos2}; the
+      served DOW model is retained in **both** alignments and under RMSSE.
+    **Paired variance (Part 4b) is why the test can discriminate at all.** The report-43 marginal
+    se near 0.029 made the 0.036 top-of-ladder gaps look indistinguishable; but the rungs are
+    strongly correlated across folds, so the **paired** differential sd is far smaller - the
+    paired-to-independent sd ratio is 0.16-0.27 at Beer Hall, 0.15-0.45 at TRT and **0.06-0.16 at
+    Ellel** - giving a paired se near 0.006-0.011. The MCS still returns wide sets among the top
+    cluster because the range statistic corrects for multiplicity: the data separates the clearly
+    worse rungs (naive, GBM, STL eliminated at p <= 0.005 almost everywhere) but **cannot separate
+    the foundation models from the served incumbent**. The autocorrelation of the differential
+    decays from acf-1 ~ 0.5-0.8 to ~ 0 by lag 7, so l = 7 is empirically justified and conservative;
+    the sensitivity sweep confirms it - l = 2 understates the overlap and returns spuriously narrow
+    sets (Beer Hall 3/1 vs 5/3 at l = 7), while l in {7, 14, 21} and B in {1000, 5000} are stable.
+    Sets are nested (alpha 0.25 subset of 0.10) by construction, so no stop condition fired.
+    Artefact `eval/mcs_L1_results.json` (carries `store_ceiling`), module `eval/mcs.py`, synthetic
+    G4 gates in `tests/test_a2_mcs.py`. Evidence: `brain/log/44_G17c_Model_Confidence_Set.md`.
+
+35. **Applying the pre-registered Ellel rule (row 32): `rung1_robust_dow` stays served; no
+    confrontation is re-scored.** Row 32 bound the action before the set existed: if the 90% MCS
+    contains `rung1_robust_dow` it stays served, if it excludes it the served model changes and all
+    three confrontations re-score. **The set contains `rung1_robust_dow`** - in the primary 246-fold
+    common run (MCS-p 0.575), in the secondary 260-fold run excluding the covariate entrant, and
+    under the RMSSE loss. The two alignments do **not** disagree, so the June-block caveat
+    (FLAG-ELLEL-JUNE-EXO) does not force an ambiguity halt. **Decision: the served model is
+    unchanged at all three venues; no confrontation is re-scored.** This closes the S2 stop-flag
+    (row 31): the six-fold argmin flip from `robust_dow` to `chronos_bolt` (gap 0.0084 = 0.18 se)
+    was noise - both models sit inside the Ellel set and are statistically indistinguishable, which
+    is what the pre-registration predicted. Applied as written; not reinterpreted in light of the
+    result.

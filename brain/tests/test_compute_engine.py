@@ -176,8 +176,11 @@ def test_the_scratch_store_is_gone_after_the_run():
     assert seen and not seen[0].exists()
 
 
-def test_the_path_reverts_to_the_served_store_after_a_run():
+def test_the_path_reverts_to_the_served_store_after_a_run(monkeypatch):
     import config
+    # Assert against the CONFIGURED default, so opt out of the suite-wide
+    # BRAIN_DUCKDB_PATH isolation (conftest) for this one path assertion.
+    monkeypatch.delenv("BRAIN_DUCKDB_PATH", raising=False)
     run(_dataset())
     assert warehouse.current_db_path() == config.DUCKDB_PATH
 

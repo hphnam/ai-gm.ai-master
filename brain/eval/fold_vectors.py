@@ -35,6 +35,7 @@ from pathlib import Path
 
 import config
 from eval import harness
+from store import warehouse
 
 SCHEMA_VERSION = 1
 OUT_DIR = config.BRAIN_DIR / "eval"
@@ -81,6 +82,9 @@ def build(venue: str, *, step_days: int | None = STEP_DAYS) -> dict:
     """Run the ladder at `step_days` and return the persistable payload."""
     from models import ladder
 
+    # A rolling-origin result is a function of the store ceiling (report 42 as_of).
+    # Guard it and stamp it, so these vectors carry the store they were measured on.
+    ceiling = warehouse.assert_store_ceiling()
     started = time.time()
     results, n_folds = ladder.evaluate_rolling(
         venue, n_folds=None, horizon=HORIZON_DAYS, step_days=step_days)
@@ -107,6 +111,7 @@ def build(venue: str, *, step_days: int | None = STEP_DAYS) -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
         "venue": venue,
+        "store_ceiling": ceiling,
         "basis": "calendar_lag7",
         "scale_policy": "per-fold training slice (ex-ante), not a pinned as_of",
         "horizon_days": HORIZON_DAYS,

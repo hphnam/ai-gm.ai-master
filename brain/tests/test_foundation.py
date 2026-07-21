@@ -109,7 +109,7 @@ def test_chronos2_resource_guard_substitutes_small_model(monkeypatch):
     class _Pipe:
         pass
 
-    def _from_pretrained(model_id, device_map=None):
+    def _from_pretrained(model_id, revision=None, device_map=None):
         if model_id == foundation.CHRONOS2_MODEL_ID:
             raise RuntimeError("out of memory")
         return _Pipe()

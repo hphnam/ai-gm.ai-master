@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "venue": "ellel",
+  "store_ceiling": "2026-07-07",
   "basis": "calendar_lag7",
   "scale_policy": "per-fold training slice (ex-ante), not a pinned as_of",
   "horizon_days": 7,

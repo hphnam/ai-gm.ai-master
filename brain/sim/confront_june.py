@@ -26,7 +26,7 @@ import config
 from eval import harness
 from ingest.taxonomy import map_category
 from sim.build_frozen_forecast import GATE_WINNER, build_future_frame
-from store.warehouse import connect, read_series
+from store.warehouse import assert_store_ceiling, connect, read_series
 
 SIM_DIR = config.BRAIN_DIR / "sim"
 JUNE = pd.date_range("2026-06-01", "2026-06-30", freq="D")
@@ -223,10 +223,11 @@ def stage2() -> dict:
 
 
 def main() -> dict:
+    ceiling = assert_store_ceiling()  # a confrontation scored against a reset store is silently wrong
     frozen = _load_frozen()
     a1, a2 = _load_actuals_l1(), _load_actuals_l2()
     _build_actuals_eval(frozen, a1, a2)
-    result = {"stage1": stage1(frozen, a1, a2), "stage2": stage2()}
+    result = {"store_ceiling": ceiling, "stage1": stage1(frozen, a1, a2), "stage2": stage2()}
     # New file, not an edit: see sim/confront_july.py and S1 G5.
     (SIM_DIR / "june2026_confront_rescored.json").write_text(
         json.dumps(result, indent=2) + "\n")

@@ -28,6 +28,16 @@ DUCKDB_PATH = STORE_DIR / "brain.duckdb"
 MANIFEST_PATH = STORE_DIR / "manifest.json"
 FLAGS_PATH = BRAIN_DIR / "FLAGS.md"
 
+# The operational store ceiling every reported number is measured against (S3 /
+# FLAG-STORE-DURABILITY). The ceiling is state that lives OUTSIDE the build:
+# `warehouse.build()` rebuilds from the seed CSV ending 2026-05-31, and only
+# `sim/restore_clock.py` advances the clock to here. `warehouse.assert_store_ceiling`
+# guards it at every entrypoint that produces a reported number, so a store silently
+# reset to seed fails loudly instead of returning a plausible May number. Any pinned
+# rolling-origin / scaled metric is a function of this ceiling (the S1 `as_of` lesson):
+# an artefact without its `store_ceiling` is not reproducible.
+EXPECTED_STORE_CEILING = "2026-07-07"
+
 # Raw source files. They live in brain/data/ (the canonical location); the
 # repo-root fallback in _resolve is kept only for backwards compatibility with
 # older checkouts that still have the files at the root.

@@ -768,7 +768,7 @@ does.
   same sample; at H=7 they are confounded, since disjoint 7-day blocks put each step on a
   fixed weekday), and a coverage gate per step.
 
-- **FLAG-STORE-DURABILITY (OPEN, operational, mitigated not fixed).** The store is
+- **FLAG-STORE-DURABILITY (RESOLVED, S3 report 44, 21 Jul 2026).** The store is
   derived and disposable by design, and that design has a sharp edge: `warehouse.build()`
   rebuilds from the committed CSV seed, which ends **2026-05-31**, so it silently drops
   the aggregate-ingested June and 1 to 7 July rows and resets the operational clock five
@@ -803,6 +803,25 @@ does.
   > and the whole problem retires when Neon is the system of record and the clock is not
   > reconstructible-by-accident local state. Until then, treat "I ran the tests" as
   > "I reset the clock".
+  >
+  > **Resolved (S3, report 44).** Three layers, in the order S3 built them so a silent
+  > reset cannot invalidate the expensive run at the end:
+  > 1. **A loud guard.** `warehouse.assert_store_ceiling(expected=config.EXPECTED_STORE_CEILING)`
+  >    raises `StoreCeilingError` naming the fix command, called at the head of every
+  >    reported-number entrypoint (`ladder.main`, `harness.main`, `fold_vectors.build`, the
+  >    July/June confront mains; the MCS runner asserts the provenance of the vectors it
+  >    reads instead of the live store). A store reset to seed now fails loudly, not quietly.
+  > 2. **Suite isolation.** `current_db_path()` honours a `BRAIN_DUCKDB_PATH` override, and
+  >    `tests/conftest.py` points it at a throwaway database built once per session, so the
+  >    two autouse `warehouse.build()` fixtures rebuild the *tmp* store and the developer's
+  >    working store keeps its ceiling. Proven by an mtime test (`test_store_durability.py`)
+  >    and verified end to end: a full suite run leaves the working store at 2026-07-07.
+  > 3. **One build entrypoint + provenance.** `python -m store.build` runs
+  >    normalise -> warehouse -> restore_clock -> assert, short-circuiting a warm store;
+  >    every result JSON and every fold-vector file now carries a `store_ceiling` field (the
+  >    S1 `as_of` lesson one level up: an artefact without its ceiling is not reproducible).
+  > The "fix is upstream / retires with Neon" note still stands as the durable answer; this
+  > closes the local hazard until then.
 
 ## S1 G17a metric integrity (report 42)
 
@@ -860,3 +879,30 @@ does.
   timestamp error into a stated precondition and records `stage2` as unavailable rather
   than emitting a wrong number; re-scoring it needs the pinned store S3 introduces. Stage 1,
   the pre-registered cold forecast, is unaffected and is re-scored in full.
+
+## S3 G17c model confidence set, environment pinning, store durability (report 44)
+
+- **FLAG-ELLEL-JUNE-EXO (OPEN, upstream data gap, verdict established, fix assigned to S6).**
+  `rung4_chronos2_exo` scores only **246 of Ellel's 260** rolling folds, failing on the
+  contiguous block 246 to 259 (test windows 2026-06-15 to 2026-07-04) with
+  `MissingCovariateError`. S3 established the cause at the data level: the `exog_weather_*`
+  tables for the **Ellel grid cell** have a single internal hole, **2026-06-21 to 2026-06-29
+  (9 days)**, in all three bases (hindcast, leadmatched, observed). Every one of those 9
+  dates **is present for the Beer Hall cell**, which is fetched in the same ingest pass and
+  has no gaps at all.
+  > **Verdict: a venue-specific upstream data gap, NOT a covariate-join defect.** The feature
+  > join (`features/build_features._attach_exog`) attaches the weather rows that exist and
+  > correctly leaves NaN where the Ellel cell has none; Beer Hall, through the identical join,
+  > gets all 9 days. So the join logic is sound and **S6's weather ablation is not
+  > contaminated by a join bug** - the very question this carry existed to settle (row 32).
+  > The chronos2-exo entrant never imputes (deliberate, `_require_covariates`), so a NaN
+  > covariate on those dates raises rather than silently degrading, which is why the failure
+  > is loud and traceable rather than a quiet wrong number.
+  >
+  > Not fixed here, per spec: closing the hole is a fetch-layer change (re-pull the Ellel
+  > cell for 2026-06-21..06-29, or establish it as a true Open-Meteo gap for that coordinate
+  > and period), which belongs with **S6**, the weather ablation, where the exogenous path is
+  > the subject rather than a dependency. Consequence for S3's MCS: the Ellel common-fold run
+  > restricts to the 246 folds all rungs share, which drops exactly this recent block; the run
+  > is therefore reported alongside the full 260-fold run excluding chronos2_exo, and both
+  > agree that `rung1_robust_dow` is retained (row 35).

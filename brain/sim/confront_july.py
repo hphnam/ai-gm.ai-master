@@ -24,7 +24,7 @@ import pandas as pd
 import config
 from eval import harness
 from ingest.taxonomy import map_category, map_item
-from store.warehouse import connect
+from store.warehouse import assert_store_ceiling, connect
 
 SIM_DIR = config.BRAIN_DIR / "sim"
 JULY = pd.date_range("2026-07-01", "2026-07-07", freq="D")
@@ -235,6 +235,7 @@ def stage3_drift(l3_july) -> dict:
 
 
 def main() -> dict:
+    ceiling = assert_store_ceiling()  # a confrontation scored against a reset store is silently wrong
     frozen = _load("july2026_forecast_frozen.parquet") if False else pd.read_parquet(
         SIM_DIR / "july2026_forecast_frozen.parquet")
     frozen["date"] = pd.to_datetime(frozen["date"])
@@ -242,7 +243,7 @@ def main() -> dict:
                   _load("july2026_actuals_l2_raw.json"),
                   _load("july2026_actuals_l3_raw.json"))
     s1 = stage1(frozen, a1, a2, a3)
-    result = {"pass1_sha": PASS1_SHA, "stage1": s1,
+    result = {"pass1_sha": PASS1_SHA, "store_ceiling": ceiling, "stage1": s1,
               "stage2_incontext": stage2_incontext(frozen, a1),
               "stage3_drift": stage3_drift(s1["l3"])}
     # A NEW file, deliberately. `july2026_confront_result.json` is the committed

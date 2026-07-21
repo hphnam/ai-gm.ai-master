@@ -51,6 +51,22 @@ CHRONOS2_MODEL_ID = "amazon/chronos-2"
 CHRONOS2_FALLBACK_MODEL_ID = "autogluon/chronos-2-small"
 RESOURCE_GUARD_SECONDS = 120
 
+# Pinned Hugging Face weight revisions (S3 / reproducibility). A model id alone lets the
+# weights move under a re-tag or re-upload, which would silently change zero-shot output
+# and invalidate the frozen pre-registration artefacts in sim/. These are the exact
+# commit SHAs of the repos that produced the committed Rung-4 results; a fresh download
+# at these revisions is byte-identical. The resource-guard fallback model is left
+# unpinned deliberately: it is a degraded substitute, never a serving path.
+CHRONOS2_REVISION = "29ec3766d36d6f73f0696f85560a422f50e8498c"   # amazon/chronos-2
+CHRONOS_REVISION = "772f3d25d38aec6d914c8949dab4462e2d46f5d8"    # amazon/chronos-bolt-small
+_PINNED_REVISION = {CHRONOS2_MODEL_ID: CHRONOS2_REVISION,
+                    CHRONOS_MODEL_ID: CHRONOS_REVISION}
+
+
+def _revision_for(model_id: str) -> str | None:
+    """The pinned HF revision for a model id, or None for the unpinned fallback."""
+    return _PINNED_REVISION.get(model_id)
+
 # G12.10b: the FULL known-future covariate universe the Chronos-2 exo entrant
 # reads (was four calendar flags pre-G12.10b). Chronos-2 supports arbitrary
 # covariates through the context frame + future_df, so the entrant consumes every
@@ -129,7 +145,7 @@ def _pipeline():
     global _PIPELINE
     if _PIPELINE is None:
         _PIPELINE = BaseChronosPipeline.from_pretrained(
-            CHRONOS_MODEL_ID, device_map=_resolve_device())
+            CHRONOS_MODEL_ID, revision=CHRONOS_REVISION, device_map=_resolve_device())
     return _PIPELINE
 
 
@@ -141,6 +157,7 @@ def chronos2_runtime_info() -> dict:
     except Exception:  # pragma: no cover
         pkg = "unknown"
     return {"version": pkg, "model_id": _CHRONOS2["model_id"],
+            "revision": _revision_for(_CHRONOS2["model_id"] or CHRONOS2_MODEL_ID),
             "api": _CHRONOS2["api"], "substituted": _CHRONOS2["substituted"],
             "weather_basis": _CHRONOS2["weather_basis"],
             "device": _CHRONOS2["device"],
@@ -195,7 +212,8 @@ def _chronos2_pipeline():
     for mid in (CHRONOS2_MODEL_ID, CHRONOS2_FALLBACK_MODEL_ID):
         try:
             with _time_limit(RESOURCE_GUARD_SECONDS):
-                pipe = Chronos2Pipeline.from_pretrained(mid, device_map=device)
+                pipe = Chronos2Pipeline.from_pretrained(
+                    mid, revision=_revision_for(mid), device_map=device)
             _CHRONOS2.update(pipe=pipe, model_id=mid, device=device,
                              substituted=(mid != CHRONOS2_MODEL_ID))
             return pipe
@@ -211,7 +229,7 @@ def _chronos2_base_pipeline():
         return _CHRONOS2["base"]
     mid = _CHRONOS2["model_id"] or CHRONOS2_MODEL_ID
     _CHRONOS2["base"] = BaseChronosPipeline.from_pretrained(
-        mid, device_map=_resolve_device())
+        mid, revision=_revision_for(mid), device_map=_resolve_device())
     return _CHRONOS2["base"]
 
 
