@@ -419,6 +419,31 @@ EVAL_FALSE_ALARM_WEEK_DAYS = 7    # window for the weekly false-alarm (fatigue) 
 JUDGE_MODEL = "claude-opus-4-8"   # pinned; logged in the judge output for reproducibility
 JUDGE_KAPPA_THRESHOLD = 0.6       # pre-registered: kappa ≥ this → judge may scale
 
+# --- Agent (S8): the LLM briefing-triage decider, offline-evaluated -----------
+# The agent returns a calibrated probability that a briefing item is worth raising.
+# It emits that probability ONCE per scenario; every downstream question (the cost
+# sweep, precision/recall/Ask-F1, ECE/Brier) is computed offline from the stored
+# probabilities with no further calls, so the evaluation replays from cache with an
+# unset key. Model + temperature + prompt VERSION are pinned and stamped into every
+# record; the prompt text itself lives in signals/prompts/agent_<version>.md and its
+# hash keys the cache, so editing the prompt invalidates every cached response (the
+# pre-registration guarantee: a tuned-until-it-scored prompt cannot silently reuse
+# old answers).
+AGENT_MODEL = "claude-opus-4-8"   # pinned; stamped into every agent record
+AGENT_TEMPERATURE = 0.0           # deterministic decode for reproducibility
+AGENT_MAX_TOKENS = 4096
+AGENT_PROMPT_VERSION = "v1"       # selects signals/prompts/agent_v1.md; frozen once evaluated
+# Cost-sensitive intervention threshold (PRISM, fu_prism_2026): the miss:false-alarm
+# cost ratio r implies a Bayes threshold t = 1 / (1 + r) on a calibrated p_raise.
+# Swept over a pre-registered grid spanning 1:4 to 4:1 and including 1:1, so Elliot's
+# elicited ratio, once it arrives, SELECTS a point on the curve rather than forcing a
+# re-run. Reported as an operating curve, never a single hard-coded point.
+AGENT_COST_RATIOS = (0.25, 0.5, 1.0, 2.0, 4.0)
+AGENT_ECE_BINS = 10               # equal-width reliability bins; coarsened if any bin < 10
+AGENT_MIN_BIN = 10                # G3 floor: no calibration bin holds fewer than this
+AGENT_BOOTSTRAP_B = 10000         # paired-bootstrap resamples for the Part 5 difference test
+AGENT_BOOTSTRAP_SEED = 93         # reproducibility of the paired bootstrap
+
 # --- Service -----------------------------------------------------------------
 BRAIN_HOST = os.environ.get("BRAIN_HOST", "127.0.0.1")
 BRAIN_PORT = int(os.environ.get("BRAIN_PORT", "8088"))
