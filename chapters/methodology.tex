@@ -101,3 +101,62 @@ lowest system cost; at Ellel the reported quantity should be an unscaled error o
 cost-weighted one, not a MASE gate. The categorisation that motivates this treatment, and the
 corrected constants used to apply it, are those of \citet{syntetos_categorization_2005} as
 amended by \citet{kostenko_note_2006}.
+
+% The diebold_comparing_1995 and harvey_testing_1997 keys cited below are expected in the
+% Overleaf root ref.bib (standard forecasting-comparison references); add them there if absent.
+\section{Choosing a model on a short series: fold count and the vanishing significance test}
+\label{sec:fold-count}
+
+Each venue is served by one forecaster, chosen from a ladder of nine by a rolling-origin
+backtest. The original selection used six folds at a seven-day horizon. Six folds of seven
+days is forty-two days of evidence, and forty-two days is not merely a thin sample: it is
+exactly the sample size at which the standard test of whether one forecaster beats another
+ceases to exist. The Diebold--Mariano test \citep{diebold_comparing_1995} compares two
+forecasts through their mean loss differential; on a small sample the statistic is corrected
+by the factor of \citet{harvey_testing_1997},
+\[
+  \mathrm{HLN}(n, h) = \sqrt{\frac{\,n + 1 - 2h + h(h-1)/n\,}{n}}.
+\]
+At a seven-day horizon the numerator $n + 1 - 14 + 42/n$ is zero at $n = 6$, so the
+correction factor is exactly zero and the corrected statistic is undefined. This is an
+algebraic identity, not a boundary approximation. The consequence is stark: the backtest that
+selected every served model could not, even in principle, have attached a significance test to
+the gap between two candidates. Selection without dispersion and selection on a forty-two-day
+base are the same defect seen twice, because six disjoint seven-day windows are forty-two
+days, forty-two days is $n = 6$, and $n = 6$ is where the test vanishes.
+
+Widening the backtest from six disjoint windows to a step-one rolling origin, in which the
+origin advances one day at a time, lifts the count to two hundred and seventy-three origins at
+the Beer Hall, two hundred and sixty at Ellel, and two hundred and five at Two River Taps. At
+those counts the correction factor recovers to about $0.97$ and a test becomes computable. The
+gain is not free: consecutive step-one windows share six of their seven days, so their loss
+differentials are serially correlated and are not independent draws. Any inference over them
+therefore requires a block bootstrap or an autocorrelation-robust variance rather than a plain
+$t$-test, which is the route the model confidence set of the next section takes.
+
+\subsection{When the small sample chose the wrong model: the Beer Hall}
+\label{sec:fold-count-beerhall}
+
+Whether the fold count merely tightened intervals or actually reversed a conclusion is settled
+at the Beer Hall, and the answer is the clearest single demonstration in this work of why the
+sample size mattered. At the current store ceiling the six-fold window ranks the served
+forecaster, \texttt{chronos2\_exo}, fifth of nine, and picks the day-of-week baseline
+\texttt{robust\_dow} as the winner. That six-fold window falls on a high-variance summer
+stretch of trading, a World Cup and a warm late June. Extend the same backtest to two hundred
+and seventy-three origins and the served \texttt{chronos2\_exo} is restored to first. The small
+sample gave the wrong answer and the large sample recovered the right one. Because the
+mechanism is shown rather than asserted, one can say precisely how a forty-two-day evidence
+base could mislead: it is a single draw of a noisy window, and the selection statistic, robbed
+of its significance test by that very sample size, had no way to flag it as such.
+
+A frozen control confirms the reading. Two River Taps closed on 8 May 2026, so its residual
+frame did not grow as later months were ingested; its six-fold and full-origin rankings agree
+to the digit and both confirm its served \texttt{ets} at every fold count. That isolates the
+Beer Hall movement as a property of sample size on a live, growing series, not an artefact of
+how the backtest was re-run. It also exposes a coupling that the metric-ruler section already
+met from the other side: because ``the six most recent folds'' is a window anchored to the
+store's last day, the same selection procedure yields a different table as the store grows, so
+a published backtest figure is reproducible only against a stated training ceiling, exactly as
+a scaled error is reproducible only against a stated basis. A backtest number, like a MASE,
+carries two coordinates, and pinning only one of them is what let a forty-two-day window pass
+for a settled result.

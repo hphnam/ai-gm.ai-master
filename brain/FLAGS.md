@@ -953,3 +953,29 @@ does.
   > diary ingest plus flipping the flag; it must NEVER be resolved by proxying from Ellel revenue.
   > Owner-gated (Elliot's diary), tracked here so the dependency sits in the ledger, not only in a
   > report.
+
+## S8a G17e agent, cost-sensitive threshold, calibration (report 46)
+
+- **FLAG-S8B-LIVE-RUN (OPEN, missing dependency, apparatus built and tested).** S8 builds the
+  briefing-triage agent (`signals/agent.py`) and the offline apparatus that measures it
+  (`eval/agent_calibration.py`: cost sweep, calibration, agent-versus-constants). The empirical half
+  needs 644 live model calls to fill the response cache, and **this environment has neither an
+  `ANTHROPIC_API_KEY` nor the `anthropic` SDK** (the same posture that keeps the judge from ever
+  running).
+  > S8a is delivered in full: the agent, the pre-registered prompt (`signals/prompts/agent_v1.md`,
+  > frozen at commit `c8fa127` before any evaluation output, hash `c1137f76`), the cache with its
+  > zero-call offline replay, the cost/calibration/comparison machinery, and the tests, all green.
+  > **S8b is one command** in a keyed environment: `pip install anthropic` then
+  > `ANTHROPIC_API_KEY=... python -m eval.agent_calibration --build`, which writes
+  > `eval/agent_cache.json` (committed), `eval/agent_calibration.{md,json}` and
+  > `eval/agent_reliability.png`; the subsequent offline replay reproduces every number with no key.
+  > It was NOT resolved by fabricating `p_raise` values or substituting a heuristic for the agent,
+  > which is exactly the over-claim S8 exists to catch. Owner-gated (a key + the SDK), tracked here so
+  > the dependency sits in the ledger.
+
+- **FLAG-METHODOLOGY-OVERLEAF (OPEN, author sync).** Precondition 4 asked that
+  `chapters/methodology.tex` be moved to Overleaf and deleted from the repo. It is **not** deleted:
+  the Overleaf canonical copy cannot be verified from here, and the file carries the new S8 prose
+  (report 43's fold-count argument and the Beer Hall small-sample demonstration). The move-to-Overleaf
+  and repo deletion is the author's manual step; the two forecasting-comparison keys the new section
+  cites (`diebold_comparing_1995`, `harvey_testing_1997`) are expected in the Overleaf root bib.

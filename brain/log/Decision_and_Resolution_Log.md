@@ -1512,3 +1512,52 @@ them into the append-only log so it is the continuous WP1-to-present record.
     `>=` bounds with no lockfile were a real defect, fixed in S3); only the "flips on a library bump"
     illustration is withdrawn. This corrects the external assessment, not this work. Evidence: report
     45 Part 5.
+
+41. **S8 Part 1: the briefing-triage agent is built and pre-registered.** `signals/agent.py` is the
+    LLM agent named by the research question: given one venue's ranked, de-duplicated briefing items
+    for a day, it returns per item a calibrated `p_raise` (probability the item is worth raising), a
+    rationale (the tone), and the pinned model plus prompt hash. The live call is an injected
+    `execute` closure and the `anthropic` import is lazy, so the module never fabricates a probability
+    and loads with the SDK absent. The prompt is a committed file `signals/prompts/agent_v1.md` (hash
+    `c1137f76`), model `claude-opus-4-8` and temperature 0 pinned in config and stamped into every
+    verdict. **Pre-registered:** committed at `c8fa127`, strictly before any evaluation output, so
+    commit order proves the prompt was not tuned against a score (G1). A second prompt could only be a
+    declared `agent_v2.md` arm, never an edit to v1. Evidence: report 46 Part 1.
+
+42. **S8 Part 2/3: the response cache and the cost-sensitive threshold.** `eval/agent_cache.py` keys
+    each response on `hash(model, prompt_hash, payload)`, so editing the prompt invalidates every
+    cached answer; offline replay makes zero model calls and a miss is a hard `CacheMiss` (the stop
+    condition, not a fallback). The cost sweep (`eval/agent_calibration.py`) follows PRISM
+    (`fu_prism_2026`): the miss:false-alarm ratio r implies the Bayes threshold `t = 1/(1+r)`, swept
+    over the pre-registered grid `(0.25, 0.5, 1, 2, 4)` spanning 1:4 to 4:1 and including 1:1, so
+    **Elliot's elicited ratio selects a row on the curve, not a re-run.** Machinery verified against a
+    calibrated corpus with a known cost optimum. Evidence: report 46 Parts 2-3, `tests/test_agent_calibration.py`.
+
+43. **S8 Part 4: the calibration is DETECTION calibration, and the distinction is stated not buried.**
+    ECE and Brier on `p_raise` measure *was there a real deviation*, the truth the 644-injection corpus
+    supplies, NOT *should the manager have been told* (intervention calibration), which needs human
+    adopt-or-dismiss judgements and is S9. The code pins `CALIBRATION_KIND = "detection"` so the report
+    cannot claim the stronger thing. The G3 bin floor is enforced (equal-width unless a bin is under
+    ten, then equal-frequency coarsening, stated). **No judge kappa is reported:** no human anchor yet,
+    and per `bavaresco_llms_2025` a judge must be validated against task-specific human annotation
+    first. Evidence: report 46 Part 4.
+
+44. **S8 Part 5: the agent-versus-constants gate, with the negative-result stop condition wired.**
+    The agent (thresholded on `p_raise`), the six-constant `briefing._score`, and a random baseline at
+    the matched base rate are compared on the same corpus and cost grid, with the pairwise disagreement
+    rate and a paired bootstrap (B=10000) on Ask-F1 and expected cost. **If the agent agrees with the
+    constants on more than 95 percent of items the run reports the LLM as decorative** and that a
+    six-constant heuristic suffices, a publishable negative result; the machinery detects that case and
+    genuine divergence in tests. The real verdict is S8b's headline. Evidence: report 46 Part 5.
+
+45. **S8b deferred: the live half awaits a keyed environment.** This environment has no
+    `ANTHROPIC_API_KEY` (verified absent from the process, every `.env`, and the shell profiles) and no
+    `anthropic` SDK in any venv, so the 644 live calls that fill the response cache, and the empirical
+    Part 3/4/5 numbers that flow from them, cannot run here. Rather than fabricate `p_raise` values or
+    substitute a heuristic and call it the agent (the fraud this assessment exists to catch), S8a
+    delivers the apparatus, the tests, the pre-registration, the housekeeping, and the methodology
+    prose; **S8b is one command**: `ANTHROPIC_API_KEY=... python -m eval.agent_calibration --build`,
+    then the offline replay reproduces every number with no key. `FLAG-S8B-LIVE-RUN` opened. Also:
+    `chapters/methodology.tex` was NOT deleted (precondition 4) because the Overleaf canonical copy
+    cannot be verified from here and the file carries the new S8 prose; the author's Overleaf sync
+    completes it. Evidence: report 46 headline, deviations, and Gates.
