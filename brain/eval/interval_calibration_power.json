@@ -1,0 +1,25 @@
+{
+  "source": "C2 confrontation (reports 31/35): BH L1 7-day held-out window, 8-14 July, all 7 points in the 90% band -> coverage 1.00",
+  "n_pairs": 7,
+  "coverage": 1.0,
+  "nominal": 0.9,
+  "p_all_in_if_calibrated": 0.4782969000000001,
+  "clopper_pearson_95": [0.5903836027749966, 1.0],
+  "supports_miscalibration": false,
+  "verdict": "1.00 on 7 points does NOT support a miscalibration claim: under perfect 90% calibration all 7 fall inside with probability 0.478, and the 95% Clopper-Pearson interval on the estimate is [0.590, 1.000], which contains the nominal 0.90.",
+  "angelopoulos_bates": {
+    "beer_hall": {
+      "n_calib": 1883,
+      "upper_bound": 0.9005307855626328
+    },
+    "ellel": {
+      "n_calib": 1792,
+      "upper_bound": 0.9005577244841049
+    },
+    "two_river_taps": {
+      "n_calib": 1407,
+      "upper_bound": 0.9007102272727273
+    }
+  },
+  "store_ceiling": "2026-07-07"
+}

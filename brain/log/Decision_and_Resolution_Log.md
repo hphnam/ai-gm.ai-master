@@ -1638,3 +1638,39 @@ them into the append-only log so it is the continuous WP1-to-present record.
     not serve (it serves `rung1_robust_dow`). The package runs on CPU (same reasoning as S5: the
     no-weather arm stays comparable to the committed ladder, reproduced to <= 1.4e-6). Evidence: report
     48 Part 4 and stop-conditions section.
+
+53. **S7: the 1.00 band coverage the external assessment read as miscalibration is not evidence of
+    anything.** It came from a seven-day confrontation window (the C2 confrontation, reports 31/35),
+    and under perfect 90 percent calibration all seven points fall inside with probability 0.90^7 =
+    0.478. The 95 percent Clopper-Pearson interval on a 1.00 estimate from seven points is [0.590,
+    1.000], which contains the nominal 0.90. So the observation is consistent with correct calibration
+    and does not support a miscalibration claim. A correction to the external assessment, the third
+    this remediation has returned. Evidence: report 49 Part 1, `interval_calibration_power.json`.
+
+54. **S7: pre-registered adoption rule for the banding methods, and the verdict is no adoption.** A
+    method replaces the incumbent Mondrian band D only if it enters the 90 percent Winkler confidence
+    set AND has the lower mean Winkler at the venue; entering the set alone is the outcome under no
+    effect. The primary metric is the Winkler score (proper, in the data's units, so Ellel is scored
+    on the same footing without a scaled-error basis). Outcome over five arms (P plain, D Mondrian, S
+    per-step, A per-step ACI at the swept best rate, G per-step AgACI): D is the Winkler best or tied
+    best at every venue; at Ellel the 90 percent set is {D} alone. No method both enters the set and
+    beats D's mean anywhere, so none qualifies. The extra machinery of per-step and adaptive
+    calibration widens the band more than it improves the miss penalty. Evidence: report 49 Part 4,
+    `interval_calibration_mcs.json`.
+
+55. **S7: stop condition 3 fired, and the served Beer Hall band is mildly overconfident.** The
+    properly-powered coverage (1,750 pairs, not a seven-day window) shows the served Beer Hall band
+    under-covers: Mondrian marginal 0.871, Clopper-Pearson [0.855, 0.887], excluding nominal 0.90 and
+    below nominal at every step within the cap. It is robust across the point model: the served
+    chronos2_exo forecaster gives 0.870, CP [0.853, 0.885], so it is a property of the band, not of
+    ETS. Under-coverage is the unsafe direction, so the stop condition fired and is reported rather
+    than patched inside an integration phase; ACI would restore coverage at a Winkler cost, making the
+    fix a served-band review. `FLAG-BAND-UNDERCOVERAGE-BH`. Evidence: report 49 Part 2.
+
+56. **S7: `FLAG-BAND-HORIZON` closed as a work package; the horizon cap stays at 7.** Per-step
+    conformal is implemented and measured at power. The prediction that per-step half-width grows 181
+    to 224 does not reproduce on this estate (Beer Hall's per-step half-width is flat, ~490 to 515 for
+    ETS and ~466 to 483 for chronos2_exo; the 181-to-224 growth was a 26-per-step De Lune-series
+    artefact). Per-step calibration equalises per-step coverage but is not a Winkler win, so under the
+    adopt-only-when-it-beats-a-gate rule it is not adopted and `MAX_HORIZON_DAYS` is unchanged, now
+    evidenced rather than assumed. Evidence: report 49 Part 3 and FLAGS.md.

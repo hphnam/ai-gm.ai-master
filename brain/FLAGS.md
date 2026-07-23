@@ -740,7 +740,32 @@ does.
   with its absolute error and band coverage alongside MASE, and never rank Ellel against
   Beer Hall on MASE - the denominators are not comparable rulers.
 
-- **FLAG-BAND-HORIZON (OPEN, research work package; G14).** The served conformal band is
+- **FLAG-BAND-HORIZON (CLOSED as a work package by S7, report 49; cap unchanged).** S7
+  implemented per-step conformal calibration (`conformal.methods.perstep_band`) and measured it at
+  power on the S2 rolling origins (1,750 pairs at Beer Hall, not the 26-per-step De Lune window).
+  Two outcomes. First, the specific prediction below (half-width growing 181 to 224) does NOT
+  reproduce on this estate: Beer Hall's per-step half-width is flat (~490 to 515 for ETS, ~466 to
+  483 for the served chronos2_exo), because these forecasters' residuals do not grow appreciably
+  over seven days; the 181-to-224 growth was a property of the De Lune series, not universal.
+  Second, per-step calibration equalises coverage across steps but is NOT a Winkler win over the
+  incumbent Mondrian band at any venue (it widens the band more than it improves the miss penalty),
+  so under the project's adopt-only-when-it-beats-a-gate rule it is not adopted and
+  `MAX_HORIZON_DAYS` stays at 7. The work package is done: the method exists, is tested, and was
+  measured; the cap decision is unchanged and now evidenced rather than assumed. The original
+  research note is retained below.
+
+- **FLAG-BAND-UNDERCOVERAGE-BH (OPEN, served-band decision; S7, report 49).** The powered coverage
+  measurement shows the served Beer Hall band **under-covers**: Mondrian marginal coverage 0.871,
+  Clopper-Pearson [0.855, 0.887], excluding the nominal 0.90, and below nominal at every step within
+  the cap (0.85 at step 1). It is not an ETS artefact: the served chronos2_exo forecaster gives the
+  same shortfall (0.870, CP [0.853, 0.885], `interval_calibration_served_check.json`). Under-coverage
+  is the unsafe direction (the band is overconfident), so S7's stop condition 3 fired and this is
+  recorded rather than silently patched. ACI (S7 arm A) restores coverage to 0.895 but is not a
+  Winkler win, so widening the served band is a decision with its own review, not an integration-phase
+  change. Owner: a served-band review. Evidence: report 49 Part 2, `interval_calibration_L1.json`.
+
+- **FLAG-BAND-HORIZON research note (retained; superseded by the CLOSED entry above).** The served
+  conformal band is
   calibrated on **≤7-step-ahead errors** and is only valid there. The residual stream
   (`conformal.wrap.rolling_point_forecasts`) walks the series in 7-day blocks, so every
   residual is at most a 7-step error; applying that quantile unchanged to day 14 or 30

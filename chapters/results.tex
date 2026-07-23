@@ -1,0 +1,114 @@
+% Results chapter. Two completed forecasting ablations, each a pre-registered comparison
+% adjudicated by the model confidence set of the methodology chapter: the S5 multi-venue
+% group in-context learning study (report 47) and the S6 lead-matched weather study (report
+% 48). Written to be \input into the thesis body; it reuses the bibliography keys of the
+% methodology chapter (chapters/ref.bib), in particular hansen_model_2011.
+
+\chapter{Results}
+\label{chap:results}
+
+Two questions about the flagship forecaster admit a clean experimental answer, and this
+chapter reports both. The first is whether forecasting the estate's venues together, so that
+a foundation model can borrow strength across them, beats forecasting each alone. The second
+is how much of the exogenous weather path's apparent value is real once the weather is placed
+on the footing the model would actually have at serving. Both are pre-registered comparisons,
+both are adjudicated by the model confidence set of Chapter~\ref{chap:methodology}, and both
+return a negative result at full prominence rather than a tuned win. Reporting them together
+is deliberate: they share an instrument and a discipline, and each is a case where the honest
+finding is that an appealing elaboration of the forecaster buys nothing the evidence can
+distinguish.
+
+\section{Cross-series in-context learning does not beat the univariate baseline}
+\label{sec:group-icl}
+
+Chronos-2 supports cross-series learning: several related series passed together in one call
+condition on one another, so a data-rich venue can inform a data-poor one. The serving path
+did not use this, passing every venue under a single shared identifier one call at a time, so
+the venues were forecast as isolated univariate series. The hypothesis, recorded before the
+run, was that grouping would help most at the sparsest venue, the village hall at Ellel, which
+has the most to gain from borrowing a richer series, and little at the Beer Hall, whose own
+history is long. Three arms were compared on the same rolling origins: the univariate baseline,
+the Beer Hall and Ellel grouped, and those two joined by Two River Taps carrying constructed
+post-closure zeros.
+
+The load-bearing precaution is a leakage guard, and it is worth stating why it is not a
+convention but a hard check. Under cross-series attention, a boundary error in one series
+contaminates the others: if any venue in a grouped context carried a value dated at or after
+the forecast origin, the model would be reading the future of the whole panel, and the
+resulting inflation would be invisible in the summary statistics. The guard therefore truncates
+every series in every grouped context at the origin, the target venue and the non-target venues
+alike, and raises rather than warns if any context reaches beyond it. A second property is
+enforced rather than assumed: because the pipeline mixes exactly the series that share a
+processing batch, the cross-learning group is made to coincide with that batch by pinning its
+size to the number of venues and ordering the frame so each origin forms its own isolated group.
+Batching several origins into one call is then numerically identical to issuing them separately,
+which was verified on the model to a maximum absolute difference of zero, so throughput never
+changes a forecast.
+
+The result is that grouping does not help anywhere the evidence can distinguish, and where it
+moves the number it moves it the wrong way. On the two hundred and sixty aligned origins the
+grouped arms are indistinguishable from or worse than the univariate baseline. At the Beer Hall
+the univariate arm has the lowest mean scaled error and grouping is a small but statistically
+significant loss, the paired bootstrap interval on the difference excluding zero, though all
+three arms sit inside the ninety percent confidence set. At Ellel the fuller group is
+directionally the best, in the predicted order, but the improvement is not significant, every
+paired interval spanning zero. At Two River Taps the grouped arm is eliminated from the
+confidence set outright. The pre-registered adoption rule required a grouped arm both to enter
+the ninety percent set and to have the lower mean at the venue concerned; no arm satisfies both
+at a venue where the criterion applies, so nothing is adopted and no served model changes. The
+capability is real, a grouped forecast differs materially from the univariate one, but on this
+estate it is not an improvement.
+
+\section{Perfect weather is no better than a seven-day-ahead forecast of it}
+\label{sec:weather}
+
+The Beer Hall's served model conditions on weather, and every accuracy figure it has produced
+was measured against weather archived close to the valid time. At serving, a forecast made at
+one origin needs weather for the seven days that follow, so the seventh day is a seven-day-ahead
+weather forecast with seven-day-ahead skill. Evaluating the model against weather archived one
+day out therefore hands it better covariates than it will ever have in production. This is not
+target leakage, and the distinction matters enough to name precisely: it is a mismatch in
+covariate quality between evaluation and serving, and it biases the exogenous path's apparent
+value upward. The study asks how much of that value survives when the weather is placed on the
+basis the model would actually have.
+
+Five arms were compared, differing only in the seven-day window of weather handed to the model
+and holding the training-context weather and every non-weather covariate fixed: no weather at
+all; observed reanalysis at the valid time, an unachievable upper bound of perfect foreknowledge;
+the archived-near-valid-time basis that every published figure used; a fixed operational lead;
+and the horizon-matched basis in which the value for horizon step $h$ is the forecast issued $h$
+days earlier, which is what serving delivers. The lead-matched arms were built from a single
+pinned global weather model, because the automatic selection populates the longer leads from a
+local high-resolution model that leaves them null, and a basis built on partly-null leads would
+measure missingness rather than skill. A gate analogous to the panel-leakage guard of the
+previous section enforces that no arm can supply a weather value whose lead is shorter than its
+horizon step, verified by value against the pinned store and proven to fire on a planted
+short-lead.
+
+The finding is that weather does not distinguishably improve the forecast at any venue on the
+basis the model would actually have. At all three venues the no-weather arm shares the ninety
+percent confidence set with every weather arm, including the horizon-matched one, so the
+exogenous path is, on this estate and this evidence, decoration. The covariate-quality optimism
+the study set out to quantify, the archived-near-valid basis flattering the model relative to
+the horizon-matched one, is real and grows with lead, but only at Ellel, where the exogenous
+entrant is neither served nor better than no weather at all. At the Beer Hall, the one venue
+whose served model is the exogenous one, the archived and the horizon-matched bases are
+statistically inseparable, and the horizon-matched arm is if anything nominally the better of
+the two. The practical consequence is reassuring and slightly deflating at once: the published
+exogenous numbers at the served venue are not inflated by covariate quality, because at that
+venue weather barely matters, and perfect knowledge of the forecast period's weather is worth no
+more than a seven-day-ahead forecast of it.
+
+\section{A common verdict}
+\label{sec:results-common}
+
+The two studies rhyme. In each, an elaboration of the forecaster that is well motivated in the
+literature and easy to believe in, cross-series learning in the first and a richer weather
+covariate in the second, fails to beat a simpler incumbent once it is measured under a
+pre-registered rule with a multiplicity-aware test. Neither result is a failure of the method in
+general; each is a statement about this estate, at this scale, on this evidence. The value of
+reporting them at full prominence, rather than searching for the venue or the metric on which the
+elaboration wins, is that the model confidence set makes the width of a set the finding. Where
+the data cannot separate the grouped from the univariate forecaster, or the weather-fed from the
+weather-free one, the wider set is the answer, and a spuriously precise winner would say less than
+the honest null.
