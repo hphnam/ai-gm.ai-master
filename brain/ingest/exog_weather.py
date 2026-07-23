@@ -33,6 +33,8 @@ from config import (
     WEATHER_CELL_COORDS,
     WEATHER_CELLS,
     WEATHER_DRY_MM,
+    WEATHER_HORIZON_MAX_LEAD,
+    WEATHER_HORIZON_MODEL,
     WEATHER_LEAD_DAYS,
 )
 from store.warehouse import connect, read_series
@@ -43,6 +45,19 @@ _PREVRUNS = "https://previous-runs-api.open-meteo.com/v1/forecast"
 _DAILY = "temperature_2m_max,precipitation_sum,sunshine_duration"
 BASES = ("observed", "hindcast", "leadmatched")
 _TABLE = {b: f"exog_weather_{b}" for b in BASES}
+# S6 A14c: the per-lead horizon store. One row per (cell, date, lead 1..7), pulled
+# from a single pinned global model. Parallel to the one-value-per-date BASES above,
+# NOT one of them, so the existing bases and their build/coverage/read paths are
+# untouched; only the horizon-matched ablation basis reads it.
+HORIZON_TABLE = "exog_weather_horizon"
+
+
+class WeatherFetchIncompleteError(RuntimeError):
+    """Raised when a fetch returns fewer days than the span it was asked for.
+
+    The silent-gap defect S6 Part 1 fixes: a short return was inserted as-is and the
+    incremental watermark (MAX(date)) advanced past the hole, so the missing interior
+    days were never revisited. A loud failure belongs where a silent partial was."""
 
 
 def _get(url: str, retries: int = 3) -> dict:
@@ -55,6 +70,24 @@ def _get(url: str, retries: int = 3) -> dict:
             last = exc
             time.sleep(1.5 * (attempt + 1))
     raise RuntimeError(f"open-meteo unreachable after {retries} tries: {last}")
+
+
+def _assert_span_complete(df: pd.DataFrame, start: str, end: str,
+                          cell: str, basis: str) -> None:
+    """Raise unless `df` carries a non-null value for EVERY calendar day in [start, end].
+
+    S6 Part 1: the write path must refuse a short return rather than insert it and let
+    the incremental watermark step past the hole. Both a missing interior day (the Ellel
+    2026-06-21..06-29 case) and a truncated tail trip this."""
+    required = pd.date_range(start, end, freq="D")
+    got = df[df["exo_temp_c"].notna()]
+    have = set(pd.to_datetime(got["date"]).dt.normalize())
+    missing = [d.date().isoformat() for d in required if d.normalize() not in have]
+    if missing:
+        raise WeatherFetchIncompleteError(
+            f"{basis}/{cell}: fetch for [{start}, {end}] returned {len(required) - len(missing)}"
+            f"/{len(required)} days; missing {len(missing)}: {missing[:8]}"
+            f"{' ...' if len(missing) > 8 else ''}")
 
 
 def _cell_span(cell: str) -> tuple[str, str]:
@@ -94,15 +127,22 @@ def fetch_hindcast(cell: str, start: str, end: str) -> pd.DataFrame:
 
 
 def fetch_leadmatched(cell: str, start: str, end: str,
-                      lead: int = WEATHER_LEAD_DAYS) -> pd.DataFrame:
+                      lead: int = WEATHER_LEAD_DAYS, *,
+                      model: str | None = None) -> pd.DataFrame:
     """The forecast as issued exactly `lead` days ahead. The previous-runs API
     only exposes the `_previous_dayN` suffix on HOURLY variables, so pull hourly
-    and aggregate to the same daily stats (max temp, sum rain, sum sunshine)."""
+    and aggregate to the same daily stats (max temp, sum rain, sum sunshine).
+
+    `model` pins an explicit Open-Meteo model (e.g. `ecmwf_ifs025`); None leaves the
+    API's automatic selection. S6 pins a global model for the horizon store because
+    automatic selection can pick a local high-res model whose longer leads are null."""
     lat, lon = WEATHER_CELL_COORDS[cell]
     hourly = (f"temperature_2m_previous_day{lead},precipitation_previous_day{lead},"
               f"sunshine_duration_previous_day{lead}")
     url = (f"{_PREVRUNS}?latitude={lat}&longitude={lon}&start_date={start}"
            f"&end_date={end}&hourly={hourly}&timezone=Europe/London")
+    if model:
+        url += f"&models={model}"
     h = _get(url)["hourly"]
     df = pd.DataFrame({
         "ts": pd.to_datetime(h["time"]),
@@ -143,7 +183,14 @@ def build(force: bool = False) -> dict:
                 "SELECT 1 FROM information_schema.tables WHERE table_name=?",
                 [table]).fetchone()
             if not exists or force:
-                frames = [_FETCH[basis](cell, *spans[cell]) for cell in cells]
+                # The rebuild path is the initial population and the force=True repair, the
+                # largest and most gap-prone fetch, so it gets the same completeness guard as
+                # the incremental path: a short return on any cell raises before any write.
+                frames = []
+                for cell in cells:
+                    f = _FETCH[basis](cell, *spans[cell])
+                    _assert_span_complete(f, spans[cell][0], spans[cell][1], cell, basis)
+                    frames.append(f)
                 df = pd.concat(frames, ignore_index=True)
                 con.execute(f"DROP TABLE IF EXISTS {table}")
                 con.register("_w", df)
@@ -166,6 +213,9 @@ def build(force: bool = False) -> dict:
                         continue
                     gap_start = str((cur_d + pd.Timedelta(days=1)).date())
                 df = _FETCH[basis](cell, gap_start, end)
+                # Refuse a short return: the whole requested [gap_start, end] must be
+                # present before we insert, or the watermark would step past a hole.
+                _assert_span_complete(df, gap_start, end, cell, basis)
                 if cur is not None:
                     df = df[df["date"] > pd.Timestamp(cur)]
                 if df.empty:
@@ -266,6 +316,126 @@ def read_basis(basis: str, con=None) -> pd.DataFrame:
         df = con.execute(f"SELECT * FROM {table}").df()
         df["date"] = pd.to_datetime(df["date"])
         return df
+    finally:
+        if own:
+            con.close()
+
+
+def repair_span(basis: str, cell: str, start: str, end: str, *,
+                model: str | None = None) -> int:
+    """Refetch [start, end] for one (basis, cell) and UPSERT it, asserting completeness.
+
+    S6 Part 1's surgical repair for the Ellel 2026-06-21..06-29 hole: idempotent (deletes
+    the span's rows first, reinserts the complete refetch), so it fills an interior gap the
+    incremental watermark had stepped past without touching any other cell/basis/span.
+    Raises `WeatherFetchIncompleteError` if the refetch is itself short, so a repair can
+    never re-record a partial. Returns the row count written."""
+    fetch = _FETCH[basis]
+    df = (fetch(cell, start, end, model=model)
+          if basis == "leadmatched" else fetch(cell, start, end))
+    _assert_span_complete(df, start, end, cell, basis)
+    con = connect()
+    try:
+        table = _TABLE[basis]
+        con.execute(f"DELETE FROM {table} WHERE cell=? AND date BETWEEN ? AND ?",
+                    [cell, start, end])
+        con.register("_w", df)
+        con.execute(f"INSERT INTO {table} ({', '.join(_COLS)}) "
+                    f"SELECT {', '.join(_COLS)} FROM _w")
+        con.unregister("_w")
+    finally:
+        con.close()
+    return len(df)
+
+
+# --- S6 A14c: the per-lead horizon store (one pinned global model, leads 1..7) ------
+
+def build_horizon(*, model: str = WEATHER_HORIZON_MODEL,
+                  max_lead: int = WEATHER_HORIZON_MAX_LEAD,
+                  force: bool = False) -> dict:
+    """Populate `exog_weather_horizon` with lead 1..`max_lead` from one pinned model.
+
+    One row per (cell, date, lead); the weather value at lead h is the forecast issued h
+    days before the valid date, which is what horizon step h would have at serving. Always
+    a full drop-and-rebuild (the store is small and the pin/leads must stay consistent);
+    every fetched span is completeness-asserted. Returns per-cell per-lead row counts."""
+    # Check existence before fetching, like build(): a cache check must not hit the network,
+    # and an already-populated store must survive an offline moment.
+    with connect(read_only=True) as ro:
+        exists = ro.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name=?",
+            [HORIZON_TABLE]).fetchone()
+    if exists and not force:
+        return {"model": model, "max_lead": max_lead, "cached": True}
+
+    cells = sorted(set(WEATHER_CELLS.values()))
+    spans = {cell: _cell_span(cell) for cell in cells}
+    frames, summary = [], {}
+    for cell in cells:
+        start, end = spans[cell]
+        per_lead = {}
+        for lead in range(1, max_lead + 1):
+            df = fetch_leadmatched(cell, start, end, lead=lead, model=model)
+            _assert_span_complete(df, start, end, cell, "horizon")
+            df = df.copy()
+            df["lead"] = lead
+            frames.append(df[["date", "cell", "lead", "exo_temp_c",
+                              "exo_rain_mm", "exo_sunshine_hrs"]])
+            per_lead[lead] = len(df)
+        summary[cell] = per_lead
+    all_df = pd.concat(frames, ignore_index=True)
+    con = connect()
+    try:
+        con.execute(f"DROP TABLE IF EXISTS {HORIZON_TABLE}")
+        con.register("_w", all_df)
+        con.execute(f"CREATE TABLE {HORIZON_TABLE} AS SELECT * FROM _w")
+        con.unregister("_w")
+    finally:
+        con.close()
+    return {"model": model, "max_lead": max_lead, "cached": False,
+            "rows": len(all_df), "per_cell": summary}
+
+
+def read_horizon(cell: str, con=None) -> pd.DataFrame:
+    """Read the per-lead horizon store for one cell (date, lead, exo_temp_c/rain/sunshine)."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        exists = con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name=?",
+            [HORIZON_TABLE]).fetchone()
+        if not exists:
+            return pd.DataFrame(columns=["date", "cell", "lead", "exo_temp_c",
+                                         "exo_rain_mm", "exo_sunshine_hrs"])
+        df = con.execute(f"SELECT * FROM {HORIZON_TABLE} WHERE cell=?", [cell]).df()
+        df["date"] = pd.to_datetime(df["date"])
+        return df
+    finally:
+        if own:
+            con.close()
+
+
+def horizon_coverage(con=None) -> dict:
+    """Non-null lead coverage per cell per lead in the horizon store, for the S6 G2 record."""
+    own = con is None
+    con = con or connect(read_only=True)
+    try:
+        exists = con.execute(
+            "SELECT 1 FROM information_schema.tables WHERE table_name=?",
+            [HORIZON_TABLE]).fetchone()
+        if not exists:
+            return {}
+        rows = con.execute(
+            f"SELECT cell, lead, COUNT(*) FILTER (WHERE exo_temp_c IS NOT NULL), "
+            f"COUNT(*), MIN(date), MAX(date) FROM {HORIZON_TABLE} "
+            f"GROUP BY cell, lead ORDER BY cell, lead").fetchall()
+        out: dict = {}
+        for cell, lead, nonnull, total, dmin, dmax in rows:
+            out.setdefault(cell, {})[int(lead)] = {
+                "non_null": int(nonnull), "rows": int(total),
+                "span": [pd.Timestamp(dmin).date().isoformat(),
+                         pd.Timestamp(dmax).date().isoformat()]}
+        return out
     finally:
         if own:
             con.close()

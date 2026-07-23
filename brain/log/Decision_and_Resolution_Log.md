@@ -1595,3 +1595,46 @@ them into the append-only log so it is the continuous WP1-to-present record.
     on CPU with the device stamped on every artefact. Batched equals unbatched: the grouped arm exactly
     (0.0), the independent arm within 0.00092, both inside Chronos non-determinism. Evidence: report 47
     device section, `eval/group_icl_calibration.json`.
+
+49. **S6: the Ellel June weather gap is an ingest artefact (partial fetch recorded as complete), not a
+    real Open-Meteo gap, and it is repaired.** The nine-day Ellel hole (2026-06-21..06-29, present in
+    all three bases, absent at Beer Hall) refetches complete now: 9 of 9 days non-null for observed,
+    hindcast and leadmatched, including ERA5 reanalysis, so a genuine model-coverage gap is ruled out.
+    The fetch helper raises on a total failure (a give-up is loud and self-healing), so the only path
+    that lands a partial span silently is the incremental `build()` inserting a short HTTP 200 with no
+    completeness check, after which the `MAX(date)` watermark steps past the interior hole. Fix: a
+    `_assert_span_complete` check on every fetched span before insert (a short return raises
+    `WeatherFetchIncompleteError`) plus a surgical `repair_span`; Ellel interior missing days went 9 to
+    0 across all three bases. `FLAG-ELLEL-JUNE-EXO` closed. Evidence: report 48 Part 1.
+
+50. **S6: the horizon-matched weather basis is pinned to one global model (`ecmwf_ifs025`).** The
+    previous-runs API fills leads 1..7 for all cells under automatic selection, but pinning the UK
+    high-resolution `ukmo_seamless` returns L5=1, L7=0, the local-model null-long-lead failure the
+    package warned about. A single global model with a seven-day horizon keeps lead 1 and lead 7 the
+    same model, so the basis measures forecast-skill decay with lead rather than a change of model
+    between leads; the name is recorded in `config.WEATHER_HORIZON_MODEL` and stamped on every artefact.
+    The fixed-lead F arm reads lead 3 from the same pinned store so F versus M isolates the lead policy;
+    the stored `exog_weather_leadmatched` table and `WEATHER_LEAD_DAYS` are untouched as the stock
+    reorder-lead object. `FLAG-WEATHER-PINNED-MODEL`. Evidence: report 48 Parts 2 and 3.
+
+51. **S6: on the serving-realistic basis, weather does not distinguishably improve the forecast at any
+    venue; the exogenous path is decoration at this estate.** Five arms of the same exo entrant
+    differing only in the 7-day target-window weather (N none, O observed, H hindcast, F fixed lead 3,
+    M horizon-matched), MCS at 90 percent plus a paired bootstrap, per venue. At every venue the
+    no-weather arm N shares the 90 percent set with every weather arm including the realistic M, so the
+    multiplicity-controlled test cannot separate having weather from not. Pre-registered rule: if M and
+    N sit in the same set, weather adds nothing at operational lead. Outcome: it holds at all three
+    venues. The covariate-quality optimism (H beats M) is real and grows with lead only at Ellel (H-M
+    CI [-0.42, -0.033] excludes zero), where the exo entrant is neither served nor better than N; at
+    Beer Hall, the one venue served by exo, H versus M is inseparable (CI spans zero) so there is no
+    optimism in the served numbers. Evidence: report 48 Part 4, `eval/weather_basis_mcs.json`.
+
+52. **S6: no served model is implicated and no stop condition fires.** The Beer Hall stop condition
+    asked whether the served exo entrant falls out of the 90 percent set under the horizon-matched
+    basis or is beaten by a lower rung. Under M the exo arm is in the set and is the nominal best, beats
+    its no-weather sibling N, and is statistically inseparable from the committed hindcast H, so the
+    committed selection (exo best at Beer Hall by ~5 percent over the nearest lower rung on the ladder)
+    holds under realistic weather. Ellel's optimism implicates `rung4_chronos2_exo`, which Ellel does
+    not serve (it serves `rung1_robust_dow`). The package runs on CPU (same reasoning as S5: the
+    no-weather arm stays comparable to the committed ladder, reproduced to <= 1.4e-6). Evidence: report
+    48 Part 4 and stop-conditions section.

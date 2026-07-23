@@ -266,6 +266,15 @@ WEATHER_TRAIN_BASIS = "hindcast"          # {"observed","hindcast","leadmatched"
 WEATHER_LEAD_DAYS = 3                      # operational reorder lead for leadmatched
 WEATHER_FORECAST_MAX_DAYS = 16            # live forecast horizon ceiling
 WEATHER_DRY_MM = 1.0                      # exo_is_dry threshold
+# S6 horizon-matched basis (A14c): the forecast issued exactly h days ahead used for
+# horizon step h, so the covariate is what the model would have at serving. The
+# previous-runs local high-res models (e.g. ukmo_seamless) leave long leads null, so a
+# single global model with a 7-day horizon is pinned for lead 1..7 across every cell;
+# the name is recorded in every artefact (S6 G2). AUTO selection also fills all 7 leads
+# here, but a pinned model keeps lead-1 and lead-7 the SAME model so the basis measures
+# forecast-skill decay with lead, not a change of model between leads.
+WEATHER_HORIZON_MODEL = "ecmwf_ifs025"    # global, ~15-day horizon; fills leads 1..7
+WEATHER_HORIZON_MAX_LEAD = 7              # equals the revenue forecast horizon
 
 # Venue -> the event scope(s) it inherits. Lancaster anchors must never touch
 # TRT; Preston anchors must never touch BH/Ellel.

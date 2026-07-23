@@ -907,7 +907,21 @@ does.
 
 ## S3 G17c model confidence set, environment pinning, store durability (report 44)
 
-- **FLAG-ELLEL-JUNE-EXO (OPEN, upstream data gap, verdict established, fix assigned to S6).**
+- **FLAG-ELLEL-JUNE-EXO (CLOSED by S6, report 48 Part 1).** The nine-day Ellel hole was an
+  **ingest artefact, not a real Open-Meteo gap**: a refetch returns all 9 days non-null across
+  all three bases (including ERA5 reanalysis, which does not have interior holes), so a genuine
+  model-coverage gap is ruled out. Because `_get` raises on a total failure (a give-up is loud
+  and self-healing), the only path that lands a partial span silently is the incremental
+  `build()` inserting a short HTTP 200 with no completeness check, after which the `MAX(date)`
+  watermark steps past the interior hole. Fixed with `_assert_span_complete` on every fetched
+  span before insert (a short return raises `WeatherFetchIncompleteError`) plus a surgical
+  `repair_span`; Ellel interior missing days went 9 to 0 across all three bases, and
+  `rung4_chronos2_exo` recovered the exact 14 gap-adjacent folds (246 to 260 eligible, G4). The
+  S3 verdict (upstream, not a join defect) stands; S6 refines "upstream" to "our ingest recorded
+  a partial fetch as complete" and closes it. The original open text is retained below for the
+  record.
+
+- **FLAG-ELLEL-JUNE-EXO (original text, superseded by the CLOSED entry above).**
   `rung4_chronos2_exo` scores only **246 of Ellel's 260** rolling folds, failing on the
   contiguous block 246 to 259 (test windows 2026-06-15 to 2026-07-04) with
   `MissingCovariateError`. S3 established the cause at the data level: the `exog_weather_*`
@@ -1003,3 +1017,28 @@ does.
   already fails to beat the univariate baseline on this estate, grouped-plus-covariates is low-priority,
   but it is named here rather than silently out of scope. The apparatus (`eval/group_icl.py`,
   `models/group_forecast.py`) would extend to it by passing the exo columns through the panel frames.
+
+## S6 G17g weather basis ablation (report 48)
+
+- **FLAG-WEATHER-PINNED-MODEL (RESOLVED by choice, recorded for provenance).** The horizon-matched
+  and fixed-lead ablation arms read from a per-lead store pulled from a single pinned global model,
+  `ecmwf_ifs025` (`config.WEATHER_HORIZON_MODEL`), rather than the API's automatic model selection.
+  Two reasons: automatic selection can pick a UK high-resolution local model (`ukmo_seamless`) whose
+  longer leads are null (measured L5=1, L7=0 on a 14-day probe), which would make a horizon-matched
+  basis measure missingness; and pinning one model keeps lead 1 and lead 7 the SAME model so the basis
+  isolates forecast-skill decay with lead from a change of model between leads. Consequence: the
+  ablation's F arm (fixed lead 3) also reads the pinned store, so F versus M isolates the lead policy
+  on one model rather than confounding it with the auto-model of the existing `exog_weather_leadmatched`
+  table. That existing table and the `WEATHER_LEAD_DAYS` constant are left untouched as the stock
+  reorder-lead object; the pinned lead-3 tracks the auto lead-3 closely (mean absolute temperature
+  difference 0.72 C at Beer Hall), so F still faithfully represents the fixed-lead basis. The model name
+  is stamped on every artefact (`eval/weather_basis_coverage.json`).
+
+- **FLAG-WEATHER-DECORATION (finding, not a defect).** On the serving-realistic (horizon-matched) basis
+  the exogenous weather path does not distinguishably improve the forecast at any venue: the no-weather
+  arm shares the 90 percent Model Confidence Set with every weather arm at Beer Hall, Ellel and Two
+  River Taps. The covariate-quality optimism (hindcast beating horizon-matched) is significant only at
+  Ellel and implicates no served model there (`rung1_robust_dow` is served). Recorded because a later
+  reader deciding whether to invest further in weather covariates should know the evidence says the
+  path is, on this estate, decoration rather than a lever. Evidence: report 48 Part 4,
+  `eval/weather_basis_mcs.json`.

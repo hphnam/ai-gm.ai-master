@@ -230,3 +230,41 @@ apparatus, reused unchanged, is what later adjudicates whether forecasting sever
 together under cross-series in-context learning improves on forecasting each alone, and returns
 the same verdict in a different key: where the grouped and univariate arms cannot be
 separated, the wider set is the finding, not a defect to be tuned away.
+
+\section{When the scaled error stops being an instrument: choosing a per-series basis}
+\label{sec:scale-basis}
+
+Every mean absolute scaled error carries a denominator, the in-sample loss of a seasonal naive
+benchmark, and the choice of that benchmark is not cosmetic on a series that trades only part of
+the week. Four bases were candidates: the lag-seven difference on the calendar-filled series;
+the same lag but with any pair touching a closed-day zero dropped, so only genuine week-on-week
+trading moves enter; and two trading-index bases, lag seven and same-weekday, that difference
+along the sequence of trading days rather than the calendar. The choice was settled by
+bootstrap rather than by argument, resampling the absolute lag-difference vector with
+replacement at ten thousand draws for a ninety-five percent percentile interval on each
+denominator, with the ruler pinned to a fixed as-of date so the point scales reproduce the
+published confrontation denominators exactly. Holding a fixed numerator, the interval on the
+denominator inverts into an interval on the induced scaled error, which turns the abstract
+question of basis choice into a visible statement about how much of a forecaster's apparent
+accuracy is really uncertainty in its yardstick.
+
+For the two venues that trade most days the answer is the reassuring one. The calendar
+lag-seven basis with closed-day pairs removed is at once weekday aligned and undeflated, its
+sample is ample at two hundred and seventy-six trading pairs for the busiest venue, and its
+interval is no wider than the deflated calendar basis it replaces, so the cleanest basis in
+principle is also not the noisiest in practice and it is adopted. Ellel is where the instrument
+breaks. Its clean active basis rests on twenty-eight lag pairs, and that thin sample gives a
+scale interval running from about five hundred to over a thousand, a spread of two thirds of the
+point estimate, so the induced scaled error is uncertain by a third before any forecaster is
+compared to any other. Retreating to the calendar basis buys pairs only by counting closed-day
+zeros that deflate the denominator, and the induced error then runs from roughly a third to over
+a half on scale uncertainty alone, which is not a usable gate. The trading-index bases invert
+the failure rather than curing it: lag seven along Ellel's trading sequence reaches back nearly
+six weeks of highly variable demand, inflating the denominator to the point where the induced
+error collapses to about a tenth, a spuriously near-perfect score that flatters every forecaster
+equally and discriminates none. At roughly one and a fifth trading days a week the seasonal
+naive concept simply has no purchase, and the honest conclusion is that the scaled error is the
+wrong instrument at this venue. Ellel is therefore reported on unscaled absolute and squared
+error, and the confidence-set work that follows scores it on that basis and never on a scaled
+one, so a venue is not handed a precise-looking gate that its own trading calendar cannot
+support.
