@@ -1,0 +1,159 @@
+{
+  "seed": 93,
+  "paired_bootstrap_seed": 94,
+  "block_len": 7,
+  "n_boot": 10000,
+  "bootstrap_b_note": "n_boot is the paired-CI B; the MCS uses mcs.N_BOOT at seed",
+  "venues": {
+    "beer_hall": {
+      "loss_metric": "mase",
+      "basis": "calendar_lag7_active",
+      "n_folds": 260,
+      "arms": ["U", "G2", "G3"],
+      "mean_loss": {
+        "U": 0.6090993539693885,
+        "G2": 0.6165689694125582,
+        "G3": 0.618458511677219
+      },
+      "mcs_pvalue": {
+        "U": 1.0,
+        "G2": 0.129,
+        "G3": 0.129
+      },
+      "set_90": ["U", "G2", "G3"],
+      "set_75": ["U"],
+      "elimination": [
+        {
+          "model": "G3",
+          "step_pvalue": 0.129,
+          "mcs_pvalue": 0.129,
+          "t_range": 1.9143672653999297,
+          "set_size_before": 3
+        },
+        {
+          "model": "G2",
+          "step_pvalue": 0.079,
+          "mcs_pvalue": 0.129,
+          "t_range": 1.7397228534444016,
+          "set_size_before": 2
+        }
+      ],
+      "paired_bootstrap": [
+        {
+          "pair": "U-G2",
+          "mean_delta": -0.007469615443169708,
+          "ci_lo": -0.015349966667083104,
+          "ci_hi": -0.0008894206675223536,
+          "excludes_zero": true
+        },
+        {
+          "pair": "U-G3",
+          "mean_delta": -0.009359157707830468,
+          "ci_lo": -0.018348249195597032,
+          "ci_hi": -0.0017748991423044477,
+          "excludes_zero": true
+        },
+        {
+          "pair": "G2-G3",
+          "mean_delta": -0.0018895422646607596,
+          "ci_lo": -0.004721039005158046,
+          "ci_hi": 0.0011364711676343548,
+          "excludes_zero": false
+        }
+      ]
+    },
+    "ellel": {
+      "loss_metric": "mae",
+      "basis": "unscaled",
+      "n_folds": 260,
+      "arms": ["U", "G2", "G3"],
+      "mean_loss": {
+        "U": 110.85447176478465,
+        "G2": 110.52936279858606,
+        "G3": 110.20954007846707
+      },
+      "mcs_pvalue": {
+        "U": 0.681,
+        "G2": 0.705,
+        "G3": 1.0
+      },
+      "set_90": ["G3", "G2", "U"],
+      "set_75": ["G3", "G2", "U"],
+      "elimination": [
+        {
+          "model": "U",
+          "step_pvalue": 0.681,
+          "mcs_pvalue": 0.681,
+          "t_range": 0.8210165335746165,
+          "set_size_before": 3
+        },
+        {
+          "model": "G2",
+          "step_pvalue": 0.705,
+          "mcs_pvalue": 0.705,
+          "t_range": 0.35517112310174714,
+          "set_size_before": 2
+        }
+      ],
+      "paired_bootstrap": [
+        {
+          "pair": "U-G2",
+          "mean_delta": 0.3251089661985844,
+          "ci_lo": -0.6833129192183819,
+          "ci_hi": 1.394183834725756,
+          "excludes_zero": false
+        },
+        {
+          "pair": "U-G3",
+          "mean_delta": 0.6449316863175767,
+          "ci_lo": -0.7096862362243136,
+          "ci_hi": 1.9333495424081766,
+          "excludes_zero": false
+        },
+        {
+          "pair": "G2-G3",
+          "mean_delta": 0.31982272011899227,
+          "ci_lo": -1.218014699390906,
+          "ci_hi": 1.7409973163394168,
+          "excludes_zero": false
+        }
+      ]
+    },
+    "two_river_taps": {
+      "loss_metric": "mase",
+      "basis": "calendar_lag7_active",
+      "n_folds": 203,
+      "arms": ["U", "G3"],
+      "mean_loss": {
+        "U": 0.626266149565881,
+        "G3": 0.6406261680222418
+      },
+      "mcs_pvalue": {
+        "U": 1.0,
+        "G3": 0.035
+      },
+      "set_90": ["U"],
+      "set_75": ["U"],
+      "elimination": [
+        {
+          "model": "G3",
+          "step_pvalue": 0.035,
+          "mcs_pvalue": 0.035,
+          "t_range": 2.1708536529828946,
+          "set_size_before": 2
+        }
+      ],
+      "paired_bootstrap": [
+        {
+          "pair": "U-G3",
+          "mean_delta": -0.014360018456360812,
+          "ci_lo": -0.02539150091791335,
+          "ci_hi": -0.0040517321755793026,
+          "excludes_zero": true
+        }
+      ]
+    }
+  },
+  "store_ceiling": "2026-07-07",
+  "device": "cpu"
+}

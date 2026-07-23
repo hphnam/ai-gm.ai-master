@@ -976,6 +976,30 @@ does.
 - **FLAG-METHODOLOGY-OVERLEAF (OPEN, author sync).** Precondition 4 asked that
   `chapters/methodology.tex` be moved to Overleaf and deleted from the repo. It is **not** deleted:
   the Overleaf canonical copy cannot be verified from here, and the file carries the new S8 prose
-  (report 43's fold-count argument and the Beer Hall small-sample demonstration). The move-to-Overleaf
-  and repo deletion is the author's manual step; the two forecasting-comparison keys the new section
-  cites (`diebold_comparing_1995`, `harvey_testing_1997`) are expected in the Overleaf root bib.
+  (report 43's fold-count argument and the Beer Hall small-sample demonstration) and now the S5 Model
+  Confidence Set section (report 44's pre-registration, the alpha-0.10-not-0.05 argument, the paired
+  variance, and the wide set as the honest result). The move-to-Overleaf and repo deletion is the
+  author's manual step; the forecasting-comparison keys the new sections cite
+  (`diebold_comparing_1995`, `harvey_testing_1997`, `hansen_model_2011`) are expected in the Overleaf
+  root bib.
+
+## S5 G17f group in-context learning (report 47)
+
+- **FLAG-TRT-CONSTRUCTED-ZEROS (RESOLVED by a stronger check, kept for provenance).** G6 asked that
+  Two River Taps' post-closure rows be confirmed present and zero in the store. They are **absent**:
+  `l1_daily` holds zero Two River Taps rows after the 2026-05-08 closure, and even within-span
+  closed-day zeros are `fill_calendar` constructions, not stored observations. The G3 arm's TRT context
+  is therefore zero-extended by construction, not by reading stored zeros. This is sound because the
+  closure is genuine (`is_closed` True, no post-closure transactions), so zero is the factually correct
+  revenue for every post-closure day. The zeros are labelled constructed throughout, TRT is scored only
+  on origins with real truth (203 of 260), and the verdict (G3 worse than univariate at TRT) does not
+  depend on the constructed tail. Recorded so no later reader mistakes the constructed zeros for
+  observed data.
+
+- **FLAG-GROUP-EXO (OPEN, future work, not run).** The S5 arms are plain Chronos-2 (no covariates) so
+  the comparison isolates cross-series in-context learning. Grouping venues WITH the known-future
+  covariate set (weather, World Cup, calendar) is a distinct question that would confound the two
+  effects and inherit the Ellel June covariate gap (`FLAG-ELLEL-JUNE-EXO`). Given that plain grouping
+  already fails to beat the univariate baseline on this estate, grouped-plus-covariates is low-priority,
+  but it is named here rather than silently out of scope. The apparatus (`eval/group_icl.py`,
+  `models/group_forecast.py`) would extend to it by passing the exo columns through the panel frames.

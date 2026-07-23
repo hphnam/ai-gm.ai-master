@@ -1561,3 +1561,37 @@ them into the append-only log so it is the continuous WP1-to-present record.
     `chapters/methodology.tex` was NOT deleted (precondition 4) because the Overleaf canonical copy
     cannot be verified from here and the file carries the new S8 prose; the author's Overleaf sync
     completes it. Evidence: report 46 headline, deviations, and Gates.
+
+46. **S5: multi-venue group in-context learning does not pay, and where it moves the number it moves
+    it the wrong way. The pre-registered prediction and adoption rule, recorded before the run.**
+    Prediction: group ICL most plausibly helps Ellel, the sparse series, and does little at Beer Hall.
+    Adoption rule: a grouped arm is an adoption candidate only if it BOTH enters the 90 percent Model
+    Confidence Set AND has the lower mean; entering the set alone is the outcome expected under no
+    effect and is not sufficient. Outcome: at Beer Hall grouping is a small but significant loss (paired
+    U beats G2/G3, CI excludes zero) yet all three sit in the 90 percent set; at Ellel grouping is
+    directionally best in the predicted order (G3 < G2 < U in MAE) but every paired CI spans zero; at
+    Two River Taps G3 is eliminated from the set and significantly worse. No arm both enters the set and
+    has the lower mean at a stop-scoped venue, so no adoption and no stop. A publishable negative
+    result. Evidence: report 47 Part 3, `eval/group_icl_mcs.json`.
+
+47. **S5: the Two River Taps closure zeros are constructed, not stored, so G6 is met by a stronger
+    check (flagged, not relaxed).** The `l1_daily` store holds zero Two River Taps rows after the
+    2026-05-08 closure, and even within-span closed-day zeros are `fill_calendar` constructions, so
+    G6's literal premise (rows present and zero in the store) is false. Rather than trust a stored zero
+    that does not exist, the substitute verifies the property G3 actually needs: the closure is genuine
+    (`is_closed` True, last active 2026-05-08 against dataset max 2026-07-07, no post-closure
+    transactions), so zero is the factually correct revenue for every post-closure day and the
+    constructed zeros are correct rather than padding of an unknown value. G3 is run with the zeros
+    labelled constructed throughout; the verdict (G3 worse than U at Two River Taps) is unchanged.
+    `FLAG-TRT-CONSTRUCTED-ZEROS`. Evidence: report 47 Part 2 and G6.
+
+48. **S5: the device verdict depends on the call shape, and the package runs on CPU regardless.**
+    Report 24 measured CPU faster than MPS on a univariate single-series call. Re-measured on grouped
+    and batched calls (20 origins, batch 1/8/32): batching origins is a ~15x win for the independent
+    univariate arm (packs forward passes) and flat for the grouped arm (cross-learning forces one
+    forward pass per origin); at batch 32 CPU still wins the univariate arm (~3.7x) but MPS wins the
+    grouped arm by ~1.7x. Because 1.7x is under the pre-registered 2x switch threshold, and because a
+    CPU run keeps the univariate arm directly comparable to the committed ladder, the whole package runs
+    on CPU with the device stamped on every artefact. Batched equals unbatched: the grouped arm exactly
+    (0.0), the independent arm within 0.00092, both inside Chronos non-determinism. Evidence: report 47
+    device section, `eval/group_icl_calibration.json`.

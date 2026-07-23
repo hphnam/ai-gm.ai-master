@@ -160,3 +160,73 @@ a published backtest figure is reproducible only against a stated training ceili
 a scaled error is reproducible only against a stated basis. A backtest number, like a MASE,
 carries two coordinates, and pinning only one of them is what let a forty-two-day window pass
 for a settled result.
+
+% The hansen_model_2011 key cited below is expected in the Overleaf root ref.bib (the model
+% confidence set of Hansen, Lunde and Nason, Econometrica 2011); add it there if absent.
+\section{Which forecasters the evidence cannot separate: the model confidence set}
+\label{sec:mcs}
+
+Recovering a computable test is not the same as declaring a winner. A rolling origin makes the
+fold count large enough that a significance test exists, but the honest use of that test is not
+to crown one forecaster; it is to report the set of forecasters the data cannot tell apart. The
+instrument is the model confidence set of \citet{hansen_model_2011}, which returns, for a
+stated confidence level, the collection of models whose predictive ability the evidence cannot
+distinguish from the best. A single served model is defensible exactly when it lies inside its
+own set, and the width of that set is itself the finding: a narrow set is a genuine ranking, a
+wide one is an admission that the data does not support one.
+
+Every choice the procedure needs was pre-registered before the set was computed, because a
+confidence set has as many investigator degrees of freedom as any other test and fixing them
+after seeing the answer would void it. The statistic is the range statistic $T_R$, the largest
+standardised pairwise loss differential across the active models, with the matched elimination
+rule that removes the model contributing that maximum. Significance is assessed by a moving
+block bootstrap rather than an independent one, because consecutive step-one origins share six
+of their seven days and their loss differentials are serially correlated by construction; an
+independent resample would treat that overlap as fresh information and understate the variance.
+The block length is set to seven, the horizon, which is the mechanical source of the overlap.
+The bootstrap seed is fixed so the sets reproduce.
+
+The confidence level is set at ten percent, and not at the conventional five, and this is a
+deliberate choice about power rather than a relaxed standard. At these fold counts and with
+top-of-ladder differences on the order of a few hundredths of a MASE, a five percent level has
+no power to separate the leading models at all: it would return the full ladder at every venue
+and say nothing. Ten percent is the tightest level at which the test can discriminate, and
+naming it in advance is what keeps it from being the level chosen after the fact to produce a
+congenial set. A secondary level of twenty-five percent is reported alongside; because a single
+elimination sequence is thresholded at each level rather than recomputed, the twenty-five
+percent set is a subset of the ten percent set by construction, so the pathological ordering in
+which a model survives the stricter level but not the looser one is made impossible rather than
+merely checked for.
+
+\subsection{Why a test is possible at all: the paired variance}
+\label{sec:mcs-paired}
+
+Taken at face value the fold-level standard errors make the exercise look hopeless. The
+per-fold loss of a single forecaster has a standard deviation several times larger than the
+gaps between the leading forecasters, so any test of one mean loss against another, treating
+the two as independent samples, would be powerless. The escape is that the forecasters are not
+independent: they see the same demand on the same days, so their per-fold losses are strongly
+correlated, and the standard deviation of their paired difference is far smaller than the
+independent combination of their separate standard deviations would suggest. On this estate the
+paired differential standard deviation runs from about a sixth to under a half of the
+independent figure across the leading pairs, so the paired standard error is three to ten times
+smaller than the marginal one. That gap is the entire reason a significance test is available
+here, and it is why the bootstrap must resample folds jointly across models, applying one index
+draw to every forecaster per replication: resampling each model independently would destroy the
+cross-model correlation and inflate every set back to uselessness. The same correlation
+structure justifies the block length empirically, since the autocorrelation of the paired
+differential decays from a substantial lag-one value to about zero by the seventh lag, so a
+block of seven is long enough to carry the dependence and no longer.
+
+The result, applied across the served ladder, is that every served model lies inside its own
+ninety percent set, and several of those sets are wide: the data separates the plainly weaker
+rungs but cannot separate the foundation models from the served incumbent at the top. A wide
+set is reported as the honest answer rather than being resolved by picking the numerically
+smallest mean, because the range statistic's multiplicity correction is precisely what a naive
+argmin lacks. Where the served choice cannot be shown superior on accuracy, the sentence worth
+writing is that it rests on cold-start behaviour and inference cost rather than on a
+demonstrated accuracy advantage; a spuriously precise winner would say less. The same
+apparatus, reused unchanged, is what later adjudicates whether forecasting several venues
+together under cross-series in-context learning improves on forecasting each alone, and returns
+the same verdict in a different key: where the grouped and univariate arms cannot be
+separated, the wider set is the finding, not a defect to be tuned away.

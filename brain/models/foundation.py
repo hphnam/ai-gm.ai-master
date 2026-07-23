@@ -51,6 +51,15 @@ CHRONOS2_MODEL_ID = "amazon/chronos-2"
 CHRONOS2_FALLBACK_MODEL_ID = "autogluon/chronos-2-small"
 RESOURCE_GUARD_SECONDS = 120
 
+# S5 G17f / Major 14: the Chronos-2 series identifier was hardcoded to "l1" at
+# three call sites, which forecloses grouped multi-venue calls (every venue would
+# collide on one id). It is a parameter now, defaulting to the historical value so
+# the single-series univariate path is byte-identical; the grouped path
+# (models/group_forecast.py) passes venue-distinct ids. On a single-series call the
+# id is cosmetic and does not enter the forecast, which is what the S5 G2 gate
+# verifies empirically.
+DEFAULT_SERIES_ID = "l1"
+
 # Pinned Hugging Face weight revisions (S3 / reproducibility). A model id alone lets the
 # weights move under a re-tag or re-upload, which would silently change zero-shot output
 # and invalidate the frozen pre-registration artefacts in sim/. These are the exact
@@ -233,17 +242,21 @@ def _chronos2_base_pipeline():
     return _CHRONOS2["base"]
 
 
-def chronos2_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
+def chronos2_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None, *,
+                     series_id: str = DEFAULT_SERIES_ID) -> np.ndarray:
     """Zero-shot Chronos-2 point forecast, clipped at 0.
 
     Primary path (S9): the README-canonical predict_df dataframe API. Fallback
     (S10, corrected for Chronos-2): the tensor predict_quantiles(inputs=[...])
-    API, used only if predict_df raises or returns a malformed frame."""
+    API, used only if predict_df raises or returns a malformed frame.
+
+    `series_id` labels the single series; the default reproduces the historical
+    "l1" frame exactly and a single-series forecast is invariant to it."""
     n = len(target)
     try:
         pipe = _chronos2_pipeline()
         context_df = pd.DataFrame({
-            "id": "l1",
+            "id": series_id,
             "timestamp": pd.to_datetime(train["date"].to_numpy()),
             "target": train["value"].to_numpy(float)})
         pred_df = pipe.predict_df(
@@ -298,7 +311,8 @@ def _require_covariates(frame: pd.DataFrame, which: str, exo_cols: list[str]) ->
 
 def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None, *,
                          venue: str | None = None,
-                         exo_cols: list[str] | None = None) -> np.ndarray:
+                         exo_cols: list[str] | None = None,
+                         series_id: str = DEFAULT_SERIES_ID) -> np.ndarray:
     """Zero-shot Chronos-2 point forecast with the FULL known-future covariate set
     (G12.10b), clipped at 0. Reads `chronos2_exo_cols(venue)` (the same full
     universe for every venue): calendar + is_ellel_event (inert-not-excluded, safe
@@ -334,13 +348,13 @@ def chronos2_exo_predict(train: pd.DataFrame, target: pd.DataFrame, _cols=None, 
     n = len(target)
     pipe = _chronos2_pipeline()
     context_df = pd.DataFrame({
-        "id": "l1",
+        "id": series_id,
         "timestamp": pd.to_datetime(train["date"].to_numpy()),
         "target": train["value"].to_numpy(float)})
     for c in exo_cols:
         context_df[c] = train[c].to_numpy(float)
     future_df = pd.DataFrame({
-        "id": "l1", "timestamp": pd.to_datetime(target["date"].to_numpy())})
+        "id": series_id, "timestamp": pd.to_datetime(target["date"].to_numpy())})
     for c in exo_cols:
         future_df[c] = target[c].to_numpy(float)
     pred_df = pipe.predict_df(
