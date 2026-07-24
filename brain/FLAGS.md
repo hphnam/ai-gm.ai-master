@@ -254,11 +254,13 @@ longer error). No code change was needed to recover the files.
 
 ## Proactive briefing (the synthesis capstone)
 
-- **FLAG-BR1 (checklist not live — G5a).** `CHECKLIST_LIVE=False` gates checklist
-  and SOP signals out of the ranked feed until Ryan's mobile completion export
-  exists (the standing open-confirmation above). While False the feed says so in
-  its `notes`; flipping to True is the single swap-in at `briefing._live_completion`.
-  No synthetic miss is ever ranked as a real alert.
+- **FLAG-BR1 (checklist not live — G5a; corrected S11).** `CHECKLIST_LIVE=False` gates the
+  `checklist` source out of the ranked feed until Ryan's mobile completion export exists (the
+  standing open-confirmation above). **This previously read "gates checklist and SOP signals",
+  which is now stale**: `sop` is a separate source (`signals.chatlog_kb_gap`, S11, report 51),
+  not gated by `CHECKLIST_LIVE`, and is live on the real corpus today. While `CHECKLIST_LIVE` is
+  False the feed says so in its `notes`; flipping it to True is the single swap-in at
+  `briefing._live_completion`. No synthetic miss is ever ranked as a real alert.
 - **FLAG-BR2 (stock is a snapshot, not a series).** `stock_cover` holds a single
   latest row (levels-not-flows, per the stock flags). So "new reorder since the last
   run" is knowable ONLY through the `briefing_runs` diff, not a daily stock history.
@@ -1096,3 +1098,28 @@ does.
   decision. Owner: a future package deciding whether continuation alerting needs its own mechanism (e.g.
   a cooldown-aware re-arm) is in scope; this flag exists so the finding is not lost. Evidence: report 50
   Part 3.
+
+## S11 G17j chat-log gap signal wired into the briefing (report 51)
+
+- **FLAG-LEARNING-DOMAINS-STATUS (updated, two of four now live).** The specification names four
+  learning domains: sales, stock movements, checklist completions, and chat-log volume. Sales
+  (deviation + change-point) has always reached the briefing. Stock movements are blocked on James
+  (the Beer Hall stocksheet owner, no TRT/Ellel sheets exist, FLAG-5/FLAG-8). Checklist completions are
+  blocked on Ryan's completion export from the Neon system of record (`CHECKLIST_LIVE=False`, G5a) and
+  stay template-only. The chat-log KB-gap signal (`signals.chatlog_kb_gap`) was blocked on nothing and
+  is now wired into the briefing as a fifth collector (`signals.briefing._collect_sop`), live on the
+  real 735-message corpus today. **Two of four learning domains are live (sales, chat-log); two remain
+  blocked (stock on James, checklist on Neon).** Evidence: report 51.
+
+- **FLAG-CHATLOG-VENUE-ATTRIBUTION (recorded, a stated scope narrowing, not a defect).** The chat-log
+  corpus is single-owner, estate-wide, web-channel product-testing chat (Elliot's AI-GM Questions
+  export), not per-venue staff operational chat; `chatlog_kb_gap`'s own venue tagging is
+  content-keyword-based, and on the real corpus none of the four above-baseline gap clusters names a
+  specific venue except one tagged "brewery" (not a `BRIEFING_VENUES` member, so it has no occurrence
+  definition to gate against and is excluded from the wired feed). The other three, which name no
+  venue at all, are broadcast to every briefing venue rather than guessed at or dropped, since
+  `chatlog_kb_gap`'s "estate" fallback conflates genuine cross-venue mentions with simply not naming a
+  venue and this corpus's overwhelming majority (359 of 376 user turns) does the latter. If a future,
+  larger corpus shifts toward genuinely per-venue staff chat (WhatsApp, not web), this broadcast
+  decision should be revisited: it is calibrated to a corpus where almost nothing names a venue, not a
+  general rule. Evidence: report 51 Part 2, `signals/chatlog_kb_gap.json`.

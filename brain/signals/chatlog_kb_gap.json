@@ -1,0 +1,72 @@
+{
+  "store_ceiling": "2026-07-07",
+  "embedder_backend": "tfidf",
+  "n_assistant_replies": 359,
+  "failure_rate": 0.1894150417827298,
+  "failure_baseline": 0.189,
+  "span": ["2026-04-29 10:33:46", "2026-06-12 08:49:34"],
+  "n_clusters": 12,
+  "n_gaps": 4,
+  "gaps": [
+    {
+      "cluster": 8,
+      "size": 5,
+      "n_failed": 3,
+      "failure_density": 0.6,
+      "score": 1.8,
+      "venue_tags": {
+        "estate": 5
+      },
+      "onset_date": "2026-04-30",
+      "examples": [
+        "Why is this gas cannister not connecting and gas is coming out of the gas tap handle?",
+        "Why is this gas cannister not connecting and gas is coming out of the gas tap handle?",
+        "6, gas bottles leaking gas from nozzle what do I do?"
+      ]
+    },
+    {
+      "cluster": 10,
+      "size": 12,
+      "n_failed": 4,
+      "failure_density": 0.333,
+      "score": 1.333,
+      "venue_tags": {
+        "estate": 12
+      },
+      "onset_date": "2026-04-30",
+      "examples": [
+        "Pretend I'm a new user for the first time. \"So what is ai-gm, what do you do and why are you useful?\"",
+        "What grant funding can I get for AI - GM to launch?",
+        "Who deals with accounts?"
+      ]
+    },
+    {
+      "cluster": 4,
+      "size": 18,
+      "n_failed": 4,
+      "failure_density": 0.222,
+      "score": 0.889,
+      "venue_tags": {
+        "brewery": 1
+      },
+      "onset_date": "2026-04-29",
+      "examples": [
+        "No probs, can I upload documents into this chat?",
+        "1) Correct, but also fill it in on the till logs. 2) Bag the excess cash, and end of day recipt. 3) Take this straight to the safe, but reme",
+        "Pictures upload one at a time, bad for a series e.g. this is where accident book is"
+      ]
+    },
+    {
+      "cluster": 9,
+      "size": 6,
+      "n_failed": 2,
+      "failure_density": 0.333,
+      "score": 0.667,
+      "venue_tags": {
+        "estate": 6
+      },
+      "onset_date": "2026-04-29",
+      "examples": ["How do I open up?", "How do I open the bar?"]
+    }
+  ]
+}

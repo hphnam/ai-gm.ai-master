@@ -14,7 +14,7 @@ from datetime import date
 import pytest
 
 from signals import briefing
-from signals import change_point, checklist_discipline, deviation, residual
+from signals import change_point, chatlog_kb_gap, checklist_discipline, deviation, residual
 from signals.briefing import Signal
 from store import warehouse
 from store.active_span import active_trading_end
@@ -45,14 +45,14 @@ def _imported(module) -> set[str]:
 
 # --- G0 dependency direction -------------------------------------------------
 
-def test_briefing_composes_the_four_signals_one_way():
+def test_briefing_composes_the_five_signals_one_way():
     mods = _imported(briefing)
     assert {"signals.deviation", "signals.change_point", "signals.residual",
-            "signals.checklist_discipline"} <= mods
+            "signals.checklist_discipline", "signals.chatlog_kb_gap"} <= mods
 
 
 def test_no_signal_imports_briefing():
-    for mod in (deviation, change_point, residual, checklist_discipline):
+    for mod in (deviation, change_point, residual, checklist_discipline, chatlog_kb_gap):
         assert "signals.briefing" not in _imported(mod)
 
 

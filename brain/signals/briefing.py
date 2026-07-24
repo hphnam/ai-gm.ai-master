@@ -2,13 +2,15 @@
 
 One daily note per estate that answers a single question: what changed since
 yesterday, ranked by how much it matters, de-duplicated, each with the likely
-reason. It invents no new detection maths. It composes the four signals that
+reason. It invents no new detection maths. It composes the five signals that
 already exist, point deviation (`signals.deviation.scan`), change-point
-(`signals.change_point.detect`), stock cover (the `stock_cover` table), and
-checklist/SOP (`signals.checklist_discipline`), into one ranked, non-redundant,
-attributed feed, remembers what it said last run (`briefing_runs`) so each item
-is labelled new / continuing / resolved, and surfaces via `GET /briefing` and the
-Track-B tool `brain_daily_briefing`.
+(`signals.change_point.detect`), stock cover (the `stock_cover` table),
+checklist (`signals.checklist_discipline`, template-only, `CHECKLIST_LIVE`
+gated), and the chat-log KB-gap signal (`signals.chatlog_kb_gap`, S11, live on
+the real corpus), into one ranked, non-redundant, attributed feed, remembers
+what it said last run (`briefing_runs`) so each item is labelled new /
+continuing / resolved, and surfaces via `GET /briefing` and the Track-B tool
+`brain_daily_briefing`.
 
 The contribution is the SYNTHESIS: the de-duplication rule (a change-point
 absorbs the deviation run and any coincident stock flag behind it), the
@@ -19,8 +21,24 @@ Out of scope (stated so it is not mistaken for missing work):
   - No delivery channel (no email/Slack/push), a queryable artefact + agent tool.
   - No new detection maths, compose existing signals only.
   - No live checklist wiring, `CHECKLIST_LIVE=False` gates template data out (G5a).
+    This is a different source (`checklist`) from the chat-log gap signal
+    (`sop`) below; the checklist source stays inert on James/Neon, the sop
+    source does not (S11). LATENT GAP, recorded not fixed: both `checklist`
+    and `sop` carry `direction="na"`, so `_cluster()`'s exact-direction
+    bucketing would merge a checklist miss and a chat-log gap that land
+    within `BRIEFING_MERGE_WINDOW_DAYS` of each other once `CHECKLIST_LIVE`
+    flips, and `_pick_head`'s generic fallback would silently drop whichever
+    one is not strongest. Unreachable today (`CHECKLIST_LIVE=False`); flagged
+    here so it is not lost, not fixed pre-emptively for a path that does not
+    exist yet.
   - Stock is a single latest snapshot, not a daily series, "new reorder since
     last run" is knowable ONLY through the `briefing_runs` diff.
+  - The chat-log gap signal is estate-wide, single-owner, and cannot always be
+    attributed to one venue by content alone (S11): a cluster whose messages
+    name no venue is broadcast to every briefing venue rather than guessed at
+    or dropped; a cluster tagged only "brewery" (not a `BRIEFING_VENUES` member,
+    no occurrence definition to gate against) is excluded, stated here rather
+    than silently absorbed.
 
 Dependency direction (G0): this module imports the four signals + the store; no
 signal imports this module. The arrow points one way, as `residual` established.
@@ -46,8 +64,11 @@ from config import (
     BRIEFING_NOVELTY_FACTOR,
     BRIEFING_RECENCY_FLOOR,
     BRIEFING_SEVERITY_MULT,
+    BRIEFING_SOP_SEVERITY_HIGH,
+    BRIEFING_SOP_SEVERITY_MEDIUM,
     BRIEFING_SOURCE_WEIGHT,
     BRIEFING_VENUES,
+    CHATLOG_FAILURE_BASELINE,
     CHECKLIST_LIVE,
     DEV_SCAN_WINDOW,
     EVENT_ONLY_VENUES,
@@ -56,9 +77,11 @@ from config import (
     VENUES_WITH_STOCK,
 )
 from signals.change_point import detect as changepoint_detect
+from signals.chatlog_kb_gap import gap_report as chatlog_gap_report
 from signals.checklist_discipline import evaluate as checklist_evaluate
 from signals.checklist_discipline import parse_checklists
 from signals.deviation import scan as deviation_scan
+from signals.occurrence import occurrence_label
 from signals.residual import attribute
 from store.active_span import active_trading_end, dataset_max_date, is_closed
 from store.warehouse import connect
@@ -100,7 +123,7 @@ class BriefingItem:
 # --- Collect (§8 collect) ----------------------------------------------------
 
 def collect(venue: str, as_of: date | None = None, layer: str = "L1", con=None) -> list[Signal]:
-    """Pull all four signals for one venue, normalised to `Signal`. Empty / closed
+    """Pull all five signals for one venue, normalised to `Signal`. Empty / closed
     / sparse venues return a short list or [], never raise."""
     own = con is None
     con = con or connect(read_only=True)
@@ -114,6 +137,7 @@ def collect(venue: str, as_of: date | None = None, layer: str = "L1", con=None) 
         sigs += _collect_changepoint(venue, layer, con)
         sigs += _collect_stock(venue, con)
         sigs += _collect_checklist(venue, as_of, con)
+        sigs += _collect_sop(venue)
         return sigs
     finally:
         if own:
@@ -203,6 +227,79 @@ def _live_completion(venue, checklist, as_of):   # pragma: no cover - blocked on
     return None
 
 
+def _sop_severity(score: float) -> str:
+    """A gap cluster's score (density x n_failed) into the briefing's severity
+    vocabulary. No "critical"/"ok": every cluster reaching here already cleared
+    `chatlog_kb_gap`'s above-baseline gap threshold, so it is real by definition,
+    never a synthetic "ok" filler."""
+    if score >= BRIEFING_SOP_SEVERITY_HIGH:
+        return "high"
+    if score >= BRIEFING_SOP_SEVERITY_MEDIUM:
+        return "medium"
+    return "low"
+
+
+def _sop_target_venues(venue_tags: dict) -> frozenset[str]:
+    """Which briefing venue(s) a chat-log gap cluster belongs to.
+
+    A cluster tagged to a real venue (content named it) attaches ONLY there
+    (the majority-tagged one, if more than one appears). A cluster with no
+    venue named at all (`chatlog_kb_gap`'s "estate" fallback covers both a
+    genuine cross-venue mention AND simply not naming a venue - the corpus is
+    single-owner product-testing chat, so the latter is the common case) is
+    broadcast to every briefing venue rather than guessed at or dropped -
+    stated in the module docstring, not silent. A cluster tagged only to a
+    non-`BRIEFING_VENUES` name ("brewery") has no occurrence definition to gate
+    against and is excluded (also stated), not surfaced ungated."""
+    real = {v for v in venue_tags if v in BRIEFING_VENUES}
+    if real:
+        # sorted(), not the bare set, so an exact-count tie between two real
+        # venues resolves the same way on every run (set iteration order is
+        # hash-randomised per process, which max() would otherwise expose).
+        top = max(sorted(real), key=lambda v: venue_tags[v])
+        return frozenset({top})
+    if set(venue_tags) <= {"estate"}:
+        return frozenset(BRIEFING_VENUES)
+    return frozenset()
+
+
+def _collect_sop(venue: str) -> list[Signal]:
+    """S11: the chat-log KB-gap signal (`signals.chatlog_kb_gap`), wired onto the
+    same footing as the other four - a headline, the evidence that produced it
+    (repeated questions + their failure count), and a score, never an invented
+    cause. Blocked on nothing (unlike checklist/`sop`'s sibling above), so this
+    is live by default, not gated behind a flag.
+
+    Gated by the S4 occurrence definition (`signals.occurrence.occurrence_label`):
+    a gap cannot be surfaced for a venue on a day the occurrence label says it is
+    structurally closed (0.0). NaN (an event-driven venue with no diary, Ellel)
+    is left inert, exactly as S10's occurrence guard treated it - never fabricated
+    into either a pass or a fail."""
+    report = chatlog_gap_report()
+    ranked = report["ranked"]
+    backend = report["backend"]
+    out: list[Signal] = []
+    for _, r in ranked[ranked["is_gap"]].iterrows():
+        if venue not in _sop_target_venues(r["venue_tags"]):
+            continue
+        onset = pd.Timestamp(r["onset_date"]).date()
+        occ = occurrence_label(venue, [onset])[0]
+        if occ == 0.0:
+            continue   # structural-zero day: a gap cannot be surfaced here (G4)
+        # "|" would corrupt the markdown report table (chatlog_kb_gap's own
+        # report applies the same guard for the same reason).
+        example = r["examples"][0].replace("|", "/") if r["examples"] else ""
+        out.append(Signal(
+            "sop", venue, onset, "na", _sop_severity(float(r["score"])),
+            float(r["score"]),
+            {"cluster": int(r["cluster"]), "size": int(r["size"]),
+             "n_failed": int(r["n_failed"]),
+             "failure_density": float(r["failure_density"]),
+             "score": float(r["score"]), "embedder_backend": backend,
+             "example": example}))
+    return out
+
+
 # --- De-duplication (§4) -----------------------------------------------------
 
 def _cluster(signals: list[Signal]) -> list[list[Signal]]:
@@ -282,6 +379,15 @@ def _score(head: Signal, status: str, baseline_trust: float, as_of: date) -> flo
 # --- Item assembly -----------------------------------------------------------
 
 def _reason(venue: str, head: Signal, layer: str, con) -> str:
+    if head.source == "sop":
+        # The evidence IS the reason here - never route a chat-log gap through
+        # the revenue exogenous-attribution seam, which would risk attaching an
+        # unrelated coincidental "cause" (a school-term transition, say) to a
+        # repeated question, an invented cause the spec explicitly forbids.
+        p = head.payload
+        return (f"{p['n_failed']} of {p['size']} similar questions went unanswered "
+                f"(density {p['failure_density']:.2f} vs baseline "
+                f"{CHATLOG_FAILURE_BASELINE:.2f})")
     lines = attribute(venue, pd.Timestamp(head.onset_date), head.direction, layer, con=con)
     return lines[0] if lines else "no coincident signal"
 
@@ -306,6 +412,11 @@ def _headline(head: Signal, evidence: list[Signal], reason: str) -> str:
         return f"{label}: {_money(p.get('actual'))} {arrow} band on {head.onset_date}; {reason}"
     if head.source == "checklist":
         return f"{label}: checklist miss ({head.severity}) on {head.onset_date}"
+    if head.source == "sop":
+        p = head.payload
+        ex = p.get("example", "")
+        return (f"{label}: repeated question suggests a missing SOP, "
+                f"'{ex}' ({p['n_failed']}/{p['size']} unanswered)")
     return f"{label}: {head.source} signal on {head.onset_date}"
 
 
@@ -367,7 +478,8 @@ def build(as_of: date | None = None, venues=None, layer: str = "L1", con=None) -
         items = [it for it in items if it.score > 0.0 or it.status == "resolved"]
         items.sort(key=_sort_key)
         if not CHECKLIST_LIVE:
-            notes.append("checklist/SOP data not live (template) — excluded from the feed")
+            notes.append("checklist data not live (template), excluded from the feed; "
+                         "the chat-log KB-gap (sop) signal is separate and stays live")
 
         counts = {s: sum(1 for it in items if it.status == s)
                   for s in ("new", "continuing", "resolved")}
@@ -539,8 +651,9 @@ def _write_report(env: dict) -> None:
         f"as_of **{env['as_of']}** · layer {env['layer']} · "
         f"new {env['counts']['new']} / continuing {env['counts']['continuing']} / "
         f"resolved {env['counts']['resolved']}\n",
-        "Composes point deviation, change-point, stock cover, and checklist/SOP. "
-        "A change-point absorbs the deviation run and any coincident stock flag "
+        "Composes point deviation, change-point, stock cover, checklist, and the "
+        "chat-log KB-gap signal (sop). A change-point absorbs the deviation run "
+        "and any coincident stock flag "
         "behind it. Ranked by a transparent score "
         "(source × severity × recency × novelty × baseline_trust × direction). "
         "Attribution is correlational ('coincides with', never 'caused by').\n",

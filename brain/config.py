@@ -360,6 +360,12 @@ BRIEFING_DIRECTION_BUMP = {"down": 1.10, "up": 1.00, "na": 1.00}
 BRIEFING_BASELINE_TRUST_SPARSE = 0.5
 BRIEFING_RECENCY_FLOOR = 0.5                 # recency_factor floor at the window edge
 
+# S11, the chat-log KB-gap signal's score (failure_density * n_failed) into the
+# briefing severity vocabulary; a cluster reaching this already cleared
+# chatlog_kb_gap's above-baseline gap threshold, so there is no "ok" tier.
+BRIEFING_SOP_SEVERITY_HIGH = 1.0
+BRIEFING_SOP_SEVERITY_MEDIUM = 0.5
+
 # --- Live ingest / freshness / conditional retrain (three-tier model) --------
 # T1 live facts (read now), T2 incremental store (append closed days), T3
 # re-learn (ladder re-fit). A transaction only ever reaches T2; T3 fires on a

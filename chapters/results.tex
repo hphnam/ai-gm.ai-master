@@ -1,26 +1,31 @@
-% Results chapter. Three completed forecasting studies, each a pre-registered comparison
-% adjudicated by the model confidence set of the methodology chapter: the S5 multi-venue
-% group in-context learning study (report 47), the S6 lead-matched weather study (report
-% 48), and the S7 conformal interval calibration study (report 49). Written to be \input
-% into the thesis body; it reuses the bibliography keys of the methodology chapter
-% (chapters/ref.bib), in particular hansen_model_2011.
+% Results chapter. Four completed studies, each a pre-registered comparison adjudicated
+% by the model confidence set of the methodology chapter or an exact interval: the S5
+% multi-venue group in-context learning study (report 47), the S6 lead-matched weather
+% study (report 48), the S7 conformal interval calibration study (report 49), and the S10
+% injection-realism study (report 50). Written to be \input into the thesis body; it
+% reuses the bibliography keys of the methodology chapter (chapters/ref.bib), in
+% particular hansen_model_2011.
 
 \chapter{Results}
 \label{chap:results}
 
-Three questions about the flagship forecaster admit a clean experimental answer, and this
-chapter reports all three. The first is whether forecasting the estate's venues together, so
-that a foundation model can borrow strength across them, beats forecasting each alone. The
-second is how much of the exogenous weather path's apparent value is real once the weather is
-placed on the footing the model would actually have at serving. The third is whether the
-forecaster's uncertainty band is calibrated, and specifically whether a seven-point
-confrontation window that read as miscalibration survives being measured with power. All three
-are pre-registered comparisons, all three are adjudicated by the model confidence set or an
-exact interval of Chapter~\ref{chap:methodology}, and none returns a tuned win: two return a
-negative result at full prominence, and the third corrects a claim in the opposite direction
-from the one it was raised to investigate. Reporting them together is deliberate: they share an
-instrument and a discipline, and each is a case where measuring properly, rather than trusting
-an appealing prior or a small sample, is the entire finding.
+Four questions about the flagship forecaster and its detection layer admit a clean
+experimental answer, and this chapter reports all four. The first is whether forecasting the
+estate's venues together, so that a foundation model can borrow strength across them, beats
+forecasting each alone. The second is how much of the exogenous weather path's apparent value
+is real once the weather is placed on the footing the model would actually have at serving.
+The third is whether the forecaster's uncertainty band is calibrated, and specifically whether
+a seven-point confrontation window that read as miscalibration survives being measured with
+power. The fourth is whether the published detection-corpus recall and latency figures, measured
+against a forecaster that never sees its own injected shift, still hold once the forecaster is
+allowed to adapt to it under the production retrain policy. All four are pre-registered
+comparisons, all four are adjudicated by the model confidence set, an exact interval, or a paired
+bootstrap of Chapter~\ref{chap:methodology}, and none returns a tuned win: two return a negative
+result at full prominence, the third corrects a claim in the opposite direction from the one it
+was raised to investigate, and the fourth confirms a headline figure while relocating the real
+adaptation effect to an axis the figure was never built to measure. Reporting them together is
+deliberate: they share an instrument and a discipline, and each is a case where measuring
+properly, rather than trusting an appealing prior or a small sample, is the entire finding.
 
 \section{Cross-series in-context learning does not beat the univariate baseline}
 \label{sec:group-icl}
@@ -151,22 +156,84 @@ prediction, that per-step half-width would grow across the horizon, does not rep
 estate's scale either: the measured per-step half-width is flat, a property of this estate's
 residuals rather than of per-step calibration in general.
 
+\section{A recall figure measured against a forecaster that cannot adapt is still the recall
+figure}
+\label{sec:injection-realism}
+
+The estate's change-point and point-deviation detectors are scored against a 644-injection
+synthetic corpus: a known regime shift, spike, stock drawdown, or exogenous-coincident event is
+planted in a held-out fold and the detector's recall, precision, and latency at recovering it are
+measured. The injection mechanic perturbs the standardised residual directly and back-solves the
+raw value that would have produced it, holding the forecaster's expectation and the conformal
+band's scale fixed at whatever a walk-forward pass over the \emph{unperturbed} history already
+computed. In production, two things the corpus does not exercise both happen: the point forecaster
+refits weekly and again on a confirmed change point, and the conformal band recalibrates on rolling
+blocks of the residuals it has actually seen. A forecaster that never sees its own injected shift
+cannot demonstrate whether it would revise its expectation toward it, so the published recall and
+latency figures are, at face value, upper bounds of unstated size. The question this section
+answers is how large that bound actually is.
+
+A second, realistic pipeline was built beside the corpus's existing one, left unmodified as the
+control arm. For a sampled injection, the realistic pipeline perturbs raw revenue rather than the
+residual, applies the change from onset onward to every day the event covers, including days that
+later become training data, and re-derives the forecaster's expectation and the conformal band's
+scale under the production retrain policy: a refit at a weekly cadence boundary or on a confirmed
+change point, whichever comes first, mirroring the live retrain gate exactly. Detection then runs,
+unmodified, on the resulting stream. A stratified paired subsample of a hundred and twenty
+injections, weighted toward the regime-shift kind and drawn without replacement from an exhaustive
+candidate pool, was scored through both pipelines with the same detector, the same venues, and the
+same truth records, so any difference is attributable to the forecaster's adaptation and nothing
+else. The pre-registered prediction was that the discount would concentrate in the sustained kinds,
+where a forecaster has time to adapt within the fold, and be negligible for a single-day spike,
+which is caught before a weekly or change-point-triggered refit can absorb it; a large spike
+discount would have flagged a bug rather than a property of realism.
+
+The measured discount is exactly zero. Recall and detection latency are statistically
+indistinguishable between the control and the realistic pipeline for every event kind: the paired
+bootstrap point difference on recall is $0.0$ with a $[0.0, 0.0]$ interval throughout, and the
+latency distributions coincide (regime shift, median four days; exogenous-coincident, median three
+days; identical in both arms). This refutes the pre-registered prediction in the direction that
+matters, since no kind shows a discount at all, not merely the spike kind as expected, and confirms
+it in the direction that guards against a bug, since a real defect would have shown up as an
+asymmetric discount rather than a uniform null across every kind. The published regime-shift
+recall and the reported latencies are not inflated by the forecaster's inability to adapt, on the
+axis of whether an event is caught and how quickly it is first caught.
+
+The realism gap the corpus's construction raised is real, but it lands on a different axis than
+recall. A change-point-triggered refit fires in three-fifths of the sampled sustained-shift pairs,
+and where it fires, the production retrain policy shows measurably fewer alarms after the trigger
+than a weekly-cadence-only ablation on the identical perturbed history, in roughly a sixth of the
+pairs that reach a trigger. Detecting a shift and refitting to it can make the detector less
+sensitive to that same shift's continuation, because the refit absorbs part of the shift into the
+new expectation. This never costs the recall figure the corpus reports, because a change-point-
+triggered refit cannot fire before the change point it refits on has already been flagged: the
+trigger and the covering alarm are the same event, so whichever alarm satisfies the corpus's
+coverage test has already happened by the time any refit it caused could act. The adaptation effect
+is real and is reported at full prominence, but it belongs to continuation alerting on an
+already-caught, still-ongoing event, an axis the published recall figure was never built to
+measure, not to the headline figure itself.
+
 \section{A common verdict}
 \label{sec:results-common}
 
-The three studies rhyme. In each, a claim or an elaboration that is well motivated, easy to
+The four studies rhyme. In each, a claim or an elaboration that is well motivated, easy to
 believe, and in one case already asserted by an external reviewer, either fails to beat a
-simpler incumbent or fails to survive being measured with the sample size the claim actually
-needs. Cross-series learning does not beat the univariate baseline; a richer weather covariate
-does not beat no weather at the basis serving delivers; and a seven-point miscalibration claim
-does not survive an exact interval, while the calibration problem the exercise does find, the
-opposite of what was alleged, is real and reported at the same prominence. None of the three
-results is a failure of a method in general; each is a statement about this estate, at this
-scale, on this evidence, obtained by the same discipline, a pre-registered comparison,
-adjudicated by a multiplicity-aware test or an exact interval, reported however it comes out.
-The value of reporting all three at full prominence, rather than searching for the venue or the
-metric on which the elaboration or the claim wins, is that the width of a confidence set or an
-exact interval is itself the finding. Where the data cannot separate the grouped from the
-univariate forecaster, the weather-fed from the weather-free one, or a well-calibrated band from
-a miscalibrated one on seven points, the wider set is the answer, and a spuriously precise
-verdict would say less than the honest null.
+simpler incumbent, fails to survive being measured with the sample size the claim actually
+needs, or turns out to be true on an axis other than the one it was raised to question.
+Cross-series learning does not beat the univariate baseline; a richer weather covariate does not
+beat no weather at the basis serving delivers; a seven-point miscalibration claim does not survive
+an exact interval, while the calibration problem the exercise does find, the opposite of what was
+alleged, is real and reported at the same prominence; and a detection corpus accused of measuring
+an unrealistically compliant forecaster turns out to measure the same recall and latency a
+realistic, adapting one would produce, with the real adaptation effect relocated to a narrower,
+previously unmeasured axis instead of erased. None of the four results is a failure of a method
+in general; each is a statement about this estate, at this scale, on this evidence, obtained by
+the same discipline, a pre-registered comparison, adjudicated by a multiplicity-aware test, an
+exact interval, or a paired bootstrap, reported however it comes out. The value of reporting all
+four at full prominence, rather than searching for the venue or the metric on which the
+elaboration or the claim wins, is that the width of a confidence set, an exact interval, or a
+bootstrap difference is itself the finding. Where the data cannot separate the grouped from the
+univariate forecaster, the weather-fed from the weather-free one, a well-calibrated band from a
+miscalibrated one on seven points, or a forecaster that adapts from one that cannot, the wider set
+or the null difference is the answer, and a spuriously precise verdict would say less than the
+honest null.

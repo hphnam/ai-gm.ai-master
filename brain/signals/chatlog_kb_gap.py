@@ -19,6 +19,7 @@ Run:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -26,9 +27,16 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import CHATLOG_FAILURE_BASELINE, STORE_DIR, VOYAGE_MODEL, chat_csv
+from config import (
+    CHATLOG_FAILURE_BASELINE,
+    EXPECTED_STORE_CEILING,
+    STORE_DIR,
+    VOYAGE_MODEL,
+    chat_csv,
+)
 
 RESULTS_MD = STORE_DIR.parent / "signals" / "chatlog_kb_gap.md"
+RESULTS_JSON = STORE_DIR.parent / "signals" / "chatlog_kb_gap.json"
 
 FAILURE_MARKERS = ("couldn't produce an answer", "please retry or rephrase")
 _VENUE_KEYWORDS = {
@@ -104,7 +112,33 @@ def load_turns() -> tuple[pd.DataFrame, dict]:
 
 # --- Embedding (with graceful fallback) -------------------------------------
 
-def embed(texts: list[str]) -> tuple[np.ndarray, str]:
+def _embed_tfidf(texts: list[str]) -> tuple[np.ndarray, str]:
+    """Keyless offline path: TF-IDF -> SVD -> unit norm. No key read, no network
+    call attempted (not merely absent-key fallback), so this is exact and
+    reproducible from a clean checkout regardless of what is in the environment."""
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.preprocessing import normalize
+
+    tfidf = TfidfVectorizer(stop_words="english", min_df=2, ngram_range=(1, 2))
+    X = tfidf.fit_transform(texts)
+    k = min(50, X.shape[1] - 1, max(2, X.shape[0] - 1))
+    svd = TruncatedSVD(n_components=k, random_state=0)
+    return normalize(svd.fit_transform(X)), "tfidf"
+
+
+def embed(texts: list[str], backend: str = "auto") -> tuple[np.ndarray, str]:
+    """backend="tfidf" pins the keyless offline path directly (S11's canonical,
+    committed path: three backends would cluster differently, so which one ran
+    cannot be left to whatever happened to be in the environment). backend="auto"
+    is the original explore-only degrade (Voyage -> sentence-transformers ->
+    TF-IDF), kept for a Ryan-side richer-embedder comparison, never the wired or
+    committed path."""
+    if backend == "tfidf":
+        return _embed_tfidf(texts)
+    if backend != "auto":
+        raise ValueError(f"unknown embed backend: {backend!r}")
+
     key = os.environ.get("VOYAGE_API_KEY")
     if key:
         try:
@@ -122,17 +156,7 @@ def embed(texts: list[str]) -> tuple[np.ndarray, str]:
         return np.asarray(model.encode(texts), float), "sentence-transformers"
     except Exception:
         pass
-
-    # Keyless offline fallback: TF-IDF -> SVD -> unit norm.
-    from sklearn.decomposition import TruncatedSVD
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.preprocessing import normalize
-
-    tfidf = TfidfVectorizer(stop_words="english", min_df=2, ngram_range=(1, 2))
-    X = tfidf.fit_transform(texts)
-    k = min(50, X.shape[1] - 1, max(2, X.shape[0] - 1))
-    svd = TruncatedSVD(n_components=k, random_state=0)
-    return normalize(svd.fit_transform(X)), "tfidf"
+    return _embed_tfidf(texts)
 
 
 # --- Cluster + rank ----------------------------------------------------------
@@ -143,14 +167,17 @@ def _is_substantive(text: str) -> bool:
     return len(t.split()) >= 4 or t.endswith("?")
 
 
-def rank_gaps(turns: pd.DataFrame, n_clusters: int = 12) -> tuple[pd.DataFrame, str]:
+def rank_gaps(turns: pd.DataFrame, n_clusters: int = 12,
+              backend: str = "tfidf") -> tuple[pd.DataFrame, str]:
+    """backend defaults to "tfidf", the pinned canonical path (S11 Part 1); pass
+    backend="auto" only for an explicit, noted exploratory comparison."""
     from sklearn.cluster import KMeans
 
     # Cluster substantive turns only, trivial confirmations are a different
     # failure mode (the assistant choking on an ack), not a missing SOP.
     turns = turns[turns["content"].map(_is_substantive)].reset_index(drop=True)
     texts = turns["content"].tolist()
-    emb, backend = embed(texts)
+    emb, backend = embed(texts, backend=backend)
     k = min(n_clusters, max(2, len(texts) // 6))
     labels = KMeans(n_clusters=k, random_state=0, n_init=10).fit_predict(emb)
     turns = turns.assign(cluster=labels)
@@ -160,9 +187,14 @@ def rank_gaps(turns: pd.DataFrame, n_clusters: int = 12) -> tuple[pd.DataFrame, 
         n = len(grp)
         n_failed = int(grp["failed"].sum())
         density = n_failed / n
-        examples = grp[grp["failed"]]["content"].head(3).tolist() or \
+        failed_grp = grp[grp["failed"]]
+        examples = failed_grp["content"].head(3).tolist() or \
             grp["content"].head(2).tolist()
         venues = grp[grp["venue"] != "estate"]["venue"].value_counts().to_dict()
+        # onset = first time this gap showed up as a failure (or first turn at
+        # all, for a non-gap cluster with no failures), never the last - the
+        # briefing reads onset_date as when a thing started, not last recurred.
+        onset_ts = failed_grp["ts"].min() if len(failed_grp) else grp["ts"].min()
         records.append({
             "cluster": cid, "size": n, "n_failed": n_failed,
             "failure_density": round(density, 3),
@@ -173,10 +205,64 @@ def rank_gaps(turns: pd.DataFrame, n_clusters: int = 12) -> tuple[pd.DataFrame, 
             "is_gap": bool(density > CHATLOG_FAILURE_BASELINE and n_failed >= 2),
             "venue_tags": venues or {"estate": n},
             "examples": [e[:140] for e in examples],
+            "onset_date": onset_ts,
         })
     ranked = pd.DataFrame(records).sort_values(
         ["is_gap", "score", "n_failed"], ascending=False).reset_index(drop=True)
     return ranked, backend
+
+
+# --- Cached, stamped access for downstream callers (briefing) ----------------
+
+_CACHE: dict | None = None
+
+
+def gap_report(n_clusters: int = 12, backend: str = "tfidf") -> dict:
+    """Process-cached {stats, ranked, backend}. The chat corpus is a static
+    historical export, so memoising the (deterministic, random_state=0)
+    clustering is safe and avoids re-running KMeans once per briefing venue."""
+    global _CACHE
+    if _CACHE is None:
+        turns, stats = load_turns()
+        ranked, resolved_backend = rank_gaps(turns, n_clusters, backend=backend)
+        _CACHE = {"stats": stats, "ranked": ranked, "backend": resolved_backend}
+    return _CACHE
+
+
+def write_artefact(top: int = 20, report: dict | None = None) -> dict:
+    """Stamp the real-corpus gap list to JSON: store_ceiling + embedder backend
+    on every artefact (S11 G2/G6), so a reader can tell which pipeline produced
+    it without re-running anything. `report` defaults to the cached canonical
+    `gap_report()`; pass the caller's own {stats, ranked, backend} (as `main()`
+    does) so a non-default `--clusters`/`--backend` CLI run stamps the artefact
+    it actually printed, rather than silently recomputing the cached default."""
+    report = report or gap_report()
+    ranked = report["ranked"]
+    gaps = ranked[ranked["is_gap"]]
+    payload = {
+        "store_ceiling": EXPECTED_STORE_CEILING,
+        "embedder_backend": report["backend"],
+        "n_assistant_replies": report["stats"]["n_assistant"],
+        "failure_rate": report["stats"]["failure_rate"],
+        "failure_baseline": CHATLOG_FAILURE_BASELINE,
+        "span": report["stats"]["span"],
+        "n_clusters": int(len(ranked)),
+        "n_gaps": int(len(gaps)),
+        "gaps": [
+            {
+                "cluster": int(r["cluster"]), "size": int(r["size"]),
+                "n_failed": int(r["n_failed"]),
+                "failure_density": float(r["failure_density"]),
+                "score": float(r["score"]),
+                "venue_tags": r["venue_tags"],
+                "onset_date": pd.Timestamp(r["onset_date"]).date().isoformat(),
+                "examples": r["examples"],
+            }
+            for _, r in gaps.head(top).iterrows()
+        ],
+    }
+    RESULTS_JSON.write_text(json.dumps(payload, indent=2))
+    return payload
 
 
 def _write_report(stats: dict, ranked: pd.DataFrame, backend: str, top: int) -> None:
@@ -216,6 +302,10 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Chat-log KB-gap detection")
     ap.add_argument("--clusters", type=int, default=12)
     ap.add_argument("--top", type=int, default=5)
+    ap.add_argument("--backend", default="tfidf", choices=["tfidf", "auto"],
+                     help="tfidf (default) is the pinned, committed path; auto is "
+                          "an explicit, noted Ryan-side richer-embedder comparison "
+                          "only, never the wired or committed path")
     args = ap.parse_args()
 
     print("A8 · chat-log KB-gap detection")
@@ -227,7 +317,7 @@ def main() -> int:
     print(f"  window            : {stats['active_days']} active days, "
           f"channels={stats['channels']}")
 
-    ranked, backend = rank_gaps(turns, args.clusters)
+    ranked, backend = rank_gaps(turns, args.clusters, backend=args.backend)
     gaps = ranked[ranked["is_gap"]]
     print(f"  embedding backend : {backend}")
     print(f"  above-baseline SOP gaps: {len(gaps)} of {len(ranked)} clusters "
@@ -241,6 +331,11 @@ def main() -> int:
 
     _write_report(stats, ranked, backend, args.top)
     print(f"  report            : {RESULTS_MD}")
+    if args.backend == "tfidf":
+        artefact = write_artefact(top=args.top,
+                                  report={"stats": stats, "ranked": ranked, "backend": backend})
+        print(f"  artefact          : {RESULTS_JSON} "
+              f"(store_ceiling={artefact['store_ceiling']}, backend={artefact['embedder_backend']})")
 
     baseline_ok = abs(stats["failure_rate"] - CHATLOG_FAILURE_BASELINE) <= 0.01
     has_gap = len(gaps) >= 1 and bool(gaps.iloc[0]["examples"])

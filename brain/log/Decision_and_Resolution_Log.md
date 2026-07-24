@@ -1733,3 +1733,57 @@ them into the append-only log so it is the continuous WP1-to-present record.
     real gap (no event-window cadence tightening), matching the package's own disclosure convention for
     its other scope narrowings. Suites re-verified green after all three fixes. Evidence: report 50
     "Review gate" section.
+
+62. **S11: the chat-log KB-gap signal is wired into the briefing as a fifth source (`sop`), blocked on
+    nothing, unlike its stock/checklist siblings.** `signals.chatlog_kb_gap` was tested and complete but
+    imported by no briefing code (Major 8: three of four learning domains inert). `signals.briefing`
+    gained `_collect_sop(venue)`, called from `collect()` on the same footing as the other four sources,
+    using the `sop` weight (0.35) already declared in `BRIEFING_SOURCE_WEIGHT` but previously unused.
+    The embedder is PINNED to the keyless TF-IDF path (`backend="tfidf"`, the new default for
+    `embed()`/`rank_gaps()`/`gap_report()`) rather than left to the pre-existing three-tier Voyage ->
+    sentence-transformers -> TF-IDF degrade, because three backends would cluster the same corpus three
+    different ways, the same reproducibility defect S3 closed for the forecasting stack; the richer
+    Voyage/sentence-transformers path stays reachable only via an explicit, documented, never-committed
+    `backend="auto"` opt-in. Every artefact is stamped `embedder_backend` + `store_ceiling`. Verified,
+    not asserted, that the pin never even attempts the network path: a test sets a fake
+    `VOYAGE_API_KEY` AND blocks `voyageai` from being importable at all, and the tfidf path still
+    completes. Evidence: report 51 Part 1, `signals/chatlog_kb_gap.py`.
+
+63. **S11: venue attribution for an estate-wide chat corpus is a stated broadcast/exclude decision,
+    not a guess.** A chat-log gap cluster tagged to a real venue (content named it) attaches only
+    there. A cluster naming no venue at all is broadcast to every briefing venue rather than guessed at
+    or silently dropped, because the corpus is single-owner, web-channel product-testing chat (Elliot's
+    AI-GM Questions export) where the overwhelming majority of turns (359 of 376) name no venue at all,
+    so `chatlog_kb_gap`'s "estate" fallback is mostly "unlabelled", not "genuinely cross-venue"; on the
+    real corpus 3 of 4 above-baseline gaps fall into this bucket. A cluster tagged only to a name outside
+    `BRIEFING_VENUES` ("brewery") is excluded, because there is no occurrence definition
+    (`signals.occurrence.occurrence_label`) to gate it against and surfacing it ungated would break the
+    convention every other source respects; 1 of 4 real-corpus gaps falls here. The occurrence gate
+    itself mirrors S10's convention exactly: a definite structural closure (label 0.0) drops the signal,
+    an inert label (NaN, Ellel's no-diary case) is left alone, never fabricated into a pass or a fail.
+    The noise guard (density-above-baseline AND >=2 failures) was proven discriminating, not asserted,
+    against a real clustering run over constructed "ordinary chatter" versus "repeated operational
+    question" text, meeting the standard S10's G1 rewrite established. On the real 735-message corpus:
+    4 of 12 clusters clear the gap threshold, comfortably under the roughly-ten-gap stop condition; the
+    wiring is proven additive (a regression test compares `briefing.build()` with and against
+    `_collect_sop` stubbed to `[]` and finds every non-sop item byte-identical), so **two of four
+    learning domains are now live (sales, chat-log); stock remains blocked on James, checklist on
+    Ryan/Neon.** Evidence: report 51 Parts 2-4, `signals/chatlog_kb_gap.json`,
+    `tests/test_chatlog_briefing.py`.
+
+64. **S11: the review gate found four issues, three fixed before commit, one recorded as a latent
+    non-bug.** `write_artefact()` ignored the CLI's `--clusters`/`--backend` flags (always
+    recomputed the default cached report), letting the committed JSON artefact silently disagree
+    with a non-default run's own printed output; fixed by threading the caller's already-computed
+    `{stats, ranked, backend}` through. `_sop_target_venues`'s majority-tag tie-break iterated a
+    Python `set` (hash-randomised per process), so an exact-count tie between two real venues
+    could pick a different venue across runs; fixed by tie-breaking over `sorted()` instead.
+    `_sop_severity`'s thresholds were hardcoded in `briefing.py` instead of `config.py` alongside
+    every other `BRIEFING_*` ranking knob; moved to `config.BRIEFING_SOP_SEVERITY_HIGH`/`_MEDIUM`.
+    The fourth finding, that `checklist` and `sop` share direction `"na"` and could silently merge
+    once `CHECKLIST_LIVE` flips true, is unreachable today and recorded in `briefing.py`'s module
+    docstring rather than fixed pre-emptively for a path that does not exist yet. The security
+    review's one Medium finding, that a chat-log gap item is the first composed signal to carry
+    free-form user text into the `brain_daily_briefing` agent tool, was addressed with a one-
+    sentence addition to that tool's description stating quoted text is data, not an instruction.
+    Suites re-verified green after all three code fixes. Evidence: report 51 "Review gate" section.

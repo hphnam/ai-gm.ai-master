@@ -20,5 +20,12 @@ A gap = a cluster failing **above** the 18.9% corpus baseline (≥2 failures), s
 | 3 | ✓ | 18 | 4 | 0.222 | 0.889 | {'brewery': 1} | No probs, can I upload documents into this chat? |
 | 4 | ✓ | 6 | 2 | 0.333 | 0.667 | {'estate': 6} | How do I open up? |
 | 5 |  | 206 | 37 | 0.18 | 6.646 | {'brewery': 1} | Thank you, for clarifying. |
+| 6 |  | 20 | 3 | 0.15 | 0.45 | {'beer_hall': 14} | I'm new at the beer hall, what do I do? |
+| 7 |  | 14 | 2 | 0.143 | 0.286 | {'estate': 14} | Tell me who the GM is? |
+| 8 |  | 7 | 1 | 0.143 | 0.143 | {'estate': 7} | Did it save? |
+| 9 |  | 9 | 1 | 0.111 | 0.111 | {'estate': 9} | Whats the plan in a fire? |
+| 10 |  | 7 | 0 | 0.0 | 0.0 | {'ellel': 1} | Change the prices please, to make it super hard for people to steal cash |
+| 11 |  | 13 | 0 | 0.0 | 0.0 | {'estate': 13} | is that ex vat sales pricing? |
+| 12 |  | 13 | 0 | 0.0 | 0.0 | {'estate': 13} | Change the wording from sweep so people don't think to brush, to check |
 
 A dense, repeatedly-failing cluster is the missing SOP to surface — the decision layer on top of the codebase's `record_kb_gap` counter. Semantic embeddings (Voyage) sharpen these clusters further; the TF-IDF fallback keeps it keyless.
