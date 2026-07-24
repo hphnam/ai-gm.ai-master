@@ -51,13 +51,12 @@ WEATHER_BASELINE_DAYS = 120
 
 # --- Residual stream ---------------------------------------------------------
 
-def build_residual_stream(venue: str, con=None) -> pd.DataFrame:
-    """Leakage-free one-step-ahead standardised residual stream over the active
-    span. expected = expanding DOW-median (Rung-1 baseline); scale = conformal
-    half-band-width (level CP_LEVEL) of the training residuals, the shared scale
-    the point-deviation and change-point detectors both read. Detection runs on
-    trading days only (DOW-median > 0), so structural-zero closed days don't
-    distort the stream."""
+def _raw_series(venue: str, con=None) -> pd.DataFrame:
+    """(date, value) over the active span, post-closure zero-extended, the raw
+    input `build_residual_stream`'s walk-forward loop runs over. Factored out
+    so a caller that needs to perturb raw revenue before the walk-forward (the
+    realistic injection pipeline, eval/inject_realistic.py) starts from
+    IDENTICAL preprocessing rather than a second copy that could drift."""
     own = con is None
     con = con or connect(read_only=True)
     try:
@@ -76,7 +75,17 @@ def build_residual_stream(venue: str, con=None) -> pd.DataFrame:
     finally:
         if own:
             con.close()
-    s = s[["date", "value"]].reset_index(drop=True)
+    return s[["date", "value"]].reset_index(drop=True)
+
+
+def build_residual_stream(venue: str, con=None) -> pd.DataFrame:
+    """Leakage-free one-step-ahead standardised residual stream over the active
+    span. expected = expanding DOW-median (Rung-1 baseline); scale = conformal
+    half-band-width (level CP_LEVEL) of the training residuals, the shared scale
+    the point-deviation and change-point detectors both read. Detection runs on
+    trading days only (DOW-median > 0), so structural-zero closed days don't
+    distort the stream."""
+    s = _raw_series(venue, con=con)
     vals = s["value"].to_numpy(float)
     dows = s["date"].dt.dayofweek.to_numpy()
 

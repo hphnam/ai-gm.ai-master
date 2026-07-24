@@ -1674,3 +1674,62 @@ them into the append-only log so it is the continuous WP1-to-present record.
     artefact). Per-step calibration equalises per-step coverage but is not a Winkler win, so under the
     adopt-only-when-it-beats-a-gate rule it is not adopted and `MAX_HORIZON_DAYS` is unchanged, now
     evidenced rather than assumed. Evidence: report 49 Part 3 and FLAGS.md.
+
+57. **S10: the realistic injection pipeline re-runs the DOW-median detection forecaster (not the
+    served ladder) under the production refit cadence, and the substitution is stated.**
+    `RETRAIN_CADENCE_DAYS`/`RETRAIN_ON_CHANGEPOINT` govern the served rung0-4 ladder in production, but
+    the 644-injection corpus's detection recall is scored against `signals.residual.build_residual_stream`,
+    which is always the Rung-1 DOW-median baseline regardless of the served rung. Re-running the full
+    ladder backtest per injected day is compute-intractable inside the package's budget and would not
+    close the realism gap the spec names, since the ladder's rung selection never appears in the
+    detection z-stream. `eval/inject_realistic.py` instead perturbs raw revenue and re-derives
+    `expected`/`scale` under the same governing cadence (weekly plus change-point acceleration) applied
+    to the model actually in the detection loop, stated and flagged per the standing rule (substitute
+    stronger, never weaker). Evidence: report 50, `eval/inject_realistic.py` module docstring.
+
+58. **S10: the propagation gate (G1) is proven discriminating, not vacuous.** A differential check
+    (`expected`/`scale` at the first refit after an injection, perturbed run vs unperturbed run) fires
+    on the intact realistic pipeline and is proven to stay silent on a deliberately broken constructor
+    that refits from the unperturbed array while the caller believes the history was perturbed, the
+    exact defect the gate exists to catch. Evidence: report 50 Part 1,
+    `tests/test_inject_realistic.py::test_propagation_gate_fires_on_a_deliberately_partial_perturbation`.
+
+59. **S10: the realism gap is real but does not inflate the published recall/latency figures; it lands
+    on continuation alerting instead.** A paired subsample (n=120: 64 regime_shift, 32 spike, 24
+    exo_coincident, seed 95) comparing the non-adaptive control pipeline against the realistic one shows
+    recall and detection latency statistically indistinguishable for every kind (paired bootstrap
+    difference 0.0, 95% CI [0.0, 0.0]). The pre-registered prediction (discount concentrated in
+    regime_shift/exo_coincident, near-zero for spike) is refuted in direction, since the discount is
+    zero for every kind, the spec's own stated alternative outcome ("recall stays high, the detection
+    layer is more resilient than Finding 5 assumed"). The real effect is a change-point-triggered
+    refit's feedback loop: it fires in 61-63 percent of sampled sustained-shift pairs and, when it
+    fires, measurably suppresses further alerting on the SAME still-ongoing shift in 16 percent of
+    checked pairs (comparing the production policy to a weekly-only ablation), never the original
+    detection, because the refit trigger IS the change-point detector and so cannot precede the alarm
+    that causes it. Stop condition 2 fires in this bounded form and is reported, not silently absorbed;
+    it does not block the package because it does not touch the recall axis the committed figures are
+    cited on. `FLAG-INJECTION-REALISM-DISCOUNT` closed (measured, zero); `FLAG-CONTINUATION-ALERT-SUPPRESSION`
+    opened. Evidence: report 50 Parts 2-3, `eval/injection_realism.json`.
+
+60. **S10: the control arm still reproduces the committed corpus (G4), and S8b keeps running on the
+    control corpus.** A fresh `eval.agent_eval.run_scaled()` (N=644, deterministic) falls within 3
+    percentage points of every by-kind recall in the committed `log/09_Agent_Eval_Report.md` snapshot
+    (regime_shift 0.996 exact), consistent with store growth since the snapshot's 2026-07-06 date, not
+    a regression from this package's one production change (`signals.residual._raw_series`, a pure
+    extraction exercised continuously by the existing suite). Given the surfaced-item set is
+    statistically the same in both arms, `eval.agent_calibration`'s ECE analysis is recommended to keep
+    running on the control corpus; S8's frozen prompt and pre-registered configuration are untouched.
+    Evidence: report 50 deliverable 6, `tests/test_injection_realism.py::test_control_arm_reproduces_the_committed_corpus`.
+
+61. **S10: the review gate found three real issues, all fixed before commit.** A default-magnitude
+    bug (`_build` fell back to `EVAL_INJECT_SHIFT_Z` instead of `EVAL_INJECT_SPIKE_Z` for an
+    unspecified spike magnitude, silently breaking G3's identical-perturbation guarantee for that call
+    path, though the sampling driver itself always passed magnitude explicitly and so was unaffected);
+    a tautological G1 negative-control test (compared two snapshots both computed from unperturbed
+    data, no discriminating power), rewritten so detection genuinely sees the perturbation while the
+    refit's training frame is withheld from it, and the same differential check used by the positive
+    control is shown to catch exactly that shape of bug; and an overstated docstring claim that
+    `realistic_stream` mirrors `ingest.refresh._should_refit` "exactly", corrected to disclose the one
+    real gap (no event-window cadence tightening), matching the package's own disclosure convention for
+    its other scope narrowings. Suites re-verified green after all three fixes. Evidence: report 50
+    "Review gate" section.

@@ -1,0 +1,2551 @@
+{
+  "store_ceiling": "2026-07-07",
+  "device": "cpu",
+  "sample_seed": 95,
+  "bootstrap_seed": 96,
+  "bootstrap_B": 10000,
+  "onset_position": "early",
+  "target_counts": {
+    "regime_shift": 64,
+    "spike": 32,
+    "exo_coincident": 24
+  },
+  "pool_sizes": {
+    "regime_shift": 84,
+    "spike": 60,
+    "exo_coincident": 72
+  },
+  "n_total": 120,
+  "feedback_loop": {
+    "pairs_checked": 88,
+    "changepoint_refit_fired": 54,
+    "suppression_detected": 14
+  },
+  "stats": {
+    "regime_shift": {
+      "n": 64,
+      "control": {
+        "recall": 1.0,
+        "recall_ci": [0.9439909106133634, 1.0],
+        "precision": 0.8536585365853658,
+        "precision_ci": [0.7583204267648197, 0.9220318532832129],
+        "latency": {
+          "n": 60,
+          "median": 4.0,
+          "q1": 3.0,
+          "q3": 6.0
+        }
+      },
+      "realistic": {
+        "recall": 1.0,
+        "recall_ci": [0.9439909106133634, 1.0],
+        "precision": 0.8588235294117647,
+        "precision_ci": [0.7663753811449798, 0.9248686534535081],
+        "latency": {
+          "n": 60,
+          "median": 4.0,
+          "q1": 3.0,
+          "q3": 6.0
+        }
+      },
+      "paired_bootstrap": {
+        "recall_diff": {
+          "point": 0.0,
+          "ci": [0.0, 0.0]
+        },
+        "precision_diff": {
+          "point": -0.005164992826398818,
+          "ci": [-0.011111420096403481, 0.0]
+        }
+      },
+      "changepoint_triggered_refit_pairs": 39,
+      "changepoint_triggered_refit_rate": 0.609375
+    },
+    "spike": {
+      "n": 32,
+      "control": {
+        "recall": 0.90625,
+        "recall_ci": [0.7497730493162054, 0.9802328198267152],
+        "precision": 1.0,
+        "precision_ci": [0.8575264022774743, 1.0],
+        "latency": {
+          "n": 0,
+          "median": null,
+          "q1": null,
+          "q3": null
+        }
+      },
+      "realistic": {
+        "recall": 0.90625,
+        "recall_ci": [0.7497730493162054, 0.9802328198267152],
+        "precision": 1.0,
+        "precision_ci": [0.8575264022774743, 1.0],
+        "latency": {
+          "n": 0,
+          "median": null,
+          "q1": null,
+          "q3": null
+        }
+      },
+      "paired_bootstrap": {
+        "recall_diff": {
+          "point": 0.0,
+          "ci": [0.0, 0.0]
+        },
+        "precision_diff": {
+          "point": 0.0,
+          "ci": [0.0, 0.0]
+        }
+      },
+      "changepoint_triggered_refit_pairs": 0,
+      "changepoint_triggered_refit_rate": 0.0
+    },
+    "exo_coincident": {
+      "n": 24,
+      "control": {
+        "recall": 1.0,
+        "recall_ci": [0.8575264022774743, 1.0],
+        "precision": 0.7647058823529411,
+        "precision_ci": [0.5882921580928333, 0.8925381842249919],
+        "latency": {
+          "n": 23,
+          "median": 3.0,
+          "q1": 2.0,
+          "q3": 5.0
+        }
+      },
+      "realistic": {
+        "recall": 1.0,
+        "recall_ci": [0.8575264022774743, 1.0],
+        "precision": 0.7837837837837838,
+        "precision_ci": [0.6178635082284505, 0.9017343641645508],
+        "latency": {
+          "n": 23,
+          "median": 3.0,
+          "q1": 2.0,
+          "q3": 5.0
+        }
+      },
+      "paired_bootstrap": {
+        "recall_diff": {
+          "point": 0.0,
+          "ci": [0.0, 0.0]
+        },
+        "precision_diff": {
+          "point": -0.019077901430842648,
+          "ci": [-0.03548114169982563, 0.0]
+        }
+      },
+      "changepoint_triggered_refit_pairs": 15,
+      "changepoint_triggered_refit_rate": 0.625
+    }
+  },
+  "records": {
+    "regime_shift": [
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 10,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 3,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 6,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 6,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 7,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 2
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 2
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 19
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 20
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 11
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 11
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 3.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "changepoint_refits": 4,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 12
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 13
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "changepoint_refits": 8,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 8,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 7,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 7,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 8
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 8
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 7,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 18
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 20
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 3,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 14
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 3,
+          "spurious": 0,
+          "delay": 14
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 10,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 11
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 11
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 12
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 11
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 4,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 8,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 13
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 13
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 7
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 12
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 8,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "changepoint_refits": 4,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 6
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 8
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 11
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 21
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 21
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 3.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 4
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      }
+    ],
+    "spike": [
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 3.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 3,
+        "control": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": false,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 0,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 3,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      }
+    ],
+    "exo_coincident": [
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 10,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 4,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 1,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 4.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 6,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 2
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 2.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 6,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.25,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 7
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 5,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 3
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "up",
+        "z": 2.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 5
+        },
+        "changepoint_refits": 2,
+        "cadence_refits": 3
+      },
+      {
+        "venue": "beer_hall",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 5
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 13
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 3,
+          "spurious": 0,
+          "delay": 13
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 2,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.5,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 4,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.25,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 12
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": 13
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 3.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 8,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 4.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": 1
+        },
+        "changepoint_refits": 9,
+        "cadence_refits": 1
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "down",
+        "z": 1.0,
+        "fold": 1,
+        "control": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 1,
+          "delay": 3
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      },
+      {
+        "venue": "two_river_taps",
+        "direction": "up",
+        "z": 1.0,
+        "fold": 0,
+        "control": {
+          "caught": true,
+          "attributable": 1,
+          "spurious": 0,
+          "delay": null
+        },
+        "realistic": {
+          "caught": true,
+          "attributable": 2,
+          "spurious": 0,
+          "delay": null
+        },
+        "changepoint_refits": 0,
+        "cadence_refits": 4
+      }
+    ]
+  }
+}

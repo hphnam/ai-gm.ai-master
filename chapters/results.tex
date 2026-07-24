@@ -1,22 +1,26 @@
-% Results chapter. Two completed forecasting ablations, each a pre-registered comparison
+% Results chapter. Three completed forecasting studies, each a pre-registered comparison
 % adjudicated by the model confidence set of the methodology chapter: the S5 multi-venue
-% group in-context learning study (report 47) and the S6 lead-matched weather study (report
-% 48). Written to be \input into the thesis body; it reuses the bibliography keys of the
-% methodology chapter (chapters/ref.bib), in particular hansen_model_2011.
+% group in-context learning study (report 47), the S6 lead-matched weather study (report
+% 48), and the S7 conformal interval calibration study (report 49). Written to be \input
+% into the thesis body; it reuses the bibliography keys of the methodology chapter
+% (chapters/ref.bib), in particular hansen_model_2011.
 
 \chapter{Results}
 \label{chap:results}
 
-Two questions about the flagship forecaster admit a clean experimental answer, and this
-chapter reports both. The first is whether forecasting the estate's venues together, so that
-a foundation model can borrow strength across them, beats forecasting each alone. The second
-is how much of the exogenous weather path's apparent value is real once the weather is placed
-on the footing the model would actually have at serving. Both are pre-registered comparisons,
-both are adjudicated by the model confidence set of Chapter~\ref{chap:methodology}, and both
-return a negative result at full prominence rather than a tuned win. Reporting them together
-is deliberate: they share an instrument and a discipline, and each is a case where the honest
-finding is that an appealing elaboration of the forecaster buys nothing the evidence can
-distinguish.
+Three questions about the flagship forecaster admit a clean experimental answer, and this
+chapter reports all three. The first is whether forecasting the estate's venues together, so
+that a foundation model can borrow strength across them, beats forecasting each alone. The
+second is how much of the exogenous weather path's apparent value is real once the weather is
+placed on the footing the model would actually have at serving. The third is whether the
+forecaster's uncertainty band is calibrated, and specifically whether a seven-point
+confrontation window that read as miscalibration survives being measured with power. All three
+are pre-registered comparisons, all three are adjudicated by the model confidence set or an
+exact interval of Chapter~\ref{chap:methodology}, and none returns a tuned win: two return a
+negative result at full prominence, and the third corrects a claim in the opposite direction
+from the one it was raised to investigate. Reporting them together is deliberate: they share an
+instrument and a discipline, and each is a case where measuring properly, rather than trusting
+an appealing prior or a small sample, is the entire finding.
 
 \section{Cross-series in-context learning does not beat the univariate baseline}
 \label{sec:group-icl}
@@ -99,16 +103,70 @@ exogenous numbers at the served venue are not inflated by covariate quality, bec
 venue weather barely matters, and perfect knowledge of the forecast period's weather is worth no
 more than a seven-day-ahead forecast of it.
 
+\section{A seven-point window cannot support a miscalibration claim, and the real problem is the
+opposite one}
+\label{sec:interval-calibration}
+
+% The xu_conformal_2021, gibbs_adaptive_2021 and zaffran_adaptive_2022 keys cited below are
+% expected in the Overleaf root ref.bib (same convention as hansen_model_2011 in
+% chapters/methodology.tex): Xu and Xie, "Conformal prediction interval for dynamic
+% time-series" (2021); Gibbs and Candes, "Adaptive conformal inference under distribution
+% shift" (2021); Zaffran et al., "Adaptive conformal predictions for time series" (2022).
+The forecaster's uncertainty band is split conformal, recalibrated on the residuals accumulated
+strictly before each block, in the temporally robust spirit of EnbPI \citep{xu_conformal_2021}.
+An external assessment of the system read a seven-day confrontation window at the Beer Hall, all
+seven points inside the ninety percent band, as evidence of miscalibration: a band that catches
+everything, the reasoning went, must be too wide. The claim is checked here on its own terms
+before anything else is measured. Under a band that is exactly calibrated at ninety percent, all
+seven independent points fall inside with probability $0.90^7 = 0.478$: a coin-flip-scale event,
+not a signal. The exact Clopper-Pearson interval on a $7/7$ estimate is $[0.590, 1.000]$, which
+contains the nominal $0.90$ and a great deal else. Seven points cannot resolve coverage to better
+than a forty-point-wide interval, and the claim does not survive being stated with its own
+sample size attached.
+
+Measured where there is power to resolve it, the S2 rolling origins pooled to between twelve
+hundred and nineteen hundred interval-observation pairs per venue, the band's real problem is
+the opposite of over-coverage. At the Beer Hall the band significantly \emph{under}-covers:
+marginal coverage $0.871$, Clopper-Pearson $[0.855, 0.887]$, excluding the nominal $0.90$ and
+below nominal at every horizon step within the seven-day cap. This is not an artefact of the
+point model measured: the served exogenous forecaster shows the same shortfall as the classical
+baseline used for the comparison, so the under-coverage is a property of the band, not of which
+point model it wraps. Under-coverage is the unsafe direction for a decision-support band, the
+one in which the interval understates its own uncertainty, so this is reported as a live finding
+rather than folded into an integration change.
+
+Three calibration methods were compared against the served band on the primary metric, the
+Winkler interval score, which is proper and scored in the units of the data: a per-step
+recalibration, and two variants of Adaptive Conformal Inference \citep{gibbs_adaptive_2021},
+a single online-adapted band and an aggregate over a learning-rate grid
+\citep{zaffran_adaptive_2022}. Under a pre-registered rule, a method is adopted only if it both
+enters the ninety percent Winkler confidence set and has the lower mean score at the venue
+concerned. None of the three methods qualifies for adoption anywhere: the extra machinery of
+per-step and adaptive calibration widens the band more than it improves the miss penalty, and
+the incumbent is the Winkler-best or tied-best arm at every venue. The one adaptive method that
+does restore Beer Hall's coverage to nominal is not a Winkler win, because the width it adds
+costs more than the misses it saves, a case where two reasonable scoring rules disagree and the
+pre-registered primary metric, not the more flattering one, settles it. A companion contract
+prediction, that per-step half-width would grow across the horizon, does not reproduce at this
+estate's scale either: the measured per-step half-width is flat, a property of this estate's
+residuals rather than of per-step calibration in general.
+
 \section{A common verdict}
 \label{sec:results-common}
 
-The two studies rhyme. In each, an elaboration of the forecaster that is well motivated in the
-literature and easy to believe in, cross-series learning in the first and a richer weather
-covariate in the second, fails to beat a simpler incumbent once it is measured under a
-pre-registered rule with a multiplicity-aware test. Neither result is a failure of the method in
-general; each is a statement about this estate, at this scale, on this evidence. The value of
-reporting them at full prominence, rather than searching for the venue or the metric on which the
-elaboration wins, is that the model confidence set makes the width of a set the finding. Where
-the data cannot separate the grouped from the univariate forecaster, or the weather-fed from the
-weather-free one, the wider set is the answer, and a spuriously precise winner would say less than
-the honest null.
+The three studies rhyme. In each, a claim or an elaboration that is well motivated, easy to
+believe, and in one case already asserted by an external reviewer, either fails to beat a
+simpler incumbent or fails to survive being measured with the sample size the claim actually
+needs. Cross-series learning does not beat the univariate baseline; a richer weather covariate
+does not beat no weather at the basis serving delivers; and a seven-point miscalibration claim
+does not survive an exact interval, while the calibration problem the exercise does find, the
+opposite of what was alleged, is real and reported at the same prominence. None of the three
+results is a failure of a method in general; each is a statement about this estate, at this
+scale, on this evidence, obtained by the same discipline, a pre-registered comparison,
+adjudicated by a multiplicity-aware test or an exact interval, reported however it comes out.
+The value of reporting all three at full prominence, rather than searching for the venue or the
+metric on which the elaboration or the claim wins, is that the width of a confidence set or an
+exact interval is itself the finding. Where the data cannot separate the grouped from the
+univariate forecaster, the weather-fed from the weather-free one, or a well-calibrated band from
+a miscalibrated one on seven points, the wider set is the answer, and a spuriously precise
+verdict would say less than the honest null.

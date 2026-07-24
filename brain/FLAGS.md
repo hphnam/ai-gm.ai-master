@@ -1067,3 +1067,32 @@ does.
   reader deciding whether to invest further in weather covariates should know the evidence says the
   path is, on this estate, decoration rather than a lever. Evidence: report 48 Part 4,
   `eval/weather_basis_mcs.json`.
+
+## S10 G17i injection realism (report 50)
+
+- **FLAG-INJECTION-REALISM-DISCOUNT (CLOSED, measured; the discount is zero).** Major 5 questioned
+  whether the 644-injection detection corpus's regime-shift recall (0.996) and latency figures were
+  inflated because the injection oracle perturbs z downstream of a forecaster that never sees its own
+  perturbation and never revises `expected`/`scale`. A paired subsample (n=120, seed 95) that re-runs
+  the detection forecaster (the Rung-1 DOW-median + conformal band `signals.residual` actually scores
+  detection against) on perturbed RAW revenue under the production refit cadence
+  (`RETRAIN_CADENCE_DAYS` weekly, `RETRAIN_ON_CHANGEPOINT`) shows recall and latency statistically
+  indistinguishable from the non-adaptive control for every event kind: paired bootstrap difference
+  0.0, 95% CI [0.0, 0.0], for regime_shift, spike, and exo_coincident alike. The published figures are
+  not upper bounds on the caught/how-fast-first-caught axis; they are measured. Evidence: report 50
+  Parts 1-2, `eval/injection_realism.json`.
+
+- **FLAG-CONTINUATION-ALERT-SUPPRESSION (OPEN, a real but narrow effect, not a served-path decision).**
+  The realism gap Major 5 anticipated is real but lands on a different axis than recall: a change-point-
+  triggered refit fires in 61 percent of sampled regime_shift pairs and 63 percent of sampled
+  exo_coincident pairs, and among those, the production refit policy shows strictly fewer post-trigger
+  change-point alarms than a weekly-cadence-only ablation on the identical perturbed history in 14 of 88
+  (16 percent) of checked pairs, comparing the production policy to a weekly-only ablation
+  (`eval.inject_realistic.feedback_loop_effect`). This can make the detector blind to a shift's own
+  continuation after the first catch, in a measured minority of cases; it never suppresses the ORIGINAL
+  alarm (the refit trigger IS the change-point detector, so it cannot fire before the covering alarm
+  already has). No served path is implicated (this is the offline detection z-stream, not `/forecast`),
+  so this is a research finding about the change-point layer's own recalibration loop, not a serving
+  decision. Owner: a future package deciding whether continuation alerting needs its own mechanism (e.g.
+  a cooldown-aware re-arm) is in scope; this flag exists so the finding is not lost. Evidence: report 50
+  Part 3.
