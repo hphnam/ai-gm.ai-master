@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh",
+      "label": "notify.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "label": "notify.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "command",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L10"
+    },
+    {
+      "language": "bash",
+      "callee": "osascript",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L21"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L22"
+    },
+    {
+      "language": "bash",
+      "callee": "notify-send",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L27"
+    },
+    {
+      "language": "bash",
+      "callee": "powershell.exe",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_notify_sh__entry",
+      "source_file": ".claude/hooks/notify.sh",
+      "source_location": "L33"
+    }
+  ],
+  "bash_sources": []
+}

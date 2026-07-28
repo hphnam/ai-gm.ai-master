@@ -1,0 +1,358 @@
+{
+  "nodes": [
+    {
+      "id": "brain_sim_ruler_comparison_doc",
+      "label": "Ruler Comparison: One Forecast, Four Denominators",
+      "file_type": "document",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_calendar_lag7",
+      "label": "calendar_lag7 (reported ruler basis)",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_trading_lag7",
+      "label": "trading_lag7",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_trading_same_weekday",
+      "label": "trading_same_weekday",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_calendar_lag7_active",
+      "label": "calendar_lag7_active",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_venue_ruler",
+      "label": "harness.venue_ruler",
+      "file_type": "code",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_fill_calendar",
+      "label": "fill_calendar",
+      "file_type": "code",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_restore_clock",
+      "label": "sim.restore_clock",
+      "file_type": "code",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_june_confront_rescored",
+      "label": "sim/june2026_confront_rescored.json",
+      "file_type": "document",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_july_confront_rescored",
+      "label": "sim/july2026_confront_rescored.json",
+      "file_type": "document",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_july_w2_confront_rescored",
+      "label": "sim/july2026_w2_confront_rescored.json",
+      "file_type": "document",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_winkler",
+      "label": "Winkler score (width-sensitive coverage scoring)",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_s1",
+      "label": "S1 (full-store gate stage)",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_s3",
+      "label": "S3 (confrontation-cutoff pinning stage)",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_ruler_comparison_s4",
+      "label": "S4 (ladder re-scoring stage)",
+      "file_type": "concept",
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_calendar_lag7",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_trading_lag7",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_trading_same_weekday",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_calendar_lag7_active",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_venue_ruler",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_venue_ruler",
+      "target": "brain_sim_ruler_comparison_fill_calendar",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_restore_clock",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_june_confront_rescored",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_july_confront_rescored",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_july_w2_confront_rescored",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_winkler",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_calendar_lag7_active",
+      "target": "brain_sim_ruler_comparison_s4",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_doc",
+      "target": "brain_sim_ruler_comparison_s3",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_venue_ruler",
+      "target": "brain_sim_ruler_comparison_s1",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_july_confront_rescored",
+      "target": "brain_sim_july2026_forecast_frozen_pre_registration",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_july_w2_confront_rescored",
+      "target": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_ruler_comparison_june_confront_rescored",
+      "target": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/sim/ruler_comparison.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "pre_registration_chain",
+      "label": "Pre-registration chain across frozen forecasts",
+      "nodes": [
+        "brain_sim_july2026_forecast_frozen_pre_registration",
+        "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+        "brain_sim_july2026_w2b_forecast_frozen_pre_registration",
+        "brain_sim_june2026_forecast_frozen_pre_registration",
+        "brain_sim_ruler_comparison_calendar_lag7"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/sim/ruler_comparison.md"
+    }
+  ]
+}

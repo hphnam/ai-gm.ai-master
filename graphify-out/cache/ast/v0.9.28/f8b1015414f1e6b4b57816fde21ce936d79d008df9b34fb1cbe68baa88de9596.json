@@ -1,0 +1,965 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "label": "cadence_sweep.py",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "label": "_actuals_l1()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L43",
+      "_callable": true
+    },
+    {
+      "id": "series",
+      "label": "Series",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/sim/cadence_sweep.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "label": "_l2_actuals_and_scale()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L52",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "label": "_predict()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L101",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_mase",
+      "label": "_mase()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L111",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "label": "_sweep_venue()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L117",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L179",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_rationale_1",
+      "label": "G12.15c - refresh-cadence sweep over June (item-demand focus, on MPS).  Analysis",
+      "file_type": "rationale",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_rationale_53",
+      "label": "June L2 category actuals + per-category seasonal-naive scale + recent share.",
+      "file_type": "rationale",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L53"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "time",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "eval",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "features_build_features",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "ingest_world_cup",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "models_foundation",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "models_ladder",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "sim_build_frozen_forecast",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "store_active_span",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "target": "series",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_mase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L117",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "target": "series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L122",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L145",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_mase",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L167",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_rationale_53",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L53",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "loads",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L44",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "read_text",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L44",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "DataFrame",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L45",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "JUNE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L47"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L48",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L49",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "JUNE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L49"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_actuals_l1",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L49",
+      "receiver": "df"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "loads",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L63",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "read_text",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L63",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "DataFrame",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L64",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L65",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L67",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L67",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L70",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L70",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L73",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L76",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L77",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L78",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L79",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L83",
+      "receiver": "hist"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L84",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L85"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L84",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L84",
+      "receiver": "g"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L85",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "seasonal_naive_scale",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L94",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L96",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "JUNE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L97"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_l2_actuals_and_scale",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L96",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "callee": "chronos2_exo_predict",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L104",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "callee": "CHRONOS2_EXO_COLS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L105"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "callee": "rung2_ets",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L107",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_predict",
+      "callee": "rung1_robust_dow",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L108",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_mase",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L112",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_mase",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L114",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "trim_to_active",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L118",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L118",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "venue_ruler",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L120",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L123",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "world_cup_features",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L123",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "JUNE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L123"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L128",
+      "receiver": "CADENCES"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L129",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "time",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L131",
+      "receiver": "time"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L133",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L133",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L134",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L138",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "copy",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L142",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "build_future_frame",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L142",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L143",
+      "receiver": "av"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "concat",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L144",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "build_future_frame",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L145",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "time",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L148",
+      "receiver": "time"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L151",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L151",
+      "receiver": "av"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L152",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L159",
+      "receiver": "l2_shares"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L160",
+      "receiver": "l2_scales"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L161",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L163",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L163",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L164",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L165",
+      "receiver": "l2_vals"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L165",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L170",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_sweep_venue",
+      "callee": "date",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L171",
+      "receiver": "first_fixture"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "assert_store_ceiling",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L180",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L185",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L189",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "chronos2_runtime_info",
+      "is_member_call": false,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L189",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L190",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_cadence_sweep_run",
+      "callee": "dumps",
+      "is_member_call": true,
+      "source_file": "brain/sim/cadence_sweep.py",
+      "source_location": "L190",
+      "receiver": "json"
+    }
+  ]
+}

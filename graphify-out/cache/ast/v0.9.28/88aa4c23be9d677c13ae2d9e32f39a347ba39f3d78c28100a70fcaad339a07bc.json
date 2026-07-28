@@ -1,0 +1,1109 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "label": "methods.py",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "label": "safe_conformal_quantile()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L30",
+      "_callable": true
+    },
+    {
+      "id": "ndarray",
+      "label": "ndarray",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/conformal/methods.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_pinball",
+      "label": "_pinball()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L49",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_interval_pinball",
+      "label": "interval_pinball()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L54",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "label": "plain_band()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "label": "mondrian_band()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "label": "perstep_band()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "label": "ACI",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L90",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_post_init",
+      "label": ".__post_init__()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L106",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_clamped_level",
+      "label": "._clamped_level()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L111",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "label": ".band()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_update_step",
+      "label": ".update_step()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L130",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "label": "AgACI",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L141",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_post_init",
+      "label": ".__post_init__()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L156",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_weights",
+      "label": "._weights()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L160",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "label": ".band()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "label": ".update_step()",
+      "file_type": "code",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L185",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_1",
+      "label": "S7 G17h - the five conformal banding methods compared on step-1 rolling origins.",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_31",
+      "label": "Split-conformal quantile (k-th smallest |residual|) safe over the whole [0, 1] r",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L31"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_55",
+      "label": "Summed pinball loss of an interval's two quantiles; the AgACI expert loss.",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_91",
+      "label": "Per-step Gibbs-Candes ACI. `eff[h]` is the effective miscoverage alpha for step",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L91"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_131",
+      "label": "Nudge step `step`'s effective miscoverage from ONE observed outcome. Called with",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L131"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_142",
+      "label": "Per-step online aggregation of ACI experts over a grid of learning rates. Each e",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L142"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_186",
+      "label": "Update every expert's cumulative loss and ACI state at step `step` from one",
+      "file_type": "rationale",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L186"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "math",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "dataclasses",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L25",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_pinball",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_interval_pinball",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_post_init",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_clamped_level",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_update_step",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_post_init",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L156",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_weights",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_weights",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_interval_pinball",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_pinball",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_clamped_level",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_post_init",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L157",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_weights",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L178",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_interval_pinball",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L189",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_31",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_55",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_interval_pinball",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_91",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_131",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_update_step",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_142",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_rationale_186",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L186",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "callee": "sort",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L37",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L37",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L37"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_safe_conformal_quantile",
+      "callee": "ceil",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L45",
+      "receiver": "math"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_plain_band",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L64",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "unique",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L71",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L72",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L72"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L72",
+      "receiver": "per_state"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "where",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L73",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "isnan",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L73",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_mondrian_band",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L74",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "unique",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L81",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L82",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L82"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L82",
+      "receiver": "per_step"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "where",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L83",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "isnan",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L83",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_perstep_band",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L84",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "callee": "empty",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L123",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_aci_band",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L128",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_post_init",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L158",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_weights",
+      "callee": "exp",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L163",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "empty",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L168",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "empty",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L169",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "empty",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L172",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "empty",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L173",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L176",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L176",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "dot",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L179",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_band",
+      "callee": "dot",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L180",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_conformal_methods_agaci_update_step",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/conformal/methods.py",
+      "source_location": "L188",
+      "receiver": "np"
+    }
+  ]
+}

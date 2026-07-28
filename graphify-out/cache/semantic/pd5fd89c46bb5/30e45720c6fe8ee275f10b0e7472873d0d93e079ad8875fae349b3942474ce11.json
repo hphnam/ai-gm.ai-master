@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_07_live_ingest_report",
+      "label": "PRJ93 Live Ingest, Freshness & Conditional Retrain Report",
+      "file_type": "document",
+      "source_file": "brain/log/07_Live_Ingest_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_07_live_ingest_report_three_tier_model",
+      "label": "Three-tier freshness/cost model (T1 live facts / T2 incremental append / T3 re-learn)",
+      "file_type": "concept",
+      "source_file": "brain/log/07_Live_Ingest_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_07_live_ingest_report",
+      "target": "brain_log_03_build_report_current",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/07_Live_Ingest_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

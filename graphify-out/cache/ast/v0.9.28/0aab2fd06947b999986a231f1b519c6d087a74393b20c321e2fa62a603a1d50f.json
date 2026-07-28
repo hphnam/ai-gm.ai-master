@@ -1,0 +1,904 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "label": "test_chatlog_briefing.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "label": "_fake_ranked()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L25",
+      "_callable": true
+    },
+    {
+      "id": "date",
+      "label": "date",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_chatlog_briefing.py"
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_chatlog_briefing.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "label": "_patch_report()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L35",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_pinned_backend_ignores_a_present_key_and_touches_no_network",
+      "label": "test_pinned_backend_ignores_a_present_key_and_touches_no_network()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L43",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "label": "test_rank_gaps_defaults_to_the_pinned_backend()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L56",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_unknown_backend_is_rejected",
+      "label": "test_unknown_backend_is_rejected()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L70",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "label": "_mixed_corpus_ranked()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L101",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ordinary_non_repeating_chatter_is_not_flagged_as_a_gap",
+      "label": "test_ordinary_non_repeating_chatter_is_not_flagged_as_a_gap()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L116",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_repeated_operational_question_is_flagged_as_a_gap",
+      "label": "test_a_repeated_operational_question_is_flagged_as_a_gap()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L124",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "label": "test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L137",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_sop_source_carries_its_own_declared_weight",
+      "label": "test_sop_source_carries_its_own_declared_weight()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L153",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_cannot_be_surfaced_on_a_structural_zero_day",
+      "label": "test_a_gap_cannot_be_surfaced_on_a_structural_zero_day()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L160",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_is_surfaced_on_a_trading_day",
+      "label": "test_a_gap_is_surfaced_on_a_trading_day()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L165",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ellels_inert_occurrence_never_gates_a_gap",
+      "label": "test_ellels_inert_occurrence_never_gates_a_gap()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L170",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue",
+      "label": "test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L179",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated",
+      "label": "test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L189",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "label": "test_wiring_sop_does_not_change_non_sop_briefing_items()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L198",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_rationale_1",
+      "label": "S11 tests - the chat-log KB-gap signal, wired into the briefing (G1-G4).  G1 wir",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "sys",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "signals",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "target": "date",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "target": "date",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_pinned_backend_ignores_a_present_key_and_touches_no_network",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_unknown_backend_is_rejected",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ordinary_non_repeating_chatter_is_not_flagged_as_a_gap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_repeated_operational_question_is_flagged_as_a_gap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L124",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_sop_source_carries_its_own_declared_weight",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L153",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_cannot_be_surfaced_on_a_structural_zero_day",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_is_surfaced_on_a_trading_day",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L165",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ellels_inert_occurrence_never_gates_a_gap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L179",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L189",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L198",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ordinary_non_repeating_chatter_is_not_flagged_as_a_gap",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L117",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_repeated_operational_question_is_flagged_as_a_gap",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_cannot_be_surfaced_on_a_structural_zero_day",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_is_surfaced_on_a_trading_day",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L166",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ellels_inert_occurrence_never_gates_a_gap",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L173",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L181",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "callee": "FRYER_EXAMPLE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L30"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_fake_ranked",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L31",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_patch_report",
+      "callee": "briefing",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L37"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_pinned_backend_ignores_a_present_key_and_touches_no_network",
+      "callee": "setenv",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L44",
+      "receiver": "monkeypatch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_pinned_backend_ignores_a_present_key_and_touches_no_network",
+      "callee": "setitem",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L48",
+      "receiver": "monkeypatch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_pinned_backend_ignores_a_present_key_and_touches_no_network",
+      "callee": "embed",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L51",
+      "receiver": "chatlog_kb_gap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "callee": "setenv",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L57",
+      "receiver": "monkeypatch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "callee": "setitem",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L58",
+      "receiver": "monkeypatch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L62",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_rank_gaps_defaults_to_the_pinned_backend",
+      "callee": "rank_gaps",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L66",
+      "receiver": "chatlog_kb_gap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_unknown_backend_is_rejected",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L71",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_unknown_backend_is_rejected",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L71"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_unknown_backend_is_rejected",
+      "callee": "embed",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L72",
+      "receiver": "chatlog_kb_gap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L102",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "_ORDINARY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L104"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L105",
+      "receiver": "rows"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L105",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "_REPEATED",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L107"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L108",
+      "receiver": "rows"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L108",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_mixed_corpus_ranked",
+      "callee": "rank_gaps",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L111",
+      "receiver": "chatlog_kb_gap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ordinary_non_repeating_chatter_is_not_flagged_as_a_gap",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L119",
+      "receiver": "e"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_repeated_operational_question_is_flagged_as_a_gap",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L127",
+      "receiver": "e"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L138"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L139",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "_build_item",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L143",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L143"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L145",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L146",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "_score",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L149",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_known_repeated_question_cluster_becomes_a_ranked_briefing_item",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L149"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_cannot_be_surfaced_on_a_structural_zero_day",
+      "callee": "BEER_HALL_CLOSED_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L161"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_cannot_be_surfaced_on_a_structural_zero_day",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L162",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_is_surfaced_on_a_trading_day",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L166"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_gap_is_surfaced_on_a_trading_day",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L167",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ellels_inert_occurrence_never_gates_a_gap",
+      "callee": "BEER_HALL_CLOSED_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L173"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_ellels_inert_occurrence_never_gates_a_gap",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L174",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L181"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_an_unnamed_venue_cluster_is_broadcast_to_every_briefing_venue",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L183",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated",
+      "callee": "BEER_HALL_TRADING_DAY",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L191"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_a_brewery_only_cluster_is_excluded_not_surfaced_ungated",
+      "callee": "_collect_sop",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L193",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "callee": "build",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L201",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "callee": "build",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L202",
+      "receiver": "briefing"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "callee": "briefing",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L205"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_chatlog_briefing_test_wiring_sop_does_not_change_non_sop_briefing_items",
+      "callee": "build",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_chatlog_briefing.py",
+      "source_location": "L206",
+      "receiver": "briefing"
+    }
+  ]
+}

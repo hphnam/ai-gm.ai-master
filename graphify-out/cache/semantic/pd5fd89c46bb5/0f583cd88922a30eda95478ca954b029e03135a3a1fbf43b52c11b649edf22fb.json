@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "brain_store_conformal_coverage_beer_hall_chart",
+      "label": "A5 Conformal Coverage Chart \u2014 rung2_ets (The Beer Hall L1)",
+      "file_type": "image",
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_beer_hall_conformal_prediction",
+      "label": "Conformal Prediction (empirical vs nominal coverage)",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_beer_hall_mondrian_conformal",
+      "label": "Mondrian Conformal Prediction",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_beer_hall_rung2_ets",
+      "label": "rung2_ets Forecast Model",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_store_conformal_coverage_beer_hall_chart",
+      "target": "brain_store_conformal_coverage_beer_hall_conformal_prediction",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_beer_hall_chart",
+      "target": "brain_store_conformal_coverage_beer_hall_mondrian_conformal",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_beer_hall_chart",
+      "target": "brain_store_conformal_coverage_beer_hall_rung2_ets",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_beer_hall_mondrian_conformal",
+      "target": "brain_store_conformal_coverage_beer_hall_conformal_prediction",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_beer_hall_chart",
+      "target": "brain_store_conformal_coverage_beer_hall_rung2_ets",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/store/conformal_coverage_beer_hall.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

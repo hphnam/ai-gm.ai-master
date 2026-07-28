@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_group_icl_s5",
+      "label": "S5 G17f \u2014 group in-context learning: 3-arm run (univariate vs two grouped arms) and Model Confidence Set; grouping loses at Two River Taps",
+      "file_type": "document",
+      "source_file": "brain/eval/group_icl.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_eval_group_icl_s5",
+      "target": "brain_readme_venue_two_river_taps",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/group_icl.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

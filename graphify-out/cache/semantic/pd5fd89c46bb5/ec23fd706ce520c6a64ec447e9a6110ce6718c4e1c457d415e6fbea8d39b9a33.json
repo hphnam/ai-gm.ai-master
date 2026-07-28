@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_21_g12_13a_frozen_forecast_report",
+      "label": "Report 21 - G12.13a Frozen Forecast Report (Pass 1 of 2)",
+      "file_type": "document",
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_21_g12_13a_frozen_forecast_report_preregistration_methodology",
+      "label": "Blind pre-registration methodology (freeze-before-confront)",
+      "file_type": "rationale",
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_21_g12_13a_frozen_forecast_report_chronos2_exo_model",
+      "label": "rung4_chronos2_exo served forecasting model",
+      "file_type": "concept",
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_21_g12_13a_frozen_forecast_report_world_cup_fixture_covariates",
+      "label": "World Cup fixture covariates (wc_* / in-hours flags)",
+      "file_type": "concept",
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_21_g12_13a_frozen_forecast_report",
+      "target": "brain_log_21_g12_13a_frozen_forecast_report_preregistration_methodology",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_21_g12_13a_frozen_forecast_report",
+      "target": "brain_log_21_g12_13a_frozen_forecast_report_chronos2_exo_model",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_21_g12_13a_frozen_forecast_report",
+      "target": "brain_log_21_g12_13a_frozen_forecast_report_world_cup_fixture_covariates",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_21_g12_13a_frozen_forecast_report",
+      "target": "brain_log_23_g12_13_canonical_reconciliation_report_mint_vs_disaggregation_split",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/21_G12_13a_Frozen_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

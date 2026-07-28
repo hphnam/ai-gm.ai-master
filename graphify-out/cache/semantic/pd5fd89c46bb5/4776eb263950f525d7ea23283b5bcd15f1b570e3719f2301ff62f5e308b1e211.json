@@ -1,0 +1,552 @@
+{
+  "nodes": [
+    {
+      "id": "brain_flags_overview",
+      "label": "FLAGS.md \u2014 standing flags, open confirmations, and data caveats register",
+      "file_type": "document",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_cp1",
+      "label": "FLAG-CP1 \u2014 CUSUM threshold h=5.0 chosen deliberately; binding constraint is delay, not false-alarm rate",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_fe1",
+      "label": "FLAG-FE1 \u2014 weather IS a live input to the served Beer Hall Chronos-2-exo model, corrected from an earlier unscoped claim",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_fe10",
+      "label": "FLAG-FE10 \u2014 no exogenous feature adopted, scoped strictly to the Rung-3 GBM, not the served Rung-4 model",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_mase_intermittent",
+      "label": "FLAG-MASE-INTERMITTENT \u2014 MASE flatters intermittent booking-driven series, must report absolute error and coverage alongside it",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_band_horizon",
+      "label": "FLAG-BAND-HORIZON \u2014 CLOSED: per-step conformal built and measured, not adopted (no Winkler win); MAX_HORIZON_DAYS stays 7",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_band_undercoverage_bh",
+      "label": "FLAG-BAND-UNDERCOVERAGE-BH \u2014 OPEN: served Beer Hall Mondrian band under-covers (0.871 vs nominal 0.90)",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_store_durability",
+      "label": "FLAG-STORE-DURABILITY \u2014 RESOLVED: full pytest suite silently rebuilds the store to the May-seed ceiling; fixed with loud guard, suite isolation, one build entrypoint",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_mase_ruler",
+      "label": "FLAG-MASE-RULER \u2014 RESOLVED for L1: four private uncoordinated seasonal-scale implementations unified into eval.harness.seasonal_naive_scale with an explicit basis argument",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_l2_denominator",
+      "label": "FLAG-L2-DENOMINATOR \u2014 re-scoped: category-level seasonal-naive denominator now named and single-sourced, undocumented-basis defect closed",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_ellel_june_exo",
+      "label": "FLAG-ELLEL-JUNE-EXO \u2014 CLOSED: 9-day Ellel weather hole was an ingest completeness bug, fixed with _assert_span_complete",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_ellel_diary",
+      "label": "FLAG-ELLEL-DIARY \u2014 OPEN: occurrence gate needs Ellel's booking diary; seam built inert, self-leak impossible by construction",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_s8b_live_run",
+      "label": "FLAG-S8B-LIVE-RUN \u2014 OPEN: briefing-triage agent apparatus built and tested, but needs 644 live model calls and no ANTHROPIC_API_KEY here",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_trt_constructed_zeros",
+      "label": "FLAG-TRT-CONSTRUCTED-ZEROS \u2014 RESOLVED by a stronger check: TRT post-closure zeros are fill_calendar constructions, not stored observations, but factually correct",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_group_exo",
+      "label": "FLAG-GROUP-EXO \u2014 OPEN, future work: grouping venues WITH covariates not run, would confound cross-series ICL with covariate effects",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_weather_pinned_model",
+      "label": "FLAG-WEATHER-PINNED-MODEL \u2014 RESOLVED by choice: pinned ecmwf_ifs025 isolates forecast-skill decay with lead from model-selection confounds",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_weather_decoration",
+      "label": "FLAG-WEATHER-DECORATION \u2014 finding, not a defect: on the serving-realistic basis, weather does not distinguishably improve the forecast at any venue",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_injection_realism_discount",
+      "label": "FLAG-INJECTION-REALISM-DISCOUNT \u2014 CLOSED: adaptive-forecaster realism discount on the 644-injection detection corpus is measured at zero",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_continuation_alert_suppression",
+      "label": "FLAG-CONTINUATION-ALERT-SUPPRESSION \u2014 OPEN, narrow: refit policy shows fewer post-trigger alarms in 16% of checked pairs, never suppresses the original alarm",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_learning_domains_status",
+      "label": "FLAG-LEARNING-DOMAINS-STATUS \u2014 two of four learning domains now live (sales, chat-log); stock blocked on James, checklist blocked on Neon export",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_chatlog_venue_attribution",
+      "label": "FLAG-CHATLOG-VENUE-ATTRIBUTION \u2014 recorded scope narrowing: single-owner web-channel chat, un-venue-named gaps broadcast to every briefing venue",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_cross_venue_blind",
+      "label": "FLAG-CROSS-VENUE-BLIND \u2014 OPEN, structural: is_ellel_event is fit on real signal but pinned to 0 on every served forecast horizon; measured effect is substitution, not spillover",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_taxonomy_drift",
+      "label": "FLAG-TAXONOMY-DRIFT \u2014 DECIDED not to wire since=recent-window ranking: it worsens MASE, moves venues in opposite directions, never fixes the named LuneBrew Pilsner item",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_fixture_anticipation",
+      "label": "FLAG-FIXTURE-ANTICIPATION \u2014 OPEN, honest negative: home-nation fixture anticipation not established, 11 July out-of-sample test failed in sign",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_flags_flag_segment_false_reject",
+      "label": "FLAG-SEGMENT-FALSE-REJECT \u2014 OPEN by design: a venue reopening after long closure is refused, and a trailing-segment exemption would relight dormant venues",
+      "file_type": "rationale",
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_flags_flag_fe1",
+      "target": "brain_eval_weather_basis_s6",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_weather_pinned_model",
+      "target": "brain_eval_weather_basis_s6",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_weather_decoration",
+      "target": "brain_eval_weather_basis_s6",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_ellel_june_exo",
+      "target": "brain_eval_weather_basis_s6",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_band_horizon",
+      "target": "brain_eval_interval_calibration_s7",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_band_undercoverage_bh",
+      "target": "brain_eval_interval_calibration_s7",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_mase_ruler",
+      "target": "glossary_mase",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_mase_intermittent",
+      "target": "glossary_mase",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_l2_denominator",
+      "target": "glossary_mase",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_mase_intermittent",
+      "target": "brain_flags_flag_l2_denominator",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_ellel_diary",
+      "target": "glossary_is_ellel_event",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_cross_venue_blind",
+      "target": "glossary_is_ellel_event",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_fixture_anticipation",
+      "target": "glossary_exo_covariate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_fixture_anticipation",
+      "target": "brain_flags_flag_cross_venue_blind",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_taxonomy_drift",
+      "target": "brain_eval_intermittency_diagnostic_wp2",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_group_exo",
+      "target": "brain_eval_group_icl_s5",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_trt_constructed_zeros",
+      "target": "brain_eval_group_icl_s5",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_s8b_live_run",
+      "target": "brain_eval_judge_prompts_llm_judge",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_injection_realism_discount",
+      "target": "prj93_agent_eval_report_scaled_injection_grid",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_continuation_alert_suppression",
+      "target": "brain_flags_flag_injection_realism_discount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_continuation_alert_suppression",
+      "target": "brain_eval_change_point_eval_arl0",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_learning_domains_status",
+      "target": "brain_flags_flag_chatlog_venue_attribution",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_flag_learning_domains_status",
+      "target": "brain_readme_state_held_tables",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_overview",
+      "target": "brain_data_opening_and_closing_checklist_document",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_overview",
+      "target": "brain_flags_flag_store_durability",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_flags_overview",
+      "target": "brain_flags_flag_cp1",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_s1_metric_integrity",
+      "label": "S1 G17a metric-integrity flag set (report 42)",
+      "nodes": ["brain_flags_flag_mase_ruler", "brain_flags_flag_l2_denominator", "glossary_mase"],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/FLAGS.md"
+    }
+  ]
+}

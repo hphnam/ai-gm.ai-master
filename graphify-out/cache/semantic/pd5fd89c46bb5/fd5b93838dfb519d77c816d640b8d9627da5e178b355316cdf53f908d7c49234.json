@@ -1,0 +1,153 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_aci_closure_coverage_chart",
+      "label": "ACI vs Static Coverage Across the two_river_taps Closure (chart)",
+      "file_type": "image",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_adaptive_conformal_inference",
+      "label": "Adaptive Conformal Inference (ACI)",
+      "file_type": "concept",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_static_prediction_interval_coverage",
+      "label": "Static Prediction Interval Coverage (nominal 0.90)",
+      "file_type": "concept",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_rolling_28day_coverage",
+      "label": "Rolling 28-day Coverage Metric",
+      "file_type": "concept",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_two_river_taps_closure_event",
+      "label": "two_river_taps Venue Closure Event (case study)",
+      "file_type": "concept",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_aci_gamma_step_size",
+      "label": "ACI Gamma (Adaptation Step-Size) Parameter",
+      "file_type": "concept",
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_eval_aci_closure_coverage_chart",
+      "target": "concept_adaptive_conformal_inference",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_aci_closure_coverage_chart",
+      "target": "concept_static_prediction_interval_coverage",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_aci_closure_coverage_chart",
+      "target": "concept_rolling_28day_coverage",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_aci_closure_coverage_chart",
+      "target": "concept_two_river_taps_closure_event",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_adaptive_conformal_inference",
+      "target": "concept_aci_gamma_step_size",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_adaptive_conformal_inference",
+      "target": "concept_static_prediction_interval_coverage",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_two_river_taps_closure_event",
+      "target": "concept_rolling_28day_coverage",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_adaptive_conformal_inference",
+      "target": "concept_two_river_taps_closure_event",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "brain/eval/aci_closure_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

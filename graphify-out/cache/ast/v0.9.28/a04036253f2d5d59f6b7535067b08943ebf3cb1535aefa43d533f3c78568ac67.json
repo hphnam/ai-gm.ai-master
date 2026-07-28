@@ -1,0 +1,199 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh",
+      "label": "block-dangerous-commands.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "label": "block-dangerous-commands.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_emit_deny",
+      "label": "emit_deny()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L11",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_cmd",
+      "label": "contains_cmd()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L35",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_icmd",
+      "label": "contains_icmd()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L36",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_emit_deny",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_cmd",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_icmd",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_emit_deny",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_cmd",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L39",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_icmd",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L77",
+      "weight": 1.0,
+      "context": "call"
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "set",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L9"
+    },
+    {
+      "language": "bash",
+      "callee": "command",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L18"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L24"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L52"
+    },
+    {
+      "language": "bash",
+      "callee": "grep",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L52"
+    },
+    {
+      "language": "bash",
+      "callee": "awk",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_sh__entry",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L82"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_emit_deny",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L14"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_emit_deny",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L15"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_cmd",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L35"
+    },
+    {
+      "language": "bash",
+      "callee": "grep",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_cmd",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L35"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_icmd",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L36"
+    },
+    {
+      "language": "bash",
+      "callee": "grep",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_block_dangerous_commands_contains_icmd",
+      "source_file": ".claude/hooks/block-dangerous-commands.sh",
+      "source_location": "L36"
+    }
+  ],
+  "bash_sources": []
+}

@@ -1,0 +1,206 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_48_g17g_weather_basis_report",
+      "label": "Report 48: S6 G17g \u2014 Lead-matched Weather and the Exogenous Path",
+      "file_type": "document",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_weather_basis_module",
+      "label": "models/weather_basis.py \u2014 horizon-matched exo wrapper + lead gate",
+      "file_type": "code",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_exog_weather_module",
+      "label": "ingest/exog_weather.py \u2014 completeness assertion, repair_span, horizon store",
+      "file_type": "code",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_ellel_june_gap_fix",
+      "label": "Ellel June weather gap: partial-fetch-recorded-as-complete, fixed by _assert_span_complete",
+      "file_type": "rationale",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_horizon_matched_basis",
+      "label": "Horizon-matched weather basis pinned to ecmwf_ifs025",
+      "file_type": "rationale",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_lead_gate",
+      "label": "assert_lead_matched lead gate (G1, load-bearing)",
+      "file_type": "rationale",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+      "label": "Weather does not distinguishably improve the forecast at any venue (decoration)",
+      "file_type": "rationale",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_flag_ellel_june_exo",
+      "label": "FLAG-ELLEL-JUNE-EXO (closed)",
+      "file_type": "concept",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_48_g17g_weather_basis_flag_weather_pinned_model",
+      "label": "FLAG-WEATHER-PINNED-MODEL",
+      "file_type": "concept",
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_48_g17g_weather_basis_report",
+      "target": "brain_log_48_g17g_weather_basis_weather_basis_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_report",
+      "target": "brain_log_48_g17g_weather_basis_exog_weather_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_exog_weather_module",
+      "target": "brain_log_48_g17g_weather_basis_ellel_june_gap_fix",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_ellel_june_gap_fix",
+      "target": "brain_log_48_g17g_weather_basis_flag_ellel_june_exo",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_weather_basis_module",
+      "target": "brain_log_48_g17g_weather_basis_horizon_matched_basis",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_horizon_matched_basis",
+      "target": "brain_log_48_g17g_weather_basis_flag_weather_pinned_model",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_weather_basis_module",
+      "target": "brain_log_48_g17g_weather_basis_lead_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_report",
+      "target": "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_report",
+      "target": "brain_log_47_g17f_group_icl_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+      "target": "brain_models_ladder_results_l1_beer_hall_milestone_result",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/48_G17g_Weather_Basis.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_17_g12_9_report",
+      "label": "PRJ93 G12.9 Implementation Report (Fold Unification, Ellel Uncap)",
+      "file_type": "document",
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_17_g12_9_report_ellel_uncap",
+      "label": "Ellel ladder uncapping (MAX_RUNG={}) plus per-fold ladder_selection audit column",
+      "file_type": "concept",
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_17_g12_9_report",
+      "target": "brain_log_16_chronos2_promotion_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_17_g12_9_report",
+      "target": "brain_log_18_downstream",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_17_g12_9_report_ellel_uncap",
+      "target": "brain_hierarchy_reconciliation_forecast_scope_decision",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_17_g12_9_report_ellel_uncap",
+      "target": "brain_log_16_chronos2_promotion_report_promotion_divergence",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/17_G12_9_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "brain_sim_july2026_w2b_forecast_frozen_pre_registration",
+      "label": "Frozen July 8\u201314 2026 Forecast, Origin B (7 July cutoff)",
+      "file_type": "document",
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2b_forecast_frozen_beer_hall",
+      "label": "Beer Hall Jul 8\u201314 forecast, Origin B",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2b_forecast_frozen_ellel",
+      "label": "Ellel Jul 8\u201314 forecast, Origin B",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2b_forecast_frozen_sharpening_hypothesis",
+      "label": "Sharpening hypothesis (Beer Hall, 11 July England QF)",
+      "file_type": "rationale",
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2b_forecast_frozen_c2",
+      "label": "C2 (scoring stage against actuals)",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_sim_july2026_w2b_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2b_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2b_forecast_frozen_beer_hall",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2b_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2b_forecast_frozen_ellel",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2b_forecast_frozen_beer_hall",
+      "target": "brain_sim_july2026_w2b_forecast_frozen_sharpening_hypothesis",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2b_forecast_frozen_sharpening_hypothesis",
+      "target": "brain_sim_july2026_w2b_forecast_frozen_c2",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2b_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

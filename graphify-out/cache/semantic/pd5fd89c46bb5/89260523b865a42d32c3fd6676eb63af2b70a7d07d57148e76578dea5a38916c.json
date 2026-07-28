@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "id": "brain_contract_compute_contract",
+      "label": "Compute contract: dataset in, bundle out \u2014 the brain's side of the API integration",
+      "file_type": "document",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_org_profile",
+      "label": "org_profile \u2014 per-org/per-venue dataset input (structural_zero_dow, is_event_driven, price_change_dates)",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_sales_daily",
+      "label": "sales_daily \u2014 the aggregate grain: venue x business_date x category x item, ex-VAT",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_trading_hours",
+      "label": "trading_hours \u2014 time-of-day envelope, derived from 1st/99th-percentile transaction time, not derivable from sales_daily",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_exogenous",
+      "label": "exogenous \u2014 known-future covariates, CHRONOS2_EXO_COLS 15 columns, request overrides curated source",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_weather_supply_decision",
+      "label": "Decision: the API supplies weather on the hindcast basis, not compute (Phase 3 refuted the one-outbound-call recommendation)",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_price_change_dates",
+      "label": "price_change_dates \u2014 additive optional field feeding price_regime, closes the hardcoded Lune date on the tenant path",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_prior_state",
+      "label": "prior_state \u2014 watermark, served_model, prior_forecasts, briefing_chain, change_point_state round-tripped by the API",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_bundle_out",
+      "label": "Bundle out \u2014 forward-dated forecasts, bands, served_forecast, watermark, ladder_selection, change_points, briefing, diagnostics",
+      "file_type": "concept",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_horizon_cap",
+      "label": "horizon_days capped at 7 (not 30) \u2014 the band's calibrated horizon; past 7 it silently under-covers",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_caller_obligations",
+      "label": "Caller obligations \u2014 canonical 12-item list: org_id echo, hindcast weather, ex-VAT sales, exogenous span, no bare threads, read diagnostics",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_open_decisions",
+      "label": "Open decisions: transport format, cross-tenant cold start, who re-runs the ladder, L2/L3 serving",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_contract_reopening_venue_reject",
+      "label": "A reopening venue is refused for MIN_SEGMENT_DAYS and takes down the whole request's forecast \u2014 open by design",
+      "file_type": "rationale",
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_readme_state_held_tables",
+      "target": "brain_contract_prior_state",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_compute_contract",
+      "target": "brain_readme_brain_service_overview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_org_profile",
+      "target": "brain_contract_price_change_dates",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_exogenous",
+      "target": "glossary_exo_covariate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_weather_supply_decision",
+      "target": "glossary_weather_bases",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_horizon_cap",
+      "target": "brain_flags_flag_band_horizon",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_reopening_venue_reject",
+      "target": "brain_flags_flag_segment_false_reject",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_org_profile",
+      "target": "glossary_l1_l2_l3_hierarchy",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_bundle_out",
+      "target": "brain_contract_horizon_cap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_contract_caller_obligations",
+      "target": "brain_contract_weather_supply_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/CONTRACT.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

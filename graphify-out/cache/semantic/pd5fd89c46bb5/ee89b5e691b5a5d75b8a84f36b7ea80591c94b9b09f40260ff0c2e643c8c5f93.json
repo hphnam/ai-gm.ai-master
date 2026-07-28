@@ -1,0 +1,311 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_dissertation_notes_document",
+      "label": "Dissertation notes: findings, framings, and things not to claim",
+      "file_type": "document",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_evaluation_design_pre_registration",
+      "label": "Pre-registered two-pass evaluation design (freeze/confront, calendar-airtight)",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_serving_horizon_accuracy_claim",
+      "label": "Serving-horizon accuracy claim (MASE 0.285/0.287, coverage 1.00), narrowly scoped",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_conformal_band_result",
+      "label": "The conformal band held on the worst day (+GBP 574 miss, in-band)",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_simple_beats_complex_finding",
+      "label": "Simple beats complex on thin data: ladder gate produces per-venue winners with no hand-picking",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_cadence_agreement_finding",
+      "label": "Cadence: two independent lines (sweep and origin comparison) agree",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_fixture_anticipation_falsification",
+      "label": "Central finding: pre-registered fixture-anticipation claim falsified (report 31)",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_kickoff_time_explanation_refuted",
+      "label": "Kickoff-time explanation for 11 July shortfall refuted by 27 June control",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_ellel_substitution_estimator_trap",
+      "label": "Ellel substitution estimator trap: pooled +GBP500 vs DOW-matched -GBP23 sign inversion",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_ellel_mase_artefact",
+      "label": "Ellel's MASE (0.096) is an artefact hiding a 90.2% under-forecast (FLAG-MASE-INTERMITTENT)",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_a14_ablation_scope_limitation",
+      "label": "A14 ablation (no exo adopted) binds only Rung-3 GBM, not served Chronos-2-exo",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_taxonomy_drift_standing_vs_frozen",
+      "label": "Taxonomy drift: frozen revenue-ranked vs standing units-ranked capture figures, not a before/after",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_l3_mase_finding",
+      "label": "L3 revenue MASE above 1 (BH 1.33) caused by taxonomy drift, not the model",
+      "file_type": "rationale",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_dissertation_notes_chapter_skeleton",
+      "label": "Dissertation chapter skeleton (evaluation design, ladder, accuracy, falsification, limitations, fidelity audit)",
+      "file_type": "concept",
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_evaluation_design_pre_registration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_serving_horizon_accuracy_claim",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_conformal_band_result",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_simple_beats_complex_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_cadence_agreement_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_fixture_anticipation_falsification",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_fixture_anticipation_falsification",
+      "target": "brain_log_dissertation_notes_kickoff_time_explanation_refuted",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_kickoff_time_explanation_refuted",
+      "target": "brain_log_dissertation_notes_ellel_substitution_estimator_trap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_ellel_mase_artefact",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_a14_ablation_scope_limitation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_taxonomy_drift_standing_vs_frozen",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_l3_mase_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_document",
+      "target": "brain_log_dissertation_notes_chapter_skeleton",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_ellel_mase_artefact",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_scale_basis_decision",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_dissertation_notes_a14_ablation_scope_limitation",
+      "target": "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/log/DISSERTATION_NOTES.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

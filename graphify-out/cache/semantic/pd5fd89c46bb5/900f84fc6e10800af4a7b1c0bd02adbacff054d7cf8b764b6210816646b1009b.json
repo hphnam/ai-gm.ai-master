@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_04_changepoint_a13_report",
+      "label": "PRJ93 A13 Change-Point Detection: Build & Analysis Report",
+      "file_type": "document",
+      "source_file": "brain/log/04_ChangePoint_A13_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_04_changepoint_a13_report_change_point_detection",
+      "label": "Change-point detection (CUSUM + persistence + BOCPD on the standardised conformal residual stream)",
+      "file_type": "concept",
+      "source_file": "brain/log/04_ChangePoint_A13_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_04_changepoint_a13_report",
+      "target": "brain_log_03_build_report_current",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/04_ChangePoint_A13_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_03_build_report_current_a14_enrichment",
+      "target": "brain_log_04_changepoint_a13_report_change_point_detection",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/04_ChangePoint_A13_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

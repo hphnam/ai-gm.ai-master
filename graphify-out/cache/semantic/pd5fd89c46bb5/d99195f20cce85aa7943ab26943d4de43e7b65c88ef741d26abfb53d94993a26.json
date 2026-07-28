@@ -1,0 +1,216 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_decision_and_resolution_log_document",
+      "label": "PRJ93 Decision and Resolution Log (append-only)",
+      "file_type": "document",
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_46_g17e_agent_and_calibration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_47_g17f_group_icl_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_48_g17g_weather_basis_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_49_g17h_interval_calibration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_50_g17i_injection_realism_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_51_g17j_chatlog_signal_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_scale_basis_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_finding3_flip_refuted",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_vs_constants_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_49_g17h_interval_calibration_coverage_undercoverage_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_50_g17i_injection_realism_feedback_loop_suppression_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_decision_and_resolution_log_document",
+      "target": "brain_log_51_g17j_chatlog_signal_venue_attribution_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "review_gate_practice_g17_series",
+      "label": "Parallel code-reviewer/security-reviewer gate across the G17 remediation packages",
+      "nodes": [
+        "brain_log_46_g17e_agent_and_calibration_report",
+        "brain_log_48_g17g_weather_basis_report",
+        "brain_log_50_g17i_injection_realism_report",
+        "brain_log_51_g17j_chatlog_signal_report"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md"
+    },
+    {
+      "id": "mcs_adoption_rule_pattern",
+      "label": "Pre-registered MCS-based adoption rule (enter set AND lower/beating mean) shared across ablation studies",
+      "nodes": [
+        "brain_log_47_g17f_group_icl_group_icl_finding",
+        "brain_log_48_g17g_weather_basis_weather_decoration_finding",
+        "brain_log_49_g17h_interval_calibration_winkler_score_comparison"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/Decision_and_Resolution_Log.md"
+    }
+  ]
+}

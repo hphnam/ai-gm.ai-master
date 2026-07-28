@@ -1,0 +1,210 @@
+{
+  "nodes": [
+    {
+      "id": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "label": "Frozen June 2026 Forecast (pre-registered, reasoned)",
+      "file_type": "document",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_parquet",
+      "label": "june2026_forecast_frozen.parquet",
+      "file_type": "document",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_beer_hall",
+      "label": "Beer Hall June forecast",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_two_river_taps",
+      "label": "Two River Taps June forecast",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_ellel",
+      "label": "Ellel June forecast",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_rung4_chronos2_exo",
+      "label": "rung4_chronos2_exo (Beer Hall model)",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_rung2_ets",
+      "label": "rung2_ets (Two River Taps model)",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_rung1_robust_dow",
+      "label": "rung1_robust_dow (Ellel model)",
+      "file_type": "concept",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_june2026_forecast_frozen_l2_l3_disaggregation",
+      "label": "L2/L3 forecast-proportion disaggregation method",
+      "file_type": "rationale",
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "target": "brain_sim_june2026_forecast_frozen_parquet",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "target": "brain_sim_june2026_forecast_frozen_beer_hall",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "target": "brain_sim_june2026_forecast_frozen_two_river_taps",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "target": "brain_sim_june2026_forecast_frozen_ellel",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_beer_hall",
+      "target": "brain_sim_june2026_forecast_frozen_rung4_chronos2_exo",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_two_river_taps",
+      "target": "brain_sim_june2026_forecast_frozen_rung2_ets",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_ellel",
+      "target": "brain_sim_june2026_forecast_frozen_rung1_robust_dow",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_pre_registration",
+      "target": "brain_sim_june2026_forecast_frozen_l2_l3_disaggregation",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_june2026_forecast_frozen_rung4_chronos2_exo",
+      "target": "brain_signals_feature_ablation_rung4_chronos2_exo",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/sim/june2026_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "per_venue_forecasting_ladder",
+      "label": "Per-venue model ladder assignment (rung1/rung2/rung4)",
+      "nodes": [
+        "brain_sim_june2026_forecast_frozen_rung4_chronos2_exo",
+        "brain_sim_june2026_forecast_frozen_rung2_ets",
+        "brain_sim_june2026_forecast_frozen_rung1_robust_dow"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/sim/june2026_forecast_frozen.md"
+    }
+  ]
+}

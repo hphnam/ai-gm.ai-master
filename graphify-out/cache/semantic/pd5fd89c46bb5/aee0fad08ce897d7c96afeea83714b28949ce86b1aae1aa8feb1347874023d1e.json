@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_20_g12_12_golive_forecast_report",
+      "label": "PRJ93 G12.12 Go-live Forecast Report",
+      "file_type": "document",
+      "source_file": "brain/log/20_G12_12_GoLive_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_20_g12_12_golive_forecast_report_neon_blocker",
+      "label": "Go-live June forecast blocked: Neon not provisioned, clean STOP per spec, nothing fabricated",
+      "file_type": "rationale",
+      "source_file": "brain/log/20_G12_12_GoLive_Forecast_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_20_g12_12_golive_forecast_report",
+      "target": "brain_log_19_g12_10_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/20_G12_12_GoLive_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_20_g12_12_golive_forecast_report_neon_blocker",
+      "target": "brain_log_19_g12_10_report_wc_features",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/20_G12_12_GoLive_Forecast_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

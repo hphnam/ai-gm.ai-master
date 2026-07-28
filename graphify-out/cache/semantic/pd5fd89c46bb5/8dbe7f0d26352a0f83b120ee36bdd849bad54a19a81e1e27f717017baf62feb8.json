@@ -1,0 +1,257 @@
+{
+  "nodes": [
+    {
+      "id": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "label": "setupdotclaude skill",
+      "file_type": "document",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "claude_claude",
+      "label": "CLAUDE.md (project root instructions file)",
+      "file_type": "document",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "_claude_settings_settings",
+      "label": ".claude/settings.json",
+      "file_type": "document",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "_claude_hooks_format_on_save_format_on_save",
+      "label": ".claude/hooks/format-on-save.sh",
+      "file_type": "document",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "_claude_hooks_block_dangerous_commands_block_dangerous_commands",
+      "label": ".claude/hooks/block-dangerous-commands.sh",
+      "file_type": "document",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "dotclaude_dotclaude_template_repo",
+      "label": "dotclaude template repository (github.com/poshan0126/dotclaude)",
+      "file_type": "concept",
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_code_quality_code_quality",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_testing_testing",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_security_security",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_error_handling_error_handling",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_frontend_frontend",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_rules_database_database",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_agents_frontend_designer_frontend_designer",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_agents_doc_reviewer_doc_reviewer",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_agents_security_reviewer_security_reviewer",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_agents_code_reviewer_code_reviewer",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_agents_performance_reviewer_performance_reviewer",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_skills_context_budget_skill_context_budget",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "claude_claude",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_settings_settings",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_hooks_format_on_save_format_on_save",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "_claude_hooks_block_dangerous_commands_block_dangerous_commands",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "target": "dotclaude_dotclaude_template_repo",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "frontend_design_token_pattern",
+      "label": "Design-tokens-first frontend pattern shared by the frontend-designer agent, frontend rule, and setupdotclaude's frontend customization phase",
+      "nodes": [
+        "_claude_agents_frontend_designer_frontend_designer",
+        "_claude_rules_frontend_frontend",
+        "_claude_skills_setupdotclaude_skill_setupdotclaude"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": ".claude/skills/setupdotclaude/SKILL.md"
+    }
+  ]
+}

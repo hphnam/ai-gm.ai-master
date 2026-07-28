@@ -1,0 +1,3552 @@
+{
+  "api/nest-cli.json": { "size": 217, "mtime_ns": 1779181503000000000, "word_count": 17 },
+  "api/package.json": { "size": 2799, "mtime_ns": 1784227346244515095, "word_count": 203 },
+  "api/prisma.config.ts": { "size": 432, "mtime_ns": 1779181503000000000, "word_count": 59 },
+  "api/prisma/migrations/20260418103508_init/migration.sql": {
+    "size": 5949,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 649
+  },
+  "api/prisma/migrations/20260418173000_agentic_kb_reshape/migration.sql": {
+    "size": 5449,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 549
+  },
+  "api/prisma/migrations/20260418194136_04_03_adaptation_loop/migration.sql": {
+    "size": 1799,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 171
+  },
+  "api/prisma/migrations/20260419160000_auth_orgs/migration.sql": {
+    "size": 8365,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 778
+  },
+  "api/prisma/migrations/20260420120000_knowledgeitem_organization_id/migration.sql": {
+    "size": 4740,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 525
+  },
+  "api/prisma/migrations/20260421150000_knowledge_item_image_source/migration.sql": {
+    "size": 437,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 62
+  },
+  "api/prisma/migrations/20260421160000_04_02_drift_reconciliation/migration.sql": {
+    "size": 1396,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 188
+  },
+  "api/prisma/migrations/20260421170000_document_type_taxonomy/migration.sql": {
+    "size": 1813,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 185
+  },
+  "api/prisma/migrations/20260421180000_checklist_entity/migration.sql": {
+    "size": 3220,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 317
+  },
+  "api/prisma/migrations/20260421200000_chat_follow_ups/migration.sql": {
+    "size": 315,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 47
+  },
+  "api/prisma/migrations/20260421210000_doc_processing_status/migration.sql": {
+    "size": 675,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 93
+  },
+  "api/prisma/migrations/20260422150000_chat_message_reasoning_parts/migration.sql": {
+    "size": 463,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 63
+  },
+  "api/prisma/migrations/20260427200000_searchable_entity/migration.sql": {
+    "size": 1679,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 164
+  },
+  "api/prisma/migrations/20260427210000_searchable_bm25/migration.sql": {
+    "size": 706,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 76
+  },
+  "api/prisma/migrations/20260427220000_kb_answer_status/migration.sql": {
+    "size": 756,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 104
+  },
+  "api/prisma/migrations/20260427230000_venue_profile/migration.sql": {
+    "size": 375,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 55
+  },
+  "api/prisma/migrations/20260427240000_chat_mode/migration.sql": {
+    "size": 387,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 59
+  },
+  "api/prisma/migrations/20260427250000_member_profile/migration.sql": {
+    "size": 668,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 92
+  },
+  "api/prisma/migrations/20260427260000_chat_compaction/migration.sql": {
+    "size": 564,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 79
+  },
+  "api/prisma/migrations/20260427270000_incident_log/migration.sql": {
+    "size": 1331,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 140
+  },
+  "api/prisma/migrations/20260427280000_search_analytics/migration.sql": {
+    "size": 1129,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 132
+  },
+  "api/prisma/migrations/20260428095243_hierarchical_section_chunk/migration.sql": {
+    "size": 3420,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 324
+  },
+  "api/prisma/migrations/20260428153000_phase5_tabular/migration.sql": {
+    "size": 2171,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 246
+  },
+  "api/prisma/migrations/20260430171800_chat_conversation_soft_delete/migration.sql": {
+    "size": 180,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 16
+  },
+  "api/prisma/migrations/20260501123500_chat_v2_flag_and_cost_columns/migration.sql": {
+    "size": 1536,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 200
+  },
+  "api/prisma/migrations/20260502120000_drop_chat_v2_enabled/migration.sql": {
+    "size": 873,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 123
+  },
+  "api/prisma/migrations/20260503154500_whatsapp_invite_otp_session/migration.sql": {
+    "size": 4143,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 412
+  },
+  "api/prisma/migrations/20260505165923_add_chat_conversation_visibility/migration.sql": {
+    "size": 790,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 115
+  },
+  "api/prisma/migrations/20260513092729_whatsapp_conversation_sid/migration.sql": {
+    "size": 744,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 76
+  },
+  "api/prisma/migrations/20260513150041_hnsw_vector_indexes/migration.sql": {
+    "size": 2540,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 296
+  },
+  "api/prisma/migrations/20260513190809_chat_message_verify_status/migration.sql": {
+    "size": 932,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 141
+  },
+  "api/prisma/migrations/20260513193500_add_notifications/migration.sql": {
+    "size": 1377,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 129
+  },
+  "api/prisma/migrations/20260514163306_add_tasks/migration.sql": {
+    "size": 1520,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 156
+  },
+  "api/prisma/migrations/20260514170651_add_expiry_records/migration.sql": {
+    "size": 1922,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 175
+  },
+  "api/prisma/migrations/20260514195130_add_notification_replies/migration.sql": {
+    "size": 867,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 80
+  },
+  "api/prisma/migrations/20260514201500_add_integrations/migration.sql": {
+    "size": 1374,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 148
+  },
+  "api/prisma/migrations/20260515150000_add_reports/migration.sql": {
+    "size": 1227,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 145
+  },
+  "api/prisma/migrations/20260515160000_add_scheduled_reports/migration.sql": {
+    "size": 1617,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 172
+  },
+  "api/prisma/migrations/20260515210000_add_notification_category/migration.sql": {
+    "size": 1643,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 240
+  },
+  "api/prisma/migrations/20260515220000_add_conversation_hide_message_hide/migration.sql": {
+    "size": 2475,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 255
+  },
+  "api/prisma/migrations/20260515230000_hidden_messages_xor_check/migration.sql": {
+    "size": 561,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 84
+  },
+  "api/prisma/migrations/20260515240000_notification_automated_flag/migration.sql": {
+    "size": 451,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 64
+  },
+  "api/prisma/migrations/20260515250000_backfill_automated_reminders/migration.sql": {
+    "size": 1462,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 220
+  },
+  "api/prisma/migrations/20260515260000_notification_reference/migration.sql": {
+    "size": 385,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 60
+  },
+  "api/prisma/migrations/20260516000000_dismissed_no_data_queries/migration.sql": {
+    "size": 1311,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 128
+  },
+  "api/prisma/migrations/20260517000000_chat_message_escalation_fields/migration.sql": {
+    "size": 875,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 110
+  },
+  "api/prisma/migrations/20260517010000_pricing_recommendations/migration.sql": {
+    "size": 1710,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 167
+  },
+  "api/prisma/migrations/20260517020000_metrics_config_hours_recovered/migration.sql": {
+    "size": 1524,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 187
+  },
+  "api/prisma/migrations/20260517040000_onboarding_started_at/migration.sql": {
+    "size": 1195,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 158
+  },
+  "api/prisma/migrations/20260517050000_add_incident_comments/migration.sql": {
+    "size": 899,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 91
+  },
+  "api/prisma/migrations/20260630000000_doc_version_reconciliation/migration.sql": {
+    "size": 515,
+    "mtime_ns": 1783620455215062263,
+    "word_count": 52
+  },
+  "api/prisma/migrations/20260701000000_add_phone_number_verified/migration.sql": {
+    "size": 155,
+    "mtime_ns": 1783620455215156429,
+    "word_count": 21
+  },
+  "api/prisma/migrations/20260702000000_add_phone_otp/migration.sql": {
+    "size": 575,
+    "mtime_ns": 1783620455215247804,
+    "word_count": 61
+  },
+  "api/prisma/migrations/20260707000000_add_notification_status_created_idx/migration.sql": {
+    "size": 279,
+    "mtime_ns": 1783620455215339762,
+    "word_count": 37
+  },
+  "api/prisma/migrations/20260709000000_add_member_venue_scope/migration.sql": {
+    "size": 356,
+    "mtime_ns": 1784227346244636846,
+    "word_count": 47
+  },
+  "api/prisma/seed-brain.sql": { "size": 988, "mtime_ns": 1783525986193552643, "word_count": 121 },
+  "api/scripts/backfill-knowledge-sections.ts": {
+    "size": 11910,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1077
+  },
+  "api/scripts/backfill-searchable-entity.ts": {
+    "size": 12256,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1203
+  },
+  "api/scripts/cleanup-orphaned-checklist-steps.ts": {
+    "size": 2690,
+    "mtime_ns": 1783620455215724512,
+    "word_count": 297
+  },
+  "api/scripts/detect-mime-from-content.ts": {
+    "size": 2036,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 280
+  },
+  "api/scripts/probe-chat-core.ts": {
+    "size": 76267,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 7078
+  },
+  "api/scripts/probe-chat-latency.ts": {
+    "size": 13662,
+    "mtime_ns": 1783620455215832344,
+    "word_count": 1556
+  },
+  "api/scripts/probe-chat.ts": {
+    "size": 18210,
+    "mtime_ns": 1783620455215958719,
+    "word_count": 1930
+  },
+  "api/scripts/probe-elliot-usage.ts": {
+    "size": 11673,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1296
+  },
+  "api/scripts/probe-eval.ts": {
+    "size": 19132,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2524
+  },
+  "api/scripts/probe-section.ts": {
+    "size": 50287,
+    "mtime_ns": 1783620455216145261,
+    "word_count": 5265
+  },
+  "api/scripts/probe-square-cost.ts": {
+    "size": 8126,
+    "mtime_ns": 1783620455216318802,
+    "word_count": 936
+  },
+  "api/scripts/probe-square-endpoints.ts": {
+    "size": 8819,
+    "mtime_ns": 1783620455216435052,
+    "word_count": 1051
+  },
+  "api/scripts/probe-tabular.ts": {
+    "size": 26070,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2841
+  },
+  "api/scripts/probe-versioning.ts": {
+    "size": 4430,
+    "mtime_ns": 1783620455216577552,
+    "word_count": 491
+  },
+  "api/scripts/reconcile-duplicates.ts": {
+    "size": 7133,
+    "mtime_ns": 1783620455216737343,
+    "word_count": 831
+  },
+  "api/scripts/reembed-corpus.ts": {
+    "size": 3569,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 453
+  },
+  "api/src/app.controller.ts": { "size": 633, "mtime_ns": 1779181503000000000, "word_count": 79 },
+  "api/src/app.module.ts": { "size": 4442, "mtime_ns": 1784227346245263850, "word_count": 366 },
+  "api/src/common/dto/api-error.dto.ts": {
+    "size": 595,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 76
+  },
+  "api/src/common/http-logger.middleware.ts": {
+    "size": 1106,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 140
+  },
+  "api/src/common/image-magic-bytes.ts": {
+    "size": 2029,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 282
+  },
+  "api/src/common/request-id.middleware.ts": {
+    "size": 443,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 58
+  },
+  "api/src/common/sanitise-error.ts": {
+    "size": 921,
+    "mtime_ns": 1783620455217018801,
+    "word_count": 125
+  },
+  "api/src/common/security-headers.middleware.ts": {
+    "size": 271,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 25
+  },
+  "api/src/common/translate-chat-error.ts": {
+    "size": 965,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 109
+  },
+  "api/src/common/with-org-scope.ts": {
+    "size": 1895,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 218
+  },
+  "api/src/common/zod-pipe.ts": { "size": 663, "mtime_ns": 1779181503000000000, "word_count": 69 },
+  "api/src/database/prisma.ts": {
+    "size": 1896,
+    "mtime_ns": 1784227346245695187,
+    "word_count": 253
+  },
+  "api/src/database/venue-context.spec.ts": {
+    "size": 7948,
+    "mtime_ns": 1784227346245769771,
+    "word_count": 1129
+  },
+  "api/src/database/venue-context.ts": {
+    "size": 9742,
+    "mtime_ns": 1784227346245873771,
+    "word_count": 1245
+  },
+  "api/src/generate-swagger.ts": {
+    "size": 1025,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 123
+  },
+  "api/src/load-env.ts": { "size": 707, "mtime_ns": 1779181503000000000, "word_count": 98 },
+  "api/src/main.ts": { "size": 4969, "mtime_ns": 1783620455217223842, "word_count": 589 },
+  "api/src/modules/adaptation/adaptation.module.ts": {
+    "size": 388,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "api/src/modules/adaptation/adaptation.service.ts": {
+    "size": 12261,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1157
+  },
+  "api/src/modules/adaptation/dto/feedback.dto.ts": {
+    "size": 486,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 46
+  },
+  "api/src/modules/adaptation/feedback.controller.ts": {
+    "size": 1748,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 166
+  },
+  "api/src/modules/auth/assert-auth-env.ts": {
+    "size": 9407,
+    "mtime_ns": 1783620455217402342,
+    "word_count": 1058
+  },
+  "api/src/modules/auth/auth.config.ts": {
+    "size": 7793,
+    "mtime_ns": 1784227346246153690,
+    "word_count": 899
+  },
+  "api/src/modules/auth/auth.controller.ts": {
+    "size": 498,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 60
+  },
+  "api/src/modules/auth/auth.decorators.ts": {
+    "size": 1280,
+    "mtime_ns": 1784227346246464400,
+    "word_count": 136
+  },
+  "api/src/modules/auth/auth.guard.ts": {
+    "size": 1079,
+    "mtime_ns": 1784227346246602443,
+    "word_count": 139
+  },
+  "api/src/modules/auth/auth.module.ts": {
+    "size": 427,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 46
+  },
+  "api/src/modules/auth/generate-org-slug.ts": {
+    "size": 1398,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 175
+  },
+  "api/src/modules/auth/org-context.middleware.ts": {
+    "size": 3119,
+    "mtime_ns": 1784227346246852278,
+    "word_count": 345
+  },
+  "api/src/modules/auth/role.guard.ts": {
+    "size": 1324,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 132
+  },
+  "api/src/modules/auth/venue-scope.guard.ts": {
+    "size": 1946,
+    "mtime_ns": 1784227346246905278,
+    "word_count": 251
+  },
+  "api/src/modules/auth/venue-scope.spec.ts": {
+    "size": 3363,
+    "mtime_ns": 1784227346246963362,
+    "word_count": 423
+  },
+  "api/src/modules/auth/venue-scope.ts": {
+    "size": 943,
+    "mtime_ns": 1784227346247043154,
+    "word_count": 125
+  },
+  "api/src/modules/chat-core/analyser.service.ts": {
+    "size": 6363,
+    "mtime_ns": 1783620455218006091,
+    "word_count": 692
+  },
+  "api/src/modules/chat-core/chat-core.module.ts": {
+    "size": 2003,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 219
+  },
+  "api/src/modules/chat-core/chat-core.service.ts": {
+    "size": 41377,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 3582
+  },
+  "api/src/modules/chat-core/conversation.service.ts": {
+    "size": 7075,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 831
+  },
+  "api/src/modules/chat-core/cost-tracker.service.spec.ts": {
+    "size": 4917,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 503
+  },
+  "api/src/modules/chat-core/cost-tracker.service.ts": {
+    "size": 2949,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 343
+  },
+  "api/src/modules/chat-core/critic.service.ts": {
+    "size": 4985,
+    "mtime_ns": 1783620455218196424,
+    "word_count": 558
+  },
+  "api/src/modules/chat-core/fast-lookup-recipes.ts": {
+    "size": 4168,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 455
+  },
+  "api/src/modules/chat-core/fast-lookup.service.ts": {
+    "size": 7357,
+    "mtime_ns": 1783620455218376632,
+    "word_count": 771
+  },
+  "api/src/modules/chat-core/input-sanitizer.ts": {
+    "size": 1652,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 189
+  },
+  "api/src/modules/chat-core/log-helpers.ts": {
+    "size": 2265,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 284
+  },
+  "api/src/modules/chat-core/multimodal-validator.ts": {
+    "size": 2023,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 243
+  },
+  "api/src/modules/chat-core/prompts/analyser.prompt.ts": {
+    "size": 3204,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 495
+  },
+  "api/src/modules/chat-core/prompts/critic.prompt.ts": {
+    "size": 2866,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 456
+  },
+  "api/src/modules/chat-core/prompts/docs-researcher.prompt.ts": {
+    "size": 1618,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 239
+  },
+  "api/src/modules/chat-core/prompts/ops-researcher.prompt.ts": {
+    "size": 1250,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 194
+  },
+  "api/src/modules/chat-core/prompts/people-researcher.prompt.ts": {
+    "size": 920,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 141
+  },
+  "api/src/modules/chat-core/prompts/tabular-researcher.prompt.ts": {
+    "size": 1192,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 181
+  },
+  "api/src/modules/chat-core/prompts/triage.prompt.ts": {
+    "size": 3563,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 522
+  },
+  "api/src/modules/chat-core/prompts/venue-researcher.prompt.ts": {
+    "size": 1342,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 206
+  },
+  "api/src/modules/chat-core/prompts/writer-examples.ts": {
+    "size": 7072,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1140
+  },
+  "api/src/modules/chat-core/prompts/writer-incident.prompt.ts": {
+    "size": 3088,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 451
+  },
+  "api/src/modules/chat-core/prompts/writer-lookup.prompt.ts": {
+    "size": 2323,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 348
+  },
+  "api/src/modules/chat-core/prompts/writer-reasoning.prompt.ts": {
+    "size": 3039,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 450
+  },
+  "api/src/modules/chat-core/researcher-sanitizer.ts": {
+    "size": 1841,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 209
+  },
+  "api/src/modules/chat-core/researcher.interface.ts": {
+    "size": 932,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 113
+  },
+  "api/src/modules/chat-core/researchers/docs.researcher.ts": {
+    "size": 9666,
+    "mtime_ns": 1783620455218522071,
+    "word_count": 998
+  },
+  "api/src/modules/chat-core/researchers/ops.researcher.ts": {
+    "size": 8026,
+    "mtime_ns": 1783620455218698263,
+    "word_count": 826
+  },
+  "api/src/modules/chat-core/researchers/people.researcher.ts": {
+    "size": 6513,
+    "mtime_ns": 1783620455218889474,
+    "word_count": 666
+  },
+  "api/src/modules/chat-core/researchers/tabular.researcher.ts": {
+    "size": 8394,
+    "mtime_ns": 1783620455219023942,
+    "word_count": 817
+  },
+  "api/src/modules/chat-core/researchers/venue.researcher.ts": {
+    "size": 6280,
+    "mtime_ns": 1783620455219291925,
+    "word_count": 631
+  },
+  "api/src/modules/chat-core/stub-clock.ts": {
+    "size": 792,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 97
+  },
+  "api/src/modules/chat-core/tools/get-checklist.tool.ts": {
+    "size": 4921,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 641
+  },
+  "api/src/modules/chat-core/tools/get-person.tool.ts": {
+    "size": 5993,
+    "mtime_ns": 1783620455219482421,
+    "word_count": 745
+  },
+  "api/src/modules/chat-core/tools/get-venue-briefing.tool.ts": {
+    "size": 5008,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 551
+  },
+  "api/src/modules/chat-core/tools/search-docs.tool.ts": {
+    "size": 2932,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 354
+  },
+  "api/src/modules/chat-core/triage-quick-classify.ts": {
+    "size": 6641,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 734
+  },
+  "api/src/modules/chat-core/triage.service.ts": {
+    "size": 12713,
+    "mtime_ns": 1783620455219662254,
+    "word_count": 1386
+  },
+  "api/src/modules/chat-core/writer.service.ts": {
+    "size": 9118,
+    "mtime_ns": 1783620455219830212,
+    "word_count": 1097
+  },
+  "api/src/modules/chat-starters/chat-starters.controller.ts": {
+    "size": 1342,
+    "mtime_ns": 1784227346247336865,
+    "word_count": 144
+  },
+  "api/src/modules/chat-starters/chat-starters.generator.ts": {
+    "size": 20545,
+    "mtime_ns": 1784227346247642450,
+    "word_count": 2454
+  },
+  "api/src/modules/chat-starters/chat-starters.module.ts": {
+    "size": 953,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 107
+  },
+  "api/src/modules/chat-starters/chat-starters.processor.ts": {
+    "size": 5629,
+    "mtime_ns": 1784227346247942369,
+    "word_count": 655
+  },
+  "api/src/modules/chat-starters/chat-starters.queue.spec.ts": {
+    "size": 747,
+    "mtime_ns": 1784227346248026744,
+    "word_count": 89
+  },
+  "api/src/modules/chat-starters/chat-starters.queue.ts": {
+    "size": 1808,
+    "mtime_ns": 1784227346248314288,
+    "word_count": 282
+  },
+  "api/src/modules/chat-starters/chat-starters.service.ts": {
+    "size": 6651,
+    "mtime_ns": 1784227346248729249,
+    "word_count": 776
+  },
+  "api/src/modules/chat-starters/dto/chat-starters.dto.ts": {
+    "size": 1560,
+    "mtime_ns": 1784227346249910831,
+    "word_count": 180
+  },
+  "api/src/modules/chat/ai-sdk-tools.ts": {
+    "size": 6027,
+    "mtime_ns": 1783620455220217837,
+    "word_count": 731
+  },
+  "api/src/modules/chat/chat.controller.ts": {
+    "size": 13228,
+    "mtime_ns": 1784227346250232468,
+    "word_count": 1270
+  },
+  "api/src/modules/chat/chat.module.ts": {
+    "size": 2236,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 205
+  },
+  "api/src/modules/chat/chat.service.ts": {
+    "size": 61433,
+    "mtime_ns": 1784227346250707638,
+    "word_count": 6597
+  },
+  "api/src/modules/chat/conversation-compactor.service.ts": {
+    "size": 5374,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 626
+  },
+  "api/src/modules/chat/conversation-mode.service.ts": {
+    "size": 6174,
+    "mtime_ns": 1784227346250946640,
+    "word_count": 707
+  },
+  "api/src/modules/chat/conversation-mode.spec.ts": {
+    "size": 2894,
+    "mtime_ns": 1783620455221047252,
+    "word_count": 345
+  },
+  "api/src/modules/chat/dto/chat.dto.ts": {
+    "size": 4309,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 388
+  },
+  "api/src/modules/chat/escalation.spec.ts": {
+    "size": 4482,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 516
+  },
+  "api/src/modules/chat/escalation.ts": {
+    "size": 3795,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 463
+  },
+  "api/src/modules/chat/find-person.spec.ts": {
+    "size": 7136,
+    "mtime_ns": 1784227346251214141,
+    "word_count": 806
+  },
+  "api/src/modules/chat/find-person.ts": {
+    "size": 4956,
+    "mtime_ns": 1784227346251373851,
+    "word_count": 645
+  },
+  "api/src/modules/chat/gm-agent.spec.ts": {
+    "size": 3189,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 426
+  },
+  "api/src/modules/chat/gm-agent.ts": {
+    "size": 27346,
+    "mtime_ns": 1783620455221548418,
+    "word_count": 3234
+  },
+  "api/src/modules/chat/quote-verifier.service.ts": {
+    "size": 4788,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 573
+  },
+  "api/src/modules/chat/system-prompt.ts": {
+    "size": 44878,
+    "mtime_ns": 1784227346251877271,
+    "word_count": 6912
+  },
+  "api/src/modules/chat/tool-dispatcher.ts": {
+    "size": 63046,
+    "mtime_ns": 1783620455222021209,
+    "word_count": 6119
+  },
+  "api/src/modules/chat/user-profile.service.ts": {
+    "size": 5725,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 667
+  },
+  "api/src/modules/compliance/compliance.controller.ts": {
+    "size": 2987,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 262
+  },
+  "api/src/modules/compliance/compliance.module.ts": {
+    "size": 1337,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 140
+  },
+  "api/src/modules/compliance/compliance.service.ts": {
+    "size": 13852,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1458
+  },
+  "api/src/modules/compliance/dto/compliance.dto.ts": {
+    "size": 4545,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 349
+  },
+  "api/src/modules/compliance/expiry-extractor.service.ts": {
+    "size": 8164,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 950
+  },
+  "api/src/modules/compliance/expiry-scheduler.processor.ts": {
+    "size": 1791,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 157
+  },
+  "api/src/modules/compliance/expiry-scheduler.queue.ts": {
+    "size": 1436,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 219
+  },
+  "api/src/modules/compliance/expiry-scheduler.service.ts": {
+    "size": 7156,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 904
+  },
+  "api/src/modules/daily-summary/daily-summary.compute.spec.ts": {
+    "size": 4693,
+    "mtime_ns": 1784227346252014147,
+    "word_count": 646
+  },
+  "api/src/modules/daily-summary/daily-summary.compute.ts": {
+    "size": 5772,
+    "mtime_ns": 1784227346252103273,
+    "word_count": 774
+  },
+  "api/src/modules/daily-summary/daily-summary.controller.ts": {
+    "size": 1910,
+    "mtime_ns": 1784227346252169981,
+    "word_count": 193
+  },
+  "api/src/modules/daily-summary/daily-summary.dto.ts": {
+    "size": 1776,
+    "mtime_ns": 1784227346252235940,
+    "word_count": 142
+  },
+  "api/src/modules/daily-summary/daily-summary.module.ts": {
+    "size": 584,
+    "mtime_ns": 1784227346252313191,
+    "word_count": 59
+  },
+  "api/src/modules/daily-summary/daily-summary.service.ts": {
+    "size": 6577,
+    "mtime_ns": 1784227346252393024,
+    "word_count": 738
+  },
+  "api/src/modules/daily-summary/venue-day.spec.ts": {
+    "size": 1221,
+    "mtime_ns": 1784227346252466400,
+    "word_count": 139
+  },
+  "api/src/modules/daily-summary/venue-day.ts": {
+    "size": 3616,
+    "mtime_ns": 1784227346252539151,
+    "word_count": 514
+  },
+  "api/src/modules/debug/debug.controller.ts": {
+    "size": 2716,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 248
+  },
+  "api/src/modules/debug/debug.module.ts": {
+    "size": 245,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 28
+  },
+  "api/src/modules/debug/debug.service.ts": {
+    "size": 7009,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 654
+  },
+  "api/src/modules/debug/dto/debug.dto.ts": {
+    "size": 2199,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 177
+  },
+  "api/src/modules/debug/truncate.ts": {
+    "size": 2342,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 288
+  },
+  "api/src/modules/docs/checklist-extractor.service.ts": {
+    "size": 15122,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1446
+  },
+  "api/src/modules/docs/classifier.service.ts": {
+    "size": 13205,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1501
+  },
+  "api/src/modules/docs/doc-extract.ts": {
+    "size": 7109,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 896
+  },
+  "api/src/modules/docs/docs.controller.ts": {
+    "size": 23790,
+    "mtime_ns": 1784227346252927695,
+    "word_count": 2391
+  },
+  "api/src/modules/docs/docs.module.ts": {
+    "size": 1230,
+    "mtime_ns": 1783620455222360041,
+    "word_count": 121
+  },
+  "api/src/modules/docs/docs.service.ts": {
+    "size": 74002,
+    "mtime_ns": 1783620455222554916,
+    "word_count": 8050
+  },
+  "api/src/modules/docs/dto/docs.dto.ts": {
+    "size": 7532,
+    "mtime_ns": 1783620455222805023,
+    "word_count": 632
+  },
+  "api/src/modules/docs/extractors/image-extractor.ts": {
+    "size": 6308,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 719
+  },
+  "api/src/modules/docs/multer-exception.filter.ts": {
+    "size": 577,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 59
+  },
+  "api/src/modules/docs/reconcile.service.ts": {
+    "size": 13180,
+    "mtime_ns": 1783620455222906665,
+    "word_count": 1601
+  },
+  "api/src/modules/docs/reconcile.title-overlap.spec.ts": {
+    "size": 1019,
+    "mtime_ns": 1783620455222980082,
+    "word_count": 137
+  },
+  "api/src/modules/email/auth-email.ts": {
+    "size": 2390,
+    "mtime_ns": 1783620455223106748,
+    "word_count": 238
+  },
+  "api/src/modules/email/mailer.ts": {
+    "size": 1396,
+    "mtime_ns": 1783620455223171998,
+    "word_count": 165
+  },
+  "api/src/modules/embeddings/embeddings.module.ts": {
+    "size": 210,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 22
+  },
+  "api/src/modules/embeddings/embeddings.service.ts": {
+    "size": 2290,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 249
+  },
+  "api/src/modules/incidents/dto/incidents.dto.ts": {
+    "size": 3999,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 346
+  },
+  "api/src/modules/incidents/incidents.controller.ts": {
+    "size": 4141,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 353
+  },
+  "api/src/modules/incidents/incidents.module.ts": {
+    "size": 765,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 94
+  },
+  "api/src/modules/incidents/incidents.service.ts": {
+    "size": 22918,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2736
+  },
+  "api/src/modules/indexer/indexer.module.ts": {
+    "size": 293,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 30
+  },
+  "api/src/modules/indexer/indexer.service.ts": {
+    "size": 3697,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 342
+  },
+  "api/src/modules/ingest/ingest.module.ts": {
+    "size": 533,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 52
+  },
+  "api/src/modules/ingest/ingest.service.ts": {
+    "size": 35283,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 3422
+  },
+  "api/src/modules/ingest/section-detector.ts": {
+    "size": 9394,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 913
+  },
+  "api/src/modules/ingest/section-tokens.ts": {
+    "size": 4035,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 541
+  },
+  "api/src/modules/integrations/breww/breww.module.ts": {
+    "size": 404,
+    "mtime_ns": 1783620455223280191,
+    "word_count": 48
+  },
+  "api/src/modules/integrations/breww/breww.provider.ts": {
+    "size": 2687,
+    "mtime_ns": 1783620455223352670,
+    "word_count": 287
+  },
+  "api/src/modules/integrations/breww/breww.service.spec.ts": {
+    "size": 4578,
+    "mtime_ns": 1783620455223515272,
+    "word_count": 552
+  },
+  "api/src/modules/integrations/breww/breww.service.ts": {
+    "size": 14299,
+    "mtime_ns": 1783620455223610162,
+    "word_count": 1638
+  },
+  "api/src/modules/integrations/breww/breww.tools.ts": {
+    "size": 4960,
+    "mtime_ns": 1783620455223776578,
+    "word_count": 572
+  },
+  "api/src/modules/integrations/crypto.spec.ts": {
+    "size": 2784,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 256
+  },
+  "api/src/modules/integrations/crypto.ts": {
+    "size": 6239,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 808
+  },
+  "api/src/modules/integrations/dto/integrations.dto.ts": {
+    "size": 1769,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 153
+  },
+  "api/src/modules/integrations/integration-provider.ts": {
+    "size": 4324,
+    "mtime_ns": 1783620455223980747,
+    "word_count": 627
+  },
+  "api/src/modules/integrations/integration-registry.ts": {
+    "size": 12969,
+    "mtime_ns": 1783620455224101747,
+    "word_count": 1472
+  },
+  "api/src/modules/integrations/integrations.controller.ts": {
+    "size": 5184,
+    "mtime_ns": 1783620455224297413,
+    "word_count": 555
+  },
+  "api/src/modules/integrations/integrations.module.ts": {
+    "size": 806,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 90
+  },
+  "api/src/modules/integrations/integrations.service.ts": {
+    "size": 10755,
+    "mtime_ns": 1783620455224555954,
+    "word_count": 1224
+  },
+  "api/src/modules/integrations/rate-limit.ts": {
+    "size": 5271,
+    "mtime_ns": 1783620455224826120,
+    "word_count": 713
+  },
+  "api/src/modules/integrations/role-scoping.spec.ts": {
+    "size": 3498,
+    "mtime_ns": 1784227346253092988,
+    "word_count": 436
+  },
+  "api/src/modules/integrations/square/square-catalog-extras.service.ts": {
+    "size": 21956,
+    "mtime_ns": 1783620455225041866,
+    "word_count": 2334
+  },
+  "api/src/modules/integrations/square/square-client.ts": {
+    "size": 4094,
+    "mtime_ns": 1783620455225155353,
+    "word_count": 556
+  },
+  "api/src/modules/integrations/square/square-cogs.service.spec.ts": {
+    "size": 2092,
+    "mtime_ns": 1783620455225224971,
+    "word_count": 292
+  },
+  "api/src/modules/integrations/square/square-cogs.service.ts": {
+    "size": 28321,
+    "mtime_ns": 1783620455225382328,
+    "word_count": 3499
+  },
+  "api/src/modules/integrations/square/square-commerce.service.ts": {
+    "size": 21240,
+    "mtime_ns": 1783620455225504875,
+    "word_count": 2422
+  },
+  "api/src/modules/integrations/square/square-crm.service.ts": {
+    "size": 15374,
+    "mtime_ns": 1783620455225636005,
+    "word_count": 1709
+  },
+  "api/src/modules/integrations/square/square-not-onboarded.spec.ts": {
+    "size": 935,
+    "mtime_ns": 1783620455225696325,
+    "word_count": 113
+  },
+  "api/src/modules/integrations/square/square-window.spec.ts": {
+    "size": 1588,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 174
+  },
+  "api/src/modules/integrations/square/square-window.ts": {
+    "size": 8575,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1069
+  },
+  "api/src/modules/integrations/square/square.controller.ts": {
+    "size": 1635,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 189
+  },
+  "api/src/modules/integrations/square/square.dto.ts": {
+    "size": 948,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 100
+  },
+  "api/src/modules/integrations/square/square.module.ts": {
+    "size": 896,
+    "mtime_ns": 1784227346253362178,
+    "word_count": 87
+  },
+  "api/src/modules/integrations/square/square.provider.ts": {
+    "size": 14300,
+    "mtime_ns": 1784227346253544092,
+    "word_count": 1451
+  },
+  "api/src/modules/integrations/square/square.service.ts": {
+    "size": 82174,
+    "mtime_ns": 1784227346254007101,
+    "word_count": 9784
+  },
+  "api/src/modules/integrations/square/square.tools.ts": {
+    "size": 51390,
+    "mtime_ns": 1784227346254285812,
+    "word_count": 5730
+  },
+  "api/src/modules/invitations/dto/invitations.dto.ts": {
+    "size": 4416,
+    "mtime_ns": 1784227346254585504,
+    "word_count": 427
+  },
+  "api/src/modules/invitations/invitation-email.ts": {
+    "size": 2317,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 226
+  },
+  "api/src/modules/invitations/invitations.controller.ts": {
+    "size": 8228,
+    "mtime_ns": 1784227346255038751,
+    "word_count": 790
+  },
+  "api/src/modules/invitations/invitations.module.ts": {
+    "size": 442,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 44
+  },
+  "api/src/modules/invitations/invitations.service.ts": {
+    "size": 25935,
+    "mtime_ns": 1784227346255319878,
+    "word_count": 2785
+  },
+  "api/src/modules/invitations/mail.service.ts": {
+    "size": 1521,
+    "mtime_ns": 1783620455226493201,
+    "word_count": 177
+  },
+  "api/src/modules/invitations/members.controller.ts": {
+    "size": 4725,
+    "mtime_ns": 1784227346255584547,
+    "word_count": 461
+  },
+  "api/src/modules/metrics/analytics.service.ts": {
+    "size": 21869,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2660
+  },
+  "api/src/modules/metrics/dto/analytics.dto.ts": {
+    "size": 7596,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 650
+  },
+  "api/src/modules/metrics/dto/hours-recovered.dto.ts": {
+    "size": 1951,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 202
+  },
+  "api/src/modules/metrics/dto/metrics.dto.ts": {
+    "size": 744,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 68
+  },
+  "api/src/modules/metrics/hours-recovered.service.ts": {
+    "size": 4984,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 649
+  },
+  "api/src/modules/metrics/hours-recovered.spec.ts": {
+    "size": 7498,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 822
+  },
+  "api/src/modules/metrics/metrics.controller.ts": {
+    "size": 8865,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 790
+  },
+  "api/src/modules/metrics/metrics.module.ts": {
+    "size": 896,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 99
+  },
+  "api/src/modules/metrics/onboarding/onboarding-metrics.controller.ts": {
+    "size": 3021,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 313
+  },
+  "api/src/modules/metrics/onboarding/onboarding-metrics.module.ts": {
+    "size": 561,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 61
+  },
+  "api/src/modules/metrics/onboarding/onboarding-metrics.service.ts": {
+    "size": 5242,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 652
+  },
+  "api/src/modules/metrics/onboarding/onboarding-metrics.spec.ts": {
+    "size": 5958,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 743
+  },
+  "api/src/modules/metrics/wau.service.ts": {
+    "size": 6623,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 838
+  },
+  "api/src/modules/metrics/wau.spec.ts": {
+    "size": 3997,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 461
+  },
+  "api/src/modules/mock-ops/mock-ops.module.ts": {
+    "size": 196,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 22
+  },
+  "api/src/modules/mock-ops/mock-ops.service.ts": {
+    "size": 5854,
+    "mtime_ns": 1783620455226799408,
+    "word_count": 652
+  },
+  "api/src/modules/notifications/conversations.controller.ts": {
+    "size": 4058,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 341
+  },
+  "api/src/modules/notifications/conversations.service.ts": {
+    "size": 23352,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2709
+  },
+  "api/src/modules/notifications/digest-email.spec.ts": {
+    "size": 4047,
+    "mtime_ns": 1783620455226869867,
+    "word_count": 431
+  },
+  "api/src/modules/notifications/digest-email.ts": {
+    "size": 3800,
+    "mtime_ns": 1783620455226936033,
+    "word_count": 391
+  },
+  "api/src/modules/notifications/digest.processor.ts": {
+    "size": 1962,
+    "mtime_ns": 1783620455227004658,
+    "word_count": 198
+  },
+  "api/src/modules/notifications/digest.queue.ts": {
+    "size": 1280,
+    "mtime_ns": 1783620455227066575,
+    "word_count": 201
+  },
+  "api/src/modules/notifications/digest.service.ts": {
+    "size": 4603,
+    "mtime_ns": 1783620455227224158,
+    "word_count": 506
+  },
+  "api/src/modules/notifications/dto/conversations.dto.ts": {
+    "size": 4878,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 540
+  },
+  "api/src/modules/notifications/dto/notifications.dto.ts": {
+    "size": 5919,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 608
+  },
+  "api/src/modules/notifications/notifications.controller.ts": {
+    "size": 5118,
+    "mtime_ns": 1783620455227416532,
+    "word_count": 472
+  },
+  "api/src/modules/notifications/notifications.module.ts": {
+    "size": 915,
+    "mtime_ns": 1783620455227515907,
+    "word_count": 82
+  },
+  "api/src/modules/notifications/notifications.service.ts": {
+    "size": 23219,
+    "mtime_ns": 1783620455227638907,
+    "word_count": 2729
+  },
+  "api/src/modules/nudges/dto/nudge.dto.ts": {
+    "size": 520,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 52
+  },
+  "api/src/modules/nudges/nudge.controller.ts": {
+    "size": 1536,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 169
+  },
+  "api/src/modules/nudges/nudge.module.ts": {
+    "size": 855,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 99
+  },
+  "api/src/modules/nudges/nudge.processor.ts": {
+    "size": 4202,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 496
+  },
+  "api/src/modules/nudges/nudge.queue.ts": {
+    "size": 876,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 137
+  },
+  "api/src/modules/nudges/nudge.service.ts": {
+    "size": 4991,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 573
+  },
+  "api/src/modules/organization/agent-memory.spec.ts": {
+    "size": 4117,
+    "mtime_ns": 1783620455227827615,
+    "word_count": 475
+  },
+  "api/src/modules/organization/agent-memory.store.ts": {
+    "size": 1772,
+    "mtime_ns": 1783620455227897823,
+    "word_count": 233
+  },
+  "api/src/modules/organization/agent-memory.ts": {
+    "size": 8042,
+    "mtime_ns": 1783620455228051281,
+    "word_count": 983
+  },
+  "api/src/modules/organization/dto/organization.dto.ts": {
+    "size": 670,
+    "mtime_ns": 1784227346255949020,
+    "word_count": 57
+  },
+  "api/src/modules/organization/memory-reconcile.module.ts": {
+    "size": 833,
+    "mtime_ns": 1783620455228213489,
+    "word_count": 91
+  },
+  "api/src/modules/organization/memory-reconcile.processor.ts": {
+    "size": 3223,
+    "mtime_ns": 1783620455228279073,
+    "word_count": 326
+  },
+  "api/src/modules/organization/memory-reconcile.queue.ts": {
+    "size": 1502,
+    "mtime_ns": 1783620455228348031,
+    "word_count": 216
+  },
+  "api/src/modules/organization/memory-reconcile.service.ts": {
+    "size": 4802,
+    "mtime_ns": 1783620455228506822,
+    "word_count": 604
+  },
+  "api/src/modules/organization/memory-reconcile.spec.ts": {
+    "size": 676,
+    "mtime_ns": 1783620455228567405,
+    "word_count": 77
+  },
+  "api/src/modules/organization/memory-reconcile.trigger.ts": {
+    "size": 1910,
+    "mtime_ns": 1783620455228645280,
+    "word_count": 208
+  },
+  "api/src/modules/organization/organization.controller.ts": {
+    "size": 2934,
+    "mtime_ns": 1784227346256229968,
+    "word_count": 276
+  },
+  "api/src/modules/organization/organization.module.ts": {
+    "size": 328,
+    "mtime_ns": 1783620455228776363,
+    "word_count": 30
+  },
+  "api/src/modules/organization/organization.service.ts": {
+    "size": 4845,
+    "mtime_ns": 1784227346256426302,
+    "word_count": 596
+  },
+  "api/src/modules/organization/organization.spec.ts": {
+    "size": 2561,
+    "mtime_ns": 1783620455228915196,
+    "word_count": 285
+  },
+  "api/src/modules/phone/consume-phone-invite.ts": {
+    "size": 1963,
+    "mtime_ns": 1784227346256712388,
+    "word_count": 210
+  },
+  "api/src/modules/phone/dto/phone.dto.ts": {
+    "size": 1147,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 95
+  },
+  "api/src/modules/phone/phone-otp.ts": {
+    "size": 4625,
+    "mtime_ns": 1783620455229142071,
+    "word_count": 603
+  },
+  "api/src/modules/phone/phone.controller.ts": {
+    "size": 6082,
+    "mtime_ns": 1783620455229359029,
+    "word_count": 538
+  },
+  "api/src/modules/phone/phone.module.ts": {
+    "size": 516,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 52
+  },
+  "api/src/modules/phone/phone.service.ts": {
+    "size": 8479,
+    "mtime_ns": 1783620455229521029,
+    "word_count": 791
+  },
+  "api/src/modules/phone/twilio-verify.ts": {
+    "size": 1157,
+    "mtime_ns": 1783620455229587612,
+    "word_count": 124
+  },
+  "api/src/modules/phone/whatsapp-verify.service.ts": {
+    "size": 6942,
+    "mtime_ns": 1783620455229793945,
+    "word_count": 663
+  },
+  "api/src/modules/places/dto/places.dto.ts": {
+    "size": 960,
+    "mtime_ns": 1784227346257012367,
+    "word_count": 77
+  },
+  "api/src/modules/places/places.controller.ts": {
+    "size": 1431,
+    "mtime_ns": 1783620455230000778,
+    "word_count": 144
+  },
+  "api/src/modules/places/places.module.ts": {
+    "size": 252,
+    "mtime_ns": 1783620455230060778,
+    "word_count": 28
+  },
+  "api/src/modules/places/places.normalize.spec.ts": {
+    "size": 5753,
+    "mtime_ns": 1784227346257425934,
+    "word_count": 583
+  },
+  "api/src/modules/places/places.normalize.ts": {
+    "size": 4822,
+    "mtime_ns": 1784227346257750437,
+    "word_count": 550
+  },
+  "api/src/modules/places/places.service.ts": {
+    "size": 2310,
+    "mtime_ns": 1784227346257924521,
+    "word_count": 202
+  },
+  "api/src/modules/pricing-recommendations/dto/pricing-recommendations.dto.ts": {
+    "size": 3487,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 255
+  },
+  "api/src/modules/pricing-recommendations/pricing-recommendations.controller.ts": {
+    "size": 4077,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 293
+  },
+  "api/src/modules/pricing-recommendations/pricing-recommendations.module.ts": {
+    "size": 689,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 72
+  },
+  "api/src/modules/pricing-recommendations/pricing-recommendations.service.ts": {
+    "size": 8697,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 842
+  },
+  "api/src/modules/pricing-recommendations/pricing-recommendations.spec.ts": {
+    "size": 12166,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1408
+  },
+  "api/src/modules/proactive-brain/brain.client.ts": {
+    "size": 8913,
+    "mtime_ns": 1784240902497180909,
+    "word_count": 1031
+  },
+  "api/src/modules/proactive-brain/brain.provider.ts": {
+    "size": 1667,
+    "mtime_ns": 1783525986194622930,
+    "word_count": 190
+  },
+  "api/src/modules/proactive-brain/brain.registration.spec.ts": {
+    "size": 3494,
+    "mtime_ns": 1783525988209783309,
+    "word_count": 366
+  },
+  "api/src/modules/proactive-brain/brain.service.spec.ts": {
+    "size": 14060,
+    "mtime_ns": 1783525988247967276,
+    "word_count": 1563
+  },
+  "api/src/modules/proactive-brain/brain.service.ts": {
+    "size": 6395,
+    "mtime_ns": 1783525988210748680,
+    "word_count": 615
+  },
+  "api/src/modules/proactive-brain/brain.tools.ts": {
+    "size": 12142,
+    "mtime_ns": 1784926396508000128,
+    "word_count": 1522
+  },
+  "api/src/modules/proactive-brain/proactive-brain.module.ts": {
+    "size": 621,
+    "mtime_ns": 1783525986198075666,
+    "word_count": 77
+  },
+  "api/src/modules/realtime/realtime.gateway.ts": {
+    "size": 10485,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1230
+  },
+  "api/src/modules/realtime/realtime.module.ts": {
+    "size": 200,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 22
+  },
+  "api/src/modules/realtime/redis-io.adapter.ts": {
+    "size": 3785,
+    "mtime_ns": 1783620455230600110,
+    "word_count": 436
+  },
+  "api/src/modules/reducto/reducto.module.ts": {
+    "size": 387,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 50
+  },
+  "api/src/modules/reducto/reducto.service.ts": {
+    "size": 9426,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1125
+  },
+  "api/src/modules/reports/dto/reports.dto.ts": {
+    "size": 1830,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 146
+  },
+  "api/src/modules/reports/reports.controller.ts": {
+    "size": 3079,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 329
+  },
+  "api/src/modules/reports/reports.module.ts": {
+    "size": 362,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "api/src/modules/reports/reports.service.ts": {
+    "size": 5734,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 670
+  },
+  "api/src/modules/retrieval/retrieval.module.ts": {
+    "size": 393,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "api/src/modules/retrieval/retrieval.service.ts": {
+    "size": 31345,
+    "mtime_ns": 1783620455230781485,
+    "word_count": 3695
+  },
+  "api/src/modules/scheduled-reports/dto/scheduled-reports.dto.ts": {
+    "size": 3147,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 244
+  },
+  "api/src/modules/scheduled-reports/report-generator-helpers.spec.ts": {
+    "size": 5461,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 611
+  },
+  "api/src/modules/scheduled-reports/report-generator-helpers.ts": {
+    "size": 3516,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 489
+  },
+  "api/src/modules/scheduled-reports/report-generator.service.ts": {
+    "size": 16272,
+    "mtime_ns": 1783620455230936859,
+    "word_count": 1770
+  },
+  "api/src/modules/scheduled-reports/scheduled-reports.controller.ts": {
+    "size": 6816,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 683
+  },
+  "api/src/modules/scheduled-reports/scheduled-reports.module.ts": {
+    "size": 1285,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 119
+  },
+  "api/src/modules/scheduled-reports/scheduled-reports.processor.ts": {
+    "size": 12033,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1235
+  },
+  "api/src/modules/scheduled-reports/scheduled-reports.queue.ts": {
+    "size": 934,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 125
+  },
+  "api/src/modules/scheduled-reports/scheduled-reports.service.ts": {
+    "size": 15923,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1892
+  },
+  "api/src/modules/suggestions/dto/suggestions.dto.ts": {
+    "size": 761,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 63
+  },
+  "api/src/modules/suggestions/suggestions.controller.ts": {
+    "size": 1795,
+    "mtime_ns": 1784227346258282065,
+    "word_count": 165
+  },
+  "api/src/modules/suggestions/suggestions.module.ts": {
+    "size": 394,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "api/src/modules/suggestions/suggestions.service.ts": {
+    "size": 10548,
+    "mtime_ns": 1784227346258753693,
+    "word_count": 967
+  },
+  "api/src/modules/tabular/infer-column-types.ts": {
+    "size": 3137,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 430
+  },
+  "api/src/modules/tabular/tabular.module.ts": {
+    "size": 412,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 55
+  },
+  "api/src/modules/tabular/tabular.service.ts": {
+    "size": 16121,
+    "mtime_ns": 1783620455231071401,
+    "word_count": 1702
+  },
+  "api/src/modules/tasks/dto/tasks.dto.ts": {
+    "size": 3390,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 323
+  },
+  "api/src/modules/tasks/task-reminder.processor.ts": {
+    "size": 2025,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 202
+  },
+  "api/src/modules/tasks/task-reminder.queue.ts": {
+    "size": 1162,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 180
+  },
+  "api/src/modules/tasks/task-reminder.service.ts": {
+    "size": 6412,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 808
+  },
+  "api/src/modules/tasks/tasks.controller.ts": {
+    "size": 3183,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 319
+  },
+  "api/src/modules/tasks/tasks.module.ts": {
+    "size": 1038,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 111
+  },
+  "api/src/modules/tasks/tasks.service.ts": {
+    "size": 13743,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1618
+  },
+  "api/src/modules/venues/dto/venues.dto.ts": {
+    "size": 1787,
+    "mtime_ns": 1783620455231185913,
+    "word_count": 190
+  },
+  "api/src/modules/venues/venues.controller.ts": {
+    "size": 3810,
+    "mtime_ns": 1784227346258895111,
+    "word_count": 329
+  },
+  "api/src/modules/venues/venues.module.ts": {
+    "size": 366,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "api/src/modules/venues/venues.service.ts": {
+    "size": 9207,
+    "mtime_ns": 1784227346259149613,
+    "word_count": 916
+  },
+  "api/src/modules/whatsapp/invite-redeem-rate-limit.ts": {
+    "size": 2111,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 290
+  },
+  "api/src/modules/whatsapp/invite-token.ts": {
+    "size": 3568,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 476
+  },
+  "api/src/modules/whatsapp/invite.controller.ts": {
+    "size": 5856,
+    "mtime_ns": 1784227346259530907,
+    "word_count": 640
+  },
+  "api/src/modules/whatsapp/invite.service.ts": {
+    "size": 15949,
+    "mtime_ns": 1784227346259798909,
+    "word_count": 1685
+  },
+  "api/src/modules/whatsapp/safe-equal.ts": {
+    "size": 1150,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 159
+  },
+  "api/src/modules/whatsapp/seen-message-sids.ts": {
+    "size": 773,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 103
+  },
+  "api/src/modules/whatsapp/twilio-signature.guard.ts": {
+    "size": 3274,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 364
+  },
+  "api/src/modules/whatsapp/twilio.controller.ts": {
+    "size": 5311,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 570
+  },
+  "api/src/modules/whatsapp/typing-indicator-timers.ts": {
+    "size": 3261,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 368
+  },
+  "api/src/modules/whatsapp/unknown-number-rate-limit.ts": {
+    "size": 742,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 94
+  },
+  "api/src/modules/whatsapp/verified-sender-rate-limit.ts": {
+    "size": 1487,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 152
+  },
+  "api/src/modules/whatsapp/whatsapp-media-download.ts": {
+    "size": 6472,
+    "mtime_ns": 1783620455232199941,
+    "word_count": 730
+  },
+  "api/src/modules/whatsapp/whatsapp-onboarding-state.ts": {
+    "size": 9764,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1172
+  },
+  "api/src/modules/whatsapp/whatsapp-onboarding.service.ts": {
+    "size": 16642,
+    "mtime_ns": 1784227346260054577,
+    "word_count": 1654
+  },
+  "api/src/modules/whatsapp/whatsapp-otp.service.ts": {
+    "size": 9495,
+    "mtime_ns": 1783620455232507523,
+    "word_count": 981
+  },
+  "api/src/modules/whatsapp/whatsapp.adapter.ts": {
+    "size": 11188,
+    "mtime_ns": 1783620455232685940,
+    "word_count": 1064
+  },
+  "api/src/modules/whatsapp/whatsapp.module.ts": {
+    "size": 1531,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 156
+  },
+  "api/src/modules/whatsapp/whatsapp.service.ts": {
+    "size": 19769,
+    "mtime_ns": 1784227346260311371,
+    "word_count": 1876
+  },
+  "api/src/redis-connection.ts": {
+    "size": 1024,
+    "mtime_ns": 1783620455232887689,
+    "word_count": 139
+  },
+  "api/src/types/adaptation.ts": {
+    "size": 1290,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 123
+  },
+  "api/src/types/api.ts": { "size": 7769, "mtime_ns": 1784227346260589498, "word_count": 760 },
+  "api/src/types/auth.ts": { "size": 7014, "mtime_ns": 1784227346260839541, "word_count": 859 },
+  "api/src/types/chat-core.ts": {
+    "size": 14394,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 1231
+  },
+  "api/src/types/chat-message.ts": {
+    "size": 1858,
+    "mtime_ns": 1783620455233219855,
+    "word_count": 199
+  },
+  "api/src/types/chat-tools.ts": {
+    "size": 54953,
+    "mtime_ns": 1783620455233414897,
+    "word_count": 6920
+  },
+  "api/src/types/cost.ts": { "size": 4132, "mtime_ns": 1779181503000000000, "word_count": 530 },
+  "api/src/types/debug.ts": { "size": 1909, "mtime_ns": 1779181503000000000, "word_count": 218 },
+  "api/src/types/docs.ts": { "size": 11059, "mtime_ns": 1783620455233589938, "word_count": 1235 },
+  "api/src/types/express-augment.d.ts": {
+    "size": 784,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 108
+  },
+  "api/src/types/index.ts": { "size": 658, "mtime_ns": 1783620455233701688, "word_count": 90 },
+  "api/src/types/knowledge-metadata.ts": {
+    "size": 621,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 48
+  },
+  "api/src/types/organization.ts": {
+    "size": 4410,
+    "mtime_ns": 1783620455233869146,
+    "word_count": 568
+  },
+  "api/src/types/proactive-suggestion.ts": {
+    "size": 366,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 45
+  },
+  "api/src/types/reports.ts": { "size": 5080, "mtime_ns": 1779181503000000000, "word_count": 553 },
+  "api/src/types/section.ts": { "size": 8943, "mtime_ns": 1779181503000000000, "word_count": 818 },
+  "api/src/types/tabular.ts": { "size": 5532, "mtime_ns": 1779181503000000000, "word_count": 467 },
+  "api/src/types/tool-result.ts": {
+    "size": 1063,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 131
+  },
+  "api/src/types/whatsapp-invite.ts": {
+    "size": 3981,
+    "mtime_ns": 1784227346261140710,
+    "word_count": 374
+  },
+  "api/src/types/whatsapp.ts": { "size": 4150, "mtime_ns": 1783620455234074812, "word_count": 504 },
+  "api/swagger.json": { "size": 397357, "mtime_ns": 1784227346261625255, "word_count": 22544 },
+  "api/tsconfig.json": { "size": 608, "mtime_ns": 1779181503000000000, "word_count": 47 },
+  "web/components.json": { "size": 435, "mtime_ns": 1779181503000000000, "word_count": 38 },
+  "web/next-env.d.ts": { "size": 251, "mtime_ns": 1784227346262190217, "word_count": 24 },
+  "web/next.config.ts": { "size": 643, "mtime_ns": 1783620455235565476, "word_count": 77 },
+  "web/orval.config.ts": { "size": 920, "mtime_ns": 1779181503000000000, "word_count": 104 },
+  "web/package.json": { "size": 1797, "mtime_ns": 1783620455235675976, "word_count": 131 },
+  "web/postcss.config.mjs": { "size": 92, "mtime_ns": 1779181503000000000, "word_count": 13 },
+  "web/src/app/(app)/@header/chat/history/page.tsx": {
+    "size": 266,
+    "mtime_ns": 1783620455235854625,
+    "word_count": 29
+  },
+  "web/src/app/(app)/@header/chat/page.tsx": {
+    "size": 169,
+    "mtime_ns": 1783620455235918521,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/compliance/page.tsx": {
+    "size": 181,
+    "mtime_ns": 1783620455236003398,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/dashboard/page.tsx": {
+    "size": 179,
+    "mtime_ns": 1783620455236084222,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/default.tsx": {
+    "size": 137,
+    "mtime_ns": 1783620455236141681,
+    "word_count": 22
+  },
+  "web/src/app/(app)/@header/docs/[id]/page.tsx": {
+    "size": 178,
+    "mtime_ns": 1783620455236284494,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/docs/inbox/page.tsx": {
+    "size": 179,
+    "mtime_ns": 1783620455236378669,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/docs/page.tsx": {
+    "size": 174,
+    "mtime_ns": 1783620455236441373,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/docs/questions/page.tsx": {
+    "size": 183,
+    "mtime_ns": 1783620455236531257,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/incidents/page.tsx": {
+    "size": 279,
+    "mtime_ns": 1784227346262700080,
+    "word_count": 31
+  },
+  "web/src/app/(app)/@header/reports/[id]/page.tsx": {
+    "size": 179,
+    "mtime_ns": 1783620455236757993,
+    "word_count": 16
+  },
+  "web/src/app/(app)/@header/reports/page.tsx": {
+    "size": 659,
+    "mtime_ns": 1783620455236822366,
+    "word_count": 63
+  },
+  "web/src/app/(app)/@header/reports/schedules/page.tsx": {
+    "size": 336,
+    "mtime_ns": 1783620455236930370,
+    "word_count": 41
+  },
+  "web/src/app/(app)/@header/settings/general/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1784227346262805700,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/integrations/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1783620455237051248,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/organization/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1783620455237138032,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1783620455237197160,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/phone/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1783620455237288713,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/team/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1784227346262899637,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/settings/venues/page.tsx": {
+    "size": 61,
+    "mtime_ns": 1783620455237380743,
+    "word_count": 6
+  },
+  "web/src/app/(app)/@header/tasks/page.tsx": {
+    "size": 246,
+    "mtime_ns": 1784227346263274908,
+    "word_count": 27
+  },
+  "web/src/app/(app)/@header/venues/new/page.tsx": {
+    "size": 246,
+    "mtime_ns": 1783620455237615108,
+    "word_count": 25
+  },
+  "web/src/app/(app)/alerts/alerts-body.tsx": {
+    "size": 1593,
+    "mtime_ns": 1784227346263382673,
+    "word_count": 147
+  },
+  "web/src/app/(app)/alerts/page.tsx": {
+    "size": 149,
+    "mtime_ns": 1784227346263437271,
+    "word_count": 20
+  },
+  "web/src/app/(app)/chat/chat-body.tsx": {
+    "size": 29506,
+    "mtime_ns": 1784227346263731241,
+    "word_count": 3108
+  },
+  "web/src/app/(app)/chat/error.tsx": {
+    "size": 793,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 81
+  },
+  "web/src/app/(app)/chat/history/history-body.tsx": {
+    "size": 11018,
+    "mtime_ns": 1784227346263934850,
+    "word_count": 1052
+  },
+  "web/src/app/(app)/chat/history/page.tsx": {
+    "size": 157,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 20
+  },
+  "web/src/app/(app)/chat/message-mapping.ts": {
+    "size": 1599,
+    "mtime_ns": 1783620455238027095,
+    "word_count": 204
+  },
+  "web/src/app/(app)/chat/page.tsx": {
+    "size": 760,
+    "mtime_ns": 1783620455238118886,
+    "word_count": 105
+  },
+  "web/src/app/(app)/chat/use-chat-submit.ts": {
+    "size": 4076,
+    "mtime_ns": 1783620455238182783,
+    "word_count": 429
+  },
+  "web/src/app/(app)/chat/use-conversation-derived-state.ts": {
+    "size": 2206,
+    "mtime_ns": 1783620455238246917,
+    "word_count": 286
+  },
+  "web/src/app/(app)/chat/use-optimistic-threads.ts": {
+    "size": 3329,
+    "mtime_ns": 1783620455238311290,
+    "word_count": 390
+  },
+  "web/src/app/(app)/chat/use-share-conversation.ts": {
+    "size": 1517,
+    "mtime_ns": 1783620455238382101,
+    "word_count": 172
+  },
+  "web/src/app/(app)/compliance/add-expiry-dialog.tsx": {
+    "size": 8304,
+    "mtime_ns": 1783620455238794803,
+    "word_count": 566
+  },
+  "web/src/app/(app)/compliance/compliance-body.tsx": {
+    "size": 11043,
+    "mtime_ns": 1784227346264478683,
+    "word_count": 1056
+  },
+  "web/src/app/(app)/compliance/page.tsx": {
+    "size": 165,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 20
+  },
+  "web/src/app/(app)/dashboard/dashboard-body.tsx": {
+    "size": 18610,
+    "mtime_ns": 1784227346264875888,
+    "word_count": 1480
+  },
+  "web/src/app/(app)/dashboard/page.tsx": {
+    "size": 161,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 20
+  },
+  "web/src/app/(app)/docs/[id]/doc-detail-body.tsx": {
+    "size": 27084,
+    "mtime_ns": 1784227346265288352,
+    "word_count": 2378
+  },
+  "web/src/app/(app)/docs/[id]/page.tsx": {
+    "size": 253,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "web/src/app/(app)/docs/docs-body.tsx": {
+    "size": 3333,
+    "mtime_ns": 1783620455239550352,
+    "word_count": 347
+  },
+  "web/src/app/(app)/docs/inbox/page.tsx": {
+    "size": 159,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 21
+  },
+  "web/src/app/(app)/docs/page.tsx": {
+    "size": 155,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 21
+  },
+  "web/src/app/(app)/docs/questions/page.tsx": {
+    "size": 167,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 21
+  },
+  "web/src/app/(app)/incidents/incidents-body.tsx": {
+    "size": 25051,
+    "mtime_ns": 1784227346265559911,
+    "word_count": 2116
+  },
+  "web/src/app/(app)/incidents/page.tsx": {
+    "size": 161,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 20
+  },
+  "web/src/app/(app)/layout.tsx": {
+    "size": 1822,
+    "mtime_ns": 1784227346265791416,
+    "word_count": 235
+  },
+  "web/src/app/(app)/loading.tsx": {
+    "size": 515,
+    "mtime_ns": 1783620455240022659,
+    "word_count": 79
+  },
+  "web/src/app/(app)/notes/[id]/note-redirect-body.tsx": {
+    "size": 1833,
+    "mtime_ns": 1783620455240159034,
+    "word_count": 234
+  },
+  "web/src/app/(app)/notes/[id]/page.tsx": {
+    "size": 407,
+    "mtime_ns": 1783620455240219831,
+    "word_count": 66
+  },
+  "web/src/app/(app)/reports/[id]/page.tsx": {
+    "size": 265,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 38
+  },
+  "web/src/app/(app)/reports/[id]/report-detail-body.tsx": {
+    "size": 11431,
+    "mtime_ns": 1784227346266095161,
+    "word_count": 1141
+  },
+  "web/src/app/(app)/reports/page.tsx": {
+    "size": 171,
+    "mtime_ns": 1783620455240502834,
+    "word_count": 20
+  },
+  "web/src/app/(app)/reports/reports-list-body.tsx": {
+    "size": 6779,
+    "mtime_ns": 1784227346266473054,
+    "word_count": 586
+  },
+  "web/src/app/(app)/reports/schedules/page.tsx": {
+    "size": 532,
+    "mtime_ns": 1784227346266723632,
+    "word_count": 45
+  },
+  "web/src/app/(app)/settings/general/page.tsx": {
+    "size": 707,
+    "mtime_ns": 1784227346266818046,
+    "word_count": 65
+  },
+  "web/src/app/(app)/settings/integrations/page.tsx": {
+    "size": 1008,
+    "mtime_ns": 1784227346267087221,
+    "word_count": 93
+  },
+  "web/src/app/(app)/settings/layout.tsx": {
+    "size": 747,
+    "mtime_ns": 1784227346267421007,
+    "word_count": 95
+  },
+  "web/src/app/(app)/settings/organization/page.tsx": {
+    "size": 289,
+    "mtime_ns": 1784227346267693996,
+    "word_count": 38
+  },
+  "web/src/app/(app)/settings/page.tsx": {
+    "size": 307,
+    "mtime_ns": 1784227346267936229,
+    "word_count": 30
+  },
+  "web/src/app/(app)/settings/phone/page.tsx": {
+    "size": 667,
+    "mtime_ns": 1784227346268197059,
+    "word_count": 64
+  },
+  "web/src/app/(app)/settings/team/page.tsx": {
+    "size": 774,
+    "mtime_ns": 1784227346268316507,
+    "word_count": 69
+  },
+  "web/src/app/(app)/settings/venues/page.tsx": {
+    "size": 947,
+    "mtime_ns": 1784227346268538475,
+    "word_count": 92
+  },
+  "web/src/app/(app)/tasks/page.tsx": {
+    "size": 145,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 20
+  },
+  "web/src/app/(app)/tasks/tasks-body.tsx": {
+    "size": 11693,
+    "mtime_ns": 1784227346268745899,
+    "word_count": 1123
+  },
+  "web/src/app/(app)/today/page.tsx": {
+    "size": 145,
+    "mtime_ns": 1784227346268850803,
+    "word_count": 20
+  },
+  "web/src/app/(app)/today/today-body.tsx": {
+    "size": 12941,
+    "mtime_ns": 1784227346268927574,
+    "word_count": 1266
+  },
+  "web/src/app/(app)/venues/new/page.tsx": {
+    "size": 985,
+    "mtime_ns": 1784227346269071340,
+    "word_count": 87
+  },
+  "web/src/app/(marketing)/about/page.tsx": {
+    "size": 5197,
+    "mtime_ns": 1784227346269218683,
+    "word_count": 573
+  },
+  "web/src/app/(marketing)/blog/[slug]/page.tsx": {
+    "size": 2358,
+    "mtime_ns": 1784227346269469022,
+    "word_count": 223
+  },
+  "web/src/app/(marketing)/blog/page.tsx": {
+    "size": 2381,
+    "mtime_ns": 1784227346269696712,
+    "word_count": 183
+  },
+  "web/src/app/(marketing)/changelog/page.tsx": {
+    "size": 4045,
+    "mtime_ns": 1784227346270005941,
+    "word_count": 391
+  },
+  "web/src/app/(marketing)/features/page.tsx": {
+    "size": 5327,
+    "mtime_ns": 1784227346270156621,
+    "word_count": 418
+  },
+  "web/src/app/(marketing)/layout.tsx": {
+    "size": 728,
+    "mtime_ns": 1784227346270345687,
+    "word_count": 98
+  },
+  "web/src/app/(marketing)/page.tsx": {
+    "size": 21033,
+    "mtime_ns": 1784227346270546197,
+    "word_count": 1717
+  },
+  "web/src/app/(marketing)/pricing/page.tsx": {
+    "size": 6704,
+    "mtime_ns": 1784227346270709037,
+    "word_count": 699
+  },
+  "web/src/app/(marketing)/privacy/page.tsx": {
+    "size": 1205,
+    "mtime_ns": 1784227346270859241,
+    "word_count": 125
+  },
+  "web/src/app/(marketing)/terms/page.tsx": {
+    "size": 1135,
+    "mtime_ns": 1784227346271101713,
+    "word_count": 112
+  },
+  "web/src/app/apple-icon.png": {
+    "size": 3144,
+    "mtime_ns": 1783620455242890596,
+    "word_count": 209
+  },
+  "web/src/app/auth/accept-invitation/[id]/accept-invitation-body.tsx": {
+    "size": 6313,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 625
+  },
+  "web/src/app/auth/accept-invitation/[id]/page.tsx": {
+    "size": 525,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 62
+  },
+  "web/src/app/auth/forgot-password/page.tsx": {
+    "size": 796,
+    "mtime_ns": 1783620455242987394,
+    "word_count": 78
+  },
+  "web/src/app/auth/layout.tsx": { "size": 723, "mtime_ns": 1779181503000000000, "word_count": 64 },
+  "web/src/app/auth/reset-password/page.tsx": {
+    "size": 475,
+    "mtime_ns": 1783620455243074893,
+    "word_count": 43
+  },
+  "web/src/app/auth/sign-in-phone/page.tsx": {
+    "size": 321,
+    "mtime_ns": 1783620455243160724,
+    "word_count": 48
+  },
+  "web/src/app/auth/sign-in/page.tsx": {
+    "size": 787,
+    "mtime_ns": 1783620455243259429,
+    "word_count": 85
+  },
+  "web/src/app/auth/sign-up/page.tsx": {
+    "size": 624,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 63
+  },
+  "web/src/app/debug/debug-body.tsx": {
+    "size": 4604,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 397
+  },
+  "web/src/app/debug/error.tsx": { "size": 622, "mtime_ns": 1779181503000000000, "word_count": 63 },
+  "web/src/app/debug/layout.tsx": {
+    "size": 628,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 77
+  },
+  "web/src/app/debug/page.tsx": { "size": 351, "mtime_ns": 1779181503000000000, "word_count": 41 },
+  "web/src/app/icon.svg": { "size": 410, "mtime_ns": 1783620455243458986, "word_count": 32 },
+  "web/src/app/layout.tsx": { "size": 3588, "mtime_ns": 1784227346271575927, "word_count": 442 },
+  "web/src/app/manifest.ts": { "size": 594, "mtime_ns": 1784227346271811246, "word_count": 68 },
+  "web/src/app/onboard/onboard-body.tsx": {
+    "size": 4115,
+    "mtime_ns": 1783620455243784189,
+    "word_count": 444
+  },
+  "web/src/app/onboard/page.tsx": {
+    "size": 1484,
+    "mtime_ns": 1783620455243959665,
+    "word_count": 184
+  },
+  "web/src/app/opengraph-image.tsx": {
+    "size": 3108,
+    "mtime_ns": 1784227346272093057,
+    "word_count": 278
+  },
+  "web/src/app/robots.ts": { "size": 630, "mtime_ns": 1783620455244079589, "word_count": 78 },
+  "web/src/app/sitemap.ts": { "size": 898, "mtime_ns": 1783620455244138002, "word_count": 108 },
+  "web/src/app/welcome/onboarding-shell.tsx": {
+    "size": 1579,
+    "mtime_ns": 1783620455244246482,
+    "word_count": 114
+  },
+  "web/src/app/welcome/page.tsx": {
+    "size": 2127,
+    "mtime_ns": 1783620455244348049,
+    "word_count": 274
+  },
+  "web/src/app/welcome/progress-header.tsx": {
+    "size": 1293,
+    "mtime_ns": 1783620455244444370,
+    "word_count": 130
+  },
+  "web/src/app/welcome/step-basics.tsx": {
+    "size": 12730,
+    "mtime_ns": 1784227346272546768,
+    "word_count": 1055
+  },
+  "web/src/app/welcome/step-done.tsx": {
+    "size": 4441,
+    "mtime_ns": 1783620455244784593,
+    "word_count": 420
+  },
+  "web/src/app/welcome/step-knowledge.tsx": {
+    "size": 10292,
+    "mtime_ns": 1783620455244962453,
+    "word_count": 1017
+  },
+  "web/src/app/welcome/step-operations.tsx": {
+    "size": 5970,
+    "mtime_ns": 1783620455245166540,
+    "word_count": 466
+  },
+  "web/src/app/welcome/step-safety.tsx": {
+    "size": 7416,
+    "mtime_ns": 1783620455245390892,
+    "word_count": 564
+  },
+  "web/src/app/welcome/step-shell.tsx": {
+    "size": 2117,
+    "mtime_ns": 1783620455245546340,
+    "word_count": 201
+  },
+  "web/src/app/welcome/steps.ts": {
+    "size": 889,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 119
+  },
+  "web/src/app/welcome/welcome-body.tsx": {
+    "size": 2831,
+    "mtime_ns": 1783620455245656013,
+    "word_count": 311
+  },
+  "web/src/components/auth/forgot-password-form.tsx": {
+    "size": 2869,
+    "mtime_ns": 1783620455245745420,
+    "word_count": 262
+  },
+  "web/src/components/auth/phone-otp-form.tsx": {
+    "size": 7370,
+    "mtime_ns": 1783620455245900630,
+    "word_count": 796
+  },
+  "web/src/components/auth/phone-sign-in-form.tsx": {
+    "size": 339,
+    "mtime_ns": 1783620455245968341,
+    "word_count": 38
+  },
+  "web/src/components/auth/reset-password-form.tsx": {
+    "size": 3573,
+    "mtime_ns": 1783620455246032714,
+    "word_count": 323
+  },
+  "web/src/components/auth/sign-in-form.tsx": {
+    "size": 4032,
+    "mtime_ns": 1783620455246136665,
+    "word_count": 331
+  },
+  "web/src/components/auth/sign-in-methods.tsx": {
+    "size": 1307,
+    "mtime_ns": 1783620455246205806,
+    "word_count": 142
+  },
+  "web/src/components/auth/sign-up-form.tsx": {
+    "size": 4674,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 399
+  },
+  "web/src/components/auth/user-menu.tsx": {
+    "size": 2846,
+    "mtime_ns": 1784227346272810697,
+    "word_count": 238
+  },
+  "web/src/components/chat/agent-trace.tsx": {
+    "size": 4280,
+    "mtime_ns": 1783620455246365547,
+    "word_count": 452
+  },
+  "web/src/components/chat/assistant-markdown.tsx": {
+    "size": 3671,
+    "mtime_ns": 1784227346273264884,
+    "word_count": 379
+  },
+  "web/src/components/chat/chat-composer.tsx": {
+    "size": 13361,
+    "mtime_ns": 1784227346273656606,
+    "word_count": 1247
+  },
+  "web/src/components/chat/chat-message.tsx": {
+    "size": 16482,
+    "mtime_ns": 1784227346274024248,
+    "word_count": 1875
+  },
+  "web/src/components/chat/chat-thread.tsx": {
+    "size": 6502,
+    "mtime_ns": 1783620455247066259,
+    "word_count": 801
+  },
+  "web/src/components/chat/citations.tsx": {
+    "size": 11106,
+    "mtime_ns": 1784227346274262189,
+    "word_count": 1304
+  },
+  "web/src/components/chat/composer/use-image-attachment.ts": {
+    "size": 1397,
+    "mtime_ns": 1783620455247302770,
+    "word_count": 143
+  },
+  "web/src/components/chat/composer/use-mention-state.ts": {
+    "size": 3396,
+    "mtime_ns": 1783620455247363805,
+    "word_count": 397
+  },
+  "web/src/components/chat/composer/use-voice-input.ts": {
+    "size": 5032,
+    "mtime_ns": 1783620455247495651,
+    "word_count": 584
+  },
+  "web/src/components/chat/feedback-buttons.tsx": {
+    "size": 1614,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 160
+  },
+  "web/src/components/chat/follow-up-pills.tsx": {
+    "size": 1387,
+    "mtime_ns": 1784227346274513006,
+    "word_count": 134
+  },
+  "web/src/components/chat/mention-picker.tsx": {
+    "size": 14938,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 2002
+  },
+  "web/src/components/chat/suggestions-surface.tsx": {
+    "size": 1699,
+    "mtime_ns": 1784227346274741649,
+    "word_count": 154
+  },
+  "web/src/components/chat/tool-cards/brain-cards.tsx": {
+    "size": 19603,
+    "mtime_ns": 1783525988248309373,
+    "word_count": 1825
+  },
+  "web/src/components/chat/tool-cards/card-shell.tsx": {
+    "size": 2765,
+    "mtime_ns": 1784227346275004148,
+    "word_count": 246
+  },
+  "web/src/components/chat/tool-cards/checklist-card.tsx": {
+    "size": 7525,
+    "mtime_ns": 1784227346275265455,
+    "word_count": 755
+  },
+  "web/src/components/chat/tool-cards/cutoffs-card.tsx": {
+    "size": 3794,
+    "mtime_ns": 1784227346275537014,
+    "word_count": 342
+  },
+  "web/src/components/chat/tool-cards/note-card.tsx": {
+    "size": 2852,
+    "mtime_ns": 1784227346275761365,
+    "word_count": 254
+  },
+  "web/src/components/chat/tool-cards/pos-payment-breakdown-card.tsx": {
+    "size": 2217,
+    "mtime_ns": 1783620455248077154,
+    "word_count": 259
+  },
+  "web/src/components/chat/tool-cards/pos-sales-summary-card.tsx": {
+    "size": 1517,
+    "mtime_ns": 1783620455248149394,
+    "word_count": 176
+  },
+  "web/src/components/chat/tool-cards/pos-top-items-card.tsx": {
+    "size": 1977,
+    "mtime_ns": 1783620455248226404,
+    "word_count": 243
+  },
+  "web/src/components/chat/tool-cards/pricing-recommendation-card.tsx": {
+    "size": 8088,
+    "mtime_ns": 1784227346276007890,
+    "word_count": 788
+  },
+  "web/src/components/chat/tool-cards/report-card.tsx": {
+    "size": 5764,
+    "mtime_ns": 1784227346276184082,
+    "word_count": 611
+  },
+  "web/src/components/chat/tool-cards/report-sections.tsx": {
+    "size": 9262,
+    "mtime_ns": 1784227346276660442,
+    "word_count": 894
+  },
+  "web/src/components/chat/tool-cards/stock-card.tsx": {
+    "size": 4793,
+    "mtime_ns": 1784227346276996374,
+    "word_count": 474
+  },
+  "web/src/components/chat/tool-cards/supplier-card.tsx": {
+    "size": 4503,
+    "mtime_ns": 1784227346277248144,
+    "word_count": 429
+  },
+  "web/src/components/chat/tool-cards/task-action-card.tsx": {
+    "size": 4263,
+    "mtime_ns": 1784227346277536392,
+    "word_count": 412
+  },
+  "web/src/components/chat/tool-cards/tasks-list-card.tsx": {
+    "size": 4779,
+    "mtime_ns": 1784227346277907133,
+    "word_count": 529
+  },
+  "web/src/components/chat/tool-cards/tool-card-router.tsx": {
+    "size": 2829,
+    "mtime_ns": 1783620455249626636,
+    "word_count": 284
+  },
+  "web/src/components/chat/tool-cards/types.ts": {
+    "size": 1957,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 301
+  },
+  "web/src/components/chat/tool-labels.ts": {
+    "size": 5385,
+    "mtime_ns": 1784227346278156518,
+    "word_count": 608
+  },
+  "web/src/components/chat/venue-chip.tsx": {
+    "size": 4132,
+    "mtime_ns": 1783620455249974966,
+    "word_count": 383
+  },
+  "web/src/components/chat/venue-selector.tsx": {
+    "size": 1495,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 144
+  },
+  "web/src/components/dashboard/charts/search-outcomes-chart.tsx": {
+    "size": 2001,
+    "mtime_ns": 1784227346278402566,
+    "word_count": 195
+  },
+  "web/src/components/dashboard/charts/wau-chart.tsx": {
+    "size": 2548,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 228
+  },
+  "web/src/components/dashboard/format.ts": {
+    "size": 2137,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 285
+  },
+  "web/src/components/dashboard/kpi-card.tsx": {
+    "size": 2719,
+    "mtime_ns": 1784227346278566122,
+    "word_count": 266
+  },
+  "web/src/components/dashboard/rank-list.tsx": {
+    "size": 5142,
+    "mtime_ns": 1784227346278860092,
+    "word_count": 569
+  },
+  "web/src/components/debug/debug-conversation-inspector.tsx": {
+    "size": 3645,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 348
+  },
+  "web/src/components/debug/debug-feedback-badge.tsx": {
+    "size": 1677,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 195
+  },
+  "web/src/components/debug/debug-json-viewer.tsx": {
+    "size": 2341,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 235
+  },
+  "web/src/components/debug/debug-request-id-badge.tsx": {
+    "size": 1078,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 115
+  },
+  "web/src/components/debug/debug-retag-queue.tsx": {
+    "size": 5629,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 533
+  },
+  "web/src/components/debug/debug-tool-call-card.tsx": {
+    "size": 2793,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 277
+  },
+  "web/src/components/docs/classify-doc-modal.tsx": {
+    "size": 16451,
+    "mtime_ns": 1784227346279241293,
+    "word_count": 0
+  },
+  "web/src/components/docs/doc-list.tsx": {
+    "size": 10151,
+    "mtime_ns": 1784227346279441670,
+    "word_count": 0
+  },
+  "web/src/components/docs/doc-preview.tsx": {
+    "size": 3439,
+    "mtime_ns": 1784227346279849131,
+    "word_count": 0
+  },
+  "web/src/components/docs/doc-type-proposal-modal.tsx": {
+    "size": 7171,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/docs/edit-doc-modal.tsx": {
+    "size": 8640,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/docs/empty-state.tsx": {
+    "size": 1992,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/docs/gap-list.tsx": {
+    "size": 11719,
+    "mtime_ns": 1784227346280155050,
+    "word_count": 0
+  },
+  "web/src/components/docs/inbox-tab.tsx": {
+    "size": 6552,
+    "mtime_ns": 1784227346280450677,
+    "word_count": 0
+  },
+  "web/src/components/docs/library-tab.tsx": {
+    "size": 13264,
+    "mtime_ns": 1784227346280790596,
+    "word_count": 0
+  },
+  "web/src/components/docs/no-data-queries-panel.tsx": {
+    "size": 3723,
+    "mtime_ns": 1784227346285715963,
+    "word_count": 0
+  },
+  "web/src/components/docs/questions-tab.tsx": {
+    "size": 2159,
+    "mtime_ns": 1784227346285945923,
+    "word_count": 0
+  },
+  "web/src/components/docs/supersede-picker-modal.tsx": {
+    "size": 5355,
+    "mtime_ns": 1783620455250962449,
+    "word_count": 0
+  },
+  "web/src/components/docs/upload-modal.tsx": {
+    "size": 24966,
+    "mtime_ns": 1784227346286221717,
+    "word_count": 0
+  },
+  "web/src/components/integrations/integrations-body.tsx": {
+    "size": 17339,
+    "mtime_ns": 1784227346287846811,
+    "word_count": 0
+  },
+  "web/src/components/invitations/invitation-list.tsx": {
+    "size": 9055,
+    "mtime_ns": 1784227346288168105,
+    "word_count": 0
+  },
+  "web/src/components/invitations/invite-form.tsx": {
+    "size": 13038,
+    "mtime_ns": 1784227346288591483,
+    "word_count": 0
+  },
+  "web/src/components/invitations/invite-status.ts": {
+    "size": 567,
+    "mtime_ns": 1783620455251568948,
+    "word_count": 0
+  },
+  "web/src/components/invitations/member-access-dialog.tsx": {
+    "size": 2133,
+    "mtime_ns": 1784227346288664150,
+    "word_count": 0
+  },
+  "web/src/components/invitations/members-list.tsx": {
+    "size": 7885,
+    "mtime_ns": 1784227346289043611,
+    "word_count": 0
+  },
+  "web/src/components/invitations/team-settings-body.tsx": {
+    "size": 1624,
+    "mtime_ns": 1784227346289111528,
+    "word_count": 0
+  },
+  "web/src/components/invitations/venue-access-picker.tsx": {
+    "size": 4130,
+    "mtime_ns": 1784227346289192820,
+    "word_count": 0
+  },
+  "web/src/components/marketing/content.ts": {
+    "size": 3809,
+    "mtime_ns": 1783620455252171947,
+    "word_count": 0
+  },
+  "web/src/components/marketing/cta-band.tsx": {
+    "size": 1282,
+    "mtime_ns": 1784227346290473204,
+    "word_count": 0
+  },
+  "web/src/components/marketing/forecast-section.tsx": {
+    "size": 9001,
+    "mtime_ns": 1784227346290849082,
+    "word_count": 0
+  },
+  "web/src/components/marketing/hero-chat.tsx": {
+    "size": 8474,
+    "mtime_ns": 1784227346290970374,
+    "word_count": 0
+  },
+  "web/src/components/marketing/posts.ts": {
+    "size": 3568,
+    "mtime_ns": 1784227346291330960,
+    "word_count": 0
+  },
+  "web/src/components/marketing/primitives.tsx": {
+    "size": 4532,
+    "mtime_ns": 1784227346292531760,
+    "word_count": 0
+  },
+  "web/src/components/marketing/reveal.tsx": {
+    "size": 1568,
+    "mtime_ns": 1784227346292592094,
+    "word_count": 0
+  },
+  "web/src/components/marketing/site-footer.tsx": {
+    "size": 1454,
+    "mtime_ns": 1784227346292975680,
+    "word_count": 0
+  },
+  "web/src/components/marketing/site-header.tsx": {
+    "size": 3823,
+    "mtime_ns": 1784227346293503683,
+    "word_count": 0
+  },
+  "web/src/components/marketing/site-nav.ts": {
+    "size": 436,
+    "mtime_ns": 1783620455252804029,
+    "word_count": 0
+  },
+  "web/src/components/marketing/structured-data.tsx": {
+    "size": 1143,
+    "mtime_ns": 1783620455252865529,
+    "word_count": 0
+  },
+  "web/src/components/marketing/wordmark.tsx": {
+    "size": 1108,
+    "mtime_ns": 1784227346293696268,
+    "word_count": 0
+  },
+  "web/src/components/organization/business-profile-form.tsx": {
+    "size": 15428,
+    "mtime_ns": 1784227346294684150,
+    "word_count": 0
+  },
+  "web/src/components/organization/general-settings-body.tsx": {
+    "size": 392,
+    "mtime_ns": 1784227346294745817,
+    "word_count": 0
+  },
+  "web/src/components/phone/phone-link-form.tsx": {
+    "size": 6696,
+    "mtime_ns": 1784227346295286112,
+    "word_count": 0
+  },
+  "web/src/components/phone/phone-status-card.tsx": {
+    "size": 4021,
+    "mtime_ns": 1784227346295439155,
+    "word_count": 0
+  },
+  "web/src/components/providers/query-provider.tsx": {
+    "size": 535,
+    "mtime_ns": 1784227346296005284,
+    "word_count": 0
+  },
+  "web/src/components/scheduled-reports/schedule-create-dialog.tsx": {
+    "size": 14298,
+    "mtime_ns": 1784227346296592205,
+    "word_count": 0
+  },
+  "web/src/components/scheduled-reports/scheduled-reports-body.tsx": {
+    "size": 12954,
+    "mtime_ns": 1784227346297056250,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts-view.tsx": {
+    "size": 50,
+    "mtime_ns": 1783620455253773277,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/action-row.tsx": {
+    "size": 3153,
+    "mtime_ns": 1784227346297349168,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alert-reply-thread.tsx": {
+    "size": 4001,
+    "mtime_ns": 1784227346297513253,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alert-row.tsx": {
+    "size": 6149,
+    "mtime_ns": 1784227346297847588,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alerts-filters.tsx": {
+    "size": 1432,
+    "mtime_ns": 1784227346298048757,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alerts-header.tsx": {
+    "size": 1408,
+    "mtime_ns": 1784227346298293133,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alerts-list.tsx": {
+    "size": 5892,
+    "mtime_ns": 1784227346298596802,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alerts-search.tsx": {
+    "size": 1391,
+    "mtime_ns": 1784227346298838012,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/alerts-view.tsx": {
+    "size": 1911,
+    "mtime_ns": 1783620455254665276,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/chip.tsx": {
+    "size": 747,
+    "mtime_ns": 1784227346299646559,
+    "word_count": 0
+  },
+  "web/src/components/shell/alerts/types.ts": {
+    "size": 49,
+    "mtime_ns": 1783620455254783401,
+    "word_count": 0
+  },
+  "web/src/components/shell/app-shell.tsx": {
+    "size": 2597,
+    "mtime_ns": 1784227346300050979,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations-view.tsx": {
+    "size": 71,
+    "mtime_ns": 1783620455254990150,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/conversation-list-row.tsx": {
+    "size": 5625,
+    "mtime_ns": 1784227346300463565,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/conversation-thread.tsx": {
+    "size": 11175,
+    "mtime_ns": 1784227346301625073,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/conversations-list.tsx": {
+    "size": 4477,
+    "mtime_ns": 1784227346302111659,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/conversations-view.tsx": {
+    "size": 2249,
+    "mtime_ns": 1783620455255551691,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/list-empty-state.tsx": {
+    "size": 1496,
+    "mtime_ns": 1784227346302319869,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/message-bubble.tsx": {
+    "size": 5170,
+    "mtime_ns": 1784227346302584538,
+    "word_count": 0
+  },
+  "web/src/components/shell/conversations/new-conversation-picker.tsx": {
+    "size": 4374,
+    "mtime_ns": 1784227346303041916,
+    "word_count": 0
+  },
+  "web/src/components/shell/dynamic-page-header.tsx": {
+    "size": 608,
+    "mtime_ns": 1783620455255998523,
+    "word_count": 0
+  },
+  "web/src/components/shell/inbox-provider.tsx": {
+    "size": 1625,
+    "mtime_ns": 1783620455256058315,
+    "word_count": 0
+  },
+  "web/src/components/shell/inbox-sheet-host.tsx": {
+    "size": 568,
+    "mtime_ns": 1784227346303109416,
+    "word_count": 0
+  },
+  "web/src/components/shell/mobile-header-gate.tsx": {
+    "size": 675,
+    "mtime_ns": 1784227346303176417,
+    "word_count": 0
+  },
+  "web/src/components/shell/mobile-more-menu.tsx": {
+    "size": 2949,
+    "mtime_ns": 1784227346303472836,
+    "word_count": 0
+  },
+  "web/src/components/shell/mobile-more-sheet.tsx": {
+    "size": 6640,
+    "mtime_ns": 1784227346303749212,
+    "word_count": 0
+  },
+  "web/src/components/shell/mobile-tab-bar.tsx": {
+    "size": 4532,
+    "mtime_ns": 1784227346303910880,
+    "word_count": 0
+  },
+  "web/src/components/shell/mobile-top-bar.tsx": {
+    "size": 5537,
+    "mtime_ns": 1784227346303994506,
+    "word_count": 0
+  },
+  "web/src/components/shell/notifications-bell.tsx": {
+    "size": 2726,
+    "mtime_ns": 1784227346304293966,
+    "word_count": 0
+  },
+  "web/src/components/shell/notifications-shared.tsx": {
+    "size": 4155,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/shell/notifications-sidebar.tsx": {
+    "size": 5633,
+    "mtime_ns": 1784227346304560010,
+    "word_count": 0
+  },
+  "web/src/components/shell/page-header-provider.tsx": {
+    "size": 2374,
+    "mtime_ns": 1783620455256649981,
+    "word_count": 0
+  },
+  "web/src/components/shell/page-header.tsx": {
+    "size": 2539,
+    "mtime_ns": 1784227346304717261,
+    "word_count": 0
+  },
+  "web/src/components/shell/pwa-install-banner.tsx": {
+    "size": 2797,
+    "mtime_ns": 1783620455256791064,
+    "word_count": 0
+  },
+  "web/src/components/shell/settings-header.tsx": {
+    "size": 380,
+    "mtime_ns": 1784227346304913387,
+    "word_count": 0
+  },
+  "web/src/components/shell/settings-shell.tsx": {
+    "size": 3918,
+    "mtime_ns": 1784227346305143597,
+    "word_count": 0
+  },
+  "web/src/components/shell/sidebar-threads.tsx": {
+    "size": 7288,
+    "mtime_ns": 1784227346305387182,
+    "word_count": 0
+  },
+  "web/src/components/shell/sidebar-user.tsx": {
+    "size": 4134,
+    "mtime_ns": 1784227346305680142,
+    "word_count": 0
+  },
+  "web/src/components/shell/sidebar.tsx": {
+    "size": 15185,
+    "mtime_ns": 1784227346305833935,
+    "word_count": 0
+  },
+  "web/src/components/ui/alert.tsx": {
+    "size": 1868,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/avatar.tsx": {
+    "size": 1419,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/back-button.tsx": {
+    "size": 1144,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/back-link.tsx": {
+    "size": 885,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/badge.tsx": {
+    "size": 1238,
+    "mtime_ns": 1784227346306096145,
+    "word_count": 0
+  },
+  "web/src/components/ui/button.tsx": {
+    "size": 1944,
+    "mtime_ns": 1784227346306425189,
+    "word_count": 0
+  },
+  "web/src/components/ui/card.tsx": {
+    "size": 1804,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/chart.tsx": {
+    "size": 10388,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/collapsible.tsx": {
+    "size": 327,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/confirm-delete-dialog.tsx": {
+    "size": 3968,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/confirm-dialog.tsx": {
+    "size": 1844,
+    "mtime_ns": 1783620455257612854,
+    "word_count": 0
+  },
+  "web/src/components/ui/dialog.tsx": {
+    "size": 3533,
+    "mtime_ns": 1784227346306663732,
+    "word_count": 0
+  },
+  "web/src/components/ui/dropdown-menu.tsx": {
+    "size": 2992,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/empty-state.tsx": {
+    "size": 1896,
+    "mtime_ns": 1784227346306939485,
+    "word_count": 0
+  },
+  "web/src/components/ui/form.tsx": {
+    "size": 4101,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/input-otp.tsx": {
+    "size": 1797,
+    "mtime_ns": 1783620455257665437,
+    "word_count": 0
+  },
+  "web/src/components/ui/input.tsx": {
+    "size": 735,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/label.tsx": {
+    "size": 706,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/list-row.tsx": {
+    "size": 687,
+    "mtime_ns": 1783620455257721104,
+    "word_count": 0
+  },
+  "web/src/components/ui/page-container.tsx": {
+    "size": 510,
+    "mtime_ns": 1783620455257781270,
+    "word_count": 0
+  },
+  "web/src/components/ui/popover.tsx": {
+    "size": 1100,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/select.tsx": {
+    "size": 5591,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/setting-card.tsx": {
+    "size": 1622,
+    "mtime_ns": 1784227346307005235,
+    "word_count": 0
+  },
+  "web/src/components/ui/sheet.tsx": {
+    "size": 3856,
+    "mtime_ns": 1783620455257884437,
+    "word_count": 0
+  },
+  "web/src/components/ui/skeleton.tsx": {
+    "size": 253,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/sonner.tsx": {
+    "size": 3262,
+    "mtime_ns": 1783620455258085895,
+    "word_count": 0
+  },
+  "web/src/components/ui/tabs.tsx": {
+    "size": 4148,
+    "mtime_ns": 1784227346307375154,
+    "word_count": 0
+  },
+  "web/src/components/ui/textarea.tsx": {
+    "size": 657,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/ui/tooltip.tsx": {
+    "size": 1206,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/components/venues/business-lookup.tsx": {
+    "size": 4683,
+    "mtime_ns": 1784227346307592239,
+    "word_count": 0
+  },
+  "web/src/components/venues/venue-form.tsx": {
+    "size": 6865,
+    "mtime_ns": 1784227346307757490,
+    "word_count": 0
+  },
+  "web/src/components/venues/venue-profile-editor.tsx": {
+    "size": 9406,
+    "mtime_ns": 1784227346308057326,
+    "word_count": 0
+  },
+  "web/src/components/venues/venue-profiles-body.tsx": {
+    "size": 6534,
+    "mtime_ns": 1784227346308203618,
+    "word_count": 0
+  },
+  "web/src/components/venues/venue-type-chips.tsx": {
+    "size": 1428,
+    "mtime_ns": 1784227346308544746,
+    "word_count": 0
+  },
+  "web/src/components/whatsapp-invitations/whatsapp-invite-list.tsx": {
+    "size": 5751,
+    "mtime_ns": 1783620455259239143,
+    "word_count": 0
+  },
+  "web/src/generated/api.ts": { "size": 581663, "mtime_ns": 1784227346309206458, "word_count": 0 },
+  "web/src/generated/zod.ts": { "size": 218513, "mtime_ns": 1784227346309619378, "word_count": 0 },
+  "web/src/lib/api-client.ts": { "size": 2726, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/api-errors.ts": { "size": 411, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/api-types.ts": { "size": 904, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/auth-client.ts": { "size": 676, "mtime_ns": 1783620455260667765, "word_count": 0 },
+  "web/src/lib/auth-schemas.ts": { "size": 679, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/format-relative.ts": {
+    "size": 590,
+    "mtime_ns": 1783620455260742348,
+    "word_count": 0
+  },
+  "web/src/lib/format.ts": { "size": 556, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/get-query-client.ts": {
+    "size": 2127,
+    "mtime_ns": 1784227346309696670,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-app-realtime.ts": {
+    "size": 1868,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-chat-starters.ts": {
+    "size": 1347,
+    "mtime_ns": 1784227346310064298,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-compliance-socket.ts": {
+    "size": 874,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-compliance.ts": {
+    "size": 4458,
+    "mtime_ns": 1784227346310584343,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-conversation.ts": {
+    "size": 1760,
+    "mtime_ns": 1784227346310994762,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-conversations-list.ts": {
+    "size": 2777,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-conversations.ts": {
+    "size": 5937,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-current-member.ts": {
+    "size": 940,
+    "mtime_ns": 1784227346311231598,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-daily-summary.ts": {
+    "size": 2238,
+    "mtime_ns": 1784227346311297639,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-dashboard.ts": {
+    "size": 6236,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-debug-conversation.ts": {
+    "size": 684,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-debug-retag-queue.ts": {
+    "size": 617,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-docs.ts": {
+    "size": 22074,
+    "mtime_ns": 1784227346311558850,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-feedback.ts": {
+    "size": 590,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-incidents.ts": {
+    "size": 5217,
+    "mtime_ns": 1784227346311808143,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-integrations.ts": {
+    "size": 4720,
+    "mtime_ns": 1784227346312040561,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-invitations.ts": {
+    "size": 5016,
+    "mtime_ns": 1784227346312473148,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-is-mobile.ts": {
+    "size": 451,
+    "mtime_ns": 1783620455261219931,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-kb-socket.ts": {
+    "size": 1220,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-notifications-socket.ts": {
+    "size": 4995,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-notifications.ts": {
+    "size": 8101,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-org-members.ts": {
+    "size": 2268,
+    "mtime_ns": 1784227346312707316,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-org-profile.ts": {
+    "size": 1625,
+    "mtime_ns": 1784227346312896109,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-phone.ts": {
+    "size": 1938,
+    "mtime_ns": 1784227346313112610,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-places-search.ts": {
+    "size": 904,
+    "mtime_ns": 1784227346313497822,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-reports.ts": {
+    "size": 4614,
+    "mtime_ns": 1784227346313658239,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-scheduled-reports.ts": {
+    "size": 5231,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-suggestions.ts": {
+    "size": 764,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-tasks-socket.ts": {
+    "size": 1309,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-tasks.ts": {
+    "size": 3995,
+    "mtime_ns": 1784227346313921033,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-update-conversation-visibility.ts": {
+    "size": 1138,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-venues.ts": {
+    "size": 2985,
+    "mtime_ns": 1784227346314147743,
+    "word_count": 0
+  },
+  "web/src/lib/hooks/use-whatsapp-invites.ts": {
+    "size": 2929,
+    "mtime_ns": 1784227346314527537,
+    "word_count": 0
+  },
+  "web/src/lib/initials.ts": { "size": 472, "mtime_ns": 1784227346314587079, "word_count": 0 },
+  "web/src/lib/map-api-error.ts": {
+    "size": 7246,
+    "mtime_ns": 1784227346314905164,
+    "word_count": 0
+  },
+  "web/src/lib/minted-conv-ids.ts": {
+    "size": 486,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/mobile-nav.ts": { "size": 693, "mtime_ns": 1784227346314964707, "word_count": 0 },
+  "web/src/lib/orval-mutator.ts": { "size": 441, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/phone.ts": { "size": 1430, "mtime_ns": 1783620455262463095, "word_count": 0 },
+  "web/src/lib/prefetch.ts": { "size": 2323, "mtime_ns": 1784227346315017874, "word_count": 0 },
+  "web/src/lib/queries/keys.ts": { "size": 1306, "mtime_ns": 1784227346315104332, "word_count": 0 },
+  "web/src/lib/realtime-socket.ts": {
+    "size": 921,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/require-app-access.ts": {
+    "size": 1541,
+    "mtime_ns": 1783620455262690137,
+    "word_count": 0
+  },
+  "web/src/lib/safe-redirect.ts": { "size": 604, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/lib/seo.ts": { "size": 1025, "mtime_ns": 1784227346315566627, "word_count": 0 },
+  "web/src/lib/server-api.ts": { "size": 972, "mtime_ns": 1784227346315638878, "word_count": 0 },
+  "web/src/lib/server-prefetch.ts": {
+    "size": 1768,
+    "mtime_ns": 1784227346315709503,
+    "word_count": 0
+  },
+  "web/src/lib/server-session.ts": {
+    "size": 1478,
+    "mtime_ns": 1784227346315950463,
+    "word_count": 0
+  },
+  "web/src/lib/server-venues.ts": {
+    "size": 1103,
+    "mtime_ns": 1779181503000000000,
+    "word_count": 0
+  },
+  "web/src/lib/utils.ts": { "size": 166, "mtime_ns": 1779181503000000000, "word_count": 0 },
+  "web/src/proxy.ts": { "size": 1661, "mtime_ns": 1783620455262953595, "word_count": 196 },
+  "web/tsconfig.json": { "size": 654, "mtime_ns": 1779181503000000000, "word_count": 55 }
+}

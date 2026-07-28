@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "_claude_skills_test_writer_skill_test_writer",
+      "label": "test-writer skill",
+      "file_type": "document",
+      "source_file": ".claude/skills/test-writer/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "_claude_skills_test_writer_skill_test_writer",
+      "target": "_claude_rules_testing_testing",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": ".claude/skills/test-writer/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

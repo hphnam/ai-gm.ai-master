@@ -1,0 +1,1400 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "label": "foundation.py",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "label": "_revision_for()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L75",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "label": "_resolve_device()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L129",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "label": "_pipeline()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L151",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "label": "chronos2_runtime_info()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L161",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "label": "chronos_bolt_predict()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L176",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/models/foundation.py"
+    },
+    {
+      "id": "ndarray",
+      "label": "ndarray",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/models/foundation.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_guardtimeout",
+      "label": "_GuardTimeout",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L190",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "exception",
+      "label": "Exception",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/models/foundation.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "label": "_time_limit()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L195",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "label": "_chronos2_pipeline()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L213",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "label": "_chronos2_base_pipeline()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L235",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "label": "chronos2_predict()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L245",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "label": "MissingCovariateError",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L281",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "valueerror",
+      "label": "ValueError",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/models/foundation.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_cols",
+      "label": "chronos2_exo_cols()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L292",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "label": "_require_covariates()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L299",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "label": "chronos2_exo_predict()",
+      "file_type": "code",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L312",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_1",
+      "label": "WP4 / WP9 \u00b7 Rung-4 foundation-model forecasters: Chronos-Bolt and Chronos-2.  Tw",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_76",
+      "label": "The pinned HF revision for a model id, or None for the unpinned fallback.",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L76"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_130",
+      "label": "G12.15a: the torch device for Chronos loads. `BRAIN_TORCH_DEVICE` overrides",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L130"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_152",
+      "label": "Load the pinned Chronos-Bolt pipeline once per process (device auto-resolved,",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L152"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_162",
+      "label": "Version / model id / API path / substitution flag / device for the report.",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L162"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_177",
+      "label": "Zero-shot Chronos-Bolt point forecast: the 0.5 quantile row, clipped at 0.",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L177"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_196",
+      "label": "Best-effort wall-clock guard via SIGALRM. Falls through without a hard     limit",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L196"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_214",
+      "label": "Load Chronos-2 once per process. Resource guard (G9.2): if the flagship     amaz",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L214"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_236",
+      "label": "Base pipeline of the loaded Chronos-2 model, for the tensor fallback path.",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L236"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_247",
+      "label": "Zero-shot Chronos-2 point forecast, clipped at 0.      Primary path (S9): the RE",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L247"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_282",
+      "label": "Raised when chronos2_exo_predict is handed a frame lacking a required     known-",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L282"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_316",
+      "label": "Zero-shot Chronos-2 point forecast with the FULL known-future covariate set",
+      "file_type": "rationale",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L316"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "os",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "signal",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "contextlib",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L46",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L47",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "torch",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L121",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "chronos",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L122",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L151",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L161",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L176",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L176",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L176",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L176",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_guardtimeout",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L190",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_guardtimeout",
+      "target": "exception",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L190",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L195",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L213",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L235",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L245",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L245",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L245",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L245",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L281",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "target": "valueerror",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L281",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_cols",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L292",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L299",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L299",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L312",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L312",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L312",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L312",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L157",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L220",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L223",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L225",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L241",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L257",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L258",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "valueerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L268",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L272",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L302",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_cols",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L337",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L341",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L346",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L349",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L350",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "target": "valueerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L367",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_cols",
+      "relation": "indirect_call",
+      "context": "assignment",
+      "confidence": "INFERRED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L296",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_76",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_130",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_152",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_162",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L162",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_177",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L177",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_196",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L196",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_214",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L214",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_236",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L236",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_247",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L247",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_282",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_missingcovariateerror",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L282",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_rationale_316",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L316",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_revision_for",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L77",
+      "receiver": "_PINNED_REVISION"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L133",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_resolve_device",
+      "callee": "is_available",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L136",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "callee": "from_pretrained",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L156",
+      "receiver": "BaseChronosPipeline"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "callee": "CHRONOS_MODEL_ID",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L157"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_pipeline",
+      "callee": "CHRONOS_REVISION",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L157"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "callee": "version",
+      "is_member_call": false,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L165",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_runtime_info",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L173",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "tensor",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L182",
+      "receiver": "torch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L182",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "predict_quantiles",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L183",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L186",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L186"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos_bolt_predict",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L187",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "signal",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L201",
+      "receiver": "signal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "_handler",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L201"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "alarm",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L202",
+      "receiver": "signal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L203"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "AttributeError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L203"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "alarm",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L209",
+      "receiver": "signal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_time_limit",
+      "callee": "signal",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L210",
+      "receiver": "signal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "CHRONOS2_MODEL_ID",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L221"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "CHRONOS2_FALLBACK_MODEL_ID",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L221"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "RESOURCE_GUARD_SECONDS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L223"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "from_pretrained",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L224",
+      "receiver": "Chronos2Pipeline"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "update",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L226",
+      "receiver": "_CHRONOS2"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "Exception",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L229"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L230",
+      "receiver": "errors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "exc",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L230"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "RuntimeError",
+      "is_member_call": false,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L232",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_pipeline",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L232",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_base_pipeline",
+      "callee": "from_pretrained",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L240",
+      "receiver": "BaseChronosPipeline"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L260",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L260",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L261",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L261"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "predict_df",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L262",
+      "receiver": "pipe"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L266",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L266"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L266",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L270",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "tensor",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L273",
+      "receiver": "torch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L273",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "predict_quantiles",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L274",
+      "receiver": "base"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L276",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L276"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_predict",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L278",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_cols",
+      "callee": "CHRONOS2_EXO_COLS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L293"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_require_covariates",
+      "callee": "isna",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L305",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L352",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L352",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L353",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L353"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L355",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L355"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L357",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L357",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L359",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L359"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "predict_df",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L360",
+      "receiver": "pipe"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L365",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L365"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L365",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_foundation_chronos2_exo_predict",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/models/foundation.py",
+      "source_location": "L368",
+      "receiver": "np"
+    }
+  ]
+}

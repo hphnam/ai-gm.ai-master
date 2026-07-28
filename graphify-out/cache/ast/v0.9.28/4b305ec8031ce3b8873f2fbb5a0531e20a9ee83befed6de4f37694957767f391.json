@@ -1,0 +1,458 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "label": "test_a4_ladder.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "label": "_synthetic()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L14",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a4_ladder.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_seasonal_naive_repeats_prior_week",
+      "label": "test_seasonal_naive_repeats_prior_week()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L24",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "label": "test_robust_dow_tracks_day_of_week_medians()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L34",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "label": "test_select_best_picks_lowest_mase()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L44",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "label": "test_milestone_passes_when_a_rung_beats_both_baselines()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L53",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "label": "test_milestone_fails_when_baseline_is_best()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L64",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_capped_milestone_gate_is_rung1_beats_naive",
+      "label": "test_capped_milestone_gate_is_rung1_beats_naive()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L74",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted",
+      "label": "test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L87",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_rationale_1",
+      "label": "A4 tests, rung predictors and the milestone/selection logic (fast, on a syntheti",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L7",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "models",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "models_ladder",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_seasonal_naive_repeats_prior_week",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_capped_milestone_gate_is_rung1_beats_naive",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L74",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_seasonal_naive_repeats_prior_week",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L15",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L16",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L20",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_synthetic",
+      "callee": "int",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L20"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_seasonal_naive_repeats_prior_week",
+      "callee": "rung0_seasonal_naive",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L27",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_seasonal_naive_repeats_prior_week",
+      "callee": "get_loc",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L31",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "callee": "rung1_robust_dow",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L37",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "callee": "get_loc",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L39",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_robust_dow_tracks_day_of_week_medians",
+      "callee": "get_loc",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L40",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L46",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L47",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L48",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_select_best_picks_lowest_mase",
+      "callee": "select_best",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L50",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L55",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L56",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L57",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_passes_when_a_rung_beats_both_baselines",
+      "callee": "milestone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L59",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L66",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L67",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L68",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_milestone_fails_when_baseline_is_best",
+      "callee": "milestone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L70",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_capped_milestone_gate_is_rung1_beats_naive",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L78",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_capped_milestone_gate_is_rung1_beats_naive",
+      "callee": "RungResult",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L79",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_capped_milestone_gate_is_rung1_beats_naive",
+      "callee": "milestone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L81",
+      "receiver": "ladder"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a4_ladder_test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted",
+      "callee": "evaluate_static",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a4_ladder.py",
+      "source_location": "L93",
+      "receiver": "ladder"
+    }
+  ]
+}

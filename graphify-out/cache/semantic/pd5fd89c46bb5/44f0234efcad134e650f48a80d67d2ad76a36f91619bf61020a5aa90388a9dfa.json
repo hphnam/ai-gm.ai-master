@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_eval_design_a2",
+      "label": "A2 \u2014 evaluation design harness, stood up before any model so every ladder rung is scored identically",
+      "file_type": "document",
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_eval_eval_design_splits",
+      "label": "A2 splits: time-aware split, rolling-origin/expanding-window, leave-one-venue-out, leakage-checked at construction",
+      "file_type": "concept",
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_eval_eval_design_metrics",
+      "label": "A2 metrics: MASE/MAE/RMSE, sMAPE (caution), empirical coverage, Winkler/pinball/mean width",
+      "file_type": "concept",
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_eval_eval_design_metrics",
+      "target": "glossary_mase",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_eval_design_splits",
+      "target": "glossary_lovo",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_eval_design_a2",
+      "target": "brain_eval_eval_design_splits",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_eval_design_a2",
+      "target": "brain_eval_eval_design_metrics",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/eval_design.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

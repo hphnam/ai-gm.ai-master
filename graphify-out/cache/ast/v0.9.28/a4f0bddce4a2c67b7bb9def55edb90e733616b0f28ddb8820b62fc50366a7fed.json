@@ -1,0 +1,1255 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "label": "test_a2_fold_count.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "label": "_series()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L21",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a2_fold_count.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "label": "_pre_refactor_rolling_origin()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L28",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_signature",
+      "label": "_signature()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L45",
+      "_callable": true
+    },
+    {
+      "id": "parametrize",
+      "label": "parametrize",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a2_fold_count.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "label": "test_step_days_none_is_identical_to_the_pre_refactor_implementation()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L58",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "label": "test_step_days_equal_to_horizon_reproduces_the_disjoint_default()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L69",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_every_origin_is_taken_when_n_folds_is_none",
+      "label": "test_every_origin_is_taken_when_n_folds_is_none()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L80",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "label": "test_n_folds_still_caps_to_the_most_recent_origins_when_stepping()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L88",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_folds_are_yielded_oldest_first",
+      "label": "test_folds_are_yielded_oldest_first()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L97",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "label": "test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L104",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "label": "test_a_non_positive_step_is_rejected_rather_than_looping_forever()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L109",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_the_guard_fires_on_a_constructed_overlapping_train_and_test",
+      "label": "test_the_guard_fires_on_a_constructed_overlapping_train_and_test()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L124",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_no_fold_leaks_at_step_one_where_windows_overlap",
+      "label": "test_no_fold_leaks_at_step_one_where_windows_overlap()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L134",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_consecutive_test_windows_genuinely_overlap_at_step_one",
+      "label": "test_consecutive_test_windows_genuinely_overlap_at_step_one()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L144",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_training_history_grows_monotonically_across_folds",
+      "label": "test_training_history_grows_monotonically_across_folds()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L154",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "label": "_payload()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L163",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "label": "test_fold_vectors_round_trip_through_disk()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L188",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "label": "test_round_trip_preserves_float_values_exactly()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L195",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "label": "test_saved_payload_is_valid_json()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L204",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_drops_folds_only_one_rung_scored",
+      "label": "test_aligned_pair_drops_folds_only_one_rung_scored()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L210",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_would_have_mispaired_under_a_naive_zip",
+      "label": "test_aligned_pair_would_have_mispaired_under_a_naive_zip()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L215",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "label": "test_aligned_pair_refuses_an_unavailable_rung()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L223",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_artefact_declares_its_overlap_and_scale_policy",
+      "label": "test_persisted_artefact_declares_its_overlap_and_scale_policy()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L231",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "label": "test_persisted_vectors_align_with_their_fold_boundaries()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L243",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_folds_never_leak",
+      "label": "test_persisted_folds_never_leak()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L254",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_1",
+      "label": "S2 G17b tests: `step_days`, leakage under overlapping windows, round-trip.  The",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_31",
+      "label": "Verbatim implementation as at d40dea7, for equivalence checking.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L31"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_145",
+      "label": "Without this the leakage tests above could pass vacuously on disjoint     window",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L145"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_216",
+      "label": "The reason `aligned_pair` exists: zipping the raw vectors pairs fold 1's     los",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L216"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_232",
+      "label": "S3 must not treat these folds as iid draws. The warning lives in the file     it",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L232"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_255",
+      "label": "The boundaries are stored as dates, so the leakage property is checkable     fro",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L255"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "eval",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_signature",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "target": "parametrize",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_every_origin_is_taken_when_n_folds_is_none",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_folds_are_yielded_oldest_first",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L109",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_the_guard_fires_on_a_constructed_overlapping_train_and_test",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L124",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_no_fold_leaks_at_step_one_where_windows_overlap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_consecutive_test_windows_genuinely_overlap_at_step_one",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_training_history_grows_monotonically_across_folds",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L154",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L163",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L188",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L195",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L204",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_drops_folds_only_one_rung_scored",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L210",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_would_have_mispaired_under_a_naive_zip",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L215",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L223",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_artefact_declares_its_overlap_and_scale_policy",
+      "target": "parametrize",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L230",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_artefact_declares_its_overlap_and_scale_policy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L231",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "target": "parametrize",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L242",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L243",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_folds_never_leak",
+      "target": "parametrize",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L253",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_folds_never_leak",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L254",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_signature",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_signature",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_every_origin_is_taken_when_n_folds_is_none",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_signature",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_folds_are_yielded_oldest_first",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_the_guard_fires_on_a_constructed_overlapping_train_and_test",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_no_fold_leaks_at_step_one_where_windows_overlap",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_consecutive_test_windows_genuinely_overlap_at_step_one",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L148",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_training_history_grows_monotonically_across_folds",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L156",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L190",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L197",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L206",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_drops_folds_only_one_rung_scored",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L211",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_would_have_mispaired_under_a_naive_zip",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_payload",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L225",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_31",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_145",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_consecutive_test_windows_genuinely_overlap_at_step_one",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L145",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_216",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_would_have_mispaired_under_a_naive_zip",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L216",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_232",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_artefact_declares_its_overlap_and_scale_policy",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L232",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_rationale_255",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_folds_never_leak",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L255",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L22",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L23",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "callee": "sin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L24",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_series",
+      "callee": "arange",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L24",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L32",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "sort_values",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L32",
+      "receiver": "df"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L35",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L36",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "assert_no_leakage",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L41",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "copy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L42",
+      "receiver": "train"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_pre_refactor_rolling_origin",
+      "callee": "copy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L42",
+      "receiver": "test"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_none_is_identical_to_the_pre_refactor_implementation",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L64",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L71",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_step_days_equal_to_horizon_reproduces_the_disjoint_default",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L73",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_every_origin_is_taken_when_n_folds_is_none",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L82",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L90",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_n_folds_still_caps_to_the_most_recent_origins_when_stepping",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L92",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_folds_are_yielded_oldest_first",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L98",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L105",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L105"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_rolling_origin_needs_at_least_one_of_n_folds_or_step_days",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L106",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L110",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L110"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_a_non_positive_step_is_rejected_rather_than_looping_forever",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L111",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_the_guard_fires_on_a_constructed_overlapping_train_and_test",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L130",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_the_guard_fires_on_a_constructed_overlapping_train_and_test",
+      "callee": "assert_no_leakage",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L131",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_no_fold_leaks_at_step_one_where_windows_overlap",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L135",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_consecutive_test_windows_genuinely_overlap_at_step_one",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L147",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_training_history_grows_monotonically_across_folds",
+      "callee": "rolling_origin",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L155",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "callee": "fold_vectors",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L189"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "callee": "save",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L191",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_fold_vectors_round_trip_through_disk",
+      "callee": "load",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L192",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "callee": "fold_vectors",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L196"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "callee": "save",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L199",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_round_trip_preserves_float_values_exactly",
+      "callee": "load",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L200",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "callee": "fold_vectors",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L205"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "callee": "save",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L206",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "callee": "loads",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L207",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_saved_payload_is_valid_json",
+      "callee": "read_text",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L207",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_drops_folds_only_one_rung_scored",
+      "callee": "aligned_pair",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L211",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_would_have_mispaired_under_a_naive_zip",
+      "callee": "aligned_pair",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L220",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L224",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L224"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_aligned_pair_refuses_an_unavailable_rung",
+      "callee": "aligned_pair",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L225",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_artefact_declares_its_overlap_and_scale_policy",
+      "callee": "load",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L235",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "callee": "load",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L244",
+      "receiver": "fold_vectors"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L246",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_vectors_align_with_their_fold_boundaries",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L247",
+      "receiver": "r"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a2_fold_count_test_persisted_folds_never_leak",
+      "callee": "load",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a2_fold_count.py",
+      "source_location": "L257",
+      "receiver": "fold_vectors"
+    }
+  ]
+}

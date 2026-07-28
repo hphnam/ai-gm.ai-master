@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "brain_requirements_optional_document",
+      "label": "brain/requirements-optional.txt \u2014 optional/heavier dependencies",
+      "file_type": "document",
+      "source_file": "brain/requirements-optional.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_requirements_optional_document",
+      "target": "brain_requirements_document",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/requirements-optional.txt",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

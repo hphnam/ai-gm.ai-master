@@ -1,0 +1,1045 @@
+{
+  "CONTRACT.md": { "size": 23037, "mtime_ns": 1784510606779693382, "word_count": 3485 },
+  "FLAGS.md": { "size": 80645, "mtime_ns": 1784925669462785420, "word_count": 11805 },
+  "README.md": { "size": 14832, "mtime_ns": 1784225933073081927, "word_count": 2145 },
+  "__init__.py": { "size": 0, "mtime_ns": 1783525986199446660, "word_count": 0 },
+  "compute/__init__.py": { "size": 135, "mtime_ns": 1784248278188726994, "word_count": 20 },
+  "compute/contract.py": { "size": 27686, "mtime_ns": 1784510445104103332, "word_count": 4053 },
+  "compute/engine.py": { "size": 9627, "mtime_ns": 1784281758157816480, "word_count": 1206 },
+  "compute/forward.py": { "size": 12096, "mtime_ns": 1784510445105356448, "word_count": 1612 },
+  "compute/loader.py": { "size": 9305, "mtime_ns": 1784284124069662421, "word_count": 1090 },
+  "config.py": { "size": 27893, "mtime_ns": 1784925906821657019, "word_count": 3930 },
+  "conformal/__init__.py": { "size": 0, "mtime_ns": 1783525986199993325, "word_count": 0 },
+  "conformal/conformal_L1_beer_hall.md": {
+    "size": 829,
+    "mtime_ns": 1783525986243391728,
+    "word_count": 148
+  },
+  "conformal/conformal_L1_ellel.md": {
+    "size": 1174,
+    "mtime_ns": 1783525986243523519,
+    "word_count": 196
+  },
+  "conformal/conformal_L1_two_river_taps.md": {
+    "size": 1468,
+    "mtime_ns": 1783525986359630994,
+    "word_count": 244
+  },
+  "conformal/methods.py": { "size": 8507, "mtime_ns": 1784845657816746393, "word_count": 1078 },
+  "conformal/wrap.py": { "size": 18604, "mtime_ns": 1784254590259109074, "word_count": 1998 },
+  "data/opening_and_closing_checklist.md": {
+    "size": 3061,
+    "mtime_ns": 1783525987193536109,
+    "word_count": 581
+  },
+  "eval/__init__.py": { "size": 0, "mtime_ns": 1783525986201001737, "word_count": 0 },
+  "eval/aci_closure_coverage.png": {
+    "size": 54769,
+    "mtime_ns": 1783525988612824350,
+    "word_count": 1878
+  },
+  "eval/aci_closure_probe.md": { "size": 1111, "mtime_ns": 1783525988612995057, "word_count": 175 },
+  "eval/aci_closure_probe.py": {
+    "size": 9643,
+    "mtime_ns": 1783525988613171307,
+    "word_count": 1083
+  },
+  "eval/agent_cache.py": { "size": 3609, "mtime_ns": 1784762072806693604, "word_count": 442 },
+  "eval/agent_calibration.py": {
+    "size": 21503,
+    "mtime_ns": 1784763947432344907,
+    "word_count": 2457
+  },
+  "eval/agent_eval.py": { "size": 53886, "mtime_ns": 1783702923383372785, "word_count": 6049 },
+  "eval/change_point_eval.md": { "size": 2571, "mtime_ns": 1783525988514374507, "word_count": 460 },
+  "eval/change_point_eval.py": {
+    "size": 9022,
+    "mtime_ns": 1783702923385344612,
+    "word_count": 1022
+  },
+  "eval/chronos2_covariate_probe.md": {
+    "size": 900,
+    "mtime_ns": 1783525988776425756,
+    "word_count": 145
+  },
+  "eval/chronos2_covariate_probe.py": {
+    "size": 5402,
+    "mtime_ns": 1784581332353302111,
+    "word_count": 552
+  },
+  "eval/chronos2_promotion_sensitivity.md": {
+    "size": 1168,
+    "mtime_ns": 1783525989051017995,
+    "word_count": 154
+  },
+  "eval/chronos2_promotion_sensitivity.py": {
+    "size": 4343,
+    "mtime_ns": 1783525989051300702,
+    "word_count": 495
+  },
+  "eval/deviation_eval.md": { "size": 1216, "mtime_ns": 1784926628251468782, "word_count": 187 },
+  "eval/eval_design.md": { "size": 2220, "mtime_ns": 1783525986201260444, "word_count": 328 },
+  "eval/fold_vectors.py": { "size": 6737, "mtime_ns": 1784596752313421640, "word_count": 803 },
+  "eval/fold_vectors_L1_beer_hall.json": {
+    "size": 168750,
+    "mtime_ns": 1784596894383749906,
+    "word_count": 11110
+  },
+  "eval/fold_vectors_L1_ellel.json": {
+    "size": 160162,
+    "mtime_ns": 1784596894384249324,
+    "word_count": 10561
+  },
+  "eval/fold_vectors_L1_two_river_taps.json": {
+    "size": 128228,
+    "mtime_ns": 1784596894391386337,
+    "word_count": 8458
+  },
+  "eval/group_icl.md": { "size": 1917, "mtime_ns": 1784770763781079237, "word_count": 353 },
+  "eval/group_icl.py": { "size": 23589, "mtime_ns": 1784770727963180404, "word_count": 2433 },
+  "eval/group_icl_L1.json": { "size": 170704, "mtime_ns": 1784771112305367107, "word_count": 7369 },
+  "eval/group_icl_calibration.json": {
+    "size": 2126,
+    "mtime_ns": 1784771112299746981,
+    "word_count": 214
+  },
+  "eval/group_icl_mcs.json": { "size": 4002, "mtime_ns": 1784771112299743314, "word_count": 297 },
+  "eval/harness.py": { "size": 26712, "mtime_ns": 1784596730782390853, "word_count": 3100 },
+  "eval/inject.py": { "size": 13279, "mtime_ns": 1783702923392458629, "word_count": 1513 },
+  "eval/inject_realistic.py": {
+    "size": 19479,
+    "mtime_ns": 1784909994090082292,
+    "word_count": 2170
+  },
+  "eval/injection_realism.json": {
+    "size": 57066,
+    "mtime_ns": 1784910289138626375,
+    "word_count": 4606
+  },
+  "eval/injection_realism.py": {
+    "size": 15769,
+    "mtime_ns": 1784908980723051187,
+    "word_count": 1532
+  },
+  "eval/intermittency_L1.md": { "size": 1550, "mtime_ns": 1784658075336434068, "word_count": 275 },
+  "eval/intermittency_diagnostic.md": {
+    "size": 3142,
+    "mtime_ns": 1784659825838590700,
+    "word_count": 602
+  },
+  "eval/intermittency_diagnostic.py": {
+    "size": 14837,
+    "mtime_ns": 1784660285643835809,
+    "word_count": 1792
+  },
+  "eval/interval_calibration.md": {
+    "size": 5055,
+    "mtime_ns": 1784846579259320992,
+    "word_count": 976
+  },
+  "eval/interval_calibration.py": {
+    "size": 24235,
+    "mtime_ns": 1784846501444661400,
+    "word_count": 2459
+  },
+  "eval/interval_calibration_L1.json": {
+    "size": 94799,
+    "mtime_ns": 1784847468434537692,
+    "word_count": 4875
+  },
+  "eval/interval_calibration_mcs.json": {
+    "size": 7998,
+    "mtime_ns": 1784847468429583551,
+    "word_count": 541
+  },
+  "eval/interval_calibration_power.json": {
+    "size": 908,
+    "mtime_ns": 1784847468429466343,
+    "word_count": 101
+  },
+  "eval/interval_calibration_served_check.json": {
+    "size": 4214,
+    "mtime_ns": 1784847468429410342,
+    "word_count": 310
+  },
+  "eval/judge.py": { "size": 10419, "mtime_ns": 1783702923395903075, "word_count": 1174 },
+  "eval/judge_prompts.md": { "size": 9949, "mtime_ns": 1784926613940512179, "word_count": 1138 },
+  "eval/labels.py": { "size": 14078, "mtime_ns": 1783702923399076397, "word_count": 1532 },
+  "eval/mcs.py": { "size": 14093, "mtime_ns": 1784596884975147884, "word_count": 1723 },
+  "eval/mcs_L1_results.json": {
+    "size": 39672,
+    "mtime_ns": 1784598854149865849,
+    "word_count": 2450
+  },
+  "eval/mcs_report.py": { "size": 5417, "mtime_ns": 1784597422530865372, "word_count": 493 },
+  "eval/occurrence_gate.py": { "size": 3393, "mtime_ns": 1784658940557615558, "word_count": 369 },
+  "eval/occurrence_gate_beer_hall.json": {
+    "size": 461,
+    "mtime_ns": 1784660346825978486,
+    "word_count": 43
+  },
+  "eval/scale_bootstrap.py": { "size": 6499, "mtime_ns": 1784658362508003353, "word_count": 791 },
+  "eval/scale_bootstrap_L1.json": {
+    "size": 4945,
+    "mtime_ns": 1784658387950208318,
+    "word_count": 373
+  },
+  "eval/weather_basis.md": { "size": 5658, "mtime_ns": 1784782220531819884, "word_count": 1090 },
+  "eval/weather_basis.py": { "size": 22388, "mtime_ns": 1784782206751369784, "word_count": 2163 },
+  "eval/weather_basis_L1.json": {
+    "size": 1078517,
+    "mtime_ns": 1784780920489460627,
+    "word_count": 37296
+  },
+  "eval/weather_basis_coverage.json": {
+    "size": 3284,
+    "mtime_ns": 1784783292359300686,
+    "word_count": 280
+  },
+  "eval/weather_basis_mcs.json": {
+    "size": 13413,
+    "mtime_ns": 1784783292359520646,
+    "word_count": 862
+  },
+  "eval/worldcup_fixture_probe.py": {
+    "size": 6793,
+    "mtime_ns": 1784581344198244150,
+    "word_count": 746
+  },
+  "features/__init__.py": { "size": 0, "mtime_ns": 1783525986201521235, "word_count": 0 },
+  "features/build_features.py": {
+    "size": 16998,
+    "mtime_ns": 1784485195660922851,
+    "word_count": 2079
+  },
+  "hierarchy/__init__.py": { "size": 0, "mtime_ns": 1783525986201861734, "word_count": 0 },
+  "hierarchy/reconcile.py": { "size": 22567, "mtime_ns": 1784581325142310420, "word_count": 2426 },
+  "hierarchy/reconciliation_forecast.md": {
+    "size": 4220,
+    "mtime_ns": 1783525988727158877,
+    "word_count": 711
+  },
+  "ingest/__init__.py": { "size": 0, "mtime_ns": 1783525986202367648, "word_count": 0 },
+  "ingest/calendar_sources.py": {
+    "size": 8080,
+    "mtime_ns": 1783702923408387073,
+    "word_count": 933
+  },
+  "ingest/exog_supplied.py": { "size": 6383, "mtime_ns": 1784284103301043515, "word_count": 808 },
+  "ingest/exog_weather.py": { "size": 21233, "mtime_ns": 1784782946914363439, "word_count": 2300 },
+  "ingest/live.py": { "size": 3477, "mtime_ns": 1783702923411676228, "word_count": 438 },
+  "ingest/local_events.py": { "size": 5225, "mtime_ns": 1783702951330059351, "word_count": 588 },
+  "ingest/normalise.py": { "size": 8460, "mtime_ns": 1784254624211983971, "word_count": 763 },
+  "ingest/refresh.py": { "size": 27078, "mtime_ns": 1784254624212388718, "word_count": 3070 },
+  "ingest/sources/__init__.py": { "size": 728, "mtime_ns": 1784248583867450277, "word_count": 92 },
+  "ingest/sources/base.py": { "size": 4408, "mtime_ns": 1784248564906668116, "word_count": 570 },
+  "ingest/spike_days.py": { "size": 3717, "mtime_ns": 1783702923420847488, "word_count": 397 },
+  "ingest/stock_normalise.py": {
+    "size": 15820,
+    "mtime_ns": 1784254624212775257,
+    "word_count": 1568
+  },
+  "ingest/taxonomy.py": { "size": 4326, "mtime_ns": 1783646502297400628, "word_count": 530 },
+  "ingest/taxonomy_map.md": { "size": 6143, "mtime_ns": 1783646502297540442, "word_count": 1135 },
+  "ingest/world_cup.py": { "size": 15621, "mtime_ns": 1783640042823301298, "word_count": 1756 },
+  "ingest/world_cup_schedule.md": {
+    "size": 11363,
+    "mtime_ns": 1783620455264501717,
+    "word_count": 2644
+  },
+  "log/01_Phase2_Build_Report.md": {
+    "size": 16911,
+    "mtime_ns": 1784227496269601377,
+    "word_count": 2493
+  },
+  "log/02_Phase2_Remediation_Report.md": {
+    "size": 9684,
+    "mtime_ns": 1784227496269883255,
+    "word_count": 1307
+  },
+  "log/03_Build_Report_Current.md": {
+    "size": 16953,
+    "mtime_ns": 1784227496270101048,
+    "word_count": 2150
+  },
+  "log/04_ChangePoint_A13_Report.md": {
+    "size": 9388,
+    "mtime_ns": 1784227496270350966,
+    "word_count": 1363
+  },
+  "log/05_PointDeviation_Report.md": {
+    "size": 10456,
+    "mtime_ns": 1784227496270603009,
+    "word_count": 1428
+  },
+  "log/06_Proactive_Briefing_Report.md": {
+    "size": 12813,
+    "mtime_ns": 1784227496270817136,
+    "word_count": 1962
+  },
+  "log/07_Live_Ingest_Report.md": {
+    "size": 11693,
+    "mtime_ns": 1784227496271073221,
+    "word_count": 1751
+  },
+  "log/08_Promote_And_Serve_Report.md": {
+    "size": 10361,
+    "mtime_ns": 1784227496271319056,
+    "word_count": 1484
+  },
+  "log/09_Agent_Eval_Report.md": {
+    "size": 14592,
+    "mtime_ns": 1784227496271538974,
+    "word_count": 2529
+  },
+  "log/10_Stock_Part2_Prefill_for_James.md": {
+    "size": 3834,
+    "mtime_ns": 1784227496271700517,
+    "word_count": 617
+  },
+  "log/11_Scaled_Eval_Report.md": {
+    "size": 16062,
+    "mtime_ns": 1784227496271888518,
+    "word_count": 2429
+  },
+  "log/12_WorldCup_LiveProbe_Report.md": {
+    "size": 22039,
+    "mtime_ns": 1784227496272064853,
+    "word_count": 3425
+  },
+  "log/13_LiveIngest_Fixes_Report.md": {
+    "size": 14134,
+    "mtime_ns": 1784227496272245479,
+    "word_count": 2072
+  },
+  "log/14_Fidelity_Corrections_Build_Report.md": {
+    "size": 14201,
+    "mtime_ns": 1784227496272420730,
+    "word_count": 2003
+  },
+  "log/15_Fidelity_Corrections_Addendum_Report.md": {
+    "size": 17609,
+    "mtime_ns": 1784227496272595523,
+    "word_count": 2257
+  },
+  "log/16_Chronos2_Promotion_Report.md": {
+    "size": 17854,
+    "mtime_ns": 1784227496272755774,
+    "word_count": 2307
+  },
+  "log/17_G12_9_Report.md": { "size": 18129, "mtime_ns": 1784227496272916900, "word_count": 2286 },
+  "log/18_DOWNSTREAM.md": { "size": 4230, "mtime_ns": 1784227496273082943, "word_count": 600 },
+  "log/19_G12_10_Report.md": { "size": 23097, "mtime_ns": 1784227496273267403, "word_count": 3109 },
+  "log/20_G12_12_GoLive_Forecast_Report.md": {
+    "size": 9279,
+    "mtime_ns": 1784227496273487529,
+    "word_count": 1393
+  },
+  "log/21_G12_13a_Frozen_Forecast_Report.md": {
+    "size": 6777,
+    "mtime_ns": 1784227496273654656,
+    "word_count": 1072
+  },
+  "log/22_G12_13b_June_Simulation_Report.md": {
+    "size": 12351,
+    "mtime_ns": 1784227496273837698,
+    "word_count": 1908
+  },
+  "log/23_G12_13_Canonical_Reconciliation_Report.md": {
+    "size": 8611,
+    "mtime_ns": 1784227496274058867,
+    "word_count": 1244
+  },
+  "log/24_G12_15_Report.md": { "size": 13858, "mtime_ns": 1784227496274378119, "word_count": 2075 },
+  "log/25_G12_16_Report.md": { "size": 9109, "mtime_ns": 1784227496274636621, "word_count": 1412 },
+  "log/26_G12_17a_July_Pass1_Report.md": {
+    "size": 9369,
+    "mtime_ns": 1784227496274873539,
+    "word_count": 1410
+  },
+  "log/27_G12_17b_July_Pass2_Report.md": {
+    "size": 8920,
+    "mtime_ns": 1784227496275115249,
+    "word_count": 1440
+  },
+  "log/28_G12_17c_July_Window2_Freeze_Report.md": {
+    "size": 7769,
+    "mtime_ns": 1784227496275316750,
+    "word_count": 1278
+  },
+  "log/29_G12_17cb_Corrected_Freeze_Report.md": {
+    "size": 7487,
+    "mtime_ns": 1784227496275517002,
+    "word_count": 1206
+  },
+  "log/30_G12_18_Comment_Rewrite_Report.md": {
+    "size": 45375,
+    "mtime_ns": 1784227496275826046,
+    "word_count": 6625
+  },
+  "log/31_G12_17c_C2_Confront_Report.md": {
+    "size": 8052,
+    "mtime_ns": 1784243037296591870,
+    "word_count": 1316
+  },
+  "log/32_G13_Production_Integration_Report.md": {
+    "size": 14526,
+    "mtime_ns": 1784250273801172824,
+    "word_count": 2182
+  },
+  "log/33_G14_De_Lune_Report.md": {
+    "size": 34799,
+    "mtime_ns": 1784510615484053709,
+    "word_count": 5479
+  },
+  "log/34_G14b_Defect_Closure_Verdict.md": {
+    "size": 17506,
+    "mtime_ns": 1784510504965194755,
+    "word_count": 2983
+  },
+  "log/35_For_Ryan_Integration_Brief_Response.md": {
+    "size": 40165,
+    "mtime_ns": 1784510620449620740,
+    "word_count": 6042
+  },
+  "log/36_G15a_Fixture_Shortfall_Diagnostics.md": {
+    "size": 23302,
+    "mtime_ns": 1784510269943001042,
+    "word_count": 3862
+  },
+  "log/37_G15b_Round4_Review.md": {
+    "size": 16205,
+    "mtime_ns": 1784484592887934596,
+    "word_count": 2605
+  },
+  "log/38_G15c_Taxonomy_Drift_Decision.md": {
+    "size": 11803,
+    "mtime_ns": 1784485018307496581,
+    "word_count": 2024
+  },
+  "log/39_G15d_Price_Regime_Seam.md": {
+    "size": 5734,
+    "mtime_ns": 1784485582548529548,
+    "word_count": 921
+  },
+  "log/40_G16_Portable_Baseline_and_Corrections.md": {
+    "size": 19126,
+    "mtime_ns": 1784510715819806797,
+    "word_count": 2955
+  },
+  "log/41_For_Ryan_Addendum_Post_G15.md": {
+    "size": 7806,
+    "mtime_ns": 1784510757247528061,
+    "word_count": 1287
+  },
+  "log/42_G17a_Metric_Integrity.md": {
+    "size": 23045,
+    "mtime_ns": 1784586619671256575,
+    "word_count": 3755
+  },
+  "log/43_G17b_Fold_Count.md": {
+    "size": 17232,
+    "mtime_ns": 1784593474354670484,
+    "word_count": 2949
+  },
+  "log/44_G17c_Model_Confidence_Set.md": {
+    "size": 18517,
+    "mtime_ns": 1784657606136913869,
+    "word_count": 2794
+  },
+  "log/45_G17d_Intermittency_and_Occurrence.md": {
+    "size": 16247,
+    "mtime_ns": 1784660029937782615,
+    "word_count": 2509
+  },
+  "log/46_G17e_Agent_and_Calibration.md": {
+    "size": 16882,
+    "mtime_ns": 1784764109308198640,
+    "word_count": 2541
+  },
+  "log/47_G17f_Group_ICL.md": {
+    "size": 17092,
+    "mtime_ns": 1784770809283846906,
+    "word_count": 2713
+  },
+  "log/48_G17g_Weather_Basis.md": {
+    "size": 18275,
+    "mtime_ns": 1784783227856277822,
+    "word_count": 2810
+  },
+  "log/49_G17h_Interval_Calibration.md": {
+    "size": 14853,
+    "mtime_ns": 1784846792935336785,
+    "word_count": 2323
+  },
+  "log/50_G17i_Injection_Realism.md": {
+    "size": 23173,
+    "mtime_ns": 1784910111344829497,
+    "word_count": 3142
+  },
+  "log/51_G17j_Chatlog_Signal.md": {
+    "size": 18743,
+    "mtime_ns": 1784926218596543282,
+    "word_count": 2510
+  },
+  "log/DISSERTATION_NOTES.md": {
+    "size": 22841,
+    "mtime_ns": 1784510480044389400,
+    "word_count": 3734
+  },
+  "log/Decision_and_Resolution_Log.md": {
+    "size": 147448,
+    "mtime_ns": 1784926239512459528,
+    "word_count": 20959
+  },
+  "log/README.md": { "size": 25999, "mtime_ns": 1784510791080698012, "word_count": 3937 },
+  "models/__init__.py": { "size": 0, "mtime_ns": 1783525986202739147, "word_count": 0 },
+  "models/foundation.py": { "size": 18347, "mtime_ns": 1784767985409304960, "word_count": 2012 },
+  "models/group_forecast.py": { "size": 8037, "mtime_ns": 1784768126501055942, "word_count": 996 },
+  "models/intermittent.py": { "size": 3147, "mtime_ns": 1783525988727428667, "word_count": 485 },
+  "models/ladder.py": { "size": 32996, "mtime_ns": 1784596724302679304, "word_count": 3476 },
+  "models/ladder_results_L1_beer_hall.md": {
+    "size": 2769,
+    "mtime_ns": 1783620455267677586,
+    "word_count": 492
+  },
+  "models/ladder_results_L1_ellel.md": {
+    "size": 2473,
+    "mtime_ns": 1783620455267809086,
+    "word_count": 452
+  },
+  "models/ladder_results_L1_two_river_taps.md": {
+    "size": 2774,
+    "mtime_ns": 1783620455268028544,
+    "word_count": 498
+  },
+  "models/weather_basis.py": { "size": 9024, "mtime_ns": 1784780471910378684, "word_count": 1024 },
+  "org_profile.py": { "size": 8687, "mtime_ns": 1784485174205618939, "word_count": 1205 },
+  "pyproject.toml": { "size": 1996, "mtime_ns": 1784240890006125087, "word_count": 294 },
+  "requirements-eval.txt": { "size": 1022, "mtime_ns": 1783525988727620416, "word_count": 146 },
+  "requirements-forecast.lock.txt": {
+    "size": 1879,
+    "mtime_ns": 1784597294334047259,
+    "word_count": 184
+  },
+  "requirements-forecast.txt": { "size": 2092, "mtime_ns": 1784597305317379387, "word_count": 298 },
+  "requirements-optional.txt": { "size": 795, "mtime_ns": 1783525986203685934, "word_count": 120 },
+  "requirements.txt": { "size": 1618, "mtime_ns": 1784240780179225147, "word_count": 229 },
+  "scripts/run_all_venues.sh": { "size": 1531, "mtime_ns": 1783525987502510035, "word_count": 189 },
+  "service/__init__.py": { "size": 0, "mtime_ns": 1783525986203903017, "word_count": 0 },
+  "service/app.py": { "size": 21710, "mtime_ns": 1784241692450913026, "word_count": 2430 },
+  "service/auth.py": { "size": 3482, "mtime_ns": 1784240841745565921, "word_count": 459 },
+  "service/compute.py": { "size": 2902, "mtime_ns": 1784249590907384690, "word_count": 398 },
+  "signals/__init__.py": { "size": 0, "mtime_ns": 1783525986204291432, "word_count": 0 },
+  "signals/agent.py": { "size": 7556, "mtime_ns": 1784761968614811489, "word_count": 870 },
+  "signals/briefing.md": { "size": 864, "mtime_ns": 1784926615662562103, "word_count": 135 },
+  "signals/briefing.py": { "size": 31639, "mtime_ns": 1784926404757985175, "word_count": 3410 },
+  "signals/change_point.md": { "size": 1785, "mtime_ns": 1783525987502984866, "word_count": 276 },
+  "signals/change_point.py": { "size": 15059, "mtime_ns": 1783702996544259385, "word_count": 1677 },
+  "signals/chatlog_kb_gap.json": {
+    "size": 2040,
+    "mtime_ns": 1784926761172977981,
+    "word_count": 260
+  },
+  "signals/chatlog_kb_gap.md": { "size": 2134, "mtime_ns": 1784925953616951851, "word_count": 455 },
+  "signals/chatlog_kb_gap.py": {
+    "size": 15117,
+    "mtime_ns": 1784925879743524896,
+    "word_count": 1494
+  },
+  "signals/checklist_discipline.md": {
+    "size": 1402,
+    "mtime_ns": 1783525986361013280,
+    "word_count": 254
+  },
+  "signals/checklist_discipline.py": {
+    "size": 10510,
+    "mtime_ns": 1783702923476248170,
+    "word_count": 1224
+  },
+  "signals/deviation.py": { "size": 8217, "mtime_ns": 1783702923477803165, "word_count": 901 },
+  "signals/feature_ablation.md": {
+    "size": 5305,
+    "mtime_ns": 1784225901758694741,
+    "word_count": 820
+  },
+  "signals/feature_ablation.py": {
+    "size": 14397,
+    "mtime_ns": 1784580859744266487,
+    "word_count": 1669
+  },
+  "signals/occurrence.py": { "size": 5612, "mtime_ns": 1784660278559525539, "word_count": 755 },
+  "signals/prompts/agent_v1.md": {
+    "size": 4110,
+    "mtime_ns": 1784761901164337232,
+    "word_count": 677
+  },
+  "signals/residual.py": { "size": 10964, "mtime_ns": 1784908980695260637, "word_count": 1229 },
+  "signals/stock_inventory.md": {
+    "size": 2783,
+    "mtime_ns": 1783525986633801020,
+    "word_count": 496
+  },
+  "signals/stock_inventory.py": {
+    "size": 12205,
+    "mtime_ns": 1783702923484317517,
+    "word_count": 1274
+  },
+  "signals/weather_diagnostic.md": {
+    "size": 3240,
+    "mtime_ns": 1783525987236165182,
+    "word_count": 539
+  },
+  "signals/weather_diagnostic.py": {
+    "size": 19344,
+    "mtime_ns": 1783702923488414420,
+    "word_count": 2144
+  },
+  "sim/__init__.py": { "size": 0, "mtime_ns": 1783633125538012869, "word_count": 0 },
+  "sim/ab_split_measured.py": { "size": 7644, "mtime_ns": 1784580859744733908, "word_count": 753 },
+  "sim/brain_over_july.py": { "size": 5335, "mtime_ns": 1783650998885547325, "word_count": 522 },
+  "sim/brain_over_june.py": { "size": 5248, "mtime_ns": 1783635669892633834, "word_count": 459 },
+  "sim/build_frozen_forecast.py": {
+    "size": 13279,
+    "mtime_ns": 1783635669892836167,
+    "word_count": 1300
+  },
+  "sim/build_july_forecast.py": {
+    "size": 17573,
+    "mtime_ns": 1783649417132698391,
+    "word_count": 1756
+  },
+  "sim/build_july_w2_forecast.py": {
+    "size": 15883,
+    "mtime_ns": 1783675695175776988,
+    "word_count": 1577
+  },
+  "sim/build_july_w2b_forecast.py": {
+    "size": 15977,
+    "mtime_ns": 1783677341591773238,
+    "word_count": 1494
+  },
+  "sim/cadence_sweep.py": { "size": 9027, "mtime_ns": 1784658578518020099, "word_count": 984 },
+  "sim/confront_july.py": { "size": 12325, "mtime_ns": 1784596815800003216, "word_count": 1173 },
+  "sim/confront_july_w2.py": { "size": 13722, "mtime_ns": 1784581334417335807, "word_count": 1364 },
+  "sim/confront_june.py": { "size": 10767, "mtime_ns": 1784596826705091116, "word_count": 1046 },
+  "sim/frame_hash.py": { "size": 3446, "mtime_ns": 1784510241624377341, "word_count": 426 },
+  "sim/frame_hash_baseline.json": {
+    "size": 638,
+    "mtime_ns": 1784511745732670688,
+    "word_count": 64
+  },
+  "sim/g15a_ellel_counterfactual.json": {
+    "size": 5489,
+    "mtime_ns": 1784482583153148381,
+    "word_count": 416
+  },
+  "sim/g15a_ellel_counterfactual.py": {
+    "size": 13871,
+    "mtime_ns": 1784482571785099482,
+    "word_count": 1481
+  },
+  "sim/g15a_weather_compare.json": {
+    "size": 1779,
+    "mtime_ns": 1784482373094554654,
+    "word_count": 152
+  },
+  "sim/g15a_weather_compare.py": {
+    "size": 6091,
+    "mtime_ns": 1784482364778135297,
+    "word_count": 717
+  },
+  "sim/g15c_taxonomy_drift.json": {
+    "size": 39355,
+    "mtime_ns": 1784485126695468945,
+    "word_count": 2395
+  },
+  "sim/g15c_taxonomy_drift.py": {
+    "size": 14264,
+    "mtime_ns": 1784580859747211306,
+    "word_count": 1534
+  },
+  "sim/g16a_portable_baseline.py": {
+    "size": 3712,
+    "mtime_ns": 1784510145857159684,
+    "word_count": 470
+  },
+  "sim/homenation_uplift.py": { "size": 3558, "mtime_ns": 1783640071164944851, "word_count": 339 },
+  "sim/ingest_july_w1_actuals.py": {
+    "size": 6524,
+    "mtime_ns": 1783677243244770148,
+    "word_count": 677
+  },
+  "sim/ingest_june_actuals.py": {
+    "size": 5813,
+    "mtime_ns": 1783648434652445506,
+    "word_count": 596
+  },
+  "sim/july2026_actuals_l1_raw.json": {
+    "size": 1705,
+    "mtime_ns": 1783650664179821349,
+    "word_count": 165
+  },
+  "sim/july2026_actuals_l2_raw.json": {
+    "size": 7005,
+    "mtime_ns": 1783650729463527339,
+    "word_count": 608
+  },
+  "sim/july2026_actuals_l3_raw.json": {
+    "size": 35628,
+    "mtime_ns": 1783650729462625965,
+    "word_count": 3189
+  },
+  "sim/july2026_brain_result.json": {
+    "size": 2226,
+    "mtime_ns": 1783651263252124931,
+    "word_count": 206
+  },
+  "sim/july2026_confront_rescored.json": {
+    "size": 15530,
+    "mtime_ns": 1784586592189330921,
+    "word_count": 1166
+  },
+  "sim/july2026_confront_result.json": {
+    "size": 12182,
+    "mtime_ns": 1783651236556762428,
+    "word_count": 942
+  },
+  "sim/july2026_forecast_frozen.json": {
+    "size": 3704,
+    "mtime_ns": 1783649506419799146,
+    "word_count": 436
+  },
+  "sim/july2026_forecast_frozen.md": {
+    "size": 2571,
+    "mtime_ns": 1783649431895021643,
+    "word_count": 472
+  },
+  "sim/july2026_refit_result.json": {
+    "size": 2688,
+    "mtime_ns": 1783649506419908145,
+    "word_count": 205
+  },
+  "sim/july2026_taxonomy_diff.json": {
+    "size": 1041,
+    "mtime_ns": 1783649506419752937,
+    "word_count": 90
+  },
+  "sim/july2026_w2_actuals_l1_raw.json": {
+    "size": 2756,
+    "mtime_ns": 1784244395100283685,
+    "word_count": 312
+  },
+  "sim/july2026_w2_confront_rescored.json": {
+    "size": 16285,
+    "mtime_ns": 1784586592495723924,
+    "word_count": 1174
+  },
+  "sim/july2026_w2_confront_result.json": {
+    "size": 12800,
+    "mtime_ns": 1784511750522875287,
+    "word_count": 958
+  },
+  "sim/july2026_w2_forecast_frozen.json": {
+    "size": 4631,
+    "mtime_ns": 1783675712650279301,
+    "word_count": 454
+  },
+  "sim/july2026_w2_forecast_frozen.md": {
+    "size": 2807,
+    "mtime_ns": 1783675712651554406,
+    "word_count": 505
+  },
+  "sim/july2026_w2b_forecast_frozen.json": {
+    "size": 5715,
+    "mtime_ns": 1783677356159489373,
+    "word_count": 534
+  },
+  "sim/july2026_w2b_forecast_frozen.md": {
+    "size": 3268,
+    "mtime_ns": 1783677356160832751,
+    "word_count": 612
+  },
+  "sim/june2026_ab_split_result.json": {
+    "size": 760,
+    "mtime_ns": 1783635906501532933,
+    "word_count": 53
+  },
+  "sim/june2026_actuals_l1_raw.json": {
+    "size": 4593,
+    "mtime_ns": 1783635669893263501,
+    "word_count": 424
+  },
+  "sim/june2026_actuals_l2_raw.json": {
+    "size": 21658,
+    "mtime_ns": 1783634453172309686,
+    "word_count": 1843
+  },
+  "sim/june2026_actuals_l3_raw.json": {
+    "size": 151597,
+    "mtime_ns": 1783646537512668443,
+    "word_count": 13516
+  },
+  "sim/june2026_brain_result.json": {
+    "size": 37594,
+    "mtime_ns": 1783634453171474686,
+    "word_count": 4274
+  },
+  "sim/june2026_cadence_sweep.json": {
+    "size": 3646,
+    "mtime_ns": 1783640309577428698,
+    "word_count": 244
+  },
+  "sim/june2026_confront_rescored.json": {
+    "size": 6600,
+    "mtime_ns": 1784586605448664570,
+    "word_count": 456
+  },
+  "sim/june2026_confront_result.json": {
+    "size": 3774,
+    "mtime_ns": 1783634453171197311,
+    "word_count": 294
+  },
+  "sim/june2026_forecast_frozen.json": {
+    "size": 9127,
+    "mtime_ns": 1783633318656486048,
+    "word_count": 1095
+  },
+  "sim/june2026_forecast_frozen.md": {
+    "size": 10560,
+    "mtime_ns": 1783635765919474208,
+    "word_count": 2181
+  },
+  "sim/june2026_homenation_uplift.json": {
+    "size": 7251,
+    "mtime_ns": 1783640090371531124,
+    "word_count": 574
+  },
+  "sim/june2026_l2_mapped_result.json": {
+    "size": 2001,
+    "mtime_ns": 1783646128308052107,
+    "word_count": 156
+  },
+  "sim/june2026_l3_result.json": {
+    "size": 8868,
+    "mtime_ns": 1783646552884244013,
+    "word_count": 699
+  },
+  "sim/refit_june_inclusive.py": {
+    "size": 2919,
+    "mtime_ns": 1783648897753887727,
+    "word_count": 302
+  },
+  "sim/render_frozen_md.py": { "size": 3517, "mtime_ns": 1783635758961497830, "word_count": 372 },
+  "sim/rescore_l2_mapped.py": { "size": 2589, "mtime_ns": 1783646099376286856, "word_count": 246 },
+  "sim/restore_clock.py": { "size": 3325, "mtime_ns": 1784245143677542794, "word_count": 393 },
+  "sim/ruler_comparison.md": { "size": 6908, "mtime_ns": 1784586548603490191, "word_count": 1226 },
+  "sim/score_l3.py": { "size": 7445, "mtime_ns": 1784580859747625185, "word_count": 719 },
+  "store/__init__.py": { "size": 0, "mtime_ns": 1783525986205261969, "word_count": 0 },
+  "store/active_span.py": { "size": 4952, "mtime_ns": 1784254590263664499, "word_count": 642 },
+  "store/build.py": { "size": 2256, "mtime_ns": 1784596523942741110, "word_count": 284 },
+  "store/conformal_coverage.png": {
+    "size": 21996,
+    "mtime_ns": 1783525986205686593,
+    "word_count": 701
+  },
+  "store/conformal_coverage_beer_hall.png": {
+    "size": 22312,
+    "mtime_ns": 1783525986245803801,
+    "word_count": 729
+  },
+  "store/conformal_coverage_ellel.png": {
+    "size": 23869,
+    "mtime_ns": 1783525986246038800,
+    "word_count": 769
+  },
+  "store/conformal_coverage_two_river_taps.png": {
+    "size": 23864,
+    "mtime_ns": 1783525986246235257,
+    "word_count": 795
+  },
+  "store/manifest.json": { "size": 2772, "mtime_ns": 1784598196496253271, "word_count": 268 },
+  "store/warehouse.py": { "size": 15450, "mtime_ns": 1784598618991661736, "word_count": 1774 },
+  "tests/__init__.py": { "size": 0, "mtime_ns": 1783525986206243507, "word_count": 0 },
+  "tests/conftest.py": { "size": 2936, "mtime_ns": 1784598625311756961, "word_count": 380 },
+  "tests/test_a0_ingest.py": { "size": 1516, "mtime_ns": 1783702923518088316, "word_count": 146 },
+  "tests/test_a10_service.py": { "size": 8052, "mtime_ns": 1784240869352671629, "word_count": 776 },
+  "tests/test_a14_enrichment.py": {
+    "size": 2935,
+    "mtime_ns": 1784284409263141252,
+    "word_count": 254
+  },
+  "tests/test_a14b_diagnostic.py": {
+    "size": 1741,
+    "mtime_ns": 1784284409263844503,
+    "word_count": 158
+  },
+  "tests/test_a1_warehouse.py": {
+    "size": 2325,
+    "mtime_ns": 1783702923520478391,
+    "word_count": 194
+  },
+  "tests/test_a2_fold_count.py": {
+    "size": 10399,
+    "mtime_ns": 1784587281870352608,
+    "word_count": 969
+  },
+  "tests/test_a2_harness.py": { "size": 2215, "mtime_ns": 1784580859747854853, "word_count": 222 },
+  "tests/test_a2_mcs.py": { "size": 8119, "mtime_ns": 1784598336041886093, "word_count": 803 },
+  "tests/test_a2_metric_ruler.py": {
+    "size": 9840,
+    "mtime_ns": 1784586567884735212,
+    "word_count": 906
+  },
+  "tests/test_a3_features.py": { "size": 3931, "mtime_ns": 1783702923522057344, "word_count": 398 },
+  "tests/test_a4_ladder.py": { "size": 3602, "mtime_ns": 1783702923522935383, "word_count": 393 },
+  "tests/test_a5_conformal.py": {
+    "size": 2005,
+    "mtime_ns": 1783702923523500256,
+    "word_count": 171
+  },
+  "tests/test_a6_reconcile.py": {
+    "size": 3623,
+    "mtime_ns": 1783702923524323711,
+    "word_count": 415
+  },
+  "tests/test_a7_transfer.py": { "size": 1632, "mtime_ns": 1784284409264238087, "word_count": 164 },
+  "tests/test_a8_kbgap.py": { "size": 1463, "mtime_ns": 1783702923525254375, "word_count": 137 },
+  "tests/test_a9_checklist.py": {
+    "size": 1888,
+    "mtime_ns": 1783702923525756206,
+    "word_count": 178
+  },
+  "tests/test_aci_closure_probe.py": {
+    "size": 1069,
+    "mtime_ns": 1783525988613289848,
+    "word_count": 112
+  },
+  "tests/test_agent_calibration.py": {
+    "size": 9340,
+    "mtime_ns": 1784763967118584973,
+    "word_count": 997
+  },
+  "tests/test_agent_eval.py": { "size": 3966, "mtime_ns": 1783525988282765341, "word_count": 340 },
+  "tests/test_append_cross_venue.py": {
+    "size": 3046,
+    "mtime_ns": 1783702923527336159,
+    "word_count": 352
+  },
+  "tests/test_attribution_weather.py": {
+    "size": 1836,
+    "mtime_ns": 1783620455268604960,
+    "word_count": 193
+  },
+  "tests/test_briefing.py": { "size": 7400, "mtime_ns": 1784924953818564065, "word_count": 692 },
+  "tests/test_change_point.py": {
+    "size": 2674,
+    "mtime_ns": 1784284409265035130,
+    "word_count": 242
+  },
+  "tests/test_chatlog_briefing.py": {
+    "size": 8657,
+    "mtime_ns": 1784925158837217576,
+    "word_count": 919
+  },
+  "tests/test_compute_engine.py": {
+    "size": 23199,
+    "mtime_ns": 1784596634591101110,
+    "word_count": 2335
+  },
+  "tests/test_config_store_env.py": {
+    "size": 1157,
+    "mtime_ns": 1783620455268690751,
+    "word_count": 127
+  },
+  "tests/test_deviation.py": { "size": 5977, "mtime_ns": 1783525988024911534, "word_count": 555 },
+  "tests/test_exog_incremental.py": {
+    "size": 3391,
+    "mtime_ns": 1783525988418703903,
+    "word_count": 320
+  },
+  "tests/test_exog_supplied.py": {
+    "size": 14871,
+    "mtime_ns": 1784284158866048214,
+    "word_count": 1474
+  },
+  "tests/test_foundation.py": { "size": 11068, "mtime_ns": 1784597929438435421, "word_count": 909 },
+  "tests/test_group_icl.py": { "size": 10325, "mtime_ns": 1784769654129290566, "word_count": 894 },
+  "tests/test_ingest_refresh.py": {
+    "size": 14737,
+    "mtime_ns": 1784248697867658523,
+    "word_count": 1369
+  },
+  "tests/test_inject.py": { "size": 3146, "mtime_ns": 1783525988282904132, "word_count": 289 },
+  "tests/test_inject_realistic.py": {
+    "size": 11967,
+    "mtime_ns": 1784910031365341810,
+    "word_count": 1128
+  },
+  "tests/test_injection_realism.py": {
+    "size": 3692,
+    "mtime_ns": 1784908980723656396,
+    "word_count": 324
+  },
+  "tests/test_intermittent.py": {
+    "size": 2022,
+    "mtime_ns": 1783702923537188750,
+    "word_count": 243
+  },
+  "tests/test_interval_calibration.py": {
+    "size": 5290,
+    "mtime_ns": 1784846624410668418,
+    "word_count": 593
+  },
+  "tests/test_live_cache.py": { "size": 2158, "mtime_ns": 1783702923537700873, "word_count": 184 },
+  "tests/test_liveness_gate.py": {
+    "size": 1845,
+    "mtime_ns": 1783648753342415925,
+    "word_count": 180
+  },
+  "tests/test_occurrence_gate.py": {
+    "size": 3181,
+    "mtime_ns": 1784658901581286108,
+    "word_count": 293
+  },
+  "tests/test_org_profile.py": {
+    "size": 10926,
+    "mtime_ns": 1784485224455209918,
+    "word_count": 936
+  },
+  "tests/test_promote_and_serve.py": {
+    "size": 9742,
+    "mtime_ns": 1784284409265411923,
+    "word_count": 817
+  },
+  "tests/test_scaled_eval.py": { "size": 4276, "mtime_ns": 1783702923540923487, "word_count": 377 },
+  "tests/test_scratch_store.py": {
+    "size": 4751,
+    "mtime_ns": 1784596623196472443,
+    "word_count": 453
+  },
+  "tests/test_stock_inventory.py": {
+    "size": 3452,
+    "mtime_ns": 1783702923541721401,
+    "word_count": 274
+  },
+  "tests/test_store_durability.py": {
+    "size": 2251,
+    "mtime_ns": 1784596673503491784,
+    "word_count": 199
+  },
+  "tests/test_taxonomy.py": { "size": 1644, "mtime_ns": 1783646641807188676, "word_count": 140 },
+  "tests/test_weather_basis.py": {
+    "size": 9340,
+    "mtime_ns": 1784782978601598793,
+    "word_count": 824
+  },
+  "tests/test_world_cup.py": { "size": 5430, "mtime_ns": 1784284409266350924, "word_count": 597 },
+  "transfer/__init__.py": { "size": 0, "mtime_ns": 1783525986208767788, "word_count": 0 },
+  "transfer/lovo.py": { "size": 11128, "mtime_ns": 1784581331330947768, "word_count": 1313 },
+  "transfer/transfer_results.md": {
+    "size": 2209,
+    "mtime_ns": 1783525988851328155,
+    "word_count": 370
+  }
+}

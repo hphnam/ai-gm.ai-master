@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_change_point_eval_arl0",
+      "label": "A13 change-point ARL0 operating point: CUSUM h=5.0, empirical ARL0 lower bound 400 (right-censored)",
+      "file_type": "document",
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_eval_change_point_eval_trt_closure",
+      "label": "A13 TRT closure ground-truth break: onset 2026-05-08, detected 2026-05-16, delay 8 trading-days",
+      "file_type": "document",
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_eval_change_point_eval_synthetic_injection",
+      "label": "A13 synthetic level-shift injection: detection delay vs false alarms across CUSUM thresholds h",
+      "file_type": "document",
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_eval_change_point_eval_bocpd_benchmark",
+      "label": "A13 BOCPD benchmark vs production CUSUM+persistence; BOCPD kept as principled benchmark, not production",
+      "file_type": "document",
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_flags_flag_cp1",
+      "target": "brain_eval_change_point_eval_arl0",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_change_point_eval_arl0",
+      "target": "glossary_arl0",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_change_point_eval_bocpd_benchmark",
+      "target": "glossary_bocpd",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_change_point_eval_trt_closure",
+      "target": "brain_readme_venue_two_river_taps",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "brain/eval/change_point_eval.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

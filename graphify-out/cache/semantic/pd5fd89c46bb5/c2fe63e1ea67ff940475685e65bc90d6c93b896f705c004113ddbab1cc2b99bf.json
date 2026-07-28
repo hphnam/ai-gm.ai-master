@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "brain_conformal_conformal_l1_two_river_taps_coverage_report",
+      "label": "A5 conformal coverage report \u2014 Two River Taps L1, rung2_ets, +28-day standby band persisted past closure",
+      "file_type": "document",
+      "source_file": "brain/conformal/conformal_L1_two_river_taps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "glossary_mondrian",
+      "target": "brain_conformal_conformal_l1_two_river_taps_coverage_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/conformal/conformal_L1_two_river_taps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_conformal_conformal_l1_two_river_taps_coverage_report",
+      "target": "brain_readme_venue_two_river_taps",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/conformal/conformal_L1_two_river_taps.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

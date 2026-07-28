@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "label": "Frozen July 8\u201314 2026 Forecast (pre-registration, second window)",
+      "file_type": "document",
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2_forecast_frozen_beer_hall",
+      "label": "Beer Hall Jul 8\u201314 forecast",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2_forecast_frozen_ellel",
+      "label": "Ellel Jul 8\u201314 forecast",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_sim_july2026_w2_forecast_frozen_two_river_taps",
+      "label": "Two River Taps (dormant, liveness-gated)",
+      "file_type": "concept",
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_forecast_frozen_pre_registration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2_forecast_frozen_beer_hall",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2_forecast_frozen_ellel",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_sim_july2026_w2_forecast_frozen_pre_registration",
+      "target": "brain_sim_july2026_w2_forecast_frozen_two_river_taps",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/sim/july2026_w2_forecast_frozen.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

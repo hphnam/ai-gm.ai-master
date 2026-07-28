@@ -1,0 +1,108 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_35_for_ryan_integration_brief_response",
+      "label": "Report 35 - For Ryan: response to the production integration brief",
+      "file_type": "document",
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": "Nam",
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_32_g13_production_integration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_33_g14_de_lune_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_34_g14b_defect_closure_verdict",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_32_g13_production_integration_report_stateless_compute_engine",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_33_g14_de_lune_report_org_profile_seam",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_33_g14_de_lune_report_contract_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_34_g14b_defect_closure_verdict_wrong_fix_pattern",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_32_g13_production_integration_report_flag_store_durability",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_35_for_ryan_integration_brief_response",
+      "target": "brain_log_33_g14_de_lune_report_flag_band_horizon",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/35_For_Ryan_Integration_Brief_Response.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

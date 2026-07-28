@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "_claude_rules_database_database",
+      "label": "database migrations rule",
+      "file_type": "document",
+      "source_file": ".claude/rules/database.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

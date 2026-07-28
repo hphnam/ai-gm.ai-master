@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_25_g12_16_report",
+      "label": "Report 25 - G12.16: item and category taxonomy reconciliation",
+      "file_type": "document",
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_25_g12_16_report_taxonomy_drift",
+      "label": "Taxonomy drift (stale top-k node selection vs June/July menu)",
+      "file_type": "concept",
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_25_g12_16_report_taxonomy_map",
+      "label": "taxonomy_map.md / map_category / map_item (Square-to-brain taxonomy map)",
+      "file_type": "concept",
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_25_g12_16_report",
+      "target": "brain_log_22_g12_13b_june_simulation_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_25_g12_16_report",
+      "target": "brain_log_24_g12_15_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_25_g12_16_report",
+      "target": "brain_log_25_g12_16_report_taxonomy_drift",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_25_g12_16_report",
+      "target": "brain_log_25_g12_16_report_taxonomy_map",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/25_G12_16_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

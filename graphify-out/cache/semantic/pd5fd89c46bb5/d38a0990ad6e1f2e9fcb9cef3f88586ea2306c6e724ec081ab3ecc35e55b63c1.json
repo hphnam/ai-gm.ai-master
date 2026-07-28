@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_19_g12_10_report",
+      "label": "PRJ93 G12.10 Implementation Report (World Cup Fixtures, TRT Coord Fix)",
+      "file_type": "document",
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_19_g12_10_report_leak_fix",
+      "label": "is_ellel_event self-leak fixed at source (constant 0 on the Ellel feature frame)",
+      "file_type": "rationale",
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_19_g12_10_report_wc_features",
+      "label": "World Cup wc_* covariates: code-derived fixture relevance by kickoff-vs-trading-hours overlap",
+      "file_type": "concept",
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_19_g12_10_report",
+      "target": "brain_log_17_g12_9_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_19_g12_10_report",
+      "target": "brain_log_18_downstream",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_19_g12_10_report",
+      "target": "brain_ingest_world_cup_schedule",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_19_g12_10_report_leak_fix",
+      "target": "brain_log_17_g12_9_report_ellel_uncap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_19_g12_10_report_wc_features",
+      "target": "brain_log_12_worldcup_liveprobe_report_honesty_gate",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/19_G12_10_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

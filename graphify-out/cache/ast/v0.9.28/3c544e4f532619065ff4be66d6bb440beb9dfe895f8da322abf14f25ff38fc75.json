@@ -1,0 +1,779 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "label": "ab_split_measured.py",
+      "file_type": "code",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "label": "_revenue_hierarchy()",
+      "file_type": "code",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L39",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "label": "_dow_median()",
+      "file_type": "code",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L90",
+      "_callable": true
+    },
+    {
+      "id": "series",
+      "label": "Series",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/sim/ab_split_measured.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "label": "_l1_top_forecast()",
+      "file_type": "code",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L100",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L109",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_1",
+      "label": "G12.13a Stage 3 (retro-measured) - the A-vs-B L2/L3 split comparison.  Closes th",
+      "file_type": "rationale",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_40",
+      "label": "VENUE / CAT / ITEM (top-k + OTHER) daily ex-VAT revenue series + S matrix.",
+      "file_type": "rationale",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_101",
+      "label": "Gate-winner L1 revenue forecast over the test block (rolling 7-day).",
+      "file_type": "rationale",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L101"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L24",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "conformal_wrap",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "eval",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "features_build_features",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "hierarchy_reconcile",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "models_foundation",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "sim_build_frozen_forecast",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "store_active_span",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "target": "series",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L109",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "target": "series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_40",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_rationale_101",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L101",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L41",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L43",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L43",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L47",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L48",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "DatetimeIndex",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L49",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "unique",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L49",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L52",
+      "receiver": "item"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L53",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L53",
+      "receiver": "sub"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L56",
+      "receiver": "cat_nodes"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "sort_values",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L58",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L58",
+      "receiver": "sub"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L61",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L61",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L65",
+      "receiver": "bottom_nodes"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "clip",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L68",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L72",
+      "receiver": "bottom_nodes"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L77",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_revenue_hierarchy",
+      "callee": "startswith",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L81",
+      "receiver": "n"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "median",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L92",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L92",
+      "receiver": "train"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "median",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L93",
+      "receiver": "train"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L94",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L94"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L94",
+      "receiver": "med"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L95",
+      "receiver": "train"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L95",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L96"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L96",
+      "receiver": "med"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_dow_median",
+      "callee": "var",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L97",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "trim_to_active",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L102",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L102",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "rolling_point_forecasts",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L103",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "CHRONOS2_EXO_COLS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L103"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L105",
+      "receiver": "roll"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L106",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L106"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_l1_top_forecast",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L106",
+      "receiver": "m"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L113",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L119",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "nan_to_num",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L122",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L125",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L126",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "zeros",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L127",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L130",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L130",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "mint_reconcile",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L134",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L137",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "startswith",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L138",
+      "receiver": "n"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "values",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L145",
+      "receiver": "shares"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "_mase_items",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L160",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "_mase_items",
+      "is_member_call": false,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L161",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "date",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L164",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "date",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L164",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "endswith",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L165",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L174",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_ab_split_measured_run",
+      "callee": "dumps",
+      "is_member_call": true,
+      "source_file": "brain/sim/ab_split_measured.py",
+      "source_location": "L174",
+      "receiver": "json"
+    }
+  ]
+}

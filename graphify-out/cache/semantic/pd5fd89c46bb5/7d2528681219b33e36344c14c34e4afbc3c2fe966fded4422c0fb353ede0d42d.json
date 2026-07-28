@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_08_promote_and_serve_report",
+      "label": "PRJ93 Promote-and-Serve (Live Ingest v2.1) Report",
+      "file_type": "document",
+      "source_file": "brain/log/08_Promote_And_Serve_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_08_promote_and_serve_report_promote_and_serve",
+      "label": "Promote-and-serve mechanism (detect via ladder_selection, promote via served_forecast)",
+      "file_type": "concept",
+      "source_file": "brain/log/08_Promote_And_Serve_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_08_promote_and_serve_report",
+      "target": "brain_log_07_live_ingest_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/08_Promote_And_Serve_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_07_live_ingest_report_three_tier_model",
+      "target": "brain_log_08_promote_and_serve_report_promote_and_serve",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/08_Promote_And_Serve_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_intermittency_diagnostic_wp2",
+      "label": "WP2 \u2014 L3 intermittency diagnostic (Beer Hall): 20 of 30 item nodes intermittent, ADI blind spot noted for obsolescence patterns",
+      "file_type": "document",
+      "source_file": "brain/eval/intermittency_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_eval_intermittency_diagnostic_wp2",
+      "target": "glossary_adi",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/intermittency_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

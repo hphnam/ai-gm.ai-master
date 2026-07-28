@@ -1,0 +1,185 @@
+{
+  "nodes": [
+    {
+      "id": "prj93_agent_eval_report_scaled_injection_grid",
+      "label": "S1 \u2014 scaled injection run: venue x kind x magnitude x onset x fold x direction grid, N=644",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_detection_results",
+      "label": "S2 \u2014 detection results with Wilson 95% CIs by kind and by venue",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_sensitivity_curve",
+      "label": "S3 \u2014 sensitivity curve: catch rate vs event magnitude, near-threshold operating points",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_latency_by_magnitude",
+      "label": "S4 \u2014 regime/exo detection latency by magnitude bin",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_ranking_ndcg",
+      "label": "S5 \u2014 ranking across many multi-event days, mean NDCG and Spearman both 1.000",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_alert_fatigue_cost",
+      "label": "S6 \u2014 alert fatigue and cost sweep across miss:false-alarm ratios",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_vus_pr_supplement",
+      "label": "S6b \u2014 VUS-PR detector-level supplement, not computed (TSB-AD dependency unavailable)",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prj93_agent_eval_report_scaled_caveats",
+      "label": "S7 \u2014 honest small-N caveats: Two River Taps closure, Ellel sparsity, wide Wilson intervals",
+      "file_type": "document",
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "prj93_agent_eval_report_scaled_injection_grid",
+      "target": "prj93_agent_eval_report_detection_results",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_detection_results",
+      "target": "prj93_agent_eval_report_sensitivity_curve",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_sensitivity_curve",
+      "target": "prj93_agent_eval_report_latency_by_magnitude",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_scaled_injection_grid",
+      "target": "prj93_agent_eval_report_ranking_ndcg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_ranking_ndcg",
+      "target": "glossary_ndcg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_detection_results",
+      "target": "prj93_agent_eval_report_alert_fatigue_cost",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_alert_fatigue_cost",
+      "target": "prj93_agent_eval_report_vus_pr_supplement",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_scaled_caveats",
+      "target": "brain_readme_venue_two_river_taps",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "prj93_agent_eval_report_scaled_caveats",
+      "target": "brain_readme_venue_ellel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "PRJ93_Agent_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_checklist_discipline_document",
+      "label": "A9 Checklist completion-discipline snapshot (template-only mode)",
+      "file_type": "document",
+      "source_file": "brain/signals/checklist_discipline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_checklist_discipline_template_only_mode",
+      "label": "Template-only mode against a synthetic completion log, pending Ryan's mobile checklist capture",
+      "file_type": "rationale",
+      "source_file": "brain/signals/checklist_discipline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_checklist_discipline_criticality_weighting_scheme",
+      "label": "Criticality weighting scheme (5 critical / 3 high / 1 normal / 0 conditional)",
+      "file_type": "concept",
+      "source_file": "brain/signals/checklist_discipline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_checklist_discipline_document",
+      "target": "brain_signals_checklist_discipline_template_only_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/checklist_discipline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_checklist_discipline_document",
+      "target": "brain_signals_checklist_discipline_criticality_weighting_scheme",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/checklist_discipline.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

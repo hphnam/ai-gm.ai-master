@@ -1,0 +1,221 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_weather_diagnostic_a14b",
+      "label": "A14b \u00b7 Weather/Calendar Signal Diagnostic",
+      "file_type": "document",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_test_a",
+      "label": "Test A \u2014 L2 (+draught L3) weather ablation",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_test_b",
+      "label": "Test B \u2014 physiology-matched features (L1)",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_test_c",
+      "label": "Test C \u2014 calendar on transition-aware folds",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_test_d",
+      "label": "Test D \u2014 residual-on-weather regression",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_flag_wd1",
+      "label": "FLAG-WD1 (temp-anomaly fragile on ~1 summer climatology)",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_flag_wd3",
+      "label": "FLAG-WD3 (fold provenance matters)",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_flag_wd_series",
+      "label": "FLAG-WD1..WD4",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_weather_diagnostic_beer_garden_day",
+      "label": "beer_garden_day feature",
+      "file_type": "concept",
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_feature_ablation_a14",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_weather_diagnostic_test_a",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_weather_diagnostic_test_b",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_weather_diagnostic_test_c",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_weather_diagnostic_test_d",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_test_b",
+      "target": "brain_signals_weather_diagnostic_flag_wd1",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_test_c",
+      "target": "brain_signals_weather_diagnostic_flag_wd3",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_a14b",
+      "target": "brain_signals_weather_diagnostic_flag_wd_series",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_test_b",
+      "target": "brain_signals_weather_diagnostic_beer_garden_day",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_weather_diagnostic_test_d",
+      "target": "brain_signals_feature_ablation_chronos2_exo_cols",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/signals/weather_diagnostic.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "weather_diagnostic_four_tests",
+      "label": "Four-test weather/calendar diagnostic battery",
+      "nodes": [
+        "brain_signals_weather_diagnostic_test_a",
+        "brain_signals_weather_diagnostic_test_b",
+        "brain_signals_weather_diagnostic_test_c",
+        "brain_signals_weather_diagnostic_test_d"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/weather_diagnostic.md"
+    }
+  ]
+}

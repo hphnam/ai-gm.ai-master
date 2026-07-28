@@ -1,0 +1,283 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "label": "live.py",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "label": "live_facts()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L31",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_fetch_metric",
+      "label": "_fetch_metric()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L57",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_ttl_seconds",
+      "label": "_ttl_seconds()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L69",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "label": "_cache_get()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L73",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_put",
+      "label": "_cache_put()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L84",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_clear",
+      "label": "cache_clear()",
+      "file_type": "code",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L88",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_1",
+      "label": "T1 live facts, current partial-period aggregates, read on demand and cached.  Th",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_33",
+      "label": "Current aggregates for the requested metrics, as-of now. Inert envelope     whil",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_58",
+      "label": "Read one live aggregate from Square's summary endpoints. Stubbed until Square",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L58"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "time",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "ingest_sources_base",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_fetch_metric",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_ttl_seconds",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_put",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L84",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_clear",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_fetch_metric",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_put",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_put",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_ttl_seconds",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_33",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_live_facts",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_rationale_58",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_fetch_metric",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L58",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_fetch_metric",
+      "callee": "NotProvisionedError",
+      "is_member_call": false,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L62",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L74",
+      "receiver": "_CACHE"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "callee": "monotonic",
+      "is_member_call": true,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L78",
+      "receiver": "time"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_get",
+      "callee": "pop",
+      "is_member_call": true,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L79",
+      "receiver": "_CACHE"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_put",
+      "callee": "monotonic",
+      "is_member_call": true,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L85",
+      "receiver": "time"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_live_cache_clear",
+      "callee": "clear",
+      "is_member_call": true,
+      "source_file": "brain/ingest/live.py",
+      "source_location": "L89",
+      "receiver": "_CACHE"
+    }
+  ]
+}

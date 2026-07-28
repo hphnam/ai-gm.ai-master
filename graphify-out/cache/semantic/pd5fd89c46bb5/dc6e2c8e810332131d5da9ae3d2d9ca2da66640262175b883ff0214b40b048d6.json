@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_chatlog_kb_gap_document",
+      "label": "A8 Chat-log KB-gap detection snapshot",
+      "file_type": "document",
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_chatlog_kb_gap_failure_rate_monitor",
+      "label": "Failure-rate monitor: 359 assistant replies, 68 unproduceable, 18.9% baseline",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_chatlog_kb_gap_ranked_sop_gap_clusters",
+      "label": "Ranked SOP-gap clusters table (gas cannister, onboarding, upload docs, opening)",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_chatlog_kb_gap_document",
+      "target": "brain_signals_chatlog_kb_gap_failure_rate_monitor",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_chatlog_kb_gap_document",
+      "target": "brain_signals_chatlog_kb_gap_ranked_sop_gap_clusters",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_chatlog_kb_gap_ranked_sop_gap_clusters",
+      "target": "brain_log_51_g17j_chatlog_signal_noise_guard_g3",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/signals/chatlog_kb_gap.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

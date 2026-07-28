@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    {
+      "id": "brain_ingest_world_cup_schedule",
+      "label": "FIFA World Cup 2026 Complete Match Schedule",
+      "file_type": "document",
+      "source_file": "brain/ingest/world_cup_schedule.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_ingest_world_cup_schedule",
+      "target": "brain_log_12_worldcup_liveprobe_report",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/ingest/world_cup_schedule.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

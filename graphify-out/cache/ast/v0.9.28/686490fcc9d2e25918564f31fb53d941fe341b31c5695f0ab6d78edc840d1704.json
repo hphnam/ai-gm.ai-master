@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh",
+      "label": "auto-test.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh__entry",
+      "label": "auto-test.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_project_root",
+      "label": "find_project_root()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L41",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_test_file",
+      "label": "find_test_file()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L57",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_project_root",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_test_file",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L57",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "command",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh__entry",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L9"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh__entry",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L10"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_sh__entry",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L144"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_project_root",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L45"
+    },
+    {
+      "language": "bash",
+      "callee": "return",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_project_root",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L46"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_test_file",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L71"
+    },
+    {
+      "language": "bash",
+      "callee": "return",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_auto_test_find_test_file",
+      "source_file": ".claude/hooks/auto-test.sh",
+      "source_location": "L71"
+    }
+  ],
+  "bash_sources": []
+}

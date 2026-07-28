@@ -1,0 +1,417 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "label": "spike_days.py",
+      "file_type": "code",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "label": "compute()",
+      "file_type": "code",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L29",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/ingest/spike_days.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "label": "build()",
+      "file_type": "code",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L55",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "label": "read_spikes()",
+      "file_type": "code",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L72",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L89",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_rationale_1",
+      "label": "A14 \u00b7 Retrospective spike / discount-day flag (spec \u00a76).  Derives `is_spike_day`",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "sys",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L31",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L33",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L33",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L46",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "where",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L48",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "fillna",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L49",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "astype",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L50",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "int",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L50"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_compute",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L51",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L57",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L59",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "register",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L60",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L61",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "unregister",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L62",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L64",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_build",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L68",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L74",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L76",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L76",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L81",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L81",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L82",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_read_spikes",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L86",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "callee": "to_dict",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L93",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "callee": "size",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L93",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_spike_days_main",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/ingest/spike_days.py",
+      "source_location": "L93",
+      "receiver": null
+    }
+  ]
+}

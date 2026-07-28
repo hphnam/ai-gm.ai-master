@@ -1,0 +1,220 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "label": "chronos2_promotion_sensitivity.py",
+      "file_type": "code",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_compare",
+      "label": "compare()",
+      "file_type": "code",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L34",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "label": "_write_report()",
+      "file_type": "code",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L40",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L75",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_rationale_1",
+      "label": "WP12 G12.7 \u00b7 deviation-sensitivity impact check (one-time, informational).  The",
+      "file_type": "rationale",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "sys",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_compare",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_compare",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L84",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "mkdir",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L41",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L64",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L65",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L67",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L69",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L72",
+      "receiver": "RESULTS_MD"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_write_report",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L72",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "callee": "loads",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L79",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "callee": "read",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L79",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "callee": "loads",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L80",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_chronos2_promotion_sensitivity_main",
+      "callee": "read",
+      "is_member_call": true,
+      "source_file": "brain/eval/chronos2_promotion_sensitivity.py",
+      "source_location": "L80",
+      "receiver": null
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "brain_models_ladder_results_l1_beer_hall_document",
+      "label": "A4 L1 ladder results \u2014 The Beer Hall",
+      "file_type": "document",
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_models_ladder_results_l1_beer_hall_milestone_result",
+      "label": "Beer Hall milestone: rung4_chronos2_exo wins (MASE 0.745), gate met",
+      "file_type": "rationale",
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_models_ladder_results_l1_beer_hall_spillover_hypothesis_check",
+      "label": "Spillover-hypothesis check: is_ellel_event permutation importance -0.0459 (rank 22/22)",
+      "file_type": "rationale",
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_models_ladder_results_l1_beer_hall_document",
+      "target": "brain_models_ladder_results_l1_beer_hall_milestone_result",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_models_ladder_results_l1_beer_hall_document",
+      "target": "brain_models_ladder_results_l1_beer_hall_spillover_hypothesis_check",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_models_ladder_results_l1_beer_hall_spillover_hypothesis_check",
+      "target": "brain_log_dissertation_notes_ellel_substitution_estimator_trap",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/models/ladder_results_L1_beer_hall.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

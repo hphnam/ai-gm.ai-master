@@ -1,0 +1,1450 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "label": "test_promote_and_serve.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "label": "_reset()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L26",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "label": "_FakeAdapter",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L39",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "sourceadapter",
+      "label": "SourceAdapter",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_promote_and_serve.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_init",
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L45",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_promote_and_serve.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_latest_available_date",
+      "label": ".latest_available_date()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L48",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_fetch_transactions",
+      "label": ".fetch_transactions()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L51",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_fetch_stock",
+      "label": ".fetch_stock()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L55",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "label": "_synthetic_next_day()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L59",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "label": "_stub_heavy()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L73",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "label": "test_new_data_triggers_promote()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L86",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "label": "test_quiet_refresh_does_not_promote()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L101",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "label": "test_force_refresh_always_promotes()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L112",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "label": "test_adoption_promotes_the_adopted_rung()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L124",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_prefers_adopted_model",
+      "label": "test_resolution_prefers_adopted_model()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L141",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "label": "test_resolution_falls_back_to_incumbent()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L151",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_defaults_to_venue_default",
+      "label": "test_resolution_defaults_to_venue_default()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L168",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_ellel_default_is_rung2_ets_now_uncapped",
+      "label": "test_ellel_default_is_rung2_ets_now_uncapped()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L178",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "label": "test_stock_venue_reconciles()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L192",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_non_stock_venue_skips_reconcile",
+      "label": "test_non_stock_venue_skips_reconcile()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L202",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "label": "test_served_forecast_records_model_and_watermark()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L214",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "label": "test_freshness_surfaces_served_model()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L235",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "label": "test_promote_end_to_end_advances_served_forecast()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L252",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "label": "test_closed_venue_keeps_standby_band_after_promote()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L269",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_1",
+      "label": "Promote-and-serve tests (PRJ93 live-ingest v2.1 addendum, GP0\u2013GP7 / G-promote-a.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_27",
+      "label": "Rebuild line_items from the CSV and drop the append/refit/serve bookkeeping,",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L27"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_40",
+      "label": "One synthetic closed day beyond the store ceiling (drives an append).",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_74",
+      "label": "Replace the two expensive persists with spies capturing their model/venue, so",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L74"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "ingest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "ingest_sources",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "store",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "target": "sourceadapter",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_init",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_init",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_latest_available_date",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_fetch_transactions",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_fetch_stock",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L124",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_prefers_adopted_model",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L151",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_defaults_to_venue_default",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L168",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_ellel_default_is_rung2_ets_now_uncapped",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L178",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L192",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_non_stock_venue_skips_reconcile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L214",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L235",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L252",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L269",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter_fetch_stock",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L113",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_prefers_adopted_model",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_prefers_adopted_model",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L153",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_defaults_to_venue_default",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_defaults_to_venue_default",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_ellel_default_is_rung2_ets_now_uncapped",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L181",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_ellel_default_is_rung2_ets_now_uncapped",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L182",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L193",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L194",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_non_stock_venue_skips_reconcile",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_non_stock_venue_skips_reconcile",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L204",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L215",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L216",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L236",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L237",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L253",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L270",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_27",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_40",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_fakeadapter",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_rationale_74",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L74",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "build",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L29",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L30",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L32",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L33",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L34",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_reset",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L36",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L60",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L62",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L62",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L65",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "copy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L66",
+      "receiver": "row"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L67",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_synthetic_next_day",
+      "callee": "timedelta",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L68",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "callee": "__setitem__",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L78",
+      "receiver": "seen"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "callee": "model_name",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L78"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "callee": "__setitem__",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L80",
+      "receiver": "seen"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_stub_heavy",
+      "callee": "venue",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L80"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L89"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L90",
+      "receiver": "calls"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "venue",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L90"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L91"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L92"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L93"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_new_data_triggers_promote",
+      "callee": "refresh",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L95",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L104"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L104",
+      "receiver": "calls"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "callee": "venue",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L104"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_quiet_refresh_does_not_promote",
+      "callee": "refresh",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L106",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L115"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L116",
+      "receiver": "calls"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "callee": "venue",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L116"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_force_refresh_always_promotes",
+      "callee": "refresh",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L118",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L127"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L128"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "refresh",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L130"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L131",
+      "receiver": "passed"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L131",
+      "receiver": "k"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_adoption_promotes_the_adopted_rung",
+      "callee": "refresh",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L133",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_prefers_adopted_model",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L145",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L154",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "callee": "_ensure_tables",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L156",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L157",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L160",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_falls_back_to_incumbent",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L162",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_resolution_defaults_to_venue_default",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L172",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_ellel_default_is_rung2_ets_now_uncapped",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L184",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L196",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_stock_venue_reconciles",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L197",
+      "receiver": "seen"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_non_stock_venue_skips_reconcile",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L206",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L217",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "_ensure_tables",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L219",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "_advance_watermark",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L220",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "date",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L220",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L222",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L224",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L225",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "_served",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L227",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_served_forecast_records_model_and_watermark",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L229",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L239",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L240",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "callee": "freshness",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L242",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_freshness_surfaces_served_model",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L244",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L255",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L256",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "_served",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L258",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L259",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L259",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_promote_end_to_end_advances_served_forecast",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L263",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "is_closed",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L272",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "skip",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L273",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "_promote_and_serve",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L275",
+      "receiver": "refresh"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "date",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L276",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "active_trading_end",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L276",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L277",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L279",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L279",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_promote_and_serve_test_closed_venue_keeps_standby_band_after_promote",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_promote_and_serve.py",
+      "source_location": "L283",
+      "receiver": "con"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": "apps_web_src_app_apple_icon_appleicon",
+      "label": "Apple Touch Icon (apple-icon.png)",
+      "file_type": "image",
+      "source_file": "apps/web/src/app/apple-icon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "apps_web_src_app_apple_icon_pwa_branding",
+      "label": "GM App PWA Branding (\"gm\" wordmark on burnt-orange background)",
+      "file_type": "concept",
+      "source_file": "apps/web/src/app/apple-icon.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "apps_web_src_app_apple_icon_appleicon",
+      "target": "apps_web_src_app_apple_icon_pwa_branding",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "apps/web/src/app/apple-icon.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

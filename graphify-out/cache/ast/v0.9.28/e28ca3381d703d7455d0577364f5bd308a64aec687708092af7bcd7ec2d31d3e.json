@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "label": "test_aci_closure_probe.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "label": "_synthetic_scores()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L11",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "label": "test_aci_update_matches_telescoping_identity()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L19",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_miscoverage_obeys_deterministic_bound",
+      "label": "test_aci_miscoverage_obeys_deterministic_bound()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L28",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_rationale_1",
+      "label": "WP6 \u00b7 ACI update-rule + deterministic-bound tests (fidelity corrections A6.1).",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "eval_aci_closure_probe",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_miscoverage_obeys_deterministic_bound",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_miscoverage_obeys_deterministic_bound",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L13",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "callee": "normal",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L14",
+      "receiver": "rng"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "callee": "normal",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L15",
+      "receiver": "rng"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_synthetic_scores",
+      "callee": "concatenate",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L16",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "callee": "aci_policy",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L22",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L23",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_update_matches_telescoping_identity",
+      "callee": "approx",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L25",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_miscoverage_obeys_deterministic_bound",
+      "callee": "aci_policy",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L31",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_aci_closure_probe_test_aci_miscoverage_obeys_deterministic_bound",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_aci_closure_probe.py",
+      "source_location": "L32",
+      "receiver": null
+    }
+  ]
+}

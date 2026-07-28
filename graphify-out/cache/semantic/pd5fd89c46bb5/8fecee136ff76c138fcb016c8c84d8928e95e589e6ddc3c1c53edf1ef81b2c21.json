@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_13_liveingest_fixes_report",
+      "label": "PRJ93 Live-Ingest Fixes: Cross-Venue Append and Exact Dual-Layer Weather",
+      "file_type": "document",
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_13_liveingest_fixes_report_append_bug_fix",
+      "label": "Cross-venue append bug fix: scope _append_transactions candidate rows by venue before the date filter",
+      "file_type": "rationale",
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_13_liveingest_fixes_report_weather_incremental_fix",
+      "label": "Incremental weather pull fix: loud structured weather_gap instead of a silent skipped-basis no-op",
+      "file_type": "rationale",
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_13_liveingest_fixes_report",
+      "target": "brain_log_12_worldcup_liveprobe_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_12_worldcup_liveprobe_report_structural_blindness",
+      "target": "brain_log_13_liveingest_fixes_report_append_bug_fix",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_13_liveingest_fixes_report_weather_incremental_fix",
+      "target": "brain_log_12_worldcup_liveprobe_report_honesty_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/13_LiveIngest_Fixes_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

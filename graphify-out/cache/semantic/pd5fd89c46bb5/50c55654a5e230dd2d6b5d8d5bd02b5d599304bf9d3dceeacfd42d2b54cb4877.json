@@ -1,0 +1,394 @@
+{
+  "nodes": [
+    {
+      "id": "glossary_a_prefix_pipeline_steps",
+      "label": "A<n> \u2014 brain forecasting pipeline step code (A0 ingest to A14b weather diagnostic)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_rung_model_ladder",
+      "label": "Rung <n> \u2014 model ladder tier (0 seasonal-naive to 4 foundation models)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_l1_l2_l3_hierarchy",
+      "label": "L1/L2/L3 \u2014 hierarchy layers: venue / category / item",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_t1_t4_freshness_tiers",
+      "label": "T1-T4 \u2014 data-freshness tiers, live facts to full recalibration",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_wp_work_packages",
+      "label": "WP<n> \u2014 fidelity-corrections and Chronos-2 build sequence (WP1-WP12)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_g_codes_acceptance_gates",
+      "label": "G<n> \u2014 acceptance gate, local to each report except the G12.x series",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_g12x_series",
+      "label": "G12.x \u2014 WP12 Chronos-2 nightly promotion sub-gates (repo-wide numbering)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_flag_prefixes",
+      "label": "FLAG-XX<n> \u2014 standing flag / open question register, authoritative in brain/FLAGS.md",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_overloaded_a_prefix",
+      "label": "The overloaded A prefix: pipeline step vs .paul web/API acceptance-test case ID collision",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_mase",
+      "label": "MASE \u2014 mean absolute scaled error, per-series denominator, not comparable across venues",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_mint",
+      "label": "MinT \u2014 minimum-trace hierarchical reconciliation (Wickramasuriya et al. 2019)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_wlsv",
+      "label": "WLSv \u2014 weighted least squares diagonal residual-variance MinT variant",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_conformal",
+      "label": "conformal \u2014 split-conformal prediction bands, distribution-free finite-sample coverage",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_mondrian",
+      "label": "Mondrian \u2014 group-conditional conformal, active vs structural-zero day groups",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_exo_covariate",
+      "label": "exo \u2014 exogenous, known-future covariate (weather, calendar, World Cup flags)",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_weather_bases",
+      "label": "hindcast / leadmatched / observed \u2014 the three weather bases; observed is an oracle that leaks",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_cusum",
+      "label": "CUSUM \u2014 cumulative-sum change detector, production detector for sustained drift",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_bocpd",
+      "label": "BOCPD \u2014 Bayesian online change-point detection (Adams & MacKay 2007), benchmark only",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_arl0",
+      "label": "ARL0 \u2014 average run length to first false alarm, change-point calibration target",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_adi",
+      "label": "ADI \u2014 average demand interval, intermittency measure gating sparse L3 nodes",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_ndcg",
+      "label": "NDCG \u2014 normalised discounted cumulative gain, the briefing ranking metric",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_lovo",
+      "label": "LOVO \u2014 leave-one-venue-out, onboarding-transfer evaluation guard within one estate",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_is_ellel_event",
+      "label": "is_ellel_event \u2014 Ellel booking-day flag, near-deterministic self-signal, neutralised on Ellel's own frame",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_mcp_sim",
+      "label": "MCP-SIM \u2014 labelled Square-connector stand-in for the production NeonAdapter, not the real ingest path",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_structural_zero",
+      "label": "structural zero \u2014 a day the venue is closed by design, a real zero not missing data",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_pre_registration",
+      "label": "pre-registration \u2014 freeze the forecast before any actual is seen, then score; frozen artefacts are immutable",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "glossary_prj93_report_index",
+      "label": "PRJ93 report index \u2014 table of build/analysis reports at the repo root and what each covers",
+      "file_type": "concept",
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "glossary_g_codes_acceptance_gates",
+      "target": "glossary_g12x_series",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_flag_prefixes",
+      "target": "brain_flags_overview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_prj93_report_index",
+      "target": "prj93_agent_eval_report_scaled_injection_grid",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_cusum",
+      "target": "glossary_bocpd",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_conformal",
+      "target": "glossary_mondrian",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_pre_registration",
+      "target": "brain_flags_flag_fixture_anticipation",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_conformal",
+      "target": "brain_conformal_conformal_l1_beer_hall_coverage_report",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_conformal",
+      "target": "brain_conformal_conformal_l1_ellel_coverage_report",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "glossary_conformal",
+      "target": "brain_conformal_conformal_l1_two_river_taps_coverage_report",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "GLOSSARY.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

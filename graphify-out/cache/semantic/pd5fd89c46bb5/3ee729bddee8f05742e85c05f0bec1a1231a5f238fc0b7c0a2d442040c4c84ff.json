@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_judge_prompts_llm_judge",
+      "label": "LLM-judge prompts (offline seam): claude-opus-4-8 pinned, fixed rubric scoring briefing items for correctness/actionability/clarity/calibrated_confidence/keep",
+      "file_type": "document",
+      "source_file": "brain/eval/judge_prompts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_eval_judge_prompts_llm_judge",
+      "target": "brain_eval_change_point_eval_trt_closure",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/eval/judge_prompts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_eval_judge_prompts_llm_judge",
+      "target": "brain_eval_deviation_eval_point_deviation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/eval/judge_prompts.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

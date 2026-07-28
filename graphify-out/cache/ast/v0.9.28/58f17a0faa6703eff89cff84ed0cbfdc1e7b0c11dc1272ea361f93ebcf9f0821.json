@@ -1,0 +1,235 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "label": "compute.py",
+      "file_type": "code",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "get",
+      "label": "get",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/service/compute.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_health",
+      "label": "health()",
+      "file_type": "code",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L46",
+      "_callable": true
+    },
+    {
+      "id": "post",
+      "label": "post",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/service/compute.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "label": "post_compute()",
+      "file_type": "code",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L53",
+      "_callable": true
+    },
+    {
+      "id": "computedataset",
+      "label": "ComputeDataset",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/service/compute.py"
+    },
+    {
+      "id": "computebundle",
+      "label": "ComputeBundle",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/service/compute.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_1",
+      "label": "The compute service: the heavy, stateless half of the brain.  One endpoint. gm-a",
+      "file_type": "rationale",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_47",
+      "label": "Liveness only. Deliberately says nothing about any org: this is the one     unau",
+      "file_type": "rationale",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L47"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_54",
+      "label": "Compute one org's forecasts from the supplied dataset.      `org_id` rides insid",
+      "file_type": "rationale",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L54"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "fastapi",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "compute_contract",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "compute_engine",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "service_auth",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_health",
+      "target": "get",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L45",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_health",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "target": "post",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L52",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "target": "computedataset",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "target": "computebundle",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_47",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_health",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_rationale_54",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/service/compute.py",
+      "source_location": "L54",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "callee": "run",
+      "is_member_call": false,
+      "source_file": "brain/service/compute.py",
+      "source_location": "L63",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_service_compute_post_compute",
+      "callee": "HTTPException",
+      "is_member_call": false,
+      "source_file": "brain/service/compute.py",
+      "source_location": "L68",
+      "receiver": null
+    }
+  ]
+}

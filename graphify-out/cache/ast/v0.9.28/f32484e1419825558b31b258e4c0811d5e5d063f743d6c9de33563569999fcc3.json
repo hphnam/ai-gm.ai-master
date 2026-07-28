@@ -1,0 +1,269 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "label": "test_a9_checklist.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "fixture",
+      "label": "fixture",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a9_checklist.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_checklists",
+      "label": "checklists()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L11",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_template_step_counts",
+      "label": "test_template_step_counts()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L15",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_gas_off_is_critical",
+      "label": "test_gas_off_is_critical()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L20",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditional_step_is_not_mandatory",
+      "label": "test_conditional_step_is_not_mandatory()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L26",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_sunday_only_step_excluded_on_weekday",
+      "label": "test_sunday_only_step_excluded_on_weekday()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L32",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditionals_never_raise_a_miss",
+      "label": "test_conditionals_never_raise_a_miss()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L39",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_missed_gas_off_is_high_severity",
+      "label": "test_missed_gas_off_is_high_severity()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L47",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_skipped_checklist_is_critical",
+      "label": "test_skipped_checklist_is_critical()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L56",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_rationale_1",
+      "label": "A9 tests, template parse, weighting, conditional exclusion, Sunday rule.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "signals",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_checklists",
+      "target": "fixture",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L10",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_checklists",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_template_step_counts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_gas_off_is_critical",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditional_step_is_not_mandatory",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_sunday_only_step_excluded_on_weekday",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditionals_never_raise_a_miss",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_missed_gas_off_is_high_severity",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_skipped_checklist_is_critical",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_checklists",
+      "callee": "parse_checklists",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L12",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_sunday_only_step_excluded_on_weekday",
+      "callee": "expected_mandatory",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L33",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_sunday_only_step_excluded_on_weekday",
+      "callee": "expected_mandatory",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L34",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditionals_never_raise_a_miss",
+      "callee": "expected_mandatory",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L41",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_conditionals_never_raise_a_miss",
+      "callee": "evaluate",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L42",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_missed_gas_off_is_high_severity",
+      "callee": "expected_mandatory",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L49",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_missed_gas_off_is_high_severity",
+      "callee": "evaluate",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L50",
+      "receiver": "cd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a9_checklist_test_skipped_checklist_is_critical",
+      "callee": "evaluate",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a9_checklist.py",
+      "source_location": "L57",
+      "receiver": "cd"
+    }
+  ]
+}

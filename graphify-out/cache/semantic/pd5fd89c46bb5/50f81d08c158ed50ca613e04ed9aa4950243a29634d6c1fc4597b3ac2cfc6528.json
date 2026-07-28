@@ -1,0 +1,59 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_05_pointdeviation_report",
+      "label": "PRJ93 Point-Deviation Signal: Build & Analysis Report",
+      "file_type": "document",
+      "source_file": "brain/log/05_PointDeviation_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_05_pointdeviation_report_point_deviation",
+      "label": "Point-deviation primitive on the shared residual foundation (signals/residual.py)",
+      "file_type": "concept",
+      "source_file": "brain/log/05_PointDeviation_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_05_pointdeviation_report",
+      "target": "brain_log_03_build_report_current",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/05_PointDeviation_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_05_pointdeviation_report",
+      "target": "brain_log_04_changepoint_a13_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/05_PointDeviation_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_04_changepoint_a13_report_change_point_detection",
+      "target": "brain_log_05_pointdeviation_report_point_deviation",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/05_PointDeviation_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh",
+      "label": "context-recovery.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh__entry",
+      "label": "context-recovery.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_find_project_root",
+      "label": "find_project_root()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L15",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_find_project_root",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L15",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "cat",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh__entry",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L54"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh__entry",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L94"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_sh__entry",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L111"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_find_project_root",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L19"
+    },
+    {
+      "language": "bash",
+      "callee": "return",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_context_recovery_find_project_root",
+      "source_file": ".claude/hooks/context-recovery.sh",
+      "source_location": "L20"
+    }
+  ],
+  "bash_sources": []
+}

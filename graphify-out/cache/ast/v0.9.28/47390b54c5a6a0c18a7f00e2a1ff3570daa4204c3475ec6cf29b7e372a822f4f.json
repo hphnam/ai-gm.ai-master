@@ -1,0 +1,481 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "label": "g15a_weather_compare.py",
+      "file_type": "code",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_is_dry",
+      "label": "_is_dry()",
+      "file_type": "code",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L52",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "label": "_row()",
+      "file_type": "code",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L59",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/sim/g15a_weather_compare.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "label": "_stored_hindcast()",
+      "file_type": "code",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L76",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L88",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_1",
+      "label": "G15a.1 - weather across the two Saturdays, conditioning basis vs what occurred.",
+      "file_type": "rationale",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_53",
+      "label": "Same derivation the frame and the forward frame use, so the cells compare.",
+      "file_type": "rationale",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_77",
+      "label": "What the model was conditioned on, exactly as it was persisted on 2026-07-10.",
+      "file_type": "rationale",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L77"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L35",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "ingest_exog_weather",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_is_dry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_is_dry",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_53",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_is_dry",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_rationale_77",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L77",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_is_dry",
+      "callee": "isna",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L54",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "fromkeys",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L61",
+      "receiver": "dict"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "FIELDS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L61"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "normalize",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L62",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L62",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L62",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "fromkeys",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L64",
+      "receiver": "dict"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "FIELDS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L64"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "notna",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L66",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "notna",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L68",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_row",
+      "callee": "notna",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L71",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L78",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L80",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L80",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "callee": "CELL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L83"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_stored_hindcast",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L85",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "DATES",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L90"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "DATES",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L90"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "fetch_observed",
+      "is_member_call": false,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L91",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "CELL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L91"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "fetch_hindcast",
+      "is_member_call": false,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L92",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "CELL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L92"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L101",
+      "receiver": "DATES"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "VENUE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L122"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "CELL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L123"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L132",
+      "receiver": "OUT"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "dumps",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L132",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L136",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_sim_g15a_weather_compare_run",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/sim/g15a_weather_compare.py",
+      "source_location": "L141",
+      "receiver": null
+    }
+  ]
+}

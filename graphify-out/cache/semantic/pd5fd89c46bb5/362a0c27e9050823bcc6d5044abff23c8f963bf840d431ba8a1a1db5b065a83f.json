@@ -1,0 +1,232 @@
+{
+  "nodes": [
+    {
+      "id": "brain_readme_brain_service_overview",
+      "label": "The brain \u2014 standalone Python forecasting/signals service (Track A), called over HTTP by the NestJS API (Track B)",
+      "file_type": "document",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_pipeline_a_steps",
+      "label": "Pipeline (A0 through A14): each step gates the next, ending in the A10 HTTP service",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_served_models_table",
+      "label": "Served model per venue: gate-selected on 6-fold rolling MASE, must beat both seasonal-naive and robust-DOW",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_venue_beer_hall",
+      "label": "The Beer Hall \u2014 venue, served model rung4_chronos2_exo, MASE 0.745, the milestone gate",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_venue_ellel",
+      "label": "Ellel Village Hall \u2014 venue, capped at Rung 1 (booking/event-driven), served model rung1_robust_dow, MASE 0.572",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_venue_two_river_taps",
+      "label": "Two River Taps \u2014 venue, closed 2026-05-08, served model rung2_ets dormant via the liveness gate, MASE 0.597",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_state_held_tables",
+      "label": "State held that is not sales history: briefing_runs, change_points, forecasts/bands, served_forecast, data_watermark, exogenous frame tables",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_service_endpoints",
+      "label": "Service endpoints (A10): /forecast, /deviation/*, /sop-gaps, /stock/cover, /briefing, /freshness, /refresh (localhost-trust, no auth on /refresh)",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_readme_live_ingest_tiers",
+      "label": "Live ingest three-tier model: T1 live facts, T2 nightly append, T3 conditional re-fit, then promote-and-serve",
+      "file_type": "concept",
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_readme_brain_service_overview",
+      "target": "glossary_a_prefix_pipeline_steps",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_brain_service_overview",
+      "target": "brain_flags_overview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_brain_service_overview",
+      "target": "claude_apps_api_backend",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_pipeline_a_steps",
+      "target": "glossary_a_prefix_pipeline_steps",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_pipeline_a_steps",
+      "target": "prj93_agent_eval_report_scaled_injection_grid",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_served_models_table",
+      "target": "brain_readme_venue_beer_hall",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_served_models_table",
+      "target": "brain_readme_venue_ellel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_served_models_table",
+      "target": "brain_readme_venue_two_river_taps",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_served_models_table",
+      "target": "glossary_rung_model_ladder",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_state_held_tables",
+      "target": "brain_contract_sales_daily",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_readme_live_ingest_tiers",
+      "target": "glossary_t1_t4_freshness_tiers",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/README.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_served_venue_models",
+      "label": "Per-venue served forecasting models on the rung ladder",
+      "nodes": [
+        "brain_readme_served_models_table",
+        "brain_readme_venue_beer_hall",
+        "brain_readme_venue_ellel",
+        "brain_readme_venue_two_river_taps",
+        "glossary_rung_model_ladder"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/README.md"
+    }
+  ]
+}

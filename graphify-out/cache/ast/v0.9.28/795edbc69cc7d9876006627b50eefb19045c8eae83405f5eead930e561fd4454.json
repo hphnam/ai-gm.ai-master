@@ -1,0 +1,889 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "label": "residual.py",
+      "file_type": "code",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "label": "_raw_series()",
+      "file_type": "code",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L54",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/signals/residual.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "label": "build_residual_stream()",
+      "file_type": "code",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L81",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "label": "attribute()",
+      "file_type": "code",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L111",
+      "_callable": true
+    },
+    {
+      "id": "timestamp",
+      "label": "Timestamp",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/signals/residual.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "label": "_table()",
+      "file_type": "code",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L222",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_1",
+      "label": "Shared foundation for the deviation signals (point + change-point).  The standar",
+      "file_type": "rationale",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_55",
+      "label": "(date, value) over the active span, post-closure zero-extended, the raw     inpu",
+      "file_type": "rationale",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_82",
+      "label": "Leakage-free one-step-ahead standardised residual stream over the active     spa",
+      "file_type": "rationale",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L82"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_113",
+      "label": "Scan the A14 exogenous seam around the onset and return a ranked list of     COI",
+      "file_type": "rationale",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L113"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L23",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L24",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "conformal_wrap",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "ingest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "store_active_span",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "target": "timestamp",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L222",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "target": "timestamp",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L146",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_55",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_82",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_rationale_113",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L113",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L61",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "read_series",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L63",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "is_closed",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L64",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "active_trading_start",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L68",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "dataset_max_date",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L69",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L70",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "rename_axis",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "reindex",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L71",
+      "receiver": "s"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "fillna",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L72",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "trim_to_active",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L74",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L77",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_raw_series",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L78",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L89",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L89"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L90",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "CP_WARMUP_DAYS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L93"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "median",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L95",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L95",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "Series",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L95",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "median",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L96",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L97",
+      "receiver": "med"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L100",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L100"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L100",
+      "receiver": "med"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "conformal_quantile",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L101",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "CP_LEVEL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L101"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "_EPS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L102"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_build_residual_stream",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L104",
+      "receiver": "rows"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L117",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L119",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "CP_ATTRIB_WINDOW_DAYS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L119"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "is_closed",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L126",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "active_trading_end",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L126",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L127",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L127",
+      "receiver": "VENUE_LABELS"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "PRICE_REGIME_BREAK",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L128"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L129",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L132",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "is_school_term",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L133",
+      "receiver": "cal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "is_school_term",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L133",
+      "receiver": "cal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L133",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L134",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "date_range",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L136",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "is_uni_term",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L137",
+      "receiver": "cal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "is_uni_term",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L137",
+      "receiver": "cal"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L137",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L138",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L145",
+      "receiver": "WEATHER_CELLS"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L156",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "WEATHER_BASELINE_DAYS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L156"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L158",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L158",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "std",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L159",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L163",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L169",
+      "receiver": "EVENT_SCOPE"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "isin",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L170",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "iterrows",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L172",
+      "receiver": "ew"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L173",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "coincident_fixtures",
+      "is_member_call": false,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L181",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L183",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L194",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L202",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L204",
+      "receiver": "hits"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L207",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_attribute",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L218",
+      "receiver": "ranked"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L223",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L223",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "callee": "df",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L227",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L227",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_residual_table",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/signals/residual.py",
+      "source_location": "L230",
+      "receiver": "pd"
+    }
+  ]
+}

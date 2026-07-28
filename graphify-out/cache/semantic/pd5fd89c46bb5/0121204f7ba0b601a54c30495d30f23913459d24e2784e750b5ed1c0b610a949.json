@@ -1,0 +1,238 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_stock_inventory_a12",
+      "label": "A12 \u00b7 Stock Inventory \u2014 Days-of-Cover Reorder Signal",
+      "file_type": "document",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_a6_forecast",
+      "label": "A6 reconciled demand forecast",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_reorder_rule",
+      "label": "Days-of-cover reorder rule",
+      "file_type": "rationale",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_keg_to_pints",
+      "label": "Size-aware keg\u2192pints conversion (52.8/88)",
+      "file_type": "rationale",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_2",
+      "label": "FLAG-2 (stock is a level, not a flow)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_3",
+      "label": "FLAG-3 (lead/safety days are working assumptions)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_4",
+      "label": "FLAG-4 (keg\u2192pints conversion factors)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_5",
+      "label": "FLAG-5 (Beer Hall only; no TRT/Ellel stock sheets)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_6",
+      "label": "FLAG-6 (hand-typed footers occasionally stale)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_flag_7",
+      "label": "FLAG-7 (median keg-cost rise is mix-confounded)",
+      "file_type": "concept",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_stock_inventory_working_capital",
+      "label": "Working capital inefficiency (reactive bulk-ordering)",
+      "file_type": "rationale",
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_a6_forecast",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_reorder_rule",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_reorder_rule",
+      "target": "brain_signals_stock_inventory_flag_3",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_keg_to_pints",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_keg_to_pints",
+      "target": "brain_signals_stock_inventory_flag_4",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_keg_to_pints",
+      "target": "brain_signals_stock_inventory_a6_forecast",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_flag_2",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_flag_5",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_flag_6",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_flag_7",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_stock_inventory_a12",
+      "target": "brain_signals_stock_inventory_working_capital",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/stock_inventory.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

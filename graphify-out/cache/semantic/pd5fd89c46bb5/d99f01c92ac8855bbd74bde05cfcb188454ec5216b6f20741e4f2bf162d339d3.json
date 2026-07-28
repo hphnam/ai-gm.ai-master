@@ -1,0 +1,249 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "label": "Report 45: S4 G17d \u2014 Intermittency and Occurrence",
+      "file_type": "document",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_kostenko_hyndman_correction",
+      "label": "Kostenko-Hyndman ADI/CV2 cutoff correction (4/3, 0.5)",
+      "file_type": "rationale",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_scale_basis_decision",
+      "label": "Scale basis decision by bootstrap (calendar_lag7_active at BH/TRT, unscaled at Ellel)",
+      "file_type": "rationale",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "label": "Observed-occurrence hurdle gate (yhat = P(trade) * E[revenue|trade])",
+      "file_type": "rationale",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_finding3_flip_refuted",
+      "label": "Finding 3 library-flip refuted (ETS 0.597 not 0.617)",
+      "file_type": "rationale",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_l2_denominator_routing",
+      "label": "L2 cadence denominator routed through harness.seasonal_naive_scale",
+      "file_type": "rationale",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_flag_ellel_diary",
+      "label": "FLAG-ELLEL-DIARY",
+      "file_type": "concept",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_flag_l2_denominator",
+      "label": "FLAG-L2-DENOMINATOR (re-scoped)",
+      "file_type": "concept",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_kostenko_note_2006",
+      "label": "Kostenko & Hyndman (2006), a note on the categorization of demand patterns",
+      "file_type": "paper",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_cragg_1971",
+      "label": "Cragg (1971), hurdle/two-part demand models",
+      "file_type": "paper",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_mullahy_1986",
+      "label": "Mullahy (1986), specification and testing of hurdle models",
+      "file_type": "paper",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_45_g17d_intermittency_and_occurrence_chatfield_all_zero_2007",
+      "label": "Chatfield (2007), all-zero / cost-weighted evaluation on lumpy demand (bib stub)",
+      "file_type": "paper",
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_kostenko_hyndman_correction",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_scale_basis_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_finding3_flip_refuted",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_l2_denominator_routing",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_flag_ellel_diary",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_l2_denominator_routing",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_flag_l2_denominator",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_kostenko_hyndman_correction",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_kostenko_note_2006",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_cragg_1971",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_mullahy_1986",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_45_g17d_intermittency_and_occurrence_scale_basis_decision",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_chatfield_all_zero_2007",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/45_G17d_Intermittency_and_Occurrence.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

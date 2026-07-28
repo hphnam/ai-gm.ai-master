@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_34_g14b_defect_closure_verdict",
+      "label": "Report 34 - G14b: defect closure, with a verdict",
+      "file_type": "document",
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_34_g14b_defect_closure_verdict_wrong_fix_pattern",
+      "label": "Wrong-fix pattern: plausible, documented, tested fixes measured only against the motivating case",
+      "file_type": "rationale",
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_34_g14b_defect_closure_verdict",
+      "target": "brain_log_33_g14_de_lune_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_34_g14b_defect_closure_verdict",
+      "target": "brain_log_34_g14b_defect_closure_verdict_wrong_fix_pattern",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_34_g14b_defect_closure_verdict",
+      "target": "brain_log_33_g14_de_lune_report_flag_band_horizon",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "wrong_fix_review_rounds",
+      "label": "Four consecutive review rounds, each finding a wrong fix in the prior round's fix",
+      "nodes": [
+        "brain_log_33_g14_de_lune_report",
+        "brain_log_34_g14b_defect_closure_verdict",
+        "brain_log_37_g15b_round4_review",
+        "brain_log_40_g16_portable_baseline_and_corrections"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9,
+      "source_file": "brain/log/34_G14b_Defect_Closure_Verdict.md"
+    }
+  ]
+}

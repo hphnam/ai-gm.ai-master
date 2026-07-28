@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_06_proactive_briefing_report",
+      "label": "PRJ93 Proactive Briefing Capstone: Build & Analysis Report",
+      "file_type": "document",
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_06_proactive_briefing_report_briefing_synthesis",
+      "label": "Proactive briefing synthesis (de-duplication + transparent ranking + honesty gates)",
+      "file_type": "concept",
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_06_proactive_briefing_report",
+      "target": "brain_log_03_build_report_current",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_06_proactive_briefing_report",
+      "target": "brain_log_04_changepoint_a13_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_06_proactive_briefing_report",
+      "target": "brain_log_05_pointdeviation_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_06_proactive_briefing_report_briefing_synthesis",
+      "target": "brain_log_04_changepoint_a13_report_change_point_detection",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_06_proactive_briefing_report_briefing_synthesis",
+      "target": "brain_log_05_pointdeviation_report_point_deviation",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_06_proactive_briefing_report_briefing_synthesis",
+      "target": "brain_log_03_build_report_current_stock_integration",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "prj93_proactive_signal_layer",
+      "label": "PRJ93 Proactive Signal Layer (change-point, point-deviation, briefing, live-ingest freshness)",
+      "nodes": [
+        "brain_log_04_changepoint_a13_report",
+        "brain_log_05_pointdeviation_report",
+        "brain_log_06_proactive_briefing_report",
+        "brain_log_07_live_ingest_report"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/06_Proactive_Briefing_Report.md"
+    }
+  ]
+}

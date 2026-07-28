@@ -1,0 +1,431 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "label": "calendar_sources.py",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "label": "_as_date()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L112",
+      "_callable": true
+    },
+    {
+      "id": "datelike",
+      "label": "DateLike",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/ingest/calendar_sources.py"
+    },
+    {
+      "id": "date",
+      "label": "date",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/ingest/calendar_sources.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_holiday",
+      "label": "is_school_holiday()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L120",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_term",
+      "label": "is_school_term()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L125",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_uni_term",
+      "label": "is_uni_term()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L131",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_uni_phase",
+      "label": "uni_phase()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L136",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "label": "coverage_gaps()",
+      "file_type": "code",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L144",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_1",
+      "label": "PRJ93 \u00b7 A14 calendar sources, Lancashire school terms + Lancaster Uni terms.  Dr",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_126",
+      "label": "True on days schools are in session (i.e. not a holiday). Weekends in     term a",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L126"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_145",
+      "label": "Report where the requested span exceeds confirmed coverage, so the     feature b",
+      "file_type": "rationale",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L145"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "typing",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "target": "date",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L112",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_holiday",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_holiday",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_term",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_term",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_uni_term",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_uni_term",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_uni_phase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_uni_phase",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "target": "datelike",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "target": "date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_holiday",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L121",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_term",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_holiday",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L128",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_uni_term",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_uni_phase",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L148",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_126",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_is_school_term",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L126",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_rationale_145",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L145",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "callee": "datetime",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L113"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "callee": "date",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L115"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_as_date",
+      "callee": "fromisoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L117",
+      "receiver": "datetime"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L151",
+      "receiver": "lo"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L151",
+      "receiver": "SCHOOL_COVERAGE_FROM"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L153",
+      "receiver": "SCHOOL_COVERAGE_TO"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L153",
+      "receiver": "hi"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L156",
+      "receiver": "lo"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L156",
+      "receiver": "UNI_COVERAGE_CONFIRMED_FROM"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L161",
+      "receiver": "UNI_COVERAGE_TO"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_ingest_calendar_sources_coverage_gaps",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/ingest/calendar_sources.py",
+      "source_location": "L161",
+      "receiver": "hi"
+    }
+  ]
+}

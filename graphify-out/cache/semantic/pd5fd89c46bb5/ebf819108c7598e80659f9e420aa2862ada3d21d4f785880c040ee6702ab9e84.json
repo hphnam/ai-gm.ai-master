@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "brain_models_ladder_results_l1_two_river_taps_document",
+      "label": "A4 L1 ladder results \u2014 Two River Taps",
+      "file_type": "document",
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_models_ladder_results_l1_two_river_taps_milestone_result",
+      "label": "TRT milestone: rung2_ets wins (MASE 0.597), gate met; rung3_gbm 0.602",
+      "file_type": "rationale",
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_models_ladder_results_l1_two_river_taps_closure_note",
+      "label": "TRT closed since 2026-05-08; band reflects pre-closure rhythm only",
+      "file_type": "rationale",
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_models_ladder_results_l1_two_river_taps_document",
+      "target": "brain_models_ladder_results_l1_two_river_taps_milestone_result",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_models_ladder_results_l1_two_river_taps_document",
+      "target": "brain_models_ladder_results_l1_two_river_taps_closure_note",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_models_ladder_results_l1_two_river_taps_milestone_result",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_finding3_flip_refuted",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/models/ladder_results_L1_two_river_taps.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,524 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "label": "scale_bootstrap.py",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "label": "_diffs()",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L47",
+      "_callable": true
+    },
+    {
+      "id": "venueruler",
+      "label": "VenueRuler",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/eval/scale_bootstrap.py"
+    },
+    {
+      "id": "ndarray",
+      "label": "ndarray",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/eval/scale_bootstrap.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "label": "bootstrap_scale()",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L55",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "label": "_induced_mase()",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L77",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "label": "run_venue()",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L91",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L113",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_1",
+      "label": "S4 Part 2 - the scale basis decision, settled by bootstrap.  S1 established four",
+      "file_type": "rationale",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_48",
+      "label": "The absolute lag-difference vector a basis averages into its scale.",
+      "file_type": "rationale",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L48"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_56",
+      "label": "Point scale, 95% percentile interval, and width as a percent of the point.",
+      "file_type": "rationale",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L56"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_78",
+      "label": "The MASE interval induced by scale uncertainty alone (MAE numerator fixed).",
+      "file_type": "rationale",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L78"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "sys",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L30",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "eval",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "target": "venueruler",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L113",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_48",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_56",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_rationale_78",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L78",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "callee": "series_for",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L49",
+      "receiver": "ruler"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_diffs",
+      "callee": "_scale_pairs",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L51",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L63",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L63"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L65",
+      "receiver": "d"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L66",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L69",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L70",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "integers",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L70",
+      "receiver": "rng"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "percentile",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L71",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_bootstrap_scale",
+      "callee": "CI",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L71"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L79",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L85",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_induced_mase",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L85",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "venue_ruler",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L92",
+      "receiver": "harness"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "AS_OF",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L92"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L93",
+      "receiver": "CONFRONT_MAE"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "AS_OF",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L94"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L106",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_run_venue",
+      "callee": "isfinite",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L108",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "assert_store_ceiling",
+      "is_member_call": false,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L116",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "AS_OF",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L119"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "B",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L119"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "SEED",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L119"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L126",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L135",
+      "receiver": "path"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_eval_scale_bootstrap_main",
+      "callee": "dumps",
+      "is_member_call": true,
+      "source_file": "brain/eval/scale_bootstrap.py",
+      "source_location": "L135",
+      "receiver": "json"
+    }
+  ]
+}

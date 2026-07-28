@@ -73,3 +73,13 @@ Skip only for: pure doc edits, formatting-only changes, dependency bumps with no
 - Never modify existing Prisma migrations under `apps/api/prisma/migrations/`. Add a new one.
 - Don't edit `apps/web/src/generated/**` (orval-generated API client).
 - `docs/` xlsx files are runtime canaries for the document-intelligence pipeline, not dev seed data.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

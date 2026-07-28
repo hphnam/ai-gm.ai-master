@@ -1,0 +1,53 @@
+{
+  "nodes": [
+    {
+      "id": "brain_conformal_conformal_l1_beer_hall_coverage_report",
+      "label": "A5 conformal coverage report \u2014 The Beer Hall L1, rung2_ets, Mondrian band PASS within +/-3pp",
+      "file_type": "document",
+      "source_file": "brain/conformal/conformal_L1_beer_hall.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "glossary_mondrian",
+      "target": "brain_conformal_conformal_l1_beer_hall_coverage_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/conformal/conformal_L1_beer_hall.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_conformal_conformal_l1_beer_hall_coverage_report",
+      "target": "brain_readme_venue_beer_hall",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/conformal/conformal_L1_beer_hall.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_conformal_coverage_reports",
+      "label": "A5 Mondrian conformal coverage reports across all three venues",
+      "nodes": [
+        "brain_conformal_conformal_l1_beer_hall_coverage_report",
+        "brain_conformal_conformal_l1_ellel_coverage_report",
+        "brain_conformal_conformal_l1_two_river_taps_coverage_report",
+        "glossary_mondrian"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/conformal/conformal_L1_beer_hall.md"
+    }
+  ]
+}

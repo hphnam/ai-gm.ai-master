@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "_claude_skills_context_budget_skill_context_budget",
+      "label": "context-budget skill",
+      "file_type": "document",
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "_claude_skills_context_budget_skill_always_loaded_cost_rationale",
+      "label": "Always-loaded config token cost rationale (CLAUDE.md loads every turn for every developer)",
+      "file_type": "rationale",
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "_claude_rules_code_quality_code_quality",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "_claude_rules_testing_testing",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "_claude_rules_security_security",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "_claude_rules_frontend_frontend",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "claude_claude",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_always_loaded_cost_rationale",
+      "target": "claude_claude",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "_claude_skills_context_budget_skill_context_budget",
+      "target": "_claude_skills_setupdotclaude_skill_setupdotclaude",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": ".claude/skills/context-budget/SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

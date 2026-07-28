@@ -1,0 +1,293 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "label": "intermittent.py",
+      "file_type": "code",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "label": "croston_classic()",
+      "file_type": "code",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L34",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "label": "croston_sba()",
+      "file_type": "code",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L40",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "label": "croston_fitted()",
+      "file_type": "code",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L46",
+      "_callable": true
+    },
+    {
+      "id": "ndarray",
+      "label": "ndarray",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/models/intermittent.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "label": "_croston_core()",
+      "file_type": "code",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L58",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_1",
+      "label": "Croston's method and the Syntetos-Boylan Approximation (SBA) for intermittent-de",
+      "file_type": "rationale",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_35",
+      "label": "Flat per-period Croston rate at the end of the training series.",
+      "file_type": "rationale",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L35"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_41",
+      "label": "Flat per-period SBA rate: (1 - alpha/2) times the Croston rate.",
+      "file_type": "rationale",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L41"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_47",
+      "label": "Leak-free one-step-ahead in-sample forecasts aligned to y.      fitted[t] is the",
+      "file_type": "rationale",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L47"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L31",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_35",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_41",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_rationale_47",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L47",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L36",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_classic",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L36"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L42",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_sba",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L42"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L54",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_fitted",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L54"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "callee": "full",
+      "is_member_call": true,
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L60",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_models_intermittent_croston_core",
+      "callee": "flatnonzero",
+      "is_member_call": true,
+      "source_file": "brain/models/intermittent.py",
+      "source_location": "L61",
+      "receiver": "np"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "nodes": [
+    {
+      "id": "brain_transfer_transfer_results_a7",
+      "label": "A7 \u00b7 Onboarding-Transfer (Leave-One-Venue-Out)",
+      "file_type": "document",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_lovo_harness",
+      "label": "LOVO harness (leave-one-venue-out shape transfer)",
+      "file_type": "rationale",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_global_gbm_a4",
+      "label": "Global GBM (A4, pooling baseline)",
+      "file_type": "concept",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_rung3_global_gbm",
+      "label": "rung3_global_gbm",
+      "file_type": "concept",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_tan_et_al_2024",
+      "label": "Tan et al. (2024)",
+      "file_type": "paper",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_das_et_al_2025",
+      "label": "Das et al. (2025) \u2014 in-context fine-tuning",
+      "file_type": "paper",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_transfer_transfer_results_crossover",
+      "label": "Cold-start crossover (transfer advantage shrinks with history)",
+      "file_type": "rationale",
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_lovo_harness",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_global_gbm_a4",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_rung3_global_gbm",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_tan_et_al_2024",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_das_et_al_2025",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_lovo_harness",
+      "target": "brain_transfer_transfer_results_das_et_al_2025",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_a7",
+      "target": "brain_transfer_transfer_results_crossover",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_transfer_transfer_results_rung3_global_gbm",
+      "target": "brain_signals_feature_ablation_rung3_gbm",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/transfer/transfer_results.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

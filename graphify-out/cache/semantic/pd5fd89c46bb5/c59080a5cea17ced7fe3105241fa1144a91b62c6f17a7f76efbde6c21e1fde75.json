@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "brain_store_conformal_coverage_chart",
+      "label": "A5 Conformal Coverage Chart (rung2_ets, Beer Hall L1)",
+      "file_type": "image",
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_conformal_prediction",
+      "label": "Conformal Prediction",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_mondrian_conformal_prediction",
+      "label": "Mondrian Conformal Prediction",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_empirical_coverage_calibration",
+      "label": "Empirical Coverage vs Nominal Coverage Calibration",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_rung2_ets_forecast_model",
+      "label": "rung2_ets Forecasting Model",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_store_conformal_coverage_chart",
+      "target": "concept_conformal_prediction",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_chart",
+      "target": "concept_mondrian_conformal_prediction",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_chart",
+      "target": "concept_empirical_coverage_calibration",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_chart",
+      "target": "concept_rung2_ets_forecast_model",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_mondrian_conformal_prediction",
+      "target": "concept_conformal_prediction",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_empirical_coverage_calibration",
+      "target": "concept_conformal_prediction",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_rung2_ets_forecast_model",
+      "target": "concept_conformal_prediction",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_empirical_coverage_calibration",
+      "target": "concept_mondrian_conformal_prediction",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "brain/store/conformal_coverage.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

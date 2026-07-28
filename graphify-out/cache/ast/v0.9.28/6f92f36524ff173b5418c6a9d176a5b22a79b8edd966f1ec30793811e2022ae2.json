@@ -1,0 +1,516 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "label": "test_a3_features.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "fixture",
+      "label": "fixture",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a3_features.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_feats",
+      "label": "feats()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L20",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_a3_features.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_series_reconciles_to_audit",
+      "label": "test_series_reconciles_to_audit()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L24",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "label": "test_lag_7_equals_value_seven_days_earlier()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L29",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_no_future_leakage",
+      "label": "test_no_future_leakage()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L35",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_exogenous_seam_present_and_populated",
+      "label": "test_exogenous_seam_present_and_populated()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L39",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_deterministic_calendar_seam_is_populated",
+      "label": "test_deterministic_calendar_seam_is_populated()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L44",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_feature_columns_expose_adopted_exo_only",
+      "label": "test_feature_columns_expose_adopted_exo_only()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L49",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_happy_hour_flag_is_wed_and_fri",
+      "label": "test_happy_hour_flag_is_wed_and_fri()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L59",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_features_carry_the_full_exo_and_chronos2_exo_column_set",
+      "label": "test_ellel_features_carry_the_full_exo_and_chronos2_exo_column_set()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L66",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "label": "test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L76",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_frame_is_ellel_event_is_identically_zero",
+      "label": "test_ellel_frame_is_ellel_event_is_identically_zero()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L97",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates",
+      "label": "test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L105",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_1",
+      "label": "A3 tests, features reconcile, are leak-free, and carry the activated seam.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_77",
+      "label": "G12.9d assertion test: no NaN in the columns the Ellel exo entrant reads     acr",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L77"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_98",
+      "label": "On Ellel's own frame the spillover flag is neutralised at source: it must     be",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L98"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_106",
+      "label": "For every non-Ellel venue the flag is unchanged: it remains the genuine     spil",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L106"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L6",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "features_build_features",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_feats",
+      "target": "fixture",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_feats",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_feats",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_series_reconciles_to_audit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_no_future_leakage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_exogenous_seam_present_and_populated",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_deterministic_calendar_seam_is_populated",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_feature_columns_expose_adopted_exo_only",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_happy_hour_flag_is_wed_and_fri",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_features_carry_the_full_exo_and_chronos2_exo_column_set",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_frame_is_ellel_event_is_identically_zero",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_77",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_98",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_frame_is_ellel_event_is_identically_zero",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_rationale_106",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L106",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_feats",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L21",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "callee": "set_index",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L30",
+      "receiver": "feats"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "callee": "dropna",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L31",
+      "receiver": "feats"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "callee": "isclose",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L32",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_lag_7_equals_value_seven_days_earlier",
+      "callee": "Timedelta",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L32",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_no_future_leakage",
+      "callee": "assert_no_leakage",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L36",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_deterministic_calendar_seam_is_populated",
+      "callee": "isna",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L46",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_feature_columns_expose_adopted_exo_only",
+      "callee": "feature_columns",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L50",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_feature_columns_expose_adopted_exo_only",
+      "callee": "EXO_COLUMNS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L56"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_happy_hour_flag_is_wed_and_fri",
+      "callee": "unique",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L61",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_features_carry_the_full_exo_and_chronos2_exo_column_set",
+      "callee": "trim_to_active",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_features_carry_the_full_exo_and_chronos2_exo_column_set",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "callee": "trim_to_active",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L84",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L84",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "callee": "isna",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L85",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_active_span_has_no_nan_in_adopted_exo_or_a_reported_gap",
+      "callee": "weather_gap",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L87",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_ellel_frame_is_ellel_event_is_identically_zero",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L101",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_a3_features_test_beer_hall_frame_is_ellel_event_still_fires_on_real_ellel_dates",
+      "callee": "build_features",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_a3_features.py",
+      "source_location": "L108",
+      "receiver": null
+    }
+  ]
+}

@@ -1,0 +1,461 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "label": "test_injection_realism.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "fixture",
+      "label": "fixture",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_injection_realism.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_con",
+      "label": "con()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L19",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_target_counts_meet_the_spec_floor",
+      "label": "test_target_counts_meet_the_spec_floor()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L27",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_build_pool_returns_paired_injections_with_shared_onset",
+      "label": "test_build_pool_returns_paired_injections_with_shared_onset()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L34",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "label": "test_sampling_is_deterministic_given_the_same_seed()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L41",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "label": "test_score_pair_reuses_agent_eval_scoring_unchanged()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L52",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_zero_when_arms_are_identical",
+      "label": "test_bootstrap_diff_is_zero_when_arms_are_identical()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L65",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_positive_when_control_recalls_more",
+      "label": "test_bootstrap_diff_is_positive_when_control_recalls_more()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L75",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "label": "test_pooled_precision_handles_zero_attributable()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L85",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_clopper_matches_interval_calibrations_implementation",
+      "label": "test_clopper_matches_interval_calibrations_implementation()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L89",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_control_arm_reproduces_the_committed_corpus",
+      "label": "test_control_arm_reproduces_the_committed_corpus()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L96",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_rationale_1",
+      "label": "S10 Part 2 tests - sampling, scoring, statistics, and G4 (control-arm reproducti",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L1"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "eval",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "store_warehouse",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_con",
+      "target": "fixture",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_con",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_target_counts_meet_the_spec_floor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_build_pool_returns_paired_injections_with_shared_onset",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_zero_when_arms_are_identical",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_positive_when_control_recalls_more",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_clopper_matches_interval_calibrations_implementation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_control_arm_reproduces_the_committed_corpus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L1",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_con",
+      "callee": "connect",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L20",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_con",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L22",
+      "receiver": "c"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_target_counts_meet_the_spec_floor",
+      "callee": "values",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L28",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_build_pool_returns_paired_injections_with_shared_onset",
+      "callee": "_build_pool",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L35",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "callee": "_build_pool",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L42",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L43",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L44",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "callee": "choice",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L45",
+      "receiver": "rng1"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_sampling_is_deterministic_given_the_same_seed",
+      "callee": "choice",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L46",
+      "receiver": "rng2"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "callee": "_build_pool",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L53",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "callee": "_score_pair",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L56",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "callee": "values",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L58",
+      "receiver": "rec"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_score_pair_reuses_agent_eval_scoring_unchanged",
+      "callee": "bool",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L60"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_zero_when_arms_are_identical",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L69",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_zero_when_arms_are_identical",
+      "callee": "_bootstrap_diffs",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L70",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_positive_when_control_recalls_more",
+      "callee": "default_rng",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L79",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_positive_when_control_recalls_more",
+      "callee": "_bootstrap_diffs",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L80",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_bootstrap_diff_is_positive_when_control_recalls_more",
+      "callee": "approx",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L81",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "callee": "isnan",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L86",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "callee": "_pooled_precision",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L86",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L86",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_pooled_precision_handles_zero_attributable",
+      "callee": "array",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L86",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_clopper_matches_interval_calibrations_implementation",
+      "callee": "_clopper",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L91",
+      "receiver": "ir"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_clopper_matches_interval_calibrations_implementation",
+      "callee": "clopper_pearson",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L91",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_injection_realism_test_control_arm_reproduces_the_committed_corpus",
+      "callee": "control_reproduction_check",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_injection_realism.py",
+      "source_location": "L97",
+      "receiver": "ir"
+    }
+  ]
+}

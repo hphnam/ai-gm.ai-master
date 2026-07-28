@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "brain_requirements_forecast_document",
+      "label": "brain/requirements-forecast.txt \u2014 production nightly forecast dependencies",
+      "file_type": "document",
+      "source_file": "brain/requirements-forecast.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_requirements_forecast_chronos_torch_pin",
+      "label": "chronos-forecasting==2.3.1 / torch==2.12.1 hard pin as reproducibility anchor",
+      "file_type": "rationale",
+      "source_file": "brain/requirements-forecast.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_requirements_forecast_document",
+      "target": "brain_requirements_forecast_chronos_torch_pin",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/requirements-forecast.txt",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_requirements_forecast_chronos_torch_pin",
+      "target": "brain_requirements_forecast_lock_document",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/requirements-forecast.txt",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,178 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_report",
+      "label": "Report 51: S11 G17j \u2014 the Chat-log Gap Signal Wired into the Briefing",
+      "file_type": "document",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_chatlog_kb_gap_module",
+      "label": "signals/chatlog_kb_gap.py \u2014 embed/rank_gaps/gap_report/write_artefact",
+      "file_type": "code",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_briefing_sop_collector",
+      "label": "signals/briefing.py _collect_sop \u2014 fifth briefing collector",
+      "file_type": "code",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_embedder_pinning_decision",
+      "label": "Embedder pinned to keyless TF-IDF path (backend='tfidf' default)",
+      "file_type": "rationale",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_venue_attribution_decision",
+      "label": "Venue attribution: broadcast unlabelled clusters, exclude non-briefing-venue tags",
+      "file_type": "rationale",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_noise_guard_g3",
+      "label": "Noise guard G3: density-above-baseline AND >=2 failures, proven discriminating",
+      "file_type": "rationale",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_51_g17j_chatlog_signal_occurrence_gate_g4",
+      "label": "Occurrence gate G4 on sop signal onset (structural zero drops, NaN never gates)",
+      "file_type": "rationale",
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_report",
+      "target": "brain_log_51_g17j_chatlog_signal_chatlog_kb_gap_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_report",
+      "target": "brain_log_51_g17j_chatlog_signal_briefing_sop_collector",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_chatlog_kb_gap_module",
+      "target": "brain_log_51_g17j_chatlog_signal_embedder_pinning_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_briefing_sop_collector",
+      "target": "brain_log_51_g17j_chatlog_signal_venue_attribution_decision",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_chatlog_kb_gap_module",
+      "target": "brain_log_51_g17j_chatlog_signal_noise_guard_g3",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_briefing_sop_collector",
+      "target": "brain_log_51_g17j_chatlog_signal_occurrence_gate_g4",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_report",
+      "target": "brain_log_50_g17i_injection_realism_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_51_g17j_chatlog_signal_report",
+      "target": "brain_signals_checklist_discipline_template_only_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "occurrence_gate_convention",
+      "label": "Shared occurrence-gate convention: structural zero drops the signal, NaN label is never gated",
+      "nodes": [
+        "brain_log_45_g17d_intermittency_and_occurrence_occurrence_gate",
+        "brain_log_50_g17i_injection_realism_occurrence_guard_g2",
+        "brain_log_51_g17j_chatlog_signal_occurrence_gate_g4"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/51_G17j_Chatlog_Signal.md"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "id": "brain_hierarchy_reconciliation_forecast",
+      "label": "A6 Hierarchical Reconciliation Report (Beer Hall)",
+      "file_type": "document",
+      "source_file": "brain/hierarchy/reconciliation_forecast.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_hierarchy_reconciliation_forecast_mint_reconciliation",
+      "label": "MinT Hierarchical Reconciliation (diagonal WLS)",
+      "file_type": "concept",
+      "source_file": "brain/hierarchy/reconciliation_forecast.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_hierarchy_reconciliation_forecast_stock_consumption_proxy",
+      "label": "Stock-Consumption Proxy / Inventory-Aware Reorder Signal",
+      "file_type": "concept",
+      "source_file": "brain/hierarchy/reconciliation_forecast.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_hierarchy_reconciliation_forecast_scope_decision",
+      "label": "A6 scope decision: Beer-Hall-only, no ladder below L1 (MinT coherence depends on the summing matrix, not base-forecaster sophistication)",
+      "file_type": "rationale",
+      "source_file": "brain/hierarchy/reconciliation_forecast.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_hierarchy_reconciliation_forecast_scope_decision",
+      "target": "brain_hierarchy_reconciliation_forecast_mint_reconciliation",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/hierarchy/reconciliation_forecast.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

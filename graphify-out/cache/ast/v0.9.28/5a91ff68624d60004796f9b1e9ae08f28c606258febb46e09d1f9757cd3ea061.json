@@ -1,0 +1,538 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "label": "test_world_cup.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "label": "_schedule_md()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L19",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "label": "test_loader_parses_all_matches_and_normalises_date()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L30",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_skips_malformed_row_without_crashing",
+      "label": "test_loader_skips_malformed_row_without_crashing()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L42",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_absent_schedule_returns_empty_frame",
+      "label": "test_absent_schedule_returns_empty_frame()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L52",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "label": "test_england_match_in_hours_when_window_reaches_kickoff()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L57",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "label": "test_early_kickoff_only_date_is_not_in_hours()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L71",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "label": "test_trt_and_other_out_of_scope_venues_get_all_zero()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L85",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "label": "test_coincident_fixtures_names_the_specific_england_match()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L94",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "label": "test_attribute_names_the_coincident_fixture()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L107",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_rationale_1",
+      "label": "G12.10d \u00b7 World Cup fixture loader + code-derived relevance tests.  Relevance is",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_rationale_108",
+      "label": "The reasoning path (signals.residual.attribute) names the specific     coinciden",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L108"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L13",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "ingest",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_skips_malformed_row_without_crashing",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_absent_schedule_returns_empty_frame",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_skips_malformed_row_without_crashing",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L74",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_rationale_108",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L108",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_schedule_md",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L21",
+      "receiver": "p"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L35",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L38",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_parses_all_matches_and_normalises_date",
+      "callee": "time",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L39",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_loader_skips_malformed_row_without_crashing",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L47",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_absent_schedule_returns_empty_frame",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L53",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "callee": "world_cup",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L62"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "callee": "world_cup_features",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L63",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L63",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_england_match_in_hours_when_window_reaches_kickoff",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L64",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "callee": "world_cup",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L77"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "callee": "world_cup_features",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L78",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L78",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_early_kickoff_only_date_is_not_in_hours",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L79",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "callee": "world_cup_features",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L89",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L89",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L90",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_trt_and_other_out_of_scope_venues_get_all_zero",
+      "callee": "to_numpy",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L91",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "callee": "world_cup",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L98"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "callee": "coincident_fixtures",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L99",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L100",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L100",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_coincident_fixtures_names_the_specific_england_match",
+      "callee": "read_world_cup_schedule",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L101",
+      "receiver": "world_cup"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "residual",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L115"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "wc",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L118"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L119",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L121",
+      "receiver": "duckdb"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "attribute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L122",
+      "receiver": "residual"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_world_cup_test_attribute_names_the_coincident_fixture",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_world_cup.py",
+      "source_location": "L122",
+      "receiver": "pd"
+    }
+  ]
+}

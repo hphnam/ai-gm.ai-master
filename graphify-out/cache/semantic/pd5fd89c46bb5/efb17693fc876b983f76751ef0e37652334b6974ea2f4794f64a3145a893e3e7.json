@@ -1,0 +1,63 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_11_scaled_eval_report",
+      "label": "PRJ93 Scaled Evaluation Run & Labelling Protocol Report",
+      "file_type": "document",
+      "source_file": "brain/log/11_Scaled_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_11_scaled_eval_report_scaled_grid",
+      "label": "Scaled injection grid (N=644, detection-rate-vs-magnitude sensitivity floor)",
+      "file_type": "concept",
+      "source_file": "brain/log/11_Scaled_Eval_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_11_scaled_eval_report",
+      "target": "brain_log_09_agent_eval_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/11_Scaled_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_11_scaled_eval_report_scaled_grid",
+      "target": "brain_log_09_agent_eval_report_eval_framework",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/11_Scaled_Eval_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "prj93_evaluation_validation_track",
+      "label": "PRJ93 Evaluation & Validation Track (agent-eval, scaled-eval, live World Cup probe)",
+      "nodes": [
+        "brain_log_09_agent_eval_report",
+        "brain_log_11_scaled_eval_report",
+        "brain_log_12_worldcup_liveprobe_report"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/11_Scaled_Eval_Report.md"
+    }
+  ]
+}

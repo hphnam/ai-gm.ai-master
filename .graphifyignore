@@ -1,0 +1,9 @@
+# graphify-specific excludes (does not affect git)
+# .venv-eval / .venv-forecast aren't caught by graphify's built-in venv
+# detection (only exact ".venv" and "*_venv" are matched by name), so without
+# this they get fully walked - ~1.7GB of site-packages - and detect() times out.
+brain/.venv-eval/
+brain/.venv-forecast/
+brain/.pytest_cache/
+brain/.ruff_cache/
+brain/__pycache__/

@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "brain_store_conformal_coverage_two_river_taps_chart",
+      "label": "A5 Conformal Coverage Chart \u2014 rung2_ets (Two River Taps L1)",
+      "file_type": "image",
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_two_river_taps_conformal_prediction",
+      "label": "Conformal Prediction Coverage (empirical vs. nominal)",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_two_river_taps_mondrian",
+      "label": "Mondrian Conformal Prediction",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_two_river_taps_rung2_ets",
+      "label": "rung2_ets Forecasting Method",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_store_conformal_coverage_two_river_taps_interval_calibration",
+      "label": "Prediction Interval Calibration (research theme)",
+      "file_type": "concept",
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_store_conformal_coverage_two_river_taps_chart",
+      "target": "brain_store_conformal_coverage_two_river_taps_conformal_prediction",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_two_river_taps_chart",
+      "target": "brain_store_conformal_coverage_two_river_taps_mondrian",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_two_river_taps_chart",
+      "target": "brain_store_conformal_coverage_two_river_taps_rung2_ets",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_store_conformal_coverage_two_river_taps_conformal_prediction",
+      "target": "brain_store_conformal_coverage_two_river_taps_interval_calibration",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/store/conformal_coverage_two_river_taps.png",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

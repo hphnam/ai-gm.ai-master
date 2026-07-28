@@ -1,0 +1,1293 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "label": "chatlog_kb_gap.py",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_failure",
+      "label": "_is_failure()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L53",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_venue_tag",
+      "label": "_venue_tag()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L58",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "label": "load_turns()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L66",
+      "_callable": true
+    },
+    {
+      "id": "dataframe",
+      "label": "DataFrame",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/signals/chatlog_kb_gap.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "label": "_embed_tfidf()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L115",
+      "_callable": true
+    },
+    {
+      "id": "ndarray",
+      "label": "ndarray",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/signals/chatlog_kb_gap.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "label": "embed()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L130",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "label": "_is_substantive()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L164",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "label": "rank_gaps()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L170",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "label": "gap_report()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L220",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "label": "write_artefact()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L232",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "label": "_write_report()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L268",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L301",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_1",
+      "label": "A8 \u00b7 Chat-log KB-gap detection (methodology \u00a74.1 / step 8).  The chat stream is",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_67",
+      "label": "Return (user_turns, stats). Each user turn is labelled with whether the     *nex",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L67"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_116",
+      "label": "Keyless offline path: TF-IDF -> SVD -> unit norm. No key read, no network     ca",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L116"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_131",
+      "label": "backend=\"tfidf\" pins the keyless offline path directly (S11's canonical,     com",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L131"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_165",
+      "label": "A real question/request, not a one-word affirmation ('Perfect,', 'Yes').",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L165"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_172",
+      "label": "backend defaults to \"tfidf\", the pinned canonical path (S11 Part 1); pass     ba",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L172"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_221",
+      "label": "Process-cached {stats, ranked, backend}. The chat corpus is a static     histori",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L221"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_233",
+      "label": "Stamp the real-corpus gap list to JSON: store_ceiling + embedder backend     on",
+      "file_type": "rationale",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L233"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "argparse",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "os",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "re",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "sys",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "numpy",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "local_alias": "np"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "pandas",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L28",
+      "weight": 1.0,
+      "local_alias": "pd"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_failure",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_venue_tag",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "target": "ndarray",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L164",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L220",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L232",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L268",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "target": "dataframe",
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L268",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L301",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_failure",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_failure",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L86",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_venue_tag",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L138",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L178",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L180",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "target": "dataframe",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L210",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L226",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L227",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L239",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L312",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L320",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L332",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L335",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_67",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_116",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_131",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_165",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L165",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_172",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L172",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_221",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_gap_report",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L221",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rationale_233",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L233",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_failure",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L54",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_venue_tag",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L59",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_venue_tag",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L60",
+      "receiver": "_VENUE_KEYWORDS"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "read_csv",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L69",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "chat_csv",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L69",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "to_datetime",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L70",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L71",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "sort_values",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L71",
+      "receiver": "df"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L73",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L79",
+      "receiver": "df"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "to_dict",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L80",
+      "receiver": "conv"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L82",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L85",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L87",
+      "receiver": "rows"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L97",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L97",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "assign",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L97",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "lower",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L97",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "nunique",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L105",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "to_dict",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L106",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "value_counts",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L106",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "mean",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L108",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_load_turns",
+      "callee": "rolling",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L108",
+      "receiver": "daily"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "callee": "TfidfVectorizer",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L123",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "callee": "fit_transform",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L124",
+      "receiver": "tfidf"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "callee": "TruncatedSVD",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L126",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "callee": "normalize",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L127",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed_tfidf",
+      "callee": "fit_transform",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L127",
+      "receiver": "svd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L140",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "get",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L142",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "Client",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L147",
+      "receiver": "voyageai"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "VOYAGE_MODEL",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L148"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L149",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L149"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "SentenceTransformer",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L155",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "asarray",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L156",
+      "receiver": "np"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "float",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L156"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_embed",
+      "callee": "encode",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L156",
+      "receiver": "model"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "callee": "strip",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L166",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "callee": "split",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L167",
+      "receiver": "t"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_is_substantive",
+      "callee": "endswith",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L167",
+      "receiver": "t"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L178",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "tolist",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L179",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "fit_predict",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L182",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "KMeans",
+      "is_member_call": false,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L182",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "assign",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L183",
+      "receiver": "turns"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "groupby",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L186",
+      "receiver": "turns"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "tolist",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L191",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "head",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L191",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "tolist",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L192",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "head",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L192",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "to_dict",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L193",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "value_counts",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L193",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L198",
+      "receiver": "records"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "reset_index",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L210",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_rank_gaps",
+      "callee": "sort_values",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L210",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "EXPECTED_STORE_CEILING",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L243"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "CHATLOG_FAILURE_BASELINE",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "collection",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L247"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "isoformat",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L258",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "date",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L258",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "Timestamp",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L258",
+      "receiver": "pd"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "iterrows",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L261",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "head",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L261",
+      "receiver": "gaps"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L264",
+      "receiver": "RESULTS_JSON"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_artefact",
+      "callee": "dumps",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L264",
+      "receiver": "json"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "iterrows",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L289",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "head",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L289",
+      "receiver": "ranked"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "replace",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L290",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L291",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L294",
+      "receiver": "lines"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "write_text",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L298",
+      "receiver": "RESULTS_MD"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_write_report",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L298",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "ArgumentParser",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L302",
+      "receiver": "argparse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "add_argument",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L303",
+      "receiver": "ap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "int",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L303"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "add_argument",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L304",
+      "receiver": "ap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "int",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L304"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "add_argument",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L305",
+      "receiver": "ap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "parse_args",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L309",
+      "receiver": "ap"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "iterrows",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L325",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_signals_chatlog_kb_gap_main",
+      "callee": "head",
+      "is_member_call": true,
+      "source_file": "brain/signals/chatlog_kb_gap.py",
+      "source_location": "L325",
+      "receiver": "gaps"
+    }
+  ]
+}

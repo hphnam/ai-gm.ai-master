@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_33_g14_de_lune_report",
+      "label": "Report 33 - G14: de-Lune, and the forecast that was not there",
+      "file_type": "document",
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_33_g14_de_lune_report_org_profile_seam",
+      "label": "org_profile.py ContextVar seam (unbound=Lune, bound=total)",
+      "file_type": "concept",
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_33_g14_de_lune_report_contract_md",
+      "label": "CONTRACT.md (compute dataset/bundle contract, caller obligations)",
+      "file_type": "concept",
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_33_g14_de_lune_report_flag_band_horizon",
+      "label": "FLAG-BAND-HORIZON (conformal band under-covers past 7-day horizon)",
+      "file_type": "concept",
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_32_g13_production_integration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_33_g14_de_lune_report_org_profile_seam",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_32_g13_production_integration_report_stateless_compute_engine",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_33_g14_de_lune_report_contract_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_33_g14_de_lune_report_flag_band_horizon",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_34_g14b_defect_closure_verdict_wrong_fix_pattern",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_33_g14_de_lune_report",
+      "target": "brain_log_32_g13_production_integration_report_stale_ledger_pattern",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/33_G14_De_Lune_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,249 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_feature_ablation_a14",
+      "label": "A14 \u00b7 Feature-Enrichment Ablation",
+      "file_type": "document",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_rung3_gbm",
+      "label": "Rung-3 GBM",
+      "file_type": "concept",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_rung4_chronos2_exo",
+      "label": "rung4_chronos2_exo (served Beer Hall model)",
+      "file_type": "concept",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_chronos2_exo_cols",
+      "label": "CHRONOS2_EXO_COLS (15-column known-future set)",
+      "file_type": "code",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_models_foundation",
+      "label": "models/foundation.py",
+      "file_type": "code",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_local_events",
+      "label": "local_events.py",
+      "file_type": "code",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_ladder_results_l1_beer_hall",
+      "label": "models/ladder_results_L1_beer_hall.md",
+      "file_type": "document",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_weather_train_serve_study",
+      "label": "Weather train/serve consistency study (\u00a74)",
+      "file_type": "rationale",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_train_serve_consistency_principle",
+      "label": "Train/serve-consistency principle",
+      "file_type": "rationale",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_leadmatched_basis",
+      "label": "Lead-matched training basis",
+      "file_type": "concept",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_flag_fe_series",
+      "label": "FLAG-FE1..FE10 (feature-ablation honesty flags)",
+      "file_type": "concept",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_feature_ablation_g12_10b",
+      "label": "G12.10b (exo-set widening gate)",
+      "file_type": "concept",
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_rung3_gbm",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_ladder_results_l1_beer_hall",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_rung4_chronos2_exo",
+      "target": "brain_signals_feature_ablation_chronos2_exo_cols",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_chronos2_exo_cols",
+      "target": "brain_signals_feature_ablation_models_foundation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_local_events",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_weather_train_serve_study",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_weather_train_serve_study",
+      "target": "brain_signals_feature_ablation_leadmatched_basis",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_weather_train_serve_study",
+      "target": "brain_signals_feature_ablation_train_serve_consistency_principle",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_flag_fe_series",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_rung4_chronos2_exo",
+      "target": "brain_signals_feature_ablation_g12_10b",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_feature_ablation_a14",
+      "target": "brain_signals_feature_ablation_rung4_chronos2_exo",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/feature_ablation.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

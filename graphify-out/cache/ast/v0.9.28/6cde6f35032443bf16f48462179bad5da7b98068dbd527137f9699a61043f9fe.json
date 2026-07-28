@@ -1,0 +1,172 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh",
+      "label": "run-all.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "label": "run-all.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "label": "run_case()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L32",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_check_subs",
+      "label": "check_subs()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L62",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_check_subs",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L102",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_check_subs",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L79",
+      "weight": 1.0,
+      "context": "call"
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "set",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L18"
+    },
+    {
+      "language": "bash",
+      "callee": "command",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L23"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L24"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L25"
+    },
+    {
+      "language": "bash",
+      "callee": "continue",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L97"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_sh__entry",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L109"
+    },
+    {
+      "language": "bash",
+      "callee": "chmod",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L36"
+    },
+    {
+      "language": "bash",
+      "callee": "true",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L36"
+    },
+    {
+      "language": "bash",
+      "callee": "printf",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L51"
+    },
+    {
+      "language": "bash",
+      "callee": "env",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L51"
+    },
+    {
+      "language": "bash",
+      "callee": "rm",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_run_case",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L93"
+    },
+    {
+      "language": "bash",
+      "callee": "grep",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_tests_run_all_check_subs",
+      "source_file": ".claude/hooks/tests/run-all.sh",
+      "source_location": "L71"
+    }
+  ],
+  "bash_sources": []
+}

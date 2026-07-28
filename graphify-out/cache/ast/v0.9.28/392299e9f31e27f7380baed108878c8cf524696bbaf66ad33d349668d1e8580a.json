@@ -1,0 +1,722 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "label": "test_scratch_store.py",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "fixture",
+      "label": "fixture",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/tests/test_scratch_store.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_use_the_real_default_store",
+      "label": "_use_the_real_default_store()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L23",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_default_path_is_the_configured_store",
+      "label": "test_default_path_is_the_configured_store()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L30",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_store_overrides_the_path",
+      "label": "test_scratch_store_overrides_the_path()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L34",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_after_the_block",
+      "label": "test_path_reverts_after_the_block()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L40",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "label": "test_path_reverts_even_when_the_block_raises()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L46",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "label": "test_nested_blocks_unwind_in_order()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L52",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "label": "test_connect_opens_the_scratch_database_not_the_real_one()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L61",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "label": "test_scratch_writes_never_touch_the_real_store()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L80",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "label": "test_the_override_is_per_thread()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L99",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "label": "test_a_thread_without_a_scratch_sees_the_real_store()",
+      "file_type": "code",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L119",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_1",
+      "label": "The per-request scratch store: the seam that makes the analytics layer stateless",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_24",
+      "label": "This module tests the ContextVar seam against the CONFIGURED default path, so it",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L24"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_62",
+      "label": "The point of the seam: existing code reaching connect() lands on injected data.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L62"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_81",
+      "label": "A compute run must not be able to mutate the served store.",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L81"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_100",
+      "label": "Starlette runs sync endpoints in a threadpool, so two concurrent requests must",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L100"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_120",
+      "label": "ContextVar defaults do not leak across threads: a background job running with no",
+      "file_type": "rationale",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L120"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "threading",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "pathlib",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "duckdb",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "pytest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "store",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_use_the_real_default_store",
+      "target": "fixture",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L22",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_use_the_real_default_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_default_path_is_the_configured_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_store_overrides_the_path",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_after_the_block",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_24",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_use_the_real_default_store",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_62",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_81",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_100",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_rationale_120",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L120",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_use_the_real_default_store",
+      "callee": "delenv",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L27",
+      "receiver": "monkeypatch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_default_path_is_the_configured_store",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L31",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_store_overrides_the_path",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L36",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_store_overrides_the_path",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L37",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_after_the_block",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L41",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_after_the_block",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L43",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "callee": "raises",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L47",
+      "receiver": "pytest"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "callee": "RuntimeError",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L47"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L47",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "callee": "RuntimeError",
+      "is_member_call": false,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L48",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_path_reverts_even_when_the_block_raises",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L49",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L54",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L55",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L56",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L57",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_nested_blocks_unwind_in_order",
+      "callee": "current_db_path",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L58",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L64",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L65",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L67",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L68",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L70",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "exists",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L72",
+      "receiver": "scratch"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L73",
+      "receiver": "duckdb"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L75",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L75",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_connect_opens_the_scratch_database_not_the_real_one",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L77",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L82",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L83",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L85",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L86",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L88",
+      "receiver": "con"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "connect",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L90",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "fetchone",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L92",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "execute",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L92",
+      "receiver": "real"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_scratch_writes_never_touch_the_real_store",
+      "callee": "close",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L95",
+      "receiver": "real"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "callee": "Barrier",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L103",
+      "receiver": "threading"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "callee": "Thread",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L110",
+      "receiver": "threading"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "callee": "worker",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L110"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "callee": "start",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L112",
+      "receiver": "t"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_the_override_is_per_thread",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L114",
+      "receiver": "t"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "callee": "scratch_store",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L127",
+      "receiver": "warehouse"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "callee": "Thread",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L128",
+      "receiver": "threading"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "callee": "worker",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L128"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "callee": "start",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L129",
+      "receiver": "t"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_tests_test_scratch_store_test_a_thread_without_a_scratch_sees_the_real_store",
+      "callee": "join",
+      "is_member_call": true,
+      "source_file": "brain/tests/test_scratch_store.py",
+      "source_location": "L130",
+      "receiver": "t"
+    }
+  ]
+}

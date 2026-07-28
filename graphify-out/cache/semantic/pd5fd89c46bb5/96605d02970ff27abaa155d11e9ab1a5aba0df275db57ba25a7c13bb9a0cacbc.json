@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_37_g15b_round4_review",
+      "label": "Report 37 - G15b: round 4, the review that had not been run",
+      "file_type": "document",
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_37_g15b_round4_review_flag_segment_false_reject",
+      "label": "FLAG-SEGMENT-FALSE-REJECT (reopening venue refused, whole request fails)",
+      "file_type": "concept",
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_37_g15b_round4_review",
+      "target": "brain_log_34_g14b_defect_closure_verdict",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_37_g15b_round4_review",
+      "target": "brain_log_37_g15b_round4_review_flag_segment_false_reject",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_37_g15b_round4_review",
+      "target": "brain_log_34_g14b_defect_closure_verdict_wrong_fix_pattern",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_37_g15b_round4_review",
+      "target": "brain_log_33_g14_de_lune_report_org_profile_seam",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/log/37_G15b_Round4_Review.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

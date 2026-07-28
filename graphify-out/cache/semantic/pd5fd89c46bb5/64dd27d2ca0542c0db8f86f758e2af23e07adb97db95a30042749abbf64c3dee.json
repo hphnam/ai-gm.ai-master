@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "brain_eval_interval_calibration_s7",
+      "label": "S7 G17h \u2014 interval calibration: powered coverage, per-step bands (arm S), adaptive methods (ACI, arm A/G); no adoption candidate beats the incumbent Mondrian band",
+      "file_type": "document",
+      "source_file": "brain/eval/interval_calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": []
+}

@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_38_g15c_taxonomy_drift_decision",
+      "label": "Report 38 - G15c: taxonomy drift, measured and decided (do not wire)",
+      "file_type": "document",
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_38_g15c_taxonomy_drift_decision_flag_taxonomy_drift",
+      "label": "FLAG-TAXONOMY-DRIFT (standing limitation, do-not-wire decision)",
+      "file_type": "concept",
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_38_g15c_taxonomy_drift_decision",
+      "target": "brain_log_25_g12_16_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_38_g15c_taxonomy_drift_decision",
+      "target": "brain_log_25_g12_16_report_taxonomy_drift",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_38_g15c_taxonomy_drift_decision",
+      "target": "brain_log_38_g15c_taxonomy_drift_decision_flag_taxonomy_drift",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_38_g15c_taxonomy_drift_decision",
+      "target": "brain_log_42_g17a_metric_integrity",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/38_G15c_Taxonomy_Drift_Decision.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

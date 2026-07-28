@@ -1,0 +1,217 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_report",
+      "label": "Report 46: S8a G17e \u2014 Agent and Calibration (build half)",
+      "file_type": "document",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_agent_module",
+      "label": "signals/agent.py \u2014 LLM briefing-triage agent",
+      "file_type": "code",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_agent_prompt_v1",
+      "label": "signals/prompts/agent_v1.md \u2014 pre-registered prompt (hash c1137f76)",
+      "file_type": "document",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_agent_cache_module",
+      "label": "eval/agent_cache.py \u2014 keyed response cache",
+      "file_type": "code",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_cost_sensitive_threshold",
+      "label": "Cost-sensitive Bayes threshold t = 1/(1+r) sweep",
+      "file_type": "rationale",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_detection_vs_intervention_calibration",
+      "label": "Detection calibration vs intervention calibration distinction",
+      "file_type": "rationale",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_agent_vs_constants_gate",
+      "label": "Agent-vs-six-constants decorative-decider stop condition",
+      "file_type": "rationale",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_s8b_deferral",
+      "label": "S8b deferral: no ANTHROPIC_API_KEY / SDK in this environment",
+      "file_type": "rationale",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_fu_prism_2026",
+      "label": "Fu, PRISM (2026)",
+      "file_type": "paper",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_46_g17e_agent_and_calibration_bavaresco_llms_2025",
+      "label": "Bavaresco et al., LLMs as judges (2025)",
+      "file_type": "paper",
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_agent_module",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_prompt_v1",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_agent_module",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_cache_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_cost_sensitive_threshold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_detection_vs_intervention_calibration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_agent_vs_constants_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_s8b_deferral",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_cost_sensitive_threshold",
+      "target": "brain_log_46_g17e_agent_and_calibration_fu_prism_2026",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_detection_vs_intervention_calibration",
+      "target": "brain_log_46_g17e_agent_and_calibration_bavaresco_llms_2025",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_46_g17e_agent_and_calibration_report",
+      "target": "brain_log_45_g17d_intermittency_and_occurrence_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/46_G17e_Agent_and_Calibration.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

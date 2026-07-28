@@ -1,0 +1,206 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_50_g17i_injection_realism_report",
+      "label": "Report 50: S10 G17i \u2014 Injection Realism",
+      "file_type": "document",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_inject_realistic_module",
+      "label": "eval/inject_realistic.py \u2014 realistic perturbation pipeline under production refit cadence",
+      "file_type": "code",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_injection_realism_module",
+      "label": "eval/injection_realism.py \u2014 paired-comparison driver",
+      "file_type": "code",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_realism_gap_finding",
+      "label": "Recall/latency statistically indistinguishable between realistic and control arms",
+      "file_type": "rationale",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_feedback_loop_suppression_finding",
+      "label": "Change-point-triggered refit suppresses continuation alerting in 16% of cases (Stop 2)",
+      "file_type": "rationale",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_propagation_gate",
+      "label": "Propagation gate G1: perturbation reaches training frame + calibration + forecast input",
+      "file_type": "rationale",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_occurrence_guard_g2",
+      "label": "assert_trading_day occurrence guard (G2), never fires on structural-zero onset",
+      "file_type": "rationale",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_flag_injection_realism_discount",
+      "label": "FLAG-INJECTION-REALISM-DISCOUNT (closed: measured, zero)",
+      "file_type": "concept",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_50_g17i_injection_realism_flag_continuation_alert_suppression",
+      "label": "FLAG-CONTINUATION-ALERT-SUPPRESSION (opened)",
+      "file_type": "concept",
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_50_g17i_injection_realism_report",
+      "target": "brain_log_50_g17i_injection_realism_inject_realistic_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_report",
+      "target": "brain_log_50_g17i_injection_realism_injection_realism_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_inject_realistic_module",
+      "target": "brain_log_50_g17i_injection_realism_propagation_gate",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_inject_realistic_module",
+      "target": "brain_log_50_g17i_injection_realism_occurrence_guard_g2",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_report",
+      "target": "brain_log_50_g17i_injection_realism_realism_gap_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_realism_gap_finding",
+      "target": "brain_log_50_g17i_injection_realism_flag_injection_realism_discount",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_report",
+      "target": "brain_log_50_g17i_injection_realism_feedback_loop_suppression_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_feedback_loop_suppression_finding",
+      "target": "brain_log_50_g17i_injection_realism_flag_continuation_alert_suppression",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_report",
+      "target": "brain_log_49_g17h_interval_calibration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_50_g17i_injection_realism_propagation_gate",
+      "target": "brain_signals_change_point_cusum_persistence_detectors",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/50_G17i_Injection_Realism.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

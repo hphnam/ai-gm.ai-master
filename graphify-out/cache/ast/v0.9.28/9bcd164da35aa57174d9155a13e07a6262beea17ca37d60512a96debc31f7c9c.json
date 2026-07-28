@@ -1,0 +1,888 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "label": "contract.py",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "label": "_Strict",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L22",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "basemodel",
+      "label": "BaseModel",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/compute/contract.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "label": "_segments()",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L202",
+      "_callable": true
+    },
+    {
+      "id": "date",
+      "label": "date",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/compute/contract.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_venueprofile",
+      "label": "VenueProfile",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L218",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile",
+      "label": "OrgProfile",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L251",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile_venue",
+      "label": ".venue()",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L283",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_salesrow",
+      "label": "SalesRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L287",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_tradinghoursrow",
+      "label": "TradingHoursRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L302",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_exogenousrow",
+      "label": "ExogenousRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L318",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_priorstate",
+      "label": "PriorState",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L336",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "label": "ComputeDataset",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L357",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "model_validator",
+      "label": "model_validator",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "origin_file": "/Users/hapuna/Library/CloudStorage/OneDrive-LancasterUniversity/Placement Project/ai-gm.ai-master/brain/compute/contract.py"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "label": "._reject_implausible_dates()",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L374",
+      "_callable": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_forecastrow",
+      "label": "ForecastRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L466",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_bandrow",
+      "label": "BandRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L475",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_servedrow",
+      "label": "ServedRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L486",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_ladderselectionrow",
+      "label": "LadderSelectionRow",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L494",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_dormantvenue",
+      "label": "DormantVenue",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L506",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computebundle",
+      "label": "ComputeBundle",
+      "file_type": "code",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L517",
+      "_callable": true,
+      "_callable_class": true
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_1",
+      "label": "The dataset-in / bundle-out types. See CONTRACT.md for the argument behind them.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_203",
+      "label": "Split sorted dates wherever the history goes quiet for longer than a quarter.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L203"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_219",
+      "label": "Per-venue config, replacing the Lune constants frozen in config.py.      There i",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L219"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_252",
+      "label": "The tenant. No `currency`: compute emits no formatted money, only floats in",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L252"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_288",
+      "label": "One row of the aggregate the API GROUP BYs from its normalised sales store.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L288"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_303",
+      "label": "Per venue x day-of-week trading window, in decimal venue-local hours.      NOT d",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L303"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_319",
+      "label": "One venue-date of known-future covariates.      Must span the training history P",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L319"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_337",
+      "label": "What the engine currently reads back from its own store.      Retiring the store",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L337"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_358",
+      "label": "Everything one compute call gets. One org, one request.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L358"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_375",
+      "label": "Three guards. They catch different things and only one is about size.          F",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L375"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_495",
+      "label": "Append-only audit. Why this model is live, and what it beat.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L495"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_507",
+      "label": "A venue with no forecast, stated positively.      The liveness gate's whole poin",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L507"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_518",
+      "label": "Everything the API persists. Compute writes none of it.",
+      "file_type": "rationale",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L518"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "itertools",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "pydantic",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "target": "basemodel",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "target": "date",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "target": "date",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_venueprofile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_venueprofile",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L251",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L251",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile_venue",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L283",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile_venue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_venueprofile",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L283",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_salesrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L287",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_salesrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L287",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_tradinghoursrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L302",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_tradinghoursrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L302",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_exogenousrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L318",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_exogenousrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L318",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_priorstate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L336",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_priorstate",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L336",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L357",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L357",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "target": "model_validator",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L373",
+      "weight": 1.0,
+      "context": "decorator"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L374",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L374",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_forecastrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L466",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_forecastrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L466",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_bandrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L475",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_bandrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L475",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_servedrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L486",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_servedrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L486",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_ladderselectionrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L494",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_ladderselectionrow",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L494",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_dormantvenue",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L506",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_dormantvenue",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L506",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computebundle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L517",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computebundle",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_strict",
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L517",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L437",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_1",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_203",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_219",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_venueprofile",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L219",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_252",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_orgprofile",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L252",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_288",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_salesrow",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L288",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_303",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_tradinghoursrow",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L303",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_319",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_exogenousrow",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L319",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_337",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_priorstate",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L337",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_358",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L358",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_375",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L375",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_495",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_ladderselectionrow",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L495",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_507",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_dormantvenue",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L507",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_rationale_518",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computebundle",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L518",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "callee": "pairwise",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L209",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L211",
+      "receiver": "out"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_segments",
+      "callee": "append",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L212",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "today",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L395",
+      "receiver": "date"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "timedelta",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L402",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "MAX_FUTURE_DAYS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L402"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L403",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "timedelta",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L414",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "MAX_FUTURE_DAYS",
+      "is_member_call": false,
+      "indirect": true,
+      "context": "argument",
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L414"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L415",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "add",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L433",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "setdefault",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L433",
+      "receiver": "by_venue"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "items",
+      "is_member_call": true,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L435",
+      "receiver": "by_venue"
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L442",
+      "receiver": null
+    },
+    {
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_brain_compute_contract_computedataset_reject_implausible_dates",
+      "callee": "ValueError",
+      "is_member_call": false,
+      "source_file": "brain/compute/contract.py",
+      "source_location": "L456",
+      "receiver": null
+    }
+  ]
+}

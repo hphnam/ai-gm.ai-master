@@ -1,0 +1,206 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_47_g17f_group_icl_report",
+      "label": "Report 47: S5 G17f \u2014 Multi-venue Group In-Context Learning",
+      "file_type": "document",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_group_forecast_module",
+      "label": "models/group_forecast.py \u2014 cross-learning grouped path",
+      "file_type": "code",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_foundation_module_series_id",
+      "label": "models/foundation.py series_id parameter (Major 14 identifier fix)",
+      "file_type": "code",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "label": "Negative result: group ICL does not improve accuracy at any venue",
+      "file_type": "rationale",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_panel_leakage_guard",
+      "label": "assert_panel_leak_free panel-leakage guard (G1)",
+      "file_type": "rationale",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_device_calibration_finding",
+      "label": "Device calibration: CPU vs MPS depends on call shape (grouped vs independent)",
+      "file_type": "rationale",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_flag_trt_constructed_zeros",
+      "label": "FLAG-TRT-CONSTRUCTED-ZEROS",
+      "file_type": "concept",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_flag_group_exo",
+      "label": "FLAG-GROUP-EXO (future work: grouping with covariates)",
+      "file_type": "concept",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_47_g17f_group_icl_hansen_lunde_nason_2011",
+      "label": "Hansen, Lunde & Nason (2011), Model Confidence Set",
+      "file_type": "paper",
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_47_g17f_group_icl_report",
+      "target": "brain_log_47_g17f_group_icl_group_forecast_module",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_report",
+      "target": "brain_log_47_g17f_group_icl_foundation_module_series_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_group_forecast_module",
+      "target": "brain_log_47_g17f_group_icl_panel_leakage_guard",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_report",
+      "target": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_report",
+      "target": "brain_log_47_g17f_group_icl_device_calibration_finding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "target": "brain_log_47_g17f_group_icl_flag_trt_constructed_zeros",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "target": "brain_log_47_g17f_group_icl_flag_group_exo",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "target": "brain_log_47_g17f_group_icl_hansen_lunde_nason_2011",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_report",
+      "target": "brain_log_46_g17e_agent_and_calibration_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_47_g17f_group_icl_group_icl_finding",
+      "target": "brain_models_ladder_results_l1_beer_hall_milestone_result",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "brain/log/47_G17f_Group_ICL.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

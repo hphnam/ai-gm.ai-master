@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_02_phase2_remediation_report",
+      "label": "PRJ93 Phase-2 Remediation Report",
+      "file_type": "document",
+      "source_file": "brain/log/02_Phase2_Remediation_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_02_phase2_remediation_report_fix1_unified_band",
+      "label": "FIX-1: unify the A6 reconciliation band (one split-conformal path for eval and persistence, node_quantiles())",
+      "file_type": "rationale",
+      "source_file": "brain/log/02_Phase2_Remediation_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_02_phase2_remediation_report",
+      "target": "brain_log_01_phase2_build_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/02_Phase2_Remediation_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_02_phase2_remediation_report_fix1_unified_band",
+      "target": "brain_hierarchy_reconciliation_forecast_mint_reconciliation",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/02_Phase2_Remediation_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

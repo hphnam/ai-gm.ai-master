@@ -1,0 +1,1993 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L1"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_name",
+      "label": "name",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L2"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_private",
+      "label": "private",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L3"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_version",
+      "label": "version",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L4"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_engines",
+      "label": "engines",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L5"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_engines_node",
+      "label": "node",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L8"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_dev",
+      "label": "dev",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L9"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_build",
+      "label": "build",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_lint",
+      "label": "lint",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_typecheck",
+      "label": "typecheck",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L12"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_start",
+      "label": "start",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L13"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_tunnel",
+      "label": "tunnel",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L14"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_start_prod",
+      "label": "start:prod",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L15"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_swagger_generate",
+      "label": "swagger:generate",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_generate",
+      "label": "db:generate",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_push",
+      "label": "db:push",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_migrate",
+      "label": "db:migrate",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L19"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_migrate_deploy",
+      "label": "db:migrate:deploy",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L20"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_studio",
+      "label": "db:studio",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L21"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_section",
+      "label": "probe:section",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_eval",
+      "label": "probe:eval",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L23"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_tabular",
+      "label": "probe:tabular",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L24"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_versioning",
+      "label": "probe:versioning",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L25"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_cleanup_orphaned_steps",
+      "label": "cleanup:orphaned-steps",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L26"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_core",
+      "label": "probe:chat-core",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L27"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat",
+      "label": "probe:chat",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L28"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_latency",
+      "label": "probe:chat-latency",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L29"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_core_real",
+      "label": "probe:chat-core:real",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L30"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_test_cost_tracker",
+      "label": "test:cost-tracker",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L31"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_backfill_sections",
+      "label": "backfill:sections",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L32"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_reembed_corpus",
+      "label": "reembed:corpus",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L33"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L35"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai_sdk_anthropic",
+      "label": "@ai-sdk/anthropic",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L36"
+    },
+    {
+      "id": "ai_sdk_anthropic",
+      "label": "@ai-sdk/anthropic",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L36"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_anthropic_ai_sdk",
+      "label": "@anthropic-ai/sdk",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L37"
+    },
+    {
+      "id": "anthropic_ai_sdk",
+      "label": "@anthropic-ai/sdk",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L37"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_bullmq",
+      "label": "@nestjs/bullmq",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L38"
+    },
+    {
+      "id": "nestjs_bullmq",
+      "label": "@nestjs/bullmq",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L38"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_common",
+      "label": "@nestjs/common",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L39"
+    },
+    {
+      "id": "nestjs_common",
+      "label": "@nestjs/common",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L39"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_core",
+      "label": "@nestjs/core",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L40"
+    },
+    {
+      "id": "nestjs_core",
+      "label": "@nestjs/core",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L40"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_express",
+      "label": "@nestjs/platform-express",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L41"
+    },
+    {
+      "id": "nestjs_platform_express",
+      "label": "@nestjs/platform-express",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L41"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_socket_io",
+      "label": "@nestjs/platform-socket.io",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L42"
+    },
+    {
+      "id": "nestjs_platform_socket_io",
+      "label": "@nestjs/platform-socket.io",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L42"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_swagger",
+      "label": "@nestjs/swagger",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L43"
+    },
+    {
+      "id": "nestjs_swagger",
+      "label": "@nestjs/swagger",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L43"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_websockets",
+      "label": "@nestjs/websockets",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L44"
+    },
+    {
+      "id": "nestjs_websockets",
+      "label": "@nestjs/websockets",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L44"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_adapter_pg",
+      "label": "@prisma/adapter-pg",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L45"
+    },
+    {
+      "id": "prisma_adapter_pg",
+      "label": "@prisma/adapter-pg",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L45"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_client",
+      "label": "@prisma/client",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L46"
+    },
+    {
+      "id": "prisma_client",
+      "label": "@prisma/client",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L46"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io_redis_adapter",
+      "label": "@socket.io/redis-adapter",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L47"
+    },
+    {
+      "id": "socket_io_redis_adapter",
+      "label": "@socket.io/redis-adapter",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L47"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai",
+      "label": "ai",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L48"
+    },
+    {
+      "id": "ai",
+      "label": "ai",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L48"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_better_auth",
+      "label": "better-auth",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L49"
+    },
+    {
+      "id": "better_auth",
+      "label": "better-auth",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L49"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_bullmq",
+      "label": "bullmq",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L50"
+    },
+    {
+      "id": "bullmq",
+      "label": "bullmq",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L50"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_chardet",
+      "label": "chardet",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L51"
+    },
+    {
+      "id": "chardet",
+      "label": "chardet",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L51"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_dotenv",
+      "label": "dotenv",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L52"
+    },
+    {
+      "id": "dotenv",
+      "label": "dotenv",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L52"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_express",
+      "label": "express",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L53"
+    },
+    {
+      "id": "express",
+      "label": "express",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L53"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_iconv_lite",
+      "label": "iconv-lite",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L54"
+    },
+    {
+      "id": "iconv_lite",
+      "label": "iconv-lite",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L54"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ioredis",
+      "label": "ioredis",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L55"
+    },
+    {
+      "id": "ioredis",
+      "label": "ioredis",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L55"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_kysely",
+      "label": "kysely",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L56"
+    },
+    {
+      "id": "kysely",
+      "label": "kysely",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L56"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_multer",
+      "label": "multer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L57"
+    },
+    {
+      "id": "multer",
+      "label": "multer",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L57"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nest_commander",
+      "label": "nest-commander",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L58"
+    },
+    {
+      "id": "nest_commander",
+      "label": "nest-commander",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L58"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_zod",
+      "label": "nestjs-zod",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L59"
+    },
+    {
+      "id": "nestjs_zod",
+      "label": "nestjs-zod",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L59"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nodemailer",
+      "label": "nodemailer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L60"
+    },
+    {
+      "id": "nodemailer",
+      "label": "nodemailer",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L60"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_pg",
+      "label": "pg",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L61"
+    },
+    {
+      "id": "pg",
+      "label": "pg",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L61"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma",
+      "label": "prisma",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L62"
+    },
+    {
+      "id": "prisma",
+      "label": "prisma",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L62"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_reflect_metadata",
+      "label": "reflect-metadata",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L63"
+    },
+    {
+      "id": "reflect_metadata",
+      "label": "reflect-metadata",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L63"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_rxjs",
+      "label": "rxjs",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L64"
+    },
+    {
+      "id": "rxjs",
+      "label": "rxjs",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L64"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io",
+      "label": "socket.io",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L65"
+    },
+    {
+      "id": "socket_io",
+      "label": "socket.io",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L65"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_square",
+      "label": "square",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L66"
+    },
+    {
+      "id": "square",
+      "label": "square",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L66"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_voyageai",
+      "label": "voyageai",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L67"
+    },
+    {
+      "id": "voyageai",
+      "label": "voyageai",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L67"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_zod",
+      "label": "zod",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L68"
+    },
+    {
+      "id": "zod",
+      "label": "zod",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L68"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L70"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_better_auth_cli",
+      "label": "@better-auth/cli",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L71"
+    },
+    {
+      "id": "better_auth_cli",
+      "label": "@better-auth/cli",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L71"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_nestjs_cli",
+      "label": "@nestjs/cli",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L72"
+    },
+    {
+      "id": "nestjs_cli",
+      "label": "@nestjs/cli",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L72"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_cli",
+      "label": "@swc/cli",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L73"
+    },
+    {
+      "id": "swc_cli",
+      "label": "@swc/cli",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L73"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_core",
+      "label": "@swc/core",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L74"
+    },
+    {
+      "id": "swc_core",
+      "label": "@swc/core",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L74"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_express",
+      "label": "@types/express",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L75"
+    },
+    {
+      "id": "types_express",
+      "label": "@types/express",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L75"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_multer",
+      "label": "@types/multer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L76"
+    },
+    {
+      "id": "types_multer",
+      "label": "@types/multer",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L76"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_node",
+      "label": "@types/node",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L77"
+    },
+    {
+      "id": "types_node",
+      "label": "@types/node",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L77"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_nodemailer",
+      "label": "@types/nodemailer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L78"
+    },
+    {
+      "id": "types_nodemailer",
+      "label": "@types/nodemailer",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L78"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_pg",
+      "label": "@types/pg",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L79"
+    },
+    {
+      "id": "types_pg",
+      "label": "@types/pg",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L79"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_tsx",
+      "label": "tsx",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L80"
+    },
+    {
+      "id": "tsx",
+      "label": "tsx",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L80"
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_typescript",
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L81"
+    },
+    {
+      "id": "typescript",
+      "label": "typescript",
+      "file_type": "concept",
+      "source_file": "apps/api/package.json",
+      "source_location": "L81"
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_private",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_version",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_engines",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_engines",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_engines_node",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_dev",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_build",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_lint",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_typecheck",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_start",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_tunnel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_start_prod",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_swagger_generate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_generate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_push",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_migrate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_migrate_deploy",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_db_studio",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_section",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_eval",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_tabular",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_versioning",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_cleanup_orphaned_steps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_core",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_latency",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_probe_chat_core_real",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_test_cost_tracker",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_backfill_sections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_scripts_reembed_corpus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai_sdk_anthropic",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai_sdk_anthropic",
+      "target": "ai_sdk_anthropic",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_anthropic_ai_sdk",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_anthropic_ai_sdk",
+      "target": "anthropic_ai_sdk",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L37",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_bullmq",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_bullmq",
+      "target": "nestjs_bullmq",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L38",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_common",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_common",
+      "target": "nestjs_common",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_core",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_core",
+      "target": "nestjs_core",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L40",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_express",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_express",
+      "target": "nestjs_platform_express",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L41",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_socket_io",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_platform_socket_io",
+      "target": "nestjs_platform_socket_io",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L42",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_swagger",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_swagger",
+      "target": "nestjs_swagger",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L43",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_websockets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_websockets",
+      "target": "nestjs_websockets",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L44",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_adapter_pg",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_adapter_pg",
+      "target": "prisma_adapter_pg",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L45",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_client",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma_client",
+      "target": "prisma_client",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L46",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io_redis_adapter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io_redis_adapter",
+      "target": "socket_io_redis_adapter",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L47",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ai",
+      "target": "ai",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L48",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_better_auth",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_better_auth",
+      "target": "better_auth",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L49",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_bullmq",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_bullmq",
+      "target": "bullmq",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L50",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_chardet",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_chardet",
+      "target": "chardet",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L51",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_dotenv",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_dotenv",
+      "target": "dotenv",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L52",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_express",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_express",
+      "target": "express",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L53",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_iconv_lite",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_iconv_lite",
+      "target": "iconv_lite",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ioredis",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_ioredis",
+      "target": "ioredis",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L55",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_kysely",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_kysely",
+      "target": "kysely",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L56",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_multer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_multer",
+      "target": "multer",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L57",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nest_commander",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nest_commander",
+      "target": "nest_commander",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L58",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_zod",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nestjs_zod",
+      "target": "nestjs_zod",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L59",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nodemailer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_nodemailer",
+      "target": "nodemailer",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L60",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_pg",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_pg",
+      "target": "pg",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L61",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_prisma",
+      "target": "prisma",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L62",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_reflect_metadata",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_reflect_metadata",
+      "target": "reflect_metadata",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L63",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_rxjs",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_rxjs",
+      "target": "rxjs",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L64",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_socket_io",
+      "target": "socket_io",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L65",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_square",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L66",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_square",
+      "target": "square",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L66",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_voyageai",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_voyageai",
+      "target": "voyageai",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L67",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_zod",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_dependencies_zod",
+      "target": "zod",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L68",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_json",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_better_auth_cli",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_better_auth_cli",
+      "target": "better_auth_cli",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L71",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_nestjs_cli",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L72",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_nestjs_cli",
+      "target": "nestjs_cli",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L72",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_cli",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L73",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_cli",
+      "target": "swc_cli",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L73",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_core",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L74",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_swc_core",
+      "target": "swc_core",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L74",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_express",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_express",
+      "target": "types_express",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L75",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_multer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_multer",
+      "target": "types_multer",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L76",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_node",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_node",
+      "target": "types_node",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L77",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_nodemailer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_nodemailer",
+      "target": "types_nodemailer",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L78",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_pg",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_types_pg",
+      "target": "types_pg",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L79",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_tsx",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_tsx",
+      "target": "tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L80",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_typescript",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_apps_api_package_devdependencies_typescript",
+      "target": "typescript",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
+      "source_location": "L81",
+      "weight": 1.0,
+      "context": "import"
+    }
+  ]
+}

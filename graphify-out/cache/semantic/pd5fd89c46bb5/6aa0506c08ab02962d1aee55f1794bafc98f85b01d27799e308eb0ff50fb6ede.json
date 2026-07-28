@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "id": "brain_log_16_chronos2_promotion_report",
+      "label": "PRJ93 Chronos-2 Promotion Report (WP12)",
+      "file_type": "document",
+      "source_file": "brain/log/16_Chronos2_Promotion_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_log_16_chronos2_promotion_report_promotion_divergence",
+      "label": "Chronos-2 promotion divergence: the real 4-fold T3 gate selects plain rung4_chronos2, not the covariate variant the spec named",
+      "file_type": "concept",
+      "source_file": "brain/log/16_Chronos2_Promotion_Report.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_log_16_chronos2_promotion_report",
+      "target": "brain_log_15_fidelity_corrections_addendum_report",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/16_Chronos2_Promotion_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_log_16_chronos2_promotion_report_promotion_divergence",
+      "target": "brain_log_14_fidelity_corrections_build_report",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/log/16_Chronos2_Promotion_Report.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "prj93_chronos2_foundation_track",
+      "label": "PRJ93 Chronos-2 Foundation-Model Track (fidelity corrections through G12.10)",
+      "nodes": [
+        "brain_log_14_fidelity_corrections_build_report",
+        "brain_log_15_fidelity_corrections_addendum_report",
+        "brain_log_16_chronos2_promotion_report",
+        "brain_log_17_g12_9_report",
+        "brain_log_19_g12_10_report"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "brain/log/16_Chronos2_Promotion_Report.md"
+    }
+  ]
+}

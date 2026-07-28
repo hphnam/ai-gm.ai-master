@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "brain_signals_prompts_agent_v1_prompt",
+      "label": "Agent Prompt v1 (frozen, pre-registered)",
+      "file_type": "document",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_prompts_agent_v1_signals_agent",
+      "label": "signals.agent",
+      "file_type": "code",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_prompts_agent_v1_agent_cache",
+      "label": "eval/agent_cache.py (response cache)",
+      "file_type": "code",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_prompts_agent_v1_agent_v2",
+      "label": "agent_v2.md (declared future prompt arm)",
+      "file_type": "document",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_prompts_agent_v1_p_raise",
+      "label": "p_raise triage probability output",
+      "file_type": "concept",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "brain_signals_prompts_agent_v1_pre_registration_principle",
+      "label": "Pre-registration discipline (frozen before evaluation)",
+      "file_type": "rationale",
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "brain_signals_prompts_agent_v1_prompt",
+      "target": "brain_signals_prompts_agent_v1_signals_agent",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_prompts_agent_v1_prompt",
+      "target": "brain_signals_prompts_agent_v1_agent_cache",
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_prompts_agent_v1_prompt",
+      "target": "brain_signals_prompts_agent_v1_agent_v2",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_prompts_agent_v1_prompt",
+      "target": "brain_signals_prompts_agent_v1_p_raise",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_prompts_agent_v1_prompt",
+      "target": "brain_signals_prompts_agent_v1_pre_registration_principle",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "brain_signals_prompts_agent_v1_pre_registration_principle",
+      "target": "brain_sim_july2026_forecast_frozen_pre_registration",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "brain/signals/prompts/agent_v1.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": []
+}

@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh",
+      "label": "format-on-save.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "file" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "label": "format-on-save.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L1",
+      "metadata": { "language": "bash", "kind": "bash_entrypoint" }
+    },
+    {
+      "id": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_find_project_root",
+      "label": "find_project_root()",
+      "file_type": "code",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L24",
+      "metadata": { "language": "bash", "kind": "bash_function" }
+    }
+  ],
+  "edges": [
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh",
+      "target": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_find_project_root",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L24",
+      "weight": 1.0
+    }
+  ],
+  "raw_calls": [
+    {
+      "language": "bash",
+      "callee": "command",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L9"
+    },
+    {
+      "language": "bash",
+      "callee": "exit",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L10"
+    },
+    {
+      "language": "bash",
+      "callee": "npx",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L42"
+    },
+    {
+      "language": "bash",
+      "callee": "break",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L53"
+    },
+    {
+      "language": "bash",
+      "callee": "grep",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L56"
+    },
+    {
+      "language": "bash",
+      "callee": "ruff",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L81"
+    },
+    {
+      "language": "bash",
+      "callee": "black",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L99"
+    },
+    {
+      "language": "bash",
+      "callee": "isort",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L100"
+    },
+    {
+      "language": "bash",
+      "callee": "rustfmt",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L111"
+    },
+    {
+      "language": "bash",
+      "callee": "gofmt",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_sh__entry",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L120"
+    },
+    {
+      "language": "bash",
+      "callee": "echo",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_find_project_root",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L28"
+    },
+    {
+      "language": "bash",
+      "callee": "return",
+      "caller_nid": "users_hapuna_library_cloudstorage_onedrive_lancasteruniversity_placement_project_ai_gm_ai_master_claude_hooks_format_on_save_find_project_root",
+      "source_file": ".claude/hooks/format-on-save.sh",
+      "source_location": "L29"
+    }
+  ],
+  "bash_sources": []
+}
