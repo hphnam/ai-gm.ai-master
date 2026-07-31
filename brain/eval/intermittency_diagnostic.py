@@ -248,21 +248,48 @@ def _write_report(venue: str, rows: list[dict], dows: set[int]) -> None:
             f"{_fmt(r['adi'])} | {_fmt(r['cv2'])} | "
             f"{'yes' if r['intermittent'] else 'no'} | "
             f"{'SBA' if select_sba(r['adi'], r['cv2']) else 'Croston'} |")
+    n_sba = sum(1 for r in rows if select_sba(r["adi"], r["cv2"]))
     lines += [
         f"\n**{n_int} of {len(rows)}** item nodes classify as intermittent "
-        f"(ADI >= {ADI_INTERMITTENT_CUTOFF}); **{n_int_nonother}** of those are "
+        f"(ADI >= {ADI_INTERMITTENT_CUTOFF:.4f}); **{n_int_nonother}** of those are "
         "non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the "
         "conditional Croston/SBA comparison in hierarchy/reconcile.py; adoption "
         "stays strictly by the held-out MASE rule, per node.",
-        "\n**ADI blind spot (noted):** ADI measures the spacing between successive "
-        "demands, so an item that sold densely for a short season and then went "
-        "dead (for example Lancashire crisps, zero_fraction 0.88 with ADI 1.00) "
+        f"\n**Selection is unanimous by construction ({n_sba} of {len(rows)} nodes "
+        "select SBA).** This is a property of the scheme, not of the estate, and "
+        "should not be read as a finding: the intermittency cutoff is ADI >= 4/3 "
+        "and 2 - (3/2)(4/3) = 0 exactly, so the selection threshold is non-positive "
+        "for every node at or above the cutoff while CV2 >= 0 always. Classified "
+        "intermittent therefore entails selects-SBA. Any node reported as Croston "
+        "here is one the rule does not govern - a node below the cutoff, or one "
+        "whose ADI/CV2 are undefined because it never sold.",
+        _blind_spot_note(rows),
+    ]
+    RESULTS_MD.write_text("\n".join(lines))
+
+
+def _blind_spot_note(rows: list[dict]) -> str:
+    """The ADI blind spot, illustrated from the current data rather than a fixed name.
+
+    The worked example used to be hardcoded to a node that later left the hierarchy, so
+    the report kept citing an item its own table no longer listed. Pick the sparsest
+    non-intermittent node with a defined ADI instead: that is exactly the obsolescence
+    shape the note is about, and it cannot go stale.
+    """
+    candidates = [r for r in rows
+                  if not r["intermittent"] and np.isfinite(r["adi"]) and r["zero_fraction"] > 0.5]
+    head = ("\n**ADI blind spot (noted):** ADI measures the spacing between successive "
+            "demands, so an item that sold densely for a short season and then went "
+            "dead ")
+    if candidates:
+        worst = max(candidates, key=lambda r: r["zero_fraction"])
+        head += (f"(for example {worst['node']}, zero_fraction "
+                 f"{worst['zero_fraction']:.2f} with ADI {worst['adi']:.2f}) ")
+    return head + (
         "classifies as non-intermittent. Such obsolescence patterns are the "
         "Teunter-Syntetos-Babai case, out of scope here, and they do not affect "
         "the WP2 outcome because Croston lost on every node that did classify as "
-        "intermittent.",
-    ]
-    RESULTS_MD.write_text("\n".join(lines))
+        "intermittent.")
 
 
 def _fmt_adi(x: float) -> str:
