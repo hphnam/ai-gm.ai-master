@@ -68,11 +68,27 @@ Ellel is lumpy (gappy and variable) under both, unambiguously, since 5.9 is far 
 cutoff. The demand-day definition barely moves the Beer Hall ADI (the one comped open day),
 which is why both rows agree.
 
-**1d. The Kostenko-Hyndman selection rule** `CV2 < 2 - (3/2) ADI` is implemented (`select_sba`)
-and reported per node at L1 and L3. **No node selects SBA at either level**: at L1 every venue's
-CV-squared exceeds the threshold, and at L3 none of the 32 nodes do (21 classify intermittent at
-ADI >= 4/3, but their CV-squared all exceed `2 - (3/2)ADI`). The SBA deflation is not indicated
-anywhere in this estate, so the diagnostic selects Croston throughout. The L3 report `.md` is a
+**1d. The Kostenko-Hyndman selection rule** `CV2 > 2 - (3/2) ADI` is implemented (`select_sba`)
+and reported per node at L1 and L3.
+
+> **CORRECTED 2026-07-31.** This paragraph originally stated the rule as
+> `CV2 < 2 - (3/2) ADI` and concluded that **no** node selects SBA at either level. The
+> inequality is inverted; the arithmetic recorded in the very same sentence — that the
+> CV-squared values "all exceed `2 - (3/2)ADI`" — is the condition for selecting **SBA**.
+> The correct reading of the numbers already in this report is therefore the opposite of the
+> conclusion it drew.
+
+**Every node selects SBA at both levels**: at L1 every venue's CV-squared exceeds its
+threshold (thresholds run from 0.23 down to -6.88 against CV-squared of 0.61 to 1.04), and at
+L3 all 21 of the 32 nodes that classify intermittent at ADI >= 4/3 do likewise. The unanimity
+is structural, not a property of this estate: `2 - (3/2)(4/3) = 0` exactly, so the selection
+threshold is non-positive for anything at or above the intermittency cutoff, and CV2 >= 0
+always. **Classified-intermittent implies selects-SBA by construction**, which means the
+selection rule adds nothing to the classification for intermittent nodes.
+
+The consequence is confined to the intermittent-node trigger feeding hierarchical
+reconciliation; adoption remains strictly by the held-out MASE rule, per node, so no served
+model moves. The L3 report `.md` is a
 store-ceiling-dependent artefact - its top-k hierarchy items and n_days drift as history grows -
 so it is left at its committed snapshot rather than regenerated at 0707, which would confound the
 constant correction with that data drift; the corrected constants are in the code and

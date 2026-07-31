@@ -124,11 +124,19 @@ move from `committed` to `6f@0707`.
 | rung0_seasonal_naive | 1.006 | 1.773 | 0.938 | 0.512 | 0.031 | 273 |
 
 Beer Hall is the clean demonstration of Major 4. At the current ceiling the 42-day six-fold
-window picks **`rung1_robust_dow`** as the winner - the served `chronos2_exo` ranks fifth on that
-window. It is a high-variance summer window (World Cup, late June). Take 273 origins and the
-served `chronos2_exo` is restored to first. **The small sample gave the wrong answer and the
-large sample recovered the served one.** The served choice is confirmed, and the mechanism by
-which six folds could have misled is shown rather than asserted.
+window picks **`rung1_robust_dow`** as the winner - the served `chronos2_exo` ranks **second**
+on that window, at 1.312 against 1.267, a gap of 0.045. It is a high-variance summer window
+(World Cup, late June). Take 273 origins and the served `chronos2_exo` is restored to first,
+while `rung1_robust_dow` falls to **fifth** at 0.803. **The small sample gave the wrong answer
+and the large sample recovered the served one.** The served choice is confirmed, and the
+mechanism by which six folds could have misled is shown rather than asserted.
+
+> **CORRECTED 2026-07-31.** This paragraph previously read "the served `chronos2_exo` ranks
+> fifth on that window". The sentence had swapped its subject: fifth is where
+> `rung1_robust_dow` lands in the `step1@0707` column at 273 origins, not where the served
+> model lands at six folds. Both ranks are read directly off the table above. The
+> demonstration is unaffected — it is if anything sharper, since a gate that separates first
+> from second by 0.045 is the narrower and more telling margin.
 
 ### Ellel, 260 origins
 

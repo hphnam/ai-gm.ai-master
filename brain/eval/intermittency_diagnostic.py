@@ -78,15 +78,20 @@ def classify(adi: float, cv2: float, *, adi_cut: float, cv2_cut: float) -> str:
 
 
 def select_sba(adi: float, cv2: float) -> bool:
-    """Kostenko-Hyndman rule: prefer SBA over Croston when `cv2 < 2 - (3/2) adi`.
+    """Kostenko-Hyndman rule: prefer SBA over Croston when `cv2 > 2 - (3/2) adi`.
 
-    Below that line Croston's positive bias dominates and the SBA deflation helps; above
+    Above that line Croston's positive bias dominates and the SBA deflation helps; below
     it, Croston is preferable. Reported per node, never used to gate adoption (that stays
     the held-out MASE rule).
+
+    NOTE: this inequality was implemented in the reversed direction until 2026-07-31, which
+    inverted every SBA/Croston selection in `intermittency_L1.md` and the L3 report. The
+    published rule is "use SBA whenever v > 2 - (3/2)p" (Kostenko & Hyndman 2006), verified
+    against the paper's text in `ledger/citation_audit.md`.
     """
     if not (np.isfinite(adi) and np.isfinite(cv2)):
         return False
-    return bool(cv2 < 2.0 - 1.5 * adi)
+    return bool(cv2 > 2.0 - 1.5 * adi)
 
 
 def _pattern(occ: np.ndarray, size: np.ndarray) -> dict:
@@ -233,7 +238,7 @@ def _write_report(venue: str, rows: list[dict], dows: set[int]) -> None:
         f"Intermittency cutoff: **ADI >= {ADI_INTERMITTENT_CUTOFF:.4f}** "
         "(Kostenko-Hyndman corrected p = 4/3; the old SBC 1.32 gate classifies the "
         "same nodes here, no node lies in the affected 1.32 to 1.3333 band). The SBA "
-        "column is the KH selection rule CV2 < 2 - (3/2)ADI.\n",
+        "column is the KH selection rule CV2 > 2 - (3/2)ADI.\n",
         "| Node | n_days | zero_fraction | ADI | CV2 | Intermittent | KH selects |",
         "|---|---|---|---|---|---|---|",
     ]
@@ -276,7 +281,7 @@ def _write_l1_report(results: list[dict], ceiling: str) -> None:
         "demand-day revenue. Two demand-day definitions cross two cutoff sets, per the "
         "Kostenko-Hyndman correction (`kostenko_note_2006`): **SBC** ADI>=1.32, "
         "CV2>=0.49; **KH** ADI>=4/3=1.3333, CV2>=0.5. The SBA column is the KH selection "
-        "rule `CV2 < 2 - (3/2)ADI`.\n",
+        "rule `CV2 > 2 - (3/2)ADI`.\n",
     ]
     for r in results:
         lines.append(f"\n## {r['venue']} (n_days = {r['n_days']})\n")

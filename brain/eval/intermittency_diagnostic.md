@@ -40,3 +40,27 @@ Trading days: **Wed, Thu, Fri, Sat, Sun** (L1 units DOW-median > eps). Intermitt
 **20 of 30** item nodes classify as intermittent (ADI >= 1.32); **17** of those are non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the conditional Croston/SBA comparison in hierarchy/reconcile.py; adoption stays strictly by the held-out MASE rule, per node.
 
 **ADI blind spot (noted):** ADI measures the spacing between successive demands, so an item that sold densely for a short season and then went dead (for example Lancashire crisps, zero_fraction 0.88 with ADI 1.00) classifies as non-intermittent. Such obsolescence patterns are the Teunter-Syntetos-Babai case, out of scope here, and they do not affect the WP2 outcome because Croston lost on every node that did classify as intermittent.
+
+## Croston-versus-SBA selection at L3 (derived 2026-07-31)
+
+The Kostenko-Hyndman selection rule is `CV2 > 2 - (3/2)ADI` — prefer the Syntetos-Boylan
+approximation above the line. Applied to the ADI and CV2 committed in the table above:
+
+**All 20 intermittent nodes select SBA. None selects Croston.**
+
+Across all 30 nodes, 29 select SBA; the single exception is
+`ITEM::Uncategorised::Lancashire  crisps` (ADI 1.00, CV2 0.30, threshold 0.500), which is
+not classified intermittent, so the rule does not govern it.
+
+The unanimity is structural rather than empirical. The intermittency cutoff is ADI >= 4/3,
+and `2 - (3/2)(4/3) = 0` exactly, so the selection threshold is non-positive for every node
+at or above the cutoff; with CV2 >= 0 always, **classified-intermittent implies
+selects-SBA by construction.** The selection rule therefore carries no information beyond
+the classification for intermittent nodes, which is worth stating plainly rather than
+presenting the count as a finding about this estate.
+
+This supersedes the earlier statement that no node in the estate selects SBA. That came
+from `select_sba` in `intermittency_diagnostic.py`, which implemented the inequality
+reversed until 2026-07-31. Derived arithmetically from the committed ADI/CV2 above, not
+regenerated — `store/brain.duckdb` is absent from this checkout. Adoption is unchanged and
+remains strictly by the held-out MASE rule, per node; this column is diagnostic only.
