@@ -2,9 +2,16 @@
 
 `warehouse.build()` rebuilds from the committed CSV seed, which ends 2026-05-31, so it
 silently drops the aggregate-ingested June and 1 to 7 July rows and resets the store to
-the seed. Any pytest run does this: `tests/test_a10_service.py` calls `warehouse.build()`
-in an autouse fixture. Nothing warns; the store just quietly becomes five weeks stale,
-and the next thing that reads it is wrong rather than broken.
+the seed. Nothing warns; the store just quietly becomes five weeks stale, and the next
+thing that reads it is wrong rather than broken.
+
+The suite used to be the main way this happened, via the `warehouse.build()` calls in
+several modules' autouse fixtures. It no longer is: `tests/conftest.py` points
+`BRAIN_DUCKDB_PATH` at a throwaway database for the session (S3 / FLAG-STORE-DURABILITY),
+so pytest cannot reach the working store at all. What remains is a manual rebuild, a bare
+`ingest.normalise` run, or - the quiet one, because the file looks perfectly healthy - a
+store restored from a backup taken before the clock was last advanced. That last case is
+what happened on 2026-07-31, and `assert_store_ceiling` is what caught it.
 
 This chains the two ingests that put it back, in the order they depend on (July W1
 refuses to run against a June-less store), and verifies the result. Both are idempotent

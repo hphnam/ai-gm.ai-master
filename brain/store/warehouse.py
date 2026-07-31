@@ -233,9 +233,15 @@ def store_ceiling(con: duckdb.DuckDBPyConnection | None = None) -> str | None:
 def assert_store_ceiling(expected: str | None = None) -> str:
     """Guard the store's ceiling; call at the head of any reported-number entrypoint.
 
-    A pytest run rebuilds the store to the seed (2026-05-31) via an autouse fixture, so
-    without this the next thing to read the store gets five weeks of stale May data and
-    a plausible, wrong answer. Fails loudly and names the fix instead.
+    Anything that rebuilds from the seed CSV leaves the store at 2026-05-31, so without
+    this the next thing to read it gets five weeks of stale May data and a plausible,
+    wrong answer. Fails loudly and names the fix instead.
+
+    The suite is no longer one of those things: `tests/conftest.py` points
+    `BRAIN_DUCKDB_PATH` at a throwaway database, so a pytest run cannot touch the working
+    store. What still lands here is a manual `warehouse.build()`, a bare
+    `ingest.normalise` run, or a store file restored from a backup taken before the clock
+    was advanced. The last of those is the quiet one, because the file looks healthy.
 
     `expected` defaults to `config.EXPECTED_STORE_CEILING` read at CALL time (not bound
     at import), so a test may drive it by monkeypatching the config value.
@@ -245,7 +251,8 @@ def assert_store_ceiling(expected: str | None = None) -> str:
     if actual != expected:
         raise StoreCeilingError(
             f"store ceiling is {actual}, expected {expected}.\n"
-            "Run: python -m sim.restore_clock")
+            "Run: python -m store.build   (normalise -> warehouse -> restore clock -> assert)\n"
+            "If line_items.parquet is already current, python -m sim.restore_clock is enough.")
     return actual
 
 
