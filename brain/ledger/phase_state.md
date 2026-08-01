@@ -1169,3 +1169,28 @@ OPEN, needs a human call: `tab:ladder` and the committed frozen tables were comp
 deliberately NOT regenerated per report 57. Ordering and adopted model unchanged, so no
 conclusion moves, but the thesis quotes magnitudes the code no longer reproduces and the
 caption needs to state its basis. Overleaf pushes are gated.
+
+### tab:ladder caption CLOSED (2026-08-01, authorised Overleaf push)
+
+Added an explicit basis note to the `tab:ladder` caption in `chapters/results.tex`: every
+figure uses the historical `calendar_lag7` denominator, the estate now rules
+`calendar_lag7_active` (BH, TRT) and unscaled (Ellel), the table is deliberately left on
+the historical basis so it remains the decision under audit, and recomputing moves
+magnitudes only.
+
+Verified AT THE COMMITTED CEILINGS (2026-05-31 / 2026-05-22 / 2026-05-08), not the current
+frame, because the caption is about the table it sits under:
+- Reconstruction reproduces the committed figures exactly for the six statistical rungs
+  (BH ETS 0.799, Ellel robust-DOW 0.572, TRT ETS 0.597).
+- With the backbone present so all NINE entrants score, ordering is IDENTICAL under
+  `calendar_lag7`, `calendar_lag7_active` and unscaled MAE at all three venues, and the
+  served model is unchanged.
+- NOT claimed, because not true: rung-4 magnitudes do not reproduce to the digit (BH
+  exogenous 0.755 here vs committed 0.745). Device/resolution dependence per sec:repro,
+  now visible via provenance.py. The caption's claim is confined to ordering + served model.
+
+Push mechanics: `write_section` replaces through to the next SAME-level heading, so
+`sec:res-demonstration` was re-appended in the same write. Verified after: 25 section
+entries before and after, subsection present exactly once, downstream indices +1193.
+
+Frozen ladder artefacts still NOT regenerated. No thesis number changed.

@@ -335,14 +335,42 @@ across `ladder.py` and `refresh.py`. `refresh.py` is worth naming: it used
 `metrics.get("MASE", inf)`, which for a venue reporting MAE would have compared `inf`
 against `inf` and silently adopted nothing.
 
-**The published table is the open consequence.** `tab:ladder` and the committed frozen
+**The published table: CLOSED by an Overleaf push.** `tab:ladder` and the committed frozen
 tables were computed on `calendar_lag7`: Two River Taps ETS reads 0.597 there and the
 aligned code produces 0.524. The frozen tables are deliberately NOT regenerated, per report
 57's argument that re-running them replaces the decision under audit. Any newly generated
 table now carries a basis note saying so, and the ordering and adopted model are unchanged,
-so no conclusion moves. But the thesis currently quotes magnitudes the code no longer
-reproduces, and that needs a caption stating the basis. Pushing to Overleaf is gated, so it
-is listed as open rather than done.
+so no conclusion moves. The `tab:ladder` caption now records the basis explicitly,
+authorised and pushed on 2026-08-01 (section 7.4).
+
+### 7.4 The `tab:ladder` caption, verified at the committed ceilings then pushed
+
+The invariance claim was checked at the ceilings the committed gate actually used
+(2026-05-31 Beer Hall, 2026-05-22 Ellel, 2026-05-08 Two River Taps), not on the current
+frame, because a caption in the thesis must be about the table it sits under. Reconstructing
+the gate there reproduces the committed figures exactly for the six statistical rungs: Beer
+Hall ETS 0.799, Ellel robust-DOW 0.572, Two River Taps ETS 0.597, all matching the table.
+
+Run again with the backbone present so all nine entrants score, the ordering is **identical
+under all three rulers** at all three venues, and the served model is unchanged:
+
+| Venue | `calendar_lag7` | `calendar_lag7_active` | unscaled MAE | ordering |
+|---|---|---|---|---|
+| Beer Hall | rung4_chronos2_exo | rung4_chronos2_exo | rung4_chronos2_exo | identical |
+| Ellel | rung1_robust_dow 0.572 | 0.142 | 106.553 | identical |
+| Two River Taps | rung2_ets 0.597 | 0.524 | 91.166 | identical |
+
+One thing the check does NOT establish, and the caption does not claim: rung-4 magnitudes
+do not reproduce to the digit (Beer Hall's exogenous arm scores 0.755 here against the
+committed 0.745). That is the device-and-resolution dependence `sec:repro` names, now
+visible because `provenance.py` stamps it. The caption's claim is confined to ordering and
+the served model, which is what was verified.
+
+The push replaced the whole `sec:res-ladder` section, so `sec:res-demonstration` was
+re-appended in the same write: `write_section` replaces through to the next SAME-level
+heading and would otherwise have deleted the nested subsection. Verified after: 25 section
+entries before and after, the subsection present exactly once, every downstream index
+shifted by exactly +1193.
 
 ## Verification
 
@@ -378,6 +406,9 @@ is listed as open rather than done.
 | Serving path updated, not left on a stale key | PASS | `refresh.py` reads `primary_loss`, not `metrics["MASE"]` |
 | Frozen ladder tables untouched | PASS | `git status models/` clean but for the module |
 | Suite green after the ladder alignment | PASS | 617 passed, 8 skipped, 0 failed |
+| Committed gate reproduces at its own ceilings | PASS | 0.799 / 0.572 / 0.597 match `tab:ladder` exactly |
+| Ordering invariant across all three rulers | PASS | all 9 entrants, all 3 venues, served model unchanged |
+| Caption push lost no content | PASS | 25 sections before and after; subsection once; indices +1193 |
 
 ## Files touched
 
