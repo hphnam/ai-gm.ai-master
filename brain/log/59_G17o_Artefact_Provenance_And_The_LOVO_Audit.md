@@ -187,6 +187,72 @@ reported but never counted, it is scored in currency, and each scaled venue uses
 `config` rules for it. A test that had been made to pass by weakening its bound would have
 been the same defect one level up.
 
+## 6. Foundation gate CLOSED: the comparison implemented, and the rung adopted
+
+Instructed on 2026-08-01 to implement it rather than keep the rung dropped on other
+grounds. `_foundation_adoption` now runs the criterion the gate has always named: zero-shot
+Chronos-2 against the global GBM on held-out rolling MASE, paired within fold over the
+ladder's 6-fold rolling origin at horizon 7.
+
+Two scoping decisions, both consequences of G2 and both stated in the code:
+
+- Scored only where a scaled error is defensible, because the criterion is a MASE
+  comparison. Ellel is excluded for the same reason it is excluded from the transfer pool.
+- Adoption requires a win at EVERY such venue. Two venues carry no majority, and unanimity
+  is the conservative bar for adopting a pretrained backbone over a fitted baseline that
+  already exists.
+
+A fold that either arm cannot score is dropped from both, never from one: keeping the
+GBM's score on a fold the backbone failed would compare them on different windows.
+
+**Result: ADOPTED.**
+
+| Venue | folds | dropped | foundation MASE | global GBM MASE |
+|---|---|---|---|---|
+| The Beer Hall | 6 | 0 | **1.180** | 1.250 |
+| Two River Taps | 6 | 0 | **0.559** | 0.641 |
+
+Zero-shot Chronos-2 beats the global GBM at both, by 0.070 and 0.082 MASE. Note the Beer
+Hall figure is above 1.0 on the ruled basis, so the foundation model beats the global GBM
+while both remain worse than the seasonal-naive reference at that venue. The clause is a
+comparison against the GBM and it is met; it is not a claim that the rung beats the
+benchmark.
+
+### A zero-width confidence interval, caught before it was reported
+
+The first run emitted `-0.070 [-0.070, -0.070]` and `-0.082 [-0.082, -0.082]`. Those are
+not intervals. `mcs.BLOCK_LEN` is 7 and the comparison has 6 folds, so the moving-block
+bootstrap has exactly one admissible block, every resample reproduces the original series,
+and the percentile interval collapses to a point mass at the observed mean. Measured
+directly: at n=6 the resampler returns **1 distinct row** out of 200 draws, against 200 of
+200 at n=45 and n=55.
+
+A zero-width CI does not read as "no evidence", it reads as infinite precision, which is
+the worse failure. `_dispersion` now returns `insufficient` whenever the sample is at or
+below the block length, and the report prints "no dispersion" plus an explicit paragraph
+saying the adoption rests on the mean comparison alone. The transfer folds carry 45 to 55
+blocks, so the guard moves no existing number.
+
+The defect was in code written for this task and it was caught by looking at the output
+rather than by a test, which is worth recording: the tests asserted the decision logic and
+would not have flagged a degenerate interval.
+
+### Coverage for a branch that had none
+
+The adoption branch had no tests at all, which is exactly why it could return an
+instruction string and no `beats_global_gbm` key for as long as no backbone was
+importable. Five tests now cover it, and they stub the per-venue comparison so they run in
+every venv rather than only where torch is installed: the key is always present, a loss at
+one venue blocks adoption, an unscorable backbone is not adopted, an importable backbone
+with no implemented predictor (timesfm, moirai) is not adopted, and the unscaled venue is
+never scored by the criterion.
+
+### The gate is now reported as two clauses
+
+Previously one verdict covered both, so the transfer clause's NOT EVALUABLE would have
+hidden a foundation failure. The report states them separately: transfer NOT EVALUABLE,
+foundation PASS (adopted), overall NOT EVALUABLE governed by the transfer clause.
+
 ## Verification
 
 | Check | Status | Evidence |
@@ -204,6 +270,14 @@ been the same defect one level up.
 | Gate reports NOT EVALUABLE, not FAIL | PASS | `evaluable` guard on a pool below three |
 | Suite green after the change | PASS | 609 passed, 8 skipped, 0 failed |
 | Corrected artefact survives a suite run | PASS | "NOT EVALUABLE" still present after full `pytest` |
+| Foundation criterion implemented, not asserted | PASS | per-fold paired MASE, both arms, tabulated |
+| Foundation adoption reproduces | PASS | 1.180/1.250 and 0.559/0.641 identical across two runs |
+| Zero-width CI cannot be emitted | PASS | `insufficient` at or below `mcs.BLOCK_LEN`; "no dispersion" printed |
+| Degenerate bootstrap measured, not assumed | PASS | 1 distinct resample of 200 at n=6; 200 of 200 at n=45 and n=55 |
+| Guard moves no existing number | PASS | transfer folds carry 45 to 55 blocks, CIs unchanged |
+| No-backbone path byte-identical | PASS | `.venv-run` artefact unchanged but for the gate restructure |
+| Adoption branch covered in every venv | PASS | 5 tests, per-venue comparison stubbed |
+| Suite green after the foundation work | PASS | `.venv-run` 616 passed / 8 skipped; `.venv-forecast` 621 passed / 1 skipped, 0 failed in both |
 
 ## Files touched
 
@@ -212,17 +286,33 @@ been the same defect one level up.
 - `transfer/lovo.py`: per-venue ruler from `config`, pool and count restricted to scaled
   venues, `mase_*` keys renamed `loss_*` because they no longer always hold a MASE,
   NOT-EVALUABLE gate, report text and module docstring rewritten
-- `tests/test_a7_transfer.py`: the majority assertion replaced by four behaviour tests
+- `transfer/lovo.py`: `_foundation_adoption` + `_foundation_vs_global_gbm` implement the
+  adoption criterion, `_foundation_table` and `_foundation_clause` report its evidence,
+  `_dispersion` guards against a degenerate bootstrap, gate split into two clauses
+- `tests/test_a7_transfer.py`: the majority assertion replaced by four behaviour tests,
+  plus five covering the adoption branch and two covering the dispersion guard (14 total)
 - corrections: report 57 (the "orphaned" row and a new correction section), report 58 (the
   "both are test output" claim in "What is not done")
 
 ## Open
 
 - ~~**Gate: `lovo.py`'s pooled statistic under G2.**~~ CLOSED above by decision.
-- **Gate: `lovo.py`'s foundation rung.** New. The `available: True` branch needs either the
-  zero-shot-vs-global-GBM evaluation implemented, or an explicit decision to keep the rung
-  dropped on grounds other than backbone absence. Until one of the two, the committed PASS
-  should not be relied on.
+- ~~**Gate: `lovo.py`'s foundation rung.**~~ CLOSED above: the criterion is implemented and
+  the rung is adopted on it.
+- **The committed LOVO artefact is now environment-dependent.** It is generated from
+  `.venv-forecast` and stamps `available: True`; regenerating from `.venv-run` flips the
+  foundation clause to "PASS (dropped)" and drops the evidence table. `sec:repro` already
+  names the library resolution and the compute device as part of a result's identity, and
+  this artefact names neither. It should carry the environment stamp the chapter's own
+  argument requires, and it does not yet.
+- **The foundation adoption has no dispersion behind it.** It rests on a mean comparison
+  over 6 folds, which is what the gate's criterion asks for and is thin. A dispersion-aware
+  version needs a denser rolling origin, which is affordable for the GBM and expensive for
+  the backbone. Not claimed, and flagged here rather than buried in the artefact.
+- **`ladder.evaluate_rolling` still hard-codes `calendar_lag7`**, the basis G2 rules
+  against for these venues, the same fault corrected in `lovo.py` above. The ladder is the
+  committed gate under audit so it was deliberately not touched, but the two instruments
+  now disagree on the ruler and that is a live inconsistency, not a settled one.
 - Two River Taps reports a post-closure trading day in the deviation stream. Recorded above.
 - `eval/worldcup_fixture_probe.py` still scores Ellel on `calendar_lag7`. Writes no
   artefact, appears in neither chapter.

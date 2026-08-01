@@ -32,11 +32,25 @@ Each fold is scored on consecutive 7-day blocks, so the comparison carries dispe
 The partial-pooling story this sweep was built to tell is that transfer wins while the venue is data-poor and hands over to its own seasonal-naïve as history accrues. The shape of the sweep is still consistent with it, but over two scaled venues the table can no longer carry that claim: at every window the denominator is 2, so the descent is a sequence of counts out of two and is equally consistent with one venue's behaviour plus noise. It is reported as a description of these two venues, not as evidence for a cold-start regime.
 
 ## Foundation-model rung (adoption by held-out rolling MASE)
-- available: False
-- DROPPED: no backbone installed, so an unjustified pretrained backbone is not adopted. The criterion is beating rung3_global_gbm on held-out rolling MASE; Tan et al. (2024) motivates scepticism toward unjustified backbones but its ablations target LLM-backbone forecasters, not pretrained time-series models. Global GBM (A4) remains the pooling baseline.
+- available: True
+- ADOPTED: zero-shot chronos against the global GBM on held-out rolling MASE, The Beer Hall 1.180 vs 1.250 over 6 folds; Two River Taps 0.559 vs 0.641 over 6 folds. Scored only where a scaled error is defensible (G2), and adoption requires winning at every such venue.
+
+Zero-shot chronos against the global GBM, rolling origin, 6 folds at horizon 7, paired within fold. Scored only where a scaled error is defensible (G2); adoption requires a win at every such venue.
+
+| Venue | folds | dropped | foundation MASE | global GBM MASE | Δ [90% CI] |
+|---|---|---|---|---|---|
+| The Beer Hall | 6 | 0 | 1.180 | 1.250 | no dispersion |
+| Two River Taps | 6 | 0 | 0.559 | 0.641 | no dispersion |
+
+**No confidence interval is quoted, and the adoption rests on the mean comparison alone.** At 6 folds against a block length of 7 the moving-block bootstrap has no resampling freedom, so a percentile interval would collapse to a point mass at the observed mean and read as infinitely precise. That is reported as absent rather than quoted. The criterion this gate names is the mean held-out rolling MASE comparison, which is met; a dispersion-aware version of the criterion would need a denser rolling origin than the ladder's committed 6-fold configuration and is not claimed here.
 
 ## In-context fine-tuning (Das et al. 2025) — forward note
 The shape-transfer here is the hand-built analogue of conditioning a held-out venue on the donor's shape. A foundation backbone with in-context fine-tuning would condition on the donor series directly; the LOVO harness above is exactly the test it must pass to be adopted.
 
 
-Gate (transfer beats naïve on a majority of the data-rich held-out venues AND foundation beats global GBM or is dropped): **NOT EVALUABLE**. The transfer clause needs three venues admitting a scaled error and the estate supplies 2, so no majority exists to test. This is a withdrawal of the estate-level claim on the grounds that the evidence base was never admissible, not a failed test.
+## Gate
+Two clauses, reported separately so neither can carry the other:
+- **Transfer clause: NOT EVALUABLE.** It needs a majority over three venues admitting a scaled error and the estate supplies 2, so no majority exists to test. This is a withdrawal of the estate-level claim on the grounds that the evidence base was never admissible, not a failed test.
+- **Foundation clause: PASS (adopted). Zero-shot chronos beats the global GBM on held-out rolling MASE at every venue admitting a scaled error.**
+
+Overall: **NOT EVALUABLE**, governed by the transfer clause.

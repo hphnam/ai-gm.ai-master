@@ -43,6 +43,9 @@ import pandas as pd
 import config
 from config import FORECAST_VENUES, REPORT_ROOT, VENUE_LABELS
 from eval import harness, mcs
+from features.build_features import build_features, feature_columns
+from models.foundation import chronos2_predict
+from models.ladder import global_gbm_predict
 from store.active_span import trim_to_active
 from store.warehouse import read_series
 
@@ -165,15 +168,124 @@ def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
     }
 
 
+FOUNDATION_FOLDS = 6
+FOUNDATION_HORIZON = 7
+FOUNDATION_MIN_TRAIN = 120
+
+
+def _foundation_vs_global_gbm(venue: str) -> dict:
+    """Rolling-origin held-out MASE, zero-shot foundation against the global GBM.
+
+    One venue, paired per fold: both forecasters see the same training slice and are
+    scored on the same held-out window with the same denominator, so the differential
+    is within-fold and the pairing is real rather than two independent means differenced.
+
+    The scale comes from each fold's own training slice, which is the ex-ante quantity
+    (`sec:ruler`), and the basis is the one `config` rules for the venue. Note this
+    differs from `ladder.evaluate_rolling`, which hard-codes `calendar_lag7`; the ladder
+    is the committed gate under audit and is deliberately not touched here, so the two
+    numbers are not directly comparable and this report does not compare them.
+    """
+    # Trimmed to the active span for the same reason the ladder trims: a closed venue's
+    # zero tail as the held-out block lets every model "win" by predicting zero.
+    feats = trim_to_active(build_features(venue), venue)
+    cols = feature_columns(feats)
+    basis = config.VENUE_SCALE_BASIS[venue]
+
+    found, gbm, failed = [], [], 0
+    for tr, te in harness.rolling_origin(
+        feats, n_folds=FOUNDATION_FOLDS, horizon_days=FOUNDATION_HORIZON,
+        min_train_days=FOUNDATION_MIN_TRAIN,
+    ):
+        ytr, yte = tr["value"].to_numpy(), te["value"].to_numpy()
+        try:
+            fp = chronos2_predict(tr, te, cols)
+            gp = global_gbm_predict(venue, tr, te, cols)
+        except Exception:
+            # A fold that either arm cannot score is dropped from BOTH, never from one:
+            # scoring the GBM on a fold the backbone failed would compare them on
+            # different windows and flatter whichever arm kept the easier folds.
+            failed += 1
+            continue
+        mf = harness.mase(yte, fp, ytr, basis=basis)
+        mg = harness.mase(yte, gp, ytr, basis=basis)
+        if np.isfinite(mf) and np.isfinite(mg):
+            found.append(mf)
+            gbm.append(mg)
+        else:
+            failed += 1
+
+    if not found:
+        return {"venue": venue, "n_folds": 0, "failed_folds": failed, "scored": False}
+    return {
+        "venue": venue,
+        "n_folds": len(found),
+        "failed_folds": failed,
+        "scored": True,
+        "mase_foundation": round(float(np.mean(found)), 3),
+        "mase_global_gbm": round(float(np.mean(gbm)), 3),
+        "beats": bool(np.mean(found) < np.mean(gbm)),
+        "dispersion": _dispersion(found, gbm),
+    }
+
+
+def _foundation_adoption(backend: str) -> dict:
+    """Run the adoption criterion the gate names: zero-shot beats the global GBM on
+    held-out rolling MASE, or it is not adopted.
+
+    Until report 59 this branch returned that sentence as a `verdict` string and no
+    `beats_global_gbm` key, so `main()`'s `.get(..., False)` read it as a failure. The
+    comparison was never implemented and the gate's PASS was therefore contingent on no
+    backbone being importable. Installing the backbone the ladder's rung 4 requires is
+    what exposed it.
+
+    Two scoping decisions, both consequences of G2 and stated rather than implied:
+    scored only on venues that admit a scaled error, because the criterion is a MASE
+    comparison; and adoption requires winning at EVERY such venue, because two venues
+    carry no majority and unanimity is the conservative bar for adopting a pretrained
+    backbone over a fitted baseline that already exists.
+    """
+    if backend != "chronos":
+        return {
+            "available": True, "backend": backend, "beats_global_gbm": False,
+            "verdict": f"NOT ADOPTED: {backend} is importable but this project "
+            "implements a zero-shot predictor only for chronos, so the criterion "
+            "cannot be evaluated against it and an unevaluated backbone is not adopted.",
+        }
+
+    per_venue = [_foundation_vs_global_gbm(v) for v in FORECAST_VENUES
+                 if config.is_scaled_venue(v)]
+    scored = [r for r in per_venue if r["scored"]]
+    if not scored:
+        return {
+            "available": True, "backend": backend, "beats_global_gbm": False,
+            "per_venue": per_venue,
+            "verdict": "NOT ADOPTED: no venue produced a scorable fold, so the "
+            "criterion returned no evidence and an unevaluated backbone is not adopted.",
+        }
+
+    beats = all(r["beats"] for r in scored)
+    detail = "; ".join(
+        f"{VENUE_LABELS.get(r['venue'], r['venue'])} {r['mase_foundation']:.3f} vs "
+        f"{r['mase_global_gbm']:.3f} over {r['n_folds']} folds"
+        f"{'' if r['beats'] else ' (loses)'}" for r in scored)
+    return {
+        "available": True, "backend": backend, "beats_global_gbm": beats,
+        "per_venue": per_venue,
+        "verdict": (f"{'ADOPTED' if beats else 'NOT ADOPTED'}: zero-shot {backend} "
+                    f"against the global GBM on held-out rolling MASE, {detail}. "
+                    "Scored only where a scaled error is defensible (G2), and adoption "
+                    "requires winning at every such venue."),
+    }
+
+
 def _foundation_ablation() -> dict:
     for mod in ("chronos", "timesfm", "moirai"):
         try:
             __import__(mod)
-            return {"available": True, "backend": mod,
-                    "verdict": "evaluate zero-shot vs global GBM; adopt only if it "
-                    "beats it on held-out rolling MASE"}
         except Exception:
             continue
+        return _foundation_adoption(mod)
     return {
         "available": False, "backend": None,
         "verdict": "DROPPED: no backbone installed, so an unjustified pretrained "
@@ -249,6 +361,17 @@ def _dispersion(block_transfer: list[float], block_naive: list[float]) -> dict:
     t, n = t[keep], n[keep]
     if t.size < 2:
         return {"n_blocks": int(t.size), "insufficient": True}
+    # A moving-block bootstrap needs more observations than its block length. At or below
+    # it there is exactly ONE admissible block, every resample is the original series, and
+    # the percentile interval collapses to a point mass at the observed mean: a
+    # zero-width "CI" that reads as infinitely precise rather than as no evidence. Found
+    # when the foundation comparison ran at 6 folds against BLOCK_LEN 7 and reported
+    # [-0.070, -0.070] (report 59). The transfer folds carry 45 to 55 blocks and are
+    # unaffected, so this guard changes no existing number.
+    if t.size <= mcs.BLOCK_LEN:
+        return {"n_blocks": int(t.size), "insufficient": True,
+                "reason": f"{t.size} observations at block length {mcs.BLOCK_LEN}; "
+                          "a moving-block bootstrap has no resampling freedom here"}
 
     res = mcs.model_confidence_set(["transfer", "naive"], np.column_stack([t, n]))
     d = t - n
@@ -267,6 +390,69 @@ def _dispersion(block_transfer: list[float], block_naive: list[float]) -> dict:
         "ci90": [round(float(lo), 3), round(float(hi), 3)],
         "excludes_zero": bool(lo > 0 or hi < 0),
     }
+
+
+def _foundation_clause(f: dict) -> str:
+    """The foundation clause's own verdict, which the overall gate must not absorb."""
+    if not f["available"]:
+        return ("PASS (dropped). No backbone is importable, so no unjustified pretrained "
+                "backbone is adopted.")
+    if f.get("beats_global_gbm"):
+        return (f"PASS (adopted). Zero-shot {f['backend']} beats the global GBM on "
+                "held-out rolling MASE at every venue admitting a scaled error.")
+    return (f"FAIL. {f['backend']} is importable but did not meet the adoption "
+            "criterion, so the rung is not adopted.")
+
+
+def _foundation_table(f: dict) -> list[str]:
+    """The evidence behind the foundation verdict, or nothing when it was not scored.
+
+    The verdict string alone is what let the unimplemented branch sit undetected, so the
+    numbers are tabulated rather than summarised.
+    """
+    rows = [r for r in f.get("per_venue", []) if r.get("scored")]
+    if not rows:
+        return []
+    out = [
+        "",
+        f"Zero-shot {f['backend']} against the global GBM, rolling origin, "
+        f"{FOUNDATION_FOLDS} folds at horizon {FOUNDATION_HORIZON}, paired within fold. "
+        "Scored only where a scaled error is defensible (G2); adoption requires a win at "
+        "every such venue.",
+        "",
+        "| Venue | folds | dropped | foundation MASE | global GBM MASE | Δ [90% CI] |",
+        "|---|---|---|---|---|---|",
+    ]
+    any_ci = False
+    for r in rows:
+        d = r["dispersion"]
+        if d.get("insufficient"):
+            disp = "no dispersion"
+        else:
+            any_ci = True
+            disp = f"{d['mean_delta']:+.3f} [{d['ci90'][0]:+.3f}, {d['ci90'][1]:+.3f}]"
+        out.append(
+            f"| {VENUE_LABELS.get(r['venue'], r['venue'])} | {r['n_folds']} | "
+            f"{r['failed_folds']} | {r['mase_foundation']:.3f} | "
+            f"{r['mase_global_gbm']:.3f} | {disp} |")
+    if not any_ci:
+        out.append(
+            f"\n**No confidence interval is quoted, and the adoption rests on the mean "
+            f"comparison alone.** At {FOUNDATION_FOLDS} folds against a block length of "
+            f"{mcs.BLOCK_LEN} the moving-block bootstrap has no resampling freedom, so a "
+            "percentile interval would collapse to a point mass at the observed mean and "
+            "read as infinitely precise. That is reported as absent rather than quoted. "
+            "The criterion this gate names is the mean held-out rolling MASE comparison, "
+            "which is met; a dispersion-aware version of the criterion would need a "
+            "denser rolling origin than the ladder's committed 6-fold configuration and "
+            "is not claimed here.")
+    unscored = [r for r in f.get("per_venue", []) if not r.get("scored")]
+    if unscored:
+        out.append(
+            "\nNot scored: " + ", ".join(
+                VENUE_LABELS.get(r["venue"], r["venue"]) for r in unscored)
+            + ". No fold produced a finite score for both arms.")
+    return out
 
 
 def _write_report(out: dict, passed: bool) -> None:
@@ -354,17 +540,21 @@ def _write_report(out: dict, passed: bool) -> None:
         "## Foundation-model rung (adoption by held-out rolling MASE)",
         f"- available: {out['foundation']['available']}",
         f"- {out['foundation']['verdict']}",
+        *_foundation_table(out["foundation"]),
         "\n## In-context fine-tuning (Das et al. 2025) — forward note",
         "The shape-transfer here is the hand-built analogue of conditioning a "
         "held-out venue on the donor's shape. A foundation backbone with in-"
         "context fine-tuning would condition on the donor series directly; the "
         "LOVO harness above is exactly the test it must pass to be adopted.\n",
-        f"\nGate (transfer beats naïve on a majority of the data-rich held-out venues "
-        f"AND foundation beats global GBM or is dropped): "
-        f"**{'PASS' if passed else 'NOT EVALUABLE'}**. The transfer clause needs three "
-        f"venues admitting a scaled error and the estate supplies {out['n_folds']}, so "
-        "no majority exists to test. This is a withdrawal of the estate-level claim on "
-        "the grounds that the evidence base was never admissible, not a failed test.",
+        "\n## Gate",
+        "Two clauses, reported separately so neither can carry the other:",
+        f"- **Transfer clause: NOT EVALUABLE.** It needs a majority over three venues "
+        f"admitting a scaled error and the estate supplies {out['n_folds']}, so no "
+        "majority exists to test. This is a withdrawal of the estate-level claim on the "
+        "grounds that the evidence base was never admissible, not a failed test.",
+        f"- **Foundation clause: {_foundation_clause(out['foundation'])}**",
+        f"\nOverall: **{'PASS' if passed else 'NOT EVALUABLE'}**, governed by the "
+        "transfer clause.",
     ]
     RESULTS_MD.write_text("\n".join(lines))
 

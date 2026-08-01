@@ -4850,8 +4850,8 @@
     "semantic_hash": ""
   },
   "brain/tests/test_a7_transfer.py": {
-    "mtime": 1785613659.785954,
-    "ast_hash": "8ab3b25101881c1d31524584c19aaae0",
+    "mtime": 1785614589.8606613,
+    "ast_hash": "bea72ba66281b8266b00f84f5dc38c20",
     "semantic_hash": ""
   },
   "brain/tests/test_a8_kbgap.py": {
@@ -5035,8 +5035,8 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "brain/transfer/lovo.py": {
-    "mtime": 1785613674.766778,
-    "ast_hash": "85eeb51d9376f7686e0ada10af0ea60f",
+    "mtime": 1785614383.324463,
+    "ast_hash": "d2f962061d71044ec55daafb419c8d99",
     "semantic_hash": ""
   },
   "package.json": {
@@ -5655,8 +5655,8 @@
     "semantic_hash": "16227e56fb524748e8c53f51ba3b6870"
   },
   "brain/transfer/transfer_results.md": {
-    "mtime": 1785613683.0614266,
-    "ast_hash": "8a016b98d8cdfd2fd33fded12fa733df",
+    "mtime": 1785614490.8429375,
+    "ast_hash": "ab431f50c6a75ece7e7229b2e7990d77",
     "semantic_hash": ""
   },
   "apps/web/src/app/apple-icon.png": {
@@ -5920,8 +5920,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1785613856.1225114,
-    "ast_hash": "a30429eaaca44343f09176943237cbf3",
+    "mtime": 1785614493.762209,
+    "ast_hash": "4ab3aa97543a6771f88605fe10d93b1c",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -5985,8 +5985,8 @@
     "semantic_hash": ""
   },
   "brain/log/59_G17o_Artefact_Provenance_And_The_LOVO_Audit.md": {
-    "mtime": 1785613844.828787,
-    "ast_hash": "af0fd27c038c77c5daec89af1aac50d5",
+    "mtime": 1785614539.117268,
+    "ast_hash": "dff4f34ac43d7ec3bebcee197a619195",
     "semantic_hash": ""
   }
 }

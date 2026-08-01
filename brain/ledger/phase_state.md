@@ -1099,3 +1099,36 @@ Consequences, all now in `transfer/transfer_results.md`:
 STILL OPEN: the foundation-rung gate (see G17o report). The `available: True` branch
 returns an instruction and no `beats_global_gbm` key, so the comparison it names was never
 implemented and the committed PASS was contingent on torch being absent.
+
+### Foundation-rung gate CLOSED (2026-08-01, instructed: implement it)
+
+`transfer/lovo.py` `_foundation_adoption` now runs the criterion the gate always named:
+zero-shot Chronos-2 vs the global GBM on held-out rolling MASE, paired within fold over
+the ladder's 6-fold rolling origin at horizon 7. Previously the `available: True` branch
+returned an instruction string and no `beats_global_gbm` key, so the gate's PASS was
+contingent on no backbone being importable.
+
+Result: ADOPTED. Beer Hall 1.180 vs 1.250; Two River Taps 0.559 vs 0.641. Scored only on
+venues admitting a scaled error (G2); adoption requires a win at EVERY such venue, since
+two venues carry no majority and unanimity is the conservative bar for adopting a
+pretrained backbone over an existing fitted baseline. Note the Beer Hall figure is above
+1.0 on the ruled basis: the rung beats the GBM while both remain worse than seasonal-naive
+there. The clause is a GBM comparison and is met; it is not a benchmark claim.
+
+DEFECT FOUND AND FIXED IN THE NEW CODE: the first run emitted zero-width CIs
+(-0.070 [-0.070, -0.070]). `mcs.BLOCK_LEN` is 7 against 6 folds, so the moving-block
+bootstrap had one admissible block and the percentile interval collapsed to a point mass
+(measured: 1 distinct resample of 200 at n=6, vs 200 of 200 at n=45/55). `_dispersion` now
+returns `insufficient` at or below the block length and the report prints "no dispersion"
+with an explicit paragraph. Transfer folds carry 45-55 blocks so no existing number moves.
+
+The gate is now reported as TWO clauses so neither hides the other: transfer NOT
+EVALUABLE, foundation PASS (adopted), overall NOT EVALUABLE governed by the transfer
+clause.
+
+Coverage: the adoption branch had NO tests, which is why it survived. Five added, stubbing
+the per-venue comparison so they run in every venv.
+
+NOTE: the committed artefact now depends on whether a backbone is importable. It is
+generated from `.venv-forecast` (chronos 2.3.1, torch 2.12.1) and stamps `available: True`.
+Regenerating from `.venv-run` will flip the foundation clause to "PASS (dropped)".

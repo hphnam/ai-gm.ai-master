@@ -6,6 +6,7 @@ import numpy as np
 
 import config
 from config import FORECAST_VENUES
+from eval import mcs
 from transfer import lovo
 
 
@@ -70,3 +71,69 @@ def test_foundation_dropped_per_ablation_when_absent(monkeypatch):
     abl = lovo._foundation_ablation()
     assert abl["available"] is False
     assert "DROPPED" in abl["verdict"]
+
+
+# --- The adoption branch -----------------------------------------------------
+#
+# This branch had no coverage at all, which is why it could return an instruction
+# string and no `beats_global_gbm` key for as long as no backbone was importable.
+# These run without a backbone by stubbing the per-venue comparison, so the decision
+# logic is tested in every venv rather than only where torch is installed.
+
+
+def _stub_venue_result(venue, foundation, gbm):
+    return {"venue": venue, "n_folds": 6, "failed_folds": 0, "scored": True,
+            "mase_foundation": foundation, "mase_global_gbm": gbm,
+            "beats": foundation < gbm,
+            "dispersion": {"insufficient": True}}
+
+
+def test_the_adoption_branch_always_reports_whether_it_beat_the_gbm(monkeypatch):
+    """The defect: this key was absent, so `.get(..., False)` silently read as a loss."""
+    monkeypatch.setattr(lovo, "_foundation_vs_global_gbm",
+                        lambda v: _stub_venue_result(v, 0.5, 0.9))
+    assert lovo._foundation_adoption("chronos")["beats_global_gbm"] is True
+
+
+def test_a_backbone_losing_at_one_venue_is_not_adopted(monkeypatch):
+    scores = {"beer_hall": (0.5, 0.9), "two_river_taps": (1.1, 0.7)}
+    monkeypatch.setattr(lovo, "_foundation_vs_global_gbm",
+                        lambda v: _stub_venue_result(v, *scores[v]))
+    assert lovo._foundation_adoption("chronos")["beats_global_gbm"] is False
+
+
+def test_an_unscorable_backbone_is_not_adopted(monkeypatch):
+    monkeypatch.setattr(lovo, "_foundation_vs_global_gbm",
+                        lambda v: {"venue": v, "n_folds": 0, "failed_folds": 6,
+                                   "scored": False})
+    assert lovo._foundation_adoption("chronos")["beats_global_gbm"] is False
+
+
+def test_a_backbone_with_no_implemented_predictor_is_not_adopted():
+    """timesfm and moirai are probed for but this project implements no predictor for
+    either, so importability alone must not adopt one."""
+    assert lovo._foundation_adoption("timesfm")["beats_global_gbm"] is False
+
+
+def test_a_sample_at_the_block_length_yields_no_confidence_interval():
+    """A moving-block bootstrap at or below its block length has one admissible block,
+    so every resample is the original series and the interval collapses to a point mass.
+    Reported as absent rather than as a zero-width CI, which would read as certainty."""
+    n = mcs.BLOCK_LEN
+    d = lovo._dispersion([1.0] * n, [1.5] * n)
+    assert d["insufficient"] is True
+
+
+def test_a_sample_above_the_block_length_still_yields_a_confidence_interval():
+    n = mcs.BLOCK_LEN + 40
+    rng = np.random.default_rng(0)
+    d = lovo._dispersion(list(rng.normal(1.0, 0.2, n)), list(rng.normal(1.5, 0.2, n)))
+    assert d["ci90"][0] < d["ci90"][1]
+
+
+def test_the_unscaled_venue_is_never_scored_by_the_foundation_criterion(monkeypatch):
+    seen = []
+    monkeypatch.setattr(lovo, "_foundation_vs_global_gbm",
+                        lambda v: (seen.append(v), _stub_venue_result(v, 0.5, 0.9))[1])
+    lovo._foundation_adoption("chronos")
+    assert not [v for v in seen if not config.is_scaled_venue(v)]
