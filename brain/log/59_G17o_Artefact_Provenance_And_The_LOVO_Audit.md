@@ -205,18 +205,18 @@ Two scoping decisions, both consequences of G2 and both stated in the code:
 A fold that either arm cannot score is dropped from both, never from one: keeping the
 GBM's score on a fold the backbone failed would compare them on different windows.
 
-**Result: ADOPTED.**
+**Result: ADOPTED.** Superseded at 24 folds in section 7; the 6-fold figures are kept here
+because the sequence is the finding.
 
 | Venue | folds | dropped | foundation MASE | global GBM MASE |
 |---|---|---|---|---|
 | The Beer Hall | 6 | 0 | **1.180** | 1.250 |
 | Two River Taps | 6 | 0 | **0.559** | 0.641 |
 
-Zero-shot Chronos-2 beats the global GBM at both, by 0.070 and 0.082 MASE. Note the Beer
-Hall figure is above 1.0 on the ruled basis, so the foundation model beats the global GBM
-while both remain worse than the seasonal-naive reference at that venue. The clause is a
-comparison against the GBM and it is met; it is not a claim that the rung beats the
-benchmark.
+Zero-shot Chronos-2 beats the global GBM at both, by 0.070 and 0.082 MASE. At this fold
+count the Beer Hall figure sits above 1.0 on the ruled basis, so the rung beat the GBM
+while both remained worse than the seasonal-naive reference there. **That reading did not
+survive the wider window and is withdrawn in section 7.**
 
 ### A zero-width confidence interval, caught before it was reported
 
@@ -253,6 +253,97 @@ Previously one verdict covered both, so the transfer clause's NOT EVALUABLE woul
 hidden a foundation failure. The report states them separately: transfer NOT EVALUABLE,
 foundation PASS (adopted), overall NOT EVALUABLE governed by the transfer clause.
 
+## 7. Three follow-ups, and one of them overturned a finding
+
+Instructed on 2026-08-01: stamp runtime identity onto artefacts, widen the foundation
+window, and align the ladder with `VENUE_SCALE_BASIS`.
+
+### 7.1 Runtime identity (`provenance.py`)
+
+A new root module, alongside `config.py` and `org_profile.py`, answering "what produced
+this". It reports the four coordinates `sec:repro` argues are part of a result's identity
+and which no artefact carried: the venv, the compute device, the resolution of the seven
+libraries that have actually moved a number here, and the store ceiling. Every field is
+best-effort and reports `unknown` rather than raising, because a stamp that crashes a
+report generator is worse than a missing field.
+
+Stamped into the LOVO artefact and the ladder tables, the two whose content depends on
+whether a backbone is importable.
+
+It paid for itself immediately. The two venvs are not the same environment:
+
+| | `.venv-run` | `.venv-forecast` |
+|---|---|---|
+| Python | 3.14.0 | 3.12.13 |
+| pandas | 3.0.5 | **3.0.3** |
+| duckdb | 1.5.5 | **1.5.4** |
+| device | n/a (no torch) | mps |
+
+Two libraries differ between the environments this project runs its numbers in, and
+nothing on any artefact said so before today. `sec:flip` withdrew a specific claim about a
+library upgrade reversing a selection, but its general argument, that an unpinned
+resolution makes a selection unverifiable, is exactly what this table shows was live.
+
+### 7.2 The foundation window widened to 24 folds, and a finding withdrawn
+
+Six folds met the criterion's letter and left it with no dispersion at all. Both scaled
+venues supply 24 folds in full at this horizon and minimum training length, so neither is
+evaluated on fewer than the other. 24 is comfortably above `mcs.BLOCK_LEN`, so the
+bootstrap regains resampling freedom and the intervals are real:
+
+| Venue | folds | foundation MASE | global GBM MASE | Δ [90% CI] |
+|---|---|---|---|---|
+| The Beer Hall | 24 | **0.643** | 0.760 | -0.117 [-0.139, -0.073] |
+| Two River Taps | 24 | **0.595** | 0.811 | -0.216 [-0.361, -0.158] |
+
+**Both CIs exclude zero.** The adoption no longer rests on a bare mean comparison: it is
+supported with dispersion at both venues, which is a materially stronger result than the
+criterion asked for.
+
+**And it withdraws the caveat from section 6.** The Beer Hall's foundation MASE is 0.643 at
+24 folds, not 1.180. The claim that the rung beat the GBM while both stayed worse than
+seasonal-naive was an artefact of which six windows the narrow origin happened to select,
+not a property of the venue. A six-fold mean was not merely imprecise, it pointed the wrong
+way on a qualitative question, and it did so while looking like a clean pass. That is the
+argument for the wider window in one line, and it is the reason the caveat is withdrawn
+rather than quietly dropped.
+
+### 7.3 The ladder aligned to the ruled basis
+
+`evaluate_rolling` hard-coded `calendar_lag7`. It now takes the venue's basis from
+`config.VENUE_SCALE_BASIS`, and for a venue ruled `unscaled` it scores unscaled MAE and
+RMSE rather than dividing by a denominator the estate has ruled indefensible.
+
+The blast radius was checked before anything was changed, because `ingest/refresh.py` uses
+this function to select the SERVED model. **Selection is unchanged at every venue**, under
+both the basis switch and Ellel's move to MAE:
+
+| Venue | best, `calendar_lag7` | best, ruled basis | full ordering |
+|---|---|---|---|
+| Beer Hall | rung1_robust_dow | rung1_robust_dow | identical |
+| Two River Taps | rung2_ets | rung2_ets | identical |
+| Ellel (MASE vs MAE) | rung1_robust_dow | rung1_robust_dow | identical |
+
+Magnitudes move; order does not. Beer Hall 1.267 to 1.021, Two River Taps 0.597 to 0.524,
+Ellel to 74.141 in pounds.
+
+`metrics["MASE"]` was the key every consumer read, including the serving path. Storing
+Ellel's MAE under it would have been the same naming lie corrected in `lovo.py`, so the
+primary value is now keyed by the name of the quantity in it, with `loss` and `basis`
+alongside and a `primary_loss()` accessor reading through them. Twenty read sites updated
+across `ladder.py` and `refresh.py`. `refresh.py` is worth naming: it used
+`metrics.get("MASE", inf)`, which for a venue reporting MAE would have compared `inf`
+against `inf` and silently adopted nothing.
+
+**The published table is the open consequence.** `tab:ladder` and the committed frozen
+tables were computed on `calendar_lag7`: Two River Taps ETS reads 0.597 there and the
+aligned code produces 0.524. The frozen tables are deliberately NOT regenerated, per report
+57's argument that re-running them replaces the decision under audit. Any newly generated
+table now carries a basis note saying so, and the ordering and adopted model are unchanged,
+so no conclusion moves. But the thesis currently quotes magnitudes the code no longer
+reproduces, and that needs a caption stating the basis. Pushing to Overleaf is gated, so it
+is listed as open rather than done.
+
 ## Verification
 
 | Check | Status | Evidence |
@@ -278,6 +369,15 @@ foundation PASS (adopted), overall NOT EVALUABLE governed by the transfer clause
 | No-backbone path byte-identical | PASS | `.venv-run` artefact unchanged but for the gate restructure |
 | Adoption branch covered in every venv | PASS | 5 tests, per-venue comparison stubbed |
 | Suite green after the foundation work | PASS | `.venv-run` 616 passed / 8 skipped; `.venv-forecast` 621 passed / 1 skipped, 0 failed in both |
+| Runtime stamp renders in both venvs | PASS | `.venv-run` and `.venv-forecast` blocks differ as expected |
+| Stamp surfaces a real environment divergence | PASS | pandas 3.0.5 vs 3.0.3, duckdb 1.5.5 vs 1.5.4 |
+| 24 folds restores real dispersion | PASS | both CIs non-degenerate and excluding zero |
+| Wider window overturns the 6-fold reading | PASS | Beer Hall 1.180 at 6 folds, 0.643 at 24 |
+| Ladder basis change moves no selection | PASS | best rung and full ordering identical at all 3 venues |
+| Ellel MAE moves no selection | PASS | MASE and MAE orderings identical |
+| Serving path updated, not left on a stale key | PASS | `refresh.py` reads `primary_loss`, not `metrics["MASE"]` |
+| Frozen ladder tables untouched | PASS | `git status models/` clean but for the module |
+| Suite green after the ladder alignment | PASS | 617 passed, 8 skipped, 0 failed |
 
 ## Files touched
 

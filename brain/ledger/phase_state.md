@@ -1132,3 +1132,40 @@ the per-venue comparison so they run in every venv.
 NOTE: the committed artefact now depends on whether a backbone is importable. It is
 generated from `.venv-forecast` (chronos 2.3.1, torch 2.12.1) and stamps `available: True`.
 Regenerating from `.venv-run` will flip the foundation clause to "PASS (dropped)".
+
+### Three follow-ups (2026-08-01, instructed)
+
+1. **Runtime identity stamped.** New root module `provenance.py` (beside `config.py` /
+   `org_profile.py`) reporting venv, compute device, the seven libraries that have moved a
+   number here, and the store ceiling. Best-effort, never raises. Stamped into the LOVO
+   artefact and the ladder tables. It immediately surfaced that the two venvs differ:
+   pandas 3.0.5 vs 3.0.3, duckdb 1.5.5 vs 1.5.4, Python 3.14 vs 3.12. Nothing on any
+   artefact said so before.
+
+2. **Foundation window widened 6 -> 24 folds** (largest round count both scaled venues
+   supply in full; well above `mcs.BLOCK_LEN` so the bootstrap has resampling freedom).
+   Beer Hall 0.643 vs 0.760, CI [-0.139, -0.073]; TRT 0.595 vs 0.811, CI [-0.361, -0.158].
+   BOTH CIs EXCLUDE ZERO, so the adoption is now supported with dispersion.
+   **This OVERTURNED a finding.** At 6 folds Beer Hall read 1.180, above 1.0, and report 59
+   recorded that the rung beat the GBM while both stayed worse than seasonal-naive. At 24
+   folds it is 0.643. The six-fold mean was not merely imprecise, it pointed the wrong way
+   on a qualitative question while looking like a clean pass. Caveat withdrawn.
+
+3. **`ladder.evaluate_rolling` aligned to `VENUE_SCALE_BASIS`.** Scaled venues now use
+   `calendar_lag7_active`; Ellel (ruled `unscaled`) scores unscaled MAE/RMSE. Verified
+   BEFORE changing anything, because `ingest/refresh.py` selects the SERVED model through
+   this function: selection is IDENTICAL at all three venues under both the basis switch
+   and Ellel's move to MAE. Magnitudes move (BH 1.267->1.021, TRT 0.597->0.524, Ellel
+   ->74.141 GBP), ordering does not. `metrics["MASE"]` replaced by a key named for the
+   quantity in it, plus `loss`/`basis` and a `primary_loss()` accessor; 20 read sites
+   updated across `ladder.py` and `refresh.py`. `refresh.py` had
+   `metrics.get("MASE", inf)`, which for an MAE venue would have compared inf to inf and
+   adopted nothing.
+
+Suite: 617 passed / 8 skipped / 0 failed (`.venv-run`).
+
+OPEN, needs a human call: `tab:ladder` and the committed frozen tables were computed on
+`calendar_lag7` (TRT ETS 0.597); the aligned code produces 0.524. Frozen tables
+deliberately NOT regenerated per report 57. Ordering and adopted model unchanged, so no
+conclusion moves, but the thesis quotes magnitudes the code no longer reproduces and the
+caption needs to state its basis. Overleaf pushes are gated.

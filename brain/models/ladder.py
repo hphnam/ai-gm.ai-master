@@ -41,7 +41,9 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 
+import config
 import org_profile
+import provenance
 from config import (
     ANCHOR_VENUE,
     FORECAST_VENUES,
@@ -402,6 +404,35 @@ def _dispersion(prefix: str, vals: list[float]) -> dict:
     }
 
 
+def _score(y_true, preds, y_scale, basis: str, *, squared: bool = False) -> float:
+    """The venue's own ruler (G2). `basis == "unscaled"` means the estate has ruled that
+    no scaled error is defensible there, so the loss is the unscaled MAE (or RMSE), in
+    currency, and nothing divides by a denominator this venue cannot support."""
+    if basis == "unscaled":
+        err = np.asarray(y_true, float) - np.asarray(preds, float)
+        return float(np.sqrt(np.mean(err ** 2))) if squared else float(np.mean(np.abs(err)))
+    fn = harness.rmsse if squared else harness.mase
+    return fn(y_true, preds, y_scale, basis=basis)
+
+
+def loss_names(venue: str) -> tuple[str, str]:
+    """(primary, secondary) metric names for a venue, e.g. ("MASE", "RMSSE")."""
+    if config.VENUE_SCALE_BASIS[venue] == "unscaled":
+        return "MAE", "RMSE"
+    return "MASE", "RMSSE"
+
+
+def primary_loss(result: "RungResult", default: float = np.nan) -> float:
+    """The rung's primary loss, whichever ruler produced it.
+
+    Reads through `metrics["loss"]` rather than a fixed `"MASE"` key. Before G2 alignment
+    every venue's number was stored under `"MASE"` including Ellel's, which the estate has
+    ruled admits no scaled error; the key is now the name of the quantity actually in it.
+    """
+    m = result.metrics or {}
+    return float(m.get(m.get("loss", "MASE"), default))
+
+
 def evaluate_rolling(
     venue: str = ANCHOR_VENUE, *, n_folds: int | None = 6, horizon: int = 7,
     with_prophet: bool = True, step_days: int | None = None,
@@ -416,6 +447,7 @@ def evaluate_rolling(
     """
     feats = _load_feats(venue)
     cols = feature_columns(feats)
+    basis = config.VENUE_SCALE_BASIS[venue]
     folds = list(harness.rolling_origin(
         feats, n_folds=n_folds, horizon_days=horizon, min_train_days=120,
         step_days=step_days))
@@ -438,8 +470,8 @@ def evaluate_rolling(
                 # wrong windows together without ever erroring.
                 acc.setdefault(name, []).append((
                     i,
-                    harness.mase(yte, preds, ytr, basis="calendar_lag7"),
-                    harness.rmsse(yte, preds, ytr, basis="calendar_lag7"),
+                    _score(yte, preds, ytr, basis),
+                    _score(yte, preds, ytr, basis, squared=True),
                 ))
 
     results = []
@@ -454,9 +486,16 @@ def evaluate_rolling(
         rvals = [r for _, _, r in scored]
         idx = [i for i, _, _ in scored]
         if vals:
+            # The primary value is keyed by the name of the quantity actually in it, so a
+            # venue scored on unscaled MAE cannot be read as reporting a MASE. The
+            # per-fold vectors keep their historical names (S3's bootstrap and
+            # `eval/fold_vectors.py` index them positionally) and carry the venue's
+            # primary loss, whichever it is; `loss` and `basis` say which.
+            primary, secondary = loss_names(venue)
             results.append(RungResult(
                 name, rung,
-                metrics={"MASE": float(np.mean(vals)), "folds": len(vals),
+                metrics={primary: float(np.mean(vals)), "folds": len(vals),
+                         "loss": primary, "secondary_loss": secondary, "basis": basis,
                          "per_fold_mase": vals, "per_fold_rmsse": rvals,
                          "fold_index": idx,
                          **_dispersion("mase", vals),
@@ -473,12 +512,12 @@ def evaluate_rolling(
 
 def _finite(results: list[RungResult]) -> list[RungResult]:
     return [r for r in results if r.available and r.metrics
-            and np.isfinite(r.metrics.get("MASE", np.nan))]
+            and np.isfinite(primary_loss(r))]
 
 
 def select_best(results: list[RungResult]) -> RungResult | None:
     finite = _finite(results)
-    return min(finite, key=lambda r: r.metrics["MASE"]) if finite else None
+    return min(finite, key=primary_loss) if finite else None
 
 
 def milestone(results: list[RungResult], cap: int = 99) -> tuple[bool, dict]:
@@ -492,18 +531,19 @@ def milestone(results: list[RungResult], cap: int = 99) -> tuple[bool, dict]:
         # Capped venue (e.g. Ellel): the ladder stops at Rung 1, so the
         # adoption criterion is "robust DOW (Rung 1) beats seasonal-naive (Rung
         # 0)", there is no higher rung that could beat Rung 1.
-        passed = dow.metrics["MASE"] < naive.metrics["MASE"]
+        passed = primary_loss(dow) < primary_loss(naive)
         gate = "Rung 1 (robust DOW) beats seasonal-naive"
         best = dow
     else:
-        passed = (best.metrics["MASE"] < naive.metrics["MASE"]
-                  and best.metrics["MASE"] < dow.metrics["MASE"])
+        passed = (primary_loss(best) < primary_loss(naive)
+                  and primary_loss(best) < primary_loss(dow))
         gate = "beats seasonal-naive AND robust DOW"
     return passed, {
         "best": best.name,
-        "best_mase": best.metrics["MASE"],
-        "naive_mase": naive.metrics["MASE"],
-        "dow_mase": dow.metrics["MASE"],
+        "best_mase": primary_loss(best),
+        "naive_mase": primary_loss(naive),
+        "dow_mase": primary_loss(dow),
+        "loss": (best.metrics or {}).get("loss", "MASE"),
         "gate": gate,
     }
 
@@ -553,27 +593,27 @@ def _rung4_report_lines(rolling_res: list[RungResult]) -> list[str]:
             provenance + ".\n", "| Entrant | model id | rolling MASE |",
             "|---|---|---|"]
     for r in entrants:
-        mase = f"{r.metrics['MASE']:.3f}" if r.metrics else f"not scored ({r.note})"
+        mase = f"{primary_loss(r):.3f}" if r.metrics else f"not scored ({r.note})"
         head.append(f"| {r.name} | {_RUNG4_MODEL_IDS.get(r.name, '')} | {mase} |")
 
     scored = [r for r in entrants if r.metrics]
     if not scored:
         return head + ["\nRung 4 evaluated zero-shot but not scored on this venue "
                        f"({entrants[0].note})."]
-    best = min(scored, key=lambda r: r.metrics["MASE"])
+    best = min(scored, key=primary_loss)
     best_id = _RUNG4_MODEL_IDS.get(best.name, best.name)
     naive, dow, gbm = (by.get("rung0_seasonal_naive"), by.get("rung1_robust_dow"),
                        by.get("rung3_global_gbm"))
-    m4 = best.metrics["MASE"]
-    adopted = bool(naive and dow and m4 < naive.metrics["MASE"]
-                   and m4 < dow.metrics["MASE"])
-    reason = (f"it beats seasonal-naive ({naive.metrics['MASE']:.3f}) and robust "
-              f"DOW ({dow.metrics['MASE']:.3f}) on held-out rolling MASE" if adopted
+    m4 = primary_loss(best)
+    adopted = bool(naive and dow and m4 < primary_loss(naive)
+                   and m4 < primary_loss(dow))
+    reason = (f"it beats seasonal-naive ({primary_loss(naive):.3f}) and robust "
+              f"DOW ({primary_loss(dow):.3f}) on held-out rolling {dow.metrics.get('loss','MASE')}" if adopted
               else "it does not beat both seasonal-naive and robust DOW on "
               "held-out rolling MASE")
     if gbm and gbm.metrics:
-        beats = "beats" if m4 < gbm.metrics["MASE"] else "does not beat"
-        gbm_txt = (f" It {beats} rung3_global_gbm ({gbm.metrics['MASE']:.3f}), "
+        beats = "beats" if m4 < primary_loss(gbm) else "does not beat"
+        gbm_txt = (f" It {beats} rung3_global_gbm ({primary_loss(gbm):.3f}), "
                    "the Rung-4 adoption criterion.")
     else:
         gbm_txt = " rung3_global_gbm is unavailable on this venue for comparison."
@@ -590,6 +630,7 @@ def _write_report(
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     label = VENUE_LABELS.get(venue, venue)
     cap = MAX_RUNG.get(venue)
+    _primary, _ = loss_names(venue)
     out = [
         f"# A4 · L1 ladder results ({label})\n",
     ]
@@ -612,21 +653,34 @@ def _write_report(
             "listed as 'capped', not silently omitted.\n")
     out += [
         "## Operational regime — rolling-origin, 7-day horizon (the milestone gate)",
-        f"Expanding-window backtest, {n_folds} held-out folds. MASE per fold vs "
-        "in-sample seasonal-naive (m=7), averaged.\n",
-        *_table(rolling_res, ("MASE", "folds")),
+        f"Expanding-window backtest, {n_folds} held-out folds. {_primary} per fold, "
+        "averaged, on the basis the estate rules for this venue "
+        f"(`{config.VENUE_SCALE_BASIS[venue]}`).\n",
+        # The committed tables and `tab:ladder` were produced on `calendar_lag7` before
+        # the G2 alignment. Magnitudes therefore differ from them; the ORDERING and the
+        # adopted model were checked to be identical at all three venues (report 59). A
+        # regenerated table that did not say so would read as contradicting the thesis.
+        "> Basis note: the committed frozen tables and `tab:ladder` were computed on "
+        "`calendar_lag7`. This run uses the ruled basis, so the magnitudes here are not "
+        "comparable to them digit-for-digit. Rung ordering and the adopted model are "
+        "unchanged by the basis at every venue in this estate.\n",
+        *_table(rolling_res, (_primary, "folds")),
         "\n## Static regime — single 8-week held-out block (multi-step from origin)",
         f"Test {split.test['date'].min().date()} → {split.test['date'].max().date()} "
         f"(n={len(split.test)}). A stress test over a long static horizon.\n",
         *_table(static_res, ("MASE", "MAE", "RMSE", "sMAPE")),
         "\n## Milestone (rolling regime)",
         f"- gate: *{info.get('gate', 'beats seasonal-naive AND robust DOW')}*",
-        f"- best model: **{info.get('best')}** (MASE {info.get('best_mase', float('nan')):.3f})",
-        f"- seasonal-naive MASE: {info.get('naive_mase', float('nan')):.3f}",
-        f"- robust-DOW MASE: {info.get('dow_mase', float('nan')):.3f}",
+        f"- best model: **{info.get('best')}** "
+        f"({_primary} {info.get('best_mase', float('nan')):.3f})",
+        f"- seasonal-naive {_primary}: {info.get('naive_mase', float('nan')):.3f}",
+        f"- robust-DOW {_primary}: {info.get('dow_mase', float('nan')):.3f}",
         f"- **gate met: {passed}**\n",
     ]
     out.extend(extra_sections or [])
+    # Rung 4 is scored only when a backbone is importable, so which environment ran is
+    # part of this table's identity, not incidental to it (sec:repro).
+    out.extend(provenance.stamp_lines())
     RESULTS_MD = _report_path(venue)
     RESULTS_MD.write_text("\n".join(out))
     return RESULTS_MD
@@ -712,7 +766,8 @@ def _run_one(venue: str, layer: str) -> bool:
     print("  -- static (8-week block) --")
     for r in sorted(static_res, key=lambda x: (x.rung, x.name)):
         if r.metrics:
-            print(f"    [{r.rung}] {r.name:22s} MASE={r.metrics['MASE']:.3f}")
+            print(f"    [{r.rung}] {r.name:22s} "
+                  f"{r.metrics.get('loss','MASE')}={primary_loss(r):.3f}")
         else:
             print(f"    [{r.rung}] {r.name:22s} skipped — {r.note}")
 
@@ -720,7 +775,8 @@ def _run_one(venue: str, layer: str) -> bool:
     print(f"  -- rolling (7-day, {n_folds} folds) [milestone gate] --")
     for r in sorted(rolling_res, key=lambda x: (x.rung, x.name)):
         if r.metrics:
-            print(f"    [{r.rung}] {r.name:22s} MASE={r.metrics['MASE']:.3f} "
+            print(f"    [{r.rung}] {r.name:22s} "
+                  f"{r.metrics.get('loss','MASE')}={primary_loss(r):.3f} "
                   f"(folds={r.metrics.get('folds')})")
         else:
             print(f"    [{r.rung}] {r.name:22s} skipped — {r.note}")

@@ -22,9 +22,12 @@ estate-level claim is therefore withdrawn on grounds of an inadmissible evidence
 rather than failed on evidence; the per-venue rows stand individually. Regaining the gate
 needs a third venue that admits a scaled error.
 
-Note also that the foundation clause passes only while no backbone is importable. With
-one present, `_foundation_ablation` returns an instruction and no `beats_global_gbm` key,
-so the zero-shot-vs-global-GBM comparison it names has never been implemented.
+The foundation clause is evaluated rather than assumed. Until report 59 the branch that
+fires when a backbone IS importable returned an instruction string and no
+`beats_global_gbm` key, so the clause passed only while no backbone was installed;
+`_foundation_adoption` now runs the zero-shot-vs-global-GBM comparison the gate names.
+Because that verdict depends on what is installed, the artefact stamps its runtime
+identity (`provenance.stamp_lines`).
 
 All cross-venue work is on VAT-corrected ex-VAT revenue (TRT deflated by 1/1.2).
 
@@ -41,6 +44,7 @@ import numpy as np
 import pandas as pd
 
 import config
+import provenance
 from config import FORECAST_VENUES, REPORT_ROOT, VENUE_LABELS
 from eval import harness, mcs
 from features.build_features import build_features, feature_columns
@@ -168,7 +172,13 @@ def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
     }
 
 
-FOUNDATION_FOLDS = 6
+# 24, not the ladder's 6. Six folds met the criterion's letter but left the comparison
+# with no dispersion at all: at or below `mcs.BLOCK_LEN` the moving-block bootstrap has no
+# resampling freedom and the interval collapses to a point mass (report 59). 24 is the
+# largest round count both scaled venues supply in full at this horizon and minimum
+# training length, so neither venue is silently evaluated on fewer folds than the other.
+# The adoption criterion itself is unchanged; only the evidence behind it is thicker.
+FOUNDATION_FOLDS = 24
 FOUNDATION_HORIZON = 7
 FOUNDATION_MIN_TRAIN = 120
 
@@ -555,6 +565,10 @@ def _write_report(out: dict, passed: bool) -> None:
         f"- **Foundation clause: {_foundation_clause(out['foundation'])}**",
         f"\nOverall: **{'PASS' if passed else 'NOT EVALUABLE'}**, governed by the "
         "transfer clause.",
+        # The foundation clause reads differently depending on whether a backbone is
+        # importable, so this artefact is not identified by its command and store ceiling
+        # alone. Stamping the environment is what lets a reader tell the two runs apart.
+        *provenance.stamp_lines(),
     ]
     RESULTS_MD.write_text("\n".join(lines))
 

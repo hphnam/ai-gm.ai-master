@@ -33,16 +33,14 @@ The partial-pooling story this sweep was built to tell is that transfer wins whi
 
 ## Foundation-model rung (adoption by held-out rolling MASE)
 - available: True
-- ADOPTED: zero-shot chronos against the global GBM on held-out rolling MASE, The Beer Hall 1.180 vs 1.250 over 6 folds; Two River Taps 0.559 vs 0.641 over 6 folds. Scored only where a scaled error is defensible (G2), and adoption requires winning at every such venue.
+- ADOPTED: zero-shot chronos against the global GBM on held-out rolling MASE, The Beer Hall 0.643 vs 0.760 over 24 folds; Two River Taps 0.595 vs 0.811 over 24 folds. Scored only where a scaled error is defensible (G2), and adoption requires winning at every such venue.
 
-Zero-shot chronos against the global GBM, rolling origin, 6 folds at horizon 7, paired within fold. Scored only where a scaled error is defensible (G2); adoption requires a win at every such venue.
+Zero-shot chronos against the global GBM, rolling origin, 24 folds at horizon 7, paired within fold. Scored only where a scaled error is defensible (G2); adoption requires a win at every such venue.
 
 | Venue | folds | dropped | foundation MASE | global GBM MASE | Δ [90% CI] |
 |---|---|---|---|---|---|
-| The Beer Hall | 6 | 0 | 1.180 | 1.250 | no dispersion |
-| Two River Taps | 6 | 0 | 0.559 | 0.641 | no dispersion |
-
-**No confidence interval is quoted, and the adoption rests on the mean comparison alone.** At 6 folds against a block length of 7 the moving-block bootstrap has no resampling freedom, so a percentile interval would collapse to a point mass at the observed mean and read as infinitely precise. That is reported as absent rather than quoted. The criterion this gate names is the mean held-out rolling MASE comparison, which is met; a dispersion-aware version of the criterion would need a denser rolling origin than the ladder's committed 6-fold configuration and is not claimed here.
+| The Beer Hall | 24 | 0 | 0.643 | 0.760 | -0.117 [-0.139, -0.073] |
+| Two River Taps | 24 | 0 | 0.595 | 0.811 | -0.216 [-0.361, -0.158] |
 
 ## In-context fine-tuning (Das et al. 2025) — forward note
 The shape-transfer here is the hand-built analogue of conditioning a held-out venue on the donor's shape. A foundation backbone with in-context fine-tuning would condition on the donor series directly; the LOVO harness above is exactly the test it must pass to be adopted.
@@ -54,3 +52,9 @@ Two clauses, reported separately so neither can carry the other:
 - **Foundation clause: PASS (adopted). Zero-shot chronos beats the global GBM on held-out rolling MASE at every venue admitting a scaled error.**
 
 Overall: **NOT EVALUABLE**, governed by the transfer clause.
+
+## Runtime identity
+- environment: `.venv-forecast` · Python 3.12.13 · Darwin arm64
+- compute device: mps
+- libraries: numpy 2.5.1, pandas 3.0.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.4, torch 2.12.1, chronos-forecasting 2.3.1
+- store ceiling: 2026-07-07

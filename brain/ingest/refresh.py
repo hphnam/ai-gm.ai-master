@@ -306,10 +306,13 @@ def _refit_ladder(venue: str, reason: str, layer: str = "L1") -> dict:
     dow = by_name.get("rung1_robust_dow")
     adopted = bool(
         best is not None and naive is not None and dow is not None
-        and best.metrics.get("MASE", float("inf")) < naive.metrics.get("MASE", float("inf"))
-        and best.metrics.get("MASE", float("inf")) < dow.metrics.get("MASE", float("inf")))
-    new_mase = float(best.metrics["MASE"]) if best is not None else None
-    old_mase = float(naive.metrics["MASE"]) if naive is not None else None
+        and ladder.primary_loss(best, float("inf")) < ladder.primary_loss(naive, float("inf"))
+        and ladder.primary_loss(best, float("inf")) < ladder.primary_loss(dow, float("inf")))
+    # `primary_loss`, not a fixed "MASE" key: under G2 a venue the estate has ruled
+    # admits no scaled error (Ellel) reports unscaled MAE, and reading a missing "MASE"
+    # key here would have silently compared inf against inf and adopted nothing.
+    new_mase = ladder.primary_loss(best) if best is not None else None
+    old_mase = ladder.primary_loss(naive) if naive is not None else None
     # G12.9b: surface the winner's per-fold MASE vector (not just its mean), so a
     # win concentrated in a single fold is visible in the audit row, not hidden.
     per_fold_mase = (json.dumps(best.metrics["per_fold_mase"])

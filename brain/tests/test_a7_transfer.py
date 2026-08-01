@@ -131,6 +131,13 @@ def test_a_sample_above_the_block_length_still_yields_a_confidence_interval():
     assert d["ci90"][0] < d["ci90"][1]
 
 
+def test_the_foundation_fold_count_leaves_the_bootstrap_room_to_resample():
+    """Six folds met the criterion but left it with no dispersion at all. If this drops
+    back to the block length the CI silently vanishes again, so the relationship is
+    pinned rather than left to a constant nobody rereads."""
+    assert lovo.FOUNDATION_FOLDS > mcs.BLOCK_LEN
+
+
 def test_the_unscaled_venue_is_never_scored_by_the_foundation_criterion(monkeypatch):
     seen = []
     monkeypatch.setattr(lovo, "_foundation_vs_global_gbm",
