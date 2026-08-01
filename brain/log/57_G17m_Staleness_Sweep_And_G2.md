@@ -16,7 +16,7 @@ seed, which ends **2026-05-31**, silently dropping the aggregate-ingested June a
 July rows. A store restored from an old backup looks perfectly healthy and is five weeks
 short. Anything generated in that window carries a 2026-05-31 ceiling.
 
-## Result: 5 genuinely stale, 5 reproduce, 3 excluded by design, 1 crashed
+## Result: 5 genuinely stale, 6 reproduce, 3 excluded by design, 1 false positive
 
 | Artefact | Verdict |
 |---|---|
@@ -32,7 +32,7 @@ short. Anything generated in that window carries a 2026-05-31 ceiling.
 | `eval/weather_basis.md` | reproduces |
 | `signals/checklist_discipline.md` | reproduces |
 | `signals/chatlog_kb_gap.md` | **not stale** - a CLI default, see below |
-| `signals/weather_diagnostic.md` | **crashed**, real regression; crash fixed, artefact regeneration still running |
+| `signals/weather_diagnostic.md` | generator **crashed**; fixed, and the artefact then reproduced exactly |
 | `models/ladder_results_L1_*.md` | frozen by design, deliberately NOT re-run |
 | `eval/chronos2_*.md` | blocked, no torch in this environment |
 | `sim/*_frozen.md` | frozen by name |
@@ -70,11 +70,16 @@ four call sites in `weather_diagnostic.py` still unpacked two. The module has be
 since that commit and nobody noticed, because its artefact was never regenerated. Fixed at
 all four sites.
 
-**Status, stated precisely.** The crash is fixed: the module now runs for over thirty
-minutes, far past the line it previously died on within seconds. Its artefact has NOT yet
-been regenerated, because the run had not completed when this report was written. So
-`signals/weather_diagnostic.md` remains stale and is the one artefact this sweep did not
-finish. It is a diagnostic and is referenced by neither chapter.
+**Resolved, and the fix is verified in the strongest available way.** The run completed
+(`A14b RESULT: PASS`, ~40 minutes) and `signals/weather_diagnostic.md` came back
+**byte-identical to the committed file**. That is worth more than a green exit: it shows
+the repair restored the previous behaviour exactly rather than merely making the module
+terminate. The artefact was never stale; only its generator was broken.
+
+An earlier draft of this report recorded this artefact as unfinished and still stale, and
+that has been corrected here. A first check appeared to confirm it was unchanged, but the
+shell had been reset to the repository root so the path did not exist and git dutifully
+reported nothing; re-checked from `brain/`, the file is present and genuinely identical.
 
 This is the argument for the sweep in one line: a stale artefact hides a broken generator.
 
@@ -148,8 +153,7 @@ and pool only the two scaled venues, stating the reduced pool.
 | No published number affected | PASS | every moved figure absent from results.tex |
 | G2 refactor changes no behaviour | PASS | both artefacts byte-identical after it |
 | chatlog is a CLI default, not staleness | PASS | `--top 12` reproduces the committed file |
-| weather_diagnostic crash fixed | PASS | runs 30+ min, past the line it died on in seconds |
-| weather_diagnostic artefact | INCOMPLETE | run had not finished; artefact still stale |
+| weather_diagnostic crash fixed | PASS | run completes; artefact byte-identical to committed |
 | Ladder correctly excluded | PASS | chapter frames it as the committed gate under audit |
 | Every cite key resolves | PASS | `hewamalage_look_2021` present, 113 entries |
 | No dangling cross-references | PASS | mechanical label/ref diff over both chapters |

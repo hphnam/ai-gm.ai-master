@@ -924,8 +924,12 @@ checked against the live results chapter and none appears there.
   record showing nothing.
 - **A real regression found only by regenerating**: `signals/weather_diagnostic.py` had
   been crashing since report 54's M24 change (`_eval_cols` gained a third return value,
-  four call sites still unpacked two). Crash fixed; its artefact regeneration was still
-  running at write-up, so that one artefact remains stale.
+  four call sites still unpacked two). Fixed, and the run then reproduced the committed
+  artefact BYTE-IDENTICALLY, which verifies the repair restored prior behaviour rather
+  than merely making the module terminate. The artefact was never stale; the generator
+  was broken. (An earlier draft recorded this as unfinished; a first check had been run
+  from the repo root, where the path does not exist, so git reported no diff on a file it
+  could not see.)
 - **One false positive kept honest**: `chatlog_kb_gap.md` was not stale, only produced at
   `--top 12` versus the default 5. Regenerating at the default would have silently
   truncated a committed artefact under the banner of fixing staleness.
@@ -946,5 +950,4 @@ Breiman, Olshen, Stone or CART entry. The one-standard-error rule stays in prose
   Unpublished, so nothing is retracted, but fixing it means deciding what a pooled
   cross-venue statistic means when one venue admits no scale. Recommendation on file.
 - `eval/chronos2_*` unverified against the restored warehouse: no torch here.
-- `signals/weather_diagnostic.md` regeneration.
 - G3's ECE run, parked by instruction.
