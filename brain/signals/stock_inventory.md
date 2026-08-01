@@ -7,7 +7,7 @@ Reorder rule: `days_of_cover < lead(3) + safety(2)` days (FLAG-3); order target 
 ## Days-of-cover (core keg/cask lines mapped to a forecast A6 node)
 | Product | L1 | On-hand kegs | On-hand pints | Forecast pints/day | Days cover | Reorder | Suggest kegs | A6 node |
 |---|---|---|---|---|---|---|---|---|
-| lunebrew caravan of love | Draught | 0.0 | 0 | 5.32 | **0.0** | ⚠ YES | 1 | Caravan of Love |
+| lunebrew caravan of love | Draught | 0.0 | 0 | 5.22 | **0.0** | ⚠ YES | 1 | Caravan of Love |
 
 1 of 14 core keg/cask lines map to a forecast A6 node; the other 13 carry **NULL demand** (no single sales item maps to that brand, or it is not in A6's top-k node set) — surfaced as on-hand only, never a guessed cover. This is the honest scope: the cover signal is exact where demand is known and silent where it is not.
 

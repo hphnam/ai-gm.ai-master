@@ -163,8 +163,10 @@ def test_a_l2(climo, top_k: int = 3) -> list[dict]:
             continue
         feats = _series_features(ser, ANCHOR, climo)
         base = _base_cols(feats)
-        b_mase, b_cov = _eval_cols(feats, base)
-        w_mase, w_cov = _eval_cols(feats, base + _WX)
+        # `_eval_cols` returns a per-fold vector as its third value (report 54, M24);
+        # this diagnostic reports means only and discards it.
+        b_mase, b_cov, _ = _eval_cols(feats, base)
+        w_mase, w_cov, _ = _eval_cols(feats, base + _WX)
         gain = (b_mase - w_mase) / b_mase if np.isfinite(w_mase) and b_mase else 0.0
         rows.append({"series": name, "n": n, "skipped": False,
                      "base_mase": b_mase, "wx_mase": w_mase, "gain_pct": gain * 100,
@@ -185,9 +187,9 @@ def test_b(climo) -> dict:
                         ("temp_anomaly", ["exo_temp_anomaly"]),
                         ("garden+anomaly", _WX_B)):
         cand = [c for c in cols if feats[c].notna().any()]
-        m, c = _eval_cols(feats, base + cand)
+        m, c, _ = _eval_cols(feats, base + cand)
         out[label] = {"mase": m, "cov": c}
-    b_mase, _ = _eval_cols(feats, base)
+    b_mase, _, _ = _eval_cols(feats, base)
     out["_baseline"] = b_mase
     return out
 

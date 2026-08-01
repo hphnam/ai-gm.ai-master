@@ -4,7 +4,10 @@
   "n_assistant_replies": 359,
   "failure_rate": 0.1894150417827298,
   "failure_baseline": 0.189,
-  "span": ["2026-04-29 10:33:46", "2026-06-12 08:49:34"],
+  "span": [
+    "2026-04-29 10:33:46",
+    "2026-06-12 08:49:34"
+  ],
   "n_clusters": 12,
   "n_gaps": 4,
   "gaps": [
@@ -66,7 +69,10 @@
         "estate": 6
       },
       "onset_date": "2026-04-29",
-      "examples": ["How do I open up?", "How do I open the bar?"]
+      "examples": [
+        "How do I open up?",
+        "How do I open the bar?"
+      ]
     }
   ]
 }

@@ -69,10 +69,10 @@ G3_VENUES = ("beer_hall", "ellel", "two_river_taps")
 CLOSURE_ZERO_VENUE = "two_river_taps"
 
 # Basis + loss per venue (S4 / G4). Ellel gets no MASE; its loss is unscaled MAE.
-VENUE_BASIS = {"beer_hall": "calendar_lag7_active",
-               "two_river_taps": "calendar_lag7_active",
-               "ellel": "unscaled"}
-VENUE_LOSS = {"beer_hall": "mase", "two_river_taps": "mase", "ellel": "mae"}
+# G2 lives in config, not here: this was one of two private copies that could
+# drift apart. Aliased rather than renamed so the call sites read unchanged.
+VENUE_BASIS = config.VENUE_SCALE_BASIS
+VENUE_LOSS = config.VENUE_LOSS
 # The arms each venue participates in.
 VENUE_ARMS = {"beer_hall": ("U", "G2", "G3"),
               "ellel": ("U", "G2", "G3"),

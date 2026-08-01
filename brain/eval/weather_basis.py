@@ -80,10 +80,10 @@ FIXED_LEAD = config.WEATHER_LEAD_DAYS    # 3, the stock operational reorder lead
 
 ARMS = ("N", "O", "H", "F", "M")
 VENUES = ("beer_hall", "ellel", "two_river_taps")
-VENUE_BASIS = {"beer_hall": "calendar_lag7_active",
-               "two_river_taps": "calendar_lag7_active",
-               "ellel": "unscaled"}
-VENUE_LOSS = {"beer_hall": "mase", "two_river_taps": "mase", "ellel": "mae"}
+# G2 lives in config, not here: this was one of two private copies that could
+# drift apart. Aliased rather than renamed so the call sites read unchanged.
+VENUE_BASIS = config.VENUE_SCALE_BASIS
+VENUE_LOSS = config.VENUE_LOSS
 
 
 # --- Frames and folds --------------------------------------------------------

@@ -51,7 +51,7 @@ guarantee quietly · **LOW** = immaterial, or a documented deliberate departure.
 | M10 | Model Confidence Set (Hansen, Lunde & Nason 2011) | LOW — **CLOSED** 2026-08-01: verified faithful, recommended action was None |
 | M11 | Croston (1972) / SBA (Syntetos & Boylan 2005) recursions | LOW — **CLOSED** 2026-07-31: run against statsforecast 2.1.1 on 3.12, max diff 1.3e-15 |
 | M12 | ACI (Gibbs & Candès 2021) | LOW — **CLOSED** 2026-08-01: verified faithful, recommended action was None |
-| M13 | MASE (Hyndman & Koehler 2006) and the `calendar_lag7_active` basis | LOW — **CARRIED INTO G2** 2026-08-01: no independent action; the basis choice is the G2 decision |
+| M13 | MASE (Hyndman & Koehler 2006) and the `calendar_lag7_active` basis | LOW — **CLOSED** 2026-08-01 with G2: decision was already written in `sec:res-basis`; enforcement hoisted to `config.VENUE_SCALE_BASIS` |
 | M14 | Basis-matched RMSSE | LOW — **CLOSED** 2026-08-01: departure stated wherever the number appears; action was None |
 | M15 | Winkler / interval score, Clopper-Pearson, Angelopoulos-Bates bound | LOW — all exact |
 | M16 | ECE (Guo et al. 2017) | LOW — **CLOSED** 2026-07-31: temperature scaling implemented |
@@ -1166,3 +1166,30 @@ for are already present:
   beyond the baseline's features.
 
 No edit made. The ledger row had simply not been updated when the prose was written.
+
+## Resolution · G2 and M13 — 2026-08-01 (report 57)
+
+**The decision was never actually open.** `sec:res-basis` already states it, with evidence:
+Ellel's four scaled bases give bootstrap interval widths of 52.5, 45.2, 42.2 and 65.6 per
+cent, and the two trading bases reach back nearly six weeks so the denominator inflates to
+about 800 and the induced MASE collapses to about 0.09. The chapter's conclusion is "a
+change of instrument rather than a change of basis", with Ellel on unscaled error and the
+Winkler score, supported by `chatfield_all-zero_2007`. Verified by reading the live
+Overleaf file, not assumed. Same failure mode as M22: prose written, ledger row not closed.
+
+**What was open was enforcement.** The decision existed as a private dict repeated verbatim
+in `eval/group_icl.py` and `eval/weather_basis.py` — the exact defect the methodology
+chapter condemns for the MASE denominator ("four separate private copies of the
+denominator, none of which recorded which reading it used"). Now
+`config.VENUE_SCALE_BASIS` / `config.VENUE_LOSS` / `config.is_scaled_venue`, with the
+reasoning stated where the constant lives. Both modules read it, and both artefacts
+regenerate BYTE-IDENTICAL, so the refactor changed no behaviour.
+
+**Two unpublished violations, left as they stand.** `transfer/lovo.py` scores Ellel on
+`calendar_lag7` MASE and pools all three venues into one statistic; under G2 that is two
+faults, since Ellel admits no scaled error and a pooled MASE is meaningful only where MASE
+is. `eval/worldcup_fixture_probe.py` does the same and writes no artefact at all. Neither
+appears in either chapter, so nothing is retracted. Fixing `lovo.py` requires deciding what
+a pooled cross-venue statistic means when one venue admits no scale, which is a methodology
+decision and not a bug fix. Recommendation on file: report Ellel separately on unscaled MAE
+and pool only the two scaled venues, stating the reduced pool.

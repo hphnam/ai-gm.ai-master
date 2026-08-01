@@ -135,6 +135,42 @@ MAX_RUNG: dict[str, int] = {}
 # None of these three touch which forecasting rung is served.
 EVENT_ONLY_VENUES = frozenset({"ellel"})
 
+# --- G2: which ruler each venue is scored on -------------------------------
+#
+# The single source of truth for the S4/G2 decision. It was previously repeated
+# as a private dict in `eval/group_icl.py` and again in `eval/weather_basis.py`,
+# which is the same defect the MASE denominator itself had before it was
+# consolidated: a policy held in several private copies drifts, and a study that
+# forgets to copy it silently scores a venue on a ruler the estate has already
+# rejected.
+#
+# Ellel trades ~1.2 days a week. Every scaled basis fails there, in one of two
+# ways: the active basis rests on 28 admissible pairs, and the trading bases
+# reach back nearly six weeks so the denominator inflates to ~800 and the induced
+# MASE collapses to ~0.09, a spuriously near-perfect score. So Ellel is scored on
+# UNSCALED error, not on a different scaled basis. Chatfield and Hayya (2007)
+# reach the same place from the other direction: on sufficiently lumpy demand the
+# lowest forecast error does not deliver the lowest system cost, so error is the
+# wrong thing to optimise at all.
+#
+# `VENUE_SCALE_BASIS[v] == "unscaled"` means no MASE/RMSSE may be reported for v.
+VENUE_SCALE_BASIS: dict[str, str] = {
+    "beer_hall": "calendar_lag7_active",
+    "two_river_taps": "calendar_lag7_active",
+    "ellel": "unscaled",
+}
+VENUE_LOSS: dict[str, str] = {
+    "beer_hall": "mase",
+    "two_river_taps": "mase",
+    "ellel": "mae",
+}
+
+
+def is_scaled_venue(venue: str) -> bool:
+    """False where the estate has ruled that no scaled error is defensible."""
+    return VENUE_SCALE_BASIS.get(venue, "calendar_lag7_active") != "unscaled"
+
+
 # Expected per-venue line-item counts (the profiled audit figures). A0 asserts
 # the ingest reconciles to these within a small tolerance.
 EXPECTED_ROW_COUNTS: dict[str, int] = {

@@ -901,3 +901,50 @@ markdown. Both chapters currently clean on all three.
 - The artefact staleness sweep against the restored warehouse. A5's failing gate was found
   by accident and the sweep has not been done. Highest-value unstarted work.
 - G3's ECE run needs `ANTHROPIC_API_KEY`.
+
+## Session 9 addendum 2 — 2026-08-01 — G17m: staleness sweep and G2
+
+**G2 CLOSED, and M13 with it.** The decision was never actually open: `sec:res-basis`
+already states it with evidence (Ellel's four bases give bootstrap widths 52.5/45.2/42.2/
+65.6 per cent; the trading bases induce a spurious MASE of ~0.09) and cites
+`chatfield_all-zero_2007`. Same failure mode as M22 — prose written, row not closed.
+What WAS open was enforcement: the decision lived as a private dict duplicated in
+`eval/group_icl.py` and `eval/weather_basis.py`. Hoisted to `config.VENUE_SCALE_BASIS` /
+`VENUE_LOSS` / `is_scaled_venue`; both artefacts regenerate byte-identical, so no behaviour
+changed.
+
+**Staleness sweep done.** 5 artefacts genuinely stale, 5 reproduce, 3 excluded by design,
+1 crashed, 1 false positive. **No published number affected** — every moved figure was
+checked against the live results chapter and none appears there.
+
+- **Two River Taps reproduces byte-for-byte**, which is the control that makes the
+  diagnosis stick: the movement is recovered history, not a code regression.
+- **The briefing was the worst**: committed as `as_of 2026-05-31`, 0 items, "quiet day
+  nothing above threshold". Actually 11 continuing items. The flagship deliverable was on
+  record showing nothing.
+- **A real regression found only by regenerating**: `signals/weather_diagnostic.py` had
+  been crashing since report 54's M24 change (`_eval_cols` gained a third return value,
+  four call sites still unpacked two). Crash fixed; its artefact regeneration was still
+  running at write-up, so that one artefact remains stale.
+- **One false positive kept honest**: `chatlog_kb_gap.md` was not stale, only produced at
+  `--top 12` versus the default 5. Regenerating at the default would have silently
+  truncated a committed artefact under the banner of fixing staleness.
+- **The ladder was deliberately NOT re-run.** `tab:ladder` is the committed gate the
+  chapter audits; re-running would replace the decision under audit, and this environment
+  has no torch so rung 4 would be destroyed. Instead its caption now names its own per-venue
+  ceiling, closing a real gap against the chapter's blanket "2026-07-07 unless stated".
+
+**Citations.** `hewamalage_look_2021` now exists and is cited in the M8 paragraph, with a
+sentence noting the source is a stability critique of the M5 setup, which strengthens the
+project's practice of reporting a scaled error alongside an unscaled proper score.
+**`breiman_classification_1984` was NOT added** — `ref.bib` has 113 entries and contains no
+Breiman, Olshen, Stone or CART entry. The one-standard-error rule stays in prose.
+
+**Open.**
+- Breiman key still absent; add it and the `\citet` becomes a one-line follow-up.
+- `transfer/lovo.py` scores Ellel on MASE and pools all three venues, violating G2 twice.
+  Unpublished, so nothing is retracted, but fixing it means deciding what a pooled
+  cross-venue statistic means when one venue admits no scale. Recommendation on file.
+- `eval/chronos2_*` unverified against the restored warehouse: no torch here.
+- `signals/weather_diagnostic.md` regeneration.
+- G3's ECE run, parked by instruction.

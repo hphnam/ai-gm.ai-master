@@ -11,6 +11,13 @@ Selected forecaster: **rung2_ets**. Validation: online rolling-origin split conf
 | plain | 90% | 95.0% | 639 | 794 | 20 | False |
 | mondrian | 90% | 95.7% | 542 | 676 | 17 | False |
 
+**Where the guarantee lapses.** Split conformal needs at least `level/(1-level)` calibration points before the requested level is even attainable; below that the correct band is infinite and `conformal_quantile` clamps to the largest observed residual instead. The clamp keeps the band usable but it carries no coverage guarantee, and the group-conditional bands are where a sparse group can hit it, so the count is reported rather than left silent:
+
+| Level | Min calibration n | Group bands issued | Of which clamped |
+|---|---|---|---|
+| 80% | 4 | 42 | 0 |
+| 90% | 9 | 42 | 0 |
+
 **Deliverable:** the Mondrian band (group-conditional on active vs structural-zero day) is persisted to DuckDB (`bands`/`forecasts`, model `conformal_rung2_ets`) and is the input to Objective 2 — *a deviation is an observation outside this band*.
 
 **Note:** this venue misses the ±3pp band on the *conservative* (over-coverage) side — the band is wider than nominal, not narrower. Over-coverage is split conformal's safe failure mode and is expected with the smaller calibration set of a closed/sparse venue; the band is still valid (coverage ≥ nominal). The Beer Hall (the Objective-1 deliverable) meets the strict two-sided gate.

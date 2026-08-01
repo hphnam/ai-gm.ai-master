@@ -8,7 +8,8 @@ A confirmed shift sets `recalibration_needed=TRUE`: the learned 'normal' (DOW ba
 ## Detected change points
 | Venue | Onset | Detected | Δdays | Dir | Mag (band/%) | Detector | Sev | Attribution (top) |
 |---|---|---|---|---|---|---|---|---|
-| The Beer Hall | 2025-12-27 | 2026-01-03 | 7 | down | -0.68 / -29% | persistence | medium | coincides with a cold snap (~6°C vs 13°C avg) |
+| The Beer Hall | 2025-12-27 | 2026-01-03 | 7 | down | -0.68 / -29% | persistence | medium | coincides with a cold snap (~6°C vs 11°C avg) |
+| The Beer Hall | 2026-05-28 | 2026-06-13 | 16 | up | +1.02 / +87% | cusum | medium | coincides with a school term↔holiday transition |
 | Two River Taps | 2025-11-01 | 2026-01-03 | 63 | down | -0.58 / -26% | cusum | low | coincides with a school term↔holiday transition |
 | Two River Taps | 2026-05-08 | 2026-05-16 | 8 | down | -1.12 / -71% | both | medium | coincides with Two River Taps's closure (structural break) |
 
