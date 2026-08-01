@@ -36,7 +36,7 @@ short. Anything generated in that window carries a 2026-05-31 ceiling.
 | `models/ladder_results_L1_*.md` | frozen by design, deliberately NOT re-run |
 | `eval/chronos2_*.md` | blocked, no torch in this environment |
 | `sim/*_frozen.md` | frozen by name |
-| `eval/deviation_eval.md` | orphaned, its module no longer exists |
+| `eval/deviation_eval.md` | **WRONG on both clauses**; corrected by report 59 |
 
 **No published number is affected.** Every figure that moved was checked against the live
 results chapter and none of them appears there: the change-point recalls, the ACI closure
@@ -179,6 +179,17 @@ and pool only the two scaled venues, stating the reduced pool.
   (`signals/briefing.md` was listed here in error and was NOT regenerated; see the
   correction above and report 58)
 - Overleaf: `tab:ladder` caption, M8 paragraph now cites `hewamalage_look_2021`
+
+## Correction to the `deviation_eval.md` row
+
+The table above recorded that artefact as "orphaned, its module no longer exists". **Both
+clauses are false.** `signals/deviation.py` exists, is executable, documents
+`python -m signals.deviation` in its own docstring, and writes the artefact at its
+`_write_report`. Nothing was orphaned. The row was never verified against the module before
+it was written, and it is the reason the artefact went a further sweep without being
+regenerated. Report 59 regenerates it from that entrypoint; it was genuinely stale, at the
+seed ceiling, for the artefact-leak reason report 58 identified rather than the reason given
+here.
 
 ## Open
 

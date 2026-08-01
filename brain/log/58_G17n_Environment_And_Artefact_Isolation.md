@@ -205,6 +205,15 @@ committed artefact is a trap, not a preference.
   from its real entrypoint and neither is verified. Report 57 separately recorded
   `deviation_eval.md` as orphaned, which is inconsistent with the suite writing it, and
   that inconsistency is unresolved.
+
+  **Both resolved by report 59, and the sentence above is half wrong.** `deviation_eval.md`
+  was indeed test output and is now regenerated (2026-05-31 to 2026-07-07). But
+  `judge_prompts.md` reproduces **byte-identical** from its real entrypoint: its corpus is
+  pinned to 2026-05-31 by `config.AGENT_EVAL_STREAM_CEILING`, deliberately, so the
+  injection oracle cannot slide into the live World Cup. The suite could overwrite it and
+  the committed content still be correct, because the pin makes the output independent of
+  the store ceiling. "Overwritten by the suite" and "wrong" are separate properties, and
+  this report conflated them. Report 57's "orphaned" claim is false and corrected there.
 - The methodology chapter's header comment still lists cite keys against "the live ref.bib
   (111 entries)" and names neither `hewamalage_look_2021` nor `breiman_classification_1984`.
   It sits outside any section, so `write_section` cannot reach it and correcting it needs a

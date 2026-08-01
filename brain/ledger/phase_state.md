@@ -1041,3 +1041,38 @@ file excludes, and nothing else.
 - **Gate: `lovo.py`'s pooled statistic** under G2, unchanged, recommendation on file.
 - `eval/chronos2_*` now runnable (torch present) but not re-run against the warehouse.
 - G3's ECE run, parked by instruction.
+
+## Session 9 addendum 4 (2026-08-01) - G17o
+
+Phase: artefact provenance closed, LOVO audited. Report
+`log/59_G17o_Artefact_Provenance_And_The_LOVO_Audit.md`.
+
+Completed:
+- `eval/deviation_eval.md` regenerated from `python -m signals.deviation` at ceiling
+  2026-07-07. Was test output at the seed ceiling; the committed copy had Ellel at
+  z +6.22 "deviation up" on 2026-05-16, which is gone at the true ceiling.
+- `eval/judge_prompts.md` regenerated from `python -m eval.judge`, byte-identical. It was
+  never stale: the corpus is pinned by `config.AGENT_EVAL_STREAM_CEILING` so the injection
+  oracle cannot slide into the live World Cup. Offline emit-prompts seam, no live calls.
+- Report 57's "deviation_eval.md orphaned, its module no longer exists" corrected. Both
+  clauses false; `signals/deviation.py` exists and owns the artefact.
+- Report 58's "both committed copies are test output" corrected. True of one, not the other.
+- LOVO audited. Confirmed unpublished in both live chapters (five search terms, zero hits).
+
+Artefacts written: `eval/deviation_eval.md`, `log/59_*.md`; corrections in `log/57_*.md`
+and `log/58_*.md`.
+
+Unstarted / open:
+- **Gate: `lovo.py` pooled statistic under G2.** Ellel on `calendar_lag7` plus a pooled
+  MASE. Pooled headline is ALREADY null (-0.119 MASE, 90% CI [-0.242, +0.036]), so no
+  positive claim is retracted; what changes is the 2-of-3 tally and the crossover table.
+- **Gate: `lovo.py` foundation rung (NEW).** The gate's PASS was contingent on torch being
+  absent. With chronos present `foundation_ok` evaluates False, because the
+  `available: True` branch returns an instruction and no `beats_global_gbm` key. The
+  zero-shot-vs-global-GBM evaluation was never implemented. Committed PASS not reliable.
+- Two River Taps reports a post-closure trading day (2026-07-05, actual 0.0) in the
+  deviation stream. Pre-existing, recorded not repaired.
+- `signals/deviation.py` writes without `mkdir(parents=True)`; `eval/judge.py` does one.
+- `eval/worldcup_fixture_probe.py` still scores Ellel on `calendar_lag7`.
+- `chapters/methodology.tex` header comment still says "111 entries".
+- G3's ECE run, parked by instruction.
