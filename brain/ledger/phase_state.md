@@ -1076,3 +1076,26 @@ Unstarted / open:
 - `eval/worldcup_fixture_probe.py` still scores Ellel on `calendar_lag7`.
 - `chapters/methodology.tex` header comment still says "111 entries".
 - G3's ECE run, parked by instruction.
+
+### G2 LOVO gate CLOSED (2026-08-01, supervisor decision)
+
+Decision: report Ellel on unscaled MAE, pool only the two scaled venues, state the reduced
+pool. Narrative cost was stated before the call and accepted. Implemented in
+`transfer/lovo.py` against `config.VENUE_SCALE_BASIS` / `VENUE_LOSS` / `is_scaled_venue`.
+
+Consequences, all now in `transfer/transfer_results.md`:
+- A THIRD fault surfaced: lovo hard-coded `calendar_lag7` where the estate rules
+  `calendar_lag7_active`, so the basis was wrong even for the scaled venues. Beer Hall
+  transfer moves 0.872 -> 1.242, i.e. ACROSS 1.0. On the ruled basis shape-transfer does
+  not beat the benchmark at the anchor venue; it beats a worse cold-window baseline
+  (1.771). TRT unchanged (its active trim makes the two bases coincide).
+- Win count and pool now 1 of 2 scaled venues. Pooled -0.072 MASE, 90% CI
+  [-0.295, +0.154], MCS retains both.
+- Gate verdict is NOT EVALUABLE, not FAIL: a majority needs three scaled venues and the
+  estate has two. Regaining it needs a third venue admitting a scaled error.
+- `test_transfer_wins_majority_at_cold_start` encoded the withdrawn claim and was replaced
+  by four behaviour tests, not relaxed. Suite 609 passed / 8 skipped / 0 failed.
+
+STILL OPEN: the foundation-rung gate (see G17o report). The `available: True` branch
+returns an instruction and no `beats_global_gbm` key, so the comparison it names was never
+implemented and the committed PASS was contingent on torch being absent.

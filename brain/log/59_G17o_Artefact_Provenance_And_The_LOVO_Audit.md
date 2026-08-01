@@ -135,6 +135,58 @@ The committed artefact is therefore **stale in its second clause** as of report 
 deliberately not regenerated here, because regenerating it under `.venv-forecast` would
 write a FAIL produced by missing code rather than by evidence.
 
+## 5. G2 gate CLOSED by decision: Ellel separate, pool the two
+
+Decision taken by the supervisor on 2026-08-01, with the narrative cost stated in advance
+and accepted: report Ellel on unscaled MAE, pool only the two scaled venues, state the
+reduced pool. Implemented against `config` as the single source of truth rather than a
+fourth private copy of the rule.
+
+### A third fault, found while implementing the first two
+
+`config.VENUE_SCALE_BASIS` rules `calendar_lag7_active` for the two scaled venues.
+`lovo.py` hard-coded `calendar_lag7` for all three. So the basis was wrong even for the
+venues that admit one, and correcting it moves a headline number:
+
+| Venue | basis | transfer | naive |
+|---|---|---|---|
+| Beer Hall | `calendar_lag7` (was) | 0.872 | 1.243 |
+| Beer Hall | `calendar_lag7_active` (ruled) | **1.242** | 1.771 |
+| Two River Taps | either | 1.184 | 0.700 |
+
+Two River Taps is unchanged because `_active_series` already trims its closure tail, so
+the two bases coincide there. The Beer Hall is not, and the correction crosses 1.0.
+
+**That crossing is the substantive result.** A MASE above one is worse than the
+seasonal-naive reference the denominator is built from. On the ruled basis, shape-transfer
+at the anchor venue does not beat the benchmark; it beats a cold-window baseline that is
+poorer still (1.771). The committed 0.872 read as beating the benchmark. The forecasts did
+not change, the denominator did.
+
+### What the corrected artefact says
+
+- Per-venue rows carry their own `loss` column and are not comparable across rows.
+- Win count and pool run over the two scaled venues only: **1 of 2** at the 14-day window.
+- Pooled over 100 blocks: -0.072 MASE, 90% CI [-0.295, +0.154], MCS retains both. The old
+  three-venue pool reported the same null by averaging Ellel's pounds with two
+  dimensionless MASE series, so its direction was right by an inadmissible route.
+- Crossover sweep is 1/2, 0/2, 0/2, 0/2, 0/2. The heading no longer claims transfer's
+  advantage is greatest when history is shortest, because a descent through counts out of
+  two is equally consistent with one venue plus noise.
+- **Gate verdict: NOT EVALUABLE**, not FAIL. The criterion is a majority over three scaled
+  venues and the estate supplies two. Reporting FAIL would assert a criterion result where
+  the criterion does not apply. `main()` would otherwise have computed `(2 // 2) + 1 = 2`
+  and silently demanded unanimity.
+
+### The test that had to be replaced
+
+`test_transfer_wins_majority_at_cold_start` asserted `transfer_wins >= majority`, which
+encodes the estate-level claim now withdrawn. It was replaced rather than relaxed, by four
+tests of the corrected behaviour: the scaled pool is under three, the unscaled venue is
+reported but never counted, it is scored in currency, and each scaled venue uses the basis
+`config` rules for it. A test that had been made to pass by weakening its bound would have
+been the same defect one level up.
+
 ## Verification
 
 | Check | Status | Evidence |
@@ -146,17 +198,27 @@ write a FAIL produced by missing code rather than by evidence.
 | judge pin is deliberate, not staleness | PASS | `AGENT_EVAL_STREAM_CEILING`, reason at the constant |
 | LOVO is unpublished in both chapters | PASS | zero matches across five search terms in live Overleaf |
 | LOVO foundation gate is environment-contingent | PASS | measured True/False across the two venvs |
+| G2 fix scores Ellel in currency, never pooled | PASS | `loss` MAE (£), absent from count and pool |
+| Scaled venues use the ruled basis | PASS | asserted against `config.VENUE_SCALE_BASIS` |
+| Basis correction explains the moved number | PASS | 0.872 to 1.242 reproduced on both bases side by side |
+| Gate reports NOT EVALUABLE, not FAIL | PASS | `evaluable` guard on a pool below three |
+| Suite green after the change | PASS | 609 passed, 8 skipped, 0 failed |
+| Corrected artefact survives a suite run | PASS | "NOT EVALUABLE" still present after full `pytest` |
 
 ## Files touched
 
-- regenerated: `eval/deviation_eval.md`
+- regenerated: `eval/deviation_eval.md`, `transfer/transfer_results.md`
 - regenerated, byte-identical: `eval/judge_prompts.md`
+- `transfer/lovo.py`: per-venue ruler from `config`, pool and count restricted to scaled
+  venues, `mase_*` keys renamed `loss_*` because they no longer always hold a MASE,
+  NOT-EVALUABLE gate, report text and module docstring rewritten
+- `tests/test_a7_transfer.py`: the majority assertion replaced by four behaviour tests
 - corrections: report 57 (the "orphaned" row and a new correction section), report 58 (the
   "both are test output" claim in "What is not done")
 
 ## Open
 
-- **Gate: `lovo.py`'s pooled statistic under G2.** Unchanged and awaiting a human call.
+- ~~**Gate: `lovo.py`'s pooled statistic under G2.**~~ CLOSED above by decision.
 - **Gate: `lovo.py`'s foundation rung.** New. The `available: True` branch needs either the
   zero-shot-vs-global-GBM evaluation implemented, or an explicit decision to keep the rung
   dropped on grounds other than backbone absence. Until one of the two, the committed PASS
