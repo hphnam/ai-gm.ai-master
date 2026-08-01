@@ -37,6 +37,7 @@ import argparse
 import sys
 
 import numpy as np
+from scipy.optimize import minimize_scalar
 
 import config
 from eval import agent_cache
@@ -196,9 +197,15 @@ def calibration(records: list[dict], n_bins=config.AGENT_ECE_BINS,
     edges, scheme = _bin_edges(p, n_bins, min_bin)
     bins = []
     ece = 0.0
-    for lo, hi, last in [(edges[i], edges[i + 1], i == len(edges) - 2)
-                         for i in range(len(edges) - 1)]:
-        mask = (p >= lo) & (p <= hi) if last else (p >= lo) & (p < hi)
+    # Guo et al. (2017) bin membership: `(lo, hi]`, left-open and right-closed, with the
+    # FIRST bin closed at 0 so p = 0 has a home. Their released `_ECELoss` is
+    # `gt(bin_lower) & le(bin_upper)`. The convention is not cosmetic here: with
+    # equal-width bins the edges fall on round decimals, which is exactly what a
+    # temperature-0 model emits, so a mass of probabilities sits ON the boundaries and
+    # regroups wholesale between the two conventions.
+    for lo, hi, first in [(edges[i], edges[i + 1], i == 0)
+                          for i in range(len(edges) - 1)]:
+        mask = (p >= lo) & (p <= hi) if first else (p > lo) & (p <= hi)
         cnt = int(np.sum(mask))
         if cnt == 0:
             bins.append({"lo": round(float(lo), 3), "hi": round(float(hi), 3),
@@ -212,6 +219,66 @@ def calibration(records: list[dict], n_bins=config.AGENT_ECE_BINS,
     return {"n": n, "ece": round(ece, 4), "brier": round(brier_score(records), 4),
             "scheme": scheme, "bins": bins, "kind": CALIBRATION_KIND,
             "caveat": CALIBRATION_CAVEAT}
+
+
+def fit_temperature(records: list[dict], *, holdout: float = 0.5) -> dict:
+    """Temperature scaling (Guo et al. 2017 §4.2), the third leg of pipeline stage 10.
+
+    Guo fit a single scalar T on a VALIDATION split by minimising negative log
+    likelihood, then divide the logits by it. The agent emits a probability rather than
+    a logit, so the probability is mapped back through `logit`, divided by T, and pushed
+    through the sigmoid: `p' = sigmoid(logit(p) / T)`. T > 1 softens an overconfident
+    model, T < 1 sharpens an underconfident one.
+
+    Two properties worth stating because they bound what this can be claimed to do.
+    The transform is strictly monotone in p, so it CANNOT change any ranking, any
+    threshold sweep's achievable operating points, or the AUC --- it moves calibration
+    only. And T is fit on a split of an already-small corpus, so `n_fit` and `n_eval`
+    are returned with it; at these n the fitted T is itself an estimate with real
+    variance, and a T near 1 should not be read as evidence of calibration.
+    """
+    p = np.array([r["p_raise"] for r in records], float)
+    y = np.array([r["truth"] for r in records], float)
+    n = len(p)
+    if n < 4 or len(np.unique(y)) < 2:
+        return {"fitted": False, "reason": "need >= 4 records and both outcomes",
+                "n": int(n), "temperature": None}
+
+    cut = max(2, int(round(n * holdout)))
+    z_fit, y_fit = _logit(p[:cut]), y[:cut]
+    if len(np.unique(y_fit)) < 2:
+        return {"fitted": False, "reason": "fit split is single-outcome",
+                "n": int(n), "temperature": None}
+
+    def nll(log_t: float) -> float:
+        q = _sigmoid(z_fit / np.exp(log_t))
+        q = np.clip(q, 1e-12, 1 - 1e-12)
+        return float(-np.mean(y_fit * np.log(q) + (1 - y_fit) * np.log1p(-q)))
+
+    res = minimize_scalar(nll, bounds=(-3.0, 3.0), method="bounded")
+    temperature = float(np.exp(res.x))
+
+    scaled = [{**r, "p_raise": float(_sigmoid(_logit(np.array([r["p_raise"]],
+                                                             float))[0] / temperature))}
+              for r in records[cut:]]
+    before = calibration(records[cut:])
+    after = calibration(scaled)
+    return {
+        "fitted": True, "temperature": round(temperature, 4),
+        "n": int(n), "n_fit": int(cut), "n_eval": int(n - cut),
+        "ece_before": before["ece"], "ece_after": after["ece"],
+        "brier_before": before["brier"], "brier_after": after["brier"],
+        "monotone": True,
+    }
+
+
+def _logit(p: np.ndarray) -> np.ndarray:
+    q = np.clip(np.asarray(p, float), 1e-6, 1 - 1e-6)
+    return np.log(q / (1.0 - q))
+
+
+def _sigmoid(z: np.ndarray | float):
+    return 1.0 / (1.0 + np.exp(-z))
 
 
 def reliability_diagram(records: list[dict], path=RELIABILITY_PNG) -> str:
@@ -338,6 +405,7 @@ def run(con=None, *, allow_live=False, version=None) -> dict:
             "cache": {"hits": cache.hits, "calls": cache.calls},
             "cost_sweep": cost_sweep(records),
             "calibration": calibration(records),
+            "temperature_scaling": fit_temperature(records),
             "agent_vs_constants": agent_vs_constants(records),
         }
         try:
@@ -391,9 +459,24 @@ def _write_report(out: dict) -> None:
     for bn in c["bins"]:
         conf = "-" if bn["conf"] is None else f"{bn['conf']:.3f}"
         acc = "-" if bn["acc"] is None else f"{bn['acc']:.3f}"
-        lines.append(f"| [{bn['lo']:.2f}, {bn['hi']:.2f}] | {bn['n']} | {conf} | {acc} |")
+        lines.append(f"| ({bn['lo']:.2f}, {bn['hi']:.2f}] | {bn['n']} | {conf} | {acc} |")
+    ts = out.get("temperature_scaling", {})
+    if ts.get("fitted"):
+        lines += [
+            f"\n**Temperature scaling** (Guo et al. 2017 §4.2): T = "
+            f"**{ts['temperature']}** fit by NLL on {ts['n_fit']} records, evaluated on "
+            f"the held-out {ts['n_eval']}. ECE {ts['ece_before']} -> "
+            f"**{ts['ece_after']}**, Brier {ts['brier_before']} -> {ts['brier_after']}. "
+            "The map is strictly monotone, so it changes calibration only and cannot "
+            "move any ranking, the cost sweep's achievable operating points, or the "
+            "AUC. At this N the fitted T carries real variance of its own, so a value "
+            "near 1 is not evidence of calibration.\n",
+        ]
+    elif ts:
+        lines.append(f"\n**Temperature scaling** not fitted: {ts.get('reason')}.\n")
     lines += [
-        f"\nReliability diagram: `{RELIABILITY_PNG.name}`. No judge kappa is reported: "
+        f"\nBins follow Guo's `(lo, hi]` convention, first bin closed at 0.\n"
+        f"Reliability diagram: `{RELIABILITY_PNG.name}`. No judge kappa is reported: "
         "there is no human anchor yet (S9).\n",
         "## Part 5 - agent versus the six constants\n",
         f"Pairwise disagreement at the 1:1 operating point: **{avc['disagreement_rate']}** "

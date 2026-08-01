@@ -81,8 +81,8 @@ def select_sba(adi: float, cv2: float) -> bool:
     """Kostenko-Hyndman rule: prefer SBA over Croston when `cv2 > 2 - (3/2) adi`.
 
     Above that line Croston's positive bias dominates and the SBA deflation helps; below
-    it, Croston is preferable. Reported per node, never used to gate adoption (that stays
-    the held-out MASE rule).
+    it, Croston is preferable. Both arguments come from the training window alone, which
+    is what makes this usable as A6's ex-ante estimator choice (see `_croston_comparison`).
 
     NOTE: this inequality was implemented in the reversed direction until 2026-07-31, which
     inverted every SBA/Croston selection in `intermittency_L1.md` and the L3 report. The
@@ -160,8 +160,19 @@ def diagnose(venue: str = ANCHOR_VENUE, top_k: int = 3) -> list[dict]:
 def intermittent_nodes(venue: str = ANCHOR_VENUE, top_k: int = 3) -> list[str]:
     """Non-OTHER L3 nodes classified intermittent (ADI >= 4/3, Kostenko-Hyndman), the
     trigger set for the conditional Croston/SBA comparison (G2.2)."""
-    return [r["node"] for r in diagnose(venue, top_k)
-            if r["intermittent"] and not r["is_other"]]
+    return list(intermittent_node_stats(venue, top_k))
+
+
+def intermittent_node_stats(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict[str, dict]:
+    """The trigger set keyed by node, carrying the (ADI, CV-squared) pair.
+
+    A6 needs the pair, not just the node name: `select_sba` decides Croston against SBA
+    from it ex ante, so the estimator is chosen by the node's training-window demand
+    pattern rather than by which one happened to win on the held-out block.
+    """
+    return {r["node"]: {"adi": r["adi"], "cv2": r["cv2"]}
+            for r in diagnose(venue, top_k)
+            if r["intermittent"] and not r["is_other"]}
 
 
 # --- L1 diagnostic (S4 Part 1) -----------------------------------------------
@@ -253,8 +264,10 @@ def _write_report(venue: str, rows: list[dict], dows: set[int]) -> None:
         f"\n**{n_int} of {len(rows)}** item nodes classify as intermittent "
         f"(ADI >= {ADI_INTERMITTENT_CUTOFF:.4f}); **{n_int_nonother}** of those are "
         "non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the "
-        "conditional Croston/SBA comparison in hierarchy/reconcile.py; adoption "
-        "stays strictly by the held-out MASE rule, per node.",
+        "conditional Croston/SBA comparison in hierarchy/reconcile.py, which selects "
+        "the estimator by the rule below and then decides adoption against the "
+        "DOW-median on a VALIDATION block inside training, never on the test block "
+        "(report 53).",
         f"\n**Selection is unanimous by construction ({n_sba} of {len(rows)} nodes "
         "select SBA).** This is a property of the scheme, not of the estate, and "
         "should not be read as a finding: the intermittency cutoff is ADI >= 4/3 "

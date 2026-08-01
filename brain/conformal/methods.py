@@ -10,8 +10,10 @@ the split-conformal quantile; they differ in how they slice or adapt it:
   A  ACI      per-step Adaptive Conformal Inference (Gibbs and Candes 2021): the effective
               miscoverage level is nudged online after each observed outcome, so a run of
               misses widens the band and a run of hits narrows it
-  G  AgACI    per-step Aggregated ACI (Zaffran et al. 2022): an online expert aggregation
-              over a grid of ACI learning rates, removing the single-rate choice A exposes
+  G  AgACI    per-step Aggregated ACI (Zaffran et al. 2022): Bernstein online aggregation
+              over a grid of ACI learning rates, removing the single-rate choice A exposes.
+              The two bounds are aggregated independently, each under its own pinball loss,
+              and BOA calibrates its own rate, so the arm introduces no tuned constant
 
 The online (A, G) methods keep the effective miscoverage in [0, 1] and count every clamp
 rather than clipping silently, so a degenerate learning rate is loud in the artefact.
@@ -135,33 +137,106 @@ class ACI:
         self.eff[int(step)] += self.gamma * (self.alpha_target - err)
 
 
+# --- Bernstein Online Aggregation (the aggregation rule AgACI is defined on) -
+
+@dataclass
+class BOA:
+    """Bernstein Online Aggregation (Wintenberger 2017) over K experts, for ONE quantile.
+
+    Faithful port of `BOA()` in the `opera` R package (dralliag/opera, `R/BOA.R`) under the
+    exact configuration Zaffran et al. (2022) drive AgACI with in `AgACI/Script/acp_gamma.R`:
+    `loss.type = list(name="pinball", tau=...)` and `loss.gradient = TRUE`.
+
+    Why BOA and not an exponentially-weighted average: BOA carries **no free learning rate**.
+    Each expert's eta_i is calibrated online from its own accumulated squared regret,
+
+        eta_inv2_i  <-  eta_inv2_i + 2.2 * r_i^2          (opera R/BOA.R, `eta_inv2` update)
+        eta_i       =   1 / sqrt(eta_inv2_i)
+
+    so the aggregation introduces no constant that would itself need justifying. An EWA
+    alternative must pick an eta, and every published bound for that choice is stated for a
+    loss bounded on a known range, which a conformal interval score is not.
+
+    Weights follow opera exactly, w_i proportional to w0_i * eta_i * exp(eta_i * R_reg_i),
+    computed in the log domain with the max subtracted:
+
+        aux_i = -log(eta_inv2_i)/2 + log(w0_i) + R_reg_i / sqrt(eta_inv2_i)
+
+    The regret is linearised by the gradient trick. For pinball at level tau, opera's
+    `gradient_pinball(x, y, tau) = (y < x) - tau` is evaluated at the AGGREGATE prediction
+    and multiplied by each expert's own prediction, so the instantaneous regret reduces to
+    `r_i = grad * (pred - x_i)`. Before any expert has accrued regret every eta_inv2_i is
+    zero and the weights are the uniform w0, which is opera's `empty` branch.
+    """
+
+    k: int
+    tau: float
+    eta_inv2: np.ndarray = field(default=None)
+    r_reg: np.ndarray = field(default=None)
+    cum_r_reg: np.ndarray = field(default=None)
+
+    def __post_init__(self):
+        if self.eta_inv2 is None:
+            self.eta_inv2 = np.zeros(self.k)
+            self.r_reg = np.zeros(self.k)
+            self.cum_r_reg = np.zeros(self.k)
+
+    def weights(self) -> np.ndarray:
+        w0 = np.ones(self.k)
+        nz = self.eta_inv2 > 0
+        if not nz.any():
+            return w0 / w0.sum()
+        w = w0.copy()
+        aux = (-np.log(self.eta_inv2[nz]) / 2.0 + np.log(w0[nz])
+               + self.cum_r_reg[nz] / np.sqrt(self.eta_inv2[nz]))
+        e = np.exp(aux - aux.max())
+        w[nz] = w0[nz].sum() * e / e.sum()
+        return w / w.sum()
+
+    def update(self, y: float, expert_preds: np.ndarray, pred: float) -> None:
+        """One BOA round from the observed outcome and the predictions that produced `pred`."""
+        grad = (1.0 if y < pred else 0.0) - self.tau
+        r = grad * (pred - np.asarray(expert_preds, dtype=float))
+        self.eta_inv2 = self.eta_inv2 + 2.2 * r ** 2
+        nz = self.eta_inv2 > 0
+        if nz.any():
+            self.r_reg[nz] = r[nz] - r[nz] ** 2 / np.sqrt(self.eta_inv2[nz])
+        self.cum_r_reg = self.cum_r_reg + self.r_reg
+
+
 # --- Aggregated ACI: online expert aggregation over the learning-rate grid ---
 
 @dataclass
 class AgACI:
-    """Per-step online aggregation of ACI experts over a grid of learning rates. Each expert
-    is an ACI at one gamma; the band is the exponentially-weighted average of the experts'
-    bounds, weights driven by each expert's cumulative interval pinball loss. Reduces EXACTLY
-    to a single ACI when the grid has one gamma (G4)."""
+    """Per-step online aggregation of ACI experts over a grid of learning rates, as specified
+    by Zaffran et al. (2022): each expert is an ACI at one gamma, and the two bounds are
+    aggregated **independently** by BOA, each under its own pinball loss -- the lower bound at
+    tau = alpha/2 and the upper at tau = 1 - alpha/2.
+
+    Two aggregators per horizon step, not one, is the paper's construction and the released
+    code's: `acp_gamma.R` makes two `opera::mixture()` calls per dataset. A single weight
+    vector shared across both bounds would let a lower-bound miss reweight the upper bound.
+
+    Reduces EXACTLY to a single ACI when the grid has one gamma (G4): with K = 1 the softmax
+    is degenerate and the aggregate is the sole expert's own bound at every step.
+    """
 
     level: float
     gammas: tuple[float, ...]
     horizon: int = HORIZON
-    eta: float = 1.0
     experts: list = field(default_factory=list)
-    cumloss: dict = field(default_factory=dict)
+    agg_lo: dict = field(default_factory=dict)
+    agg_hi: dict = field(default_factory=dict)
     clamps: int = 0
     last_experts: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.experts = [ACI(self.level, g, self.horizon) for g in self.gammas]
-        self.cumloss = {h: np.zeros(len(self.gammas)) for h in range(1, self.horizon + 1)}
-
-    def _weights(self, step: int) -> np.ndarray:
-        losses = self.cumloss[step]
-        z = -self.eta * (losses - losses.min())
-        w = np.exp(z)
-        return w / w.sum()
+        alpha = 1.0 - self.level
+        k = len(self.gammas)
+        steps = range(1, self.horizon + 1)
+        self.agg_lo = {h: BOA(k, alpha / 2.0) for h in steps}
+        self.agg_hi = {h: BOA(k, 1.0 - alpha / 2.0) for h in steps}
 
     def band(self, pool_res: np.ndarray, pool_step: np.ndarray,
              yhat: np.ndarray, steps: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -175,19 +250,24 @@ class AgACI:
                 lo_k, hi_k = ex.band(pool_res, pool_step,
                                      np.array([yhat[i]]), np.array([h]))
                 los[k], his[k] = lo_k[0], hi_k[0]
-            w = self._weights(int(h))
-            lo_out[i] = max(float(np.dot(w, los)), 0.0)
-            hi_out[i] = float(np.dot(w, his))
-            self.last_experts[int(h)] = (los, his)
+            lo_pred = float(np.dot(self.agg_lo[int(h)].weights(), los))
+            hi_pred = float(np.dot(self.agg_hi[int(h)].weights(), his))
+            lo_out[i] = max(lo_pred, 0.0)
+            hi_out[i] = hi_pred
+            # The emitted aggregate is carried with the expert bounds because BOA linearises
+            # its regret AT that aggregate, and other origins update this step in between.
+            self.last_experts[int(h)] = (los, his, lo_pred, hi_pred)
         self.clamps = sum(ex.clamps for ex in self.experts)
         return lo_out, hi_out
 
-    def update_step(self, step: int, y: float, los: np.ndarray, his: np.ndarray) -> None:
-        """Update every expert's cumulative loss and ACI state at step `step` from one
-        observed outcome, with the per-expert interval bounds that produced it."""
-        self.cumloss[int(step)] += np.array(
-            [interval_pinball(y, lo, hi, self.level) for lo, hi in zip(los, his)])
+    def update_step(self, step: int, y: float, los: np.ndarray, his: np.ndarray,
+                    lo_pred: float, hi_pred: float) -> None:
+        """Update both BOA aggregators and every expert's ACI state at step `step` from one
+        observed outcome, with the per-expert bounds and the aggregate they produced."""
+        h = int(step)
+        self.agg_lo[h].update(y, los, lo_pred)
+        self.agg_hi[h].update(y, his, hi_pred)
         for k, ex in enumerate(self.experts):
             covered = los[k] <= y <= his[k]
             err = 0.0 if covered else 1.0
-            ex.eff[int(step)] += ex.gamma * (ex.alpha_target - err)
+            ex.eff[h] += ex.gamma * (ex.alpha_target - err)

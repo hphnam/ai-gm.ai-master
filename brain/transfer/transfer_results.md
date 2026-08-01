@@ -2,13 +2,17 @@
 
 Cold-start window: **14 days** (used only to anchor the held-out venue's level). Forecast = donor DOW shape × own level. Baseline = per-venue seasonal-naïve on the same cold window. Both share the same MASE denominator, so the comparison is scale-fair. Each venue is trimmed to its active trading span (TRT's closure tail excluded).
 
-| Held-out venue | Donors | n_test | MASE transfer | MASE naïve | Transfer wins |
-|---|---|---|---|---|---|
-| The Beer Hall | Two River Taps, Ellel Village Hall | 348 | 0.902 | 1.257 | True |
-| Two River Taps | The Beer Hall, Ellel Village Hall | 317 | 1.190 | 0.700 | False |
-| Ellel Village Hall | The Beer Hall, Two River Taps | 329 | 0.920 | 1.306 | True |
+Each fold is scored on consecutive 7-day blocks, so the comparison carries dispersion: an MCS 90% set and a paired moving-block bootstrap CI on transfer − naïve, not a win count (ledger M23).
 
-**At the 14-day cold-start, transfer beats per-venue-naïve on 2/3 held-out venues.**
+| Held-out venue | Donors | blocks | MASE transfer | MASE naïve | Δ [90% CI] | 90% MCS set |
+|---|---|---|---|---|---|---|
+| The Beer Hall | Two River Taps, Ellel Village Hall | 55 | 0.872 | 1.243 | -0.371 [-0.391, -0.348] | transfer |
+| Two River Taps | The Beer Hall, Ellel Village Hall | 45 | 1.184 | 0.700 | +0.486 [+0.442, +0.529] | naive |
+| Ellel Village Hall | The Beer Hall, Two River Taps | 53 | 0.927 | 1.319 | -0.373 [-0.488, -0.300] | transfer |
+
+**At the 14-day cold-start, transfer beats per-venue-naïve on 2/3 held-out venues.** Each of those three verdicts is now decisive in its own right: every per-venue CI excludes zero and the MCS retains a single method per venue.
+
+**Pooled across the estate, however, the two are not distinguishable.** Over all 153 blocks the mean difference is -0.119 MASE with a 90% CI of [-0.242, +0.036], which straddles zero, and the 90% model confidence set retains transfer, naive. The majority verdict is a count of venue-level wins, not evidence that shape-transfer is the better method on this estate; the two venues it wins and the one it loses very nearly cancel. This is the statement the earlier 2-of-3 tally could not make, in either direction.
 
 ## Crossover — transfer's advantage is greatest when history is shortest
 | Cold-start window | Transfer wins |

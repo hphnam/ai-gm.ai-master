@@ -1,5 +1,16 @@
 # Report 49 - S7 G17h: interval calibration, per-step bands, and the adaptive methods
 
+> **SUPERSEDED IN PART, 2026-07-31 - the G (AgACI) column only. See report 52.**
+> The G arm reported here was not AgACI: it used exponentially weighted aggregation
+> instead of Bernstein online aggregation, one shared weight vector across both bounds
+> instead of two independent ones, and a summed interval loss instead of a per-bound
+> pinball loss. Found by released-code comparison (`ledger/code_vs_paper.md`, M3).
+> The arm was reimplemented and the study re-run at the same ceiling: **G becomes 1837
+> (Beer Hall), 1480 (Ellel), 693 (Two River Taps)**, worse than reported below. Every
+> other arm, every confidence set and every adoption decision in this report is
+> unchanged and stands. Do not quote the G figures below. This report is annotated
+> rather than rewritten so the commit ordering stays intact.
+
 Date: 2026-07-23. Branch `brain-construction-local`, from tip `070f249` (S6). Point model ETS
 (the band's cold-start default and `conformal.wrap`'s coverage-gate reference), device CPU; the
 served-forecaster scope check uses Chronos-2 on CPU. Style: no em-dashes, plain prose, loud

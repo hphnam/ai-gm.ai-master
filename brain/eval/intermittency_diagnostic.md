@@ -39,7 +39,7 @@ Trading days: **Wed, Thu, Fri, Sat, Sun** (L1 units DOW-median > eps). Intermitt
 | ITEM::Merchandise::Caravan T-shirt | 285 | 0.98 | 4.20 | 0.15 | yes | SBA |
 | ITEM::Merchandise::OTHER | 285 | 0.94 | 11.93 | 0.37 | yes | SBA |
 
-**21 of 32** item nodes classify as intermittent (ADI >= 1.3333); **16** of those are non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the conditional Croston/SBA comparison in hierarchy/reconcile.py; adoption stays strictly by the held-out MASE rule, per node.
+**21 of 32** item nodes classify as intermittent (ADI >= 1.3333); **16** of those are non-OTHER nodes. Per G2.2, a non-zero non-OTHER count triggers the conditional Croston/SBA comparison in hierarchy/reconcile.py, which selects the estimator by the rule below and then decides adoption against the DOW-median on a VALIDATION block inside training, never on the test block (report 53).
 
 **Selection is unanimous by construction (31 of 32 nodes select SBA).** This is a property of the scheme, not of the estate, and should not be read as a finding: the intermittency cutoff is ADI >= 4/3 and 2 - (3/2)(4/3) = 0 exactly, so the selection threshold is non-positive for every node at or above the cutoff while CV2 >= 0 always. Classified intermittent therefore entails selects-SBA. Any node reported as Croston here is one the rule does not govern - a node below the cutoff, or one whose ADI/CV2 are undefined because it never sold.
 

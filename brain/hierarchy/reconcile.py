@@ -1,10 +1,18 @@
-"""A6 · Hierarchy + MinT reconciliation + consumption proxy (methodology §6).
+"""A6 · Hierarchy + WLS_v reconciliation + consumption proxy (methodology §6).
 
 Builds a coherent venue -> category -> item units hierarchy for the Beer Hall,
 forecasts every node independently (robust DOW-median base forecasts), then
-reconciles them with **MinT** (Wickramasuriya et al. 2019; WLS with a diagonal
-error-covariance) so item/category/venue forecasts are coherent. MinT output is
-coherent by construction, Σ(item) = category = venue exactly, which we verify.
+reconciles them so item/category/venue forecasts are coherent. Output is coherent
+by construction, Σ(item) = category = venue exactly, which we verify.
+
+**Naming.** The reconciliation formula is exactly Equation (11) of Wickramasuriya
+et al. (2019), but with a DIAGONAL W. Those authors reserve the name "MinT" for
+their full off-diagonal estimators, MinT(Sample) and MinT(Shrink), and call the
+diagonal case **WLS_v** --- of which they write that MinT "can be described as a
+WLS estimator" in that case. This module therefore says WLS_v, not MinT. The
+diagonal is a deliberate choice, not an approximation of convenience: at 30-odd
+nodes over a 399-day calendar the shrinkage estimator would be estimating a
+covariance with more entries than the calibration block has rows.
 
 The reconciled item-unit forecast is the **stock-consumption proxy**: forecast
 pints of `Lager - BH` -> implied keg depletion, serving the ordering use-case
@@ -30,7 +38,7 @@ from config import (
 )
 from conformal.wrap import conformal_quantile
 from eval import harness
-from models.intermittent import croston_fitted, croston_sba
+from models.intermittent import croston_classic, croston_sba
 from store.warehouse import connect, read_series, write_band, write_forecast
 
 MODELS_DIR = STORE_DIR.parent / "models_L2_L3"
@@ -122,10 +130,24 @@ def build_hierarchy(venue: str = ANCHOR_VENUE, top_k: int = 3, since=None):
     return node_series, S, nodes, bottom_nodes, cat_of_bottom
 
 
-# --- Base forecasts + MinT ---------------------------------------------------
+# --- Base forecasts + WLS_v ---------------------------------------------------
 
-def _dow_median_forecast(series: pd.Series, test_dates: pd.DatetimeIndex):
-    train = series[series.index < test_dates.min()]
+def _dow_median_forecast(
+    series: pd.Series, test_dates: pd.DatetimeIndex, fit_end: pd.Timestamp | None = None
+):
+    """DOW-median forecast for `test_dates`, fitted strictly before `fit_end`.
+
+    `fit_end` defaults to the first target date, which is the ordinary
+    fit-right-up-to-the-forecast behaviour. A6 passes an EARLIER boundary so the
+    conformal calibration block sits between the fit span and the test block and
+    the same fitted median produces both the calibration scores and the test
+    point forecast --- the disjointness split conformal's guarantee rests on.
+
+    The second return value is the IN-SAMPLE residual variance. A6 no longer uses
+    it (its MinT weights come off the held-out calibration block, see
+    `node_quantiles`); the `sim/` July builders still do.
+    """
+    train = series[series.index < (fit_end or test_dates.min())]
     med = train.groupby(train.index.dayofweek).median()
     overall = float(train.median())
     yhat = np.array([med.get(d.dayofweek, overall) for d in test_dates], float)
@@ -135,7 +157,9 @@ def _dow_median_forecast(series: pd.Series, test_dates: pd.DatetimeIndex):
 
 
 def mint_reconcile(Ybase: np.ndarray, S: np.ndarray, w: np.ndarray) -> np.ndarray:
-    """MinT (diagonal WLS). Ybase (m,H), returns coherent (m,H)."""
+    """WLS_v reconciliation: Wickramasuriya et al. (2019) Eq. (11) with a diagonal
+    W. Named WLS_v, not MinT, after those authors' own convention --- see the module
+    docstring. Ybase (m,H), returns coherent (m,H)."""
     winv = 1.0 / np.clip(w, _EPS, None)
     A = S.T @ (winv[:, None] * S)            # n x n
     b = S.T @ (winv[:, None] * Ybase)        # n x H
@@ -144,53 +168,84 @@ def mint_reconcile(Ybase: np.ndarray, S: np.ndarray, w: np.ndarray) -> np.ndarra
 
 
 def node_quantiles(
-    node_series: dict, nodes: list[str], test_start: pd.Timestamp
-) -> dict[tuple[str, float], float]:
+    node_series: dict, nodes: list[str], cal_start: pd.Timestamp,
+    test_start: pd.Timestamp,
+) -> tuple[dict[tuple[str, float], float], dict[str, np.ndarray]]:
     """Split-conformal quantile per non-VENUE node per level, the single band
     source of truth for A6 (used by BOTH the coverage check and persistence).
 
-    Score = |actual - DOW-median| on each node's pre-test training span, which
-    is exactly the residual of that node's base forecaster (_dow_median_forecast).
+    Score = |actual - DOW-median| on the CALIBRATION block `[cal_start,
+    test_start)`, with the median fitted strictly before `cal_start`. The
+    calibration set is therefore disjoint from the fitting set, which is the
+    entire source of split conformal's finite-sample guarantee (Lei et al. 2018;
+    Angelopoulos & Bates 2023 §1) --- and `reconcile` predicts the test block
+    from that same fitted median, so the guarantee transfers to the served band.
+
+    This previously scored the fitting span itself. A DOW median is fitted to the
+    very points it was then scored against, so the quantile was of an in-sample
+    residual: optimistically narrow, and carrying no guarantee at all despite the
+    name. Returns the signed calibration residuals alongside, because MinT's W is
+    the base-forecast ERROR covariance and an in-sample residual understates it
+    for the same reason.
     """
     out: dict[tuple[str, float], float] = {}
+    resid: dict[str, np.ndarray] = {}
     for node in nodes:
+        s = node_series[node]
+        cal_dates = s.index[(s.index >= cal_start) & (s.index < test_start)]
+        if not len(cal_dates):
+            continue
+        yhat, _ = _dow_median_forecast(s, cal_dates, cal_start)
+        resid[node] = s.reindex(cal_dates, fill_value=0.0).to_numpy(float) - yhat
         if node == "VENUE":
             continue
-        s = node_series[node]
-        train = s[s.index < test_start]
-        med = train.groupby(train.index.dayofweek).median()
-        res = np.abs(train.to_numpy() - np.array(
-            [med.get(d.dayofweek, train.median()) for d in train.index], float))
         for lvl in CONFORMAL_LEVELS:
-            out[(node, lvl)] = conformal_quantile(res, lvl)
-    return out
+            out[(node, lvl)] = conformal_quantile(np.abs(resid[node]), lvl)
+    return out, resid
 
 
 def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
     node_series, S, nodes, bottom_nodes, cat_of_bottom = build_hierarchy(venue, top_k)
     cat_nodes = [n for n in nodes if n.startswith("CAT::")]
     calendar = node_series["VENUE"].index
+    # Three disjoint blocks of TEST_WEEKS each, walking back from the end of the
+    # calendar, so no block is ever asked to do two jobs:
+    #   [test_start, end]        test    --- reported, touched by nothing else
+    #   [cal_start, test_start)  calibration --- conformal scores + MinT weights
+    #   [val_start, cal_start)   validation  --- the Croston/DOW adoption contest
+    #   < val_start              fit         --- the contest's estimators
+    # Everything the test block sees is fitted strictly before cal_start.
     test_start = calendar.max() - pd.Timedelta(weeks=TEST_WEEKS)
+    cal_start = test_start - pd.Timedelta(weeks=TEST_WEEKS)
+    val_start = cal_start - pd.Timedelta(weeks=TEST_WEEKS)
     test_dates = calendar[calendar >= test_start]
 
     Ybase = np.zeros((len(nodes), len(test_dates)))
-    w = np.zeros(len(nodes))
+    w = np.ones(len(nodes))
     actual = np.zeros((len(nodes), len(test_dates)))
     for i, node in enumerate(nodes):
-        Ybase[i], w[i] = _dow_median_forecast(node_series[node], test_dates)
+        Ybase[i], _ = _dow_median_forecast(node_series[node], test_dates, cal_start)
         actual[i] = node_series[node].reindex(test_dates, fill_value=0.0).to_numpy()
 
     # One conformal band source (node_q), used for coverage AND persistence.
-    node_q = node_quantiles(node_series, nodes, test_start)
+    node_q, cal_resid = node_quantiles(node_series, nodes, cal_start, test_start)
 
-    # WP2: for intermittent L3 nodes (ADI >= 1.32), score croston_sba against the
-    # DOW-median base on the held-out block and adopt it per node only if it wins
-    # on MASE. Adoption overrides Ybase/w/node_q in place, so MinT and the band
-    # both use the winning forecaster. MinT coherence is unaffected (S unchanged).
-    from eval.intermittency_diagnostic import intermittent_nodes
-    intermittent = intermittent_nodes(venue, top_k)
+    # MinT's W is the base-forecast error covariance, so the weights come off the
+    # held-out calibration block rather than the fitting span.
+    for i, node in enumerate(nodes):
+        e = cal_resid.get(node)
+        if e is not None and e.size > 1:
+            w[i] = float(np.var(e))
+
+    # WP2: every intermittent L3 node (ADI >= 4/3) moves off the DOW-median onto the
+    # Croston-family estimator its (ADI, CV-squared) pair selects. No decision reads
+    # the test block. Adoption overrides Ybase/w/node_q in place, so MinT and the band
+    # both use it. MinT coherence is unaffected (S unchanged).
+    from eval.intermittency_diagnostic import intermittent_node_stats
+    intermittent = intermittent_node_stats(venue, top_k)
     croston_rows = _croston_comparison(
-        node_series, nodes, test_dates, test_start, intermittent, Ybase, w, node_q)
+        node_series, nodes, test_dates, test_start, cal_start, val_start,
+        intermittent, Ybase, w, node_q)
 
     recon = mint_reconcile(Ybase, S, w)
 
@@ -241,45 +296,127 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
     }
 
 
-def _croston_comparison(node_series, nodes, test_dates, test_start, intermittent,
-                        Ybase, w, node_q) -> list[dict]:
-    """WP2 evaluation-only path: croston_sba vs DOW-median per intermittent node.
+VAL_SUBBLOCK_DAYS = 7
 
-    Scores both base forecasters on the held-out TEST_WEEKS block (MAE + MASE,
-    same seasonal-naive denominator as elsewhere). Where SBA wins on MASE, adopts
-    it as that node's base forecast by overriding Ybase (fed to MinT and
-    persistence), w (the MinT trust weight), and node_q (the conformal band, so
-    the band is calibrated on the forecaster that produces the point). Returns one
-    comparison row per node for the report.
+
+def _one_se_adopt(y_val, dow_pred, est_pred, y_fit) -> tuple[bool, float]:
+    """One-standard-error adoption gate, per `ledger/prereg_adoption_margin_2026-08-01.md`.
+
+    Returns `(adopt, mean(d) + se)`. Adopt only when that quantity is negative, i.e. when
+    the estimator's mean advantage over the DOW median exceeds one standard error of that
+    advantage (Breiman et al. 1984). The bare inequality it replaces adopted on any margin
+    at all, and adopted a node that won by 0.21 per cent and then scored 96 per cent worse
+    on the test block.
+
+    The differential is paired over DISJOINT 7-day sub-blocks: both candidates are scored
+    on identical days, so the sub-block's own difficulty cancels, and disjointness keeps
+    the standard error a plain one rather than requiring a moving-block bootstrap. Daily
+    differentials would be serially correlated and would understate the standard error,
+    making the margin too easy to clear.
+
+    Fail-closed on fewer than two sub-blocks, on any non-finite differential (a node with
+    no sales in the fitting span has a zero scaled-error denominator), and on zero
+    dispersion, which would collapse the rule back to the bare inequality.
     """
+    n_blocks = len(y_val) // VAL_SUBBLOCK_DAYS
+    if n_blocks < 2:
+        return False, float("nan")
+    d = []
+    for b in range(n_blocks):
+        sl = slice(b * VAL_SUBBLOCK_DAYS, (b + 1) * VAL_SUBBLOCK_DAYS)
+        d.append(harness.mase(y_val[sl], est_pred[sl], y_fit, basis="calendar_lag7")
+                 - harness.mase(y_val[sl], dow_pred[sl], y_fit, basis="calendar_lag7"))
+    d = np.asarray(d, float)
+    if not np.all(np.isfinite(d)):
+        return False, float("nan")
+    sd = float(np.std(d, ddof=1))
+    if sd == 0.0:
+        return False, float("nan")
+    crit = float(np.mean(d)) + sd / np.sqrt(n_blocks)
+    return bool(crit < 0.0), crit
+
+
+def _croston_comparison(node_series, nodes, test_dates, test_start, cal_start,
+                        val_start, intermittent, Ybase, w, node_q) -> list[dict]:
+    """WP2: choose between the DOW-median and a Croston-family estimator per node.
+
+    No decision touches the test block, and no block does two jobs:
+
+      * WHICH intermittent estimator is Kostenko-Hyndman `select_sba(adi, cv2)` --- SBA
+        above `cv2 = 2 - (3/2) adi`, Croston below --- read off the training window.
+      * WHETHER it displaces the DOW-median is a MASE contest on the VALIDATION block
+        `[val_start, cal_start)`, with both forecasters fitted strictly before it. The
+        winner is then refitted on everything before `cal_start` for the test forecast.
+      * Its band and its MinT weight come off the CALIBRATION block, scored with that
+        refit --- held out from the fit, and disjoint from the block that selected it.
+
+    Adoption originally ran the contest on the test block itself and then reported that
+    same block's MASE, so the published figure was a minimum over two forecasters, biased
+    low, and not an out-of-sample number for the rule in force. The band was then taken
+    over the estimator's own in-sample residual, understating it a second time. Both
+    blocks now sit strictly between the fit span and the test block.
+
+    Adoption overrides Ybase (fed to MinT and persistence), w (the MinT trust weight) and
+    node_q (so the band is calibrated on the forecaster that produces the point). Returns
+    one row per node for the report.
+    """
+    # Deferred: intermittency_diagnostic imports build_hierarchy from this module.
+    from eval.intermittency_diagnostic import select_sba
+
     rows = []
-    for node in intermittent:
+    for node, stats in intermittent.items():
         if node not in nodes:
             continue
         i = nodes.index(node)
         s = node_series[node]
-        ytr = s[s.index < test_start].to_numpy(float)
+        ytr = s[s.index < cal_start].to_numpy(float)
         y_true = s.reindex(test_dates, fill_value=0.0).to_numpy(float)
         dow_pred = Ybase[i].copy()
-        cro_pred = np.full(len(test_dates), croston_sba(ytr, alpha=0.1), float)
 
-        mase_dow = harness.mase(y_true, dow_pred, ytr, basis="calendar_lag7")
-        mase_sba = harness.mase(y_true, cro_pred, ytr, basis="calendar_lag7")
-        adopt = bool(np.isfinite(mase_dow) and np.isfinite(mase_sba)
-                     and mase_sba < mase_dow)
+        use_sba = select_sba(stats["adi"], stats["cv2"])
+        rate = (croston_sba if use_sba else croston_classic)(ytr, alpha=0.1)
+        cro_pred = np.full(len(test_dates), rate, float)
+
+        # The contest, on the validation block, both fitted strictly before it.
+        val_dates = s.index[(s.index >= val_start) & (s.index < cal_start)]
+        fit = s[s.index < val_start]
+        adopt = False
+        val_dow = val_est = margin = float("nan")
+        if len(val_dates) and len(fit) > 1:
+            yv = s.reindex(val_dates, fill_value=0.0).to_numpy(float)
+            yfit = fit.to_numpy(float)
+            dow_val, _ = _dow_median_forecast(fit, val_dates, val_start)
+            est_val = np.full(len(val_dates),
+                              (croston_sba if use_sba else croston_classic)(
+                                  yfit, alpha=0.1), float)
+            val_dow = harness.mase(yv, dow_val, yfit, basis="calendar_lag7")
+            val_est = harness.mase(yv, est_val, yfit, basis="calendar_lag7")
+            adopt, margin = _one_se_adopt(yv, dow_val, est_val, yfit)
+
+        # Held-out residual of the estimator that would actually be served: the rate
+        # is fitted strictly before cal_start, the block starts at it.
+        cal_dates = s.index[(s.index >= cal_start) & (s.index < test_start)]
+        signed = s.reindex(cal_dates, fill_value=0.0).to_numpy(float) - rate
+        signed = signed[np.isfinite(signed)]
+        adopt = adopt and signed.size > 1
         if adopt:
             Ybase[i] = cro_pred
-            resid = np.abs(ytr - croston_fitted(ytr, alpha=0.1, deflate=True))
-            resid = resid[np.isfinite(resid)]
-            if resid.size > 1:
-                w[i] = float(np.var(resid))
-                for lvl in CONFORMAL_LEVELS:
-                    node_q[(node, lvl)] = conformal_quantile(resid, lvl)
+            # Variance of the SIGNED residual: MinT's W is the base-forecast error
+            # covariance (Wickramasuriya et al. 2019 §2.3). Taking it over |e| measured
+            # the spread of the error MAGNITUDE, a different and smaller quantity, so
+            # every intermittent node was over-trusted relative to its DOW-median peers.
+            w[i] = float(np.var(signed))
+            for lvl in CONFORMAL_LEVELS:
+                node_q[(node, lvl)] = conformal_quantile(np.abs(signed), lvl)
         rows.append({
             "node": node, "adopted": adopt,
+            "method": "sba" if use_sba else "croston",
+            "adi": stats["adi"], "cv2": stats["cv2"],
+            "val_mase_dow": val_dow, "val_mase_est": val_est, "one_se_crit": margin,
             "mae_dow": harness.mae(y_true, dow_pred),
             "mae_sba": harness.mae(y_true, cro_pred),
-            "mase_dow": mase_dow, "mase_sba": mase_sba,
+            "mase_dow": harness.mase(y_true, dow_pred, ytr, basis="calendar_lag7"),
+            "mase_sba": harness.mase(y_true, cro_pred, ytr, basis="calendar_lag7"),
         })
     return rows
 
@@ -352,10 +489,14 @@ def _persist(venue, nodes, recon, test_dates, node_q) -> None:
 
 
 def _croston_section(rows: list[dict]) -> list[str]:
+    # Deferred: intermittency_diagnostic imports build_hierarchy from this module.
+    from eval.intermittency_diagnostic import ADI_INTERMITTENT_CUTOFF
+
     if not rows:
         return [
             "\n## Intermittency: Croston/SBA vs DOW-median (WP2)",
-            "No non-OTHER L3 node classified as intermittent (ADI >= 1.32), so the "
+            f"No non-OTHER L3 node classified as intermittent "
+            f"(ADI >= {ADI_INTERMITTENT_CUTOFF:.4f}), so the "
             "DOW-median base forecaster stands unchanged (see "
             "eval/intermittency_diagnostic.md).",
         ]
@@ -364,21 +505,37 @@ def _croston_section(rows: list[dict]) -> list[str]:
         return "n/a" if not np.isfinite(x) else f"{x:.3f}"
 
     n_adopt = sum(1 for r in rows if r["adopted"])
+    n_sba = sum(1 for r in rows if r["adopted"] and r["method"] == "sba")
     out = [
         "\n## Intermittency: Croston/SBA vs DOW-median (WP2)",
-        "Intermittent L3 nodes (ADI >= 1.32) scored on the held-out TEST_WEEKS "
-        "block. croston_sba is adopted as a node's base forecast only when it "
-        "beats DOW-median on MASE (same seasonal-naive denominator); otherwise "
-        "DOW-median stands. MinT coherence is preserved either way.",
-        f"\n**{n_adopt} of {len(rows)}** intermittent nodes adopted croston_sba.\n",
-        "| Node | MASE DOW | MASE SBA | MAE DOW | MAE SBA | Adopted |",
-        "|---|---|---|---|---|---|",
+        "For each intermittent L3 node (ADI >= 4/3), Kostenko-Hyndman "
+        "`cv2 > 2 - (3/2) adi` picks the estimator and a MASE contest on the "
+        "VALIDATION block (the third TEST_WEEKS block back from the end of the "
+        "calendar, both forecasters fitted strictly before it) decides whether it "
+        "displaces the DOW-median, under a ONE-STANDARD-ERROR margin: the estimator must "
+        "beat the DOW-median by more than one standard error of the paired differential "
+        "over disjoint 7-day sub-blocks (`1-SE crit` column, adopt when negative), not "
+        "merely by any amount. The margin was pre-registered in "
+        "`ledger/prereg_adoption_margin_2026-08-01.md` before implementation, AFTER "
+        "observing that the bare inequality adopted a node on a 0.21% margin which then "
+        "scored 96% worse on test; that ordering is stated rather than concealed. "
+        "An adopted estimator is then refitted on everything "
+        "before the CALIBRATION block, which supplies its band and its weight. The TEST "
+        "columns are therefore reported, never selected on. WLS_v coherence is preserved "
+        "either way.",
+        f"\n**{n_adopt} of {len(rows)}** intermittent nodes adopted an intermittent "
+        f"estimator ({n_sba} SBA, {n_adopt - n_sba} Croston).\n",
+        "| Node | ADI | CV2 | Est. | val MASE DOW | val MASE est | 1-SE crit | Adopted "
+        "| test MASE DOW | test MASE est |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         out.append(
-            f"| {r['node']} | {fmt(r['mase_dow'])} | {fmt(r['mase_sba'])} | "
-            f"{fmt(r['mae_dow'])} | {fmt(r['mae_sba'])} | "
-            f"{'yes' if r['adopted'] else 'no'} |")
+            f"| {r['node']} | {fmt(r['adi'])} | {fmt(r['cv2'])} | {r['method']} | "
+            f"{fmt(r['val_mase_dow'])} | {fmt(r['val_mase_est'])} | "
+            f"{fmt(r.get('one_se_crit', float('nan')))} | "
+            f"{'yes' if r['adopted'] else 'no'} | "
+            f"{fmt(r['mase_dow'])} | {fmt(r['mase_sba'])} |")
     return out
 
 
@@ -387,8 +544,10 @@ def _write_report(out: dict) -> None:
     lines = [
         "# A6 · Hierarchical reconciliation (Beer Hall, units)\n",
         f"Nodes: {out['n_nodes']} ({out['n_bottom']} bottom item nodes). "
-        "Base forecasts: robust DOW-median per node. Reconciliation: MinT "
-        "(diagonal WLS).\n",
+        "Base forecasts: robust DOW-median per node. Reconciliation: **WLS_v** "
+        "(Wickramasuriya et al. 2019 Eq. 11 with a diagonal W; those authors reserve "
+        "\"MinT\" for the off-diagonal Sample/Shrink estimators, so this artefact does "
+        "not use that name).\n",
         "**Scope:** A6 (L2/L3 hierarchy reconciliation) is run for the Beer Hall "
         "only. It is intentionally not extended to Two River Taps (closed) or "
         "Ellel (booking-driven, ~64 trading days) — their category/item splits "
@@ -458,12 +617,12 @@ def _write_report(out: dict) -> None:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Hierarchical MinT reconciliation")
+    ap = argparse.ArgumentParser(description="Hierarchical WLS_v reconciliation")
     ap.add_argument("--venue", default=ANCHOR_VENUE)
     ap.add_argument("--top-k", type=int, default=3)
     args = ap.parse_args()
 
-    print(f"A6 · hierarchy + MinT reconciliation ({args.venue})")
+    print(f"A6 · hierarchy + WLS_v reconciliation ({args.venue})")
     out = reconcile(args.venue, args.top_k)
     print(f"  nodes             : {out['n_nodes']} ({out['n_bottom']} bottom items)")
     print(f"  test span         : {out['test_dates'][0].date()} -> "
@@ -476,8 +635,10 @@ def main() -> int:
               f"   L3 @{int(lvl*100)}%: {out['l3_coverage'][lvl]*100:.1f}%")
     if out.get("croston"):
         n_adopt = sum(1 for r in out["croston"] if r["adopted"])
+        n_sba = sum(1 for r in out["croston"] if r["adopted"] and r["method"] == "sba")
         print(f"  intermittency     : {n_adopt}/{len(out['croston'])} intermittent "
-              "nodes adopt croston_sba (held-out MASE rule)")
+              f"nodes off DOW-median ({n_sba} SBA, {n_adopt - n_sba} Croston; "
+              "ex-ante Kostenko-Hyndman rule)")
     if out["keg"]:
         k = out["keg"]
         print(f"  consumption proxy : {k['line']} {k['forecast_pints']} pints/"

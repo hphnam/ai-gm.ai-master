@@ -454,7 +454,11 @@ AGENT_PROMPT_VERSION = "v1"       # selects signals/prompts/agent_v1.md; frozen 
 # elicited ratio, once it arrives, SELECTS a point on the curve rather than forcing a
 # re-run. Reported as an operating curve, never a single hard-coded point.
 AGENT_COST_RATIOS = (0.25, 0.5, 1.0, 2.0, 4.0)
-AGENT_ECE_BINS = 10               # equal-width reliability bins; coarsened if any bin < 10
+# Guo et al. (2017) specify M = 15 equal-width bins; matched here rather than departing
+# silently. With AGENT_MIN_BIN = 10 this needs n >= 150 before coarsening leaves 15 bins
+# standing, so at these n the reported ECE is dominated by the coarsening scheme - which is
+# why `calibration` returns the scheme string and per-bin counts alongside the statistic.
+AGENT_ECE_BINS = 15               # equal-width reliability bins; coarsened if any bin < 10
 AGENT_MIN_BIN = 10                # G3 floor: no calibration bin holds fewer than this
 AGENT_BOOTSTRAP_B = 10000         # paired-bootstrap resamples for the Part 5 difference test
 AGENT_BOOTSTRAP_SEED = 93         # reproducibility of the paired bootstrap

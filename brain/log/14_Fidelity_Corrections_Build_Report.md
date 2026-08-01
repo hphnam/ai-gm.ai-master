@@ -137,6 +137,12 @@ with the reason.
 - **D7. WP2 adoption outcome.** croston_sba wins on 0 of 17 nodes, so no base
   forecast is swapped and the reconcile production path output is unchanged. This is
   the gate deciding, not a spec departure, but it is worth stating plainly.
+
+  > **SUPERSEDED 2026-07-31, this bullet only. See report 53.** The gate quoted here
+  > scored both forecasters on the held-out test block and then reported that block, so
+  > "0 of 17" is a test-block selection outcome and not an out-of-sample result. Selection
+  > now runs on a validation block inside training and adopts 1 of 16. Do not quote the
+  > count above. Annotated rather than rewritten so the commit ordering stays intact.
 - **D8. WP2 band residual for adopted nodes.** For any adopted node the conformal
   band residuals are recomputed from the Croston forecaster (so the band matches the
   point). Moot here since none adopted, but implemented for correctness.

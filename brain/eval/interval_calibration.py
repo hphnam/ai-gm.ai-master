@@ -113,7 +113,7 @@ def generate_records(venue: str, model: str | None = None) -> pd.DataFrame:
 # --- The online leak-free pass ----------------------------------------------
 
 def run_online(records: pd.DataFrame, level: float, *, gammas=ACI_GAMMAS,
-               eta: float, warmup: int = WARMUP_POOL) -> dict[str, pd.DataFrame]:
+               warmup: int = WARMUP_POOL) -> dict[str, pd.DataFrame]:
     """One leak-free EnbPI-style pass. Returns {arm: banded rows}. The pool holds residuals
     whose target date is observed by the origin; the online arms update per step with the lag
     h at which that step's outcome is revealed."""
@@ -126,7 +126,7 @@ def run_online(records: pd.DataFrame, level: float, *, gammas=ACI_GAMMAS,
     origins = sorted(by_origin)
 
     acis = {g: ACI(level, g) for g in gammas}
-    agaci = AgACI(level, gammas, eta=eta)
+    agaci = AgACI(level, gammas)
     aci_keys = {g: f"A@{g}" for g in gammas}
     online = list(aci_keys.values()) + ["G"]
     pending = {k: {h: {} for h in range(1, HORIZON + 1)} for k in online}
@@ -158,7 +158,7 @@ def run_online(records: pd.DataFrame, level: float, *, gammas=ACI_GAMMAS,
             for h in range(1, HORIZON + 1):
                 memo = pending["G"][h].pop(t, None)
                 if memo is not None:
-                    agaci.update_step(h, y_t, memo[0], memo[1])
+                    agaci.update_step(h, y_t, *memo)
         # 2. advance the pool to every residual whose target date is <= t.
         while tptr < len(sorted_targets) and sorted_targets[tptr] <= t:
             for st, rs, stt in res_by_target[sorted_targets[tptr]]:
@@ -192,8 +192,8 @@ def run_online(records: pd.DataFrame, level: float, *, gammas=ACI_GAMMAS,
         lo, hi = agaci.band(pr, ps, yhat, steps)
         _record("G", g_rows, lo, hi)
         for i, h in enumerate(steps):
-            los, his = agaci.last_experts[int(h)]
-            pending["G"][int(h)][targets[i]] = (los.copy(), his.copy())
+            los, his, lo_pred, hi_pred = agaci.last_experts[int(h)]
+            pending["G"][int(h)][targets[i]] = (los.copy(), his.copy(), lo_pred, hi_pred)
 
     out = {k: pd.DataFrame(v) for k, v in banded.items()}
     out["_clamps"] = {aci_keys[g]: acis[g].clamps for g in gammas}
@@ -223,7 +223,9 @@ def arm_metrics(banded: pd.DataFrame, level: float) -> dict:
         "marginal": _cov_ci(covered),
         "mean_width": harness.mean_width(lo, hi),
         "winkler": harness.winkler(y, lo, hi, level),
-        "per_step": {int(h): {**_cov_ci(covered[step == h]),
+        # Keys are strings, not ints: `render` runs both on this dict in-process and on
+        # its JSON round-trip (which stringifies keys), and the two must index alike.
+        "per_step": {str(h): {**_cov_ci(covered[step == h]),
                               "mean_width": harness.mean_width(lo[step == h], hi[step == h]),
                               "winkler": harness.winkler(y[step == h], lo[step == h],
                                                          hi[step == h], level)}
@@ -312,13 +314,6 @@ def power_analysis(*, n: int = 7, level: float = PRIMARY_LEVEL, coverage: float 
 
 # --- Build ------------------------------------------------------------------
 
-def _eta_for(records: pd.DataFrame, n_origins: int, k_experts: int) -> float:
-    """AgACI aggregation rate: sqrt(8 ln K / T) scaled by the per-round loss magnitude, so the
-    exponential weights discriminate without collapsing onto one expert immediately."""
-    scale = float(np.median(records["res"])) or 1.0
-    return float(np.sqrt(8.0 * np.log(max(k_experts, 2)) / max(n_origins, 2)) / scale)
-
-
 def build() -> dict:
     ceiling = assert_store_ceiling()
     started = time.time()
@@ -329,13 +324,12 @@ def build() -> dict:
         records = generate_records(venue)
         n_origins = records["origin"].nunique()
         calib_sizes[venue] = int(len(records[records["target"] <= records["origin"].max()]))
-        eta = _eta_for(records, n_origins, len(ACI_GAMMAS))
 
         per_level = {}
         winkler_primary = {}
         gamma_sweep = {}
         for level in LEVELS:
-            arms_raw = run_online(records, level, eta=eta)
+            arms_raw = run_online(records, level)
             clamps = arms_raw.pop("_clamps")
             # ACI gamma sweep on the primary level: pick the best gamma by mean Winkler.
             sweep = {f"A@{g}": arm_metrics(arms_raw[f"A@{g}"], level)["winkler"]
@@ -359,7 +353,7 @@ def build() -> dict:
         venues_out[venue] = {
             "n_origins": int(n_origins),
             "point_model": default_model(venue),
-            "eta_agaci": eta,
+            "agaci_aggregation": "BOA (Wintenberger 2017), per bound, no tuned rate",
             "per_level": per_level,
             "aci_gamma_sweep": gamma_sweep,
         }
@@ -434,11 +428,11 @@ def render(vectors: dict, mcs_out: dict, power: dict) -> None:
         lines.append("| step | " + " | ".join(str(h) for h in range(1, HORIZON + 1)) + " |")
         lines.append("|" + "---|" * (HORIZON + 1))
         for a in ("D", "S", "A", "G"):
-            cov = " | ".join(f"{m[a]['per_step'][h]['coverage']:.2f}"
+            cov = " | ".join(f"{m[a]['per_step'][str(h)]['coverage']:.2f}"
                              for h in range(1, HORIZON + 1))
             lines.append(f"| {a} | {cov} |")
         lines.append(f"\nS per-step half-width: " + ", ".join(
-            f"h{h}={m['S']['per_step'][h]['mean_width'] / 2:.0f}"
+            f"h{h}={m['S']['per_step'][str(h)]['mean_width'] / 2:.0f}"
             for h in range(1, HORIZON + 1)) + ".")
         lines.append(f"ACI gamma sweep (mean Winkler): " + ", ".join(
             f"{g}={w:.1f}" for g, w in vv["aci_gamma_sweep"].items())
@@ -469,14 +463,15 @@ def served_coverage_check(venue: str = "beer_hall") -> dict:
     records = generate_records(venue, model=model)
     out = {}
     for level in LEVELS:
-        arms = run_online(records, level, eta=0.001)
+        arms = run_online(records, level)
         arms.pop("_clamps")
         out[str(level)] = {a: {
             "marginal": arm_metrics(arms[a], level)["marginal"],
-            "per_step_coverage": {h: arm_metrics(arms[a], level)["per_step"][h]["coverage"]
+            "per_step_coverage": {h: arm_metrics(arms[a], level)["per_step"][str(h)]["coverage"]
                                   for h in range(1, HORIZON + 1)},
-            "per_step_half_width": {h: arm_metrics(arms[a], level)["per_step"][h]["mean_width"] / 2
-                                    for h in range(1, HORIZON + 1)},
+            "per_step_half_width":
+                {h: arm_metrics(arms[a], level)["per_step"][str(h)]["mean_width"] / 2
+                 for h in range(1, HORIZON + 1)},
         } for a in ("P", "D", "S")}
     ceiling = assert_store_ceiling()
     payload = {"store_ceiling": ceiling, "device": "cpu", "venue": venue,

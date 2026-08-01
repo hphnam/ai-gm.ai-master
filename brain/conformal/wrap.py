@@ -68,8 +68,34 @@ warnings.filterwarnings("ignore")
 EPS = 1e-6
 
 
+def conformal_min_n(level: float, *, cap: int = 100_000) -> int:
+    """Smallest calibration set at which `level` is actually attainable: 4 points
+    for 80%, 9 for 90%.
+
+    Split conformal takes the `ceil((n+1)(1-alpha))`-th smallest score; that index
+    exceeds `n` for small n, where the correct prediction set is INFINITE and the
+    guarantee is simply unavailable. Searched with the SAME expression
+    `conformal_quantile` clamps on rather than the closed form `level/(1-level)`,
+    which is not exact in binary --- `0.8/(1-0.8)` is 4.000000000000001, and
+    rounding that up reports the boundary one point too high.
+    """
+    n = 1
+    while n < cap and math.ceil((n + 1) * level) > n:
+        n += 1
+    return n
+
+
 def conformal_quantile(scores: np.ndarray, level: float) -> float:
-    """Finite-sample split-conformal quantile: the k-th smallest |residual|."""
+    """Finite-sample split-conformal quantile: the k-th smallest |residual|.
+
+    CLAMPED at the largest observed score when `n < conformal_min_n(level)`, where
+    the honest answer is +inf. MAPIE and `crepes` return infinity instead. The clamp
+    is kept because an infinite band is useless to an operator, but it is not free:
+    below that n the band is finite and carries NO coverage guarantee. Callers that
+    can hit small groups must count how often it fires --- `conformal_min_n` is the
+    test, and `evaluate` reports the tally as `undersized_group_bands`. A guarantee
+    that lapses silently on exactly the sparsest groups is the worst case.
+    """
     scores = np.sort(np.asarray(scores, float))
     n = len(scores)
     if n == 0:
@@ -164,6 +190,10 @@ def evaluate(
               for lvl in CONFORMAL_LEVELS}
     acc_res: list[float] = []
     acc_grp: list[int] = []
+    # M7: how many group-conditional bands were issued from a calibration set too
+    # small for the level, where `conformal_quantile` clamps and the guarantee lapses.
+    undersized = {lvl: 0 for lvl in CONFORMAL_LEVELS}
+    n_group_bands = {lvl: 0 for lvl in CONFORMAL_LEVELS}
 
     bs = full["date"].min()
     end = full["date"].max()
@@ -179,6 +209,9 @@ def evaluate(
                 q = conformal_quantile(ar, lvl)
                 _accumulate(pooled[lvl]["plain"], yb, yh - q, yh + q)
                 qg = _mondrian_quantiles(ar, ag, lvl)
+                for g in qg:
+                    n_group_bands[lvl] += 1
+                    undersized[lvl] += int((ag == g).sum() < conformal_min_n(lvl))
                 qpt = np.array([qg.get(g, q) for g in gb])
                 _accumulate(pooled[lvl]["mondrian"], yb,
                             np.clip(yh - qpt, 0, None), yh + qpt)
@@ -196,6 +229,9 @@ def evaluate(
             entry[variant] = harness.interval_metrics(
                 np.asarray(p["y"]), np.asarray(p["lo"]), np.asarray(p["hi"]), lvl)
             entry[f"{variant}_n"] = len(p["y"])
+        entry["undersized_group_bands"] = undersized[lvl]
+        entry["group_bands"] = n_group_bands[lvl]
+        entry["min_calibration_n"] = conformal_min_n(lvl)
         out["levels"][lvl] = entry
 
     _persist_test_band(venue, model_name, feats, full)
@@ -338,6 +374,9 @@ def _run_one(venue: str, layer: str, model: str | None) -> bool:
     for level, m in out["levels"].items():
         cov = m["mondrian"]["coverage"] * 100
         ok = ok and abs(cov - level * 100) <= COVERAGE_TOL_PP
+        print(f"  guarantee @{int(level*100)}%: {m['undersized_group_bands']} of "
+              f"{m['group_bands']} group bands issued below n="
+              f"{m['min_calibration_n']} (clamped, no coverage guarantee)")
 
     if out.get("closed"):
         print(f"  standby band      : +{out['standby_days']}d projected past "
@@ -409,6 +448,22 @@ def _write_report(out: dict, passed: bool) -> None:
             lines.append(
                 f"| {v} | {int(lvl*100)}% | {cov:.1f}% | {m[v]['mean_width']:.0f} | "
                 f"{m[v]['winkler']:.0f} | {m[v]['mean_pinball']:.0f} | {ok} |")
+    lines += [
+        "\n**Where the guarantee lapses.** Split conformal needs at least "
+        "`level/(1-level)` calibration points before the requested level is even "
+        "attainable; below that the correct band is infinite and "
+        "`conformal_quantile` clamps to the largest observed residual instead. The "
+        "clamp keeps the band usable but it carries no coverage guarantee, and the "
+        "group-conditional bands are where a sparse group can hit it, so the count "
+        "is reported rather than left silent:",
+        "",
+        "| Level | Min calibration n | Group bands issued | Of which clamped |",
+        "|---|---|---|---|",
+    ]
+    for lvl, m in out["levels"].items():
+        lines.append(
+            f"| {int(lvl*100)}% | {m['min_calibration_n']} | {m['group_bands']} | "
+            f"{m['undersized_group_bands']} |")
     lines += [
         "\n**Deliverable:** the Mondrian band (group-conditional on active vs "
         "structural-zero day) is persisted to DuckDB (`bands`/`forecasts`, model "

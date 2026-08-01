@@ -39,6 +39,12 @@ def test_matches_statsforecast_on_bernoulli_gap_series():
         reason="statsforecast does not build on this Python 3.14 venv (scipy/numba); "
         "cross-check skipped per spec G2.2",
     )
+    # RUN AND PASSED OUT OF BAND, 2026-07-31 (ledger M11): statsforecast 2.1.1 on a
+    # CPython 3.12.13 venv, 200 Bernoulli-gap series. Max absolute difference 1.3e-15 for
+    # both CrostonClassic and CrostonSBA, and the leading-zero edge cases (our
+    # `phat = i0 + 1` against their `np.diff(..., prepend=0)`) agree exactly. Note the run
+    # cannot discriminate our parameterised `1 - alpha/2` from their hard-coded 0.95,
+    # because at the default alpha = 0.1 the two coincide; see report 53.
     rng = np.random.default_rng(93)
     series = [
         (rng.random(120) < 0.4) * rng.integers(1, 6, 120).astype(float)

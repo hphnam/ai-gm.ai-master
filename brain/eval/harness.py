@@ -354,8 +354,8 @@ def rmsse(
 
     The denominator uses the basis's own lag, not M5's lag 1, because the claim
     being made is that MASE and RMSSE differ in LOSS FUNCTION, and that only holds
-    if the ruler is shared. `rmsse_m5` is the literal M5 statistic; report both,
-    labelled (report 42 section 3).
+    if the ruler is shared. `rmsse_m5` is the lag-1 variant; report both, labelled
+    (report 42 section 3).
     """
     denom = seasonal_naive_squared_scale(
         y_train, basis=basis, n_calendar_days=n_calendar_days
@@ -378,12 +378,25 @@ def naive_squared_scale(y_train: np.ndarray, *, lag: int = 1) -> float:
 def rmsse_m5(
     y_true: np.ndarray, y_pred: np.ndarray, y_train: np.ndarray
 ) -> float:
-    """RMSSE exactly as the M5 competition defined it: lag-1 naive denominator.
+    """RMSSE on a lag-1 naive denominator, the form M5 is generally reported to use.
 
     Reported alongside `rmsse` so the answer to "is this M5's RMSSE" is "both, and
     here is each". On a series with closed days the lag-1 denominator is inflated
     by every open-to-closed transition, which is why it is the secondary figure
     here and not the primary one.
+
+    Verified against the literature 2026-07-31 (ledger M8). Hewamalage et al., "A Look
+    at the Evaluation Setup of the M5 Forecasting Competition", eq. 5, gives M5's RMSSE
+    scale as `1/(n-1) * sum_{i=2}^{n} (Y_i - Y_{i-1})^2` with n the length of the
+    observed period. `naive_squared_scale` takes `np.mean` over the n-1 first
+    differences, which is that expression exactly, so the normalisation matches.
+
+    M5 additionally computes its denominator only after a product's first non-zero
+    sale. That rule is NOT stated in any source this project holds, and it is moot
+    here regardless: `venue_ruler` builds the calendar series from the venue's own
+    first row to its last, so there is no pre-launch zero run to exclude. M5 needed the
+    rule because 42,840 products share one calendar from 2011; a per-venue series has
+    no such prefix.
     """
     denom = naive_squared_scale(y_train)
     if not np.isfinite(denom):
@@ -432,8 +445,15 @@ class VenueRuler:
         return rmsse(y_true, y_pred, self.series_for(basis), basis=basis,
                      n_calendar_days=self.n_calendar_days)
 
-    def rmsse_m5(self, y_true: np.ndarray, y_pred: np.ndarray, basis: str) -> float:
-        return rmsse_m5(y_true, y_pred, self.series_for(basis))
+    def rmsse_m5(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Always on the CALENDAR series, whatever basis is being reported beside it.
+
+        It previously took the reported basis and so silently switched to the
+        trading-day series, which removes exactly the closed-day transitions the
+        lag-1 denominator exists to expose. A figure labelled M5 has to mean one
+        thing regardless of its neighbour.
+        """
+        return rmsse_m5(y_true, y_pred, self.calendar)
 
     def scale_block(self) -> dict:
         """The scale half of a metric row: every basis, and the counts behind it."""
@@ -532,7 +552,7 @@ def venue_metric_row(
     row: dict = {
         "mase": {b: round(ruler.mase(y_true, y_pred, b), 3) for b in SCALE_BASES},
         "rmsse": round(ruler.rmsse(y_true, y_pred, reported_basis), 3),
-        "rmsse_m5": round(ruler.rmsse_m5(y_true, y_pred, reported_basis), 3),
+        "rmsse_m5": round(ruler.rmsse_m5(y_true, y_pred), 3),
         "mae": round(mae(y_true, y_pred), 1),
         "rmse": round(rmse(y_true, y_pred), 1),
         "n_days": int(np.asarray(y_true).size),

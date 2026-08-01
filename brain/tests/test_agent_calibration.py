@@ -143,6 +143,64 @@ def test_ece_matches_a_hand_computed_case():
     assert cal["ece"] == pytest.approx(0.05)
 
 
+def test_a_probability_on_a_bin_edge_falls_in_the_lower_bin():
+    """Guo et al. use `(lo, hi]`, so p = 0.7 belongs to (0.6, 0.7], not [0.7, 0.8).
+    With equal-width bins the edges are round decimals, which is exactly what a
+    temperature-0 model emits, so this convention decides where most of the mass sits."""
+    recs = [{"item_key": str(i), "constant_score": 0.0, "p_raise": 0.7, "truth": True}
+            for i in range(10)]
+    cal = ac.calibration(recs, n_bins=10, min_bin=10)
+    occupied = next(b for b in cal["bins"] if b["n"])
+    assert occupied["hi"] == pytest.approx(0.7)
+
+
+def test_zero_is_kept_by_the_first_bin_which_stays_closed_at_the_left():
+    recs = [{"item_key": str(i), "constant_score": 0.0, "p_raise": 0.0, "truth": False}
+            for i in range(10)]
+    cal = ac.calibration(recs, n_bins=10, min_bin=10)
+    assert sum(b["n"] for b in cal["bins"]) == 10
+
+
+def _overconfident(n=200, seed=93):
+    """Truth is Bernoulli(0.5 + 0.4*s) but the agent reports a far sharper probability."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for i in range(n):
+        s = rng.uniform(-1, 1)
+        true_p = 0.5 + 0.4 * s
+        stated = 0.5 + 0.499 * np.sign(s) * abs(s) ** 0.3   # pushed toward 0/1
+        out.append({"item_key": str(i), "constant_score": 0.0,
+                    "p_raise": float(np.clip(stated, 0.001, 0.999)),
+                    "truth": bool(rng.random() < true_p)})
+    return out
+
+
+def test_temperature_scaling_softens_an_overconfident_agent():
+    fit = ac.fit_temperature(_overconfident())
+    assert fit["temperature"] > 1.0
+
+
+def test_temperature_scaling_improves_ece_on_an_overconfident_agent():
+    fit = ac.fit_temperature(_overconfident())
+    assert fit["ece_after"] < fit["ece_before"]
+
+
+def test_temperature_scaling_preserves_the_ranking():
+    """The map is strictly monotone, so it cannot change any ordering or threshold sweep."""
+    recs = _overconfident()
+    fit = ac.fit_temperature(recs)
+    p = np.array([r["p_raise"] for r in recs])
+    scaled = ac._sigmoid(ac._logit(p) / fit["temperature"])
+    assert np.array_equal(np.argsort(p, kind="stable"),
+                          np.argsort(scaled, kind="stable"))
+
+
+def test_temperature_scaling_declines_a_single_outcome_corpus():
+    recs = [{"item_key": str(i), "constant_score": 0.0, "p_raise": 0.6, "truth": True}
+            for i in range(20)]
+    assert ac.fit_temperature(recs)["fitted"] is False
+
+
 def test_brier_matches_a_hand_computed_case():
     # 10 items p=0.9 (8 real -> (0.9-1)^2*8 + (0.9-0)^2*2), 10 items p=0.1 (1 real).
     hand = (8 * 0.1 ** 2 + 2 * 0.9 ** 2 + 1 * 0.9 ** 2 + 9 * 0.1 ** 2) / 20

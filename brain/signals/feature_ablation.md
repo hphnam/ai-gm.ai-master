@@ -6,37 +6,43 @@
 >
 > The two results do not conflict. Different model, different feature mechanism: the GBM consumes engineered columns and was beaten by its own autoregressive lags on ~270 days; Chronos-2 conditions on covariates zero-shot through the context/future frames and earned its rung at the gate. The exo entrant was widened from four calendar flags to the full set at G12.10b, *after* this ablation was written.
 
-Venue: **beer_hall**. Model: Rung-3 GBM (the only ladder model that consumes engineered features), expanding-window rolling-origin, 6 folds, 7-day horizon. A column ships only if it cuts mean held-out MASE by > 1% without degrading coverage by > 3pp.
+Venue: **beer_hall**. Model: Rung-3 GBM (the only ladder model that consumes engineered features), expanding-window rolling-origin, 39 disjoint folds, 7-day horizon. The origin advances by a full horizon over the whole active span rather than stopping at six folds: six is fewer than the moving-block length, which makes every bootstrap resample identical to the sample and pins every MCS p-value to 0 or 1. A column ships only if the 90% model confidence set over the baseline and all candidates EXCLUDES the baseline and retains that candidate, and coverage does not degrade by > 3pp. The old rule was a > 1% cut in the six-fold mean, which is well inside fold-to-fold noise at these series lengths (ledger M24); the per-fold spread it hid is now in the CI column.
 
 Local-event days in this venue's active window: **7** (the confirmed curated anchors are autumn/winter; the two biggest recurring Lancaster festivals did not run in-window — see local_events.py — and none fall in the recent rolling-origin test folds, so the event feature is constant-0 there and **cannot** change test MASE: an honest null result, not a bug).
 
-**Baseline GBM** — MASE **0.8159**, 90% coverage 88.1%.
+**Baseline GBM** — MASE **0.9551**, 90% coverage 87.9%.
 
-| Candidate exo feature | MASE | Δ MASE | Coverage | Ships? |
-|---|---|---|---|---|
-| `exo_is_school_term` | 0.8322 | -2.00% | 88.1% | no |
-| `exo_is_uni_term` | 0.8657 | -6.11% | 85.7% | no |
-| `calendar (school+uni)` | 0.8212 | -0.65% | 85.7% | no |
-| `weather (T+rain+sun)` | 0.9801 | -20.12% | 83.3% | no |
-| `exo_is_dry` | 0.8446 | -3.52% | 88.1% | no |
-| `exo_fixture_nearby` | 0.8159 | +0.00% | 88.1% | no |
-| `exo_event_rank` | 0.8159 | +0.00% | 88.1% | no |
+| Candidate exo feature | MASE | Δ MASE | Δ vs baseline [90% CI] | Coverage | In 90% set | Ships? |
+|---|---|---|---|---|---|---|
+| `exo_is_school_term` | 0.9427 | +1.30% | -0.0124 [-0.0279, +0.0063] | 86.8% | yes | no |
+| `exo_is_uni_term` | 0.9489 | +0.65% | -0.0063 [-0.0145, +0.0049] | 87.5% | yes | no |
+| `calendar (school+uni)` | 0.9391 | +1.68% | -0.0160 [-0.0237, -0.0016] | 86.4% | yes | no |
+| `weather (T+rain+sun)` | 0.9120 | +4.51% | -0.0431 [-0.1243, +0.0243] | 87.5% | yes | no |
+| `exo_is_dry` | 0.9474 | +0.81% | -0.0077 [-0.0245, +0.0025] | 88.3% | yes | no |
+| `exo_fixture_nearby` | 0.9551 | +0.00% | +0.0000 [+0.0000, +0.0000] | 87.9% | yes | no |
+| `exo_event_rank` | 0.9551 | +0.00% | +0.0000 [+0.0000, +0.0000] | 87.9% | yes | no |
+
+90% model confidence set over baseline + candidates on 39 folds: **weather (T+rain+sun), calendar (school+uni), exo_is_school_term, exo_is_dry, exo_is_uni_term, baseline, exo_fixture_nearby, exo_event_rank**. The baseline is retained, so no candidate is separable from it and nothing ships.
+
 
 ## Weather train/serve consistency study (§4)
 At inference only a *forecast* of the weather is known, so the headline question is which **training** basis predicts best when **serving** on a forecast basis (here `leadmatched` — the forecast as issued 3 days ahead). Observed (ERA5) is an *upper bound* only.
 
 ### Q2 — training basis (serve = forecast)
-Reference **oracle** (weather perfectly known at train *and* serve): MASE **0.9270** — the upper bound, not achievable live.
+Reference **oracle** (weather perfectly known at train *and* serve): MASE **0.9005** — the upper bound, not achievable live.
 
 | Training basis | Serve basis | Held-out MASE | Note |
 |---|---|---|---|
-| observed | leadmatched | 0.9690 | train/serve **mismatch** (clean reanalysis, forecast serve) |
-| hindcast | leadmatched | 0.9071 |  |
-| leadmatched | leadmatched | 0.8160 ⬅ best | train basis matches serve |
+| observed | leadmatched | 0.8788 ⬅ lowest (in 90% set) | train/serve **mismatch** (clean reanalysis, forecast serve) |
+| hindcast | leadmatched | 0.8884 (in 90% set) |  |
+| leadmatched | leadmatched | 0.9102 (in 90% set) | train basis matches serve |
 
-### Q3 — forecast skill at 3-day lead (observed vs lead-matched, n=362)
-- temperature MAE: **0.89 °C** (short-lead temp is accurate — the basis barely matters for it).
-- precipitation MAE: **3.48 mm** (rain is the noisier signal — where basis choice matters most).
+The three bases are **not separable** on 39 folds: the 90% model confidence set retains observed, hindcast, leadmatched. The lowest mean is marked above, but it is a ranking and not a finding, and 'best' is deliberately not written next to it.
+
+
+### Q3 — forecast skill at 3-day lead (observed vs lead-matched, n=399)
+- temperature MAE: **0.86 °C** (short-lead temp is accurate — the basis barely matters for it).
+- precipitation MAE: **3.55 mm** (rain is the noisier signal — where basis choice matters most).
 
 ## Verdict (honest negative — adoption gated by evidence, Rung-3 GBM only)
 **No exogenous feature is adopted as a GBM model feature.** Against the strong autoregressive baseline (lag-7/14, roll-28, DOW), every candidate *increases* held-out MASE on this operational window: the deterministic calendar flags are **near-constant within the recent rolling-origin test folds** (the test span sits inside one university/school term, so the flag only adds a spurious split → mild overfitting), weather overfits ~270 training days, and the curated events have no anchor in the test folds. This is a genuine result the ablation — not assumption — established; the value of calendar features would surface across term-boundary transitions that the 6-week operational horizon does not span (FLAG-FE10).

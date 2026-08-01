@@ -119,3 +119,63 @@ prediction held; the resulting adoption count; and the coverage figures. If the 
 rejects the adoption, the chapters' figures move to run D and the text must say that the
 margin was added after observing the failure, not that the corrected pipeline happened to
 produce better coverage.
+
+---
+
+# OUTCOME, appended 2026-08-01 after the run
+
+## The prediction held
+
+`ITEM::Beer::Lager - BH`: `mean(d) + sd(d)/sqrt(8) = +0.026`. Positive, so the rule
+rejects the adoption, as predicted. **0 of 16 nodes now adopt** (was 1 of 16).
+
+The pooled validation margin was 0.21 per cent in the estimator's favour; the sub-block
+standard error is an order of magnitude larger than that advantage. The adoption was
+inside the noise, which is what the rule exists to detect and what could not be seen from
+a pooled point estimate.
+
+No other node's decision changed, consistent with the arithmetic noted above: a stricter
+rule can only reduce the adoption count.
+
+Four nodes return `n/a` for the criterion where they returned a finite bare-inequality
+comparison (`Centennial Summer Pale`, `Nuts`, `Lunebrew T Shirt`, `Hire Fee`). This is the
+fail-closed path firing on zero dispersion or a non-finite sub-block differential, and in
+every case the bare rule had already declined, so no decision changed.
+
+## An error in this document's own "already measured" block
+
+**The keg figure quoted above was wrong and is corrected here.**
+
+This document stated that if the rule rejected the adoption, the keg order would be
+**1.09**. It is **0.72** (63.7 pints per week). The error was a misattribution: 1.09 comes
+from the PRE-M2 artefact, run under the old fitting span and the in-sample band. Run D of
+report 55 was a coverage-only control harness and never computed the consumption proxy at
+all, so there was no measured run-D keg figure to quote.
+
+The coverage figures quoted in the same block were correct and reproduce exactly: L2 65.8
+and 85.1, L3 60.0 and 72.1 at nominal eighty and ninety.
+
+The error is recorded here rather than silently corrected because this file's whole
+purpose is to be checkable against what followed. It also propagated: report 55 and the
+results chapter both said the adoption moved the keg order "from 1.09 to 1.39", where the
+correct like-for-like comparison under the corrected pipeline is **0.72 to 1.39**. Both
+are being corrected.
+
+## Net effect on the served figures
+
+| | before the margin | after the margin |
+|---|---|---|
+| adoptions | 1 of 16 | 0 of 16 |
+| L2 coverage @80 / @90 | 63.4 / 84.9 | 65.8 / 85.1 |
+| L3 coverage @80 / @90 | 50.4 / 64.0 | 60.0 / 72.1 |
+| keg order | 1.39 | 0.72 |
+| coherence | exact | exact |
+
+## What must be said when this is reported
+
+The ordering stands and is not softened: the margin was specified after observing the
+failure of the rule it replaces. The coverage improvement is therefore NOT evidence that
+the margin is correct. It is the arithmetic consequence of removing a forecaster that was
+already measured to be worse on the test block. The argument for the rule is the Breiman
+one-standard-error argument and the demonstration that a 0.21 per cent pooled margin sits
+inside the sub-block noise, not the coverage number that follows from applying it.

@@ -1,6 +1,6 @@
 # A6 · Hierarchical reconciliation (Beer Hall, units)
 
-Nodes: 39 (30 bottom item nodes). Base forecasts: robust DOW-median per node. Reconciliation: MinT (diagonal WLS).
+Nodes: 41 (32 bottom item nodes). Base forecasts: robust DOW-median per node. Reconciliation: **WLS_v** (Wickramasuriya et al. 2019 Eq. 11 with a diagonal W; those authors reserve "MinT" for the off-diagonal Sample/Shrink estimators, so this artefact does not use that name).
 
 **Scope:** A6 (L2/L3 hierarchy reconciliation) is run for the Beer Hall only. It is intentionally not extended to Two River Taps (closed) or Ellel (booking-driven, ~64 trading days) — their category/item splits would be sparser than the Beer Hall's already-under-covering item bands. Revisit if/when those venues' L1 forecasts prove operationally useful.
 
@@ -17,40 +17,39 @@ Each band is `reconciled ŷ ± split-conformal quantile of the node's DOW-median
 
 | Layer | 80% coverage | 90% coverage |
 |---|---|---|
-| L2 (category) | 70.8% | 82.5% |
-| L3 (top item) | 60.5% | 77.6% |
+| L2 (category) | 65.8% | 85.1% |
+| L3 (top item) | 60.0% | 72.1% |
 
 Item (L3) series are sparse and noisy, so their bands under-cover — an honest, expected limitation of conformal at this grain; category (L2) bands are tighter to nominal.
 
 ## Intermittency: Croston/SBA vs DOW-median (WP2)
-Intermittent L3 nodes (ADI >= 1.32) scored on the held-out TEST_WEEKS block. croston_sba is adopted as a node's base forecast only when it beats DOW-median on MASE (same seasonal-naive denominator); otherwise DOW-median stands. MinT coherence is preserved either way.
+For each intermittent L3 node (ADI >= 4/3), Kostenko-Hyndman `cv2 > 2 - (3/2) adi` picks the estimator and a MASE contest on the VALIDATION block (the third TEST_WEEKS block back from the end of the calendar, both forecasters fitted strictly before it) decides whether it displaces the DOW-median, under a ONE-STANDARD-ERROR margin: the estimator must beat the DOW-median by more than one standard error of the paired differential over disjoint 7-day sub-blocks (`1-SE crit` column, adopt when negative), not merely by any amount. The margin was pre-registered in `ledger/prereg_adoption_margin_2026-08-01.md` before implementation, AFTER observing that the bare inequality adopted a node on a 0.21% margin which then scored 96% worse on test; that ordering is stated rather than concealed. An adopted estimator is then refitted on everything before the CALIBRATION block, which supplies its band and its weight. The TEST columns are therefore reported, never selected on. WLS_v coherence is preserved either way.
 
-**0 of 17** intermittent nodes adopted croston_sba.
+**0 of 16** intermittent nodes adopted an intermittent estimator (0 SBA, 0 Croston).
 
-| Node | MASE DOW | MASE SBA | MAE DOW | MAE SBA | Adopted |
-|---|---|---|---|---|---|
-| ITEM::Beer::Lager - BH | 1.056 | 1.662 | 10.140 | 15.960 | no |
-| ITEM::Beer::Caravan of Love | 1.216 | 2.223 | 6.509 | 11.899 | no |
-| ITEM::Spirits::SMIRNOFF | 0.616 | 0.767 | 3.035 | 3.776 | no |
-| ITEM::Spirits::Whitley Neil | 0.351 | 0.529 | 0.702 | 1.056 | no |
-| ITEM::Soft Drinks::Cordial & Soda | 1.384 | 1.549 | 1.807 | 2.022 | no |
-| ITEM::Soft Drinks::Fruit Shoot | 1.033 | 1.322 | 1.193 | 1.526 | no |
-| ITEM::Wine::Discovery Beach Zinfandel | 0.570 | 0.920 | 0.789 | 1.276 | no |
-| ITEM::Wine::Alpino Pinot Grigio | 0.000 | 0.641 | 0.000 | 0.645 | no |
-| ITEM::Wine::Aperol Spritz | 1.843 | 1.878 | 1.614 | 1.645 | no |
-| ITEM::Uncategorised::Centennial Summer Pale | 0.000 | 0.265 | 0.000 | 0.597 | no |
-| ITEM::Happy Hour::£4 Lager/Cider | 0.709 | 1.425 | 2.175 | 4.370 | no |
-| ITEM::Happy Hour::£3.50 Cask | 0.748 | 1.869 | 1.649 | 4.120 | no |
-| ITEM::Happy Hour::£15 FIZZ | 0.840 | 1.308 | 0.158 | 0.246 | no |
-| ITEM::Food::Nuts | 0.347 | 0.782 | 0.439 | 0.990 | no |
-| ITEM::Merchandise::Lunebrew T Shirt | 0.000 | 3.468 | 0.000 | 0.186 | no |
-| ITEM::Merchandise::Hire Fee | 0.654 | 1.150 | 0.035 | 0.062 | no |
-| ITEM::Merchandise::Pool Table deposit | 1.426 | 1.720 | 0.053 | 0.063 | no |
+| Node | ADI | CV2 | Est. | val MASE DOW | val MASE est | 1-SE crit | Adopted | test MASE DOW | test MASE est |
+|---|---|---|---|---|---|---|---|---|---|
+| ITEM::Beer::Lager - BH | 1.589 | 0.836 | sba | 1.421 | 1.418 | 0.026 | no | 0.891 | 1.749 |
+| ITEM::Beer::Lune Valley Gold | 1.560 | 0.695 | sba | 0.736 | 0.969 | 0.291 | no | 0.917 | 1.238 |
+| ITEM::Spirits::SMIRNOFF | 1.709 | 2.245 | sba | 0.325 | 0.638 | 0.374 | no | 0.796 | 1.059 |
+| ITEM::Spirits::Gordons | 2.242 | 1.989 | sba | 0.561 | 0.911 | 0.437 | no | 0.854 | 1.035 |
+| ITEM::Soft Drinks::Cordial & Soda | 1.742 | 0.601 | sba | 0.918 | 1.081 | 0.223 | no | 1.207 | 1.466 |
+| ITEM::Soft Drinks::Fruit Shoot | 2.491 | 0.758 | sba | 0.689 | 0.882 | 0.237 | no | 0.790 | 1.053 |
+| ITEM::Wine::Discovery Beach Zinfandel | 2.097 | 0.722 | sba | 0.554 | 0.842 | 0.340 | no | 0.683 | 0.957 |
+| ITEM::Wine::Aperol Spritz | 2.690 | 2.004 | sba | 0.722 | 1.018 | 0.332 | no | 3.153 | 3.353 |
+| ITEM::Wine::Sauvignon Blanc | 1.500 | 0.606 | sba | n/a | n/a | n/a | no | 5.842 | 5.948 |
+| ITEM::Uncategorised::Centennial Summer Pale | 3.718 | 0.882 | sba | 0.000 | 0.198 | n/a | no | 0.000 | 0.248 |
+| ITEM::Happy Hour::£4 Lager/Cider | 2.765 | 0.633 | sba | 0.456 | 0.958 | 0.652 | no | 0.919 | 1.672 |
+| ITEM::Happy Hour::£3.50 Cask | 2.938 | 0.551 | sba | 0.814 | 1.291 | 0.605 | no | 0.818 | 2.030 |
+| ITEM::Food::Nuts | 1.486 | 0.648 | sba | 0.507 | 0.585 | n/a | no | 0.415 | 0.732 |
+| ITEM::Merchandise::Lunebrew T Shirt | 23.727 | 0.239 | sba | 0.000 | 2.595 | n/a | no | 0.306 | 3.439 |
+| ITEM::Merchandise::Hire Fee | 23.900 | 0.117 | sba | 0.000 | 0.556 | n/a | no | 1.748 | 2.346 |
+| ITEM::Merchandise::Caravan T-shirt | 4.200 | 0.150 | sba | n/a | n/a | n/a | no | n/a | n/a |
 
 ## Stock-consumption proxy
 - line: **Lager - BH** (2 node(s))
-- reconciled 7-day forecast: **90.6 pints**
-- @ 88 pints/keg → **1.03 kegs** to order for the week.
+- reconciled 7-day forecast: **63.7 pints**
+- @ 88 pints/keg → **0.72 kegs** to order for the week.
 
 ## Inventory-aware reorder (A12 stock-cover join)
 The demand-only proxy above becomes a true reorder signal once the physical on-hand position (A12 `stock_cover`) is joined: `days_of_cover = on_hand_pints / forecast_daily_pints`. Lines whose brand is not a forecast A6 node are omitted here (NULL demand, not guessed).

@@ -9,6 +9,7 @@ import pytest
 
 from conformal.methods import (
     ACI,
+    BOA,
     AgACI,
     mondrian_band,
     perstep_band,
@@ -58,7 +59,7 @@ def test_agaci_single_gamma_reduces_to_aci():
     pool_res, pool_step = _synthetic_pool()
     rng = np.random.default_rng(1)
     aci = ACI(level=0.90, gamma=0.02)
-    agaci = AgACI(level=0.90, gammas=(0.02,), eta=1.0)
+    agaci = AgACI(level=0.90, gammas=(0.02,))
     steps = np.arange(1, 8)
     max_diff = 0.0
     for _ in range(30):
@@ -70,9 +71,49 @@ def test_agaci_single_gamma_reduces_to_aci():
         y = yhat + rng.normal(0, 80, 7)
         for i, h in enumerate(steps):
             aci.update_step(int(h), y[i], lo_a[i], hi_a[i])
-            los, his = agaci.last_experts[int(h)]
-            agaci.update_step(int(h), y[i], los, his)
+            agaci.update_step(int(h), y[i], *agaci.last_experts[int(h)])
     assert max_diff == 0.0
+
+
+# --- BOA against the released opera implementation ---------------------------
+#
+# The two expected weight vectors below were derived by transcribing
+# dralliag/opera R/BOA.R (and R/loss.R's gradient_pinball) directly, independently of
+# conformal/methods.py. They are the oracle for our port, in the same role
+# test_matches_statsforecast_on_bernoulli_gap_series plays for Croston.
+
+def test_boa_weights_are_uniform_before_any_expert_accrues_regret():
+    assert BOA(k=2, tau=0.05).weights() == pytest.approx([0.5, 0.5])
+
+
+def test_boa_reproduces_the_opera_weight_update_after_one_round():
+    boa = BOA(k=2, tau=0.05)
+    boa.update(y=12.0, expert_preds=np.array([10.0, 20.0]), pred=15.0)
+    assert boa.weights() == pytest.approx([0.79386788, 0.20613212], abs=1e-8)
+
+
+def test_boa_reproduces_the_opera_weight_update_over_three_rounds():
+    boa = BOA(k=2, tau=0.05)
+    for x, y in (([10.0, 20.0], 12.0), ([11.0, 19.0], 30.0), ([9.0, 21.0], 5.0)):
+        boa.update(y=y, expert_preds=np.array(x), pred=float(np.dot(boa.weights(), x)))
+    assert boa.weights() == pytest.approx([0.92384867, 0.07615133], abs=1e-8)
+
+
+# --- The AgACI departure this replaced: one shared weight vector across bounds -
+
+def test_agaci_aggregates_the_two_bounds_with_independent_weights():
+    pool_res, pool_step = _synthetic_pool()
+    rng = np.random.default_rng(7)
+    agaci = AgACI(level=0.90, gammas=(0.005, 0.05, 0.1))
+    steps = np.arange(1, 8)
+    for _ in range(40):
+        yhat = rng.normal(500, 50, 7)
+        agaci.band(pool_res, pool_step, yhat, steps)
+        # Outcomes biased above the band so the upper bound is punished and the lower is not.
+        y = yhat + rng.normal(220, 40, 7)
+        for i, h in enumerate(steps):
+            agaci.update_step(int(h), y[i], *agaci.last_experts[int(h)])
+    assert agaci.agg_lo[1].weights() != pytest.approx(agaci.agg_hi[1].weights())
 
 
 # --- G3: the ACI level is constrained loudly, not clipped silently -----------
@@ -138,6 +179,6 @@ def test_online_pass_covers_near_nominal_on_exchangeable_residuals():
             tgt = dates[i + h]
             rows.append({"origin": o, "step": h, "target": tgt, "y": actual[tgt],
                          "yhat": 1000.0, "res": abs(actual[tgt] - 1000.0), "state": 0})
-    out = run_online(pd.DataFrame(rows), 0.90, eta=0.001, warmup=140)
+    out = run_online(pd.DataFrame(rows), 0.90, warmup=140)
     cov = arm_metrics(out["S"], 0.90)["marginal"]["coverage"]
     assert 0.87 <= cov <= 0.94

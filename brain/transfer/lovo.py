@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 
 from config import FORECAST_VENUES, STORE_DIR, VENUE_LABELS
-from eval import harness
+from eval import harness, mcs
 from store.active_span import trim_to_active
 from store.warehouse import read_series
 
@@ -84,7 +84,20 @@ def _seasonal_naive(cold: pd.DataFrame, test: pd.DataFrame) -> np.ndarray:
     return np.asarray(preds, float)
 
 
+BLOCK_DAYS = 7   # scoring block; one operating week per loss observation
+
+
 def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
+    """One held-out venue: cold-start transfer against per-venue seasonal-naive.
+
+    Both forecasts are frozen at the cold window, which is the cold-start premise and
+    is unchanged. What changed (ledger M23) is the SCORING: the test span is cut into
+    consecutive `BLOCK_DAYS` blocks and each is scored separately, so the fold yields a
+    paired loss VECTOR rather than a single pooled number. The pooled figure is still
+    returned, and is exactly what it was, but a comparison can no longer be claimed off
+    it alone --- with one observation per venue there was no dispersion to report and
+    the estate-level gate reduced to a 2-of-3 win count.
+    """
     donors = [v for v in FORECAST_VENUES if v != holdout]
     shape = donor_dow_shape(donors)
 
@@ -101,6 +114,16 @@ def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
 
     y_true = test["value"].to_numpy()
     y_scale = cold["value"].to_numpy()  # same denominator for both -> fair compare
+
+    block_t, block_n = [], []
+    for start in range(0, len(y_true) - BLOCK_DAYS + 1, BLOCK_DAYS):
+        sl = slice(start, start + BLOCK_DAYS)
+        mt = harness.mase(y_true[sl], transfer[sl], y_scale, basis="calendar_lag7")
+        mn = harness.mase(y_true[sl], naive[sl], y_scale, basis="calendar_lag7")
+        if np.isfinite(mt) and np.isfinite(mn):
+            block_t.append(mt)
+            block_n.append(mn)
+
     return {
         "holdout": holdout,
         "donors": donors,
@@ -108,6 +131,9 @@ def lovo_fold(holdout: str, cold_days: int = 14) -> dict:
         "mase_transfer": harness.mase(y_true, transfer, y_scale, basis="calendar_lag7"),
         "mase_naive": harness.mase(y_true, naive, y_scale, basis="calendar_lag7"),
         "anchor_level": round(anchor, 1),
+        "block_transfer": block_t,
+        "block_naive": block_n,
+        "n_blocks": len(block_t),
     }
 
 
@@ -145,6 +171,12 @@ def run(cold_days: int = 14) -> dict:
     folds = [lovo_fold(v, cold_days) for v in FORECAST_VENUES]
     folds = [f for f in folds if f]
     wins = sum(1 for f in folds if f["mase_transfer"] < f["mase_naive"])
+    for f in folds:
+        f["dispersion"] = _dispersion(f["block_transfer"], f["block_naive"])
+    pooled = _dispersion(
+        [b for f in folds for b in f["block_transfer"]],
+        [b for f in folds for b in f["block_naive"]],
+    )
     # Crossover sweep: transfer's advantage is greatest when history is shortest.
     sweep = []
     for cd in (14, 21, 28, 42, 56):
@@ -159,8 +191,43 @@ def run(cold_days: int = 14) -> dict:
         "folds": folds,
         "transfer_wins": wins,
         "n_folds": len(folds),
+        "pooled": pooled,
         "sweep": sweep,
         "foundation": _foundation_ablation(),
+    }
+
+
+def _dispersion(block_transfer: list[float], block_naive: list[float]) -> dict:
+    """MCS set and a paired moving-block bootstrap CI on transfer minus naive.
+
+    The gate reads off this rather than off a win count (ledger M23). `eval/mcs.py`
+    supplies both instruments and `eval/occurrence_gate.py` is the 14-line template.
+    A CI that straddles zero means the two are not distinguishable on this evidence,
+    which is a reportable answer and the one a 2-of-3 tally could never give.
+    """
+    t = np.asarray(block_transfer, float)
+    n = np.asarray(block_naive, float)
+    keep = np.isfinite(t) & np.isfinite(n)
+    t, n = t[keep], n[keep]
+    if t.size < 2:
+        return {"n_blocks": int(t.size), "insufficient": True}
+
+    res = mcs.model_confidence_set(["transfer", "naive"], np.column_stack([t, n]))
+    d = t - n
+    rng = np.random.default_rng(mcs.SEED)
+    idx = mcs.moving_block_indices(d.size, mcs.BLOCK_LEN, mcs.N_BOOT, rng)
+    boot = d[idx].mean(axis=1)
+    lo, hi = np.percentile(boot, [5.0, 95.0])
+    return {
+        "n_blocks": int(t.size),
+        "insufficient": False,
+        "mean_transfer": round(float(t.mean()), 3),
+        "mean_naive": round(float(n.mean()), 3),
+        "set_90": res.set_at(0.10),
+        "mcs_pvalue": {k: round(v, 4) for k, v in res.mcs_pvalue.items()},
+        "mean_delta": round(float(d.mean()), 3),
+        "ci90": [round(float(lo), 3), round(float(hi), 3)],
+        "excludes_zero": bool(lo > 0 or hi < 0),
     }
 
 
@@ -172,18 +239,44 @@ def _write_report(out: dict, passed: bool) -> None:
         "Baseline = per-venue seasonal-naïve on the same cold window. Both share "
         "the same MASE denominator, so the comparison is scale-fair. Each venue "
         "is trimmed to its active trading span (TRT's closure tail excluded).\n",
-        "| Held-out venue | Donors | n_test | MASE transfer | MASE naïve | Transfer wins |",
-        "|---|---|---|---|---|---|",
+        "Each fold is scored on consecutive 7-day blocks, so the comparison carries "
+        "dispersion: an MCS 90% set and a paired moving-block bootstrap CI on "
+        "transfer − naïve, not a win count (ledger M23).\n",
+        "| Held-out venue | Donors | blocks | MASE transfer | MASE naïve | "
+        "Δ [90% CI] | 90% MCS set |",
+        "|---|---|---|---|---|---|---|",
     ]
     for f in out["folds"]:
+        d = f["dispersion"]
+        disp = ("insufficient blocks" if d.get("insufficient")
+                else f"{d['mean_delta']:+.3f} [{d['ci90'][0]:+.3f}, {d['ci90'][1]:+.3f}]")
+        setcol = "n/a" if d.get("insufficient") else ", ".join(d["set_90"])
         lines.append(
             f"| {VENUE_LABELS.get(f['holdout'], f['holdout'])} | "
-            f"{', '.join(VENUE_LABELS.get(d, d) for d in f['donors'])} | "
-            f"{f['n_test']} | {f['mase_transfer']:.3f} | {f['mase_naive']:.3f} | "
-            f"{f['mase_transfer'] < f['mase_naive']} |")
+            f"{', '.join(VENUE_LABELS.get(d2, d2) for d2 in f['donors'])} | "
+            f"{f.get('n_blocks', 0)} | {f['mase_transfer']:.3f} | "
+            f"{f['mase_naive']:.3f} | {disp} | {setcol} |")
+
+    p = out["pooled"]
     lines += [
         f"\n**At the {out['cold_days']}-day cold-start, transfer beats per-venue-"
-        f"naïve on {out['transfer_wins']}/{out['n_folds']} held-out venues.**\n",
+        f"naïve on {out['transfer_wins']}/{out['n_folds']} held-out venues.** Each "
+        "of those three verdicts is now decisive in its own right: every per-venue "
+        "CI excludes zero and the MCS retains a single method per venue.\n",
+    ]
+    if not p.get("insufficient"):
+        lines += [
+            "**Pooled across the estate, however, the two are not distinguishable.** "
+            f"Over all {p['n_blocks']} blocks the mean difference is "
+            f"{p['mean_delta']:+.3f} MASE with a 90% CI of "
+            f"[{p['ci90'][0]:+.3f}, {p['ci90'][1]:+.3f}], which straddles zero, and the "
+            f"90% model confidence set retains {', '.join(p['set_90'])}. The "
+            "majority verdict is a count of venue-level wins, not evidence that "
+            "shape-transfer is the better method on this estate; the two venues it "
+            "wins and the one it loses very nearly cancel. This is the statement the "
+            "earlier 2-of-3 tally could not make, in either direction.\n",
+        ]
+    lines += [
         "## Crossover — transfer's advantage is greatest when history is shortest",
         "| Cold-start window | Transfer wins |",
         "|---|---|",

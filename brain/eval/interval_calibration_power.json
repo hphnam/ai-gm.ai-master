@@ -4,7 +4,10 @@
   "coverage": 1.0,
   "nominal": 0.9,
   "p_all_in_if_calibrated": 0.4782969000000001,
-  "clopper_pearson_95": [0.5903836027749966, 1.0],
+  "clopper_pearson_95": [
+    0.5903836027749966,
+    1.0
+  ],
   "supports_miscalibration": false,
   "verdict": "1.00 on 7 points does NOT support a miscalibration claim: under perfect 90% calibration all 7 fall inside with probability 0.478, and the 95% Clopper-Pearson interval on the estimate is [0.590, 1.000], which contains the nominal 0.90.",
   "angelopoulos_bates": {
