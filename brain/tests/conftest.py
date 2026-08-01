@@ -32,6 +32,25 @@ os.environ.setdefault("BRAIN_ALLOW_INSECURE", "1")
 _SUITE_STORE_DIR = tempfile.mkdtemp(prefix="brain-test-store-")
 os.environ.setdefault("BRAIN_DUCKDB_PATH", os.path.join(_SUITE_STORE_DIR, "brain.duckdb"))
 
+# Isolating the DATABASE was never enough. Artefact paths resolve from BRAIN_REPORT_ROOT,
+# and until report 58 they resolved from `STORE_DIR.parent` instead, which is the checkout
+# whatever BRAIN_DUCKDB_PATH says. So a suite run rewrote committed artefacts in the
+# working tree: `signals/briefing.md`, `eval/deviation_eval.md` and `eval/judge_prompts.md`
+# were being produced by pytest, at the seed ceiling, over the real ones. The committed
+# briefing's "quiet day - nothing above threshold" was a test artefact, not a briefing.
+# Redirecting the report root closes that at the source rather than per-test.
+_SUITE_REPORT_ROOT = tempfile.mkdtemp(prefix="brain-test-reports-")
+os.environ.setdefault("BRAIN_REPORT_ROOT", _SUITE_REPORT_ROOT)
+
+# The writers assume their output directory already exists, which held only because it
+# always did in the checkout. Mirroring the repo's artefact directories keeps that
+# assumption true under isolation. Derived from the checkout rather than hard-coded, so a
+# module writing to a new subdirectory does not need this list updated.
+_BRAIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for _name in os.listdir(_BRAIN_DIR):
+    if os.path.isdir(os.path.join(_BRAIN_DIR, _name)) and not _name.startswith("."):
+        os.makedirs(os.path.join(_SUITE_REPORT_ROOT, _name), exist_ok=True)
+
 
 @pytest.fixture(scope="session", autouse=True)
 def _isolated_store_built():
@@ -62,3 +81,4 @@ def _isolated_store_built():
         warehouse.build()
     yield
     shutil.rmtree(_SUITE_STORE_DIR, ignore_errors=True)
+    shutil.rmtree(_SUITE_REPORT_ROOT, ignore_errors=True)

@@ -29,7 +29,7 @@ import pandas as pd
 from config import (
     BEER_GARDEN_TEMP_C,
     HAPPY_HOUR_DAYS,
-    STORE_DIR,
+    REPORT_ROOT,
     STRUCTURAL_ZERO_DOW,
     WD_CLIMATOLOGY_WIN,
     WD_MIN_SERIES_DAYS,
@@ -42,7 +42,7 @@ from ingest.exog_weather import read_basis
 from signals.feature_ablation import N_FOLDS, HORIZON, MIN_TRAIN, _eval_cols
 from store.warehouse import connect, read_series
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "weather_diagnostic.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "weather_diagnostic.md"
 ANCHOR = "beer_hall"
 BASIS = "leadmatched"            # realistic serving basis (matches A14 study)
 _WX = ["exo_temp_c", "exo_rain_mm", "exo_sunshine_hrs"]

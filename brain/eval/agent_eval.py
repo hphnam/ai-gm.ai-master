@@ -39,7 +39,7 @@ from signals.residual import _EPS, attribute
 from store.active_span import active_trading_end, is_closed
 from store.warehouse import connect
 
-REPORT_MD = config.STORE_DIR.parent.parent / "PRJ93_Agent_Eval_Report.md"
+REPORT_MD = config.REPORT_ROOT.parent / "PRJ93_Agent_Eval_Report.md"
 
 
 # --- Surface: injected stream → real detectors → real briefing items ----------

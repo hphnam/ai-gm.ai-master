@@ -39,15 +39,15 @@ from config import (
     CP_RUN_N,
     CP_WARMUP_DAYS,
     EVENT_ONLY_VENUES,
-    STORE_DIR,
-    VENUE_LABELS,
+    REPORT_ROOT,
     VENUES_FOR_CHANGEPOINT,
+    VENUE_LABELS,
 )
 from signals.residual import _EPS, attribute, build_residual_stream
 from store.active_span import active_trading_end, is_closed
 from store.warehouse import connect
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "change_point.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "change_point.md"
 
 
 # --- Detectors ---------------------------------------------------------------

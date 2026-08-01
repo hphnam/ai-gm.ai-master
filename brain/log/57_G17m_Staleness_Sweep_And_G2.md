@@ -61,6 +61,16 @@ above-band days, three sustained shifts and two missing-SOP flags.
 The estate's flagship deliverable was on record showing nothing at all. Nothing in a
 chapter depended on it, but it is the single most misleading artefact the sweep found.
 
+**Corrected by report 58, on both counts.** First, this artefact was listed under "Files
+touched / regenerated" below and it was not regenerated: its last commit was `dbcc525` and
+the working tree still matched it. The regeneration was run and observed here but never
+written or committed. Second, and more importantly, the diagnosis above is wrong. The
+committed briefing was not generated during the truncated window. It was **produced by the
+test suite**, which resolved artefact paths into the checkout regardless of the database
+isolation, and which therefore overwrote this file on every `pytest` run. Regenerating it,
+which is what this report recommended, would have been silently undone by the next test
+run. See report 58.
+
 ## A real regression, found only because the artefact was regenerated
 
 `signals/weather_diagnostic.py` **crashed**: `too many values to unpack (expected 2, got 3)`.
@@ -165,15 +175,15 @@ and pool only the two scaled venues, stating the reduced pool.
 - `signals/weather_diagnostic.py` (four `_eval_cols` unpack sites)
 - regenerated: `conformal/conformal_L1_{ellel,two_river_taps}.md`,
   `eval/{aci_closure_probe,change_point_eval}.md`,
-  `signals/{briefing,change_point,stock_inventory}.md`
+  `signals/{change_point,stock_inventory}.md`
+  (`signals/briefing.md` was listed here in error and was NOT regenerated; see the
+  correction above and report 58)
 - Overleaf: `tab:ladder` caption, M8 paragraph now cites `hewamalage_look_2021`
 
 ## Open
 
-- **Gate: the Breiman citation.** `breiman_classification_1984` is NOT in `ref.bib`. The
-  file has 113 entries and contains no Breiman, Olshen, Stone or CART entry; only
-  `hewamalage_look_2021` was added. The one-standard-error rule is therefore still
-  described in prose without a `\cite`.
+- ~~**Gate: the Breiman citation.**~~ CLOSED by report 58: the key was added, `ref.bib` is
+  at 114 entries, and both chapters now cite it.
 - **Gate: `lovo.py`'s pooled statistic** under G2, per the recommendation above.
 - `eval/chronos2_*` remain unverified against the restored warehouse: no `torch` here.
 - G3's ECE run, parked by instruction.

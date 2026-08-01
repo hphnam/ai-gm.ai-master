@@ -46,9 +46,9 @@ from signals import agent
 from signals import briefing
 from store.warehouse import connect
 
-REPORT_MD = config.STORE_DIR.parent / "eval" / "agent_calibration.md"
-METRICS_JSON = config.STORE_DIR.parent / "eval" / "agent_calibration.json"
-RELIABILITY_PNG = config.STORE_DIR.parent / "eval" / "agent_reliability.png"
+REPORT_MD = config.REPORT_ROOT / "eval" / "agent_calibration.md"
+METRICS_JSON = config.REPORT_ROOT / "eval" / "agent_calibration.json"
+RELIABILITY_PNG = config.REPORT_ROOT / "eval" / "agent_reliability.png"
 
 # The calibration truth is detection, not intervention. Stated in code so the report cannot
 # quietly claim the stronger thing.

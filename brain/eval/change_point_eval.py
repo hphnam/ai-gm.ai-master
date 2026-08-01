@@ -28,12 +28,12 @@ from config import (
     CP_CUSUM_K,
     CP_RUN_M,
     CP_RUN_N,
-    STORE_DIR,
+    REPORT_ROOT,
 )
 from signals.change_point import bocpd, cusum, persistence
 from signals.residual import build_residual_stream
 
-RESULTS_MD = STORE_DIR.parent / "eval" / "change_point_eval.md"
+RESULTS_MD = REPORT_ROOT / "eval" / "change_point_eval.md"
 ANCHOR = "beer_hall"
 _RNG = np.random.default_rng(13)
 

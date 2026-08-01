@@ -33,7 +33,7 @@ import pandas as pd
 from config import (
     ANCHOR_VENUE,
     CONFORMAL_LEVELS,
-    STORE_DIR,
+    REPORT_ROOT,
     TEST_WEEKS,
 )
 from conformal.wrap import conformal_quantile
@@ -41,8 +41,8 @@ from eval import harness
 from models.intermittent import croston_classic, croston_sba
 from store.warehouse import connect, read_series, write_band, write_forecast
 
-MODELS_DIR = STORE_DIR.parent / "models_L2_L3"
-RESULTS_MD = STORE_DIR.parent / "hierarchy" / "reconciliation_forecast.md"
+MODELS_DIR = REPORT_ROOT / "models_L2_L3"
+RESULTS_MD = REPORT_ROOT / "hierarchy" / "reconciliation_forecast.md"
 
 PINTS_PER_KEG = 88            # 11-gallon (imperial) keg
 KEG_LINES = ("lager - bh",)  # the consumption-proxy line(s)

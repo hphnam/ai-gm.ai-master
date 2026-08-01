@@ -22,4 +22,8 @@ chronos-forecasting>=2.2
 torch>=2.5
 
 TSB-AD>=0.2
-vus>=1.0
+# vus has never published a 1.0: PyPI tops out at 0.0.6, so the previous `vus>=1.0` made
+# this whole file unresolvable and .venv-eval could never be built from its own spec
+# (report 58). No reported number moves: WP10 computes VUS-PR from the pinned TSB-AD 1.5
+# and this fallback has therefore never once been the thing that supplied the metric.
+vus>=0.0.6

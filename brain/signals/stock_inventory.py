@@ -28,15 +28,15 @@ import sys
 import pandas as pd
 
 from config import (
+    REPORT_ROOT,
     STOCK_A6_NODE_MAP,
     STOCK_LEAD_TIME_DAYS,
     STOCK_REORDER_CYCLE_DAYS,
     STOCK_SAFETY_DAYS,
-    STORE_DIR,
 )
 from store.warehouse import connect
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "stock_inventory.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "stock_inventory.md"
 A6_FORECAST_VENUE = "beer_hall"   # A6 forecasts key the sales-side slug
 A6_MODEL = "mint_dowmedian"
 _HORIZON_DAYS = 7

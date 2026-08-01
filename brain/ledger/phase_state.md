@@ -951,3 +951,93 @@ Breiman, Olshen, Stone or CART entry. The one-standard-error rule stays in prose
   cross-venue statistic means when one venue admits no scale. Recommendation on file.
 - `eval/chronos2_*` unverified against the restored warehouse: no torch here.
 - G3's ECE run, parked by instruction.
+
+---
+
+## Session 9 addendum 3 (2026-08-01) — G17n: the environment closed, the artefact leak found
+
+**Phase.** S9 G17n. Five requested items, all done, plus a sixth found while doing the
+fourth which turned out to be its cause.
+
+**Completed.**
+- **Breiman placed.** `ref.bib` now has 114 entries and `breiman_classification_1984`
+  resolves. Cited in `sec:res-margin` (`\citep`) and `sec:intermittency` (`\citet`, "the
+  device introduced for tree pruning by"). Section counts unchanged, 15 and 25, so the
+  report-55 `write_section` subsection-deletion failure did not recur.
+- **The 8 failures were never schema or version problems.** `requirements.txt` declares
+  pyarrow, pydantic, fastapi and openpyxl; the venv had none installed. Installing the
+  file took the suite from 8 failed + 16 collection errors to 602 passed / 0 failed. No
+  source change, no pin moved. The documented four-venv layout did not exist on this box;
+  a single ad-hoc `.venv-run` had been partially populated and was not even gitignored.
+- **torch resolved via the documented route.** `.venv-forecast` built on 3.12 from
+  `requirements-forecast.lock.txt`: torch 2.12.1 and chronos 2.3.1 exactly. The lock
+  header's flip warning was checked, not assumed — it names sklearn 1.8.0 and the lock
+  pins 1.9.0, so the resolution is not the flipping combination. All 7 previously-skipped
+  `test_foundation.py` tests pass; rung 4 is runnable here for the first time.
+- **`requirements-eval.txt` was never resolvable.** It pinned `vus>=1.0` and vus has never
+  published a 1.0 (PyPI tops out at 0.0.6), so `.venv-eval` could not be built from its own
+  spec by anyone. Corrected to `>=0.0.6`. No number moves: WP10 computes VUS-PR from the
+  pinned TSB-AD 1.5 and this fallback has never supplied the metric. With the venv built,
+  the G2.2 Croston/SBA statsforecast cross-check **runs in band for the first time** (it
+  carried a comment recording an out-of-band pass on statsforecast 2.1.1; that is the
+  version it now passes on in band).
+- **`warehouse.build()` signals at write time.** It always lands 5 weeks short, not
+  sometimes, because the parquet seed permanently ends 2026-05-31. It now returns its
+  ceiling and warns to stderr naming the fix. A warning not an exception, because
+  `store.build` restores the clock on the next line and the hand-run sequence is
+  legitimate; quiet on scratch/overridden stores so it does not fire 17 times per suite
+  run. `config.SEED_CEILING` added — the date had been living in prose comments in four
+  modules, the same duplication G2 removed for the scale basis. 4 new tests.
+- **The truncating default is gone.** `DEFAULT_TOP` is now tied to `DEFAULT_CLUSTERS` so
+  they cannot drift. The bare `python -m signals.chatlog_kb_gap` reproduces the committed
+  `.md` and `.json` byte-identically. No Makefile exists, so code plus the two documented
+  command sites is the standardisation.
+
+**The sixth finding, which supersedes report 57's briefing diagnosis.**
+- Report 57 listed `signals/briefing.md` as regenerated. **It was not** — last commit
+  `dbcc525`, working tree identical to it. That was an overstatement, corrected here.
+- The real cause: **a `pytest` run overwrites committed artefacts in the working tree.**
+  conftest isolates the DATABASE and its docstring claims it "isolates every store write";
+  that is true of DuckDB writes and false of artefact writes, because 23 modules resolved
+  output paths from `STORE_DIR.parent`, which is the checkout regardless of
+  `BRAIN_DUCKDB_PATH`. Demonstrated: `pytest tests/test_briefing.py` alone flips the
+  artefact from `as_of 2026-07-07 / 11 continuing` back to `2026-05-31 / 0`. The committed
+  "quiet day" briefing was **test output**, not a briefing against a short store.
+  Regenerating it, report 57's proposed fix, would have been undone by the next pytest run.
+- An mtime sweep over 32 tracked artefacts names exactly three the suite rewrote:
+  `signals/briefing.md`, `eval/deviation_eval.md`, `eval/judge_prompts.md`.
+- **Fix:** `config.REPORT_ROOT` (where artefacts are WRITTEN, overridable by
+  `BRAIN_REPORT_ROOT`) separated from `STORE_DIR` (where the store is READ). The one-line
+  alternative of redirecting `BRAIN_STORE_DIR` does not work — `line_items.parquet` and the
+  parquet fixtures live under it, so it breaks every read. 30 call sites across 23 modules,
+  all 24 affected modules import-checked. `signals/agent.py` corrected back to `BRAIN_DIR`:
+  its `PROMPTS_DIR` is a committed INPUT (the frozen agent prompt) that had shared the
+  artefact idiom by accident and would otherwise have vanished into tmp, breaking the
+  freeze-before-evaluation guarantee `sec:agent` rests on.
+- Verified in order: refactor behaviour-preserving (chatlog artefact byte-identical);
+  suite touches zero tracked artefacts (mtime sweep); suite still green; **the regenerated
+  briefing survives a full suite run**.
+
+**Artifacts written.** `log/58_G17n_Environment_And_Artefact_Isolation.md`; regenerated
+`signals/briefing.md` (as_of 2026-07-07, 11 continuing items); `.venv-forecast` and
+`.venv-eval` built.
+
+**Suite.** 614 tests in every venv, zero failures and zero collection errors in all three:
+`.venv-run` 606 passed / 8 skipped (torch+chronos x7, statsforecast x1), `.venv-forecast`
+613 / 1, `.venv-eval` **614 / 0**. Each venv now skips exactly what its own requirements
+file excludes, and nothing else.
+
+**Unstarted / open.**
+- `eval/deviation_eval.md` and `eval/judge_prompts.md` are the other two artefacts the suite
+  was overwriting, so both committed copies are test output. Now isolated and safe, but
+  neither regenerated from its real entrypoint nor verified. Report 57 separately called
+  `deviation_eval.md` orphaned, which contradicts the suite writing it; unresolved.
+- Latent, recorded not fixed: artefact writers assume their output directory exists. The
+  suite mirrors the checkout's directory names into its tmp root, which is scaffolding. A
+  fresh deployment writing to an empty report root would still raise `FileNotFoundError`.
+- The methodology chapter header comment still says "111 entries" and lists neither
+  `hewamalage_look_2021` nor `breiman_classification_1984`. It sits outside any section so
+  `write_section` cannot reach it; correcting it needs a whole-file push.
+- **Gate: `lovo.py`'s pooled statistic** under G2, unchanged, recommendation on file.
+- `eval/chronos2_*` now runnable (torch present) but not re-run against the warehouse.
+- G3's ECE run, parked by instruction.

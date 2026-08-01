@@ -26,9 +26,9 @@ from __future__ import annotations
 import json
 import sys
 
-from config import STORE_DIR
+from config import REPORT_ROOT
 
-RESULTS_MD = STORE_DIR.parent / "eval" / "chronos2_promotion_sensitivity.md"
+RESULTS_MD = REPORT_ROOT / "eval" / "chronos2_promotion_sensitivity.md"
 
 
 def compare(before: list[dict], after: list[dict]) -> dict:

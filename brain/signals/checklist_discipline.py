@@ -21,9 +21,9 @@ import re
 import sys
 from dataclasses import dataclass
 
-from config import checklist_md, STORE_DIR
+from config import REPORT_ROOT, checklist_md
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "checklist_discipline.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "checklist_discipline.md"
 
 # Criticality weights, high-consequence steps must outweigh "refill straws".
 W_CRITICAL, W_HIGH, W_NORMAL, W_CONDITIONAL = 5, 3, 1, 0

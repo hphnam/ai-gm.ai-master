@@ -24,14 +24,14 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import STORE_DIR, WEATHER_CELLS, WEATHER_LEAD_DAYS
+from config import REPORT_ROOT, WEATHER_CELLS, WEATHER_LEAD_DAYS
 from eval import harness, mcs
 from features.build_features import build_features, feature_columns
 from ingest.exog_weather import read_basis
 from models.ladder import _fit_gbm, _recursive_gbm_predict
 from store.active_span import trim_to_active
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "feature_ablation.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "feature_ablation.md"
 ANCHOR = "beer_hall"
 N_FOLDS, HORIZON, MIN_TRAIN = 6, 7, 120
 LEVEL = 0.90

@@ -23,7 +23,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import STORE_DIR
+from config import REPORT_ROOT
 from eval import harness
 from features.build_features import build_features
 from models.foundation import CHRONOS2_MODEL_ID, HAS_CHRONOS, _chronos2_pipeline
@@ -32,7 +32,7 @@ VENUE = "beer_hall"
 # Covariates known at forecast time (calendar-derived). Never weather.
 KNOWN_FUTURE = ["is_bank_holiday", "is_ellel_event", "exo_is_school_term",
                 "exo_is_uni_term"]
-RESULTS_MD = STORE_DIR.parent / "eval" / "chronos2_covariate_probe.md"
+RESULTS_MD = REPORT_ROOT / "eval" / "chronos2_covariate_probe.md"
 
 
 def _point_forecast(pipe, train: pd.DataFrame, test: pd.DataFrame,

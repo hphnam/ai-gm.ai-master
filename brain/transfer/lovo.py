@@ -29,12 +29,12 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import FORECAST_VENUES, STORE_DIR, VENUE_LABELS
+from config import FORECAST_VENUES, REPORT_ROOT, VENUE_LABELS
 from eval import harness, mcs
 from store.active_span import trim_to_active
 from store.warehouse import read_series
 
-RESULTS_MD = STORE_DIR.parent / "transfer" / "transfer_results.md"
+RESULTS_MD = REPORT_ROOT / "transfer" / "transfer_results.md"
 
 
 def _series(venue: str) -> pd.DataFrame:

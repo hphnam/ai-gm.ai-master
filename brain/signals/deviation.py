@@ -27,13 +27,13 @@ from config import (
     DEV_BAND_K,
     DEV_SCAN_WINDOW,
     DEV_SEVERE_K,
-    STORE_DIR,
-    VENUE_LABELS,
+    REPORT_ROOT,
     VENUES_FOR_DEVIATION,
+    VENUE_LABELS,
 )
 from signals.residual import attribute, build_residual_stream
 
-RESULTS_MD = STORE_DIR.parent / "eval" / "deviation_eval.md"
+RESULTS_MD = REPORT_ROOT / "eval" / "deviation_eval.md"
 
 
 # --- Classification ----------------------------------------------------------

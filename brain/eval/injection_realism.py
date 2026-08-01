@@ -39,7 +39,7 @@ BOOTSTRAP_B = 10000
 TARGET_COUNTS = {"regime_shift": 64, "spike": 32, "exo_coincident": 24}
 ONSET_POSITION = "early"          # see eval.inject_realistic's module docstring
 
-ARTEFACT = config.STORE_DIR.parent / "eval" / "injection_realism.json"
+ARTEFACT = config.REPORT_ROOT / "eval" / "injection_realism.json"
 
 # Committed corpus reference (log/09_Agent_Eval_Report.md, N=644, deterministic grid).
 # G4 compares a fresh eval.agent_eval.run_scaled() against these, tolerating the drift a

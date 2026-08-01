@@ -35,7 +35,11 @@ from typing import Callable
 
 import config
 
-PROMPTS_DIR = config.STORE_DIR.parent / "signals" / "prompts"
+# BRAIN_DIR, not REPORT_ROOT: the versioned prompt is a committed INPUT that this module
+# reads, not an artefact it writes. It shared the artefact idiom by accident, which made it
+# follow BRAIN_REPORT_ROOT to a tmp directory and vanish (report 58). The freeze-before-
+# evaluation guarantee in sec:agent rests on this file living in version control.
+PROMPTS_DIR = config.BRAIN_DIR / "signals" / "prompts"
 
 # The response schema: one verdict per input item, p_raise a probability in [0, 1].
 SCORING_SCHEMA = {

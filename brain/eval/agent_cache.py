@@ -23,7 +23,7 @@ import json
 import config
 from signals import agent
 
-CACHE_PATH = config.STORE_DIR.parent / "eval" / "agent_cache.json"
+CACHE_PATH = config.REPORT_ROOT / "eval" / "agent_cache.json"
 
 
 class CacheMiss(KeyError):

@@ -31,7 +31,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import STORE_DIR
+from config import REPORT_ROOT
 from conformal.wrap import conformal_quantile
 from signals.residual import build_residual_stream
 from store.active_span import active_trading_end
@@ -43,8 +43,8 @@ GAMMAS = (0.005, 0.01, 0.02)
 WARMUP = 20                  # prior scores before the first banded day
 ROLL_WINDOW = 28             # trailing days for the rolling-coverage series
 
-RESULTS_MD = STORE_DIR.parent / "eval" / "aci_closure_probe.md"
-COVERAGE_PNG = STORE_DIR.parent / "eval" / "aci_closure_coverage.png"
+RESULTS_MD = REPORT_ROOT / "eval" / "aci_closure_probe.md"
+COVERAGE_PNG = REPORT_ROOT / "eval" / "aci_closure_coverage.png"
 
 
 def _quantile_at(scores: np.ndarray, alpha: float) -> float:

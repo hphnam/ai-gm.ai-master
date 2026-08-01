@@ -35,7 +35,9 @@ def build(*, force: bool = False) -> str:
 
     print("store.build: normalise -> warehouse -> restore_clock -> assert")
     normalise.main()          # rebuild line_items.parquet from the seed CSVs
-    warehouse.build()         # (re)build the DuckDB store at the seed ceiling
+    # warn_if_short is off because the short store is expected here and lives for exactly
+    # one line: restore_clock runs next and assert_store_ceiling checks the result.
+    warehouse.build(warn_if_short=False)
     restore_clock.run()       # re-ingest June + July W1 to advance to the ceiling
     ceiling = warehouse.assert_store_ceiling()
     print(f"store.build: OK, ceiling {ceiling}")

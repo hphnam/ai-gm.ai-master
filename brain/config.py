@@ -28,6 +28,15 @@ DUCKDB_PATH = STORE_DIR / "brain.duckdb"
 MANIFEST_PATH = STORE_DIR / "manifest.json"
 FLAGS_PATH = BRAIN_DIR / "FLAGS.md"
 
+# Where generated reports and artefacts are WRITTEN, as distinct from where the store is
+# READ. Twenty-three modules used to spell this `STORE_DIR.parent`, which conflated the
+# two: the suite could isolate its store reads by pointing BRAIN_STORE_DIR elsewhere, but
+# every artefact path still resolved into the checkout, so `pytest` overwrote committed
+# artefacts in the working tree. That is how the committed briefing came to be a test
+# artefact reading "quiet day - nothing above threshold" at the seed ceiling (report 58).
+# Separating the two gives the suite a lever it did not have: BRAIN_REPORT_ROOT.
+REPORT_ROOT = Path(os.environ.get("BRAIN_REPORT_ROOT") or STORE_DIR.parent)
+
 # The operational store ceiling every reported number is measured against (S3 /
 # FLAG-STORE-DURABILITY). The ceiling is state that lives OUTSIDE the build:
 # `warehouse.build()` rebuilds from the seed CSV ending 2026-05-31, and only
@@ -37,6 +46,14 @@ FLAGS_PATH = BRAIN_DIR / "FLAGS.md"
 # rolling-origin / scaled metric is a function of this ceiling (the S1 `as_of` lesson):
 # an artefact without its `store_ceiling` is not reproducible.
 EXPECTED_STORE_CEILING = "2026-07-07"
+
+# Where a bare rebuild lands. The committed seed CSVs stop here, so `warehouse.build()`
+# ALWAYS produces a store five weeks short and `sim.restore_clock` is what closes the
+# gap. Named because the sweep in report 57 found the date living only in prose comments
+# in four modules, which is the same duplication G2 removed for the scale basis: the
+# number that decides whether a store is short should be readable from one place.
+# `warehouse.build()` warns against this when it lands here on the working store.
+SEED_CEILING = "2026-05-31"
 
 # Raw source files. They live in brain/data/ (the canonical location); the
 # repo-root fallback in _resolve is kept only for backwards compatibility with

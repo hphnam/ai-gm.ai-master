@@ -46,8 +46,8 @@ from config import (
     ANCHOR_VENUE,
     FORECAST_VENUES,
     MAX_RUNG,
+    REPORT_ROOT,
     SEASONAL_PERIOD,
-    STORE_DIR,
     VENUE_LABELS,
 )
 from eval import harness
@@ -66,11 +66,11 @@ from store.warehouse import assert_store_ceiling
 
 warnings.filterwarnings("ignore")
 
-MODELS_DIR = STORE_DIR.parent / "models_L1"
+MODELS_DIR = REPORT_ROOT / "models_L1"
 
 
 def _report_path(venue: str):
-    return STORE_DIR.parent / "models" / f"ladder_results_L1_{venue}.md"
+    return REPORT_ROOT / "models" / f"ladder_results_L1_{venue}.md"
 
 
 def _load_feats(venue: str) -> pd.DataFrame:

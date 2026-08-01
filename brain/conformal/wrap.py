@@ -40,6 +40,7 @@ from config import (
     COVERAGE_TOL_PP,
     FORECAST_VENUES,
     MAX_RUNG,
+    REPORT_ROOT,
     STORE_DIR,
     TEST_WEEKS,
     VENUE_LABELS,
@@ -422,7 +423,7 @@ def main() -> int:
 def _write_report(out: dict, passed: bool) -> None:
     venue = out["venue"]
     label = VENUE_LABELS.get(venue, venue)
-    md = STORE_DIR.parent / "conformal" / f"conformal_L1_{venue}.md"
+    md = REPORT_ROOT / "conformal" / f"conformal_L1_{venue}.md"
     lines = [
         f"# A5 · Conformal band — coverage report ({label} L1)\n",
         f"Selected forecaster: **{out['model']}**. Validation: online rolling-"

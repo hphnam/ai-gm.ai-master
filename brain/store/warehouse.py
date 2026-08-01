@@ -185,8 +185,24 @@ def _create_output_tables(con: duckdb.DuckDBPyConnection) -> None:
     )
 
 
-def build() -> None:
-    """(Re)build the store from the A0 parquet. Idempotent."""
+def build(*, warn_if_short: bool = True) -> str | None:
+    """(Re)build the store from the A0 parquet. Idempotent. Returns the resulting ceiling.
+
+    The parquet is written by `ingest.normalise` from the committed seed CSVs, which end
+    at `SEED_CEILING`. A build therefore lands five weeks below the operational ceiling
+    EVERY time, and `sim.restore_clock` is what closes the gap. That gap used to be
+    silent: the store looked healthy and was short, and anything generated against it
+    carried a stale ceiling without saying so.
+
+    `warn_if_short` is honoured only when the target is the configured working store. A
+    scratch store or a `BRAIN_DUCKDB_PATH` override (which is what the suite builds
+    against) is expected to sit at the seed ceiling and carries none of the risk, so it
+    stays quiet rather than emitting the warning several times per test run.
+
+    A warning and not an exception, deliberately: `store.build` calls this and restores
+    the clock on the next line, and the same sequence run by hand is legitimate. The
+    fail-loud guard for reported numbers is `assert_store_ceiling`, at read time.
+    """
     if not LINE_ITEMS_PARQUET.exists():
         raise FileNotFoundError(
             f"{LINE_ITEMS_PARQUET} missing — run `python -m ingest.normalise` first."
@@ -200,8 +216,20 @@ def build() -> None:
         )
         _create_views(con)
         _create_output_tables(con)
+        ceiling = store_ceiling(con)
     finally:
         con.close()
+
+    is_working_store = current_db_path() == config.DUCKDB_PATH
+    if warn_if_short and is_working_store and ceiling != config.EXPECTED_STORE_CEILING:
+        print(
+            f"WARNING: store rebuilt to {ceiling}, "
+            f"below the operational ceiling {config.EXPECTED_STORE_CEILING}.\n"
+            "         The seed CSVs stop there; June and July W1 are NOT in this store.\n"
+            "         Run: python -m sim.restore_clock   (or python -m store.build)",
+            file=sys.stderr,
+        )
+    return ceiling
 
 
 # --- Ceiling guard (FLAG-STORE-DURABILITY) -----------------------------------

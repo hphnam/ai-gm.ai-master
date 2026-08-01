@@ -32,12 +32,12 @@ import sys
 import numpy as np
 import pandas as pd
 
-from config import ANCHOR_VENUE, STORE_DIR
+from config import ANCHOR_VENUE, REPORT_ROOT
 from hierarchy.reconcile import build_hierarchy
 from store.warehouse import connect, read_series
 
-RESULTS_MD = STORE_DIR.parent / "eval" / "intermittency_diagnostic.md"
-RESULTS_L1_MD = STORE_DIR.parent / "eval" / "intermittency_L1.md"
+RESULTS_MD = REPORT_ROOT / "eval" / "intermittency_diagnostic.md"
+RESULTS_L1_MD = REPORT_ROOT / "eval" / "intermittency_L1.md"
 _EPS = 1e-6
 
 # The Syntetos-Boylan-Croston boundary constants, as originally published and as used

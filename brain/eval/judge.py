@@ -30,7 +30,7 @@ import numpy as np
 import config
 from signals import briefing
 
-PROMPTS_MD = config.STORE_DIR.parent / "eval" / "judge_prompts.md"
+PROMPTS_MD = config.REPORT_ROOT / "eval" / "judge_prompts.md"
 
 RUBRIC = {
     "correctness": "Does the headline match the day's numbers (actual vs expected/band)?",

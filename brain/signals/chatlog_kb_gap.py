@@ -13,7 +13,7 @@ tagged from content where named (Beer-Hall-dominant). The short window and the
 WhatsApp/web channel mismatch are recorded as standing flags.
 
 Run:
-    python -m signals.chatlog_kb_gap [--clusters 12] [--top 5]
+    python -m signals.chatlog_kb_gap [--clusters 12] [--top 12]
 """
 
 from __future__ import annotations
@@ -30,13 +30,22 @@ import pandas as pd
 from config import (
     CHATLOG_FAILURE_BASELINE,
     EXPECTED_STORE_CEILING,
-    STORE_DIR,
+    REPORT_ROOT,
     VOYAGE_MODEL,
     chat_csv,
 )
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "chatlog_kb_gap.md"
-RESULTS_JSON = STORE_DIR.parent / "signals" / "chatlog_kb_gap.json"
+RESULTS_MD = REPORT_ROOT / "signals" / "chatlog_kb_gap.md"
+RESULTS_JSON = REPORT_ROOT / "signals" / "chatlog_kb_gap.json"
+
+# The committed artefact tabulates every cluster formed, so the two defaults are tied
+# rather than stated twice. They used to differ (12 clusters, top 5), which meant the
+# documented bare command truncated the table to five rows: the staleness sweep in
+# report 57 read that as seven lost clusters and nearly "fixed" a correct artefact by
+# regenerating it at the default. A truncating default on a committed artefact is a
+# trap, not a preference.
+DEFAULT_CLUSTERS = 12
+DEFAULT_TOP = DEFAULT_CLUSTERS
 
 FAILURE_MARKERS = ("couldn't produce an answer", "please retry or rephrase")
 _VENUE_KEYWORDS = {
@@ -300,8 +309,10 @@ def _write_report(stats: dict, ranked: pd.DataFrame, backend: str, top: int) -> 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Chat-log KB-gap detection")
-    ap.add_argument("--clusters", type=int, default=12)
-    ap.add_argument("--top", type=int, default=5)
+    ap.add_argument("--clusters", type=int, default=DEFAULT_CLUSTERS)
+    ap.add_argument("--top", type=int, default=DEFAULT_TOP,
+                    help="rows tabulated in the artefact; defaults to every cluster "
+                         "formed, which is what the committed artefact contains")
     ap.add_argument("--backend", default="tfidf", choices=["tfidf", "auto"],
                      help="tfidf (default) is the pinned, committed path; auto is "
                           "an explicit, noted Ryan-side richer-embedder comparison "

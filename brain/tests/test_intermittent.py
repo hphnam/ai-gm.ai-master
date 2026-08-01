@@ -36,7 +36,8 @@ def test_sba_is_croston_deflated_by_the_bias_factor():
 def test_matches_statsforecast_on_bernoulli_gap_series():
     sf = pytest.importorskip(
         "statsforecast.models",
-        reason="statsforecast does not build on this Python 3.14 venv (scipy/numba); "
+        reason="statsforecast absent: it is an eval-only dependency (requirements-eval.txt, "
+        ".venv-eval) and does not build on the 3.14 runtime venv (scipy/numba); "
         "cross-check skipped per spec G2.2",
     )
     # RUN AND PASSED OUT OF BAND, 2026-07-31 (ledger M11): statsforecast 2.1.1 on a

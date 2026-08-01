@@ -72,9 +72,9 @@ from config import (
     CHECKLIST_LIVE,
     DEV_SCAN_WINDOW,
     EVENT_ONLY_VENUES,
-    STORE_DIR,
-    VENUE_LABELS,
+    REPORT_ROOT,
     VENUES_WITH_STOCK,
+    VENUE_LABELS,
 )
 from signals.change_point import detect as changepoint_detect
 from signals.chatlog_kb_gap import gap_report as chatlog_gap_report
@@ -86,7 +86,7 @@ from signals.residual import attribute
 from store.active_span import active_trading_end, dataset_max_date, is_closed
 from store.warehouse import connect
 
-RESULTS_MD = STORE_DIR.parent / "signals" / "briefing.md"
+RESULTS_MD = REPORT_ROOT / "signals" / "briefing.md"
 
 # Head-selection strength (§4) and tie-break ranks.
 SOURCE_RANK = {"change_point": 5, "stock": 4, "deviation": 3, "checklist": 2, "sop": 1}
