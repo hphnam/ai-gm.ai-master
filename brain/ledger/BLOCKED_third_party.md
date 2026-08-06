@@ -173,7 +173,7 @@ therefore applied directly against the Zotero Web API and are already live:
 
 | Item | Action | Result |
 |---|---|---|
-| `K73XDLEQ` Ye et al. | conferencePaper → preprint; full title restored; date 2025-06-11; DOI 10.48550/arXiv.2502.17361; `Citation Key: ye_closer_2025` | HTTP 204, verified on read-back |
+| `K73XDLEQ` Ye et al. | full title restored; **peer-reviewed NeurIPS 2025 conference paper**, `proceedingsTitle` set, date 2025; arXiv preprint id kept in Extra as secondary; `Citation Key: ye_closer_2025` | HTTP 204, verified on read-back. NOTE an intermediate edit wrongly retyped this as a preprint and was reverted the same session |
 | `665AJ6CH` Hoo et al. | Extra records the cited version (v4, 2026-01-26) against the Jan-2025 arXiv id; `Citation Key: hoo_tables_2026` | HTTP 204, verified |
 | `KG8QMUJV` Judd et al. | **created**, journalArticle, J. Applied Statistics 53(2) 372–390, doi 10.1080/02664763.2025.2519136, CC BY 4.0, `Citation Key: judd_forecasting_2025` | HTTP 200, verified |
 

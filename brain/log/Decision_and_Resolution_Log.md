@@ -2876,3 +2876,26 @@ them into the append-only log so it is the continuous WP1-to-present record.
     and cheap; nothing in the project pins that particular key.
     Not done, deliberately: `zotero_update_search_database` needs the MCP tool, so it waits for
     the next session. Noted in `BLOCKED_third_party.md` §G.
+
+104. **Ye et al. is a peer-reviewed NeurIPS 2025 paper, not a preprint. My correction was the error.**
+     Phuong supplied the authoritative OpenReview record: `@inproceedings`, booktitle "The
+     Thirty-ninth Annual Conference on Neural Information Processing Systems", 2025. Zotero's
+     ORIGINAL item type, `conferencePaper`, was therefore RIGHT, and row 103 "fixed" it into
+     being wrong. The genuine defects were only the truncated title and the missing date; I
+     inferred preprint status from an arXiv record without checking whether the paper had since
+     been accepted, which is the same class of mistake as citing a paper from its abstract.
+     Reverted in three places, all of which had to move together:
+     - **Zotero `K73XDLEQ`**: back to `conferencePaper` with `proceedingsTitle` set, date 2025,
+       the OpenReview URL as `url`, the arXiv DOI cleared from the DOI field and the preprint id
+       kept in Extra as a secondary identifier. Citation key still pinned.
+     - **`ref.bib`**: `@misc` with arXiv fields becomes `@inproceedings` with the booktitle.
+     - **`chapters/literature_review.tex`**: the `[a 2025 preprint]` marker removed, and the
+       count corrected **nineteen to eighteen**. Recomputed: 18 unpublished works cited, 13
+       marked, 5 unmarked and all five inside multi-key exemplar lists, so the sentence's own
+       arithmetic holds. Prose needed no change, as it never described the paper's status.
+     Worth keeping visible: this is the second time in two sessions that a claim about a paper's
+     PUBLICATION STATE, as opposed to its content, went wrong. The content claims were all
+     NotebookLM-verified and all held. The rule covers content and does not cover venue, date or
+     peer-review status, and those are exactly what an examiner checks first. **A bibliographic
+     claim needs the same treatment as a factual one: check the venue of record, not the arXiv
+     page.**
