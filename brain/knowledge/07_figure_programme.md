@@ -559,3 +559,70 @@ finding staying in prose.
 
 **No run in this list regenerates `tab:ladder`**, and no figure in this programme depends on
 one. That demotion stands as approved and unregenerated under A11.
+
+---
+
+## 9. Build log — 2026-08-07
+
+### Built, rendered and viewed
+
+| Float | Script | Output | Status |
+|---|---|---|---|
+| F5 `fig:validity-efficiency` | `figures/fig_validity_efficiency.py` | `out/fig_validity_efficiency.pdf` | **done, viewed** |
+| F7 `fig:nulls` | `figures/fig_nulls.py` | `out/fig_nulls.pdf` | **done, viewed — see the correction below** |
+| F4 `fig:drift` | `figures/fig_drift.py` | `out/fig_drift.pdf` | **done, viewed** |
+| F6 `fig:sensitivity` | `figures/fig_sensitivity.py` | `out/fig_sensitivity.pdf` | **done, viewed** |
+
+Shared style in `figures/_style.py`: Okabe–Ito, colour never load-bearing on its own,
+vector PDF at 6.0 in text width, Type 42 fonts, panel letters, units on every axis.
+`assert_estate()` stops on a fourth venue rather than filtering it, and `load()` refuses
+to draw from a missing artefact rather than substituting a default.
+
+### Authored but NOT rendered — no TeX toolchain on this machine
+
+| Float | Source | Status |
+|---|---|---|
+| F1 `fig:blocks` | `figures/fig_blocks.py` → `out/fig_blocks.tex` | generated to scale from `hierarchy/block_spans.json`; **never compiled** |
+| F3 `fig:pipeline` | `out/fig_pipeline.tex` | hand-authored; **never compiled** |
+| A-F1..A-F7 | not started | blocked on the same |
+
+`pdflatex`, `lualatex`, `xelatex`, `tectonic` and Homebrew are all absent. TikZ output
+cannot be verified here, and the publication standard says render and view **every**
+figure. Two known risks that only a compile would settle: node-text overflow in the three
+narrow blocks of F1 (mitigated by moving every label outside the bar) and the
+`positioning`/`fit`/`backgrounds` library requirements of F3.
+
+### F7 — the specified takeaway is wrong, and the figure is what caught it
+
+§2 F7 states the takeaway as *"every paired difference's interval straddles zero"*. Drawn,
+**eight of the thirty-one paired intervals exclude zero**:
+
+| Venue | Pairs excluding zero |
+|---|---|
+| Beer Hall | `N−M` $+0.0163$ $[0.0004, 0.0337]$; `U−G2` $-0.0075$; `U−G3` $-0.0094$ |
+| Ellel | `O−F` $-0.137$; `H−F` $-0.236$; `H−M` $-0.220$ |
+| Two River Taps | `O−H` $-0.0028$; `U−G3` $-0.0144$ |
+
+**The claim survives where the chapter actually makes it, and only there.** At every venue
+the 90 per cent confidence set retains **all five** weather arms, so the weather limb is
+undifferentiated as a set. Every `N−*` pair — the contrast that asks whether weather beats
+no weather — includes zero at Ellel and Two River Taps. The Ellel exclusions are all
+*between* weather arms, which is a question about which covariate set, not about whether
+weather pays.
+
+**One exception needs stating rather than absorbing.** Beer Hall `N−M` excludes zero at
+$+0.0163$ $[0.0004, 0.0337]$: the full weather arm beats no weather, and the lower limb sits
+at four ten-thousandths. It is the thinnest possible exclusion and it points the opposite
+way to RQ3's answer. The defensible sentence is that the weather limb is a null as a set at
+all three venues, with one marginal pairwise contrast at the Beer Hall that a confidence set
+does not sustain — which is the same conservative-set-against-pairwise-test tension §3.6
+already tells the reader how to read.
+
+The pooling exclusions (`U−G2`, `U−G3`) are **already correctly reported** in
+`sec:res-group`: *"At the two data-rich venues grouping is a small loss that the paired test
+detects."* No change needed there.
+
+**Revised F7 takeaway:** neither limb of RQ3 separates as a set at any venue, while a
+handful of pairwise contrasts are detectable and every one of them is marginal. That is a
+stronger figure than the one specified, and it is the reason the float was worth building
+before 4.3 was composed.
