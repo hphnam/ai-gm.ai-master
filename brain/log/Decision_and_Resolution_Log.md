@@ -2130,3 +2130,34 @@ them into the append-only log so it is the continuous WP1-to-present record.
     (`ELLEL_DIARY_LIVE = False`, with the circular fix foreclosed by construction). The null
     result's status is unchanged: against a DOW-conditioned baseline the gate is expected
     geometry, not a measurement. No methodology change, no experiment re-run.
+
+---
+
+82. **2026-08-06 — D-D4 DECIDED: accept the design, fix the attribution — but not the way the
+    row proposed, because that fix was itself a misattribution.** §4 recommended *"re-cite to
+    Corollary A.2 and present the observed-state case as our extension"*. **Verified verbatim**
+    in NotebookLM: Cor A.2 reads *"If predicted state probabilities are accurate
+    p-hat(z_t|x_{1:t-1}) = p(z_t|x_{1:t-1}), then epsilon = 0, therefore E[err_t] = alpha for
+    all T"*, and Thm 4.3 bounds `|(1/T) sum E[err_t] - alpha| <= epsilon · max_z delta_{z,T}`
+    with `epsilon = P(z-hat_t != z_t)` — **both stated for "the CPTC algorithm"**, whose update
+    step is *"alpha_{z-hat_t,t+1} <- alpha_{z-hat_t,t} + gamma · (alpha - err_t)"*. **We do not
+    run CPTC.** `conformal/wrap.py` is static split conformal in two variants, `plain` and
+    `mondrian`, with no adaptive alpha and no gamma; its own docstring says *"Change-point-aware
+    online conformal (Sun and Yu 2025) remains noted, not wired"* (L8-9), and the adaptive line
+    (ACI/BOA in `conformal/methods.py`) was measured and NOT adopted, having performed worse
+    than static at this estate's one real regime change. Citing Cor A.2 as our guarantee would
+    therefore have claimed a theorem about an algorithm the served system does not implement —
+    the same defect class as V1/V2/V3, caught only because the check was run twice. **Corrected
+    attribution, three claims to three homes, no new paper and so no gate:** (1) what the
+    procedure IS — `barber_conformal_2023`, already cited, defines it verbatim, *"Mondrian
+    methods informally divide the observations into groups, and assume that the observations
+    within each group are still exchangeable"*, crediting Vovk, Gammerman & Shafer (2005);
+    (2) what it GUARANTEES — `stocker_gentle_2025`, already cited, *"this simple procedure
+    provides the powerful guarantee of finite-sample marginal coverage: P(Y_{T+1} in
+    C_{1-alpha}(X_{T+1})) >= 1 - alpha"*, applied within each group; (3) WHY an observed
+    partition — `sun_conformal_2025` Thm 4.3, cited as motivation, since a latent-state method
+    pays a penalty scaling with `epsilon` that a known calendar does not incur. **V2 CLOSED:**
+    the paper defines the state as *"the unobserved discrete mode"* throughout, so the
+    `observed`/`inferred` framing is ours and must be labelled as ours. Also flagged for the
+    write-up: the ACI-measured-and-rejected result is our own evidence and is stronger here
+    than any citation, and it is currently unused in this passage. No code change, no run.

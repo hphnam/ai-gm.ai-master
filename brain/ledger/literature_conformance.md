@@ -623,3 +623,102 @@ a measurement about the estate**. Nothing here weakens that, and both chapters a
    necessity, and it is the sentence that answers the obvious viva question.
 3. Keep the null-result caveat exactly as it stands.
 4. State the surviving limitation as covariate poverty, cross-referenced to D-U3.
+
+---
+
+## 12. D-D4 resolved — 2026-08-06
+
+**Decision: ACCEPT the design; fix the attribution — but NOT the way §4 proposed.** The §4
+recommendation was *"re-cite to Corollary A.2 and present the observed-state case as our
+extension"*. Source verification plus a code read shows that **would have replaced V2's
+misattribution with a subtler one of the same class**. The correct fix is different and is
+set out below. This closes **V2**.
+
+### Verification, at source
+
+NotebookLM against `sun_conformal_2025` (notebook `d565d5f0`, source
+`a2475250-a1c1-4fc4-a78f-2a195f2608d6`), verbatim:
+
+| Item | Verbatim |
+|---|---|
+| **Thm 4.3** | *"For any sample size T >= 1, the CPTC algorithm ensures that \|(1/T) sum E[err_t] - alpha\| <= epsilon · max_z delta_{z,T}, where epsilon = P(z-hat_t != z_t) is the error rate of the state predictions"* |
+| **Cor A.2** | *"Corollary A.2 (Zero miscoverage rate under Accurate State Prediction). If predicted state probabilities are accurate p-hat(z_t\|x_{1:t-1}) = p(z_t\|x_{1:t-1}), then epsilon = 0, therefore E[err_t] = alpha for all T, achieving optimal performance of online conformal prediction."* |
+| **The state** | *"the latent state z_t indicates which dynamical regime (out of K possible regimes) is currently active at time t"*; *"Let z_t in Z = {1, ..., K} denote the **unobserved** discrete mode"* |
+
+V2 is confirmed exactly: the paper defines its state as **latent by construction**, so the
+`observed` versus `inferred` framing the methodology attributes to it is not the paper's.
+
+### Why the recommended fix was wrong
+
+Both Thm 4.3 and Cor A.2 are results **about the CPTC algorithm** — an online procedure with
+a per-state adaptive update, *"Update alpha_{z-hat_t,t+1} <- alpha_{z-hat_t,t} + gamma ·
+(alpha - err_t)"*.
+
+**We do not run CPTC.** `conformal/wrap.py` produces static split conformal in two variants,
+`plain` (marginal) and `mondrian` (group-conditional, grouped by active versus
+structural-zero day). There is no adaptive alpha and no gamma anywhere in it, and the
+module's own docstring already says so: *"Change-point-aware online conformal (Sun and Yu
+2025) remains noted, not wired."* (`conformal/wrap.py:8-9`). The adaptive line — ACI and BOA
+— lives separately in `conformal/methods.py`, was **measured and not adopted** because it
+performed worse than static at this estate's one real regime change.
+
+So citing Corollary A.2 as the guarantee our bands enjoy would claim a theorem about an
+algorithm the served system does not implement. That is the same defect class as V1/V2/V3 —
+an inference *from* a source that the source does not carry — and catching it here is the
+whole point of running the check twice.
+
+### The attribution that is correct
+
+Three separate claims, three separate homes:
+
+1. **What our procedure is.** Group-conditional split conformal over a fixed partition known
+   before calibration. `barber_conformal_2023` — **already cited, already in Zotero** —
+   defines it verbatim: *"Mondrian methods informally divide the observations into groups,
+   and assume that the observations within each group are still exchangeable (e.g.,
+   class-conditional conformal classification)"*, and attributes the method to Vovk,
+   Gammerman & Shafer (2005). **No new citation is required**, so no add-a-paper gate is
+   triggered.
+2. **What our procedure guarantees.** The standard split-conformal finite-sample marginal
+   guarantee, applied within each group. `stocker_gentle_2025` — already cited — states it
+   verbatim: *"If the data in I_cal and the new test point (X_test, Y_test) are exchangeable,
+   this simple procedure provides the powerful guarantee of finite-sample marginal coverage:
+   P(Y_{T+1} in C_{1-alpha}(X_{T+1})) >= 1 - alpha"*. The Mondrian variant buys within-group
+   validity **on the assumption that exchangeability holds within each group**, which is
+   precisely what splitting active from structural-zero days is for.
+3. **Why we chose an observed partition.** `sun_conformal_2025` Thm 4.3 establishes that a
+   **latent-state** conditional method pays a coverage penalty scaling with the state
+   misclassification rate `epsilon = P(z-hat_t != z_t)`. Our partition is a known calendar,
+   so that failure mode does not arise. Sun & Yu is cited as **motivation for the design
+   choice**, not as a coverage theorem for our procedure.
+
+That third framing is both true and checkable, and it keeps the genuine strength the §4 row
+identified without borrowing a guarantee we have not earned.
+
+### What the methodology may and may not say
+
+- **May say**: a latent-state conditional method carries a state-misclassification term
+  (Thm 4.3, quotable); our partition is observed, so the design does not incur it.
+- **Must not say**: that Corollary A.2 gives our bands `epsilon = 0` coverage. Cor A.2 is
+  about CPTC. We do not run CPTC.
+- **Must not say**: that Sun & Yu frame the choice as `observed` versus `inferred`. They
+  define the state as unobserved throughout (V2).
+- **Should say**, and does not yet: that the adaptive alternative was **measured and
+  rejected** — ACI performed worse than static at this estate's one real regime change. That
+  is our own evidence and it is stronger here than any citation.
+
+### Post-decision status
+
+| Item | Status |
+|---|---|
+| **D-D4** | **DECIDED — accept the design; attribution fixed, but re-homed across three sources** |
+| **V2** | **CLOSED.** The paper's state is latent by construction; the `observed`/`inferred` framing is ours and is now labelled as ours |
+| R37 | **CONFORMS** once the three claims are cited to their correct homes |
+| New citation needed | **None.** `barber_conformal_2023` and `stocker_gentle_2025` are already cited keys — no add-a-paper gate |
+| Second-order risk avoided | Citing Cor A.2 as our guarantee would have been a fresh misattribution: it is a theorem about CPTC, which `conformal/wrap.py:8-9` states we do not wire |
+
+### Owed to the writing, not written this session
+
+1. Split the current single citation into the three claims above, each to its own source.
+2. Delete any implication that a Sun & Yu theorem bounds *our* coverage.
+3. Label the observed-partition argument explicitly as the chapter's own reasoning.
+4. Add the ACI-measured-and-rejected sentence, which is our evidence and currently unused here.
