@@ -34,8 +34,9 @@ import numpy as np
 from scipy import stats
 
 import config
+import provenance
 from eval import harness
-from features.build_features import build_features, feature_columns
+from features.build_features import feature_columns
 from models import ladder
 
 REPORT_MD = config.REPORT_ROOT / "eval" / "functional_pair.md"
@@ -56,7 +57,12 @@ LADDER_ARMS = {
 
 
 def _folds(venue: str):
-    feats = build_features(venue)
+    # `ladder._load_feats` is `build_features` THEN `trim_to_active`. This module previously
+    # called `build_features` alone, which left Ellel on its untrimmed 392-row calendar and
+    # produced 266 origins where every other L1 package uses 260 -- against the 273/260/205
+    # this file's own STEP comment states it is producing. Intent documented against
+    # behaviour, so it was a defect rather than a design choice. See log/77.
+    feats = ladder._load_feats(venue)
     return feats, list(harness.rolling_origin(
         feats, n_folds=None, horizon_days=HORIZON,
         min_train_days=MIN_TRAIN, step_days=STEP))
@@ -153,6 +159,7 @@ def build() -> dict:
            "venues": {v: run_venue(v) for v in config.FORECAST_VENUES}}
     out["wall_clock_s"] = round(time.time() - t0, 1)
     out["crossing_venues"] = [v for v, r in out["venues"].items() if r["crossing_observed"]]
+    out["provenance"] = provenance.runtime_stamp()
     _write_report(out)
     METRICS_JSON.write_text(json.dumps(out, indent=2, sort_keys=True, default=str) + "\n")
     return out

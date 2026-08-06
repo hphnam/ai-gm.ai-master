@@ -22,6 +22,7 @@ Read-only over the briefing and signals; invents no detection maths. CLI:
 
 from __future__ import annotations
 
+import json
 import sys
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -30,6 +31,7 @@ import numpy as np
 import pandas as pd
 
 import config
+import provenance
 from eval import inject
 from eval.inject import Injection, TruthRecord
 from signals import briefing
@@ -39,7 +41,15 @@ from signals.residual import _EPS, attribute
 from store.active_span import active_trading_end, is_closed
 from store.warehouse import connect
 
-REPORT_MD = config.REPORT_ROOT.parent / "PRJ93_Agent_Eval_Report.md"
+# `REPORT_ROOT.parent` put this in the REPO root while the live artefact -- the one the
+# Results chapter cites -- sits in `brain/log/`. A re-run therefore wrote a fresh report
+# somewhere nobody reads and left the cited copy untouched. Defect recorded in log/60.
+REPORT_MD = config.REPORT_ROOT / "log" / "PRJ93_Agent_Eval_Report.md"
+
+# Detection is the only result family with no machine-readable artefact: `tab:vuspr` is a
+# headline float standing on a markdown table. The JSON carries the same numbers the
+# report prints, so a figure script never has to parse prose.
+REPORT_JSON = config.REPORT_ROOT / "eval" / "agent_eval.json"
 
 
 # --- Surface: injected stream → real detectors → real briefing items ----------
@@ -658,6 +668,10 @@ def _write_scaled_report(out: dict) -> None:
     scaled section first, so re-runs don't duplicate. The N=4 smoke sections above stay
     as the quick self-test; this is what the Results chapter cites."""
     base = REPORT_MD.read_text().split(_SCALED_MARKER)[0] if REPORT_MD.exists() else ""
+    # The base report now carries its own runtime stamp at the foot. Inheriting it here
+    # would strand a second identity block mid-document, above the scaled section, and the
+    # foot of THIS report is the one that describes the run that produced the cited numbers.
+    base = base.split("\n## Runtime identity")[0]
     d = out["detection"]
     o = d["overall"]
     lines = [
@@ -733,7 +747,16 @@ def _write_scaled_report(out: dict) -> None:
         "- Sensitivity cells with small N carry wide Wilson intervals by construction; "
         "read the interval, not the point estimate.\n",
     ]
+    # TSB-AD/vus are declared gating here and nowhere else: this is the only artefact whose
+    # numbers disappear without them.
+    lines += provenance.stamp_lines(gating=("TSB-AD", "vus"))
     REPORT_MD.write_text("\n".join(lines))
+
+    payload = dict(out)
+    payload["provenance"] = provenance.runtime_stamp()
+    REPORT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_JSON.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
 
 
 # --- The two named probes (spec §6) ------------------------------------------
@@ -980,6 +1003,7 @@ def _write_report(r: EvalResult) -> None:
         "with overstated comments, an F1-returns-NaN-when-precision-is-0 edge) were **all "
         "fixed**.\n",
     ]
+    lines += provenance.stamp_lines()
     REPORT_MD.write_text("\n".join(lines))
 
 
@@ -999,6 +1023,17 @@ def main() -> int:
                     help="run the full venue×kind×magnitude×onset×fold×direction grid "
                          "(the dissertation-grade run) and extend the report")
     args = ap.parse_args()
+
+    # Checked BEFORE any work and before any write. `_write_report` truncates the scaled
+    # section on every run, so a refusal that fired later would already have destroyed the
+    # citable report it was trying to protect -- which is how this guard was first tested.
+    if args.scaled and _load_vus_get_metrics()[0] is None:
+        print("REFUSING the scaled run: neither TSB-AD nor the pinned `vus` fallback is "
+              f"importable in {sys.executable}.\n"
+              "  VUS-PR is the measure the review committed to and is never approximated "
+              "by hand, so a scaled run without it would silently drop tab:vuspr.\n"
+              "  Use .venv-eval, or install from requirements-eval.txt.", file=sys.stderr)
+        return 2
 
     print("Agent evaluation · briefing usefulness (offline oracle + anchor + judge)")
     r = run()

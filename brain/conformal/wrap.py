@@ -34,6 +34,7 @@ import numpy as np
 import pandas as pd
 
 import org_profile
+import provenance
 from config import (
     ANCHOR_VENUE,
     CONFORMAL_LEVELS,
@@ -483,6 +484,7 @@ def _write_report(out: dict, passed: bool) -> None:
             "with the smaller calibration set of a closed/sparse venue; the band "
             "is still valid (coverage ≥ nominal). The Beer Hall (the Objective-1 "
             "deliverable) meets the strict two-sided gate.")
+    lines += provenance.stamp_lines()
     md.write_text("\n".join(lines))
 
 

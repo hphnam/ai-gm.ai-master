@@ -29,6 +29,7 @@ import numpy as np
 from scipy import stats
 
 import config
+import provenance
 from eval import fold_vectors, mcs
 
 REPORT_MD = config.REPORT_ROOT / "eval" / "metric_ordering.md"
@@ -107,6 +108,7 @@ def build() -> dict:
         out["venues"][v]["winner_changes"] for v in scoped)
     out["order_identical_everywhere"] = all(
         out["venues"][v]["order_identical"] for v in scoped)
+    out["provenance"] = provenance.runtime_stamp()
     _write_report(out)
     METRICS_JSON.write_text(json.dumps(out, indent=2, sort_keys=True, default=str) + "\n")
     return out

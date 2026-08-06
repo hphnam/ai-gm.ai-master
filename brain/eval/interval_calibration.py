@@ -419,13 +419,18 @@ def build() -> dict:
         "venues": venues_out,
     }
     VECTORS_PATH.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n")
+    # The MCS and power artefacts are quoted independently of the vector file -- `tab:mcs`
+    # and `tab:coverage` read them without ever opening `interval_calibration_L1.json` --
+    # so each carries its own identity rather than inheriting one nobody looks up.
     mcs_payload = {"store_ceiling": ceiling, "device": "cpu",
                    "primary_level": PRIMARY_LEVEL, "seed": SEED,
                    "paired_bootstrap_seed": PAIRED_BOOTSTRAP_SEED,
                    "block_len": BLOCK_LEN, "n_boot": BOOTSTRAP_B,
-                   "incumbent": INCUMBENT, "venues": mcs_out}
+                   "incumbent": INCUMBENT,
+                   "provenance": payload["provenance"], "venues": mcs_out}
     MCS_PATH.write_text(json.dumps(mcs_payload, indent=2, allow_nan=False) + "\n")
     power["store_ceiling"] = ceiling
+    power["provenance"] = payload["provenance"]
     POWER_PATH.write_text(json.dumps(power, indent=2, allow_nan=False) + "\n")
     render(payload, mcs_payload, power)
     return {"vectors": payload, "mcs": mcs_payload, "power": power}

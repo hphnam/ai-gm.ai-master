@@ -29,3 +29,9 @@ A gap = a cluster failing **above** the 18.9% corpus baseline (≥2 failures), s
 | 12 |  | 13 | 0 | 0.0 | 0.0 | {'estate': 13} | Change the wording from sweep so people don't think to brush, to check |
 
 A dense, repeatedly-failing cluster is the missing SOP to surface — the decision layer on top of the codebase's `record_kb_gap` counter. Semantic embeddings (Voyage) sharpen these clusters further; the TF-IDF fallback keeps it keyless.
+
+## Runtime identity
+- environment: `.venv-eval` · Python 3.12.13 · Darwin arm64
+- compute device: mps
+- libraries: numpy 1.26.4, pandas 2.3.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.5, torch 2.13.0, chronos-forecasting 2.3.1
+- store ceiling: 2026-07-07

@@ -91,3 +91,9 @@ The demand-only proxy above becomes a true reorder signal once the physical on-h
 | Product | L1 | On-hand kegs | Forecast pints/day | Days cover | Reorder | Suggest kegs |
 |---|---|---|---|---|---|---|
 | lunebrew caravan of love | Draught | 0.0 | 5.22 | **0.0** | ⚠ YES | 1 |
+
+## Runtime identity
+- environment: `.venv-forecast` · Python 3.12.13 · Darwin arm64
+- compute device: mps
+- libraries: numpy 2.5.1, pandas 3.0.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.4, torch 2.12.1, chronos-forecasting 2.3.1
+- store ceiling: 2026-07-07

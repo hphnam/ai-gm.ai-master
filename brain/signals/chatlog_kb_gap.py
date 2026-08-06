@@ -27,6 +27,7 @@ import sys
 import numpy as np
 import pandas as pd
 
+import provenance
 from config import (
     CHATLOG_FAILURE_BASELINE,
     EXPECTED_STORE_CEILING,
@@ -270,6 +271,7 @@ def write_artefact(top: int = 20, report: dict | None = None) -> dict:
             for _, r in gaps.head(top).iterrows()
         ],
     }
+    payload["provenance"] = provenance.runtime_stamp()
     RESULTS_JSON.write_text(json.dumps(payload, indent=2))
     return payload
 
@@ -304,6 +306,7 @@ def _write_report(stats: dict, ranked: pd.DataFrame, backend: str, top: int) -> 
                  "surface — the decision layer on top of the codebase's "
                  "`record_kb_gap` counter. Semantic embeddings (Voyage) sharpen "
                  "these clusters further; the TF-IDF fallback keeps it keyless.")
+    lines += provenance.stamp_lines()
     RESULTS_MD.write_text("\n".join(lines))
 
 

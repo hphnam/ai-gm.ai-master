@@ -264,3 +264,11 @@ Source library: **TSB-AD 1.5**. stock_drawdown is excluded (no z signature).
 - **Two River Taps** is closed (active to 2026-05-08); only PRE-closure folds are injected, so its N is smaller and post-closure behaviour is out of scope.
 - **Ellel** is booking-driven and sparse: its residual stream leaves a single short held-out fold, too short to test a sustained shift, so it is **spike-only** and flagged small-N — not a detector failure, a data limit.
 - Sensitivity cells with small N carry wide Wilson intervals by construction; read the interval, not the point estimate.
+
+
+## Runtime identity
+- environment: `.venv-eval` · Python 3.12.13 · Darwin arm64
+- interpreter: `/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-eval/bin/python`
+- compute device: mps
+- libraries: numpy 1.26.4, pandas 2.3.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.5, torch 2.13.0, chronos-forecasting 2.3.1, TSB-AD 1.5, vus 0.0.6
+- store ceiling: 2026-07-07

@@ -107,12 +107,25 @@ VENUE_LABELS: dict[str, str] = {
 # The donor of rhythm shape (richest, cleanest series).
 ANCHOR_VENUE = "beer_hall"
 
-# Forecast targets, the three real venues. This tuple is the ONLY thing that decides
-# what gets forecast, and it is an allowlist on purpose: a location that appears in
+# Forecast targets, the three venues. This tuple is the ONLY thing that decides what
+# gets forecast, and it is an allowlist on purpose: a location that appears in
 # VENUE_MAP but not here is never forecast, so adding a venue upstream cannot silently
-# enrol it. `events` is absent because it is not a trading venue in the usual sense -
-# 203 line items across 2 distinct dates in the whole seed window, against 47,644 for
-# `beer_hall` (G15a.3).
+# enrol it.
+#
+# `events` is absent for a CATEGORICAL reason, not a volume one. The unit of analysis
+# in this study is a trading venue: a fixed site with an opening calendar, against
+# which a daily demand rhythm can be learned and a deviation from normal defined.
+# `events` is a Square location booking off-site event transactions. It has no opening
+# calendar and no site, so it has no rhythm to learn and falls outside the unit of
+# analysis however many rows it carries. This is a BOUNDARY on what the study is about,
+# not a threshold applied to data - so there is no cut-off here, and none was ever set.
+#
+# Its volume (203 line items across 2 distinct dates in the whole seed window, against
+# 47,644 for `beer_hall`, G15a.3) is corroboration only: it is consistent with the
+# categorical reading and would not change it either way. Do not restate the volume as
+# the reason. A volume rationale reads as a data-driven exclusion threshold, which
+# invites the question of when the threshold was set and against what - a question this
+# exclusion does not have to answer, because it is not that kind of exclusion.
 #
 # G15a.3 removed a sibling `EXCLUDED_VENUES = frozenset({"events"})` that lived here
 # and was read by nothing: grep found exactly one hit, its own definition. It was the

@@ -21,3 +21,9 @@ Selected forecaster: **rung2_ets**. Validation: online rolling-origin split conf
 **Deliverable:** the Mondrian band (group-conditional on active vs structural-zero day) is persisted to DuckDB (`bands`/`forecasts`, model `conformal_rung2_ets`) and is the input to Objective 2 — *a deviation is an observation outside this band*.
 
 **Note:** this venue misses the ±3pp band on the *conservative* (over-coverage) side — the band is wider than nominal, not narrower. Over-coverage is split conformal's safe failure mode and is expected with the smaller calibration set of a closed/sparse venue; the band is still valid (coverage ≥ nominal). The Beer Hall (the Objective-1 deliverable) meets the strict two-sided gate.
+
+## Runtime identity
+- environment: `.venv-forecast` · Python 3.12.13 · Darwin arm64
+- compute device: mps
+- libraries: numpy 2.5.1, pandas 3.0.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.4, torch 2.12.1, chronos-forecasting 2.3.1
+- store ceiling: 2026-07-07

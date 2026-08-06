@@ -74,5 +74,21 @@
         "How do I open the bar?"
       ]
     }
-  ]
+  ],
+  "provenance": {
+    "environment": ".venv-eval",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "1.26.4",
+      "pandas": "2.3.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.5",
+      "torch": "2.13.0",
+      "chronos-forecasting": "2.3.1"
+    },
+    "store_ceiling": "2026-07-07"
+  }
 }

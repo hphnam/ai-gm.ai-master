@@ -7,6 +7,25 @@
   "block_len": 7,
   "n_boot": 10000,
   "incumbent": "D",
+  "provenance": {
+    "environment": ".venv-forecast",
+    "interpreter": "/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1",
+      "TSB-AD": "not installed",
+      "vus": "not installed"
+    },
+    "store_ceiling": "2026-07-07"
+  },
   "venues": {
     "beer_hall": {
       "venue": "beer_hall",

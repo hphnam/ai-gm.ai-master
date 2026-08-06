@@ -1,6 +1,6 @@
 # R9 - the functional minimal pair
 
-Pre-registered at decision-log row 77, commit c098fba, before `rung1_mean_dow` existed. Rolling origin, horizon 7, min train 120, step 1. Wall clock 760.7s.
+Pre-registered at decision-log row 77, commit c098fba, before `rung1_mean_dow` existed. Rolling origin, horizon 7, min train 120, step 1. Wall clock 832.3s.
 
 `rung1_robust_dow` and `rung1_mean_dow` share one code path and differ only in the central-tendency aggregator, so a difference between them is attributable to the forecast functional alone. The ladder arms below are a generalisation check, not the load-bearing evidence: they confound the functional with family, capacity, feature access and fit procedure.
 
@@ -36,38 +36,6 @@ Paired per-fold difference (mean arm - median arm): **MASE +0.0092** [-0.0093, +
 | `rung2_ets` | mean | 0.6159 | 0.5795 | +46.983 | 2.830e-07 |
 | `rung3_gbm` | mean | 0.7230 | 0.6563 | +28.983 | 5.306e-03 |
 
-## ellel
-
-- metric axis **MAE / RMSE** (G2: unscaled venue)
-- folds: 266, points: 1862
-
-### Bias (mean signed residual, actual - forecast)
-
-| arm | mean signed resid | 95% CI | p | biased |
-|---|---|---|---|---|
-| `rung1_robust_dow` (median) | +75.090 | [+59.692, +90.488] | 3.433e-21 | True |
-| `rung1_mean_dow` (mean) | -39.831 | [-56.832, -22.831] | 4.616e-06 | True |
-
-Bias magnitude closer to zero for the mean arm by **+35.259** (mean arm less biased -- prediction (i) HOLDS here).
-
-### The 2x2
-
-| arm | MAE | RMSE |
-|---|---|---|
-| `rung1_robust_dow` (median) | 105.9785 | 236.8921 |
-| `rung1_mean_dow` (mean) | 166.6424 | 306.5116 |
-
-Paired per-fold difference (mean arm - median arm): **MAE +60.6639** [+50.3836, +70.9442], p 1.700e-25; **RMSE +69.6194** [+49.5838, +89.6551], p 5.405e-11.
-
-**Crossing observed (median wins on MAE, mean wins on RMSE): False**
-
-### Generalisation check (confounded; not load-bearing)
-
-| rung | functional | MAE | RMSE | mean signed resid | p |
-|---|---|---|---|---|---|
-| `rung2_ets` | mean | 133.2345 | 273.9306 | +9.219 | 2.448e-01 |
-| `rung3_gbm` | mean | 168.0388 | 297.7018 | -37.333 | 6.958e-06 |
-
 ## two_river_taps
 
 - metric axis **MASE / RMSSE**, basis `calendar_lag7_active`
@@ -99,6 +67,38 @@ Paired per-fold difference (mean arm - median arm): **MASE +0.0057** [-0.0189, +
 |---|---|---|---|---|---|
 | `rung2_ets` | mean | 0.6051 | 0.4924 | +28.434 | 1.557e-09 |
 | `rung3_gbm` | mean | 0.6931 | 0.5258 | -21.937 | 9.022e-06 |
+
+## ellel
+
+- metric axis **MAE / RMSE** (G2: unscaled venue)
+- folds: 260, points: 1820
+
+### Bias (mean signed residual, actual - forecast)
+
+| arm | mean signed resid | 95% CI | p | biased |
+|---|---|---|---|---|
+| `rung1_robust_dow` (median) | +77.655 | [+61.933, +93.377] | 1.127e-21 | True |
+| `rung1_mean_dow` (mean) | -41.730 | [-59.152, -24.308] | 2.829e-06 | True |
+
+Bias magnitude closer to zero for the mean arm by **+35.925** (mean arm less biased -- prediction (i) HOLDS here).
+
+### The 2x2
+
+| arm | MAE | RMSE |
+|---|---|---|
+| `rung1_robust_dow` (median) | 107.5923 | 240.1578 |
+| `rung1_mean_dow` (mean) | 170.9889 | 312.1852 |
+
+Paired per-fold difference (mean arm - median arm): **MAE +63.3967** [+52.4619, +74.3315], p 1.009e-24; **RMSE +72.0275** [+50.6764, +93.3786], p 1.802e-10.
+
+**Crossing observed (median wins on MAE, mean wins on RMSE): False**
+
+### Generalisation check (confounded; not load-bearing)
+
+| rung | functional | MAE | RMSE | mean signed resid | p |
+|---|---|---|---|---|---|
+| `rung2_ets` | mean | 133.8792 | 272.0204 | +13.681 | 8.891e-02 |
+| `rung3_gbm` | mean | 168.4874 | 296.8281 | -34.766 | 3.614e-05 |
 
 ## Crossing summary
 

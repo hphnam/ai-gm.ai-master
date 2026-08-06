@@ -1,6 +1,6 @@
 # S7 G17h - interval calibration: powered coverage, per-step bands, adaptive methods
 
-Store ceiling 2026-07-07; device cpu; seed 93; primary level 0.9; wall-clock 31.2s.
+Store ceiling 2026-07-07; device cpu; seed 93; primary level 0.9; wall-clock 29.2s.
 
 ## Part 1: the 1.00 coverage claim, restated with power
 
@@ -103,6 +103,7 @@ Paired bootstrap vs incumbent:
 
 ## Runtime identity
 - environment: `.venv-forecast` · Python 3.12.13 · Darwin arm64
+- interpreter: `/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python`
 - compute device: mps
 - libraries: numpy 2.5.1, pandas 3.0.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.4, torch 2.12.1, chronos-forecasting 2.3.1
 - store ceiling: 2026-07-07

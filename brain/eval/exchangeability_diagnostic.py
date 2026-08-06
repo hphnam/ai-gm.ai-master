@@ -52,6 +52,13 @@ from eval import interval_calibration as ic
 from store.warehouse import assert_store_ceiling
 
 OUT_PATH = config.BRAIN_DIR / "eval" / "exchangeability_diagnostic.json"
+
+# R2. The JSON above summarises the score distribution to four time quartiles, which is the
+# right grain for a table and too coarse for a figure: `fig:drift` has to show WHEN the scale
+# moves and, at Ellel, that the movement sits on calendar-open days that did not trade. The
+# per-observation frame is already computed here and was simply never persisted. Written as
+# CSV so a figure script needs pandas and nothing else. No statistic is recomputed.
+SCORES_PATH = config.BRAIN_DIR / "eval" / "exchangeability_scores.csv"
 LEVEL = ic.PRIMARY_LEVEL
 VENUES = ic.VENUES
 
@@ -380,8 +387,10 @@ def _partition_fidelity(records: pd.DataFrame) -> dict:
     }
 
 
-def venue_report(venue: str) -> dict:
+def venue_report(venue: str, *, collect: list | None = None) -> dict:
     records = ic.generate_records(venue)
+    if collect is not None:
+        collect.append(records.assign(venue=venue))
     return {
         "venue": venue,
         "point_model": ic.default_model(venue),
@@ -405,8 +414,9 @@ def main(argv: list[str]) -> int:
         "provenance": provenance.runtime_stamp(),
         "venues": {},
     }
+    scores: list = []
     for venue in (argv[1:] or list(VENUES)):
-        rep = venue_report(venue)
+        rep = venue_report(venue, collect=scores)
         artefact["venues"][venue] = rep
         d = rep["scale_drift"]
         u = rep["rank_uniformity"]
@@ -456,6 +466,12 @@ def main(argv: list[str]) -> int:
 
     OUT_PATH.write_text(json.dumps(artefact, indent=2, allow_nan=False) + "\n")
     print(f"\nwrote {OUT_PATH}")
+    if scores:
+        frame = pd.concat(scores, ignore_index=True)[
+            ["venue", "origin", "step", "target", "y", "yhat", "res", "state"]]
+        frame.to_csv(SCORES_PATH, index=False)
+        print(f"wrote {SCORES_PATH} ({len(frame)} rows, "
+              f"{frame['venue'].nunique()} venues)")
     return 0
 
 

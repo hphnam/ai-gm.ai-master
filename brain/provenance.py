@@ -35,6 +35,15 @@ STAMPED_PACKAGES = (
     "duckdb",
     "torch",
     "chronos-forecasting",
+    # GATING packages: absent, these do not slow a computation down, they delete it.
+    # `TSB-AD` supplies VUS-PR and `vus` is its pinned fallback. Running `eval/agent_eval.py`
+    # in `.venv-forecast`, which carries neither, replaced the seven-cell VUS-PR table with a
+    # "dependency unavailable" notice and left the other 272 lines of the report intact --
+    # a defect shaped to survive a diff on totals. It is listed here so the stamp shows
+    # `not installed` at the top of the artefact instead of the damage showing up only as
+    # prose buried inside it. See log/76 section 10.
+    "TSB-AD",
+    "vus",
 )
 
 
@@ -93,6 +102,9 @@ def store_ceiling() -> str:
 def runtime_stamp(*, include_store: bool = True) -> dict:
     stamp = {
         "environment": venv_name(),
+        # The directory name alone is ambiguous once venvs are copied or renamed, and the
+        # venv is part of a result's identity rather than a detail of how it was launched.
+        "interpreter": sys.executable,
         "python": platform.python_version(),
         "platform": f"{platform.system()} {platform.machine()}",
         "device": torch_device(),
@@ -103,21 +115,31 @@ def runtime_stamp(*, include_store: bool = True) -> dict:
     return stamp
 
 
-def stamp_lines(*, include_store: bool = True) -> list[str]:
-    """Markdown block for the foot of a generated artefact."""
+def stamp_lines(*, include_store: bool = True,
+                gating: tuple[str, ...] = ()) -> list[str]:
+    """Markdown block for the foot of a generated artefact.
+
+    `gating` names the packages THIS artefact's numbers depend on. Only those are called
+    out when absent. Listing every absent package loudly would fire on scripts that never
+    needed it -- `block_spans` does not want a warning about TSB-AD -- and a warning that
+    fires on artefacts it does not apply to is a warning nobody reads.
+    """
     s = runtime_stamp(include_store=include_store)
     installed = ", ".join(f"{k} {v}" for k, v in s["packages"].items()
                           if v != "not installed")
-    absent = [k for k, v in s["packages"].items() if v == "not installed"]
+    absent = [k for k in gating if s["packages"].get(k) == "not installed"]
     lines = [
         "",
         "## Runtime identity",
         f"- environment: `{s['environment']}` · Python {s['python']} · {s['platform']}",
+        f"- interpreter: `{s['interpreter']}`",
         f"- compute device: {s['device']}",
         f"- libraries: {installed}",
     ]
     if absent:
-        lines.append(f"- not installed: {', '.join(absent)}")
+        # Loud, because an absent gating package does not degrade a result, it removes one.
+        lines.append(f"- **NOT INSTALLED: {', '.join(absent)}** — any measure supplied by "
+                     "these is missing from this artefact, not merely approximated")
     if include_store:
         lines.append(f"- store ceiling: {s['store_ceiling']}")
     return lines

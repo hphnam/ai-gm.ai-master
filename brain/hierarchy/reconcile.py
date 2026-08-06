@@ -30,6 +30,7 @@ import sys
 import numpy as np
 import pandas as pd
 
+import provenance
 from config import (
     ANCHOR_VENUE,
     CONFORMAL_LEVELS,
@@ -709,6 +710,7 @@ def _write_report(out: dict) -> None:
                 f"{s['forecast_daily_pints']:.2f} | **{s['days_of_cover']:.1f}** | "
                 f"{'⚠ YES' if s['reorder_flag'] else 'no'} | "
                 f"{s['suggested_order_kegs']:.0f} |")
+    lines += provenance.stamp_lines()
     RESULTS_MD.write_text("\n".join(lines))
 
 

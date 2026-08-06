@@ -69,12 +69,87 @@ When a fact changes, change it in the store that owns it and correct the others 
 pointing at that store rather than by restating the fact in each. A number
 duplicated across three files will be updated in one of them.
 
+### Any claim that something is OPEN gets verified before it is reported
+
+**This is a hard step, not a disposition.** A claim that something is open, unresolved,
+unrun, blocked, still waiting or never decided is checked against **both** owning stores
+before it reaches Phuong or a plan:
+
+1. `brain/ledger/BLOCKED_third_party.md` — §F carries the open-row counts.
+2. `brain/log/Decision_and_Resolution_Log.md` — read the **tail**. A decision row appended
+   after a `phase_state.md` entry supersedes it, and the log is the only file that records
+   the supersession.
+
+If the two disagree with the source of the claim, the stores win and the claim is wrong.
+
+**The rule exists because it was broken.** On 2026-08-06 the ruler conflict
+(`harness.REPORTED_BASIS` against `config.VENUE_SCALE_BASIS`) was reported as the highest
+-priority open blocker, gating a figure programme and a day of compute. It had already been
+ruled and executed — decision row **87**, Gate A, with `log/70` recording the migration
+completing. The claim came from `phase_state.md:1794-1804`, which records the conflict as
+open because that is what was true when the line was appended. `BLOCKED_third_party.md` §F
+already read *"Open rows not blocked on a third party: 0"*. The check that would have caught
+it took seconds and was not done.
+
+**Subagent findings of this shape do not pass through unchecked.** A subagent reporting an
+item as open has almost always read a history file, because history files are longer, more
+specific and easier to grep than the one-line state a status file carries. Verify before
+relaying, and say in the subagent's prompt which store owns the answer.
+
+This will recur in 8C, where *"this was never decided"* is a claim that arrives constantly —
+about a rejected alternative, a naming choice, a float disposition. Most of the time it is
+`phase_state.md` being read as state, and the answer is in `05_paper_architecture.md` §7 or a
+decision row.
+
 ### Corrections are appended, never overwritten
 
 Where a later finding supersedes an earlier one, record the correction with what it
 supersedes and why. `log/73` §4 and decision rows 101 and 106 are the pattern. A
 silently revised claim leaves a reader unable to tell a verified statement from a
 lucky one.
+
+### A fix is verified by inspecting the artefact, never by the exit code
+
+**An exit code reports what a script decided. It does not report what the script left on
+disk, and those come apart precisely when something has gone wrong.** After any change to a
+generator — a guard, a basis, an output path, a stamp — open the artefact and check the thing
+that was supposed to change, plus one thing that was not.
+
+**The rule exists because it was broken twice in one session, in opposite directions.**
+
+- `eval/agent_eval.py` was given a guard refusing a `--scaled` run without the VUS-PR
+  library. The guard sat inside the `if args.scaled` block, by which point `_write_report`
+  had already truncated the scaled section — so the guard returned a correct non-zero exit
+  **after destroying the artefact it existed to protect**. The exit code was right and the
+  file was gone. Found by opening the file.
+- The same script, run in the wrong venv, exited **zero** having replaced a seven-cell
+  headline table with a "dependency unavailable" notice, leaving the other 272 lines intact.
+  A green run and a damaged artefact.
+
+Corollary: **`git diff` on a regenerated artefact is part of the run, not an optional check
+afterwards.** A regeneration whose diff nobody read has not been verified, whatever it
+printed.
+
+### A clean result is reported with the scope of the check that produced it
+
+**State what a check establishes and, in the same breath, what it does not.** This matters
+most when the answer is clean, because a clean result invites the reader to generalise it and
+a narrow check gives them nothing to stop on.
+
+The rule exists because it was broken twice, in the same shape both times:
+
+- The R0 triage verified 20 of 22 artefacts against the **store ceiling** and was reported as
+  "verified fresh". Freshness against the store and provenance under a numerics regime are
+  different properties, and a later sweep found 14 artefacts carrying no environment
+  identity at all. One verdict was given where two were needed.
+- The B0 error was the same failure earlier: `phase_state.md` answers *what happened*, and it
+  was used to answer *what is open now*.
+
+The operational form: when a check comes back clean, write the sentence as "X reproduces
+under Y" — naming the condition — rather than "X is verified". If the condition cannot be
+named, the check has not been characterised well enough to report. See `log/78` Part 1 for
+the worked example: the artefacts reproduce **under the regime `log/61` identifies as
+committed**, which is not the same claim as the regime question being closed.
 
 ## Conflicts — unresolved
 

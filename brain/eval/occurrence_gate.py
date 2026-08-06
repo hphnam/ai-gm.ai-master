@@ -22,6 +22,7 @@ import sys
 import numpy as np
 
 import config
+import provenance
 from eval import harness, mcs
 from signals import occurrence
 
@@ -29,7 +30,12 @@ VENUE = "beer_hall"
 HORIZON = 7
 MIN_TRAIN = 120
 STEP = 1
-BASIS = "calendar_lag7"
+
+# Gate A (decision row 87) made `config.VENUE_SCALE_BASIS` the single authority and demoted
+# `harness.REPORTED_BASIS` to a fallback for venues absent from the map. This module kept a
+# hard-coded `calendar_lag7` literal and was missed by the log/70 regeneration sweep, so it
+# was still scoring on the superseded ruler. Read the authority, as `models/ladder.py` does.
+BASIS = config.VENUE_SCALE_BASIS.get(VENUE, harness.REPORTED_BASIS)
 
 
 def _base(train, target):
@@ -72,6 +78,7 @@ def evaluate() -> dict:
         },
         "base_model": "rung1_robust_dow",
         "seed": mcs.SEED, "block_len": mcs.BLOCK_LEN, "n_boot": mcs.N_BOOT,
+        "provenance": provenance.runtime_stamp(),
     }
 
 

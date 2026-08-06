@@ -2,22 +2,44 @@
   "artefact": "occurrence_gate_beer_hall",
   "store_ceiling": "2026-07-07",
   "venue": "beer_hall",
-  "basis": "calendar_lag7",
+  "basis": "calendar_lag7_active",
   "n_folds": 273,
   "mean_mase": {
-    "gated": 0.7872,
-    "ungated": 0.8032
+    "gated": 0.6448,
+    "ungated": 0.6578
   },
   "mcs": {
-    "set_0.10": ["gated", "ungated"],
-    "set_0.25": ["gated", "ungated"],
+    "set_0.10": [
+      "gated",
+      "ungated"
+    ],
+    "set_0.25": [
+      "gated",
+      "ungated"
+    ],
     "mcs_pvalue": {
       "gated": 1.0,
-      "ungated": 0.391
+      "ungated": 0.394
     }
   },
   "base_model": "rung1_robust_dow",
   "seed": 93,
   "block_len": 7,
-  "n_boot": 1000
+  "n_boot": 1000,
+  "provenance": {
+    "environment": ".venv-forecast",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1"
+    },
+    "store_ceiling": "2026-07-07"
+  }
 }

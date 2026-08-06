@@ -986,3 +986,161 @@ Two corrections to the audit above:
   `GBP 44.8` batch-merge figure it appears to derive from — 44.8 survives only
   as prose in report 47 with no artefact. The real grouped-vs-univariate
   difference, computed from the committed per-origin MAE vectors, is £4.27–£10.94.
+
+---
+
+# ADDENDUM 2026-08-06 — the two floats the audit never covered
+
+`tab:exchangeability` and `tab:vuspr` postdate the original audit batches A–F and were
+never assessed. They entered the figure programme as a **known unknown**, which is not the
+same as a pass. Both are audited here against regenerated sources (R0 sweep, `log/76`).
+
+## `tab:exchangeability` — source `eval/exchangeability_diagnostic.json`
+
+Store ceiling 2026-07-07, full `provenance` block present. Three venues, no fourth.
+
+| # | Claim | Source | Value | Verdict |
+|---|---|---|---|---|
+| X1 | Beer Hall implied coverage reproduces published coverage "to a thousandth" | `venues.beer_hall.rank_uniformity.frac_above_nominal_quantile` = 0.129714 | implied **0.8703** against published **0.871** | **MATCHES** — agrees at the third decimal, which is the claim |
+| X2 | Ellel implied coverage | `venues.ellel.rank_uniformity` | **0.9126** (n_banded 1659) | **MATCHES** |
+| X3 | Two River Taps implied coverage | `venues.two_river_taps.rank_uniformity` | **0.9615** (n_banded 1274) | **MATCHES** |
+| X4 | Ellel drift sits on calendar-open non-trading days | `drift_decomposition.composition.drift_false_open_only` | n = **1037**, ρ = **+0.3672**, p = **1.88e-34** | **MATCHES** `BLOCKED_third_party.md` D-U3 (ρ = +0.367, p = 1.9e-34, n = 1037) |
+| X5 | ...and not on its trading days | `drift_traded_only` (ellel) | n = 263, ρ = 0.0939, **p = 0.129** | **MATCHES** — not significant, which is the decomposition's whole point. State the p-value; a null limb carries the argument here |
+| X6 | Beer Hall false-open limb runs the other way | `drift_false_open_only` (beer_hall) | n = **21**, ρ = **−0.472**, p = 0.031 | **MATCHES** — but n = 21. Do not report this as a per-venue symmetry of Ellel's n = 1037 limb without stating both n |
+
+**Verdict: no MISMATCH, no STALE, no UNTRACEABLE.** One reporting instruction (X6): the two
+false-open limbs differ in n by a factor of ~50 and must not be presented as a matched pair.
+
+## `tab:vuspr` — source `log/PRJ93_Agent_Eval_Report.md` §S6b, now also `eval/agent_eval.json`
+
+Regenerated 2026-08-06 in `.venv-eval` (TSB-AD 1.5 present). Report reproduces the committed
+version **exactly**, apart from the newly appended runtime stamp.
+
+| # | Claim | Value | Verdict |
+|---|---|---|---|
+| V1 | VUS-PR by kind × venue, 7 cells | exo_coincident/BH 0.932 (48); exo_coincident/TRT 0.996 (36); regime_shift/BH 0.934 (144); regime_shift/TRT 0.972 (108); spike/BH 0.760 (144); spike/ellel 0.704 (36); spike/TRT 0.912 (108) | **MATCHES** |
+| V2 | `stock_drawdown` excluded from the VUS-PR table | "no z signature" | **MATCHES** — and the exclusion must be stated in the caption, or the table reads as a missing measurement |
+| V3 | Source library | TSB-AD **1.5**, never reimplemented | **MATCHES** |
+| V4 | Overall detection | N = 644, recall **0.807** [0.78, 0.84], precision **0.872**, F1 0.839 | **MATCHES** |
+| V5 | Cost sweep is degenerate | misses **124**, false alarms **8**, constant across all four ratios; only weighted cost moves (132.0 / 256.0 / 628.0 / 1248.0) | **MATCHES** — confirmed constant, so it is not plottable. See `07_figure_programme.md` F6 |
+
+**Verdict: no MISMATCH, no STALE, no UNTRACEABLE.**
+
+**One defect found and fixed while auditing, which the audit itself would not have caught.**
+`eval/agent_eval.py` wrote its report to `config.REPORT_ROOT.parent` — the **repo root** —
+while the cited artefact lives in `brain/log/`. A re-run therefore produced a fresh report
+where nobody reads it and left the cited copy untouched. Recorded in `log/60`, now fixed;
+the module also emits `eval/agent_eval.json`, so `tab:vuspr` no longer stands on a markdown
+table alone.
+
+**And one trap worth recording.** The first regeneration was run in `.venv-forecast`, which
+does **not** carry TSB-AD. The script degraded gracefully rather than failing — it wrote
+*"VUS-PR: not computed, dependency unavailable"* and silently replaced the entire seven-cell
+table. Every other number in the report was unaffected, so a diff that skimmed the totals
+would have passed it. **The venv is part of an artefact's identity, and running the right
+script in the wrong one is a live way to lose a headline result.** This is exactly what the
+runtime stamp added in `log/69` §4 exists to make visible, and it is why the stamping was
+extended to this generator before the regeneration, not after.
+
+---
+
+# ADDENDUM 2026-08-06 (2) — `functional_pair` frame correction, before and after
+
+**Recorded so 8C composes Results 4.1 from the corrected figures rather than the current
+draft's.** `eval/functional_pair.py` scored Ellel on the **untrimmed 392-row** frame
+(`build_features`) where every other L1 package uses the **trimmed 386-row** frame
+(`ladder._load_feats` = `build_features` then `trim_to_active`). Diagnosed as a defect rather
+than a design choice because the module's own `STEP` comment states it is producing
+"273/260/205 origins" while it produced 273/**266**/205. Fixed and re-run (832.3 s,
+`.venv-forecast`). Full reasoning in `log/77`.
+
+| venue | quantity | BEFORE (untrimmed) | AFTER (trimmed) |
+|---|---|---|---|
+| beer_hall | n origins | 273 | **273 — unchanged** |
+| beer_hall | paired_absolute Δ | +0.0092 [−0.0093, 0.0277], p = 0.327 | **identical** |
+| beer_hall | paired_squared Δ | −0.0056 [−0.0216, 0.0103], p = 0.488 | **identical** |
+| two_river_taps | n origins | 205 | **205 — unchanged** |
+| two_river_taps | paired_absolute Δ | +0.0057 [−0.0189, 0.0303], p = 0.649 | **identical** |
+| two_river_taps | paired_squared Δ | −0.0015 [−0.0166, 0.0137], p = 0.850 | **identical** |
+| **ellel** | **n origins** | **266** | **260** |
+| **ellel** | paired_absolute Δ (£, unscaled) | +60.664 [50.384, 70.944], p = 1.70e-25 | **+63.397 [52.462, 74.332], p = 1.01e-24** |
+| **ellel** | paired_squared Δ (£) | +69.619 [49.584, 89.655], p = 5.41e-11 | **+72.028 [50.676, 93.379], p = 1.80e-10** |
+
+**Only Ellel moves, and only Ellel could**: it is the one venue with a leading dead span for
+`trim_to_active` to remove (the 2025-06-08 sale-and-reversal mis-ring plus five dead days to
+2025-06-13, `log/43:55-59`). Beer Hall and Two River Taps reproduce **identically**, which is
+the check that the fix touched the frame and nothing else.
+
+**The R9 conclusion is unaffected.** `crossing_venues` remains **`[beer_hall,
+two_river_taps]`** and Ellel's `crossing_observed` remains **False**. Ellel's magnitudes rise
+about 4.5 per cent and its p-values remain overwhelming (1e-24 and 1.8e-10), so every
+statement the chapter makes about the minimal pair survives with corrected numbers.
+
+**Use the AFTER column.** The BEFORE column is recorded only so a reader of the current draft
+can tell which figure they are looking at.
+
+---
+
+## ADDENDUM 2026-08-07 — the `tab:winkler` 90% set column is sensitive to the numerics regime
+
+Source: `log/78`. `eval/interval_calibration` regenerated in both venvs on approval.
+
+**Scope first, because this is narrower than it sounds.** Every Winkler mean, every coverage
+figure and every Clopper–Pearson limb **reproduces exactly** under `.venv-forecast`, the
+regime `log/61` identifies as the committed one, and those artefacts now carry a provenance
+stamp naming it. `tab:coverage` is clear in full. Ellel is stable in every verdict. What
+moves is the **"90% set" column of `tab:winkler`** (rows 28, 30, 32 of this audit) and the
+paired-bootstrap significance beneath it.
+
+**This is NOT about `tab:mcs`.** `tab:mcs` is the ladder MCS over nine forecasting candidates
+(`eval/mcs_L1_results.json`); `tab:winkler` is the conformal-arms comparison
+(`interval_calibration_mcs.json`). Only the latter was exercised. An earlier note in this
+session misattributed the finding to `tab:mcs`; it is corrected here rather than above.
+
+| Venue | `.venv-forecast` (committed) | `.venv-eval` (numpy 1.26.4) |
+|---|---|---|
+| beer_hall | set `[D, A, G, S, P]`, adoption `[]` | same set, adoption `[]` — but P−A and S−A bootstrap intervals lose their exclusion of zero |
+| ellel | set `[D]`, adoption `[]` | identical verdicts |
+| **two_river_taps** | set `[D, P, S, A, G]`, adoption `[]` | set **`[P, D, A, G]`** (S eliminated, p 0.191 → 0.036), adoption **`['P']`** |
+
+**Compose from the `.venv-forecast` column.** It is the committed regime and the one every
+other reported figure was produced under.
+
+**Corroborates row 579 from an independent direction.** That row already warned MCS p-values
+near α = 0.10 are unstable to ±1 set member under bootstrap-B variation, and asked the table
+to say so. The same boundary now moves under library resolution instead of replicate count.
+Two independent perturbations, one conclusion.
+
+**Two River Taps specifically, and this is why it is a finding rather than a computing
+accident.** It has the fewest origins (205 against 273 and 260) and the tightest spread
+between arms, so it has the least margin to absorb a threshold crossing. The sensitivity
+tracks sample size.
+
+**Required in 5.3** — see the drafted note in `ledger/blocker_clearance_package.md` §5.3.
+Lead with non-separability as the finding; the quantification is the support.
+
+**Known bounded gap:** `tab:mcs` is an MCS too and inherits the amplification mechanism by
+construction. `mcs_L1_results.json` is unstamped; `log/70` records its Gate A regeneration
+running in `.venv-forecast`, so it is consistent with every other committed number, but it
+has never been run across the gap. Testing it means regenerating the ladder, which the
+approved `tab:ladder` disposition puts out of scope. Demonstrated for the conformal arms;
+plausible, untested, for the ladder.
+
+---
+
+## ADDENDUM 2026-08-07 (2) — Beer Hall P−A and S−A are marginal verdicts
+
+Source: `log/78` Part 3. Set membership at Beer Hall is unchanged across regimes, so this
+does not reach the `tab:winkler` set column — but the underlying paired-bootstrap verdicts
+do move, and if either difference is quoted in 4.1 prose as established, the qualification
+belongs with it.
+
+| Pair | `.venv-forecast` | `.venv-eval` |
+|---|---|---|
+| P − A | +125.36 [16.46, 250.66] **excludes zero** | +97.40 [−16.58, 225.81] does not |
+| S − A | +113.80 [11.94, 227.07] **excludes zero** | +83.87 [−22.68, 200.86] does not |
+
+Lower limbs of +16.5 and +11.9 on intervals roughly 235 wide: the verdict rests on the last
+few per cent of its own interval. **Do not write either as a clean separation.** The
+defensible phrasing is that A's advantage over P and S at Beer Hall is directionally
+consistent but not robust — which is the same conclusion the empty adoption list reaches.

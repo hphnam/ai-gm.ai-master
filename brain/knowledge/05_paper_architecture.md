@@ -466,7 +466,7 @@ faster as a sentence than as a float.
 | `tab:group` | 7×3 | **Body 4.3** | A null result needs its paired intervals visible or it reads as an absence of effort. |
 | `tab:weather` | 7×3 | **Body 4.3** | Five arms across three venues; the mutual indistinguishability is the finding and it is only visible as a table. |
 | `tab:coverage` | 6×3 | **Body 4.4** | Headline. Coverage, Clopper–Pearson interval, power and MDE per venue are all looked up. |
-| `tab:exchangeability` | 6×3 | **Body 4.4** | The check that makes the finding: implied coverage against published coverage, agreeing to a thousandth. The agreement is the argument. |
+| `tab:exchangeability` | 6×3 | **Body 4.4** | The check that makes the finding: implied coverage against published coverage, agreeing to a thousandth. The agreement is the argument. **Two binding reporting conditions — see §2.7a.** |
 | `tab:winkler` | 7×3 | **Body 4.4** | Five interval methods against the incumbent — this is the comparison-against-rejected-alternatives evidence **D7** requires. |
 | `tab:vuspr` | 4×7 | **Body 4.5** | Detection headline, by event kind and venue. |
 | `tab:ladder` | 4×9 | **Appendix E** | The historical committed gate on a superseded basis. See §2.8a — this is what dissolves the 525-word caption. |
@@ -480,6 +480,27 @@ faster as a sentence than as a float.
 
 **Body floats in Results after this: one figure and eight tables**, down from one figure
 and sixteen tables.
+
+### 2.7a Binding reporting conditions on `tab:exchangeability` and Results 4.4
+
+**Added 2026-08-06 from the audit of the two floats the numbers audit never covered
+(`numbers_audit.md`, Addendum). These are binding on 8C, not advisory.** They are recorded
+here rather than only in the audit ledger because both are qualifications of exactly the kind
+a 2.8:1 compression flattens — each survives as a clause or not at all, and the finding is
+wrong without it.
+
+**E1 — Ellel's traded-only limb is NOT significant, and that null carries the argument.**
+The exchangeability finding at Ellel is a **decomposition**, not a trend: the drift sits on
+calendar-open days that did not trade (n = 1037, ρ = +0.367, p = 1.9×10⁻³⁴) and **not** on
+the days it traded (n = 263, ρ = 0.094, **p = 0.129**). Report the traded-only p-value
+explicitly. Dropping it leaves "Ellel's residual scale drifts", which is true, uninformative,
+and not what was established. The whole of `log/74` §5 rests on the contrast.
+
+**E2 — the two false-open limbs are not a matched pair and must not be presented as one.**
+Ellel's false-open limb has **n = 1037**; the Beer Hall's has **n = 21** (ρ = −0.472,
+p = 0.031). They point in opposite directions, which is tempting to write as a symmetry. It
+is not one: the n differ by a factor of about fifty. State both n wherever both limbs appear,
+or report only Ellel's.
 
 ### Methodology — three tables
 
@@ -1200,6 +1221,18 @@ rule in `PRJ93_RULES.md` applied to approvals rather than to findings.
 |---|---|---|---|---|---|
 | **U1** | A2 / §2.1, the purpose cell for Introduction 1.4 | "Four contributions at graded strength" | "**Five** contributions at graded strength" | Phuong, explicit unlock, 2026-08-06 | The RQ mapping yields five. C5 is gap limb 7's frozen apparatus, and folding it into another claim would conceal the thing graded strength exists to disclose. See `06_research_questions.md` §6. |
 | **U2** | A2 / §2.1, the purpose cell for Discussion 5.5 | Four declared divergences | **Six**, adding the three-venue estate against the specification's four, and the NeonDB research schema not provided | Phuong, confirmed at the same gate, 2026-08-06 | 5.5 is mandatory under HC59 and its defect mode is incompleteness. Both were confirmed while verifying the estate size in the aim. The budget is unchanged at 300. See `06_research_questions.md` §9. |
+| **U3** | `07_figure_programme.md` §3, float **A-F1** (Appendix B, R65) | A TikZ **PRISMA-style screening flow diagram** — records identified → screened → excluded with reasons → included | A **criteria table plus prose**. **No flow diagram is drawn.** | Phuong, explicit approval, 2026-08-06 | **Three of the four PRISMA boxes have no number and none is recoverable.** `04_supervisor_evidence_pack.md` §3.1 states it directly: *"No screened-versus-retained count exists at any stage, and it is not recoverable now"*, and *"the search was not pre-registered, and no protocol document exists"*. A flow diagram's rhetorical function is to assert that a systematic process occurred; drawing it with invented counts would place a claim the project's own evidence pack contradicts into the document's most legible form. Independently, the cited corpus contains **no PRISMA diagram either** (`07_figure_programme.md` §6), so the convention had no precedent to appeal to. R65 asks for the protocol to be *recorded*, which the table does. See `log/77`. **Two binding conditions attach — see below.** |
+
+**Conditions on U3, binding on whoever writes Appendix B.**
+
+1. **The non-pre-registration is declared in Appendix B itself**, not only in Discussion 5.5.
+   A reader who arrives at the search protocol learns its status there. Deferring it to
+   another chapter makes the appendix read as an ordinary protocol until contradicted
+   elsewhere, which is the defect U3 exists to avoid rather than relocate.
+2. **Terminal counts are labelled as terminal.** A bare "N sources included" beside a criteria
+   table reads as the bottom of a funnel. Wherever a count appears it says that it is a
+   terminal count and that no stage counts exist — otherwise the table recreates the
+   implication the flow diagram was refused for.
 
 **The budgets in A10 are fixed.** A section that cannot satisfy the rubric criteria
 named against it in §5 within its budget **escalates to Phuong**. It does not exceed

@@ -85,3 +85,49 @@ therefore about which story the chapter tells, and the human owns it (D-D1).
 One caveat that belongs with the decision: at Two River Taps the served model is `rung2_ets`,
 and it is the rung RMSSE demotes furthest. Anyone arguing the served choice is
 metric-robust should not use TRT as the example.
+
+---
+
+## CORRECTION appended 2026-08-06 — every number above is restated on the ruled basis
+
+**What this supersedes.** All mean losses and the Two River Taps rank correlations printed
+above. **No conclusion in this report changes.** Recorded as a correction rather than an
+edit, per the corrections-are-appended rule in `PRJ93_RULES.md`.
+
+**Why.** `eval/metric_ordering.json` was committed on the pre-Gate-A ruler
+(`calendar_lag7`). Gate A (`Decision_and_Resolution_Log.md` row 87) made
+`config.VENUE_SCALE_BASIS` the single authority, and `log/70` regenerated the fold vectors,
+the MCS and `tab:ladder` — but **not** this artefact, which is a downstream consumer of the
+fold vectors. It was found by the R0 staleness sweep (`log/76`).
+
+**The move is a denominator swap, not a change of predictions.** Regenerating gives
+new/old ratio ranges of **0.8179–0.8190** at the Beer Hall and **0.9297–0.9355** at Two
+River Taps under MASE — identical to the ranges `log/70` §2 published for the ruler
+migration. A rung-independent ratio is the signature of a changed denominator.
+
+### Restated values
+
+| venue | measure | winner | top-4 means |
+|---|---|---|---|
+| beer_hall | MASE | `rung4_chronos2_exo` | 0.5862, 0.5991, 0.6005, 0.6159 |
+| beer_hall | RMSSE | `rung4_chronos_bolt` | 0.5680, 0.5681, 0.5795, 0.5848 |
+| two_river_taps | MASE | `rung2_ets` | 0.6051, 0.6150, 0.6260, 0.6261 |
+| two_river_taps | RMSSE | `rung4_chronos2` | 0.4614, 0.4630, 0.4652, 0.4924 |
+
+Rank correlation, restated: Beer Hall **unchanged** at ρ = 0.950 (p = 8.76e-05), τ = 0.833.
+Two River Taps moves to **ρ = 0.833 (p = 5.27e-03), τ = 0.667 (p = 1.27e-02)** from ρ = 0.817
+(p = 7.22e-03), τ = 0.611.
+
+### What survives unchanged
+
+- The winner changes under the two measures at **both** venues.
+- The ordering is **not** identical at either venue.
+- **Both 90 per cent model confidence sets remain identical under both losses.**
+- **Beer Hall is still a coin-toss.** `chronos_bolt` 0.5680 against `chronos2_exo` 0.5681 —
+  a gap of 0.0001, tighter than the 0.0002 reported above and pointing the same way.
+- **Two River Taps is still substantive.** `rung2_ets` still goes from rank 1 under MASE to
+  **rank 4** under RMSSE, and the three Chronos rungs still overtake it.
+- The caveat above stands: the served model at Two River Taps is the rung RMSSE demotes
+  furthest.
+
+The D-D1 decision this report informs is therefore unaffected.

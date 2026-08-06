@@ -1,0 +1,60 @@
+{
+  "artefact": "block_spans",
+  "venue": "beer_hall",
+  "test_weeks": 8,
+  "calendar_start": "2025-06-04",
+  "calendar_end": "2026-07-07",
+  "n_calendar_days": 399,
+  "n_nodes": 41,
+  "n_bottom_nodes": 32,
+  "blocks": [
+    {
+      "block": "fit",
+      "start": "2025-06-04",
+      "end": "2026-01-19",
+      "n_days": 230,
+      "job": "estimators for the adoption contest"
+    },
+    {
+      "block": "validation",
+      "start": "2026-01-20",
+      "end": "2026-03-16",
+      "n_days": 56,
+      "job": "Croston/DOW adoption contest"
+    },
+    {
+      "block": "calibration",
+      "start": "2026-03-17",
+      "end": "2026-05-11",
+      "n_days": 56,
+      "job": "conformal scores + reconciliation weights"
+    },
+    {
+      "block": "test",
+      "start": "2026-05-12",
+      "end": "2026-07-07",
+      "n_days": 57,
+      "job": "reported; touched by nothing else"
+    }
+  ],
+  "store_ceiling": "2026-07-07",
+  "provenance": {
+    "environment": ".venv-forecast",
+    "interpreter": "/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1",
+      "TSB-AD": "not installed",
+      "vus": "not installed"
+    },
+    "store_ceiling": "2026-07-07"
+  }
+}
