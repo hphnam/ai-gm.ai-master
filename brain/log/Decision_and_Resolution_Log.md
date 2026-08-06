@@ -2100,3 +2100,33 @@ them into the append-only log so it is the continuous WP1-to-present record.
     no `A`/`h`/`b` in it. The unelicited-parameter argument therefore moves to **Further
     Work**, scoped concretely to A12 at Beer Hall given an elicitation. No code changed, no
     run, no chapter text written.
+
+---
+
+81. **2026-08-06 — D-D3 DECIDED: accept, and reclassify — the row's premise was false.** The
+    §4 row said `signals/occurrence.py::p_trade` *"returns exactly 0 or 1 by construction"*,
+    putting the binary part outside Cragg/Mullahy's specification. **Reading the code, that is
+    wrong.** `p_trade` returns `E[occurrence | day-of-week]`, a groupby mean over training
+    labels (`signals/occurrence.py:95-98`) — a **saturated nonparametric estimator** of
+    `P(trade | DOW)`. It evaluates to 0/1 at Beer Hall because that calendar is deterministic,
+    not because the code forces it. **Verified verbatim** in NotebookLM that Cragg fits a
+    probit (*"All our models start from the probit analysis model..."*) and Mullahy a binomial
+    logit (*"...identically those of a standard binomial logit model"*), and that **neither
+    discusses a known/observed first stage** — so the divergence, if real, would be genuine.
+    **Verified numerically rather than asserted** (`eval/hurdle_saturation_check.py`, result
+    `log/67_DD3_hurdle_saturation_result.md`, seed 93, n=400): with DOW dummies the saturated
+    logit MLE reproduces the groupby cell frequencies to **max abs diff 7.61e-05**, i.e. they
+    are the same estimator; and the deterministic cells show **complete separation**, |coef| =
+    11.46 still diverging at 2000 iterations — the coefficient MLE does not exist while the
+    fitted probability converges. So the closed form is the numerically stable route to
+    identical fitted probabilities, and the probit *parameterisation*, not our design, is what
+    breaks on a deterministic calendar. Both gains the sources name for a separate first stage
+    are **structural** (Cragg: different variables/parameters may govern the two decisions,
+    motivated by *"search, information, and transactions costs"*; Mullahy: the two processes
+    need not be constrained identical) and this design has that separation — the amount model
+    is fit on trading days only. **Surviving limitation is smaller than the row claimed:** the
+    first stage conditions on DOW alone — covariate poverty, not absence of estimation — and
+    the richer covariate is Ellel's diary, already recorded as D-U3 and blocked
+    (`ELLEL_DIARY_LIVE = False`, with the circular fix foreclosed by construction). The null
+    result's status is unchanged: against a DOW-conditioned baseline the gate is expected
+    geometry, not a measurement. No methodology change, no experiment re-run.

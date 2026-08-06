@@ -534,3 +534,92 @@ named blocker, instead of a vague gesture at cost weighting.
 2. One sentence adding the modified-MAPE / GRMSE-breakdown support to the G2 justification.
 3. Correct the §4 row's "two parameters" to three wherever it is carried forward.
 4. Do **not** cite §2.3 or ask 6 in support of this row.
+
+---
+
+## 11. D-D3 resolved — 2026-08-06
+
+**Decision: ACCEPT, and reclassify. The row's own premise was false, and correcting it moves
+D-D3 from a defended divergence to substantial conformance.** No methodology change; one
+verification module added (`eval/hurdle_saturation_check.py`), no experiment re-run.
+
+### Verification, at source
+
+NotebookLM against `cragg_statistical_1971` and `mullahy_specification_1986` (notebook
+`d565d5f0`), verbatim:
+
+| Source | First stage as specified |
+|---|---|
+| Cragg 1971 | *"All our models start from the probit analysis model where the probability that a particular event will occur at observation t, p(E_t), is given by ..."*; for the hurdle form, `f(y_t = 0 | X_1t, X_2t) = C(-X'_1t beta)` |
+| Mullahy 1986 | *"The idea underlying the hurdle formulations is that a binomial probability model governs the binary outcome of whether a count variate has a zero or a positive realization"*; *"Parameterizing u_1t = exp(X_t beta_1), it is seen that the binomial probabilities (17) and (18) are identically those of a standard binomial logit model"* |
+| Known/observed participation | **NOT SUPPORTED.** Neither author discusses a first stage that is a deterministic or known indicator rather than an estimated probability |
+| What estimating it buys — Cragg | *"They differ from that model by allowing the determination of the size of the variable when it is not zero to depend on different parameters or variables from those determining the probability of its being zero"*; the motivation is friction — *"search, information, and transactions costs which inhibit the carrying out of desired plans"* |
+| What estimating it buys — Mullahy | *"In standard count data models familiar to economists (e.g., the Poisson), these two processes are constrained to be identical"* |
+
+### The correction that changes the row
+
+The §4 row said `signals/occurrence.py::p_trade` *"returns exactly 0 or 1 by construction,
+so `hurdle()` collapses to a calendar mask"*. **That is wrong.** `p_trade` returns
+`E[occurrence | day-of-week]` — a groupby mean over the training labels
+(`signals/occurrence.py:95-98`). It is a **saturated nonparametric estimator** of
+`P(trade | DOW)`. It evaluates to 0 or 1 at Beer Hall because that venue's closure calendar
+is deterministic, **not because the code forces it**; a venue trading on some Mondays and not
+others returns a fraction, and the module is written to allow that.
+
+**Verified numerically rather than asserted** (`log/67_DD3_hurdle_saturation_result.md`): for
+a design matrix of DOW dummies, the saturated-logit MLE reproduces the groupby cell
+frequencies to **max abs diff 7.61e-05** — BFGS tolerance, not a modelling difference. The
+two are the same estimator.
+
+And in the deterministic cells the fitted coefficients reach **|coef| = 11.46 and are still
+diverging** at 2000 iterations: textbook complete separation, where the coefficient MLE does
+not exist while the fitted probability converges to the cell frequency.
+
+### The argument that carries the decision
+
+Our first stage **is** Cragg's and Mullahy's first stage, with a single categorical covariate,
+computed in its closed form. The closed form is not an avoidance of estimation — it is the
+numerically stable route to identical fitted probabilities, and the probit/logit
+*parameterisation*, not our design, is what fails on a deterministic calendar.
+
+Both gains the sources name for a separate first stage are **structural**: Cragg's is that the
+two decisions may depend on different variables and parameters; Mullahy's is that the binary
+and positive processes need not be constrained identical. This design has that separation —
+`hurdle_forecast` fits the amount model on trading days only, so it is *"not diluted by
+structural-closure zeros"* (`signals/occurrence.py:107-109`). Neither gain requires the first
+stage to be stochastic.
+
+### The limitation that survives, and it is smaller than the row claimed
+
+Our first stage conditions on **day-of-week alone**. Cragg's friction motivation — that
+participation is uncertain *given desire* — has no purchase at a contractually closed venue,
+but it would have purchase at an event-led one, which is exactly Ellel. That limitation is
+already recorded and already blocked (D-U3, `ELLEL_DIARY_LIVE = False`), and the module
+forecloses the circular fix by construction: the occurrence label is *"exogenous by
+construction and never read from a venue's own revenue"*, with no code path able to fill it
+from Ellel's trading days (`signals/occurrence.py:15-21`).
+
+### The null result, and why its status is unchanged
+
+The row's honest cost stands verbatim: against a DOW-conditioned baseline the gate is a
+function of a variable the baseline already carries, so the null is **expected geometry, not
+a measurement about the estate**. Nothing here weakens that, and both chapters already say it.
+
+### Post-decision status
+
+| Item | Status |
+|---|---|
+| **D-D3** | **DECIDED — accept; reclassify from DEFENSIBLE toward CONFORMS on the estimation limb** |
+| R13 | **CONFORMS on specification.** The binary part is fitted, saturated, with one covariate |
+| §4 D-D3 row | Superseded — "returns exactly 0 or 1 by construction" is factually wrong about the code |
+| Residual limitation | Covariate poverty of the first stage (DOW only), not absence of estimation. Ellel's richer covariate is D-U3, blocked |
+
+### Owed to the writing, not written this session
+
+1. Replace "the binary part is observed, not estimated" framing with the accurate one: a
+   saturated first stage whose closed form coincides with the MLE, evidenced by
+   `log/67_DD3_hurdle_saturation_result.md`.
+2. Add the complete-separation point — it converts an apparent shortcut into a numerical
+   necessity, and it is the sentence that answers the obvious viva question.
+3. Keep the null-result caveat exactly as it stands.
+4. State the surviving limitation as covariate poverty, cross-referenced to D-U3.
