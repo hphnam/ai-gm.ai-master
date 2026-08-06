@@ -2820,3 +2820,35 @@ them into the append-only log so it is the continuous WP1-to-present record.
     ref.bib and NotebookLM but NOT in Zotero. Third item on the manual list in
     `BLOCKED_third_party.md` section G.
     Overleaf `306f824`.
+
+102. **Literature-review audit: no claim left standing on assertion alone.**
+    Swept every paragraph over 35 words for a citation, correcting the regex first (the naive
+    one missed `\citet[note]{key}` and produced a false positive). Ten paragraphs carry no
+    citation and all ten are legitimate: chapter roadmap, the four stated positions (each
+    self-marked as this chapter's conjecture), the evidence-base note, the definition of
+    "rhythm", two statements about this study's own conduct, two design commitments, and a
+    section framing. **No unsourced empirical assertion survives.**
+    Three defects found, and two of them predate this session.
+    (a) **R-Zero violation, pre-existing.** The review said "This dissertation's own weather
+    experiment returns a null, with no detectable effect at the number of evaluation folds
+    available." That reports a later chapter's result inside the review, which the R-Zero rule
+    forbids, AND it is the precise overstatement `sec:res-weather` warns against: that section
+    says "Reporting this as weather being decorative would overstate the null", because the
+    effect is consistently signed and about 1.8 paired standard errors. Replaced with a pointer
+    to `sec:exo` for the experiment and `sec:res-weather` for the outcome.
+    (b) **Preprint count false, pre-existing.** "eleven works cited below had not completed
+    peer review ... and each is marked at its citation" — actually nineteen, with eight
+    unmarked. Three of the eight were mine from row 100. Fixed by marking every solo citation
+    (14 now marked) and rewording to state that the remaining five appear only inside
+    multi-key exemplar lists where a per-item marker is not available. Counted by bib entry
+    TYPE and absence of a venue field, not by the presence of an arXiv eprint field — the
+    naive test over-counted to 25 by catching published papers that carry an arXiv id.
+    (c) **A direct quotation with no citation.** The Hoo known-future restriction was quoted
+    verbatim with the citation only in the preceding paragraph. `\citep{hoo_tables_2026}` added.
+    Also sourced the previously bare mechanism claim that a public house responds to weather
+    "through outdoor trade and footfall": `judd_forecasting_2025` find hour and site to be
+    better proxies for footfall than temperature, which makes weather a candidate proxy for
+    something the calendar already carries. That WEAKENS the chapter's own channel argument and
+    is written that way rather than as support.
+    Verified after: zero dangling references, zero citations unresolved against ref.bib, zero
+    em dashes in the chapter, braces balanced.
