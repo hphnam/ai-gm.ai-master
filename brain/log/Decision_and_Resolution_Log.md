@@ -2497,3 +2497,39 @@ them into the append-only log so it is the continuous WP1-to-present record.
     primary loss) and `sec:rw-ruler` already carries the tension as a limitation. Flipping the
     headline metric is a methodology change and a human gate, so the evidence was written in
     **without** flipping it. Needs an operator decision.
+
+92. **Headline metric flipped from MASE to RMSSE (operator-approved this session).** (`log/71`)
+    Implements D-D1's recorded decision, which row 91 had flagged as unimplemented. **No model
+    was re-run and no set recomputed** -- both losses have been stored on every fold since the
+    first MCS run, so this is a change of designation applied to artefacts already on disk.
+    *Pre-registration:* row 33 registered MASE as the reported headline. The designation is
+    changed AFTER the sets were computed, so it is **declared as a deviation** in
+    `sec:res-mcs` rather than absorbed. Three bounding facts written in: the argument is D-D1's,
+    from the estimand, independent of any result; nothing was run to obtain the swap; and no
+    served choice changes. `eval/mcs_L1_results.json` carries
+    `"headline_designation_changed_post_hoc": true` so the artefact states it without the prose.
+    *Code:* `eval/mcs_report.py` keys were `mcs_primary_mase` / `mcs_secondary_rmsse`, baking a
+    DESIGNATION into a key a later decision can falsify -- the same defect class as the basis
+    literal (`log/70`). Renamed to loss-named `mcs_rmsse` / `mcs_mase`, with `HEADLINE_LOSS` /
+    `SECONDARY_LOSS` constants and a top-level `headline_loss` consumers index with; `top4` and
+    the sensitivity sweep now follow `HEADLINE_LOSS`; added `headline_loss_at_venue` because at
+    Ellel the `rmsse` vector is an RMSE in currency. `make_ladder_figure.py` reads
+    `headline_loss` from the artefact instead of naming a metric. 49 tests pass.
+    *Sets:* Beer Hall 5/9 p=0.990, Two River Taps 4/9 p=0.220, Ellel 6/9 p=0.912. **All three
+    incumbents retained**, so the pre-registered rule returns the incumbent everywhere and no
+    served model changes. Ellel's headline set is WIDER than its MASE set (6 vs 4).
+    *The substantive finding:* the served model is the argument-minimum at **no** venue now.
+    Beer Hall 0.02 se and Ellel 0.50 se are ties as before, but **Two River Taps' served ETS
+    drops from FIRST under MASE to FOURTH under RMSSE, behind all three foundation arms, with a
+    paired gap of 3.27 se.** Written up in new `sec:res-mcs-functional` as NOT a contradiction
+    of its MCS retention: pairwise asks one question, the set controls thirty-six, and p=0.220
+    is the weakest of the three retentions. This is D-D1's argument appearing in the estate's
+    own data -- a squared measure separating two forecasters the absolute measure could not.
+    *Chapters:* `sec:res-mcs` rebuilt with the declaration + new `sec:res-mcs-functional`;
+    `sec:ruler` now leads on RMSSE with MASE as labelled secondary; `sec:ruler-ellel` reworded
+    to RMSE headline / MAE secondary; `sec:rw-ruler`'s concession **resolved and relocated** --
+    the chapter now adopts the measure it argued for, and what survives is that the served model
+    returns a median under a mean's name, so the headline elicits a functional it cannot
+    produce. `sec:ruler-functional`'s limitation **sharpened rather than softened** on the same
+    point. `fig:ladder` regenerated on RMSSE with RMSSE MCS ink.
+    *Untouched:* `tab:ladder` stays MASE -- the frozen six-origin committed gate (row 89).
