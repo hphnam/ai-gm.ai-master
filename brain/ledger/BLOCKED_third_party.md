@@ -86,11 +86,26 @@ The key gates three rows. One key unblocks all three, and they share an apparatu
 
 ### D-D5 residue — TabPFN-TS as a ladder rung
 
-- **Blocker** `TABPFN_TOKEN`. The weights are released through a vendor account.
-- **Hard constraint, do not work around** the library's default entry point transmits the
-  series to a hosted service. The estate's revenue data must not leave the machine, which
-  is why `CLIENT` mode was refused outright. A token is only useful with a local-weights
-  path.
+- **Blocker** two of them, and the second does not yield to a credential. Re-verified
+  2026-08-06 against `grinsztajn_tabpfn-3_2026` and the two PriorLabs repositories.
+- **Hard constraint 1, do not work around** the library's default entry point still
+  transmits the series to a hosted service ("uses the cloud client by default"). The
+  estate's revenue data must not leave the machine, which is why `CLIENT` mode was
+  refused outright. A token is only useful with a local-weights path.
+- **Hard constraint 2, NEW and larger** the current weights carry a licence permitting
+  "testing, evaluation, and internal benchmarking" and prohibiting commercial or
+  production use, naming **"using model outputs as inputs to internal commercial
+  decision-making"** among the prohibitions. This estate is a trading business with an
+  operating decision layer. So **evaluating the rung is licensed and serving it is not**,
+  on terms no credential or compute changes. Do not let a future session record this row
+  as "unblocked by an env var" again.
+- **Which backend to pin, if it is ever run** the version `hoo_tables_2026` describes and
+  benchmarks is the earlier one, distributed permissively. The library's current default
+  is a later checkpoint requiring an account. Running the later one and citing that paper
+  would be citing a paper for a model it does not evaluate.
+- **Not the blocker** compute. `kaas_probabilistic_2026` measures 1607.9 ms per forecast,
+  which at this estate's 738 origins is tens of minutes. `log/75` ran a probe of
+  comparable cost to completion. Do not let the write-up leave that explanation open.
 - **Already exists** the evaluator is committed, pre-registered, and runs unchanged.
 - **Why it matters twice** it is the one candidate surveyed that exposes a genuine
   predictive mean, so it bears directly on the median-under-a-mean's-name limitation as
@@ -137,3 +152,18 @@ dissertation without its own pre-registered gate. Neither is waiting on a person
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
 | Dangling cross-references across the four chapter files | 0 |
 | Latest Overleaf commit at time of writing | `4cba26f` |
+
+---
+
+## G · Manual step the agent cannot do — Zotero is local-only
+
+`zotero_update_item` fails with "Cannot perform write operations in local-only mode."
+Two records are wrong at source and were fixed in `ref.bib` only, so **a re-export from
+Zotero will clobber both fixes**:
+
+| Item | What is wrong | Correct value |
+|---|---|---|
+| `K73XDLEQ` (Ye et al.) | title truncated to "…Its Strengths and…", **no date** → renders "Ye et al., n.d." | Title ends "…and Extending Its Capabilities"; arXiv 2502.17361; v2 dated 2025-06-11; BBT key `ye_closer_2025` |
+| Hoo et al. | arXiv id 2501.02945 is the Jan-2025 first posting; cited content is v4 | Keep the id, keep the 2026-01-26 date; the `note` field in ref.bib records the version |
+
+To enable agent writes later, set `ZOTERO_API_KEY` and `ZOTERO_LIBRARY_ID` for hybrid mode.
