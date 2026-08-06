@@ -3,6 +3,7 @@
 .venv-eval/
 .venv-forecast/
 .venv-run/
+.venv-tabpfn/
 __pycache__/
 *.pyc
 .pytest_cache/

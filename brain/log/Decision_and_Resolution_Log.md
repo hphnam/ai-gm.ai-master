@@ -2161,3 +2161,61 @@ them into the append-only log so it is the continuous WP1-to-present record.
     `observed`/`inferred` framing is ours and must be labelled as ours. Also flagged for the
     write-up: the ACI-measured-and-rejected result is our own evidence and is stronger here
     than any citation, and it is currently unused in this passage. No code change, no run.
+
+---
+
+83. **2026-08-06 — R5 PRE-REGISTRATION (D-D5), written and committed BEFORE any evaluation
+    code exists.** Same discipline as row 77: this row is committed first, and the run is
+    scored against the predictions **as written here**, including the ones that fail.
+
+    **The problem.** `sec:rw-rhythm` argues that 3 venues / 1 year / few regressors sits
+    inside the regime where **Chronos-2 and TabPFN-TS** are the licensed choices. One was
+    tested. A named-but-untested alternative is the easiest question an examiner asks.
+
+    **Why this is worth a late entrant, and it is not the convenience argument.** Verified
+    verbatim from `hoo_tables_2026`: TabPFN-TS computes *"the mean for squared-error
+    evaluations, the median for absolute-error evaluations, and arbitrary quantiles"* from a
+    binned posterior predictive. It therefore **exposes a genuine predictive mean** — which
+    the served foundation model does not (`chronos-forecasting` 2.3.1,
+    `chronos/chronos2/pipeline.py` L817, *"the median is returned as the mean here"*). D-D1
+    fixed the ruler and left median-serving as a declared limitation. TabPFN-TS is the only
+    entrant available that could close it, so this run is not "another rung" — it is the R9
+    minimal pair repeated on a foundation model.
+
+    **Design.** A standalone evaluator `eval/tabpfn_entrant.py`. It scores TabPFN-TS and the
+    incumbent rungs on **identical rolling-origin folds** (horizon 7, min train 120,
+    **step 7**, so ~39 folds/venue — the R2 protocol, not R9's step 1, to stay inside the
+    abort window), venue-appropriate metrics per G2 ({MASE, RMSSE} scaled, {MAE, RMSE} at
+    Ellel), MCS (`BLOCK_LEN=7`, `N_BOOT=1000`, `SEED=93`) plus the paired bootstrap
+    (`PAIRED_BOOTSTRAP_SEED=94`). It does **not** touch `models/ladder.py` and does **not**
+    enter served-model selection.
+
+    **Environment, and why a new one.** Installed into a fresh `.venv-tabpfn`
+    (`tabpfn_time_series` 1.2.0, `tabpfn` 8.2.0), NOT into `.venv-forecast`. R3 established
+    that `eval/interval_calibration` artefacts are environment-sensitive and unstamped, and
+    `.venv-forecast` is the environment that reproduces the committed numbers. Installing a
+    torch-stack dependency into it could silently restate published figures.
+
+    **Predictions, numbered and falsifiable.**
+    (i) The estate sits inside TabPFN's validated envelope — *"up to 10,000 samples and 500
+    features"* (`hollmann_accurate_2025`) — with max training rows well under 500 at every
+    venue, making the regime-fit claim checkable rather than rhetorical.
+    (ii) At Beer Hall TabPFN-TS is **retained in the 90% MCS** alongside the incumbent best
+    rung: competitive, not decisively better.
+    (iii) At Ellel TabPFN-TS does **not** beat the incumbent on MAE. Neither source says
+    anything about intermittent or zero-inflated series (verified: NOT SUPPORTED in both),
+    and the paper calls the model *"a strong conditional interpolator"* that *"fails to
+    extrapolate when forecasting requires moving beyond the observed target domain"*.
+    (iv) Its mean and median arms differ measurably in bias, with the median arm biased more
+    positive than the mean at Beer Hall — the R9 direction, replicated on a different model
+    family.
+    (v) The served model does **not** change. Reported, never served.
+
+    **Abort conditions.** Wall clock > 60 minutes; model-weight download failure; memory
+    error. On abort, fall back to the free alternative — narrow the review sentence to name
+    only Chronos-2 — and record the abort.
+
+    **Commitments.** Reported never served; model selection is not retroactively re-opened;
+    null and negative cells get the same prominence as positive ones; the incumbent arms are
+    re-scored on the same step-7 folds so the comparison is internally consistent rather than
+    borrowed from R9's step-1 numbers.
