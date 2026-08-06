@@ -1803,3 +1803,69 @@ its life. **New open item, not resolved:** `harness.REPORTED_BASIS` and
 `config.VENUE_SCALE_BASIS` are two live rulers disagreeing by **1.2417x at Beer Hall** and
 1.1361x at TRT, unevenly distributed across chapters. Methodology decision, human gate.
 Full record: `log/69_basis_audit_and_ruler_conflict_result.md`, decision-log row 85.
+
+---
+
+## Session close — 2026-08-06 (TabPFN literature, D-U6 closure, chapter audit)
+
+**Overleaf head `27df1af`. Brain head recorded below. Decision-log rows 96–102.**
+
+### Analysis produced this session
+
+- **`log/74` — D-U6 closed at the third venue.** Ellel's residual drift is confined to
+  calendar-open days the venue did not trade (rho +0.367, p 1.9e-34, n=1037) with no
+  significant drift on the 263 days it traded (rho +0.094, p 0.129). Those days are 79.8 per
+  cent of the group, and on every one of them |y - yhat| = yhat as a verified identity. The
+  level of trade is REJECTED on both denominators, including a trailing mean over traded days
+  only. The residue is the missing occurrence signal, i.e. **D-U3**. Beer Hall and Ellel show
+  the SAME partition defect in opposite directions (94/546 closed-but-traded; 1037/1300
+  open-but-not-traded).
+- **`log/75` — a published interval finding replicated.** `kaas_probabilistic_2026`'s ORDERING
+  between Chronos-2 and Chronos-Bolt reproduces at all three venues on all reported metrics;
+  the MAGNITUDE does not (Bolt covers 0.816/0.862/0.772 at nominal 0.80, not 0.62). New
+  finding: **Chronos-Bolt cannot emit a 90 per cent interval** — trained on deciles 0.1–0.9, a
+  0.05/0.95 request clamps silently. Third finding, unsought: Ellel's pooled coverage 0.896
+  against **active-only 0.447**, independently confirming `log/74` on an instrument sharing
+  none of its apparatus (native model quantiles, no conformal band, no Mondrian partition).
+
+### Chapters
+
+`sec:res-native-interval` added. `sec:res-drift-cause` and `sec:conclusion-limitations`
+carry the Ellel account. `sec:exo` gained the known-future covariate precondition. `sec:ladder`
+and `sec:further-work` rewritten for the TabPFN licence. Literature review took the TabPFN
+v2/v3 line plus a corrected weather argument. Eight Further Work extensions, three gated.
+
+### Chapter audit — three defects found, two of them pre-existing
+
+1. **My own overreach (introduced then corrected in-session).** The review asserted the
+   calendar-over-weather assumption "fails", contradicting `sec:res-weather`, which retains all
+   five arms including no-weather at every venue. Corrected, and the correction is logged rather
+   than silently applied.
+2. **R-Zero violation, pre-existing.** The review stated "This dissertation's own weather
+   experiment returns a null" — a later chapter's result reported in the review, AND the exact
+   overstatement `sec:res-weather` warns against. Replaced with a forward pointer.
+3. **Preprint count wrong, pre-existing.** "eleven works ... had not completed peer review ...
+   each is marked at its citation" was false: nineteen, eight unmarked. Now nineteen with
+   fourteen marked and the remaining five identified as exemplar-list entries where a per-item
+   marker is unavailable.
+
+Also resolved: a primary/secondary loss collision between the review and `tab:mcs-config`, and
+a direct quotation carrying no citation.
+
+### New source
+
+**`judd_forecasting_2025`** (J. Applied Statistics 53(2) 372–390, CC BY 4.0). Corroborates all
+three weather findings and supplies the mechanism: weather is significant per product category
+and "not significant for total sales" because the signs cancel; "hour and site are better
+proxies for footfall than temperature and daypart". **This study forecasts venue totals (L1),
+the level at which the effect vanishes, and the estate HAS L2 category data** — the cancellation
+account is testable here and is untested. Candidate Further Work, not claimed.
+
+### Open items carried forward
+
+- **`brain/ledger/BLOCKED_third_party.md` is the retrieval point.** Seven third-party rows,
+  three gated Further Work items, and a §G manual list.
+- **Zotero is local-only**, so three metadata fixes cannot be written back and a Zotero
+  re-export will clobber them. Needs `ZOTERO_API_KEY` + `ZOTERO_LIBRARY_ID`.
+- **Unchanged from before this session:** `harness.REPORTED_BASIS` vs `config.VENUE_SCALE_BASIS`
+  still disagree by 1.2417x at Beer Hall. Methodology decision, human gate. Not touched.
