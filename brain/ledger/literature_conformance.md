@@ -953,3 +953,40 @@ exogenous-covariate specification section that **was never written** in the
 methodology, and `sec:res-paired` names a paired-bootstrap section that does not
 exist either, so repairing them means writing the missing content or guessing an
 author's intent, and neither belongs inside a push about conformance rows.
+
+---
+
+## 16. D-U6 reopened and closed deeper — 2026-08-06
+
+§15 closed D-U6 on the *form* of the violation. `log/73` closes it on the *cause*,
+finds a **second** violation the first pass had waved at, and tests the remedy the
+first pass had only pointed at. One of the three results contradicts §15's own
+framing and is recorded as a correction rather than an addition.
+
+| Question §15 left open | Answer |
+|---|---|
+| Why does the scale drift? | **The level of trade**, at the two venues whose coverage departs. Deflation removes the drift at the Beer Hall (p 0.502) and Two River Taps, and does **not** remove it at Ellel |
+| Does a windowed pool fix it? | **Not uniformly.** Fixes Two River Taps (0.963 → 0.909, narrower), recovers a quarter of the Beer Hall shortfall, and **degrades** Ellel |
+| Is drift the whole story at the Beer Hall? | **No.** 17.2 per cent of its calendar-closed days actually traded, and that misspecified Mondrian group is the larger contributor |
+
+The remedy result is the one worth keeping visible. A fix that helps one venue,
+barely moves a second and harms a third is a weaker outcome than the mechanism
+predicted, and reporting it that way is what distinguishes a diagnosis from a
+story. That the remedy's benefit tracks the mechanism's strength venue by venue is
+the confirmation; that it is not uniform is why it cannot be adopted estate-wide.
+
+### The two dangling cross-references are resolved
+
+§15 recorded `sec:exo` and `sec:res-paired` as content gaps rather than typos and
+declined to guess. Both sections are now written, and `sec:flip` in the methodology
+is repointed to `sec:res-batch`. **All four chapter files now resolve every
+reference**, so nothing compiles as `??`.
+
+`sec:res-paired` produced a finding of its own. The block-length sensitivity sweep
+had never been reported, and it is not the null a first draft of that section
+assumed: block length moves every retained set, and at Two River Taps it moves the
+**served decision**, the incumbent being retained at 7 and 14 and eliminated at 2
+and 21. That is the third independent indication that the same venue's incumbent is
+the marginal one, after its $p = 0.220$ and its elimination at $\alpha = 0.25$. The
+pre-registered block length of 7 returns the largest set at every venue, so it is
+the conservative setting among those swept.

@@ -77,6 +77,57 @@
           "6": 0.124,
           "7": 0.132
         }
+      },
+      "level_coupling": {
+        "n": 1285,
+        "level_trend": {
+          "spearman_rho": 0.5802119824384983,
+          "spearman_p": 1.710640439666745e-116
+        },
+        "level_to_residual": {
+          "spearman_rho": 0.12550040521885653,
+          "spearman_p": 6.413662842804495e-06
+        },
+        "absolute_residual_drift": {
+          "spearman_rho": 0.06427965679542322,
+          "spearman_p": 0.021202044431140023
+        },
+        "deflated_residual_drift": {
+          "spearman_rho": -0.01876215471764394,
+          "spearman_p": 0.5016030316253265
+        },
+        "mean_level_first_quarter": 702.2437145078835,
+        "mean_level_last_quarter": 900.7241644414775
+      },
+      "partition_fidelity": {
+        "n_calendar_closed": 546,
+        "n_calendar_closed_but_traded": 94,
+        "rate": 0.17216117216117216,
+        "mean_takings_on_those_days": 295.774574468085,
+        "mean_abs_residual_on_those_days": 238.022848595016,
+        "mean_abs_residual_on_genuinely_closed": 32.20931313974398
+      },
+      "windowed_remedy": {
+        "expanding": {
+          "n": 1750,
+          "coverage": 0.8714285714285714,
+          "mean_width": 960.6042376615654
+        },
+        "window_120": {
+          "n": 1750,
+          "coverage": 0.876,
+          "mean_width": 1018.190620165919
+        },
+        "window_180": {
+          "n": 1750,
+          "coverage": 0.8782857142857143,
+          "mean_width": 1028.986162727989
+        },
+        "window_240": {
+          "n": 1750,
+          "coverage": 0.8782857142857143,
+          "mean_width": 965.2804211427105
+        }
       }
     },
     "ellel": {
@@ -136,6 +187,57 @@
           "6": 0.10126582278481013,
           "7": 0.08016877637130802
         }
+      },
+      "level_coupling": {
+        "n": 1214,
+        "level_trend": {
+          "spearman_rho": 0.06684312332506308,
+          "spearman_p": 0.019849118386113217
+        },
+        "level_to_residual": {
+          "spearman_rho": 0.082517281195866,
+          "spearman_p": 0.004014063024033558
+        },
+        "absolute_residual_drift": {
+          "spearman_rho": 0.18195671783538853,
+          "spearman_p": 1.6952266128503111e-10
+        },
+        "deflated_residual_drift": {
+          "spearman_rho": 0.170584319551732,
+          "spearman_p": 2.2129179373057985e-09
+        },
+        "mean_level_first_quarter": 173.384622856177,
+        "mean_level_last_quarter": 147.52200141442722
+      },
+      "partition_fidelity": {
+        "n_calendar_closed": 520,
+        "n_calendar_closed_but_traded": 21,
+        "rate": 0.04038461538461539,
+        "mean_takings_on_those_days": 321.82000000000005,
+        "mean_abs_residual_on_those_days": 317.51431329714705,
+        "mean_abs_residual_on_genuinely_closed": 5.040173418883297
+      },
+      "windowed_remedy": {
+        "expanding": {
+          "n": 1659,
+          "coverage": 0.9138034960819771,
+          "mean_width": 513.4200342538759
+        },
+        "window_120": {
+          "n": 1659,
+          "coverage": 0.9234478601567209,
+          "mean_width": 608.1081412714016
+        },
+        "window_180": {
+          "n": 1659,
+          "coverage": 0.9264617239300783,
+          "mean_width": 628.139122087277
+        },
+        "window_240": {
+          "n": 1659,
+          "coverage": 0.9192284508740205,
+          "mean_width": 515.9422558281134
+        }
       }
     },
     "two_river_taps": {
@@ -194,6 +296,57 @@
           "5": 0.038461538461538464,
           "6": 0.03296703296703297,
           "7": 0.07692307692307693
+        }
+      },
+      "level_coupling": {
+        "n": 943,
+        "level_trend": {
+          "spearman_rho": -0.8169831992316483,
+          "spearman_p": 3.382111320054609e-227
+        },
+        "level_to_residual": {
+          "spearman_rho": 0.07485488323793375,
+          "spearman_p": 0.021513825847326886
+        },
+        "absolute_residual_drift": {
+          "spearman_rho": -0.07075878459625853,
+          "spearman_p": 0.029801086407390882
+        },
+        "deflated_residual_drift": {
+          "spearman_rho": 0.06093280166815812,
+          "spearman_p": 0.06142837701158448
+        },
+        "mean_level_first_quarter": 526.5689028406914,
+        "mean_level_last_quarter": 358.2444490881458
+      },
+      "partition_fidelity": {
+        "n_calendar_closed": 410,
+        "n_calendar_closed_but_traded": 65,
+        "rate": 0.15853658536585366,
+        "mean_takings_on_those_days": 214.1478205128205,
+        "mean_abs_residual_on_those_days": 154.34747380138256,
+        "mean_abs_residual_on_genuinely_closed": 22.4895555822195
+      },
+      "windowed_remedy": {
+        "expanding": {
+          "n": 1274,
+          "coverage": 0.9631083202511774,
+          "mean_width": 535.0223164499419
+        },
+        "window_120": {
+          "n": 1274,
+          "coverage": 0.9089481946624803,
+          "mean_width": 468.564987053558
+        },
+        "window_180": {
+          "n": 1274,
+          "coverage": 0.9113029827315542,
+          "mean_width": 470.64609871642847
+        },
+        "window_240": {
+          "n": 1274,
+          "coverage": 0.9175824175824175,
+          "mean_width": 466.0840799113425
         }
       }
     }

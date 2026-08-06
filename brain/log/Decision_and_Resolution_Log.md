@@ -2632,3 +2632,51 @@ them into the append-only log so it is the continuous WP1-to-present record.
     Overleaf's 53,484, so the ledger's "byte-identical" line no longer held. The mirror is
     refreshed from the rewritten text.
     **NOT PUSHED.** Overleaf is a human gate.
+
+96. **D-U6 extended: the drift has a cause, there is a second violation, and the remedy does
+    not do what report 72 implied.** (`log/73`)
+    *The cause.* Deflating each absolute residual by a trailing 28-day level of the venue's own
+    takings, taken strictly before the target date, and re-running the identical drift statistic.
+    Beer Hall: raw rho +0.086 -> **deflated -0.019, p 0.502**, over a window where the level rose
+    702 -> 901 (trend rho +0.580). Two River Taps: level FELL 527 -> 358 as it wound down to
+    closure, and its negative drift also ceases to be significant under deflation. **Ellel does
+    not follow** -- flat level, strongest raw drift (+0.218), deflation barely moves it (+0.171,
+    p 2.2e-09). The asymmetry is the strength: the two venues whose coverage departs are the two
+    whose drift is a level effect, and the venue whose drift is not a level effect is the one
+    whose coverage is fine.
+    *A second violation, larger at the anchor venue.* The Mondrian partition groups by a
+    day-of-week closure calendar, and **94 of 546 Beer Hall calendar-closed days actually traded
+    (17.2%)**, mean |residual| 238.0 against 32.21 on genuinely closed days -- a factor of 7.4.
+    Those are misses by construction, and they are why the committed artefact shows that venue's
+    closure group covering 0.840 against 0.884 for its active group. Distinct from the drift:
+    non-stationarity inside a correct group versus a group specified wrongly.
+    *The remedy, tested.* Two River Taps 0.9631 -> **0.9089** at W=120 and mean width DROPS
+    535 -> 469, better calibrated and sharper together. Beer Hall recovers only 0.007 of a 0.029
+    shortfall and pays 7% width. **Ellel is made worse**, 0.9138 -> 0.9265, widening 18%.
+    So the honest report is a NON-UNIFORM remedy that tracks the mechanism venue by venue, which
+    is confirmation of the diagnosis and a refusal of the estate-wide fix. **`log/72` S5's
+    "points at a windowed pool" is superseded**, and three of its statements are corrected in
+    `log/73` S4 rather than quietly dropped.
+
+97. **The two dangling cross-references resolved by writing the sections they named.**
+    Both were content gaps rather than typos, which is why report 95 declined to guess.
+    *`sec:exo`* (methodology, new): the seven exogenous features in three groups (weather,
+    institutional calendar, events with per-venue anchor scoping), the discount-share feature
+    **excluded from the forward path** because its value is not knowable at the origin, and the
+    five weather arms N/O/H/F/M with the lead policy. States the general point the section
+    exists for: scoring on recorded weather and serving on forecast weather measures a system
+    that cannot be deployed. F and M drawn from ONE pinned global model so the contrast isolates
+    lead policy, and the lead capped at 7 to equal the forecast horizon.
+    *`sec:res-paired`* (results, new): pairing, the moving-block bootstrap, the block length.
+    **The sensitivity sweep is not a null and my first draft said it was.** Verified against
+    `eval/mcs_L1_results.json` before writing: replication count (1000 vs 5000) is immaterial
+    everywhere, but block length moves every retained set (BH 3/5/4/4, Ellel 4/6/6/5, TRT
+    3/4/4/3 across 2/7/14/21) and **at Two River Taps it moves the served decision** -- the
+    incumbent is retained at 7 and 14 and ELIMINATED at 2 and 21. Written up with both
+    consequences: the pre-registered 7 gives the LARGEST set at every venue, so it is the
+    conservative choice and cannot be read as picked to eliminate a rival; and this is the
+    **third** independent indication that Two River Taps' incumbent is the marginal one, after
+    p=0.220 and the alpha=0.25 elimination (row 93). Re-selecting the block length after seeing
+    which value retains the incumbent is named as the manoeuvre pre-registration prevents.
+    *`sec:flip`* in methodology repointed to `sec:res-batch`. All four chapter files now have
+    zero unresolved references.
