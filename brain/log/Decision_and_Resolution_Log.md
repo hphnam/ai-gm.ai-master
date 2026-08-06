@@ -2765,3 +2765,58 @@ them into the append-only log so it is the continuous WP1-to-present record.
     withholding weather raises MAE ~1 kW for all three foundation models and widens intervals
     1.5-1.96 kW. Rewritten to say the assumption is tested in a neighbouring domain and FAILS
     there, rather than being untested.
+
+101. **My own weather claim was an overreach, caught by auditing it against the results chapter.**
+    Row 100 rewrote the lit review to say the calendar-over-weather assumption "is tested, in a
+    neighbouring domain, and **it fails there**", on `kaas_probabilistic_2026`. But
+    `sec:res-weather` reports the OPPOSITE for this estate: all five weather arms retained in
+    the 90 per cent set at every venue, the no-weather arm among them; the gain from no-weather
+    to best-weather is 0.0163 MASE at the Beer Hall, about 1.8 paired standard errors; and the
+    arm ordering is INCOHERENT (reanalysis, which is perfect foreknowledge, is nominally the
+    WORST of the four weather arms). A review asserting the assumption fails, in front of a
+    results chapter finding weather inseparable from no weather, is a chapter arguing with
+    itself. Introduced by me in the previous turn.
+    **The corpus already held the hospitality evidence I had not used.** Verified via NotebookLM:
+    `schmidt_machine_2022` calls weather "well-known to improve forecasting results, especially
+    in retail and restaurant domains" and then DECLINES to use it (cites four secondary works,
+    tests none); `chae_value_2024` tabulates weather as an input to prior studies, uses none in
+    its own models, recommends it as future work, and reports NO effect size for the studies it
+    tabulates; `hossain_comparative_2025` does measure it (r = -0.51 temperature, -0.43
+    rainfall) but BOTH sales and weather are MONTHLY over 15 months in a monsoon climate, so
+    the correlation is substantially a season effect, and no ablation shows a forecast
+    improving. So the hospitality base is two recommendations, one confounded correlation, and
+    no controlled test.
+    **New source found, verified and added: `judd_forecasting_2025`** (J. Applied Statistics
+    53(2) 372-390, CC BY 4.0, PMC12872089). Zero-inflated mixed-effects models on hourly
+    foodservice sales, six transit-hub sites. It corroborates all three of this project's
+    weather findings and supplies the MECHANISM this project could not: weather is significant
+    for hot drinks and for cold drinks INDIVIDUALLY and "not significant for total sales",
+    because the signs run opposite by category and cancel in the aggregate; "hour and site are
+    better proxies for footfall ... than temperature and daypart"; and on lead policy, because
+    the coefficient is small, "the impact of using ... two weeks in advance predicted
+    temperatures and not the actual ones is small in the predictions of sales" -- which is this
+    project's H-vs-M null reached from a coefficient instead of an ablation.
+    Consequence worth carrying: this study forecasts VENUE TOTALS (L1), which is exactly the
+    aggregation level at which Judd et al. report the effect vanishing. The estate HAS L2
+    category data, so the cancellation account is testable here and is not tested. Candidate
+    Further Work, not claimed.
+    Rewritten to separate the domains: energy (Kaas, Haben) where weather is PHYSICALLY coupled
+    to load and the effect is strong, against hospitality where coupling runs only through a
+    decision to go out. R-Zero respected: the review states what the literature says and that
+    the design measures it, and points to `sec:res-weather` for the outcome without stating it.
+    **Second contradiction found in the same sweep.** The lit review said the mean-absolute
+    measure is "carried throughout as a labelled secondary", while `tab:mcs-config` in the
+    methodology reads "Primary loss: per-fold MASE". Not a factual error -- the MCS
+    deliberately retains MASE because it audits a decision originally taken on MASE -- but the
+    same words carry two meanings and a reader meets them as a contradiction. Now stated
+    explicitly: squared measure carries the headline, absolute measure carries the audit.
+    **Two papers could NOT be used and were dropped rather than cited from abstracts.**
+    `10.1080/15378020.2016.1209723` (Bujisic et al., effect of weather factors on restaurant
+    sales) and `10.1016/j.jretconser.2019.101921` (Badorf and Hoberg, daily weather on retail
+    sales) are both closed access with `any_repository_has_fulltext: false` per OpenAlex, so
+    neither could enter NotebookLM and the no-claim-without-a-NotebookLM-query rule forbids
+    citing them. Recorded here so a future session does not rediscover and mistakenly use them.
+    **Zotero writes remain blocked** (local-only mode), so `judd_forecasting_2025` is in
+    ref.bib and NotebookLM but NOT in Zotero. Third item on the manual list in
+    `BLOCKED_third_party.md` section G.
+    Overleaf `306f824`.
