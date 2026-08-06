@@ -2852,3 +2852,27 @@ them into the append-only log so it is the continuous WP1-to-present record.
     is written that way rather than as support.
     Verified after: zero dangling references, zero citations unresolved against ref.bib, zero
     em dashes in the chapter, braces balanced.
+
+103. **Zotero writes enabled; the three manual items closed by the agent, not left for Phuong.**
+    Key verified against the Zotero Web API BEFORE any write: `userID` 20198714 matches the
+    library the MCP server was already reading, `access.user.write` is true, library holds 321
+    items at version 1609. Credentials written to `~/.claude.json` at `mcpServers.zotero.env`
+    after a timestamped backup; `ZOTERO_LOCAL` deliberately LEFT at `true`, because the server's
+    own error message says local + key + id is what it calls hybrid mode.
+    **The MCP tools still failed after the config write, and that is expected rather than a
+    fault:** an MCP server reads its env at process start, so `mcp__zotero__zotero_update_item`
+    will not work until the next session. Rather than defer the work, the three fixes were
+    applied directly against the Web API and read back: Ye et al. `K73XDLEQ` migrated
+    conferencePaper → preprint with the full title, date 2025-06-11 and the arXiv DOI (204);
+    Hoo et al. `665AJ6CH` Extra now records that the cited content is v4 of 2026-01-26 while the
+    arXiv id is the January 2025 first posting (204); Judd et al. created as `KG8QMUJV` (200).
+    **The clobber risk recorded in rows 100 and 101 is now gone.** Citation keys are pinned in
+    both the native `citationKey` field and an Extra `Citation Key:` line, so a Better BibTeX
+    re-export reproduces `ye_closer_2025`, `hoo_tables_2026` and `judd_forecasting_2025` rather
+    than regenerating `ye_closer_nodate` and dropping the other two.
+    **Security, recorded because it is a real exposure and not a hypothetical.** The key arrived
+    in a chat transcript, which persists in plain text under `~/.claude/projects/`, and it
+    carries library and file write on the user library and on all groups. Rotation is advisable
+    and cheap; nothing in the project pins that particular key.
+    Not done, deliberately: `zotero_update_search_database` needs the MCP tool, so it waits for
+    the next session. Noted in `BLOCKED_third_party.md` §G.
