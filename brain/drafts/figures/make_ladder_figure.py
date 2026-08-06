@@ -70,25 +70,34 @@ plt.rcParams.update({
 })
 
 
-def _load(venue: str) -> tuple[dict, list[str]]:
+def _load(venue: str) -> tuple[dict, list[str], str, str]:
+    """Vectors, the retained set, and the headline loss to plot.
+
+    The headline is read from the artefact rather than named here, so a change of
+    designation moves the figure with the tables instead of leaving it a run behind.
+    """
     payload = json.loads(
         (BRAIN / "eval" / f"fold_vectors_L1_{venue}.json").read_text())
     mcs = json.loads((BRAIN / "eval" / "mcs_L1_results.json").read_text())
-    retained = mcs["venues"][venue]["mcs_primary_mase"]["common_fold"]["sets"]["0.1"]
-    return payload, retained
+    head = mcs["headline_loss"]
+    retained = mcs["venues"][venue][f"mcs_{head}"]["common_fold"]["sets"]["0.1"]
+    # The vector key is `rmsse` at every venue, but at a venue ruled `unscaled` it
+    # holds an RMSE in currency. The artefact records which, per venue.
+    unit = mcs["venues"][venue]["headline_loss_at_venue"]
+    return payload, retained, head, unit
 
 
 def ladder() -> None:
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 3.9))
 
     for ax, venue in zip(axes, VENUES):
-        payload, retained = _load(venue)
+        payload, retained, head, unit_key = _load(venue)
         scored = {k: v for k, v in payload["rungs"].items() if v.get("available")}
         # Worst at the top so the reader's eye falls down to the retained set.
-        order = sorted(scored, key=lambda k: -np.mean(scored[k]["mase"]))
+        order = sorted(scored, key=lambda k: -np.mean(scored[k][head]))
 
         for y, name in enumerate(order):
-            x = np.asarray(scored[name]["mase"], dtype=float)
+            x = np.asarray(scored[name][head], dtype=float)
             lo, q1, med, q3, hi = np.percentile(x, [5, 25, 50, 75, 95])
             keep = name in retained
             colour = MARK if keep else MUTED
@@ -114,7 +123,7 @@ def ladder() -> None:
 
         # Literal U+00A3, not a LaTeX \pounds -- mathtext has no such macro and
         # renders the control sequence verbatim into the axis label.
-        unit = "MASE" if payload["loss"] == "mase" else "MAE (£)"
+        unit = "RMSSE" if unit_key == "rmsse" else "RMSE (£)"
         ax.set_xlabel(f"{unit}\n{payload['basis']}, $n={payload['n_folds']}$",
                       fontsize=8, color=MUTED)
         ax.set_title(TITLES[venue], fontsize=9.5, color=INK, pad=7)
