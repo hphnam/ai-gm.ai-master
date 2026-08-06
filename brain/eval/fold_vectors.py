@@ -112,7 +112,13 @@ def build(venue: str, *, step_days: int | None = STEP_DAYS) -> dict:
         "schema_version": SCHEMA_VERSION,
         "venue": venue,
         "store_ceiling": ceiling,
-        "basis": "calendar_lag7",
+        # NEVER hard-code this. `evaluate_rolling` scores on the venue's ruled basis
+        # (`config.VENUE_SCALE_BASIS`), so a fixed label here would mislabel the values it
+        # is describing -- at Ellel, ruled `unscaled`, the vectors are MAE in currency and
+        # a `calendar_lag7` label would read as a MASE. Consumers pair on this field.
+        "basis": config.VENUE_SCALE_BASIS.get(venue, harness.REPORTED_BASIS),
+        "loss": "mase" if config.is_scaled_venue(venue) else "mae",
+        "secondary_loss": "rmsse" if config.is_scaled_venue(venue) else "rmse",
         "scale_policy": "per-fold training slice (ex-ante), not a pinned as_of",
         "horizon_days": HORIZON_DAYS,
         "min_train_days": MIN_TRAIN_DAYS,

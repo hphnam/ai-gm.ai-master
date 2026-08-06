@@ -2334,3 +2334,47 @@ them into the append-only log so it is the continuous WP1-to-present record.
     (single-tenant corpus, human-in-the-loop briefing rather than an actuator, and the forecast
     path never reading the retrieval store), stating that no mitigation is implemented.
     Nothing written into a chapter; nothing pushed to Overleaf.
+
+---
+
+87. **2026-08-06 — BOTH GATES APPROVED AND EXECUTED (in progress).**
+    **Gate A — the ruler.** `config.VENUE_SCALE_BASIS` is now the single authority.
+    `harness.REPORTED_BASIS` demoted to a documented FALLBACK for venues absent from the map,
+    with the 1.2417x / 1.1361x divergence recorded in the comment so the next reader cannot
+    repeat it. **The migration turned out to be half-done already**: `evaluate_rolling`
+    (`models/ladder.py:477`) had used the ruled basis since G2, and the ladder report writer
+    already carried a basis note; what had NOT migrated were `evaluate_static` (L405, fixed),
+    `eval/fold_vectors.py` (hard-coded `"basis": "calendar_lag7"` — a **mislabelling bug**: it
+    would have stamped a `calendar_lag7` label onto ruled-basis values, and at Ellel that
+    label reads as a MASE on vectors that are MAE in currency; now writes the ruled basis plus
+    explicit `loss`/`secondary_loss` fields), and the two reproduction limbs
+    (`eval/group_icl.py`, `eval/weather_basis.py`) which now pair on `payload["basis"]` rather
+    than a literal, so they cannot silently compare two rulers and call the difference a
+    reproduction gap. **Scope correction owed to the human:** I described this as "~20%
+    movement in published MASE". That understated it — Ellel is ruled `unscaled`, so its nine
+    `tab:ladder` rows become **MAE in £**, a structural change to the table, not a rescale.
+    Confirmed from the committed artefacts that Ellel's stored per-fold values (~0.118) are
+    pre-G2 scaled figures, i.e. the discredited family the state brief forbids quoting.
+    `eval/fold_vectors` regeneration launched (~1h of Chronos); **not yet complete at the time
+    of writing, so `tab:ladder` is NOT yet re-scored**.
+    **Gate B — Overleaf, three sections pushed.**
+    (i) `sec:res-undercoverage`: **D-F3 was already done** — `tab:coverage` already carried the
+    Clopper-Pearson intervals and `tab:winkler` had no dashes, so that ledger row was stale.
+    But the check found a live defect: the caption still quoted the Angelopoulos-Bates
+    expected-coverage bound (0.9005/0.9006/0.9007) that **R3 established is unavailable at all
+    three venues**. The upper limb is now withheld with the atom masses stated (0.152 / 0.556 /
+    0.173 of the mass at score 0), and the **lower** limb — which carries the under-coverage
+    argument and needs no continuity — explicitly retained, so withdrawing the upper limb
+    costs the finding nothing.
+    (ii) New `sec:res-costsweep`: **D-F5 stated as our instance and corrected.** 124 misses,
+    8 false alarms, cost 132 / 256 / 628 / 1248, misses dominant at every ratio; degeneracy
+    real, direction **inverted** relative to `lu_proactive_2024`'s over-offering prediction
+    (precision 0.871 vs recall 0.804).
+    (iii) `sec:occurrence` retitled *"Occurrence, and the hurdle's saturated first stage"*:
+    **D-D3 written in.** The old title and text asserted the first factor is "observed rather
+    than estimated" — wrong about the implementation. Now states the saturated estimator, the
+    7.6e-05 agreement with the saturated-logit MLE, complete separation (|beta| past 11, still
+    diverging), and relocates the limitation to covariate poverty, cross-referenced to Ellel.
+    **Still owed:** `tab:ladder` re-score (blocked on the running regeneration), D-F6 threat
+    model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs, and the gate-4 table-or-chart
+    decision.

@@ -402,7 +402,9 @@ def evaluate_static(venue: str = ANCHOR_VENUE):
         else:
             results.append(RungResult(
                 name, rung,
-                metrics=harness.point_metrics(yte, preds, ytr, basis="calendar_lag7"),
+                metrics=harness.point_metrics(
+                    yte, preds, ytr,
+                    basis=config.VENUE_SCALE_BASIS.get(venue, harness.REPORTED_BASIS)),
                 predictions=preds))
     if not HAS_CHRONOS:
         results.append(_rung4_foundation())

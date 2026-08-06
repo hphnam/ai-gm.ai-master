@@ -292,7 +292,11 @@ def _reproduce(forecasts: dict[str, np.ndarray], venue: str, frame: pd.DataFrame
         if y_pred is None or y_true is None or key not in by_date:
             continue
         y_train = frame[pd.to_datetime(frame["date"]) <= origin]["value"].to_numpy(float)
-        m = harness.mase(y_true, y_pred, y_train, basis="calendar_lag7")
+        # Pair on the basis the committed payload RECORDS, never a literal: after the G2
+        # alignment the stored vectors are on the venue's ruled basis, so a hard-coded
+        # `calendar_lag7` here would compare two different rulers and call it a
+        # reproduction gap.
+        m = harness.mase(y_true, y_pred, y_train, basis=payload["basis"])
         if np.isfinite(m):
             mine.append(m)
             theirs.append(by_date[key])

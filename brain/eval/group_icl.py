@@ -271,7 +271,9 @@ def reproduce_committed(pipe, *, origin_batch: int = 32) -> dict:
             if y_true is None:
                 continue
             y_train = fr[pd.to_datetime(fr["date"]) <= t]["value"].to_numpy(float)
-            m = harness.mase(y_true, y_pred, y_train, basis="calendar_lag7")
+            # Pair on the basis the committed payload RECORDS, never a literal (see
+            # `weather_basis._reproduce`): a fixed basis would compare two rulers.
+            m = harness.mase(y_true, y_pred, y_train, basis=committed_payload["basis"])
             if key in committed_by_date and np.isfinite(m):
                 mine.append(m)
                 theirs.append(committed_by_date[key])

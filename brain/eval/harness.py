@@ -195,13 +195,18 @@ SCALE_BASES = (
 )
 
 
-# The basis the dissertation quotes. `calendar_lag7` is not the methodologically
-# best of the four (it is deflated by structural zeros, see report 42), but it is
-# the only one on which BOTH the ladder backtest and every confrontation already
-# exist, and S1 is forbidden from re-running the ladder. Comparability across the
-# pre-registration chain beats a better ruler applied to only half of it.
-# `calendar_lag7_active` is the intended successor, to be adopted in S4 when the
-# ladder can be re-scored alongside it.
+# FALLBACK ONLY, since 2026-08-06. `config.VENUE_SCALE_BASIS` is the single
+# authority on which ruler a venue is scored with; this constant applies only to a
+# venue absent from that map.
+#
+# It was previously "the basis the dissertation quotes", kept for comparability
+# because "S1 is forbidden from re-running the ladder". That constraint stopped
+# binding once the ladder was re-scored, and leaving two live constants recreated
+# FLAG-MASE-RULER one level up: measured on the same six folds the two disagree by
+# a factor of 1.2417 at Beer Hall and 1.1361 at Two River Taps, so the same
+# forecast scored 24% lower on one than the other (report 69). `calendar_lag7` is
+# also the methodologically weaker of the two, being deflated by structural zeros
+# (report 42).
 REPORTED_BASIS = "calendar_lag7"
 
 
