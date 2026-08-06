@@ -2680,3 +2680,23 @@ them into the append-only log so it is the continuous WP1-to-present record.
     which value retains the incumbent is named as the manoeuvre pre-registration prevents.
     *`sec:flip`* in methodology repointed to `sec:res-batch`. All four chapter files now have
     zero unresolved references.
+
+98. **A trail left by my own correction, found by sweeping for it rather than by being told.**
+    `log/73` S3 superseded the untested claim that a windowed pool is the indicated remedy, and
+    `results.tex` `sec:res-drift-cause` reports the tested result correctly. **`conclusion.tex`
+    did not.** Its Further Work item still read "the indicated remedy is a windowed or
+    recency-weighted pool rather than an expanding one" -- the pre-test framing, written in the
+    earlier push and never revisited when the test came back unfavourable. A results chapter
+    saying a remedy is not an estate-wide fix while the conclusion recommends it estate-wide is
+    the same class of self-contradiction as the mean-absolute-scaled limitation caught in
+    report 95, and it was introduced by the correction itself.
+    Fixed in Overleaf `8898ccb`: the item now reports what the window actually buys per venue
+    (TRT 0.963 to 0.909 and narrower, a quarter of the Beer Hall shortfall at 7 per cent width,
+    Ellel moved away from nominal) and asks for a per-venue length rule fixed before the
+    coverage it is tuned against is seen.
+    Same pass added the **seventh** Further Work item, which `log/73` S5 named and the
+    conclusion had no entry for: deriving the Mondrian groups from observed trading rather than
+    the weekday. Listed first of the seven because it is the cheapest and the best evidenced
+    (17.2 per cent of the Beer Hall's calendar-closed days traded; residual factor 7.4).
+    Verified after: zero dangling references across all four chapter files, zero em dashes in
+    the added prose, braces balanced.
