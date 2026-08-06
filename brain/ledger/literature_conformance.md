@@ -801,3 +801,82 @@ form keeps both models in the regime claim and separates evaluation from licensi
    observation**, same framing as Chronos-2, not a criticism of Prior Labs.
 3. Add TabPFN-TS to Further Work as unblocked-by-one-env-var, alongside the A12 cost
    objective from §10.
+
+---
+
+## 14. Verified closure audit — 2026-08-06
+
+Every row re-checked **against the live chapters on Overleaf**, not against this
+ledger's own prior claims. §8's "row status after the runs" recorded what the runs
+established; this section records what the *chapters actually say*, which is a
+different question and is the one that matters for the submission.
+
+### Rows verified CLOSED in the text
+
+| Row | Where it landed | Verified by reading |
+|---|---|---|
+| **D-F1** | `sec:res-undercoverage` | `tab:coverage` caption withholds the A–B **upper** limb at **all three** venues with the atom masses (0.152 / 0.556 / 0.173) and calibration sizes stated, and keeps the lower limb, which is the limb the under-coverage argument needs |
+| **D-F2** | `log/60` | Run closed. See D-F8 for the writing half, which is **not** closed |
+| **D-F3** | `sec:res-winkler`, `sec:res-undercoverage` | `tab:winkler` carries all 15 cells, no dashes; `tab:coverage` carries Clopper–Pearson intervals, achieved power and MDE |
+| **D-F4** | `fig:ladder`, `sec:res-ladder` | Replaced by three-panel small multiples with MCS ink; `tab:ladder` retained as the frozen six-origin gate and audited as that decision (row 89) |
+| **D-F5** | `sec:res-costsweep` | Stated as **our** instance, with the direction **inverted** against `lu_proactive_2024` — 8 false alarms against 124 misses |
+| **D-F6** | `sec:chatlog`, `sec:res-chatlog` | Threat model written; the injection surface is named at the tool boundary rather than waved at |
+| **D-D1** | `sec:ruler`, `sec:ruler-functional`, `sec:res-mcs` | RMSSE headline, MASE labelled secondary, deviation declared (rows 92–93) |
+| **D-D2** | `sec:ruler-ellel` | Argued from the estimand; A/h/b **undefined** for a revenue target |
+| **D-D3** | `sec:occurrence` | Saturated first stage, complete separation, covariate poverty as the surviving limitation |
+| **D-D4 / V2** | `sec:conformal` | Three claims re-homed to three sources; Sun & Yu as motivation only. **Closes V2** |
+| **D-D5** | `sec:ladder`, `sec:rw-rhythm` | Abort recorded with its cause; prediction (i) salvaged; no claim in either direction about how it would have scored |
+| **V1 / V3** | `sec:rw-ruler` | The $p > 2$ threshold and the word "deflates" are both now owned by the chapter in prose |
+
+### Rows still open and NOT blocked on a third party
+
+These are the answer to "everything except the third-party ones". There are four,
+all writing, none needing a run.
+
+| Row | What is missing | Cost |
+|---|---|---|
+| **D-F8** | VUS-PR was computed (`log/60`, TSB-AD 1.5, 7 cells, 624 windows) and appears in **no chapter**. The detection headline is still the 0.996 sustained-shift recall. `sec:res-costsweep` supplies the precision limb and the inverted direction, so the argument is half-made, but the measure the review commits to at `sec:rw-deviation` is never reported | One results subsection. No run |
+| **D-F7** (writing half) | The unbiasedness failure is measured (`log/62`: 22 of 41 nodes reject, 19 positive, VENUE $+21.09$, $p = 0.047$) and appears in **no chapter**. Neither `methodology.tex` nor `results.tex` has a reconciliation section at all, so the lit review states the precondition (`sec:rw-rhythm`) and nothing downstream resolves it | One results subsection, or an explicit statement that reconciliation is out of reported scope. No run |
+| **C11 / C12** | Both are marked in the lit review as places where the literature and this project point different ways, and both are deferred to a discussion. `chapters/conclusion.tex` is still the **unedited template stub** — a figure example and nothing else — so neither has a home | Blocked on writing the conclusion, not on data |
+| **D-U6** | The Beer Hall under-coverage is measured, directional, reproduced on a second model and reported at power. The exchangeability violation behind it is still **not identified**. This row is analysis, not data, and was never third-party blocked | Genuine analysis |
+
+`D-U8` (clarification urgency, `gulati_ask_2026`) is also not third-party
+blocked; it was declared out of scope at five weeks and that declaration stands.
+
+### Rows correctly blocked on a third party
+
+`D-U1` (ECE, Anthropic key), `D-U2` (cost-ratio elicitation, Elliot), `D-U3`
+(Ellel booking diary, Elliot), `D-U4` (judge validation, key + Elliot), `D-U5`
+(compliance/reliance, Elliot), `D-U7` (leg two of the contribution, key), and
+`D-D5`'s residual (`TABPFN_TOKEN`, vendor account). Seven rows, none actionable
+here.
+
+### Trail found in `literature_review.tex` and removed
+
+The chapter carried four residues of its own editing, all fixed in the same pass:
+
+1. **A stale limitation that contradicted the chapter's own conclusion.**
+   `sec:rw-synthesis` still listed "the headline accuracy figures are
+   mean-absolute-scaled while Section~\ref{sec:rw-ruler} makes the case for a
+   squared-scaled measure" — false since row 92, and contradicted by
+   `sec:rw-ruler` sixteen paragraphs earlier, which states the squared measure was
+   adopted. Replaced by the limitation that actually survives: the served model
+   returns a median under a mean's name.
+2. **An edit-provenance comment** naming this ledger and the V1/V3 rows, sitting
+   above the paragraph it described. The prose already carries the attribution, so
+   the comment was pure scar. Number traces stay; this was not one.
+3. **D-F1 stated too narrowly.** The chapter said the no-ties condition "fails on
+   precisely the data this work concerns, since on a series of mostly zeros tied
+   scores are the norm" — the pre-`log/61` framing, which localises the failure to
+   the sparse venue. `log/61` found the atom at all three. Rewritten so the cause
+   is **structural closure rather than sparsity**, which is what actually generalises.
+4. **A 528-character unwrapped line** carrying the TabPFN patch, visibly a
+   different edit from the 80-column text around it, and phrased as an attempt
+   "that did not score" — vague where `log/68` is specific. Rewrapped and narrowed
+   to the three-part form: keep the regime claim, say only one model was evaluated
+   and why, license nothing about how the other would have performed.
+
+One further residue was left deliberately. `sec:rw-rhythm` still states MinT's
+unbiasedness precondition without downstream resolution, because resolving it in
+the review would report a result the review is not allowed to report under the
+R-Zero rule. It resolves when D-F7's writing half lands, and not before.

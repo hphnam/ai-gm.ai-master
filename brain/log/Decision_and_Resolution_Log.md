@@ -2588,3 +2588,47 @@ them into the append-only log so it is the continuous WP1-to-present record.
     to minimise the other. The paragraph names what WOULD be incoherent -- concealing the gap
     between the passes and presenting the served set as though it had won the contest actually
     reported -- so the point reads as design rather than defence.
+
+95. **Re-audited every conformance row against the live chapters, and rewrote the literature
+    review off the result.** (`ledger/literature_conformance.md` S14)
+    *Why re-audit.* S8 recorded what the six runs ESTABLISHED. That is a different question
+    from what the chapters SAY, and only the second one is submitted. Each row was checked by
+    reading the live Overleaf text rather than by trusting this ledger's own prior claim.
+    *Verified closed in the text:* D-F1, D-F3, D-F4, D-F5, D-F6, D-D1, D-D2, D-D3, D-D4/V2,
+    D-D5, V1, V3. Twelve rows, each with the section that carries it named.
+    *Still open and NOT third-party blocked -- four, all writing, no runs:* **D-F8** (VUS-PR
+    computed in `log/60` and present in no chapter; the detection headline is still the 0.996
+    sustained-shift recall, with `sec:res-costsweep` supplying only the precision limb);
+    **D-F7's writing half** (the 22-of-41-node unbiasedness failure from `log/62` appears
+    nowhere, and neither chapter has a reconciliation section at all); **C11 and C12** (both
+    deferred to a discussion, and `chapters/conclusion.tex` is still the unedited template
+    stub); **D-U6** (the Beer Hall exchangeability violation is still unidentified -- analysis,
+    never third-party blocked). D-U8 is scope, also not third-party.
+    *Correctly blocked on a third party:* D-U1, D-U2, D-U3, D-U4, D-U5, D-U7, and D-D5's
+    `TABPFN_TOKEN` residue.
+    *Four trails removed from `literature_review.tex`.* (1) `sec:rw-synthesis` still listed
+    "the headline accuracy figures are mean-absolute-scaled" as a limitation -- **false since
+    row 92 and contradicted by the chapter's own `sec:rw-ruler` sixteen paragraphs earlier**.
+    Replaced with the limitation that actually survives, the served model returning a median
+    under a mean's name. (2) An edit-provenance comment naming this ledger and the V1/V3 rows,
+    deleted; the prose already carries the attribution and a number trace it was not.
+    (3) D-F1 was stated in its pre-`log/61` form, localising the tie failure to "a series of
+    mostly zeros"; rewritten so the cause is **structural closure rather than sparsity**, which
+    is what generalises and what `log/61` actually found. (4) A 528-character unwrapped line
+    carrying the TabPFN patch, phrased as an attempt "that did not score"; rewrapped and
+    narrowed to `log/68`'s three-part form.
+    Also strengthened while open: the Chatfield paragraph now carries the **precondition** (the
+    cost is an inventory-system cost needing a stock position) plus the second and better
+    support (his own MAPE modification and GRMSE exclusion on zeros), so the methodology's
+    declining of the cost objective is set up rather than looking like an oversight; and the
+    observed-over-inferred regime argument is now explicitly **labelled as the chapter's own
+    inference**, with a sentence saying it carries no guarantee across to the static bands.
+    *Invariants held:* 90 citation keys in, 90 out, none added and none dropped, so no
+    add-a-paper or drop-a-paper gate is triggered. Zero em dashes. No AI-writing flags survive
+    the sweep. `sec:rw-rhythm`'s unresolved MinT precondition was left **deliberately** -- the
+    R-Zero rule forbids the review reporting the D-F7 result, so it resolves when D-F7's
+    writing half lands and not before.
+    *Note:* `brain/drafts/literature_review.tex` was **stale** -- 67,389 bytes against
+    Overleaf's 53,484, so the ledger's "byte-identical" line no longer held. The mirror is
+    refreshed from the rewritten text.
+    **NOT PUSHED.** Overleaf is a human gate.
