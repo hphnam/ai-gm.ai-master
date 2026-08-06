@@ -56,6 +56,12 @@ LEVEL = ic.PRIMARY_LEVEL
 VENUES = ic.VENUES
 
 
+def _fmt(v: float | None, *, sci: bool = False) -> str:
+    if v is None:
+        return "n/a"
+    return f"{v:.2e}" if sci else f"{v:+.3f}"
+
+
 def _scale_drift(records: pd.DataFrame) -> dict:
     """Does the residual scale move with time, and which way."""
     active = records[records["state"] == 0].sort_values("target")
@@ -184,6 +190,115 @@ def _level_coupling(records: pd.DataFrame) -> dict:
     }
 
 
+def _drift_decomposition(records: pd.DataFrame) -> dict:
+    """What moves at a venue whose drift is NOT a level effect.
+
+    `_level_coupling` removed the drift at two venues and left Ellel's intact, and the
+    write-up recorded that as unexplained. Four candidates are separable on the committed
+    store, and each predicts a different pattern, so the test can come back negative on
+    all four rather than being guaranteed to name a winner.
+
+      composition   Ellel's occurrence signal is a day-of-week calendar standing in for a
+                    booking diary this work never received. A calendar-open day the venue
+                    did not in fact trade produces a residual of the whole forecast, and if
+                    the RATE of those days grows the mean residual grows with no change in
+                    anything about the venue's trading. Separated by re-running the drift on
+                    traded days alone and on false-open days alone.
+
+      dispersion    The level can be flat while the spread around it widens. Deflating by a
+                    trailing standard deviation instead of a trailing mean distinguishes the
+                    two, since a pure dispersion effect leaves the mean untouched.
+
+      tail          A drift carried by a growing handful of large days is a composition
+                    effect in the right tail rather than a scale change. Re-run below the
+                    venue's own median take.
+
+      shape         A monotone drift and a single structural break both register as a
+                    positive Spearman. Splitting the window at its midpoint separates them:
+                    a break shows a large between-half gap and weak within-half trends.
+
+    All deflators are trailing and shifted, so nothing uses information the band lacked.
+    Run at all three venues: the two whose drift is already explained are the control.
+    """
+    active = records[records["state"] == 0].sort_values("target").copy()
+    daily = active.groupby("target")["y"].mean().sort_index()
+    lvl = daily.rolling(28, min_periods=14).mean().shift(1)
+    dsp = daily.rolling(28, min_periods=14).std().shift(1)
+    active["level"] = active["target"].map(lvl)
+    active["disp"] = active["target"].map(dsp)
+
+    t_all = active["target"].map(pd.Timestamp.toordinal).to_numpy(float)
+
+    def _rho(x, y) -> dict:
+        # None rather than NaN: too few pairs to estimate is a different statement from a
+        # correlation of zero, and the artefact is written with allow_nan disabled.
+        if len(x) < 20:
+            return {"n": int(len(x)), "spearman_rho": None, "spearman_p": None}
+        rho, p = stats.spearmanr(x, y)
+        if not np.isfinite(rho):
+            return {"n": int(len(x)), "spearman_rho": None, "spearman_p": None}
+        return {"n": int(len(x)), "spearman_rho": float(rho), "spearman_p": float(p)}
+
+    traded = active[active["y"] > 0]
+    false_open = active[active["y"] <= 0]
+    q = pd.qcut(active["target"].rank(method="first"), 4, labels=False).to_numpy()
+    is_false = (active["y"] <= 0).to_numpy(float)
+
+    med = float(active["y"].median())
+    below = active[active["y"] <= med]
+
+    half = len(active) // 2
+    first, second = active.iloc[:half], active.iloc[half:]
+
+    d = active[active["disp"].notna() & (active["disp"] > 0)]
+    lv = active[active["level"].notna() & (active["level"] > 0)]
+
+    return {
+        "composition": {
+            "false_open_rate": float(is_false.mean()),
+            "false_open_rate_by_quartile": [
+                float(is_false[q == i].mean()) for i in range(4)],
+            "false_open_rate_trend": _rho(t_all, is_false),
+            "drift_traded_only": _rho(
+                traded["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                traded["res"].to_numpy(float)),
+            "drift_false_open_only": _rho(
+                false_open["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                false_open["res"].to_numpy(float)),
+            "mean_abs_residual_traded": float(traded["res"].mean()) if len(traded) else 0.0,
+            "mean_abs_residual_false_open": (
+                float(false_open["res"].mean()) if len(false_open) else 0.0),
+        },
+        "dispersion": {
+            "dispersion_trend": _rho(
+                d["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                d["disp"].to_numpy(float)),
+            "drift_deflated_by_dispersion": _rho(
+                d["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                (d["res"] / d["disp"]).to_numpy(float)),
+            "drift_deflated_by_level": _rho(
+                lv["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                (lv["res"] / lv["level"]).to_numpy(float)),
+        },
+        "tail": {
+            "median_take": med,
+            "drift_below_median_take": _rho(
+                below["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                below["res"].to_numpy(float)),
+        },
+        "shape": {
+            "mean_abs_residual_first_half": float(first["res"].mean()),
+            "mean_abs_residual_second_half": float(second["res"].mean()),
+            "drift_within_first_half": _rho(
+                first["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                first["res"].to_numpy(float)),
+            "drift_within_second_half": _rho(
+                second["target"].map(pd.Timestamp.toordinal).to_numpy(float),
+                second["res"].to_numpy(float)),
+        },
+    }
+
+
 def _windowed_remedy(records: pd.DataFrame, windows=(120, 180, 240)) -> dict:
     """Does a recency-limited calibration pool restore coverage?
 
@@ -275,6 +390,7 @@ def venue_report(venue: str) -> dict:
         "rank_uniformity": _rank_uniformity(records),
         "level_coupling": _level_coupling(records),
         "partition_fidelity": _partition_fidelity(records),
+        "drift_decomposition": _drift_decomposition(records),
         "windowed_remedy": _windowed_remedy(records),
     }
 
@@ -313,6 +429,28 @@ def main(argv: list[str]) -> int:
         print(f"    partition    {f['n_calendar_closed_but_traded']}/{f['n_calendar_closed']} "
               f"= {f['rate']:.3f} calendar-closed days actually traded "
               f"(mean take {f['mean_takings_on_those_days']:.1f})")
+        dd = rep["drift_decomposition"]
+        co, dp, tl, sh = dd["composition"], dd["dispersion"], dd["tail"], dd["shape"]
+        print(f"    false-open   rate={co['false_open_rate']:.3f} "
+              f"by-quartile={[round(x, 3) for x in co['false_open_rate_by_quartile']]} "
+              f"trend rho={co['false_open_rate_trend']['spearman_rho']:+.3f} "
+              f"p={co['false_open_rate_trend']['spearman_p']:.2e}")
+        print(f"      traded only  rho={co['drift_traded_only']['spearman_rho']:+.3f} "
+              f"p={co['drift_traded_only']['spearman_p']:.2e} "
+              f"n={co['drift_traded_only']['n']}")
+        fo = co["drift_false_open_only"]
+        print(f"      false-open   rho={_fmt(fo['spearman_rho'])} "
+              f"p={_fmt(fo['spearman_p'], sci=True)} n={fo['n']}")
+        print(f"      by dispersion rho={dp['drift_deflated_by_dispersion']['spearman_rho']:+.3f}"
+              f" p={dp['drift_deflated_by_dispersion']['spearman_p']:.2e}  "
+              f"(disp trend rho={dp['dispersion_trend']['spearman_rho']:+.3f})")
+        print(f"      below median  rho={tl['drift_below_median_take']['spearman_rho']:+.3f} "
+              f"p={tl['drift_below_median_take']['spearman_p']:.2e} "
+              f"n={tl['drift_below_median_take']['n']}")
+        print(f"      halves       {sh['mean_abs_residual_first_half']:.1f} -> "
+              f"{sh['mean_abs_residual_second_half']:.1f}  "
+              f"within-1 rho={sh['drift_within_first_half']['spearman_rho']:+.3f} "
+              f"within-2 rho={sh['drift_within_second_half']['spearman_rho']:+.3f}")
         for k, v in rep["windowed_remedy"].items():
             print(f"    {k:<12} cov={v['coverage']:.4f}  width={v['mean_width']:.1f}  n={v['n']}")
 

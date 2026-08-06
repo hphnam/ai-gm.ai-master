@@ -107,6 +107,73 @@
         "mean_abs_residual_on_those_days": 238.022848595016,
         "mean_abs_residual_on_genuinely_closed": 32.20931313974398
       },
+      "drift_decomposition": {
+        "composition": {
+          "false_open_rate": 0.015384615384615385,
+          "false_open_rate_by_quartile": [
+            0.0,
+            0.06158357771260997,
+            0.0,
+            0.0
+          ],
+          "false_open_rate_trend": {
+            "n": 1365,
+            "spearman_rho": -0.0723283354847661,
+            "spearman_p": 0.007511137746993854
+          },
+          "drift_traded_only": {
+            "n": 1344,
+            "spearman_rho": 0.102222751053617,
+            "spearman_p": 0.00017410554711969054
+          },
+          "drift_false_open_only": {
+            "n": 21,
+            "spearman_rho": -0.47193990372426947,
+            "spearman_p": 0.03077138103808419
+          },
+          "mean_abs_residual_traded": 287.2074792734195,
+          "mean_abs_residual_false_open": 882.2016761779811
+        },
+        "dispersion": {
+          "dispersion_trend": {
+            "n": 1285,
+            "spearman_rho": 0.39870032241746517,
+            "spearman_p": 3.2701093192173477e-50
+          },
+          "drift_deflated_by_dispersion": {
+            "n": 1285,
+            "spearman_rho": -0.02971386041654615,
+            "spearman_p": 0.2871710404752215
+          },
+          "drift_deflated_by_level": {
+            "n": 1285,
+            "spearman_rho": -0.01876215471764394,
+            "spearman_p": 0.5016030316253265
+          }
+        },
+        "tail": {
+          "median_take": 630.62,
+          "drift_below_median_take": {
+            "n": 687,
+            "spearman_rho": -0.05699640052416239,
+            "spearman_p": 0.13559232895750706
+          }
+        },
+        "shape": {
+          "mean_abs_residual_first_half": 284.9590390612103,
+          "mean_abs_residual_second_half": 307.74673895090467,
+          "drift_within_first_half": {
+            "n": 682,
+            "spearman_rho": 0.0424166551840451,
+            "spearman_p": 0.26864760443393443
+          },
+          "drift_within_second_half": {
+            "n": 683,
+            "spearman_rho": 0.2681854121019059,
+            "spearman_p": 1.0261496062155137e-12
+          }
+        }
+      },
       "windowed_remedy": {
         "expanding": {
           "n": 1750,
@@ -217,6 +284,73 @@
         "mean_abs_residual_on_those_days": 317.51431329714705,
         "mean_abs_residual_on_genuinely_closed": 5.040173418883297
       },
+      "drift_decomposition": {
+        "composition": {
+          "false_open_rate": 0.7976923076923077,
+          "false_open_rate_by_quartile": [
+            0.6953846153846154,
+            0.8523076923076923,
+            0.7846153846153846,
+            0.8584615384615385
+          ],
+          "false_open_rate_trend": {
+            "n": 1300,
+            "spearman_rho": 0.08997560190327003,
+            "spearman_p": 0.0011638908091497547
+          },
+          "drift_traded_only": {
+            "n": 263,
+            "spearman_rho": 0.09390818074347339,
+            "spearman_p": 0.12875259615843318
+          },
+          "drift_false_open_only": {
+            "n": 1037,
+            "spearman_rho": 0.3672028519429453,
+            "spearman_p": 1.882574493686813e-34
+          },
+          "mean_abs_residual_traded": 516.3398086345438,
+          "mean_abs_residual_false_open": 95.1590149203677
+        },
+        "dispersion": {
+          "dispersion_trend": {
+            "n": 1214,
+            "spearman_rho": 0.35162593529975916,
+            "spearman_p": 1.1937189513344278e-36
+          },
+          "drift_deflated_by_dispersion": {
+            "n": 1214,
+            "spearman_rho": 0.13843674742928297,
+            "spearman_p": 1.2863930513557746e-06
+          },
+          "drift_deflated_by_level": {
+            "n": 1214,
+            "spearman_rho": 0.170584319551732,
+            "spearman_p": 2.2129179373057985e-09
+          }
+        },
+        "tail": {
+          "median_take": 0.0,
+          "drift_below_median_take": {
+            "n": 1037,
+            "spearman_rho": 0.3672028519429453,
+            "spearman_p": 1.882574493686813e-34
+          }
+        },
+        "shape": {
+          "mean_abs_residual_first_half": 131.4298174560548,
+          "mean_abs_residual_second_half": 229.30444122595497,
+          "drift_within_first_half": {
+            "n": 650,
+            "spearman_rho": 0.044019634029168385,
+            "spearman_p": 0.262429218136617
+          },
+          "drift_within_second_half": {
+            "n": 650,
+            "spearman_rho": 0.11363661816077814,
+            "spearman_p": 0.003719711118089774
+          }
+        }
+      },
       "windowed_remedy": {
         "expanding": {
           "n": 1659,
@@ -326,6 +460,73 @@
         "mean_takings_on_those_days": 214.1478205128205,
         "mean_abs_residual_on_those_days": 154.34747380138256,
         "mean_abs_residual_on_genuinely_closed": 22.4895555822195
+      },
+      "drift_decomposition": {
+        "composition": {
+          "false_open_rate": 0.006829268292682927,
+          "false_open_rate_by_quartile": [
+            0.0,
+            0.02734375,
+            0.0,
+            0.0
+          ],
+          "false_open_rate_trend": {
+            "n": 1025,
+            "spearman_rho": -0.04119734378451361,
+            "spearman_p": 0.18753421915810992
+          },
+          "drift_traded_only": {
+            "n": 1018,
+            "spearman_rho": -0.06695660271138858,
+            "spearman_p": 0.03267145305994958
+          },
+          "drift_false_open_only": {
+            "n": 7,
+            "spearman_rho": null,
+            "spearman_p": null
+          },
+          "mean_abs_residual_traded": 137.67640888435338,
+          "mean_abs_residual_false_open": 354.06562507103564
+        },
+        "dispersion": {
+          "dispersion_trend": {
+            "n": 943,
+            "spearman_rho": -0.8397624443001641,
+            "spearman_p": 7.992684625764414e-252
+          },
+          "drift_deflated_by_dispersion": {
+            "n": 943,
+            "spearman_rho": 0.15190329035105324,
+            "spearman_p": 2.789741710209617e-06
+          },
+          "drift_deflated_by_level": {
+            "n": 943,
+            "spearman_rho": 0.06093280166815812,
+            "spearman_p": 0.06142837701158448
+          }
+        },
+        "tail": {
+          "median_take": 354.6666666666669,
+          "drift_below_median_take": {
+            "n": 515,
+            "spearman_rho": -0.07535963655421894,
+            "spearman_p": 0.08755161999431198
+          }
+        },
+        "shape": {
+          "mean_abs_residual_first_half": 168.7911452988979,
+          "mean_abs_residual_second_half": 109.57500434061059,
+          "drift_within_first_half": {
+            "n": 512,
+            "spearman_rho": 0.16043799455019894,
+            "spearman_p": 0.0002673261685564849
+          },
+          "drift_within_second_half": {
+            "n": 513,
+            "spearman_rho": 0.07408671699153509,
+            "spearman_p": 0.0936915426963343
+          }
+        }
       },
       "windowed_remedy": {
         "expanding": {

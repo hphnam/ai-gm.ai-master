@@ -990,3 +990,71 @@ and 21. That is the third independent indication that the same venue's incumbent
 the marginal one, after its $p = 0.220$ and its elimination at $\alpha = 0.25$. The
 pre-registered block length of 7 returns the largest set at every venue, so it is
 the conservative setting among those swept.
+
+---
+
+## 17. The last unblocked row closed, and the blocked set made retrievable — 2026-08-06
+
+### D-U6 closed at the third venue
+
+`log/73` S5 left one thing out of reach: "Ellel's drift is unexplained." `log/74`
+locates it. Four candidate mechanisms were separable on the committed store and the
+test could have come back negative on all four.
+
+| Candidate | Outcome at Ellel |
+|---|---|
+| level of trade | **rejected on both denominators** — including a trailing mean over traded days only (level trend rho +0.799, deflation moves the drift only +0.186 to +0.157) |
+| dispersion at a flat level | rejected, rho +0.138 after deflating by trailing standard deviation |
+| a growing right tail | rejected, the drift is entirely BELOW the venue's median take, that median being zero |
+| **composition** | **confirmed** |
+
+The drift is confined to calendar-open days the venue did not trade: rho +0.367,
+p 1.9e-34 on n=1037, against rho +0.094, p 0.129 on the 263 days it traded. Those
+days are 79.8 per cent of the group. On every one of them y=0 against a non-negative
+forecast, so |y - yhat| = yhat as an identity (verified, not argued) -- what drifts is
+what the model predicts for a day the venue does not open.
+
+So the residue is the absence of an occurrence signal, which is **D-U3**. The last
+row that was open and not third-party blocked closes into a row that was already
+declared, already blocked, and already carried as a limitation.
+
+### The two partition defects are one defect
+
+| venue | the calendar says | the venue did | rate |
+|---|---|---|---|
+| beer_hall | closed | traded | 94/546 = 0.172 |
+| ellel | open | did not trade | 1037/1300 = 0.798 |
+
+A day-of-week calendar standing in for an occurrence signal fails in both directions
+and the estate supplies one venue of each. The Further Work item already recorded --
+derive the Mondrian groups from observed trading rather than the weekday -- repairs
+both, which is why it is now listed first of the seven.
+
+Stated so the finding is not oversold: Ellel has the strongest raw drift of the three
+venues and the coverage closest to nominal, and there is no contradiction. The drift
+sits in the subgroup whose residuals average 95.2 against 516.3 on traded days, so a
+proportional change there barely moves the pooled ninetieth percentile. **Real,
+strongly significant, operationally inert** -- and that is also why the windowed pool
+of `log/73` S3 made Ellel worse.
+
+### The blocked set now has a retrieval point
+
+`brain/ledger/BLOCKED_third_party.md`, pointed at from the top of `PRJ93_RULES.md`.
+One row per blocker with what unblocks it, what already exists, and what to run. It
+also carries the two hard constraints a future session could otherwise trip over: the
+TabPFN token is useless without a local-weights path because the estate's data must
+not leave the machine, and the two remaining Further Work items are changes to served
+artefacts that need their own pre-registered gates rather than being merely undone.
+
+D-U3 is recorded there with a **falsifiable prediction**: with the diary live the
+false-open rate collapses and `drift_false_open_only` collapses with it. If it does
+not, `log/74` S5 is wrong.
+
+### Row counts
+
+| Class | Before | After |
+|---|---|---|
+| SHOULD-FIX | 0 | 0 |
+| Unadjudicated contradictions | 0 | 0 |
+| **Open and NOT third-party blocked** | 1 (D-U6 at Ellel) | **0** |
+| DIVERGES — UNRESOLVED | 7 | 7, unchanged, every one blocked |

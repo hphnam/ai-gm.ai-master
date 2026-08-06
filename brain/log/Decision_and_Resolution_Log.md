@@ -2700,3 +2700,36 @@ them into the append-only log so it is the continuous WP1-to-present record.
     (17.2 per cent of the Beer Hall's calendar-closed days traded; residual factor 7.4).
     Verified after: zero dangling references across all four chapter files, zero em dashes in
     the added prose, braces balanced.
+
+99. **Ellel's drift located, and the last unblocked row closed into a blocked one.**
+    `log/73` S5 named this as out of reach. `log/74` tests four candidates, three of which
+    had to be able to fail, and the level of trade is **rejected on the stronger denominator
+    as well as the weaker** -- a trailing mean over Ellel's TRADED days only, which answers
+    the objection that `log/73`'s all-active denominator was diluted by a group four-fifths
+    composed of zeros. Traded-day level rises at rho +0.799 and deflation moves the drift
+    only from +0.186 to +0.157.
+    The answer is composition. Drift on days Ellel traded: rho +0.094, p=0.129, n=263 --
+    **not significant**. Drift on days the calendar called open and it did not trade: rho
+    +0.367, p=1.9e-34, n=1037, and those are 79.8 per cent of the group. On every one of
+    those rows y=0 against a non-negative forecast, so |y - yhat| = yhat as an **identity**
+    (verified in code, not asserted). What drifts is what the point model predicts for a day
+    the venue does not open.
+    The residue is therefore the missing occurrence signal, which is **D-U3** -- already
+    declared, already blocked on Elliot, already a limitation. The last row that was open
+    and not third-party blocked closes into one that was.
+    Unification worth keeping: the Beer Hall's and Ellel's partition defects are the SAME
+    defect in opposite directions (94/546 calendar-closed days traded; 1037/1300
+    calendar-open days did not). The Mondrian-from-observed-trading Further Work item
+    repairs both, which promotes it to first of the seven.
+    Guard against overselling, written into the chapter: Ellel has the strongest raw drift
+    and the coverage closest to nominal, because the drift sits in the subgroup whose
+    residuals average 95.2 against 516.3 on traded days. Real, significant, **operationally
+    inert** -- and the reason `log/73`'s windowed pool made Ellel worse.
+    Overleaf `4cba26f`. `sec:res-drift-cause` and `sec:conclusion-limitations` updated;
+    `log/73` S5's "unexplained" statement marked superseded rather than deleted.
+    Also created `brain/ledger/BLOCKED_third_party.md` as the single retrieval point for the
+    seven blocked rows, pointed at from the top of `PRJ93_RULES.md`, carrying per-row
+    unblock instructions, the two hard constraints (TabPFN needs local weights because the
+    data must not leave the machine; the two Further Work items are served-artefact changes
+    needing their own gates), and a falsifiable prediction for D-U3 to be checked against
+    when the diary arrives.

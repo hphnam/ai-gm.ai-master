@@ -3,6 +3,15 @@
 Personal invariants for the dissertation work under `brain/`. Not
 auto-loaded — every phase prompt must name this file explicitly.
 
+## Where the open work is
+
+`brain/ledger/BLOCKED_third_party.md` is the single retrieval point for everything
+still open. As of 2026-08-06 that is seven rows, every one blocked on a named third
+party, plus two gated Further Work items. Read it before planning anything; do not
+re-derive the list from `literature_conformance.md`, which records history rather
+than state. When a blocker clears, that file says what already exists and what to
+run, and D-U3 carries a falsifiable prediction to check the account against.
+
 ## Conflicts — unresolved
 
 None identified between the rules below and the root `CLAUDE.md`.
