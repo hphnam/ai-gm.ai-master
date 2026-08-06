@@ -136,7 +136,79 @@ now pairs on `config.VENUE_SCALE_BASIS` and additionally asserts the `loss` fiel
   this file replaces them with the currency figures above.
 - Report 44's Ellel MCS membership at α=0.10.
 
-## 8 · Not done here
+## 8 · Scoping correction — these vectors are NOT `tab:ladder`
 
-The Overleaf push of the re-scored `tab:ladder` is **not** made. It needs a human gate, and it is
-entangled with gate 4 (table or chart) because the table now mixes MASE and GBP in one float.
+Carried through several sessions as "re-score `tab:ladder`". That was wrong, and reading the live
+Overleaf section settles it.
+
+`tab:ladder` (`sec:res-ladder`) is the **historical committed gate at six rolling origins,
+step 7**. Its caption states the freeze explicitly: *"Re-running the table at the later ceiling
+would replace the decision under audit with a different decision, so it is deliberately not
+done."* It is not built from the per-fold vectors at all.
+
+The 273 / 260 / 205 vectors regenerated here feed **`tab:mcs`** (`sec:res-mcs`, "Which models the
+data cannot separate"). That is the table the ruler migration actually moves.
+
+`tab:ladder` therefore needs **no re-score**. One thing about it did change and in its favour:
+its caption says *"the implementation now follows that ruling rather than a single hard-coded
+denominator"*, which was aspirational before gate A and is true now that `evaluate_static` reads
+`config.VENUE_SCALE_BASIS` (`models/ladder.py:405`).
+
+## 9 · `tab:mcs` — what the re-run changes
+
+| row | published | now |
+|---|---|---|
+| Beer Hall, foundation+exo, 273 origins | 5/9, p 1.000 | **unchanged** |
+| Two River Taps, ETS, 205 origins | 4/9, p 1.000 | **unchanged** |
+| Ellel, robust DOW, 246 common folds | 5/9, p 0.575 | **row disappears** |
+| Ellel, robust DOW, 260 folds, exo excluded | 3/9, p 0.579 | **row disappears** |
+| Ellel, robust DOW, 260 folds | — | **4/9, single alignment** |
+
+**Ellel's two-alignment complication is gone.** The published caption justifies it as *"the
+exogenous rung cannot be scored on fourteen folds affected by the covariate gap"*. That gap was
+repaired and the repair verified — `log/48` records *"G4 Ellel June repair recovers 14 folds |
+PASS | 246 -> 260 exo-eligible; the exact 14 gap-adjacent origins, proven analytically and in the
+run"*. The MCS artefact had simply never been regenerated on the repaired store. `rung4_chronos2_exo`
+now scores all 260 of Ellel's folds, so there is one alignment and the caveat sentence is retired.
+
+Two independent changes therefore land on Ellel's row at once — the ruler (gate A) and the
+recovered folds (G4, already verified). Neither is new evidence; both are the table catching up.
+
+## 10 · The Ellel argument-minimum paragraph, recomputed
+
+`sec:res-mcs` currently reads: *"on a gap of $0.008$ MASE against a per-fold standard deviation of
+$0.71$, that is $0.18$ standard errors."* On the ruled basis, paired over the 260 common folds:
+
+| quantity | value |
+|---|---|
+| served `rung1_robust_dow` | 107.59 GBP |
+| argument-minimum `rung4_chronos_bolt` | 106.04 GBP |
+| paired mean gap | **1.55 GBP** |
+| paired sd | 26.94 |
+| paired se | 1.67 |
+| **gap in standard errors** | **0.93** |
+
+The gap widens from 0.18 se to 0.93 se. It remains inside one standard error, `rung1_robust_dow`
+remains retained in the 90% set, and the pre-registered decision rule (incumbent stays if
+retained) still returns the incumbent — so **the conclusion is unchanged and the margin is
+smaller than the prose currently claims.** Writing it up must not keep the 0.18.
+
+Worth reporting alongside: pairing reduces the sd from 178.00 to 26.94, a factor of 6.6. That is
+the paired design earning its place, and it is the reason a 1.55 GBP gap is measurable at all.
+
+## 11 · `fig:ladder` — the figure built for gate 4
+
+`drafts/figures/make_ladder_figure.py` → `ladder.pdf` / `ladder.png`. Three panels, one per venue,
+each with its own axis and its own unit label, rungs ordered worst-at-top. Per rung: 5–95 whisker,
+IQR box, median rule, and the mean as a separate diamond. MCS membership at α=0.10 is what the
+ink marks — retained rungs in colour, eliminated in grey — because `log/70` §3 establishes no
+ranking change survives its own standard error, so bolding a winner would be the W36 defect.
+
+Runs in `.venv-eval` (the venv carrying matplotlib), which is safe only because the script reads
+committed artefacts and computes order statistics; it fits nothing.
+
+## 12 · Not done here
+
+The Overleaf push is **not** made — it is a human gate. What it would cover: `tab:mcs` rebuilt to
+three rows, its caption's Ellel-alignment caveat retired, the argument-minimum paragraph's 0.18
+corrected to 0.93, and `fig:ladder` introduced.

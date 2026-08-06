@@ -2407,3 +2407,33 @@ them into the append-only log so it is the continuous WP1-to-present record.
     its mean at every rung, so a bare mean column is not defensible presentation.
     **Still owed:** `tab:ladder` push + gate 4, D-F6 threat model, V1/V3, and the
     D-D1/D-D2/D-D4/D-D5 methodology paragraphs.
+
+89. **Scoping correction: the regenerated vectors are `tab:mcs`, not `tab:ladder`.** (`log/70` S8-S11)
+    Carried across several sessions as "re-score `tab:ladder`". Reading the live Overleaf section
+    settles it: `tab:ladder` is the **historical committed gate at six origins, step 7**, and its
+    own caption freezes it -- "re-running the table at the later ceiling would replace the
+    decision under audit with a different decision, so it is deliberately not done". It is not
+    built from the per-fold vectors. The 273/260/205 vectors feed **`tab:mcs`**. `tab:ladder`
+    needs no re-score; one clause in its caption ("the implementation now follows that ruling")
+    became true with the gate-A edit to `models/ladder.py:405`.
+    *Second, independent change on Ellel's row:* `rung4_chronos2_exo` now scores all 260 folds
+    rather than 246. This is NOT new -- `log/48` records the G4 June repair as verified
+    ("246 -> 260 exo-eligible; the exact 14 gap-adjacent origins, proven analytically and in the
+    run"). The MCS artefact had never been regenerated on the repaired store. Ellel's
+    two-alignment complication therefore collapses to a single alignment and the caption's
+    fourteen-fold caveat is retired.
+    *`tab:mcs` after:* Beer Hall 5/9 and Two River Taps 4/9 unchanged; Ellel becomes a single row,
+    4/9 at 260 folds, with `rung0_seasonal_naive` eliminated.
+    *Argument-minimum paragraph recomputed:* the published "gap of 0.008 MASE ... 0.18 standard
+    errors" becomes **1.55 GBP against a paired se of 1.67, i.e. 0.93 se**. Still inside one
+    standard error, incumbent still retained, pre-registered rule still returns the incumbent --
+    conclusion unchanged, margin smaller than the prose claims. The 0.18 must not survive.
+    Pairing cuts the sd from 178.00 to 26.94 (6.6x), which is why a 1.55 GBP gap is measurable.
+    *Gate 4 answered (operator, this session):* small multiples, three panels. Built as
+    `fig:ladder` (`drafts/figures/make_ladder_figure.py`) -- own axis and unit per venue, 5-95
+    whisker, IQR box, median rule, mean as a separate diamond so Ellel's mean-outside-box skew is
+    visible. MCS membership at alpha=0.10 is what the ink marks; no rung is bolded by rank.
+    *MCS write-up decision (operator, this session):* report both sets, foreground the caution --
+    present the ruled-basis membership as primary and the superseded set alongside as sensitivity
+    to the G2 scale ruling.
+    **Overleaf push NOT made.** Gated.
