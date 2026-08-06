@@ -1,0 +1,328 @@
+{
+  "artefact": "native_interval_probe",
+  "store_ceiling": "2026-07-07",
+  "quantile_levels": [
+    0.05,
+    0.1,
+    0.5,
+    0.9,
+    0.95
+  ],
+  "levels": [
+    0.8,
+    0.9
+  ],
+  "lower_limb_clipped_at_zero": true,
+  "provenance": {
+    "environment": ".venv-forecast",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1"
+    },
+    "store_ceiling": "2026-07-07"
+  },
+  "venues": {
+    "beer_hall": {
+      "venue": "beer_hall",
+      "arms": {
+        "rung4_chronos_bolt": {
+          "n_origins": 273,
+          "native_levels": [
+            0.8
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1911,
+              "coverage": 0.815803244374673,
+              "coverage_ci": [
+                0.7976816151149833,
+                0.8329500606450057
+              ],
+              "mean_width": 611.7536757632365,
+              "median_width": 613.6165771484375,
+              "interval_pinball": 137.55898083010624,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 1438,
+              "coverage": 0.7691237830319889,
+              "coverage_ci": [
+                0.7464586810528829,
+                0.790683901733363
+              ],
+              "mean_width": 676.0866865813317,
+              "median_width": 662.4535064697266,
+              "interval_pinball": 162.29555875053984,
+              "n_crossed_quantiles": 0
+            }
+          }
+        },
+        "rung4_chronos2": {
+          "n_origins": 273,
+          "native_levels": [
+            0.8,
+            0.9
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1911,
+              "coverage": 0.8226059654631083,
+              "coverage_ci": [
+                0.804726297660133,
+                0.8394895389387992
+              ],
+              "mean_width": 627.7211714125253,
+              "median_width": 599.1683959960938,
+              "interval_pinball": 120.52751704385177,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 1911,
+              "coverage": 0.9178440607012036,
+              "coverage_ci": [
+                0.9046191618990352,
+                0.9297690006446975
+              ],
+              "mean_width": 1028.033904885572,
+              "median_width": 939.3343505859375,
+              "interval_pinball": 76.13311295649572,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 1438,
+              "coverage": 0.7788595271210014,
+              "coverage_ci": [
+                0.7565032968609939,
+                0.8000704425630216
+              ],
+              "mean_width": 765.3187803180891,
+              "median_width": 700.8056640625,
+              "interval_pinball": 147.53013033807193,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 1438,
+              "coverage": 0.9040333796940194,
+              "coverage_ci": [
+                0.887625870800469,
+                0.9187675192759803
+              ],
+              "mean_width": 1224.5804006393496,
+              "median_width": 1099.502197265625,
+              "interval_pinball": 89.50264718831666,
+              "n_crossed_quantiles": 0
+            }
+          }
+        }
+      }
+    },
+    "ellel": {
+      "venue": "ellel",
+      "arms": {
+        "rung4_chronos_bolt": {
+          "n_origins": 260,
+          "native_levels": [
+            0.8
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1820,
+              "coverage": 0.8615384615384616,
+              "coverage_ci": [
+                0.844813258956578,
+                0.8770885444687304
+              ],
+              "mean_width": 232.40051181918972,
+              "median_width": 228.39789581298828,
+              "interval_pinball": 97.25456634680782,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 284,
+              "coverage": 0.31690140845070425,
+              "coverage_ci": [
+                0.2631928667720331,
+                0.37448008799083565
+              ],
+              "mean_width": 249.48231463365153,
+              "median_width": 257.18614196777344,
+              "interval_pinball": 497.86410354506813,
+              "n_crossed_quantiles": 0
+            }
+          }
+        },
+        "rung4_chronos2": {
+          "n_origins": 260,
+          "native_levels": [
+            0.8,
+            0.9
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1820,
+              "coverage": 0.8956043956043956,
+              "coverage_ci": [
+                0.8806384171052704,
+                0.9092808718131465
+              ],
+              "mean_width": 296.04650088299763,
+              "median_width": 56.281944274902344,
+              "interval_pinball": 74.53061627683536,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 1820,
+              "coverage": 0.9445054945054945,
+              "coverage_ci": [
+                0.93297551172157,
+                0.9545746300548014
+              ],
+              "mean_width": 485.7566254416665,
+              "median_width": 168.5983657836914,
+              "interval_pinball": 52.7920624734229,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 284,
+              "coverage": 0.4471830985915493,
+              "coverage_ci": [
+                0.3884155579269767,
+                0.5070641827525946
+              ],
+              "mean_width": 726.8307785383413,
+              "median_width": 438.6411590576172,
+              "interval_pinball": 360.31262256273095,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 284,
+              "coverage": 0.6514084507042254,
+              "coverage_ci": [
+                0.5928689856567866,
+                0.7067506028852848
+              ],
+              "mean_width": 1087.9529505984883,
+              "median_width": 672.1156616210938,
+              "interval_pinball": 237.06091320091582,
+              "n_crossed_quantiles": 0
+            }
+          }
+        }
+      }
+    },
+    "two_river_taps": {
+      "venue": "two_river_taps",
+      "arms": {
+        "rung4_chronos_bolt": {
+          "n_origins": 205,
+          "native_levels": [
+            0.8
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1435,
+              "coverage": 0.7721254355400697,
+              "coverage_ci": [
+                0.7495292808755261,
+                0.7936018202433619
+              ],
+              "mean_width": 326.15918590798196,
+              "median_width": 323.38372802734375,
+              "interval_pinball": 57.424262132810796,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 1083,
+              "coverage": 0.7257617728531855,
+              "coverage_ci": [
+                0.6981404253778243,
+                0.7521505208969562
+              ],
+              "mean_width": 357.21716467803645,
+              "median_width": 347.40576171875,
+              "interval_pinball": 65.8591951336777,
+              "n_crossed_quantiles": 0
+            }
+          }
+        },
+        "rung4_chronos2": {
+          "n_origins": 205,
+          "native_levels": [
+            0.8,
+            0.9
+          ],
+          "levels": {
+            "0.8": {
+              "n": 1435,
+              "coverage": 0.8236933797909408,
+              "coverage_ci": [
+                0.8029715680418852,
+                0.8430804832122536
+              ],
+              "mean_width": 344.8077442129315,
+              "median_width": 332.88409423828125,
+              "interval_pinball": 53.80879716365871,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 1435,
+              "coverage": 0.9275261324041811,
+              "coverage_ci": [
+                0.9128680580682961,
+                0.9404028971362388
+              ],
+              "mean_width": 491.5457737301285,
+              "median_width": 468.0030212402344,
+              "interval_pinball": 34.55426664239439,
+              "n_crossed_quantiles": 0
+            }
+          },
+          "active_only": {
+            "0.8": {
+              "n": 1083,
+              "coverage": 0.8153277931671283,
+              "coverage_ci": [
+                0.790910347109896,
+                0.8380179567144928
+              ],
+              "mean_width": 388.7724536532951,
+              "median_width": 370.3526306152344,
+              "interval_pinball": 60.640898660205984,
+              "n_crossed_quantiles": 0
+            },
+            "0.9": {
+              "n": 1083,
+              "coverage": 0.9353647276084949,
+              "coverage_ci": [
+                0.9190396173450451,
+                0.949270592059266
+              ],
+              "mean_width": 550.4435429735968,
+              "median_width": 519.03466796875,
+              "interval_pinball": 38.406654888374995,
+              "n_crossed_quantiles": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

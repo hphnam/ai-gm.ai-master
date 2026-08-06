@@ -2733,3 +2733,35 @@ them into the append-only log so it is the continuous WP1-to-present record.
     data must not leave the machine; the two Further Work items are served-artefact changes
     needing their own gates), and a falsifiable prediction for D-U3 to be checked against
     when the diary arrives.
+
+100. **TabPFN literature integrated, and a published finding replicated rather than cited.**
+    Five papers verified against NotebookLM before any claim was written; two of them
+    (`kaas_probabilistic_2026`, `hertel_explainable_2026`) were already in ref.bib and had not
+    been named in the brief.
+    **Two bib defects fixed.** `ye_closer_nodate` carried a TRUNCATED title ending in "..." and
+    no date, so it would have rendered "Ye et al., n.d." with an ellipsis. Resolved via the
+    arXiv API to 2502.17361, v1 2025-02-24, v2 2025-06-11; rekeyed `ye_closer_2025` (safe, the
+    chapters did not cite it yet). `hoo_tables_2026` carries arXiv id 2501.02945 which is the
+    JANUARY 2025 first posting while the cited content is v4 of 2026-01-26; a `note` field now
+    records that so a reader checking the id does not find different numbers.
+    **ZOTERO IS LOCAL-ONLY, so neither fix could be written back.** Item K73XDLEQ still holds
+    the truncated title and no date; a re-export from Zotero WILL clobber both bib fixes.
+    Flagged to Phuong as a manual step; not something the agent can close.
+    **The finding that changes a chapter claim.** `grinsztajn_tabpfn-3_2026` states the open
+    weights permit "testing, evaluation, and internal benchmarking" and prohibit commercial or
+    production use, naming "using model outputs as inputs to internal commercial
+    decision-making" among the prohibitions. This estate is a trading business. So EVALUATING
+    the rung is licensed and SERVING it is not, on terms no credential changes. `sec:ladder`
+    and `sec:further-work` said "blocked on a credential", which is now incomplete; both
+    rewritten. The cloud-by-default hazard the original abort turned on is UNCHANGED and the
+    refusal stands.
+    **Verified constraint that vindicates `sec:exo`.** TabPFN-TS accepts only covariates
+    "known for future points in time, such as holidays, not unknown ones like weather"; the
+    library drops past-dynamic covariates outright. So arms F and M (forecast weather for the
+    horizon) are consumable and H and O (recorded weather) are not. The lead policy was fixed
+    before that constraint was consulted, so the agreement is independent.
+    **A declared gap closed against the assumption.** The lit review said no source separates
+    the calendar and weather covariate channels. `kaas_probabilistic_2026` separates them:
+    withholding weather raises MAE ~1 kW for all three foundation models and widens intervals
+    1.5-1.96 kW. Rewritten to say the assumption is tested in a neighbouring domain and FAILS
+    there, rather than being untested.
