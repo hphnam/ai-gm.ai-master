@@ -2457,3 +2457,43 @@ them into the append-only log so it is the continuous WP1-to-present record.
     **`tab:ladder` deliberately untouched** -- row 89 establishes it is the frozen six-origin
     committed gate.
     **Still owed:** D-F6 threat model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs.
+
+91. **D-F6, V1, V3 and the four defensible-divergence paragraphs written into the chapters.**
+    Seven further Overleaf commits.
+    *V1/V3* (`sec:rw-ruler`): the `p > 2` threshold is now stated as this chapter's own
+    derivation, with `hewamalage_forecast_2023`'s unconditional claim attributed to them and the
+    median-is-zero step shown; "deflates the denominator" is labelled our characterisation, the
+    source naming the problem without assigning a direction.
+    *D-F6* (`sec:chatlog`): threat model written. The draft in `ledger/transcription_pack.md`
+    said retrieval "feeds a briefing that a named human reads rather than an autonomous
+    actuator" -- **too generous, and corrected before writing**: `signals/briefing.py:80`
+    imports `chatlog_gap_report` and `signals/agent.py` scores briefing items with an LLM, so
+    staff-authored text does reach a model's context. Written as: single-tenant corpus, the
+    forecast path never reads it (**verified** -- no reference to `chatlog` anywhere in
+    `models/`, `eval/` or `store/`), and the agent's verdicts are not served. Zou's ASR figures
+    and verbatim wording were already confirmed in `ledger/citation_audit.md`.
+    *D-D1* (new `sec:ruler-functional`): R9 minimal pair written in -- Beer Hall bias +67.67 ->
+    +24.65 against a MASE move of 0.009; **both failed predictions reported at equal
+    prominence** (Two River Taps' negative median-arm bias, Ellel's inversion) and the "not
+    separable from zero" phrasing used rather than "shows"; the chronos median-under-a-mean's-
+    name limitation carried, with the declined quantile-integration remedy named so the finding
+    is not doing double duty as an excuse.
+    *D-D2* (new `sec:ruler-ellel`): argued from the estimand -- Chatfield's A/h/b are
+    **undefined** for a revenue target, not unelicited; the stronger second support (his own
+    MAPE and GRMSE degrading on zeros) used; the A12 Beer-Hall-only replenishment rule stated
+    before an examiner finds it.
+    *D-D4* (`sec:conformal`): three claims homed in three places -- `barber_conformal_2023` for
+    what Mondrian is, `stocker_gentle_2025` for what it guarantees, `sun_conformal_2025` as
+    **motivation only**, with an explicit sentence that citing it as our guarantee would claim
+    a theorem about an algorithm this system does not run. The observed/inferred framing is
+    labelled as ours. Added the measured ACI rejection, which is stronger warrant than any
+    citation. **Closes V2.**
+    *D-D5* (`sec:ladder` + `sec:rw-rhythm`): the abort recorded with its pre-registration and
+    its licence/data-privacy cause; prediction (i) salvaged (392/385/324 rows against a 10,000
+    limit, ~4%); an explicit sentence that nothing licenses a statement in any direction about
+    how it would have scored. The lit-review regime claim narrowed to the sample-size limb.
+    **CONFLICT FLAGGED, NOT RESOLVED:** the write-up pack records D-D1's decision as "RMSSE
+    headline, MASE labelled secondary", but the chapters report MASE as headline (`tab:mcs`
+    primary loss) and `sec:rw-ruler` already carries the tension as a limitation. Flipping the
+    headline metric is a methodology change and a human gate, so the evidence was written in
+    **without** flipping it. Needs an operator decision.
