@@ -2378,3 +2378,32 @@ them into the append-only log so it is the continuous WP1-to-present record.
     **Still owed:** `tab:ladder` re-score (blocked on the running regeneration), D-F6 threat
     model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs, and the gate-4 table-or-chart
     decision.
+
+88. **Gate A completed — ruler migration re-scored, MCS re-run.** (`log/70`)
+    The `eval.fold_vectors` regeneration finished (2511s of Chronos, exit 0). Fold counts are
+    unchanged at all three venues, so the windows are the same windows and only the ruler moved.
+    Basis now reads `calendar_lag7_active` at beer_hall and two_river_taps and **`unscaled`** at
+    ellel, whose vectors are consequently **MAE in GBP**.
+    *Verification that this is a denominator swap and not a model change:* the new/old ratio is
+    uniform across all nine rungs at the two scaled venues (0.8179-0.8190 and 0.9297-0.9355). It
+    is deliberately NOT the pinned-`as_of` ratios of `log/69` (1.2417, 1.1361) because
+    `fold_vectors` scales per fold ex-ante rather than on one pinned ruler.
+    *Rankings:* identical at beer_hall; one adjacent swap at two_river_taps (0.6260 vs 0.6261)
+    and one at ellel (`rung1_robust_dow` 107.59 now ahead of `rung4_chronos2_exo` 110.78). Both
+    are far inside their standard errors. **No ranking change survives its own se, and none may
+    be written up as a reordering with content.**
+    *MCS re-run* (deterministic, reads no store): beer_hall identical at both alphas and both
+    metrics; two_river_taps reordered but membership unchanged; ellel **drops
+    `rung0_seasonal_naive` from the 90% set under both MASE and RMSSE**. This STRENGTHENS the
+    ladder argument -- on the discredited ruler the naive baseline could not be separated from
+    the learned rungs at Ellel, and on the ruled basis it can. Report 44's ellel alpha=0.10
+    membership is superseded.
+    *Guard test corrected:* `test_persisted_artefact_declares_its_overlap_and_scale_policy`
+    asserted the same `"calendar_lag7"` literal that permitted the mislabelling. It now pairs on
+    `config.VENUE_SCALE_BASIS` and also asserts `loss`. 49 tests pass.
+    The D-F4 block of `ledger/transcription_pack.md` is marked SUPERSEDED and points at `log/70`.
+    **NOT pushed to Overleaf.** The re-scored `tab:ladder` push is a separate human gate and is
+    entangled with gate 4: the table now mixes MASE and GBP in one float, and Ellel's sd exceeds
+    its mean at every rung, so a bare mean column is not defensible presentation.
+    **Still owed:** `tab:ladder` push + gate 4, D-F6 threat model, V1/V3, and the
+    D-D1/D-D2/D-D4/D-D5 methodology paragraphs.

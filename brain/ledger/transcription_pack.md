@@ -119,9 +119,11 @@ standard error is not a result, and bolding a winner across it is the defect W36
 
 **Two cautions.**
 - **Do not bold a winner without the MCS.** The retained-set language is the honest form.
-- These figures are on the **ladder's** basis (`calendar_lag7`, `models/ladder.py:405`), which is
-  NOT the basis `config.VENUE_SCALE_BASIS` rules. See `log/69` — the two rulers differ by
-  **1.2417x at Beer Hall**. Whatever is printed must name its basis.
+- **SUPERSEDED — do not transcribe the cells above.** They are on the ladder's old
+  `calendar_lag7` literal. Gate A made `config.VENUE_SCALE_BASIS` the single authority and the
+  vectors were regenerated; the live cells are in **`log/70` section 5**. Ellel is now
+  **MAE in GBP**, not a MASE, so the table carries two units. Whatever is printed must name its
+  basis per venue.
 
 ---
 

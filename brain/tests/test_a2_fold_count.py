@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import config
 from eval import fold_vectors, harness
 
 
@@ -236,7 +237,11 @@ def test_persisted_artefact_declares_its_overlap_and_scale_policy(venue):
     assert p["windows_overlap"] is True
     assert p["step_days"] < p["horizon_days"]
     assert "block bootstrap" in p["independence_warning"]
-    assert p["basis"] == "calendar_lag7"
+    # Pair on the ruled basis, never a literal. This assertion used to hard-code
+    # `calendar_lag7`, which is what let the artefact carry a basis label that
+    # disagreed with the ruler it was actually scored on (report 69).
+    assert p["basis"] == config.VENUE_SCALE_BASIS.get(venue, harness.REPORTED_BASIS)
+    assert p["loss"] == ("mase" if config.is_scaled_venue(venue) else "mae")
 
 
 @pytest.mark.parametrize("venue", ["beer_hall", "ellel", "two_river_taps"])
