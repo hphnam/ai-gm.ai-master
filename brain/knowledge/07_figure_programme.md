@@ -626,3 +626,67 @@ detects."* No change needed there.
 handful of pairwise contrasts are detectable and every one of them is marginal. That is a
 stronger figure than the one specified, and it is the reason the float was worth building
 before 4.3 was composed.
+
+---
+
+## 10. Captions — drafted 2026-08-07, to the 15-word title / 45-word body rule
+
+Written as `\caption[title]{title. body}` so the list of figures carries the title alone.
+
+**F1 `fig:blocks`** — *The four-block split, and the superseded two-way split it replaced.*
+> Blocks are drawn to scale on the Beer Hall calendar. Each does one job once, and the fit
+> span ends strictly before the calibration block, which is the source of the conformal
+> guarantee rather than a technicality. **The $n = 56$ unbiasedness rows of
+> Section~\ref{sec:res-reconciliation} are the calibration block.** *(41 words)*
+
+The final sentence is required: `validation` and `calibration` are both 56 days, so a bare
+"$n = 56$" is ambiguous between two blocks that do different jobs.
+
+**F3 `fig:pipeline`** — *From a Square export to an intervention, with the Methods
+subsection carrying each step.*
+> The two evaluation disciplines are drawn where each applies: the rolling origin governs
+> model selection, the held-out calibration block governs the band. Deployment detail is in
+> Appendix~C. *(26 words)*
+
+**F4 `fig:drift`** — *Conformity scores over time, with the calibration quantile and
+Ellel's non-trading days marked.*
+> Absolute residuals per venue with a 28-day rolling median. Ellel's drift sits on
+> calendar-open days that did not trade — 1,037 of 1,300 — where the residual equals the
+> forecast by identity. *(32 words)*
+
+**F5 `fig:validity-efficiency`** — *Empirical coverage against mean interval width for five
+conformal methods, by venue.*
+> Horizontal bars are Clopper–Pearson 95 per cent intervals; the dashed rule marks nominal
+> 0.90. No method dominates — coverage is bought with width. Both quantities reproduce
+> exactly across numerics regimes; set membership does not (Section~\ref{sec:conclusion-limitations}).
+> *(35 words)*
+
+The last clause is the W1 propagation. F5 draws the two quantities that are regime-**stable**,
+so without it the figure quietly implies the whole comparison is stable, which is the reading
+5.3 exists to prevent.
+
+**F6 `fig:sensitivity`** — *Detection catch rate against injected deviation magnitude, by
+event kind and venue.*
+> Bands are Wilson 95 per cent intervals; $n$ is injections per series. Spikes are the only
+> kind whose catch rate depends on magnitude, saturating near 0.67 at the two data-rich
+> venues. *(31 words)*
+
+**F7 `fig:nulls`** — *Paired mean differences with 90 per cent bootstrap intervals, weather
+and pooling arms.*
+> Filled markers exclude zero. Axes are per venue: Beer Hall and Two River Taps in MASE,
+> Ellel in pounds. Eight of thirty-one contrasts exclude zero, every one marginal, and no
+> confidence set separates. *(34 words)*
+
+### Compile verification — the exception and why it is not a waiver
+
+F1 and F3 are TikZ and no TeX toolchain exists on this machine. **Verification is by Overleaf
+compile rather than local render.** That is the stronger route, not a concession: Overleaf is
+the environment that actually builds the document, and a second local distribution could
+diverge from it. Pushed as `figure_proof.tex` at the project root — isolated, not `\input` by
+`main.tex`, so a TikZ error cannot break the chapters mid-composition. (The Overleaf bridge
+will not create a directory, so it sits at the root rather than under `scratch/`.)
+
+**The compile log is not the verification.** F1's open question is whether three abutting
+1.85 cm blocks carry their labels without collision, and a clean exit reports what the
+compiler decided, not where the labels landed — the exit-code rule in `PRJ93_RULES.md`
+applied to LaTeX. The PDF must be looked at.

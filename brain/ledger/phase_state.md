@@ -2093,3 +2093,46 @@ alongside `05_paper_architecture.md`. Both are approved and neither is reopened 
 U-row. The two prompt blocks in `06` §10 — the Chapter 5 5.1 discipline and the Methods
 3.11 exception — must reach the sessions they name, or those sessions will rediscover the
 problems they were written to prevent.
+
+---
+
+## 2026-08-07 — Phase: numerics regime, blocker clearance, first figures
+
+**Completed**
+
+- `eval/interval_calibration` regenerated in **both** venvs (`log/78`). `.venv-forecast`
+  reproduces every committed number exactly and the artefacts now carry a provenance stamp;
+  `.venv-eval` reproduces `log/61`'s deltas to the digit (Winkler 1814.3 → 1839.6, ACI clamps
+  46 → 76).
+- **The finding**: coverage and Winkler point estimates are resolution-stable; the confidence
+  set built on them is not. Two River Taps loses a set member and gains an adoption candidate
+  between numpy minor versions. Corrected float attribution — this is **`tab:winkler`**'s set
+  column, not `tab:mcs`. Binding notes in `05_paper_architecture.md` **§2.7b (W1/W2/W3)`.
+- B1, B2, B4, B5 applied to Overleaf. B2 removed the power and MDE columns and the prose that
+  quoted them; B4 added the pairs column and the frame paragraph; B5 added seed, candidate-set
+  size and folds. 5.3 carries the numerics validity note. 4.3 states and resolves the Beer
+  Hall N−M exception.
+- Four body figures built, rendered and viewed: F4, F5, F6, F7, under `figures/`.
+- Two rules added to `PRJ93_RULES.md`: verify a fix by inspecting the artefact, never the exit
+  code; and report a clean result with the scope of the check that produced it.
+
+**Verified end state**
+
+- Working tree clean, committed. Overleaf carries `figure_proof.tex` at the project root
+  (isolated, not `\input` by `main.tex`).
+- `figures/out/`: four PDFs + `fig_blocks.tex`, `fig_pipeline.tex`, `figure_proof.tex`.
+- Block spans: fit 230 / validate 56 / calibrate 56 / test 57, Beer Hall calendar 399 days.
+
+**Unstarted / open**
+
+- **F1 and F3 have never been compiled.** No TeX toolchain here; verification is by Overleaf
+  compile, and the PDF must be looked at rather than the log. A-F1..A-F7 not started.
+- **Three unstamped artefact clusters contain a model confidence set**: `group_icl_mcs.json`,
+  `weather_basis_mcs.json`, `mcs_L1_results.json`. After `log/78` this is a **known-shape
+  exposure, not an unknown one** — an MCS is an elimination procedure over bootstrap p-values,
+  so a perturbation too small to move a point estimate can still cross α and delete a set
+  member, and none of the three records the environment that produced it. `mcs_L1_results`
+  is `.venv-forecast` by `log/70`'s record only. `tab:mcs`, `tab:weather` and `tab:group` all
+  read from these. Closing it means re-running all three; regenerating the ladder is out of
+  scope under the approved `tab:ladder` disposition.
+- `tab:mcs` bounded gap: recorded at `05` §2.7b W2, deliberately left open.

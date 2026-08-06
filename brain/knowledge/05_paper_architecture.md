@@ -461,13 +461,13 @@ faster as a sentence than as a float.
 | Float | Size | Placement | Reason |
 |---|---|---|---|
 | `fig:ladder` | figure | **Body 4.1** | The chapter's only figure. Carries per-fold dispersion and confidence-set retention at once, and replaces `tab:ladder` in the body. |
-| `tab:mcs` | 5×3 | **Body 4.1** | Which models are retained is the headline, and **D7 rests on it**. Exact retention per venue must be legible. |
+| `tab:mcs` | 5×3 | **Body 4.1** | Which models are retained is the headline, and **D7 rests on it**. Exact retention per venue must be legible. **Carries a bounded gap — see §2.7b.** |
 | `tab:intermittency` | 6×6 | **Body 4.2** | The reader must read $p$ and $v$ against the two constant sets to see the reclassification. Small and load-bearing. |
 | `tab:group` | 7×3 | **Body 4.3** | A null result needs its paired intervals visible or it reads as an absence of effort. |
 | `tab:weather` | 7×3 | **Body 4.3** | Five arms across three venues; the mutual indistinguishability is the finding and it is only visible as a table. |
-| `tab:coverage` | 6×3 | **Body 4.4** | Headline. Coverage, Clopper–Pearson interval, power and MDE per venue are all looked up. |
+| `tab:coverage` | 4×3 | **Body 4.4** | Headline. Pairs, coverage and the Clopper–Pearson interval per venue. **Power and MDE are GONE** — no power analysis exists in the project and one computed now would be retrofitted (B2, `blocker_clearance_package.md`). Applied to the chapter 2026-08-07. |
 | `tab:exchangeability` | 6×3 | **Body 4.4** | The check that makes the finding: implied coverage against published coverage, agreeing to a thousandth. The agreement is the argument. **Two binding reporting conditions — see §2.7a.** |
-| `tab:winkler` | 7×3 | **Body 4.4** | Five interval methods against the incumbent — this is the comparison-against-rejected-alternatives evidence **D7** requires. |
+| `tab:winkler` | 7×3 | **Body 4.4** | Five interval methods against the incumbent — this is the comparison-against-rejected-alternatives evidence **D7** requires. **Its "90% set" column is numerics-sensitive — see §2.7b.** |
 | `tab:vuspr` | 4×7 | **Body 4.5** | Detection headline, by event kind and venue. |
 | `tab:ladder` | 4×9 | **Appendix E** | The historical committed gate on a superseded basis. See §2.8a — this is what dissolves the 525-word caption. |
 | `tab:bootstrap` | 6×7 | **Appendix E** | Denominator bootstrap across four bases and two venues. It *justifies* the ruling; the ruling itself moves to Methods 3.2 and the body needs only the two interval widths that decide it. |
@@ -501,6 +501,38 @@ Ellel's false-open limb has **n = 1037**; the Beer Hall's has **n = 21** (ρ = �
 p = 0.031). They point in opposite directions, which is tempting to write as a symmetry. It
 is not one: the n differ by a factor of about fifty. State both n wherever both limbs appear,
 or report only Ellel's.
+
+### 2.7b Numerics sensitivity in the two confidence-set floats — binding on 8C
+
+**Added 2026-08-07 from `log/78`. Binding, not advisory.** Recorded here because 8C composes
+from this file and would otherwise meet the qualification only in a result log.
+
+**W1 — `tab:winkler`'s "90% set" column is regime-sensitive; its Winkler means are not.**
+Regenerating `eval/interval_calibration` under numpy 1.26.4 instead of the committed 2.5.1
+leaves every Winkler mean, coverage figure and Clopper–Pearson limb **identical**, and moves
+set membership at Two River Taps: per-step calibration is eliminated (p 0.191 → 0.036) and an
+adoption candidate appears where the committed regime has none. Ellel is stable in every
+verdict. Beer Hall keeps its set but loses two paired-bootstrap exclusions of zero.
+**Compose the set column from the `.venv-forecast` figures**, and carry the 5.3 validity note
+(`blocker_clearance_package.md` §5.3) — it leads with non-separability as the finding and
+uses the sensitivity as its evidence, not the other way round.
+
+**W2 — `tab:mcs` inherits the mechanism by construction and has never been tested.** It is an
+MCS too: an elimination procedure over bootstrap p-values, where a perturbation too small to
+move a point estimate can still cross α and delete a set member. `eval/mcs_L1_results.json`
+carries **no provenance stamp**; `log/70` records its Gate A regeneration running in
+`.venv-forecast`, so it is consistent with every other committed number, but it has never been
+run across the two regimes. Testing it means regenerating the ladder, which the approved
+`tab:ladder` disposition puts out of scope. **The gap stays open and is not to be closed by
+assertion.** If 4.1 states ladder set membership as a finding, the W1 qualification applies to
+it by construction — say so in a clause rather than leaving 8D to find it. Demonstrated for
+the conformal arms; plausible and untested for the ladder.
+
+**W3 — do not let this become a second answer to RQ1.** The corroboration is of the
+*mechanism* (few origins ⇒ unstable selection), not of RQ1's separability claim. RQ1's
+candidates are forecasting approaches; this evidence is about interval methods — a different
+candidate set in a different float. One forward clause in 4.1 pointing at 5.3 is the correct
+weight. Upgrading it into a second independent answer would be an overclaim.
 
 ### Methodology — three tables
 
