@@ -880,3 +880,76 @@ One further residue was left deliberately. `sec:rw-rhythm` still states MinT's
 unbiasedness precondition without downstream resolution, because resolving it in
 the review would report a result the review is not allowed to report under the
 R-Zero rule. It resolves when D-F7's writing half lands, and not before.
+
+---
+
+## 15. The four unblocked rows closed — 2026-08-06
+
+All four rows §14 identified as open-and-not-third-party are now closed in the
+chapters. Overleaf commit `25cb94f`.
+
+| Row | Closed by | Evidence |
+|---|---|---|
+| **D-U6** | `sec:res-exchangeability` (new) | `log/72`, artefact `eval/exchangeability_diagnostic.json` |
+| **D-F7** | `sec:res-reconciliation` (new) | `log/62`, already run 2026-08-05; this was the writing half |
+| **D-F8** | `sec:res-vuspr` (new) | `log/60`, already run 2026-08-05; this was the writing half |
+| **C11 / C12** | `chapters/conclusion.tex` (written) | `sec:conclusion-reversal`, `sec:conclusion-adaptive` |
+
+### D-U6 is the only one that needed new work
+
+The other three were transcription of runs already banked. D-U6 needed an
+analysis nobody had done, and it produced the strongest result of the four.
+
+`eval/exchangeability_diagnostic.py` tests one hypothesis derived from the band's
+own construction rather than from the data: the calibration pool is **expanding**,
+so a residual scale drifting upward leaves the quantile too narrow for the present.
+That account predicts a **sign per venue**, which is what makes it falsifiable on
+three venues that already disagree.
+
+| venue | Spearman $\rho$ | tail fraction above $q_{0.90}$ | implied coverage | published coverage |
+|---|---|---|---|---|
+| beer_hall | +0.086 | 0.130 | 0.870 | 0.871 |
+| ellel | +0.218 | 0.087 | 0.913 | 0.914 |
+| two_river_taps | **−0.072** | 0.039 | 0.962 | 0.963 |
+
+Two River Taps' scale **falls** and it over-covers, which is the prediction that
+could have refuted the account and did not. Ellel's mean drifts hardest of the
+three while its 90th percentile is flat, so the drift is in the body and not the
+tail — the venue whose residuals move most is the venue whose coverage moves
+least, and that asymmetry is what a tail-quantile band would predict.
+
+The rank statistic reproduces the published coverage at all three venues to a
+thousandth, on the same pair counts (1750 / 1659 / 1274) as `tab:coverage`. That
+agreement is the check that the diagnostic measures the coverage table's own
+object rather than a neighbour pointing the same way.
+
+**Bounded deliberately.** The cause of the Beer Hall's growing error scale is not
+identified; growth in trade is the obvious candidate and is untested. And the
+finding **withdraws support** from the third remedy `sec:res-winkler` offers,
+inflating the nominal level, since a constant inflation is a fixed correction to a
+moving target. A windowed pool is carried to Further Work instead.
+
+### Revised counts
+
+| Verdict | At §1 | After the runs (§8) | Now |
+|---|---|---|---|
+| CONFORMS | 24 | 28 | **31** |
+| DIVERGES — SHOULD FIX | 8 | 4 | **0** |
+| DIVERGES — DEFENSIBLE | 5 | 5 | 0 (all five decided) |
+| DIVERGES — UNRESOLVED | 8 | 8 | **7**, every one blocked on a third party |
+| Contradictions unadjudicated | 2 | 2 | **0** |
+
+Every row that could be closed without Ryan, Elliot or a vendor account is closed.
+The seven that remain are D-U1 through D-U5, D-U7 and D-D5's `TABPFN_TOKEN`
+residue; D-U8 stands as a scope declaration rather than a blocker.
+
+### Pre-existing defect found and not fully fixed
+
+Three cross-references resolve to nothing and will compile as `??`:
+`sec:exo` (results twice, methodology once), `sec:res-paired` (results once), and
+`sec:flip` (methodology once). `sec:flip` in **results** was unambiguous and is
+repointed to `sec:res-batch`. The other four are not typos. `sec:exo` names an
+exogenous-covariate specification section that **was never written** in the
+methodology, and `sec:res-paired` names a paired-bootstrap section that does not
+exist either, so repairing them means writing the missing content or guessing an
+author's intent, and neither belongs inside a push about conformance rows.

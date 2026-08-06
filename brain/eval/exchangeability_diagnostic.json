@@ -1,0 +1,201 @@
+{
+  "artefact": "exchangeability_diagnostic",
+  "store_ceiling": "2026-07-07",
+  "level": 0.9,
+  "warmup_pool": 140,
+  "provenance": {
+    "environment": ".venv-forecast",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1"
+    },
+    "store_ceiling": "2026-07-07"
+  },
+  "venues": {
+    "beer_hall": {
+      "venue": "beer_hall",
+      "point_model": "rung2_ets",
+      "n_origins": 273,
+      "scale_drift": {
+        "n_active_pairs": 1365,
+        "spearman_rho": 0.08609337115022338,
+        "spearman_p": 0.0014535722147384867,
+        "by_time_quartile": [
+          {
+            "quartile": 1,
+            "first_target": "2025-10-02",
+            "last_target": "2025-12-12",
+            "mean_abs_residual": 235.04104121097907,
+            "p90_abs_residual": 689.7495809140189
+          },
+          {
+            "quartile": 2,
+            "first_target": "2025-12-12",
+            "last_target": "2026-02-19",
+            "mean_abs_residual": 334.66426116046193,
+            "p90_abs_residual": 906.9130650205984
+          },
+          {
+            "quartile": 3,
+            "first_target": "2026-02-19",
+            "last_target": "2026-04-26",
+            "mean_abs_residual": 204.0410154875003,
+            "p90_abs_residual": 615.7132663151881
+          },
+          {
+            "quartile": 4,
+            "first_target": "2026-04-26",
+            "last_target": "2026-07-05",
+            "mean_abs_residual": 411.87845135514186,
+            "p90_abs_residual": 1056.292382340177
+          }
+        ]
+      },
+      "rank_uniformity": {
+        "n_banded": 1750,
+        "mean_rank": 0.5544271709931129,
+        "frac_above_nominal_quantile": 0.12971428571428573,
+        "active_only": {
+          "n": 1250,
+          "mean_rank": 0.5263098354576367,
+          "frac_above_nominal_quantile": 0.1168
+        },
+        "per_step_frac_above": {
+          "1": 0.148,
+          "2": 0.136,
+          "3": 0.128,
+          "4": 0.116,
+          "5": 0.124,
+          "6": 0.124,
+          "7": 0.132
+        }
+      }
+    },
+    "ellel": {
+      "venue": "ellel",
+      "point_model": "rung2_ets",
+      "n_origins": 260,
+      "scale_drift": {
+        "n_active_pairs": 1300,
+        "spearman_rho": 0.2181629898244171,
+        "spearman_p": 1.7998124645658913e-15,
+        "by_time_quartile": [
+          {
+            "quartile": 1,
+            "first_target": "2025-10-12",
+            "last_target": "2025-12-19",
+            "mean_abs_residual": 134.80700386382614,
+            "p90_abs_residual": 633.5715746393057
+          },
+          {
+            "quartile": 2,
+            "first_target": "2025-12-19",
+            "last_target": "2026-02-21",
+            "mean_abs_residual": 128.0526310482835,
+            "p90_abs_residual": 540.590526627476
+          },
+          {
+            "quartile": 3,
+            "first_target": "2026-02-21",
+            "last_target": "2026-04-26",
+            "mean_abs_residual": 269.5641579877985,
+            "p90_abs_residual": 534.1187880781459
+          },
+          {
+            "quartile": 4,
+            "first_target": "2026-04-29",
+            "last_target": "2026-07-04",
+            "mean_abs_residual": 189.0447244641114,
+            "p90_abs_residual": 517.5351838774598
+          }
+        ]
+      },
+      "rank_uniformity": {
+        "n_banded": 1659,
+        "mean_rank": 0.5538243719094766,
+        "frac_above_nominal_quantile": 0.08740204942736589,
+        "active_only": {
+          "n": 1185,
+          "mean_rank": 0.5567000809028293,
+          "frac_above_nominal_quantile": 0.0759493670886076
+        },
+        "per_step_frac_above": {
+          "1": 0.08016877637130802,
+          "2": 0.08860759493670886,
+          "3": 0.08438818565400844,
+          "4": 0.08438818565400844,
+          "5": 0.09282700421940929,
+          "6": 0.10126582278481013,
+          "7": 0.08016877637130802
+        }
+      }
+    },
+    "two_river_taps": {
+      "venue": "two_river_taps",
+      "point_model": "rung2_ets",
+      "n_origins": 205,
+      "scale_drift": {
+        "n_active_pairs": 1025,
+        "spearman_rho": -0.07205931644892138,
+        "spearman_p": 0.021043192826398098,
+        "by_time_quartile": [
+          {
+            "quartile": 1,
+            "first_target": "2025-10-10",
+            "last_target": "2025-12-03",
+            "mean_abs_residual": 157.3071584945354,
+            "p90_abs_residual": 386.55107362931545
+          },
+          {
+            "quartile": 2,
+            "first_target": "2025-12-04",
+            "last_target": "2026-01-23",
+            "mean_abs_residual": 180.01931456054064,
+            "p90_abs_residual": 350.73558149161204
+          },
+          {
+            "quartile": 3,
+            "first_target": "2026-01-23",
+            "last_target": "2026-03-15",
+            "mean_abs_residual": 109.34369564585694,
+            "p90_abs_residual": 284.1040323943897
+          },
+          {
+            "quartile": 4,
+            "first_target": "2026-03-15",
+            "last_target": "2026-05-08",
+            "mean_abs_residual": 109.87567685092029,
+            "p90_abs_residual": 221.83004570216826
+          }
+        ]
+      },
+      "rank_uniformity": {
+        "n_banded": 1274,
+        "mean_rank": 0.45736728563477996,
+        "frac_above_nominal_quantile": 0.038461538461538464,
+        "active_only": {
+          "n": 910,
+          "mean_rank": 0.48178679138245856,
+          "frac_above_nominal_quantile": 0.03956043956043956
+        },
+        "per_step_frac_above": {
+          "1": 0.027472527472527472,
+          "2": 0.03296703296703297,
+          "3": 0.027472527472527472,
+          "4": 0.03296703296703297,
+          "5": 0.038461538461538464,
+          "6": 0.03296703296703297,
+          "7": 0.07692307692307693
+        }
+      }
+    }
+  }
+}
