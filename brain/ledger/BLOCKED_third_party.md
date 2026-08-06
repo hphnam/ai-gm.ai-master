@@ -9,7 +9,7 @@ anything, and should not re-derive the blocked list from `literature_conformance
 which records history rather than state.
 
 Related: `brain/PRJ93_RULES.md` (invariants), `brain/log/Decision_and_Resolution_Log.md`
-(rows 1–99), `brain/ledger/literature_conformance.md` §14–§17.
+(rows 1–100), `brain/ledger/literature_conformance.md` §14–§17.
 
 ---
 
@@ -126,19 +126,24 @@ unless Phuong reopens it.
 
 ---
 
-## E · Two Further Work items that are gated rather than blocked
+## E · Three Further Work items that are gated rather than blocked
 
-Both are changes to a **served artefact**, so neither can be executed inside this
-dissertation without its own pre-registered gate. Neither is waiting on a person.
+All three are changes to a **served artefact**, so none can be executed inside this
+dissertation without its own pre-registered gate. None is waiting on a person.
 
 1. **Mondrian groups from observed trading rather than the weekday.** Repairs both
    directions of the partition defect: the Beer Hall's 94 of 546 calendar-closed days that
    traded, and Ellel's 1037 of 1300 calendar-open days that did not. Cheapest and best
-   evidenced of the seven extensions.
+   evidenced of the eight extensions.
 2. **A per-venue windowed calibration pool.** Measured, not assumed. It brings Two River
    Taps from 0.963 to 0.909 while narrowing the band, recovers about a quarter of the Beer
    Hall shortfall at 7 per cent width, and moves Ellel away from nominal. What it needs is a
    rule for setting the length fixed before the coverage it is tuned against is seen.
+3. **A native model interval against a conformal one** (`log/75` §5). Chronos-2's own 90
+   per cent interval covers 0.9178 at the Beer Hall where the served band covers 0.871.
+   That identifies NOTHING as it stands, because point model, band construction and the
+   presence of a calibration layer all differ at once. Holding the point model fixed and
+   varying only the interval source would identify it.
 
 ---
 
@@ -151,7 +156,7 @@ dissertation without its own pre-registered gate. Neither is waiting on a person
 | Open rows not blocked on a third party | **0** |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
 | Dangling cross-references across the four chapter files | 0 |
-| Latest Overleaf commit at time of writing | `4cba26f` |
+| Latest Overleaf commit at time of writing | `9174a2d` |
 
 ---
 
