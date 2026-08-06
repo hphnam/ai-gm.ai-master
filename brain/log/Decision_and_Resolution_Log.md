@@ -1787,3 +1787,204 @@ them into the append-only log so it is the continuous WP1-to-present record.
     free-form user text into the `brain_daily_briefing` agent tool, was addressed with a one-
     sentence addition to that tool's description stating quoted text is data, not an instruction.
     Suites re-verified green after all three code fixes. Evidence: report 51 "Review gate" section.
+
+65. **Literature-conformance gate: the review's verdicts audited against the method, six runs
+    authorised and executed (2026-08-05).** The completed `literature_review.tex` was mined for
+    every passage establishing a methodological requirement, identifying a limitation in prior
+    work, or stating a contradiction between sources: 63 verdicts, extracted to
+    `knowledge/05_litreview_verdicts.md`, classified against the implementation in
+    `ledger/literature_conformance.md`. Of the 45 bearing on our method, 24 CONFORMED, 8 were
+    DIVERGES--SHOULD FIX, 5 DIVERGES--DEFENSIBLE (reserved to the human), 8 DIVERGES--UNRESOLVED
+    (all blocked on a third party). Six runs were authorised at the gate; all six ran the same
+    day for roughly two minutes of total compute. Post-run the counts are 28 / 4 / 5 / 8, and
+    the four remaining SHOULD-FIX rows are writing-only.
+
+66. **Three chapter propositions are the chapter's own derivations attributed to sources that do
+    not state them.** Neither T8 verification pass caught these, because both checked *claims
+    about papers* and these are *inferences from papers* -- a distinct defect class, now named.
+    (i) The p>2 condition for constant-zero optimality under absolute error: NotebookLM returns
+    NOT SUPPORTED for any threshold in `hewamalage_forecast_2023`, which states the unconditional
+    version. The condition is elementary and correct; it is ours. (ii) The claim that an
+    *observed* regime variable removes the state-misclassification term: `sun_conformal_2025`
+    defines the state as *unobserved* by construction, and the vanishing condition is
+    **Corollary A.2**, not the Theorem 4.3 currently cited. Our inference holds a fortiori and is
+    the strongest single argument for the Mondrian design, but it is our extension. (iii) The
+    word "deflates" on the scaling denominator quantifies a direction the source does not.
+    **Resolution: keep all three arguments, fix all three attributions.** Each is stronger stated
+    as our own reasoning than as a borrowed result.
+
+67. **R1 -- VUS-PR computed for the first time; W25 closed on a stale blocker.** Report 11's
+    *"not computed, dependency unavailable"* is why the promise stayed open for months. The
+    dependency was present all along in `.venv-eval` (`vus`, `TSB_AD`); `.venv-run` and
+    `.venv-forecast` carry neither, which is why the blocker kept reading as real. No code change,
+    75 seconds. VUS-PR by (kind, venue) over 624 windows: regime shift 0.934 (BH) / 0.972 (TRT),
+    exogenous coincidence 0.932 / 0.996, spikes 0.760 (BH) / 0.704 (Ellel) / 0.912 (TRT). The
+    detector separates on sustained structure and poorly on point events, corroborated inside the
+    same run by the magnitude-1 sensitivity cells. Control: overall scaled recall came back 0.807,
+    reproducing report 50 exactly. Evidence: `log/60_R1_vus_pr_result.md`.
+
+68. **R3 -- the conformal upper bound is withheld wherever its condition fails, which is
+    everywhere.** Angelopoulos & Bates Theorem D.2 holds only *"if the scores have a continuous
+    joint distribution"*; their remedy of adding vanishing noise addresses incidental ties, not an
+    atom. On a structurally closed day forecast and actual are both zero, so the score
+    distribution carries a genuine point mass at 0. Measured: tie fraction 0.160 (BH), 0.590
+    (Ellel), 0.183 (TRT), with the largest atom at score 0 in every case. The bound is now
+    reported as NOT AVAILABLE at all three venues with the tie diagnostic printed beside it; the
+    withheld values were 0.9005 / 0.9006 / 0.9007. **The lower bound is unaffected** -- it needs
+    no continuity -- which is the limb the Beer Hall under-coverage argument rests on. Evidence:
+    `log/61_R3_conformal_upper_bound_result.md`.
+
+69. **`eval/interval_calibration` is environment-sensitive and carries no provenance stamp.**
+    Found while running R3: a purely additive edit appeared to move coverage and Winkler figures.
+    Diagnosed rather than assumed -- the module is deterministic *within* a venv (byte-identical
+    re-run), and the delta is between venvs: `.venv-eval` runs numpy 1.26.4 / pandas 2.3.3,
+    `.venv-forecast` runs numpy 2.5.1 / pandas 3.0.3 on identical statsmodels. Re-running in
+    `.venv-forecast` reproduced the committed artefact exactly, and that is the run of record.
+    **Recommendation on file: stamp this artefact with `provenance.py`.** A future regeneration
+    from the wrong venv would silently restate every figure in `tab:winkler` with nothing on the
+    artefact to show it.
+
+70. **R6 -- the unbiasedness precondition WLS_v inherits from MinT was tested for the first time,
+    and it fails.** Wickramasuriya et al. require `E[e_T(h)|I_T] = 0` and deliver the best
+    minimum-variance linear *unbiased* reconciled forecasts; asked what happens when the bases are
+    biased, the 2019 paper is silent. One-sample t-test per node on the held-out calibration
+    block: **22 of 41 nodes reject unbiasedness, 19 of them with a positive mean residual**,
+    including CAT::Beer (+25.36, p=7.7e-05) and VENUE itself (+21.09, p=0.047). The sign is what
+    theory predicts -- a day-of-week *median* base is median-eliciting and sits below the mean on
+    a right-skewed node -- so this is a property of the chosen base forecaster, not a defect in
+    the reconciliation. **Resolution: the optimality claim is restated as conditional, with the
+    condition measured and reported rather than assumed.** Evidence:
+    `log/62_R6_wlsv_unbiasedness_result.md`.
+
+71. **The measurement argument now closes empirically, and the last link is ours.** Absolute-error
+    measures optimise the median (`hewamalage_forecast_2023`, verbatim); median-eliciting point
+    forecasts are *"usually not"* coherent and MASE is *"just a scaled MAE"* (`kolassa_we_2023`,
+    verbatim); MinT optimality requires unbiased bases (`wickramasuriya_optimal_2019`, verbatim);
+    and our DOW-median bases are measurably biased on 22 of 41 nodes. This is one of the few
+    places where the project's own data supplies empirical support for a theoretical objection its
+    own literature review raises, and it belongs in the Discussion.
+
+72. **R2 -- W37 closed: "covariates HELP" was a null, and the project caught it with its own
+    instrument.** The committed artefact concluded covariates help from a six-fold mean delta of
+    -0.014 across folds splitting three better and three worse (sign test p=1.0). Three defects
+    fixed: a bare mean as verdict; six folds, at which `mcs.moving_block_indices` clamps the block
+    to `n_obs` and the bootstrap is degenerate (the exact failure report 54 caught shipping a
+    feature 6.5% worse than baseline); and a hard-coded `calendar_lag7` where the estate rules
+    `calendar_lag7_active`. Re-run over the whole active span at a full-horizon step: **39 folds,
+    delta -0.0002, covariate better on 18 of 39, paired 90% CI [-0.0102, +0.0108] containing zero,
+    90% MCS retaining both arms.** Widening the grid collapsed the difference by two orders of
+    magnitude, demonstrating rather than asserting that the -0.014 was noise pointing in the
+    flattering direction. The exogenous null survives and is now properly evidenced, agreeing with
+    S6, with Hertel's 89/3.55/2.74 attribution split and with Haben's *"often detrimental"*.
+    Evidence: `log/64_R2_covariate_probe_result.md`.
+
+73. **The hard-coded scale basis is in its third file.** G17o fixed `transfer/lovo.py`; R2 fixed
+    `eval/chronos2_covariate_probe.py`; `eval/worldcup_fixture_probe.py` still scores Ellel on
+    `calendar_lag7`, which under G2 is a violation twice over. It writes no artefact and appears
+    in neither chapter, so nothing is retracted by leaving it, and repairing it means deciding
+    what a cross-venue statistic means when one venue admits no scale -- a methodology decision,
+    not a bug fix, and outside this gate. **Recorded with the standing recommendation to assume a
+    fourth copy until someone greps for it.**
+
+74. **R7 -- report 57's "blocked, no torch" row was two artefacts, and the label was imprecise.**
+    `eval/chronos2_covariate_probe.md` was genuinely stale and carried a wrong conclusion (fixed
+    under R2). `eval/chronos2_promotion_sensitivity.md` reproduces byte-identical and is **not
+    staleness-eligible at all**: it takes two JSON snapshots as CLI arguments and never reads the
+    warehouse, so it cannot drift with the store ceiling, which is the only mechanism that sweep
+    tested. It belongs with `sim/*_frozen.md` under "excluded by design". Noted for the next
+    sweep: an artefact that is a pure function of committed inputs needs a different staleness
+    test from one generated against a moving store. Evidence:
+    `log/65_R7_chronos2_staleness_result.md`.
+
+75. **R4 -- G1 turned from a preference into a measurement, and it refuted my own recommendation.**
+    Re-analysis only: committed per-fold loss vectors re-read, the same MCS instrument re-run under
+    each loss, no refit. **The winning rung changes between MASE and RMSSE at BOTH scaled venues**
+    -- Beer Hall `chronos2_exo` to `chronos_bolt`, Two River Taps `ets` to `chronos2` -- so the
+    pre-run recommendation, which rested on an expectation of ordering invariance, does not
+    survive. **But the 90% model confidence set is identical under both losses at both venues.**
+    The two flips differ in size: Beer Hall is a coin-toss (0.5902 against 0.5900 under RMSSE),
+    while at Two River Taps ETS falls from rank 1 to rank 4. The finding is that the only quantity
+    the headline metric changes is the bare argmin -- the quantity W5 already established this
+    project must not rely on -- while the inferential answer every conclusion does rest on is
+    metric-invariant. **G1 remains the human's decision and is deliberately left open.** Evidence:
+    `log/63_R4_metric_ordering_result.md`.
+
+76. **The five DIVERGES--DEFENSIBLE rows are reserved to the human and none was decided by the
+    agent.** D-D1 the MASE/RMSSE headline (now evidential, see 75); D-D2 Ellel scored on unscaled
+    MAE where Chatfield's remedy is a *cost* objective whose two parameters were never elicited;
+    D-D3 the degenerate hurdle, whose occurrence part is a deterministic calendar mask rather than
+    an estimated probability; D-D4 the observed-state Mondrian design, which is stronger than the
+    paper's and needs only its attribution corrected (see 66); D-D5 TabPFN-TS named as
+    regime-appropriate and never entered in the ladder. Phase 8 must write the agreed
+    justification for each into the methodology chapter, so each is presented separately with a
+    recommendation and none is batched.
+
+77. **PRE-REGISTRATION — the functional minimal pair (`rung1_mean_dow`), written before any code
+    was touched (2026-08-05).** Append-only; corrections to this row go as new forward-pointer
+    rows, never as edits to it.
+
+    **Diagnosis being tested.** Two defects were mutually concealing. Defect A, the ruler: MASE
+    elicits the median. Defect B, the estimand: the decision layer needs a mean -- deviation
+    z-scores, band construction, and any revenue figure summed across days or venues are all
+    mean-shaped, and expectations add where medians do not (Kolassa 2023, verbatim: *"the
+    expectation is additive"*; *"the median of the density of a sum is usually not equal to the
+    sum of the medians"*). A median-optimal ruler scoring a median-emitting estimator cannot see
+    the mismatch. R6 measured the consequence at L3: **22 of 41 nodes reject unbiasedness
+    (p = 2.3e-18 against chance), 19 of the 22 positive (sign test p = 0.0004)**.
+
+    **Why an observational contrast alone is insufficient, recorded so the design is not read as
+    over-engineering.** Contrasting `rung1_robust_dow` (median) against `rung2_ets` / `rung3_gbm`
+    (both conditional means) confounds the functional with family, capacity, feature access and
+    fit procedure. Any bias difference would be attributable to four things at once, and the
+    design would not support the causal reading.
+
+    **The manipulation.** `rung1_mean_dow`: identical to `rung1_robust_dow` in features, folds,
+    fit span and structure, differing only in the central-tendency aggregator (median -> mean).
+    Implemented by parameterising the existing rung on its aggregator so both arms share one code
+    path. This is the only controlled manipulation of the functional available anywhere in the
+    ladder. The observational contrast across the ladder is retained as a **generalisation
+    check**, explicitly not as the load-bearing evidence.
+
+    **Design.** Functional {median, mean} x metric {MASE, RMSSE} at the two scaled venues; at
+    Ellel the metric axis is {MAE, RMSE}, since G2 rules it `unscaled` and no scaled error is
+    defined there. Rolling origin at the established fold counts. Outcome measures: mean signed
+    residual with a one-sample t-test (bias), and the metric pair.
+
+    **Predictions, written before running.**
+    (i) `rung1_mean_dow` shows a mean signed residual closer to zero than `rung1_robust_dow` at
+    every venue; `robust_dow`'s bias is POSITIVE (forecast below actual) on right-skewed revenue.
+    (ii) Under MASE, `rung1_robust_dow` scores better than or equal to `rung1_mean_dow`.
+    (iii) Under RMSSE, `rung1_mean_dow` scores better than `rung1_robust_dow`.
+    (iv) **The crossing in (ii)+(iii) -- each functional winning under the metric that elicits it
+    -- is the load-bearing prediction. If it does not appear, the elicitation argument is not
+    operative at this data scale, and that is the finding to report.**
+    (v) Ellel shows the largest bias gap and the largest metric divergence, because at 82% zero
+    days the DOW median is 0 on most days while the DOW mean is not. Least certain of the five.
+
+    **Abort conditions.** Stop and fall back if: the mean arm cannot be built as a strict
+    aggregator swap (the pair would no longer be minimal); the two arms do not share an identical
+    fold grid (the comparison would not be paired); or the run exceeds roughly 30 minutes. The
+    fallback is RMSSE-headline plus median-serving as a named limitation with the remedy, the
+    cost and the reason for deferral all stated.
+
+    **Commitments.** The median arm is reported at equal prominence whatever the outcome. Null
+    and negative cells get the same prominence as positive ones. **This does not re-select the
+    served model**: selection was made under MASE and is not revisited here, and the retained
+    sets are reported unchanged under both rulers as the verifiable non-effect that defends
+    against a charge of picking the flattering metric.
+
+    **Quantile-integrated mean for Chronos-2: considered and declined.** It would make the full
+    2x2 constructible, but it is a new estimator outside the pre-registered ladder, its
+    approximation error at 3-9 quantile levels is unquantified, and siting it near a served path
+    would spend the pre-registration asset. It goes to Further Work with the approximation-error
+    question named as the prerequisite. **Recorded here so the Chronos-2 finding below is not
+    doing double duty as an excuse for not running the arm.**
+
+    **The Chronos-2 observation, pinned.** `chronos-forecasting` **2.3.1**,
+    `chronos/chronos2/pipeline.py`: the docstring at **L786-787** documents the second return
+    value as *"A list of torch tensors containing containing mean (point) forecasts"*, while
+    **L817-818** read `# NOTE: the median is returned as the mean here` /
+    `mean = [pred[..., training_quantile_levels.index(0.5)] for pred in predictions]`. Framed as
+    an **ecosystem observation, not a defect claim against the maintainers**: a widely used
+    library returns the median under the name `mean`, and a practitioner reading the signature or
+    the docstring would not know. It is why the served Beer Hall model cannot supply the mean arm.
