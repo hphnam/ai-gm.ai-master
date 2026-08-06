@@ -1919,3 +1919,44 @@ Better BibTeX re-export reproduces them.
 - Unchanged: `harness.REPORTED_BASIS` vs `config.VENUE_SCALE_BASIS` disagree by 1.2417x at Beer
   Hall. Methodology decision, human gate, deliberately not touched.
 - `brain/ledger/BLOCKED_third_party.md` remains the single retrieval point.
+
+### State at close — verified, 2026-08-06
+
+Recorded as facts a next session can check rather than as narrative.
+
+| | |
+|---|---|
+| Overleaf head | `922e97e`, working tree clean, 0 ahead / 0 behind |
+| Repo head | `c9ba53cb`, `brain/` clean |
+| Decision-log rows this session | 96–106 |
+| New result logs | `log/74` (D-U6 at Ellel), `log/75` (native interval replication) |
+| New analysis code | `eval/native_interval_probe.py`; `eval/exchangeability_diagnostic.py` extended |
+| New artefacts | `eval/native_interval_probe.json`, `eval/exchangeability_diagnostic.json` |
+| Knowledge graph | 13,299 nodes, 24,656 edges, 884 communities |
+| Chapter references | zero dangling, zero citations unresolved against `ref.bib` |
+| Conformance rows open and NOT third-party blocked | **0** |
+| DIVERGES — UNRESOLVED | 7, every one blocked on a named third party |
+| Further Work extensions | 8, of which 3 are gated served-artefact changes |
+| Zotero | 121 live top-level items, 23 trashed; semantic index 121 documents, full coverage; MCP writes verified |
+
+Caveat on the graph: `graphify` reports the community set shifted, so 649 communities are
+currently named by their hub rather than by an LLM label. Run `graphify label` when the names
+matter; nothing depends on them today.
+
+### Where to start next session
+
+1. **Read `brain/ledger/BLOCKED_third_party.md` first.** It is the state; this file is history.
+2. **Two chores, both small.** Rotate the Zotero API key. Confirm nothing else regressed by
+   recompiling on Overleaf.
+3. **One decision waiting on Phuong, not on data.** `harness.REPORTED_BASIS` against
+   `config.VENUE_SCALE_BASIS`, 1.2417x apart at the Beer Hall, unevenly distributed across
+   chapters. Deliberately untouched across two sessions now because it is a methodology call.
+4. **The one genuinely new thread, and it is testable here.** `judd_forecasting_2025` explains a
+   weather null as category-level cancellation: significant per product category, "not
+   significant for total sales" because the signs oppose. This study forecasts venue totals at
+   L1, which is the level at which the effect vanishes, and **the estate holds L2 category
+   data**. Nothing has tested whether the cancellation account reproduces here. It would need a
+   pre-registered gate before it touched anything served, but as an analysis it is unblocked and
+   it bears directly on `sec:res-weather`.
+
+Nothing in the list above is blocked on the agent.
