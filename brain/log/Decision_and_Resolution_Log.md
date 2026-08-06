@@ -2064,3 +2064,39 @@ them into the append-only log so it is the continuous WP1-to-present record.
     precedent at **73% intermittent AT PRODUCT-STORE LEVEL** (62.9% across all 42,840 series; the
     figure is in the *Background, organization and implementation* paper), **Hansen, Lunde & Nason
     (2011)** for the MCS as the inference layer.
+
+---
+
+80. **2026-08-06 — D-D2 DECIDED: Ellel stays on unscaled MAE, and the reason is the estimand,
+    not the missing cost parameters.** The §4 recommendation (accept the divergence) stands;
+    the argument under it was rebuilt after source verification, and three things in the row
+    as written were wrong. **Verified verbatim** in NotebookLM against `chatfield_all-zero_2007`:
+    the cost is `TotalCost = (ordering cost + holding cost + shortage cost)`, scored as
+    `C1 = TotalCost/n` and `C2 = TotalCost/sum(X_t)`, inside *"a simulation study of this
+    inventory system"* whose replenishment quantity is the forecast itself — *"The size of
+    this replenishment order, Q, equals the demand forecast, y-hat_t+1, for the following
+    period, plus any current backorders"* — forecasting **demand in units**. **Correction C1:**
+    the row said two parameters (`b`, `h`); there are **three** — ordering cost `A` as well.
+    **Correction C2:** the row cross-referenced the §2.3 data-provision record and ask 6, but
+    the elicitation blocked there is B6, the **surfacing cost ratio for `F_beta`**
+    (`fu_prism_2026`, `trinh_hil-bench_2026`) — a different cost from Chatfield's inventory
+    cost rates. Citing it would have imported the externally-imposed-scope argument into a
+    place it does not reach; same class as V1/V2/V3, an inference *from* a source rather than
+    a claim *about* one. **Correction C3, the substantive one:** the primary argument is that
+    Ellel's estimand is `revenue_exvat`, **daily revenue ex-VAT in pounds**
+    (`store/warehouse.py:293`), which has no stock position — nothing held, nothing
+    backordered, nothing ordered — so `A`, `h` and `b` are not unelicited but **undefined**.
+    The remedy is defined for a different estimand. That is a property of the problem, which
+    is the bar §4 sets, and it is stronger than the missing-parameters argument it replaces.
+    **Gain:** Chatfield supports the actual G2 choice twice, and the second support was unused
+    — the paper's own denominator-bearing measures degrade on zeros, MAPE *"modified, because
+    we cannot divide by a demand of zero"* and GRMSE excluded because *"that multiplicative
+    measure breaks down with forecast errors of zero"*. That is direct support for dropping
+    the denominator at an 82%-zero venue. **Nuance recorded rather than smoothed:** a
+    replenishment decision does exist — A12 `signals/stock_inventory.py` flags a reorder on
+    `days_of_cover < lead_time + safety` — but it runs at **Beer Hall only**
+    (`A6_FORECAST_VENUE = "beer_hall"`, L40), consumes the **A6 product-node forecast in
+    pints/day** rather than the venue-daily revenue series, and is a service-level rule with
+    no `A`/`h`/`b` in it. The unelicited-parameter argument therefore moves to **Further
+    Work**, scoped concretely to A12 at Beer Hall given an elicitation. No code changed, no
+    run, no chapter text written.

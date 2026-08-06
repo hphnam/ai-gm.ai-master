@@ -1751,3 +1751,17 @@ by the agent.
 **Still unstarted.** Phase C (blocked on Ryan's key); the Discussion chapter; the
 search-protocol appendix; and the four writing-only SHOULD-FIX rows D-F3, D-F4, D-F5, D-F6.
 No Overleaf write and no chapter edit this session.
+
+### D-D2 addendum — 2026-08-06
+
+D-D2 decided: **accept the divergence, argued from the estimand.** Chatfield & Hayya's cost
+is an inventory-system cost (`ordering + holding + shortage`) whose parameters price a stock
+position that a revenue-in-pounds estimand does not have, so the remedy is undefined here
+rather than declined. Three corrections to the §4 row recorded (parameter count two -> three;
+the §2.3 / ask-6 cross-reference removed as a misattribution — that elicitation is the
+`F_beta` surfacing cost ratio, not inventory cost rates; primary argument moved from missing
+parameters to estimand mismatch). A second, previously unused verbatim support for G2 found
+in the same paper: its own denominator-bearing measures degrade on zeros. Cost-objective limb
+moved to Further Work, scoped to A12 at Beer Hall. Full record at
+`ledger/literature_conformance.md` §10 and decision-log row 80. **Remaining defensible rows:
+D-D3, D-D4, D-D5.**

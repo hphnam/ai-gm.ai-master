@@ -414,3 +414,123 @@ independent support for G2.
 2. **Median-serving persists.** The remedy, its cost and the reason for deferral are all
    stated; the cost is now *measured* on a controlled pair rather than merely named.
 3. **The right-skew mechanism is unexplained at Two River Taps.**
+
+---
+
+## 10. D-D2 resolved — 2026-08-06
+
+**Decision: ACCEPT the divergence, and argue it from the estimand.** The recorded
+recommendation at §4 stands, but source verification changed the *argument that carries it*,
+and corrected three things in the row as written. No run; no code change; no chapter text
+written this session.
+
+### Verification, at source
+
+NotebookLM against `chatfield_all-zero_2007` (notebook `d565d5f0`, source
+`fe944ef5-4894-4143-8426-dac909838bad`), verbatim:
+
+| Question | Verbatim from the paper |
+|---|---|
+| What cost? | `TotalCost = (ordering cost + holding cost + shortage cost)` over the horizon; `C1 = TotalCost / n`, `C2 = TotalCost / sum(X_t)` |
+| Parameters | *"b Shortage cost per unit per unit time"*, *"h Holding cost per unit per unit time"*, *"Ordering cost, A"* |
+| Where computed | *"We develop a simulation study of this inventory system"* — a stock-control simulation with a replenishment policy: *"The size of this replenishment order, Q, equals the demand forecast, y-hat_t+1, for the following period, plus any current backorders"* |
+| Forecast target | Demand **in units**: *"a forecast for the demand in the following period must be made"*; *"non-zero demands ... normally distributed with mean of 100 units"* |
+| Error vs cost | *"the lowest forecasting error does not necessarily lead to the lowest system cost"* |
+
+### Three corrections to the row as written at §4
+
+- **C1 — the parameter count was wrong.** The row said *"two parameters — unit shortage cost
+  `b` and unit holding cost `h`"*. `TotalCost` has **three**: ordering cost `A`, holding cost
+  `h`, shortage cost `b`. Ordering cost is not a rounding detail — it is what makes the
+  policy trade order frequency against cover, and it is the one an operator is least likely
+  to be able to state.
+- **C2 — the evidence cross-reference was wrong, and would have been a checkable
+  misattribution.** The row pointed at the §2.3 data-provision record and ask 6 (Elliot).
+  The elicitation blocked there is **B6 — the surfacing cost ratio for `F_beta`**
+  (`fu_prism_2026`, `trinh_hil-bench_2026`), a decision-threshold asymmetry. That is a
+  **different cost from Chatfield's `A`/`h`/`b`**, which are inventory cost rates. Nothing in
+  §2.3 records an inventory-cost elicitation, because none was ever specified. Citing §2.3
+  here would have imported the externally-imposed-scope argument into a place it does not
+  reach. Same class as V1/V2/V3 — an inference *from* a source, not a claim *about* one.
+- **C3 — the primary argument is the estimand, not the missing parameters.** This is the
+  substantive change and it makes the row much stronger.
+
+### The argument that carries the decision
+
+Chatfield & Hayya's cost is not a generic cost-weighted loss that any forecast could be
+scored under. It is the cost of an **inventory system in which the forecast IS the
+replenishment quantity** — over-order incurs `h` on the carried units, under-order incurs `b`
+on the backorder, each order incurs `A`. The mechanism that converts forecast error into
+system cost is the stock position.
+
+Ellel's estimand has no stock position. The target is **`revenue_exvat` — daily revenue
+ex-VAT, in pounds** (`store/warehouse.py:293`, `value = "revenue_exvat"`; L1 venue-daily is
+documented as *"revenue ex-VAT (the spine)"*). Revenue is not held, not backordered and not
+ordered. `A`, `h` and `b` are therefore not merely **unelicited** for this forecast — they
+are **undefined**, because there is no unit whose carrying or shortage they price.
+
+So the divergence is not a harder remedy declined. It is a remedy defined for a different
+estimand. **That is a property of the problem**, which is the bar §4 sets.
+
+### What Chatfield does license, and it is more than the row claimed
+
+The transferable finding is the one at the level of the *instrument*, and the paper supports
+it twice over:
+
+1. *"the lowest forecasting error does not necessarily lead to the lowest system cost"* — the
+   general warning that error is not automatically the right objective under lumpiness. This
+   is what G2 already cites and it is correctly used.
+2. **New, and directly on point.** Chatfield hit the zero problem *inside the error family*
+   and had to work around it in both directions: MAPE had to be *"modified, because we cannot
+   divide by a demand of zero"*, and GRMSE — *"touted by Syntetos and Boylan (2005: 308) as
+   best for intermittent demand"* — was excluded because *"that multiplicative measure breaks
+   down with forecast errors of zero"*. A paper whose own denominator-bearing measures
+   degrade on zero-heavy demand is **direct support for dropping the denominator at an
+   82%-zero venue**, which is exactly what `VENUE_SCALE_BASIS["ellel"] = "unscaled"` /
+   `VENUE_LOSS["ellel"] = "mae"` does (`config.py:174-183`; `_score` in `models/ladder.py`
+   returns unscaled MAE, or RMSE when squared, when `basis == "unscaled"`).
+
+Limb 2 supports our actual choice more directly than the cost limb ever did, and it is not
+currently used anywhere in either chapter. It should be, and it costs one sentence.
+
+### The nuance that must not be smoothed over
+
+A replenishment decision **does** exist in this system: A12 (`signals/stock_inventory.py`)
+computes `days_of_cover = on_hand_pints / forecast_daily_pints` and flags a reorder when
+cover falls below `lead_time + safety`. It does not rescue the cost objective, for three
+reasons, all checkable:
+
+- It runs at **Beer Hall only** — `A6_FORECAST_VENUE = "beer_hall"` (L40). Ellel has no stock
+  panel, so the venue D-D2 is about has no replenishment decision at all.
+- It consumes the **A6 reconciled product-node forecast in pints/day**
+  (`A6_MODEL = "mint_dowmedian"`), not the venue-daily revenue series that D-D2 concerns.
+- Its policy is **days-of-cover against a service level**, not a cost minimisation. No `A`,
+  `h` or `b` appears anywhere in it.
+
+Stating this is what keeps the argument honest: the claim is not "this project has no
+inventory anywhere", it is "the forecast under discussion drives no replenishment decision,
+and the one that does uses a different series, at a different venue, under a different rule".
+
+### Where the unelicited-parameter argument survives
+
+It moves to **Further Work**, correctly scoped and now concrete: a Chatfield-style cost
+objective is definable for **A12 at Beer Hall** — a units/day forecast that already drives an
+ordering decision — given elicited `A`, `h` and `b`. That names a real extension with a
+named blocker, instead of a vague gesture at cost weighting.
+
+### Post-decision status
+
+| Item | Status |
+|---|---|
+| **D-D2** | **DECIDED — accept, argued from the estimand.** Not a run |
+| R24 | **CONFORMS on the instrument limb.** The scaled-error drop at Ellel is what Chatfield licenses, now with a second verbatim support |
+| Cost-objective limb | **Declared out of scope by estimand mismatch**, with the A12/Beer Hall extension named in Further Work |
+| §4 D-D2 row | Superseded by this section on three points (C1 parameter count, C2 evidence pointer, C3 primary argument) |
+
+### Owed to the writing, not written this session
+
+1. One methodology paragraph: Chatfield's cost is an inventory-system cost whose parameters
+   price a stock position this estimand does not have.
+2. One sentence adding the modified-MAPE / GRMSE-breakdown support to the G2 justification.
+3. Correct the §4 row's "two parameters" to three wherever it is carried forward.
+4. Do **not** cite §2.3 or ask 6 in support of this row.
