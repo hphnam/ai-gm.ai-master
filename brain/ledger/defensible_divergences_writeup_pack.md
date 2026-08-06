@@ -273,12 +273,30 @@ Nothing below was written this session — *"do not start rewriting chapters thi
    "Not met"). **D-F5** — state the Ask-F1 degeneracy as our instance. **D-F6** —
    retrieval-store threat model.
 
-**Standing hazards, not writing**
-8. Stamp `eval/interval_calibration` artefacts with `provenance.py` — R3 showed they are
-   environment-sensitive and unstamped, so a regeneration from the wrong venv would silently
-   restate every figure in `tab:winkler`.
-9. `eval/worldcup_fixture_probe.py` still hard-codes `calendar_lag7` — the third file to carry
-   it. Assume a fourth until someone greps.
+**Standing hazards — both CLOSED 2026-08-06, and one of them opened something bigger**
+8. ~~Stamp `eval/interval_calibration` artefacts with `provenance.py`.~~ **DONE.**
+   `runtime_stamp()` into the vectors JSON, `stamp_lines()` into the report footer. Re-run in
+   `.venv-forecast`: diff purely additive, **no number moved**.
+9. ~~`eval/worldcup_fixture_probe.py` is the third file to hard-code `calendar_lag7`; assume a
+   fourth.~~ **DONE, and the note was wrong.** `harness.REPORTED_BASIS = "calendar_lag7"` is
+   the documented project standard across ~45 sites; the real defect class is a *scaled*
+   metric at Ellel, and there is **no fourth file**. The one instance is fixed and re-run, and
+   had never published a number (report 19: *"June not present in this store, test
+   deferred"*). Two reproduction limbs (`group_icl:274`, `weather_basis:295`) must **keep**
+   the committed basis — do not "fix" them. Full record: `log/69`.
+
+**NEW — open, and it is a methodology gate**
+9b. **Two live rulers disagree by 24%.** `harness.REPORTED_BASIS = "calendar_lag7"` and
+   `config.VENUE_SCALE_BASIS = "calendar_lag7_active"` are both live and not equivalent: mean
+   scale 297.36 vs 369.16 at Beer Hall (**ratio 1.2417**), 153.52 vs 174.39 at TRT (1.1361).
+   `tab:ladder` uses the first (`models/ladder.py:405`); R9, R2 and the world-cup probe use
+   the second. **A MASE quoted without its basis is ambiguous by up to 24%, and MASE from
+   different chapters is not directly comparable.** This is FLAG-MASE-RULER recurring one
+   level up — report 42 removed three private copies of the denominator; the disagreement
+   moved into two public constants. `harness.py` defers adoption because *"S1 is forbidden
+   from re-running the ladder"*, which no longer binds. **Recommendation**: make
+   `config.VENUE_SCALE_BASIS` the single authority, demote `REPORTED_BASIS` to a fallback,
+   re-score `tab:ladder`. Costs a re-score, moves published MASE ~20%. Human call.
 
 **Blocked on a third party**
 10. R8 → S8b cache build → S8c / ECE / temperature scaling / agent-vs-constants. One command,

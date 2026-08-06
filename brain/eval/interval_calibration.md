@@ -99,3 +99,10 @@ Paired bootstrap vs incumbent:
 - D-A: mean delta -24.9, 90% CI [-43.5, -5.1] (excludes 0)
 - D-G: mean delta -46.3, 90% CI [-82.5, -9.4] (excludes 0)
 
+
+
+## Runtime identity
+- environment: `.venv-forecast` · Python 3.12.13 · Darwin arm64
+- compute device: mps
+- libraries: numpy 2.5.1, pandas 3.0.3, scikit-learn 1.9.0, statsmodels 0.14.6, duckdb 1.5.4, torch 2.12.1, chronos-forecasting 2.3.1
+- store ceiling: 2026-07-07

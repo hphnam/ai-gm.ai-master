@@ -35,6 +35,7 @@ from scipy import stats
 
 import config
 import org_profile
+import provenance
 from conformal.methods import (
     ACI,
     AgACI,
@@ -414,6 +415,7 @@ def build() -> dict:
         "warmup_pool": WARMUP_POOL, "aci_gammas": list(ACI_GAMMAS), "seed": SEED,
         "method": "split conformal on step-1 rolling origins; ETS point model",
         "wall_clock_s": round(time.time() - started, 1),
+        "provenance": provenance.runtime_stamp(),
         "venues": venues_out,
     }
     VECTORS_PATH.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n")
@@ -510,6 +512,12 @@ def render(vectors: dict, mcs_out: dict, power: dict) -> None:
                              f"90% CI [{p['ci_lo']:+.1f}, {p['ci_hi']:+.1f}]"
                              f"{' (excludes 0)' if p['excludes_zero'] else ''}")
         lines.append("")
+    # R3 found this artefact restating coverages and Winkler scores under a different
+    # numpy/pandas resolution while the code was untouched. The store ceiling and device
+    # were already stamped; the library resolution was not, so the two runs were
+    # indistinguishable on the page. Every figure in `tab:winkler` comes from here.
+    lines.append("")
+    lines += provenance.stamp_lines()
     REPORT_PATH.write_text("\n".join(lines) + "\n")
 
 

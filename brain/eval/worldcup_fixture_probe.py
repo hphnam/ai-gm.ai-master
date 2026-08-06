@@ -27,6 +27,7 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
+import config
 from eval import harness
 from features.build_features import build_features
 from ingest.world_cup import WC_FEATURE_COLS, read_world_cup_schedule
@@ -48,18 +49,38 @@ def _store_reaches_june(con) -> date | None:
     return row[0] if row and row[0] is not None else None
 
 
-def _fold_mase(venue: str, feats: pd.DataFrame, exo_cols: list[str],
+def _loss_label(venue: str) -> str:
+    """The name of the venue's ruled primary loss, for the report's column headings."""
+    return "MASE" if config.is_scaled_venue(venue) else "MAE"
+
+
+def _fold_loss(venue: str, feats: pd.DataFrame, exo_cols: list[str],
                restrict: tuple[pd.Timestamp, pd.Timestamp] | None = None) -> list[float]:
+    """Per-fold loss under the venue's OWN ruler (G2), not a fixed scaled one.
+
+    This probe previously scored every venue on `calendar_lag7`, which quietly published a
+    MASE for Ellel -- the venue `config.VENUE_SCALE_BASIS` rules `unscaled` precisely
+    because at 1.2 trading days a week no scale basis is defensible. Beer Hall keeps the
+    dissertation's `harness.REPORTED_BASIS`; Ellel is scored on unscaled MAE in currency.
+    """
+    basis = config.VENUE_SCALE_BASIS.get(venue, harness.REPORTED_BASIS)
+    scaled = config.is_scaled_venue(venue)
     out: list[float] = []
     for tr, te in harness.rolling_origin(feats, n_folds=6, horizon_days=7,
                                          min_train_days=120):
+        # Always forecast the FULL horizon and restrict only the scoring window.
+        # Truncating `te` first changed what the model was asked to predict, and the
+        # released chronos2 now rejects the resulting non-contiguous `future_df`
+        # outright -- so the tournament-restricted arms could not run at all.
+        pred = np.asarray(chronos2_exo_predict(tr, te, venue=venue, exo_cols=exo_cols))
+        keep = np.ones(len(te), dtype=bool)
         if restrict is not None:
-            te = te[(te["date"] >= restrict[0]) & (te["date"] <= restrict[1])]
-            if te.empty:
+            keep = ((te["date"] >= restrict[0]) & (te["date"] <= restrict[1])).to_numpy()
+            if not keep.any():
                 continue
-        pred = chronos2_exo_predict(tr, te, venue=venue, exo_cols=exo_cols)
-        out.append(harness.mase(te["value"].to_numpy(), pred,
-                                tr["value"].to_numpy(), basis="calendar_lag7"))
+        y_true, y_train = te["value"].to_numpy()[keep], tr["value"].to_numpy()
+        out.append(harness.mase(y_true, pred[keep], y_train, basis=basis) if scaled
+                   else harness.mae(y_true, pred[keep]))
     return [v for v in out if np.isfinite(v)]
 
 
@@ -114,32 +135,34 @@ def run() -> list[str]:
     schedule = read_world_cup_schedule()
     for venue in PROBE_VENUES:
         feats = trim_to_active(build_features(venue), venue)
-        with_wc = _fold_mase(venue, feats, list(CHRONOS2_EXO_COLS))
-        without_wc = _fold_mase(venue, feats, _BASE_COLS)
-        with_t = _fold_mase(venue, feats, list(CHRONOS2_EXO_COLS),
+        loss = _loss_label(venue)
+        basis = config.VENUE_SCALE_BASIS.get(venue, harness.REPORTED_BASIS)
+        with_wc = _fold_loss(venue, feats, list(CHRONOS2_EXO_COLS))
+        without_wc = _fold_loss(venue, feats, _BASE_COLS)
+        with_t = _fold_loss(venue, feats, list(CHRONOS2_EXO_COLS),
                             restrict=(TOURNAMENT_START, TOURNAMENT_END))
-        without_t = _fold_mase(venue, feats, _BASE_COLS,
-                              restrict=(TOURNAMENT_START, TOURNAMENT_END))
+        without_t = _fold_loss(venue, feats, _BASE_COLS,
+                               restrict=(TOURNAMENT_START, TOURNAMENT_END))
         out += [
-            f"\n## {venue}",
-            f"- with wc_*   : mean MASE {_mean(with_wc):.3f} (folds {len(with_wc)})",
-            f"- without wc_*: mean MASE {_mean(without_wc):.3f} (folds {len(without_wc)})",
-            f"- tournament-only with wc_*   : mean MASE {_mean(with_t):.3f} "
+            f"\n## {venue} — scored on `{basis}` ({loss})",
+            f"- with wc_*   : mean {loss} {_mean(with_wc):.3f} (folds {len(with_wc)})",
+            f"- without wc_*: mean {loss} {_mean(without_wc):.3f} (folds {len(without_wc)})",
+            f"- tournament-only with wc_*   : mean {loss} {_mean(with_t):.3f} "
             f"(folds {len(with_t)})",
-            f"- tournament-only without wc_*: mean MASE {_mean(without_t):.3f} "
+            f"- tournament-only without wc_*: mean {loss} {_mean(without_t):.3f} "
             f"(folds {len(without_t)})",
         ]
         # Per-feature ablation: base + england-only vs base + full wc set.
         eng_only = _BASE_COLS + ["wc_england_in_hours"]
-        with_eng = _fold_mase(venue, feats, eng_only)
-        out.append(f"- ablation, base + wc_england_in_hours only: mean MASE "
+        with_eng = _fold_loss(venue, feats, eng_only)
+        out.append(f"- ablation, base + wc_england_in_hours only: mean {loss} "
                    f"{_mean(with_eng):.3f}")
         out += _descriptive_match_days(venue, feats, schedule)
 
     out += ["", "## Power caveat",
             "One June yields only a handful of England-match dates in trading hours, "
             "so this is DIRECTIONAL evidence, not a significant estimate. A fixture "
-            "covariate that does not improve MASE is a valid outcome; the flag is "
+            "covariate that does not improve the venue's loss is a valid outcome; the flag is "
             "retained as a candidate (consistent with the local_events stance)."]
     return out
 

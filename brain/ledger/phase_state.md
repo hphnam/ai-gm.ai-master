@@ -1790,3 +1790,16 @@ All five DIVERGES — DEFENSIBLE rows are now decided.
 
 Full records at `ledger/literature_conformance.md` §11-§13 and decision-log rows 81-84.
 **No DIVERGES — DEFENSIBLE rows remain open.** No chapter text written this session.
+
+### Basis audit addendum — 2026-08-06
+
+Write-up-pack items 8 and 9 closed. Item 8: `eval/interval_calibration` artefacts now carry
+`provenance` (stamp verified purely additive, no number moved). Item 9: the "third file,
+assume a fourth" note was **wrong** — `harness.REPORTED_BASIS = "calendar_lag7"` is the
+documented project standard across ~45 sites and there is no fourth file; the real defect
+class is a scaled metric at Ellel, and the single instance
+(`eval/worldcup_fixture_probe.py`) is fixed and re-run, having never published a number in
+its life. **New open item, not resolved:** `harness.REPORTED_BASIS` and
+`config.VENUE_SCALE_BASIS` are two live rulers disagreeing by **1.2417x at Beer Hall** and
+1.1361x at TRT, unevenly distributed across chapters. Methodology decision, human gate.
+Full record: `log/69_basis_audit_and_ruler_conflict_result.md`, decision-log row 85.

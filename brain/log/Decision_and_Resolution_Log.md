@@ -2252,3 +2252,54 @@ them into the append-only log so it is the continuous WP1-to-present record.
     — the environment that reproduces the committed artefacts, per the R3 hazard — was not
     disturbed; it was not. **First blocker in this project owned by a software vendor rather
     than by Elliot, Ryan or the estate's structure.**
+
+---
+
+85. **2026-08-06 — the `calendar_lag7` audit: the ledger's own criterion was wrong, one real
+    defect fixed, and a live 24% ruler conflict found underneath it.** Full record at
+    `log/69_basis_audit_and_ruler_conflict_result.md`.
+    **(a) The criterion was miscopied.** The standing note said the hard-coded basis was "in
+    its third file, assume a fourth". There are **~45 sites and almost all are correct**:
+    `eval/harness.py:205` defines `REPORTED_BASIS = "calendar_lag7"` as *"the basis the
+    dissertation quotes"*. A hard-coded `calendar_lag7` is the project standard, not a bug,
+    and a future session hunting them would have "fixed" forty correct call sites. The real
+    defect class is narrower — a **scaled** metric at a venue ruled `unscaled`, i.e. Ellel.
+    Re-audited on that criterion: **no fourth file**. `eval/group_icl.py:274` and
+    `eval/weather_basis.py:295` are reproduction limbs that MUST keep the committed basis and
+    must not be changed; `occurrence_gate`, `feature_ablation`, `reconcile` and the tests are
+    all single-scaled-venue or deliberate fixtures.
+    **(b) The one real defect, fixed.** `eval/worldcup_fixture_probe.py` scored both venues on
+    `calendar_lag7`, publishing a MASE for Ellel. `_fold_mase` is now `_fold_loss` and reads
+    `config.VENUE_SCALE_BASIS`. **Nothing published depended on it** — report 19 records the
+    probe deferring with *"June not present in this store, test deferred"*, so it had never
+    produced a number in its life. First-ever results: beer_hall MASE (`calendar_lag7_active`)
+    **1.056** with `wc_*` vs 1.127 without, tournament-only 1.152 vs 1.258, england-only
+    ablation 1.080; ellel MAE (`unscaled`) 78.431 vs **76.805**, tournament-only 112.178 vs
+    **109.021**, ablation 77.191. Directional only, 6 folds (4 tournament), no dispersion
+    statistic — the covariates help at Beer Hall and mildly hurt at Ellel.
+    **(c) A second pre-existing bug surfaced.** The tournament arms truncated `te` BEFORE
+    predicting, so released chronos2 rejected the non-contiguous horizon
+    (`ValueError: future_df timestamps do not match the expected prediction timestamps`) and
+    those arms could not run at all. Now predicts the full horizon and masks for scoring —
+    the correct semantics, recorded as a behaviour change rather than folded in silently.
+    **(d) The finding underneath — two live rulers disagreeing by 24%.**
+    `harness.REPORTED_BASIS = "calendar_lag7"` and
+    `config.VENUE_SCALE_BASIS["beer_hall"] = "calendar_lag7_active"` are BOTH live and are not
+    equivalent. Measured on the same 6 folds: mean scale 297.36 vs 369.16 at Beer Hall
+    (**ratio 1.2417**) and 153.52 vs 174.39 at TRT (1.1361), so **the same forecast scores 24%
+    lower at Beer Hall on the active basis**. They are unevenly distributed:
+    `models/ladder.py:405` scores `tab:ladder` on `calendar_lag7` while R9, R2 and this probe
+    read `config.VENUE_SCALE_BASIS`. **A MASE quoted without naming its basis is ambiguous by
+    up to 24%, and MASE values from different chapters are not directly comparable.** This is
+    the FLAG-MASE-RULER failure of report 42 recurring one level up: the three private copies
+    were removed, the disagreement moved into two public constants. The `harness.py` comment
+    defers adoption because *"S1 is forbidden from re-running the ladder"* — a constraint that
+    no longer binds. **NOT RESOLVED — methodology decision, human gate.** Recommendation:
+    make `config.VENUE_SCALE_BASIS` the single authority, demote `REPORTED_BASIS` to a
+    fallback, re-score `tab:ladder`; costs a re-score and moves published MASE by ~20%.
+    Strengthens D-D1's rule from the other side — the basis alone is worth 24%.
+    **(e) Provenance stamping done (item 8).** `eval/interval_calibration.py` now writes
+    `provenance.runtime_stamp()` into the vectors JSON and `stamp_lines()` into the report
+    footer. Re-ran in `.venv-forecast`: the artefact diff is **purely additive — not one
+    number moved**, which both verifies the stamp and re-confirms the R3 finding that this
+    venv reproduces the committed figures exactly.
