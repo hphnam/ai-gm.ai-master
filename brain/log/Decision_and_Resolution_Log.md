@@ -2899,3 +2899,20 @@ them into the append-only log so it is the continuous WP1-to-present record.
      peer-review status, and those are exactly what an examiner checks first. **A bibliographic
      claim needs the same treatment as a factual one: check the venue of record, not the arXiv
      page.**
+
+105. **Semantic search index rebuilt without waiting for a restart.**
+     `zotero_update_search_database` exists only as an MCP tool, and the MCP process still holds
+     the pre-credential env, so the obvious route was blocked. The `zotero-mcp` binary exposes
+     the same operation as a CLI subcommand (`update-db`), which reads env from the invoking
+     shell rather than from the MCP process, so exporting the credentials inline did it.
+     Incremental, not a force-rebuild: 20 changed items processed, 17 added, 3 updated, 1 stale
+     document deleted, 0 errors, 2.3 s. Index 105 → **121 documents against 121 top-level items,
+     full coverage.** The library's 322 API item count includes attachments and notes, which are
+     not indexed as documents, so 121 is the right target and not a shortfall.
+     All four TabPFN-era items are named in the indexing log (Hoo, Judd, Ye, Grinsztajn).
+     **Verification trap recorded:** `zotero-mcp db-inspect` prints "Showing up to: 20", so
+     grepping its output returns false negatives for anything outside the first 20. Coverage was
+     confirmed by the count identity instead.
+     **Still requires the user:** restarting the session so the `mcp__zotero__*` write tools pick
+     up the new env. The agent cannot restart its own MCP connections, and the config is already
+     correct and verified, so this is the only outstanding step.

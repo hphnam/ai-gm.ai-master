@@ -181,8 +181,17 @@ Citation keys are pinned in BOTH the native `citationKey` field and an Extra
 `Citation Key:` line, so a Better BibTeX re-export now reproduces the keys the chapters
 use instead of clobbering them. **The ref.bib fixes are no longer at risk from a re-export.**
 
-Next session: run `zotero_update_search_database` so the three items are semantically
-searchable, and confirm `mcp__zotero__zotero_update_item` now succeeds.
+**Semantic search database: DONE**, via the CLI rather than the MCP tool, so it did not have
+to wait for a restart:
+`zotero-mcp update-db` with the env exported inline. 20 changed items processed, 17 added,
+3 updated, 0 errors, 1 stale document deleted. Index went 105 → **121 documents against 121
+top-level items, i.e. full coverage** (the API's 322 counts attachments and notes, which are
+not indexed as documents). All four TabPFN-era items appear by name in the indexing log.
+Note `zotero-mcp db-inspect` lists only 20 of 121, so a grep over its output is not evidence
+of absence.
+
+Next session, one check only: confirm `mcp__zotero__zotero_update_item` now succeeds. The
+config is correct and verified; it is the running MCP process that holds the stale env.
 
 **Security note.** The API key was pasted into a chat transcript, which is stored in plain
 text under `~/.claude/projects/`. It grants library and file write on the user library and
