@@ -2437,3 +2437,23 @@ them into the append-only log so it is the continuous WP1-to-present record.
     present the ruled-basis membership as primary and the superseded set alongside as sensitivity
     to the G2 scale ruling.
     **Overleaf push NOT made.** Gated.
+
+90. **Overleaf push made (approved this session): `sec:res-mcs` rebuilt, `fig:ladder` introduced.**
+    Three Overleaf commits. (a) `figures/ladder.pdf` + `.png`. (b) `sec:res-mcs` rewritten:
+    `tab:mcs` reduced from four rows to three (Beer Hall 5/9 p=1.000, Two River Taps 4/9
+    p=1.000, Ellel 4/9 p=0.662 at 260 origins); the Ellel two-alignment caveat retired with its
+    own paragraph explaining the verified June repair; the argument-minimum figure corrected
+    from "0.008 MASE ... 0.18 standard errors" to "GBP 1.55 against a paired se of GBP 1.67,
+    which is 0.93 standard errors", with the pairing gain (sd 178.00 -> 26.94, 6.6x) stated;
+    a sensitivity paragraph reporting BOTH readings per the operator's decision, naming the
+    ruled basis as primary and the superseded `calendar_lag7` reading as the sensitivity, and
+    stating the direction (the ruling sharpens Ellel's evidence rather than weakening it).
+    `fig:ladder` introduced with a caption carrying the per-venue unit warning, the box/median/
+    mean construction, and the reason mean and median are drawn apart. Every number carries a
+    `% Trace:` comment to `log/70` or `log/48`.
+    (c) A tightening pass after the `avoid-ai-writing` audit: two "worth [verb]ing" vague
+    endorsements removed ("worth stating in that paired form", "worth naming plainly") and an
+    em-dash pair in the figure caption split into two sentences.
+    **`tab:ladder` deliberately untouched** -- row 89 establishes it is the frozen six-origin
+    committed gate.
+    **Still owed:** D-F6 threat model, V1/V3, D-D1/D-D2/D-D4/D-D5 methodology paragraphs.
