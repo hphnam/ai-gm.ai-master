@@ -8,8 +8,13 @@ This file is the single retrieval point. A future session should read it before 
 anything, and should not re-derive the blocked list from `literature_conformance.md`,
 which records history rather than state.
 
-Related: `brain/PRJ93_RULES.md` (invariants), `brain/log/Decision_and_Resolution_Log.md`
-(rows 1–100), `brain/ledger/literature_conformance.md` §14–§17.
+Related: `brain/PRJ93_RULES.md` (invariants, and the session-lifecycle rule that says to
+read THIS file first), `brain/log/Decision_and_Resolution_Log.md` (rows 1–106),
+`brain/ledger/literature_conformance.md` §14–§17.
+
+**This file owns current state and nothing else.** It is rewritten rather than appended.
+For how something came to be true, read the decision log; for cross-session recall, query
+agentmemory. Do not restate a fact from those here, or it will drift.
 
 ---
 

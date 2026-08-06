@@ -6,15 +6,83 @@ auto-loaded — every phase prompt must name this file explicitly.
 ## Where the open work is
 
 `brain/ledger/BLOCKED_third_party.md` is the single retrieval point for everything
-still open. As of 2026-08-06 that is seven rows, every one blocked on a named third
-party, plus two gated Further Work items. Read it before planning anything; do not
-re-derive the list from `literature_conformance.md`, which records history rather
-than state. When a blocker clears, that file says what already exists and what to
-run, and D-U3 carries a falsifiable prediction to check the account against.
+still open. Read it before planning anything; do not re-derive the list from
+`literature_conformance.md`, which records history rather than state. When a blocker
+clears, that file says what already exists and what to run.
+
+**No counts are repeated here on purpose.** An earlier version of this section said
+"seven rows plus two gated Further Work items" and was already wrong by one when it
+was next read. The owning file carries the numbers; this section carries only the
+pointer.
+
+## Session lifecycle — both ends, every time
+
+Nothing that a future session would have to re-derive may exist only in a
+context window. Context is lost on compaction, on a crash, and at the end of
+every run, and none of those give warning. So the two persistent stores are
+written at **both** ends of a session, not just at the close.
+
+**At the start, before planning anything:**
+
+1. `mcp__agentmemory__memory_recall` on the topic of the first request. Recall is
+   BM25 unless embeddings are configured, so query with concrete keywords — file
+   names, error strings, row ids like `D-U3` — not prose.
+2. `graphify query "<question>"` to orient before reading source. The map is the
+   first move, raw files the second.
+3. Read `brain/ledger/BLOCKED_third_party.md`. That is the state; `phase_state.md`
+   is history and will mislead if read as current.
+
+Recall returns what was true when it was written. If a memory names a file, a
+flag or a function, confirm it still exists before acting on it.
+
+**Mid-run, not deferred to the close:** the moment a `brain/log/*result*.md` lands,
+or a decision is taken that cost real work to reach, save it. A conclusion held
+back for a tidy end-of-session write-up is a conclusion gambled on the session
+ending tidily. This is the rule that stops information being dropped mid-run.
+
+**At the close, all four, in this order:**
+
+1. `mcp__agentmemory__memory_save` for the durable conclusions: what was decided
+   and why, what was ruled out and on what evidence, what a blocker actually is.
+   Not activity — the hooks capture that.
+2. `graphify update .` after any code change, so the map does not go stale between
+   runs. Run `graphify label` as well when the community set has shifted and the
+   names will be read.
+3. Append to `brain/ledger/phase_state.md`: what was completed, what artefacts were
+   written, what is unstarted, and the verified end state — heads, row counts,
+   artefact paths. This is the only place that requirement is stated.
+4. Commit, and confirm the working tree is clean and pushed. An uncommitted
+   correction is indistinguishable from one that was never made.
+
+### The three stores must agree
+
+Each answers a different question, and drift between them is how a later session
+gets a wrong answer confidently. Keep the division sharp:
+
+| Store | Authoritative for | Never use for |
+|---|---|---|
+| `BLOCKED_third_party.md` | what is open **now**, and what unblocks it | history; it is rewritten, not appended |
+| `phase_state.md` + `Decision_and_Resolution_Log.md` | what happened and why, in order | current state; entries age out of truth |
+| agentmemory | cross-session recall of decisions, traps and constraints | anything the repo already records |
+
+When a fact changes, change it in the store that owns it and correct the others by
+pointing at that store rather than by restating the fact in each. A number
+duplicated across three files will be updated in one of them.
+
+### Corrections are appended, never overwritten
+
+Where a later finding supersedes an earlier one, record the correction with what it
+supersedes and why. `log/73` §4 and decision rows 101 and 106 are the pattern. A
+silently revised claim leaves a reader unable to tell a verified statement from a
+lucky one.
 
 ## Conflicts — unresolved
 
-None identified between the rules below and the root `CLAUDE.md`.
+None identified between the rules below and the root `CLAUDE.md`. The session
+lifecycle above **reinforces** the memory rule in `.claude/rules/memory.md` rather
+than competing with it: that file already requires recall at the start and save at
+the end, and this one adds graphify to both ends, adds the mid-run save, and fixes
+which store owns which fact. Nothing here modifies that file — see Scope boundary.
 
 ## Token discipline (non-negotiable)
 
@@ -28,16 +96,30 @@ None identified between the rules below and the root `CLAUDE.md`.
   order. Read source files only when the map is insufficient.
 - Any analysis longer than 40 lines gets written to a file under
   `brain/knowledge/` or `brain/ledger/` immediately, not held in context.
-- End every session by appending to `brain/ledger/phase_state.md`: phase
-  id, what was completed, what artifacts were written, what is unstarted.
+- The `phase_state.md` write-up at session end is specified once, under
+  Session lifecycle. It is not restated here, because a requirement written
+  in two places is a requirement updated in one.
 
 ## Verification rules
 
 - No factual claim about a cited paper without a NotebookLM query first
   (notebook `d565d5f0-9ad6-446f-9573-2316a2f8c0ca`). Memory is not a
   source.
-- No citation key used without confirming it exists in Zotero. New papers
-  are pushed to Zotero by me (the agent), never handed to Phuong to add.
+- **The rule above covers what a paper says. It does not cover venue, date
+  or peer-review status, and those are what a marker checks first.** A
+  bibliographic claim needs the venue of record — the publisher, DOI or
+  proceedings entry — not the arXiv page. An arXiv posting does not mean a
+  paper is unpublished: Ye et al. was called a preprint here and is a
+  peer-reviewed NeurIPS 2025 paper (decision row 104).
+- No citation key used without confirming it exists in Zotero **and is not
+  in the trash**. `zotero_search_items` returns trashed items, and the Web
+  API only reveals `deleted` if that field is inspected; a whole session was
+  spent editing a discarded duplicate on the strength of that (row 106).
+  Check `deleted` before editing any item reached via search.
+- New papers are pushed to Zotero by me (the agent), never handed to Phuong
+  to add. Pin the citation key in both the native `citationKey` field and an
+  Extra `Citation Key:` line, so a Better BibTeX re-export cannot regenerate
+  a different key and break a citation that already compiles.
 - No number written into the dissertation without tracing it to the
   matching `brain/log/*result*.md` file. Cite the result file path in a
   LaTeX comment next to the number.

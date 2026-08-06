@@ -1945,6 +1945,10 @@ matter; nothing depends on them today.
 
 ### Where to start next session
 
+The full opening sequence is specified under **Session lifecycle** in
+`brain/PRJ93_RULES.md` (recall, graphify, then the state file) and is not repeated here.
+What is specific to THIS handover:
+
 1. **Read `brain/ledger/BLOCKED_third_party.md` first.** It is the state; this file is history.
 2. **Two chores, both small.** Rotate the Zotero API key. Confirm nothing else regressed by
    recompiling on Overleaf.
@@ -1960,3 +1964,22 @@ matter; nothing depends on them today.
    it bears directly on `sec:res-weather`.
 
 Nothing in the list above is blocked on the agent.
+
+### Rules amended at close — 2026-08-06
+
+`PRJ93_RULES.md` gained a **Session lifecycle** section: agentmemory recall plus a graphify
+query at the START, a save the moment a result lands rather than deferred to the end, and
+save + `graphify update` + this file + a clean commit at the CLOSE. It also fixes which store
+owns which fact, so the three cannot drift.
+
+Three consistency defects were found and fixed while writing it, all of them instances of the
+problem the new rule describes:
+- The rules file's own "Where the open work is" section carried a stale count ("two gated
+  Further Work items" when there are three). Counts now live only in the owning file.
+- The `phase_state` end-of-session requirement was stated in two sections. Now stated once.
+- Two rules this session proved insufficient were logged in the decision log but never written
+  into the rules: that the NotebookLM rule covers a paper's CONTENT and not its venue or
+  peer-review status (row 104), and that a Zotero key must be confirmed live and not trashed
+  (row 106). Both now in Verification rules.
+
+Nothing under `.claude/` was touched; the Scope boundary holds.
