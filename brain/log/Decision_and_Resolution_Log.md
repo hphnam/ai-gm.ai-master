@@ -2916,3 +2916,32 @@ them into the append-only log so it is the continuous WP1-to-present record.
      **Still requires the user:** restarting the session so the `mcp__zotero__*` write tools pick
      up the new env. The agent cannot restart its own MCP connections, and the config is already
      correct and verified, so this is the only outstanding step.
+
+106. **I had been editing a TRASHED DUPLICATE. The live Ye record was correct all along.**
+     Reconnecting restored the MCP write tools (verified: a tag write on `KG8QMUJV` succeeded,
+     and semantic search returns Judd at relevance 0.624). The first read-back through the MCP
+     surfaced what the raw API calls had not shown me: `K73XDLEQ` carries **`deleted=1`**.
+     The Zotero trash holds **five** captures of the Ye paper (`K73XDLEQ`, `4TPC4TAI`,
+     `RL9KDI4G`, `LCW5NWZV`, `3N8XB3MH`). The LIVE record is `8UI7QJCU`, and it **already had**
+     the full title, the 2025 date and the NeurIPS `proceedingsTitle` before I touched anything.
+     So the defect reported in rows 100 and 101 — truncated title, missing date, wrong item type
+     — was a property of a discarded duplicate, not of the library. Phuong had already curated
+     the real record correctly. **Rows 100, 101, 103 and 104 are corrected by this row on that
+     point**; what remains true from them is the ref.bib and chapter work, which was independent.
+     **Root cause, worth recording as a trap.** `zotero_search_items` returns items EVEN IF
+     TRASHED (its own tool description says so, and surfaces a Status line). I read the item key
+     out of a search result and then worked against it through the raw Web API, which does not
+     volunteer trashed status in the fields I printed. The `deleted` field WAS present in my very
+     first GET, listed among "fields present", and I did not read it. **Check `deleted` before
+     editing any Zotero item reached via search.**
+     Corrective actions taken: the live `8UI7QJCU` now carries the pinned `Citation Key:
+     ye_closer_2025` in both the native field and Extra; the trashed duplicate `K73XDLEQ` has had
+     its citation key CLEARED and its Extra set to "DUPLICATE, trashed. Live record is 8UI7QJCU."
+     so Better BibTeX cannot resolve `ye_closer_2025` to a discarded item.
+     **Library-wide integrity check run, because the same trap could hide worse.** 121 live
+     top-level items against 23 trashed. Six trashed items have no live counterpart by title, and
+     none of them breaks a citation: three are duplicate captures of Hyndman's *Forecasting:
+     Principles and Practice* (live record `K45PBRM3`), one is a webpage variant of CART (live
+     book `54Z6YNAL`), one is *Algorithmic Learning in a Random World* which the chapters cite
+     zero times, and one is an unrelated stray capture about copolymer degradation.
+     **No citation in any chapter is backed only by a trashed item.**
