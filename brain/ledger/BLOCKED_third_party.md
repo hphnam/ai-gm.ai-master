@@ -173,7 +173,7 @@ therefore applied directly against the Zotero Web API and are already live:
 
 | Item | Action | Result |
 |---|---|---|
-| `K73XDLEQ` Ye et al. | full title restored; **peer-reviewed NeurIPS 2025 conference paper**, `proceedingsTitle` set, date 2025; arXiv preprint id kept in Extra as secondary; `Citation Key: ye_closer_2025` | HTTP 204, verified on read-back. NOTE an intermediate edit wrongly retyped this as a preprint and was reverted the same session |
+| ~~`K73XDLEQ`~~ **`8UI7QJCU`** Ye et al. | **`K73XDLEQ` turned out to be a TRASHED DUPLICATE.** The live record `8UI7QJCU` already carried the full title, date 2025 and the NeurIPS `proceedingsTitle`; only the pinned citation key was missing, and it has been added. The trashed duplicate has been de-keyed so BBT cannot resolve to it | verified on read-back |
 | `665AJ6CH` Hoo et al. | Extra records the cited version (v4, 2026-01-26) against the Jan-2025 arXiv id; `Citation Key: hoo_tables_2026` | HTTP 204, verified |
 | `KG8QMUJV` Judd et al. | **created**, journalArticle, J. Applied Statistics 53(2) 372–390, doi 10.1080/02664763.2025.2519136, CC BY 4.0, `Citation Key: judd_forecasting_2025` | HTTP 200, verified |
 
@@ -192,6 +192,21 @@ of absence.
 
 Next session, one check only: confirm `mcp__zotero__zotero_update_item` now succeeds. The
 config is correct and verified; it is the running MCP process that holds the stale env.
+
+### Zotero hygiene, checked 2026-08-06
+
+121 live top-level items, 23 trashed. The trash holds **five** captures of the Ye paper, which
+is how the duplicate above was mistaken for the real record.
+
+**Trap to avoid repeating:** `zotero_search_items` returns items even when they are trashed.
+An item key taken from a search result must have its `deleted` flag checked before it is
+edited. The raw Web API does not volunteer trashed status unless the field is inspected.
+
+Six trashed items have no live counterpart by title and **none breaks a citation**: three are
+duplicate captures of Hyndman's *Forecasting: Principles and Practice* (live `K45PBRM3`), one
+is a webpage variant of CART (live book `54Z6YNAL`), one is *Algorithmic Learning in a Random
+World* which the chapters never cite, and one is an unrelated stray capture. **No citation in
+any chapter is backed only by a trashed item.**
 
 **Security note.** The API key was pasted into a chat transcript, which is stored in plain
 text under `~/.claude/projects/`. It grants library and file write on the user library and
