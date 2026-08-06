@@ -170,5 +170,20 @@ Zotero will clobber both fixes**:
 |---|---|---|
 | `K73XDLEQ` (Ye et al.) | title truncated to "…Its Strengths and…", **no date** → renders "Ye et al., n.d." | Title ends "…and Extending Its Capabilities"; arXiv 2502.17361; v2 dated 2025-06-11; BBT key `ye_closer_2025` |
 | Hoo et al. | arXiv id 2501.02945 is the Jan-2025 first posting; cited content is v4 | Keep the id, keep the 2026-01-26 date; the `note` field in ref.bib records the version |
+| `judd_forecasting_2025` | **Not in Zotero at all.** Added to ref.bib and NotebookLM only | Judd, Mylona, Liu, Hogg, Butler, *J. Applied Statistics* 53(2) 372–390, doi 10.1080/02664763.2025.2519136, CC BY 4.0 |
 
 To enable agent writes later, set `ZOTERO_API_KEY` and `ZOTERO_LIBRARY_ID` for hybrid mode.
+
+### Two papers deliberately NOT cited, so they are not rediscovered
+
+Both are on-topic for the weather channel and both are **closed access with no repository
+full text** (OpenAlex `any_repository_has_fulltext: false`), so neither can enter NotebookLM
+and the no-claim-without-a-NotebookLM-query rule forbids citing them from an abstract:
+
+- Bujisic, Bogicevic, Parsa, *The effect of weather factors on restaurant sales*,
+  J. Foodservice Business Research 20(3) 350–370, doi `10.1080/15378020.2016.1209723`.
+- Badorf and Hoberg, *The impact of daily weather on retail sales*,
+  J. Retailing and Consumer Services 52:101921, doi `10.1016/j.jretconser.2019.101921`.
+
+If institutional access appears, these are worth adding: they are the two daily-resolution
+weather-and-sales studies the hospitality argument currently lacks.
