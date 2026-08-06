@@ -1988,3 +1988,79 @@ them into the append-only log so it is the continuous WP1-to-present record.
     an **ecosystem observation, not a defect claim against the maintainers**: a widely used
     library returns the median under the name `mean`, and a practitioner reading the signature or
     the docstring would not know. It is why the served Beer Hall model cannot supply the mean arm.
+
+78. **R9 result — the functional minimal pair ran, and two of five pre-registered predictions
+    failed (2026-08-06).** Forward-pointer row against the pre-registration at row 77; row 77 is
+    not edited. Full record `log/66_R9_functional_pair_result.md`, artefacts
+    `eval/functional_pair.{md,json}`. 760.7s, inside the 30-minute abort. Control:
+    `rung1_robust_dow` verified **bit-identical** after the refactor onto the shared aggregator
+    path (max abs diff 0.0), so the pair is genuinely minimal.
+
+    **Prediction (iv), the load-bearing one: the crossing was OBSERVED at both scaled venues, in
+    the predicted orientation, and NEITHER LEG IS SIGNIFICANT** (Beer Hall p 0.327 / 0.488; Two
+    River Taps p 0.649 / 0.850; all four paired intervals contain zero). The claim the project
+    may make is therefore: *on the one manipulation that isolates the functional, each functional
+    was better on the metric that elicits it, at both scaled venues, and the per-fold differences
+    are not separable from zero.* Direction replicated across two venues; effect not demonstrated.
+    The word "shows" is not available.
+
+    **Prediction (i) is PARTIALLY FALSIFIED and the mechanism is refuted at one venue.** Holds at
+    Beer Hall (bias +67.67 -> +24.65) and Ellel (+75.09 -> -39.83). **Fails at Two River Taps on
+    both limbs**: the mean arm is MORE biased (-29.46 -> -41.69) and the median arm's bias is
+    NEGATIVE, where the pre-registered right-skew reasoning required positive. The mechanism does
+    not hold at one of three venues and this run offers no explanation. Recorded as a failure of
+    the stated mechanism. That TRT closed in May 2026 and its series is truncated is a
+    hypothesis, not a finding, and nothing here tests it.
+
+    **The bias result is stronger than the accuracy result and is the real finding.** At Beer Hall
+    the functional swap removes roughly two-thirds of the bias (+67.67 -> +24.65) while moving
+    MASE by 0.009. **A ruler nearly indifferent between two forecasters whose bias differs by a
+    factor of three is the concealment the design was built to expose**, and it is the sentence
+    the methodology needs.
+
+    **Ellel inverts the argument, and that is the most informative cell.** At ~82% zero days the
+    DOW mean is decisively WORSE on both metrics (MAE 105.98 -> 166.64, RMSE 236.89 -> 306.51,
+    p 1.7e-25 and 5.4e-11), because the mean is dragged up by rare large trading days and predicts
+    non-zero revenue on days that are actually zero. At extreme intermittency the elicitation
+    argument is overwhelmed. This is Chatfield's all-zero result in the estate's own data and is
+    independent empirical support for the G2 decision to take Ellel off scaled error.
+
+    **The generalisation check is inconclusive, as the design anticipated.** Mean-functional
+    ladder rungs do not uniformly show lower bias (`rung2_ets` +46.98 at Beer Hall, above
+    `rung1_mean_dow`'s +24.65; `rung3_gbm` +28.98 at Beer Hall, -37.33 at Ellel). Family,
+    capacity, feature access and fit procedure vary alongside the functional, so it licenses no
+    causal reading. Retained as a generalisation check only, which is why the minimal pair was
+    built.
+
+    **A defect in the R9 report generator, found and fixed.** The first emission printed
+    "positive = mean arm less biased, as predicted" unconditionally, including at Two River Taps
+    where the value is negative and the prediction failed. Third instance of this class after
+    report 57's crashed `weather_diagnostic` generator and R2's "covariates HELP". Fixed to branch
+    on sign, to name each prediction HOLDS or FAILS, and to append the non-significance caveat
+    wherever the crossing is reported. The corrected report was re-emitted **from the stored JSON
+    with no re-run**, so the numbers remain the pre-registered ones.
+
+    **Commitments discharged.** Median arm reported at equal prominence — it wins the absolute
+    metric at all three venues and both metrics at Ellel. Served-model selection NOT revisited:
+    `rung1_mean_dow` is reported and never served, and no retained set or served model changes.
+
+79. **D-D1 RESOLVED — RMSSE adopted as headline, argued from the estimand.** Not framed as
+    conceding to the examiner and not as buying compliance. The argument: the decision layer needs
+    a mean, since deviation z-scores, band construction and any revenue summed across days or
+    venues are mean-shaped and expectations add where medians do not; the serving layer emits a
+    median; MASE scored that median against a median-eliciting ruler and made the mismatch
+    invisible by construction; RMSSE is the instrument that surfaces it. R9 supplies the direct
+    measurement — the ruler is nearly indifferent across a threefold bias difference — and R4
+    supplies the reporting frame: **argmin of a fold mean is metric-dependent, valid inference is
+    not.** MASE is retained as a labelled secondary with the flatline and structural-zero caveats
+    and the July 0.386-versus-0.836 spread as a worked illustration of why a scaled metric needs
+    two coordinates, a stated basis and a stated `as_of`. Reporting rules fixed at the same time:
+    say "invariant across the two rulers tested at the pre-registered alpha, at the two scaled
+    venues", never "metric-invariant"; use **Beer Hall** as the robustness example and report the
+    Two River Taps counterexample (ETS rank 1 -> 4) in the same paragraph rather than leaving it
+    to be found. Citations split precisely: **Kolassa (2020)** for which functional each measure
+    elicits, **Kolassa (2023)** for additivity and coherence, **Hewamalage et al. (2023)** for the
+    intermittency pathology, **Makridakis, Spiliotis & Assimakopoulos (2022)** for the M5
+    precedent at **73% intermittent AT PRODUCT-STORE LEVEL** (62.9% across all 42,840 series; the
+    figure is in the *Background, organization and implementation* paper), **Hansen, Lunde & Nason
+    (2011)** for the MCS as the inference layer.

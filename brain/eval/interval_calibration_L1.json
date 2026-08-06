@@ -19,7 +19,7 @@
   ],
   "seed": 93,
   "method": "split conformal on step-1 rolling origins; ETS point model",
-  "wall_clock_s": 29.5,
+  "wall_clock_s": 31.2,
   "venues": {
     "beer_hall": {
       "n_origins": 273,

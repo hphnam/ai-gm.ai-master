@@ -13,15 +13,42 @@
   "angelopoulos_bates": {
     "beer_hall": {
       "n_calib": 1883,
-      "upper_bound": 0.9005307855626328
+      "upper_bound": 0.9005307855626328,
+      "score_ties": {
+        "n": 1883,
+        "n_distinct": 1581,
+        "tie_fraction": 0.16038236856080723,
+        "atom_mass": 0.1524163568773234,
+        "atom_value": 0.0,
+        "holds": false
+      },
+      "upper_bound_valid": false
     },
     "ellel": {
       "n_calib": 1792,
-      "upper_bound": 0.9005577244841049
+      "upper_bound": 0.9005577244841049,
+      "score_ties": {
+        "n": 1792,
+        "n_distinct": 734,
+        "tie_fraction": 0.5904017857142857,
+        "atom_mass": 0.5558035714285714,
+        "atom_value": 0.0,
+        "holds": false
+      },
+      "upper_bound_valid": false
     },
     "two_river_taps": {
       "n_calib": 1407,
-      "upper_bound": 0.9007102272727273
+      "upper_bound": 0.9007102272727273,
+      "score_ties": {
+        "n": 1407,
+        "n_distinct": 1149,
+        "tie_fraction": 0.18336886993603413,
+        "atom_mass": 0.17270788912579957,
+        "atom_value": 0.0,
+        "holds": false
+      },
+      "upper_bound_valid": false
     }
   },
   "store_ceiling": "2026-07-07"

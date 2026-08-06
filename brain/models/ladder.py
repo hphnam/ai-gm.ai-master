@@ -148,29 +148,56 @@ def rung0_seasonal_naive(train: pd.DataFrame, target: pd.DataFrame, _cols=None) 
 
 # --- Rung 1 ------------------------------------------------------------------
 
-def rung1_robust_dow(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
-    dow_median = train.groupby("dow")["value"].median()
-    overall = train["value"].median()
+def _dow_profile(train: pd.DataFrame, target: pd.DataFrame, agg: str) -> np.ndarray:
+    """Day-of-week profile with a monthly index and a bank-holiday factor.
+
+    `agg` is the central-tendency functional -- "median" or "mean" -- and it is the ONLY
+    thing that differs between `rung1_robust_dow` and `rung1_mean_dow`. Both arms share this
+    one code path deliberately: the pair is the project's only controlled manipulation of the
+    forecast functional, with features, folds, fit span and structure held identical, so a
+    difference between them is attributable to the functional alone. Contrasting the median
+    rung against ETS or the GBM instead would confound the functional with model family,
+    capacity, feature access and fit procedure. Pre-registered at decision-log row 77,
+    commit `c098fba`, before this function existed.
+    """
+    dow_stat = getattr(train.groupby("dow")["value"], agg)()
+    overall = getattr(train["value"], agg)()
     month_index = (
-        train.groupby(train["date"].dt.month)["value"].median() / max(overall, 1e-9)
+        getattr(train.groupby(train["date"].dt.month)["value"], agg)() / max(overall, 1e-9)
     ).clip(0.5, 2.0)
     bh_train = train[train["is_bank_holiday"] == 1]
     if len(bh_train) >= 3:
-        ratio = (bh_train["value"] / bh_train["dow"].map(dow_median)).replace(
+        ratio = (bh_train["value"] / bh_train["dow"].map(dow_stat)).replace(
             [np.inf, -np.inf], np.nan
         ).dropna()
-        bh_factor = float(ratio.median()) if len(ratio) else 1.0
+        bh_factor = float(getattr(ratio, agg)()) if len(ratio) else 1.0
     else:
         bh_factor = 1.0
 
     preds = []
     for _, row in target.iterrows():
-        base = dow_median.get(row["dow"], overall)
+        base = dow_stat.get(row["dow"], overall)
         base *= month_index.get(row["date"].month, 1.0)
         if row["is_bank_holiday"] == 1:
             base *= bh_factor
         preds.append(base)
     return np.asarray(preds, float)
+
+
+def rung1_robust_dow(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
+    """Median day-of-week profile. "Robust" names the median: it is the functional."""
+    return _dow_profile(train, target, "median")
+
+
+def rung1_mean_dow(train: pd.DataFrame, target: pd.DataFrame, _cols=None) -> np.ndarray:
+    """Mean day-of-week profile -- the minimal pair to `rung1_robust_dow`.
+
+    Exists to separate the two defects the audit found mutually concealing: MASE elicits the
+    median, and the decision layer downstream (deviation z-scores, band construction, any
+    revenue summed across days or venues) needs a mean, because expectations add and medians
+    do not. Reported, never served: this rung does not enter served-model selection.
+    """
+    return _dow_profile(train, target, "mean")
 
 
 # --- Rung 2 ------------------------------------------------------------------

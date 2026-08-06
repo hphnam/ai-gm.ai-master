@@ -12,6 +12,40 @@ Base forecasts at L2/L3 use robust DOW-median only — the rung-climbing discipl
 - max category discrepancy: 0.00e+00
 - **coherent: True**
 
+## Base-forecast unbiasedness (the precondition WLS_v inherits from MinT)
+Wickramasuriya et al. (2019) assume `E[e_T(h)|I_T] = 0` and deliver the best minimum-variance linear **unbiased** reconciled forecasts. The condition is measured here rather than assumed: a one-sample t-test of mean(residual) = 0 per node on the held-out calibration block, `alpha` 0.05, no multiplicity correction.
+
+- nodes tested: **41**
+- nodes rejecting unbiasedness: **22** (of which 19 with a positive mean residual, i.e. the base forecast sits BELOW the actual)
+- **precondition holds across all nodes: False**
+
+| node | n | mean resid | 95% CI | p |
+|---|---|---|---|---|
+| ITEM::Food::Crisps | 56 | -2.57 | [-3.07, -2.07] | 1.54e-14 |
+| ITEM::Food::Nuts | 56 | -0.57 | [-0.77, -0.37] | 3.16e-07 |
+| ITEM::Uncategorised::OTHER | 56 | +4.52 | [+2.86, +6.18] | 1.21e-06 |
+| ITEM::Beer::Lager - BH | 56 | +10.12 | [+6.38, +13.87] | 1.39e-06 |
+| ITEM::Wine::Sauvignon Blanc | 56 | +2.36 | [+1.48, +3.23] | 1.47e-06 |
+| ITEM::Beer::OTHER | 56 | +17.04 | [+9.16, +24.91] | 6.22e-05 |
+| CAT::Beer | 56 | +25.36 | [+13.47, +37.25] | 7.69e-05 |
+| ITEM::Soft Drinks::OTHER | 56 | +2.18 | [+1.12, +3.24] | 1.26e-04 |
+| ITEM::Wine::Aperol Spritz | 56 | +1.38 | [+0.70, +2.05] | 1.50e-04 |
+| ITEM::Soft Drinks::Cordial & Soda | 56 | +1.20 | [+0.60, +1.80] | 1.97e-04 |
+| CAT::Food | 56 | -2.16 | [-3.44, -0.88] | 1.37e-03 |
+| ITEM::Food::OTHER | 56 | +0.89 | [+0.34, +1.44] | 2.01e-03 |
+| ITEM::Wine::Discovery Beach Zinfandel | 56 | +0.61 | [+0.20, +1.01] | 3.94e-03 |
+| ITEM::Spirits::Gordons | 56 | +1.25 | [+0.37, +2.13] | 6.22e-03 |
+| ITEM::Soft Drinks::Fruit Shoot | 56 | +0.89 | [+0.23, +1.56] | 9.64e-03 |
+| CAT::Merchandise | 56 | +0.11 | [+0.02, +0.19] | 1.29e-02 |
+| CAT::Soft Drinks | 56 | +5.98 | [+1.23, +10.74] | 1.47e-02 |
+| ITEM::Food::Seabrook Crisps | 56 | +1.23 | [+0.18, +2.28] | 2.25e-02 |
+| ITEM::Merchandise::OTHER | 56 | +0.09 | [+0.01, +0.17] | 2.40e-02 |
+| CAT::Wine | 56 | +2.96 | [+0.33, +5.60] | 2.80e-02 |
+| ITEM::Beer::Lune Valley Gold | 56 | +2.14 | [+0.04, +4.25] | 4.60e-02 |
+| VENUE | 56 | +21.09 | [+0.27, +41.91] | 4.72e-02 |
+
+A DOW **median** base is median-eliciting, so on a right-skewed node it is expected to sit below the mean. Where that is what the table shows, the bias is a property of the chosen base forecaster and not a defect in the reconciliation. The MinT optimality claim is nonetheless conditional on a condition these nodes do not meet, and is reported as such.
+
 ## Reconciled-band coverage (the SAME band the /forecast API serves)
 Each band is `reconciled ŷ ± split-conformal quantile of the node's DOW-median residuals` — one band-construction path, used for both this coverage check and persistence (no separate parametric band).
 

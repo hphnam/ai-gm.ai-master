@@ -1,0 +1,89 @@
+% PRJ93 — ref.bib additions, drafted 2026-08-01.
+%
+% FOUR entries to be APPENDED BY HAND to the Overleaf root ref.bib.
+% DO NOT REGENERATE ref.bib AND DO NOT RE-EXPORT VIA BETTER BIBTEX — the key
+% format differs and breaks roughly sixty existing citations (W48).
+%
+% Style matches the existing 114 entries: biblatex fields (`date`, `journaltitle`,
+% `urldate`), keys on the file's own author_firstword_year convention.
+%
+% All four are in Zotero as of 2026-08-01, pushed via the local connector API:
+%   montero-manso_principles_2021 -> 257UK8GY
+%   dixon_independence_2007       -> P4WGCXET
+%   ancker_effects_2017           -> LYYQFLFG
+%   paleyes_challenges_2022       -> BQPDVMEJ
+
+@article{montero-manso_principles_2021,
+	title = {Principles and algorithms for forecasting groups of time series: Locality and globality},
+	shorttitle = {Principles and algorithms for forecasting groups of time series},
+	volume = {37},
+	number = {4},
+	issn = {0169-2070},
+	url = {https://doi.org/10.1016/j.ijforecast.2021.03.004},
+	doi = {10.1016/j.ijforecast.2021.03.004},
+	pages = {1632--1653},
+	journaltitle = {International Journal of Forecasting},
+	author = {Montero-Manso, Pablo and Hyndman, Rob J.},
+	urldate = {2026-08-01},
+	date = {2021-10},
+}
+
+@article{dixon_independence_2007,
+	title = {On the Independence of Compliance and Reliance: Are Automation False Alarms Worse Than Misses?},
+	shorttitle = {On the Independence of Compliance and Reliance},
+	volume = {49},
+	number = {4},
+	url = {https://doi.org/10.1518/001872007X215656},
+	doi = {10.1518/001872007X215656},
+	pages = {564--572},
+	journaltitle = {Human Factors},
+	publisher = {{SAGE} Publications Inc},
+	author = {Dixon, Stephen R. and Wickens, Christopher D. and {McCarley}, Jason S.},
+	urldate = {2026-08-01},
+	date = {2007-08},
+}
+
+@article{ancker_effects_2017,
+	title = {Effects of workload, work complexity, and repeated alerts on alert fatigue in a clinical decision support system},
+	volume = {17},
+	number = {1},
+	url = {https://doi.org/10.1186/s12911-017-0430-8},
+	doi = {10.1186/s12911-017-0430-8},
+	pages = {36},
+	journaltitle = {{BMC} Medical Informatics and Decision Making},
+	author = {Ancker, Jessica S. and Edwards, Alison and Nosal, Sarah and Hauser, Diane and Mauer, Elizabeth and Kaushal, Rainu},
+	urldate = {2026-08-01},
+	date = {2017-04-10},
+}
+
+@article{paleyes_challenges_2022,
+	title = {Challenges in Deploying Machine Learning: A Survey of Case Studies},
+	shorttitle = {Challenges in Deploying Machine Learning},
+	volume = {55},
+	number = {6},
+	url = {https://doi.org/10.1145/3533378},
+	doi = {10.1145/3533378},
+	pages = {1--29},
+	journaltitle = {{ACM} Computing Surveys},
+	publisher = {Association for Computing Machinery},
+	author = {Paleyes, Andrei and Urma, Raoul-Gabriel and Lawrence, Neil D.},
+	urldate = {2026-08-01},
+	date = {2022-12-07},
+}
+
+% ---------------------------------------------------------------------------
+% ONE DELETION, separately (hygiene, no gate):
+%
+%   @online{noauthor_full_nodate, ...}
+%
+% Title "Full article: On the selection of forecasting accuracy measures", no
+% author, no year. A Zotero web-capture duplicate of koutsandreas_selection_2022.
+% Uncited today, so it breaks nothing, but it would compile as "[n.d.]".
+%
+% ONE RETYPE, separately (hygiene, no gate):
+%
+%   ding_proactor_2026 is @article with NO journaltitle — only an OpenReview
+%   forum URL. It will render as a journal article with no venue while being
+%   cited as a substantive result. Retype to @misc/@unpublished with the
+%   OpenReview URL, or confirm the venue.
+% ---------------------------------------------------------------------------

@@ -72,6 +72,24 @@
             "statusMessage": "Checking command safety..."
           }
         ]
+      },
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/hapuna/.local/bin/graphify hook-guard search"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/hapuna/.local/bin/graphify hook-guard read"
+          }
+        ]
       }
     ],
     "PostToolUse": [

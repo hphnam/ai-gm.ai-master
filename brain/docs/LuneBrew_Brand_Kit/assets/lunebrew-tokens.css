@@ -1,0 +1,92 @@
+/* ============================================================
+   LUNE BREW — Deck tokens & base components
+   Import this first; see LuneBrew_Deck_Guide_for_Agents.md for rules.
+   Logos: assets/logo-white.svg (on dark) · assets/logo-black.svg (on light)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Archivo+Narrow:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  /* CORE */
+  --ink:#111111; --ink-2:#1D1D1B; --paper:#EFF0EB; --white:#FFFFFF;
+  --gold:#E5A83D;                       /* THE accent + hero data series */
+  /* NEUTRALS */
+  --grey:#8A8A86; --grey-2:#5C5C58;
+  --line-l:rgba(17,17,17,.12); --line-d:rgba(255,255,255,.14);
+  /* FLAVOUR ACCENTS — pick ONE per deck/section */
+  --choc:#3F2C1B; --pine:#E9B028; --mango:#E18200;
+  --teal:#2F9C96; --lime:#A7C520; --ruby:#C0392B;
+  /* TYPE */
+  --f-display:'Poppins',system-ui,sans-serif;
+  --f-head:'Archivo Narrow','Arial Narrow',system-ui,sans-serif;
+  --f-body:'Inter',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+}
+
+/* ---- Slide shell (HTML decks). 1280x720 base; scales via aspect-ratio ---- */
+.slide{position:relative;aspect-ratio:16/9;overflow:hidden;padding:7% 8%;
+  font-family:var(--f-body);color:var(--ink);background:var(--paper)}
+.slide.dark{background:var(--ink);color:#fff}     /* title/section/statement/close */
+.slide.light{background:var(--paper);color:var(--ink)}  /* content/results */
+.slide.data{background:#fff;color:var(--ink)}     /* charts/tables/code */
+
+/* ---- Persistent chrome (put on every working slide) ---- */
+.chrome-logo{position:absolute;top:4.5%;left:8%;height:4.2%}
+.chrome-pill{position:absolute;top:5.5%;right:8%}
+.chrome-meta{position:absolute;left:8%;bottom:4.2%;font:600 11px/1 var(--f-body);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
+.chrome-page{position:absolute;right:8%;bottom:4.2%;font:600 11px/1 var(--f-body);
+  letter-spacing:.1em;color:var(--grey)}
+
+/* ---- Headlines ---- */
+.assert{font:700 clamp(26px,3.4vw,40px)/1.05 var(--f-display);letter-spacing:-.01em;max-width:22ch}
+.assert b{color:var(--gold)}                       /* lift the key word */
+.label{font:700 clamp(24px,3.2vw,36px)/1 var(--f-head);text-transform:uppercase;letter-spacing:.01em}
+.eyebrow{font:600 12px/1 var(--f-body);letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.metacaps{font:600 11px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
+
+/* ---- LB pill (section / figure id) ---- */
+.lbpill{display:inline-flex;border:1.6px solid currentColor;border-radius:999px;overflow:hidden;
+  font:700 12px/1 var(--f-body);letter-spacing:.06em;align-items:stretch}
+.lbpill span{padding:6px 11px;display:flex;align-items:center}
+.lbpill .n{border-left:1.6px solid currentColor;color:var(--gold)}
+
+/* ---- Tab card (the "so what" / highlight box) ---- */
+.tabcard{background:var(--ink);color:#fff;border-radius:22px;padding:18px 20px;max-width:300px}
+.tabcard .r1{display:flex;justify-content:space-between;font:600 10px/1 var(--f-body);
+  letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.tabcard .big{font:700 40px/1 var(--f-head);text-transform:uppercase;margin:8px 0;color:var(--gold)}
+.tabcard .r3{display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid rgba(255,255,255,.18);padding-top:10px;font:500 13px/1.3 var(--f-body)}
+.tabcard .tag{color:var(--gold);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+
+/* ---- Wave divider (inline SVG also fine) ---- */
+.wave{display:inline-block;width:72px;height:20px;color:var(--gold)}
+
+/* ---- Stadium band (section framing) ---- */
+.stadium{border:10px solid var(--gold);border-radius:999px;position:relative}
+.stadium .anchor{position:absolute;left:8%;bottom:10%;background:var(--ink);color:#fff;
+  border-radius:12px;padding:6px 14px;font:700 15px/1 var(--f-display)}
+
+/* ---- Code block (real text, focal-line highlight) ---- */
+.code{background:var(--ink-2);border:1px solid var(--line-d);border-radius:18px;overflow:hidden;
+  color:#EDEDE9;font:400 15px/1.5 var(--f-mono)}
+.code .hd{display:flex;justify-content:space-between;padding:10px 18px;color:var(--grey);
+  font:600 11px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)}
+.code pre{margin:0;padding:18px 22px}
+.code .cm{color:var(--grey);font-style:italic}
+.code .kw{color:var(--gold)} .code .fn{color:var(--teal)}
+.code .str{color:var(--lime)} .code .num{color:var(--mango)}
+.code .hl{background:rgba(229,168,61,.10);box-shadow:inset 3px 0 0 var(--gold);display:inline-block;width:100%}
+
+/* ---- Table ---- */
+.lb-table{border-collapse:collapse;font:400 15px/1.4 var(--f-body);width:100%}
+.lb-table th{background:var(--ink);color:#fff;font:600 11px/1 var(--f-body);
+  letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;text-align:left}
+.lb-table td{padding:10px 14px;border-bottom:1px solid var(--line-l)}
+.lb-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+.lb-table tr.win td{background:rgba(229,168,61,.10);box-shadow:inset 3px 0 0 var(--gold)}
+
+/* ---- Chart palette helpers (apply to series) ---- */
+.c-hero{color:var(--gold);fill:var(--gold);stroke:var(--gold)}
+.c-mute{color:var(--grey);fill:var(--grey);stroke:var(--grey)}
+/* categorical order: gold, teal, ruby, mango, lime, choc, grey */

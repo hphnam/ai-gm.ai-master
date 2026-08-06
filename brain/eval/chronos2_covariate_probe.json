@@ -1,0 +1,279 @@
+{
+  "arms": [
+    "univariate",
+    "covariate"
+  ],
+  "basis": "calendar_lag7_active",
+  "block_len": 7,
+  "cov_mean": 0.6065380614087036,
+  "dispersion_ok": true,
+  "fold_sd_covariate": 0.4032403408231552,
+  "fold_sd_univariate": 0.4094038311505278,
+  "mcs_pvalue": {
+    "covariate": 1.0,
+    "univariate": 0.982
+  },
+  "mean_loss": {
+    "covariate": 0.6065380614087036,
+    "univariate": 0.6067004257105937
+  },
+  "n_boot": 1000,
+  "n_folds": 39,
+  "n_folds_covariate_better": 18,
+  "paired_bootstrap": [
+    {
+      "ci_hi": 0.010848695127716622,
+      "ci_lo": -0.010208043089299058,
+      "excludes_zero": false,
+      "mean_delta": 0.00016236430189009443,
+      "pair": "univariate-covariate"
+    }
+  ],
+  "paired_bootstrap_seed": 94,
+  "rows": [
+    {
+      "fold": 1,
+      "mase_covariate": 0.35847661601664366,
+      "mase_univariate": 0.326968492443645,
+      "train_end": "2025-10-07"
+    },
+    {
+      "fold": 2,
+      "mase_covariate": 0.3727579780707279,
+      "mase_univariate": 0.35700822275098326,
+      "train_end": "2025-10-14"
+    },
+    {
+      "fold": 3,
+      "mase_covariate": 0.3222827989363692,
+      "mase_univariate": 0.34199550132064,
+      "train_end": "2025-10-21"
+    },
+    {
+      "fold": 4,
+      "mase_covariate": 0.3055408494671632,
+      "mase_univariate": 0.2634171867872836,
+      "train_end": "2025-10-28"
+    },
+    {
+      "fold": 5,
+      "mase_covariate": 0.3096732111214534,
+      "mase_univariate": 0.29518963501696865,
+      "train_end": "2025-11-04"
+    },
+    {
+      "fold": 6,
+      "mase_covariate": 0.33647303745313256,
+      "mase_univariate": 0.2855655390589306,
+      "train_end": "2025-11-11"
+    },
+    {
+      "fold": 7,
+      "mase_covariate": 0.541680163720614,
+      "mase_univariate": 0.5292921479021799,
+      "train_end": "2025-11-18"
+    },
+    {
+      "fold": 8,
+      "mase_covariate": 0.6292612812509627,
+      "mase_univariate": 0.6473974943621981,
+      "train_end": "2025-11-25"
+    },
+    {
+      "fold": 9,
+      "mase_covariate": 0.6674516972053668,
+      "mase_univariate": 0.6649361061735226,
+      "train_end": "2025-12-02"
+    },
+    {
+      "fold": 10,
+      "mase_covariate": 0.40871753968062713,
+      "mase_univariate": 0.3912422105301217,
+      "train_end": "2025-12-09"
+    },
+    {
+      "fold": 11,
+      "mase_covariate": 0.464312556212352,
+      "mase_univariate": 0.44879147111294027,
+      "train_end": "2025-12-16"
+    },
+    {
+      "fold": 12,
+      "mase_covariate": 1.119059467757185,
+      "mase_univariate": 1.0728937135849488,
+      "train_end": "2025-12-23"
+    },
+    {
+      "fold": 13,
+      "mase_covariate": 1.570059019604113,
+      "mase_univariate": 1.5745152982839392,
+      "train_end": "2025-12-30"
+    },
+    {
+      "fold": 14,
+      "mase_covariate": 0.7488491205924247,
+      "mase_univariate": 0.8675558089311005,
+      "train_end": "2026-01-06"
+    },
+    {
+      "fold": 15,
+      "mase_covariate": 0.3377640704396466,
+      "mase_univariate": 0.1666890172219133,
+      "train_end": "2026-01-13"
+    },
+    {
+      "fold": 16,
+      "mase_covariate": 0.3118027154664433,
+      "mase_univariate": 0.3436234799302124,
+      "train_end": "2026-01-20"
+    },
+    {
+      "fold": 17,
+      "mase_covariate": 0.4947170000558758,
+      "mase_univariate": 0.5248432686783464,
+      "train_end": "2026-01-27"
+    },
+    {
+      "fold": 18,
+      "mase_covariate": 0.18736917502471967,
+      "mase_univariate": 0.21630565009933433,
+      "train_end": "2026-02-03"
+    },
+    {
+      "fold": 19,
+      "mase_covariate": 0.23859224103624174,
+      "mase_univariate": 0.21056751154627062,
+      "train_end": "2026-02-10"
+    },
+    {
+      "fold": 20,
+      "mase_covariate": 0.43951055236622916,
+      "mase_univariate": 0.3317215561855888,
+      "train_end": "2026-02-17"
+    },
+    {
+      "fold": 21,
+      "mase_covariate": 0.1665684335928746,
+      "mase_univariate": 0.2459473595164488,
+      "train_end": "2026-02-24"
+    },
+    {
+      "fold": 22,
+      "mase_covariate": 0.49908091053707054,
+      "mase_univariate": 0.44483326791916566,
+      "train_end": "2026-03-03"
+    },
+    {
+      "fold": 23,
+      "mase_covariate": 0.2271889302799621,
+      "mase_univariate": 0.3434510588473759,
+      "train_end": "2026-03-10"
+    },
+    {
+      "fold": 24,
+      "mase_covariate": 0.6715462929109828,
+      "mase_univariate": 0.708021148837725,
+      "train_end": "2026-03-17"
+    },
+    {
+      "fold": 25,
+      "mase_covariate": 0.12872743601373568,
+      "mase_univariate": 0.1945750281814912,
+      "train_end": "2026-03-24"
+    },
+    {
+      "fold": 26,
+      "mase_covariate": 1.0637961607782989,
+      "mase_univariate": 0.9418362003589202,
+      "train_end": "2026-03-31"
+    },
+    {
+      "fold": 27,
+      "mase_covariate": 0.2805626787632386,
+      "mase_univariate": 0.2772344037693709,
+      "train_end": "2026-04-07"
+    },
+    {
+      "fold": 28,
+      "mase_covariate": 0.5377143996214505,
+      "mase_univariate": 0.51581856386413,
+      "train_end": "2026-04-14"
+    },
+    {
+      "fold": 29,
+      "mase_covariate": 0.3579212247499204,
+      "mase_univariate": 0.4281149909461734,
+      "train_end": "2026-04-21"
+    },
+    {
+      "fold": 30,
+      "mase_covariate": 0.73480632077606,
+      "mase_univariate": 0.7124738557247394,
+      "train_end": "2026-04-28"
+    },
+    {
+      "fold": 31,
+      "mase_covariate": 0.4483923855842544,
+      "mase_univariate": 0.4425490610236904,
+      "train_end": "2026-05-05"
+    },
+    {
+      "fold": 32,
+      "mase_covariate": 0.8158748419134423,
+      "mase_univariate": 0.7825030798430167,
+      "train_end": "2026-05-12"
+    },
+    {
+      "fold": 33,
+      "mase_covariate": 0.6697517220703395,
+      "mase_univariate": 0.6808230438413371,
+      "train_end": "2026-05-19"
+    },
+    {
+      "fold": 34,
+      "mase_covariate": 0.7609240912962708,
+      "mase_univariate": 0.8387148412792204,
+      "train_end": "2026-05-26"
+    },
+    {
+      "fold": 35,
+      "mase_covariate": 1.1987550164856975,
+      "mase_univariate": 1.257911951488659,
+      "train_end": "2026-06-02"
+    },
+    {
+      "fold": 36,
+      "mase_covariate": 1.9848242099802367,
+      "mase_univariate": 2.0185901065318164,
+      "train_end": "2026-06-09"
+    },
+    {
+      "fold": 37,
+      "mase_covariate": 0.7975546655485225,
+      "mase_univariate": 0.7659151340748522,
+      "train_end": "2026-06-16"
+    },
+    {
+      "fold": 38,
+      "mase_covariate": 1.3391608081326987,
+      "mase_univariate": 1.3795822522845496,
+      "train_end": "2026-06-23"
+    },
+    {
+      "fold": 39,
+      "mase_covariate": 0.8074827744260872,
+      "mase_univariate": 0.8219019424593971,
+      "train_end": "2026-06-30"
+    }
+  ],
+  "seed": 93,
+  "set_75": [
+    "covariate",
+    "univariate"
+  ],
+  "set_90": [
+    "covariate",
+    "univariate"
+  ],
+  "uni_mean": 0.6067004257105936
+}

@@ -49,14 +49,43 @@ batch multiple gates into one question.
 
 ## Writing standard
 
-Target: publishable, distinction-grade. Apply the scientific-writing,
-statistical-reporting, and scientific-visualisation skills.
+Target: publishable, distinction-grade. Apply the installed skills that
+match the task:
 
-> No skill matching scientific writing, statistical reporting, or
-> scientific visualisation exists in `.claude/skills/` today (checked:
-> context-budget, debug-fix, explain, pr-review, refactor, setupdotclaude,
-> ship, tdd, test-writer — none overlap). This rule cannot be honoured
-> until those skills exist. Flagged, not resolved here.
+- `scientific-writing` — drafting or revising any prose section.
+- `statistical-reporting` — any test selection, assumption check, or
+  results-section number.
+- `scientific-visualization` — any figure.
+- `literature-search` — search strategy, screening, synthesis; pairs with
+  `literature-review-writer` for the background section.
+- `hypothesis-formulation` — stating hypotheses or experimental
+  predictions.
+
+## Rubric compliance (every write-up section)
+
+No section is written or revised without first re-reading what the
+marker expects of it. Three sources, all authoritative:
+
+- `brain/docs/Student Documentation - MSc DS - Dissertation Submission.md`
+  — the submission requirements as issued.
+- `brain/knowledge/00_marking_criteria.md` — the same rubric converted
+  for working use. Use this for the per-section criteria.
+- the `ds-writing` skill — Lancaster FST writing guidance: chapter
+  structure and balance, critical vs descriptive prose, source
+  integration, figure/table captioning.
+
+Before drafting a section, name the criteria it must satisfy. After
+drafting, trace back: for each criterion, point at the passage that
+meets it. A section that cannot be traced is not finished. Descriptive
+knowledge-telling that hits the word count still fails — `ds-writing`
+diagnoses this, so run it on any chapter that feels thin.
+
+## Overleaf pre-flight
+
+Every file bound for Overleaf gets an AI-writing pass before it goes:
+run `humanizer` and `avoid-ai-writing` over the text and clear the
+findings. This is part of the Overleaf human gate above — present the
+cleaned text, not the raw draft.
 
 Plain tables are a defect, not a baseline — every table must be justified
 against a chart alternative.

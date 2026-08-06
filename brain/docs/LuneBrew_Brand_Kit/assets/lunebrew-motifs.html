@@ -1,0 +1,57 @@
+<!-- ============================================================
+     LUNE BREW — Motif snippets (copy-paste)
+     Requires lunebrew-tokens.css. Keep ≥1 marker per slide (see spec §3).
+     ============================================================ -->
+
+<!-- 1) LUNE RIBBON — hero/dark slides only. One per slide. -->
+<svg class="ribbon" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"
+     style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <path d="M-40 470 C 260 470 320 210 600 210 C 880 210 940 520 1240 520"
+        fill="none" stroke="#FFFFFF" stroke-width="70" stroke-linecap="round" opacity=".06"/>
+  <path d="M-40 440 C 280 440 330 170 620 170 C 900 170 960 470 1300 450"
+        fill="none" stroke="#E5A83D" stroke-width="10" stroke-linecap="round" opacity=".55"/>
+</svg>
+
+<!-- 2) LB PILL — section / figure id. Cheapest brand marker; use on dense slides. -->
+<span class="lbpill"><span class="k">LB</span><span class="n">04</span></span>
+
+<!-- 3) TAB CARD — the "so what": headline stat / result / definition / code output. -->
+<div class="tabcard">
+  <div class="r1"><span>◷ LB · 04</span><span>KEY RESULT</span></div>
+  <div class="big">+62%</div>
+  <div class="r3"><span>throughput vs baseline</span><span class="tag">p&lt;0.01</span></div>
+</div>
+
+<!-- 4) WAVE DIVIDER — section underline / corner mark. -->
+<svg class="wave" viewBox="0 0 72 20" aria-hidden="true">
+  <path d="M2 10 q 7 -8 14 0 t 14 0 t 14 0 t 14 0" fill="none"
+        stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+</svg>
+
+<!-- 5) STADIUM BAND — section dividers; frame imagery. -->
+<div class="stadium" style="width:66%;height:70%">
+  <div class="anchor">LUNEBREW</div>
+</div>
+
+<!-- 6) MONOLINE ICONS — single weight, never filled. globe / glass / hops. -->
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor"
+     stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+  <circle cx="20" cy="20" r="15"/><path d="M5 20h30M20 5c5 6 5 24 0 30M20 5c-5 6-5 24 0 30"/>
+</svg>
+
+<!-- 7) CODE BLOCK — real text, focal line highlighted. -->
+<figure class="code">
+  <div class="hd"><span>train.py</span><span>PYTHON</span></div>
+<pre><code><span class="cm"># fit the model</span>
+<span class="kw">def</span> <span class="fn">train</span>(X, y):
+    model = GradientBoosting(<span class="num">n_estimators=300</span>)
+    <span class="hl">model.fit(X, y)</span>          <span class="cm"># focal line</span>
+    <span class="kw">return</span> model
+</code></pre>
+</figure>
+
+<!-- 8) PERSISTENT CHROME — add to every working slide. -->
+<img class="chrome-logo" src="assets/logo-white.svg" alt="Lune Brew"><!-- logo-black.svg on light -->
+<span class="chrome-pill lbpill"><span class="k">LB</span><span class="n">04</span></span>
+<footer class="chrome-meta">DECK TITLE · METHODOLOGY · 04</footer>
+<span class="chrome-page">4 / 22</span>

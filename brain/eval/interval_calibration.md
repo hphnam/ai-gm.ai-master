@@ -1,6 +1,6 @@
 # S7 G17h - interval calibration: powered coverage, per-step bands, adaptive methods
 
-Store ceiling 2026-07-07; device cpu; seed 93; primary level 0.9; wall-clock 29.5s.
+Store ceiling 2026-07-07; device cpu; seed 93; primary level 0.9; wall-clock 31.2s.
 
 ## Part 1: the 1.00 coverage claim, restated with power
 
@@ -11,10 +11,10 @@ C2 confrontation (reports 31/35): BH L1 7-day held-out window, 8-14 July, all 7 
 - 95% Clopper-Pearson interval on the 1.00 estimate: [0.590, 1.000].
 - Supports miscalibration: **False**. 1.00 on 7 points does NOT support a miscalibration claim: under perfect 90% calibration all 7 fall inside with probability 0.478, and the 95% Clopper-Pearson interval on the estimate is [0.590, 1.000], which contains the nominal 0.90.
 
-Angelopoulos-Bates upper bound on expected coverage (nominal + 1/(n_calib+1)):
-- beer_hall: n_calib 1883, bound 0.9005
-- ellel: n_calib 1792, bound 0.9006
-- two_river_taps: n_calib 1407, bound 0.9007
+Angelopoulos-Bates upper bound on expected coverage (nominal + 1/(n_calib+1)). Theorem D.2 holds only if the conformity scores have a continuous joint distribution, so the bound is quoted only where the calibration scores are distinct:
+- beer_hall: n_calib 1883, **upper bound NOT AVAILABLE** - the score distribution is not continuous (1581/1883 distinct; tie fraction 0.160; largest atom 0.152 of the mass at score 0). The unquotable value would have been 0.9005. The lower bound is unaffected: it requires no continuity.
+- ellel: n_calib 1792, **upper bound NOT AVAILABLE** - the score distribution is not continuous (734/1792 distinct; tie fraction 0.590; largest atom 0.556 of the mass at score 0). The unquotable value would have been 0.9006. The lower bound is unaffected: it requires no continuity.
+- two_river_taps: n_calib 1407, **upper bound NOT AVAILABLE** - the score distribution is not continuous (1149/1407 distinct; tie fraction 0.183; largest atom 0.173 of the mass at score 0). The unquotable value would have been 0.9007. The lower bound is unaffected: it requires no continuity.
 
 ## Part 2 and 4: five-arm comparison at the primary level
 

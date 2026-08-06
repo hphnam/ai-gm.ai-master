@@ -288,8 +288,42 @@ def run_mcs(winkler_by_arm: dict[str, dict], venue: str) -> dict:
 
 # --- Part 1: the Major 9 power analysis -------------------------------------
 
+def score_ties(scores: np.ndarray) -> dict:
+    """Diagnostic for the condition the conformal UPPER bound rests on.
+
+    Angelopoulos & Bates state it twice: Theorem D.2 holds only "if the scores s_1, ..., s_n
+    have a continuous joint distribution", and in the preamble, "the upper bound only holds
+    when the distribution of the conformal score is continuous, avoiding ties." Their remedy
+    -- "the user can always add a vanishing amount of random noise to the score" -- addresses
+    INCIDENTAL ties. It does not address an atom: on a venue whose trading week is mostly
+    structural closures the residual is exactly zero on most calibration days, so the score
+    distribution has a point mass and no vanishing noise recovers continuity.
+
+    Reported, never silently applied. `holds` is the paper's literal condition; `atom_mass`
+    is how badly it fails, so a reader can judge rather than take a boolean.
+    """
+    s = np.asarray(scores, dtype=float)
+    s = s[np.isfinite(s)]
+    n = int(s.size)
+    if n == 0:
+        return {"n": 0, "n_distinct": 0, "tie_fraction": None, "atom_mass": None,
+                "holds": False, "note": "no finite scores"}
+    vals, counts = np.unique(s, return_counts=True)
+    n_distinct = int(vals.size)
+    return {
+        "n": n,
+        "n_distinct": n_distinct,
+        # share of scores that do NOT hold a value uniquely
+        "tie_fraction": float((n - n_distinct) / n),
+        # mass of the single largest atom -- the quantity that breaks continuity
+        "atom_mass": float(counts.max() / n),
+        "atom_value": float(vals[int(np.argmax(counts))]),
+        "holds": bool(n_distinct == n),
+    }
+
+
 def power_analysis(*, n: int = 7, level: float = PRIMARY_LEVEL, coverage: float = 1.0,
-                   calib_sizes: dict | None = None) -> dict:
+                   calib_sizes: dict | None = None, calib_ties: dict | None = None) -> dict:
     k = int(round(coverage * n))
     p_all_in = level ** n
     cp_lo, cp_hi = clopper_pearson(k, n)
@@ -306,9 +340,17 @@ def power_analysis(*, n: int = 7, level: float = PRIMARY_LEVEL, coverage: float 
                     "which contains the nominal 0.90."),
     }
     if calib_sizes:
-        out["angelopoulos_bates"] = {
-            v: {"n_calib": nc, "upper_bound": level + 1.0 / (nc + 1)}
-            for v, nc in calib_sizes.items()}
+        ties = calib_ties or {}
+        ab = {}
+        for v, nc in calib_sizes.items():
+            t = ties.get(v)
+            entry = {"n_calib": nc, "upper_bound": level + 1.0 / (nc + 1)}
+            if t is not None:
+                entry["score_ties"] = t
+                # The bound is quoted only where the condition it rests on is met.
+                entry["upper_bound_valid"] = bool(t["holds"])
+            ab[v] = entry
+        out["angelopoulos_bates"] = ab
     return out
 
 
@@ -320,10 +362,14 @@ def build() -> dict:
     venues_out = {}
     mcs_out = {}
     calib_sizes = {}
+    calib_ties = {}
     for venue in VENUES:
         records = generate_records(venue)
         n_origins = records["origin"].nunique()
-        calib_sizes[venue] = int(len(records[records["target"] <= records["origin"].max()]))
+        calib = records[records["target"] <= records["origin"].max()]
+        calib_sizes[venue] = int(len(calib))
+        # `res` IS the conformity score: the absolute residual the quantile is taken over.
+        calib_ties[venue] = score_ties(calib["res"].to_numpy())
 
         per_level = {}
         winkler_primary = {}
@@ -359,7 +405,7 @@ def build() -> dict:
         }
         mcs_out[venue] = run_mcs(winkler_primary, venue)
 
-    power = power_analysis(calib_sizes=calib_sizes)
+    power = power_analysis(calib_sizes=calib_sizes, calib_ties=calib_ties)
 
     payload = {
         "schema_version": 1, "store_ceiling": ceiling, "device": "cpu",
@@ -403,9 +449,27 @@ def render(vectors: dict, mcs_out: dict, power: dict) -> None:
     ]
     if "angelopoulos_bates" in power:
         lines.append("Angelopoulos-Bates upper bound on expected coverage "
-                     "(nominal + 1/(n_calib+1)):")
+                     "(nominal + 1/(n_calib+1)). Theorem D.2 holds only if the conformity "
+                     "scores have a continuous joint distribution, so the bound is quoted "
+                     "only where the calibration scores are distinct:")
         for v, ab in power["angelopoulos_bates"].items():
-            lines.append(f"- {v}: n_calib {ab['n_calib']}, bound {ab['upper_bound']:.4f}")
+            t = ab.get("score_ties")
+            if t is None:
+                lines.append(f"- {v}: n_calib {ab['n_calib']}, bound {ab['upper_bound']:.4f}")
+                continue
+            if ab.get("upper_bound_valid"):
+                lines.append(
+                    f"- {v}: n_calib {ab['n_calib']}, bound {ab['upper_bound']:.4f} "
+                    f"(scores distinct: {t['n_distinct']}/{t['n']})")
+            else:
+                lines.append(
+                    f"- {v}: n_calib {ab['n_calib']}, **upper bound NOT AVAILABLE** - "
+                    f"the score distribution is not continuous "
+                    f"({t['n_distinct']}/{t['n']} distinct; tie fraction "
+                    f"{t['tie_fraction']:.3f}; largest atom {t['atom_mass']:.3f} of the mass "
+                    f"at score {t['atom_value']:.4g}). "
+                    f"The unquotable value would have been {ab['upper_bound']:.4f}. "
+                    "The lower bound is unaffected: it requires no continuity.")
         lines.append("")
 
     lines.append("## Part 2 and 4: five-arm comparison at the primary level\n")

@@ -1,0 +1,650 @@
+{
+  "order_identical_everywhere": false,
+  "out_of_scope": {
+    "ellel": "unscaled"
+  },
+  "scaled_venues": [
+    "beer_hall",
+    "two_river_taps"
+  ],
+  "venues": {
+    "beer_hall": {
+      "kendall_p": 0.0008542768959435626,
+      "kendall_tau": 0.8333333333333334,
+      "mase": {
+        "mcs_set": [
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt",
+          "rung4_chronos2",
+          "rung2_ets",
+          "rung1_robust_dow"
+        ],
+        "means": {
+          "rung0_seasonal_naive": 0.9375465624687549,
+          "rung1_robust_dow": 0.8032188216093493,
+          "rung2_ets": 0.7523643273484731,
+          "rung2_stl": 0.8709882552004397,
+          "rung3_gbm": 0.8830241923773793,
+          "rung3_global_gbm": 0.8647032205085213,
+          "rung4_chronos2": 0.7341935956701844,
+          "rung4_chronos2_exo": 0.7163152357979844,
+          "rung4_chronos_bolt": 0.732082341296235
+        },
+        "metric": "mase",
+        "n_folds": 273,
+        "names": [
+          "rung0_seasonal_naive",
+          "rung1_robust_dow",
+          "rung2_ets",
+          "rung2_stl",
+          "rung3_gbm",
+          "rung3_global_gbm",
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt"
+        ],
+        "order": [
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt",
+          "rung4_chronos2",
+          "rung2_ets",
+          "rung1_robust_dow",
+          "rung3_global_gbm",
+          "rung2_stl",
+          "rung3_gbm",
+          "rung0_seasonal_naive"
+        ],
+        "summary": {
+          "elimination": [
+            {
+              "mcs_pvalue": 0.0,
+              "model": "rung3_global_gbm",
+              "set_size_before": 9,
+              "step_pvalue": 0.0,
+              "t_range": 6.230092518577271
+            },
+            {
+              "mcs_pvalue": 0.0,
+              "model": "rung3_gbm",
+              "set_size_before": 8,
+              "step_pvalue": 0.0,
+              "t_range": 5.561781124901003
+            },
+            {
+              "mcs_pvalue": 0.002,
+              "model": "rung2_stl",
+              "set_size_before": 7,
+              "step_pvalue": 0.002,
+              "t_range": 4.528532860154867
+            },
+            {
+              "mcs_pvalue": 0.002,
+              "model": "rung0_seasonal_naive",
+              "set_size_before": 6,
+              "step_pvalue": 0.002,
+              "t_range": 4.222444809222478
+            },
+            {
+              "mcs_pvalue": 0.111,
+              "model": "rung1_robust_dow",
+              "set_size_before": 5,
+              "step_pvalue": 0.111,
+              "t_range": 2.3974538929442195
+            },
+            {
+              "mcs_pvalue": 0.224,
+              "model": "rung2_ets",
+              "set_size_before": 4,
+              "step_pvalue": 0.224,
+              "t_range": 1.8968149427934615
+            },
+            {
+              "mcs_pvalue": 0.38,
+              "model": "rung4_chronos2",
+              "set_size_before": 3,
+              "step_pvalue": 0.38,
+              "t_range": 1.2913692325432293
+            },
+            {
+              "mcs_pvalue": 0.38,
+              "model": "rung4_chronos_bolt",
+              "set_size_before": 2,
+              "step_pvalue": 0.235,
+              "t_range": 1.1663354367035907
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.002,
+            "rung1_robust_dow": 0.111,
+            "rung2_ets": 0.224,
+            "rung2_stl": 0.002,
+            "rung3_gbm": 0.0,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.38,
+            "rung4_chronos2_exo": 1.0,
+            "rung4_chronos_bolt": 0.38
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.9375465624687552,
+            "rung1_robust_dow": 0.8032188216093493,
+            "rung2_ets": 0.7523643273484734,
+            "rung2_stl": 0.8709882552004398,
+            "rung3_gbm": 0.883024192377379,
+            "rung3_global_gbm": 0.8647032205085213,
+            "rung4_chronos2": 0.7341935956701844,
+            "rung4_chronos2_exo": 0.7163152357979843,
+            "rung4_chronos_bolt": 0.7320823412962347
+          },
+          "n_folds": 273,
+          "set_sizes": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "sets": {
+            "0.1": [
+              "rung4_chronos2_exo",
+              "rung4_chronos_bolt",
+              "rung4_chronos2",
+              "rung2_ets",
+              "rung1_robust_dow"
+            ],
+            "0.25": [
+              "rung4_chronos2_exo",
+              "rung4_chronos_bolt",
+              "rung4_chronos2"
+            ]
+          }
+        },
+        "winner": "rung4_chronos2_exo"
+      },
+      "mcs_only_in_mase": [],
+      "mcs_only_in_rmsse": [],
+      "mcs_set_identical": true,
+      "mcs_set_mase": [
+        "rung1_robust_dow",
+        "rung2_ets",
+        "rung4_chronos2",
+        "rung4_chronos2_exo",
+        "rung4_chronos_bolt"
+      ],
+      "mcs_set_rmsse": [
+        "rung1_robust_dow",
+        "rung2_ets",
+        "rung4_chronos2",
+        "rung4_chronos2_exo",
+        "rung4_chronos_bolt"
+      ],
+      "n_rungs": 9,
+      "order_identical": false,
+      "rmsse": {
+        "mcs_set": [
+          "rung4_chronos_bolt",
+          "rung4_chronos2_exo",
+          "rung2_ets",
+          "rung4_chronos2",
+          "rung1_robust_dow"
+        ],
+        "means": {
+          "rung0_seasonal_naive": 0.7611758891613941,
+          "rung1_robust_dow": 0.6421125453910221,
+          "rung2_ets": 0.6016595906136024,
+          "rung2_stl": 0.6576848840591982,
+          "rung3_gbm": 0.6818288476940735,
+          "rung3_global_gbm": 0.6646088336774316,
+          "rung4_chronos2": 0.6077021468994991,
+          "rung4_chronos2_exo": 0.5901909078848326,
+          "rung4_chronos_bolt": 0.590029578701268
+        },
+        "metric": "rmsse",
+        "n_folds": 273,
+        "names": [
+          "rung0_seasonal_naive",
+          "rung1_robust_dow",
+          "rung2_ets",
+          "rung2_stl",
+          "rung3_gbm",
+          "rung3_global_gbm",
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt"
+        ],
+        "order": [
+          "rung4_chronos_bolt",
+          "rung4_chronos2_exo",
+          "rung2_ets",
+          "rung4_chronos2",
+          "rung1_robust_dow",
+          "rung2_stl",
+          "rung3_global_gbm",
+          "rung3_gbm",
+          "rung0_seasonal_naive"
+        ],
+        "summary": {
+          "elimination": [
+            {
+              "mcs_pvalue": 0.006,
+              "model": "rung2_stl",
+              "set_size_before": 9,
+              "step_pvalue": 0.006,
+              "t_range": 3.7704985283619963
+            },
+            {
+              "mcs_pvalue": 0.006,
+              "model": "rung3_gbm",
+              "set_size_before": 8,
+              "step_pvalue": 0.004,
+              "t_range": 3.7407342596667204
+            },
+            {
+              "mcs_pvalue": 0.006,
+              "model": "rung3_global_gbm",
+              "set_size_before": 7,
+              "step_pvalue": 0.004,
+              "t_range": 3.7337596767994374
+            },
+            {
+              "mcs_pvalue": 0.006,
+              "model": "rung0_seasonal_naive",
+              "set_size_before": 6,
+              "step_pvalue": 0.005,
+              "t_range": 3.671580219173232
+            },
+            {
+              "mcs_pvalue": 0.191,
+              "model": "rung1_robust_dow",
+              "set_size_before": 5,
+              "step_pvalue": 0.191,
+              "t_range": 2.0533458179479753
+            },
+            {
+              "mcs_pvalue": 0.191,
+              "model": "rung4_chronos2",
+              "set_size_before": 4,
+              "step_pvalue": 0.17,
+              "t_range": 1.9846848246714628
+            },
+            {
+              "mcs_pvalue": 0.547,
+              "model": "rung2_ets",
+              "set_size_before": 3,
+              "step_pvalue": 0.547,
+              "t_range": 1.012850288144692
+            },
+            {
+              "mcs_pvalue": 0.991,
+              "model": "rung4_chronos2_exo",
+              "set_size_before": 2,
+              "step_pvalue": 0.991,
+              "t_range": 0.016417853409082913
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.006,
+            "rung1_robust_dow": 0.191,
+            "rung2_ets": 0.547,
+            "rung2_stl": 0.006,
+            "rung3_gbm": 0.006,
+            "rung3_global_gbm": 0.006,
+            "rung4_chronos2": 0.191,
+            "rung4_chronos2_exo": 0.991,
+            "rung4_chronos_bolt": 1.0
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.7611758891613941,
+            "rung1_robust_dow": 0.6421125453910225,
+            "rung2_ets": 0.6016595906136024,
+            "rung2_stl": 0.6576848840591981,
+            "rung3_gbm": 0.6818288476940736,
+            "rung3_global_gbm": 0.6646088336774316,
+            "rung4_chronos2": 0.6077021468994995,
+            "rung4_chronos2_exo": 0.5901909078848326,
+            "rung4_chronos_bolt": 0.5900295787012679
+          },
+          "n_folds": 273,
+          "set_sizes": {
+            "0.1": 5,
+            "0.25": 3
+          },
+          "sets": {
+            "0.1": [
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung2_ets",
+              "rung4_chronos2",
+              "rung1_robust_dow"
+            ],
+            "0.25": [
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung2_ets"
+            ]
+          }
+        },
+        "winner": "rung4_chronos_bolt"
+      },
+      "spearman_p": 8.762523965086185e-05,
+      "spearman_rho": 0.9500000000000001,
+      "venue": "beer_hall",
+      "winner_changes": true,
+      "winner_mase": "rung4_chronos2_exo",
+      "winner_rmsse": "rung4_chronos_bolt"
+    },
+    "two_river_taps": {
+      "kendall_p": 0.02474096119929453,
+      "kendall_tau": 0.611111111111111,
+      "mase": {
+        "mcs_set": [
+          "rung2_ets",
+          "rung4_chronos_bolt",
+          "rung4_chronos2_exo",
+          "rung4_chronos2"
+        ],
+        "means": {
+          "rung0_seasonal_naive": 0.7182002044018313,
+          "rung1_robust_dow": 0.8350924133397122,
+          "rung2_ets": 0.6478405832101088,
+          "rung2_stl": 0.7814331344782749,
+          "rung3_gbm": 0.7409138155019387,
+          "rung3_global_gbm": 0.8968765442839027,
+          "rung4_chronos2": 0.6709001012205017,
+          "rung4_chronos2_exo": 0.670488384977004,
+          "rung4_chronos_bolt": 0.6589576090154936
+        },
+        "metric": "mase",
+        "n_folds": 205,
+        "names": [
+          "rung0_seasonal_naive",
+          "rung1_robust_dow",
+          "rung2_ets",
+          "rung2_stl",
+          "rung3_gbm",
+          "rung3_global_gbm",
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt"
+        ],
+        "order": [
+          "rung2_ets",
+          "rung4_chronos_bolt",
+          "rung4_chronos2_exo",
+          "rung4_chronos2",
+          "rung0_seasonal_naive",
+          "rung3_gbm",
+          "rung2_stl",
+          "rung1_robust_dow",
+          "rung3_global_gbm"
+        ],
+        "summary": {
+          "elimination": [
+            {
+              "mcs_pvalue": 0.0,
+              "model": "rung3_global_gbm",
+              "set_size_before": 9,
+              "step_pvalue": 0.0,
+              "t_range": 5.221371331438178
+            },
+            {
+              "mcs_pvalue": 0.001,
+              "model": "rung1_robust_dow",
+              "set_size_before": 8,
+              "step_pvalue": 0.001,
+              "t_range": 4.412968342410156
+            },
+            {
+              "mcs_pvalue": 0.003,
+              "model": "rung2_stl",
+              "set_size_before": 7,
+              "step_pvalue": 0.003,
+              "t_range": 4.009974401814339
+            },
+            {
+              "mcs_pvalue": 0.05,
+              "model": "rung3_gbm",
+              "set_size_before": 6,
+              "step_pvalue": 0.05,
+              "t_range": 2.7799869755847935
+            },
+            {
+              "mcs_pvalue": 0.05,
+              "model": "rung0_seasonal_naive",
+              "set_size_before": 5,
+              "step_pvalue": 0.05,
+              "t_range": 2.674348892846037
+            },
+            {
+              "mcs_pvalue": 0.682,
+              "model": "rung4_chronos2",
+              "set_size_before": 4,
+              "step_pvalue": 0.682,
+              "t_range": 1.1049932453372655
+            },
+            {
+              "mcs_pvalue": 0.682,
+              "model": "rung4_chronos2_exo",
+              "set_size_before": 3,
+              "step_pvalue": 0.526,
+              "t_range": 1.0906328615586907
+            },
+            {
+              "mcs_pvalue": 0.682,
+              "model": "rung4_chronos_bolt",
+              "set_size_before": 2,
+              "step_pvalue": 0.672,
+              "t_range": 0.4349460436733267
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.05,
+            "rung1_robust_dow": 0.001,
+            "rung2_ets": 1.0,
+            "rung2_stl": 0.003,
+            "rung3_gbm": 0.05,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 0.682,
+            "rung4_chronos2_exo": 0.682,
+            "rung4_chronos_bolt": 0.682
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.718200204401831,
+            "rung1_robust_dow": 0.8350924133397124,
+            "rung2_ets": 0.6478405832101088,
+            "rung2_stl": 0.7814331344782746,
+            "rung3_gbm": 0.7409138155019381,
+            "rung3_global_gbm": 0.8968765442839028,
+            "rung4_chronos2": 0.6709001012205021,
+            "rung4_chronos2_exo": 0.6704883849770042,
+            "rung4_chronos_bolt": 0.6589576090154935
+          },
+          "n_folds": 205,
+          "set_sizes": {
+            "0.1": 4,
+            "0.25": 4
+          },
+          "sets": {
+            "0.1": [
+              "rung2_ets",
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung4_chronos2"
+            ],
+            "0.25": [
+              "rung2_ets",
+              "rung4_chronos_bolt",
+              "rung4_chronos2_exo",
+              "rung4_chronos2"
+            ]
+          }
+        },
+        "winner": "rung2_ets"
+      },
+      "mcs_only_in_mase": [],
+      "mcs_only_in_rmsse": [],
+      "mcs_set_identical": true,
+      "mcs_set_mase": [
+        "rung2_ets",
+        "rung4_chronos2",
+        "rung4_chronos2_exo",
+        "rung4_chronos_bolt"
+      ],
+      "mcs_set_rmsse": [
+        "rung2_ets",
+        "rung4_chronos2",
+        "rung4_chronos2_exo",
+        "rung4_chronos_bolt"
+      ],
+      "n_rungs": 9,
+      "order_identical": false,
+      "rmsse": {
+        "mcs_set": [
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt",
+          "rung2_ets"
+        ],
+        "means": {
+          "rung0_seasonal_naive": 0.5673658227860289,
+          "rung1_robust_dow": 0.5820078002472108,
+          "rung2_ets": 0.513879957779486,
+          "rung2_stl": 0.5681892049159101,
+          "rung3_gbm": 0.5490914450558613,
+          "rung3_global_gbm": 0.7142917682842137,
+          "rung4_chronos2": 0.4817241171768523,
+          "rung4_chronos2_exo": 0.4831790352879296,
+          "rung4_chronos_bolt": 0.4859896861809628
+        },
+        "metric": "rmsse",
+        "n_folds": 205,
+        "names": [
+          "rung0_seasonal_naive",
+          "rung1_robust_dow",
+          "rung2_ets",
+          "rung2_stl",
+          "rung3_gbm",
+          "rung3_global_gbm",
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt"
+        ],
+        "order": [
+          "rung4_chronos2",
+          "rung4_chronos2_exo",
+          "rung4_chronos_bolt",
+          "rung2_ets",
+          "rung3_gbm",
+          "rung0_seasonal_naive",
+          "rung2_stl",
+          "rung1_robust_dow",
+          "rung3_global_gbm"
+        ],
+        "summary": {
+          "elimination": [
+            {
+              "mcs_pvalue": 0.0,
+              "model": "rung3_global_gbm",
+              "set_size_before": 9,
+              "step_pvalue": 0.0,
+              "t_range": 5.1906201399403535
+            },
+            {
+              "mcs_pvalue": 0.001,
+              "model": "rung1_robust_dow",
+              "set_size_before": 8,
+              "step_pvalue": 0.001,
+              "t_range": 4.259793940832636
+            },
+            {
+              "mcs_pvalue": 0.027,
+              "model": "rung2_stl",
+              "set_size_before": 7,
+              "step_pvalue": 0.027,
+              "t_range": 3.2094772782844023
+            },
+            {
+              "mcs_pvalue": 0.027,
+              "model": "rung3_gbm",
+              "set_size_before": 6,
+              "step_pvalue": 0.023,
+              "t_range": 3.1140453516807494
+            },
+            {
+              "mcs_pvalue": 0.079,
+              "model": "rung0_seasonal_naive",
+              "set_size_before": 5,
+              "step_pvalue": 0.079,
+              "t_range": 2.521142918539165
+            },
+            {
+              "mcs_pvalue": 0.201,
+              "model": "rung2_ets",
+              "set_size_before": 4,
+              "step_pvalue": 0.201,
+              "t_range": 1.887585440735132
+            },
+            {
+              "mcs_pvalue": 0.908,
+              "model": "rung4_chronos_bolt",
+              "set_size_before": 3,
+              "step_pvalue": 0.908,
+              "t_range": 0.42426558265057185
+            },
+            {
+              "mcs_pvalue": 0.908,
+              "model": "rung4_chronos2_exo",
+              "set_size_before": 2,
+              "step_pvalue": 0.798,
+              "t_range": 0.2542768345234653
+            }
+          ],
+          "mcs_pvalue": {
+            "rung0_seasonal_naive": 0.079,
+            "rung1_robust_dow": 0.001,
+            "rung2_ets": 0.201,
+            "rung2_stl": 0.027,
+            "rung3_gbm": 0.027,
+            "rung3_global_gbm": 0.0,
+            "rung4_chronos2": 1.0,
+            "rung4_chronos2_exo": 0.908,
+            "rung4_chronos_bolt": 0.908
+          },
+          "mean_loss": {
+            "rung0_seasonal_naive": 0.5673658227860291,
+            "rung1_robust_dow": 0.5820078002472108,
+            "rung2_ets": 0.5138799577794861,
+            "rung2_stl": 0.5681892049159104,
+            "rung3_gbm": 0.549091445055861,
+            "rung3_global_gbm": 0.7142917682842135,
+            "rung4_chronos2": 0.4817241171768521,
+            "rung4_chronos2_exo": 0.48317903528792977,
+            "rung4_chronos_bolt": 0.48598968618096305
+          },
+          "n_folds": 205,
+          "set_sizes": {
+            "0.1": 4,
+            "0.25": 3
+          },
+          "sets": {
+            "0.1": [
+              "rung4_chronos2",
+              "rung4_chronos2_exo",
+              "rung4_chronos_bolt",
+              "rung2_ets"
+            ],
+            "0.25": [
+              "rung4_chronos2",
+              "rung4_chronos2_exo",
+              "rung4_chronos_bolt"
+            ]
+          }
+        },
+        "winner": "rung4_chronos2"
+      },
+      "spearman_p": 0.0072247852463587885,
+      "spearman_rho": 0.8166666666666667,
+      "venue": "two_river_taps",
+      "winner_changes": true,
+      "winner_mase": "rung2_ets",
+      "winner_rmsse": "rung4_chronos2"
+    }
+  },
+  "winner_changes_anywhere": true
+}

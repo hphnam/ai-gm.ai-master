@@ -29,5 +29,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
     "turbo": "latest"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.5.0"
   }
 }

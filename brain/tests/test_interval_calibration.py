@@ -182,3 +182,27 @@ def test_online_pass_covers_near_nominal_on_exchangeable_residuals():
     out = run_online(pd.DataFrame(rows), 0.90, warmup=140)
     cov = arm_metrics(out["S"], 0.90)["marginal"]["coverage"]
     assert 0.87 <= cov <= 0.94
+
+
+def test_the_upper_bound_is_withheld_when_the_scores_are_not_continuous():
+    # Angelopoulos & Bates Theorem D.2 holds only "if the scores s_1, ..., s_n have a
+    # continuous joint distribution". A structural-zero venue puts an atom at res == 0.
+    from eval.interval_calibration import power_analysis, score_ties
+    ties = {"ellel": score_ties(np.array([0.0] * 80 + [1.0, 2.0, 3.0]))}
+    out = power_analysis(calib_sizes={"ellel": 83}, calib_ties=ties)
+    ab = out["angelopoulos_bates"]["ellel"]
+    assert ab["upper_bound_valid"] is False
+    assert ab["score_ties"]["atom_value"] == 0.0
+
+
+def test_the_upper_bound_stands_when_every_score_is_distinct():
+    from eval.interval_calibration import power_analysis, score_ties
+    ties = {"beer_hall": score_ties(np.array([1.0, 2.0, 3.0, 4.0]))}
+    out = power_analysis(calib_sizes={"beer_hall": 4}, calib_ties=ties)
+    assert out["angelopoulos_bates"]["beer_hall"]["upper_bound_valid"] is True
+
+
+def test_the_tie_fraction_counts_scores_without_a_unique_value():
+    from eval.interval_calibration import score_ties
+    # 5 scores, 3 distinct values -> 2 of the 5 do not hold their value uniquely.
+    assert score_ties(np.array([0.0, 0.0, 0.0, 1.0, 2.0]))["tie_fraction"] == 0.4

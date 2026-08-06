@@ -1194,3 +1194,560 @@ Push mechanics: `write_section` replaces through to the next SAME-level heading,
 entries before and after, subsection present exactly once, downstream indices +1193.
 
 Frozen ladder artefacts still NOT regenerated. No thesis number changed.
+
+---
+
+## 2026-08-03 — Phase: literature review closed
+
+**Completed**
+- T8 closed. All 90 citation keys checked against source text across two
+  passes today. One error found this pass (Hertel rounding, 4%/3% → 3.6%/2.7%);
+  Phuong applied their own wording in Overleaf and it was kept over mine.
+- Both pedagogical figures dropped; one synthetic figure (`fig:gap-map`)
+  designed, generated, and pushed. Its axes are lifted from the chapter's own
+  synthesis sentences, so it asserts nothing the prose does not.
+- `chapters/literature_review.tex` pushed and verified byte-identical,
+  67,389 bytes, sha256 `4e6e6218…85417`.
+
+**Artifacts written**
+- `brain/log/HANDOFF_2026-08-03_litreview.md` — full session handoff.
+- `brain/drafts/figures/make_litreview_figures.py` — rewritten, single figure.
+- `brain/drafts/figures/gap_map.{pdf,png}`, `INSERTION.md`.
+- `brain/drafts/literature_review.tex` — synced to the pushed remote.
+- `brain/ledger/litreview_critique.md` — three appends (T8 close, figure
+  rationale, push record).
+
+**Findings that change the record**
+- NotebookLM is unreliable as a sole verifier — wrong or NOT-IN-SOURCES on six
+  claims that Zotero full text confirms verbatim. Third session running.
+  Zotero full text is the authority; NotebookLM is a search index.
+- T12 (figures must be referenced) is a whole-thesis rule and was allowed to
+  drive a chapter's content. Two figures existed only to satisfy it. A
+  whole-thesis rule must not decide a chapter-level question.
+- Second near-miss on a hand-assembled `write_file` that would have truncated
+  the chapter. Blocked by the classifier. Rule now recorded in two places.
+
+**Open — human only**
+- Delete `figures/sbc_plane.pdf` + `figures/hln_correction.pdf` from Overleaf.
+- Delete junk NotebookLM source `416b583d-07f2-4f3c-8109-f4dcd5e566ad`.
+- Phuong's truncated message ("It will match the…") never completed; ask
+  before assuming it was immaterial.
+
+---
+
+## 2026-08-05 — Phase: supervisor evidence pack (consolidation, no new experiments)
+
+**Completed**
+- Read in artifact-first order per instruction: state brief, marking criteria,
+  pipeline spec, the five ledgers, `docs/PRJ93.md`, examiner register. Three
+  subagents delegated the heavy ledger reads under the token-discipline rule
+  (results verification, writing state, methodology trajectory), each returning
+  under 400 lines.
+- `brain/store/` inspected **directly** rather than described: DuckDB opened
+  read-only (24 tables), parquet and the two raw CSV/xlsx sets counted in code.
+  New first-hand measurements, none previously recorded in one place:
+  - `line_items` 93,400 rows; per-venue trading days 302 / 280 / 68 / 2;
+    missing-day counts 97 / 51 / 324 / 0.
+  - **Export→MCP discontinuity quantified**: 92,329 CSV rows (26,483 distinct
+    clock times, real txn ids, tax present) vs 1,071 MCP rows (1 clock time,
+    100% null `price_point`, 100% zero `tax`, synthetic ids). Intraday, price
+    point and VAT granularity stop at 2026-05-31.
+  - **Stock join gap quantified**: 238 stock products vs 440 sales items, 26
+    exact name matches, **6.38% of net sales / 4.64% of units**.
+  - Chat corpus reproduced from source: 735 messages / 66 conversations / 25
+    days / 100% web / 18.9% failure — reconciles exactly with
+    `signals/chatlog_kb_gap.md`.
+  - Checklist artefact confirmed a **blank template** (27 open + 32 close, zero
+    completion events, zero timestamps).
+- graphify used for orientation and **did not hang this session** (contradicting
+  `tooling_verdict.md:119-133`); it returns a truncated 486-node subgraph in
+  seconds. The `timeout` binary is absent on this shell — that was the earlier
+  apparent hang, not graphify.
+
+**Artifacts written**
+- `brain/knowledge/04_supervisor_evidence_pack.md` — 1,343 lines / ~16k words.
+  Six sections plus a closing "Unverified or conflicting" register of **35
+  items** (10 value conflicts, 5 untraceable numbers, 7 ledger
+  self-contradictions, 4 flag-roster disagreements, 9 unperformable checks).
+
+**Findings that change the record**
+- **`brain/log/*result*.md` matches no file, and never has.**
+  `PRJ93_RULES.md:31-34` makes that path the number-tracing convention. It was
+  specified and never instantiated; traces in practice go to `log/NN_*.md` and
+  to per-script `.md`/`.json`. The rule is the thing that is wrong.
+- **"MCP-SIM" is not simulated data.** Provenance carries merchant id
+  `ML1FFAGJMQBTZ`, real Square view names and real refresh timestamps. The label
+  should be renamed before anyone external reads it.
+- **Examiner W27 is contradicted by the artefact.** W27 charges a flat Ask-F1
+  cost of 8.0 at every ratio; `log/PRJ93_Agent_Eval_Report.md:141-148` reports
+  126 misses vs 8 false alarms and cost 134.0 / 260.0 / 638.0 / 1268.0. Do not
+  repeat W27 without re-checking.
+- **Agent memory returned zero results** on two queries. Nothing is recoverable
+  from memory that is not already in a file.
+- 3 of 5 `brewery_inventory` snapshots carry a null `snapshot_date` (607 of
+  1,002 rows) — not time-orderable, not flagged anywhere previously.
+- `brain/drafts/literature_review_condensed.tex` (7,481 w, written 2026-08-04)
+  is recorded in no ledger, and is 2,363 words shorter than the byte-locked
+  remote.
+
+**Open — human only**
+- Everything in §6 of the pack: 5 asks to Ryan, 3 to Elliot, 4 to James, 6 to
+  the supervisor. The Track B key chase date (2026-08-04) has passed.
+- `knowledge/03_*` does not exist; the pack is numbered 04 per instruction.
+
+**Unstarted**
+- Phase C in full. Phase D, E, F. G1 and G3. Nothing was run, rerun or pushed
+  this session; no Overleaf write was made, per instruction.
+
+## 2026-08-05 — Phase: supervisor evidence pack, §3 literature foundation
+
+Enrichment pass on `knowledge/04_supervisor_evidence_pack.md`. No slides, no
+Overleaf write, no chapter edit, no Zotero write.
+
+**Completed.** Inserted a new `## 3. Literature foundation and methodological
+justification` before the methodology trajectory, and renumbered §3→4, §4→5,
+§5→6, §6→7 with every internal cross-reference updated. No existing section was
+rewritten. Seven sub-sections: 3.1 search and screening protocol, 3.2 corpus
+composition, 3.3 corpus revision under critique, 3.4 synthesis and critical
+position, 3.5 evidence-to-method traceability (29-row matrix + two exception
+lists), 3.6 sequencing, 3.7 standing limitations. Pack now 1,993 lines /
+~25,050 words.
+
+**Measured first-hand this session** (not copied from a ledger):
+- `drafts/literature_review.tex`: **133 citation occurrences, 86 unique keys**;
+  first-appearance by section framing 6 / rhythm 34 / ruler 10 / deviation 10 /
+  surfacing 11 / evaluation 10 / synthesis 5; 13 keys cited 3+ times, 55 cited
+  exactly once; year span 1954–2026, 2024–26 share 37/86 = 43%.
+- Zotero: **118 items**, PDF coverage 112/118. Collections D1 3, D2 5, D3 58,
+  D4 9, D5 9, D6 10, D7 10, D8 14 — sums to 118, so nothing unfiled.
+- `eval/mcs.py:52-56` — `BLOCK_LEN = 7`, `N_BOOT = 1000` (sensitivity
+  1000/5000), `SEED = 93`, block sensitivity (2,7,14,21). Earlier prose
+  elsewhere in my own notes said B = 10,000; **1000 is what the code says.**
+- `config.py:358-363` — `CP_CUSUM_K = 0.5`, `CP_CUSUM_H = 5.0`,
+  `CP_ARL0_EMPIRICAL_LB = 400` right-censored at the simulation length.
+
+**Findings that change the record.**
+1. **The search protocol was never written and never pre-registered.**
+   `appendix/` does not exist; no `search_protocol.tex` anywhere. ARC stage 3
+   specifies it (`02_prj93_pipeline_spec.md:70-79`) and Phase A scheduled it to
+   2026-08-04, now passed. Role A raised "no search protocol" in critique
+   iteration 1 (`litreview_critique.md:72`) and it is **the one finding from
+   that round never repaired** across revisions 2–6. §3.1 states this plainly
+   rather than implying a protocol.
+2. **Breiman et al. 1984 is in Zotero (`54Z6YNAL`) and cited in no chapter.**
+   The one-standard-error adoption rule — the project's showcase
+   pre-registration — currently rests on an uncited warrant. This is exactly the
+   W54 failure mode the audit named ("acquisition alone does not close it"), and
+   it is a one-line fix.
+3. **No resampling literature exists in the corpus at all.** Künsch and
+   Politis & Romano are absent from Zotero and from the review, yet the
+   moving-block bootstrap is the inference engine behind every CI in the
+   results. Logged as exception A3, class *gap*.
+4. **The four papers added on 2026-08-01 are four of the six Zotero items with
+   no stored PDF**, and four of the thirteen doing the heaviest argumentative
+   load. Their verification cannot be re-checked offline. Most fixable item in
+   §3.7: fetch four PDFs.
+5. **All four 2026-08-01 additions were filed into D3** regardless of theme
+   (Dixon and Ancker belong in D8, Paleyes in D1), so the collection counts are
+   not a clean thematic census.
+6. **`citation_audit.md:387-389` still reads "None has been applied"** while the
+   critique log records at least nine of those corrections as fixed. The
+   canonical defect ledger was never updated. Recorded, not edited.
+7. **`hyndman_another_2006` remains the highest-priority unresolved citation
+   defect** — the 2006 paper has no seasonal-naive denominator and the
+   methodology chapter cites it for one, while the project's whole ruler is
+   seasonal-naive. Unverifiable here: `methodology.tex` is not in the working
+   tree. Same for the second `bavaresco_llms_2025` occurrence.
+8. **Cited-key count is 86, not 90.** The ledger says 90 in three places and the
+   pack's own §6.3 says both 90 and ~86. Not reconciled.
+9. **Zotero is 118 today, not the 122 recorded**, and the three-way
+   reconciliation the spec asks for (NotebookLM / My Library / `scc452`) is
+   still open — I queried one library only.
+
+**Exception lists produced.** A (method decisions with no literature backing):
+12 items, 6 pragmatic, 3 exploratory, **3 genuine gaps — A3 bootstrap,
+A5 Breiman, A6 the six hard-coded surfacing constants**. B (literature findings
+the methodology does not act on): 13 items, of which **B4, B6, B7, B8 are
+blocked by data provision** — booking diary and operator labels and cost
+elicitation (Elliot), cross-tenant data plus privacy sign-off (Ryan). Those four
+are the strongest evidence that scope reduction was externally imposed.
+
+**Register.** "Unverified or conflicting" grew 35 → **44 items** (new L1–L9).
+
+**Artifacts written.** `knowledge/04_supervisor_evidence_pack.md` (amended),
+this entry. Backup of the pre-edit pack in the session scratchpad.
+
+**Unstarted / open.** `appendix/search_protocol.tex` (W33, free marks, still
+unwritten). Cite Breiman. Acquire two resampling references (gate 2). Fetch
+four PDFs into Zotero. Update `citation_audit.md` to record the applied fixes.
+Check `hyndman_another_2006` and `bavaresco_llms_2025` in `methodology.tex`.
+Record dispositions for `tibshirani_conformal_2019` and Wickens & Dixon.
+Upload `gap_map.pdf` and delete the two dead figure PDFs from Overleaf.
+Experiment gap closure (Phase C) still not started.
+
+### Same session, second pass — re-verified §3 against Overleaf, not the drafts
+
+The operator directed that all written-state claims be checked on Overleaf, since
+everything is pushed there. Done, read-only: `list_files`, `status_summary`,
+`get_sections`, and full reads of `chapters/literature_review.tex` and
+`chapters/methodology.tex`. **No write.** The remote differs materially from both
+the local drafts and the ledgers, and §3 was corrected throughout.
+
+**The remote lit review is the condensed draft, and that is in no ledger.**
+52,435 bytes / ~7,111 words, matching `drafts/literature_review_condensed.tex`
+(52,431 bytes) to within whitespace. `litreview_critique.md:747-750` records the
+remote as `push6.tex`, 67,389 bytes, SHA256 `4e6e6218…`. A ~2,400-word
+condensation was pushed after the critique record closed, with no gate entry and
+no acceptance-test re-run. It preserved all 86 keys but **rolled back three
+repairs**: the T13 consolidated limitations inventory (recorded CLOSED 08-03) is
+gone; the whole scope paragraph is gone, taking the author-as-rater
+internal-validity statement with it; the per-section preprint accounting
+(1 + 3 + 7 = 11) is reduced to a bare total. The in-text search-boundary
+sentence ("No systematic search for a small-collection counterexample…") is also
+gone. Fifth instance of the every-fix-ships-a-defect pattern, and the first
+outside the loop built to catch it.
+
+**Key count RESOLVED: 86.** Remote has 128 occurrences / 86 unique; local draft
+133 / same 86. Ledger's 90 is stale. Load-bearing set is 10 keys at 3+ on the
+remote, not 13 — `haben_short_2019`, `hewamalage_forecast_2023` and
+`barber_conformal_2023` each lost a repeat in the condensation. Cited-once 57.
+
+**Two defects I called unrepaired this morning are fixed on Overleaf.**
+`hyndman_another_2006` now carries only the original lag-1 definition, with
+`hyndman_forecasting_2021` (Zotero `K45PBRM3`) added for the seasonal form —
+closing what I had called the project's highest-priority citation defect.
+`bavaresco_llms_2025` is corrected in the methodology as well as the review.
+
+**One exception-list entry of mine was wrong.** A5 claimed Breiman was owned but
+uncited. **The remote methodology cites `breiman_classification_1984`** in
+`sec:intermittency`, with estimator, sub-block rationale and fail-closed
+conditions. Corrected in place rather than deleted. Genuine A-list gaps fall
+from three to two: A3 (no resampling citation behind the moving-block bootstrap)
+and A6 (the six surfacing constants, which is Fatal 2, not a citation problem).
+A1 and A10 also softened — the methodology explicitly disclaims the CUSUM ARL
+warrant and justifies the pinned chat-log backend.
+
+**Three B-list entries softened.** B1: RMSSE **is** computed, on the same four
+bases as MASE and as the MCS secondary loss — G1 is a headline choice, not a
+missing computation. B3: `hewamalage_look_2021` is cited twice in methodology and
+is the stated warrant for reporting a scaled error beside an unscaled proper
+score. B10: the Mondrian variant is implemented on an **observed** regime
+variable specifically to remove Sun & Yu's state-misclassification term.
+
+**The real finding: the methodology chapter is better warranted than the ledgers
+record, and no ledger records it.** New citations, two audit defects closed, a
+pre-registered MCS configuration table, and a withdrawn finding — none of it in
+`citation_audit.md`, `litreview_critique.md`, `FLAGS.md` or here until now. Two
+keys in active use (`hyndman_forecasting_2021`, `breiman_classification_1984`)
+sit outside every verification record.
+
+**Undocumented defect disclosed by the remote.** The SBA selection inequality was
+implemented **reversed**, quoted from the external review rather than checked
+against Kostenko & Hyndman, and the published "no node selects SBA" finding is
+withdrawn as an artefact of it. Under the correct rule every node selects SBA —
+and the chapter then proves the rule non-informative at the cutoff, since
+2 − (3/2)(4/3) = 0 exactly and v ≥ 0 always, so classification entails selection.
+Good result, no ledger entry. **Not checked: whether `models/intermittent.py` was
+fixed or only the prose.**
+
+**Figures: nearly closed.** `figures/gap_map.pdf` is on the remote, one
+`\includegraphics`, one `\ref`; `hln_correction.pdf` deleted. **`sbc_plane.pdf`
+is still orphaned at the project root** and should be deleted.
+
+**Register** grew 44 → **49 items** (L10–L14 added). Pack now 2,148 lines /
+~27,390 words.
+
+**Newly unstarted / open from this pass.** Restore the three condensation
+rollbacks (T13 inventory, scope paragraph, preprint accounting) — cheap, no gate,
+since restoring deleted text adds no citation. Delete `sbc_plane.pdf` from the
+remote. Verify `hyndman_forecasting_2021` and `breiman_classification_1984`
+resolve in `ref.bib`. Check whether the SBA inequality is fixed in code. Update
+`citation_audit.md` to record the methodology repairs. Read `results.tex` to
+verify the AgACI re-run's effect on the Winkler figures (L14). `ref.bib` entry
+count remains uncountable under token discipline.
+
+#### Consistency sweep after the Overleaf pass
+
+Closing check over §3 for claims still resting on the local draft after the
+remote re-verification. Six fixed:
+
+- The register sub-heading still read "(9)"; it holds L1–L14. Now "(14)".
+- §3.1's "no protocol passage" row cited a grep over the local draft; re-pointed
+  to the remote, where the search was actually run.
+- §3.4's stance quotation was the local wording ("takes a position on each
+  instead of surveying opinion"); the remote reads "rather than surveying
+  opinion". Replaced, with the source named as Overleaf.
+- §3.4's three contribution quotations (methodological novelty conceded, "field
+  instantiation, not of method", the PRISM-preprint exposure) had bare local line
+  refs. All three verified verbatim on the remote and re-attributed; the
+  preprint-exposure sentence is now quoted in the remote's own words.
+- §3.4's operator-grounding quotation was the local long form; replaced with the
+  remote's shorter "and none against the decisions of the operator whose work it
+  is intervening in".
+- §3.6 and §3.4 both quoted "a tension inherited from artefacts frozen before
+  that case was assembled". **That sentence is not on the remote** — it sat in
+  the deleted scope paragraph. Replaced with the remote's wording ("the reasons
+  are ones of comparability with artefacts frozen before this argument was
+  assembled"), with the deletion noted.
+
+Two deliberate local-draft references remain in §3, both contrastive: the
+byte/word comparison establishing that the remote is the condensed draft, and
+the search-boundary row recording that the sentence exists only locally.
+Remaining bare `:NNN` refs in §3 resolve to `litreview_critique.md` and
+`citation_audit.md`, which is correct in context.
+
+**Final state.** `knowledge/04_supervisor_evidence_pack.md` — 2,160 lines /
+~27,517 words / 370 table rows; seven sections plus a 49-item register.
+`ledger/phase_state.md` — 1,467 lines. No Overleaf write, no chapter edit, no
+Zotero write at any point in this session.
+
+---
+
+## Phase DECK — supervisor briefing deck and teaching script (2026-08-05)
+
+**Ruleset.** `brain/PRJ93_RULES.md` named and followed. No Overleaf write, no
+chapter edit, no Zotero write, no experiment rerun, no methodology change. No
+human gate was reached, so none was put.
+
+**Sources read.** `knowledge/04_supervisor_evidence_pack.md` (full, the sole
+content source); `docs/LuneBrew_Brand_Kit/` in full (guide, tokens, motifs,
+README, logo assets); the `wip-technical-briefing` skill (SKILL.md, deck-build,
+script-teaching, plain-language-glossary, deck_helpers.js) extracted to the
+session scratchpad. No other project file was opened.
+
+**Artefacts written** — all under `brain/deck/`, none under `chapters/`:
+
+| File | What it is |
+|---|---|
+| `PRJ93_briefing_deck.html` | 50-slide deck, 1280x720, Lune Brew brand |
+| `PRJ93_briefing_script.md` | teaching-level spoken script, 50 sections + preamble + 15 Q&A entries |
+| `speaker_notes.md` | per-slide notes, generated from the build |
+| `build.js`, `qa.js`, `shoot.js`, `lib/*.js` | deck source, geometry audit, capture |
+| `qa/s01..s50.png`, `qa/sheet1..5.png` | rendered inspection set |
+
+**Brand conformance.** Built to the kit, not to the skill's palette. The
+skill's `assets/deck_helpers.js` constants (DARK/AMBER/TEAL/GREEN/RED/INK/MUTE/
+TINT/ICE/CODEBG) and its Cambria/Calibri/Courier stack are explicitly overridden
+and unused; the override is recorded in `lib/chrome.js`. Kit tokens, type scale,
+motif kit, chrome and the assertion-headline rule are followed throughout. One
+flavour accent (teal) across the deck.
+
+**Kit extensions made (E1-E9, marked in `lib/deck.css.js`)** — for folding back
+into the guide: status chip; dependency/status matrix; node-and-edge diagram
+primitives; typeset formula block; annotated chart frame; provisional stamp;
+two-column split with centre rule; screening-flow box; card grid. Status-token
+mapping for provision states: absent=ruby, insufficient=mango, unjoinable=choc,
+delivered=teal, focal=gold, every use doubled by a text label.
+
+**QA.** Geometry audited programmatically over every slide (elements leaving the
+1280x720 frame, clipped overflow) to zero findings, plus visual inspection of all
+50 renders across five passes. Defects found and fixed included a flex bug that
+grew the column divider into a 40px band, overlapping architecture cards, and
+value labels colliding in the dot-and-interval charts. AI-writing audit run on
+both deliverables and the build strings: zero em-dashes, zero flagged vocabulary
+in prose, zero hollow intensifiers.
+
+**Content discipline.** Nothing on a slide that is not in the evidence pack.
+Provisional values are stamped on the slide. Every figure carries its source path
+in the speaker notes. The pack's six forbidden figures appear nowhere. One
+fabricated sample size (n=64 on a near-threshold recall row) was introduced
+during layout work and removed the same session.
+
+**Corrected during the build.** The capability matrix merged two row pairs, which
+changed its counts; the headline and both narratives were corrected from "seven
+of fifteen" to "six of thirteen held by another party" rather than left stale.
+
+**Unstarted.** Everything in the evidence pack's section 7 remains as recorded:
+Phase C not started, the discussion chapter unwritten, the search-protocol
+appendix unwritten, ECE not computed.
+
+## Phase DECK-R — briefing restructured as a research pipeline (2026-08-05)
+
+**Trigger.** Supervisor-facing review of the first build: the deck read as a log
+of actions rather than as an account of research conduct; internal verification
+apparatus was on slides; the literature section presented counts rather than
+papers and arguments; project-internal shorthand was unglossed; text was
+unreadable on two slides.
+
+**Reordering.** Slide modules split at section boundaries into `lib/sec-01…08`
+and required in pipeline order in `build.js`: position → literature → method the
+literature licensed → architecture → results → what is blocked and why → writing
+state → plan and asks. Data provision moved from second to sixth, because its
+role in the briefing is to explain which results could not be produced. LB
+section numbers and divider chrome renumbered to match. 50 slides → 51.
+
+**Removed from slides and notes (internal apparatus, not research content).**
+Overleaf remote comparisons and byte counts; NotebookLM and Zotero verification
+statements; citation-audit verdict tallies; critique-loop iteration and finding
+counts; ledger paths in on-slide SOURCE lines; the corpus-revision timeline
+slide in full. Speaker-note provenance paths retained — those are the
+requirement, not the defect.
+
+**Added.** Slide 2, a definitions slide (the four objectives, the examiner
+severity classes, the nine human gates, the twelve interface obligations, and
+the three status words), so nothing later stops to gloss itself. Slide 13, the
+review's three predictions set against the experiment verdicts that tested them
+(pooling, ranking stability, weather) — the literature-to-method-to-result
+hinge, replacing the process timeline. Load-bearing citations now named
+(Montero-Manso & Hyndman, Fu, Ding, Ansari, Hertel, Park, Dixon & Wickens,
+Ancker) rather than described by role.
+
+**Jargon made explicit.** "Fatal N" → the graded severity class plus its
+substance. "Objective 4" → the usefulness objective and its four terms.
+"CONTRACT.md:328-335" → obligation 10 of 12, who runs model selection. Gates
+G1/G2/G3 → the decision each holds open.
+
+**Render defects found and fixed.** (1) `.hl` is a full-line highlight
+(`display:inline-block;width:100%`); two code blocks put a trailing comment
+outside it, which pushed the comment off the rendered line — slide 17 lost
+`): # no default`, slide 20 lost both constant comments. Whole line now wrapped.
+(2) Two `<figure class="code">` were never closed, so the following `note()` was
+swallowed into the dark code box and rendered grey-on-black (slide 20).
+(3) `hbar` placed value labels at the bar end and tags a fixed offset beyond,
+so long bars drove their own number into the annotation (slide 37 unreadable).
+Rewritten with reserved value and tag gutters, plot width reduced accordingly.
+(4) A flex child holding the boundary arrow stretched full height and reached
+the source line; switched to `align-self:flex-start`.
+
+**QA.** New `overlap.js` reports intersecting text-bearing leaf boxes across all
+slides; final state is zero. `qa.js` geometry audit reports only the intentional
+ribbon bleed and full-bleed divider panels. All 51 slides re-captured and
+inspected on contact sheets plus full-size checks of 17, 20, 37, 45.
+
+**Script.** `PRJ93_briefing_script.md` reordered to match, renumbered, all nine
+internal cross-references remapped, two new sections written, and the log-flavour
+passages rewritten as research argument. AI-writing audit clean: zero em-dashes,
+zero flagged vocabulary in prose (`robust` remains only as the identifier
+`robust_dow`), zero hollow intensifiers.
+
+**Not done.** No Overleaf write, no chapter edit, no Zotero write, no experiment
+rerun, no gate reached.
+
+## Litreview verdict extraction — 2026-08-05
+
+**Phase.** Extraction-only pass over `chapters/literature_review.tex` (Overleaf
+rev, 67,389 bytes, SHA256 `4e6e6218…5417`; local `brain/drafts/literature_review.tex`
+confirmed byte-identical, so no source disagreement to report).
+
+**Completed.** 63 methodological verdicts extracted (requirements, prior-work
+limitations, contradictions), each with a checkable proposition, verbatim anchor,
+citation keys and operational consequence. 12-row contradictions register with
+the chapter's adjudication and which side to follow. Per-row T8 verification
+status assigned from `ledger/litreview_critique.md`.
+
+**Artifact.** `brain/knowledge/05_litreview_verdicts.md`.
+
+**Ranges read** (token discipline): local file lines 1–40, 40–139, 139–273,
+273–425, 560–672, 673–770, 770–883, 884–1010; `sec:rw-ruler` (425–560) read via
+`mcp__overleaf__get_section_content` rather than locally.
+
+**Unstarted.** No NotebookLM verification run (parent agent owns it). Two
+contradictions remain UNRESOLVED-IN-CHAPTER by R-Zero design (ranking-reversal
+direction, adaptive calibration at the regime change) and are a downstream
+obligation on the discussion chapter, not a chapter defect.
+
+## 2026-08-05 — Phase LITCONF: literature conformance audit, six runs executed
+
+**Ruleset.** `brain/PRJ93_RULES.md` named and followed. No Overleaf write, no
+chapter edit, no Zotero write. Gate 3 (rerun) was put and cleared for six runs;
+gate 1 (methodology change) was NOT taken — TabPFN-TS was excluded from the
+authorisation and remains open.
+
+**Sources read.** `PRJ93_RULES.md`, `knowledge/00_state_brief.md`,
+`knowledge/02_prj93_pipeline_spec.md` (full), `ledger/litreview_critique.md`
+(full), `ledger/code_vs_paper.md` (full, two pages), `ledger/numbers_audit.md`
+(§Summary, lines 767–988), `ledger/phase_state.md` (tail + lines 1045–1200),
+`knowledge/04_supervisor_evidence_pack.md` (§3.5 lines 791–915, §6.7–§7 lines
+1759–1868). Source files read only where a ledger row was contested:
+`eval/agent_calibration.py`, `eval/agent_cache.py`, `eval/agent_eval.py`,
+`eval/interval_calibration.py`, `eval/chronos2_covariate_probe.py`,
+`hierarchy/reconcile.py`, `config.py`. `graphify query` used for orientation.
+
+**Verification.** Seven NotebookLM queries against `d565d5f0`, verbatim quotation
+required, on: Kolassa coherence, Hewamalage median/scaling, Hansen MCS, Guo ECE,
+Barber Thm 2, Harvey correction, Diebold small-sample size, M5 rank stability,
+Brigato, Dixon, Chatfield, Ansari, Kim, Liu, Zheng, Bavaresco, Montero-Manso,
+Angelopoulos–Bates Thm D.2, Wickramasuriya unbiasedness. **Three chapter
+propositions returned NOT SUPPORTED as attributed** (decision 66). NotebookLM's
+citation indices were scrambled in two of seven responses while the quoted text
+was correct — third session running; the "search index, not oracle" rule holds.
+
+**Artefacts written.**
+
+| File | What it is |
+|---|---|
+| `knowledge/05_litreview_verdicts.md` | 63 extracted verdicts + 12-row contradictions register (subagent) |
+| `ledger/literature_conformance.md` | full classification, §8 post-run status |
+| `ledger/run_plan_2026-08-05.md` | consolidated run plan, categories (a)–(d) |
+| `log/60_R1_vus_pr_result.md` … `log/65_R7_chronos2_staleness_result.md` | six paired result files |
+| `eval/metric_ordering.py` + `.md` + `.json` | NEW module, R4 |
+
+**Code changed.** `eval/interval_calibration.py` (`score_ties`, wired through
+`power_analysis` and the report writer); `hierarchy/reconcile.py`
+(`unbiasedness_check`, wired into payload and report);
+`eval/chronos2_covariate_probe.py` (per-fold vectors, MCS, paired bootstrap,
+widened fold grid, ruled basis). Three tests added to
+`tests/test_interval_calibration.py`.
+
+**Regenerated.** `eval/interval_calibration.{md,json}` (control: every
+pre-existing number reproduces exactly in `.venv-forecast`),
+`hierarchy/reconciliation_forecast.md` (control: diff is additions only),
+`eval/chronos2_covariate_probe.md`, `brain/log/PRJ93_Agent_Eval_Report.md`.
+
+**Tests.** Full suite in `.venv-forecast`: **627 passed, 1 skipped, 0 failed**
+(26m44s). The three touched modules re-verified separately at 54/54
+(`test_interval_calibration`, `test_a6_reconcile`, `test_a2_mcs`). Against the
+last recorded figure (617 passed / 8 skipped at G17o) the suite has gained 10
+tests and 7 previously-skipped tests now run, because `.venv-forecast` carries
+torch/chronos where `.venv-run` does not.
+
+**Conformance movement.** 24 → **28** CONFORMS; 8 → **4** DIVERGES–SHOULD FIX
+(all four now writing-only); 5 DIVERGES–DEFENSIBLE unchanged (human's, none
+decided by the agent); 8 DIVERGES–UNRESOLVED unchanged (all blocked on a third
+party).
+
+**Findings not in the plan.** (i) The conformal upper bound fails at all three
+venues, not only Ellel. (ii) `eval/interval_calibration` is environment-sensitive
+and carries no `provenance.py` stamp — a regeneration from the wrong venv would
+silently restate `tab:winkler`. (iii) The hard-coded `calendar_lag7` basis is in
+its third file. (iv) **ECE is NOT unblocked** — `eval/agent_calibration.py` is
+complete and correct, but `run()` needs `eval/agent_cache.json`, which does not
+exist and requires `--build` with an Anthropic key. The pipeline spec, the state
+brief and the evidence pack all record ECE as cheap and unblocked; all three are
+wrong. The compensating half is that S8b, S8c and ECE are one command, not three
+experiments.
+
+**Unstarted.** Phase C still not started and still blocked on Ryan's key
+(R8 in the run plan). The Discussion chapter, the search-protocol appendix, and
+the four writing-only SHOULD-FIX rows (`D-F3` `tab:winkler` and coverage
+intervals, `D-F4` `tab:ladder` dispersion, `D-F5` the Ask-F1 degeneracy
+instance, `D-F6` the retrieval threat model) are all unblocked and unwritten.
+The five DIVERGES–DEFENSIBLE decisions await the human, D-D1 first.
+
+### Addendum — R9, the functional minimal pair (2026-08-06)
+
+Gate 1 (methodology change) was put and cleared for a new REPORTED-ONLY rung. Pre-registered
+at decision-log row 77, commit `c098fba`, **before any code was touched**; result row 78;
+D-D1 resolved at row 79. Full record `log/66_R9_functional_pair_result.md`.
+
+**Written.** `models/ladder.py::rung1_mean_dow` + shared `_dow_profile`;
+`eval/functional_pair.py` + `eval/functional_pair.{md,json}`;
+`log/66_R9_functional_pair_result.md`; `ledger/literature_conformance.md` §9.
+
+**Controls.** `rung1_robust_dow` bit-identical after the refactor (max abs diff 0.0).
+Ladder tests 41/41. Report prose corrected and re-emitted **from stored JSON, no re-run**.
+
+**Outcome.** Crossing observed at both scaled venues in the predicted orientation, **all
+four paired intervals containing zero** — a direction, not an effect. Two of five
+pre-registered predictions failed: Two River Taps refutes the right-skew mechanism (median
+arm biased negative, mean arm worse), and Ellel inverts the argument (DOW mean decisively
+worse on both metrics at ~82% zero days). The load-bearing finding is the **concealment**:
+at Beer Hall the functional swap removes two-thirds of the bias while moving MASE by 0.009.
+
+**D-D1 DECIDED: RMSSE headline, MASE labelled secondary.** Four of the five
+DIVERGES–DEFENSIBLE rows remain open — D-D2, D-D3, D-D4, D-D5 — and none has been decided
+by the agent.
+
+**Still unstarted.** Phase C (blocked on Ryan's key); the Discussion chapter; the
+search-protocol appendix; and the four writing-only SHOULD-FIX rows D-F3, D-F4, D-F5, D-F6.
+No Overleaf write and no chapter edit this session.

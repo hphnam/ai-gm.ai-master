@@ -1,0 +1,751 @@
+% PRJ93 literature review — restructured draft, 2026-08-01.
+% Working copy under brain/. NOT pushed to Overleaf (gate 5).
+%
+% Changes against the Overleaf version are itemised in
+% brain/ledger/litreview_corpus_judgement.md and the diff summary in
+% brain/ledger/litreview_critique.md.
+%
+% No project result figure appears in this chapter by design: the review
+% anticipates the dissertation's findings by argument, never by quoting a
+% number, so SKILL.md T1 has no surface here to fail on.
+
+This chapter is organised as a methodological pipeline that mirrors the
+proposed system: an agent must first learn a venue's normal trading rhythm,
+then satisfy itself that the rhythm has been scored and selected honestly, then
+notice when the present departs from it, then decide whether the departure is
+worth raising, and finally be judged on whether that decision was a good one.
+Each section consumes the output of the one before it. Two of them are
+deliberately parallel: Section~\ref{sec:rw-ruler} asks how a forecaster should
+be judged, and Section~\ref{sec:rw-evaluation} asks the same question of the
+agent built on top of it.
+
+Four arguments are threaded through the whole, and this review takes a position
+on each rather than surveying opinion. Operational rhythm can be borrowed across
+venues, but the benefit is a property of the size of the group and not of the
+act of sharing, so a three-venue estate should expect little of it. A deviation
+is best defined as the breach of a calibrated band, whose guarantee degrades
+gracefully rather than holding through a regime change. A learned rhythm
+functions as the agent's memory, in a bounded sense argued for below rather
+than assumed. And the worth of a proactive alert turns on the asymmetric human
+cost of a false alarm, which is an empirical claim with empirical support and
+is treated here as one.
+
+Two features of the evidence base are stated once, here, rather than hedged
+throughout. First, the frontier of proactive agency is young: of the sources
+cited in this chapter, eleven are 2025--26 preprints that have not completed
+peer review, and they are concentrated in
+Sections~\ref{sec:rw-surfacing} and~\ref{sec:rw-evaluation}. Where an argument
+in this dissertation rests on one of them, it is flagged at the point of use,
+and no claim of contribution rests on unrefereed work alone. Second, this review
+was written after the experimental work it introduces, and it would have been
+easy to write a chapter that predicted only the results that succeeded. It does
+not: where the literature anticipates a negative outcome in this estate, that
+prediction is made explicitly, before the result is reported.
+
+\section{From Decision Support to the Autonomous Managerial Agent}
+\label{sec:rw-framing}
+
+The system this dissertation builds is a manager-facing agent, and a
+related-work chapter must first settle what kind of artefact that makes it.
+\citet{gorry_framework_1971} drew the distinction that
+still organises the field: a decision is \emph{structured} when Simon's
+intelligence, design and choice phases can be formalised into rules, and
+\emph{unstructured} when it resists formalisation and demands human judgement,
+with decision-support systems positioned to assist managers on the
+unstructured and semi-structured cases rather than to replace them. For five
+decades the manager remained the decision-maker and the software remained the
+support. \citet{kumar_agentic_2026} argue that agentic AI breaks
+this arrangement. What separates an agent from earlier enterprise software,
+on their account, is delegated autonomy: the capacity to initiate actions,
+make decisions and coordinate activity toward a goal with little human
+prompting, so that agency is distributed across people and machines rather
+than held by the user alone. Read against Gorry, this is not a faster support
+tool but a different category of actor, one that participates in the decision
+instead of merely informing it.
+
+The deployment record indicates the category is already populated, and that it
+is populated faster than it is understood. An index of thirty widely used
+agentic products \citep{staufer_2025_2026} documents systems acting with limited
+oversight, yet also finds that developers disclose almost nothing about their
+safety and evaluation, leaving no public information for 135 of 240 safety
+fields. The gap is not peculiar to agents. Surveying published reports of
+machine-learning deployments across industries and use cases,
+\citet{paleyes_challenges_2022} map the difficulties practitioners report onto
+the stages of a deployment workflow and find that practitioners face issues at
+every stage of that process --- a catalogue assembled from case studies of
+systems in use, not from benchmark results. Two consequences follow for this
+work. Principled evaluation of a deployed agent is a contribution in its own
+right rather than an afterthought, and the setting in which such an agent is
+evaluated is itself a variable, because the problems that a deployment reports
+are not the problems a benchmark reports.
+
+Adopting the actor view has one further consequence that the rest of this
+chapter develops. An agent that acts unasked must hold an internal model of what
+is \emph{normal} for the venue it manages, because an unprompted action is only
+warranted by a departure from expectation. Learning that model from short,
+noisy trading records is the constraint, named here and resolved later, that
+shadows the whole design.
+
+\section{Learning the Rhythm: Forecasting Normality Under Data Scarcity}
+\label{sec:rw-rhythm}
+
+By a venue's \emph{rhythm} we mean its recurring pattern of trade, the
+day-of-week and seasonal regularities against which any given day can be
+called typical or surprising. The defining difficulty is scarcity: a single
+hospitality venue offers months, not years, of clean history, and a venue
+that has just opened offers none at all. This is the cold-start constraint,
+and it rules out the comfortable assumption of much forecasting work that each
+series carries enough of its own history to be fitted in isolation.
+
+Within that constraint, the demand-forecasting literature delivers a result
+that is easy to overlook: simple methods are hard to beat.
+\citet{chae_value_2024}, studying a large restaurant chain, show that deep
+models using only internal operational and calendar features match or
+outperform machine-learning models given access to richer external
+macroeconomic and health data, so the marginal value of additional data is
+smaller than practitioners assume. \citet{hossain_comparative_2025}
+reinforce the point from the opposite direction: although a multilayer
+perceptron and random forest rank highest on their restaurant data, classical
+exponential smoothing and \citet{croston_forecasting_1972}'s method outperform
+a gradient-boosted baseline, which fails to capture seasonality without
+hand-built features. \citet{schmidt_machine_2022} sharpen the same point on a
+single restaurant's sales: across twenty-three models and two baselines, the
+best one-day-ahead result is a kernel-ridge model at 19.6\% sMAPE. At the
+one-week horizon the ordering reverses, every non-recurrent model degrading
+past 20\% error while the best recurrent model holds 19.5\%, so the
+competitiveness of simple models is horizon-dependent rather than general.
+Taken together these studies establish a baseline expectation this work
+inherits: on small, seasonal hospitality series, classical statistical and
+linear models set a competitive bar that a more elaborate method must clear on
+evidence rather than on architecture.
+
+\subsection*{When does borrowing across series pay?}
+
+The transfer route promises to relieve scarcity by importing structure learned
+elsewhere, and the question this section must settle is not whether that is
+possible but when it is worth doing. \citet{montero-manso_principles_2021}
+give the sharpest available answer, and it is not the one the enthusiasm for
+shared models suggests. Globality is not a similarity assumption: global
+methods are, in their words, not more restrictive than local methods, since
+both can produce the same forecasts without any assumptions about similarity of
+the series. What differs is where the complexity budget is spent. The
+complexity of local methods grows with the size of the set while it remains
+constant for global methods, so that --- and the qualifier is the authors' own
+--- \emph{in large datasets} a global algorithm can afford to be quite complex
+and still benefit from better generalisation. The benefit of pooling is
+therefore a statement about the number of series available to amortise a
+shared function over, not about the act of sharing. An estate of three venues
+is not a large dataset in this sense, and the honest prediction the principle
+licenses is that cross-series learning will do little for such an estate. This
+dissertation reports exactly that outcome, and reports it as the predicted one.
+
+With that expectation set, the mechanisms are worth stating precisely.
+Time-series foundation models pretrain on large heterogeneous corpora and then
+forecast unseen series zero-shot, and they divide by representation. TimesFM
+\citep{das_decoder-only_2024} is a patched decoder that predicts the next patch
+autoregressively and reaches near-supervised zero-shot accuracy with only 200M
+parameters. Chronos \citep{ansari_chronos_2024} takes the opposite stance,
+scaling and quantising real values into a fixed token vocabulary so an
+off-the-shelf language-model architecture can be trained on them, and reports
+comparable or superior zero-shot accuracy across 42 datasets. A wider family
+--- masked-encoder, quantile, masked-reconstruction and probabilistic or
+industrial entrants
+\citep{woo_unified_2024,liu_moirai_2026,goswami_moment_2024,rasul_lag-llama_2024,garza_timegpt-1_2024}
+--- fills out the design space without changing the central premise that
+pretraining on time series, not on language, is what transfers.
+
+That premise needs a sharp qualification, and \citet{tan_are_2024} supply it.
+In ablations on three popular methods that bolt a pretrained language model
+onto a forecaster, they find that removing the language model or replacing it
+with a basic attention layer leaves accuracy unchanged or better while cutting
+training and inference time by up to three orders of magnitude, and that the
+language model helps neither sequence modelling nor the few-shot regime. This
+does not contradict TimesFM and Chronos so much as locate the value precisely:
+gains come from time-series pretraining and patching, not from language-model
+machinery. TimesFM reaches the same conclusion from the other direction,
+improving on language-model prompting by more than 25\%
+\citep{das_decoder-only_2024}. For a small hospitality estate the lesson is a
+disciplined baseline ladder, classical models first, then a transfer-based
+global model, with scepticism toward any component justified by language-model
+provenance alone.
+
+One entrant deserves separate treatment, because it is the model this work
+eventually serves. Chronos-2 \citep{ansari_chronos-2_2025} departs from its
+predecessor by alternating standard time attention with a \emph{group}
+attention layer that aggregates across all series sharing a group identifier at
+each patch index. A group may be a set of series sharing a source or metadata,
+so that the model performs cross-series learning at inference time instead of
+forecasting each series from its own history alone, and the authors single out
+short histories and cold starts as the conditions under which that sharing
+helps most. Read against \citet{montero-manso_principles_2021}, that claim is
+conditional in a way the architecture paper does not emphasise: group attention
+supplies the mechanism for pooling but cannot manufacture the group size that
+makes pooling pay.
+
+The same mechanism admits past-only and known-future covariates as group
+members, which places Chronos-2 among the small number of pretrained
+forecasters that can condition on exogenous information at all. TabPFN-TS
+\citep{hoo_tables_2026}, an 11M-parameter tabular foundation model applied to
+forecasting through temporal featurisation, is the other, and it inherits from
+TabPFN \citep{hollmann_accurate_2025} a design explicitly aimed at datasets of
+up to ten thousand rows. \citet{hertel_explainable_2026} evaluate both on load
+forecasting and find them competitive with transformers trained from scratch on
+domain-specific data while requiring no training data at all, and report that
+Moirai, by contrast, does not effectively leverage future covariates in that
+setting. A single hospitality estate, with three venues, one year of trade and
+a handful of calendar and weather regressors, sits inside the regime these two
+models were designed for rather than at the scale the transformer literature
+usually assumes, and the covariate capability is the specific reason one of
+them is served here.
+
+What makes transfer usable under genuine cold-start is the ability to adapt at
+inference without per-venue retraining. \citet{das_-context_2025} demonstrate
+in-context fine-tuning, prompting a foundation model with several related
+series so it adapts to a target distribution at inference time, and report up
+to 25\% improvement while rivalling a model explicitly fine-tuned on the
+target, with no gradient updates. \citet{zhou_context-driven_2025} attack the
+zero-history case directly, retrieving the traffic of semantically similar
+pages to forecast a new page that has no series of its own, which is the
+structural analogue of forecasting a venue on its opening week from its
+siblings. GPHT \citep{liu_generative_2024} shows the underlying mechanism,
+pretraining on a mixed channel-independent corpus to cut error by roughly
+5.75\% over training from scratch. Each of these is a demonstration on a corpus
+of many series, which is consistent with, rather than an exception to, the
+locality--globality principle above.
+
+Estate structure can also be exploited through reconciliation. MinT
+\citep{wickramasuriya_optimal_2019} adjusts independent forecasts so that
+venue-level predictions sum coherently to the estate total, minimising the
+trace of the reconciled error covariance among all linear reconciliations that
+preserve unbiasedness, an optimality that holds only if the base forecasts are
+themselves unbiased --- a condition Section~\ref{sec:rw-ruler} shows is not
+innocuous on a series of mostly zeros. HiGP \citep{cini_graph-based_2024} folds
+the same coherence into an end-to-end model by projecting predictions onto the
+space of coherent forecasts. The review by
+\citet{athanasopoulos_forecast_2024} maps the resulting design space. These
+results jointly justify treating a sparse or new venue not as an isolated
+forecasting failure but as a borrower of rhythm from its estate and its
+analogues --- while setting the expectation, from
+\citet{montero-manso_principles_2021}, that on an estate this small the loan
+will be a small one.
+
+\subsection*{Intermittent trade is a different object}
+
+The literature above assumes demand arrives continuously. For a venue that
+trades one or two days in a typical week it does not, and the distinction is
+not cosmetic: it changes the model, the metric and the meaning of a good
+forecast. \citet{croston_forecasting_1972} separated the problem into the size
+of a demand when it occurs and the interval between occurrences, estimating
+each separately rather than smoothing a series that is mostly zeros;
+\citet{syntetos_accuracy_2005} showed Croston's estimator is biased and
+supplied the correction that bears their name. The classification that decides
+when these methods apply is due to \citet{syntetos_categorization_2005}, who
+partition series by average inter-demand interval and the squared coefficient
+of variation of demand sizes into smooth, erratic, intermittent and lumpy
+regions. \citet{kostenko_note_2006} then showed the published cutoffs contain
+arithmetic errors, correcting them to $p = 4/3$ and $v = 0.5$ in place of 1.32
+and 0.49, and derived the selection rule $v > 2 - \tfrac{3}{2}p$ dividing the
+plane diagonally between Croston and the bias-corrected estimator. The
+correction is small in magnitude and decisive in effect for any series whose
+interval falls between the two constants, as this dissertation's anchor venue
+does.
+
+A second tradition models the same structure as two decisions rather than one.
+\citet{cragg_statistical_1971} proposed the two-part specification in which a
+binary model governs whether the outcome is positive and a separate model
+governs the amount conditional on occurrence, and \citet{mullahy_specification_1986}
+developed the unrestricted hurdle form, estimating the occurrence and magnitude
+components by separate maximum likelihood. The attraction for a booking-led
+venue is direct: whether the venue trades tomorrow is a different question,
+answerable from different information, from how much it takes if it does. The
+limitation is equally direct, and is a limitation of data rather than of
+method --- a hurdle model is only as good as the occurrence signal available to
+it, and where that signal lives outside the dataset the two-part structure
+buys nothing.
+
+\subsection*{Weather, and the temptation of exogenous data}
+
+Weather is the exogenous covariate a hospitality forecaster reaches for first,
+and the load-forecasting literature is the place where that reflex has been
+tested most carefully. The result is a caution.
+\citet{haben_short_2019} forecast demand at the low-voltage level and report
+that, in contrast to high-voltage load forecasts, temperature was not an
+important factor in the accuracy of their forecasts: often it had little to no
+effect, and in many cases including temperature was actually detrimental to
+accuracy. Their proposed explanation is the one that transfers: temperature is
+strongly correlated with seasonality, so a model can learn temperature as a
+surrogate for the seasonal pattern it already has, and produce larger errors
+than it would with no temperature at all. The relevant variable is the level of
+aggregation. Weather drives aggregate demand across a region; it competes with
+the day-of-week pattern at the level of a single site.
+\citet{hertel_explainable_2026} put a magnitude on the residual contribution,
+attributing 3.55\% of a covariate-informed Chronos-2 forecast's feature
+importance to temperature and 2.74\% to irradiance, against roughly 89\%
+carried by the load history itself. A single hospitality venue is a site, not a
+region, and the expectation this literature sets is that a weather covariate
+will be marginal at best and capable of harm at worst. This dissertation's
+weather result is consistent with that expectation, and the expectation is
+recorded here rather than after the fact.
+
+\subsection*{From a point to a band}
+
+A point forecast, however accurate, cannot say what would count as surprising.
+The conformal-prediction line replaces the point with an interval that carries
+a distribution-free coverage guarantee. In its split form, which is the
+variant used here, a score function is calibrated on held-out data and an
+empirical quantile of those scores sets the interval width.
+\citet{angelopoulos_conformal_2023} state the resulting guarantee in two
+directions at once: coverage is bounded below by the nominal level and above
+by that level plus a term of order one over the calibration-set size. The
+upper bound deserves as much attention as the lower one, because it means a
+band that contains every observation is not a cautious band but a
+mis-calibrated one, and coverage reported without the width that produced it
+conceals the difference.
+
+That guarantee holds under exchangeability, which trading data has no
+particular reason to satisfy, and the online variants exist to address exactly
+this. Adaptive conformal inference \citep{gibbs_adaptive_2021} adjusts the
+nominal level in response to realised coverage. EnbPI \citep{xu_conformal_2021}
+discards the exchangeability requirement altogether, guaranteeing approximately
+valid marginal coverage under mixing conditions on the error process rather
+than distributional assumptions on the data, and calibrating by updating past
+residuals through a sliding window without refitting the underlying model; its
+successor \citep{xu_sequential_2023} makes the residual model explicit, and
+conformal PID control \citep{angelopoulos_conformal_2023-1} recasts the
+adjustment as feedback control. The practical guidance is collected by
+\citet{stocker_gentle_2025}. Adaptivity carries a price that
+\citet{zaffran_adaptive_2022} make explicit: on exchangeable scores the
+adaptive update degrades efficiency in proportion to its step size, so a
+method that adapts to a shift that never arrives is worse than one that does
+not adapt at all. \emph{Calibration}, in this sense, is the property that a
+stated 90\% interval contains the truth about 90\% of the time, neither more
+nor less. Expressing a venue's rhythm as a calibrated band, rather than a
+single expected number, is the design choice this section ends on, because once
+the rhythm is an interval the question shifts from \emph{what will happen} to
+\emph{what would count as surprising}.
+
+\section{Scoring the Rhythm: Error Measures and Model Selection}
+\label{sec:rw-ruler}
+
+A rhythm that cannot be scored honestly cannot be defended, and two distinct
+questions have to be answered before any forecast in this dissertation means
+anything: which error measure expresses what a venue actually cares about, and
+by what procedure one model is declared better than another. Both are usually
+treated as preliminaries. On intermittent hospitality data they are the
+substance.
+
+The scaled measures are the natural candidates on series of different
+magnitudes, but \citet{hewamalage_forecast_2023} show that the choice is not
+neutral: measures built on absolute errors optimise for the median, and on
+intermittent series that property makes a constant zero look like the best
+available prediction. The same paper notes the companion hazard for
+benchmark-scaled measures, that a naive benchmark scoring exact zeros on zero
+actuals deflates the denominator those measures divide by. Both failure modes
+bite hardest on precisely the venue this estate most needs a metric for --- one
+whose median trading day takes nothing. The M5 competition
+\citep{makridakis_m5_2022} answered this by scoring on the root mean squared
+scaled error across a retail corpus in which 77.3\% of series had an average
+inter-demand interval above $4/3$; squared base errors optimise for the mean
+rather than the median \citep{hewamalage_forecast_2023}.
+\citet{kolassa_why_2020} argues more generally that the measure encodes an
+implicit choice of which functional of the predictive distribution is wanted
+--- naming the mean, the median and the $(-1)$-median as the summaries
+different measures reward --- so that selecting a measure is selecting a target
+and not merely a scale.
+
+Three further results converge on the same conclusion from different
+directions, and together they make the choice of a squared scaled error less a
+preference than a constraint. First, coherence:
+\citet{kolassa_we_2023} states the cost in his title, though the
+incompatibility is narrower, and more useful, than the title suggests. Because
+the median of a sum is not generally the sum of the medians, point forecasts
+minimising MAE, or MASE, which is a scaled MAE, are usually not coherent. The
+exception is the instructive part --- the only error measures whose minimising
+point forecasts are coherent are the squared error and monotonic functions of
+weighted sums of squared errors, because the expectation is additive. The
+conflict is a property of absolute-error measures, not of error minimisation as
+such, and a squared-error measure dissolves it rather than trading against it.
+For an estate that reconciles venue forecasts to an estate total, this is not
+an aesthetic point: it is the condition under which the reconciliation of
+Section~\ref{sec:rw-rhythm} is coherent with the objective the forecaster was
+fitted to, and it is a second reason, independent of intermittency, to prefer
+squared error.
+
+Second, the limit of error as an instrument at all.
+\citet{chatfield_all-zero_2007} show in a factorial study of lumpy demand that
+the lowest forecasting error does not necessarily lead to the lowest system
+cost, and --- the sharper half of the finding --- that all-zero forecasts yield
+the lowest cost when lumpiness is high, and remain best at middling lumpiness
+whenever shortage cost greatly exceeds holding cost. Where a series is lumpy
+enough, error minimisation and cost minimisation come apart, and the honest
+response is to change the objective rather than to keep tuning against a
+measure that has stopped tracking what matters.
+
+Third, the point forecast may be the wrong object.
+\citet{kolassa_evaluating_2016} argues that the emphasis on point forecasts
+misses the mark for count and intermittent demand, and that one should instead
+characterise the entire predictive distribution, from which point, interval or
+quantile forecasts can be extracted as required. His instrument is the proper
+scoring rule, which assesses calibration and sharpness together rather than
+either alone. This closes a loop opened at the end of
+Section~\ref{sec:rw-rhythm}: a band reported by its coverage alone is scored on
+calibration with sharpness suppressed, which is exactly the asymmetry
+\citet{angelopoulos_conformal_2023}'s two-sided bound warns against. Coverage
+and width are one measurement, not two, and a proper scoring rule is the
+literature's name for treating them that way.
+
+The second question is comparison. Declaring one model better than another on a
+difference of means is not a finding, and the forecasting literature has said
+so for thirty years. \citet{diebold_comparing_1995} formalised the test of
+equal predictive accuracy between two forecast sequences;
+\citet{harvey_testing_1997} showed the statistic is seriously over-sized in
+moderate samples and supplied the finite-sample correction
+$\left[\frac{n + 1 - 2h + n^{-1}h(h-1)}{n}\right]^{1/2}$, whose behaviour is
+itself informative --- for a short evaluation window at a long horizon the
+bracketed quantity can vanish, and where it does no corrected variant of the
+test exists to be computed. That is a fact about the design rather than a
+defect of the correction, and this dissertation states where it applies rather
+than working around it. \citet{hansen_model_2011} generalise from the pairwise
+case to the set: a model confidence set contains the best model with a given
+level of confidence, and, in their own formulation, acknowledges the limitations
+of the data, such that uninformative data yield a set with many models whereas
+informative data yield a set with only a few. A wide retained set is therefore
+a statement about the evidence rather than a failure of the procedure --- and
+on six folds of a single year's trade, a wide set is what an honest procedure
+should be expected to return.
+
+Two recent studies show how fragile rankings are when this discipline is
+absent. \citet{brigato_there_2025}, evaluating eight models on fourteen
+datasets across roughly five thousand trained networks, find that slight
+changes to experimental setups or evaluation metrics drastically shift the
+common belief that newly published results advance the state of the art, and
+that even minor deviations in setup can dramatically change performance
+rankings. \citet{hewamalage_look_2021} make the same concern measurable,
+proposing rank stability --- how much the ranking of an experiment changes
+across similar datasets when models and errors are held constant --- and
+finding that the main drivers of instability are hierarchical aggregation and
+scaling, with the scale normalisation of the M5 error measure less stable than
+other scale-free errors. Two things follow. The number of evaluation origins is
+not a free parameter, because a ranking computed on too few can reverse when
+more are used; and the case for a squared scaled error assembled above is
+strong but not costless, since the scale normalisation it depends on is itself
+a documented source of rank instability. Both cautions are taken up in the
+methodology, and both anticipate a reversal this dissertation reports.
+
+\section{Noticing Deviation: From Calibrated Forecast to Signal}
+\label{sec:rw-deviation}
+
+Once the rhythm is a calibrated interval rather than a point, a meaningful
+\emph{deviation} is definitionally a breach of that band, and the detection
+literature's job is to make breach-detection reliable and honestly evaluated
+on short, noisy series. The classical methods organise by what they detect.
+Bayesian online change-point detection \citep{adams_bayesian_2007} maintains a
+posterior over the run length since the last change, suited to abrupt regime
+shifts such as a venue's permanent closure; the offline survey by
+\citet{truong_selective_2020} reduces the whole family to a choice of cost
+function, search method and penalty, which clarifies that change-point
+detection answers \emph{when the regime moved}. That reduction also locates
+the cumulative-sum scheme of \citet{page_continuous_1954}, the sequential
+counterpart to the offline cost functions the survey enumerates. Page assigns
+a score to each observation, accumulates those scores, and signals when the
+running total has risen a fixed amount above its own running minimum, which
+makes the scheme sensitive to small sustained shifts that a per-observation
+test will not register. He also supplies the criterion by which such a
+detector should be judged. The average run length, which he defines as the
+expected number of observations before action is taken, measures the expense
+of false alarms when conditions are stable and the delay before a real change
+is acted on when they are not. That two-sided cost is the same one this
+chapter arrives at independently in Section~\ref{sec:rw-evaluation}, stated
+for an industrial inspection scheme seventy years before it was restated for
+conversational agents. Being cheap to evaluate on each new observation and
+requiring no posterior over run length, the cumulative-sum scheme is the
+detector this work puts into production, with Bayesian online change-point
+detection retained as the offline benchmark it is scored against.
+Point-anomaly methods answer a different question, \emph{is this observation
+extreme}, and SPOT \citep{siffer_anomaly_2017} answers it by fitting a
+generalised Pareto tail via extreme value theory, requiring only a risk level
+and assuming nothing about the data distribution. Mapping these onto a venue is
+straightforward: a sudden quiet Saturday is a point anomaly against the band, a
+venue closure is a change point, and conflating the two is a modelling error.
+
+The harder problem is evaluation, and here the literature contains a finding
+that should unsettle any reported detection score. \citet{kim_towards_2022}
+show that the point-adjustment protocol, which counts a whole anomalous segment
+as detected if any single point inside it crosses the threshold, is so generous
+that randomly generated anomaly scores reach an adjusted F1 near one and
+overturn most state-of-the-art results. \citet{liu_elephant_2024} confirm and
+extend this with TSB-AD, a curated benchmark of 1070 series, identifying VUS-PR
+as the measure that stays stable under small detection lags while remaining
+unbiased against random scores, and finding along the way that simpler
+statistical detectors often beat elaborate neural ones, which echoes the
+baseline lesson of Section~\ref{sec:rw-rhythm}. Corrective protocols exist that
+penalise the false positives the standard adjustment ignores, whether by
+balancing the adjustment or by decaying credit for late detection
+\citep{bhattacharya_towards_2024,gim_evaluation_2023}. The implication for this
+work is methodological rather than incidental: detection on hospitality data
+should be reported with a lag-tolerant, random-robust measure in the spirit of
+VUS-PR, and point-adjusted F1 is rejected as a headline metric because it
+would flatter a detector that has learned nothing.
+
+The thread of Section~\ref{sec:rw-rhythm} closes here. CPTC
+\citep{sun_conformal_2025} fuses the two halves directly, pairing a switching
+dynamical model that predicts the underlying state with online conformal
+prediction calibrated separately per state. Its guarantees repay precise
+statement, because they are narrower than the framing invites. Exact
+finite-sample coverage holds only under exchangeability, which a change point
+violates by construction. What survives a regime shift is time-averaged
+asymptotic validity, resting on an assumption that the states themselves have
+a stationary distribution, together with faster post-shift convergence than
+adaptive conformal inference, which the authors describe as shortening the
+miscoverage period rather than removing it. The residual risk then concentrates
+in a single quantity, since coverage degrades in proportion to the rate at
+which the state is misclassified. \citet{barber_conformal_2023} give the
+general form of the same trade, bounding the loss of coverage under arbitrary
+departures from exchangeability by a weighted sum of total-variation distances
+between residual vectors, and doing so with no assumption whatever on the joint
+distribution of the data.
+
+Read together, these results reposition the design question this chapter has
+been building toward. A band cannot be promised to hold through a regime
+change. It can only be promised to lose coverage in proportion to how badly
+the regime is estimated. For a hospitality estate the operational consequence
+is to prefer a regime variable that is observed over one that is inferred,
+because whether a venue is trading is recorded in the till rather than hidden
+in the residuals, and an observed state drives the misclassification term to
+zero. A detector can establish \emph{that} trade has broken from its rhythm;
+it cannot decide whether the break is worth a manager's attention.
+
+\section{Reasoning and Surfacing: Agents that Act Without Being Asked}
+\label{sec:rw-surfacing}
+
+Converting a deviation signal into a timely, well-judged intervention needs
+more than tool-use plumbing; it needs an agent that initiates action and
+decides what is worth raising. The plumbing itself is mature: interleaved
+reasoning and tool calls, self-supervised API invocation, and verbal
+self-correction across attempts are established primitives
+\citep{yao_react_2022,schick_toolformer_2023,shinn_reflexion_2023}, they are
+present in the existing product, and they are not where the open problem lies.
+That the problem is open is visible in evaluation: $\tau$-bench
+\citep{yao_-bench_2024} places agents in multi-turn tool-and-user interactions
+and finds frontier models far from solving them, with even GPT-4o completing
+only 35.2\% of tasks in the airline domain, so reliability rather than
+capability is the binding constraint even before proactivity enters.
+
+Memory is the bridge from the forecasting half of this work to the agent half,
+and the connection must be stated carefully, because it is easy to claim more
+for it than is warranted. Retrieval-augmented generation
+\citep{lewis_retrieval-augmented_2020} established the template of grounding a
+generator in an external, non-parametric store accessed by a learned
+retriever. \citet{hu_memory_2026} argue that agent memory is categorically more
+than this: where classical retrieval reads from a static corpus per query,
+agent memory is a persistent, self-evolving cognitive state that accumulates
+the agent's own experience over time. Generative agents
+\citep{park_generative_2023} make the mechanism concrete, with a memory stream
+surfaced by a weighted combination of recency, relevance and importance, and
+recursive reflection --- triggered when accumulated importance crosses a
+threshold, rather than on a clock --- that abstracts raw records into
+higher-level inferences.
+
+The reframing this work takes from that literature is deliberately bounded. A
+learned rhythm is a durable, evolving record of normality that the agent
+retrieves against when deciding whether the present is worth remarking on, and
+in that specific respect it does the work of the retrieval half of a memory
+stream: an importance-triggered mechanism firing on a threshold is a closer
+analogue to a band breach than a clock is. What a forecasting band does not
+supply is the rest of the architecture --- there is no reflection step
+abstracting episodes into higher-level inferences, and no store of the agent's
+own past interventions to retrieve from. The claim made here, and defended in
+the discussion, is the narrow one: the rhythm serves as the agent's model of
+normality, not as a full memory system in the sense \citet{hu_memory_2026} and
+\citet{park_generative_2023} describe. Retrieval over live operational data
+carries a caveat in either case, since such stores are an attack surface, as
+PoisonedRAG \citep{zou_poisonedrag_2025} demonstrates, which matters once the
+memory is populated from production traffic.
+
+The frontier of proactive agency is where this work positions its contribution,
+and it is candid about its empirical maturity: most of the results in this
+paragraph are preprints, and their claims are reported with corresponding
+caution. \citet{lu_proactive_2024} provide the template. Their ProactiveBench
+gathers 6,790 training and 233 test events from real human activity, trains an
+agent to anticipate needs, and, tellingly, the dominant failure they document
+is over-offering: even strong proprietary models carry false-alarm rates above
+50\%, predicting help when no clear intent exists, so their best fine-tuned
+agent reaches only a 66.47\% F1 while a separately trained reward model attains
+91.80\% agreement with human judges. The headline finding is therefore not that
+proactivity is hard to produce but that it is hard to \emph{restrain}.
+Subsequent work attacks restraint from different angles. ProActor
+\citep{ding_proactor_2026} reframes timing as a window of valid moments rather
+than a single labelled point and optimises it with turn-level reinforcement
+learning, on the argument that penalising any deviation from one rigid
+timestamp is the wrong objective. ProAgentBench \citep{tang_proagentbench_2026}
+grounds the question in 28,000 events from over 500 hours of real sessions and
+states the cost structure plainly: low precision in deciding when to assist
+causes alert fatigue, where excess false alarms drive users to ignore or
+disable the feature. PRISM \citep{fu_prism_2026} draws the consequence,
+formulating intervention as a cost-sensitive decision in which the agent speaks
+only when calibrated acceptance probability clears a threshold set by the
+asymmetric costs of false alarms and misses, and reports a 22.78\% reduction in
+false alarms with a 20.14\% F1 gain. \citet{gulati_ask_2026} add that the
+urgency of a clarifying question depends on what is missing: goal clarification
+decays quickly, retaining near-oracle value only if asked very early, while
+input clarification remains recoverable through roughly half of execution, so a
+single uniform urgency for every kind of missing information is wrong. Adjacent
+systems for dialogue, wearables and mobile interfaces
+\citep{liu_proactiveeval_2025,yang_contextagent_2025,yang_fingertip_2025}
+confirm proactivity is being pursued across domains without supplying a
+precedent in a multi-venue operational setting. Read together, this body of
+work converges on one diagnosis that the next section takes up: the binding
+failure of a proactive agent is the false alarm, and the open question is how
+to weigh it.
+
+\section{Judging the Judgement: Evaluating Proactive Intervention}
+\label{sec:rw-evaluation}
+
+The agent's decision to speak is only as good as our ability to tell a useful
+prompt from an unwelcome one, and accuracy is the wrong instrument for that
+measurement. Two literatures supply the right one. The first concerns
+automated evaluation. \citet{zheng_judging_2023} show that a strong language
+model as judge agrees with human preference above 80\%; on MT-bench pairwise
+comparison with ties excluded, GPT-4 reaches 85\% agreement with humans against
+81\% agreement among humans themselves, which makes the approach attractive at
+scale. The qualifications are serious, however. \citet{wang_large_2024}
+demonstrate a positional bias severe enough that swapping the order of two
+candidates can reverse the verdict; \citet{panickssery_llm_2024} show that
+judges recognise and favour their own generations, with self-preference scaling
+with self-recognition; and JUDGE-BENCH \citep{bavaresco_llms_2025} finds
+substantial variance in agreement across models and datasets, with agreement
+depending on the property being evaluated, the expertise of the human judges,
+and whether the text being judged is human- or model-generated, concluding that
+judges must be carefully validated against human judgments before they are used
+as evaluators. The position this work takes is to use an automated judge only
+as an instrumented, bias-audited proxy, with the real target being human
+adopt-or-dismiss outcomes on actual surfaced insights.
+
+The second literature defines what the metric must encode, and it is the
+human-factors account of trust in automation. \citet{meyer_conceptual_2004}
+draws the distinction that sets the loss function: \emph{compliance} is the
+operator's response to a warning, \emph{reliance} the response to its absence,
+and crucially the two are governed by different properties of the detector.
+Compliance depends on the response criterion, responses to warnings becoming
+less likely when the probability of an unjustified warning is high, the
+cry-wolf syndrome in which operators cease or slow their response. Reliance
+depends instead on the system's sensitivity, and therefore on what it fails to
+catch.
+
+That the two failures are not merely different but unequal is an empirical
+claim, and it has been tested directly. \citet{dixon_independence_2007} placed
+operators under diagnostic automation that was either false-alarm-prone or
+miss-prone and found that false-alarm-prone automation hurt overall performance
+more than miss-prone automation, and that it degraded both compliance and
+reliance while miss-prone automation appeared to affect only reliance. Their
+stated implication for design is the premise this dissertation's loss function
+encodes: false alarms are more damaging to overall performance than misses. The
+evidence is a laboratory study of thirty-two participants on a synthetic
+monitoring task, and the asymmetry is asserted here at that strength and no
+higher; the authors themselves conclude only that compliance and reliance are
+not entirely independent.
+
+Field evidence puts a magnitude on the same mechanism.
+\citet{ancker_effects_2017}, studying 112 clinicians over three and a half
+years of electronic health record data, found that the likelihood of accepting
+a reminder dropped by 30\% for each additional reminder received in an
+encounter, and by 10\% for each five-percentage-point increase in the
+proportion of reminders that were repeats. The setting is clinical rather than
+hospitality and the number does not transfer, but the mechanism does, and it is
+the mechanism a proactive agent must budget against: the cost of an
+unnecessary alert is not paid by that alert, it is paid by the next one. The
+structure is not new, and it is worth noting that the detection literature
+reached it first --- Page's average run length \citep{page_continuous_1954}
+already traded the expense of false alarms under stable conditions against the
+delay before a real change is acted on. What the human-factors work adds is
+that in a managerial setting the two costs are borne by a person whose
+willingness to keep reading is itself consumed by the false alarms.
+
+The remaining literature situates that asymmetry in a theory of appropriate
+use. \citet{lee_trust_2004} frame the goal as appropriate reliance, calibrated
+trust in which trust matches capability, with overtrust producing misuse and
+distrust producing disuse, the inappropriate rejection of a capable aid that
+\citet{parasuraman_humans_1997} tie directly to high false-alarm rates.
+\citet{parasuraman_complacency_2010} document the opposite pole, automation
+bias and complacency, and a meta-analysis \citep{hancock_meta-analysis_2011}
+shows that system performance, not surface attributes, is the largest driver of
+trust, with robot performance factors ($\bar{r} = +0.34$) far exceeding robot
+attributes ($\bar{r} = +0.03$).
+
+The consequence for evaluation is that the right metric is calibrated precision
+against real dismissals, weighted by the asymmetric cost of an interruption,
+not an undifferentiated F1. A near-ready template exists: HiL-Bench
+\citep{trinh_hil-bench_2026} scores agents with Ask-F1, the harmonic mean of
+question precision and blocker recall, which penalises both over-asking and
+silent wrong guessing; adapted from its coding domain to adopt-versus-dismiss
+outcomes, it captures exactly the two-sided failure a hospitality agent must
+avoid. Calibration closes the loop back to the forecasting half:
+\citet{guo_calibration_2017} show modern networks are overconfident and that
+temperature scaling restores calibration measured by expected calibration
+error, so the coverage guarantee that defined a deviation in
+Section~\ref{sec:rw-deviation}, and the calibration-with-sharpness argument of
+Section~\ref{sec:rw-ruler}, reappear here as an evaluation guarantee on the
+agent's stated confidence.
+
+\section{Synthesis: What the Literature Leaves Open}
+\label{sec:rw-synthesis}
+
+Four results stand established by the work above, and each is established with
+a qualification this chapter has argued for rather than inherited. Operational
+rhythm can be borrowed across venues and analogues despite scarce data
+\citep{das_-context_2025,zhou_context-driven_2025,liu_generative_2024}, but the
+benefit scales with the number of series available to pool over, so a small
+estate should expect a small loan \citep{montero-manso_principles_2021}. A
+deviation can be defined as the breach of a calibrated band whose loss of
+coverage under a regime change is bounded rather than eliminated
+\citep{sun_conformal_2025,barber_conformal_2023,liu_elephant_2024}. An agent
+can be made to act unprompted, with its learned rhythm serving as the model of
+normality it retrieves against, though not as a full memory architecture
+\citep{lu_proactive_2024,hu_memory_2026,park_generative_2023}. And the worth of
+such an action is measurable against the asymmetric cost of a false alarm, an
+asymmetry that is empirically tested rather than merely assumed
+\citep{meyer_conceptual_2004,dixon_independence_2007,ancker_effects_2017,fu_prism_2026,trinh_hil-bench_2026}.
+Each has been demonstrated in isolation, and in domains --- coding, dialogue,
+web traffic, wearables, clinical informatics --- distant from hospitality
+operations.
+
+The fourth demands the most care, because the method it calls for already
+exists. PRISM \citep{fu_prism_2026} sets its intervention threshold from an
+asymmetric miss-to-false-alarm cost ratio, and among the proactive systems
+surveyed here it is the one that gates on a calibrated acceptance probability
+rather than on accuracy alone. It reports the gate's effect, a 22.78\%
+reduction in false alarms and a 20.14\% gain in F1, but not the calibration of
+the probability the gate depends on. No claim of methodological novelty in
+cost-sensitive intervention is therefore available to this dissertation, and
+none is made. What PRISM leaves undone, and what none of the surveyed systems
+attempts, is to fix that cost ratio to the stated preferences of the person who
+bears the cost, to measure the calibration of the acceptance probability that
+ratio is applied to, and then to score the resulting decisions against that
+same person's accept-or-dismiss judgements on signals drawn from their own
+business. Every system reviewed above is evaluated against an annotated corpus,
+a simulated user, or a language model acting as judge.
+
+The contribution is accordingly one of field instantiation rather than of
+method, and that is a recognised category rather than a consolation.
+\citet{paleyes_challenges_2022}'s survey is assembled from reports of systems
+in deployment and finds practitioners encountering difficulties at every stage
+of the deployment workflow --- a body of knowledge that exists because
+deployments were written up, not because benchmarks were run. The contribution
+here is to take a risk-sensitive intervention policy of the kind PRISM
+specifies, place it above a rhythm borrowed across a small real estate and a
+deviation signal defined by a calibrated band, and evaluate the assembly
+against an operator's own decisions in a live multi-venue setting.
+
+What this chapter has additionally tried to do is state in advance where that
+assembly should be expected to fail. The locality--globality principle predicts
+that pooling across three venues will buy little
+\citep{montero-manso_principles_2021}. The low-voltage load-forecasting
+evidence predicts that weather will be marginal and may be harmful
+\citep{haben_short_2019,hertel_explainable_2026}. The rank-stability and
+benchmarking literature predicts that a model ranking computed on a handful of
+evaluation origins can reverse when more are used
+\citep{hewamalage_look_2021,brigato_there_2025}. Each of those predictions is
+borne out in the chapters that follow. Whether a policy developed on annotated
+benchmarks survives contact with one manager, three venues and a year of untidy
+till data is the remaining empirical question the literature reviewed here
+leaves open, and it is the question this dissertation sets out to answer.

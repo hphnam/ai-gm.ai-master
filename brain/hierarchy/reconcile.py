@@ -156,6 +156,66 @@ def _dow_median_forecast(
     return yhat, float(np.var(resid)) if len(resid) > 1 else 1.0
 
 
+def unbiasedness_check(cal_resid: dict, nodes: list[str], alpha: float = 0.05) -> dict:
+    """Test the condition WLS_v inherits from MinT, per node, on held-out residuals.
+
+    Wickramasuriya et al. (2019) build the whole result on unbiased base forecasts:
+    "Let e_T(h) = y_{T+h} - yhat_T(h) be the h-step-ahead conditionally stationary base
+    forecast errors with E[e_T(h)|I_T] = 0 ... This implies that the base forecasts are
+    unbiased." Theorem 1 then minimises the trace "such that SPS = S", which is what makes
+    the reconciled forecasts "the best (minimum variance) linear UNBIASED reconciled
+    forecasts". The 2019 paper says nothing about what happens when the bases are biased;
+    Athanasopoulos et al. (2024) note only that dropping unbiasedness leads to a different
+    (Ben Taieb & Koo) estimator, which is not what is implemented here.
+
+    So the honest statement is conditional, and this measures the condition. A DOW MEDIAN is
+    a median-eliciting forecaster, and on a right-skewed node the median sits below the mean,
+    so a negative mean residual is the outcome to expect rather than a surprise.
+
+    One-sample t-test of mean(e) = 0 per node on the calibration block. No multiplicity
+    correction is applied and the count is reported raw, because the quantity of interest is
+    the direction and size of any bias, not a family-wise decision.
+    """
+    from scipy import stats as _stats
+
+    rows = []
+    for node in nodes:
+        e = cal_resid.get(node)
+        if e is None or np.asarray(e).size < 2:
+            continue
+        e = np.asarray(e, dtype=float)
+        e = e[np.isfinite(e)]
+        n = int(e.size)
+        if n < 2:
+            continue
+        mean = float(e.mean())
+        sd = float(e.std(ddof=1))
+        se = sd / np.sqrt(n) if sd > 0 else 0.0
+        if se > 0:
+            t = mean / se
+            p = float(2 * _stats.t.sf(abs(t), df=n - 1))
+            half = float(_stats.t.ppf(1 - alpha / 2, df=n - 1) * se)
+        else:
+            t, p, half = (float("nan"), float("nan"), 0.0)
+        rows.append({
+            "node": node, "n": n, "mean_residual": mean, "se": float(se),
+            "ci_lo": mean - half, "ci_hi": mean + half,
+            "t": float(t), "p": p,
+            "biased": bool(np.isfinite(p) and p < alpha),
+        })
+    n_biased = sum(1 for r in rows if r["biased"])
+    return {
+        "alpha": alpha,
+        "n_nodes_tested": len(rows),
+        "n_biased": n_biased,
+        # Sign of the bias where it is detected: a median-eliciting base on skewed
+        # nodes is expected to sit low, i.e. a POSITIVE mean residual (actual - forecast).
+        "n_biased_positive": sum(1 for r in rows if r["biased"] and r["mean_residual"] > 0),
+        "holds": bool(n_biased == 0),
+        "nodes": rows,
+    }
+
+
 def mint_reconcile(Ybase: np.ndarray, S: np.ndarray, w: np.ndarray) -> np.ndarray:
     """WLS_v reconciliation: Wickramasuriya et al. (2019) Eq. (11) with a diagonal
     W. Named WLS_v, not MinT, after those authors' own convention --- see the module
@@ -237,6 +297,9 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
         if e is not None and e.size > 1:
             w[i] = float(np.var(e))
 
+    # The precondition WLS_v inherits from MinT, tested rather than assumed.
+    unbiased = unbiasedness_check(cal_resid, nodes)
+
     # WP2: every intermittent L3 node (ADI >= 4/3) moves off the DOW-median onto the
     # Croston-family estimator its (ADI, CV-squared) pair selects. No decision reads
     # the test block. Adoption overrides Ybase/w/node_q in place, so MinT and the band
@@ -292,7 +355,7 @@ def reconcile(venue: str = ANCHOR_VENUE, top_k: int = 3) -> dict:
         "venue_disc": venue_disc, "cat_disc": cat_disc, "coherent": coherent,
         "l2_coverage": l2_coverage, "l3_coverage": l3_coverage,
         "keg": keg, "stock": stock, "test_dates": (test_dates.min(), test_dates.max()),
-        "croston": croston_rows,
+        "croston": croston_rows, "unbiasedness": unbiased,
     }
 
 
@@ -567,6 +630,39 @@ def _write_report(out: dict) -> None:
         f"- max venue discrepancy: {out['venue_disc']:.2e}",
         f"- max category discrepancy: {out['cat_disc']:.2e}",
         f"- **coherent: {out['coherent']}**\n",
+    ]
+    ub = out.get("unbiasedness")
+    if ub:
+        lines += [
+            "## Base-forecast unbiasedness (the precondition WLS_v inherits from MinT)",
+            "Wickramasuriya et al. (2019) assume `E[e_T(h)|I_T] = 0` and deliver the best "
+            "minimum-variance linear **unbiased** reconciled forecasts. The condition is "
+            "measured here rather than assumed: a one-sample t-test of mean(residual) = 0 "
+            "per node on the held-out calibration block, `alpha` "
+            f"{ub['alpha']}, no multiplicity correction.\n",
+            f"- nodes tested: **{ub['n_nodes_tested']}**",
+            f"- nodes rejecting unbiasedness: **{ub['n_biased']}** "
+            f"(of which {ub['n_biased_positive']} with a positive mean residual, i.e. the "
+            "base forecast sits BELOW the actual)",
+            f"- **precondition holds across all nodes: {ub['holds']}**\n",
+        ]
+        if ub["n_biased"]:
+            lines += [
+                "| node | n | mean resid | 95% CI | p |",
+                "|---|---|---|---|---|",
+            ]
+            for r in sorted((x for x in ub["nodes"] if x["biased"]),
+                            key=lambda x: x["p"]):
+                lines.append(
+                    f"| {r['node']} | {r['n']} | {r['mean_residual']:+.2f} | "
+                    f"[{r['ci_lo']:+.2f}, {r['ci_hi']:+.2f}] | {r['p']:.2e} |")
+            lines.append(
+                "\nA DOW **median** base is median-eliciting, so on a right-skewed node it "
+                "is expected to sit below the mean. Where that is what the table shows, the "
+                "bias is a property of the chosen base forecaster and not a defect in the "
+                "reconciliation. The MinT optimality claim is nonetheless conditional on a "
+                "condition these nodes do not meet, and is reported as such.\n")
+    lines += [
         "## Reconciled-band coverage (the SAME band the /forecast API serves)",
         "Each band is `reconciled ŷ ± split-conformal quantile of the node's "
         "DOW-median residuals` — one band-construction path, used for both this "
