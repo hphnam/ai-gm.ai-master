@@ -1869,3 +1869,53 @@ account is testable here and is untested. Candidate Further Work, not claimed.
   re-export will clobber them. Needs `ZOTERO_API_KEY` + `ZOTERO_LIBRARY_ID`.
 - **Unchanged from before this session:** `harness.REPORTED_BASIS` vs `config.VENUE_SCALE_BASIS`
   still disagree by 1.2417x at Beer Hall. Methodology decision, human gate. Not touched.
+
+### Session close, second half — 2026-08-06 (Zotero enabled, three corrections)
+
+**Overleaf head `922e97e`, clean and fully pushed. Brain continues below. Rows 103–106.**
+
+#### Zotero writes enabled and used
+
+Credentials written to `~/.claude.json` at `mcpServers.zotero.env` after a timestamped backup
+(`ZOTERO_LOCAL` deliberately left `true`, since local + key + id is what the server calls hybrid
+mode). **An MCP server reads its env at process start**, so the write tools stayed blocked until
+Phuong reconnected; the work was done against the Web API in the meantime and the reconnect was
+then verified (a tag write succeeded, and semantic search returns Judd at 0.624).
+
+Semantic index rebuilt via the `zotero-mcp update-db` CLI rather than the MCP tool, so it did not
+have to wait: 20 changed items, 17 added, 3 updated, 1 stale document deleted, 0 errors.
+**121 documents against 121 live top-level items, full coverage.**
+
+#### Three corrections, in increasing order of how wrong I was
+
+1. **Ye et al. is peer-reviewed, not a preprint.** NeurIPS 2025. I inferred preprint status from
+   an arXiv record without checking whether the paper had been accepted. Reverted in Zotero,
+   `ref.bib` (`@misc` to `@inproceedings`) and the chapter, where the preprint census moved
+   **nineteen to eighteen** (18 unpublished cited, 13 marked, 5 inside exemplar lists).
+2. **The rule gap that allowed it.** "No factual claim about a cited paper without a NotebookLM
+   query" covers CONTENT. Every content claim this session was verified and held. Venue, date and
+   peer-review status are not covered, and they are what an examiner checks first. **A
+   bibliographic claim now needs the venue of record, not the arXiv page.**
+3. **I had been editing a trashed duplicate.** `K73XDLEQ` carries `deleted=1`. The trash holds
+   FIVE captures of the Ye paper; the live record `8UI7QJCU` **already had** the correct title,
+   date and proceedings. The defect reported earlier was a property of a discarded row, not of the
+   library. `zotero_search_items` returns trashed items, and the raw Web API does not volunteer
+   the flag unless inspected. **Check `deleted` before editing any item reached via search.**
+
+#### Library integrity audit, run because of (3)
+
+121 live top-level items, 23 trashed. Six trashed items have no live counterpart and **none breaks
+a citation** (three Hyndman FPP duplicates against live `K45PBRM3`, a CART webpage variant against
+live `54Z6YNAL`, one work cited zero times, one unrelated stray). **No citation in any chapter is
+backed only by a trashed item.** Citation keys for `ye_closer_2025`, `hoo_tables_2026` and
+`judd_forecasting_2025` are pinned on the LIVE records in both the native field and Extra, so a
+Better BibTeX re-export reproduces them.
+
+#### Outstanding
+
+- **Rotate the Zotero API key.** It arrived in a chat transcript, which persists in plain text
+  under `~/.claude/projects/`, and it grants library and file write on the user library and all
+  groups. Nothing in the project pins that specific key.
+- Unchanged: `harness.REPORTED_BASIS` vs `config.VENUE_SCALE_BASIS` disagree by 1.2417x at Beer
+  Hall. Methodology decision, human gate, deliberately not touched.
+- `brain/ledger/BLOCKED_third_party.md` remains the single retrieval point.
