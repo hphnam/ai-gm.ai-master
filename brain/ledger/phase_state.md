@@ -1983,3 +1983,113 @@ problem the new rule describes:
   (row 106). Both now in Verification rules.
 
 Nothing under `.claude/` was touched; the Scope boundary holds.
+
+---
+
+## Session — research questions derived and approved, 2026-08-06
+
+Phase 8A. One deliverable, one gate, closed in the same session. No dissertation prose
+changed, nothing written to Overleaf, no experiment run.
+
+### What was completed
+
+**`brain/knowledge/06_research_questions.md` written and APPROVED.** Five numbered
+research questions derived from the seven gap limbs at `05_paper_architecture.md` §2.10,
+the project specification, and the Results inventory. Each question cleared three
+admission constraints: entailed by the gap Chapter 2 establishes from prior work alone,
+answerable by a result this project holds, and stated at a grain Chapter 5 can answer
+directly.
+
+The set maps **one-to-one onto the five Results sections** of the approved target tree.
+That was a design constraint rather than an outcome: R8 is a trace criterion, and one
+question / one Results section / one answer paragraph in Discussion 5.1 / one objective
+judgement in Conclusions 6.1 makes the trace mechanical for a marker instead of an
+argument they must reconstruct.
+
+### The three decisions taken at the gate
+
+1. **Gap limb 7 — operator-grounded evaluation — is scoped OUT of the research questions**
+   and carried as contribution C5 at graded strength. It is NOT an RQ6 answered
+   negatively. R8 and D12 are trace criteria and a stated question with no answer fails
+   both by construction; HC59 already mandates the divergence appear in Discussion 5.5,
+   so an RQ6 would state the same fact once where the rubric asks for it and once where
+   it penalises it. Limb 7 remains visible in five places. **Reversible in one direction
+   only:** if `ANTHROPIC_API_KEY` and Elliot both arrive, the result reports under RQ5,
+   never as a new RQ6 — adding a question after the evidence is seen is the ordering
+   defect the pre-registration discipline exists to prevent.
+
+2. **Introduction 1.4 moves from four contributions to five.** C5 is limb 7's frozen
+   apparatus and folding it into another claim would conceal the thing graded strength
+   exists to disclose.
+
+3. **`sec:res-chatlog` (348 words, the knowledge-gap signal) is a substantial result
+   answering no research question, and cannot be made to answer one.** The seven gap
+   limbs contain no prior-work claim about knowledge-gap detection, so an RQ6 here would
+   need an eighth limb built from literature the review does not survey. Reported instead
+   as a specification-level deliverable in Results 4.5, revisited in Conclusions 6.1
+   against objective 1, with no contribution line. Demonstrated, not established.
+
+### The estate size, verified rather than assumed
+
+The aim says *three-venue estate* and RQ1 and RQ3 both turn on estate size, so it was
+checked before the gate closed. **Confirmed correct: Beer Hall, Ellel, Two River Taps.**
+The specification's *"live across 4 Lune Brew Co venues"* describes the platform
+deployment, not the study. Do not "correct" three to four anywhere — the number is
+load-bearing in the abstract, 1.1, 2.3, 3.1 and two answers, because limbs 1 and 2 are
+small-estate claims.
+
+Two HC59 divergences the 5.5 list did not have were found in the process and added: the
+three-venue estate against the specification's four, and the NeonDB research schema never
+provided. 5.5 goes from four declared divergences to six, budget unchanged at 300.
+
+### New mechanism — the unlock trail
+
+`05_paper_architecture.md` §7 gained an **"Items reopened after approval"** table. A
+closed-approvals section edited without a trail stops being useful, so a reopening now
+carries a U-row with its authority, its date and its reason. Two rows so far: **U1**
+(Introduction 1.4, four → five contributions) and **U2** (Discussion 5.5, four → six
+divergences). This is the corrections-are-appended rule applied to approvals rather than
+to findings. A future session amends an approved item by adding a U-row, never silently.
+
+### Artefacts written
+
+| Path | Change |
+|---|---|
+| `brain/knowledge/06_research_questions.md` | **New.** The aim, five RQs, the mapping table, the limb-7 recommendation and reasoning, the exact Introduction 1.3 and 1.4 strings, the two structural-defect checks, the rubric trace, the estate verification, and two pre-recorded session prompt blocks. |
+| `brain/knowledge/05_paper_architecture.md` | §2.1 Introduction 1.4 cell (U1) and Discussion 5.5 cell (U2); §7 approvals A15–A17 plus the new reopened-items table. |
+
+### Unstarted
+
+- **8B and 8C** — the restructure itself. Both now have fixed questions to work to.
+- **Why the estate is three venues rather than four.** Nothing in `brain/` records whether
+  the fourth venue was excluded during the work or was never in scope. An exclusion made
+  after seeing data needs a stated criterion in Methods 3.1 under R83; a boundary needs
+  one sentence in 5.5. **Owned by 8D, but Phuong may know it offhand — cheaper now than
+  later.**
+- Everything in `BLOCKED_third_party.md` is unchanged. No blocker cleared this session.
+
+### Verified end state
+
+| Quantity | Value |
+|---|---|
+| Research questions, fixed | 5 |
+| Gap limbs with no question | 1 (limb 7, by approved decision) |
+| Results sections with no question | 1 (`sec:res-chatlog`, by approved decision) |
+| Questions with no result | 0 |
+| Approvals in `05` §7 | A1–A17 |
+| Reopened items | U1, U2 |
+| Declared HC59 divergences in 5.5 | 6 |
+| Dissertation prose changed | 0 |
+| Files pushed to Overleaf | 0 |
+
+### Where to start next session
+
+Opening sequence per **Session lifecycle** in `brain/PRJ93_RULES.md`, and
+`BLOCKED_third_party.md` first — it is the state, this file is history. Everything in the
+previous handover's start list still stands and none of it was touched this session.
+
+Specific to THIS handover: `06_research_questions.md` is now the second closed document
+alongside `05_paper_architecture.md`. Both are approved and neither is reopened without a
+U-row. The two prompt blocks in `06` §10 — the Chapter 5 5.1 discipline and the Methods
+3.11 exception — must reach the sessions they name, or those sessions will rediscover the
+problems they were written to prevent.

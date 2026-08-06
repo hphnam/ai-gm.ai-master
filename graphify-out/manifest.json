@@ -5835,8 +5835,8 @@
     "semantic_hash": "c32468f4563f5a76ab63ac2edc15896a"
   },
   "brain/PRJ93_RULES.md": {
-    "mtime": 1786031900.5677218,
-    "ast_hash": "0ef6b313842629b1fc353a34bf279e62",
+    "mtime": 1786040679.2157524,
+    "ast_hash": "4f2ed2dc03aa40d8bf7e401f7d3b5473",
     "semantic_hash": ""
   },
   "brain/docs/DataSciDissWriting June2026final.md": {
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786039481.0604558,
-    "ast_hash": "d7be16c4bebbd99ef8c25e4786015cef",
+    "mtime": 1786040269.8132315,
+    "ast_hash": "d43bc9f3b073ea32f63dab430928dc20",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786039349.844166,
-    "ast_hash": "94dc4ac7dc146f0942b9ac8c9030ebda",
+    "mtime": 1786040189.491553,
+    "ast_hash": "0f43871e0f5efc45509104ea1cfe0b97",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6342,6 +6342,16 @@
   "brain/drafts/figures/ladder.png": {
     "mtime": 1786024064.7713099,
     "ast_hash": "417eab5dcdc74ea464a353a17ccfc226",
+    "semantic_hash": ""
+  },
+  "brain/knowledge/05_paper_architecture.md": {
+    "mtime": 1786050949.609647,
+    "ast_hash": "4f129fdadf03bb990f306cfe8cdc6e9f",
+    "semantic_hash": ""
+  },
+  "brain/knowledge/06_research_questions.md": {
+    "mtime": 1786050930.4980948,
+    "ast_hash": "dd820f6e47fa80203c4f6469b32766a0",
     "semantic_hash": ""
   }
 }
