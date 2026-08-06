@@ -94,3 +94,53 @@ forecasters an absolute measure could not.
 
 `tab:ladder` stays MASE. It is the frozen six-origin committed gate (row 89), and restating the
 decision under audit on a ruler it did not use would replace it with a different decision.
+
+---
+
+## 7 · The α=0.25 check, and it flips
+
+Asked after §4 was written, because `p = 0.220` sits close to the secondary pre-registered
+level. Both levels (0.10 primary, 0.25 secondary) were fixed at decision row 33.
+
+| venue | served | p | retained @0.10 | retained @0.25 | @0.25 under secondary loss |
+|---|---|---|---|---|---|
+| beer_hall | foundation, exo | 0.990 | yes | yes (3/9) | yes |
+| two_river_taps | ETS | **0.220** | yes (4/9) | **NO — eliminated** | **yes** |
+| ellel | robust DOW | 0.912 | yes | yes (4/9) | yes |
+
+At α=0.25 the Two River Taps set contracts to the three foundation arms and **ETS is
+eliminated**. It is the only served model at any venue failing to survive both pre-registered
+levels.
+
+The elimination is **specific, not general**: the same rung is retained at α=0.25 under the
+secondary absolute-error loss. What removes it is the squared measure *at* the stricter level,
+not the stricter level alone. Reporting it that precisely costs a clause and forecloses the
+reading that the incumbent is fragile across the board.
+
+The served model is unchanged, because the pre-registered rule is registered at the primary
+level and the primary level retains it.
+
+## 8 · The Two River Taps condition — why no operational cost attaches
+
+Verifiable from the artefact rather than asserted: `fold_vectors_L1_two_river_taps.json` has a
+last fold `test_end` of **2026-05-08** against a `store_ceiling` of **2026-07-07**. The series
+stops two months before the ceiling because the venue closed on 8 May 2026.
+
+The venue is frozen — no forecast served, no band issued, no operational decision downstream of
+the rung in `tab:mcs`. **The cost of leaving a weaker model in place there is zero.** So what
+§4 and §7 report is inferential restraint under a pre-registered rule, and NOT a judgement that
+a 3.27-se gap would not matter to somebody running the venue.
+
+**Counterfactual, written into the chapter and left to further work.** Had the venue been
+trading, a rung retained at the primary level but eliminated at the secondary, at p = 0.220 and
+carrying a >3-se pairwise gap against a foundation arm already served elsewhere in the estate,
+is a candidate for revisiting on **operational** grounds rather than inferential ones. The
+confidence set establishes that the evidence does not license a switch; it does not establish
+that a manager should be indifferent to one, and conflating the two is the error the paragraph
+exists to prevent.
+
+## 9 · Claims corrected in the parent section
+
+Three statements in `sec:res-mcs` asserted retention without naming a level, which §7
+contradicts. All three now name it: the `tab:mcs` caption, the "two readings follow" paragraph,
+and the closing pre-registered-rule paragraph, each pointing at `sec:res-mcs-functional`.

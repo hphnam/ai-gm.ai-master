@@ -2533,3 +2533,32 @@ them into the append-only log so it is the continuous WP1-to-present record.
     produce. `sec:ruler-functional`'s limitation **sharpened rather than softened** on the same
     point. `fig:ladder` regenerated on RMSSE with RMSSE MCS ink.
     *Untouched:* `tab:ladder` stays MASE -- the frozen six-origin committed gate (row 89).
+
+93. **The alpha=0.25 check flips at Two River Taps, and is self-reported.** (`log/71` S7-S9)
+    Checked because `p = 0.220` sits close to the secondary pre-registered level (both levels
+    fixed at row 33). **At alpha=0.25 the Two River Taps set contracts to the three foundation
+    arms and the served ETS is ELIMINATED** -- the only served model at any venue failing to
+    survive both pre-registered levels.
+    *Stated with the precision that matters:* the same rung IS retained at alpha=0.25 under the
+    secondary absolute-error loss, so what removes it is the squared measure AT the stricter
+    level, not the stricter level alone. That forecloses the reading that the incumbent is
+    fragile across the board. Served model unchanged -- the rule is registered at the primary
+    level, which retains it.
+    *Three overclaims corrected in `sec:res-mcs`:* the `tab:mcs` caption, the "two readings
+    follow" paragraph and the closing rule paragraph all asserted retention without naming a
+    level. All three now name it and point at `sec:res-mcs-functional`.
+    *The declined gap written up explicitly:* the 3.27-se pairwise contrast is reported as
+    computed, large, and NOT acted on, with the governing rule named -- "a rule that binds only
+    when it agrees with the pairwise contrast is not a rule". A finding declined is stronger
+    evidence of method than one never mentioned.
+    *The Two River Taps condition, verified not asserted:* last fold `test_end` 2026-05-08
+    against `store_ceiling` 2026-07-07; the venue closed 8 May 2026 and is frozen, so no
+    forecast is served, no band issued, and no operational decision sits downstream. **Cost of
+    leaving a weaker model there is zero**, which makes the restraint inferential rather than a
+    claim the gap is unimportant. Counterfactual for a trading venue written in and left to
+    further work: revisit on OPERATIONAL grounds, since the set says the evidence does not
+    license a switch and does not say a manager should be indifferent to one.
+    **Structural gap flagged:** `chapters/conclusion.tex` is a 7-line stub with no Further Work
+    section, so the counterfactual sits inline in `sec:res-mcs-functional` (the same convention
+    as D-D2's further-work note in `sec:ruler-ellel`). It should move when the conclusion is
+    written.
