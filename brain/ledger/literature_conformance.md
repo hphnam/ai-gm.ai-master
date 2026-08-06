@@ -722,3 +722,82 @@ identified without borrowing a guarantee we have not earned.
 2. Delete any implication that a Sun & Yu theorem bounds *our* coverage.
 3. Label the observed-partition argument explicitly as the chapter's own reasoning.
 4. Add the ACI-measured-and-rejected sentence, which is our evidence and currently unused here.
+
+---
+
+## 13. D-D5 resolved — 2026-08-06
+
+**Decision: run attempted, ABORTED on a pre-registered condition; the review sentence is
+narrowed, and the blocker is recorded as an ecosystem observation.** The §4 row left this as
+a human call leaning toward running R5. It was run, and it stopped for a reason nobody had
+anticipated: not compute, not time, but credential provisioning.
+
+### What was verified before the attempt
+
+NotebookLM against `hollmann_accurate_2025` and `hoo_tables_2026`, verbatim:
+
+| Claim | Verbatim |
+|---|---|
+| Envelope | *"yields dominant performance for datasets with up to 10,000 samples and 500 features"* |
+| What TabPFN-TS does | *"we recast time series forecasting as a tabular regression problem"*; features are running index, *"eight cyclic calendar components"* plus year, and auto-detected *"top-k periodicities"*; *"we do not rely on lagged or autoregressive features"* |
+| **It has a real mean** | *"the mean for squared-error evaluations, the median for absolute-error evaluations, and arbitrary quantiles"* from a binned posterior predictive |
+| Where it fails | *"a strong conditional interpolator but lacks a mechanism for systematic trend extrapolation"* |
+| Intermittency | **NOT SUPPORTED in either source.** Neither paper mentions intermittent or zero-inflated series |
+
+The third row is why this was worth a late entrant and not merely another rung: TabPFN-TS
+exposes a **genuine predictive mean**, which the served foundation model does not
+(`chronos-forecasting` 2.3.1 L817, *"the median is returned as the mean here"*). It was the
+only available candidate that could have closed D-D1's residual median-serving limitation.
+
+### The abort
+
+`tabpfn` 8.2.0 raises `TabPFNLicenseError`: *"TabPFN requires a one-time license acceptance
+to download model weights for local inference, but no interactive terminal is available."*
+Local inference needs a `ux.priorlabs.ai` account and an exported `TABPFN_TOKEN`. No account
+was created — that is the operator's decision. The cloud alternative was never available
+either: `TabPFNTimeSeriesPredictor.__new__` defaults to `TabPFNMode.CLIENT`, which posts the
+series to a vendor API, and this estate's revenue does not leave the machine.
+
+Full record: `log/68_R5_tabpfn_entrant_result.md`.
+
+### What survived, and what must not be claimed
+
+**Prediction (i) HOLDS, and it is the one that mattered for the review sentence.** The
+regime-fit claim is now arithmetic rather than rhetoric: max training rows are **392 /
+324 / 385** across the three venues against a validated limit of 10,000 — **3.9% of the
+sample limit** at the largest. The estate sits deep inside TabPFN's envelope, not near its
+edge.
+
+**Predictions (ii), (iii) and (iv) are NOT TESTED and may not be reported in any direction.**
+In particular, nothing here licenses any statement about how TabPFN-TS would have performed,
+at Ellel or anywhere else. An untested prediction is an absent result, not a weak one.
+
+### The review sentence
+
+Narrowed, but not in the way §4 proposed. §4's free alternative was *"name only Chronos-2"*.
+That would discard a regime-fit argument now supported by a verified number. The accurate
+form keeps both models in the regime claim and separates evaluation from licensing:
+
+- **Keep**: the estate sits inside the regime where Chronos-2 and TabPFN-TS are the licensed
+  choices — now quantified at 392 rows against 10,000.
+- **Add**: only Chronos-2 was evaluated, and state why — local weights are gated behind
+  vendor account provisioning, and the library's cloud default transmits the series.
+- **Never say or imply**: that TabPFN-TS was tried and found wanting.
+
+### Post-decision status
+
+| Item | Status |
+|---|---|
+| **D-D5** | **DECIDED — attempted, aborted, narrowed.** Not a divergence closed by a run; a divergence converted into a documented, checkable blocker |
+| R8 (regime fit) | **CONFORMS on the claim, PARTIAL on the test.** The regime argument is quantified; one of the two named models remains unevaluated |
+| Pre-registration row 83 | **Stands.** Scored as written; the evaluator is committed and runs unchanged given a token |
+| New blocker class | First blocker in this project owned by a **software vendor** rather than by Elliot, Ryan or the estate's structure |
+
+### Owed to the writing, not written this session
+
+1. The narrowed review sentence in the three parts above.
+2. A Discussion note on provisioning: local weights behind a vendor account, and two entry
+   points in one library disagreeing on whether inference is local or cloud. **Ecosystem
+   observation**, same framing as Chronos-2, not a criticism of Prior Labs.
+3. Add TabPFN-TS to Further Work as unblocked-by-one-env-var, alongside the A12 cost
+   objective from §10.

@@ -1765,3 +1765,28 @@ in the same paper: its own denominator-bearing measures degrade on zeros. Cost-o
 moved to Further Work, scoped to A12 at Beer Hall. Full record at
 `ledger/literature_conformance.md` §10 and decision-log row 80. **Remaining defensible rows:
 D-D3, D-D4, D-D5.**
+
+### D-D3 / D-D4 / D-D5 addendum — 2026-08-06
+
+All five DIVERGES — DEFENSIBLE rows are now decided.
+
+- **D-D3** — accept and **reclassify toward CONFORMS**. The row's premise was false:
+  `p_trade` returns `E[occurrence | DOW]`, a saturated nonparametric estimator, not a 0/1
+  constant. Verified numerically (`log/67_DD3_hurdle_saturation_result.md`): the saturated
+  logit MLE reproduces the groupby cell frequencies to 7.61e-05, and the deterministic cells
+  show complete separation (|coef| 11.46, diverging). Surviving limitation is covariate
+  poverty (DOW only), cross-referenced to D-U3.
+- **D-D4** — accept the design; attribution **re-homed across three sources**, and the §4
+  recommendation rejected because it would have been a fresh misattribution: Cor A.2 and
+  Thm 4.3 are results about **CPTC**, which `conformal/wrap.py:8-9` states is "noted, not
+  wired". `barber_conformal_2023` for what the procedure is, `stocker_gentle_2025` for what
+  it guarantees, `sun_conformal_2025` Thm 4.3 as motivation only. No new paper, no gate.
+  **V2 CLOSED.**
+- **D-D5** — R5 attempted and **aborted on a pre-registered condition**: `tabpfn` 8.2.0 gates
+  local weights behind a vendor account + `TABPFN_TOKEN`, and the library's cloud default
+  transmits the series. Prediction (i) salvaged — 392 / 324 / 385 max training rows against a
+  10,000 limit, so the regime claim is quantified. (ii)-(iv) NOT TESTED. Evaluator committed
+  and runs unchanged given a token.
+
+Full records at `ledger/literature_conformance.md` §11-§13 and decision-log rows 81-84.
+**No DIVERGES — DEFENSIBLE rows remain open.** No chapter text written this session.

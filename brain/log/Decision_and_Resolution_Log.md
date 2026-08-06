@@ -2219,3 +2219,36 @@ them into the append-only log so it is the continuous WP1-to-present record.
     null and negative cells get the same prominence as positive ones; the incumbent arms are
     re-scored on the same step-7 folds so the comparison is internally consistent rather than
     borrowed from R9's step-1 numbers.
+
+---
+
+84. **2026-08-06 — D-D5 DECIDED: R5 attempted and ABORTED on a pre-registered condition; the
+    review sentence is narrowed and the blocker recorded.** Pre-registration row 83 (commit
+    `473de1df`) was written and committed before `eval/tabpfn_entrant.py` existed; the
+    evaluator, folds, MCS, paired bootstrap and mean/median pair are all written and
+    committed. **The abort was not compute and not time** — wall clock under three minutes.
+    `tabpfn` 8.2.0 (`tabpfn/browser_auth.py:621`) raises `TabPFNLicenseError`: *"TabPFN
+    requires a one-time license acceptance to download model weights for local inference, but
+    no interactive terminal is available"*, requiring a `ux.priorlabs.ai` account and an
+    exported `TABPFN_TOKEN`. No account was created — the operator's call, not the agent's.
+    The cloud route was never available: `TabPFNTimeSeriesPredictor.__new__` defaults to
+    `TabPFNMode.CLIENT`, which posts the series to a vendor API, so the evaluator pins
+    `TabPFNMode.LOCAL` explicitly rather than trusting a default that **differs between two
+    entry points in the same library**. **Prediction (i) HOLDS and is salvaged**, because it
+    never needed the model: max training rows **392 / 324 / 385** at beer_hall /
+    two_river_taps / ellel against TabPFN's validated *"up to 10,000 samples and 500
+    features"* — **3.9% of the sample limit** at the largest, so the regime-fit claim is now
+    arithmetic rather than rhetoric. **Predictions (ii)–(iv) are NOT TESTED and may not be
+    reported in any direction**; nothing licenses any statement about how TabPFN-TS would have
+    performed. **Why this was worth a late entrant at all:** verified verbatim from
+    `hoo_tables_2026`, TabPFN-TS computes *"the mean for squared-error evaluations, the median
+    for absolute-error evaluations"* from a binned posterior predictive, so it exposes a
+    **genuine predictive mean** — the only available candidate that could have closed D-D1's
+    residual median-serving limitation, the served Chronos-2 having none. **Review sentence
+    narrowed, but not as §4 proposed** (§4 said "name only Chronos-2", which would discard a
+    regime claim now backed by a number): keep both models in the regime claim, state that
+    only Chronos-2 was evaluated and why, and never imply TabPFN-TS was tried and found
+    wanting. Environment isolated in `.venv-tabpfn` (gitignored) precisely so `.venv-forecast`
+    — the environment that reproduces the committed artefacts, per the R3 hazard — was not
+    disturbed; it was not. **First blocker in this project owned by a software vendor rather
+    than by Elliot, Ryan or the estate's structure.**
