@@ -41,11 +41,14 @@ naming a metric, so a future designation change moves the figure with the tables
 
 ## 3 · The confidence sets under the new headline
 
-| venue | headline | set @0.10 | set @0.25 | served | served p | retained |
+| venue | headline | set @0.10 | set @0.25 | served | served p | served retained **@0.10** |
 |---|---|---|---|---|---|---|
 | beer_hall | RMSSE | 5/9 | 3/9 | foundation, exo | 0.990 | yes |
 | two_river_taps | RMSSE | 4/9 | 3/9 | ETS | **0.220** | yes |
 | ellel | RMSE (GBP) | 6/9 | 4/9 | robust DOW | 0.912 | yes |
+
+The last column is the **primary level only**. §7 checks α=0.25 and Two River Taps does not
+survive it — read the two tables together, never this one alone.
 
 Set membership at α=0.10 is unchanged at the Beer Hall and Two River Taps. At Ellel the headline
 set is **wider** than the MASE set was — six rungs rather than four, admitting STL and ETS.
