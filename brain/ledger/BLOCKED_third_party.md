@@ -160,19 +160,34 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 
 ---
 
-## G · Manual step the agent cannot do — Zotero is local-only
+## G · Zotero — RESOLVED 2026-08-06, with one caveat
 
-`zotero_update_item` fails with "Cannot perform write operations in local-only mode."
-Two records are wrong at source and were fixed in `ref.bib` only, so **a re-export from
-Zotero will clobber both fixes**:
+Credentials supplied and written to `~/.claude.json` at `mcpServers.zotero.env`
+(`ZOTERO_API_KEY`, `ZOTERO_LIBRARY_ID=20198714`, `ZOTERO_LIBRARY_TYPE=user`;
+`ZOTERO_LOCAL` left at `true`, since local + key + id is what the server calls hybrid mode).
+A timestamped backup of the config was taken first.
 
-| Item | What is wrong | Correct value |
+**Caveat: the MCP server reads its env at process start, so the `mcp__zotero__*` write tools
+still fail in THIS session.** They will work from the next session. The three fixes were
+therefore applied directly against the Zotero Web API and are already live:
+
+| Item | Action | Result |
 |---|---|---|
-| `K73XDLEQ` (Ye et al.) | title truncated to "…Its Strengths and…", **no date** → renders "Ye et al., n.d." | Title ends "…and Extending Its Capabilities"; arXiv 2502.17361; v2 dated 2025-06-11; BBT key `ye_closer_2025` |
-| Hoo et al. | arXiv id 2501.02945 is the Jan-2025 first posting; cited content is v4 | Keep the id, keep the 2026-01-26 date; the `note` field in ref.bib records the version |
-| `judd_forecasting_2025` | **Not in Zotero at all.** Added to ref.bib and NotebookLM only | Judd, Mylona, Liu, Hogg, Butler, *J. Applied Statistics* 53(2) 372–390, doi 10.1080/02664763.2025.2519136, CC BY 4.0 |
+| `K73XDLEQ` Ye et al. | conferencePaper → preprint; full title restored; date 2025-06-11; DOI 10.48550/arXiv.2502.17361; `Citation Key: ye_closer_2025` | HTTP 204, verified on read-back |
+| `665AJ6CH` Hoo et al. | Extra records the cited version (v4, 2026-01-26) against the Jan-2025 arXiv id; `Citation Key: hoo_tables_2026` | HTTP 204, verified |
+| `KG8QMUJV` Judd et al. | **created**, journalArticle, J. Applied Statistics 53(2) 372–390, doi 10.1080/02664763.2025.2519136, CC BY 4.0, `Citation Key: judd_forecasting_2025` | HTTP 200, verified |
 
-To enable agent writes later, set `ZOTERO_API_KEY` and `ZOTERO_LIBRARY_ID` for hybrid mode.
+Citation keys are pinned in BOTH the native `citationKey` field and an Extra
+`Citation Key:` line, so a Better BibTeX re-export now reproduces the keys the chapters
+use instead of clobbering them. **The ref.bib fixes are no longer at risk from a re-export.**
+
+Next session: run `zotero_update_search_database` so the three items are semantically
+searchable, and confirm `mcp__zotero__zotero_update_item` now succeeds.
+
+**Security note.** The API key was pasted into a chat transcript, which is stored in plain
+text under `~/.claude/projects/`. It grants library and file write on the user library and
+all groups. Rotate it at zotero.org/settings/keys when convenient and update
+`~/.claude.json`; nothing in the project depends on that specific key.
 
 ### Two papers deliberately NOT cited, so they are not rediscovered
 
