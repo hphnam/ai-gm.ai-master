@@ -2562,3 +2562,29 @@ them into the append-only log so it is the continuous WP1-to-present record.
     section, so the counterfactual sits inline in `sec:res-mcs-functional` (the same convention
     as D-D2's further-work note in `sec:ruler-ellel`). It should move when the conclusion is
     written.
+
+94. **Swept every chapter for unlevelled confidence-set claims; added the aggregate coherence
+    statement.**
+    *The sweep.* "Retained" without a level is the same defect class as the basis literal
+    (`log/70`) and the `mcs_primary_mase` key name (`log/71` S2): a claim reading as
+    unconditional while its condition lives elsewhere. Three found in `sec:res-mcs` alone (row
+    93) suggested the phrasing was propagating, so all five chapter files were swept for
+    `retained` / `retains` / `survives` / `in the set` with no alpha in the same sentence.
+    **Seven genuine cases** fixed across `results.tex`, none in the other chapters:
+    the pre-registered rule itself ("stays served if it is retained" -> "**at the primary
+    level**", the canonical statement and the one that matters, since row 93 showed the
+    incumbent fails at the secondary); the 273-origin five-of-nine claim; the occurrence-gate
+    both-arms claim; the weather no-weather-arm claim; the Winkler G retention; the Beer Hall
+    three-arms claim; and the whole-candidate-set claim. The audit script's remaining hits were
+    verified as **false positives** -- a "90 per cent" spelling the pattern missed, and
+    `$\alpha = 0.10$` split at its own decimal point by the sentence-splitter.
+    *The aggregate.* Under the headline loss the served model is the argument-minimum at **no**
+    venue. Each venue was handled correctly in isolation but the aggregate had no sentence, and
+    a reader assembles it regardless -- unexplained it reads as three venues disagreeing with
+    their own served models. Written into `sec:res-mcs-functional` as a **coherence property of
+    the two-pass design**: the gate was taken at six origins under the absolute measure and is
+    audited as that decision (`sec:res-ladder`, row 89), the headline is the squared measure at
+    full fold count (`sec:ruler-functional`), so a set selected under one ruler was never chosen
+    to minimise the other. The paragraph names what WOULD be incoherent -- concealing the gap
+    between the passes and presenting the served set as though it had won the contest actually
+    reported -- so the point reads as design rather than defence.
