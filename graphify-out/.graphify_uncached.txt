@@ -1,6 +1,0 @@
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/docs/Prj93_external_examiner_assessment.md
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/knowledge/00_marking_criteria.md
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/knowledge/01_autoresearchclaw_reference.md
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/knowledge/02_prj93_pipeline_spec.md
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/ledger/numbers_audit.md
-/Users/hapuna/Downloads/ai-gm.ai-master/brain/ledger/phase_state.md
