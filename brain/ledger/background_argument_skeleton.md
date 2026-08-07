@@ -217,11 +217,47 @@ Chapter 3 applies it to this estate's design.** The derivation lives in one plac
 cited from the other.
 
 **This is a relocation test, not a deletion test.** If Methods can carry A3 and A6, roughly
-200 words leave Chapter 2 without a single argumentative move being lost, and the chapter
-comes back close to budget for free. If Methods cannot carry them, the residue is genuinely
-irreducible and the decision moves to **budget reallocation** — at which point Methods' real
-floor is known, which it is not today. Deciding the reallocation now, on one chapter with the
-other five unmeasured, is deciding blind.
+200 words leave Chapter 2 without a single argumentative move being lost. Deciding a
+reallocation now, on one chapter with the other five unmeasured, is deciding blind.
 
-**Until that check runs, 4,893 is provisional.** It is not an accepted overrun and it is not
-a precedent. See `phase_state.md`.
+#### The check has THREE possible answers, not two
+
+Framing it as Methods-can-carry or Methods-can't is the trap, because it treats relocation as
+the assumed outcome.
+
+| | Answer | Consequence |
+|---|---|---|
+| **(a)** | Methods can carry A3 and A6, **and has the headroom** | Chapter 2 closes; ~200 words move to where they do their work |
+| **(b)** | Methods cannot carry them — the derivations genuinely belong in the review | Chapter 2's residue is irreducible |
+| **(c)** | Methods can carry them **but is itself over budget** | Relocation *moves* the overrun rather than resolving it |
+
+**(c) is the likely answer and must not be discovered late.** Methods stands at **9,326
+against a 4,200 budget**, a **−5,126 deficit** — far worse than Chapter 2's. It must also
+absorb the `sec:res-basis` ruling relocated from Results in 8A.1 (§2.8a) and the R69 figure.
+It may have less headroom than Chapter 2 did, not more.
+
+So: **measure Methods' floor before deciding anything**, and run the check as a genuine
+question about where each derivation does its work rather than as a search for somewhere to
+put 200 words. If both chapters are irreducible, that is the point at which **budget
+reallocation** gets decided — on real numbers from two measured chapters instead of one.
+
+#### Chapter 3 cannot fully close until the figures compile
+
+F1, F3 and the algorithm floats all land in Methods, and the **R69 figure is load-bearing for
+3.7's word saving** — the booked net **−165** assumes F1 replaces the four-block prose. The
+Overleaf compile is a human-only gate (`prj93-8b-compile-gate`).
+
+**Do not let an uncompiled figure block the composition, and do not let it be quietly assumed
+either.** If the compile has not happened when 8C-2 reaches Methods, compose the chapter
+around the figures as specified and mark the word saving **provisional**, exactly as Chapter
+2's overrun is marked. A saving booked against a float nobody has seen render is not a
+measured saving.
+
+**Until the check runs, 4,948 is provisional.** It is not an accepted overrun and it is not a
+precedent. See `phase_state.md` and `BLOCKED_third_party.md` §F, row S-1.
+
+> **Figure correction, 2026-08-07:** this section first said 4,893 / 893 words over. The
+> counter mis-stripped escaped `\%` and undercounted by 55. **The live chapter is 4,948 and
+> the overrun is 948.** The ruling is unchanged — relocating A3 and A6 was never going to
+> close 893 on its own either. Use `brain/scripts/wordcount.py`, which emits the per-section
+> table directly.

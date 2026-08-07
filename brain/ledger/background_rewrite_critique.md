@@ -157,6 +157,55 @@ A **433** for 2.8 was quoted in the 8C-1 hand-off. It is wrong — the sections 
 only with 421, which is what the counter returns. The total was right in that hand-off; the
 one section figure was not.
 
+### Second correction, same day — the counter itself was wrong. **The live figure is 4,948.**
+
+The table immediately above undercounts. Its counter stripped LaTeX comments with `%.*`,
+which also matches an **escaped** `\%`, so every line quoting a percentage was truncated at
+the percent sign and the rest of that line was never counted.
+
+| | Buggy `%` | Corrected |
+|---|---|---|
+| Live Chapter 2 (12 `\%` lines) | 4,893 | **4,948** (+55) |
+| Pre-rewrite Chapter 2 (23 `\%` lines) | 8,592 | **8,696** (+104) |
+
+Isolated by patching one regex at a time: the escaped-percent fix accounts for the entire
+difference, and removing the counter's redundant control-sequence strip-list changes nothing.
+
+**The "calibrated to 0.14 %" claim in the entry above is withdrawn.** That figure came from
+comparing one aggregate — 8,592 against the architecture's measured 8,604 — and a
+single-number calibration cannot detect a defect that shifts both measurements in the same
+direction. The corrected counter reads **8,696** against the architecture's 8,604, about
+1.1 % high; that gap is unexplained and depends on what tool produced 8,604. The direction of
+the fix is not in doubt regardless: a marker counts *"from 51.85\% for GPT-4o to 64.73\% for
+GPT-4o-mini"* as eight words and the old counter counted two.
+
+**Corrected per-section table, emitted by `brain/scripts/wordcount.py` (not transcribed):**
+
+| Section | Budget | Live |
+|---|---|---|
+| Decision support and delegated autonomy | 260 | 284 |
+| Demand forecasting on short hospitality series | 220 | 229 |
+| Cross-series pooling and exogenous covariates | 700 | 837 |
+| Intermittent demand | 280 | 324 |
+| Conformal prediction intervals | 340 | 352 |
+| Error measures and model comparison | 480 | 686 |
+| Deviation detection from calibrated intervals | 370 | 500 |
+| Proactive agents and intervention policy | 400 | 457 |
+| Evaluation of agent interventions | 400 | 570 |
+| Synthesis and research gap | 550 | 709 |
+| **Body total** | **4,000** | **4,948** |
+
+**Δ +948 (+24 %).** Caption 42 words, charged to the 1,200 all-chapter caption line.
+
+The overrun is 948, not 893. This does not change the 2026-08-07 ruling — relocating **A3**
+and **A6** was never going to close 893 on its own either — but every figure quoted from this
+file before the boundary check must be the 4,948 one.
+
+**The lesson, for the record:** the artefact was verified and the instrument was not. Chapter
+2's text was checked paragraph by paragraph against the Overleaf copy, which was the right
+check and caught nothing because nothing was wrong with the text. The error was in the tool
+doing the measuring, and one aggregate agreeing with one other aggregate is not a calibration.
+
 **Status of the 893-word overrun: provisional, not accepted.** Phuong's ruling of 2026-08-07
 is that none of the four costed cuts is made, and that the residue is re-tested by a
 **Chapter 2 / Chapter 3 boundary check** run as the first step of 8C-2 — see

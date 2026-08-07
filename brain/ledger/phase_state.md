@@ -2422,3 +2422,38 @@ the load-bearing property, which is the size.
 - **The Chapter 2 / Chapter 3 boundary check** is the first step of 8C-2, before any Methods
   composition. Its outcome decides whether Chapter 2's overrun closes or moves to
   reallocation.
+
+### Correction, same day — the word counter was defective. **Chapter 2 is 4,948, not 4,893.**
+
+The counter used all session stripped LaTeX comments with `%.*`, which also matches an
+**escaped** `\%`. Every line quoting a percentage was truncated at the percent sign and its
+remainder never counted. Found while moving the counter into `brain/scripts/wordcount.py`,
+when the rebuilt tool disagreed with the figure reported hours earlier.
+
+| | Buggy `%` | Corrected |
+|---|---|---|
+| Live Chapter 2 (12 `\%` lines) | 4,893 | **4,948** (+55) |
+| Pre-rewrite Chapter 2 (23 `\%` lines) | 8,592 | **8,696** (+104) |
+
+Isolated one regex at a time: the escaped-percent fix accounts for the whole difference.
+**The "calibrated to 0.14 %" claim made earlier in this file is withdrawn** — it compared a
+single aggregate against a single aggregate, which cannot detect a defect that moves both the
+same way. The corrected counter reads 8,696 against the architecture's measured 8,604, ~1.1 %
+high and unexplained; the direction of the fix is certain regardless, since a marker counts
+the truncated words and the old counter did not.
+
+**Sections changed: 2.5 → 352, 2.8 → 457, 2.9 → 570. The overrun is 948, not 893.** The
+2026-08-07 ruling is unaffected — relocating A3 and A6 (~200 words) was never going to close
+893 either — but S-1 in `BLOCKED_third_party.md` §F now reads 948 and every later quotation
+takes that figure. Full corrected table in `background_rewrite_critique.md`.
+
+**What this says about the earlier verification.** The artefact was checked correctly and
+exhaustively: Chapter 2's text was fingerprinted paragraph by paragraph against the Overleaf
+copy, and nothing was wrong with the text. The defect was in the instrument doing the
+measuring, and it survived a check that only ever compared one total to one other total.
+
+`brain/scripts/wordcount.py` now replaces the scratchpad counter. It carries the §2.1 budgets
+for all six chapters, emits the per-section table as **paste-ready markdown with a Δ**, and
+warns when a heading in the `.tex` is absent from the approved tree or vice versa. Two
+transcription errors in two hand-offs (2.8 as 433, then 421) came from copying rows by hand;
+there is now nothing to copy.
