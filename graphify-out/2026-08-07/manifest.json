@@ -5835,8 +5835,8 @@
     "semantic_hash": "c32468f4563f5a76ab63ac2edc15896a"
   },
   "brain/PRJ93_RULES.md": {
-    "mtime": 1786064591.8255587,
-    "ast_hash": "dd3b464a4703d2287bdf5b534218d864",
+    "mtime": 1786094423.368141,
+    "ast_hash": "a6b4011b287101d2511e6927a017437e",
     "semantic_hash": ""
   },
   "brain/docs/DataSciDissWriting June2026final.md": {
@@ -5885,9 +5885,9 @@
     "semantic_hash": ""
   },
   "brain/ledger/citation_audit.md": {
-    "mtime": 1785433222.3823884,
-    "ast_hash": "7ab9efd69b57881184ff409e425bbe86",
-    "semantic_hash": "7ab9efd69b57881184ff409e425bbe86"
+    "mtime": 1786094437.228339,
+    "ast_hash": "094c346e9af5f4e955851aad00ff4b6f",
+    "semantic_hash": ""
   },
   "brain/ledger/citation_fixes.md": {
     "mtime": 1785451260.9411378,
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786066325.1055315,
-    "ast_hash": "064b869342b5954bd74ea38a02193384",
+    "mtime": 1786095199.3144457,
+    "ast_hash": "5904faaa06b3263cd17c22d193efd21d",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786040189.491553,
-    "ast_hash": "0f43871e0f5efc45509104ea1cfe0b97",
+    "mtime": 1786095211.5300617,
+    "ast_hash": "003856337cf121185041be551aa1fe42",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6345,8 +6345,8 @@
     "semantic_hash": ""
   },
   "brain/knowledge/05_paper_architecture.md": {
-    "mtime": 1786060603.630359,
-    "ast_hash": "8fda4e782723955799ce535e769cff7c",
+    "mtime": 1786094404.8223507,
+    "ast_hash": "a70c026061f56fcd5e3d29eb228c3180",
     "semantic_hash": ""
   },
   "brain/knowledge/06_research_questions.md": {
@@ -6437,6 +6437,21 @@
   "brain/ledger/main_preamble_diff.md": {
     "mtime": 1786066161.8349285,
     "ast_hash": "b3f54723a8e880c5f0c1fb42c3694e9f",
+    "semantic_hash": ""
+  },
+  "brain/scripts/wordcount.py": {
+    "mtime": 1786095053.5704057,
+    "ast_hash": "ae745627d8e897e6ae4719f6d2f71dca",
+    "semantic_hash": ""
+  },
+  "brain/ledger/background_argument_skeleton.md": {
+    "mtime": 1786095230.343458,
+    "ast_hash": "0e23d2fe6f546cecfa11dd6c0b9a4947",
+    "semantic_hash": ""
+  },
+  "brain/ledger/background_rewrite_critique.md": {
+    "mtime": 1786095182.196335,
+    "ast_hash": "c042065705b7378d2b06f6a8e65f33fa",
     "semantic_hash": ""
   }
 }
