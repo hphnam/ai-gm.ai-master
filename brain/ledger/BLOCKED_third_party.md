@@ -186,6 +186,47 @@ argument skeletons.
 
 ---
 
+### What 8C-3 (Results) inherits — recorded 2026-08-07, not in the 8C template
+
+Two items, plus a correction to how they were handed over.
+
+1. **Report the floor in `Raw / Artefact / Marker` form.** `brain/scripts/wordcount.py` now
+   emits all three, so Results' floor is comparable with Methods' **5,618 raw / 92 artefact /
+   5,526 marker**. Quote **Marker** against the 5,200 budget; compare revisions on **Raw**,
+   where the artefact cancels. Results is equation-light, so its artefact will be small and
+   almost all label keys — do not assume Methods' 92 transfers.
+
+2. **The float exposures 4.1 and 4.3 must meet while composing, rather than leave to 8D.**
+   The hand-off named `tab:vuspr`, `tab:group` and `tab:weather` as carrying "the
+   unstamped-MCS exposure". **Verified against the owning files, and it resolves into three
+   different exposures on three different floats — they are not one item:**
+
+   | Float | Section | Actual exposure | Owner |
+   |---|---|---|---|
+   | `tab:mcs` | **4.1** | **W2, the unstamped-MCS exposure proper.** It is an MCS too, so a perturbation too small to move a point estimate can still cross α and delete a set member. `eval/mcs_L1_results.json` carries **no provenance stamp**; testing it means regenerating the ladder, which is out of scope. **The gap stays open and is not to be closed by assertion** — if 4.1 states ladder set membership as a finding, say in a clause that W1 applies to it by construction. | `05` §2.7b |
+   | `tab:group` | **4.3** | **B1, open.** *"roughly £40"* is untraceable; the real value is £4.27–£10.94, and the resolution is **£9.99 mean / £172 max**. Transcription from a committed artefact, no re-run. | `07` §4; values in `blocker_clearance_package.md` B1 |
+   | `tab:weather` | **4.3** | **B3, closed but consequential.** Must source the **post-M24** fold grid: M24 moved every A14 MASE (1.5460 → 0.9551) when the grid widened from six folds. Confirm `eval/weather_basis_L1.json` is the post-M24 artefact before composing. | `07` §4; `code_vs_paper.md` M24 |
+   | `tab:vuspr` | **4.5, not 4.1 or 4.3** | **Neither of the above.** It was introduced *after* the numbers audit and has **never been audited** — a known unknown recorded as such, which `07` §4 is explicit *"is not the same as clean"*. | `07` §4 |
+
+   `tab:exchangeability` (4.4) carries the same never-audited status as `tab:vuspr`.
+
+3. **B4 is discharged by 8C-2 and should not be re-raised.** The `tab:bases` dispersion
+   blocker asked for the 95 % intervals, n-pairs and induced-MASE columns; they are in the
+   table pushed to `chapters/methodology.tex` on 2026-08-07, with the Ellel
+   `calendar_lag7_active` cell (28 pairs, 65.6 % width) emboldened and visible. **B5 remains
+   open**: the seed, candidate-set size and common-fold restriction are stated in the Methods
+   body, but `tab:mcs-config` itself is an Appendix C float and Appendix C does not exist yet.
+
+> **Finding, and it is a gap in this file's own remit.** `07_figure_programme.md` §4 carries a
+> **fourth state store** — a seven-row blocker table (B1–B7) whose open rows are not reflected
+> here, while this file claims to be the single retrieval point. They are a different register
+> from conformance rows, so §F's *"SHOULD-FIX conformance rows: 0"* is not contradicted, but a
+> session reading only §F would not learn that **B1, B2, B5 and B7 are open**, B7 being an
+> artefact-staleness sweep that was never run and *"potentially affects every figure"*. 8C-3
+> should either fold those rows into §F or state plainly that `07` §4 owns them.
+
+---
+
 ## G · Zotero — RESOLVED 2026-08-06, with one caveat
 
 Credentials supplied and written to `~/.claude.json` at `mcpServers.zotero.env`

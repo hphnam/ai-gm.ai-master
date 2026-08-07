@@ -2603,3 +2603,52 @@ the check that matters, since the files are the real store: the boundary-check f
 `background_argument_skeleton.md` and §F S-1; U4 is in `05_paper_architecture.md` §7; the
 Zotero rule is in `PRJ93_RULES.md`; the counter correction is in this file and in
 `wordcount.py`. No durable fact existed only in the unindexed store.
+
+### Session close addendum, 2026-08-07 — conventions recorded, runtime store untracked
+
+Three rules added to `PRJ93_RULES.md`, each from a defect this session hit rather than from
+principle:
+
+1. **`brain-construction-local` is local; Overleaf is the publication target.** `git push` on
+   explicit instruction only. The branch has run whole phases ahead of `origin` by intent, and
+   that had been re-inferred once a session.
+2. **A number entering a decision comes from an instrumented tool with a fixture, never an
+   ad-hoc script.** Two ad-hoc counters have now been wrong, both in the direction of the
+   number about to be acted on, and both caught only by building the real tool and watching it
+   disagree: the `%.*` escaped-percent defect (4,893 for 4,948) and the artefact double-count
+   (98 for 92). The fixture's expected value is derived by hand, cell by cell, before the tool
+   runs.
+3. **A withdrawal is retracted everywhere the claim was ASSERTED, not only where it was
+   RECORDED.** The "calibrated to 0.14 %" claim was withdrawn in this file and left standing in
+   `wordcount.py`'s docstring, which is where the next reader would actually meet it.
+
+**agentmemory's runtime store untracked** (`data/state_store.db/`, `data/stream_store/`, 29
+files). Binary, rewritten on every save, never present in a brain commit. Removed with
+`git rm --cached` rather than deleted, so the memories backfilled earlier today survive;
+verified after the fact — worker healthy, 4 memories, backfill still returned by recall.
+Working tree now clean.
+
+### 8C-3 carry-forward — the hand-off named three floats and it resolves into four exposures
+
+Recorded in `BLOCKED_third_party.md` §F. **Verified against the owning files rather than
+transcribed**, and the mapping did not survive the check:
+
+- `tab:vuspr` is a **4.5** float in both `05` §2.7 and `07` §1, not 4.1 or 4.3, and its
+  exposure is **not** the unstamped MCS — it and `tab:exchangeability` were introduced after
+  the numbers audit and have **never been audited**, which `07` §4 states *"is not the same as
+  clean"*.
+- The unstamped-MCS exposure proper is **W2 on `tab:mcs` (4.1)**.
+- `tab:group` (4.3) carries **B1, open** — the untraceable "roughly £40". `tab:weather` (4.3)
+  carries **B3** — must source the post-M24 fold grid.
+- **B4 is discharged by this session** and should not be re-raised: `tab:bases` shipped with
+  its intervals, n-pairs and induced-MASE columns. **B5 remains open**, since `tab:mcs-config`
+  is an Appendix C float and Appendix C does not exist.
+
+**A gap in `BLOCKED_third_party.md`'s own remit was found while writing this.**
+`07_figure_programme.md` §4 holds a **fourth state store**: a seven-row blocker table whose
+open rows (**B1, B2, B5, B7**) are not reflected in §F, while §F claims to be the single
+retrieval point. B7 is an artefact-staleness sweep that was never run and *"potentially
+affects every figure"*. Not reconciled here — 8C-3 either folds those rows into §F or §F
+states that `07` §4 owns them. Reported, not silently merged.
+
+**8C-3 was not conducted.**

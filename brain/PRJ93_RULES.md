@@ -51,8 +51,13 @@ ending tidily. This is the rule that stops information being dropped mid-run.
 3. Append to `brain/ledger/phase_state.md`: what was completed, what artefacts were
    written, what is unstarted, and the verified end state — heads, row counts,
    artefact paths. This is the only place that requirement is stated.
-4. Commit, and confirm the working tree is clean and pushed. An uncommitted
-   correction is indistinguishable from one that was never made.
+4. Commit, and confirm the working tree is clean. An uncommitted correction is
+   indistinguishable from one that was never made.
+
+**`brain-construction-local` is a local branch and Overleaf is the publication target.**
+`git push` happens on explicit instruction only — the branch has run many commits ahead of
+`origin` for whole phases, and that is the intent rather than a backlog. "Push it" in this
+project means push to Overleaf. Stated here so it stops being re-inferred once a session.
 
 ### The three stores must agree
 
@@ -108,6 +113,15 @@ supersedes and why. `log/73` §4 and decision rows 101 and 106 are the pattern. 
 silently revised claim leaves a reader unable to tell a verified statement from a
 lucky one.
 
+**A withdrawal is retracted everywhere the claim was ASSERTED, not only where it was
+RECORDED.** Those are different sets, and the second is usually the smaller one. On
+2026-08-07 the claim that the word counter was *"calibrated to 0.14 %"* was withdrawn in
+`phase_state.md` — and was still sitting in `brain/scripts/wordcount.py`'s own docstring
+hours later, where the next reader would actually meet it. The ledger had the retraction;
+the tool had the claim. **On withdrawing anything, grep for the claim rather than for the
+file you wrote it in**, and fix the copies in code comments, docstrings, captions and
+`README`s, which are the copies a reader reaches first.
+
 ### A fix is verified by inspecting the artefact, never by the exit code
 
 **An exit code reports what a script decided. It does not report what the script left on
@@ -142,6 +156,35 @@ is there. That grep is what caught the `git mv`.
 Corollary: **`git diff` on a regenerated artefact is part of the run, not an optional check
 afterwards.** A regeneration whose diff nobody read has not been verified, whatever it
 printed.
+
+### A number that enters a decision comes from an instrumented tool, never an ad-hoc script
+
+**Ad-hoc measurement scripts have been wrong twice, and both times in the direction of the
+number that was about to be acted on.** Both were caught the same way: by building the real
+tool and watching it disagree with the throwaway one.
+
+- The scratchpad word counter stripped LaTeX comments with `%.*`, which also matches an
+  **escaped** `\%`, truncating every line quoting a percentage. Chapter 2 read 4,893 instead
+  of 4,948 — and the overrun was about to be accepted at the lower figure.
+- The one-off script measuring the counter's own over-read added equation-environment words to
+  *all* label words, double-counting the labels that sit **inside** equation environments.
+  Methods' artefact read 98 instead of 92, and that figure was already in a report.
+
+The failure is structural, not careless. A script written to answer one question is written
+once, read once, and never given a case whose answer is known independently — so its only
+test is whether the number looks plausible, and a number that looks plausible is exactly what
+a defect of this kind produces.
+
+**The rule: any number entering a decision, a hand-off or the dissertation goes through a
+committed tool with a fixture.** The fixture carries the awkward constructs — escaped
+percents, comments, inline and displayed maths, citations, captions — and its expected value
+is derived **by hand, cell by cell**, before the tool is run. `brain/scripts/wordcount.py` is
+the worked example. A one-off script is fine for orientation and never for a figure someone
+will act on.
+
+Corollary, and it is the same failure as the exit-code rule: **cell-by-cell, not aggregate
+against aggregate.** One total compared to one other total cannot detect a defect that moves
+both the same way — see the withdrawn "0.14 %" calibration above.
 
 ### A clean result is reported with the scope of the check that produced it
 
