@@ -2652,3 +2652,75 @@ affects every figure"*. Not reconciled here — 8C-3 either folds those rows int
 states that `07` §4 owns them. Reported, not silently merged.
 
 **8C-3 was not conducted.**
+
+---
+
+## 2026-08-07 (3) — Phase: state-store register, and the sweep that retracted the last entry
+
+Governance session ruled by Phuong before 8C-3: §F owns pointers to every state store, not
+only conformance rows; sweep for other stores; resolve B7's status. **8C-3 was not conducted.**
+
+**The previous entry in this file is wrong and is retracted here rather than edited.** It
+records figure blockers **B1, B2, B5, B7 as open** and B7 as *"an artefact-staleness sweep
+that was never run"*. Every one of those four is closed, and three were closed before that
+entry was written. It was transcribed from `07_figure_programme.md` §4 without checking the
+files §4 itself points at — the same failure the entry above it was reporting.
+
+**All eight float blockers are closed.**
+
+- **B0** never open (`log/76` correction).
+- **B1, B2, B4, B5 applied to Overleaf on 2026-08-07** — recorded in this file at the
+  2026-08-07 (1) entry, five hundred lines above the entry that called them open. Verified in
+  the live `results.tex`, not in the ledger: £9.99/£10.94/£4.27/£4.68/£5.84 and £185 widest
+  for B1; *"No achieved power or minimum detectable effect is quoted anywhere in this
+  chapter, and the omission is deliberate"* for B2; seed 93, $B = 1000$, block length 7 and
+  the common-fold caveat in `tab:mcs`'s caption for B5.
+- **B3** cleared by measurement, `log/77`: post-M24 **and** post-Gate-A with an independent
+  cross-check.
+- **B6** cleared by `log/76` §7 — L2 @90 % = 85.1 %, L3 = 72.1 %, the post-M2 figures.
+- **B7 ran in full.** `log/76` Part 1 triaged 22 JSON artefacts by stamp; **Part 2** stamped
+  seven generators, regenerated the eight unstamped artefacts and diffed them — six exact,
+  two confirmed stale on the superseded ruler and corrected. Part 2 is a numerics check, so
+  the *"it answered freshness, not numerics"* reading holds for Part 1 only and B7 needs no
+  run decision.
+
+**One residual, found by reading artefacts rather than the sweep's own report.** `log/76` §2
+lists `eval/chronos2_covariate_probe.json` and `eval/group_icl_calibration.json` in Tier 1,
+*"every one carries `store_ceiling = 2026-07-07`"*. Neither carries a `store_ceiling`, a
+`provenance` block, or any stamp. Tier 1 is 18 of 22, Tier 3 is 10 of 22, and the error runs
+in the reassuring direction. Both feed Results 4.3. Recorded as a known unknown; regenerating
+them is a run decision and was not taken.
+
+**Five dangling cross-references, against a §F row reading zero.** `tab:mcs-config`
+(methodology + results), `fig:blocks`, `fig:pipeline`, `fig:origins` (methodology),
+`fig:nulls` (results). All print `??`. Four were created by 8C-2 and the row was not updated.
+`fig:nulls` is the cheapest: F7 is built and rendered, and only the float placement is
+missing.
+
+**Two chapter-file facts §F did not carry.** `chapters/introduction.tex` is an empty template
+stub — Chapter 1 is 0 words against 1,400. `chapters/conclusion.tex` is composed to a
+*five-chapter* shape predating the approved tree, carrying the Discussion's divergences and
+limitations material; `main.tex` has no `\chapter{Discussion}`. Both bear on the reallocation
+S-3 defers, and both push the same way — there is a real 1,400-word hole to fund.
+
+**The B-namespace collision was self-inflicted by the previous session.** A1–A16 → B1–B16 was
+a rename into a prefix already carrying `07` §4's float blockers B0–B7 and two files' round-B
+critique ids. For one day §F used B1/B3/B6 in two senses forty lines apart. Fixed by naming
+the owner beside every `B`-id that leaves its own file; not fixed by a second rename, since
+the float-blocker namespace is now closed. Map extended in `05_paper_architecture.md` §7.
+
+**Also retracted: `07` §11's *"Not made — nothing was written to `main.tex`"*.** The live
+`main.tex` carries the extended `\usetikzlibrary`, `algorithm2e` (as `[algo2e]`, with
+`\RestyleAlgo{ruled}` and `\LinesNumbered`) and `amssymb`. `ledger/main_preamble_diff.md`
+recorded the application and recorded that two of the three claimed additions were never
+missing; §11 and the header comment of the live `chapters/methodology.tex` are the copies
+that were never retracted. The methodology header is **not** fixed here — editing Overleaf is
+a human gate and no grant covers this session.
+
+**Verified end state**
+
+- `07` §4 carries an appended status correction; §11 carries a superseded marker.
+- §F carries the state-store register, a corrected dangling-reference count, corrected
+  8C-3 carry-forward rows, and the two chapter-file facts.
+- `05` §7's namespace map extended with the `B` collision.
+- Nothing pushed to Overleaf. Nothing regenerated. No run taken.

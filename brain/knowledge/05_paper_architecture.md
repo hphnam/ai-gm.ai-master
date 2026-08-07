@@ -1266,6 +1266,24 @@ A fifth reading exists and is not renameable: `phase_state.md`'s July entries us
 carries a correction entry pointing here. Anything reading an `A`-number out of `phase_state.md`
 must check its date and its section before mapping it to an approval.
 
+**Correction, 2026-08-07 — the rename escaped one collision into another, because the
+destination was never checked.** `B` was already in use three times over when A1–A16 were
+renamed into it:
+
+| Prefix | Also means | Owner |
+|---|---|---|
+| `B0…B7` | **Float blockers** — the numbers a float may not be built without | `07_figure_programme.md` §4 |
+| `B1…B5` | Critique findings, round B | `background_rewrite_critique.md` |
+| `B1…B4` | Critique findings, round B | `methodology_rewrite_critique.md` |
+
+For one day `BLOCKED_third_party.md` §F used `B1`, `B3` and `B6` in two senses about forty
+lines apart. The critique uses are file-scoped, dated and low-hazard. The float blockers were
+not, and are now all closed, so the live collision is retiring rather than being renamed —
+renaming a dead namespace is churn. **The transferable part is the failure, not the fix: a
+rename escapes a collision only if the destination is checked, and checking the destination
+was the one step the original repair skipped.** Write the owner beside any `B`-id that
+appears outside its own file.
+
 ### Items reopened after approval
 
 A closed-approvals section edited without a trail stops being useful, so a reopening is

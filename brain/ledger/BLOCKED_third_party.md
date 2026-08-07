@@ -160,10 +160,43 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 | Unadjudicated contradictions | 0 |
 | Open rows not blocked on a third party | **3** — all self-closable, all listed below |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
-| Dangling cross-references across the four chapter files | 0 |
+| Dangling cross-references across the four chapter files | **5** — see the register below. *(Was recorded as 0; 8C-2 created four of them and did not update this row.)* |
 | Chapters composed to the approved tree and pushed | **2 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2) |
+| Chapter files live on Overleaf with prose in them | **4** — plus `conclusion.tex`, composed to a *pre-tree* five-chapter shape. `introduction.tex` is an empty template stub |
 | Measured word floors, both PROVISIONAL pending reallocation | Ch 2 **4,948**/4,000 · Ch 3 **5,526**/4,200 (marker-equivalent) |
-| Chapters still unmeasured | 4 — Introduction, **Results**, Discussion, Conclusions |
+| Chapters still unmeasured | 4 — Introduction (**nothing written**), **Results**, Discussion (**no file; lives inside `conclusion.tex`**), Conclusions |
+
+### The register of other state stores — ruled 2026-08-07
+
+**This file is the single retrieval point, and that obligation is to point at every store,
+not to hold every row.** Rows are not migrated here: two copies of a row drift, and the
+owning file is where the detail belongs. What §F owes a reader is the guarantee that reading
+it reveals what exists.
+
+| Store | Owns | Status as of 2026-08-07 |
+|---|---|---|
+| `knowledge/07_figure_programme.md` §4 | Float blockers **B0–B7** — the numbers and sources a float may not be built without | **All eight closed.** Verified against the live `results.tex` and against `log/76`/`log/77`, not against the table, which was stale on seven rows. Correction appended there |
+| `knowledge/07_figure_programme.md` §8 | Run list **R0–R4**, presented under the rerun gate | All five run. R0 → `log/76`; R1, R2, R4 → `log/77`; R3 → `log/76` §11 (`eval/agent_eval.json` created) |
+| `ledger/numbers_audit.md` | MISMATCH / STALE / UNTRACEABLE verdicts on every number in two chapters | Resolutions in `numbers_audit_resolutions.md`; the 2026-08-06 addendum closes the two floats the audit never covered. **Three items are explicitly handed to other ledgers and are not tracked here** — see §"Three items for other ledgers", of which the `select_sba` code/chapter direction conflict is live |
+| `ledger/code_vs_paper.md` | Released-code comparison rows **M1–M24+** | Consulted by `07` §4; no independent open list |
+| `ledger/literature_conformance.md` | SHOULD-FIX conformance rows | Summarised by the first row of the table above — this one *is* already reachable from §F |
+| `knowledge/05_paper_architecture.md` §7 | Approvals **A1–A17** and the items-reopened **U-rows** | Closed document; reopened only by a U-row |
+
+**Why the ruling was needed.** `07` §4 held four rows recorded as open, and a session
+following the stated retrieval discipline exactly would not have learned they existed. It
+turned out they were all closed, so the cost was the opposite of the one feared — a
+carry-forward that told the next session to re-raise work already done. A store nobody
+points at goes wrong in both directions.
+
+> **Namespace hazard, and it is one this file created.** `background_argument_skeleton.md`'s
+> arguments were renamed A1–A16 → **B1–B16** on 2026-08-07 to escape a four-way `A`
+> collision. `B` was not free: `07` §4's float blockers are **B0–B7**, and two more files use
+> `B`-prefixed ids for critique-round findings (`background_rewrite_critique.md` B1–B5,
+> `methodology_rewrite_critique.md` B1–B4). For one day this section used **B1, B3 and B6 in
+> two different senses about forty lines apart**. Fixed below by never writing a bare `B`-id:
+> every one now carries its owner. The collision is retiring on its own as `07` §4 closes,
+> and renaming a dead namespace would be churn — but the lesson is not: **a rename escapes a
+> collision only if the destination was checked, and it was not.**
 
 ### The three self-closable rows
 
@@ -180,7 +213,7 @@ argument skeletons.
 
 | # | Row | What closes it |
 |---|---|---|
-| **S-1** | **Chapter 2 is 948 words over its 4,000 budget (4,948, provisional).** Held, not accepted — a 24 % overrun repeated across six chapters lands the document near 24,800 against HC1's 20,000. *(Corrected from 4,893/893 on 2026-08-07: the counter mis-stripped escaped `\%`. Use `brain/scripts/wordcount.py`.)* | **The boundary check is RUN and the answer is (c).** Not "Methods can carry them", not "Methods cannot" — **Methods can and is itself over budget**, so relocation moved the overrun rather than resolving it. The two derivations answered **differently**, which is the evidence the boundary rule was applied rather than assumed: **B3** (median-versus-mean functional argument) **stays in Chapter 2** — it is a claim about where two literatures stop, which is Chapter 2's job by definition; Methods 3.2 cites it and spends ~60 words on the application to Ellel's revenue estimand, which R84 requires there anyway. Chapter 2 saves **nothing** from B3. **B6** (recorded-regime extension) **moves to Methods 3.7**, where it already lived in the superseded prose and where it carries its limit and the D-D4 three-way attribution that Chapter 2 cannot hold; Chapter 2 keeps a ~25-word limb sentence for gap limb 4. Net **−85 to Chapter 2**, taking the overrun to ~863. **What closes S-1 is now budget reallocation, and that is deliberately not decided yet** — see S-3. |
+| **S-1** | **Chapter 2 is 948 words over its 4,000 budget (4,948, provisional).** Held, not accepted — a 24 % overrun repeated across six chapters lands the document near 24,800 against HC1's 20,000. *(Corrected from 4,893/893 on 2026-08-07: the counter mis-stripped escaped `\%`. Use `brain/scripts/wordcount.py`.)* | **The boundary check is RUN and the answer is (c).** Not "Methods can carry them", not "Methods cannot" — **Methods can and is itself over budget**, so relocation moved the overrun rather than resolving it. The two derivations answered **differently**, which is the evidence the boundary rule was applied rather than assumed: **background argument B3** (median-versus-mean functional argument) **stays in Chapter 2** — it is a claim about where two literatures stop, which is Chapter 2's job by definition; Methods 3.2 cites it and spends ~60 words on the application to Ellel's revenue estimand, which R84 requires there anyway. Chapter 2 saves **nothing** from it. **Background argument B6** (recorded-regime extension) **moves to Methods 3.7**, where it already lived in the superseded prose and where it carries its limit and the D-D4 three-way attribution that Chapter 2 cannot hold; Chapter 2 keeps a ~25-word limb sentence for gap limb 4. Net **−85 to Chapter 2**, taking the overrun to ~863. **What closes S-1 is now budget reallocation, and that is deliberately not decided yet** — see S-3. |
 | **S-2** | **`\ref{app:search}` is plain `Appendix~B` text in `literature_review.tex` §2.1.** Written as a ref, replaced because Appendix B does not exist and it would compile to `??`. | Writing **Appendix B**: define `\label{app:search}` there and convert the plain text back to `\ref{app:search}`. Also carries U3's two binding conditions (`05_paper_architecture.md` §7). |
 | **S-3** | **Chapter 3 is 1,326 words over its 4,200 budget (5,526 marker-equivalent, 5,618 raw), pushed 2026-08-07.** Held PROVISIONAL on the same terms as S-1, and for the same reason: an unmarked overrun compounds. **This is a measured floor, not a first draft** — the smallest count at which every criterion named against the chapter in `05_paper_architecture.md` §5 is still met, reached after two compression passes and five critique rounds. Worst sections: **3.7** 740 against 440 (carries RQ4's whole methodological premise plus D-D4 plus R69/R70/R71/D3/D6), **3.2** 707 against 640 (the §2.8a mandatory six-item ordering), **3.3** 477 against 390. Only 3.5 lands near budget. | **Budget reallocation — and it is deliberately NOT decided yet.** Two floors are not enough to decide on. **Results is the chapter that determines whether there is anything to reallocate**: 14,580 against 5,200, and the only chapter where large compression is genuinely plausible, since thirty sections of run narrative collapse into five. Ruling now risks handing Methods words that Results needs more. **Measure Results first**; that puts 32,510 of the current 37,471 measured. Do not quote 4,948 or 5,526 as final in the interim. |
 
@@ -204,26 +237,54 @@ Two items, plus a correction to how they were handed over.
    | Float | Section | Actual exposure | Owner |
    |---|---|---|---|
    | `tab:mcs` | **4.1** | **W2, the unstamped-MCS exposure proper.** It is an MCS too, so a perturbation too small to move a point estimate can still cross α and delete a set member. `eval/mcs_L1_results.json` carries **no provenance stamp**; testing it means regenerating the ladder, which is out of scope. **The gap stays open and is not to be closed by assertion** — if 4.1 states ladder set membership as a finding, say in a clause that W1 applies to it by construction. | `05` §2.7b |
-   | `tab:group` | **4.3** | **B1, open.** *"roughly £40"* is untraceable; the real value is £4.27–£10.94, and the resolution is **£9.99 mean / £172 max**. Transcription from a committed artefact, no re-run. | `07` §4; values in `blocker_clearance_package.md` B1 |
-   | `tab:weather` | **4.3** | **B3, closed but consequential.** Must source the **post-M24** fold grid: M24 moved every A14 MASE (1.5460 → 0.9551) when the grid widened from six folds. Confirm `eval/weather_basis_L1.json` is the post-M24 artefact before composing. | `07` §4; `code_vs_paper.md` M24 |
-   | `tab:vuspr` | **4.5, not 4.1 or 4.3** | **Neither of the above.** It was introduced *after* the numbers audit and has **never been audited** — a known unknown recorded as such, which `07` §4 is explicit *"is not the same as clean"*. | `07` §4 |
+   | `tab:group` | **4.3** | **Figure blocker B1 — CLOSED, and the correction is already live.** *"Roughly £40"* was untraceable; `results.tex` now carries £9.99 and £10.94 per origin at the Beer Hall, £4.27 and £4.68 at Ellel, £5.84 at Two River Taps, reaching £185 at the widest single origin. **8C-3 must carry these forward** — it recomposes from evidence, so an applied correction living only in the superseded prose is a correction it can silently undo | `07` §4; `blocker_clearance_package.md` |
+   | `tab:weather` | **4.3** | **Figure blocker B3 — CLOSED by measurement.** `log/77` verified `eval/weather_basis_L1.json` is post-M24 *and* post-Gate-A, with an independent cross-check. Nothing to confirm while composing | `log/77`; `code_vs_paper.md` M24 |
+   | `tab:vuspr` | **4.5, not 4.1 or 4.3** | **Audited after all.** It postdated the numbers audit and was recorded as a known unknown; `numbers_audit.md`'s ADDENDUM 2026-08-06 audits it against the R0-regenerated source. `07` §4's *"never been audited"* sentence stood for a day after the audit that answered it | `numbers_audit.md` |
 
-   `tab:exchangeability` (4.4) carries the same never-audited status as `tab:vuspr`.
+   `tab:exchangeability` (4.4) was audited in the same addendum.
 
-3. **B4 is discharged by 8C-2 and should not be re-raised.** The `tab:bases` dispersion
-   blocker asked for the 95 % intervals, n-pairs and induced-MASE columns; they are in the
-   table pushed to `chapters/methodology.tex` on 2026-08-07, with the Ellel
-   `calendar_lag7_active` cell (28 pairs, 65.6 % width) emboldened and visible. **B5 remains
-   open**: the seed, candidate-set size and common-fold restriction are stated in the Methods
-   body, but `tab:mcs-config` itself is an Appendix C float and Appendix C does not exist yet.
+3. **Two body corrections are live on Overleaf and are not in any skeleton.** Figure blockers
+   **B2** and **B5** were applied on 2026-08-07 and 8C-3 will meet neither unless it looks:
+   `sec:res-power` states *"No achieved power or minimum detectable effect is quoted anywhere
+   in this chapter, and the omission is deliberate"* — a justified decision replacing a
+   removed column, and the kind of sentence a recomposition drops as unnecessary; and
+   `tab:mcs`'s caption carries seed 93, $B = 1000$, block length 7 and the common-fold
+   caveat. **Figure blocker B4** is discharged twice over — applied to `results.tex`, and
+   re-shipped in 8C-2's `tab:bases`.
 
-> **Finding, and it is a gap in this file's own remit.** `07_figure_programme.md` §4 carries a
-> **fourth state store** — a seven-row blocker table (B1–B7) whose open rows are not reflected
-> here, while this file claims to be the single retrieval point. They are a different register
-> from conformance rows, so §F's *"SHOULD-FIX conformance rows: 0"* is not contradicted, but a
-> session reading only §F would not learn that **B1, B2, B5 and B7 are open**, B7 being an
-> artefact-staleness sweep that was never run and *"potentially affects every figure"*. 8C-3
-> should either fold those rows into §F or state plainly that `07` §4 owns them.
+4. **Five dangling cross-references, and 8C-3 owns two of them.**
+
+   | Reference | Sites | Why it dangles |
+   |---|---|---|
+   | `tab:mcs-config` | `methodology.tex`, `results.tex` | Moved to Appendix C by approval A9. **Appendix C does not exist** |
+   | `fig:blocks` | `methodology.tex` | F1 authored (`out/fig_blocks.tex`), never compiled, never inserted |
+   | `fig:pipeline` | `methodology.tex` | F3 authored, never compiled, never inserted |
+   | `fig:origins` | `methodology.tex` | A-F7 built; lives in Appendix C, which does not exist |
+   | `fig:nulls` | `results.tex` | **F7 is built and rendered** (`out/fig_nulls.pdf`) and the reference was written before the float was placed |
+
+   Every one prints `??`. Four were created by 8C-2 and the row above them in §F still read
+   zero. `fig:nulls` is the cheapest to close and 8C-3 should close it while composing 4.3
+   rather than leave it to 8D.
+
+5. **The floor is not the only thing unmeasured, and the deficit runs the other way.**
+   `chapters/introduction.tex` is an **empty template stub** — Chapter 1 is 0 words against a
+   1,400 budget. `chapters/conclusion.tex` is composed, substantial, and shaped to a
+   *five-chapter* document that predates the approved tree: it carries the Discussion's
+   "Divergences from the reviewed literature" and "Limitations" material inside a chapter
+   budgeted as Conclusions, and `main.tex` has no `\chapter{Discussion}` at all. Both bear on
+   the reallocation question that S-3 defers, and both push it the same way: there is a real
+   1,400-word hole to fund before any of Methods' or Chapter 2's overrun is forgiven.
+
+6. **Two artefacts feeding 4.3 carry no provenance stamp, and the sweep recorded them as
+   stamped.** `eval/chronos2_covariate_probe.json` and `eval/group_icl_calibration.json` are
+   listed in `log/76` §2 Tier 1 under *"every one carries `store_ceiling = 2026-07-07`"*.
+   Read directly, neither carries a `store_ceiling`, a `provenance` block, or any generation
+   stamp. They belong in Tier 3, unstamped and therefore unverifiable, so the sweep's Tier 1
+   is 18 of 22 and its Tier 3 is 10. The covariate probe carries `mcs_pvalue`, `set_90` and
+   `mean_loss` for the Chronos-2 exogenous arms; the calibration file carries the batch-size
+   timings behind the batch-merge probe. **This is a known unknown, not a defect** — the same
+   status `tab:vuspr` held before its addendum. Regenerating them is a run decision and has
+   not been taken.
 
 ---
 

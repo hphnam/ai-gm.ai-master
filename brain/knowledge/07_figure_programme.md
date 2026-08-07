@@ -402,7 +402,70 @@ table uses. That is a `tab:bases` annotation, handled with B4.
 
 `tab:exchangeability` and `tab:vuspr` were introduced after the numbers audit and have
 **never been audited**. That is not the same as clean, and it is recorded here as a known
-unknown rather than as a pass.
+unknown rather than as a pass. **Superseded — both were audited on 2026-08-06 against the
+regenerated sources, and `numbers_audit.md`'s "ADDENDUM 2026-08-06" carries the result.**
+The sentence above stood unchanged for a day after the audit it denies had been written.
+
+### Status correction, appended 2026-08-07 — every row above is closed, and this table was the last place saying otherwise
+
+The table in §4 is a **state store**, and it went stale the moment the blockers were worked
+without anyone coming back to it. All eight rows are closed. None was closed here.
+
+| # | Closed by | Where the evidence is |
+|---|---|---|
+| B0 | Never open | `log/76`, and the correction already appended above |
+| B1 | **Applied to Overleaf** | `results.tex` now reads £9.99 / £10.94 per origin at the Beer Hall, £4.27 / £4.68 at Ellel, £5.84 at Two River Taps, reaching £185 at the widest single origin. Verified in the live file, not in the ledger |
+| B2 | **Applied to Overleaf** | The power and MDE columns are gone, and `sec:res-power` now states *"No achieved power or minimum detectable effect is quoted anywhere in this chapter, and the omission is deliberate"* — converted into a justified decision rather than a silence |
+| B3 | Cleared by measurement | `log/77` §"Blocker B3", post-M24 **and** post-Gate-A, with an independent cross-check |
+| B4 | Cleared twice | Applied to `results.tex`; re-shipped in 8C-2's `tab:bases` with the 95 % intervals, pairs and induced-MASE columns, Ellel's 28-pair cell emboldened |
+| B5 | **Applied to Overleaf** | Seed 93, $B = 1000$, block length 7 and the common-fold caveat are in `tab:mcs`'s caption and in Methods 3.6. The *float* `tab:mcs-config` still does not exist — see the dangling-reference finding below |
+| B6 | Cleared by measurement | `log/76` §7 — the regenerated run prints L2 @90 % = 85.1 %, L3 = 72.1 %, the post-M2 figures |
+| B7 | **Ran in full** | `log/76` Parts 1 *and* 2 — see below |
+
+**B7 is the one worth stating carefully, because the standing summary of it was wrong in
+both directions at once.** It was recorded here as *"sweep not run"* and repeated downstream
+as *"never run, potentially affects every figure"*. R0 ran on 2026-08-06 and `log/76` is its
+report: Part 1 triaged 22 JSON artefacts by their `store_ceiling` stamp; Part 2 stamped seven
+generators, regenerated the eight unstamped artefacts and diffed them. Six reproduced exactly.
+Two were confirmed stale on the superseded ruler — `metric_ordering.json` and
+`occurrence_gate_beer_hall.json` — and both were corrected. Part 2 also cleared B6 as a side
+effect and created `eval/agent_eval.json`.
+
+**Part 2 is why the "it answered freshness, not numerics" reading no longer holds.** Part 1
+was the store-ceiling triage and that reading was right for it. Part 2 regenerated and
+diffed, which is a numerics check, and it found two numeric staleness cases and fixed them.
+B7 does not need a run decision.
+
+**Two artefacts are a genuine residual, and they were mis-triaged rather than missed.**
+`log/76` §2 lists `eval/chronos2_covariate_probe.json` and `eval/group_icl_calibration.json`
+in Tier 1, *"every one carries `store_ceiling = 2026-07-07`"*. Read directly, **neither
+carries a `store_ceiling`, a `provenance` block, or a generation stamp of any kind.** They
+belong in Tier 3 — unstamped and therefore unverifiable — so the sweep's Tier 1 is 18 of 22
+rather than 20, and its Tier 3 is 10 rather than 8. The error runs in the reassuring
+direction. Both feed **Results 4.3**: the covariate probe carries `mcs_pvalue`, `set_90` and
+`mean_loss` for the Chronos-2 exogenous arms, and the calibration file carries the batch-size
+timings behind the batch-merge probe. Regenerating them is a run decision and is **not**
+taken here.
+
+### A dangling-reference finding that belongs to this file
+
+`\ref{tab:mcs-config}`, `\ref{fig:blocks}`, `\ref{fig:pipeline}`, `\ref{fig:origins}` and
+`\ref{fig:nulls}` are all live in `methodology.tex` and `results.tex` with **no matching
+`\label` anywhere in the document**. Every one prints `??`. Four of the five are floats this
+programme specifies and built — F1, F3, A-F7 and F7 — which were never inserted into the
+chapter that references them. This is recorded in `BLOCKED_third_party.md` §F as well,
+because the count of dangling references is a state quantity and this file is not where
+someone would look for it.
+
+### §11's preamble note is superseded
+
+§11 closes with *"Two preamble additions `main.tex` will need — **Not made**"* and with
+*"`amssymb` is also absent"*. Read against the live `main.tex`: the extended
+`\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}` is
+there, `algorithm2e` is there (as `[algo2e]`, with `\RestyleAlgo{ruled}` and
+`\LinesNumbered`), and `amssymb` is loaded. `ledger/main_preamble_diff.md` records the
+application and records that two of the three claimed additions were never missing. §11 is
+the copy that was never retracted.
 
 ---
 
@@ -790,6 +853,10 @@ asserting the objects that were modelled rather than all of them. The label exte
 part of the assertion and the bar area was cut to 11.5 cm to make room.
 
 ### Two preamble additions `main.tex` will need
+
+> **SUPERSEDED 2026-08-07.** All three are in the live `main.tex`, and two of them were
+> never absent. See the §4 status correction and `ledger/main_preamble_diff.md`. The text
+> below is left standing because it is what a later reader will find cited elsewhere.
 
 **Not made — nothing was written to `main.tex`.** Recorded here so 8C does not meet them
 mid-composition:
