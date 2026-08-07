@@ -44,3 +44,10 @@ npm-debug.log*
 pnpm-debug.log*
 .paul/automation-logs/
 CLAUDE.local.md
+
+# agentmemory runtime state — a running process's store, not a project artefact.
+# Tracked by accident and never present in a brain commit; untracked 2026-08-07.
+# These are binary and rewritten on every save, so committing them puts noise in
+# every future diff. The durable record lives in brain/ledger/ and brain/log/.
+data/state_store.db/
+data/stream_store/
