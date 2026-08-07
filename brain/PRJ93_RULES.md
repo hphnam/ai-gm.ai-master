@@ -294,3 +294,17 @@ metrics and TeX's decisions that the generator never sees. So:
 
 A green generator run means the geometry it can compute is sound. It says nothing about the
 half that needs TeX, and the second half is where both remaining defects lived.
+
+**An assertion nobody has seen fail is an assertion taken on faith.** Before relying on a
+guard, feed it the violation it exists to catch and watch it raise. `figures/_tikz_assert.py`
+was exercised against an overlap, a sub-minimum gap, a non-adjacent reach past an immediate
+neighbour, an out-of-extent box and a negative-x node before any figure was built on it.
+This is the exit-code rule generalised: a guard that returns quietly is reporting what it
+decided, and until it has failed once you do not know it can.
+
+**Assert against the target's geometry, not the harness's.** `fig_blocks.py` computed its
+clearances against the compile proof -- 11pt `article`, landscape, 15 mm margins -- while the
+document is 12pt `report` with `\linespread{1.5}` and a 150 mm text width. The clearances
+survived, but the reported margin was wrong by a third, because at 12pt with 1.5 leading a
+two-line `\scriptsize` label is about a quarter taller. A check run against a convenient
+geometry is a check against a document that does not exist.

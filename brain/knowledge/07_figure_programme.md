@@ -258,8 +258,11 @@ Methods 3.6 carries a one-sentence statement of the protocol constants plus a po
 - **Corpus grounding** Bhattacharya et al. (2024), *Towards Unbiased Evaluation of Time-series
   Anomaly Detector*, **Figs. 5 and 6** — metric behaviour plotted against precision and recall
   in faceted panels binned to hold data cardinality roughly equal, which is the convention for
-  detection performance under sparse positives. Siffer et al. (2017), **Fig. 7**, supplies the
-  practice of printing the swept parameter value at each plotted point.
+  detection performance under sparse positives. **A second grounding claim was dropped here on
+  2026-08-07**: this entry cited Siffer et al. Fig. 7 for "printing the swept parameter value
+  at each plotted point", which was never verified against the source and which F6 as built
+  does not do — it prints n once per series, not a swept value per point. An unverified
+  convention claim propping up a figure that does not use it is worth less than nothing.
 - **Medium** matplotlib, three facets.
 - **Caption** 60 words. **Prose** Adds a finding rather than replacing prose. **Net +60
   words.** Justified on RQ5: the chapter's answer to "does detection perform well enough to
@@ -304,9 +307,9 @@ free marks, not because they compete for space.
 | # | Float | Appendix | Purpose | Medium | Grounding |
 |---|---|---|---|---|---|
 | A-F1 | Corpus screening flow | **B** | **R65, currently unmet.** Records identified → screened → excluded with reasons → included | TikZ | **Corpus is silent** — see §6 |
-| A-F2 | `alg:conformal` — split conformal with the Mondrian variant and the small-n substitution | C | HC56 (pseudocode preferred), R69 | `algorithm2e` | Angelopoulos & Bates Alg. 1–2; Zaffran et al. Alg. 2; Sun & Yu Alg. 1; Siffer et al. Alg. 1–2 |
+| A-F2 | `alg:conformal` — split conformal with the Mondrian variant and the small-n substitution | C | HC56 (pseudocode preferred), R69 | `algorithm2e` | Angelopoulos & Bates **§1** (four-step outline, unnumbered) + **§4.1** (group-balanced); Zaffran et al. **Alg. 1** (AgACI). **CORRECTED 2026-08-07** — see §11 |
 | A-F3 | `alg:adoption` — the one-standard-error adoption rule and its three fail-closed conditions | C | The rule is pre-registered and its failure modes are load-bearing | `algorithm2e` | As above |
-| A-F4 | `alg:detection` — band breach, standardised residual, CUSUM | C | R69 for 3.8 | `algorithm2e` | Siffer et al. Alg. 1 (SPOT) |
+| A-F4 | `alg:detection` — band breach, standardised residual, CUSUM | C | R69 for 3.8 | `algorithm2e` | **CONVENTION ONLY:** Siffer et al. **Alg. 2** (SPOT) for the form a streaming detector is stated in. **NOT a method source — this project implements no part of SPOT.** Method sources are Page (1954) for the CUSUM and Truong et al. (2020) for online-over-offline. See §11 |
 | A-F5 | Deployment architecture | C | The field-instantiation contribution; displaced from F3 | TikZ | Lu et al. (2024); Fu et al. (2026) PRISM |
 | A-F6 | Injection protocol schematic | D | Control vs realistic arms drawn rather than narrated | TikZ | Liu & Paparrizos (2024) Figs. 4–5 |
 | A-F7 | `fig:origins` — rolling-origin schematic (**demoted from the body**, §0) | C | R69, and the block-bootstrap overlap argument in 3.6 | TikZ, to scale from `folds[]` | Meyer et al. (2026) Fig. 1(a) |
@@ -797,3 +800,38 @@ mid-composition:
 
 `amssymb` is also absent, which is why A-F4 uses `\mathbf{1}` for the indicator rather than
 `\mathbb{1}`. That is a substitution, not a request for a third package.
+
+### A-F7's caption, checked against the 15/45 rule before the compile
+
+The inset makes A-F7 a **compound** float — one panel to scale, one magnified — so the
+caption must say which is which. That is a new obligation the original spec did not carry.
+
+**A-F7** — *Rolling-origin evaluation drawn to scale, with a magnified inset showing
+consecutive-origin overlap.* (13 words)
+> Upper panel to scale on the Beer Hall calendar: training windows expand rightwards, each
+> followed by its seven-day forecast block. The inset is magnified, not to scale, and shows
+> three consecutive origins sharing six of seven days. *(37 words)*
+
+It fits with room. Appendix captions are uncounted against HC1 in any case (05 §0), so the
+15/45 rule applies here as house style rather than as budget — but a compound float whose
+caption does not distinguish its panels is wrong at any word count.
+
+### F1 re-verified against the document's geometry, and my stated clearance was wrong
+
+F1's clearances were computed against the compile proof — 11pt `article`, landscape, 15 mm
+margins — not against 12pt `report` with `\linespread{1.5}` and a 150 mm text width.
+
+**The figure survives. The number I reported did not.** At 12pt with 1.5 leading a two-line
+`\scriptsize` label is about 0.72 cm rather than the ~0.60 cm assumed, so the clearance to
+the time axis is **0.22 cm, not the 0.33 cm previously stated** — a third smaller. Horizontal
+clearances are unaffected: they derive from block widths in figure coordinates, which the
+document's font size does not touch, and the whole picture at 13.65 cm sits inside 150 mm
+with 1.35 cm to spare.
+
+The axis is no longer at a coordinate that happened to clear the labels. It is placed at
+`LABEL_TOP_Y − LABEL_H_CM − AXIS_MARGIN_CM`, so the constant that has to be right is the
+label height rather than the axis position, and it is stated with its derivation. The
+generator also now asserts the picture inside the document's text width, which it never did.
+
+The margin remains an estimate: label height is downstream of line breaking, so it is on the
+check list, not in an assertion.

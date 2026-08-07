@@ -23,13 +23,28 @@ from __future__ import annotations
 from datetime import date
 
 from _style import OUT, load
+from _tikz_assert import assert_within
 
+# The dissertation is 12pt `report` on A4 with left=35mm right=25mm and \linespread{1.5}
+# (main.tex). Text width is 150mm. This figure's clearances were first computed against an
+# 11pt article in landscape with 15mm margins -- the geometry of the compile PROOF rather
+# than of the document -- which made every one of them a check against the wrong target.
+TEXT_WIDTH_CM = 15.0
 WIDTH_CM = 13.4
 ROW_H = 0.62
 # Clearance between adjacent below-bar labels. Small, because the narrow blocks are
-# 1.85 cm wide and the longest word in their text ("reconciliation") is about 1.45 cm
+# 1.85 cm wide and the longest word left on the figure ("calibrate") is about 1.15 cm
 # at \scriptsize -- the label must stay wider than that or it overfulls instead.
 GUTTER_CM = 0.09
+# Height of a two-line \scriptsize label under the DOCUMENT's leading, not the proof's.
+# 12pt base makes \scriptsize 8pt on a ~9.5pt baseline; \linespread{1.5} takes that to
+# ~14.25pt, so two lines plus ascender and descender is about 0.72 cm -- roughly a quarter
+# taller than the same label in the 11pt proof. The axis is placed BELOW that rather than
+# at a coordinate that happened to clear it once.
+LABEL_H_CM = 0.72
+LABEL_TOP_Y = 0.98
+AXIS_MARGIN_CM = 0.22
+AXIS_Y = round(LABEL_TOP_Y - LABEL_H_CM - AXIS_MARGIN_CM, 2)
 FILL = {
     "fit": ("black!8", "black!45"),
     "validation": ("black!22", "black!55"),
@@ -142,17 +157,18 @@ def main() -> None:
         label_w = min(2.45, w - GUTTER_CM)
         lines.append(
             f"  \\node[anchor=north,align=center,text width={label_w:.3f}cm]"
-            f" at ({x0 + w / 2:.3f},0.98) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
+            f" at ({x0 + w / 2:.3f},{LABEL_TOP_Y}) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
             f"\\\\[-2pt] $n{{=}}{blk['n_days']}$}};")
 
     lines += [
-        "  %% time axis",
-        f"  \\draw[->,black!70] (0,0.05) -- ({WIDTH_CM + 0.25:.2f},0.05);",
+        "  %% time axis -- placed below the computed label extent, not at a coordinate",
+        "  %% that cleared it once under a different document's leading.",
+        f"  \\draw[->,black!70] (0,{AXIS_Y}) -- ({WIDTH_CM + 0.25:.2f},{AXIS_Y});",
     ]
     for label in (spans["calendar_start"], spans["blocks"][1]["start"],
                   spans["blocks"][2]["start"], spans["blocks"][3]["start"],
                   spans["calendar_end"]):
-        lines.append(f"  \\draw[black!70] ({x(label):.3f},0.05) -- ({x(label):.3f},-0.06)"
+        lines.append(f"  \\draw[black!70] ({x(label):.3f},{AXIS_Y}) -- ({x(label):.3f},{AXIS_Y - 0.11:.2f})"
                      f" node[below,black!70]{{\\scriptsize {label}}};")
 
     lines += [
@@ -166,6 +182,8 @@ def main() -> None:
 
     _assert_no_label_overlap(spans, x)
     _assert_no_left_overhang(lines)
+    # The whole drawing, axis arrow included, must sit inside the DOCUMENT's text width.
+    assert_within([("picture", 0.0, WIDTH_CM + 0.25)], what="F1", lo=0.0, hi=TEXT_WIDTH_CM)
 
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / "fig_blocks.tex"
