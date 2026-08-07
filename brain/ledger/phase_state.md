@@ -2724,3 +2724,63 @@ a human gate and no grant covers this session.
   8C-3 carry-forward rows, and the two chapter-file facts.
 - `05` §7's namespace map extended with the `B` collision.
 - Nothing pushed to Overleaf. Nothing regenerated. No run taken.
+
+---
+
+## 2026-08-07 (4) — Phase: 8C-F float migration, CHECKPOINT A
+
+Migrating the figure programme out of the isolated harness into the chapters that own it.
+Composes no prose. Checkpoint A is preamble + appendix skeletons only; stopped for a compile.
+
+**Checkpoint A step 1 was a no-op, and the form specified in the prompt would have broken the
+build.** The preamble additions are already in the live `main.tex` — extended
+`\usetikzlibrary`, `\usepackage[algo2e]{algorithm2e}` with `\RestyleAlgo{ruled}` and
+`\LinesNumbered`, and `amssymb`. `main_preamble_diff.md` records the application. The prompt
+asked for `algorithm2e` loaded with `[ruled,vlined,linesnumbered]`; `main.tex` loads
+`algorithm` and `algpseudocode` on the two lines above it, and the `[algo2e]` option is the
+thing that renames the environment so all three coexist. Swapping the option set drops
+`algo2e` and collides with `algorithm` — which is exactly why the approved diff used the
+command forms and left the option alone. **Nothing in the preamble was changed.**
+
+**Applied and pushed to Overleaf**
+
+- `appendix/search_screening.tex` — Appendix B skeleton, defines `\label{app:search}`.
+- `appendix/pseudocode.tex` — Appendix C skeleton, `\label{app:pseudocode}`.
+- `appendix/robustness.tex` — Appendix D skeleton, `\label{app:robustness}`.
+  All three are structural: a label and a header comment naming what Checkpoint B hosts.
+- `main.tex` — the `appendices` block only. Three `\chapter` + `\input` pairs added after the
+  inherited template stub, which is **kept deliberately**: chapters 2 and 3 reference
+  Appendices B, C and D by letter, so removing Appendix A would reletter all three and
+  invalidate every reference silently.
+- `chapters/literature_review.tex` §2.1 — plain `Appendix~B` converted back to
+  `Appendix~\ref{app:search}`. **This closes S-2.** Written with `write_section`, not
+  `write_file`, so no other prose was in the write path; the neighbouring section was read
+  back afterwards and is intact.
+
+**Methods has no Appendix~B reference.** The prompt expected a carry-forward in both chapters;
+`methodology.tex` references Appendices C and D only, in nine places, all plain text. Those
+are now convertible since the labels exist, but converting them is a chapter edit and was not
+in this checkpoint.
+
+**Three float-body classes, and one architecture rule cannot cover them.** Recorded before
+Checkpoint B acts on it:
+
+| Class | Files | Correct handling |
+|---|---|---|
+| Bare `tikzpicture`, no caption, no label | `fig_blocks`, `fig_pipeline`, `a_f5_deployment`, `a_f6_injection`, `a_f7_origins` | Chapter supplies the float env, `\input`, caption, label — the rule as written |
+| **Complete `algorithm2e` floats** already carrying their own caption and label | `a_f2_alg_conformal` (`alg:conformal`, `ln:sub`), `a_f3_alg_adoption` (`alg:adoption`, `ln:fc1`–`ln:fc3`), `a_f4_alg_detection` (`alg:detection`) | `\input` directly. Wrapping nests a float in a float and duplicates every label |
+| **Not a float at all** | `a_f1_screening.tex` — a `\section` with `\label{app:screening}` plus three complete table floats | It is Appendix B's body. `\input` it under the chapter |
+
+**Two Checkpoint B items are not migrations and need a ruling.** `tab:mcs-config` has **no
+body anywhere** — authoring it from `blocker_clearance_package.md` B5 is composition, not
+migration. `tab:window` is defined today inside `results.tex`; moving it to Appendix D edits
+prose 8C-3 is about to delete.
+
+**Verified end state**
+
+- Overleaf carries 18 `.tex` files; the three new appendix files are present.
+- `main.tex` read back after the write: preamble identical, appendices block as intended.
+- Nothing under `figures/` moved yet. `figure_proof.tex` still present, retirement pending
+  both compiles.
+- One cosmetic defect introduced and not fixed: a `LOad-BEARING` typo in the new `main.tex`
+  comment. Left rather than retransmit 250 lines of a file about to be compiled.
