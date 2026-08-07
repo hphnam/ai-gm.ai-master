@@ -46,7 +46,10 @@ MUTED = "#8a8a8a"
 FAINT = "#d8d8d8"
 MARK = "#b03a2e"
 
-VENUES = ["beer_hall", "two_river_taps", "ellel"]
+# Estate order, and it must match figures/_style.py's: F4-F7 read left to right
+# in this order, and a reader comparing panels across figures in one chapter
+# will misread the comparison if one figure permutes them.
+VENUES = ["beer_hall", "ellel", "two_river_taps"]
 TITLES = {"beer_hall": "Beer Hall", "two_river_taps": "Two River Taps",
           "ellel": "Ellel"}
 
