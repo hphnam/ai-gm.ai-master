@@ -2856,3 +2856,54 @@ starred subsections were promoted to `\section*` so the chapter does not skip a 
   typo, and `methodology.tex`'s header, which still claims `main.tex` lacks the preamble
   packages, still gives the wrong `[ruled,vlined,linesnumbered]` form, and still points at
   `out/` paths that no longer feed the document. The header is the one that matters.
+
+---
+
+## 2026-08-07 (6) — Phase: 8C-F, the first document compile failed and was repaired
+
+Checkpoint B produced no PDF. No compile log was available and there is no TeX toolchain on
+this machine, so the repair was made from a static reading of the pushed files. **The fix is
+inferred, not confirmed** — the next compile is what establishes it.
+
+**Root cause, with the reason it is the leading candidate.** `main.tex` loaded `algorithm`,
+`algpseudocode` and `algorithm2e` together. `algpseudocode` (algorithmicx) and `algorithm2e`
+both define `\For`, `\ForEach`, `\If`, `\ElseIf`, `\Return` and `\KwTo` — every command the
+three appendix algorithm floats use. The `[algo2e]` option resolves only the *environment*
+clash with `algorithm`; it does nothing about the command clash.
+
+**Checkpoint A proved the preamble loads and nothing more.** A contained no `algorithm2e`
+environment at all, so it exercised none of those commands. Checkpoint B introduced the first
+three in the project's history alongside eight other new things. The staging that existed to
+prevent exactly this was applied to the preamble and not to the riskiest content.
+
+**Verified before removing anything:** zero occurrences of `\begin{algorithm}`, an
+`algorithmic` environment, `\State`, `\Procedure` or `\listofalgorithms` in any chapter or
+appendix. Both packages were template leftovers.
+
+**Four changes pushed**
+
+| File | Change |
+|---|---|
+| `main.tex` | `\usepackage{algorithm}` and `\usepackage{algpseudocode}` **removed**. `[algo2e]` kept — it names the environment the floats open, so dropping it would break all three. Comment rewritten to record why. `LOad-BEARING` typo fixed |
+| `figures/alg_detection.tex` | `\tcp*[f]{...}` sat on its own line after two `\lIf` lines; `\lIf` terminates its own line, so the end-of-line comment had no line to attach to. Now a `\tcc{}` full-line comment placed before the conditionals |
+| `figures/alg_detection.tex` | `\If{...}{...}` was followed by `\ElseIf{...}{...}`. `\If` closes its block, orphaning the `\ElseIf`. Now `\uIf` + `\ElseIf`, which is algorithm2e's chaining form |
+| all three `alg_*.tex` | `\SetAlgoLined` removed. It set the lined style per float and overrode the `\RestyleAlgo{ruled}` main.tex sets globally, which would have rendered one appendix's three algorithms in two styles |
+
+`\textbf{and}` inside the Detector~B condition became `\textnormal{and}`, and the pooled
+fallback line in `alg:conformal` was rewritten to name the pooled $\hat q$ rather than reuse
+an undefined symbol.
+
+**Not touched, deliberately.** `methodology.tex`'s stale header. It is comments only, so it
+cannot affect a build, and retransmitting ~600 lines of a chapter while the build is still
+unverified adds transcription risk to a diagnosis. It is scheduled for after the compile
+passes, together with retiring `figure_proof.tex`.
+
+**Verified end state**
+
+- `main.tex` read back from the remote: package block as intended, appendices block intact,
+  `\begin{document}`/`\end{document}` balanced.
+- `figure_proof.tex` is still in the project and still not `\input` by `main.tex`, so it is
+  not contributing to the failure — and it remains the only place those three algorithm
+  floats can be exercised in isolation.
+- Expected `??` after a successful compile is unchanged: `tab:mcs-config` and `fig:nulls`
+  only.
