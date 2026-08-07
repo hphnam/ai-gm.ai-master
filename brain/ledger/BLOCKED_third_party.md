@@ -154,6 +154,26 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 
 ## F · State to carry forward
 
+**What §F holds, ruled 2026-08-07.** **If a fact is cheaply derivable from an instrument, this
+section holds a pointer to the instrument and not a copy of the fact.** A hand-maintained copy of
+something a tool reports for free will drift, and it drifts *towards confidence*: the register of
+dangling references below survived three stale rows precisely because nobody re-derived them, and
+each reading of it made it look more settled. The rows below are marked with the instrument that
+owns them; a session quoting one runs the instrument first.
+
+The test does not apply to everything. A floor costs a run to re-derive and is under active
+decision, so its value is held here *and* its command named. A tier-3 item is not derivable at
+all — it needs a person at a browser. Those rows keep their values.
+
+**The compile command for this document is
+`brain/scripts/latexcheck.py main.tex --shell-escape --outdir <scratch>`, and the
+`--shell-escape` is not optional.** `\quickwordcount` in `main.tex` uses `\write18` to generate
+`main-words.sum`, which `declaration.tex` then `\input`s. Without the flag the file is never
+written and the build dies at an emergency stop on the first pass. **A run that omits the flag
+passes only because a stale `main-words.sum` is sitting in the working clone** — which is what
+every previous run in this project did, including 8C-3's own pre-push check. Same verdict, wrong
+reason, and it would not have survived a clean checkout. Found by cloning the pushed state fresh.
+
 **Units, fixed 2026-08-07.** Every word count in this section is **marker-equivalent** — the
 `wordcount.py` Marker column, which is Raw minus the artefact the counter charges to prose and a
 marker does not. Raw follows in parentheses where it is useful. This row exists because §F
@@ -167,14 +187,13 @@ comparison, and the two floors were being held against each other for exactly th
 | Open rows not blocked on a third party | **2** — S-1 and S-3, both self-closable, both below. *(Was 3. S-2 closed and is struck below.)* |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
 | Dangling cross-references across the chapter files | **0** — verified by compile, not by register. *(This row read **5**. That was wrong: three of the five were already placed by 8C-F and the register was never re-read against a build. See the corrected register below.)* |
-| Chapters composed to the approved tree | **3 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2), Chapter 4 (8C-3) |
-| Chapters composed **and pushed** | **2 of 6** — Chapter 4 is composed, compiled and committed locally at `f903214`, **not pushed**: the push guard refuses a protected-branch push to `origin/main`. Overleaf still holds `24887e2` |
+| Chapters composed to the approved tree | **3 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2), Chapter 4 (8C-3). *Instrument: `git log` on the clone* |
+| Chapters composed **and pushed** | **3 of 6.** `origin/main` is **`f903214`** (pushed manually 2026-08-07 after the protected-branch guard refused the agent's push). *Instrument: `git ls-remote --heads origin`; never assume from a push's exit code* |
 | Chapter files live on Overleaf with prose in them | **4** — plus `conclusion.tex`, composed to a *pre-tree* five-chapter shape. `introduction.tex` is an empty template stub |
-| Measured word floors, all three PROVISIONAL pending reallocation | Ch 2 **4,938**/4,000 (raw 4,948) · Ch 3 **5,526**/4,200 (raw 5,618) · Ch 4 **6,247**/5,200 (raw 6,274) |
+| Measured word floors, all three PROVISIONAL pending reallocation | Ch 2 **4,938**/4,000 (raw 4,948) · Ch 3 **5,526**/4,200 (raw 5,618) · Ch 4 **6,247**/5,200 (raw 6,274). *Instrument: `brain/scripts/wordcount.py <file> <key>`; values held here because a floor costs a run and is under active decision* |
 | Three-chapter total against the budgets they share | **16,711 / 13,400**, over by **3,311 (+25 %)** |
 | Chapters still unmeasured | 3 — Introduction (**nothing written**), Discussion (**no file; lives inside `conclusion.tex`**), Conclusions. Budgeted **4,800** between them plus the abstract, and **composed rather than compressed**, so their floors cannot be inferred from the three measured ones |
-| Document compiles | **YES** — 115 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 8 overfull boxes. **Tier 2 only:** run on the local clone under TeX Live 2026 at `f903214`, which is **not the state Overleaf holds**. The last figure verified on a fresh clone of the *pushed* state is `24887e2`, at 139 pages |
-| Undefined references in the live document | **0** on the composed state. `tab:mcs-config` is authored in Appendix C and `fig:nulls` is placed in 4.3. **Both still print `??` on Overleaf** until `f903214` lands |
+| Document builds, and every figure a build reports | **VERIFIED ON A FRESH CLONE OF THE PUSHED STATE `f903214`**, not on the working clone: 115 pages, 0 errors, **0 undefined references**, 0 undefined citations, 0 floats lost, 8 overfull boxes (largest 182.80 pt, `search_screening_body.tex`), 26 underfull. The 224.47 pt `main.lot` box is gone and the List of Tables is 30 entries. *Instrument: the command at the head of this section. Do not copy these numbers forward — re-run it.* **Tier 2 only:** TeX Live 2026 locally, which is not Overleaf's until T3-1 closes |
 | Open tier-3 (Overleaf-only) items | **2** — T3-1 and T3-2 below |
 | Root knowledge graph | **STALE.** `graphify-out/graph.json` stands at **13,618 nodes** with **six large files recorded stale**. No refresh, update or re-extraction was run in 8C-3 by instruction: the graph is a convenience index, that session navigated by path and grep, and a refresh would have spent heavily for no marginal value. The two refusals of 2026-08-07 are unresolved and `brain/scripts/graph_write_guard.py` brackets any future run. **Nothing in 8C-1/2/3 was blocked by the staleness** |
 

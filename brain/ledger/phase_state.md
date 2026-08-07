@@ -3364,3 +3364,38 @@ Phuong; not routed around.
   §2.7b's W3 forward clause.
 - **Graph not refreshed**, by instruction. Still 13,618 nodes, six files stale. Nothing in 8C-3
   was blocked by it.
+
+### 8C-3 addendum — push landed manually; fresh-clone compile corrected the instrument
+
+**Push verified against the remote, not assumed.** Phuong pushed manually after the
+protected-branch guard refused the agent. `git ls-remote --heads origin` returns
+`f903214…  refs/heads/main`; `origin/main..main` is empty. The remote's `figures/ladder.pdf`
+now extracts as **RMSSE / RMSE (£)** with panels **(A) Beer Hall · (B) Ellel · (C) Two River
+Taps**, so the Figure 4.1 contradiction is closed on the artefact a marker opens. All four
+F4–F7 PDFs are byte-identical between remote and local.
+
+**The stronger check found a defect in the check itself, not in the document.** Cloning the
+pushed state fresh and compiling it FAILED at an emergency stop: `declaration.tex` `\input`s
+`main-words.sum`, which `\quickwordcount` generates via `\write18`, which is disabled without
+`--shell-escape`. Re-run **with** the flag on the same fresh clone: **PASS, 115 pages, 0 errors,
+0 undefined references, 0 undefined citations, 0 floats lost, 8 overfull, 26 underfull** —
+identical to the working-clone figures.
+
+Confirmed **pre-existing, not introduced by 8C-3**: `24887e2` fails the same way from a fresh
+checkout. So the finding is about the instrument's invocation. **Every `latexcheck` run in this
+project before now omitted `--shell-escape` and passed only because a stale `main-words.sum` sat
+in the working clone**, including 8C-3's own pre-push run. Right verdict, wrong reason, and it
+would not have survived a clean checkout. Recorded in `PRJ93_RULES.md` under the compile-and-push
+lifecycle and at the head of `BLOCKED_third_party.md` §F.
+
+**§F further repaired on the pointer-not-copy test** (Phuong's ruling, generalising the retired
+dangling-reference register): where a fact is cheaply derivable from an instrument, §F names the
+instrument instead of holding the value. Applied to the composed/pushed rows (git), the build row
+(latexcheck, now folded together with the undefined-reference row it duplicated), and the floors
+(wordcount.py, values retained because a floor costs a run and is under active decision). Tier-3
+rows keep their values because no instrument can derive them.
+
+**Also surfaced:** `brain/scripts/graph_write_guard.py` is untracked. It brackets the graphify
+run and rolls back the manifest stamps when the shrink guard refuses — the repair that was needed
+by hand twice on 2026-08-07. Untracked means nobody else gets it and a fresh clone of this repo
+has no guard at all. It is not 8C-3's file; flagged to its author rather than committed.

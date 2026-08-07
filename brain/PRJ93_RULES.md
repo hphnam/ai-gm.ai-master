@@ -110,6 +110,17 @@ a float body, or the preamble.
    Until then **no local compile result may be stated as a claim about the target render.**
    Write "compiles under TeX Live 2026 locally", never "compiles".
 
+**The compile command carries `--shell-escape`, and omitting it makes the check pass for the
+wrong reason.** `main.tex`'s `\quickwordcount` writes `main-words.sum` through `\write18` and
+`declaration.tex` `\input`s it. Without the flag the file is never generated and the build dies at
+an emergency stop on the first pass — so a run that omits it **passes only when a stale
+`main-words.sum` happens to be sitting in the working clone**, which is the normal state of a
+clone that has been compiled before. Every run in this project before 2026-08-07 was in that
+category, including 8C-3's own pre-push check. It reached the right verdict by an accident of
+working-directory state, and would have failed from a clean checkout. This is the exit-code rule
+in a new place: the command reported what it attempted, and only the fresh clone reported what
+was true.
+
 **A push is verified against the remote, not against the exit code of `git push`.** Confirm
 `git ls-remote --heads origin` carries the expected commit and that `origin/<branch>..HEAD` is
 empty. The stronger form, and the one to use after any change that touched a float body or
