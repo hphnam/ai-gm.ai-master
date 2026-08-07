@@ -276,4 +276,21 @@ horizontal overlap untouched, and the fix read as complete because the thing it 
 against was the previous defect rather than the geometry.
 
 The general form: **when a fix moves an object, re-derive every constraint the object was
-subject to, not the one that prompted the move.**
+subject to, not the one that prompted the move.** That failed twice in a row on one figure:
+moving the labels out of the bars fixed vertical overflow and left horizontal overlap
+untouched; narrowing the labels then fixed the overlap and pushed the vertical extent back
+through the time axis. Each fix was checked against the defect that prompted it.
+
+**The assertions have a hard boundary, and it must not be mistaken for coverage.** A
+generator can check what it computes: horizontal spans, node coordinates, whether anything
+sits left of the origin. It **cannot** check anything downstream of line breaking — how many
+lines a label wraps to, and therefore how far down the page it descends, depends on font
+metrics and TeX's decisions that the generator never sees. So:
+
+| Property | Verified by |
+|---|---|
+| horizontal spans, overlap, origin placement | generator assertion, every run |
+| vertical extent, overfull boxes, glyph collision | **the compile, and only the compile** |
+
+A green generator run means the geometry it can compute is sound. It says nothing about the
+half that needs TeX, and the second half is where both remaining defects lived.

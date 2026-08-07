@@ -643,13 +643,28 @@ before 4.3 was composed.
 Written as `\caption[title]{title. body}` so the list of figures carries the title alone.
 
 **F1 `fig:blocks`** — *The four-block split, and the superseded two-way split it replaced.*
-> Blocks are drawn to scale on the Beer Hall calendar. Each does one job once, and the fit
-> span ends strictly before the calibration block, which is the source of the conformal
-> guarantee rather than a technicality. **The $n = 56$ unbiasedness rows of
-> Section~\ref{sec:res-reconciliation} are the calibration block.** *(41 words)*
+> To scale on the Beer Hall calendar. Fit estimates; validation runs the adoption contest;
+> calibration produces conformal scores and reconciliation weights; test is reported and
+> touched by nothing else. Disjointness is the source of the conformal guarantee. **The
+> $n = 56$ unbiasedness rows are the calibration block.** *(45 words, at the line)*
 
-The final sentence is required: `validation` and `calibration` are both 56 days, so a bare
-"$n = 56$" is ambiguous between two blocks that do different jobs.
+Two things this caption is now doing, and both are deliberate.
+
+**The four role descriptions moved here from under the bars.** On the figure they forced a
+label wide enough to hold "conformal scores + reconciliation weights", which at the width the
+horizontal spacing allows wraps to four or five lines and descends through the time axis into
+the date labels. They are explanation rather than labelling, so the caption is where they
+belong; moving them removes the constraint instead of accommodating it. `fig_blocks.py`
+prints them on every run under `FOR THE CAPTION`, read from `block_spans.json`, so the caption
+cannot drift from the artefact.
+
+**"The $n = 56$ unbiasedness rows are the calibration block" is required.** Validation and
+calibration are both 56 days, so a bare "$n = 56$" is ambiguous between two blocks that do
+different jobs.
+
+Disjointness needs no more than its clause because the figure carries the arrow that says
+"fit ends strictly before calibration begins" — the caption should not restate what the
+drawing already states.
 
 **F3 `fig:pipeline`** — *From a Square export to an intervention, with the Methods
 subsection carrying each step.*

@@ -126,12 +126,18 @@ def main() -> None:
         lines.append(
             f"  \\node[blk,fill={fill},draw={draw},minimum width={w:.3f}cm]"
             f" at ({x0:.3f},1.05) {{{tag}}};")
+        # Name and n only, on two lines. The role descriptions used to sit here and were
+        # the reason the label needed width; at 1.76 cm "conformal scores + reconciliation
+        # weights" wraps to four or five lines, and the whole label then descends through
+        # the time axis at y = 0.05 and into the date labels below it. Narrowing the label
+        # to fix the horizontal overlap made that worse. The descriptions are explanation
+        # rather than labelling, so they moved into the caption, which removes the
+        # constraint instead of accommodating it. `blk["job"]` is the caption's source.
         label_w = min(2.45, w - GUTTER_CM)
         lines.append(
             f"  \\node[anchor=north,align=center,text width={label_w:.3f}cm]"
             f" at ({x0 + w / 2:.3f},0.98) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
-            f" ($n{{=}}{blk['n_days']}$)\\\\[-1pt]"
-            f" {{\\scriptsize\\color{{black!60}}{blk['job']}}}}};")
+            f"\\\\[-2pt] \\scriptsize $n{{=}}{blk['n_days']}$}};")
 
     lines += [
         "  %% time axis",
@@ -159,8 +165,12 @@ def main() -> None:
     path = OUT / "fig_blocks.tex"
     path.write_text("\n".join(lines) + "\n")
     print(f"wrote {path}")
-    print(f"  spans: " + ", ".join(
+    print("  spans: " + ", ".join(
         f"{b['block']} {b['start']}..{b['end']} n={b['n_days']}" for b in spans["blocks"]))
+    # The roles moved off the figure and into the caption, so they are printed here.
+    # The caption's source is this artefact; a caption written from memory drifts from it.
+    print("  FOR THE CAPTION — " + "; ".join(
+        f"{b['block']}: {b['job']}" for b in spans["blocks"]))
 
 
 if __name__ == "__main__":
