@@ -3163,3 +3163,129 @@ rebuild. Do NOT pass `force=True` to `to_json` to push the smaller graph through
 never ran, including a `chunk_05` that this run's four agents would never have overwritten.
 Merging them would have silently folded three-day-old extraction into today's graph. Deleted
 before the merge. Check for stale chunk files before any future graphify merge.
+
+---
+
+## Session 2026-08-07 (second run) — 8C-F follow-up: push verified, rules hardened, graph refused again
+
+### The push landed, and the PUSHED state was compiled
+
+Phuong pushed `d246333` and `24887e2` by hand. Verified three ways, because "I ran `git push`"
+and "the remote holds a document that builds" are different claims:
+
+1. **Remote ref** — `git ls-remote` head is `24887e2`; `origin/main..HEAD` empty; clone clean.
+2. **Content at `origin/main`**, read from the fetched ref rather than the working tree — the
+   `out`→`outb` rename with no `[out,` survivors, all four regenerated float bodies carrying
+   their new coordinates, `figure_proof.tex` absent, **ten** converted references, all four
+   F4–F7 PDFs. **Nothing present locally is absent on the remote.**
+3. **Independently through the MCP bridge**, a different path from git: it now lists **26
+   files, not 27** — `figure_proof.tex` is gone from Overleaf's own project view, so the push
+   reached the project and not merely the git bridge.
+
+**Then a FRESH CLONE of the pushed state was compiled from scratch**: 139 pages, 0 errors, 0
+undefined citations, 0 floats lost, 9 overfull boxes, undefined refs exactly `tab:mcs-config`
+and `fig:nulls`. Baseline recorded at `24887e2`.
+
+### The push block was never git
+
+No hooks in the clone, `core.hooksPath` unset at every level, no git protection config. It is
+`.claude/hooks/block-dangerous-commands.sh`, a **Claude Code `PreToolUse` Bash hook** wired in
+this repo's `.claude/settings.json`. It reads the **command string only**, so a guard
+configured for `ai-gm.ai-master` blocked a push to `prj93-overleaf` — a different repository.
+Phuong's own terminal push of the identical command succeeded, which is what rules out a git
+hook. Diagnosis and a **proposed, unapplied** fix are in `ledger/push_guard_proposal.md`; it
+discriminates on the resolved **remote URL**, never the branch name, and was tested both ways
+(Overleaf exempt, this repo's GitHub origin still guarded). Unapplied because `.claude/` is
+out of bounds under the Scope boundary and shared with a collaborator.
+
+### latexcheck's fixture tested the author's imagination; now it does not
+
+Extended from 3 warning classes to **seven cases**, and it now drives the **real CLI as a
+subprocess and checks the actual process exit code** — the previous self-test asserted the
+internal `fatal` flag, one step removed from the guarantee callers depend on.
+
+| case | exit | pdf |
+|---|---|---|
+| clean-control | 0 | yes |
+| warnings-ref-cite-box | 1 | yes |
+| missing-end-document | 1 | no |
+| undefined-control-seq | 1 | no |
+| missing-environment | 1 | no |
+| missing-package-file | 1 | no |
+| runaway-open-brace | 1 | no |
+
+The clean control is not decoration: without it the table cannot distinguish a working guard
+from one that fails on everything.
+
+**The new cases earned their place immediately.** `undefined-control-seq` was caught **only**
+by the no-PDF check — under `-file-line-error` a primitive TeX error prints as
+`<file>:<line>: Undefined control sequence` with no `" Error:"` marker, so the parser never
+classified it. Fixed with an explicit `TEX_FATAL_PHRASES` list rather than by treating every
+`file:line:` line as fatal. Regression-checked on the live document: still 0 errors, 139
+pages, no false positives.
+
+### The ROOT graph refresh was refused AGAIN — and my earlier hypothesis was wrong
+
+**Before 13,618 nodes / 25,047 links. After: 13,618 — UNCHANGED.** ROOT
+(`graphify-out/graph.json`) confirmed; `brain/graphify-out/` untouched at 5,495 throughout.
+
+All chunks landed this time (13 + 84 + 74 semantic nodes, plus 639 replayed from cache and 727
+AST = 1,535 extracted). The merge still came to **13,329 against 13,618, net −289**, and the
+shrink guard refused again. **It was not forced.**
+
+**This disproves the previous entry's explanation.** That entry attributed the −306 shrink to
+two of four semantic chunks failing to return. With every chunk landing the deficit is
+essentially unchanged at −289, so the missing chunks were never the cause.
+
+**The real cause is extraction depth, and it is mine.** Per-file deltas against the old graph:
+
+| file | old → new | delta |
+|---|---|---|
+| `docs/Prj93_external_examiner_assessment.md` | 142 → 64 | **−78** |
+| `ledger/literature_conformance.md` | 82 → 12 | **−70** |
+| `ledger/phase_state.md` | 77 → 19 | **−58** |
+| `knowledge/04_supervisor_evidence_pack.md` | 59 → 12 | **−47** |
+| `ledger/citation_audit.md` | 43 → 7 | **−36** |
+| `knowledge/05_paper_architecture.md` | 63 → 28 | **−35** |
+
+34 files lose nodes, 36 gain, net −292 across the changed set. The losses land almost exactly
+on the **largest documents** — which are the files I told the agents to read "in bounded
+ranges", targeting "15–25 nodes per file", because two earlier agents had been killed by
+timeouts and one by a mid-response API error. **The budget instruction that made the agents
+survive is the same instruction that under-extracted the big files.** The guard is protecting
+the graph from my own prompt, which is exactly its job.
+
+**What actually closes this:** a full rebuild (`/graphify .`), or a re-extract of the ~6 large
+documents at proper depth with a generous time budget and no node-count target. **Do not pass
+`force=True`** — the smaller graph is a real loss of content, not a dedup artefact.
+
+**Both earlier repairs re-verified after this run:**
+- `save_manifest` again stamped every dispatched file as current while the graph write was
+  refused. Restored from git again — `graphify-out/manifest.json` is clean against HEAD, so
+  the manifest and the graph agree and the next `--update` re-queues rather than skips.
+- No `.graphify_chunk_*.json` remain on disk and **zero are tracked in git**, so the
+  2026-08-04 contamination hazard has not reappeared. The late-landing chunk from the previous
+  run was converted into a **content-addressed semantic cache entry** before deletion, so its
+  19 files replay by hash rather than sitting as a positional file no later run would overwrite.
+
+### Recorded this session
+
+- `PRJ93_RULES.md` — new **"Compile and push"** lifecycle section: a clean `latexcheck` is the
+  precondition for a push; local-green-but-unpushed leaves Overleaf broken; both halves get
+  reported; tier 2 may not speak for tier 3 while the TeX Live year is unknown; and a push is
+  verified against the remote, with a fresh-clone compile as the strong form.
+- `BLOCKED_third_party.md` §F — **T3-1** (Overleaf TeX Live year, Phuong to read) and **T3-2**
+  (title page not locally verifiable, no Inkscape) as owned tier-3 items; plus the document's
+  compile state.
+- The **caption defect as a named 8C-3 deliverable** in §F and in
+  `05_paper_architecture.md`'s Results block. **Nine** surviving body floats, not seventeen —
+  five demoted to appendices, three absorbed into prose. Verified by enumerating all 17 labels
+  in `results.tex`; the architecture doc independently already read "one figure and eight
+  tables".
+
+### Verified end state
+
+- Overleaf remote at `24887e2`; pushed state compiles (139 pages) under **local TeX Live 2026**
+  — a tier-2 claim only, until T3-1 closes.
+- ROOT graph unchanged at 13,618 / 25,047. `brain/graphify-out` unchanged at 5,495.
+- 8C-3 **not** started. No prose composed.
