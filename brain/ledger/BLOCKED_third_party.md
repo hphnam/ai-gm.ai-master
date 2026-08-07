@@ -165,6 +165,80 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 | Chapter files live on Overleaf with prose in them | **4** — plus `conclusion.tex`, composed to a *pre-tree* five-chapter shape. `introduction.tex` is an empty template stub |
 | Measured word floors, both PROVISIONAL pending reallocation | Ch 2 **4,948**/4,000 · Ch 3 **5,526**/4,200 (marker-equivalent) |
 | Chapters still unmeasured | 4 — Introduction (**nothing written**), **Results**, Discussion (**no file; lives inside `conclusion.tex`**), Conclusions |
+| Document compiles | **YES** — first clean build 2026-08-07. 139 pages, 0 errors, 0 undefined citations, 0 floats lost, 9 overfull boxes. Verified on a **fresh clone of the pushed state** at `24887e2`, not only pre-push |
+| Undefined references in the live document | **2**, both known and both 8C-3's: `tab:mcs-config`, `fig:nulls` |
+| Open tier-3 (Overleaf-only) items | **2** — T3-1 and T3-2 below |
+
+### Tier-3 items — verifiable only on Overleaf, not unchecked
+
+The assertion boundary in `PRJ93_RULES.md` has three tiers: generator, local compile,
+Overleaf. These two sit in tier 3 and **cannot be closed from here**. They are open items with
+a named owner and a named action, not gaps.
+
+#### T3-1 — Overleaf's TeX Live year is unknown
+
+- **Why it cannot be read from here.** The MCP bridge exposes only file read/write
+  (`list_files`, `read_file`, `get_sections`, `status_summary`) — **no settings tool** — and
+  the year is not stored anywhere in the git repo.
+- **Local is TeX Live 2026** (`scheme-full`, `~/texlive/2026`).
+- **Action, owner Phuong:** read Menu → Settings → TeX Live version in the Overleaf UI and
+  record it here.
+- **What binds until then:** `PRJ93_RULES.md` § "Compile and push", clause 4 — tier-2/tier-3
+  agreement is **UNVERIFIED**, so no local compile result may be stated as a claim about the
+  target render. Write "compiles under TeX Live 2026 locally", never "compiles".
+- **Why it matters rather than being pedantry:** this project has already been bitten by an
+  environment split of exactly this shape — numpy 1.26 against 2.5, `log/78`.
+
+#### T3-2 — the title page is not locally verifiable
+
+- `title_page.tex` line 7 calls `\includesvg[scale=0.6]{figures/lu-logo.svg}`. The `svg`
+  package shells out to **Inkscape, which is not installed locally**, so the local build
+  routes through a **scratch-only `svg.sty` stub** that draws a placeholder box.
+- **Everything downstream of the title page IS locally verified.** The title page itself is
+  **not**, and no local run may be reported as covering it.
+- **This is a standing tier-3-only item, not a defect and not an omission.** Overleaf has
+  Inkscape, so the target render is expected to be correct; "expected" is the operative word
+  until someone looks at page i of the Overleaf PDF.
+- **Closing it would require** installing Inkscape locally, which buys one page of coverage —
+  not obviously worth it while tier 3 is a browser tab away.
+
+### 8C-3 input — the caption short-title deliverable
+
+**This is a named deliverable of 8C-3, not a compile byproduct.** It is recorded here because
+it was found by the first document compile and would otherwise live only in a log.
+
+**The defect.** `chapters/results.tex` carries **17 `\caption` commands and zero
+`\caption[short]{long}`**. Every Chapter-4 float therefore prints its entire multi-sentence
+caption into the List of Tables and List of Figures, which:
+
+- runs the **List of Tables to six pages** (PDF pages 8–13), and
+- produces the document's largest overfull box, a **224.47 pt overfull vbox in `main.lot`**,
+  plus most of its underfull vboxes.
+
+The six short titles written for the methodology, literature-review and appendix floats all
+work correctly and none split at the wrong point, so the pattern is proven — it simply was
+never applied to Results.
+
+**The count is NOT 17. Nine body floats survive.** Verified against `results.tex`, not
+inferred: all 17 labels enumerated, and all eight named for removal confirmed present exactly
+once.
+
+| | Floats | Disposition |
+|---|---|---|
+| Demoted to appendices | `tab:ladder`, `tab:bootstrap`, `tab:recon-decomp`, `tab:native-interval`, `tab:window` | **5** |
+| Absorbed into prose | `tab:folds`, `tab:occurrence`, `tab:injection` | **3** |
+| **Surviving body floats** | `fig:ladder`, `tab:mcs`, `tab:intermittency`, `tab:group`, `tab:weather`, `tab:coverage`, `tab:exchangeability`, `tab:winkler`, `tab:vuspr` | **9** — 8 tables + 1 figure |
+
+**What 8C-3 writes:** a short title at the **15/45 rule** via `\caption[short]{short. body}`
+for **each of the 9 surviving body floats** — the short title repeated as the opening sentence
+of the body so the list entry and the caption's first clause do not drift apart.
+
+> **Related obligation, deliberately not folded into the 9.** The 5 floats demoted to
+> appendices still print into the LoT/LoF from wherever they land, so they need short titles
+> too — but under the appendix's float programme, not Results'. Tracked here so the count
+> "9" is not later mistaken for "all captions needing work".
+
+Mirrored in `knowledge/05_paper_architecture.md` § Results.
 
 ### The register of other state stores — ruled 2026-08-07
 

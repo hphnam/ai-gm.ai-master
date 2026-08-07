@@ -481,6 +481,28 @@ faster as a sentence than as a float.
 **Body floats in Results after this: one figure and eight tables**, down from one figure
 and sixteen tables.
 
+#### 8C-3 deliverable — short titles on every surviving body float
+
+**Found by the first document compile, 2026-08-07.** `results.tex` currently carries **17
+`\caption` commands and not one `\caption[short]{long}`. Every Chapter-4 float therefore
+prints its whole multi-sentence caption into the List of Tables**, which runs the LoT to
+**six pages** and produces the document's largest overfull box — a **224.47 pt overfull vbox
+in `main.lot`**. The short titles already written for Methods, the literature review and
+appendices B/C/D all behave correctly, so the pattern is proven and simply was never applied
+here.
+
+**8C-3 writes a short title at the 15/45 rule via `\caption[short]{short. body}` for each of
+the nine surviving body floats** — the short title repeated as the body caption's opening
+sentence, so the list entry and the caption cannot drift apart:
+
+`fig:ladder` · `tab:mcs` · `tab:intermittency` · `tab:group` · `tab:weather` ·
+`tab:coverage` · `tab:exchangeability` · `tab:winkler` · `tab:vuspr`
+
+**The number is nine, not seventeen** — the five Appendix D/E demotions and the three
+prose absorptions in the table above account for the other eight. Those five still need short
+titles once they land in their appendices, but under the appendix float programme rather than
+this deliverable; tracked in `BLOCKED_third_party.md` §F so the count is not later confused.
+
 ### 2.7a Binding reporting conditions on `tab:exchangeability` and Results 4.4
 
 **Added 2026-08-06 from the audit of the two floats the numbers audit never covered

@@ -70,6 +70,33 @@ RE_NO_OUTPUT = re.compile(
 # bang form and therefore reported a clean table over a dead build.
 RE_FILE_LINE_ERROR = re.compile(r"^(\S[^:]*):(\d+): (.+)$")
 
+# Primitive TeX errors carry no " Error:" marker. Matched as an explicit list
+# rather than by treating every "<file>:<line>:" line as fatal, which would
+# sweep up benign informational lines.
+TEX_FATAL_PHRASES = (
+    "Undefined control sequence",
+    "Emergency stop",
+    "Missing $ inserted",
+    "Missing { inserted",
+    "Missing } inserted",
+    "Missing \\endgroup inserted",
+    "Runaway argument",
+    "Runaway definition",
+    "Paragraph ended before",
+    "File ended while scanning",
+    "Too many }'s",
+    "Extra }, or forgotten",
+    "Argument of",
+    "TeX capacity exceeded",
+    "Dimension too large",
+    "Illegal unit of measure",
+    "Misplaced alignment tab",
+)
+
+
+def _is_tex_fatal(message):
+    return any(p in message for p in TEX_FATAL_PHRASES)
+
 # A '(' that opens a file: followed by a path-ish token. TeX also prints bare
 # '(' for grouping, so require something that looks like a filename.
 RE_FILE_OPEN = re.compile(r"\((/?[^\s()\"$]*\.(?:tex|sty|cls|def|cfg|clo|ldf|fd|bbx|cbx|lbx|aux|toc|lof|lot|out|bbl))")
@@ -198,7 +225,12 @@ def parse_log(log_text):
                 rep.errors.append(("TeX", detail, where))
         else:
             m = RE_FILE_LINE_ERROR.match(line)
-            if m and " Error:" in m.group(3):
+            # Under -file-line-error a fatal TeX error is "<file>:<line>: <msg>".
+            # Only LaTeX/package errors carry " Error:"; the primitive TeX ones
+            # do not, so matching on that substring alone missed "Undefined
+            # control sequence" entirely -- found by the extended fixture, where
+            # only the no-PDF check caught that case.
+            if m and (" Error:" in m.group(3) or _is_tex_fatal(m.group(3))):
                 rep.errors.append((f"{m.group(1)}:{m.group(2)}", m.group(3).strip(), where))
 
         m = RE_PAGES.search(line)
@@ -332,68 +364,148 @@ Citation to nothing: \cite{fixture:nosuchkey2026}.
 \end{document}
 """
 
+# A clean control. Without it the suite cannot distinguish "the guard works"
+# from "the guard fails on everything", which are indistinguishable from a
+# table of red rows.
+FIXTURE_CLEAN = r"""
+\documentclass[12pt,a4paper]{article}
+\begin{document}
+A clean page with nothing wrong in it.
+\end{document}
+"""
+
+# --- Builds that DIE rather than warn -----------------------------------------
+#
+# WHY THESE EXIST. The original fixture tested only the three warning classes the
+# parser was written to find, and the tool then reported "VERDICT: PASS" over a
+# real build that produced no PDF at all (svg/Inkscape, 2026-08-07). A fixture
+# containing only anticipated failures tests the author's imagination, not the
+# instrument. These cases make the compiler die in ways the parser was NOT
+# designed around, and assert the tool still exits non-zero and still refuses to
+# say PASS.
+
+FIXTURE_NO_END = r"""
+\documentclass[12pt,a4paper]{article}
+\begin{document}
+This document never closes -- there is no \string\end{document} below.
+"""
+
+FIXTURE_UNDEFINED_CS = r"""
+\documentclass[12pt,a4paper]{article}
+\begin{document}
+Text, then an undefined control sequence: \thisControlSequenceIsNotDefined
+\end{document}
+"""
+
+FIXTURE_MISSING_ENV = r"""
+\documentclass[12pt,a4paper]{article}
+% amsmath is deliberately NOT loaded, so `align' is undefined.
+\begin{document}
+\begin{align}
+  x &= y \\
+  a &= b
+\end{align}
+\end{document}
+"""
+
+FIXTURE_MISSING_PACKAGE = r"""
+\documentclass[12pt,a4paper]{article}
+\usepackage{thispackagedoesnotexist2026}
+\begin{document}
+Text.
+\end{document}
+"""
+
+FIXTURE_RUNAWAY_BRACE = r"""
+\documentclass[12pt,a4paper]{article}
+\begin{document}
+\textbf{This brace is never closed and the file ends inside the group.
+\end{document}
+"""
+
+# name -> (source, must_exit_nonzero, expect_no_pdf)
+FIXTURE_CASES = [
+    ("clean-control",          FIXTURE_CLEAN,           False, False),
+    ("warnings-ref-cite-box",  FIXTURE,                 True,  False),
+    ("missing-end-document",   FIXTURE_NO_END,          True,  None),
+    ("undefined-control-seq",  FIXTURE_UNDEFINED_CS,    True,  True),
+    ("missing-environment",    FIXTURE_MISSING_ENV,     True,  True),
+    ("missing-package-file",   FIXTURE_MISSING_PACKAGE, True,  True),
+    ("runaway-open-brace",     FIXTURE_RUNAWAY_BRACE,   True,  None),
+]
+
 
 def self_test():
     """Feed the guard the violations it exists to catch and watch it raise.
 
     PRJ93_RULES.md: an assertion nobody has seen fail is an assertion taken on
-    faith. This builds a fixture carrying one undefined ref, one bad citation
-    key and one overfull hbox, then asserts the parser reports all three AND
-    that the tool exits non-zero.
+    faith. Two things this suite does deliberately:
+
+    1. It runs the REAL CLI as a subprocess and checks the ACTUAL process exit
+       code. An earlier version asserted the internal `rep.fatal` flag instead,
+       which is one step removed from the guarantee callers depend on -- and the
+       tool did in fact once print PASS while the build produced no PDF.
+    2. It includes builds that DIE, not only builds that warn, plus a clean
+       control. Anticipated failures alone test the author's imagination; the
+       clean control is what distinguishes a working guard from one that simply
+       fails on everything.
     """
     tmp = Path(tempfile.mkdtemp(prefix="latexcheck-fixture-"))
-    tex = tmp / "fixture.tex"
-    tex.write_text(FIXTURE)
-    outdir = tmp / "out"
-    outdir.mkdir()
-
-    print(f"[self-test] fixture at {tex}")
-    proc = run_latexmk(tex, outdir)
-    logpath = outdir / "fixture.log"
-    if not logpath.exists():
-        print("[self-test] FAIL: no log produced")
-        print(proc.stdout[-3000:])
-        print(proc.stderr[-2000:])
-        return 1
-
-    rep = parse_log(logpath.read_text(errors="replace"))
-    print_report(rep, logpath, outdir / "fixture.pdf")
-
+    rows = []
     failures = []
-    if "fixture:nowhere" not in rep.undefined_refs:
-        failures.append("did NOT report the undefined reference 'fixture:nowhere'")
-    if "fixture:nosuchkey2026" not in rep.undefined_cites:
-        failures.append("did NOT report the undefined citation 'fixture:nosuchkey2026'")
-    over = [b for b in rep.boxes if b["kind"] == "Overfull" and b["box"] == "hbox"]
-    if not over:
-        failures.append("did NOT report an overfull hbox")
-    if not rep.fatal:
-        failures.append("would have EXITED ZERO on a document with all three defects")
 
-    print("\n" + "=" * 78)
-    print("SELF-TEST")
+    for name, source, want_nonzero, expect_no_pdf in FIXTURE_CASES:
+        case_dir = tmp / name
+        case_dir.mkdir(parents=True)
+        tex = case_dir / "fixture.tex"
+        tex.write_text(source)
+        outdir = case_dir / "out"
+        outdir.mkdir()
+
+        proc = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve()), str(tex),
+             "--outdir", str(outdir)],
+            capture_output=True, text=True,
+        )
+        rc = proc.returncode
+        pdf = outdir / "fixture.pdf"
+        pdf_written = pdf.exists()
+        verdict_line = next(
+            (l for l in proc.stdout.splitlines() if l.startswith("VERDICT:")),
+            "(no VERDICT line)",
+        )
+
+        ok = (rc != 0) if want_nonzero else (rc == 0)
+        if not ok:
+            failures.append(
+                f"{name}: expected {'non-zero' if want_nonzero else 'zero'} exit, got {rc}"
+            )
+        # Where the build is expected to produce nothing, a PASS verdict would be
+        # the exact regression this suite exists to prevent.
+        if expect_no_pdf is True:
+            if pdf_written:
+                failures.append(f"{name}: expected NO pdf, but one was written")
+                ok = False
+            if "PASS" in verdict_line:
+                failures.append(f"{name}: reported PASS over a build with no PDF")
+                ok = False
+
+        rows.append((name, rc, "yes" if pdf_written else "no",
+                     verdict_line.replace("VERDICT: ", "")[:46],
+                     "PASS" if ok else "FAIL"))
+
     print("=" * 78)
-    checks = [
-        ("undefined \\ref reported by label name",
-         "fixture:nowhere" in rep.undefined_refs,
-         f"fixture:nowhere -> {rep.undefined_refs.get('fixture:nowhere')}"),
-        ("undefined citation reported by key",
-         "fixture:nosuchkey2026" in rep.undefined_cites,
-         f"fixture:nosuchkey2026 -> {rep.undefined_cites.get('fixture:nosuchkey2026')}"),
-        ("overfull hbox reported with overflow in pt",
-         bool(over),
-         f"{over[0]['pt']}pt at {over[0]['lines']}" if over else "-"),
-        ("exit code would be non-zero", rep.fatal, f"fatal={rep.fatal}"),
-    ]
-    for name, ok, detail in checks:
-        print(f"  [{'PASS' if ok else 'FAIL'}] {name}: {detail}")
+    print("LATEXCHECK SELF-TEST")
+    print("=" * 78)
+    print(fmt_table(["case", "exit", "pdf", "verdict", "result"], rows))
 
     if failures:
         print("\nSELF-TEST FAILED:")
         for f in failures:
             print("  - " + f)
         return 1
-    print("\nSELF-TEST PASSED - the guard has now been seen to fail on purpose.")
+    print("\nSELF-TEST PASSED - the guard has been seen to fail on purpose on "
+          f"{sum(1 for c in FIXTURE_CASES if c[2])} broken builds, and to pass a clean one.")
     shutil.rmtree(tmp, ignore_errors=True)
     return 0
 

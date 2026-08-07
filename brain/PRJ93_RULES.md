@@ -85,6 +85,39 @@ is strictly better evidence.
 `\write18` on every compile and must stay untracked; the build directory lives outside the
 clone entirely (`--outdir` into the scratchpad), so a compile never dirties `git status`.
 
+### Compile and push — one lifecycle, not two optional halves
+
+**This is a lifecycle rule, not a suggestion.** It applies to every change to a `.tex` file,
+a float body, or the preamble.
+
+1. **Compile before pushing.** The change goes through `brain/scripts/latexcheck.py` on the
+   clone *before* it is pushed. **A clean `latexcheck` is the precondition for a push, not a
+   courtesy.** A push whose compile was not run is unpre-flighted; a push whose compile was
+   run and not reported is unverified, because the run is only evidence once someone can read
+   what it said.
+2. **Compiling locally does not end the work.** A change that compiles locally and is **not
+   pushed** leaves Overleaf holding a state that may not build at all. That is not
+   hypothetical: `fig_pipeline`'s `out`/`outb` key collision sat on Overleaf in a
+   non-compiling state while the fix sat in an unpushed local commit. **Overleaf is the
+   publication target and the only render a marker ever sees.** Local green plus unpushed
+   equals a broken document, not a fixed one.
+3. **Report both halves.** What `latexcheck` said locally, *and* that the push landed —
+   confirmed against the remote, not assumed from a command that appeared to succeed.
+   **Either without the other is an incomplete report.** "It compiles" and "it is pushed" are
+   two different claims and neither implies the other.
+4. **Tier 2 does not speak for tier 3.** Agreement between the local toolchain and Overleaf is
+   **UNVERIFIED** until Overleaf's TeX Live year is known — see `BLOCKED_third_party.md` §F.
+   Until then **no local compile result may be stated as a claim about the target render.**
+   Write "compiles under TeX Live 2026 locally", never "compiles".
+
+**A push is verified against the remote, not against the exit code of `git push`.** Confirm
+`git ls-remote --heads origin` carries the expected commit and that `origin/<branch>..HEAD` is
+empty. The stronger form, and the one to use after any change that touched a float body or
+the preamble, is to **clone the pushed state fresh and compile that** — which is the only
+check that answers "does the state Overleaf now holds actually build", as opposed to "did the
+state I had before pushing build". This project has already had an artefact damaged between a
+verified run and the file on disk; a push is exactly such a gap.
+
 ### The three stores must agree
 
 Each answers a different question, and drift between them is how a later session
