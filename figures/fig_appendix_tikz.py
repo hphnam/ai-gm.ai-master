@@ -133,7 +133,12 @@ def build_injection() -> list[str]:
         " {realistic arm\\\\{\\tiny replayed historical event}};",
         "  \\draw[fl,black!45] (ctrl.south) -- (s1.north);",
         "  \\draw[fl,black!45] (real.north) -- (s1.south);",
-        "  \\node[font=\\tiny,text=black!55,anchor=north west] at (0,-2.1)"
+        # y=-2.6 and a wrapping text width, not y=-2.1 on one line. The `realistic arm'
+        # box is anchored north at -1.35 and its two lines carry it to about -2.25, so the
+        # old position printed the sentence straight THROUGH that box; the single long line
+        # also overfull'd the text block by 9.56 pt. Both were only visible once compiled.
+        "  \\node[font=\\tiny,text=black!55,anchor=north west,text width=13.4cm,align=left]"
+        " at (0,-2.6)"
         " {Both arms inject into the same held-out stream and are scored by the same"
         " detector, so any difference is a property of the injection.};",
         "\\end{tikzpicture}",
@@ -168,7 +173,14 @@ def _origin_inset(folds: list[dict], y_top: float) -> list[str]:
         f"  \\node[font=\\scriptsize\\itshape,text=black!60,anchor=north west]"
         f" at (0,{y_top:.3f}) {{three consecutive origins, magnified}};",
     ]
-    yy = y_top - 0.34
+    # 0.78, not 0.34. A \scriptsize line under the document's \linespread{1.5} descends
+    # about 0.40 cm below its anchor=north point (measured off the compile: F1's two-line
+    # label runs 1.05 cm with a 0.647 cm baseline step, so one line is ~0.40 cm). At 0.34
+    # the first forecast block started ABOVE the title's own baseline, and because the
+    # blocks are emitted after the title node they painted straight over it -- the inset
+    # title was illegible in the first rendered compile. 0.78 clears the descender and
+    # leaves ~0.12 cm of air.
+    yy = y_top - 0.78
     for i in range(3):
         f = folds[i]
         x0, x1 = ix(f["test_start"]), ix(f["test_end"])
@@ -179,8 +191,10 @@ def _origin_inset(folds: list[dict], y_top: float) -> list[str]:
         yy -= 0.40
     # The shared span between the first and third block, which is the quantity that matters.
     shade_lo, shade_hi = ix(folds[2]["test_start"]), ix(folds[0]["test_end"]) + per_day
+    # Top edge follows the first block, not the title: at y_top-0.30 the shading also ran
+    # under the title text and greyed it further.
     lines.insert(1, f"  \\fill[black!12] ({shade_lo:.3f},{yy - 0.02:.3f}) rectangle "
-                    f"({shade_hi:.3f},{y_top - 0.30:.3f});")
+                    f"({shade_hi:.3f},{y_top - 0.52:.3f});")
     lines.append(f"  \\node[font=\\tiny,text=black!55,anchor=north] at "
                  f"({(shade_lo + shade_hi) / 2:.3f},{yy + 0.02:.3f})"
                  " {shared by all three};")

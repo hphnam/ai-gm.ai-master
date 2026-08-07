@@ -59,6 +59,32 @@ ending tidily. This is the rule that stops information being dropped mid-run.
 `origin` for whole phases, and that is the intent rather than a backlog. "Push it" in this
 project means push to Overleaf. Stated here so it stops being re-inferred once a session.
 
+### The Overleaf write path is git — adopted 2026-08-07
+
+The Overleaf project is cloned as a **sibling** of this repo, at
+`/Users/hapuna/Downloads/prj93-overleaf` (remote `git.overleaf.com/6a11ac2180bb716e3c2491c4`).
+It is a separate history and is deliberately **not** a submodule, subtree or subdirectory of
+`ai-gm.ai-master`: merging the two would recreate exactly the confusion this move removes.
+
+| | Rule |
+|---|---|
+| **Writes** | **All edits go through git.** The Overleaf web UI is for compiling and reading only. Two writers produce `.tex` conflicts, and the conflict surfaces as a corrupted section rather than as an error. |
+| **Verification** | `git diff` and `git status`, **not** a full remote read-back. A diff is the artefact-level check the rules already demand; a read-back of 40 kB compared by eye is not a check. |
+| **The MCP bridge** | Retained for **reading and status only** — `list_files`, `get_sections`, `read_file`, `status_summary`. Not for writes. |
+| **Before every push** | `brain/scripts/latexcheck.py` runs on the clone and **its output is reported**. A push whose compile was not reported has not been pre-flighted. |
+
+**`write_section`'s known hazard stops being a hazard once writes are diffs.** The
+2026-07-31 incident (`ledger/overleaf_incident_2026-07-31.md`) recorded that `write_section`
+replaces through to the next same-level heading and **silently deletes nested subsections**.
+That failure mode exists because the tool rewrites a span it infers. A git diff shows every
+line that changes before it is committed, so a silent deletion becomes a visible `-` block.
+The tool is not banned because it is dangerous; it is retired from writing because the diff
+is strictly better evidence.
+
+**Build artefacts are not committed.** `main-words.sum` is produced by `\quickwordcount`'s
+`\write18` on every compile and must stay untracked; the build directory lives outside the
+clone entirely (`--outdir` into the scratchpad), so a compile never dirties `git status`.
+
 ### The three stores must agree
 
 Each answers a different question, and drift between them is how a later session
@@ -355,15 +381,28 @@ through the time axis. Each fix was checked against the defect that prompted it.
 generator can check what it computes: horizontal spans, node coordinates, whether anything
 sits left of the origin. It **cannot** check anything downstream of line breaking — how many
 lines a label wraps to, and therefore how far down the page it descends, depends on font
-metrics and TeX's decisions that the generator never sees. So:
+metrics and TeX's decisions that the generator never sees.
 
-| Property | Verified by |
-|---|---|
-| horizontal spans, overlap, origin placement | generator assertion, every run |
-| vertical extent, overfull boxes, glyph collision | **the compile, and only the compile** |
+**There are three tiers, not two.** The two-tier version of this table assigned vertical
+extent, overfull boxes and glyph collision to *"the compile, and only the compile"* — which,
+while no compiler existed here, silently meant *"Phuong's Overleaf run, and only that"*. A
+local TeX Live installation (2026-08-07) makes the middle tier mine to run, and the boundary
+has to say so or the checks will keep being deferred to a human.
 
-A green generator run means the geometry it can compute is sound. It says nothing about the
-half that needs TeX, and the second half is where both remaining defects lived.
+| Tier | Verifies | Instrument | Run by |
+|---|---|---|---|
+| 1 · generator | horizontal geometry: spans, overlap, inter-node clearance, origin placement | `figures/_tikz_assert.py`, asserted on every write | the generator, unattended |
+| 2 · local compile | **everything downstream of line breaking**: vertical extent, overfull/underfull boxes, glyph collision, float placement and loss, undefined refs and citations, appendix lettering, list-of-figures short titles | `brain/scripts/latexcheck.py` | me, before every push |
+| 3 · Overleaf | the **target** rendering — the artefact a marker actually opens | Overleaf's own compile | Phuong |
+
+**Tier 2 is a pre-flight and not the target.** It is a different TeX Live year from Overleaf's
+until the two are confirmed equal, and this project has already been bitten by exactly that
+class of split (numpy 1.26 against 2.5, `log/78`). A tier-2 pass licenses a push; it does not
+license a claim about what the marker sees. Where the two disagree, **Overleaf wins** and the
+disagreement itself is the finding — record it rather than re-running until one agrees.
+
+A green tier-1 run means the geometry it can compute is sound. It says nothing about tiers 2
+and 3, and both remaining F1 defects lived in tier 2.
 
 **An assertion nobody has seen fail is an assertion taken on faith.** Before relying on a
 guard, feed it the violation it exists to catch and watch it raise. `figures/_tikz_assert.py`

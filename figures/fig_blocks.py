@@ -36,19 +36,26 @@ ROW_H = 0.62
 # 1.85 cm wide and the longest word left on the figure ("calibrate") is about 1.15 cm
 # at \scriptsize -- the label must stay wider than that or it overfulls instead.
 GUTTER_CM = 0.09
-# Height of a two-line \scriptsize label under the DOCUMENT's leading, not the proof's.
+# Vertical extent of a two-line \scriptsize label BELOW its anchor=north point, under the
+# DOCUMENT's leading.
 #
-# THIS IS AN ESTIMATE, NOT A MEASUREMENT. Nothing here has been read off a rendered PDF.
-# It is derived: 12pt base makes \scriptsize 8pt on a ~9.5pt baseline; \linespread{1.5}
-# takes that to ~14.25pt, so two lines plus ascender and descender is about 0.72 cm --
-# roughly a quarter taller than the same label in the 11pt proof, which is why the
-# clearance first reported at 3.3 mm is in fact 2.2 mm. Label height is downstream of line
-# breaking, so it sits on the compile check list rather than in an assertion.
+# MEASURED off the rendered document PDF on 2026-08-07, replacing the derived estimate of
+# 0.72 cm that stood here before. The estimate was wrong by 0.21 cm -- almost exactly the
+# 2.2 mm it was supposed to be leaving as clearance -- and the axis rule therefore printed
+# THROUGH the "n=230" glyphs rather than below them.
 #
-# The three inputs are BASE SIZE, \scriptsize's ratio, and \linespread. If any of them
-# changes in main.tex, this constant is wrong and must be re-derived -- it is not a number
-# that was found to work, and it should not be treated as one.
-LABEL_H_CM = 0.72
+# How it was measured (brain/scripts/latexcheck.py builds the PDF; pymupdf reads spans):
+#   page 45, figure band -- label anchor (TikZ y=0.98) lands at PDF y=183.48;
+#   the second line "n=230" has glyph bottom at PDF y=213.19.
+#   extent = (213.19 - 183.48) pt = 29.71 pt = 1.048 cm.
+# Cross-checked against the defect it explains: the old axis sat at TikZ y=+0.04 while the
+# glyph bottom was at y=-0.068, i.e. the rule crossed the text by 0.108 cm = 3.06 pt, which
+# is what the render shows. Estimate and observation agree on the failure, so the number is
+# the observation and not another derivation.
+#
+# The three inputs are BASE SIZE, \scriptsize's ratio, and \linespread. If any changes in
+# main.tex this must be RE-MEASURED from a fresh compile, not re-derived.
+LABEL_H_CM = 1.05
 LABEL_TOP_Y = 0.98
 AXIS_MARGIN_CM = 0.22
 AXIS_Y = round(LABEL_TOP_Y - LABEL_H_CM - AXIS_MARGIN_CM, 2)
@@ -178,10 +185,25 @@ def main() -> None:
         lines.append(f"  \\draw[black!70] ({x(label):.3f},{AXIS_Y}) -- ({x(label):.3f},{AXIS_Y - 0.11:.2f})"
                      f" node[below,black!70]{{\\scriptsize {label}}};")
 
+    # The disjointness that IS the guarantee.
+    #
+    # The label is ~6 cm of text over a 1.9 cm arrow, and on the first rendered compile it
+    # read as floating: sitting midway between the two rows it was ambiguous whether it
+    # belonged to the superseded row above or the adopted row below, and nothing tied it to
+    # the two boundaries it actually measures. Leader lines fix that -- they drop from each
+    # arrow end to the top edge of the adopted row at exactly the fit-end and
+    # calibrate-start coordinates, so the span being named is the span being drawn. The
+    # wording is left alone: "strictly" is the strict inequality that makes the sets
+    # disjoint, and shortening the phrase would trade meaning for width.
+    fit_end_x = x(spans["blocks"][0]["end"])
+    cal_start_x = x(spans["blocks"][2]["start"])
+    row2_top = 1.05 + ROW_H
     lines += [
         "  %% the disjointness that IS the guarantee",
-        f"  \\draw[<->,black!75] ({x(spans['blocks'][0]['end']):.3f},1.98) -- "
-        f"({x(spans['blocks'][2]['start']):.3f},1.98)"
+        f"  \\draw[black!40,thin] ({fit_end_x:.3f},{row2_top:.2f}) -- ({fit_end_x:.3f},1.98);",
+        f"  \\draw[black!40,thin] ({cal_start_x:.3f},{row2_top:.2f}) -- ({cal_start_x:.3f},1.98);",
+        f"  \\draw[<->,black!75] ({fit_end_x:.3f},1.98) -- "
+        f"({cal_start_x:.3f},1.98)"
         " node[midway,above,yshift=-2pt]{\\scriptsize fit ends strictly before calibration"
         " begins};",
         "\\end{tikzpicture}",
