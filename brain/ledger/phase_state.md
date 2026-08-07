@@ -2457,3 +2457,47 @@ for all six chapters, emits the per-section table as **paste-ready markdown with
 warns when a heading in the `.tex` is absent from the approved tree or vice versa. Two
 transcription errors in two hand-offs (2.8 as 433, then 421) came from copying rows by hand;
 there is now nothing to copy.
+
+### Session-close checks, 2026-08-07 — agentmemory was NOT capturing
+
+Three stores checked at close. Two were fine; one was not, and the failure had been silent
+for at least two days.
+
+| Store | State |
+|---|---|
+| `phase_state.md` | **updated** — the 8C-1 adjudication entry and the counter correction above |
+| graphify | **updated** — `graphify update .` re-extracted 844 files and rebuilt to 13,598 nodes / 25,027 edges / 906 communities. `brain/scripts/wordcount.py` is now in the graph. Two standing warnings unrelated to this session: 56 `.sql` files need `pip install "graphifyy[sql]"`, and community labels drifted (879 saved against 906 now) so `graphify label` would refresh them |
+| agentmemory | **NOT capturing.** See below |
+
+**The agentmemory worker is down and has been since at least 2026-08-05.** `agentmemory
+status` reports "Not running — no response at http://localhost:3111", and per
+`.claude/rules/memory.md` the MCP tools then fall back silently to a flat
+`~/.agentmemory/standalone.json` where nothing is indexed for recall.
+
+**Root cause, which `agentmemory doctor` does not detect.** The `iii` engine (PID 67158,
+started Wed 19:00) still **holds** port 3111 — `lsof` shows it LISTENing — but answers
+nothing; `curl http://localhost:3111/health` returns **http 000**. So the port is occupied by
+a hung process: `status` sees no response and reports "not running", while a fresh
+`npx @agentmemory/agentmemory` dies with *"address 127.0.0.1:3111 is already in use"*. Doctor
+reports only the generic "Server reachable ✗". Two duplicate `agentmemory` node workers
+(PIDs 67147, 67949) are also live from the same evening.
+
+**Fix, not applied — it kills processes on Phuong's machine and was not authorised:**
+`kill 67158 67147 67949` then `npx @agentmemory/agentmemory`. Verify with
+`agentmemory status` **and** a `curl` to `/health`, because status alone cannot tell a hung
+listener from a dead one.
+
+**Nothing from this session is lost.** All four `memory_save` calls returned real ids and
+landed in `~/.agentmemory/standalone.json` (5 entries, including a round-trip probe dated
+2026-08-05 that shows how long this has been broken). More importantly the durable facts were
+also written to the file-based store at
+`~/.claude/projects/-Users-hapuna-Downloads-ai-gm-ai-master/memory/` — five memories plus
+`MEMORY.md` — which is a separate system and is intact.
+
+**Two lessons, and the second is the same one this session already learned once.**
+`memory_save` returning `{"saved":"mem_…"}` is not evidence of capture; it returns an id for
+the fallback write too. That is the third instance today of a success-shaped return standing
+in for a verified outcome, after the Overleaf push (checked properly) and the word counter
+(not checked). And `.claude/rules/memory.md` already says to check the worker **at the start**
+of a session — this session checked at the end, which is why four saves went to the fallback
+before anyone noticed.
