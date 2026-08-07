@@ -2907,3 +2907,65 @@ passes, together with retiring `figure_proof.tex`.
   floats can be exercised in isolation.
 - Expected `??` after a successful compile is unchanged: `tab:mcs-config` and `fig:nulls`
   only.
+
+---
+
+## 2026-08-07 (7) — Phase: 8C-F, static audit of the whole project, second repair
+
+**The compile log is not retrievable and this is now established rather than assumed.** The
+Overleaf MCP is a **git clone of the project source** in a temp directory; Overleaf keeps
+`output.log` and `output.pdf` on its compile server and never commits them. Probed three
+ways: `list_files` with `.log` returns nothing, `read_file output.log` returns ENOENT, and
+`find` over the clone turns up only the two committed figure PDFs. **No tool in this bridge
+can read a compile log. Stop looking for one.**
+
+**What the clone does allow is a real static audit** over the actual input graph rather than
+inference. Written and run this session:
+
+| Check | Result |
+|---|---|
+| `\input` graph reachable from `main.tex` | 25 files, every target exists |
+| `\begin`/`\end` balance per file | all balanced |
+| `\includegraphics` targets | both exist (`figures/gap_map`, `figures/ladder`) |
+| Labels / duplicates | 109, **no duplicates** |
+| Dangling `\ref` | exactly 2 — `fig:nulls`, `tab:mcs-config`, both expected |
+| Unpaired `$` | none |
+| Unescaped specials outside math | none (all hits were `_` inside `\input`/`\citet`/`\label` args, `&` in tabular, `#` in macro bodies) |
+| Cite keys in the new captions vs `ref.bib` + `ref_additions.bib` | all 8 resolve |
+
+Structure is clean, which is itself the finding: **the fault is package-level, not
+structural**, and the audit surfaced the defect that explains the failure exactly.
+
+**`\SetKwInOut` was declared three times.** Each of `\Input`, `\Output` and `\Notation` was
+declared inside all three appendix algorithm floats. `\SetKwInOut` builds its macro with
+`\newcommand`, so the first `\input` defines them and the second dies with *"Command
+`\Input` already defined"*. **This can only fire once a document holds two or more
+`algorithm2e` floats**, which is precisely what Checkpoint B created for the first time and
+precisely why the isolated proof harness never caught it — `figure_proof.tex` was never
+compiled either, so nothing had ever exercised two of them together.
+
+Declared once in `main.tex` now; removed from all three floats.
+
+**Repairs pushed across both passes**
+
+| # | Defect | Fix |
+|---|---|---|
+| 1 | `algorithm` + `algpseudocode` + `algorithm2e` all loaded; the first two define `\For`, `\ForEach`, `\If`, `\ElseIf`, `\Return`, `\KwTo` | Both removed — verified zero uses of `\begin{algorithm}`, `algorithmic`, `\State`, `\Procedure`, `\listofalgorithms` anywhere. `[algo2e]` kept: it names the environment the floats open |
+| 2 | `\SetKwInOut` ×3 → `\newcommand` collision | Declared once in the preamble |
+| 3 | `\tcp*[f]` orphaned after two self-terminating `\lIf` lines | Now a `\tcc{}` line before the conditionals |
+| 4 | `\If` followed by `\ElseIf` — `\If` closes its block | `\uIf` + `\ElseIf` |
+| 5 | `\SetAlgoLined` per float overrode the global `\RestyleAlgo{ruled}` | Removed from all three |
+
+**Verified after the second push**, by re-running the audit against the clone: live
+`\SetKwInOut` declarations = 3, all in `main.tex`; no live `\SetAlgoLined`; 25 files, all
+environments balanced, 109 labels, no duplicates, the same two expected dangling refs.
+
+**Still inferred, not confirmed.** Every defect above is real and each would break a build,
+but without a log there is no proof that the *first* one to fire has been removed. The next
+compile is the test.
+
+**Method note worth keeping.** The clone path leaked out of an ENOENT error message. The
+audit it made possible found in one pass what two rounds of reading files in context did
+not — because it ran over the *real* input graph rather than over the files I remembered
+pushing. Prefer a mechanical sweep of the resolved graph to re-reading what you believe you
+wrote.
