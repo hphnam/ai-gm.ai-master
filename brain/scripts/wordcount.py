@@ -7,8 +7,19 @@ Budgets come from `brain/knowledge/05_paper_architecture.md` §2.1, which is app
 (A2/A10) and fixed. Chapter keys: intro, background, methods, results, discussion,
 conclusions. Omit the key to count without a budget column.
 
-Calibrated against the architecture's independently measured 8,604 for the pre-rewrite
-literature review; this counter returned 8,592, an error of 0.14 %.
+VERIFIED 2026-08-07 against a hand-counted fixture, cell by cell rather than total against
+total: escaped percents, a whole-line comment, a trailing comment, inline maths, a citation,
+a displayed equation and a short-form caption. Five independently derived cells, all exact.
+(The earlier "calibrated to 0.14 %" note is withdrawn — it compared one aggregate to one
+aggregate, which cannot detect a defect that moves both the same way, and that is exactly how
+the `%.*` defect survived.)
+
+TWO KNOWN OVER-READS, both against a marker rather than against arithmetic. A displayed
+`equation` environment contributes ~6 words of pure scaffolding (the literal word "equation"
+twice, plus the label), and every `\\label{...}` contributes 1. Equation- and
+subsection-dense chapters therefore read high: Methods carries 75 counted words inside its six
+equation environments and 23 label words. Subtract them before quoting a marker-equivalent
+figure; do NOT subtract them when comparing two revisions measured by this same tool.
 
 WHY THIS EXISTS: a per-section figure was transcribed wrongly into a hand-off twice, while
 the total was right both times. The table is emitted in final form so there is nothing left
@@ -81,6 +92,10 @@ FLOAT_RE = re.compile(
     re.S,
 )
 CAPTION_RE = re.compile(r"\\caption(?:\[[^\]]*\])?\{(.*?)\}\s*(?:\\label|\Z)", re.S)
+DISPLAY_MATH_RE = re.compile(
+    r"\\begin\{(equation|align|gather|multline)\*?\}.*?\\end\{\1\*?\}", re.S
+)
+LABEL_RE = re.compile(r"\\label\{[^}]*\}")
 
 
 def count(s):
@@ -91,6 +106,22 @@ def count(s):
     s = re.sub(r"\\[a-zA-Z]+\*?", " ", s)
     s = re.sub(r"[{}\\~]", " ", s)
     return len([w for w in s.split() if re.search(r"[A-Za-z0-9]", w)])
+
+
+def artefact(s):
+    """Words `count` charges to prose that a marker would not.
+
+    Two mechanisms, both systematic and both scaling with the chapter:
+      - a displayed math environment leaves the literal token of its own name twice
+        plus its label, and its mathematics is a display rather than prose;
+      - every \\label{...} leaves its own key as a word.
+    Subtract for a marker-equivalent figure. Do NOT subtract when comparing two
+    revisions measured by this same tool, where the artefact cancels.
+    """
+    display = sum(count(m.group(0)) for m in DISPLAY_MATH_RE.finditer(s))
+    # Labels inside a display are already charged above; strip before counting the rest.
+    rest = DISPLAY_MATH_RE.sub("", s)
+    return display + sum(count(m.group(0)) for m in LABEL_RE.finditer(rest))
 
 
 def main():
@@ -106,35 +137,51 @@ def main():
     body = FLOAT_RE.sub("", text)
 
     parts = re.split(r"\\section\*?\{", body)
-    preamble = count(parts[0])
+    preamble = (count(parts[0]), artefact(parts[0]))
     sections = []
     for p in parts[1:]:
         name = p.split("}")[0]
-        sections.append((name, count(p) - count(name)))
+        sections.append((name, count(p) - count(name), artefact(p)))
 
     budgeted = dict(BUDGETS[key][1]) if key else {}
     total_budget = BUDGETS[key][0] if key else None
 
-    print(f"| Section | {'Budget | ' if key else ''}Live |")
-    print(f"|---|{'---|' if key else ''}---|")
-    if preamble:
-        print(f"| *(opener, before first heading)* | {'— | ' if key else ''}{preamble} |")
-    body_total = preamble
-    for name, n in sections:
-        body_total += n
-        if key:
-            b = budgeted.get(name)
-            print(f"| {name} | {b if b is not None else '**not in tree**'} | {n} |")
-        else:
-            print(f"| {name} | {n} |")
+    print(f"| Section | {'Budget | ' if key else ''}Raw | Artefact | Marker |")
+    print(f"|---|{'---|' if key else ''}---|---|---|")
+    if preamble[0]:
+        pad = "— | " if key else ""
+        print(
+            f"| *(opener, before first heading)* | {pad}{preamble[0]} | "
+            f"{preamble[1]} | {preamble[0] - preamble[1]} |"
+        )
+    raw_total, art_total = preamble
+    for name, n, a in sections:
+        raw_total += n
+        art_total += a
+        b = f"{budgeted.get(name)} | " if key else ""
+        if key and budgeted.get(name) is None:
+            b = "**not in tree** | "
+        print(f"| {name} | {b}{n} | {a} | {n - a} |")
+    marker_total = raw_total - art_total
     if key:
-        delta = body_total - total_budget
+        delta = marker_total - total_budget
         sign = f"+{delta}" if delta > 0 else str(delta)
         pct = f" ({delta / total_budget:+.0%})" if total_budget else ""
-        print(f"| **Body total** | **{total_budget:,}** | **{body_total:,}** |")
-        print(f"\n**Δ {sign}{pct} against budget.**")
+        print(
+            f"| **Body total** | **{total_budget:,}** | **{raw_total:,}** | "
+            f"**{art_total}** | **{marker_total:,}** |"
+        )
+        print(f"\n**Δ {sign}{pct} against budget, on the marker-equivalent count.**")
+        print(
+            f"Artefact is {art_total} words of displayed math and label keys that this "
+            "counter charges to prose and a marker does not. Compare two revisions on "
+            "**Raw**, where it cancels; quote **Marker** against a budget."
+        )
     else:
-        print(f"| **Body total** | **{body_total:,}** |")
+        print(
+            f"| **Body total** | **{raw_total:,}** | **{art_total}** | "
+            f"**{marker_total:,}** |"
+        )
 
     caption_words = 0
     for f in floats:
@@ -149,8 +196,8 @@ def main():
 
     # A heading in the .tex that is not in the approved tree is a divergence, not a typo.
     if key:
-        stray = [n for n, _ in sections if n not in budgeted]
-        missing = [n for n in budgeted if n not in {s for s, _ in sections}]
+        stray = [n for n, _, _ in sections if n not in budgeted]
+        missing = [n for n in budgeted if n not in {s for s, _, _ in sections}]
         for n in stray:
             print(f"\n⚠ heading not in §2.1 tree: {n!r}")
         for n in missing:

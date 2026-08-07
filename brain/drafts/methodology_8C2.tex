@@ -1,0 +1,594 @@
+% =====================================================================
+% Methodology chapter, PRJ93.
+% main.tex issues \chapter{Methods} before \input-ing this file.
+%
+% PREAMBLE DEPENDENCIES (main.tex does not yet carry these):
+%   \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+%   \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+% fig:blocks (out/fig_blocks.tex) and fig:pipeline (out/fig_pipeline.tex) are
+% inserted at the marked points. Neither has been compiled.
+%
+% Labels: every label carried by the superseded revision is preserved, so no
+% inbound \ref from results.tex or conclusion.tex breaks. sec:repro, sec:mcs,
+% sec:ruler-functional and sec:ruler-ellel no longer head sections; each sits on
+% the passage that now carries its content.
+% =====================================================================
+\label{chap:methodology}
+
+The methods below were applied to a three-venue hospitality estate in order to learn each
+venue's daily trading rhythm from point-of-sale history, bound that rhythm with a calibrated
+interval, and monitor departures from it. Measurement instruments are specified before the
+models they grade, because on these series the choice of error denominator changes conclusions
+rather than only their scale. Procedural detail (parameter grids, computational environment
+and robustness variants) is in Appendices~C and~D.
+
+\section{Study design and data sources}
+\label{sec:design}
+
+The estate comprises three trading venues in Lancashire: the Beer Hall, Ellel and Two River
+Taps. Table~\ref{tab:venues} gives each frame's length and trading intensity. The three differ
+enough to function as three regimes rather than three replicates, which is why several methods
+below are specified per venue. Two River Taps ceased trading on 2026-05-08 and its history
+cannot grow, which makes it a control: a measurement moving at the Beer Hall or Ellel while
+fixed at Two River Taps is attributable to accumulated history rather than to a change in
+procedure.
+
+\begin{table}[t]
+\centering
+\small
+% Trace: frame lengths and trading intensity from build_features after trim_to_active,
+% store ceiling 2026-07-07; brain/log/45_G17d_Intermittency_and_Occurrence.md.
+\caption[The three venues, their frame lengths and trading intensity at the store ceiling]{The
+three venues, their frame lengths and trading intensity at the store ceiling. Frame length is
+calendar days after trimming to each venue's active span, at ceiling 2026-07-07. Trading
+intensity is trading days per calendar week. Two River Taps closed on 2026-05-08, so its frame
+is fixed.}
+\label{tab:venues}
+\begin{tabular}{lrrp{0.34\textwidth}}
+\toprule
+Venue & Frame & Trading days/wk & Role in the design \\
+\midrule
+Beer Hall      & 399 & 5.30 & Anchor; richest history; methods tested here first \\
+Ellel          & 386 & 1.21 & Sparse and booking-driven; constrains method choice \\
+Two River Taps & 331 & 5.92 & Closed 2026-05-08; frozen control series \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Trace: brain/store/manifest.json per_venue_counts; brain/config.py:110-127.
+The unit of analysis is a trading venue, meaning a fixed site with an opening calendar against
+which a daily rhythm can be learned and a departure from normal defined. A fourth location in
+the warehouse books off-site event transactions and falls outside that boundary: it has no site
+and no opening calendar, so it carries no rhythm to learn whatever volume it holds. This is a
+categorical boundary on the unit of analysis rather than a threshold applied to data, and the
+location's 203 records across two dates corroborate it without having set it.
+
+The measured input is a point-of-sale export of ex-VAT daily revenue at venue, category and item
+level, with all work reported at venue level unless stated. Records were trimmed to each venue's
+active span and the warehouse pinned at a store ceiling of 2026-07-07, without which a
+rolling-origin evaluation is not reproducible.
+\label{sec:repro}
+Library versions, the model revision hash and the compute device are pinned per environment and
+stamped on every artefact for the same reason; Appendix~C records them.
+
+% Trace: brain/log/51_G17j_Chatlog_Signal.md (corpus composition).
+No revenue observation is discarded as an outlier. Extreme days are the object of study rather
+than contamination, and removing them would remove the deviations
+Section~\ref{sec:detection} exists to find. Cleaning is therefore confined to adjudicating what
+counts as a trading day. Three days carry till activity and exactly zero net revenue: one is a
+comped day at a venue open and serving, which is a trading day with zero takings, while a
+reversed sale and a batch of voided lines are artefacts and are not trading days. A second
+input, a corpus of 735 staff and assistant chat messages, supports
+Section~\ref{sec:chatlog}. Stock movements and checklist completions, two further domains named
+in the project specification, were unavailable; the system therefore learns from two of the four
+specified domains, and the consequence is stated where it binds. Figure~\ref{fig:pipeline} traces
+the path from that export
+to an intervention, with the subsection number printed in each block locating the step that
+governs it.
+
+\section{Accuracy measures and the denominator basis}
+\label{sec:ruler}
+
+Accuracy must be comparable across venues trading on 5.3, 1.2 and 5.9 days a week respectively,
+which rules out an unscaled error as the primary instrument. The scaled-error family of
+\citet{hyndman_another_2006} divides a forecast's error by the in-sample error of a naive
+benchmark. Taking the absolute form first, because it defines the denominator both measures
+share, the seasonal variant used throughout scales by the in-sample mean absolute error of the
+seasonal-naive method at lag $m$ \citep{hyndman_forecasting_2021},
+\begin{equation}
+\mathrm{MASE} \;=\; \frac{\frac{1}{h}\sum_{t=1}^{h}\lvert y_t - \hat{y}_t\rvert}{s},
+\qquad
+s \;=\; \frac{1}{\lvert \mathcal{D}\rvert}\sum_{t \in \mathcal{D}} \bigl\lvert y_t -
+y_{t-m}\bigr\rvert,
+\label{eq:mase}
+\end{equation}
+with $m = 7$ and $\mathcal{D}$ the in-sample index pairs entering the denominator. A value below
+one beats the benchmark. The headline measure is the squared counterpart, the root mean squared
+scaled error of \citet{makridakis_m5_2022}, whose scale \citet{hewamalage_look_2021} give as
+\begin{equation}
+s_{\mathrm{M5}} \;=\; \frac{1}{n-1}\sum_{i=2}^{n}\bigl(y_i - y_{i-1}\bigr)^2 ,
+\label{eq:rmsse-m5}
+\end{equation}
+for $n$ the length of the observed period. It is computed on the same bases as
+Equation~\ref{eq:mase} rather than on the lag-one denominator, so the two share one ruler and
+differ only in loss function.
+
+On a series with closed days $\mathcal{D}$ is not uniquely defined, and the admissible readings
+disagree by enough to reverse a conclusion. Four bases were therefore named and all four
+computed, with a bootstrap interval on each scale rather than a point estimate, as
+Table~\ref{tab:bases} reports. At Ellel the scale runs from 180 to 806 across four admissible
+readings, so the same forecast reads as 0.411 or 0.092 by that choice alone; the narrowest
+reading there rests on 28 admissible pairs and carries a 95 per cent interval 65.6 per cent wide.
+% Trace: brain/log/45_G17d_Intermittency_and_Occurrence.md:105-118, function bootstrap_scale,
+% B = 10,000, percentile interval, as_of = 2026-07-07.
+
+\begin{table}[t]
+\centering
+\small
+\caption[The four denominator bases, their bootstrap scales, and the scaled error each
+induces]{The four denominator bases, their bootstrap scales, and the scaled error each induces.
+Percentile intervals from 10,000 resamples of the absolute lag-difference vector, as-of
+2026-07-07. Pairs is the sample the denominator rests on. Dashes mark bases inadmissible at that
+venue. No induced error is quoted at the dormant venue.}
+\label{tab:bases}
+\begin{tabular}{llrlrl}
+\toprule
+Venue & Basis & Scale & 95\% interval & Pairs & Induced MASE \\
+\midrule
+Beer Hall & \texttt{calendar\_lag7}         & 315.7 & [270.0, 365.0]  & 392 & 0.571 [0.494, 0.668] \\
+Beer Hall & \texttt{calendar\_lag7\_active} & 386.9 & [332.1, 446.4]  & 276 & 0.466 [0.404, 0.543] \\
+\midrule
+Ellel     & \texttt{calendar\_lag7}          & 180.1 & [135.3, 229.9]   & 385 & 0.411 [0.322, 0.547] \\
+Ellel     & \texttt{trading\_lag7}           & 770.8 & [604.3, 952.7]   & 61  & 0.096 [0.078, 0.122] \\
+Ellel     & \texttt{trading\_same\_weekday}  & 806.2 & [639.1, 979.2]   & 67  & 0.092 [0.076, 0.116] \\
+Ellel     & \texttt{calendar\_lag7\_active}  & 754.0 & [522.0, 1016.4]  & \textbf{28} & 0.098 [0.073, 0.142] \\
+\midrule
+Two River Taps & \texttt{calendar\_lag7\_active} & 173.2 & [148.6, 202.1] & 268 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\label{sec:ruler-ellel}
+The ruling follows. The Beer Hall and Two River Taps are scored on
+\texttt{calendar\_lag7\_active}; Ellel has no defensible scaled basis and is scored on unscaled
+error, root mean squared as headline and mean absolute as secondary. That departs from the
+comparability requirement this section opens with and needs an argument rather than a note. The
+remedy the literature offers for demand this intermittent is
+\citet{chatfield_all-zero_2007}'s, which is to stop tuning against an error measure and score
+against system cost instead. That cost is the cost of an inventory system in which the forecast
+\emph{is} the replenishment quantity, summing ordering, holding and shortage costs each priced
+per unit. Ellel's estimand is daily revenue in pounds. Revenue is not ordered, held or
+backordered, so those three rates are not unelicited here: no unit exists whose carrying or
+shortage they would price, and they are undefined. The remedy is defined for a different
+estimand, which is a property of the problem rather than a gap in the preparation. What does
+transfer is elsewhere in the same study, whose own percentage and geometric measures had to be
+modified or dropped because neither survives a demand or an error of zero, which is direct
+support for dropping the denominator where the zeros are thickest. One replenishment decision does
+exist
+here: a stock signal flags a reorder on projected days of cover, at the Beer Hall alone, from a
+product-level forecast in units per day rather than the revenue series, and carries no ordering,
+holding or shortage cost.
+
+\label{sec:ruler-functional}
+Which functional a measure elicits is distinct from which scale it carries, and here it is the
+sharper question. Following \citet{kolassa_we_2023}, an absolute-error measure is minimised by the
+conditional median and a squared-error measure by the conditional mean, so the two reward
+different forecasters rather than grading one on different scales. The estate's decision layer
+acts on expected takings, so the squared measure carries the headline and the absolute measure is
+retained as a labelled secondary, both because it is more widely reported and because a conclusion
+holding under only one of them is a conclusion about the measure. That choice sharpens one
+limitation rather than settling it: the served foundation model returns a median under a mean's
+name, so the headline measure elicits a functional the served forecaster cannot produce.
+Integrating over the emitted quantiles is the available remedy and was declined because it would
+change the served model after the evaluation was frozen;
+Section~\ref{sec:conclusion-limitations} carries the consequence. Every scaled figure in this
+document states its basis and its as-of date, since the denominator of Equation~\ref{eq:mase} is
+computed in-sample and grows with the warehouse. For interval quality the Winkler score is used
+instead, a proper scoring rule in the units of the data and so usable where no scaled basis is
+defensible.
+
+\section{Demand-pattern classification}
+\label{sec:intermittency}
+
+Whether a series is treated as intermittent is decided on the average inter-demand interval $p$,
+the mean gap between consecutive non-zero days, and the squared coefficient of variation of
+demand sizes $v$, following \citet{syntetos_categorization_2005}. Two constants in that scheme
+are arithmetically incorrect, and the corrections of \citet{kostenko_note_2006} are used: the
+limiting interval is $p = 4/3$ rather than $1.32$, and the maximum squared coefficient of
+variation $v = 0.5$ rather than $0.49$. The original pair is retained under an explicit name so
+a classification can be reported under each. The same authors give a selection rule between
+Croston's method and the Syntetos–Boylan approximation by dividing the classification plane
+diagonally, preferring the approximation when
+\begin{equation}
+v \;>\; 2 - \tfrac{3}{2}p .
+\label{eq:sba}
+\end{equation}
+Its direction is fixed by geometry: the diagonal passes through $(p,v) = (1, 0.5)$ and
+$(p,v) = (4/3, 0)$, the maxima at which Croston's method can still be preferred, so Croston
+occupies the region nearer the origin and the approximation is preferred above the line.
+
+Equation~\ref{eq:sba} carries no information over the series it governs, and saying so matters
+because a count of selections would otherwise read as an empirical finding. The intermittency
+cutoff is $p \geq 4/3$ and $2 - \tfrac{3}{2}\cdot\tfrac{4}{3} = 0$ exactly, so the selection
+threshold is non-positive for any series at or above that cutoff while $v \geq 0$ always.
+Classification as intermittent therefore \emph{entails} selection of the approximation. The rule
+discriminates only in the non-intermittent region, where it is not consulted, and that is a
+property of the scheme rather than of this estate.
+
+Which estimator each node adopts is a second and more consequential decision. Selecting on the
+classification alone, the more literal ex-ante reading, was rejected on evidence: the intermittent
+estimator loses to the day-of-week median at every intermittent node where both scores are
+defined, so that rule would install a uniformly worse forecaster throughout. Adoption is therefore
+decided on a validation block disjoint from the block the result is reported on, in the partition
+of Figure~\ref{fig:blocks}. Disjointness is necessary and not sufficient, because a validation
+score is itself an estimate with a standard error and a rule adopting on any margin adopts partly
+on noise. Adoption therefore carries a one-standard-error margin, the device introduced for tree
+pruning by \citet{breiman_classification_1984}: the intermittent estimator displaces the
+day-of-week median only where its mean advantage exceeds one standard error of that advantage,
+the paired differential taken over disjoint seven-day sub-blocks of the validation window.
+Sub-blocks rather than days, because daily errors here are serially correlated and a daily
+standard error would be biased downward; disjoint rather than overlapping, so no bootstrap is
+needed to undo that correlation; and seven days because that is the dispersion unit already used
+elsewhere. The rule is pre-registered and fails closed in favour of the incumbent on fewer than
+two sub-blocks, on a non-finite differential and on zero dispersion. What it refuses is an
+advantage small relative to its own variability, not one merely small. Appendix~D reports the
+classification's sensitivity to the constant pair.
+
+\section{Exogenous covariates and availability lead}
+\label{sec:exo}
+
+Two rungs of the ladder and one arm of the interval study take covariates beyond the target
+series' own history. The set has seven members in three groups: weather supplies temperature,
+rainfall, sunshine hours and a dry-day indicator thresholded at one millimetre; institutional
+calendar supplies school-term and university-term indicators, which matter in a university city
+where much of both trade and staffing follows the academic year; and events supply a
+nearby-fixture indicator scoped per venue, so an anchor in one town cannot reach a venue in
+another.
+
+Membership is governed by what is knowable at the origin rather than by what the store holds, and
+that is the substance of this section. A covariate is usable at serving only if a value for the
+target date is obtainable when the forecast is issued. Calendar and event members satisfy this by
+construction, since term dates and fixture lists are published in advance. Weather does not: a
+weather value for a date seven days ahead is a forecast and carries the error of one, whereas the
+value most readily available in a research store is the one recorded after the fact. Scoring an
+exogenous model on recorded weather and serving it on forecast weather measures a system that
+cannot be deployed. One feature is excluded on the same principle: a discount-share indicator
+marking days on which nearly all takings were discounted is computed and used retrospectively to
+flag anomalous days, and is never offered as a forward regressor, since its value on a future day
+is not knowable at the origin. Admitting it would make the exogenous path a leak.
+
+The basis is therefore fixed rather than assumed, and five arms of one exogenous entrant differ in
+nothing but the weather handed to them for the seven-day window. Arm~N receives none and
+reproduces the univariate rung, making it the reference the others are read against; arm~O
+receives reanalysis at the valid time, which is perfect foreknowledge and so an upper bound rather
+than a candidate; arm~H receives the archived value near the valid time; arm~F the forecast issued
+at a fixed three-day operational lead; and arm~M the forecast issued $h$ days ahead for horizon
+step $h$, which is serving reality and the only arm a deployed system could reproduce. Arms~F
+and~M draw from one pinned global weather model across all leads, so their difference isolates the
+lead policy rather than confounding it with a change of vendor model, and the maximum lead is
+capped at the seven-day horizon so no arm receives a covariate for a date beyond the range the
+forecast is issued for. Results are reported per horizon step as well as pooled, because forecast
+skill decays with lead and a pooled average hides the gap where it is largest.
+
+\section{Candidate models and the adoption gate}
+\label{sec:ladder}
+
+Model choice proceeds up a ladder of five rungs, each admitting structure the rung below cannot
+represent, so capacity is bought one property at a time. The five supply nine scored entrants.
+Rung 0 is a seasonal-naive benchmark.
+Rung 1 is a robust day-of-week baseline taking a per-weekday median scaled by a monthly index
+clipped to $[0.5, 2.0]$ and a bank-holiday factor, and fits nothing. Rung 2 covers exponential
+smoothing with additive trend and additive seasonality at period 7, and a robust seasonal-trend
+decomposition at the same period. Rung 3 is histogram gradient boosting forecasting recursively
+on its own lag features, in a per-venue and a global arm. Rung 4 is a pretrained time-series
+foundation model \citep{ansari_chronos_2024}, zero-shot and without per-venue training, in a
+univariate arm and in an arm conditioned on the exogenous set of Section~\ref{sec:exo}; its
+served point forecast is the median quantile clipped at zero.
+
+A rung is adopted only if it beats both the seasonal-naive benchmark and the robust day-of-week
+baseline on rolling-origin root mean squared scaled error at the basis ruled in
+Section~\ref{sec:ruler}, and at Ellel on the unscaled equivalent. The ladder exists to make the
+null expensive to reject: a foundation model is served only where it defeats a benchmark that
+costs nothing to compute. Appendix~C states the adoption rule and its fail-closed conditions as
+pseudocode.
+
+% Trace: brain/log/45_G17d_Intermittency_and_Occurrence.md (frame lengths at ceiling 2026-07-07).
+The exponential-smoothing rung is one fixed specification, not a member selected from the family
+by an automatic procedure. The information-criterion search over trend, seasonal and damping
+options that standard implementations run by default is deliberately not performed: at frame
+lengths of 399 days at the longest it would select among specifications on a sample that cannot
+separate them, and would add a second selection step whose uncertainty the rolling-origin
+comparison does not carry. A poor showing by that rung is therefore evidence against the
+specification and not against exponential smoothing as a class.
+
+% Trace: brain/log/68_R5_tabpfn_entrant_result.md (pre-registered abort conditions).
+Two further entrants are specified and scored at no venue, for reasons outside the data. One has
+no backend in the evaluation environment.
+The other, a tabular-backbone forecaster, routes inference through a vendor service in its
+released configuration, and this estate's revenue may not leave the machine; a local route raises
+a separate licensing question that Section~\ref{sec:further-work} carries. The estate is refitted
+weekly, with an additional refit on a confirmed change point, and that policy is what makes the
+protocol of Section~\ref{sec:injection} necessary.
+
+\section{Model comparison procedure}
+\label{sec:selection}
+
+Comparing rung means over six rolling origins covering 42 consecutive days and adopting the
+argument-minimum is not a procedure this evidence supports, for a reason that is arithmetic
+rather than a matter of degree. The \citet{diebold_comparing_1995} test of equal predictive
+accuracy is oversized in small samples, and the correction of \citet{harvey_testing_1997}
+multiplies the statistic by
+\begin{equation}
+\left[\frac{n + 1 - 2h + n^{-1}h(h-1)}{n}\right]^{1/2},
+\label{eq:hln}
+\end{equation}
+for $n$ forecast comparisons at horizon $h$. At $n = 6$ and $h = 7$ the numerator is
+$6 + 1 - 14 + 7 = 0$, so the factor is exactly zero and no corrected statistic is computable on
+any data whatever. Such a design does not have a weak test; it has none.
+% Trace: brain/log/63_R4_metric_ordering_result.md.
+
+Advancing the origin by one day rather than by the horizon lifts the Beer Hall from 39 origins to
+273 and raises Equation~\ref{eq:hln} to 0.976, giving 273, 260 and 205 origins at the Beer Hall,
+Ellel and Two River Taps. Overlapping test windows are the point of the change and carry a cost
+handled rather than ignored: consecutive seven-day windows at a one-day step share six of seven
+observations, so loss differentials are serially correlated by construction and are not
+independent draws. Figure~\ref{fig:origins} in Appendix~C draws the scheme with a magnified inset
+in which that overlap is visible.
+
+\label{sec:mcs}
+With a computable test available the selection question is restated. Rather than which rung has
+the lowest mean, this work asks which rungs the data cannot separate, using the model confidence
+set of \citet{hansen_model_2011}, in which the hypothesis of equal predictive ability is tested
+repeatedly across the candidate set, one model eliminated at a time, until it is no longer
+rejected. All nine entrants enter at every venue with no venue-specific shortlist; the statistic
+is the range statistic with its paired elimination rule; resampling is a moving block bootstrap at
+block length seven, chosen to respect the serial correlation the one-day step induces, with
+$B = 1000$ replications, seed 93 and $\alpha = 0.10$ primary. It runs on the folds common to all
+nine entrants, which need not be the full origin counts above and are recorded per venue in
+Table~\ref{tab:mcs-config} in Appendix~C, with the full configuration, written to the project's
+decision log before the procedure ran.
+
+Two properties govern how the output is read. The procedure is conservative by construction,
+controlling error across the whole candidate set, so a difference a pairwise test detects can
+still sit inside the set, and where that occurs both facts are reported. And a large retained set
+is a valid outcome rather than a failure: \citet{hansen_model_2011} are explicit that where the
+data lack the information to separate models the procedure terminates early and returns many,
+which is a statement about the evidence rather than a defect of the test. Because the compared
+models are strongly correlated across folds, the variance of a paired loss differential can be far
+smaller than the marginal standard errors suggest; that quantity is measured rather than assumed,
+and Appendix~D reports it with a block-length sweep.
+
+\section{Conformal interval construction}
+\label{sec:conformal}
+
+A deviation detector needs a normal range, which a point forecast does not supply. Intervals are
+constructed by split conformal prediction: distribution-free, and giving finite-sample coverage
+without a Gaussian assumption, which daily revenue does not admit since it is skewed and bounded
+below. Given absolute residuals on a calibration set of size $n$, the half-width at level
+$1-\alpha$ is the $k$-th smallest absolute residual with $k = \lceil (n+1)(1-\alpha) \rceil$, and
+the interval is the point forecast plus and minus that quantity. Calibration is refreshed on
+rolling seven-day blocks from residuals strictly earlier than the block, in the temporally robust
+spirit of \citet{xu_conformal_2021}; Appendix~C states the construction and its group-conditional
+variant as pseudocode.
+
+% Figure fig:blocks (out/fig_blocks.tex) is inserted here.
+Figure~\ref{fig:blocks} shows how the calendar is partitioned to support it, and the partition
+buys the guarantee itself rather than tidiness. A forecaster scored against the points it was
+fitted to produces an optimistic residual, and a quantile of that residual carries no coverage
+claim. Every conformal band reported here is built on the lower arrangement in that figure, the
+same fitted forecaster producing both the calibration scores and the forecasts the band is
+attached to.
+
+That index $k$ can exceed $n$. Where $n < (1-\alpha)/\alpha$, which is fewer than nine calibration
+points at 90 per cent, the correct conformal set is unbounded, so the guarantee is unavailable at
+that
+sample size rather than merely weak. Reference implementations return an infinite interval; this
+work returns the largest observed residual, because an unbounded interval is useless to an
+operator deciding whether a day is normal. The substitution is handled by counting rather than by
+silence: every band issued below the attainable size is tallied beside the coverage it qualifies,
+since a guarantee lapsing quietly would lapse first on the thinnest groups.
+
+Coverage is bounded above as well as below. \citet{angelopoulos_conformal_2023} give expected
+coverage as at most $1-\alpha + 1/(n+1)$, so a coverage materially above nominal signals
+misspecification as much as one below, and both directions are tested per venue. That bound also
+assumes almost surely distinct conformity scores, which a closure calendar violates: doors shut
+gives an actual and a forecast of zero and a residual of exactly zero, an atom at the foot of the
+score distribution. The condition is tested rather than assumed.
+
+Three refinements are specified. A Mondrian variant computes group-conditional quantiles
+separating active from structural-zero days, so a closed venue's near-zero residuals cannot shrink
+a trading day's interval. Per-step calibration fits a separate quantile per horizon step, since a
+one-step and a seven-step residual are not exchangeable. And two adaptive methods are implemented:
+adaptive conformal inference \citep{gibbs_adaptive_2021}, which updates the effective miscoverage
+level online after each outcome, and its aggregated form \citep{zaffran_adaptive_2022}, which runs
+one learner per rate on a grid and aggregates online, which removes the learning-rate choice the
+former exposes. Aggregation is applied separately to each bound under its own pinball loss, so a
+miss on one cannot reweight the other.
+
+The Mondrian partition is an observed calendar variable rather than an inferred regime, and its
+three claims come from three places of which only one is a guarantee. What the construction
+\emph{is} is described by \citet{barber_conformal_2023}: groups are formed and observations
+assumed exchangeable within each. What it \emph{guarantees} is the split-conformal property
+applied within each group, which \citet{stocker_gentle_2025} state as finite-sample marginal
+coverage at the nominal level. Why the partition is observed rather than inferred is where care is
+owed. \citet{sun_conformal_2025} bound a state-conditional method's coverage error by a term
+scaling with the rate at which its state predictions are wrong, so a method obliged to infer its
+regime pays a penalty a known calendar does not. That motivates the choice and does not certify
+it: the result is proved for an algorithm carrying an adaptive miscoverage update this work does
+not implement, and citing it as the guarantee would claim a theorem about a procedure the served
+system never runs.
+
+The adaptive alternative was not left as an argument. Both methods were implemented and measured
+against the static variants at this estate's one genuine regime change, and the band that is
+served is the one that outscored the others there; Section~\ref{sec:res-winkler} reports the
+comparison. Direct evidence from the series in question is a stronger warrant for a design than a
+citation, which is why the choice was settled by measurement. Interval methods are compared on the
+Winkler score as primary, with
+coverage and mean width beside it, because comparing on coverage alone rewards unlimited widening
+while the score penalises width and miscoverage together.
+
+\section{Deviation detection}
+\label{sec:detection}
+
+Detection is separated from explanation by design. The statistical layer reports what it observed
+and returns null where it has no feed for a cause; it never attributes. A separate enrichment
+layer, on meeting a flagged null, retrieves candidate coincident factors and reports them as
+coincidences with evidence attached, and never rewrites detection. That separation is what allows
+a flagged day with no available explanation to be reported honestly as unexplained.
+
+A point deviation is a band breach. The standardised residual is
+\begin{equation}
+z_t \;=\; \frac{y_t - \tilde{y}_t}{\max\bigl(w_t^{(90)},\, \varepsilon\bigr)},
+\label{eq:z}
+\end{equation}
+with $\tilde{y}_t$ the day-of-week median and $w_t^{(90)}$ the conformal half-width at 90 per
+cent, so $\lvert z_t \rvert = 1$ sits exactly on the interval edge and a deviation is by
+construction a breach. Tying the threshold to the interval means detection inherits the coverage
+properties of Section~\ref{sec:conformal}. A sustained shift needs a different instrument, since
+one large day should not raise a regime alarm. A cumulative sum \citep{page_continuous_1954} of
+the form $S^{+}_t = \max(0,\, S^{+}_{t-1} + z_t - k)$ with $k = 0.5$ alarms at $S^{+} > 5$,
+two-sided: a day at $z = 3$ contributes only $2.5$, whereas ten consecutive days near $z = 1$
+reach the threshold. A persistence rule alarms on four same-direction breaches within seven
+trailing trading days, catching an abrupt level shift the cumulative sum reaches more slowly.
+Bayesian online change-point detection \citep{adams_bayesian_2007} is implemented as a benchmark
+and does not drive production alarms. Preferring an online cumulative sum to offline segmentation
+follows the distinction drawn by \citet{truong_selective_2020}: only the online family is
+admissible where a decision must be taken on the day. Appendix~C states both detectors as
+pseudocode.
+
+What that pairing does and does not inherit from its literature is stated plainly, because the
+constants are borrowed and the unit is not. The operating point $k = 0.5$, $h = 5$ and the
+average-run-length tables recommending it are derived for a statistic accumulating deviations
+standardised by a \emph{standard deviation}. Equation~\ref{eq:z} does not divide by a standard
+deviation. It divides by a conformal half-width, a quantile of the absolute residual, and the
+ratio between the two depends on the shape of the residual distribution rather than being a fixed
+constant. The constants are therefore transplanted into a unit in which their published
+false-alarm properties are undefined, and no average-run-length claim is made for this detector on
+their authority. What licenses the operating point instead is empirical validation against a real
+closure and against synthetic injections at known onsets, on this estate's own residuals: a
+weaker warrant than a closed-form run length, and the honest one. The alternative is to
+restandardise $z_t$ by a robust scale estimate and recover the tables, at the cost of decoupling
+the detector from the interval whose coverage Section~\ref{sec:conformal} establishes. The
+coupling was judged worth more, since a deviation that is not a band breach would be a second and
+separately calibrated notion of normal.
+
+\section{Occurrence modelling}
+\label{sec:occurrence}
+
+A venue that is closed has no demand rather than zero demand, and a model treating the two alike
+forecasts a fraction of a trading day's revenue onto a day the doors are shut. The standard
+remedy is a two-part specification \citep{cragg_statistical_1971, mullahy_specification_1986}, in
+which a binary model governs whether the outcome is positive and a second governs the amount:
+\begin{equation}
+\hat{y}_t \;=\; P(\text{trade at } t) \cdot \mathrm{E}\bigl[\,y_t \mid \text{trade at } t\,\bigr].
+\label{eq:hurdle}
+\end{equation}
+
+% Trace: brain/log/67_DD3_hurdle_saturation_result.md (seed 93, n = 400).
+The first factor is estimated rather than observed: it is the conditional mean of the occurrence
+label given the day of the week over the training slice, a saturated nonparametric estimator with
+one categorical covariate. It returns zero or one at the Beer Hall because that venue's closure
+calendar is deterministic, not because the code imposes those values, and a venue trading on some
+Mondays and not others would return a fraction. For a design matrix of day-of-week indicators the
+maximum-likelihood estimate of a probit or logit first stage \emph{is} the within-cell empirical
+frequency, and the two agree here to $7.6 \times 10^{-5}$, optimiser tolerance rather than a
+modelling difference. What the closed form buys is numerical: in the deterministic cells the
+fitted probability converges while the coefficient does not, a controlled check driving
+$\lvert\hat{\beta}\rvert$ past 11 and still diverging at two thousand iterations, the signature of
+complete separation.
+
+What the design forgoes is covariates, not estimation. Both structural gains the specification is
+motivated by survive: the amount model is fitted on trading days alone and so is not diluted by
+structural-closure zeros, and the two processes are not constrained to share parameters. The
+honest limitation is that this first stage conditions on the day of the week and nothing else,
+adequate where closure is contractual and inadequate where it is event-led. That is Ellel, whose
+booking diary was unavailable, so the occurrence covariate is left inert and the gate reported as
+untestable there rather than approximated. The tempting approximation, deriving Ellel's occurrence
+from its own trading days, is circular, and the implementation makes it impossible rather than
+discouraged: the diary function takes no revenue parameter, and a test asserts no such argument or
+branch exists.
+
+\section{Detection evaluation protocol}
+\label{sec:injection}
+
+Detection performance is measured against a corpus of 644 synthetic events injected into the
+history: sustained regime shifts, single-day spikes, stock drawdowns, and events coincident with
+an exogenous factor. Recall and latency are scored against known onsets.
+% Trace: brain/log/50_G17i_Injection_Realism.md.
+That corpus perturbs the standardised residual stream: it displaces $z$, back-solves the actual
+value while holding the forecast expectation fixed, and splices perturbed test rows onto
+unperturbed training rows, so the forecaster never sees the perturbation in either its expectation
+or its training data. Production refits weekly, refits again on a confirmed change point, and
+recalibrates on rolling seven-day blocks, and all three absorb a sustained shift. Recall and
+latency measured on that corpus are therefore upper bounds, and the size of the gap is an
+empirical question rather than a matter for assertion.
+
+That corpus is retained unmodified as the control arm, and a second pipeline supplies the
+realistic one. The realistic arm fixes the perturbation in revenue units at the injection date,
+applies it to the
+raw revenue of every row from that date onward including rows that later become training data,
+re-derives the forecast and the interval under the production refit policy, and only then runs the
+unchanged detection code. Fixing the magnitude in revenue rather than in $z$ is what makes the
+arms comparable: the same money moves in both, and the pipeline is the only difference. Injections
+land only on trading days, using the occurrence definition of Section~\ref{sec:occurrence}. The
+paired comparison runs on a stratified subsample of $n = 120$ under a recorded seed rather than on
+all 644 events, because the realistic arm re-runs the forecaster for every event; Ellel is
+excluded, since without the booking diary its occurrence label is inert and an injection there
+could not be verified to land on a trading day. Appendix~D records the stratification and the
+seed. The design also makes a feedback loop observable: a confirmed change point triggers a refit,
+a refit deflates subsequent standardised residuals, and one detection can therefore suppress later
+detection of the same continuing event.
+
+\section{Knowledge-gap signal}
+\label{sec:chatlog}
+
+The chat corpus of Section~\ref{sec:design} is used to surface repeated operational questions as
+candidate gaps in the estate's documented procedures. Messages are embedded and clustered, and a
+cluster is surfaced only where its density of unanswered questions exceeds an empirically measured
+baseline for ordinary traffic. The threshold protects the ranked output, since a gap detector
+firing on routine chatter would train a reader to ignore the whole briefing; the signal is
+therefore tuned for precision rather than recall. The embedding backend is pinned to a keyless
+term-frequency projection rather than an alternative requiring a network service or a downloaded
+model, because three backends produce three clusterings and a result depending on which was
+configured would not be reproducible; the backend name is stamped on every artefact it writes.
+
+This corpus differs from every other input in that its write path does not belong to the author.
+Staff compose the messages the signal reads, so material reaching the briefing is supplied by the
+people the briefing describes. \citet{zou_poisonedrag_2025} show what that admits: injecting a few
+malicious texts into a retrieval-augmented system's knowledge database can induce a language model
+to return an attacker-chosen answer. Three properties bound the exposure and none is a mitigation.
+The corpus is single-tenant, so an attacker must already be staff; the forecast path does not read
+it, so no injected passage can move a number; and the agent's verdicts are not served. What such a
+passage can reach is the narrative layer of the briefing, which is the layer a reader has least
+independent means to check. Section~\ref{sec:res-chatlog} reports what the signal returned on
+this corpus.
+
+\section{Intervention layer and scoring apparatus}
+\label{sec:agent}
+
+Whether a language-model agent can decide which detected deviations are worth raising is a
+question the served artefact does not address, since it ranks candidates by a product of six
+constants with no model participating in any served decision. This section specifies the
+apparatus that addresses it. For each candidate item the agent returns a probability that the item
+is worth raising, with a rationale and the hash of the prompt that produced it. Temperature is
+zero and the model identifier pinned. Every response is cached on disk keyed on prompt, model and
+item payload, and the evaluation replays from that cache without service calls, so a reader
+without a credential can reproduce every number.
+
+Two features of the protocol foreclose specific criticisms. The prompt is committed in a revision
+provably preceding the one introducing any evaluation code, so that ordering establishes it was
+fixed before any score existed. And the decision threshold is not elicited as a single number:
+following \citet{fu_prism_2026}, the ratio of the cost of a missed problem to that of a false
+alarm is swept over a pre-registered grid, so an operator's elicited ratio selects a point on a
+curve already computed. Whether the agent contributes is decided against the incumbent
+constant-weighted score and against a random baseline at the matched base rate, on the same corpus
+and grid, with a paired bootstrap on decision quality; close agreement between agent and constants
+is declared in advance to be a negative result rather than reframed.
+
+Two limits bound what the apparatus can establish. The injection corpus supplies ground truth for
+whether a deviation occurred, not for whether a manager should have been told, so what is measured
+is \emph{detection} calibration and the code records that label. And no agreement statistic
+against a model-based judge is reported: \citet{bavaresco_llms_2025} find such agreement varies
+substantially across models and datasets and depends on whether the judged text is human- or
+model-generated, concluding that a judge must be validated against human judgements before it is
+relied upon. Absent that annotation a judge here would be an unvalidated proxy.

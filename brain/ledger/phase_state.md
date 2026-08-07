@@ -2501,3 +2501,105 @@ in for a verified outcome, after the Overleaf push (checked properly) and the wo
 (not checked). And `.claude/rules/memory.md` already says to check the worker **at the start**
 of a session — this session checked at the end, which is why four saves went to the fallback
 before anyone noticed.
+
+---
+
+## 2026-08-07 — Phase 8C-2: Chapter 3, Methods. Composed, pushed, floor measured.
+
+**Completed.** `chapters/methodology.tex` recomposed from the evidence base and pushed to
+Overleaf. Verified on the remote: `get_sections` returns **12 sections**, the exact approved
+headings from `05_paper_architecture.md` §2.1, in order.
+
+**Artefacts written**
+- `ledger/methods_argument_skeleton.md` — 14 load-bearing derivations (`M1`–`M14`) extracted
+  from the superseded prose BEFORE composing. Nine exist nowhere else. This is the D7
+  protection step, and it carries the post-composition confirmation that all 14 survived.
+- `ledger/methodology_rewrite_critique.md` — five rounds (ARC roles A/B/C plus
+  descriptive-vs-critical and process-vs-result). 12 blocking, all fixed; 7 advisory with
+  dispositions.
+- `chapters/methodology.tex` on Overleaf, whole-file `write_file`, per the 2026-07-31 incident.
+- `drafts/methodology_8C2.tex` — local working copy.
+
+**Verified end state**
+- 9,385 → **5,618 raw / 5,526 marker-equivalent** against a 4,200 budget. **Over by 1,326.**
+  Recorded as **S-3** in `BLOCKED_third_party.md` §F, PROVISIONAL on the same terms as
+  Chapter 2's 948. **This is a measured floor**, not a first draft: two compression passes and
+  five critique rounds, and every further hundred words costs a criterion named in §5.
+- **All 25 labels** from the superseded revision preserved; no inbound `\ref` from
+  `results.tex` or `conclusion.tex` breaks. `sec:repro`, `sec:mcs`, `sec:ruler-functional` and
+  `sec:ruler-ellel` no longer head sections and sit on the passages carrying their content.
+  `tab:mcs-config` is the sole label released, moving to Appendix C under A9.
+- **28 citation keys, no new key and none dropped.** Every one already used by the superseded
+  revision, so all resolve in `ref.bib`. Four load-bearing keys re-confirmed live in Zotero by
+  TITLE lookup, per the false-negative rule; none carries `deleted`.
+- AI-writing pre-flight clean: **0 em dashes** (from 9), 0 negative parallelisms, 0 flagged
+  vocabulary. Three `-ing` and five rule-of-three hits inspected individually and kept as real
+  enumerations.
+- Outbound refs owed by other files: `fig:blocks`, `fig:pipeline`, `fig:origins`,
+  `tab:mcs-config`, `sec:conclusion-limitations`, `sec:further-work`, `sec:res-chatlog`,
+  `sec:res-winkler`. The last four exist today; 8D inherits the obligation to preserve them
+  when Results and Conclusions are recomposed.
+
+**The boundary check — RUN, and the two derivations answered DIFFERENTLY.**
+Answer **(c)**: Methods can carry them and is itself over budget, so relocation moved the
+overrun rather than resolving it. **B3** (median-versus-mean functional argument) stays in
+Chapter 2 — a claim about where two literatures stop, which is Chapter 2's job by definition;
+Chapter 2 saves nothing. **B6** (recorded-regime extension) moves to Methods 3.7, where it
+already lived and where it carries a limit and a three-way attribution Chapter 2 cannot hold;
+Chapter 2 keeps a ~25-word limb sentence, net −85. Detail in `background_argument_skeleton.md`
+and §F S-1.
+
+**Reallocation is NOT decided, deliberately.** Two floors are not enough. Results — 14,580
+against 5,200 — is the chapter that determines whether there is anything to reallocate, and
+it is the one where compression is genuinely plausible, since thirty sections of run narrative
+collapse into five. Ruling now risks handing Methods words Results needs more. Measuring
+Results puts **32,510 of the current 37,471** measured.
+
+### Findings that change the record
+
+- **U5 added to `05_paper_architecture.md` §7.** The Methods chapter opener had **40 words**
+  — the arithmetic remainder of twelve section budgets, never designed as an allocation — and
+  **R86 cannot be discharged in 40**, requiring purpose, materials background and aim. Raised
+  as an A10 escalation and ruled to **75**, so it is a corrected approval rather than an
+  unexplained overrun a later session re-litigates. The 35 words are inside S-3, not additional.
+- **The `A` namespace collided FOUR ways, not three.** The fourth surfaced only while applying
+  the fix: this file's July entries use `A3`, `A5`, `A6` as **citation-audit exception ids**
+  (`A3` = no resampling citation behind the moving-block bootstrap; `A6` = the six hard-coded
+  surfacing constants). **Fixed structurally in the files that could still move:**
+  `background_argument_skeleton.md`'s arguments renamed **A1–A16 → B1–B16** (33 replacements,
+  each reviewed), with §F updated to match. Approvals keep `A1…A17`, appendix floats keep
+  `A-F1…A-F7`, Methods keeps `M1…M14`. **This file is append-only and keeps its old `A` ids** —
+  anything reading an `A`-number out of it must check the entry's date and section before
+  mapping it to an approval. The map is `05_paper_architecture.md` §7.
+- **`wordcount.py` now reports Raw, Artefact and Marker.** Two over-reads, both systematic and
+  both scaling with equation density: a displayed math environment leaves the literal token of
+  its own name twice plus its label, and every `\label` leaves its key. Methods carries **92**
+  such words. Compare two revisions on **Raw**, where the artefact cancels; quote **Marker**
+  against a budget. The new column was verified against the same hand-counted fixture
+  (24/6/18, exact) and the tree-divergence guard was exercised against a tampered heading and
+  seen to raise. **Correction to the 8C-2 report: the artefact is 92, not 98** — the ad-hoc
+  script double-counted the 6 label words that sit inside equation environments.
+- **The stale calibration claim was still live in the instrument.** `wordcount.py`'s docstring
+  asserted "calibrated to 0.14 %" — a claim this file withdrew hours earlier. Replaced with
+  the fixture record. A withdrawal recorded in a ledger and not in the tool is a withdrawal
+  the next reader does not see.
+
+### agentmemory — recovered, backfilled, and the loss window characterised
+
+The hung `iii` process holding port 3111 **had already exited**, so the recorded fix
+(`kill 67158 67147 67949`) was unnecessary and was not run; the port was simply free.
+`npx @agentmemory/agentmemory` brought the worker up: **v0.9.28, healthy, 17 sessions**.
+
+**The loss was narrower than feared and is now closed.** `~/.agentmemory/standalone.json`
+held **5** entries, not three days of work: one round-trip probe (2026-08-05) and **four**
+durable saves, all from the morning of 2026-08-07. Two were superseded by this session's own
+indexed save of the resolved boundary check. The other two — the governance defects (U4 and
+the Zotero false negative) and the word-counter defect with its calibration lesson — were
+**backfilled into the live index and verified by retrieval**, not by the returned id: both
+now return as indexed `decision` records under a keyword recall.
+
+**Independently, the file store was confirmed to carry everything the memories did**, which is
+the check that matters, since the files are the real store: the boundary-check framing is in
+`background_argument_skeleton.md` and §F S-1; U4 is in `05_paper_architecture.md` §7; the
+Zotero rule is in `PRJ93_RULES.md`; the counter correction is in this file and in
+`wordcount.py`. No durable fact existed only in the unindexed store.

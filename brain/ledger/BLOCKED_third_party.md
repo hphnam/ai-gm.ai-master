@@ -158,21 +158,31 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 |---|---|
 | SHOULD-FIX conformance rows | 0 |
 | Unadjudicated contradictions | 0 |
-| Open rows not blocked on a third party | **2** — both self-closable, both listed below |
+| Open rows not blocked on a third party | **3** — all self-closable, all listed below |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
 | Dangling cross-references across the four chapter files | 0 |
-| Latest Overleaf commit at time of writing | `9174a2d` |
+| Chapters composed to the approved tree and pushed | **2 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2) |
+| Measured word floors, both PROVISIONAL pending reallocation | Ch 2 **4,948**/4,000 · Ch 3 **5,526**/4,200 (marker-equivalent) |
+| Chapters still unmeasured | 4 — Introduction, **Results**, Discussion, Conclusions |
 
-### The two self-closable rows — opened 2026-08-07
+### The three self-closable rows
 
-Neither is blocked on anyone. Both were opened by the Chapter 2 composition and are carried
-here because this file is the single retrieval point; the reasoning is in `phase_state.md`
-(entry of 2026-08-07) and `background_argument_skeleton.md`.
+None is blocked on anyone. S-1 and S-2 were opened by the Chapter 2 composition; S-3 by
+Chapter 3's. The reasoning is in `phase_state.md` (entries of 2026-08-07) and in the two
+argument skeletons.
+
+> **Namespace note, applied 2026-08-07.** `background_argument_skeleton.md`'s arguments were
+> renamed **A1–A16 → B1–B16** because three other live namespaces use `A`: approval rows
+> (`05_paper_architecture.md` §7), appendix floats (`07_figure_programme.md` §3, `A-F1…A-F7`),
+> and July's citation-audit exception ids in `phase_state.md`. Methods' skeleton is `M1–M14`.
+> Rows below use the new `B` ids. `phase_state.md` is append-only and still carries the old
+> `A` ids in its 2026-08-07 entries; a correction entry there points here.
 
 | # | Row | What closes it |
 |---|---|---|
-| **S-1** | **Chapter 2 is 948 words over its 4,000 budget (4,948, provisional).** Held, not accepted — a 24 % overrun repeated across six chapters lands the document near 24,800 against HC1's 20,000. *(Corrected from 4,893/893 on 2026-08-07: the counter mis-stripped escaped `\%`. Use `brain/scripts/wordcount.py`.)* | The **Chapter 2 / Chapter 3 boundary check**, first step of **8C-2**, run as a genuine question with **three** possible answers, not two: (a) Methods can carry **A3** (one venue scored unscaled → Methods 3.2) and **A6** (the recorded-regime extension → Methods 3.7), and has the headroom — Chapter 2 closes; (b) Methods cannot carry them — the residue is irreducible; (c) **Methods can carry them but is itself over budget**, so relocation moves the overrun rather than resolving it. **(c) is the likely answer** — Methods is 9,326 against a 4,200 budget, a −5,126 deficit far worse than Chapter 2's, and it must also absorb the relocated `sec:res-basis` ruling and the R69 figure. **Measure Methods' floor before deciding anything.** Relocation is not the assumed outcome. If both chapters are irreducible, that is the point at which **budget reallocation** is decided, on real numbers. |
+| **S-1** | **Chapter 2 is 948 words over its 4,000 budget (4,948, provisional).** Held, not accepted — a 24 % overrun repeated across six chapters lands the document near 24,800 against HC1's 20,000. *(Corrected from 4,893/893 on 2026-08-07: the counter mis-stripped escaped `\%`. Use `brain/scripts/wordcount.py`.)* | **The boundary check is RUN and the answer is (c).** Not "Methods can carry them", not "Methods cannot" — **Methods can and is itself over budget**, so relocation moved the overrun rather than resolving it. The two derivations answered **differently**, which is the evidence the boundary rule was applied rather than assumed: **B3** (median-versus-mean functional argument) **stays in Chapter 2** — it is a claim about where two literatures stop, which is Chapter 2's job by definition; Methods 3.2 cites it and spends ~60 words on the application to Ellel's revenue estimand, which R84 requires there anyway. Chapter 2 saves **nothing** from B3. **B6** (recorded-regime extension) **moves to Methods 3.7**, where it already lived in the superseded prose and where it carries its limit and the D-D4 three-way attribution that Chapter 2 cannot hold; Chapter 2 keeps a ~25-word limb sentence for gap limb 4. Net **−85 to Chapter 2**, taking the overrun to ~863. **What closes S-1 is now budget reallocation, and that is deliberately not decided yet** — see S-3. |
 | **S-2** | **`\ref{app:search}` is plain `Appendix~B` text in `literature_review.tex` §2.1.** Written as a ref, replaced because Appendix B does not exist and it would compile to `??`. | Writing **Appendix B**: define `\label{app:search}` there and convert the plain text back to `\ref{app:search}`. Also carries U3's two binding conditions (`05_paper_architecture.md` §7). |
+| **S-3** | **Chapter 3 is 1,326 words over its 4,200 budget (5,526 marker-equivalent, 5,618 raw), pushed 2026-08-07.** Held PROVISIONAL on the same terms as S-1, and for the same reason: an unmarked overrun compounds. **This is a measured floor, not a first draft** — the smallest count at which every criterion named against the chapter in `05_paper_architecture.md` §5 is still met, reached after two compression passes and five critique rounds. Worst sections: **3.7** 740 against 440 (carries RQ4's whole methodological premise plus D-D4 plus R69/R70/R71/D3/D6), **3.2** 707 against 640 (the §2.8a mandatory six-item ordering), **3.3** 477 against 390. Only 3.5 lands near budget. | **Budget reallocation — and it is deliberately NOT decided yet.** Two floors are not enough to decide on. **Results is the chapter that determines whether there is anything to reallocate**: 14,580 against 5,200, and the only chapter where large compression is genuinely plausible, since thirty sections of run narrative collapse into five. Ruling now risks handing Methods words that Results needs more. **Measure Results first**; that puts 32,510 of the current 37,471 measured. Do not quote 4,948 or 5,526 as final in the interim. |
 
 ---
 

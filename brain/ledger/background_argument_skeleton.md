@@ -22,7 +22,7 @@ turns back into knowledge-telling.
 
 ## The four §8.3 names, in full
 
-### A1 · Globality is an estimation-budget argument, not a similarity argument → **2.3**
+### B1 · Globality is an estimation-budget argument, not a similarity argument → **2.3**
 
 - **Claim.** `montero-manso_principles_2021` do not assume the series resemble each other.
   Global and local methods can produce the same forecasts *without any assumptions about
@@ -41,7 +41,7 @@ turns back into knowledge-telling.
   which would license pooling three venues on the grounds that they trade alike. Rejected
   because the source explicitly disclaims it.
 
-### A2 · The energy-versus-hospitality weather adjudication → **2.3**
+### B2 · The energy-versus-hospitality weather adjudication → **2.3**
 
 - **Claim.** The strong weather evidence is in energy, not hospitality, and the coupling
   mechanism does not transfer. Electrical load is coupled to weather physically —
@@ -79,7 +79,7 @@ turns back into knowledge-telling.
   attribution share measures how a fitted model distributes credit rather than what a
   covariate contributes out of sample.
 
-### A3 · The median-versus-mean functional argument → **2.4 and 2.6**
+### B3 · The median-versus-mean functional argument → **2.4 and 2.6**
 
 - **The p > 2 derivation — OWNED, and flagged as owned in the prose.**
   `hewamalage_forecast_2023` state without condition that median-optimising measures treat
@@ -114,7 +114,7 @@ turns back into knowledge-telling.
   Rejected because its two parameters are undefined for a quantity that is not a
   replenishment quantity — a property of the problem, not a convenience.
 
-### A4 · The false-alarm asymmetry, at graded evidential strength → **2.9**
+### B4 · The false-alarm asymmetry, at graded evidential strength → **2.9**
 
 - **Claim.** `meyer_conceptual_2004` separates *compliance* (response to a warning) from
   *reliance* (response to its absence) and governs them by different detector properties:
@@ -153,18 +153,18 @@ turns back into knowledge-telling.
 
 | # | Argument | → | Owned? |
 |---|---|---|---|
-| **A5** | **Structural closure, not sparsity, breaks the distinct-scores condition.** `angelopoulos_conformal_2023`'s two-sided bound needs almost surely distinct conformity scores. A mostly-zero series ties as a matter of course, but so does *any* venue with a closing day: doors shut ⇒ actual and forecast both zero ⇒ absolute residual exactly zero ⇒ an atom at zero. The upper bound is therefore unavailable wherever a trading calendar has holes in it. | 2.5 | **OWNED** — the generalisation from sparsity to closure is the chapter's |
-| **A6** | **The recorded-regime extension of CPTC.** `sun_conformal_2025` treat the regime as latent by construction; their coverage loss is bounded by a term growing with the state-misclassification rate. If misclassification is the currency the bound is paid in, a regime variable that is simply *recorded* costs nothing. Stated with its limit: it carries no guarantee the paper proves about its own online procedure across to a static band. | 2.7 | **OWNED** — §0 **V2** confirms the source says the opposite of the framing an earlier draft attributed; the inference is valid *a fortiori* from Corollary A.2 and is the chapter's |
-| **A7** | **Kostenko's correction moves the label, not the estimator choice.** `kostenko_note_2006` contribute two separable things: an arithmetic correction to `syntetos_categorization_2005`'s cutoffs (4/3, 0.5 for 1.32, 0.49), and a different selection rule, a diagonal $v > 2 - \tfrac32 p$. Because the rule is a diagonal rather than a threshold on $p$, for $p > 4/3$ the quantity $2 - \tfrac32 p$ is negative and the bias-corrected estimator is preferred at every $v$. **Geometry, not evidence.** | 2.4 | **OWNED** |
-| **A8** | **The hurdle's limitation is a data property, not a modelling one.** `cragg_statistical_1971` / `mullahy_specification_1986`: whether a booking-led venue trades tomorrow is a different question, answerable from different information, from how much it takes if it does. But a hurdle is only as good as the occurrence signal available to it, and where that signal lives outside the dataset the two-part structure buys nothing. | 2.4 | **OWNED** |
-| **A9** | **What transfers is pretraining on time series, not on language.** `tan_are_2024` remove the language model from three methods, or replace it with a basic attention layer, and accuracy is unchanged or better while training and inference fall by up to three orders of magnitude; `das_decoder-only_2024` reach it from the other side. Consequence: a disciplined baseline ladder and scepticism toward any component justified by language-model provenance alone. | 2.3 | inherited claim, **owned consequence** |
-| **A10** | **A vendor report volunteering its own instability is the sharpest available evidence for it.** `grinsztajn_tabpfn-3_2026` report a checkpoint ranking second on skill scores and fourth on win rates, and say the win rates are *"very sensitive to tiny differences on a few datasets"*. That is a sharper instance of the rank instability `brigato_there_2025` and `hewamalage_look_2021` argue for than either supplies, **because it arrives from a party with an interest in the ordering being stable**. | 2.6 | **OWNED** |
-| **A11** | **A near-complete confidence set is a statement about evidence, not a finding of equivalence.** `hansen_model_2011`'s own formulation: uninformative data yield a set with many models. And `harvey_testing_1997`'s correction factor vanishes when the evaluation window is as short as the horizon, leaving a statistic that is computable and carries no information whatever — which is why the number of evaluation origins is not a free parameter. | 2.6 | inherited claim, **owned reading** |
-| **A12** | **The negative result is firm and the positive one is not, and the asymmetry is what makes the choice defensible.** `kim_towards_2022` show point-adjusted F1 is so generous that random scores reach adjusted F1 near one — firm, and disqualifying. What the literature offers instead, a lag-tolerant random-robust measure in the spirit of VUS-PR (`liu_elephant_2024`), rests on a benchmark whose series are not hospitality series, so it is the best available default rather than a settled requirement. | 2.7 | **OWNED** |
-| **A13** | **The memory claim is narrowed on purpose.** A learned rhythm does the work of the *retrieval half* of a memory stream (`park_generative_2023`, `hu_memory_2026`) and supplies no reflection step abstracting episodes into higher-level inferences and no store of the agent's own past actions. The claim is therefore that the rhythm is a model of normality, not a memory architecture. | 2.8 | **OWNED** — a deliberate retreat that protects a claim from overstatement |
-| **A14** | **The construction of the gap from PRISM.** `fu_prism_2026` gates on a calibrated acceptance probability set from an asymmetric cost ratio — so no claim of methodological novelty in cost-sensitive intervention is available, and none is made. What it leaves undone is threefold: fix the cost ratio to the stated preferences of the person who bears the cost; measure the calibration of the acceptance probability the ratio is applied to; and score the resulting decisions against that same person's accept-or-dismiss judgements. | 2.10 | **OWNED** — this is the gap |
-| **A15** | **Field instantiation is a contribution of the kind this body of knowledge is made of.** `paleyes_challenges_2022`'s catalogue is assembled from reports of systems in deployment — it exists because deployments were written up, not because benchmarks were run. | 2.10 | **OWNED** |
-| **A16** | **The gap's own conditional.** The positioning rests on a 2026 preprint: if PRISM's results do not survive review the gap is differently shaped, though the absence of an operator-grounded evaluation would remain. | 2.10 | **OWNED**, and it is R67 discharged at the point it bites |
+| **B5** | **Structural closure, not sparsity, breaks the distinct-scores condition.** `angelopoulos_conformal_2023`'s two-sided bound needs almost surely distinct conformity scores. A mostly-zero series ties as a matter of course, but so does *any* venue with a closing day: doors shut ⇒ actual and forecast both zero ⇒ absolute residual exactly zero ⇒ an atom at zero. The upper bound is therefore unavailable wherever a trading calendar has holes in it. | 2.5 | **OWNED** — the generalisation from sparsity to closure is the chapter's |
+| **B6** | **The recorded-regime extension of CPTC.** `sun_conformal_2025` treat the regime as latent by construction; their coverage loss is bounded by a term growing with the state-misclassification rate. If misclassification is the currency the bound is paid in, a regime variable that is simply *recorded* costs nothing. Stated with its limit: it carries no guarantee the paper proves about its own online procedure across to a static band. | 2.7 | **OWNED** — §0 **V2** confirms the source says the opposite of the framing an earlier draft attributed; the inference is valid *a fortiori* from Corollary A.2 and is the chapter's |
+| **B7** | **Kostenko's correction moves the label, not the estimator choice.** `kostenko_note_2006` contribute two separable things: an arithmetic correction to `syntetos_categorization_2005`'s cutoffs (4/3, 0.5 for 1.32, 0.49), and a different selection rule, a diagonal $v > 2 - \tfrac32 p$. Because the rule is a diagonal rather than a threshold on $p$, for $p > 4/3$ the quantity $2 - \tfrac32 p$ is negative and the bias-corrected estimator is preferred at every $v$. **Geometry, not evidence.** | 2.4 | **OWNED** |
+| **B8** | **The hurdle's limitation is a data property, not a modelling one.** `cragg_statistical_1971` / `mullahy_specification_1986`: whether a booking-led venue trades tomorrow is a different question, answerable from different information, from how much it takes if it does. But a hurdle is only as good as the occurrence signal available to it, and where that signal lives outside the dataset the two-part structure buys nothing. | 2.4 | **OWNED** |
+| **B9** | **What transfers is pretraining on time series, not on language.** `tan_are_2024` remove the language model from three methods, or replace it with a basic attention layer, and accuracy is unchanged or better while training and inference fall by up to three orders of magnitude; `das_decoder-only_2024` reach it from the other side. Consequence: a disciplined baseline ladder and scepticism toward any component justified by language-model provenance alone. | 2.3 | inherited claim, **owned consequence** |
+| **B10** | **A vendor report volunteering its own instability is the sharpest available evidence for it.** `grinsztajn_tabpfn-3_2026` report a checkpoint ranking second on skill scores and fourth on win rates, and say the win rates are *"very sensitive to tiny differences on a few datasets"*. That is a sharper instance of the rank instability `brigato_there_2025` and `hewamalage_look_2021` argue for than either supplies, **because it arrives from a party with an interest in the ordering being stable**. | 2.6 | **OWNED** |
+| **B11** | **A near-complete confidence set is a statement about evidence, not a finding of equivalence.** `hansen_model_2011`'s own formulation: uninformative data yield a set with many models. And `harvey_testing_1997`'s correction factor vanishes when the evaluation window is as short as the horizon, leaving a statistic that is computable and carries no information whatever — which is why the number of evaluation origins is not a free parameter. | 2.6 | inherited claim, **owned reading** |
+| **B12** | **The negative result is firm and the positive one is not, and the asymmetry is what makes the choice defensible.** `kim_towards_2022` show point-adjusted F1 is so generous that random scores reach adjusted F1 near one — firm, and disqualifying. What the literature offers instead, a lag-tolerant random-robust measure in the spirit of VUS-PR (`liu_elephant_2024`), rests on a benchmark whose series are not hospitality series, so it is the best available default rather than a settled requirement. | 2.7 | **OWNED** |
+| **B13** | **The memory claim is narrowed on purpose.** A learned rhythm does the work of the *retrieval half* of a memory stream (`park_generative_2023`, `hu_memory_2026`) and supplies no reflection step abstracting episodes into higher-level inferences and no store of the agent's own past actions. The claim is therefore that the rhythm is a model of normality, not a memory architecture. | 2.8 | **OWNED** — a deliberate retreat that protects a claim from overstatement |
+| **B14** | **The construction of the gap from PRISM.** `fu_prism_2026` gates on a calibrated acceptance probability set from an asymmetric cost ratio — so no claim of methodological novelty in cost-sensitive intervention is available, and none is made. What it leaves undone is threefold: fix the cost ratio to the stated preferences of the person who bears the cost; measure the calibration of the acceptance probability the ratio is applied to; and score the resulting decisions against that same person's accept-or-dismiss judgements. | 2.10 | **OWNED** — this is the gap |
+| **B15** | **Field instantiation is a contribution of the kind this body of knowledge is made of.** `paleyes_challenges_2022`'s catalogue is assembled from reports of systems in deployment — it exists because deployments were written up, not because benchmarks were run. | 2.10 | **OWNED** |
+| **B16** | **The gap's own conditional.** The positioning rests on a 2026 preprint: if PRISM's results do not survive review the gap is differently shaped, though the absence of an operator-grounded evaluation would remain. | 2.10 | **OWNED**, and it is R67 discharged at the point it bites |
 
 ---
 
@@ -173,8 +173,8 @@ turns back into knowledge-telling.
 | Cut | Words (current) | Reason |
 |---|---|---|
 | The chapter-opener roadmap and the four-argument manifesto | ~200 of the 343-word opener | §2.1 budgets ten sections summing to exactly 4,000 and gives the opener no line; §2.2 sends the opener's remnant to 2.10. Chapter-by-chapter signposting is R56's job in Introduction 1.5. |
-| The preprint census (*"eighteen works … had not completed peer review"*) | ~55 | Review-conduct commentary (§1.1 item 0). R67 is discharged by the per-citation markers, which are retained in full, and by A16. |
-| `ye_closer_2025` — why TabPFN v2 works given randomised attribute tokens | ~90 | The passage exists to license TabPFN-TS, and §4.5 removes the TabPFN withdrawal from the review entirely. `hoo_tables_2026` is retained for the known-future-covariate constraint, which is load-bearing for the availability-lead argument; `grinsztajn_tabpfn-3_2026` is retained for A10. |
+| The preprint census (*"eighteen works … had not completed peer review"*) | ~55 | Review-conduct commentary (§1.1 item 0). R67 is discharged by the per-citation markers, which are retained in full, and by B16. |
+| `ye_closer_2025` — why TabPFN v2 works given randomised attribute tokens | ~90 | The passage exists to license TabPFN-TS, and §4.5 removes the TabPFN withdrawal from the review entirely. `hoo_tables_2026` is retained for the known-future-covariate constraint, which is load-bearing for the availability-lead argument; `grinsztajn_tabpfn-3_2026` is retained for B10. |
 | The wide foundation-model roster (`woo_unified_2024`, `liu_moirai_2026`, `goswami_moment_2024`, `rasul_lag-llama_2024`, `garza_timegpt-1_2024`) shown as a design space | ~40 | §4.5: *"the foundation-model landscape reduces to one grouped citation and the two models actually entered."* Retained as one grouped citation. |
 | `xu_sequential_2023`, `angelopoulos_conformal_2023-1`, `stocker_gentle_2025` given individually | ~45 | 2.5 holds 340 words. Grouped with `gibbs_adaptive_2021` and `xu_conformal_2021` as the online-conformal family; `zaffran_adaptive_2022`'s efficiency penalty is the load-bearing member and is kept at full strength. |
 | `parasuraman_complacency_2010` and `hancock_meta-analysis_2011`'s $\bar r$ figures | ~55 | 2.9 holds 400 words across two literatures. The trust-calibration frame is kept in one sentence; the meta-analytic effect sizes bear on robot trust rather than on the alert asymmetry that carries the argument. |
@@ -187,27 +187,27 @@ turns back into knowledge-telling.
 
 ## Ruling of 2026-08-07 — none of the four costed cuts is made
 
-The hand-off carried a costed cut-list for the 893-word overrun: **A3 limb 3** (the Chatfield
-"narrower part transfers" passage, ~90), **A6** (the recorded-regime extension, ~110), **A4's
+The hand-off carried a costed cut-list for the 893-word overrun: **B3 limb 3** (the Chatfield
+"narrower part transfers" passage, ~90), **B6** (the recorded-regime extension, ~110), **B4's
 foundation** (Meyer's compliance/reliance distinction, ~95) and the **limb-by-limb
 decomposition** in 2.10 (~145). Phuong's ruling: **make none of them, and do not accept 4,893
 as final either.** Two are rejected outright and two are deferred to a check that has not
 been run.
 
-**A4 and the limb decomposition are not cuttable.** A4's Meyer distinction is a claim about
+**B4 and the limb decomposition are not cuttable.** B4's Meyer distinction is a claim about
 prior work, so Chapter 2 is its home; removing it leaves the loss function without a warrant.
 The limb-by-limb decomposition discharges **R63** — gap elicited equals gap filled — which is
 a marking criterion, and the decomposition is what discharges it.
 
 ### The Chapter 2 / Chapter 3 boundary check — first step of 8C-2, not yet run
 
-**A3 and A6 are not cut. They are tested for relocation.** The observation behind this is that
+**B3 and B6 are not cut. They are tested for relocation.** The observation behind this is that
 neither is only a Chapter 2 argument:
 
 | | What it is | Whose ruling it underwrites |
 |---|---|---|
-| **A3** | The argument licensing one venue being scored unscaled | **Methods 3.2** — the ruling relocated there from Results in 8A.1 |
-| **A6** | The strongest argument for the Mondrian design | **Methods 3.7** |
+| **B3** | The argument licensing one venue being scored unscaled | **Methods 3.2** — the ruling relocated there from Results in 8A.1 |
+| **B6** | The strongest argument for the Mondrian design | **Methods 3.7** |
 
 Both are derivations whose *conclusion* Chapter 3 has to state and justify anyway. If
 Chapter 2 derives them in full **and** Chapter 3 restates the justification, that is
@@ -216,7 +216,7 @@ that resolves it: **Chapter 2 establishes what the literature supports and where
 Chapter 3 applies it to this estate's design.** The derivation lives in one place and is
 cited from the other.
 
-**This is a relocation test, not a deletion test.** If Methods can carry A3 and A6, roughly
+**This is a relocation test, not a deletion test.** If Methods can carry B3 and B6, roughly
 200 words leave Chapter 2 without a single argumentative move being lost. Deciding a
 reallocation now, on one chapter with the other five unmeasured, is deciding blind.
 
@@ -227,7 +227,7 @@ the assumed outcome.
 
 | | Answer | Consequence |
 |---|---|---|
-| **(a)** | Methods can carry A3 and A6, **and has the headroom** | Chapter 2 closes; ~200 words move to where they do their work |
+| **(a)** | Methods can carry B3 and B6, **and has the headroom** | Chapter 2 closes; ~200 words move to where they do their work |
 | **(b)** | Methods cannot carry them — the derivations genuinely belong in the review | Chapter 2's residue is irreducible |
 | **(c)** | Methods can carry them **but is itself over budget** | Relocation *moves* the overrun rather than resolving it |
 
@@ -258,6 +258,6 @@ precedent. See `phase_state.md` and `BLOCKED_third_party.md` §F, row S-1.
 
 > **Figure correction, 2026-08-07:** this section first said 4,893 / 893 words over. The
 > counter mis-stripped escaped `\%` and undercounted by 55. **The live chapter is 4,948 and
-> the overrun is 948.** The ruling is unchanged — relocating A3 and A6 was never going to
+> the overrun is 948.** The ruling is unchanged — relocating B3 and B6 was never going to
 > close 893 on its own either. Use `brain/scripts/wordcount.py`, which emits the per-section
 > table directly.

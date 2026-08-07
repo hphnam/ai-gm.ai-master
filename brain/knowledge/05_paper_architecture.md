@@ -1249,6 +1249,23 @@ conflict rather than revising the item silently — the corrections-are-appended
 | A16 | Gap limb 7 scoped out of the research questions and carried as contribution C5 at graded strength | `06_research_questions.md` §4 |
 | A17 | `sec:res-chatlog` reported as a specification-level deliverable, with no research question and no contribution line | `06_research_questions.md` §7.2 |
 
+**The `A` prefix in this table means an approval row and nothing else.** It was one of four
+live `A` namespaces until 2026-08-07, and the 8C-2 prompt crossed two of them in a single
+paragraph — reading approvals `A3`/`A6` where background arguments were meant. Resolved
+structurally rather than by convention, in the files that could still move:
+
+| Namespace | Prefix | Owner |
+|---|---|---|
+| Approval rows | **`A1…A17`** (unchanged) | this file, §7 |
+| Background-chapter arguments | **`B1…B16`** (was `A1…A16`, renamed 2026-08-07) | `background_argument_skeleton.md` |
+| Methods-chapter arguments | **`M1…M14`** | `methods_argument_skeleton.md` |
+| Appendix floats | **`A-F1…A-F7`** (unchanged) | `07_figure_programme.md` §3 |
+
+A fifth reading exists and is not renameable: `phase_state.md`'s July entries use `A3`, `A5`,
+`A6` as citation-audit **exception ids**. That file is append-only, so it keeps them and
+carries a correction entry pointing here. Anything reading an `A`-number out of `phase_state.md`
+must check its date and its section before mapping it to an approval.
+
 ### Items reopened after approval
 
 A closed-approvals section edited without a trail stops being useful, so a reopening is
@@ -1260,6 +1277,7 @@ rule in `PRJ93_RULES.md` applied to approvals rather than to findings.
 | **U1** | A2 / §2.1, the purpose cell for Introduction 1.4 | "Four contributions at graded strength" | "**Five** contributions at graded strength" | Phuong, explicit unlock, 2026-08-06 | The RQ mapping yields five. C5 is gap limb 7's frozen apparatus, and folding it into another claim would conceal the thing graded strength exists to disclose. See `06_research_questions.md` §6. |
 | **U2** | A2 / §2.1, the purpose cell for Discussion 5.5 | Four declared divergences | **Six**, adding the three-venue estate against the specification's four, and the NeonDB research schema not provided | Phuong, confirmed at the same gate, 2026-08-06 | 5.5 is mandatory under HC59 and its defect mode is incompleteness. Both were confirmed while verifying the estate size in the aim. The budget is unchanged at 300. See `06_research_questions.md` §9. |
 | **U3** | `07_figure_programme.md` §3, float **A-F1** (Appendix B, R65) | A TikZ **PRISMA-style screening flow diagram** — records identified → screened → excluded with reasons → included | A **criteria table plus prose**. **No flow diagram is drawn.** | Phuong, explicit approval, 2026-08-06 | **Three of the four PRISMA boxes have no number and none is recoverable.** `04_supervisor_evidence_pack.md` §3.1 states it directly: *"No screened-versus-retained count exists at any stage, and it is not recoverable now"*, and *"the search was not pre-registered, and no protocol document exists"*. A flow diagram's rhetorical function is to assert that a systematic process occurred; drawing it with invented counts would place a claim the project's own evidence pack contradicts into the document's most legible form. Independently, the cited corpus contains **no PRISMA diagram either** (`07_figure_programme.md` §6), so the convention had no precedent to appeal to. R65 asks for the protocol to be *recorded*, which the table does. See `log/77`. **Two binding conditions attach — see below.** |
+| **U5** | A2 / A10 / §2.1, the **Methods chapter opener** — the residual between the chapter's 4,200 budget and its twelve section budgets | **40 words** (4,200 − 4,160, never stated as an allocation; it is what is left over) | **75 words**, stated as an allocation | Phuong, explicit ruling, 2026-08-07, on the escalation raised at the 8C-2 push | **R86 cannot be discharged in 40 words.** It requires the Methods opener to restate *purpose*, *materials background* **and** *the aim/problem* — three things. The residual was never designed; it is the arithmetic remainder of twelve section budgets, and A10's own escalation rule says a section that cannot meet its criteria within budget escalates rather than dropping a criterion. Taking the escalation now rather than at reallocation makes this a corrected approval instead of an unexplained 35-word overrun that a later session would find and re-litigate. **The 35 words are inside Chapter 3's S-3 floor and are not additional to it.** |
 | **U4** | §3.2 rename table, rows 2 and 3 — the headings for literature-review sections **2.2** and **2.3** | 2.2 "Demand periodicity under short histories"; 2.3 "Cross-series pooling and global models" | **Superseded by §2.1.** 2.2 is "**Demand forecasting on short hospitality series**"; 2.3 is "**Cross-series pooling and exogenous covariates**" | Phuong, explicit ruling, 2026-08-07, on the conflict reported at the 8C-1 hand-off | Two *approved* items disagreed — §2.1's tree (A2/A10) against §3.2's rename table (A5) — and leaving that open keeps two live headings for one section, which resurfaces at every later touch. §2.1 wins on three grounds: the composition brief names the tree as the source for headings; §2.1's forms are parallel with their siblings under **N3**, the rule §3.2's own rule column invokes for section 2.6; and §3.2 **contradicts itself** on 2.3, its row 5 (the weather MERGE) already naming the merged section "Cross-series pooling and exogenous covariates". Chapter 2 as pushed on 2026-08-07 carries the §2.1 forms. §3.2 rows 2 and 3 are dead. |
 
 **Conditions on U3, binding on whoever writes Appendix B.**
