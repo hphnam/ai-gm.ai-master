@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786064654.9851968,
-    "ast_hash": "cdd44d1aea51c156df54cae73d00d529",
+    "mtime": 1786066325.1055315,
+    "ast_hash": "064b869342b5954bd74ea38a02193384",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6435,8 +6435,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/main_preamble_diff.md": {
-    "mtime": 1786063864.026342,
-    "ast_hash": "c403e1ba2751e1682d9e4207aaa96bf3",
+    "mtime": 1786066161.8349285,
+    "ast_hash": "b3f54723a8e880c5f0c1fb42c3694e9f",
     "semantic_hash": ""
   }
 }

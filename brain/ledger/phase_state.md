@@ -2252,3 +2252,42 @@ Everything else on the nine check lists is either asserted by a generator or cos
 after the proof compiles clean, not before**. `amssymb` is taken, so A-F4 uses `\mathbb{1}`.
 The proof carries exactly this preamble, so a clean compile proves the additions before
 `main.tex` is touched. 8B closes at that point and the next session is **8C-1, Chapter 2**.
+
+### Correction appended at close — the preamble gate found a defect, not a formality
+
+Applying the preamble diff meant reading `main.tex` rather than the ledger note describing
+it. **Two of the diff's three lines were wrong**: `amssymb` and `algorithm2e` were both
+already loaded.
+
+The stale reading hid a real defect. `main.tex` loads `\usepackage[algo2e]{algorithm2e}`
+**alongside `algorithm` and `algpseudocode`** — that option exists to stop the two clashing
+and it **renames the environment**. A-F2, A-F3 and A-F4 all opened `\begin{algorithm}`,
+which in `main.tex` opens the other package's float and fails every algorithm2e body command
+inside it.
+
+**`figure_proof.tex` would not have caught this.** Loading `algorithm2e` alone, with no
+`algorithm` package, `\begin{algorithm}` resolved correctly and those three pages would have
+compiled clean while the document broke. *A proof that passes where the document fails is
+worse than no proof: it converts an open question into a false answer.* Same shape as the F1
+geometry retrofit — assert against the target, not the harness — one layer up, in the package
+block rather than the class options. **The package block is part of the target's geometry.**
+
+Applied to `main.tex` (additive, nothing removed or reordered): the four TikZ libraries,
+`\RestyleAlgo{ruled}` and `\LinesNumbered`. Command forms, so the `[algo2e]` option that
+makes the coexistence work is untouched. Read back and verified. A-F2/3/4 open
+`\begin{algorithm2e}`; A-F4 uses `\mathbb{1}`. `figure_proof.tex` is at **revision 7** with a
+preamble reproducing `main.tex`'s package block.
+
+**Not verified, stated rather than glossed:** the proof pushed to Overleaf was assembled from
+verbatim reads of the local file but was not byte-diffed afterwards — the MCP cannot diff, and
+re-reading 40 kB to compare by eye is not a check. `figures/out/figure_proof.tex` is
+authoritative. A transcription slip would very likely surface as an error on the page being
+inspected, but that is a likelihood argument, not a verification.
+
+**Known drift hazard for 8C:** each float exists twice — in `figures/out/*.tex` and inlined
+in the proof. Collapse to `\input` when the appendix files go to Overleaf.
+
+**8B state at close: unchanged in substance — the compile is still the single outstanding
+item**, but it now tests the preamble the document actually has. Review order as recorded
+above: F1 item 5 first, then the three generator-uncheckable items, plus one new check per
+algorithm page (the float opens `algorithm2e` and the body is line-numbered).
