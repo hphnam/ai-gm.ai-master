@@ -2291,3 +2291,68 @@ in the proof. Collapse to `\input` when the appendix files go to Overleaf.
 item**, but it now tests the preamble the document actually has. Review order as recorded
 above: F1 item 5 first, then the three generator-uncheckable items, plus one new check per
 algorithm page (the float opens `algorithm2e` and the body is line-numbered).
+
+---
+
+## Session 2026-08-07 — Phase 8C: Chapter 2, Background and related work
+
+**Completed.** `chapters/literature_review.tex` recomposed from the evidence base and
+pushed to Overleaf. Verified on the remote: `get_sections` returns **10 sections**, exact
+approved headings from `05_paper_architecture.md` §2.1, in order.
+
+**Artefacts written**
+- `ledger/background_argument_skeleton.md` — the 16 load-bearing arguments extracted from
+  the current prose before composing, with the four §8.3 names in full, plus the costed
+  deliberate-cut table. This is the D7 protection step.
+- `ledger/background_rewrite_critique.md` — five critique rounds (ARC roles A/B/C plus
+  descriptive-vs-critical and process-vs-result). 6 blocking findings, all fixed; 9 advisory
+  with dispositions.
+- `chapters/literature_review.tex` on Overleaf, whole-file `write_file` (not
+  `write_section`, per the 2026-07-31 incident).
+
+**Verified end state**
+- 8,592 → **4,893 words** against a 4,000 budget. **Over by 893 (22 %).** Not closed; the
+  costed cut-list is in the hand-off and the four candidate cuts each remove a load-bearing
+  derivation.
+- **No new citation keys.** 14 dropped for space, all still in `ref.bib`:
+  `athanasopoulos_forecast_2024`, `bhattacharya_towards_2024`, `cini_graph-based_2024`,
+  `gim_evaluation_2023`, `hancock_meta-analysis_2011`, `hertel_explainable_2026`,
+  `kolassa_why_2020`†, `lee_trust_2004`, `makridakis_m5_2022`†,
+  `parasuraman_complacency_2010`, `parasuraman_humans_1997`, `ye_closer_2025`,
+  `zou_poisonedrag_2025`. († restored after round 3 — R66 needs the headline metric's
+  external warrant.) 80 keys used, every one present in `ref.bib`.
+- **Labels: all seven pre-existing preserved** (`sec:rw-framing`, `-rhythm`, `-ruler`,
+  `-deviation`, `-surfacing`, `-evaluation`, `-synthesis`) so no inbound cross-reference from
+  methodology/results/conclusion breaks. Three added for the previously unlabelled
+  subsections: `sec:rw-pooling`, `sec:rw-intermittent`, `sec:rw-conformal`.
+- **Zero dangling `\ref`.** Every target resolves inside the file. `\ref{app:search}` was
+  written and then replaced with plain `Appendix~B`, because Appendix B does not exist and
+  the ref would have compiled to `??`.
+- All 38 PRJ93-result passages dispositioned per §2.9. No forward reference into Methods or
+  Results survives.
+- AI-writing pre-flight clean: 0 em dashes, 0 flagged vocabulary, 0 vague attributions, 0
+  superficial `-ing` analyses. One negative parallelism was found by the round-4 read, not by
+  the regex sweep, and fixed.
+
+**Findings that change the record**
+- **`05_paper_architecture.md` §2.1 and §3.2 disagree on one heading.** §2.1's tree gives
+  *"Demand forecasting on short hospitality series"*; §3.2's rename table gives *"Demand
+  periodicity under short histories"*. **Both are approved** (A2/A10 and A5). Resolved in
+  favour of §2.1 because the prompt names the tree as the source for headings and because
+  §2.1's form is parallel with its siblings under N3. Reported, not reconciled silently.
+- **`zotero_search_by_citation_key` returns false negatives in web mode.** It scans `Extra`
+  for a `Citation Key:` line, so it finds only the three keys pinned during the 2026-08-06
+  repair and misses every key whose BBT key is unpinned. Four keys reported "not found" were
+  confirmed live by title lookup. **A null from that tool is not evidence of absence.**
+  `BLOCKED_third_party.md` §G's one remaining check (whether `zotero_update_item` now
+  succeeds) was not run — no write was needed.
+- **`brain/drafts/literature_review_condensed.tex` exists** (2026-08-04, 7,481 words) and is
+  superseded: it predates the live revision 6 and is itself 87 % over the 4,000 budget. Not
+  used. The template did not anticipate it.
+
+**Unstarted / carried**
+- The 893-word overrun. Escalated rather than closed, per §7's fixed-budget rule.
+- `Appendix~B` is plain text; convert to `\ref{app:search}` when Appendix B lands.
+- R66 has one known gap by approved decision: the knowledge-gap signal (Methods 3.11) is
+  argued for nowhere in Chapter 2, because `06_research_questions.md` §7.2 rules out
+  building an eighth gap limb for it. Recorded in the critique file so it is not "fixed".
