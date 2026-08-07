@@ -37,10 +37,17 @@ ROW_H = 0.62
 # at \scriptsize -- the label must stay wider than that or it overfulls instead.
 GUTTER_CM = 0.09
 # Height of a two-line \scriptsize label under the DOCUMENT's leading, not the proof's.
-# 12pt base makes \scriptsize 8pt on a ~9.5pt baseline; \linespread{1.5} takes that to
-# ~14.25pt, so two lines plus ascender and descender is about 0.72 cm -- roughly a quarter
-# taller than the same label in the 11pt proof. The axis is placed BELOW that rather than
-# at a coordinate that happened to clear it once.
+#
+# THIS IS AN ESTIMATE, NOT A MEASUREMENT. Nothing here has been read off a rendered PDF.
+# It is derived: 12pt base makes \scriptsize 8pt on a ~9.5pt baseline; \linespread{1.5}
+# takes that to ~14.25pt, so two lines plus ascender and descender is about 0.72 cm --
+# roughly a quarter taller than the same label in the 11pt proof, which is why the
+# clearance first reported at 3.3 mm is in fact 2.2 mm. Label height is downstream of line
+# breaking, so it sits on the compile check list rather than in an assertion.
+#
+# The three inputs are BASE SIZE, \scriptsize's ratio, and \linespread. If any of them
+# changes in main.tex, this constant is wrong and must be re-derived -- it is not a number
+# that was found to work, and it should not be treated as one.
 LABEL_H_CM = 0.72
 LABEL_TOP_Y = 0.98
 AXIS_MARGIN_CM = 0.22

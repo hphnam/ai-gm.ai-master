@@ -2191,3 +2191,64 @@ input. Outstanding: the F1/F3 compile, A-F1 through A-F7, and the manifest.
 at once.** They are independent of F1's open cosmetic, it is one review pass instead of two,
 and it tests the assertion boundary against seven new floats rather than one. The alternative
 — compile first, fix F1, then build — is only better if the compile happens immediately.
+
+---
+
+## 2026-08-07 — Phase 8B: appendix floats built, programme closed to the compile
+
+**Completed**
+
+All nine floats are authored. Nothing in 8B is outstanding except the compile itself.
+
+- **A-F1 Appendix B** — criteria table plus prose, *not* a PRISMA flow (U3). Both conditions
+  discharged in the appendix text: non-pre-registration declared there rather than only in
+  the ledger, and a paragraph before the counts table stating every figure in the subsection
+  is terminal and they do not form a funnel. **No identified/screened/excluded counts appear**
+  — they do not exist and were not constructed.
+- **A-F2, A-F3, A-F4 Appendix C** — `alg:conformal`, `alg:adoption`, `alg:detection` in
+  `algorithm2e`, each with a `\Notation` block defining every symbol on first use, and
+  departures from the cited source stated by line number.
+- **A-F5, A-F6, A-F7 Appendix C/D** — TikZ, assertions applied from the first draft rather
+  than after a defect. A-F5 is the deployment architecture and does **not** restate F3's
+  method pipeline. A-F7 is F2 demoted; its grounding was re-examined and survives.
+- `figures/_tikz_assert.py` — shared geometry assertions, exercised against five deliberate
+  violations before being relied on.
+- `figure_proof.tex` at **revision 6**, nine pages, one per uncompiled float, each carrying
+  its own numbered check list with generator-uncheckable items marked as such. Its preamble
+  matches `main.tex` exactly. Nothing was written to `main.tex`.
+
+**Two corrections that propagated**
+
+- **Siffer is a convention source, not a method source.** This project implements no part of
+  SPOT — no GPD fit, no Grimshaw estimate, no EVT threshold. The wrong premise lived only in
+  `07_figure_programme.md`'s grounding column and is fixed at source. Methods 3.8 does not
+  cite Siffer at all and the literature review already drew the distinction, so it was
+  contained. An unverified grounding claim of my own (Siffer Fig. 7, on F6) was dropped in
+  the same pass — the figure as built does not use the convention.
+- **F1's clearances were first computed against the compile harness, not the document.**
+  Authored under `article`/11pt/landscape/15 mm; the target is `report`/twoside/12pt/
+  `\linespread{1.5}`/150 mm. Horizontal clearances are unaffected — they derive from figure
+  coordinates. **The vertical clearance is 2.2 mm, not the 3.3 mm reported: wrong by a third.**
+  The axis is now derived (`LABEL_TOP_Y - LABEL_H_CM - AXIS_MARGIN_CM`) and `LABEL_H_CM`
+  records that it is an estimate from base size, `\scriptsize` ratio and `\linespread` — not
+  a measurement, and wrong if any of those three change.
+
+**Open — the single outstanding 8B item**
+
+**The compile.** `figure_proof.tex` must be set as the Overleaf compile target, built, and
+the rendered PDF inspected. This cannot be done from here: the Overleaf MCP writes and reads
+files and has no compile tool or PDF read-back.
+
+**Review order when the PDF comes back**, most consequential first:
+
+1. **F1 item 5** — the disjointness label, ~6 cm of text over a 1.9 cm arrow. Deliberately
+   left unguessed; needs a leader line or a shorter phrase if it reads as floating.
+2. **The three items no generator could check** — F1's vertical extent (2.2 mm clearance),
+   algorithm line overflow on A-F2 to A-F4, and A-F7's inset legibility.
+
+Everything else on the nine check lists is either asserted by a generator or cosmetic.
+
+**Then**: apply `brain/ledger/main_preamble_diff.md` to `main.tex` — **approved, to be applied
+after the proof compiles clean, not before**. `amssymb` is taken, so A-F4 uses `\mathbb{1}`.
+The proof carries exactly this preamble, so a clean compile proves the additions before
+`main.tex` is touched. 8B closes at that point and the next session is **8C-1, Chapter 2**.

@@ -126,6 +126,19 @@ that was supposed to change, plus one thing that was not.
   headline table with a "dependency unavailable" notice, leaving the other 272 lines intact.
   A green run and a damaged artefact.
 
+A third form appeared later, in a shell rather than a script. A `&&` chain began with a
+`git mv` that failed; the heredoc behind it — the one that folded the retrofitted F1 into
+`figure_proof.tex` — therefore never ran. **The chain reported the failure honestly and the
+proof silently kept the stale figure.** Nothing was destroyed and nothing exited zero; the
+step simply did not happen, and every downstream statement about the proof was made about a
+file that had not changed.
+
+The operational form is the same in all three cases and is worth stating as a method rather
+than as a warning: **confirm a change by searching the artefact for the specific thing that
+was supposed to change.** Not "did the command succeed" — grep the new axis coordinate, the
+new stamp, the new row. A command reports what it attempted. Only the artefact reports what
+is there. That grep is what caught the `git mv`.
+
 Corollary: **`git diff` on a regenerated artefact is part of the run, not an optional check
 afterwards.** A regeneration whose diff nobody read has not been verified, whatever it
 printed.
