@@ -2136,3 +2136,58 @@ problems they were written to prevent.
   read from these. Closing it means re-running all three; regenerating the ladder is out of
   scope under the approved `tab:ladder` disposition.
 - `tab:mcs` bounded gap: recorded at `05` §2.7b W2, deliberately left open.
+
+### Carried out of 2026-08-07 — read this before touching a figure
+
+**F1 and F3 are at revision 4, authored, and have NEVER been compiled.** There is no TeX
+toolchain on this machine; verification is by Overleaf compile, which is the stronger route
+because Overleaf is the environment that actually builds the document. `figure_proof.tex`
+sits at the Overleaf project root — isolated, not `\input` by `main.tex`, so a TikZ error
+cannot reach the chapters. (Root rather than `scratch/` because the bridge will not create a
+directory.) Set it as the compile target, build, and **look at the PDF** — the log answers a
+different question.
+
+Six-item check list, in the file's own preamble:
+
+1. adjacent below-bar labels separated — arithmetic says 1.23 mm; confirm no glyphs touch
+2. nothing left of the picture origin
+3. **no label descends into the time axis or the date labels** — the one the generator
+   cannot check
+4. no overfull `hbox` on that page
+5. **KNOWN OPEN, cosmetic.** The disjointness label is ~6 cm of text over a 1.9 cm arrow. If
+   it reads as floating rather than attached it needs a leader line or a shorter phrase. It
+   was deliberately **not** guessed at: whether it reads as detached is a judgement that
+   needs the render, and the three revisions before it all failed by predicting instead of
+   looking.
+6. `adopted` reads as a tag for the whole row, not as part of the `fit` label
+
+**So F1 is not finished.** It is one known cosmetic away, and that is the state to inherit.
+
+**A-F1 through A-F7 are not started**, blocked on the same gap. Whoever builds them applies
+the six-item list per float **and the assertion boundary from the start** — that boundary is
+the transferable output of four revisions on one figure and is written up in `PRJ93_RULES.md`:
+
+| Property | Verified by |
+|---|---|
+| horizontal spans, overlap, origin placement | generator assertion, every run |
+| vertical extent, overfull boxes, glyph collision | the compile, and only the compile |
+
+The failure mode it prevents: **when a fix moves an object, re-derive every constraint the
+object was subject to, not the one that prompted the move.** Rev 1 fixed vertical overflow
+and left horizontal overlap; rev 2 fixed the overlap and pushed vertical extent back through
+the axis. Each was checked against the defect that prompted it.
+
+**The three unstamped MCS clusters** are recorded above with their mechanism, not as a
+filename list — an elimination procedure over bootstrap p-values, where a perturbation too
+small to move a point estimate can still cross α and delete a set member. 8C reads that while
+composing `tab:group` and `tab:weather`.
+
+### Next session is finishing 8B, not starting 8C
+
+The figure programme is incomplete and 8C's chapter sessions take the built manifest as an
+input. Outstanding: the F1/F3 compile, A-F1 through A-F7, and the manifest.
+
+**Recommended sequencing: build the appendix floats first and hold the compile for all nine
+at once.** They are independent of F1's open cosmetic, it is one review pass instead of two,
+and it tests the assertion boundary against seven new floats rather than one. The alternative
+— compile first, fix F1, then build — is only better if the compile happens immediately.

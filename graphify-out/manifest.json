@@ -5835,8 +5835,8 @@
     "semantic_hash": "c32468f4563f5a76ab63ac2edc15896a"
   },
   "brain/PRJ93_RULES.md": {
-    "mtime": 1786058016.619701,
-    "ast_hash": "572ebfbb3004f00c31c8f8960e6504e7",
+    "mtime": 1786061807.6467147,
+    "ast_hash": "f06e2874bbc1c9db22638f9ec9100112",
     "semantic_hash": ""
   },
   "brain/docs/DataSciDissWriting June2026final.md": {
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786060659.6227858,
-    "ast_hash": "2150595f761ba708d536e9ed5dd18891",
+    "mtime": 1786062157.9683216,
+    "ast_hash": "501835fc98c9ee82cb04ccfd5151977e",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6375,8 +6375,8 @@
     "semantic_hash": ""
   },
   "figures/fig_blocks.py": {
-    "mtime": 1786059753.889457,
-    "ast_hash": "d3b12a1034ca93d4b895a6d0c224225f",
+    "mtime": 1786061980.9675348,
+    "ast_hash": "ad26407f4d40d8eb2c38fbe1683def89",
     "semantic_hash": ""
   },
   "figures/fig_drift.py": {
@@ -6400,8 +6400,8 @@
     "semantic_hash": ""
   },
   "brain/knowledge/07_figure_programme.md": {
-    "mtime": 1786060635.0295184,
-    "ast_hash": "afed29a75c94cd40639bb7a3abc8c66f",
+    "mtime": 1786061796.9225976,
+    "ast_hash": "636cb974d5f5d6ef506b7e1e79fbe474",
     "semantic_hash": ""
   },
   "brain/ledger/blocker_clearance_package.md": {
