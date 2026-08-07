@@ -76,13 +76,15 @@ def main() -> None:
                    label=f"{QUANTILE:.0%} calibration quantile")
 
         share = len(false_open) / len(open_days) if len(open_days) else 0.0
-        ax.set_title(
-            f"{VENUE_LABEL[venue]} — {len(false_open):,} of {len(open_days):,} "
-            f"calendar-open days did not trade ({share:.0%})", pad=6, loc="left")
+        # The false-open counts are the panel's finding and belong in the caption,
+        # where they reach the List of Figures. Emitted so the caption can quote
+        # them from the run rather than from memory.
+        print(f"{VENUE_LABEL[venue]}: {len(false_open):,} of {len(open_days):,} "
+              f"calendar-open days did not trade ({share:.0%})")
         ax.set_ylabel("Conformity score (£)")
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
-        panel_label(ax, f"({tag})")
+        panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
 
     axes[-1].set_xlabel("Forecast target date")
     handles, labels = axes[0].get_legend_handles_labels()

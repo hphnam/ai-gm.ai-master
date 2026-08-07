@@ -70,12 +70,13 @@ def main() -> None:
         ax.text(0.985, 0.015, "pooling", transform=ax.transAxes, ha="right", va="bottom",
                 fontsize=6, color="0.35", style="italic")
 
+        # The unit rides the x-axis label alone. Repeating it in a panel title
+        # duplicated it inside the figure as well as against the caption.
         unit = "MASE" if rows[0][2].lower().startswith("mase") else "£"
-        ax.set_title(f"{VENUE_LABEL[venue]}  ({unit})", pad=9)
         ax.set_xlabel(f"Paired mean difference ({unit})")
         ax.margins(x=0.14)
         ax.tick_params(axis="x", labelrotation=0)
-        panel_label(ax, f"({tag})")
+        panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
 
     handles = [
         plt.Line2D([], [], color=OKABE_ITO["blue"], marker="o", mfc="white", mew=0.9,

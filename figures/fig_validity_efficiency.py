@@ -49,9 +49,8 @@ def main() -> None:
             ax.annotate(arm, (cov, width), textcoords="offset points", xytext=(0, 5),
                         ha="center", fontsize=6.5, color=colour, zorder=4)
 
-        ax.set_title(VENUE_LABEL[venue], pad=9)
         ax.set_xlabel("Empirical coverage")
-        panel_label(ax, f"({tag})")
+        panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
         ax.margins(x=0.18, y=0.22)
 
     axes[0].set_ylabel("Mean interval width (£)")

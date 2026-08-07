@@ -90,7 +90,7 @@ def _load(venue: str) -> tuple[dict, list[str], str, str]:
 def ladder() -> None:
     fig, axes = plt.subplots(1, 3, figsize=(7.4, 3.9))
 
-    for ax, venue in zip(axes, VENUES):
+    for ax, venue, tag in zip(axes, VENUES, "ABC"):
         payload, retained, head, unit_key = _load(venue)
         scored = {k: v for k, v in payload["rungs"].items() if v.get("available")}
         # Worst at the top so the reader's eye falls down to the retained set.
@@ -126,7 +126,10 @@ def ladder() -> None:
         unit = "RMSSE" if unit_key == "rmsse" else "RMSE (£)"
         ax.set_xlabel(f"{unit}\n{payload['basis']}, $n={payload['n_folds']}$",
                       fontsize=8, color=MUTED)
-        ax.set_title(TITLES[venue], fontsize=9.5, color=INK, pad=7)
+        # A panel label, not a title: it identifies which panel is which, and the
+        # figure's title lives in the caption where the List of Figures reaches it.
+        ax.text(0.0, 1.04, f"({tag}) {TITLES[venue]}", transform=ax.transAxes,
+                fontweight="bold", fontsize=8.5, color=INK, ha="left", va="bottom")
         ax.tick_params(axis="x", labelsize=7.5, colors=MUTED, length=2.5)
         ax.tick_params(axis="y", length=0)
         for side in ("top", "right", "left"):

@@ -82,8 +82,7 @@ def main() -> None:
         ax.set_xticklabels(["1", "1.25", "1.5", "2", "3", "4"])
         ax.minorticks_off()
         ax.set_xlabel("Injected magnitude (z)")
-        ax.set_title(VENUE_LABEL[venue], pad=9)
-        panel_label(ax, f"({tag})")
+        panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
 
     axes[0].set_ylabel("Catch rate")
 
