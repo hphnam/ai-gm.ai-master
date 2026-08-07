@@ -34,7 +34,31 @@ the ingest-defect covariate gap) carried no derivation in this list.
 
 | Cut | Words | Why |
 |---|---|---|
-| The pairing-variance exposition — why paired standard errors, the $178.00 \to 26.94$ factor of $6.6$ at Ellel, and why a $\pounds 1.55$ gap is measurable at all | ~330 | Demoted to Appendix D with `tab:window`'s sibling material by approval A9 (§2.7, "pairing variance, block-length sweep"). The composed 4.1 keeps the block-length sensitivity, which is the part that reaches a served decision, and drops the tutorial on why pairing works. **The $6.6$ factor is not currently restated anywhere**, and that is the single largest thing this compression loses. |
+| The pairing-variance exposition — why paired standard errors, the $178.00 \to 26.94$ factor of $6.6$ at Ellel, and why a $\pounds 1.55$ gap is measurable at all | ~330 | Demoted to Appendix D with `tab:window`'s sibling material by approval A9 (§2.7, "pairing variance, block-length sweep"). The composed 4.1 keeps the block-length sensitivity, which is the part that reaches a served decision, and drops the tutorial on why pairing works. **See the hand-off below — this one is not to be lost.** |
+
+## Hand-off to 8C-4/8C-5 — the factor of 6.6 belongs in Discussion
+
+**Ruled by Phuong, 2026-08-07.** The $178.00 \to 26.94$ pairing factor of $6.6$ at Ellel is the
+largest single thing the Results compression drops, and it is a number with argumentative force
+rather than a detail. Losing it entirely is not the right outcome; Results could not carry it at
+1,400 words, and Discussion has room for a figure Results could not.
+
+**What it establishes, and why it is a Discussion claim rather than a Results one.** The factor
+is why a mean gap of $\pounds 1.55$ between the served baseline and the argument-minimum is
+measurable at all. On unpaired errors that gap sits far inside noise and no comparison can be
+made — so the conclusion drawn from it, *that the two cannot be separated*, would have been
+reached **by insufficient precision rather than by evidence**. That is a claim about the validity
+of this project's own null results, which is Discussion 5.3's subject by definition.
+
+**Placement: 5.3 "Validity of the approach", not 5.4.** 5.4 is limitations; this is the opposite
+— it is the instrument being good enough to license a null. It also pairs naturally with the
+numerics validity note and the W3 quantification that 5.3 already has to absorb, all three being
+statements about whether the reported non-separations mean what they say.
+
+**Source.** `brain/eval/mcs.py` `paired_variance()`; per-pair diagnostics in
+`brain/eval/mcs_L1_results.json` under `paired_variance_top4`. The full exposition is in the
+superseded Results prose, retrievable from git at `24887e2:chapters/results.tex`
+`sec:res-paired`.
 | The two-alignment Ellel caveat and its retirement | ~60 | Repair chronology. The rung now scores all 260 folds; a reader needs the 260, not its history. |
 | The keg-order misattribution correction ($1.09$ against $0.72$) | ~75 | Chronology of the project's own arithmetic, not a result. The surviving figure is $0.72$. |
 | The undefined-score node that disappeared before the margin applied | ~90 | A correct non-event. Reporting it costs 90 words to establish that nothing happened. |

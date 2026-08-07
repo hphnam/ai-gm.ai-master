@@ -140,3 +140,28 @@ This supersedes **E5** above, which had argued for keeping the margin chronology
 ruled against it and E5 was reasoning from first principles about a settled question, which is the
 failure `PRJ93_RULES.md` names for 8C: re-deriving what an approval already decided. The
 qualification survives; the narrative does not.
+
+### How E5 was caught, because it will recur in 8C-4
+
+**It was not caught by a better critique round.** Rounds A–E all ran before Round F and none of
+them found it, because each was reasoning about the text on its merits — and on its merits E5's
+argument is sound. A qualification on the strength of a claim *is* different from a narrative of
+the work, and that distinction is real. It was simply not mine to draw, because §4.5 had drawn it
+already and reached the other answer.
+
+What caught it was reading `05_paper_architecture.md` **§4.5** at all. That section was not in the
+8C-3 brief's READ list, which named §2.1, §2.7a/b, §7 and the rename tables. §4.5 was reached
+only while assembling the criterion trace, and it turned out to hold five binding rulings on what
+each over-budget section displaces — the single most useful page for a compression phase, and the
+one the brief did not name.
+
+**The operational form, for 8C-4 and 8C-5:** before compressing anything, read §4.5's row for
+that chapter first, and treat its displacement list as settled. Discussion 5.4 has a row there
+too, and it is the one section in the document that **grows** — it absorbs the status half of
+`sec:res-agent`, the review's admitted omissions, and R106/R107. A session that compresses 5.4
+toward its budget will be reversing an approval.
+
+**The general shape is the one the rules already name and this is a second instance:** an argument
+constructed from first principles inside the session will beat a half-remembered approval, because
+the argument is present and vivid and the approval is a line in a file nobody opened. The defence
+is not better arguing. It is reading the owning file before the argument starts.

@@ -3289,3 +3289,78 @@ documents at proper depth with a generous time budget and no node-count target. 
   — a tier-2 claim only, until T3-1 closes.
 - ROOT graph unchanged at 13,618 / 25,047. `brain/graphify-out` unchanged at 5,495.
 - 8C-3 **not** started. No prose composed.
+
+## Session 2026-08-07 (8) — Phase 8C-3: Results composed to the tree; push BLOCKED
+
+**Completed.**
+
+1. **Embedded-title sweep, estate-wide.** 33 figure sources scanned, rendered PDFs read back by
+   pulling literal show-strings out of the content streams. Five generators carried titles in the
+   image body. F4 `fig_drift.py` was the real defect: a *finding sentence* per panel, the
+   false-open counts, painted into the raster with no caption, no LoF entry and no traceable
+   comment. F5/F6/`fig:ladder` carried venue names; F7 also repeated the unit its own x-axis
+   label already showed. Fixed at the generator in all five — venue into the panel label, finding
+   and unit into the caption. `fig_drift.py` now prints the three counts so the caption quotes
+   them from the run. All five regenerated; rendered text and PNGs re-inspected.
+
+2. **`brain/scripts/figurecheck.py`**, a sibling of `latexcheck.py` because the defect lives in
+   generator source before any compile. Verified in **both** directions before use (4 fixtures,
+   clean ones carrying a commented-out `set_title(` and a `title=` inside a TeX comment) and then
+   against the five real pre-fix sources via `git show HEAD:`, where it flagged all five. Its
+   scope boundary — API constructs yes, bare TikZ nodes reading as titles no — is now recorded in
+   `PRJ93_RULES.md` alongside the three-tier boundary it generalises.
+
+3. **`figures/ladder.pdf` on Overleaf was the pre-`b1faf683` MASE build** while `results.tex`
+   line 156 introduced it as RMSSE. Found by the sweep, not by the register. Rung *ordering*
+   differed too. Replaced with the committed build; panels also reordered Beer Hall / Ellel /
+   Two River Taps to match F4–F7, on Phuong's approval.
+
+4. **Chapter 4 recomposed from the result files**, not shortened. 13 sections + 15 subsections →
+   5 sections. **13,072 → 6,247 marker-equivalent**, 2.1:1. Section labels HELD where
+   `methodology.tex`/`conclusion.tex` reference them, so ten external refs keep resolving. Nine
+   body floats, every one with a 15/45 short title. F4/F5/F7 placed at first reference, F6 in
+   4.5. Appendix E created for the four demoted tables; `tab:window` → D; `tab:mcs-config`
+   authored in C from the artefact.
+
+5. **Ledgers.** `figure_title_sweep.md`, `results_argument_skeleton.md` (R1–R13, all survive),
+   `results_rewrite_critique.md` (rounds A–F).
+
+**Verified end state.**
+
+- `latexcheck` on the clone at `f903214`, TeX Live 2026: **PASS**. 115 pages, 0 errors,
+  **0 undefined references** (was 2), 0 undefined citations, 0 floats lost, 8 overfull boxes.
+- The **224.47 pt `main.lot` overfull vbox is gone**; List of Tables 30 entries against six pages.
+- `figurecheck.py` clean over 33 sources, exit 0.
+- Floors, marker-equivalent: Ch 2 **4,938**, Ch 3 **5,526**, Ch 4 **6,247**. Total
+  **16,711 / 13,400**, +25 %.
+
+**PUSH BLOCKED, and this is the one thing 8C-4 must not assume away.** `git push origin main`
+is refused by a protected-branch guard. `origin/main` still holds **`24887e2`**. Verified
+read-only after the refusal: the remote's `figures/ladder.pdf` still reads **MASE**, so the live
+document's Figure 4.1 still contradicts its own body text, and `tab:mcs-config` and `fig:nulls`
+still print `??` on Overleaf. **Local green plus unpushed equals a broken document.** Handed to
+Phuong; not routed around.
+
+**Corrections made to other stores.**
+
+- **§F repaired in three places** and normalised to marker-equivalent throughout. S-2 struck as
+  already closed; the dangling-reference register retired after a build showed **2** undefined
+  references against its claimed 5, with three rows stale; graphify staleness row added.
+- **`blocker_clearance_package.md` B5** asserts Ellel's MCS n "is not 260". The artefact says
+  `common_fold.n_folds` = 273 / 260 / 205, equal to the headline counts at all three venues.
+  Correction appended beside `tab:mcs-config`, not applied silently. Third instance of a package
+  number wrong against its own source.
+
+**Unstarted / handed on.**
+
+- **8C-4 Discussion**, not conducted this session by instruction.
+- **Reallocation deliberately NOT decided.** Phuong's ruling: three unmeasured chapters are
+  budgeted at 4,800 and are composed rather than compressed, so deciding now allocates from a
+  pool whose other half is unmeasured. Reallocate across all six after 8C-4 and 8C-5.
+- **The pairing factor of 6.6** ($178.00 \to 26.94$ at Ellel) is the largest thing the
+  compression drops. Ruled into **Discussion 5.3**, not lost — hand-off written into
+  `results_argument_skeleton.md`.
+- **Three `\ref`s owed** once Discussion 5.3/5.4 exist: `sec:res-agent`, `sec:res-pattern`, and
+  §2.7b's W3 forward clause.
+- **Graph not refreshed**, by instruction. Still 13,618 nodes, six files stale. Nothing in 8C-3
+  was blocked by it.

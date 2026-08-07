@@ -154,20 +154,29 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 
 ## F · State to carry forward
 
+**Units, fixed 2026-08-07.** Every word count in this section is **marker-equivalent** — the
+`wordcount.py` Marker column, which is Raw minus the artefact the counter charges to prose and a
+marker does not. Raw follows in parentheses where it is useful. This row exists because §F
+previously quoted Chapter 2 in Raw and Chapter 3 in Marker while presenting the two for
+comparison, and the two floors were being held against each other for exactly that comparison.
+
 | Quantity | Value |
 |---|---|
 | SHOULD-FIX conformance rows | 0 |
 | Unadjudicated contradictions | 0 |
-| Open rows not blocked on a third party | **3** — all self-closable, all listed below |
+| Open rows not blocked on a third party | **2** — S-1 and S-3, both self-closable, both below. *(Was 3. S-2 closed and is struck below.)* |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
-| Dangling cross-references across the four chapter files | **5** — see the register below. *(Was recorded as 0; 8C-2 created four of them and did not update this row.)* |
-| Chapters composed to the approved tree and pushed | **2 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2) |
+| Dangling cross-references across the chapter files | **0** — verified by compile, not by register. *(This row read **5**. That was wrong: three of the five were already placed by 8C-F and the register was never re-read against a build. See the corrected register below.)* |
+| Chapters composed to the approved tree | **3 of 6** — Chapter 2 (8C-1), Chapter 3 (8C-2), Chapter 4 (8C-3) |
+| Chapters composed **and pushed** | **2 of 6** — Chapter 4 is composed, compiled and committed locally at `f903214`, **not pushed**: the push guard refuses a protected-branch push to `origin/main`. Overleaf still holds `24887e2` |
 | Chapter files live on Overleaf with prose in them | **4** — plus `conclusion.tex`, composed to a *pre-tree* five-chapter shape. `introduction.tex` is an empty template stub |
-| Measured word floors, both PROVISIONAL pending reallocation | Ch 2 **4,948**/4,000 · Ch 3 **5,526**/4,200 (marker-equivalent) |
-| Chapters still unmeasured | 4 — Introduction (**nothing written**), **Results**, Discussion (**no file; lives inside `conclusion.tex`**), Conclusions |
-| Document compiles | **YES** — first clean build 2026-08-07. 139 pages, 0 errors, 0 undefined citations, 0 floats lost, 9 overfull boxes. Verified on a **fresh clone of the pushed state** at `24887e2`, not only pre-push |
-| Undefined references in the live document | **2**, both known and both 8C-3's: `tab:mcs-config`, `fig:nulls` |
+| Measured word floors, all three PROVISIONAL pending reallocation | Ch 2 **4,938**/4,000 (raw 4,948) · Ch 3 **5,526**/4,200 (raw 5,618) · Ch 4 **6,247**/5,200 (raw 6,274) |
+| Three-chapter total against the budgets they share | **16,711 / 13,400**, over by **3,311 (+25 %)** |
+| Chapters still unmeasured | 3 — Introduction (**nothing written**), Discussion (**no file; lives inside `conclusion.tex`**), Conclusions. Budgeted **4,800** between them plus the abstract, and **composed rather than compressed**, so their floors cannot be inferred from the three measured ones |
+| Document compiles | **YES** — 115 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 8 overfull boxes. **Tier 2 only:** run on the local clone under TeX Live 2026 at `f903214`, which is **not the state Overleaf holds**. The last figure verified on a fresh clone of the *pushed* state is `24887e2`, at 139 pages |
+| Undefined references in the live document | **0** on the composed state. `tab:mcs-config` is authored in Appendix C and `fig:nulls` is placed in 4.3. **Both still print `??` on Overleaf** until `f903214` lands |
 | Open tier-3 (Overleaf-only) items | **2** — T3-1 and T3-2 below |
+| Root knowledge graph | **STALE.** `graphify-out/graph.json` stands at **13,618 nodes** with **six large files recorded stale**. No refresh, update or re-extraction was run in 8C-3 by instruction: the graph is a convenience index, that session navigated by path and grep, and a refresh would have spent heavily for no marginal value. The two refusals of 2026-08-07 are unresolved and `brain/scripts/graph_write_guard.py` brackets any future run. **Nothing in 8C-1/2/3 was blocked by the staleness** |
 
 ### Tier-3 items — verifiable only on Overleaf, not unchecked
 
@@ -202,7 +211,14 @@ a named owner and a named action, not gaps.
 - **Closing it would require** installing Inkscape locally, which buys one page of coverage —
   not obviously worth it while tier 3 is a browser tab away.
 
-### 8C-3 input — the caption short-title deliverable
+### 8C-3 input — the caption short-title deliverable · **DISCHARGED 2026-08-07**
+
+> **Closed.** All nine surviving body floats carry a `\caption[short]{short. body}` at the 15/45
+> rule, and the four demoted to Appendix E plus `tab:window` in Appendix D carry them too.
+> Measured on the build: the **224.47 pt overfull vbox in `main.lot` is gone**, the List of
+> Tables is **30 entries** against six pages, and the document's largest overfull box is now
+> `search_screening_body.tex` at 182.80 pt. Chapter-4 caption words fell **1,537 → 619**.
+> The section below is kept for the specification it records.
 
 **This is a named deliverable of 8C-3, not a compile byproduct.** It is recorded here because
 it was found by the first document compile and would otherwise live only in a log.
@@ -274,9 +290,10 @@ points at goes wrong in both directions.
 
 ### The three self-closable rows
 
-None is blocked on anyone. S-1 and S-2 were opened by the Chapter 2 composition; S-3 by
-Chapter 3's. The reasoning is in `phase_state.md` (entries of 2026-08-07) and in the two
-argument skeletons.
+None is blocked on anyone. S-1 was opened by the Chapter 2 composition, S-3 by Chapter 3's. S-2
+is struck: it was closed before it was last read, and the strike is kept rather than deleted so
+the correction is visible. The reasoning is in `phase_state.md` (entries of 2026-08-07) and in
+the argument skeletons.
 
 > **Namespace note, applied 2026-08-07.** `background_argument_skeleton.md`'s arguments were
 > renamed **A1–A16 → B1–B16** because three other live namespaces use `A`: approval rows
@@ -288,7 +305,7 @@ argument skeletons.
 | # | Row | What closes it |
 |---|---|---|
 | **S-1** | **Chapter 2 is 948 words over its 4,000 budget (4,948, provisional).** Held, not accepted — a 24 % overrun repeated across six chapters lands the document near 24,800 against HC1's 20,000. *(Corrected from 4,893/893 on 2026-08-07: the counter mis-stripped escaped `\%`. Use `brain/scripts/wordcount.py`.)* | **The boundary check is RUN and the answer is (c).** Not "Methods can carry them", not "Methods cannot" — **Methods can and is itself over budget**, so relocation moved the overrun rather than resolving it. The two derivations answered **differently**, which is the evidence the boundary rule was applied rather than assumed: **background argument B3** (median-versus-mean functional argument) **stays in Chapter 2** — it is a claim about where two literatures stop, which is Chapter 2's job by definition; Methods 3.2 cites it and spends ~60 words on the application to Ellel's revenue estimand, which R84 requires there anyway. Chapter 2 saves **nothing** from it. **Background argument B6** (recorded-regime extension) **moves to Methods 3.7**, where it already lived in the superseded prose and where it carries its limit and the D-D4 three-way attribution that Chapter 2 cannot hold; Chapter 2 keeps a ~25-word limb sentence for gap limb 4. Net **−85 to Chapter 2**, taking the overrun to ~863. **What closes S-1 is now budget reallocation, and that is deliberately not decided yet** — see S-3. |
-| **S-2** | **`\ref{app:search}` is plain `Appendix~B` text in `literature_review.tex` §2.1.** Written as a ref, replaced because Appendix B does not exist and it would compile to `??`. | Writing **Appendix B**: define `\label{app:search}` there and convert the plain text back to `\ref{app:search}`. Also carries U3's two binding conditions (`05_paper_architecture.md` §7). |
+| ~~**S-2**~~ | ~~`\ref{app:search}` is plain `Appendix~B` text in `literature_review.tex` §2.1.~~ | **CLOSED, and it had been closed for some time before this row was read.** Appendix B exists as `\chapter{Corpus search and screening}` in `main.tex`, `\label{app:search}` is defined at `appendix/search_screening.tex:15`, and `literature_review.tex:26` reads `Appendix~\ref{app:search}` — not plain text. Found 2026-08-07 by 8C-3 when it was told to *create* Appendix B on the strength of this row. **Creating it would have added a second `\chapter` inside `\begin{appendices}` and relettered C, D and E, silently invalidating every by-letter appendix reference in Chapters 2 and 3** — a document-wide failure with no `??` to reveal it, which is the exact hazard `main.tex:254` warns about. The lesson is the one the register below carries: a row asserting something is missing is checked against a **build**, not against another row. |
 | **S-3** | **Chapter 3 is 1,326 words over its 4,200 budget (5,526 marker-equivalent, 5,618 raw), pushed 2026-08-07.** Held PROVISIONAL on the same terms as S-1, and for the same reason: an unmarked overrun compounds. **This is a measured floor, not a first draft** — the smallest count at which every criterion named against the chapter in `05_paper_architecture.md` §5 is still met, reached after two compression passes and five critique rounds. Worst sections: **3.7** 740 against 440 (carries RQ4's whole methodological premise plus D-D4 plus R69/R70/R71/D3/D6), **3.2** 707 against 640 (the §2.8a mandatory six-item ordering), **3.3** 477 against 390. Only 3.5 lands near budget. | **Budget reallocation — and it is deliberately NOT decided yet.** Two floors are not enough to decide on. **Results is the chapter that determines whether there is anything to reallocate**: 14,580 against 5,200, and the only chapter where large compression is genuinely plausible, since thirty sections of run narrative collapse into five. Ruling now risks handing Methods words that Results needs more. **Measure Results first**; that puts 32,510 of the current 37,471 measured. Do not quote 4,948 or 5,526 as final in the interim. |
 
 ---
@@ -326,19 +343,34 @@ Two items, plus a correction to how they were handed over.
    caveat. **Figure blocker B4** is discharged twice over — applied to `results.tex`, and
    re-shipped in 8C-2's `tab:bases`.
 
-4. **Five dangling cross-references, and 8C-3 owns two of them.**
+4. ~~**Five dangling cross-references, and 8C-3 owns two of them.**~~ **CORRECTED 2026-08-07
+   against a build. There were two, not five, and this register was wrong on three rows.**
 
-   | Reference | Sites | Why it dangles |
-   |---|---|---|
-   | `tab:mcs-config` | `methodology.tex`, `results.tex` | Moved to Appendix C by approval A9. **Appendix C does not exist** |
-   | `fig:blocks` | `methodology.tex` | F1 authored (`out/fig_blocks.tex`), never compiled, never inserted |
-   | `fig:pipeline` | `methodology.tex` | F3 authored, never compiled, never inserted |
-   | `fig:origins` | `methodology.tex` | A-F7 built; lives in Appendix C, which does not exist |
-   | `fig:nulls` | `results.tex` | **F7 is built and rendered** (`out/fig_nulls.pdf`) and the reference was written before the float was placed |
+   The register was assembled by reading files. A `latexcheck` run on the pre-8C-3 state
+   reported **exactly two** undefined references. The three rows below that claimed to dangle
+   had already been placed by 8C-F, and the register was never re-read against a compile.
 
-   Every one prints `??`. Four were created by 8C-2 and the row above them in §F still read
-   zero. `fig:nulls` is the cheapest to close and 8C-3 should close it while composing 4.3
-   rather than leave it to 8D.
+   | Reference | Register said | Build said | Now |
+   |---|---|---|---|
+   | `tab:mcs-config` | dangles; "Appendix C does not exist" | **dangled** | **Closed.** Appendix C *does* exist (`\chapter{Method specifications and pseudocode}`, `\label{app:pseudocode}`). The float genuinely had no body anywhere; 8C-3 authored it from `eval/mcs_L1_results.json` |
+   | `fig:nulls` | dangles | **dangled** | **Closed.** F7 placed in Results 4.3 at first reference |
+   | `fig:blocks` | "never compiled, never inserted" | **resolved** | Placed by 8C-F. Register stale |
+   | `fig:pipeline` | "never compiled, never inserted" | **resolved** | Placed by 8C-F. Register stale |
+   | `fig:origins` | "lives in Appendix C, which does not exist" | **resolved** | `\label{fig:origins}` at `appendix/pseudocode.tex:60`. Register stale on both halves |
+
+   **The transferable failure.** Three rows asserted a reference was broken, and a build would
+   have contradicted all three in seconds. A dangling reference is the one class of defect that
+   is *free* to check — it prints `??` and `latexcheck` names it by label — so a register of
+   them that is maintained by hand is strictly worse than the compile that supersedes it.
+   **This register is retired.** The row in the §F table above is now sourced from the build,
+   and any future claim that a reference dangles is checked by running `latexcheck` first.
+
+   **Two new ones were created and closed in the same session, and they are not in this table
+   because they never reached a build.** `conclusion.tex` referenced `sec:res-agent` and
+   `sec:res-pattern`; approval A5 relocates both sections out of Results, so 8C-3 converted both
+   to plain text with the owner recorded at each site. **Owner: 8C-4/8C-5**, which must restore
+   a `\ref` once Discussion 5.3 and 5.4 exist as labelled sections. The same applies to §2.7b's
+   W3 forward clause in Results 4.1, which is prose without a `\ref` for the same reason.
 
 5. **The floor is not the only thing unmeasured, and the deficit runs the other way.**
    `chapters/introduction.tex` is an **empty template stub** — Chapter 1 is 0 words against a
