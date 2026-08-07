@@ -2969,3 +2969,197 @@ audit it made possible found in one pass what two rounds of reading files in con
 not — because it ran over the *real* input graph rather than over the files I remembered
 pushing. Prefer a mechanical sweep of the resolved graph to re-reading what you believe you
 wrote.
+
+---
+
+## Session 2026-08-07 — Phase 8C-F: local compile, git write path, queue cleared
+
+**The single outstanding 8B item is closed. The document compiles.**
+
+### Stage 1 — TeX Live and the first real compile
+
+**TeX Live 2026**, `scheme-full`, installed to `~/texlive/2026` via `install-tl` with a
+profile and **no `sudo`** (binaries land in `bin/universal-darwin`, not `aarch64-darwin`).
+`latexmk` 4.88, `biber` 2.21. Doc and source files were skipped (`tlpdbopt_install_docfiles`
+/`srcfiles = 0`) — no package is omitted by that, only their documentation.
+
+**Overleaf's TeX Live year is UNRESOLVED and could not be read from here.** The MCP bridge
+exposes only file read/write — no settings tool — and the year is not stored in the repo.
+Local is 2026. **These are not assumed equal.** Same class of risk as numpy 1.26 vs 2.5
+(`log/78`); Phuong must read Menu → Settings → TeX Live.
+
+**`brain/scripts/latexcheck.py`** — the instrumented tool. Runs `latexmk -pdf
+-interaction=nonstopmode -halt-on-error`, parses the log into a table (undefined refs BY
+LABEL NAME, undefined citations by key, lost floats, over/underfull boxes with location and
+overflow in pt, missing characters, package errors), prints page count and output path, and
+exits non-zero on any error class and on undefined references. Sets `max_print_line` so TeX
+does not wrap label names across log lines and silently truncate the parse.
+
+Verified against a fixture carrying a deliberate undefined `\ref`, a bad citation key and an
+overfull hbox — **in both directions**: exit 1 on the broken fixture, exit 0 on a clean one.
+
+**The instrument was wrong on its first real run, and the artefact caught it.** It printed
+`VERDICT: PASS` over a build that produced no PDF. Two causes: with `-file-line-error` errors
+are emitted as `<file>:<line>: Package X Error:`, matching neither the `!` nor the `^Package`
+form; and the string is `Fatal error occurred, no output PDF file produced`, not `No pages of
+output`. Fixed; VERDICT now also fails on a missing output PDF and a non-zero latexmk exit.
+This is the exit-code rule catching the tool written to enforce it.
+
+### The compile, against the checklist
+
+| # | Check | Result |
+|---|---|---|
+| a | Does it build? | **YES — 139 pages, 0 errors.** But not at first |
+| b | Appendix lettering B/C/D | **CONFIRMED** — A p112, B p113, C p117, D p124 |
+| c | Undefined refs = exactly two | **CONFIRMED** — `tab:mcs-config`, `fig:nulls`. No third |
+| d | Line refs print numbers | **CONFIRMED** — `ln:sub`→9, `ln:fc1`→2, `ln:fc2`→5, `ln:fc3`→9. No `??` |
+| e | A-F7 placement | **No floats lost anywhere.** A-F7 sits on p120 with A-F5 |
+| f | Overfull boxes | 10 → 9 after fixes. Algorithm pages are NOT the exposure: `pseudocode.tex` overfulls by only 2.54 pt |
+| g | LoF / LoT short titles | **The six new short titles all work.** The defect is elsewhere — see below |
+
+**(a) THE SUSPECTED CAUSE IS EXONERATED.** The `[algo2e]` / two-`\lIf`-then-`\tcp*[f]`
+arrangement in `alg:detection` was already repaired on 2026-08-07 (four fixes recorded in the
+file header) and `algorithm`/`algpseudocode` were removed from `main.tex`. It did not die in
+Appendix C. **The real first fatal was `figures/fig_pipeline.tex` (F3, in Methods):** its
+TikZ node style was named `out`, which collides with TikZ's built-in `/tikz/out` key —
+declared value-required, so a `.style` redefinition never takes effect. Error: *"The key
+'/tikz/out' requires a value"*. Renamed to `outb`. **Do not name a TikZ style after a TikZ
+key.** This would have failed on Overleaf identically.
+
+**(g) `chapters/results.tex` has 17 `\caption` commands and ZERO `\caption[short]{long}`.**
+Every Chapter-4 table plus Figure 4.1 therefore dumps its entire multi-sentence caption into
+the lists — the List of Tables runs to **six pages** and carries a 224 pt overfull vbox. The
+six new short titles (methodology ×4, litreview ×1, appendix B/C/D) are all correct and none
+split at the wrong point. **Writing 17 short titles is 8C-3 work and was deliberately not
+done this session.**
+
+### Stage 1.4 — resolved by LOOKING, not by predicting
+
+Pages rasterised at 200–500 dpi and viewed. Four defects, all of them downstream of line
+breaking and all invisible to every generator assertion. **All fixed in the GENERATORS**
+(`figures/fig_blocks.py`, `figures/fig_appendix_tikz.py`), regenerated, copied, recompiled
+and re-inspected.
+
+- **F1 item 3 — FAILED.** The time axis printed **through** the `n=230` glyphs. `LABEL_H_CM`
+  was a derived estimate of 0.72 cm carrying its own *"THIS IS AN ESTIMATE, NOT A
+  MEASUREMENT"* warning. **Measured off the render: 1.05 cm** — short by 0.21 cm, almost
+  exactly the 2.2 mm it was supposed to be leaving. Axis 0.04 → −0.29. **Measured clearance
+  after the fix: 6.29 pt = 2.22 mm**, matching `AXIS_MARGIN_CM`.
+- **F1 item 5 — read as detached.** ~6 cm of text over a 1.9 cm arrow, midway between two
+  rows and tied to neither. Added leader lines from each arrow end to the adopted row at the
+  fit-end and calibrate-start coordinates. Wording kept: *strictly* is the strict inequality.
+- **F1 item 6 — NO DEFECT.** "adopted" reads as a row tag, parallel to *superseded:*.
+- **A-F7 inset — the overlap IS legible, but the title was destroyed.** "three consecutive
+  origins, magnified" was painted over by the first forecast block (blocks are emitted after
+  the title node; gap 0.34 cm against a ~0.40 cm descender). Gap now 0.78 cm.
+- **A-F6 — sub-caption printed straight through the `realistic arm` box** and overfull'd by
+  9.56 pt. Moved to y=−2.6 with a wrapping width. That overfull box is now gone.
+- **A-F5 and F3 — clean** once F3 compiled at all.
+
+**Local environment gaps, stated rather than glossed.** `\includesvg` in `title_page.tex`
+needs Inkscape, which is not installed locally; a **scratch-only** `svg.sty` stub routes past
+it, so **the title page is NOT locally verified**. `\quickwordcount` needs `-shell-escape`
+(emits `main-words.sum`, now gitignored). Overleaf has both.
+
+### Stage 1.5 — the assertion boundary is now THREE tiers
+
+`PRJ93_RULES.md` assigned vertical extent, overfull boxes and glyph collision to *"the
+compile, and only the compile"* — which, while no local compiler existed, silently meant
+*"Phuong's Overleaf run"*. Now: **tier 1 generator** (horizontal geometry, origin placement),
+**tier 2 local compile** (everything downstream of line breaking), **tier 3 Overleaf** (the
+target render). Tier 2 licenses a push; it does **not** license a claim about what a marker
+sees, and where the two disagree Overleaf wins and the disagreement is the finding.
+
+### Stage 2 — the git write path
+
+**The document exists ONLY on Overleaf.** There is no `main.tex` in this repo, so Stage 1.3
+could not run before Stage 2.1 supplied the source. Resolved by cloning **read-only** first
+(a clone migrates nothing) and holding write-path adoption until the build passed.
+
+Clone: **`/Users/hapuna/Downloads/prj93-overleaf`** — a sibling, separate history, not a
+submodule or subtree. **The Overleaf branch is `main`, not `master`.**
+
+**2.2 verified, no divergence.** All 27 `.tex` the bridge lists are present; 12 methodology
+sections and 10 literature-review sections match exactly; the three appendix skeletons are
+B `app:search`, C `app:pseudocode`, D `app:robustness`; `figures/` holds `gap_map.pdf` and
+`ladder.pdf`. The clone additionally holds 7 binaries the bridge does not list (it returns
+text files only) — a bridge display filter, not a divergence. Note: the bridge reports a
+`chapter` "Methods" for methodology.tex that is a `%`-commented line — it does not skip
+comments.
+
+**2.3 recorded in `PRJ93_RULES.md`:** all edits via git; the web UI for compiling and reading
+only; verification by `git diff`/`git status`, not remote read-back; the MCP bridge retained
+for reading and status; a reported `latexcheck` run before every push. `write_section`'s
+2026-07-31 hazard stops mattering once writes are diffs — a silent nested-subsection deletion
+becomes a visible `-` block.
+
+### Stage 3 — the queue
+
+- **3.1** methodology.tex header replaced. It instructed a future reader to apply an
+  already-applied preamble diff in a form (`[ruled,vlined,linesnumbered]`) that **would break
+  the build** by dropping `[algo2e]`, and pointed at `out/` paths that are the generator's
+  local output directory and were never what the document reads.
+- **3.2 ALREADY DONE — not a task.** `LOad-BEARING` was corrected in commit `7a1c47f`. No
+  occurrence survives anywhere. Reported rather than re-fixed, per the verify-before-
+  reporting-open rule.
+- **3.3** `figure_proof.tex` retired (743 lines). Nothing `\input` it. It held the second
+  pasted copy of nine floats that would drift, and it could not have caught the defect that
+  mattered: loading `algorithm2e` alone, `\begin{algorithm}` resolved fine there while the
+  document broke.
+- **3.4** The ten Appendix C/D prose references converted to `\ref` in one batch, targeting
+  the labels that already existed. **Verified in the rendered PDF: all ten print as the
+  letters C and D**, not numbers.
+- **3.5** F4–F7 PDFs added to `figures/` — the binary path the bridge could not take. Float
+  environments remain for 8C-3; **not** placed in `results.tex`.
+
+### PUSH IS BLOCKED — the one thing not delivered
+
+Two commits sit local and **unpushed** in the clone: `d246333` (Stage 1 figure fixes) and
+`24887e2` (Stage 3 queue). `git push` is refused by an environment branch-protection guard:
+*"push to protected branch 'main'. Use a feature branch and open a PR."* **Overleaf's git
+bridge is single-branch and has no PR mechanism**, so that guard cannot be satisfied from
+here and was not worked around. Phuong must push, or the guard must be relaxed for this
+remote. **Until then Overleaf still has the broken `fig_pipeline` and will not compile.**
+
+### Verified end state
+
+- Local build: **139 pages, 0 errors, 0 undefined citations, 0 floats lost**, 9 overfull
+  boxes, undefined refs exactly `tab:mcs-config` + `fig:nulls`.
+- `ai-gm.ai-master` commit `e410203e`; clone commits `d246333`, `24887e2` (unpushed).
+- 8C-3 is **not** started. No prose was composed.
+
+### Stage 3.6 — ROOT graph refresh: ATTEMPTED, REFUSED BY THE SHRINK GUARD
+
+**Node count before: 13,618 (25,047 links). Node count after: 13,618 — UNCHANGED.**
+Confirmed ROOT (`graphify-out/graph.json`), not `brain/graphify-out/`, which stayed at
+5,495 nodes throughout.
+
+`detect_incremental` found **127 changed files** (54 code, 64 document, 3 paper, 6 image).
+AST extraction succeeded: 726 nodes, 1,661 edges. Semantic extraction was dispatched as four
+parallel subagents; **only two of the four returned** (chunk 2: 254 nodes/404 edges; chunk 3:
+189 nodes/253 edges). Chunks 1 and 4 never wrote their files.
+
+The merge of AST + the two returned chunks into the existing graph produced **13,312 nodes**
+— a net **−306** against the live 13,618, because the 37 re-extracted files yielded fewer
+nodes than their previous extraction while the 36 files behind the two missing chunks
+contributed nothing. **graphify's shrink guard (#479) refused to overwrite `graph.json`**,
+which is exactly what it exists to do. **The guard was not forced.** Forcing it would have
+let a half-complete run degrade a good graph — the same failure shape as the `eval/agent_eval.py`
+incidents in the rules: a green-looking run that quietly damages the artefact.
+
+**One real inconsistency was created and repaired.** `save_manifest` had already stamped the
+37 successfully-extracted files as current, while their nodes were never written to
+`graph.json` — so the next `--update` would have SKIPPED them and left the graph permanently
+stale for those files. The manifest was restored from git (`git checkout -- graphify-out/manifest.json`),
+so manifest and graph agree again. The 37 files' extractions ARE in the semantic cache, so a
+re-run replays them without re-dispatching subagents; the other 36 were left unstamped by
+design and will be re-queued.
+
+**To finish this properly:** re-run the graphify skill so all four chunks land, or run a full
+rebuild. Do NOT pass `force=True` to `to_json` to push the smaller graph through.
+
+**A stale-artefact hazard was also found and cleared:** `graphify-out/` still held four
+`.graphify_chunk_*.json` files dated **2026-08-04** from an earlier run whose Step 9 cleanup
+never ran, including a `chunk_05` that this run's four agents would never have overwritten.
+Merging them would have silently folded three-day-old extraction into today's graph. Deleted
+before the merge. Check for stale chunk files before any future graphify merge.
