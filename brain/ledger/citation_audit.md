@@ -377,6 +377,33 @@ because 11 of 84 claims were unverifiable in NotebookLM. That framing was
 wrong in one respect: the claims were verifiable, just not *there*. Zotero
 reached all eleven.
 
+---
+
+## Provenance check — 2026-08-07, MISSING-KEY column
+
+A tooling defect found while composing Chapter 2 puts every MISSING-KEY
+verdict in question wherever one was produced by `zotero_search_by_citation_key`.
+In web/hybrid mode that tool resolves a key only by scanning `Extra` for a
+`Citation Key:` line, so it returns "No item found" for any item whose key was
+never pinned by hand, present or not. Four live keys came back null that way on
+2026-08-07 and were confirmed by title lookup. The rule is now in
+`PRJ93_RULES.md` under Verification rules.
+
+**This audit is not affected, and the reason is definitional.** MISSING-KEY is
+defined in the Verdict vocabulary above as *"cited but absent from `ref.bib`"* —
+against the BibTeX file, not against the library. The check behind it was the
+full inventory recorded in the Method section (`ref.bib` read in full, 111
+entries against 84 keys in use), not a per-key library query.
+`zotero_search_by_citation_key` was not used to produce any verdict in this
+file. Zotero appears here only as a **full-text source** for the eleven keys
+NotebookLM could not retrieve, and each of those was reached by opening the
+item and reading it, which is a positive result and cannot be a false negative.
+
+**Scope of this check:** the MISSING-KEY column only. The SUPPORTED,
+OVERSTATED, WRONG-SOURCE and UNVERIFIED verdicts rest on NotebookLM and on
+Zotero full text, and are untouched by the defect either way. Both MISSING-KEY
+totals — 0 first pass, 0 revised — stand.
+
 The notebook gap is still real and still worth closing — `hyndman_another_2006`
 and `syntetos_categorization_2005` are absent from it entirely — but it is a
 tooling gap, not an evidence gap. **The substantive finding is the opposite of

@@ -814,11 +814,17 @@ before seeing any.
 
 ## 3.2 Rename table — literature review
 
+> **Rows 2 and 3 are superseded — see §7, U4.** They disagreed with the approved tree in
+> §2.1, and §2.1 governs. Section 2.2 is **"Demand forecasting on short hospitality
+> series"**; section 2.3 is **"Cross-series pooling and exogenous covariates"** (which
+> row 5 below already names correctly). The shipped chapter uses the §2.1 forms. Do not
+> rename from rows 2 and 3.
+
 | Current | Proposed | Rule |
 |---|---|---|
 | Decision support and the arrival of delegated autonomy | Decision support and delegated autonomy | N7 — "the arrival of" is chronology |
-| Learning a venue's rhythm when the history is short | Demand periodicity under short histories | N1 — gerund clause to nominal phrase |
-| When does borrowing across series pay? | Cross-series pooling and global models | N4, N2 |
+| ~~Learning a venue's rhythm when the history is short~~ | ~~Demand periodicity under short histories~~ **→ superseded, U4** | N1 — gerund clause to nominal phrase |
+| ~~When does borrowing across series pay?~~ | ~~Cross-series pooling and global models~~ **→ superseded, U4** | N4, N2 |
 | Intermittent trade is a different object | Intermittent demand | N1, N2 — a full clause asserting a verdict |
 | Weather, and the temptation of exogenous data | *(merged into "Cross-series pooling and exogenous covariates")* | N8 — "temptation"; section CUT as duplicate |
 | From a point to a band | Conformal prediction intervals | N2 — metaphor replaced by subject |
@@ -1254,6 +1260,7 @@ rule in `PRJ93_RULES.md` applied to approvals rather than to findings.
 | **U1** | A2 / §2.1, the purpose cell for Introduction 1.4 | "Four contributions at graded strength" | "**Five** contributions at graded strength" | Phuong, explicit unlock, 2026-08-06 | The RQ mapping yields five. C5 is gap limb 7's frozen apparatus, and folding it into another claim would conceal the thing graded strength exists to disclose. See `06_research_questions.md` §6. |
 | **U2** | A2 / §2.1, the purpose cell for Discussion 5.5 | Four declared divergences | **Six**, adding the three-venue estate against the specification's four, and the NeonDB research schema not provided | Phuong, confirmed at the same gate, 2026-08-06 | 5.5 is mandatory under HC59 and its defect mode is incompleteness. Both were confirmed while verifying the estate size in the aim. The budget is unchanged at 300. See `06_research_questions.md` §9. |
 | **U3** | `07_figure_programme.md` §3, float **A-F1** (Appendix B, R65) | A TikZ **PRISMA-style screening flow diagram** — records identified → screened → excluded with reasons → included | A **criteria table plus prose**. **No flow diagram is drawn.** | Phuong, explicit approval, 2026-08-06 | **Three of the four PRISMA boxes have no number and none is recoverable.** `04_supervisor_evidence_pack.md` §3.1 states it directly: *"No screened-versus-retained count exists at any stage, and it is not recoverable now"*, and *"the search was not pre-registered, and no protocol document exists"*. A flow diagram's rhetorical function is to assert that a systematic process occurred; drawing it with invented counts would place a claim the project's own evidence pack contradicts into the document's most legible form. Independently, the cited corpus contains **no PRISMA diagram either** (`07_figure_programme.md` §6), so the convention had no precedent to appeal to. R65 asks for the protocol to be *recorded*, which the table does. See `log/77`. **Two binding conditions attach — see below.** |
+| **U4** | §3.2 rename table, rows 2 and 3 — the headings for literature-review sections **2.2** and **2.3** | 2.2 "Demand periodicity under short histories"; 2.3 "Cross-series pooling and global models" | **Superseded by §2.1.** 2.2 is "**Demand forecasting on short hospitality series**"; 2.3 is "**Cross-series pooling and exogenous covariates**" | Phuong, explicit ruling, 2026-08-07, on the conflict reported at the 8C-1 hand-off | Two *approved* items disagreed — §2.1's tree (A2/A10) against §3.2's rename table (A5) — and leaving that open keeps two live headings for one section, which resurfaces at every later touch. §2.1 wins on three grounds: the composition brief names the tree as the source for headings; §2.1's forms are parallel with their siblings under **N3**, the rule §3.2's own rule column invokes for section 2.6; and §3.2 **contradicts itself** on 2.3, its row 5 (the weather MERGE) already naming the merged section "Cross-series pooling and exogenous covariates". Chapter 2 as pushed on 2026-08-07 carries the §2.1 forms. §3.2 rows 2 and 3 are dead. |
 
 **Conditions on U3, binding on whoever writes Appendix B.**
 

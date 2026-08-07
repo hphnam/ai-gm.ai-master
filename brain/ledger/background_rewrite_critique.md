@@ -120,3 +120,45 @@ No blocking finding remains open.
 chapter measures **4,856 words against the 4,000 budget**, and the residue cannot be removed
 without deleting arguments the argument-skeleton step was run to protect. The costed cut-list
 is in the hand-off, not here.
+
+---
+
+## Correction — 2026-08-07, the word count above is stale
+
+**The figure in the verdict is 4,856. The live chapter is 4,893.** The 4,856 was measured
+before the last three edits of the session and was not re-measured after them: the round-3
+R66 restoration of `makridakis_m5_2022`, `kolassa_why_2020` and `hollmann_accurate_2025`
+(+53), the round-4 negative-parallelism rewrite, and the read-back fix for the repetition
+that rewrite introduced. Recorded here rather than overwritten, per the corrections-are-
+appended rule.
+
+**Verified on the artefact, not on the local draft.** `chapters/literature_review.tex` was
+re-read from Overleaf on 2026-08-07 and fingerprinted paragraph by paragraph against the
+local copy — 10 sections, 40 body paragraphs, one figure environment, identical openers and
+closers in identical order. The counter is the one calibrated at 0.14 % against the
+architecture's measured 8,604 for the pre-rewrite chapter.
+
+| Section | Budget | Live |
+|---|---|---|
+| 2.1 Decision support and delegated autonomy | 260 | 284 |
+| 2.2 Demand forecasting on short hospitality series | 220 | 229 |
+| 2.3 Cross-series pooling and exogenous covariates | 700 | 837 |
+| 2.4 Intermittent demand | 280 | 324 |
+| 2.5 Conformal prediction intervals | 340 | 345 |
+| 2.6 Error measures and model comparison | 480 | 686 |
+| 2.7 Deviation detection from calibrated intervals | 370 | 500 |
+| 2.8 Proactive agents and intervention policy | 400 | 421 |
+| 2.9 Evaluation of agent interventions | 400 | 558 |
+| 2.10 Synthesis and research gap | 550 | 709 |
+| **Body total** | **4,000** | **4,893** |
+| `fig:gap-map` caption | *(caption line)* | 42 |
+
+A **433** for 2.8 was quoted in the 8C-1 hand-off. It is wrong — the sections sum to 4,893
+only with 421, which is what the counter returns. The total was right in that hand-off; the
+one section figure was not.
+
+**Status of the 893-word overrun: provisional, not accepted.** Phuong's ruling of 2026-08-07
+is that none of the four costed cuts is made, and that the residue is re-tested by a
+**Chapter 2 / Chapter 3 boundary check** run as the first step of 8C-2 — see
+`phase_state.md` and `background_argument_skeleton.md`. This figure is not a precedent for
+a 22 % chapter overrun and must not be cited as one.

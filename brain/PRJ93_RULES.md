@@ -204,10 +204,24 @@ which store owns which fact. Nothing here modifies that file — see Scope bound
   API only reveals `deleted` if that field is inspected; a whole session was
   spent editing a discarded duplicate on the strength of that (row 106).
   Check `deleted` before editing any item reached via search.
+- **A null from `zotero_search_by_citation_key` is not evidence of absence.**
+  In web/hybrid mode that tool resolves a key only by scanning the `Extra`
+  field for a `Citation Key:` line, so it finds *only* keys that were pinned
+  by hand — everything else returns "No item found" whether or not the item
+  exists. Four live keys came back null in one session on 2026-08-07
+  (`montero-manso_principles_2021`, `fu_prism_2026`, `meyer_conceptual_2004`,
+  `hewamalage_forecast_2023`) and all four were then confirmed present by
+  title lookup. **Confirm with `zotero_search_items` on the title before
+  acting on a null**, and never record a MISSING-KEY verdict, delete a
+  citation or re-add a paper on the strength of one. The same fact makes the
+  tool useless as a completeness check: a clean sweep with it proves only
+  that the pinned subset is pinned.
 - New papers are pushed to Zotero by me (the agent), never handed to Phuong
   to add. Pin the citation key in both the native `citationKey` field and an
   Extra `Citation Key:` line, so a Better BibTeX re-export cannot regenerate
-  a different key and break a citation that already compiles.
+  a different key and break a citation that already compiles. Pinning is also
+  what makes `zotero_search_by_citation_key` work on that item at all — see
+  the rule above.
 - No number written into the dissertation without tracing it to the
   matching `brain/log/*result*.md` file. Cite the result file path in a
   LaTeX comment next to the number.

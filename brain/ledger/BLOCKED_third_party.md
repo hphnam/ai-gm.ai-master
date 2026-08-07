@@ -158,10 +158,21 @@ dissertation without its own pre-registered gate. None is waiting on a person.
 |---|---|
 | SHOULD-FIX conformance rows | 0 |
 | Unadjudicated contradictions | 0 |
-| Open rows not blocked on a third party | **0** |
+| Open rows not blocked on a third party | **2** — both self-closable, both listed below |
 | DIVERGES — UNRESOLVED rows | 7, every one listed above |
 | Dangling cross-references across the four chapter files | 0 |
 | Latest Overleaf commit at time of writing | `9174a2d` |
+
+### The two self-closable rows — opened 2026-08-07
+
+Neither is blocked on anyone. Both were opened by the Chapter 2 composition and are carried
+here because this file is the single retrieval point; the reasoning is in `phase_state.md`
+(entry of 2026-08-07) and `background_argument_skeleton.md`.
+
+| # | Row | What closes it |
+|---|---|---|
+| **S-1** | **Chapter 2 is 893 words over its 4,000 budget (4,893, provisional).** Held, not accepted — a 22 % overrun repeated across six chapters lands the document at 24,400 against HC1's 20,000. | The **Chapter 2 / Chapter 3 boundary check**, first step of **8C-2**: test whether arguments **A3** (one venue scored unscaled → Methods 3.2) and **A6** (the recorded-regime extension → Methods 3.7) relocate to Methods, whose rulings they already underwrite. ~200 words with no argumentative move lost. If Methods cannot carry them, escalate to **budget reallocation** with Methods' floor known. |
+| **S-2** | **`\ref{app:search}` is plain `Appendix~B` text in `literature_review.tex` §2.1.** Written as a ref, replaced because Appendix B does not exist and it would compile to `??`. | Writing **Appendix B**: define `\label{app:search}` there and convert the plain text back to `\ref{app:search}`. Also carries U3's two binding conditions (`05_paper_architecture.md` §7). |
 
 ---
 
@@ -197,6 +208,21 @@ of absence.
 
 Next session, one check only: confirm `mcp__zotero__zotero_update_item` now succeeds. The
 config is correct and verified; it is the running MCP process that holds the stale env.
+**Still unrun as of 2026-08-07** — the Chapter 2 session needed no Zotero write, so the check
+had no natural occasion. Not counted in §F because it verifies a fix already applied and
+read-back-verified, not outstanding work.
+
+**`zotero_search_by_citation_key` returns false negatives — found 2026-08-07.** In hybrid
+mode it resolves a key only by scanning `Extra` for a `Citation Key:` line, so it finds
+**only** the keys pinned by hand in the repair above and returns "No item found" for every
+other item, present or not. Four live keys came back null in one session —
+`montero-manso_principles_2021`, `fu_prism_2026`, `meyer_conceptual_2004`,
+`hewamalage_forecast_2023` — and all four were confirmed present by `zotero_search_items`
+title lookup. **A null from that tool is not evidence of absence**, and a clean sweep with it
+proves only that the pinned subset is pinned. The rule is in `PRJ93_RULES.md` under
+Verification rules. `citation_audit.md` was checked against this and is unaffected: its
+MISSING-KEY verdict is defined against `ref.bib`, not the library, and no verdict in that
+file was produced by this tool.
 
 ### Zotero hygiene, checked 2026-08-06
 

@@ -182,3 +182,46 @@ turns back into knowledge-telling.
 
 **Nothing in the A-list above is cut.** Every row survives into the draft; the trace is in
 `background_rewrite_critique.md` and in the criterion trace reported at hand-off.
+
+---
+
+## Ruling of 2026-08-07 — none of the four costed cuts is made
+
+The hand-off carried a costed cut-list for the 893-word overrun: **A3 limb 3** (the Chatfield
+"narrower part transfers" passage, ~90), **A6** (the recorded-regime extension, ~110), **A4's
+foundation** (Meyer's compliance/reliance distinction, ~95) and the **limb-by-limb
+decomposition** in 2.10 (~145). Phuong's ruling: **make none of them, and do not accept 4,893
+as final either.** Two are rejected outright and two are deferred to a check that has not
+been run.
+
+**A4 and the limb decomposition are not cuttable.** A4's Meyer distinction is a claim about
+prior work, so Chapter 2 is its home; removing it leaves the loss function without a warrant.
+The limb-by-limb decomposition discharges **R63** — gap elicited equals gap filled — which is
+a marking criterion, and the decomposition is what discharges it.
+
+### The Chapter 2 / Chapter 3 boundary check — first step of 8C-2, not yet run
+
+**A3 and A6 are not cut. They are tested for relocation.** The observation behind this is that
+neither is only a Chapter 2 argument:
+
+| | What it is | Whose ruling it underwrites |
+|---|---|---|
+| **A3** | The argument licensing one venue being scored unscaled | **Methods 3.2** — the ruling relocated there from Results in 8A.1 |
+| **A6** | The strongest argument for the Mondrian design | **Methods 3.7** |
+
+Both are derivations whose *conclusion* Chapter 3 has to state and justify anyway. If
+Chapter 2 derives them in full **and** Chapter 3 restates the justification, that is
+cross-chapter redundancy — the word-budget leak 8D is instructed to sweep for. The boundary
+that resolves it: **Chapter 2 establishes what the literature supports and where it stops;
+Chapter 3 applies it to this estate's design.** The derivation lives in one place and is
+cited from the other.
+
+**This is a relocation test, not a deletion test.** If Methods can carry A3 and A6, roughly
+200 words leave Chapter 2 without a single argumentative move being lost, and the chapter
+comes back close to budget for free. If Methods cannot carry them, the residue is genuinely
+irreducible and the decision moves to **budget reallocation** — at which point Methods' real
+floor is known, which it is not today. Deciding the reallocation now, on one chapter with the
+other five unmeasured, is deciding blind.
+
+**Until that check runs, 4,893 is provisional.** It is not an accepted overrun and it is not
+a precedent. See `phase_state.md`.

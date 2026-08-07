@@ -2356,3 +2356,69 @@ approved headings from `05_paper_architecture.md` §2.1, in order.
 - R66 has one known gap by approved decision: the knowledge-gap signal (Methods 3.11) is
   argued for nowhere in Chapter 2, because `06_research_questions.md` §7.2 rules out
   building an eighth gap limb for it. Recorded in the critique file so it is not "fixed".
+
+---
+
+## 2026-08-07 — 8C-1 hand-off adjudicated (Phuong). Overrun held PROVISIONAL.
+
+Ruling on the five items carried out of the composition session. Appended, not merged into
+the entry above.
+
+**1. The 893-word overrun is provisional, pending a boundary check. It is not accepted.**
+None of the four costed cuts is made. **A4** (Meyer's compliance/reliance distinction) and
+the **limb-by-limb decomposition** are ruled not cuttable — A4 is a claim about prior work so
+Chapter 2 is its home, and the decomposition is what discharges **R63**, a marking criterion.
+**A3** and **A6** are neither cut nor kept: they are tested for **relocation to Methods 3.2
+and 3.7**, whose rulings they already underwrite, as the **first step of 8C-2**. If Methods
+can carry them, ~200 words leave Chapter 2 with no argumentative move lost. If not, the
+residue is irreducible and the decision moves to budget reallocation — by which point
+Methods' real floor is known, which it is not today. Reasoning and the boundary rule in
+`background_argument_skeleton.md`, final section.
+
+> **4,893 is not a precedent.** An unmarked 22 % overrun compounds: six chapters at that rate
+> land the document at 24,400 against HC1's 20,000. Any later session quoting this figure
+> quotes it as provisional or not at all.
+
+**2. The live word count is 4,893, not 4,856.** `background_rewrite_critique.md`'s verdict
+carried 4,856, measured before the round-3 R66 restorations and the round-4/5 fixes and never
+re-measured. **Verified on the artefact:** `chapters/literature_review.tex` re-read from
+Overleaf and fingerprinted paragraph by paragraph against the local copy — 10 sections, 40
+body paragraphs, one figure environment, identical openers and closers in identical order.
+Correction appended to the critique file with the per-section table. One section figure in
+the hand-off was also wrong: **2.8 is 421, not 433**; the sections sum to 4,893 only with 421.
+The total was right.
+
+**3. The heading conflict is closed as U4, not left open.** `05_paper_architecture.md` §7 now
+carries **U4**: §3.2's rename-table rows for 2.2 and 2.3 are **superseded by §2.1**. §3.2
+itself is struck through at those rows and carries a pointer, so a reader arriving there sees
+it rather than finding it only in §7. **A second conflict was found while writing the U-row
+and was not in the hand-off:** §3.2 also renames 2.3 to *"Cross-series pooling and global
+models"* while its own row 5 (the weather MERGE) names the merged section *"Cross-series
+pooling and exogenous covariates"* — §3.2 contradicts itself, and the shipped chapter uses
+the §2.1 / row-5 form.
+
+**4. The Zotero false-negative is now a rule, and `citation_audit.md` is cleared.**
+`PRJ93_RULES.md` Verification rules now states that a null from
+`zotero_search_by_citation_key` is not evidence of absence, with the four keys that
+demonstrated it and the instruction to confirm by title lookup before acting. **The audit is
+unaffected, and definitionally so:** its MISSING-KEY verdict is defined against `ref.bib`,
+not against the library, and rests on the full 111-entry inventory recorded in its Method
+section. `zotero_search_by_citation_key` produced no verdict in that file; Zotero appears
+there only as a full-text source, which is a positive result and cannot be a false negative.
+Both MISSING-KEY totals stand at 0. Scope of the check: the MISSING-KEY column only.
+
+**5. Venue names stay out of 2.3.** Confirmed. Naming Beer Hall, Ellel and Two River Taps is
+a study fact with no prior-work function; 3.1 owns it. *"An estate of three venues"* carries
+the load-bearing property, which is the size.
+
+**Carried forward — do not lose these two**
+
+- **`\ref{app:search}`.** `chapters/literature_review.tex` §2.1 closes with plain
+  `Appendix~B records the search and screening procedure behind this corpus`. It is plain
+  text because Appendix B does not exist yet and `\ref` would compile to `??`. **Convert to
+  `\ref{app:search}` when Appendix B lands**, and define that label there. Recorded here as
+  well as in `background_rewrite_critique.md` C6, because a carry-forward living only in a
+  critique record is a carry-forward that gets missed.
+- **The Chapter 2 / Chapter 3 boundary check** is the first step of 8C-2, before any Methods
+  composition. Its outcome decides whether Chapter 2's overrun closes or moves to
+  reallocation.
