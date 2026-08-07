@@ -216,6 +216,53 @@ Corollary: **`git diff` on a regenerated artefact is part of the run, not an opt
 afterwards.** A regeneration whose diff nobody read has not been verified, whatever it
 printed.
 
+### A constraint added to make a run COMPLETE becomes a constraint on what it PRODUCES
+
+**A mitigation and a specification are different things, and a mitigation written into a
+prompt stops being distinguishable from a specification the moment it is read by whoever
+does the work.** Timeouts, token budgets, "keep it bounded", "aim for 15–25 per file" — each
+is a legitimate answer to a run that keeps dying, and each silently caps the output it was
+added to enable.
+
+The worked example is the graph refresh of 2026-08-07. The extraction subagents were given
+"bounded ranges, 15–25 nodes per file" to stop them stalling. They obeyed it as a
+specification: the external examiner assessment fell 142 → 64 nodes, `literature_conformance`
+82 → 12, and eight files collapsed to **exactly one node each**, which is not a summary of a
+40 kB report but a budget being rationed across a chunk. The shrink guard refused the write,
+correctly, twice.
+
+**The tell is a guard refusing twice with a different explanation available each time.** The
+first refusal was attributed to two of four chunks failing; the second disproved that, because
+all chunks landed and the deficit was essentially unchanged (−289 against −306). Two plausible
+and *different* stories for the same refusal means the stories are being fitted to the
+refusal. **When a guard refuses twice, suspect the instruction rather than the run** — and in
+particular suspect the instruction that was added to make the run survive.
+
+**The repair is to fix the emission, not to restore the cap.** The re-extraction with no
+node-count target then stalled on every chunk, at the moment each agent emitted its result as
+one large JSON. That is what the original cap was actually working around — a response-stream
+limit, not a limit on how much a document contains. The fix is a multi-part write protocol
+(many small part files, assembled afterwards), which removes the failure without touching the
+depth. **A budget imposed on the content to work around a limit in the transport is a
+mislocated fix**, and it will keep costing content until the transport is addressed.
+
+### Stamping follows the write, never the dispatch
+
+`graphify`'s manifest save does not ask whether the graph write succeeded. `save_manifest`
+stamps every file that produced extraction *output*; the shrink guard refuses the graph write
+in an earlier, independent step. When the guard fires, `graph.json` correctly keeps its old
+content and `manifest.json` is stamped as though the new content landed — so the next
+`--update` reads those files as unchanged and **skips them permanently**. The extraction is
+then unreachable: not in the graph, and never re-queued.
+
+This was repaired by hand twice on 2026-08-07 with `git checkout -- graphify-out/manifest.json`.
+A repair that is needed twice is a missing fix. `brain/scripts/graph_write_guard.py` brackets
+the run — `snapshot` before, `settle` after — and rolls the stamps back when `graph.json` is
+byte-identical afterwards. **`settle` exiting non-zero is the reportable outcome, not an error
+to route around:** it means the refusal was real and the graph still needs a run that lands.
+Its `--self-test` reproduces the exact 2026-08-07 failure, per the rule that a guard nobody
+has seen fail is a guard taken on faith.
+
 ### A number that enters a decision comes from an instrumented tool, never an ad-hoc script
 
 **Ad-hoc measurement scripts have been wrong twice, and both times in the direction of the
@@ -443,6 +490,29 @@ was exercised against an overlap, a sub-minimum gap, a non-adjacent reach past a
 neighbour, an out-of-extent box and a negative-x node before any figure was built on it.
 This is the exit-code rule generalised: a guard that returns quietly is reporting what it
 decided, and until it has failed once you do not know it can.
+
+### The same boundary in a new medium: what a construct check can and cannot reach
+
+The three tiers above divide by *when* a defect becomes visible. A second boundary runs across
+the same material and divides by *whether the defect is a construct at all*, and it has to be
+stated or a clean sweep will be read as coverage it does not have.
+
+`brain/scripts/figurecheck.py` (added 2026-08-07) flags figure sources that paint a title into
+the image body, because a title belongs in the `\caption` where it reaches the List of Figures,
+the cross-reference and the marker's eye. It catches the title **APIs** — matplotlib's
+`set_title`, `suptitle`, `plt.title`, and pgfplots' `title=` key. It does **not** catch a bare
+TikZ `\node` positioned above a picture and reading as a title, and that is a deliberate
+boundary rather than a gap: placement and wording are a judgement, not a construct, and a regex
+guessing at them would flag every label in the estate.
+
+**The transferable rule: an assertion is worth writing exactly where the defect has a syntax.**
+Where it does not, say so in the tool's own docstring and leave the case to a reader, rather than
+widening the pattern until the check cries wolf and is disabled. A guard that fires on four
+legitimate calls is worse than no guard, because the next person silences it.
+
+Verified in **both** directions before use, per the assertion rule above — four fixtures, dirty
+and clean, the clean ones carrying a commented-out `ax.set_title(` and a `title=` inside a TeX
+comment — and then against the five real pre-fix sources, where it flagged all five.
 
 **Assert against the target's geometry, not the harness's.** `fig_blocks.py` computed its
 clearances against the compile proof -- 11pt `article`, landscape, 15 mm margins -- while the
