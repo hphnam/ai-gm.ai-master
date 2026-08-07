@@ -26,6 +26,10 @@ from _style import OUT, load
 
 WIDTH_CM = 13.4
 ROW_H = 0.62
+# Clearance between adjacent below-bar labels. Small, because the narrow blocks are
+# 1.85 cm wide and the longest word in their text ("reconciliation") is about 1.45 cm
+# at \scriptsize -- the label must stay wider than that or it overfulls instead.
+GUTTER_CM = 0.09
 FILL = {
     "fit": ("black!8", "black!45"),
     "validation": ("black!22", "black!55"),
@@ -37,6 +41,40 @@ SHORT = {"fit": "fit", "validation": "validate", "calibration": "calibrate", "te
 
 def _d(s: str) -> date:
     return date.fromisoformat(s)
+
+
+def _assert_no_label_overlap(spans, x) -> None:
+    """Fail the build if two below-bar labels would occupy the same horizontal span.
+
+    This is here because the overlap was missed once by eye and by reasoning about the
+    figure, and found only by doing the arithmetic: a 2.45 cm label on 1.885 cm centres
+    overlaps its neighbour by 0.565 cm whatever text it holds. Geometry a generator can
+    check should not be left to a person looking at a render.
+    """
+    boxes = []
+    for blk in spans["blocks"]:
+        x0, x1 = x(blk["start"]), x(blk["end"])
+        w = max(x1 - x0, 0.05)
+        half = min(2.45, w - GUTTER_CM) / 2
+        centre = x0 + w / 2
+        boxes.append((blk["block"], centre - half, centre + half))
+    for (a, _, a_hi), (b, b_lo, _) in zip(boxes, boxes[1:]):
+        if b_lo < a_hi:
+            raise SystemExit(
+                f"REFUSING to write: labels '{a}' and '{b}' overlap by "
+                f"{a_hi - b_lo:.3f} cm. Widen the blocks or narrow the labels.")
+
+
+def _assert_no_left_overhang(lines: list[str]) -> None:
+    """Nothing may be placed at a negative x.
+
+    With `\\noindent` the picture origin IS the text margin, so a node hung off the left
+    lands in the page margin as an overfull box rather than being reflowed.
+    """
+    bad = [ln for ln in lines if " at (-" in ln]
+    if bad:
+        raise SystemExit("REFUSING to write: node placed left of the origin:\n  "
+                         + "\n  ".join(bad))
 
 
 def main() -> None:
@@ -59,12 +97,15 @@ def main() -> None:
     cut = x(spans["blocks"][2]["start"])
     lines += [
         "  %% superseded two-way split",
+        # The row tags live INSIDE the widest bar of each row. Set outside on the left
+        # (`anchor=east` at a negative x) they extended about 1.5 cm past the picture
+        # origin, which with \noindent is the text margin -- an overfull \hbox and glyphs
+        # in the page margin, and TikZ does not reflow to save you from it.
         f"  \\node[blk,fill=black!6,draw=black!35,text=black!60,minimum width={cut:.3f}cm]"
-        f" at (0,2.35) {{\\scriptsize fit \\emph{{and}} calibrate}};",
+        f" at (0,2.35) {{\\scriptsize\\itshape superseded:\\/"
+        f" \\upshape fit \\emph{{and}} calibrate}};",
         f"  \\node[blk,fill=black!30,draw=black!55,minimum width={WIDTH_CM - cut:.3f}cm]"
         f" at ({cut:.3f},2.35) {{\\scriptsize test}};",
-        "  \\node[anchor=east,text=black!55] at (-0.15,2.66) "
-        "{\\scriptsize\\itshape superseded};",
         f"  \\draw[decorate,decoration={{brace,amplitude=3pt}},black!55] "
         f"(0,{2.35 + ROW_H + 0.08:.2f}) -- ({cut:.3f},{2.35 + ROW_H + 0.08:.2f}) "
         "node[midway,above,yshift=-1pt,text=black!55]{\\scriptsize one span, two jobs};",
@@ -76,19 +117,23 @@ def main() -> None:
         x0, x1 = x(blk["start"]), x(blk["end"])
         fill, draw = FILL[blk["block"]]
         w = max(x1 - x0, 0.05)
-        # The bar carries fill only. A label typeset INSIDE a 1.85 cm block would
-        # overflow it and collide with its neighbour, and the three narrow blocks abut.
+        # The bar carries fill only, plus the row tag on the widest block. A label typeset
+        # INSIDE a 1.85 cm block would overflow it; a fixed-width label BELOW it overlaps
+        # its neighbour instead, because the label centres are spaced by the block widths.
+        # So the label width is derived from the block it belongs to, less a gutter, which
+        # makes non-overlap a property of the construction rather than of a chosen constant.
+        tag = "\\scriptsize\\itshape adopted" if blk["block"] == "fit" else ""
         lines.append(
             f"  \\node[blk,fill={fill},draw={draw},minimum width={w:.3f}cm]"
-            f" at ({x0:.3f},1.05) {{}};")
+            f" at ({x0:.3f},1.05) {{{tag}}};")
+        label_w = min(2.45, w - GUTTER_CM)
         lines.append(
-            f"  \\node[anchor=north,align=center,text width=2.45cm]"
+            f"  \\node[anchor=north,align=center,text width={label_w:.3f}cm]"
             f" at ({x0 + w / 2:.3f},0.98) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
             f" ($n{{=}}{blk['n_days']}$)\\\\[-1pt]"
             f" {{\\scriptsize\\color{{black!60}}{blk['job']}}}}};")
 
     lines += [
-        "  \\node[anchor=east] at (-0.15,1.36) {\\scriptsize\\itshape adopted};",
         "  %% time axis",
         f"  \\draw[->,black!70] (0,0.05) -- ({WIDTH_CM + 0.25:.2f},0.05);",
     ]
@@ -106,6 +151,9 @@ def main() -> None:
         " begins};",
         "\\end{tikzpicture}",
     ]
+
+    _assert_no_label_overlap(spans, x)
+    _assert_no_left_overhang(lines)
 
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / "fig_blocks.tex"

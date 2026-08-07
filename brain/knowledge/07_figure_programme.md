@@ -315,8 +315,17 @@ free marks, not because they compete for space.
 A17, and 06 §10 pre-records that it is not to be flagged as a defect. Disposition: **no body
 float.** A body float would spend 60 of the twenty counted caption words on material that
 answers nothing, and 4.5's 800 words already carry it as a specification-level deliverable.
-If a float is wanted it is **A-F7 in Appendix C** — the twelve clusters by density, free
+If a float is wanted it would be a twelve-clusters-by-density chart in Appendix C, free
 against HC1. Recommended: none.
+
+**Numbering correction, 2026-08-07.** This paragraph previously assigned that hypothetical
+float the label **A-F7**, which the §3 table had already given to the demoted rolling-origin
+schematic. Two different floats, one identifier, in one file. It surfaced because F3's
+annotation cross-references the rolling-origin figure and the reference had to be resolved to
+something. **A-F7 is the rolling-origin schematic.** The 3.11 float is not recommended and
+carries no number, because a number reserved for a float nobody is building is a number that
+gets reused. In the chapter the reference is `\ref{fig:origins}` — a LaTeX label, not a
+printed identifier — so nothing downstream depends on the appendix ordering.
 
 ---
 

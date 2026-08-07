@@ -261,3 +261,19 @@ against a chart alternative.
 Nothing in this file, or anything else under `brain/`, modifies
 `.claude/` or the root `CLAUDE.md`. That config is shared with a
 collaborator and is out of bounds for this project.
+
+### Geometry a generator can check is not left to a render
+
+A figure's layout has two kinds of defect. One needs eyes — is the line too faint, does the
+ordering read. The other is **arithmetic**: a 2.45 cm label on 1.885 cm centres overlaps its
+neighbour by 0.565 cm whatever text it holds, and no amount of looking is needed to know it.
+
+**Compute the second kind and assert it in the generator.** `figures/fig_blocks.py` refuses
+to write when two labels overlap or when any node sits left of the picture origin, because
+both were missed twice: once by eye and once by reasoning about the figure instead of about
+its coordinates. Fixing a label's vertical overflow by moving it outside its bar left the
+horizontal overlap untouched, and the fix read as complete because the thing it was compared
+against was the previous defect rather than the geometry.
+
+The general form: **when a fix moves an object, re-derive every constraint the object was
+subject to, not the one that prompted the move.**
