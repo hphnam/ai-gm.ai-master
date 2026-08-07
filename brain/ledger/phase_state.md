@@ -2784,3 +2784,75 @@ prose 8C-3 is about to delete.
   both compiles.
 - One cosmetic defect introduced and not fixed: a `LOad-BEARING` typo in the new `main.tex`
   comment. Left rather than retransmit 250 lines of a file about to be compiled.
+
+---
+
+## 2026-08-07 (5) — Phase: 8C-F float migration, CHECKPOINT B
+
+Every float with a home now lives in the chapter that owns it. Composed no prose beyond the
+three float captions the architecture requires. Stopped for the second compile.
+
+**Migrated and pushed — bodies under `figures/`, environments in the owning file**
+
+| Float | Body on Overleaf | Environment lives in | Label |
+|---|---|---|---|
+| F1 | `figures/fig_blocks.tex` | `methodology.tex` §3.7 | `fig:blocks` |
+| F3 | `figures/fig_pipeline.tex` | `methodology.tex` §3.1 | `fig:pipeline` |
+| A-F2 | `figures/alg_conformal.tex` | **direct `\input`, Appendix C** | `alg:conformal`, `ln:sub` |
+| A-F3 | `figures/alg_adoption.tex` | **direct `\input`, Appendix C** | `alg:adoption`, `ln:fc1`–`ln:fc3` |
+| A-F4 | `figures/alg_detection.tex` | **direct `\input`, Appendix C** | `alg:detection` |
+| A-F5 | `figures/fig_deployment.tex` | Appendix C | `fig:deployment` |
+| A-F7 | `figures/fig_origins.tex` | Appendix C | `fig:origins` |
+| A-F6 | `figures/fig_injection.tex` | Appendix D | `fig:injection` |
+| A-F1 | `appendix/search_screening_body.tex` | **not a float** — Appendix B's body | 3 table labels |
+
+Bodies were pushed **byte-identical to the generator output**, so a later diff against
+`figures/out/` is a real check rather than a formality.
+
+**Three captions authored, because a float environment cannot exist without one.** F1, F3 and
+A-F7 used the captions already drafted at `07` §10. A-F5 and A-F6 had none anywhere — the
+proof harness gave them `\section*` headings rather than captions — so both were written to
+the 15/45 rule from `07` §3's own purpose and grounding lines. Appendix captions are uncounted
+against HC1 (`05` §0), so neither costs budget. `tab:venues` and `tab:bases` were checked and
+are already compliant: 13/34 and 13/36.
+
+**A-F1's two structural changes, made deliberately and recorded in the file.** Its opening
+`\section{Corpus search and screening}` was removed — `main.tex` issues a `\chapter` of the
+same title, so it reproduced the chapter heading one level down. Its `\label{app:screening}`
+was removed: `app:search` is what Chapter 2 references, two labels on one appendix is how a
+reference ends up pointing at the wrong one, and `app:screening` was referenced nowhere. Its
+starred subsections were promoted to `\section*` so the chapter does not skip a level.
+
+**Held, and each for a stated reason**
+
+- `tab:mcs-config` — no body exists anywhere; placing it means authoring a pre-registration
+  table from `blocker_clearance_package.md` B5. **It is the only reference this migration does
+  not resolve**, and it is live in both `methodology.tex` and `results.tex`.
+- `tab:window` — defined inside `results.tex`; moving it edits prose 8C-3 will delete.
+- F4, F5, F6, F7 — Results floats. Their PDFs already carry final names
+  (`fig_drift`, `fig_validity_efficiency`, `fig_sensitivity`, `fig_nulls`) in
+  `figures/out/`. **They could not be pushed**: the Overleaf bridge's `write_file` takes
+  string content, so a binary PDF cannot go through it, and pushing a corrupted one would be
+  worse than a missing one. `figures/gap_map.pdf` and `figures/ladder.pdf` are already in the
+  project, so the path exists — it is just not this one. Manual upload, then 8C-3 writes four
+  `\includegraphics` environments.
+- The Methods plain-text `Appendix~C`/`Appendix~D` conversion — ten occurrences across seven
+  sections. **Deliberately all-or-nothing and deliberately after the compile**: converting
+  half leaves a chapter mixed, and `\ref{app:pseudocode}` only renders "C" if the appendix
+  lettering survives, which the compile has not yet confirmed. Doing it first would be
+  asserting against the harness rather than the target.
+
+**Verified end state**
+
+- 108 labels in the compiled document, **no duplicates**, checked mechanically rather than by
+  eye. `figure_proof.tex` redefines nine of them but is not `\input` by `main.tex`, so it does
+  not participate — that is the retirement case, not a live clash.
+- Every `\ref` in Chapters 2 and 3 resolves **except `tab:mcs-config`**. `results.tex` still
+  carries `fig:nulls` dangling, held by design.
+- `methodology.tex` read back from the remote after both writes; both floats present, both
+  neighbouring sections intact.
+- Two stale comments knowingly left, both deferred rather than fixed, because each would cost
+  a full-file retransmit of a chapter immediately before a compile: `main.tex`'s `LOad-BEARING`
+  typo, and `methodology.tex`'s header, which still claims `main.tex` lacks the preamble
+  packages, still gives the wrong `[ruled,vlined,linesnumbered]` form, and still points at
+  `out/` paths that no longer feed the document. The header is the one that matters.
