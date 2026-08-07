@@ -119,4 +119,24 @@ what it does not.**
 | First composition from evidence | 6,645 | Recomposed to the five-section tree; 8 floats removed by approved disposition |
 | Compression pass 1 | 6,420 | Redundant qualifiers, doubled explanations |
 | Compression pass 2 | 6,305 | 4.4 hardest: drift cause, native intervals, Winkler |
-| Critique rounds A–E | see final report | A1 added 34, E1–E2 net neutral |
+| Critique rounds A–E | 6,368 | A1 added 34; E1–E2 net neutral |
+| **Round F displacements** | **6,247** | §4.5's five unapplied rulings |
+
+## Round F — the displacement list in `05` §4.5 was not fully applied
+
+**Found, and this is the round that produced the floor.** §4.5 already rules on what leaves each
+over-budget section. Five of its rulings were sitting unapplied in the draft, which meant the
+chapter was carrying material an approval had already removed:
+
+| §4.5 ruling | Was | Now |
+|---|---|---|
+| 4.1 — "the whole of the pairing and block-length material to Appendix D" | The full retained-set-size sweep, $3,5,4,4$ / $4,6,6,5$ / $3,4,4,3$, plus the replication-count null | The one consequence that reaches a served decision (Two River Taps retained at 7 and 14, eliminated at 2 and 21) plus a pointer to Appendix D |
+| 4.1 — "the hypothetical in `sec:res-mcs-functional` about how a trading Two River Taps would have been handled" | Two sentences of counterfactual management advice | Cut; the forward pointer to Further Work remains |
+| 4.4 — "the implementation-correction narrative in `sec:res-winkler`" | Three departures itemised, plus the $16/3/18$-point comparison against the departing implementation | One clause naming the aggregation actually used |
+| 4.4 — "the per-venue detail of `sec:res-native-interval`" | Three coverage figures and three calibration deltas inline | The worst-venue shortfall and the three orderings; per-arm detail is Appendix E |
+| Methods 3.3 — "the chronology of when the margin was specified"; the *fact* survives in one clause | "specified after that failure was observed and written to a pre-registration document committed before any implementing code existed" | "pre-registered before any implementing code existed, which is a narrower guarantee ... and is not claimed as more" |
+
+This supersedes **E5** above, which had argued for keeping the margin chronology. §4.5 had already
+ruled against it and E5 was reasoning from first principles about a settled question, which is the
+failure `PRJ93_RULES.md` names for 8C: re-deriving what an approval already decided. The
+qualification survives; the narrative does not.
