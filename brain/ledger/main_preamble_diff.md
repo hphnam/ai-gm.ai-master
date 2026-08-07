@@ -1,76 +1,69 @@
-# `main.tex` preamble additions — PREPARED, NOT APPLIED
+# `main.tex` preamble additions — APPLIED 2026-08-07
 
-**Nothing has been written to `main.tex`.** This is a gate item: an edit to `main.tex`
-needs approval like any other Overleaf change, and unlike a chapter edit a bad preamble
-breaks the whole build rather than one section.
+**Status: applied to `main.tex` on Overleaf, and the prepared diff it replaces was wrong.**
 
-**These are not optional.** No appendix float compiles without them. A-F2, A-F3 and A-F4 all
-require `algorithm2e`; F3, A-F5, A-F6 and A-F7 all require TikZ libraries `main.tex` does not
-load.
+The earlier version of this file (prepared, unapplied) claimed three additions were needed.
+It was written from a stale reading of `main.tex`'s package block. Reading the file directly
+before applying found that **two of its three lines were already there**.
 
-## The diff
+## What the prepared diff got wrong
 
-`main.tex` currently has, at lines 43–46 of the package block:
+| Claimed | Actual |
+|---|---|
+| `\usepackage{amssymb}` is NEW | **Already loaded.** The `\mathbf{1}` substitution in A-F4 existed to work around a package that was never absent. |
+| `\usepackage[ruled,vlined,linesnumbered]{algorithm2e}` is NEW | **Already loaded** — as `\usepackage[algo2e]{algorithm2e}`, alongside `algorithm` and `algpseudocode`. |
+| TikZ libraries need extending | Correct. This was the one accurate line. |
+
+## The defect the stale reading concealed
+
+`main.tex` loads `algorithm2e` with the **`algo2e` option**, which exists precisely so the
+package can coexist with the `algorithm` package loaded on the line above it. That option
+**renames the environment to `algorithm2e`**.
+
+A-F2, A-F3 and A-F4 all opened `\begin{algorithm}`. In `main.tex` that would have opened the
+*other* package's float, and every `algorithm2e` body command inside it — `\SetKwInOut`,
+`\KwIn`, `\lIf`, `\tcp*`, the line numbering — would have failed.
+
+**The compile proof would not have caught it.** `figure_proof.tex` loaded `algorithm2e`
+alone, with no `algorithm` package and no `algo2e`, so `\begin{algorithm}` resolved to
+algorithm2e's own environment and the page would have compiled clean. A proof that passes
+while the document fails is worse than no proof: it converts an open question into a false
+answer. This is the same failure as the F1 geometry retrofit — *assert against the target,
+not the harness* — one layer up, in the package block rather than the class options.
+
+## What was actually applied to `main.tex`
+
+Additive only; nothing removed or reordered.
 
 ```latex
-\usepackage{amsmath}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta}
+% was: \usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}
+
+% new, immediately after the existing \usepackage[algo2e]{algorithm2e}
+\RestyleAlgo{ruled}
+\LinesNumbered
 ```
-
-Proposed:
-
-```latex
-\usepackage{amsmath}
-\usepackage{amssymb}                                   % NEW
-\usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}  % EXTENDED
-\usepackage[ruled,vlined,linesnumbered]{algorithm2e}   % NEW
-```
-
-## What each is for, and which float fails without it
 
 | Addition | Required by | What breaks without it |
 |---|---|---|
-| `positioning` | F3, A-F5, A-F6 | `right=of`, `below=8mm of` — F3's entire layout is relative rather than coordinate-based |
-| `fit` | F3 | the two dashed evaluation groups that enclose the ladder/MCS boxes and the band |
-| `backgrounds` | F3 | `on background layer`, without which the dashed groups paint over the boxes they enclose |
+| `positioning` | F3, A-F5, A-F6 | `right=of`, `below=8mm of` — F3's layout is relative, not coordinate-based |
+| `fit` | F3 | the two dashed evaluation groups enclosing the ladder/MCS boxes and the band |
+| `backgrounds` | F3 | `on background layer`; without it the dashed groups paint over what they enclose |
 | `decorations.pathreplacing` | F1 | the brace over the superseded split |
-| `arrows.meta` | all TikZ floats | already present; kept |
-| `algorithm2e` | A-F2, A-F3, A-F4 | all three algorithm floats; there is no fallback |
-| `amssymb` | A-F4 only, and only if the `\mathbb{1}` form is wanted | nothing — see below |
+| `\LinesNumbered` | A-F2, A-F3 | **not cosmetic** — `\ref{ln:sub}`, `\ref{ln:fc1}`–`\ref{ln:fc3}` print `??` |
+| `\RestyleAlgo{ruled}` | A-F2/3/4 | the floats fall back to the plain style |
 
-## `amssymb` is the one genuine choice
+The command forms were used rather than package options so the existing `[algo2e]` option is
+left untouched — changing that option would break the coexistence with `algorithm`.
 
-A-F4 currently uses `\mathbf{1}` for the indicator, which needs no package. `\mathbb{1}` is
-the conventional indicator and `amssymb` is a one-line, near-zero-risk addition, so taking it
-while the preamble is open is reasonable — **but it is a preference, not a requirement**, and
-it is the only line here that is. If it goes in, A-F4 changes one line:
+## Corresponding float changes
 
-```latex
-$b_t \leftarrow \mathbf{1}[z_t>1] - \mathbf{1}[z_t<-1]$      % current
-$b_t \leftarrow \mathbb{1}[z_t>1] - \mathbb{1}[z_t<-1]$      % with amssymb
-```
+- A-F2, A-F3, A-F4 now open `\begin{algorithm2e}`, in both `figures/out/` and the proof.
+- A-F4 uses `\mathbb{1}`, since `amssymb` was there all along.
+- `figure_proof.tex` is at **revision 7** and its preamble now reproduces `main.tex`'s
+  package block, not only its class, size, leading and margins.
 
-Recommend taking it. `\mathbb{1}` is what a reader of this literature expects, and the
-substitution exists only because the package was absent.
+## Still outstanding
 
-## Options for `algorithm2e`, since it is the one with real load-order risk
-
-`algorithm2e` defines `\algorithm` and can clash with `algorithm`/`float` packages. `main.tex`
-loads neither, so there is no known conflict. It does interact with `hyperref`, which
-`main.tex` does load: load `algorithm2e` **after** `hyperref` (as proposed above, since the
-package block sits below the `hyperref` setup) to avoid the known `\theHalgorithm` warning.
-
-The `[ruled,vlined,linesnumbered]` options are chosen to match how the three floats are
-written: `linesnumbered` is required, because A-F2 and A-F3 cross-reference specific lines
-(`\ref{ln:sub}`, `\ref{ln:fc1}`–`\ref{ln:fc3}`) and those references print as `??` without it.
-
-## Verification route
-
-The nine-page `figure_proof.tex` already carries exactly this preamble and is the test of it.
-**If the proof compiles, the additions are proven against the real document geometry before
-`main.tex` is touched at all** — which is the point of having built the proof against
-`main.tex`'s own class, size, leading and margins rather than against a convenient setup.
-
-Apply to `main.tex` only after the proof compiles clean.
+The compile. Everything above is a static reading of the two preambles; whether the nine
+floats typeset inside 150 mm is what the PDF is for.
