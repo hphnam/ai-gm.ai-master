@@ -714,3 +714,86 @@ will not create a directory, so it sits at the root rather than under `scratch/`
 1.85 cm blocks carry their labels without collision, and a clean exit reports what the
 compiler decided, not where the labels landed — the exit-code rule in `PRJ93_RULES.md`
 applied to LaTeX. The PDF must be looked at.
+
+---
+
+## 11. Appendix floats built — 2026-08-07
+
+All seven built. Nothing in the programme is now outstanding except the compile.
+
+| Float | Medium | Output | Asserted by generator |
+|---|---|---|---|
+| A-F1 | LaTeX prose + 3 tables | `out/a_f1_screening.tex` | n/a — no geometry |
+| A-F2 `alg:conformal` | `algorithm2e` | `out/a_f2_alg_conformal.tex` | n/a |
+| A-F3 `alg:adoption` | `algorithm2e` | `out/a_f3_alg_adoption.tex` | n/a |
+| A-F4 `alg:detection` | `algorithm2e` | `out/a_f4_alg_detection.tex` | n/a |
+| A-F5 deployment | TikZ | `out/a_f5_deployment.tex` | spans, overlap ≥0.5 cm, extent ≤150 mm, no negative x |
+| A-F6 injection | TikZ | `out/a_f6_injection.tex` | same |
+| A-F7 rolling origin | TikZ, to scale | `out/a_f7_origins.tex` | same, **including the right-margin labels** |
+
+`figures/_tikz_assert.py` holds the shared checks and was **tested against deliberate
+violations** before being relied on — overlap, sub-minimum gap, a non-adjacent reach past
+an immediate neighbour, an out-of-extent box and a negative-x node all raise. An assertion
+nobody has seen fail is an assertion taken on faith.
+
+### Three citation numbers in §3 were wrong, verified against source
+
+Checked via NotebookLM before any pseudocode was written, which is the whole reason the
+rule exists.
+
+| §3 said | Correct | Consequence |
+|---|---|---|
+| Siffer et al. **Alg. 1** (SPOT) | SPOT is **Algorithm 2**. Algorithm 1 is POT, the peaks-over-threshold *initialisation primitive*; Algorithm 3 is DSPOT | number corrected |
+| Zaffran et al. **Alg. 2** | AgACI is **Algorithm 1** | number corrected |
+| Angelopoulos & Bates **Alg. 1–2** | Split conformal is an unnumbered four-step outline in §1; group-balanced is §4.1 | cite the sections, not an algorithm number |
+
+**The Siffer correction is the one that matters, and it is not about a number.** This
+project implements no part of SPOT: no generalised Pareto fit, no Grimshaw estimate, no
+extreme-value threshold. The bound is a conformal band and the two detectors are classical
+CUSUM and $k$-of-$n$ persistence. Siffer et al. therefore ground the **convention** — a
+streaming detector stated as pseudocode with its update rule and alarm condition explicit —
+and not the method. A-F4 says so in the float itself. Citing them as the method's source
+would have claimed a lineage the code does not have, and that is the exact failure mode
+"verify pseudocode against the source before writing it" exists to prevent.
+
+`page_continuous_1954` and `truong_selective_2020` carry the CUSUM and the online-versus-
+offline choice; both are already cited in Methods 3.8, so A-F4 introduces no new key.
+`siffer_anomaly_2017` and `adams_bayesian_2007` are both live audited keys.
+
+### A-F7's grounding survives the demotion — checked, not assumed
+
+Meyer et al. (2026) Fig. 1(a) grounds the rolling-origin **scheme** — a staircase of stacked
+timelines with training windows shifting right and forecast targets following. That
+justification was never placement-dependent, so demoting F2 to Appendix C does not touch
+it. `folds[]` carries `train_end`, `test_start`, `test_end` and `n_train` for all 273
+origins, so the to-scale claim also survives.
+
+**But the figure as specified failed its own argument, and drawing it is what showed that.**
+The overlap between consecutive forecast blocks is the stated reason for a block length of
+seven. At full span a seven-day block is **1.7 mm** wide and consecutive blocks are **0.25
+mm** apart, so the overlap was invisible. A-F7 now carries a **magnified inset** of three
+consecutive origins at a stated magnification, with the span shared by all three shaded.
+The main panel keeps the expanding window to scale; the inset carries the overlap.
+
+### What the target's own geometry caught
+
+The proof preamble was made to match `main.tex` exactly — `report`, `twoside`, `12pt`,
+`a4paper`, `\linespread{1.5}`, and the same `\newgeometry`. Text width is therefore the real
+**150 mm**, not a convenient number.
+
+That immediately caught A-F7 at roughly **163 mm**: the bars were inside 13.4 cm but the
+right-margin origin labels were never in the asserted model. Same shape as the F1 defect —
+asserting the objects that were modelled rather than all of them. The label extent is now
+part of the assertion and the bar area was cut to 11.5 cm to make room.
+
+### Two preamble additions `main.tex` will need
+
+**Not made — nothing was written to `main.tex`.** Recorded here so 8C does not meet them
+mid-composition:
+
+1. `\usepackage[ruled,vlined,linesnumbered]{algorithm2e}` — absent entirely.
+2. `\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,decorations.pathreplacing}` —
+   `main.tex` currently loads `arrows.meta` **only**.
+
+`amssymb` is also absent, which is why A-F4 uses `\mathbf{1}` for the indicator rather than
+`\mathbb{1}`. That is a substitution, not a request for a third package.
