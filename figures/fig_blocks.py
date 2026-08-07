@@ -122,10 +122,16 @@ def main() -> None:
         # its neighbour instead, because the label centres are spaced by the block widths.
         # So the label width is derived from the block it belongs to, less a gutter, which
         # makes non-overlap a property of the construction rather than of a chosen constant.
-        tag = "\\scriptsize\\itshape adopted" if blk["block"] == "fit" else ""
         lines.append(
             f"  \\node[blk,fill={fill},draw={draw},minimum width={w:.3f}cm]"
-            f" at ({x0:.3f},1.05) {{{tag}}};")
+            f" at ({x0:.3f},1.05) {{}};")
+        if blk["block"] == "fit":
+            # Left-aligned inside the bar, not centred. Centred it sits at the same x as
+            # the `fit` label directly below and the pair reads as a two-line caption for
+            # that one block rather than as a tag for the whole row.
+            lines.append(
+                f"  \\node[anchor=west,text=black!55] at ({x0 + 0.1:.3f},{1.05 + ROW_H / 2:.3f})"
+                " {\\scriptsize\\itshape adopted};")
         # Name and n only, on two lines. The role descriptions used to sit here and were
         # the reason the label needed width; at 1.76 cm "conformal scores + reconciliation
         # weights" wraps to four or five lines, and the whole label then descends through
@@ -137,7 +143,7 @@ def main() -> None:
         lines.append(
             f"  \\node[anchor=north,align=center,text width={label_w:.3f}cm]"
             f" at ({x0 + w / 2:.3f},0.98) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
-            f"\\\\[-2pt] \\scriptsize $n{{=}}{blk['n_days']}$}};")
+            f"\\\\[-2pt] $n{{=}}{blk['n_days']}$}};")
 
     lines += [
         "  %% time axis",
