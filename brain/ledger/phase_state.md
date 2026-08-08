@@ -3885,3 +3885,73 @@ second worked example.
 
 **Owed before any label is read:** `graphify label`. The community set moved this run — 895 saved
 labels against 925 communities, 180 renamed by hub — so the saved names are stale.
+
+---
+
+## 2026-08-09 — R24 (marginal ACFs) and T8 (Chapter 4 source claims)
+
+**Scope as given:** two ledger-queue items, no composition beyond what they require. Graphify was
+held at 13,618 with six files stale by instruction; navigation was by path and grep. The PreToolUse
+hook demanded a refresh on essentially every read and grep and was declined every time, as in 8C-4.
+**Nothing was unfindable.** One read-only `graphify query` was attempted to satisfy the hook without
+refreshing; the shell has no `timeout` binary and the call was abandoned rather than retried, which
+cost nothing because path-and-grep navigation was sufficient throughout.
+
+### Completed
+
+**R24 — the two marginal ACFs. The cancellation assumption FAILS.**
+
+- New instrument `brain/eval/marginal_acf.py`, committed, `--self-test` passing on five fixtures
+  including a deliberate-violation check on its own reproduction guard. It imports
+  `eval.mcs._autocorr`, `common_loss_matrix` and `top_rungs_by_mean` rather than reimplementing
+  them, and reproduces `mcs_L1_results.json` `paired_variance_top4[0]` **cell by cell** at all three
+  venues before reporting anything new. Run under numpy **2.5.1**, the committed regime.
+- Artefact `brain/eval/marginal_acf_L1.json`. Ledger `brain/ledger/r24_marginal_acf.md`.
+- Ellel, `chronos_bolt` against `robust_dow`, RMSE unscaled, n = 260: lag-1 differential 0.811,
+  marginals **0.873** and **0.868**; lag-10 differential **0.241**, marginals **−0.129** and
+  **−0.195**. Bartlett VIF 9.74 / 7.11 / 6.19. Corrected ratio 6.37 / **5.82** / 5.14 / 4.10 / 2.53
+  at lag budgets 2 / 7 / 10 / 14 / 21 against 6.205 uncorrected.
+- **Verdict: fails, and adversely at this venue.** The sign reverses at the other two, where the
+  leading contrast is between near-identical foundation models. So the assumption is false in
+  general rather than unverified.
+- `chapters/discussion.tex` reworded, not renumbered: 6.2 is relabelled an uncorrected upper bound,
+  the corrected figure at the pre-registered block length is given, and the venue-dependence is the
+  stated reason it cannot be assumed away.
+
+**T8 for Chapter 4 — discharged.** `brain/ledger/source_claim_verification_ch4.md`. 12 keys, 14
+citation commands: **12 SUPPORTED, 1 OVERSTATED, 1 UNREACHABLE.**
+
+- One repair: `lu_proactive_2024` at `results.tex`:941, the **unrepaired half of role-audit V4**.
+- `breiman_classification_1984` UNREACHABLE, recorded as unchecked rather than passed, with the
+  search scope named in the same sentence as the claim.
+- `angelopoulos_conformal_2023` and `kaas_probabilistic_2026` verified at the PDF; both
+  load-bearing claims hold.
+
+### Artefacts written
+
+`brain/eval/marginal_acf.py`, `brain/eval/marginal_acf_L1.json`,
+`brain/ledger/r24_marginal_acf.md`, `brain/ledger/source_claim_verification_ch4.md`;
+`BLOCKED_third_party.md` §F and `recompute_set.md` updated.
+
+### Verified end state
+
+- **Overleaf clone `main` = `422c85d`, ONE commit ahead of `origin/main` = `12f8cc7`.** The push is
+  Phuong's; the PreToolUse guard refuses it and routing around it was not attempted.
+- **`origin/main` was `12f8cc7`, not the `fe7bd9a` §F recorded.** §F's "seven commits await a push"
+  row was **seven commits stale** and has been struck with the correction appended. A row naming a
+  remote SHA is a measurement with a timestamp; re-run `git ls-remote` before quoting one.
+- latexcheck **PASS** on the working clone and again on a **fresh clone of the local commit** with
+  `main-words.sum` confirmed absent: both **130 pages, 0 errors, 0 undefined references, 0 undefined
+  citations, 0 floats lost**, 7 overfull, 32 underfull. TeX Live 2026 locally, which is tier 2 and
+  says nothing about the target render while T3-1 is open. **The fresh clone was of the LOCAL
+  commit, not the remote.**
+- figurecheck 1, completenesscheck 7, venueordercheck 8 — **identical to the same three run against
+  HEAD before the edits**, so this session introduced none of them. All three `--self-test` passed
+  first.
+- Word floors: Ch 4 **7,588** (+1), Ch 5 **4,993** (+120), four-chapter total **23,045**,
+  projection **~26,000**.
+
+### Not started, deliberately
+
+S-4 and 8C-5, both out of scope by instruction. The recompute set still holds R4, R9, R16, R22 and
+R30, and D3 stays live.

@@ -107,7 +107,24 @@ The cancellation therefore cannot be checked, let alone asserted. Computing the 
 is arithmetic on the fold vectors (`brain/eval/fold_vectors_L1_*.json`); until they exist the
 claim is unsupported rather than wrong.
 
-**STATUS 2026-08-08: APPROVED and NOT DONE. It is the first item of the next session, by Phuong's
+**STATUS 2026-08-09: DONE. The assumption FAILS, and adversely at Ellel.** Full working in
+[`r24_marginal_acf.md`](r24_marginal_acf.md); artefact `brain/eval/marginal_acf_L1.json`;
+instrument `brain/eval/marginal_acf.py`. Marginal lag-1 ACFs are **0.873** (`chronos_bolt`) and
+**0.868** (`robust_dow`) against the differential's 0.811, so the three series differ at lag 1 —
+but the decision is not made at lag 1. The marginals cross to **negative** by the seventh or eighth
+fold while the differential is still at **0.241** at lag 10, so the Bartlett variance inflation is
+larger on the **differential** (9.74 against 7.11 and 6.19) and the corrected ratio **falls** to
+**5.82** at the pre-registered `BLOCK_LEN = 7` and **2.53** at 21, against 6.205 uncorrected. The
+sign **reverses** at the other two venues. The 6.2 becomes an uncorrected upper bound on the
+pairing gain; the sentence is reworded rather than renumbered.
+
+**The prediction recorded before the run got the level right and the direction wrong**, which is
+the part worth carrying: both marginal lag-1 values landed inside the predicted 0.85–0.93 interval
+and above 0.811 as predicted, and the predicted *consequence* (correction larger on the marginals,
+so the ratio rises) was backwards. **A variance inflation is a sum over lags, so it is settled by
+decay, not by level.** Anchoring on lag 1 is what produced the wrong sign.
+
+**Superseded status line, kept per the corrections-are-appended rule — 2026-08-08: APPROVED and NOT DONE. It is the first item of the next session, by Phuong's
 instruction, and the reason is worth keeping.** It was the last approved item in a long batch and
 was stopped rather than rushed — *"right to stop rather than rush it"*. Everything it needs is
 committed: the fold vectors, and the 0.811 it is compared against. Nothing blocks it and nothing
