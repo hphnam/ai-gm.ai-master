@@ -3399,3 +3399,147 @@ rows keep their values because no instrument can derive them.
 run and rolls back the manifest stamps when the shrink guard refuses — the repair that was needed
 by hand twice on 2026-08-07. Untracked means nobody else gets it and a fresh clone of this repo
 has no guard at all. It is not 8C-3's file; flagged to its author rather than committed.
+
+---
+
+## 8C-4 — Chapter 5, Discussion, composed 2026-08-08
+
+**Completed.** Chapter 5 did not exist. `main.tex` had no `\chapter{Discussion}` at all and the
+material was sitting inside `conclusion.tex` in a pre-tree five-chapter shape. Composed to the
+`05_paper_architecture.md` §2.1 tree from the evidence base, not compressed from prose.
+
+**Artefacts written**
+- `chapters/discussion.tex` (new, on the Overleaf clone), 453 lines
+- `brain/drafts/discussion_8C4.tex` (the drafting copy)
+- `brain/ledger/discussion_argument_skeleton.md` — D1–D19, nineteen extracted, nineteen discharged
+- `brain/ledger/discussion_rewrite_critique.md` — two iterations, three independent role calls each
+
+**Files changed on the clone** `main.tex` (Discussion chapter inserted between Results and
+Conclusions), `chapters/conclusion.tex` (1,423 words excised, two reference debts discharged),
+`chapters/results.tex` (W3 forward `\ref`), `chapters/methodology.tex` and
+`appendix/search_screening_body.tex` (inbound `\ref`s repointed), `chapters/literature_review.tex`
+(`\label{chap:litreview}` added).
+
+**Verified end state**
+- Local commit **`fe7bd9a`**. `git ls-remote --heads origin` = **`f903214`**. **NOT PUSHED.**
+- Working clone compile: PASS, 125 pages, 0 errors, 0 undefined refs, 0 undefined citations,
+  0 floats lost, 8 overfull, 29 underfull.
+- **Fresh clone of `fe7bd9a` compiled with no stale `main-words.sum` present: PASS**, 125 pages,
+  same error/reference/citation counts, 33 underfull. Tier 2 only; T3-1 and T3-2 unchanged.
+- Chapter 5 floor **4,646 marker** (raw 4,653 / artefact 7) against 2,400. Per section:
+  5.1 **962**/500 · 5.2 **1,157**/500 · 5.3 **1,031**/400 · 5.4 **906**/700 · 5.5 **591**/300.
+- Zero em dashes. 19 `% Trace:` comments. 21 citation keys, every one already cited elsewhere, so
+  the chapter adds no paper to the printed bibliography and triggers no add-a-paper gate.
+
+**Unstarted** the push, and the three items below that need Phuong.
+
+### The push did not land, and the reason is worth recording precisely
+
+Phuong reported pushing manually. At that moment **the work was entirely uncommitted** —
+`chapters/discussion.tex` was untracked and six files were modified but unstaged — so the push had
+nothing of 8C-4 to carry and the remote stayed at `f903214`. The agent then committed `fe7bd9a` and
+attempted `git push origin main`; the **PreToolUse hook refused it**: *"Blocked: push to protected
+branch 'main'. Use a feature branch and open a PR."* Same refusal as 8C-3. **Not routed around**,
+per the rule that a blocked push is handed over rather than worked past.
+
+**The generalisable part:** "I pushed" and "the remote holds it" are two claims, and the second is
+the one that matters. `git ls-remote` answered it in one command. This is the compile-and-push
+lifecycle rule applied to the human half of the loop as well as the agent's.
+
+### Four of six chapters are now measured, and reallocation cannot be deferred further
+
+| Chapter | Marker | Budget |
+|---|---|---|
+| 2 Background | 4,938 | 4,000 |
+| 3 Methods | 5,526 | 4,200 |
+| 4 Results | 6,247 | 5,200 |
+| **5 Discussion** | **4,646** | **2,400** |
+| **Measured four** | **21,357** | **15,800** (+35 %) |
+
+With Introduction (1,400), Conclusions (1,100) and the abstract (300) at budget the document lands
+near **24,150 against HC1's 20,000**. S-3 deferred reallocation on the grounds that two floors were
+not enough to decide on and that Results would determine whether there was anything to reallocate.
+Both conditions are now met.
+
+**One rubric finding reframes the question.** `00_marking_criteria.md`:411–414 records that the
+guidance *"states explicitly that 'there is no word count for each section', and section balance
+should be agreed with the supervisor."* The §2.1 per-section budgets are therefore this project's
+own approved allocation (A10), **not a rubric requirement**. HC1's total is the mechanical
+constraint. So the live question is not whether 5.2 exceeds 500; it is which criteria or which
+material the document sheds to reach 20,000.
+
+**Why Chapter 5's floor is what it is.** Of its 4,646 words, **1,531 were added by the critique
+loop**, every one of them closing a named blocking finding. `autoresearchclaw/SKILL.md` §4's T2, T3
+and T6 require a p-value, an interval, a denominator and a survivorship disclosure on each claim,
+and the chapter restates roughly thirty of Chapter 4's numbers. Compression will not recover them;
+the apparatus belongs beside the number, whose first home is Chapter 4.
+
+### Corrections this session makes to stores upstream of it
+
+Appended rather than applied in place, per the corrections rule. **Four of these are errors the
+chapter INHERITED rather than introduced**, which is the reason to record them here.
+
+| Store | Correction |
+|---|---|
+| `results_argument_skeleton.md` hand-off | The Ellel pairing factor is **6.2** (£381.68 → £61.51, gap £1.91, 0.50 se) on the committed headline (unscaled RMSE), not the **6.6** (£178.00 → £26.94, £1.55) the hand-off names, which are `log/70` §10's **secondary MAE** figures. `numbers_audit.md` has no row for either triple |
+| `conclusion.tex` | *"the aggregated adaptive arm is the worst of the five at every venue"* is **false at the Beer Hall**: `tab:winkler` gives P 1940 (worst), D 1807, S 1928, A 1814, G **1837**, so G is third. Owner 8C-5 |
+| `log/78` Part 3 · `numbers_audit.md` ADDENDUM | Both attribute the interval-study instability to the **ladder's** 205 origins. The interval-calibration study runs **250 / 237 / 182** (`interval_calibration_mcs.json` `n_folds`) |
+| `log/78` (internal) | Part 2's table records Beer Hall arm A's Winkler mean moving **1814.3 → 1839.6** across environments, while Part 3 says the point estimates are *"resolution-stable to three significant figures"* and Part 4 that they *"reproduce exactly"*. 1810 and 1840 differ at three significant figures, so the summaries overstate the table |
+| `blocker_clearance_package.md` §5.3 | The **approved** note's *"Every Winkler mean, coverage figure and Clopper–Pearson limb reproduces exactly"* carries the same overstatement. The chapter states the measured bound instead: coverage shifts by at most 0.004, the largest Winkler movement is 25 points on 1814, stable to **two** significant figures |
+| `results.tex` `tab:winkler` caption | States **B = 1000**; `interval_calibration_mcs.json` says `n_boot` = **10,000**. `tab:mcs`'s B = 1000 **is** correct (`n_boot_primary` = 1000) — two different bootstraps, one wrong caption. 5.3's stability argument depends on 10,000 |
+| `results.tex` | Recall is **0.807** in `sec:res-vuspr` and **0.804** in `sec:res-costsweep`; precision **0.871** against audit V4's **0.872**. And 644 − 124 = 520 true positives against 8 false alarms is a precision of **0.985**, so the cost-sweep counts and the corpus precision are on **different bases** and cannot be reconciled from committed artefacts |
+| `results.tex`:526 | *"agree to a thousandth"* — the implied-versus-measured coverage differences are 0.00114 / 0.00121 / 0.00157, so all three exceed 0.001 |
+
+### Two items closed that other files carried as open
+
+**`06_research_questions.md` §9 is answered, and its conditional does not fire.** §9 hands 8D the
+question of *why* the estate is three venues rather than the specification's four, with a
+conditional that Methods 3.1 owes an exclusion criterion if it was an exclusion. `config.py`:110–137
+answers it in the required terms: the fourth Square location is `events`, an off-site
+event-booking location with no site and no opening calendar, and *"this is a BOUNDARY on what the
+study is about, not a threshold applied to data — so there is no cut-off here, and none was ever
+set."* **Boundary, not exclusion. Methods 3.1 owes nothing.** The same comment forbids restating
+the location's 203 line-items as the reason, and 5.5 does not.
+
+**The specification's "4 venues" is a claim about the platform.** `docs/PRJ93.md` reads *"Currently
+live across 4 Lune Brew Co venues"* inside a product description and nowhere specifies a
+four-venue study.
+
+### A near-miss worth recording, because it is 8C-3's lesson recurring
+
+A reviewer advised that a list of six divergences containing one non-failure weakens the count, and
+recommended demoting the venue-count item out of 5.5's list. **I accepted it, which dropped the
+count from six to five and broke approved unlock U2** — whose stated defect mode is
+*incompleteness*, and whose whole content is that 5.5 carries **six**. Caught on re-reading §7's
+U-rows and restored. An approval I had already read losing to an argument constructed in-session,
+which is exactly what 8C-3 recorded as its second durable conclusion.
+
+### Reference debts
+
+§F lists three owed to this session. There were **five**, and a sixth surfaced in the build.
+
+| Debt | Resolution |
+|---|---|
+| `sec:res-agent` plain text in `conclusion.tex` | `\ref{sec:disc-limitations}` restored |
+| `sec:res-pattern` plain text in `conclusion.tex` | `\ref{sec:disc-validity}` restored |
+| Results 4.1's W3 forward clause | `\ref{sec:disc-validity}` added |
+| **`methodology.tex`:204 → `sec:conclusion-limitations`** (not in §F) | Repointed at `sec:disc-limitations` |
+| **`appendix/search_screening_body.tex`:39 → `sec:conclusion-limitations`** (not in §F) | Repointed |
+| **`chap:litreview` was never defined** (found by the compile) | `\label{chap:litreview}` added; Chapter 2 was the only chapter file without one |
+
+The last three would have printed `??`. The build is the instrument that owns this, not a register.
+
+### Open, with owners
+
+| # | Item | Owner |
+|---|---|---|
+| **H13** | **RQ5's premise was never instantiated.** The sweep runs miss-to-false-alarm ratios of 1:1 to 10:1, every one weighting a miss at least as heavily as a false alarm, while RQ5 posits the opposite asymmetry. The chapter declares it in 5.5 and folds it into the operator-feedback divergence rather than leaving a stated question half-unanswered, on the precedent `06` §4 set for limb 7. **Rewording an RQ is a methodology gate** | **Phuong** |
+| **H11** | The Beer Hall coverage exclusion is conditional on an unquantified design effect (needs ICC < 0.39; at full within-origin dependence the interval includes nominal). Two River Taps survives either way. Mitigated by resting the result on the served model's identical 0.870 and the rank decomposition. **Computing the design effect is a rerun** | Phuong / 8D |
+| **H12** | **T8 fails.** No NotebookLM check was run this session. Every cited-paper claim is inherited from Chapter 2 or `defensible_divergences_writeup_pack.md`, where it was verified at source, and was re-checked against those records — a documentary check, not the one the rule names | Phuong / 8D |
+| **H8** | The pairing decomposition exists in **no float**. `appendix/robustness.tex` lacks the pairing-variance material `results.tex`:130 promises is there | 8C-3 / Phuong |
+| **H3** | `conclusion.tex`: the adaptive-arm error above, extensions counted as eight/seven/six/nine across one section, and an unsourced *"three of four"* quantifier | 8C-5 |
+| — | **The deliberate omission.** §4.5 displaces the `sec:res-winkler` implementation-correction narrative (the faithful-BOA AgACI arm scoring 16, 3 and 18 points **worse**). Not brought into 5.2, per the ruling. Brought to Phuong rather than smuggled in | Phuong |
+
+**Graph not refreshed**, by instruction. Still 13,618 nodes, six files stale. The hook demanded a
+refresh on every read and grep, including inside all six subagents; declined every time. Nothing
+was unfindable and nothing in 8C-4 was blocked by the staleness.

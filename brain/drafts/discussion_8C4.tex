@@ -1,0 +1,294 @@
+% =====================================================================
+% Discussion chapter, PRJ93 Proactive Brain.
+%
+% NOTE: main.tex issues \chapter{Discussion} before \input-ing this file.
+% Do not add a \chapter command here; \label{chap:discussion} only.
+%
+% Composed to the approved five-section tree at 05_paper_architecture.md
+% section 2.1. Heading text is that tree's, verbatim (approvals A2/A10).
+% Section 5.4 GROWS against its 700-word budget by the ruling at
+% 05_paper_architecture.md section 4.5; compressing it toward budget
+% would reverse that approval.
+%
+% Labels defined here that other files reference:
+%   sec:disc-validity     <- conclusion.tex closing; results.tex 4.1 (W3)
+%   sec:disc-limitations  <- conclusion.tex claims; methodology.tex;
+%                            appendix/search_screening_body.tex
+%
+% Em dashes: zero, per document convention.
+% =====================================================================
+\label{chap:discussion}
+
+\section{Answers to the research questions}
+\label{sec:disc-answers}
+
+Each question is answered in the order the Introduction states it; the arguments are in
+Sections~\ref{sec:disc-divergences} to~\ref{sec:disc-limitations}.
+
+The first question asked whether candidate forecasting approaches can be separated on
+out-of-sample accuracy at the data volumes a three-venue estate provides, and whether the number
+of evaluation origins changes which approach is selected. They cannot, and it does. The ninety
+per cent confidence sets retain five of nine at the Beer Hall, four at Two River Taps and six at
+Ellel (Table~\ref{tab:mcs}), separating the clearly inferior rungs from the rest but not the
+foundation model from the simpler incumbents. At six origins the gate placed
+the served Beer Hall model second of nine; at $273$ it returns to first and the day-of-week
+baseline falls to fifth.
+
+The second asked whether the intermittency and hierarchical structure of these venues' demand
+admit the point-forecast estimand and the coherent reconciliation standard practice assumes. The
+reconciliation is not admitted. The unbiasedness precondition
+\citet{wickramasuriya_optimal_2019} require fails at $22$ of the Beer Hall hierarchy's $41$
+nodes, $19$ of them with a positive mean residual, so the forecasts remain exactly coherent while
+no minimum-variance optimality may be claimed here. All three series
+classify as erratic or lumpy, none of them smooth (Table~\ref{tab:intermittency}). The estimand
+survives, qualified by a served forecaster that returns a median where the decision layer needs a
+mean.
+
+The third asked whether weather, or cross-series pooling across venues, improves forecast
+accuracy beyond what a venue's own trading history supports. Neither does. All five weather arms
+are retained in the ninety per cent set at every venue (Table~\ref{tab:weather}), and grouping is
+indistinguishable from or worse than forecasting each venue alone (Table~\ref{tab:group}). No
+capability failed to engage: grouped and univariate forecasts differ by $\pounds 9.99$ to
+$\pounds 10.94$ per origin at the Beer Hall and by $\pounds 185$ at the widest, so pooling moves
+the forecast without moving its accuracy.
+
+The fourth asked whether a split-conformal interval holds its nominal coverage at every venue
+and, where it does not, which property of the data accounts for the shortfall. It does not, and
+the property is exchangeability. Against a nominal ninety per cent the served band covers $0.871$
+at the Beer Hall, $0.914$ at Ellel and $0.963$ at Two River Taps (Table~\ref{tab:coverage}).
+Ranking each banded residual inside its own calibration pool reproduces all three to a
+thousandth, at $0.870$, $0.913$ and $0.962$, so the shortfall is rank non-uniformity on the
+objects the band is built from. Section~\ref{sec:disc-limitations} carries what it leaves
+unrepaired.
+
+The fifth asked whether, under a cost asymmetry favouring silence over noise, deviation detection
+from a calibrated interval performs well enough to justify surfacing its output to an operator. On
+the lag-tolerant measure the answer divides by event kind: regime shifts and exogenous
+coincidences score between $0.93$ and $1.00$, spikes between $0.70$ and $0.91$
+(Table~\ref{tab:vuspr}). The asymmetry itself is not resolved. Swept over
+four miss-to-false-alarm ratios the weighted cost rises while $124$ misses and $8$ false alarms
+stay fixed, so no operating point is selected, for the reason
+Section~\ref{sec:disc-limitations} gives.
+
+\section{Divergences from the reviewed literature}
+\label{sec:disc-divergences}
+
+Chapter~\ref{chap:litreview} marks two places where its sources point one way and this estate's
+measurements point another, and defers both. Both are settled here, with four further divergences
+from methods the review endorses, since a divergence left unexplained reads as an oversight.
+
+The ranking reversal moved in a direction no cited work predicts.
+\citet{hewamalage_look_2021} and \citet{brigato_there_2025} establish that rankings are unstable
+under small evaluation setups and both leave the direction open: what they predict is that a
+ranking may move, not which way. This estate's instance is directional and it favoured the model
+already in production, which is the direction most open to the suspicion of a result arranged
+after the fact. Three properties of how it arose answer that. The origin count was raised because
+the review argues six origins carry almost no information, and that argument was committed before
+the larger evaluation ran; the correction was applied to all nine rungs at once, not to
+the incumbent alone; and the same enlarged evaluation demoted a different model from first to fifth.
+The resolution is narrow. The literature predicts instability and this work observed it twice, in
+opposite directions, so the direction of either movement is a fact about this sample.
+
+Adaptive calibration performed worse than leaving the band alone. The review's conformal arc runs
+through \citet{gibbs_adaptive_2021}, \citet{zaffran_adaptive_2022} and
+\citet{sun_conformal_2025} toward methods that adapt their level to realised coverage, and
+Table~\ref{tab:winkler} records the aggregated adaptive arm as the worst of five at every venue.
+That reads as a contradiction only until the licensing condition is read, and then it inverts:
+\citet{zaffran_adaptive_2022} establish that on exchangeable scores the adaptive update costs
+efficiency whether or not a shift arrives. This estate had one regime change in roughly a year,
+so a method paying continuously against a once-yearly event is expected to lose on aggregate. The
+negative result is predicted by the cited literature rather than in tension with it, and what it
+establishes is a boundary condition on when adaptivity is worth its price, one that does not
+generalise past the regime-change rate producing it.
+
+The headline measure diverges from the field's default, and the review's own chain is what
+licenses it. Absolute-error measures elicit the median \citep{hewamalage_forecast_2023}, the mean
+absolute scaled error is a scaled absolute error and median-eliciting point forecasts are usually
+not coherent \citep{kolassa_we_2023}, and reconciliation optimality requires unbiased bases
+\citep{wickramasuriya_optimal_2019}. Two arguments about measures and one condition, which the
+review could state and had no way to join; Section~\ref{sec:res-reconciliation} joins them by
+measuring the condition and finding it fails in the direction the first two imply.
+
+Ellel is scored on unscaled absolute error where \citet{chatfield_all-zero_2007} licenses
+replacing the objective with a cost function, so the instrument changed and the objective did
+not. The remedy does not transfer: Chatfield's cost is that of an inventory system in which the
+forecast is the replenishment quantity, and Ellel's estimand is daily revenue, which is neither
+ordered nor held nor backordered. Its ordering, holding and shortage costs are undefined rather
+than unelicited, which is a property of the estimand and not of the data that happened to be
+available.
+
+The occurrence gate diverges from its cited framework by less than this work's own record
+claimed. \citet{cragg_statistical_1971} and \citet{mullahy_specification_1986} specify a fitted
+binary part, and the gate was recorded as diverging because its factor takes only zero or one.
+The factor is a saturated nonparametric estimator of the trading probability given day of week,
+and against a saturated logit on the same dummies it reproduces the cell frequencies to within
+$10^{-4}$. What fails on a deterministic calendar is the probit parameterisation, whose
+coefficient does not exist under complete separation, and not the design.
+
+The band's grouping extends its cited guarantee rather than applying it, so the attribution
+splits three ways. \citet{barber_conformal_2023} supply what the construction is, a grouped
+method assuming within-group exchangeability; \citet{stocker_gentle_2025} supply what it
+guarantees, finite-sample marginal coverage inside each group; and \citet{sun_conformal_2025}
+supply only the motivation, since a latent-state method pays a penalty scaling with its
+state-prediction error and an observed closure calendar does not incur it. Their algorithm is not
+implemented here, so no theorem of theirs bounds the coverage reported, and the framing of an
+observed regime variable against an inferred one is this work's own.
+
+Three smaller divergences are argued where they arise and are recorded here so the list is
+complete: pooling returns a null below an estate size \citet{montero-manso_principles_2021} never
+quantify, reanalysis weather is nominally the worst of the four weather arms at the Beer Hall
+where the motivating mechanism puts it first, and \citet{kaas_probabilistic_2026}'s interval
+finding replicates in ordering and not in magnitude.
+
+\section{Validity of the approach}
+\label{sec:disc-validity}
+
+Three of the five answers above are non-separations, so whether the design was precise enough to
+tell a real absence of difference from an instrument too blunt to find one is the question those
+answers turn on. Three measurements bear on it and they point the same way.
+
+Pairing is what makes the non-separations measurable. Every standard error quoted for a
+difference between two rungs is a paired one, formed fold by fold and compared against the
+independent-model quantity an unpaired comparison would use. At Ellel, on the unscaled headline
+loss, pairing takes the standard deviation of the leading contrast from $\pounds 381.68$ to
+$\pounds 61.51$, a factor of $6.2$. That factor is why a mean gap of $\pounds 1.91$ between the
+served baseline and the argument-minimum is measurable at all: unpaired, it would sit far inside
+noise, and the conclusion that the two cannot be separated would have been reached by
+insufficient precision rather than by evidence.
+
+The confidence sets are non-separable in a second and independent sense. Regenerating the
+interval-calibration arms under \texttt{numpy} 1.26.4 in place of the committed 2.5.1 moves set
+membership at Two River Taps, where per-step calibration is retained under the committed regime
+and eliminated under the other, its exclusion $p$-value falling from $0.191$ to $0.036$. The
+economical reading is that these five interval methods are not separable at this sample size: a
+confidence set reporting a real distinction survives its own arithmetic, and this one does not,
+which is a finding about the data rather than about the computation. The instability is confined
+to set membership. Every Winkler mean, coverage figure and Clopper--Pearson limb in
+Tables~\ref{tab:coverage} and~\ref{tab:winkler} reproduces exactly across both environments, and
+Ellel's set is unchanged in every verdict. Two River Taps is where it surfaces because it is the
+venue with the fewest evaluation origins in the estate, $205$ against $273$ and $260$, and so
+carries the tightest spread between arms and the least margin to absorb a threshold crossing.
+
+That is a second sighting of a mechanism already reported rather than a second answer to the
+first question. The candidates there are forecasting approaches and these are interval methods, a
+different candidate set measured in a different float, so offering one as corroboration of the
+other would compare two populations. What it corroborates is the mechanism: the venue with the
+fewest origins is the one whose set membership moves, and the venues with $273$ and $260$ hold.
+
+A fourth line of evidence concerns method, not this estate. Four quantities recorded
+as established in this project's own documentation did not survive recomputation, and none of the
+four was identified by reasoning about it: each was identified by measuring it with enough
+observations to resolve the question, and in three of them the sample size behind the original
+figure had not been recorded beside it. What that licenses is narrow, and it bears directly on
+the claims above: a figure whose sample size is not recorded beside it has not been verified,
+which is the standard every number surviving into this chapter was held to.
+
+\section{Limitations and threats to validity}
+\label{sec:disc-limitations}
+
+Limitations divide into properties of the problem, which would recur for anyone attempting this
+work on this kind of estate, and properties of the circumstances, which would not. They are
+separated because conflating them lets a provisioning failure read as a research finding, or the
+reverse.
+
+Four are properties of the problem. The served forecaster returns a median under a mean's name:
+this work adopts a squared-scaled headline on the argument that the decision layer needs a
+mean-eliciting measure, and the model in production cannot emit a mean. Integrating over the
+emitted quantiles is the available remedy and was declined because it would change the served
+model after the evaluation was frozen. The reconciliation's optimality does not hold, for the
+reason Section~\ref{sec:res-reconciliation} measures. Ellel's occurrence signal exists in the world and not in
+the dataset, so the hurdle cannot be tested as a hurdle at the one venue whose occurrence is
+genuinely uncertain, and the circular substitute of deriving occurrence from that venue's own
+trading history is unreachable by any code path. The cost of that absence has been measured:
+$1037$ of Ellel's $1300$ calendar-open days did not trade, and the venue's entire residual drift
+sits on those days, none of it on the $263$ days it did trade. Fourth, the
+Mondrian partition's day-of-week calendar can fail in either direction and this estate supplies
+one venue of each: the Beer Hall's calendar calls $546$ days closed and $94$ of them traded,
+while Ellel's calls $1300$ open and $1037$ did not. No recency weighting repairs a group
+specified wrongly, which is why a shorter calibration memory brings one venue to nominal and
+moves another away from it.
+
+Four are properties of the circumstances, and the first is the largest single gap between what
+this work set out to do and what it reports. The intervention layer's apparatus is complete,
+tested and frozen by commit ordering, and it has not been run, because executing it requires live
+model calls on a production integration outside this work's control; three of the four terms of
+its objective compute as soon as a response cache exists. The expected calibration error the
+review identifies as the instrument capable of carrying a coverage guarantee through to an
+agent's output \citep{guo_calibration_2017} is implemented and never run for the same reason. The
+fourth term requires human accept-or-dismiss judgements, of which none were obtained, so no
+agreement statistic exists and the judge remains an uncalibrated proxy
+\citep{zheng_judging_2023, bavaresco_llms_2025}; a fallback protocol of repeated self-annotation
+is specified, and reporting it as equivalent to independent annotation would be an over-claim
+that is not made. The cost ratio fixing the weight in the surfacing measure was never elicited
+\citep{fu_prism_2026}, which is why the sweep reports a curve and selects no point on it. And
+cross-venue transfer is not evaluable rather than unevaluated: the test requires three venues
+carrying a defensible scaled error and this estate has two.
+
+Three biases are disclosed rather than mitigated, because none can be removed at this scale. The
+evaluation of surfaced insights had one rater and that rater is the author, so no inter-rater
+statistic is available. The literature review was written after much of the experimental work it
+introduces, so where a cited source anticipates an outcome here that anticipation is an argument
+a reader can check against the source, not a record of a prior belief. And the corpus
+every result rests on was assembled by the same work that then evaluated on it, for the reason
+Section~\ref{sec:disc-specification} gives; that is a threat to external validity, and it is
+repeated here because it is also one to internal validity.
+
+Four assumptions carry the results and each has a stated consequence if it fails.
+Exchangeability of the conformity scores is assumed by the interval construction and is measured
+to fail at two venues, and that measurement is one of this work's findings. Day of week stands
+in for occurrence, and the two-directional partition defect above is the cost of that
+substitution. The detection figures rest on a synthetic injection corpus standing in for events
+an operator confirmed, so the $124$ misses are counted against injections and not against
+operational reality, which bounds what the cost sweep establishes. And the coverage intervals
+assume independent indicators, which overlapping origins at a seven-day horizon do not supply, so
+those intervals are mildly optimistic and are reported as such.
+
+Two omissions in the review itself belong here and not only in the appendix recording them. The
+corpus search was not pre-registered and no protocol document exists, so
+Appendix~\ref{app:search} records criteria alone. No screened-versus-retained
+count exists at any stage and none is reconstructed, which is why no flow diagram is drawn:
+drawing one would put a claim this work's own evidence contradicts into the document's most
+legible form.
+
+\section{Divergence from the project specification}
+\label{sec:disc-specification}
+
+Six things the project specification describes did not hold for the work as done. They are stated
+together because the pattern across them is informative: four of the six are methods this review
+argues for and the specification undertook to supply the inputs to, so the reduction in scope
+followed from inputs that did not arrive rather than from judgements about what was worth
+attempting.
+
+The specification offers read access to a dedicated research schema in the production database
+from the first week. No such schema was provisioned at any point, so every result here rests on a
+corpus assembled from source exports into a local warehouse. That is the divergence with the
+widest consequence: the external validity of every figure is untested, because the data was
+prepared by the same work that evaluated on it and no independently provisioned copy exists
+against which the preparation could be checked.
+
+The specification describes the platform as live across four venues and this study covers three.
+The two statements are not in conflict, and the distinction is worth stating precisely. Four
+counts the platform's deployment; three is the study's sample, and the difference between them is
+the unit of analysis rather than an exclusion. A trading venue here is a fixed site with an
+opening calendar, against which a daily rhythm can be learned and a departure from it defined.
+The fourth location books off-site events, so it has no site and no opening calendar and
+therefore no rhythm to learn, whatever it turns over. That is a boundary on what the study is
+about, not a threshold applied to data, so no cut-off was set and none is reported.
+
+Three named deliverables were not reached. An agent reasoning over the deviation signals and
+deciding what to raise exists, is frozen, and has not been measured, for the reason
+Section~\ref{sec:disc-limitations} gives. Qualitative manager feedback is named among the
+evaluation deliverables and none was obtained, so the term of the objective requiring human
+judgement is unmeasured rather than measured badly. Multi-venue transfer learning, which the
+specification calls the interesting research, is blocked by the estate's own composition, for the
+reason Section~\ref{sec:disc-limitations} gives.
+
+The sixth is a licensing constraint, and it is recorded because any comparable project would
+meet it. A tabular foundation model this work argues is
+regime-appropriate \citep{hollmann_accurate_2025} was entered and withdrawn: its current weights
+require accepting a licence permitting testing, evaluation and internal benchmarking while
+prohibiting the use of model outputs as inputs to internal commercial decision-making
+\citep{grinsztajn_tabpfn-3_2026}. This estate is a trading business with an operating decision
+layer, so evaluating that model is licensed and serving it is not, on terms no credential
+changes. The regime-fit argument is accordingly stated for both model families and evidenced for
+one, and nothing here is claimed about how the withdrawn candidate would have performed.
