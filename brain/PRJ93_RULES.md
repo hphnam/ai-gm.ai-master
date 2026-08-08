@@ -466,6 +466,36 @@ requirement:
 *"It cannot mark a draft… Load `brain/knowledge/00_marking_criteria.md` for that."* Running
 the rubric check in place of the roles satisfies neither.
 
+### Anything a critique log claims to have applied is quoted, not named
+
+**A critique log records the check it ran by reproducing it, not by referring to it.** Write the
+role's defining sentence into the log, or the test's text, or the criterion's wording — inline, in
+the log, next to what it found. Naming is what decayed; quoting cannot decay, because a wrong quote
+is visible on the page and a wrong name is not.
+
+This is the structural half of the remedy above, and it is the half that does the work. The rule
+that a prompt must cite the path fixes the *next* session's inputs. This rule fixes every session's
+*outputs*, so that a log which silently ran the wrong check can be caught by reading it.
+
+What it requires, concretely:
+
+- A round headed with a role's name carries that role's remit **quoted from the owning file**. A
+  heading like `Round A, Methodologist` with no quoted remit is not a record of Role A.
+- A gate reported as passed quotes the test it passed. `T8 PASSES` is not a record; the T8 wording
+  plus the instrument plus the scope is.
+- A check reported as clean states **what it did not cover** in the same breath. Six role calls and
+  a fourteen-test gate, all aimed at two chapters, left an unwritten abstract standing on
+  `origin/main`, and it was found only when one call looked outside its remit. **Scope a check
+  narrowly and it will be clean narrowly.**
+- A claim about a source quotes the source's sentence. `brain/ledger/source_claim_verification.md`
+  is the worked example: it found a construction attributed to a paper whose related-work paragraph
+  disclaims it, and no summary of that paper would have shown this.
+
+**The general defect this closes.** *Absence of a check is invisible in an artefact that records
+only what was done.* Every log in this project records completed work, so an omitted check leaves
+no trace anywhere — not in the log, not in the compile, not in the word count. Quoting is the
+cheapest available way to make an omission legible, because the quote is either there or it is not.
+
 ## Overleaf pre-flight
 
 Every file bound for Overleaf gets an AI-writing pass before it goes:

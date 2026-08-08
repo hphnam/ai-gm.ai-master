@@ -3612,3 +3612,87 @@ about a remote.** 8C-3 learned that a working clone can pass on a stale artefact
 different radii: checking the thing nearest to hand and reading the result as covering the thing
 that actually matters. The fix in both cases is one command, and in both cases the command was
 available the whole time.
+
+---
+
+## 2026-08-08 — Phase: critique-loop audit, and SKILL.md §8's trial record discharged
+
+**Audit only. No chapter text was changed, nothing was composed, nothing was pushed.**
+
+### What was found
+
+The 8C-3 prompt said *"the SKILL.md roles"* without the path. Chapter 4's six critique rounds
+(A–F) contain **none of `brain/skills/autoresearchclaw/SKILL.md` §3's three roles**. Rounds A, B, C
+and F are rubric coverage, number-traceability, structural boundary and §4.5 approval compliance —
+all real work, none of them Role A Methodologist, Role B Statistician or Role C Claim auditor. The
+two phase-specific roles named *inline* in that prompt (D and E) were run correctly.
+
+**The reference decayed in three steps and the artefact never revealed it:**
+
+| File | Names the roles as |
+|---|---|
+| `litreview_critique.md`, `background_rewrite_critique.md` | the path, `SKILL.md` §3, headings `Role A, Methodologist` |
+| `methodology_rewrite_critique.md` | the name, no path |
+| `results_rewrite_critique.md` | *"the three standing roles"* — no name, no path, content replaced |
+| `discussion_rewrite_critique.md` (first pass) | inherited the phrase verbatim |
+
+By Chapter 4 the phrase referred to nothing but itself. **8C-4 caught this itself**, mid-phase, and
+re-ran the roles properly — its own correction states the mechanism from the inside: *"It read the
+round headings out of `results_rewrite_critique.md` … and treated them as the house roles."*
+
+### SKILL.md §8's trial record — discharged, having stood Unstarted through three uses
+
+§8 requires the first use of the roles to be treated as a trial with what they missed recorded here.
+The item at `phase_state.md`:173–175 has carried it as **Unstarted** since 2026-07-30. It is now
+discharged. Six conclusions, full evidence in `ledger/role_audit_ch4_ch5.md`:
+
+1. **The roles find what the invented rounds structurally cannot.** Chapter 4's rounds were
+   thorough and missed a number contradicting its own trace file, a per-venue oracle-tuned table
+   column, a sweep quoted at three different settings, a 41-way uncorrected multiplicity and four
+   floats carrying no uncertainty. Nothing else in the loop looks along those axes.
+2. **The cause was the reference, not reluctance.** The inline-specified roles ran; the
+   name-referenced ones did not, in one session. That control case is what isolates it, and it is
+   why the remedy is a path written into `PRJ93_RULES.md` and `05_paper_architecture.md` §8.1a
+   rather than an exhortation. A requirement living only in prompts drifts — the same lesson §4.5
+   taught 8C-3.
+3. **Independence is worth more than the roles' content**, and 8C-4 measured it: seven findings and
+   zero blocking in one shared context, against **42 blocking** across three independent calls, same
+   chapter, same day.
+4. **The roles are NOT idempotent — this was not predicted.** A second independent Role A returned
+   seven blocking findings on Chapter 5 *after* a correct three-role loop with two iterations had
+   already run on it. A completed critique loop lowers the next pass's yield without emptying it, so
+   "the loop has run" is not a certificate.
+5. **Genuine disagreement is diagnostic.** Two roles proposed opposite repairs for one discrepancy;
+   adjudicating located an ambiguity in the artefact schema (`n_boot` meaning two different things
+   across four files, with the disambiguating note in only one of them) that neither role's remit
+   covers and neither would have found alone. A synthesiser that compromised would have destroyed
+   the finding. §2's "preserve genuine disagreements" earned its place.
+6. **What the roles missed.** Six role calls and a fourteen-test gate, pointed at two chapters, and
+   `abstract.tex` — unwritten template boilerplate, live on `origin/main` — was found only because
+   one call looked outside its remit. **Scope a check narrowly and it will be clean narrowly.**
+
+### Artefacts written
+
+- `ledger/role_audit_ch4_ch5.md` — all six critiques, the two adjudicated cross-cutting items, and
+  the §8 trial record in full.
+- `PRJ93_RULES.md` — new section *"The critique loop — name the file, not the roles"*.
+- `05_paper_architecture.md` §8.1a — the loop each composed chapter passes through.
+- `results_rewrite_critique.md` — header corrected (it also claimed five rounds where six ran).
+- `BLOCKED_third_party.md` §F — two rows added: the unwritten abstract, and the open findings.
+
+### Unrepaired, and deliberately so
+
+Every finding is REPORTED, NOT FIXED. Repairs touch composed chapters and reach Overleaf, which is
+a human gate. Two carry ordering that is not discretionary: §5's contradiction signal (`results.tex`
+and `discussion.tex` state incompatible things about the same regeneration) resolves **before any
+other revision**, then T1's trace mismatch at `results.tex:825`.
+
+### The generalisable part
+
+**A name degrades where a path does not.** A path is either right or broken; a name is
+re-derivable from context, which means it can be re-derived *wrongly* and still resolve to
+something plausible. The substituted rounds were good work, which is exactly why nothing looked
+wrong — **the absence of a check is invisible in an artefact that records only what was done.**
+That is the same shape as the stale `main-words.sum` and the stale `ladder.pdf`: in all three the
+instrument reported honestly on what it was pointed at, and nobody had checked what it was pointed
+at.
