@@ -1,25 +1,25 @@
-# Graph Report - ai-gm.ai-master  (2026-08-08)
+# Graph Report - ai-gm.ai-master  (2026-08-07)
 
 ## Corpus Check
-- 1280 files · ~1,529,586 words
+- 1262 files · ~1,470,958 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 13862 nodes · 25344 edges · 925 communities (630 shown, 295 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 1064 edges (avg confidence: 0.8)
+- 13618 nodes · 25047 edges · 895 communities (611 shown, 284 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 1058 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0497ce34`
+- Built from commit: `8dd51026`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - generated/api.ts
 - zod.ts
-- integrations-body.tsx
-- report-detail-body.tsx
-- index.ts
+- upload-modal.tsx
+- api-client.ts
+- probe-chat-core.ts
 - button.tsx
 - analytics.dto.ts
 - labels.py
@@ -27,46 +27,46 @@
 - cn
 - square.provider.ts
 - orvalMutator
-- incidents-body.tsx
+- apiFetch
 - CurrentOrg
 - notifications.dto.ts
 - connect
 - build_features
 - app.module.ts
-- Role audit — Chapters 4 and 5 under `autoresearchclaw` SKILL.md §3/§4
+- whatsapp-onboarding.service.ts
 - withQueryKey
-- tool-dispatcher.ts
+- index.ts
 - config.py
 - test_compute_engine.py
 - VenueScope
-- A13 · Change-point detector validation
-- CurrentUser
+- Standardised conformal residual stream z = (actual - DOW-median) / conformal half-band@90%
+- chat.controller.ts
 - compliance-body.tsx
 - agent_eval.py
 - probe-tabular.ts
 - .sendMessage
-- getServerSession
+- invite-form.tsx
 - dependencies
 - dependencies
-- scheduled-reports-body.tsx
-- conversations.dto.ts
+- fail
+- CurrentUser
 - dynamic-page-header.tsx
 - chat.service.ts
 - ladder.py
 - 07 · Figure programme — specification for the dissertation's floats
-- use-dashboard.ts
+- gm-agent.ts
 - debug.dto.ts
 - test_exog_supplied.py
 - refresh.py
 - checklist-extractor.service.ts
 - pricing-recommendations.dto.ts
-- trim_to_active
+- build
 - docs.service.ts
 - test_weather_basis.py
 - chat.dto.ts
-- IntegrationsService
+- .update
 - ToolResult
-- .create
+- InviteController
 - briefing.py
 - test_org_profile.py
 - probe-section.ts
@@ -76,31 +76,31 @@
 - map_category
 - reports.ts
 - test_agent_calibration.py
-- read_series
+- weather_diagnostic.py
 - test_group_icl.py
 - world_cup.py
 - agent-memory.ts
-- dashboard-body.tsx
+- page-header-provider.tsx
 - brain.client.ts
 - SBC/Kostenko-Hyndman classification plane (dropped figure)
-- HLN Correction Factor vs Evaluation-Window Length (figure)
+- PRISM (cost-asymmetric acceptance-probability gate)
 - places.normalize.ts
 - doc-detail-body.tsx
 - wrap.py
 - lovo.py
-- Ruler Comparison: One Forecast, Four Denominators
+- Frozen July 1–7 2026 Forecast (pre-registration)
 - allow
 - inject_realistic.py
 - adaptation.service.ts
-- IngestService
+- tasks.dto.ts
 - report-card.tsx
 - inject.py
 - daily-summary.service.ts
 - chat-message.tsx
-- latexcheck.py
+- Attribution honesty gate: honest-null vs genuine coincidence, never a confident wrong cause
 - app.py
 - recall skill
-- .getForVenue
+- S7 G17h · interval calibration (powered coverage, per-step bands, adaptive methods)
 - dashboard/format.ts
 - group_icl.py
 - test_a2_metric_ruler.py
@@ -110,12 +110,12 @@
 - intermittency_diagnostic.py
 - reports.dto.ts
 - eval/weather_basis.py
-- Honest negative verdict — no exogenous feature adopted into the GBM
-- Discussion critique log — 8C-4, 2026-08-08
+- brain/.venv-eval evaluation environment
+- tasks-body.tsx
 - Part 2 — Rubric decomposed
 - M23 · LOVO transfer gate decided without dispersion
 - Lune Brew — Deck Building Guide for AI Agents
-- SquareService
+- square-commerce.service.ts
 - package.json
 - change_point.py
 - Drafting rules — long-form writing guidance
@@ -129,7 +129,7 @@
 - test_a2_fold_count.py
 - venue-context.ts
 - docs.ts
-- test_store_durability.py
+- Honest negative verdict — no exogenous feature adopted into the GBM
 - compilerOptions
 - harness.py
 - test_ingest_refresh.py
@@ -141,10 +141,10 @@
 - scripts
 - test_a2_mcs.py
 - digest.service.ts
-- chat-starters.generator.ts
-- PhoneService
+- RetrievalService
+- .send
+- isToolFail
 - tool-card-router.tsx
-- tool-cards/types.ts
 - APPENDICES
 - Winkler table — five arms, dashes hid computed values
 - contract.py
@@ -154,7 +154,7 @@
 - chat-composer.tsx
 - fig_appendix_tikz.py
 - setupdotclaude skill
-- TasksService
+- expiry-scheduler.service.ts
 - aci_closure_probe.py
 - agent_calibration.py
 - PRJ93 Fidelity Corrections Build Report (Report 14)
@@ -162,11 +162,11 @@
 - SourceAdapter
 - test_foundation.py
 - square.module.ts
-- square.service.ts
+- SquareService
 - provenance.py
-- organization.controller.ts
+- .describe
 - checklist_discipline.py
-- .send
+- FastLookupService
 - 2. Per-stage reasoning and critique layer
 - chatlog_kb_gap.py
 - test_promote_and_serve.py
@@ -179,7 +179,7 @@
 - test_agent_eval.py
 - test_deviation.py
 - devDependencies
-- nudge.service.ts
+- nudge.module.ts
 - foundation.py
 - SectionDetector
 - image-extractor.ts
@@ -191,7 +191,7 @@
 - Knowledge pipeline (Reducto → Voyage → Postgres)
 - tasks
 - config.VENUE_SCALE_BASIS (single source of truth)
-- _attach_exog
+- Ruler Comparison: One Forecast, Four Denominators
 - RealtimeGateway
 - .onOpen
 - Dissertation Writing: Data Science and AI
@@ -201,12 +201,12 @@
 - Agent memory (memory_20250818 provider tool)
 - BullMQ background jobs
 - components.json
-- whatsapp.service.ts
-- chat-starters.queue.ts
-- phone.dto.ts
+- prisma.ts
+- chat-starters.generator.ts
+- phone.controller.ts
 - A5 conformal band coverage report (Beer Hall L1)
-- Missing beats_global_gbm key defect
-- assertAuthEnv
+- Training-frame hash gate (sim/frame_hash.py)
+- Annotated Corpora of Recorded Activity
 - G1 decided — MASE stays primary (three reasons)
 - M8 · rmsse_m5 denominator and the unverifiable M5 claim
 - PRJ93 — Part 2 pre-fill for James (Beer Hall keg → till-item mapping)
@@ -216,8 +216,8 @@
 - test_stock_inventory.py
 - reconcile-duplicates.ts
 - square-cogs.service.ts
-- prisma.ts
-- chat-starters.service.ts
+- probe-eval.ts
+- Tooling verdict — MCP connector smoke test
 - includes
 - S6 G17g — lead-matched weather five-arm exogenous ablation and MCS: horizon-matched (M) arm wins Beer Hall MCS but decoratively
 - Appendix K: remediation programme, status as at 2026-07-21
@@ -230,14 +230,14 @@
 - rules
 - chart.tsx
 - REST endpoint table (117 endpoints)
-- .search
+- stage2
 - classifier.service.ts
 - .runNudge
-- [slug]/page.tsx
+- blog/page.tsx
 - ScheduledReportsService
 - Data Science and AI Dissertation Writing Workshop
 - July 8 to 14 window (G12.17c, calendar-airtight)
-- _foundation_adoption (implemented criterion)
+- Missing beats_global_gbm key defect
 - ResponseCache
 - PRJ93 — the research questions
 - M1 · Croston/SBA node adoption (test-set selection)
@@ -252,7 +252,7 @@
 - writer-examples.ts
 - StubClient
 - test_a6_reconcile.py
-- confront_july.py
+- hero-chat.tsx
 - Example 1 — Deep Learning OCR dissertation
 - Materials and Methods section
 - 10. INDEPENDENT SOURCE VERIFICATION
@@ -262,7 +262,7 @@
 - Three-Block Fit/Validation/Calibration/Test Layout
 - Model Confidence Set (S3 Instrument)
 - auth.config.ts
-- .get
+- test_a4_ladder.py
 - mailer.ts
 - Mondrian Conformal Prediction
 - Document version reconciliation
@@ -272,7 +272,6 @@
 - agentmemory-mcp-tools skill
 - commit-context skill
 - find-person.ts
-- OnboardingMetricsController
 - Blocked on a third party — the retrieval point
 - wau.service.ts
 - features/page.tsx
@@ -286,7 +285,7 @@
 - manifest.json
 - june2026_ingest
 - biome.json
-- whatsapp-invite.ts
+- fig:gap-map — proactive-agent evaluation gap map
 - 70 — Ruler migration: fold-vector regeneration, MCS re-run, `tab:ladder` re-score
 - seo.ts
 - g15c_taxonomy_drift.py
@@ -302,12 +301,12 @@
 - live.py
 - occurrence_label
 - test_inject.py
-- native_interval_probe.py
+- Literature review critique-revise record
 - app.controller.ts
 - PhoneController
 - Chapter 3 (Methods) rewrite — critique record
-- parseRedisUrl
-- active_trading_end
+- main.ts
+- trim_to_active
 - pricing-recommendation-card.tsx
 - Example 2 — Health Service patient flow dissertation
 - External Examiner Examination Record (AI-assisted persona, 63/100)
@@ -322,8 +321,8 @@
 - 2. TARGET ARCHITECTURE
 - Connect adapter table (18 adapters)
 - Funnel model (long shots, medium shots, close ups)
-- apiFetch
-- test_append_cross_venue.py
+- debug-body.tsx
+- g16a_portable_baseline.py
 - tabpfn_entrant.py
 - Harvey (1998:3-5) three principles for integrating sources
 - FIFA World Cup 2026 - Complete 104 Match Schedule & Results
@@ -331,7 +330,7 @@
 - Kostenko–Hyndman selection rule (use SBA when v > 2 − (3/2)p)
 - Fix 8 — hyndman_another_2006 OVERSTATED (no seasonal MASE in the 2006 paper)
 - Addendum — rung4_chronos_bolt missing from the ladder table
-- Harvey-Leybourne-Newbold Small-Sample Correction Factor
+- Report 53 - S7 G17i: A6 Selection Moved Off the Test Block
 - Unread-notes email digest (note-digest queue)
 - formatter
 - scale_bootstrap.py
@@ -343,14 +342,14 @@
 - Knowledge transforming (KTr)
 - 9.1 STEP 1: DIAGNOSIS
 - Four adversarial review rounds, four with hits
-- scan_text
+- stock-card.tsx
 - 29 - G12.17c-b (Corrected C1): production-faithful 7-day-cadence freeze of 8 to 14 July
 - Report 50: S10 G17i — Injection Realism
 - ledger/code_vs_paper.md Released-Code Audit Ledger
 - july2026_w1_ingest
 - invitations.service.ts
 - OrgProfile
-- main.ts
+- croston_classic
 - test_liveness_gate.py
 - agentmemory-hooks skill
 - literature-review-writer skill
@@ -359,7 +358,7 @@
 - 4. WORD BUDGET RECONCILIATION
 - FLAG-FIXTURE-ANTICIPATION — OPEN, honest negative: home-nation fixture anticipation not established, 11 July out-of-sample test failed in sign
 - 11. CORRECTIONS TO THE EXAMINER'S OWN PRIOR ADVICE
-- test_briefing.py
+- _StubAttribution
 - PRJ93 project specification (AI General Manager: Building the Proactive Brain)
 - chronos2_covariate_probe.py
 - Gap d — intermittency set up only in the methodology
@@ -386,7 +385,7 @@
 - agentmemory connect <agent>
 - Em dash rate ceiling (1 per 1,000 words)
 - chat-thread.tsx
-- app/layout.tsx
+- pricing/page.tsx
 - Abstract
 - ACI vs Static Coverage Across the two_river_taps Closure (chart)
 - fold_vectors.py
@@ -395,19 +394,19 @@
 - Report 45 (§1d states SBA condition, concludes Croston)
 - §6 — Layer 2: data pipeline
 - §7 — Layer 3: multi-tenancy — **Adopted (Phase 3)**, with three deliberate deviations
-- Session 2026-08-07 — Phase 8C-F: local compile, git write path, queue cleared
+- tasks-list-card.tsx
 - AgentTraceLive (components/chat/agent-trace.tsx)
 - api/package.json
 - formatter
-- Results rewrite — critique log, 8C-3, 2026-08-07
+- Croston Region (narrow wedge near p=1)
 - Methods argument skeleton — extracted 2026-08-07, before composition (8C-2)
 - chatStartersControllerGet
 - complianceControllerGet
 - Ranked by marginal value to the dissertation
 - Chapter 2 — argument skeleton extracted from the current prose
 - Discussion and conclusion sections
-- The Overleaf push block — diagnosis and proposed fix
-- DOWNSTREAM: the "run live or rerun" answer (G12.9g)
+- M20 · Chronos-Bolt / Chronos-2 interface
+- HLN Correction Factor vs Evaluation-Window Length (figure)
 - debugControllerGetRetagQueue
 - docsControllerGapKbMatches
 - docsControllerGet
@@ -435,13 +434,12 @@
 - Session close — 2026-08-06 (TabPFN literature, D-U6 closure, chapter audit)
 - getNotificationsControllerListQueryOptions
 - getNotificationsControllerListRepliesQueryOptions
-- ChatStartersGenerator
+- @ai-sdk/react
 - getOrganizationControllerGetProfileQueryOptions
-- phone-otp.ts
 - getReportsControllerGetOneQueryOptions
 - Chapter 2 rewrite — critique record
 - 71 — Flipping the headline metric from MASE to RMSSE
-- 8C-4 — Chapter 5, Discussion, composed 2026-08-08
+- cadence_sweep.py
 - getVenuesControllerGetQueryOptions
 - getVenuesControllerListQueryOptions
 - proxy.ts
@@ -471,11 +469,8 @@
 - memory_recall
 - chatControllerDeleteConversation
 - chatControllerSendMessage
-- Source-claim verification — T8 discharged for Chapter 5
 - chatControllerUpdateVisibility
 - 3. Literature foundation and methodological justification
-- self_test
-- graph_write_guard.py
 - conversationsControllerHideConversation
 - conversationsControllerMarkRead
 - 2026-08-07 — Phase 8B: appendix floats built, programme closed to the compile
@@ -491,23 +486,19 @@
 - 1. CURRENT-STATE INVENTORY
 - _saturated_logit
 - invitationsControllerRevoke
-- test_live_cache.py
+- @radix-ui/react-collapsible
 - 2.2 Every data source, verified against the store
 - nudgeControllerRunNudge
-- supplier-card.tsx
 - 10. D-D2 resolved — 2026-08-06
 - 3. DIVERGES — SHOULD FIX (8)
-- rank-list.tsx
+- @radix-ui/react-dialog
 - pricingRecommendationsControllerCreate
 - R1 result — VUS-PR detector supplement
 - R6 result — the unbiasedness precondition WLS_v inherits from MinT
 - tw-animate-css
-- Session 2026-08-07 (second run) — 8C-F follow-up: push verified, rules hardened, graph refused again
+- metric_ordering.py
 - R5 result — ABORTED on a pre-registered condition, with one prediction salvaged
 - scheduledReportsControllerRemove
-- ingest_july_w1_actuals.py
-- ingest_june_actuals.py
-- test_a14b_diagnostic.py
 - 05 · Paper architecture — specification for restructuring PRJ93 into a research paper
 - chatControllerListConversations
 - conversationsControllerList
@@ -806,11 +797,10 @@
 - 7. Forward plan and asks
 - 4. DIVERGES — DEFENSIBLE (5) — each is a human decision
 - 2026-08-05 — Phase LITCONF: literature conformance audit, six runs executed
-- ChatStartersController
-- invite-token.ts
+- refresh
+- _FakeAdapter
 - getMetricsControllerGetWauQueryOptions
 - getInvitationsControllerListQueryOptions
-- Embedded figure titles — estate-wide sweep, 2026-08-07 (8C-3 STEP 1)
 - getMetricsControllerGetActiveStaffQueryOptions
 - getMetricsControllerGetRecentEscalationsQueryOptions
 - getPricingRecommendationsControllerListQueryOptions
@@ -825,7 +815,7 @@
 - 8. Post-run status — 2026-08-05
 - 9. D-D1 resolved, and the minimal pair that resolved it — 2026-08-06
 - Agent Memory
-- 2026-08-08 — Phase: critique-loop audit, and SKILL.md §8's trial record discharged
+- Session close, second half — 2026-08-06 (Zotero enabled, three corrections)
 - getNotificationsControllerRecipientsQueryOptions
 - getOnboardingMetricsControllerGetMineQueryOptions
 - getOrgMembersControllerListQueryOptions
@@ -864,11 +854,11 @@
 - @nestjs/bullmq
 - @nestjs/swagger
 - nestjs-zod
-- web/package.json
+- 2026-07-31 — Overleaf restore closed; methodology corrections landed
 - @prisma/adapter-pg
 - @prisma/client
 - 77 — R1, R2 and R4, and what R4 found instead
-- 8. COMPOSITION METHOD, AND THE EVIDENCE BASE PER CHAPTER
+- 2026-07-31 (second entry) — flagged items resolved
 - socket.io
 - @socket.io/redis-adapter
 - 2026-07-31 (third entry) — warehouse restored, artefacts regenerated
@@ -896,36 +886,15 @@
 - suggestionsControllerOnTurn
 - tasksControllerRemove
 - venuesControllerCreate
-- Discussion argument skeleton — D1–D19, 8C-4
-- completenesscheck.py
+- artefact
 - 2026-08-07 — 8C-1 hand-off adjudicated (Phuong). Overrun held PROVISIONAL.
-- 2026-08-08 — 8C-4 closing addendum: the push is verified on the remote
-- 2026-08-08 (later) — Phase: reconciliation, the abstract, and the repair batch
-- express-augment.d.ts
-- Results argument skeleton — R1–R13, 8C-3
-- zod
-- input-otp
-- libphonenumber-js
-- next
-- next-themes
-- @radix-ui/react-avatar
-- @radix-ui/react-dropdown-menu
-- @radix-ui/react-label
-- @radix-ui/react-popover
-- @radix-ui/react-select
-- @radix-ui/react-slot
-- react-dom
-- react-hook-form
-- react-markdown
-- remark-gfm
-- @tanstack/react-query
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 197 edges
 2. `CurrentOrg` - 149 edges
 3. `orvalMutator()` - 133 edges
-4. `connect()` - 100 edges
-5. `ToolResult` - 99 edges
+4. `ToolResult` - 99 edges
+5. `connect()` - 99 edges
 6. `apiFetch()` - 91 edges
 7. `prisma` - 85 edges
 8. `CurrentUser` - 74 edges
@@ -941,8 +910,8 @@
   brain/drafts/figures/gap_map.pdf → brain/knowledge/00_state_brief.md
 - `W21 — PRISM already occupies the claimed unoccupied intersection` --references--> `PRISM (cost-asymmetric acceptance-probability gate)`  [INFERRED]
   brain/knowledge/00_state_brief.md → brain/drafts/figures/gap_map.pdf
-- `Fail-closed conditions keeping the incumbent` --semantically_similar_to--> `M7 · Conformal quantile clamp at small n`  [INFERRED] [semantically similar]
-  brain/ledger/prereg_adoption_margin_2026-08-01.md → brain/ledger/code_vs_paper.md
+- `SBC/Kostenko-Hyndman classification plane (dropped figure)` --shares_data_with--> `Average Inter-Demand Interval p (x-axis)`  [EXTRACTED]
+  brain/drafts/figures/sbc_plane.pdf → brain/drafts/figures/sbc_plane.png
 
 ## Import Cycles
 - 3-file cycle: `apps/api/src/modules/chat/tool-dispatcher.ts -> apps/api/src/modules/integrations/integration-registry.ts -> apps/api/src/modules/integrations/integration-provider.ts -> apps/api/src/modules/chat/tool-dispatcher.ts`
@@ -1000,7 +969,7 @@
 - **Pre-registration chain across frozen forecasts** — brain_sim_july2026_forecast_frozen_pre_registration, brain_sim_july2026_w2_forecast_frozen_pre_registration, brain_sim_july2026_w2b_forecast_frozen_pre_registration, brain_sim_june2026_forecast_frozen_pre_registration, brain_sim_ruler_comparison_calendar_lag7 [INFERRED 0.85]
 - **Per-venue model ladder assignment (rung1/rung2/rung4)** — brain_sim_june2026_forecast_frozen_rung2_ets [INFERRED 0.75]
 
-## Communities (925 total, 295 thin omitted)
+## Communities (895 total, 284 thin omitted)
 
 ### Community 0 - "generated/api.ts"
 Cohesion: 0.00
@@ -1010,153 +979,153 @@ Nodes (1016): AcceptInvitationResponseDto, AcceptInvitationResponseDtoActiveOrga
 Cohesion: 0.00
 Nodes (413): AppControllerGetHealthResponse, ChatControllerDeleteConversationParams, chatControllerDeleteConversationPathIdRegExp, ChatControllerDeleteConversationQueryParams, chatControllerDeleteConversationQueryVenueIdRegExp, ChatControllerDeleteConversationResponse, ChatControllerGetConversationParams, chatControllerGetConversationPathIdRegExp (+405 more)
 
-### Community 2 - "integrations-body.tsx"
-Cohesion: 0.08
-Nodes (32): VenueSelectorProps, CategoryFilter, LibraryTab(), SORT_VALUES, SortKey, STATUS_VALUES, StatusFilter, useDebouncedValue() (+24 more)
-
-### Community 3 - "report-detail-body.tsx"
+### Community 2 - "upload-modal.tsx"
 Cohesion: 0.06
-Nodes (36): buildRerunPrefill(), csvCell(), errorCopy(), ExportMenu(), fmtKpiValue(), ReportDetailBody(), ReportFooterActions(), reportTablesToCsv() (+28 more)
+Nodes (49): StepKnowledge(), VenueChip(), VenueSelectorProps, CategoryFilter, LibraryTab(), SORT_VALUES, SortKey, STATUS_VALUES (+41 more)
 
-### Community 4 - "index.ts"
+### Community 3 - "api-client.ts"
 Cohesion: 0.03
-Nodes (139): assert(), assertContains(), assertEqual(), assertGt(), assertGte(), assertLt(), assertMatchesNone(), AssertResult (+131 more)
+Nodes (77): buildRerunPrefill(), csvCell(), errorCopy(), ExportMenu(), fmtKpiValue(), ReportDetailBody(), ReportFooterActions(), reportTablesToCsv() (+69 more)
+
+### Community 4 - "probe-chat-core.ts"
+Cohesion: 0.03
+Nodes (133): assert(), assertContains(), assertEqual(), assertGt(), assertGte(), assertLt(), assertMatchesNone(), AssertResult (+125 more)
 
 ### Community 5 - "button.tsx"
 Cohesion: 0.03
-Nodes (117): DEFAULT_VALUES, FormSchema, FormValues, Props, Props, OnboardBody(), Preview, metadata (+109 more)
+Nodes (110): OnboardBody(), Preview, metadata, isStepId(), SearchParams, WelcomePage(), ProgressHeader(), detectTimezone() (+102 more)
 
 ### Community 6 - "analytics.dto.ts"
 Cohesion: 0.03
-Nodes (97): AnalyticsService, assertVenueInOrg(), fillDailyBuckets(), startOfUtcDay(), Injectable, ymd(), ActiveStaffItemSchema, ActiveStaffQueryDto (+89 more)
+Nodes (94): AnalyticsService, assertVenueInOrg(), fillDailyBuckets(), startOfUtcDay(), Injectable, ymd(), ActiveStaffItemSchema, ActiveStaffQueryDto (+86 more)
 
 ### Community 7 - "labels.py"
 Cohesion: 0.08
 Nodes (40): card(), check_point(), _classify(), main(), DataFrame, Point-deviation signal, the per-day primitive (PRJ93 point-deviation spec).  Fla, Compact summary for the agent. A normal day is a quiet 'within normal     range', (status, direction, severity). Band-multiple rule (FLAG-PD2): deliberately     d (+32 more)
 
 ### Community 8 - "auth.ts"
-Cohesion: 0.02
-Nodes (105): AcceptInvitationResponseDto, AcceptInvitationResponseSchema, CreateInvitationResponseDto, CreateInvitationResponseSchema, InvitationDto, InvitationIdParamDto, InvitationPreviewDto, InvitationPreviewSchema (+97 more)
+Cohesion: 0.03
+Nodes (101): AcceptInvitationResponseDto, AcceptInvitationResponseSchema, CreateInvitationResponseDto, CreateInvitationResponseSchema, InvitationDto, InvitationIdParamDto, InvitationPreviewDto, InvitationPreviewSchema (+93 more)
 
 ### Community 9 - "cn"
-Cohesion: 0.03
-Nodes (106): VenuePickerList(), DebugInner(), initials(), UserMenu(), formatDue(), ListData, ListTask, TaskRow() (+98 more)
+Cohesion: 0.05
+Nodes (58): initials(), UserMenu(), Props, KpiCard(), Props, DebugRequestIdBadge(), Props, LINKS (+50 more)
 
 ### Community 10 - "square.provider.ts"
-Cohesion: 0.10
-Nodes (25): CategorySalesRow, DiscountUsageRow, ModifierPopularityRow, toVendorRow(), VendorRow, redactShiftPayForStaff(), redactTopItemsRevenueForStaff(), TopItemsShape (+17 more)
+Cohesion: 0.13
+Nodes (19): redactShiftPayForStaff(), redactTopItemsRevenueForStaff(), TopItemsShape, BASE_SQUARE_TOOL_DEFINITIONS, laborWindowProps, salesWindowProps, SQUARE_ID, SQUARE_TOOL_DEFINITIONS (+11 more)
 
 ### Community 11 - "orvalMutator"
 Cohesion: 0.02
 Nodes (105): appControllerGetHealth(), complianceControllerCreate(), conversationsControllerSend(), docsControllerCreate(), docsControllerPromoteNoDataQuery(), docsControllerUnsupersede(), docsControllerUpdate(), getAppControllerGetHealthUrl() (+97 more)
 
-### Community 12 - "incidents-body.tsx"
-Cohesion: 0.03
-Nodes (74): DocsBody(), DocsTab, TAB_HREF, TABS, Activity(), describeTransition(), errorDetail(), FILTER_VALUES (+66 more)
+### Community 12 - "apiFetch"
+Cohesion: 0.04
+Nodes (76): DashboardBody(), isForbidden(), PANEL_ICON_TONE, PanelCard(), PRESET_VALUES, SEARCH_LEGEND, Activity(), CommentRow() (+68 more)
 
 ### Community 13 - "CurrentOrg"
-Cohesion: 0.05
-Nodes (75): zodPipe(), ZodValidationPipe, CurrentOrg, RequireRole(), ExtractErrorReason, isTextLikeUpload(), normalizeDelimiter(), normalizeTextBufferEncoding() (+67 more)
+Cohesion: 0.06
+Nodes (71): CurrentOrg, RequireRole(), ExtractErrorReason, isTextLikeUpload(), normalizeDelimiter(), normalizeTextBufferEncoding(), sanitizeUploadTitle(), TEXTLIKE_MIMES (+63 more)
 
 ### Community 14 - "notifications.dto.ts"
 Cohesion: 0.06
-Nodes (46): CategoryCsv, ComposeNotificationBodyDto, ComposeNotificationBodySchema, ComposeReplyBodyDto, ComposeReplyBodySchema, ID, ListNotificationRepliesResponseDto, ListNotificationRepliesResponseSchema (+38 more)
+Nodes (45): CategoryCsv, ComposeNotificationBodyDto, ComposeNotificationBodySchema, ComposeReplyBodyDto, ComposeReplyBodySchema, ID, ListNotificationRepliesResponseDto, ListNotificationRepliesResponseSchema (+37 more)
 
 ### Community 15 - "connect"
-Cohesion: 0.04
+Cohesion: 0.05
 Nodes (64): _a6_daily_pints(), compute_cover(), dead_stock(), main(), _persist(), DataFrame, A12 · Stock inventory, days-of-cover reorder signal (spec §7).  Joins the latest, Working-capital summary from the snapshot aggregates (spec §6). (+56 more)
 
 ### Community 16 - "build_features"
 Cohesion: 0.04
-Nodes (63): range, assert_no_leakage(), _bank_holidays(), build_features(), calendar_features(), event_venue_dates(), main(), A3 · L1 daily series + leak-free feature table (methodology §5 step 3).  Builds (+55 more)
+Nodes (55): range, assert_no_leakage(), _attach_exog(), _bank_holidays(), build_features(), calendar_features(), main(), A3 · L1 daily series + leak-free feature table (methodology §5 step 3).  Builds (+47 more)
 
 ### Community 17 - "app.module.ts"
 Cohesion: 0.06
-Nodes (57): AppModule, Module, AdaptationModule, Module, AuthModule, Module, ChatModule, Module (+49 more)
+Nodes (55): AdaptationModule, Module, AuthModule, Module, ChatModule, Module, ChatCoreModule, Module (+47 more)
 
-### Community 18 - "Role audit — Chapters 4 and 5 under `autoresearchclaw` SKILL.md §3/§4"
-Cohesion: 0.05
-Nodes (38): A · Arithmetic on committed artefacts — no run needed, B · Needs a run, R16 — confirmed. `tab:winkler`'s A column is per-venue oracle-tuned, R22 — two of the four floats are arithmetic, two need a run, R24 — arithmetic, and the assumption is already falsified by a committed number, R30 — Ellel's traded-only served-band coverage. **A run, and here is why the shortcut fails**, R30 — settled, and it reaches past Ellel, R4 — closed. The artefact was fixed first, then the prose (+30 more)
+### Community 18 - "whatsapp-onboarding.service.ts"
+Cohesion: 0.19
+Nodes (14): RunTransitionResult, Injectable, WhatsappOnboardingService, classifyInbound(), composeWelcomeText(), InboundIntent, normalizeInviteCode(), normalizeOtp() (+6 more)
 
 ### Community 19 - "withQueryKey"
 Cohesion: 0.02
 Nodes (84): chatControllerGetConversation(), complianceControllerList(), dailySummaryControllerGetGroup(), debugControllerGetConversation(), debugControllerGetMessage(), getAppControllerGetHealthQueryKey(), getAppControllerGetHealthQueryOptions(), getChatControllerGetConversationQueryKey() (+76 more)
 
-### Community 20 - "tool-dispatcher.ts"
+### Community 20 - "index.ts"
 Cohesion: 0.03
-Nodes (90): allLogs, assert(), assertRegex(), AssertResult, hasTool(), LoggedCall, main(), makeDispatcher() (+82 more)
+Nodes (64): buildAiSdkTools(), toolLogger, withDispatchLogging(), DispatchContext, leaveNoteRateLimit, scheduleReportRateLimit, ToolDispatcher, Injectable (+56 more)
 
 ### Community 21 - "config.py"
-Cohesion: 0.04
-Nodes (45): chat_csv(), checklist_md(), is_scaled_venue(), items_csv(), Path, Central configuration for the Proactive Brain (Track A).  Paths, the canonical v, False where the estate has ruled that no scaled error is defensible., Multiplier to convert a venue's Net Sales to a common ex-VAT basis. (+37 more)
+Cohesion: 0.03
+Nodes (49): chat_csv(), checklist_md(), is_scaled_venue(), items_csv(), Path, Central configuration for the Proactive Brain (Track A).  Paths, the canonical v, False where the estate has ruled that no scaled error is defensible., Multiplier to convert a venue's Net Sales to a common ex-VAT basis. (+41 more)
 
 ### Community 22 - "test_compute_engine.py"
 Cohesion: 0.05
 Nodes (73): PriorState, What the engine currently reads back from its own store.      Retiring the store, _dataset(), Stateless compute: dataset in, bundle out, nothing persisted.  The isolation tes, A fabricated org must not inherit the served store's real venues. If compute eve, The compute service is shared, so sequential orgs must be independent., Nothing persists: no volume to preserve, no residue to leak into the next call., One venue's blow-up must be reported, not swallowed, and must not take the org's (+65 more)
 
 ### Community 23 - "VenueScope"
-Cohesion: 0.07
-Nodes (52): CurrentVenueScope, canAccessVenue(), extractVenueId(), Injectable, VenueScopeGuard, isVenueScoped(), resolveAccessibleVenueIds(), VenueScope (+44 more)
+Cohesion: 0.06
+Nodes (58): CurrentVenueScope, canAccessVenue(), isVenueScoped(), VenueScope, DailySummaryController, ApiBearerAuth, ApiResponse, ApiTags (+50 more)
 
-### Community 24 - "A13 · Change-point detector validation"
-Cohesion: 0.20
-Nodes (12): WP6 · ACI coverage across the two_river_taps closure, Deterministic ACI miscoverage bound, Adaptive conformal inference (ACI gamma policies), Static 0.90 conformal band, Two River Taps closure (structural break, 2026-05-08), BOCPD benchmark, A13 · Change-point detector validation, CUSUM ARL₀ operating point (k=0.5, h=5.0) (+4 more)
+### Community 24 - "Standardised conformal residual stream z = (actual - DOW-median) / conformal half-band@90%"
+Cohesion: 0.13
+Nodes (19): WP6 · ACI coverage across the two_river_taps closure, Deterministic ACI miscoverage bound, Adaptive conformal inference (ACI gamma policies), Static 0.90 conformal band, Two River Taps closure (structural break, 2026-05-08), BOCPD benchmark, A13 · Change-point detector validation, CUSUM ARL₀ operating point (k=0.5, h=5.0) (+11 more)
 
-### Community 25 - "CurrentUser"
+### Community 25 - "chat.controller.ts"
 Cohesion: 0.05
-Nodes (60): All, runWithVenueContext(), auth, AuthController, nodeHandler, ApiExcludeController, Controller, Req (+52 more)
+Nodes (51): translateChatServiceError(), zodPipe(), ZodValidationPipe, runWithVenueContext(), CurrentRole, AuthedRequest, AuthGuard, Injectable (+43 more)
 
 ### Community 26 - "compliance-body.tsx"
-Cohesion: 0.05
-Nodes (43): AddExpiryDialog(), COMPLIANCE_SKELETON_KEYS, ComplianceBody(), Filter, FILTER_VALUES, FILTERS, groupByWindow(), RecordGroup() (+35 more)
+Cohesion: 0.08
+Nodes (29): AddExpiryDialog(), DEFAULT_VALUES, FormSchema, FormValues, Props, COMPLIANCE_SKELETON_KEYS, ComplianceBody(), Filter (+21 more)
 
 ### Community 27 - "agent_eval.py"
 Cohesion: 0.06
-Nodes (69): aged_regime_shift_probe(), _all_signals(), attribution_metrics(), build_corpus(), build_scaled_corpus(), _cell(), _ci(), _clean() (+61 more)
+Nodes (71): aged_regime_shift_probe(), _all_signals(), attribution_metrics(), build_corpus(), build_scaled_corpus(), _cell(), _ci(), _clean() (+63 more)
 
 ### Community 28 - "probe-tabular.ts"
 Cohesion: 0.06
-Nodes (64): assert(), assertEqual(), _assertGte(), assertLt(), AssertResult, ensureOrg(), fixtureChecklistCsv(), fixtureGroupCsv() (+56 more)
+Nodes (68): assert(), assertEqual(), _assertGte(), assertLt(), AssertResult, ensureOrg(), fixtureChecklistCsv(), fixtureGroupCsv() (+60 more)
 
 ### Community 29 - ".sendMessage"
-Cohesion: 0.06
-Nodes (39): ChatCoreService, composeRefinedBrief(), numberOr0(), sha12(), Injectable, CostTracker, RoleEntry, round6() (+31 more)
+Cohesion: 0.08
+Nodes (35): ChatCoreService, composeRefinedBrief(), numberOr0(), sha12(), Injectable, CostTracker, RoleEntry, round6() (+27 more)
 
-### Community 30 - "getServerSession"
+### Community 30 - "invite-form.tsx"
 Cohesion: 0.04
-Nodes (64): ChatBody(), ChatPage(), AppLayout(), GeneralSettingsPage(), IntegrationsSettingsPage(), SettingsLayout(), SettingsIndexPage(), PhonePage() (+56 more)
+Nodes (79): GeneralSettingsPage(), IntegrationsSettingsPage(), SettingsLayout(), SettingsIndexPage(), PhonePage(), TeamSettingsPage(), VenueProfilesPage(), NewVenuePage() (+71 more)
 
 ### Community 31 - "dependencies"
-Cohesion: 0.09
-Nodes (23): @ai-sdk/react, ai, @hookform/resolvers, lucide-react, @radix-ui/react-collapsible, @radix-ui/react-dialog, @radix-ui/react-tooltip, recharts (+15 more)
+Cohesion: 0.04
+Nodes (49): ai, zod, @hookform/resolvers, input-otp, libphonenumber-js, lucide-react, next, next-themes (+41 more)
 
 ### Community 32 - "dependencies"
 Cohesion: 0.06
 Nodes (33): @anthropic-ai/sdk, ai, better-auth, iconv-lite, @nestjs/common, @nestjs/core, @nestjs/platform-express, @nestjs/platform-socket.io (+25 more)
 
-### Community 33 - "scheduled-reports-body.tsx"
-Cohesion: 0.09
-Nodes (27): ScheduleCreateDialog(), TIMEZONES, Filter, FILTER_VALUES, FILTERS, formatCadence(), formatNextRun(), ScheduledReportsBody() (+19 more)
+### Community 33 - "fail"
+Cohesion: 0.06
+Nodes (29): stubClock(), CutoffSummary, getVenueBriefing(), VenueBriefing, normaliseChecklistSteps(), assertVenueId(), guarded(), MockOpsService (+21 more)
 
-### Community 34 - "conversations.dto.ts"
-Cohesion: 0.08
-Nodes (37): ConversationsController, ApiBearerAuth, ApiResponse, ApiTags, Body, Controller, Delete, Get (+29 more)
+### Community 34 - "CurrentUser"
+Cohesion: 0.06
+Nodes (46): CurrentUser, OnboardingMetricsController, serialize(), ApiBearerAuth, ApiResponse, ApiTags, Controller, Get (+38 more)
 
 ### Community 36 - "chat.service.ts"
-Cohesion: 0.03
-Nodes (83): ALLOW, buildVenueContext(), buildVenueSnapshot(), DEFAULT_QUERIES, main(), pct(), ToolTiming, TurnCollector (+75 more)
+Cohesion: 0.04
+Nodes (53): buildToolCallMap(), ChatService, classifyTabularIntent(), decodeConversationCursor(), encodeConversationCursor(), expandRecentToModelMessages(), FACTUAL_SPECIFIC_RE, PersistedToolCall (+45 more)
 
 ### Community 37 - "ladder.py"
 Cohesion: 0.08
-Nodes (54): _dispersion(), _dow_profile(), ets_prophet_diagnostic(), evaluate_rolling(), evaluate_static(), _finite(), _fit_gbm(), global_gbm_predict() (+46 more)
+Nodes (56): _dispersion(), _dow_profile(), ets_prophet_diagnostic(), evaluate_rolling(), evaluate_static(), _finite(), _fit_gbm(), global_gbm_predict() (+48 more)
 
 ### Community 38 - "07 · Figure programme — specification for the dissertation's floats"
 Cohesion: 0.05
-Nodes (40): 07 · Figure programme — specification for the dissertation's floats, 0. The float-slot arithmetic, and a correction to how the headroom was read, 10. Captions — drafted 2026-08-07, to the 15-word title / 45-word body rule, 11. Appendix floats built — 2026-08-07, §11's preamble note is superseded, 1. The thirteen existing body floats — presentation confirmed, 2. The seven new body floats, 3. Appendix floats — free against HC1 (+32 more)
+Nodes (37): 07 · Figure programme — specification for the dissertation's floats, 0. The float-slot arithmetic, and a correction to how the headroom was read, 10. Captions — drafted 2026-08-07, to the 15-word title / 45-word body rule, 11. Appendix floats built — 2026-08-07, 1. The thirteen existing body floats — presentation confirmed, 2. The seven new body floats, 3. Appendix floats — free against HC1, 4. Blockers — resolved before a figure is built, not after (+29 more)
 
-### Community 39 - "use-dashboard.ts"
-Cohesion: 0.09
-Nodes (32): DashboardBody(), isForbidden(), venueName(), ActiveStaffResponseDto, CostsResponseDto, EscalationsResponseDto, HoursRecoveredResponseDto, MetricsFeedbackResponseDto (+24 more)
+### Community 39 - "gm-agent.ts"
+Cohesion: 0.04
+Nodes (64): allLogs, assert(), assertRegex(), AssertResult, hasTool(), ALLOW, buildVenueContext(), buildVenueSnapshot() (+56 more)
 
 ### Community 40 - "debug.dto.ts"
 Cohesion: 0.06
@@ -1167,20 +1136,20 @@ Cohesion: 0.06
 Nodes (58): overlay(), Caller-supplied covariates, and the one place they are overlaid.  The brain deri, Replace derived covariates with supplied ones, per (venue, date, column).      P, Materialise supplied covariates into the scratch store, long-form.      Returns, Wide frame (date + one column per supplied covariate) for `venue`.      Empty fr, read_supplied(), write_supplied(), _bound() (+50 more)
 
 ### Community 42 - "refresh.py"
-Cohesion: 0.12
-Nodes (32): _advance_watermark(), _auto_exog(), _data_max(), _ensure_tables(), freshness(), _has_changepoint_since(), _has_table(), _in_event_window() (+24 more)
+Cohesion: 0.07
+Nodes (54): _advance_watermark(), _append_transactions(), _auto_exog(), _data_max(), _ensure_tables(), freshness(), _has_changepoint_since(), _has_table() (+46 more)
 
 ### Community 43 - "checklist-extractor.service.ts"
-Cohesion: 0.13
-Nodes (16): buildPrompt(), ChecklistExtractInput, ChecklistExtractorService, estimateUsd(), ExtractRawResponseSchema, releaseSlot(), Injectable, waiters (+8 more)
+Cohesion: 0.16
+Nodes (13): acquireSlot(), buildPrompt(), ChecklistExtractInput, ChecklistExtractorService, estimateUsd(), ExtractRawResponseSchema, releaseSlot(), Injectable (+5 more)
 
 ### Community 44 - "pricing-recommendations.dto.ts"
 Cohesion: 0.06
 Nodes (40): AdoptPricingRecommendationBodyDto, AdoptPricingRecommendationBodySchema, CreatePricingRecommendationBodyDto, CreatePricingRecommendationBodySchema, DismissPricingRecommendationBodyDto, DismissPricingRecommendationBodySchema, ListPricingRecommendationsQueryDto, ListPricingRecommendationsQuerySchema (+32 more)
 
-### Community 45 - "trim_to_active"
-Cohesion: 0.06
-Nodes (54): chronos2_runtime_info(), Version / model id / API path / substitution flag / device for the report., (date, value) over the active span, post-closure zero-extended, the raw     inpu, _raw_series(), _band_halfwidth(), build(), build_future_frame(), _june_dates() (+46 more)
+### Community 45 - "build"
+Cohesion: 0.08
+Nodes (44): _band_halfwidth(), build(), build_future_frame(), _june_dates(), _l1_point(), G12.13a (Pass 1 of 2) - freeze the forward June 2026 forecast BLIND to actuals., Split-conformal half-width from recent rolling 7-day residuals of the served, Recent ex-VAT revenue mix: category share of venue total, and each item's     sh (+36 more)
 
 ### Community 46 - "docs.service.ts"
 Cohesion: 0.09
@@ -1191,24 +1160,24 @@ Cohesion: 0.07
 Nodes (52): _exo_arm(), One exogenous arm (O/H/F/M). Returns (forecasts, skipped_incomplete_weather)., _assert_span_complete(), Raised when a fetch returns fewer days than the span it was asked for.      The, Raise unless `df` carries a non-null value for EVERY calendar day in [start, end, WeatherFetchIncompleteError, assert_lead_matched(), _chunks() (+44 more)
 
 ### Community 48 - "chat.dto.ts"
-Cohesion: 0.06
-Nodes (43): translateChatServiceError(), ChatController, ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags, Body (+35 more)
+Cohesion: 0.07
+Nodes (40): ChatController, ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags, Body, Controller (+32 more)
 
-### Community 49 - "IntegrationsService"
-Cohesion: 0.10
-Nodes (18): main(), moneyStr(), describeError(), main(), constantTimeEquals(), decryptToken(), deriveRecordKey(), encryptToken() (+10 more)
+### Community 49 - ".update"
+Cohesion: 0.13
+Nodes (18): ComplianceController, ApiBearerAuth, ApiResponse, ApiTags, Body, Controller, Get, HttpCode (+10 more)
 
 ### Community 50 - "ToolResult"
 Cohesion: 0.22
 Nodes (6): ZERO_DECIMAL_CURRENCIES, SquareCommerceService, Injectable, resolveWindow(), WindowInput, ToolResult
 
-### Community 51 - ".create"
-Cohesion: 0.07
-Nodes (23): assertAuthSecret(), InviteController, InviteRedeemController, ApiBearerAuth, ApiTags, Body, Controller, Delete (+15 more)
+### Community 51 - "InviteController"
+Cohesion: 0.08
+Nodes (20): assertAuthSecret(), InviteController, InviteRedeemController, ApiBearerAuth, ApiTags, Controller, Delete, Get (+12 more)
 
 ### Community 52 - "briefing.py"
-Cohesion: 0.09
-Nodes (50): _baseline_trust(), BriefingItem, build(), _build_item(), card(), _cluster(), collect(), _collect_changepoint() (+42 more)
+Cohesion: 0.06
+Nodes (59): _baseline_trust(), BriefingItem, build(), _build_item(), card(), _cluster(), collect(), _collect_changepoint() (+51 more)
 
 ### Community 53 - "test_org_profile.py"
 Cohesion: 0.06
@@ -1219,132 +1188,132 @@ Cohesion: 0.13
 Nodes (46): assert(), assertEqual(), assertGte(), assertLt(), AssertResult, cleanupW20(), ensureOrgWithVenue(), fixtureCsv() (+38 more)
 
 ### Community 55 - "Citation audit (84 keys, two passes)"
-Cohesion: 0.05
-Nodes (49): Citation audit (84 keys, two passes), Das et al. 2024 — TimesFM decoder-only foundation model, Fu et al. 2026 — PRISM: Festina Lente Proactivity, Guo et al. 2017 — On calibration of modern neural networks, Hancock et al. 2011 — Meta-analysis of trust in human-robot interaction, Human-factors and calibration citation cluster, Lu et al. 2024 — Proactive Agent / ProactiveBench, Meyer 2004 — Conceptual Issues in the Study of Dynamic Hazard Warnings (+41 more)
+Cohesion: 0.09
+Nodes (29): Citation audit (84 keys, two passes), Das et al. 2024 — TimesFM decoder-only foundation model, Hancock et al. 2011 — Meta-analysis of trust in human-robot interaction, Human-factors and calibration citation cluster, Meyer 2004 — Conceptual Issues in the Study of Dynamic Hazard Warnings, noauthor_full_nodate (malformed Zotero web-capture entry), NotebookLM notebook d565d5f0, Page 1954 — Continuous Inspection Schemes (CUSUM, ARL) (+21 more)
 
 ### Community 56 - "history-body.tsx"
 Cohesion: 0.15
 Nodes (16): buildRows(), formatTimestamp(), HistoryBody(), HistoryRow(), Row, sectionForDate(), SECTIONS, formatRelative() (+8 more)
 
 ### Community 57 - "incidents.dto.ts"
-Cohesion: 0.07
-Nodes (38): ComposeIncidentCommentBodyDto, ComposeIncidentCommentBodySchema, INCIDENT_COMMENT_KINDS, INCIDENT_SEVERITIES, INCIDENT_STATUSES, IncidentCommentParamDto, IncidentCommentParamSchema, IncidentCommentRowSchema (+30 more)
+Cohesion: 0.06
+Nodes (39): ComposeIncidentCommentBodyDto, ComposeIncidentCommentBodySchema, INCIDENT_COMMENT_KINDS, INCIDENT_SEVERITIES, INCIDENT_STATUSES, IncidentCommentParamDto, IncidentCommentParamSchema, IncidentCommentRowSchema (+31 more)
 
 ### Community 58 - "map_category"
-Cohesion: 0.13
-Nodes (24): _category_map(), _item_map(), map_category(), map_item(), _norm(), _parse_table(), Loader for the Square-to-brain taxonomy map (`ingest/taxonomy_map.md`).  Single, Brain L3 node (`brain_category::brain_item`) for a Square item.      Resolves th (+16 more)
+Cohesion: 0.07
+Nodes (42): _category_map(), _item_map(), map_category(), map_item(), _norm(), _parse_table(), Loader for the Square-to-brain taxonomy map (`ingest/taxonomy_map.md`).  Single, Brain L3 node (`brain_category::brain_item`) for a Square item.      Resolves th (+34 more)
 
 ### Community 59 - "reports.ts"
-Cohesion: 0.06
-Nodes (31): ReportListItem, ReportRow, ReportsService, Injectable, ScheduledReportsProcessor, InjectQueue, Processor, SCHEDULED_REPORTS_JOB_FIRE (+23 more)
+Cohesion: 0.08
+Nodes (24): ReportListItem, ReportRow, ReportsService, Injectable, SCHEDULED_REPORTS_JOB_FIRE, SCHEDULED_REPORTS_JOB_TICK, ScheduledReportsFireJobData, ScheduledReportsTickJobData (+16 more)
 
 ### Community 60 - "test_agent_calibration.py"
 Cohesion: 0.05
 Nodes (37): _calibrated_corpus(), _overconfident(), S8a gates: the offline agent evaluation is replayable, calibrated honestly, and, The key folds in the prompt hash, so a different prompt version keys elsewhere., On calibrated data, at ratio 4:1 the grid threshold that minimises expected cost, A higher miss:false-alarm ratio lowers the threshold, so at least as many items, Guo et al. use `(lo, hi]`, so p = 0.7 belongs to (0.6, 0.7], not [0.7, 0.8)., Truth is Bernoulli(0.5 + 0.4*s) but the agent reports a far sharper probability. (+29 more)
 
-### Community 61 - "read_series"
+### Community 61 - "weather_diagnostic.py"
 Cohesion: 0.08
-Nodes (47): ablation(), _base_cols(), _block_len(), _eval_cols(), _fold_eval(), main(), _paired_ci(), DataFrame (+39 more)
+Nodes (43): ablation(), _base_cols(), _block_len(), _eval_cols(), main(), _paired_ci(), DataFrame, ndarray (+35 more)
 
 ### Community 62 - "test_group_icl.py"
 Cohesion: 0.09
 Nodes (38): assert_panel_leak_free(), _chunks(), group_predict(), _long_frame(), PanelLeakageError, PanelOrigin, PanelSeries, S5 G17f - grouped cross-series Chronos-2 forecasting (multi-venue in-context lea (+30 more)
 
 ### Community 63 - "world_cup.py"
-Cohesion: 0.10
-Nodes (33): time, coincident_fixtures(), derive_trading_hours(), _is_separator(), _kickoff_hours(), main(), _match_columns(), _norm_header() (+25 more)
+Cohesion: 0.14
+Nodes (25): time, coincident_fixtures(), derive_trading_hours(), _is_separator(), _kickoff_hours(), main(), _match_columns(), _norm_header() (+17 more)
 
 ### Community 64 - "agent-memory.ts"
-Cohesion: 0.11
-Nodes (21): applyMemoryCommand(), isFilePath(), isValidPath(), MemoryAction, MemoryMap, ok(), readMemoryMap(), handleMemoryCommand() (+13 more)
+Cohesion: 0.09
+Nodes (24): applyMemoryCommand(), isFilePath(), isValidPath(), MemoryAction, MemoryMap, ok(), readMemoryMap(), handleMemoryCommand() (+16 more)
 
-### Community 65 - "dashboard-body.tsx"
-Cohesion: 0.11
-Nodes (12): PANEL_ICON_TONE, PanelCard(), PRESET_VALUES, SEARCH_LEGEND, KpiCard(), Props, Card, CardContent (+4 more)
+### Community 65 - "page-header-provider.tsx"
+Cohesion: 0.13
+Nodes (16): ChatBody(), ChatPage(), AppLayout(), MobileHeaderGate(), ConfigContext, HeaderConfig, PageHeaderProvider(), SetContext (+8 more)
 
 ### Community 66 - "brain.client.ts"
-Cohesion: 0.08
-Nodes (19): BandRow, BrainClient, BriefingItem, BriefingResponse, ChangePoint, ChangePointResponse, ChecklistQuery, ChecklistResponse (+11 more)
+Cohesion: 0.11
+Nodes (17): BandRow, BriefingItem, BriefingResponse, ChangePoint, ChangePointResponse, ChecklistQuery, ChecklistResponse, DeviationQuery (+9 more)
 
 ### Community 67 - "SBC/Kostenko-Hyndman classification plane (dropped figure)"
-Cohesion: 0.08
-Nodes (36): Average Inter-Demand Interval p (x-axis), Corrected Cutoffs (p=4/3, v=0.5), Croston Method (selected region), Croston Region (narrow wedge near p=1), Cutoff Discrepancy Band (inset: lumpy under 1.32 vs erratic under 4/3), Demand Quadrant Labels (smooth / erratic / intermittent / lumpy), SBC Plane Figure (Croston vs SBA selection map), Published Cutoffs (p=1.32, v=0.49) (+28 more)
+Cohesion: 0.20
+Nodes (16): Corrected Cutoffs (p=4/3, v=0.5), Cutoff Discrepancy Band (inset: lumpy under 1.32 vs erratic under 4/3), Demand Quadrant Labels (smooth / erratic / intermittent / lumpy), SBC Plane Figure (Croston vs SBA selection map), Published Cutoffs (p=1.32, v=0.49), SBC/Kostenko-Hyndman classification plane (dropped figure), Squared Coefficient of Variation v (y-axis), ADI blind spot (obsolescence patterns) (+8 more)
 
-### Community 68 - "HLN Correction Factor vs Evaluation-Window Length (figure)"
-Cohesion: 0.07
-Nodes (43): Gap Map: Proactive-Agent Evaluation Positioning Matrix, Annotated Corpora of Recorded Activity, Ask, ContextAgent, Empty-Cell Gap Argument, Evaluation-grounding axis (LM judge / simulated users / annotated corpora / operator decisions), Fingertip, fig:gap-map — proactive-agent evaluation gap map (+35 more)
+### Community 68 - "PRISM (cost-asymmetric acceptance-probability gate)"
+Cohesion: 0.27
+Nodes (12): Gap Map: Proactive-Agent Evaluation Positioning Matrix, Empty-Cell Gap Argument, Gates on a Cost-Asymmetric Threshold, Intervention-policy axis (accuracy/F1 → cost-asymmetric threshold → elicited cost ratio with measured gate calibration), A Language Model as Judge, Operator-Elicited Cost Ratio, Gate Calibration Measured, PRISM (cost-asymmetric acceptance-probability gate), ProActor (+4 more)
 
 ### Community 69 - "places.normalize.ts"
-Cohesion: 0.11
-Nodes (23): PlacesSearchResponse, PlacesController, ApiBearerAuth, ApiTags, Controller, PlacesModule, Module, businessTypeFrom() (+15 more)
+Cohesion: 0.09
+Nodes (26): PlaceCandidateSchema, PlacesSearchResponse, PlacesSearchResponseSchema, PlacesSearchSchema, PlacesController, ApiBearerAuth, ApiTags, Controller (+18 more)
 
 ### Community 70 - "doc-detail-body.tsx"
 Cohesion: 0.03
-Nodes (88): AudienceRole, Checklist, ChecklistBody(), ChecklistStep, DeleteDocDialog(), DocDetailBody(), formatScheduleLine(), MetaLine() (+80 more)
+Nodes (120): DocsBody(), DocsTab, TAB_HREF, TABS, AudienceRole, Checklist, ChecklistBody(), ChecklistStep (+112 more)
 
 ### Community 71 - "wrap.py"
 Cohesion: 0.06
-Nodes (56): BandRow, _accumulate(), conformal_min_n(), conformal_quantile(), _coverage_png(), default_model(), evaluate(), main() (+48 more)
+Nodes (53): BandRow, _accumulate(), conformal_min_n(), conformal_quantile(), _coverage_png(), default_model(), evaluate(), main() (+45 more)
 
 ### Community 72 - "lovo.py"
 Cohesion: 0.12
 Nodes (27): _active_series(), _dispersion(), donor_dow_shape(), _foundation_ablation(), _foundation_adoption(), _foundation_clause(), _foundation_table(), _foundation_vs_global_gbm() (+19 more)
 
-### Community 73 - "Ruler Comparison: One Forecast, Four Denominators"
-Cohesion: 0.05
-Nodes (41): eval/agent_cache.py (response cache), agent_v2.md (declared future prompt arm), p_raise triage probability output, Pre-registration discipline (frozen before evaluation), Agent Prompt v1 (frozen, pre-registered), signals.agent, Beer Hall Jul 1–7 forecast, Ellel Jul 1–7 forecast (+33 more)
+### Community 73 - "Frozen July 1–7 2026 Forecast (pre-registration)"
+Cohesion: 0.07
+Nodes (29): eval/agent_cache.py (response cache), agent_v2.md (declared future prompt arm), p_raise triage probability output, Pre-registration discipline (frozen before evaluation), Agent Prompt v1 (frozen, pre-registered), signals.agent, Beer Hall Jul 1–7 forecast, Ellel Jul 1–7 forecast (+21 more)
 
 ### Community 74 - "allow"
 Cohesion: 0.05
 Nodes (40): hooks, Notification, PostToolUse, PreToolUse, SessionStart, permissions, allow, deny (+32 more)
 
 ### Community 75 - "inject_realistic.py"
-Cohesion: 0.07
-Nodes (30): assert_trading_day(), _build(), _changepoint_since(), feedback_loop_effect(), inject_exo_coincident(), inject_regime_shift(), inject_spike(), main() (+22 more)
+Cohesion: 0.08
+Nodes (28): assert_trading_day(), _build(), feedback_loop_effect(), inject_exo_coincident(), inject_regime_shift(), inject_spike(), main(), _perturbed_raw() (+20 more)
 
 ### Community 76 - "adaptation.service.ts"
 Cohesion: 0.07
 Nodes (28): ACTIVE_STATUSES, AdaptationService, CaptureFeedbackResult, EnqueueReTagResult, FindKnowledgeHit, ProcessReTagQueueResult, Injectable, CaptureFeedbackInputDto (+20 more)
 
-### Community 77 - "IngestService"
-Cohesion: 0.12
-Nodes (10): extractStatusCode(), hashOrgId(), IngestService, proposalToJsonInput(), sanitiseEmbedError(), Injectable, KnowledgeCrossRef, KnowledgeCrossRefSchema (+2 more)
+### Community 77 - "tasks.dto.ts"
+Cohesion: 0.09
+Nodes (29): CreateTaskBodyDto, CreateTaskBodySchema, ID, ListTasksQueryDto, ListTasksQuerySchema, ListTasksResponseDto, ListTasksResponseSchema, SingleTaskResponseDto (+21 more)
 
 ### Community 78 - "report-card.tsx"
 Cohesion: 0.09
-Nodes (30): PaymentBreakdown, PosPaymentBreakdownCard(), TENDER_LABEL, TenderRow, PosSalesSummaryCard(), SalesSummary, PosTopItemsCard(), TopItem (+22 more)
+Nodes (27): PaymentBreakdown, TENDER_LABEL, TenderRow, PosSalesSummaryCard(), SalesSummary, TopItem, TopItems, fmtRange() (+19 more)
 
 ### Community 79 - "inject.py"
 Cohesion: 0.10
-Nodes (37): _apply_z(), base_stream(), folds(), _has_table(), holdout(), inject_exo_coincident(), inject_regime_shift(), inject_spike() (+29 more)
+Nodes (35): _apply_z(), base_stream(), folds(), _has_table(), holdout(), inject_exo_coincident(), inject_regime_shift(), inject_spike() (+27 more)
 
 ### Community 80 - "daily-summary.service.ts"
 Cohesion: 0.12
 Nodes (21): aggregateVenueSummaries(), buildVenueSummary(), composeDayFigures(), DayFigures, GroupDailySummary, LaborLike, NOT_CONNECTED_FIGURES, PaymentLike (+13 more)
 
 ### Community 81 - "chat-message.tsx"
-Cohesion: 0.09
-Nodes (26): AssistantMarkdown(), MARKDOWN_COMPONENTS, AssistantClassification, assistantPlainText(), ChatMessage(), classifyAssistantParts(), Props, stripFollowUpTail() (+18 more)
+Cohesion: 0.08
+Nodes (27): AssistantMarkdown(), MARKDOWN_COMPONENTS, AssistantClassification, assistantPlainText(), ChatMessage(), classifyAssistantParts(), Props, stripFollowUpTail() (+19 more)
 
-### Community 82 - "latexcheck.py"
-Cohesion: 0.16
-Nodes (12): FileStack, fmt_table(), _is_tex_fatal(), main(), parse_log(), print_report(), Tracks which source file the log is currently inside.      TeX marks file entry, Exit non-zero conditions: any error class, plus undefined references. (+4 more)
+### Community 82 - "Attribution honesty gate: honest-null vs genuine coincidence, never a confident wrong cause"
+Cohesion: 0.40
+Nodes (6): Agent-evaluation triangulation (synthetic-injection oracle + human-labelled anchor + LLM judge), Scaled injection grid (N=644, detection-rate-vs-magnitude sensitivity floor), Attribution honesty gate: honest-null vs genuine coincidence, never a confident wrong cause, Incremental weather pull fix: loud structured weather_gap instead of a silent skipped-basis no-op, World Cup wc_* covariates: code-derived fixture relevance by kickoff-vs-trading-hours overlap, Go-live June forecast blocked: Neon not provisioned, clean STOP per spec, nothing fabricated
 
 ### Community 83 - "app.py"
-Cohesion: 0.10
-Nodes (33): _b(), ChangePointRequest, checklist_discipline(), ChecklistRequest, _checklists(), deviation_changepoint(), deviation_check(), deviation_scan() (+25 more)
+Cohesion: 0.08
+Nodes (40): _b(), briefing(), ChangePointRequest, checklist_discipline(), ChecklistRequest, _checklists(), deviation_changepoint(), deviation_check() (+32 more)
 
 ### Community 84 - "recall skill"
 Cohesion: 0.14
 Nodes (36): commit-history skill, memory_commits (MCP tool), URL-encoded REST fallback for commit filters, forget worked examples, Delete by memory id only, never a bare sessionId, Explicit confirmation gate before destructive delete, forget skill, memory_governance_delete (MCP tool) (+28 more)
 
-### Community 85 - ".getForVenue"
-Cohesion: 0.13
-Nodes (15): DailySummaryController, ApiBearerAuth, ApiResponse, ApiTags, Controller, Get, Query, UseGuards (+7 more)
+### Community 85 - "S7 G17h · interval calibration (powered coverage, per-step bands, adaptive methods)"
+Cohesion: 0.15
+Nodes (15): G2.2 conditional Croston/SBA comparison gate, Angelopoulos-Bates upper bound on expected coverage, Beer Hall band under-coverage (0.871 vs 0.90 nominal), Clopper-Pearson power restatement of the 1.00 coverage claim, S7 G17h · interval calibration (powered coverage, per-step bands, adaptive methods), A6 · Hierarchical reconciliation (Beer Hall, units), Robust DOW-median base forecaster at L2/L3, One-standard-error adoption margin for intermittent estimators (+7 more)
 
 ### Community 86 - "dashboard/format.ts"
-Cohesion: 0.23
-Nodes (12): KpiStrip(), COMPACT, formatCompact(), formatGbpFromCents(), formatHours(), formatPercent(), formatRelativeDays(), formatUsdFromCents() (+4 more)
+Cohesion: 0.17
+Nodes (16): KpiStrip(), Bucket, SearchOutcomesChart(), COMPACT, formatCompact(), formatGbpFromCents(), formatHours(), formatPercent() (+8 more)
 
 ### Community 87 - "group_icl.py"
 Cohesion: 0.10
@@ -1356,19 +1325,19 @@ Nodes (15): S1 G17a tests: the one scale ruler, its four bases, and RMSSE.  Ever
 
 ### Community 89 - "DocsService"
 Cohesion: 0.09
-Nodes (11): composeContent(), DocsService, Injectable, ReconcileService, Injectable, MemoryReconcileTrigger, Injectable, InjectQueue (+3 more)
+Nodes (11): composeContent(), DocsService, toDocumentTypeDto(), Injectable, ReconcileService, Injectable, CategorySuggestionResponse, DocumentTypeDto (+3 more)
 
 ### Community 90 - "invite.service.ts"
-Cohesion: 0.23
-Nodes (6): generateCode(), InviteService, Injectable, safeStringEqual(), maskPhone(), InvitePublic
+Cohesion: 0.07
+Nodes (38): assertAuthEnv(), AuthEnv, generatePin(), hashPin(), issuePhoneOtp(), logger, sendPerNumberLimit, sendPhoneOtp() (+30 more)
 
 ### Community 91 - "test_a10_service.py"
 Cohesion: 0.04
 Nodes (34): HTTPException, assert_auth_configured(), Shared-secret bearer auth for the API-to-brain hop (security finding H1).  The b, Refuse to serve unauthenticated. Called at service import, not request time., Reject any request not carrying the shared secret as a bearer token.      Compar, require_auth(), health(), post_compute() (+26 more)
 
 ### Community 92 - "intermittency_diagnostic.py"
-Cohesion: 0.07
-Nodes (45): _blind_spot_note(), classify(), diagnose(), _fmt(), _fmt_adi(), intermittent_node_stats(), intermittent_nodes(), l1_diagnose() (+37 more)
+Cohesion: 0.10
+Nodes (32): _blind_spot_note(), classify(), diagnose(), _fmt(), _fmt_adi(), intermittent_node_stats(), intermittent_nodes(), l1_diagnose() (+24 more)
 
 ### Community 93 - "reports.dto.ts"
 Cohesion: 0.09
@@ -1378,49 +1347,49 @@ Nodes (24): CreateReportBodyDto, CreateReportBodySchema, ListReportsQueryDto, Li
 Cohesion: 0.15
 Nodes (26): base_frame(), build(), _fold_vectors(), _loss_matrix(), main(), _n_arm(), _paired_bootstrap(), _per_step_pooled() (+18 more)
 
-### Community 95 - "Honest negative verdict — no exogenous feature adopted into the GBM"
-Cohesion: 0.08
-Nodes (34): chronos-forecasting 2.x + torch CPU (Rung-4 zero-shot eval), brain/.venv-eval evaluation environment, statsforecast (Croston/SBA cross-check oracle), TSB-AD (pinned VUS-PR metric, WP5), vus>=0.0.6 fallback pin, A14 · Feature-enrichment ablation (Rung-3 GBM only), Three training bases not separable on 39 folds, CHRONOS2_EXO_COLS — 15-column known-future exogenous set (+26 more)
+### Community 95 - "brain/.venv-eval evaluation environment"
+Cohesion: 0.13
+Nodes (19): chronos-forecasting 2.x + torch CPU (Rung-4 zero-shot eval), brain/.venv-eval evaluation environment, statsforecast (Croston/SBA cross-check oracle), TSB-AD (pinned VUS-PR metric, WP5), vus>=0.0.6 fallback pin, rung4_chronos2_exo — served Beer Hall model (rolling MASE 0.745), NULL-demand lines surfaced as on-hand only, never a guessed cover, T1 — every number traces to a brain/log/*result*.md file (+11 more)
 
-### Community 96 - "Discussion critique log — 8C-4, 2026-08-08"
-Cohesion: 0.11
-Nodes (18): Correction at the head of this file, because the first attempt got the method wrong, Corrections this round makes to files upstream of the chapter, Discussion critique log — 8C-4, 2026-08-08, Genuine disagreements, preserved rather than flattened, Iteration 1 — the three independent calls, Iteration 2 disposition, Iteration 2, Role A (Methodologist) — returned, Iteration 2, Roles B and C — returned, and one of my own rulings reversed (+10 more)
+### Community 96 - "tasks-body.tsx"
+Cohesion: 0.09
+Nodes (21): Filter, FILTER_VALUES, FILTERS, groupByDue(), TASK_SKELETON_KEYS, TaskGroup(), TaskRow(), TasksBody() (+13 more)
 
 ### Community 97 - "Part 2 — Rubric decomposed"
 Cohesion: 0.06
 Nodes (30): 1.1 Length, 1.2 Typesetting and format, 1.3 Figures and tables, 1.4 Referencing, 1.5 Appendices and source code, 1.6 Mandatory content, 1.7 Submission mechanics, 1.8 Associated required deliverables (+22 more)
 
 ### Community 98 - "M23 · LOVO transfer gate decided without dispersion"
-Cohesion: 0.09
-Nodes (31): Widened 39-disjoint-fold grid, arch.bootstrap.MCS reference implementation, _block_len clamp guard, BLOCK_LEN_SENSITIVITY sweep, amazon-science/chronos-forecasting declared codebase, Moving-block bootstrap degenerate at six folds, Stage-14 rule: dispersion reported with every point estimate, _eval_cols (six-fold mean collapse) (+23 more)
+Cohesion: 0.12
+Nodes (25): Widened 39-disjoint-fold grid, arch.bootstrap.MCS reference implementation, _block_len clamp guard, BLOCK_LEN_SENSITIVITY sweep, Moving-block bootstrap degenerate at six folds, Stage-14 rule: dispersion reported with every point estimate, _eval_cols (six-fold mean collapse), eval/group_icl.py comparison instrument (+17 more)
 
 ### Community 99 - "Lune Brew — Deck Building Guide for AI Agents"
 Cohesion: 0.05
 Nodes (38): 0. Prime directives (read first, in priority order), 10. Tables, 11. Template library, 12. Explanatory density (making slides that teach), 13. Accessibility & contrast (hard rules), 14. Pre-flight checklist (agent self-check before export), 15. Minimal reusable skeletons, 1.1 Colour (+30 more)
 
-### Community 100 - "SquareService"
+### Community 100 - "square-commerce.service.ts"
 Cohesion: 0.10
-Nodes (21): bigIntToNumberOrString(), cache, fingerprintToken(), formatMoney(), getSquareClient(), scrubbingFetch(), CashDrawerRow, DisputeRow (+13 more)
+Nodes (20): CategorySalesRow, DiscountUsageRow, ModifierPopularityRow, toVendorRow(), VendorRow, bigIntToNumberOrString(), cache, fingerprintToken() (+12 more)
 
 ### Community 101 - "package.json"
 Cohesion: 0.06
 Nodes (32): @biomejs/biome, husky, lint-staged, dependencies, puppeteer-core, devDependencies, @biomejs/biome, husky (+24 more)
 
 ### Community 102 - "change_point.py"
-Cohesion: 0.14
-Nodes (28): arl0_curve(), injection_curve(), main(), persistence_check(), ndarray, A13 · Change-point detector validation (spec §8), honest characterisation.  Four, Robust noise scale of the stable rhythm (MAD-based, change-robust)., 4-of-7 fires on a sustained run, ignores an isolated breach. (+20 more)
+Cohesion: 0.13
+Nodes (30): arl0_curve(), injection_curve(), main(), persistence_check(), ndarray, A13 · Change-point detector validation (spec §8), honest characterisation.  Four, Robust noise scale of the stable rhythm (MAD-based, change-robust)., 4-of-7 fires on a sustained run, ignores an isolated breach. (+22 more)
 
 ### Community 103 - "Drafting rules — long-form writing guidance"
 Cohesion: 0.10
 Nodes (28): The defect generator — an unresolvable claim becomes a sentence about handling it, R-Zero — say nothing about what a later chapter will do, Role A — Methodologist, Role B — Statistician, Role C — Claim auditor, Disputed claims settled at source, not by adjudicating reviewers, Synthesiser call, Three-role critique loop with separate calls (+20 more)
 
 ### Community 104 - "integrations.controller.ts"
-Cohesion: 0.08
-Nodes (28): ConnectPatBodyDto, ConnectPatBodySchema, IntegrationSummaryDto, IntegrationSummarySchema, ListIntegrationsResponseDto, ListIntegrationsResponseSchema, ProviderParamDto, ProviderParamSchema (+20 more)
+Cohesion: 0.10
+Nodes (22): ConnectPatBodyDto, ConnectPatBodySchema, IntegrationSummaryDto, IntegrationSummarySchema, ListIntegrationsResponseDto, ListIntegrationsResponseSchema, ProviderParamDto, ProviderParamSchema (+14 more)
 
 ### Community 105 - "(marketing)/page.tsx"
-Cohesion: 0.10
-Nodes (13): CAPABILITIES, MARQUEE, metadata, PROBLEMS, PROOF, STEPS, HeroChat(), Phase (+5 more)
+Cohesion: 0.13
+Nodes (13): CAPABILITIES, MARQUEE, metadata, PROBLEMS, PROOF, STEPS, DAYS, ForecastSection() (+5 more)
 
 ### Community 106 - "numbers_audit.md"
 Cohesion: 0.04
@@ -1431,32 +1400,32 @@ Cohesion: 0.11
 Nodes (25): RuntimeError, The store's last day is not the expected operational ceiling.      Raised loudly, StoreCeilingError, _assert_vector_provenance(), _autocorr(), available_rungs(), common_loss_matrix(), main() (+17 more)
 
 ### Community 108 - "primitives.tsx"
-Cohesion: 0.11
-Nodes (18): metadata, PRINCIPLES, FAQS, metadata, PricingPage(), Tier, TIERS, metadata (+10 more)
+Cohesion: 0.21
+Nodes (9): metadata, PRINCIPLES, CtaBand(), Container(), EYEBROW_COLOR, EYEBROW_RULE, EyebrowTone, OutlineButton() (+1 more)
 
 ### Community 109 - "breww.service.ts"
-Cohesion: 0.09
-Nodes (25): BrewwModule, Module, BrewwProvider, Injectable, BATCH_STATUS_CODES, BATCH_STATUS_NAMES, boundedJson(), BrewwApiError (+17 more)
+Cohesion: 0.05
+Nodes (38): describeError(), main(), BrewwProvider, Injectable, BATCH_STATUS_CODES, BATCH_STATUS_NAMES, boundedJson(), BrewwApiError (+30 more)
 
 ### Community 110 - "interval_calibration.py"
 Cohesion: 0.05
 Nodes (63): ACI, AgACI, BOA, interval_pinball(), mondrian_band(), perstep_band(), _pinball(), plain_band() (+55 more)
 
 ### Community 111 - "test_a2_fold_count.py"
-Cohesion: 0.11
-Nodes (32): _payload(), _pre_refactor_rolling_origin(), DataFrame, parametrize, S2 G17b tests: `step_days`, leakage under overlapping windows, round-trip.  The, Without this the leakage tests above could pass vacuously on disjoint     window, The reason `aligned_pair` exists: zipping the raw vectors pairs fold 1's     los, S3 must not treat these folds as iid draws. The warning lives in the file     it (+24 more)
+Cohesion: 0.06
+Nodes (41): _payload(), _pre_refactor_rolling_origin(), DataFrame, parametrize, S2 G17b tests: `step_days`, leakage under overlapping windows, round-trip.  The, Without this the leakage tests above could pass vacuously on disjoint     window, The reason `aligned_pair` exists: zipping the raw vectors pairs fold 1's     los, S3 must not treat these folds as iid draws. The warning lives in the file     it (+33 more)
 
 ### Community 112 - "venue-context.ts"
 Cohesion: 0.11
 Nodes (15): buildVenueScopeWhere(), BULK_WRITE_OPS, CREATE_MANY_OPS, IMPORTANT: Prisma invokes an extension's `query` hook in a DETACHED async, READ_WHERE_OPS, resolveClientForRequest(), SCOPED_MODELS, ScopedModelConfig (+7 more)
 
 ### Community 113 - "docs.ts"
-Cohesion: 0.09
-Nodes (22): AcceptTypeRequest, AcceptTypeRequestSchema, AcceptTypeResponse, AnswerGapRequest, AnswerGapRequestSchema, AudienceRole, AudienceRoleSchema, CategorySuggestionResponseSchema (+14 more)
+Cohesion: 0.07
+Nodes (27): AcceptTypeRequest, AcceptTypeRequestSchema, AcceptTypeResponse, AnswerGapRequest, AnswerGapRequestSchema, AudienceRole, AudienceRoleSchema, CategorySuggestionResponseSchema (+19 more)
 
-### Community 114 - "test_store_durability.py"
-Cohesion: 0.14
-Nodes (9): _build_as_working_store(), S3 Part 1 / FLAG-STORE-DURABILITY: the suite cannot touch the working store, and, The whole point of the isolation: `pytest` rebuilds happen in the throwaway, Build with the isolated store standing in as the configured working store., A scratch or overridden store is SUPPOSED to sit at the seed, so warning there, test_a_build_does_not_touch_the_configured_working_store(), test_a_build_into_an_isolated_store_stays_quiet(), test_a_build_that_lands_short_of_the_ceiling_warns() (+1 more)
+### Community 114 - "Honest negative verdict — no exogenous feature adopted into the GBM"
+Cohesion: 0.19
+Nodes (15): A14 · Feature-enrichment ablation (Rung-3 GBM only), Three training bases not separable on 39 folds, CHRONOS2_EXO_COLS — 15-column known-future exogenous set, Constant-0 event feature in test folds (honest null, not a bug), Honest negative verdict — no exogenous feature adopted into the GBM, leadmatched weather basis (forecast as issued 3 days ahead), 90% model confidence set adoption rule (39 disjoint folds), Rung-3 GBM (baseline MASE 0.9551, 90% coverage 87.9%) (+7 more)
 
 ### Community 115 - "compilerOptions"
 Cohesion: 0.08
@@ -1467,28 +1436,28 @@ Cohesion: 0.06
 Nodes (60): active_pair_count(), assert_no_leakage(), coverage(), _dummy_seasonal_naive(), interval_metrics(), LeakageError, leave_one_venue_out(), mae() (+52 more)
 
 ### Community 117 - "test_ingest_refresh.py"
-Cohesion: 0.09
-Nodes (28): _count_selection(), FakeAdapter, _imported(), T2/T3 ingest-refresh tests (PRJ93 live-ingest spec, G0–G6 / G-live-b/c/d).  The, The Neon and Square backends are deleted, not disabled. The brain does not fetch, Refresh left the HTTP surface (M1), so the contract is driven through the     fu, The winner's per-fold MASE vector is surfaced in the audit row, not just     its, Returns one synthetic closed day beyond the store ceiling. (+20 more)
+Cohesion: 0.12
+Nodes (21): _count_selection(), _imported(), T2/T3 ingest-refresh tests (PRJ93 live-ingest spec, G0–G6 / G-live-b/c/d).  The, The Neon and Square backends are deleted, not disabled. The brain does not fetch, The winner's per-fold MASE vector is surfaced in the audit row, not just     its, Rebuild line_items from the CSV and drop the append/refit/serving     bookkeepin, _reset_store(), _seed_refit() (+13 more)
 
 ### Community 118 - "today-body.tsx"
-Cohesion: 0.05
-Nodes (54): AlertsBody(), NoteRedirectBody(), NoteResponse, formatMoney(), formatToday(), fromGroup(), fromVenue(), greeting() (+46 more)
+Cohesion: 0.04
+Nodes (76): AlertsBody(), NoteRedirectBody(), NoteResponse, formatMoney(), formatToday(), fromGroup(), fromVenue(), greeting() (+68 more)
 
 ### Community 119 - "exog_weather.py"
 Cohesion: 0.08
-Nodes (35): build(), build_horizon(), _cell_span(), coverage(), _daily_frame(), fetch_hindcast(), fetch_leadmatched(), fetch_observed() (+27 more)
+Nodes (33): build(), build_horizon(), _cell_span(), coverage(), _daily_frame(), fetch_hindcast(), fetch_leadmatched(), fetch_observed() (+25 more)
 
 ### Community 120 - "chat-body.tsx"
-Cohesion: 0.05
-Nodes (58): venue(), ChatCore(), ChatInner(), ChatSession(), EmptyState(), greetingWord(), MANAGER_FALLBACK_PROMPTS, ShareButton() (+50 more)
+Cohesion: 0.04
+Nodes (80): venue(), ChatCore(), ChatInner(), ChatSession(), EmptyState(), greetingWord(), MANAGER_FALLBACK_PROMPTS, ShareButton() (+72 more)
 
 ### Community 121 - "2. Specification for the 18 kept stages"
 Cohesion: 0.08
 Nodes (25): 10 · ECE / reliability / temperature scaling, 12 · Experiment run, 14 · Result analysis, 15 · Research decision, 16 · Discussion outline, 17 · Paper draft, 18 · Peer review, 19 · Revision (+17 more)
 
 ### Community 122 - "Phase state"
-Cohesion: 0.05
-Nodes (36): 2026-07-30 — Phase: AutoResearchClaw distillation, 2026-07-30 — Phase: autoresearchclaw SKILL.md, 2026-07-30 — Phase: citation audit (pipeline stage 23 + stage 6), 2026-07-30 — Phase: citation re-verification + fix drafting, 2026-07-30 — Phase: grounding + MCS smoke test, 2026-07-30 — Phase: PRJ93 pipeline spec, 2026-07-31 (fourth entry) — store ceiling durability, verified not asserted, 2026-07-31 — Overleaf restore closed; methodology corrections landed (+28 more)
+Cohesion: 0.08
+Nodes (23): 2026-07-30 — Phase: AutoResearchClaw distillation, 2026-07-30 — Phase: autoresearchclaw SKILL.md, 2026-07-30 — Phase: citation audit (pipeline stage 23 + stage 6), 2026-07-30 — Phase: citation re-verification + fix drafting, 2026-07-30 — Phase: grounding + MCS smoke test, 2026-07-30 — Phase: PRJ93 pipeline spec, 2026-07-31 (fourth entry) — store ceiling durability, verified not asserted, 2026-08-03 — Phase: literature review closed (+15 more)
 
 ### Community 123 - "scripts"
 Cohesion: 0.08
@@ -1502,21 +1471,21 @@ Nodes (14): _payload(), S3 G17c tests: the Model Confidence Set on known synthet
 Cohesion: 0.15
 Nodes (15): CATEGORY_LABELS, DigestNote, escapeHtml(), isDigestableEmail(), noteWho(), renderNoteDigestEmail(), snippet(), NoteDigestProcessor (+7 more)
 
-### Community 126 - "chat-starters.generator.ts"
-Cohesion: 0.26
-Nodes (11): ALLOWED_CATEGORIES, buildEchoCorpus(), buildPrompt(), extractTitle(), GenerationSignals, normaliseForEcho(), SHAPE_BLOCKLIST, stripWhitespace() (+3 more)
-
-### Community 127 - "PhoneService"
-Cohesion: 0.29
-Nodes (3): hashPhone(), PhoneService, Injectable
-
-### Community 128 - "tool-card-router.tsx"
+### Community 126 - "RetrievalService"
 Cohesion: 0.10
-Nodes (30): BandRow, BriefingCard(), BriefingData, BriefingItem, ChangePoint, ChangePointCard(), ChangePointData, CoverLine (+22 more)
+Nodes (11): Inject, RetrievalService, Injectable, TASK_STATUSES, TaskStatus, TASK_STATUS_SET, TaskRow, TasksService (+3 more)
 
-### Community 129 - "tool-cards/types.ts"
-Cohesion: 0.16
-Nodes (15): NoteCard(), NoteData, CompleteData, CreateData, formatDate(), TaskCompletedCard(), TaskCreatedCard(), sanitizeMentionName() (+7 more)
+### Community 127 - ".send"
+Cohesion: 0.20
+Nodes (6): SendPhoneCodeResponseDto, Res, hashIp(), hashPhone(), PhoneService, Injectable
+
+### Community 128 - "isToolFail"
+Cohesion: 0.10
+Nodes (25): BandRow, BriefingCard(), BriefingData, BriefingItem, ChangePoint, ChangePointCard(), ChangePointData, CoverLine (+17 more)
+
+### Community 129 - "tool-card-router.tsx"
+Cohesion: 0.14
+Nodes (19): NoteCard(), NoteData, PosPaymentBreakdownCard(), PosTopItemsCard(), fmtMoney(), CompleteData, CreateData, formatDate() (+11 more)
 
 ### Community 130 - "APPENDICES"
 Cohesion: 0.10
@@ -1543,8 +1512,8 @@ Cohesion: 0.09
 Nodes (24): AI-isms (AI writing tells), avoid-ai-writing skill, Three operating modes: rewrite / detect / edit, Narrated candor, Never-inject rewrite guardrails, Over-polishing failure mode, Preservation validator (detector/validate.js), Rhythm and uniformity (structure is the #1 detection signal) (+16 more)
 
 ### Community 136 - "chat-composer.tsx"
-Cohesion: 0.15
-Nodes (21): ChatComposer(), ComposerInput, ComposerSchema, Props, IMAGE_ALLOWED_MIME, useImageAttachment(), MentionSetter, useMentionState() (+13 more)
+Cohesion: 0.14
+Nodes (23): ChatComposer(), ComposerInput, ComposerSchema, Props, IMAGE_ALLOWED_MIME, useImageAttachment(), MentionSetter, useMentionState() (+15 more)
 
 ### Community 137 - "fig_appendix_tikz.py"
 Cohesion: 0.08
@@ -1554,9 +1523,9 @@ Nodes (47): build_deployment(), build_injection(), build_origins(), main(), _ori
 Cohesion: 0.13
 Nodes (23): code-reviewer agent, doc-reviewer agent, frontend-designer agent, performance-reviewer agent, security-reviewer agent, .claude/hooks/block-dangerous-commands.sh, .claude/hooks/format-on-save.sh, code-quality rule (+15 more)
 
-### Community 139 - "TasksService"
-Cohesion: 0.09
-Nodes (19): ExpirySchedulerProcessor, InjectQueue, Processor, EXPIRY_REMINDER_WINDOWS, EXPIRY_SCHEDULER_JOB_TICK, ExpiryReminderWindow, ExpirySchedulerTickJobData, ExpirySchedulerService (+11 more)
+### Community 139 - "expiry-scheduler.service.ts"
+Cohesion: 0.15
+Nodes (11): ExpirySchedulerProcessor, InjectQueue, Processor, EXPIRY_REMINDER_WINDOWS, EXPIRY_SCHEDULER_JOB_TICK, ExpiryReminderWindow, ExpirySchedulerTickJobData, ExpirySchedulerService (+3 more)
 
 ### Community 140 - "aci_closure_probe.py"
 Cohesion: 0.15
@@ -1567,8 +1536,8 @@ Cohesion: 0.15
 Nodes (22): _bin_edges(), brier_score(), build_scenarios(), calibration(), collect_records(), _delta(), _f(), fit_temperature() (+14 more)
 
 ### Community 142 - "PRJ93 Fidelity Corrections Build Report (Report 14)"
-Cohesion: 0.11
-Nodes (23): PRJ93 Fidelity Corrections Build Report (Report 14), Chronos-2 Zero-Shot Wins the Beer Hall Milestone (WP9), Croston phat0 Initialisation Risk (G8.4), Python 3.14 Heavy-Backend Unavailability (D5/D10/D14), WP1 Wording and Citation Corrections, WP2 L3 Intermittency Diagnostic and Conditional Croston/SBA, WP3 FLAG-CP1 Resolution (CP_ARL0_EMPIRICAL_LB), WP4 Rung 4 Chronos-Bolt Zero-Shot Adoption Gate (+15 more)
+Cohesion: 0.14
+Nodes (18): PRJ93 Fidelity Corrections Build Report (Report 14), Chronos-2 Zero-Shot Wins the Beer Hall Milestone (WP9), Croston phat0 Initialisation Risk (G8.4), Python 3.14 Heavy-Backend Unavailability (D5/D10/D14), WP1 Wording and Citation Corrections, WP2 L3 Intermittency Diagnostic and Conditional Croston/SBA, WP3 FLAG-CP1 Resolution (CP_ARL0_EMPIRICAL_LB), WP4 Rung 4 Chronos-Bolt Zero-Shot Adoption Gate (+10 more)
 
 ### Community 143 - "test_a7_transfer.py"
 Cohesion: 0.10
@@ -1579,48 +1548,48 @@ Cohesion: 0.11
 Nodes (14): ABC, CsvAdapter, get_adapter(), Source adapters for the RESEARCH history path. One backend: the CSV export.  Thi, The adapter named by `INGEST_SOURCE` (default csv). Config, never model., A source of closed-day transactions and stock for the T2 warehouse., Most recent date the source can offer, or None when unavailable., Closed-day line-item rows with `date > since` (all rows when None),         in t (+6 more)
 
 ### Community 145 - "test_foundation.py"
-Cohesion: 0.09
-Nodes (29): WP4/WP9/WP12: state the Rung-4 zero-shot outcome strictly by the gate,     repor, _rung4_report_lines(), RungResult, chronos2_exo_cols(), chronos2_exo_predict(), Zero-shot Chronos-2 point forecast with the FULL known-future covariate set, A4 tests, rung predictors and the milestone/selection logic (fast, on a syntheti, _synthetic() (+21 more)
+Cohesion: 0.13
+Nodes (20): WP4/WP9/WP12: state the Rung-4 zero-shot outcome strictly by the gate,     repor, _rung4_report_lines(), chronos2_exo_cols(), chronos2_exo_predict(), Zero-shot Chronos-2 point forecast with the FULL known-future covariate set, _exo_frame(), WP4 / WP9 · Rung-4 foundation wiring tests.  The gate-wording helper is backend-, _rolling() (+12 more)
 
 ### Community 146 - "square.module.ts"
 Cohesion: 0.08
 Nodes (22): DailySummaryModule, Module, SquareCatalogExtrasService, Injectable, SquareController, ApiBearerAuth, ApiTags, Controller (+14 more)
 
-### Community 147 - "square.service.ts"
-Cohesion: 0.09
-Nodes (20): computePeriodDelta(), hourInZone(), isFeatureNotOnboarded(), noLocationMappedFail(), NOT_CONNECTED, PeriodDelta, PeriodSnapshot, NOTE: Square order line items don't carry the parent item id (only the (+12 more)
+### Community 147 - "SquareService"
+Cohesion: 0.08
+Nodes (27): getSquareClient(), computePeriodDelta(), hourInZone(), isFeatureNotOnboarded(), lookupWage(), noLocationMappedFail(), NOT_CONNECTED, PeriodDelta (+19 more)
 
 ### Community 148 - "provenance.py"
-Cohesion: 0.11
-Nodes (23): build(), main(), _ordering(), R4 / G1 evidence - does the headline metric change which model the ladder picks?, Mean loss per rung on the COMMON fold set, plus the MCS 90% set under that loss., run_venue(), _write_report(), _base() (+15 more)
+Cohesion: 0.16
+Nodes (16): _base(), evaluate(), main(), S4 Part 4b - does the occurrence gate measurably help at Beer Hall?  Scores the, package_versions(), Runtime identity for generated artefacts.  `sec:repro` names three coordinates t, Markdown block for the foot of a generated artefact.      `gating` names the pac, The environment directory's name, e.g. `.venv-forecast`.      The project runs f (+8 more)
 
-### Community 149 - "organization.controller.ts"
-Cohesion: 0.11
-Nodes (21): GeneratedDescriptionResponseDto, GeneratedDescriptionResponseSchema, OrganizationProfileResponseDto, OrganizationProfileResponseSchema, UpdateOrganizationProfileDto, DESCRIBE_LIMITER, OrganizationController, ApiBearerAuth (+13 more)
+### Community 149 - ".describe"
+Cohesion: 0.12
+Nodes (17): GeneratedDescriptionResponseDto, GeneratedDescriptionResponseSchema, OrganizationProfileResponseDto, OrganizationProfileResponseSchema, UpdateOrganizationProfileDto, DESCRIBE_LIMITER, OrganizationController, ApiBearerAuth (+9 more)
 
 ### Community 150 - "checklist_discipline.py"
 Cohesion: 0.29
 Nodes (12): _classify_weight(), evaluate(), expected_mandatory(), main(), parse_checklists(), A9 · Checklist completion-discipline baseline (methodology §4.2 / step 8).  Pars, A small hand-built completion log to exercise the detector now. Each     scenari, Score one completion against the template. dow: Mon=0 … Sun=6. (+4 more)
 
-### Community 151 - ".send"
-Cohesion: 0.20
-Nodes (10): PhoneStatusResponseDto, SendPhoneCodeResponseDto, VerifyPhoneCodeBodyDto, mapPhoneError(), ApiResponse, Body, Get, Req (+2 more)
+### Community 151 - "FastLookupService"
+Cohesion: 0.39
+Nodes (3): FastLookupService, formatContact(), Injectable
 
 ### Community 152 - "2. Per-stage reasoning and critique layer"
 Cohesion: 0.09
 Nodes (21): 10 · Code generation, 12 · Execution — the only real fabrication firewall, 13 · Iterative refine, 14 · Result analysis — real statistics, real debate, 15 · Research decision, 16–17 · Outline and draft, 18 · PEER_REVIEW — the biggest gap between architecture and marketing, 19 · Revision (+13 more)
 
 ### Community 153 - "chatlog_kb_gap.py"
-Cohesion: 0.14
-Nodes (23): embed(), _embed_tfidf(), gap_report(), _is_failure(), _is_substantive(), load_turns(), main(), DataFrame (+15 more)
+Cohesion: 0.16
+Nodes (21): embed(), _embed_tfidf(), gap_report(), _is_failure(), _is_substantive(), load_turns(), main(), DataFrame (+13 more)
 
 ### Community 154 - "test_promote_and_serve.py"
-Cohesion: 0.14
-Nodes (24): Per-venue T2 append (+ conditional T3). Idempotent: no new data and not     `for, refresh(), _FakeAdapter, Promote-and-serve tests (PRJ93 live-ingest v2.1 addendum, GP0–GP7 / G-promote-a., Rebuild line_items from the CSV and drop the append/refit/serve bookkeeping,, One synthetic closed day beyond the store ceiling (drives an append)., Replace the two expensive persists with spies capturing their model/venue, so, _reset() (+16 more)
+Cohesion: 0.20
+Nodes (20): Promote-and-serve tests (PRJ93 live-ingest v2.1 addendum, GP0–GP7 / G-promote-a., Rebuild line_items from the CSV and drop the append/refit/serve bookkeeping,, Replace the two expensive persists with spies capturing their model/venue, so, _reset(), _stub_heavy(), _synthetic_next_day(), test_adoption_promotes_the_adopted_rung(), test_closed_venue_keeps_standby_band_after_promote() (+12 more)
 
 ### Community 155 - "use-notifications.ts"
 Cohesion: 0.05
-Nodes (78): q(), CommentRow(), IncidentCard(), MentionPicker(), ActionRow(), AlertReplyThread(), AlertRow(), categoryTone() (+70 more)
+Nodes (70): NormalizedQuery, at(), q(), START, ActionRow(), AlertReplyThread(), AlertRow(), categoryTone() (+62 more)
 
 ### Community 156 - "PRJ93 "Proactive Brain": Complete External Examiner Examination Record"
 Cohesion: 0.11
@@ -1647,20 +1616,20 @@ Cohesion: 0.11
 Nodes (5): clean_labels(), _drop(), _imported(), Agent-evaluation tests (PRJ93 agent-eval spec, G2/G3/G5/G6/G7 + honesty gates)., test_agent_eval_imports_briefing_and_signals_one_way()
 
 ### Community 162 - "test_deviation.py"
-Cohesion: 0.14
-Nodes (12): _imported_modules(), Point-deviation tests (PRJ93 point-deviation spec, gates G0–G9).  The per-day pr, A synthetic residual stream: each day's actual is expected + z·scale, so the, _stream(), test_as_of_row_is_independent_of_later_days(), test_deviation_imports_foundation_not_change_point(), test_deviation_in_a_structural_break_window_is_attributed(), test_just_inside_the_band_is_normal() (+4 more)
+Cohesion: 0.15
+Nodes (11): _imported_modules(), Point-deviation tests (PRJ93 point-deviation spec, gates G0–G9).  The per-day pr, A synthetic residual stream: each day's actual is expected + z·scale, so the, _stream(), test_as_of_row_is_independent_of_later_days(), test_deviation_imports_foundation_not_change_point(), test_just_inside_the_band_is_normal(), test_just_outside_the_band_is_deviation() (+3 more)
 
 ### Community 163 - "devDependencies"
 Cohesion: 0.12
 Nodes (17): @types/node, typescript, orval, tailwindcss, @tailwindcss/postcss, @tanstack/react-query-devtools, @types/react, @types/react-dom (+9 more)
 
-### Community 164 - "nudge.service.ts"
-Cohesion: 0.09
-Nodes (19): acquireSlot(), NudgeController, ApiBearerAuth, ApiTags, Controller, UseGuards, isWithinShoppingWindow(), NudgeProcessor (+11 more)
+### Community 164 - "nudge.module.ts"
+Cohesion: 0.15
+Nodes (12): MockOpsModule, Module, NudgeModule, Module, isWithinShoppingWindow(), NudgeProcessor, InjectQueue, Processor (+4 more)
 
 ### Community 165 - "foundation.py"
-Cohesion: 0.13
-Nodes (21): _chronos2_base_pipeline(), _chronos2_pipeline(), chronos2_predict(), chronos_bolt_predict(), _GuardTimeout, MissingCovariateError, _pipeline(), WP4 / WP9 · Rung-4 foundation-model forecasters: Chronos-Bolt and Chronos-2.  Tw (+13 more)
+Cohesion: 0.09
+Nodes (33): _bolt_quantiles(), _chronos2_quantiles(), _collect(), main(), DataFrame, ndarray, Do this estate's Chronos arms reproduce the published overconfidence of Chronos-, One row per (origin, step) carrying the actual and every requested quantile. (+25 more)
 
 ### Community 166 - "SectionDetector"
 Cohesion: 0.15
@@ -1699,16 +1668,16 @@ Cohesion: 0.11
 Nodes (18): ^build, src/generated/**, dist/**, .next/**, dependsOn, outputs, cache, persistent (+10 more)
 
 ### Community 175 - "config.VENUE_SCALE_BASIS (single source of truth)"
-Cohesion: 0.10
-Nodes (21): Twelve caller obligations (canonical in CONTRACT.md), Dataset/bundle compute contract (compute/contract.py), Compute path (stateless per-request), ContextVar-bound per-request scratch store, brain/CONTRACT.md, Isolation holds by ABSENCE (no threads in analytics), org_profile.py de-Lune seam (UNBOUND vs BOUND), Price-regime seam (PRICE_REGIME_BREAK to price_change_dates) (+13 more)
+Cohesion: 0.12
+Nodes (17): Twelve caller obligations (canonical in CONTRACT.md), Dataset/bundle compute contract (compute/contract.py), Compute path (stateless per-request), ContextVar-bound per-request scratch store, brain/CONTRACT.md, Isolation holds by ABSENCE (no threads in analytics), Data-derived trading-hours envelope, _WORLD_CUP_EXO family (6 covariates) (+9 more)
 
-### Community 176 - "_attach_exog"
-Cohesion: 0.20
-Nodes (13): _attach_exog(), The six World Cup covariates, or all-zero when the tenant did not opt in.      O, Populate the exo_* columns by LEFT-JOINing the deterministic calendar     (leaka, _world_cup_frame(), derive_is_dry(), Set `exo_is_dry` from `exo_rain_mm`, keeping any value the caller supplied., build(), curated_frame() (+5 more)
+### Community 176 - "Ruler Comparison: One Forecast, Four Denominators"
+Cohesion: 0.17
+Nodes (12): calendar_lag7 (reported ruler basis), calendar_lag7_active, Ruler Comparison: One Forecast, Four Denominators, fill_calendar, sim.restore_clock, S1 (full-store gate stage), S3 (confrontation-cutoff pinning stage), S4 (ladder re-scoring stage) (+4 more)
 
 ### Community 177 - "RealtimeGateway"
-Cohesion: 0.03
-Nodes (50): IncidentCommentKind, IncidentSeverity, IncidentStatus, commentRateLimit, IncidentCommentRow, IncidentParty, IncidentRow, IncidentsService (+42 more)
+Cohesion: 0.04
+Nodes (39): ConversationMessage, ConversationsService, ConversationSummary, decodeCursor(), DeleteMessageKind, DeleteMessageScope, encodeCursor(), InvalidConversationCursorError (+31 more)
 
 ### Community 178 - ".onOpen"
 Cohesion: 0.15
@@ -1719,8 +1688,8 @@ Cohesion: 0.09
 Nodes (21): 10. Discussion and conclusion, 11. Review checklist, 12. When applying this skill, 13. Support and further reading, 1. The core distinction: knowledge telling versus knowledge transforming, 2. Two levels of editing, in order, 3. The project narrative, 4. Structure and chapter balance (+13 more)
 
 ### Community 180 - "A13 · Change-point / regime-shift detection"
-Cohesion: 0.11
-Nodes (23): Adams & MacKay 2007 (BOCPD), Point deviation — per-day band check, signals.change_point (sustained-shift reporter), LLM-judge prompts (offline seam): claude-opus-4-8 pinned, fixed rubric scoring briefing items for correctness/actionability/clarity/calibrated_confidence/keep, FLAG-S8B-LIVE-RUN — OPEN: briefing-triage agent apparatus built and tested, but needs 644 live model calls and no ANTHROPIC_API_KEY here, FLAG-CONTINUATION-ALERT-SUPPRESSION, Change-point absorbs the deviation run and coincident stock flag, Correlational attribution — 'coincides with', never 'caused by' (+15 more)
+Cohesion: 0.16
+Nodes (16): Adams & MacKay 2007 (BOCPD), Change-point absorbs the deviation run and coincident stock flag, Correlational attribution — 'coincides with', never 'caused by', Dormant-venue and non-live-data exclusions from the feed, Proactive briefing — ranked, de-duplicated, attributed daily feed (L1), Transparent briefing rank score (source x severity x recency x novelty x baseline_trust x direction), Chat-log KB-gap (sop) signal — missing-SOP detection from unanswered repeats, A13 · Change-point / regime-shift detection (+8 more)
 
 ### Community 181 - "M4 · MinT weight on Croston-adopted nodes"
 Cohesion: 0.12
@@ -1742,29 +1711,29 @@ Nodes (18): audienceForRole (owner→manager audience derivation), BullMQ backgr
 Cohesion: 0.11
 Nodes (17): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+9 more)
 
-### Community 186 - "whatsapp.service.ts"
-Cohesion: 0.04
-Nodes (65): safeBufferEqual(), markAndCheckSid(), seen, normalizeTwilioEvent(), ApiExcludeController, Body, Controller, HttpCode (+57 more)
+### Community 186 - "prisma.ts"
+Cohesion: 0.03
+Nodes (65): main(), Row, section(), table(), distinct(), main(), Residual, JoinScopedWhere (+57 more)
 
-### Community 187 - "chat-starters.queue.ts"
-Cohesion: 0.20
-Nodes (9): ChatStartersModule, Module, ChatStartersProcessor, Processor, audienceForRole(), CHAT_STARTERS_JOB_FANOUT, CHAT_STARTERS_JOB_PER_VENUE, ChatStartersFanoutJobData (+1 more)
+### Community 187 - "chat-starters.generator.ts"
+Cohesion: 0.06
+Nodes (44): ChatStartersController, ApiBearerAuth, ApiResponse, ApiTags, Controller, Get, Query, UseGuards (+36 more)
 
-### Community 188 - "phone.dto.ts"
-Cohesion: 0.22
-Nodes (8): PhoneStatusResponseSchema, SendPhoneCodeBodyDto, SendPhoneCodeResponseSchema, UnlinkPhoneResponseSchema, VerifyPhoneCodeResponseDto, VerifyPhoneCodeResponseSchema, SendPhoneCodeBodySchema, VerifyPhoneCodeBodySchema
+### Community 188 - "phone.controller.ts"
+Cohesion: 0.17
+Nodes (12): PhoneStatusResponseSchema, SendPhoneCodeBodyDto, SendPhoneCodeResponseSchema, UnlinkPhoneResponseSchema, VerifyPhoneCodeBodyDto, VerifyPhoneCodeResponseDto, VerifyPhoneCodeResponseSchema, mapPhoneError() (+4 more)
 
 ### Community 189 - "A5 conformal band coverage report (Beer Hall L1)"
 Cohesion: 0.15
 Nodes (17): A5 conformal band coverage report (Beer Hall L1), conformal_quantile clamp (guarantee lapse below min calibration n), A5 conformal band coverage report (Ellel Village Hall L1), A5 conformal band coverage report (Two River Taps L1), Standby band for a closed venue (Two River Taps), The Beer Hall (venue), Closure dormancy / change_point_state, CUSUM change-point detector (production) (+9 more)
 
-### Community 190 - "Missing beats_global_gbm key defect"
-Cohesion: 0.15
-Nodes (13): Constants that govern nothing (hazard pattern), FLAG-DEAD-CONSTANT, brain/FLAGS.md (live flag ledger), Missing beats_global_gbm key defect, Environment divergence (pandas 3.0.5 vs 3.0.3, duckdb 1.5.5 vs 1.5.4), Environment-contingent committed artefact (open item), provenance.py runtime identity stamp, sec:flip (unpinned resolution makes a selection unverifiable) (+5 more)
+### Community 190 - "Training-frame hash gate (sim/frame_hash.py)"
+Cohesion: 0.12
+Nodes (17): Comparability rules for the portable baseline, D6: MAX_SALES_ROWS documentation drift (547,500), Documents outlive the code they describe (five instances), Training-frame hash gate (sim/frame_hash.py), sim/g16a_portable_baseline.py (portable cross-tree hashing), org_profile.py de-Lune seam (UNBOUND vs BOUND), Price-regime seam (PRICE_REGIME_BREAK to price_change_dates), transfer/lovo.py cross-venue shape transfer (+9 more)
 
-### Community 191 - "assertAuthEnv"
-Cohesion: 0.24
-Nodes (8): assertAuthEnv(), AuthEnv, basicAuth(), logger, sendSms(), Injectable, TwilioSignatureGuard, RFC-5322
+### Community 191 - "Annotated Corpora of Recorded Activity"
+Cohesion: 0.27
+Nodes (11): Annotated Corpora of Recorded Activity, Ask, ContextAgent, Fingertip, What the Intervention Decision Is Scored Against (X Axis), The Operator's Own Accept-or-Dismiss Decisions, ProactiveBench, ProactiveEval (+3 more)
 
 ### Community 192 - "G1 decided — MASE stays primary (three reasons)"
 Cohesion: 0.15
@@ -1775,8 +1744,8 @@ Cohesion: 0.14
 Nodes (17): calendar_lag7_active basis (project construct), fill_calendar / venue_ruler calendar series, G7 addition — add M5 sources to NotebookLM, Hewamalage et al. (2023) M5 evaluation setup (eq. 5, eq. 11), Hyndman & Koehler (2006) MASE, M5 leading-zero denominator rule (unevidenced, moot), M13 · MASE and the calendar_lag7_active basis, M14 · Basis-matched RMSSE (+9 more)
 
 ### Community 194 - "PRJ93 — Part 2 pre-fill for James (Beer Hall keg → till-item mapping)"
-Cohesion: 0.13
-Nodes (16): A14 exogenous feature enrichment (calendar/weather/events, rolling-origin ablation-gated), A11/A12 stock integration: physical on-hand position joined to A6 demand-only proxy (days_of_cover), Change-point detection (CUSUM + persistence + BOCPD on the standardised conformal residual stream), Point-deviation primitive on the shared residual foundation (signals/residual.py), Proactive briefing synthesis (de-duplication + transparent ranking + honesty gates), Agent-evaluation triangulation (synthetic-injection oracle + human-labelled anchor + LLM judge), (a) Part 2 table — pre-filled left columns, (b) Pick-list — valid till-item names James maps TO (+8 more)
+Cohesion: 0.11
+Nodes (18): Baseline forecasting ladder (rungs 0-4: seasonal-naive to foundation model), A14 exogenous feature enrichment (calendar/weather/events, rolling-origin ablation-gated), A11/A12 stock integration: physical on-hand position joined to A6 demand-only proxy (days_of_cover), Change-point detection (CUSUM + persistence + BOCPD on the standardised conformal residual stream), Point-deviation primitive on the shared residual foundation (signals/residual.py), Proactive briefing synthesis (de-duplication + transparent ranking + honesty gates), (a) Part 2 table — pre-filled left columns, (b) Pick-list — valid till-item names James maps TO (+10 more)
 
 ### Community 195 - "Breww integration (brewery domain)"
 Cohesion: 0.13
@@ -1799,16 +1768,16 @@ Cohesion: 0.21
 Nodes (13): APPLY, args, candidatePairs(), INCLUDE_COMPLIANCE, main(), orgIds(), PairRow, THRESHOLD (+5 more)
 
 ### Community 200 - "square-cogs.service.ts"
-Cohesion: 0.15
-Nodes (13): CatalogCost, Client, collectCatalogUnitCosts(), collectReceiveCosts(), HOSPITALITY_COST_PERCENT_HINT, ItemCostRow, lineCogsMinor(), minorToMajor() (+5 more)
+Cohesion: 0.13
+Nodes (16): main(), moneyStr(), CatalogCost, Client, collectCatalogUnitCosts(), collectReceiveCosts(), HOSPITALITY_COST_PERCENT_HINT, ItemCostRow (+8 more)
 
-### Community 201 - "prisma.ts"
-Cohesion: 0.04
-Nodes (47): main(), Row, section(), table(), CANNED, CannedQuery, ensureOrgWithVenue(), ExpectedShape (+39 more)
+### Community 201 - "probe-eval.ts"
+Cohesion: 0.06
+Nodes (28): CANNED, CannedQuery, ensureOrgWithVenue(), ExpectedShape, main(), Outcome, pnpCleanup(), NOTE: brittle if a future change drops the find_knowledge limit below (+20 more)
 
-### Community 202 - "chat-starters.service.ts"
-Cohesion: 0.26
-Nodes (7): ChatStartersAudience, ChatStartersService, fallbackFor(), MANAGER_FALLBACK_QUESTIONS, STAFF_FALLBACK_QUESTIONS, StoredStartersPayload, Injectable
+### Community 202 - "Tooling verdict — MCP connector smoke test"
+Cohesion: 0.18
+Nodes (11): get_section_content and write_section are not symmetric, which hid the deletion, Overleaf git bridge as the recovery route, Overleaf incident — five subsections destroyed and restored, Label-set diff as the reconstruction verification, Reconstruct and write whole — never patch a damaged file section by section, write_section replaces through to the next same-level heading, graphify query and explain hang on this graph, Standing rule — probe with get_item_metadata on a known key before citation work (+3 more)
 
 ### Community 203 - "includes"
 Cohesion: 0.13
@@ -1835,48 +1804,48 @@ Cohesion: 0.16
 Nodes (16): Superseded ADI 1.32 literal, ADI_INTERMITTENT_CUTOFF = ADI_CUTOFF_KH = 4/3, Cragg (1971) two-part hurdle model, Defect entering from a review document rather than the code, Degenerate hurdle (occurrence part not estimated), Kostenko-Hyndman rule degenerate over the trigger set, ELLEL_DIARY_LIVE = False (gate measured on one venue), docs/Prj93_external_examiner_assessment.md Finding 19 (defect origin) (+8 more)
 
 ### Community 209 - "M2 · "Split-conformal" band on in-sample residuals"
-Cohesion: 0.14
-Nodes (16): Angelopoulos & Bates (2023) conformal gentle introduction, conformal_min_n(level) clamp-countability helper, conformal_quantile (wrap.py) and its clamp, Four-block calendar walk-back (test | calibration | validation | fit), Gneiting & Raftery (2007) proper scoring rules, Lei et al. (2018) split conformal, M15 · Winkler score, Clopper-Pearson, Angelopoulos-Bates bound (all exact), M2 · "Split-conformal" band on in-sample residuals (+8 more)
+Cohesion: 0.09
+Nodes (24): Angelopoulos & Bates (2023) conformal gentle introduction, conformal_min_n(level) clamp-countability helper, conformal_quantile (wrap.py) and its clamp, Four-block calendar walk-back (test | calibration | validation | fit), Gneiting & Raftery (2007) proper scoring rules, Lei et al. (2018) split conformal, M15 · Winkler score, Clopper-Pearson, Angelopoulos-Bates bound (all exact), M2 · "Split-conformal" band on in-sample residuals (+16 more)
 
 ### Community 210 - "PRJ93 Fidelity Corrections Addendum: Build Report (WP8 to WP11, Chronos-2)"
 Cohesion: 0.12
 Nodes (15): 0. Environment (WP8), 1. What each work package delivered, 2. Deviations from the addendum spec, 3. Stop conditions, 4. Files changed (addendum), 5. WP12 addendum: Chronos-2 live-serving promotion, Deviations from the WP12 spec, Files changed (WP12) (+7 more)
 
 ### Community 211 - "Report 49 - S7 G17h: Interval Calibration and Adaptive Methods"
-Cohesion: 0.29
-Nodes (7): Report 49 - S7 G17h: Interval Calibration and Adaptive Methods, Angelopoulos-Bates Expected-Coverage Upper Bound, FLAG-BAND-UNDERCOVERAGE-BH (Beer Hall Band Under-Covers), Mondrian Band D (Incumbent, Active/Zero State Grouping), Pre-Registered Winkler Adoption Rule (MCS Set AND Lower Mean), Winkler Interval Score as Primary Metric, Report 52 - S7 G17h Re-run: AgACI Corrected to Published Aggregation
+Cohesion: 0.18
+Nodes (11): Report 49 - S7 G17h: Interval Calibration and Adaptive Methods, Angelopoulos-Bates Expected-Coverage Upper Bound, FLAG-BAND-UNDERCOVERAGE-BH (Beer Hall Band Under-Covers), Mondrian Band D (Incumbent, Active/Zero State Grouping), Pre-Registered Winkler Adoption Rule (MCS Set AND Lower Mean), Winkler Interval Score as Primary Metric, Report 52 - S7 G17h Re-run: AgACI Corrected to Published Aggregation, Annotate In Place, Never Rewrite, to Preserve Commit Ordering (+3 more)
 
 ### Community 212 - "rules"
 Cohesion: 0.17
 Nodes (12): noForEach, rules, complexity, recommended, style, suspicious, noNonNullAssertion, useImportType (+4 more)
 
 ### Community 213 - "chart.tsx"
-Cohesion: 0.13
-Nodes (21): Bucket, SearchOutcomesChart(), formatWeek(), WauChart(), Week, formatShortDate(), SHORT_DATE, ChartConfig (+13 more)
+Cohesion: 0.15
+Nodes (17): formatWeek(), WauChart(), Week, ChartConfig, ChartContainer(), ChartContext, ChartContextProps, ChartLegendContent() (+9 more)
 
 ### Community 214 - "REST endpoint table (117 endpoints)"
 Cohesion: 0.15
 Nodes (15): agentmemory-architecture skill, Hybrid retrieval (BM25 + vector + graph expansion), iii engine primitives (functions, triggers, worker state), Capture / compress / consolidate / forget lifecycle, Port quartet (REST 3111, streams 3112, viewer 3113, engine 49134), Real-time memory viewer (localhost:3113), Zero-LLM default (on-device embeddings, no API key), AGENTMEMORY_SECRET (+7 more)
 
-### Community 215 - ".search"
-Cohesion: 0.18
-Nodes (10): PlaceCandidateSchema, PlacesSearchDto, PlacesSearchResponseDto, PlacesSearchResponseSchema, PlacesSearchSchema, SEARCH_LIMITER, ApiResponse, Body (+2 more)
+### Community 215 - "stage2"
+Cohesion: 0.31
+Nodes (10): _build_actuals_eval(), _load_actuals_l1(), _load_actuals_l2(), _load_frozen(), main(), G12.13b (Pass 2 of 2) - confront the frozen forecast with real June actuals.  Lo, Realistic weekly-rolling 7-day-ahead: each week forecast from history plus     J, Persist the aligned eval parquet (L1 + L2, all June days, 0 where closed). (+2 more)
 
 ### Community 216 - "classifier.service.ts"
-Cohesion: 0.15
-Nodes (11): buildPrompt(), ClassifierService, ClassifierVenue, ClassifyInput, ClassifyRawResponseSchema, ClassifyResult, estimateUsd(), Injectable (+3 more)
+Cohesion: 0.17
+Nodes (10): buildPrompt(), ClassifierService, ClassifierVenue, ClassifyInput, ClassifyRawResponseSchema, ClassifyResult, estimateUsd(), Injectable (+2 more)
 
 ### Community 217 - ".runNudge"
-Cohesion: 0.25
-Nodes (7): NudgeVenueIdParamDto, NudgeVenueIdParamSchema, RunNudgeResponseDto, RunNudgeResponseSchema, ApiResponse, HttpCode, Param
+Cohesion: 0.14
+Nodes (12): NudgeVenueIdParamDto, NudgeVenueIdParamSchema, RunNudgeResponseDto, RunNudgeResponseSchema, NudgeController, ApiBearerAuth, ApiResponse, ApiTags (+4 more)
 
-### Community 218 - "[slug]/page.tsx"
+### Community 218 - "blog/page.tsx"
 Cohesion: 0.26
-Nodes (9): BlogIndexPage(), metadata, BlogPostPage(), generateMetadata(), STATIC_PATHS, formatPostDate(), getPost(), POSTS (+1 more)
+Nodes (8): BlogIndexPage(), metadata, BlogPostPage(), generateMetadata(), STATIC_PATHS, formatPostDate(), getPost(), POSTS
 
 ### Community 219 - "ScheduledReportsService"
-Cohesion: 0.06
-Nodes (38): CreateScheduledReportBodySchema, FrequencySchema, ListScheduledReportsQueryDto, ListScheduledReportsQuerySchema, ScheduledReportDto, ScheduledReportIdParamDto, ScheduledReportIdParamSchema, ScheduledReportListResponseDto (+30 more)
+Cohesion: 0.05
+Nodes (44): CreateScheduledReportBodyDto, CreateScheduledReportBodySchema, FrequencySchema, ListScheduledReportsQueryDto, ListScheduledReportsQuerySchema, ScheduledReportDto, ScheduledReportIdParamDto, ScheduledReportIdParamSchema (+36 more)
 
 ### Community 220 - "Data Science and AI Dissertation Writing Workshop"
 Cohesion: 0.13
@@ -1886,9 +1855,9 @@ Nodes (15): Academic Phrasebank, Manchester University, Dissertation Assessment 
 Cohesion: 0.13
 Nodes (15): sim/confront_july_w2.py (store-ceiling assert), FLAG-STORE-DURABILITY, July 1 to 7 window (G12.17a/b), July 8 to 14 window (G12.17c, calendar-airtight), June live-simulation window (G12.13a/b), Ladder adoption gate (beat both baselines on 6-fold rolling MASE), Origin A (June-30 cutoff, 9 to 15 day-ahead), Origin B (July-7 cutoff, production-faithful 7 day-ahead) (+7 more)
 
-### Community 222 - "_foundation_adoption (implemented criterion)"
-Cohesion: 0.22
-Nodes (9): Crossover sweep (partial-pooling narrative), _foundation_ablation (backbone probe returning an instruction), _foundation_adoption (implemented criterion), LOVO foundation gate (environment-contingent PASS), Model Confidence Set (MCS) retention, Gate verdict NOT EVALUABLE (pool below three), test_transfer_wins_majority_at_cold_start (replaced), Two-clause gate reporting (transfer + foundation) (+1 more)
+### Community 222 - "Missing beats_global_gbm key defect"
+Cohesion: 0.13
+Nodes (15): Constants that govern nothing (hazard pattern), FLAG-DEAD-CONSTANT, brain/FLAGS.md (live flag ledger), Missing beats_global_gbm key defect, Crossover sweep (partial-pooling narrative), _foundation_ablation (backbone probe returning an instruction), _foundation_adoption (implemented criterion), LOVO foundation gate (environment-contingent PASS) (+7 more)
 
 ### Community 223 - "ResponseCache"
 Cohesion: 0.17
@@ -1899,8 +1868,8 @@ Cohesion: 0.10
 Nodes (20): 0. The three constraints every question had to clear, 10. Binding instructions for the later session prompts, 11. What is fixed, 1. The aim, 2. The questions, 3. The mapping, 4. Limb 7 — recommendation, and the reasoning, 5. The exact strings for Introduction 1.3 (+12 more)
 
 ### Community 225 - "M1 · Croston/SBA node adoption (test-set selection)"
-Cohesion: 0.15
-Nodes (15): Croston (1972) intermittent demand method, _croston_comparison (outcome-based node adoption), Divergence from the code in the direction of the paper, M1 · Croston/SBA node adoption (test-set selection), M11 · Croston and SBA recursions, Sauvignon Blanc adoption (7.043 vs 7.071, loses on test), statsforecast released implementation (CrostonClassic / CrostonSBA / AutoCroston), Syntetos & Boylan (2005) SBA deflator (+7 more)
+Cohesion: 0.24
+Nodes (10): Croston (1972) intermittent demand method, _croston_comparison (outcome-based node adoption), Divergence from the code in the direction of the paper, M1 · Croston/SBA node adoption (test-set selection), M11 · Croston and SBA recursions, Sauvignon Blanc adoption (7.043 vs 7.071, loses on test), statsforecast released implementation (CrostonClassic / CrostonSBA / AutoCroston), Syntetos & Boylan (2005) SBA deflator (+2 more)
 
 ### Community 226 - "Report 35 — For Ryan: response to the production integration brief, point by point"
 Cohesion: 0.13
@@ -1939,12 +1908,12 @@ Cohesion: 0.18
 Nodes (10): INCIDENT_EXAMPLES, LOOKUP_EXAMPLES, REASONING_EXAMPLES, WriterExample, BANNED_OPENINGS_LIST, EXAMPLES_BLOCK, BANNED_OPENINGS_LIST, EXAMPLES_BLOCK (+2 more)
 
 ### Community 236 - "test_a6_reconcile.py"
-Cohesion: 0.04
-Nodes (80): main(), R1 -- emit the four-block split's boundaries and row counts.  `fig:blocks` (the, spans(), build_hierarchy(), _consumption_proxy(), _croston_comparison(), _croston_section(), _dow_median_forecast() (+72 more)
+Cohesion: 0.05
+Nodes (68): main(), R1 -- emit the four-block split's boundaries and row counts.  `fig:blocks` (the, spans(), build_hierarchy(), _consumption_proxy(), _croston_comparison(), _croston_section(), _dow_median_forecast() (+60 more)
 
-### Community 237 - "confront_july.py"
-Cohesion: 0.29
-Nodes (11): _actual_by_node(), _load(), main(), G12.17b (Pass 2) - confront the frozen July forecast with real July 1 to 7 actua, 1 Jul BH: forecast vs DOW-median vs actual; compare to June's first in-hours, _score_l3(), stage1(), stage2_incontext() (+3 more)
+### Community 237 - "hero-chat.tsx"
+Cohesion: 0.20
+Nodes (4): HeroChat(), Phase, QUESTIONS, CitationChip()
 
 ### Community 238 - "Example 1 — Deep Learning OCR dissertation"
 Cohesion: 0.18
@@ -1975,16 +1944,16 @@ Cohesion: 0.15
 Nodes (14): Post-Closure Break Is a Mean Shift, Not a Spread Change, WP6 ACI Coverage Across the TRT Closure, ACI Adaptive Conformal Inference (Gibbs-Candes 2021), AgACI Aggregated ACI (Zaffran et al. 2022), Loud Level Clamp (Effective Alpha Clamps Counted, Never Silent), BOA Bernstein Online Aggregation Class, EWA-Instead-of-BOA Departure from Zaffran, Per-Bound Pinball Loss with Independent Weight Vectors (+6 more)
 
 ### Community 245 - "Model Confidence Set (S3 Instrument)"
-Cohesion: 0.12
-Nodes (19): aligned_pair Fold-Index Alignment Guard, eval/fold_vectors.py Persisted Per-Fold MASE/RMSSE Vectors, MissingCovariateError on Ellel June Exo Folds, Model Confidence Set (S3 Instrument), Overlapping Windows Break IID Independence, Occurrence Label Is Exogenous, Never Read from Own Revenue, FLAG-ELLEL-DIARY (Booking Diary Not Yet Live), Occurrence Hurdle Gate (Cragg/Mullahy, Observed P(trade)) (+11 more)
+Cohesion: 0.16
+Nodes (14): aligned_pair Fold-Index Alignment Guard, eval/fold_vectors.py Persisted Per-Fold MASE/RMSSE Vectors, MissingCovariateError on Ellel June Exo Folds, Model Confidence Set (S3 Instrument), Overlapping Windows Break IID Independence, Occurrence Label Is Exogenous, Never Read from Own Revenue, Occurrence Hurdle Gate (Cragg/Mullahy, Observed P(trade)), Report 54 - S7 G17j: Dispersion and Guo's Calibration Leg (+6 more)
 
 ### Community 246 - "auth.config.ts"
-Cohesion: 0.22
-Nodes (10): authIsHttps, cookieParentDomain, env, SessionOrgContext, baseSlug(), generateOrgSlug(), OrgSlugConflictError, shortId() (+2 more)
+Cohesion: 0.12
+Nodes (18): All, auth, authIsHttps, cookieParentDomain, env, SessionOrgContext, AuthController, nodeHandler (+10 more)
 
-### Community 247 - ".get"
-Cohesion: 0.20
-Nodes (9): ApiResponse, Get, Query, ChatStartersPayloadDto, ChatStartersPayloadSchema, ChatStartersQueryDto, ChatStartersQuerySchema, StarterQuestionSchema (+1 more)
+### Community 247 - "test_a4_ladder.py"
+Cohesion: 0.24
+Nodes (8): A4 tests, rung predictors and the milestone/selection logic (fast, on a syntheti, _synthetic(), test_capped_milestone_gate_is_rung1_beats_naive(), test_milestone_fails_when_baseline_is_best(), test_milestone_passes_when_a_rung_beats_both_baselines(), test_robust_dow_tracks_day_of_week_medians(), test_seasonal_naive_repeats_prior_week(), test_select_best_picks_lowest_mase()
 
 ### Community 248 - "mailer.ts"
 Cohesion: 0.18
@@ -1999,8 +1968,8 @@ Cohesion: 0.14
 Nodes (14): DOC_RECONCILE_DISABLED, Document version reconciliation, POST /docs/upload, Wave 2 expiry extractor (ingest-time classifier), EXPIRY_EXTRACTOR_DISABLED, EXPIRY_SCHEDULER_DISABLED, ExpiryRecord model, KnowledgeItem model (+6 more)
 
 ### Community 251 - "scripts"
-Cohesion: 0.25
-Nodes (8): scripts, api:generate, build, dev, lint, start, tunnel, typecheck
+Cohesion: 0.14
+Nodes (13): engines, node, name, private, scripts, api:generate, build, dev (+5 more)
 
 ### Community 252 - "loader.py"
 Cohesion: 0.21
@@ -2019,24 +1988,20 @@ Cohesion: 0.21
 Nodes (13): Post-commit hook linking commits to sessions, memory_commit_lookup, memory_commits, memory_verify (citation-chain provenance), GET /agentmemory/session/by-commit, Line-range lookup with linked session (example 1), Null commit predates session linking (example 2), commit-context skill (+5 more)
 
 ### Community 256 - "find-person.ts"
-Cohesion: 0.21
-Nodes (10): dedupeContacts(), findPerson(), FindPersonResult, PersonContact, PersonDocMention, PersonMember, ContactFixture, DocFixture (+2 more)
-
-### Community 257 - "OnboardingMetricsController"
-Cohesion: 0.24
-Nodes (9): OnboardingMetricsController, serialize(), ApiBearerAuth, ApiResponse, ApiTags, Controller, Get, Param (+1 more)
+Cohesion: 0.20
+Nodes (11): dedupeContacts(), findPerson(), FindPersonResult, PersonContact, PersonDocMention, PersonMember, redactPersonForRole(), ContactFixture (+3 more)
 
 ### Community 258 - "Blocked on a third party — the retrieval point"
-Cohesion: 0.07
-Nodes (26): 8C-3 input — the caption short-title deliverable · **DISCHARGED 2026-08-07**, A · Blocked on an Anthropic API key, B · Blocked on Elliot (the operator), Blocked on a third party — the retrieval point, C · Blocked on a vendor account, D-D5 residue — TabPFN-TS as a ladder rung, D · Not blocked, and deliberately not done, D-U1 — expected calibration error on the agent's output (+18 more)
+Cohesion: 0.10
+Nodes (19): A · Blocked on an Anthropic API key, B · Blocked on Elliot (the operator), Blocked on a third party — the retrieval point, C · Blocked on a vendor account, D-D5 residue — TabPFN-TS as a ladder rung, D · Not blocked, and deliberately not done, D-U1 — expected calibration error on the agent's output, D-U2 — the surfacing cost ratio (+11 more)
 
 ### Community 259 - "wau.service.ts"
 Cohesion: 0.29
 Nodes (10): addDaysUtc(), buildWeekBuckets(), fillBuckets(), isoWeekStartUtc(), localIsoMonday(), RawRow, wallClockParts(), WauBucket (+2 more)
 
 ### Community 260 - "features/page.tsx"
-Cohesion: 0.13
-Nodes (14): metadata, STATUS_LABEL, Feature, FEATURES, Integration, INTEGRATIONS, Problem, PROBLEMS (+6 more)
+Cohesion: 0.18
+Nodes (11): metadata, STATUS_LABEL, Feature, FEATURES, Integration, INTEGRATIONS, Problem, PROBLEMS (+3 more)
 
 ### Community 261 - "Appendix G: complete verified reference list"
 Cohesion: 0.15
@@ -2078,17 +2043,17 @@ Nodes (13): venues, june2026_ingest, as_of, grain, ingested_at, mode, note, rows
 Cohesion: 0.18
 Nodes (10): files, ignoreUnknown, linter, enabled, overrides, $schema, vcs, clientKind (+2 more)
 
-### Community 271 - "whatsapp-invite.ts"
-Cohesion: 0.18
-Nodes (10): CreateInviteInputSchema, CreateInviteResponseSchema, InvitePublicSchema, InviteStatus, InviteStatusSchema, InviteVenueIdsSchema, InviteWhatsappRole, InviteWhatsappRoleSchema (+2 more)
+### Community 271 - "fig:gap-map — proactive-agent evaluation gap map"
+Cohesion: 0.29
+Nodes (8): Evaluation-grounding axis (LM judge / simulated users / annotated corpora / operator decisions), fig:gap-map — proactive-agent evaluation gap map, Operator-grounded evaluation gap (the empty cell), Surveyed proactive-agent systems (ProActor, tau-bench, ProactiveEval, Ask, ProactiveBench, ProAgentBench, ContextAgent, Fingertip), Literature-review figure insertion plan, sec:rw-synthesis (related-work synthesis section), A figure must say something about the literature as a body, S9 — manager-label evaluation (60–100 adopt-or-dismiss labels)
 
 ### Community 272 - "70 — Ruler migration: fold-vector regeneration, MCS re-run, `tab:ladder` re-score"
 Cohesion: 0.12
 Nodes (16): 10 · The Ellel argument-minimum paragraph, recomputed, 11 · `fig:ladder` — the figure built for gate 4, 12 · Not done here, 1 · What was regenerated, 2 · Movement, and the check that it is a denominator swap, 3 · Ranking changes, 4 · Model Confidence Set — re-run, and the one substantive change, 5 · `tab:ladder` — the re-scored cells (+8 more)
 
 ### Community 273 - "seo.ts"
-Cohesion: 0.17
-Nodes (5): metadata, Release, RELEASES, TAG_STYLE, DISALLOWED
+Cohesion: 0.13
+Nodes (9): metadata, Release, RELEASES, TAG_STYLE, metadata, metadata, DISALLOWED, Eyebrow() (+1 more)
 
 ### Community 274 - "g15c_taxonomy_drift.py"
 Cohesion: 0.15
@@ -2142,25 +2107,29 @@ Nodes (11): ellel_diary_occurrence(), hurdle(), hurdle_forecast(), occurrence_la
 Cohesion: 0.18
 Nodes (4): con(), _imported(), Injection-oracle tests (PRJ93 agent-eval spec, G1 / G-eval-e).  The four event k, test_inject_imports_harness_and_signals_not_the_reverse()
 
-### Community 287 - "native_interval_probe.py"
-Cohesion: 0.31
-Nodes (10): _bolt_quantiles(), _chronos2_quantiles(), _collect(), main(), DataFrame, ndarray, Do this estate's Chronos arms reproduce the published overconfidence of Chronos-, One row per (origin, step) carrying the actual and every requested quantile. (+2 more)
+### Community 287 - "Literature review critique-revise record"
+Cohesion: 0.22
+Nodes (9): Fu et al. 2026 — PRISM: Festina Lente Proactivity, Guo et al. 2017 — On calibration of modern neural networks, Lu et al. 2024 — Proactive Agent / ProactiveBench, Acceptance tests T1-T14, fig:gap-map — surveyed proactive systems by policy against scoring target, Literature review critique-revise record, Revision 4 style pass — AI-writing patterns removed, T12 — figures requirement (+1 more)
 
 ### Community 288 - "app.controller.ts"
 Cohesion: 0.22
 Nodes (8): ApiExtraModels, AppController, Controller, Get, ApiErrorResponseDto, ApiErrorResponseSchema, API_ERROR_CODES, HealthCheck
 
 ### Community 289 - "PhoneController"
-Cohesion: 0.20
-Nodes (7): UnlinkPhoneResponseDto, PhoneController, ApiBearerAuth, ApiTags, Controller, Delete, HttpCode
+Cohesion: 0.16
+Nodes (11): PhoneStatusResponseDto, UnlinkPhoneResponseDto, PhoneController, ApiBearerAuth, ApiResponse, ApiTags, Controller, Delete (+3 more)
 
 ### Community 290 - "Chapter 3 (Methods) rewrite — critique record"
 Cohesion: 0.22
 Nodes (8): Chapter 3 (Methods) rewrite — critique record, Pre-flight — `humanizer` and `avoid-ai-writing`, Round 1 — Role A, Methodologist, Round 2 — Role B, Statistician, Round 3 — Role C, Claim auditor, Round 4 — descriptive knowledge-telling against critical writing (`ds-writing`), Round 5 — process reported rather than result, Structural checks
 
-### Community 292 - "active_trading_end"
-Cohesion: 0.06
-Nodes (8): active_trading_end(), Last calendar date with nonzero L1 revenue (the global max if always-on)., test_closed_venue_emits_no_post_closure_deviation(), A13 tests, change-point detectors fire on real shifts, stay quiet on noise, reco, test_closed_venue_has_no_alarms_after_the_closure_onset(), con(), Scaled-run + labelling-sampler tests (PRJ93 scaled-eval spec, GA1 / GB1 / GB2)., test_usable_folds_excludes_post_closure_for_a_closed_venue()
+### Community 291 - "main.ts"
+Cohesion: 0.11
+Nodes (10): AppModule, Module, httpLoggerMiddleware(), logger, requestIdMiddleware(), securityHeadersMiddleware(), bootstrap(), logger (+2 more)
+
+### Community 292 - "trim_to_active"
+Cohesion: 0.05
+Nodes (26): attribute(), Shared foundation for the deviation signals (point + change-point).  The standar, Scan the A14 exogenous seam around the onset and return a ranked list of     COI, (date, value) over the active span, post-closure zero-extended, the raw     inpu, _raw_series(), _table(), active_trading_end(), active_trading_start() (+18 more)
 
 ### Community 293 - "pricing-recommendation-card.tsx"
 Cohesion: 0.31
@@ -2218,13 +2187,13 @@ Nodes (10): antigravity connect adapter, claude-code connect adapter, codex conn
 Cohesion: 0.20
 Nodes (10): Data Science and AI specific review requirements, Funnel model (long shots / medium shots / close-ups / gap), HOCs before LOCs (global structure before sentence polish), AlexNet / activation functions / CNNs discussion, Example 1 — chronological organisation of previous work (critique), Funnel model (long shots, medium shots, close ups), Literature Review / Background section, Literature review organisation options (funnel, chronological, thematic, methodological) (+2 more)
 
-### Community 307 - "apiFetch"
-Cohesion: 0.05
-Nodes (66): ClassifyDocModal(), fuzzyFindCategory(), KindOption(), levenshtein(), Mode, TabButton(), askerLabel(), formatAskedBy() (+58 more)
+### Community 307 - "debug-body.tsx"
+Cohesion: 0.06
+Nodes (35): DebugInner(), VenueSelector(), DebugConversationInspector(), MessageCard(), Props, relativeTime(), DebugFeedbackBadge(), relativeTime() (+27 more)
 
-### Community 308 - "test_append_cross_venue.py"
-Cohesion: 0.31
-Nodes (10): _append_transactions(), Append genuinely-new closed days (date beyond the store's current max for     th, _frame(), Regression: `_append_transactions` must be strictly venue-local (FA1).  The earl, A line_items store: beer_hall through 2026-05-31, ellel through 2026-05-20., A multi-venue frame with a new day for each venue past its OWN ceiling., _rows(), _store() (+2 more)
+### Community 308 - "g16a_portable_baseline.py"
+Cohesion: 0.33
+Nodes (8): _build_all(), frame_hash(), _head(), measure(), Measure the three training-frame hashes against ANY tree in this repository's hi, Column order first, then contents. Byte-identical to `sim.frame_hash.frame_hash`, Build the three frames on whichever tree we are standing in.      Post-de-Lune `, run()
 
 ### Community 309 - "tabpfn_entrant.py"
 Cohesion: 0.22
@@ -2254,9 +2223,9 @@ Nodes (10): Fatal 1 and Fatal 2 — which seasonal-naive denominator is legitima
 Cohesion: 0.20
 Nodes (10): eval/mcs_L1_results.json, Fix 3 — Ellel MCS p = 0.579 at 260 folds (0.575 is the 246-fold common_fold), Fix 5 — five rungs (0–4), nine scored entrants, not seven rungs, Fix 2 — rung3_global_gbm at Two River Taps = 0.728 (not n/a), models/ladder.py, models/ladder_results_L1_*.md, rung2_prophet (unscored, backend not installed), Addendum — rung4_chronos_bolt missing from the ladder table (+2 more)
 
-### Community 316 - "Harvey-Leybourne-Newbold Small-Sample Correction Factor"
-Cohesion: 0.20
-Nodes (10): Harvey-Leybourne-Newbold Small-Sample Correction Factor, HLN Is Algebraically Zero at Six Folds and Horizon Seven, Report 45 - S4 G17d: Intermittency, Scale Basis and Occurrence, Kostenko-Hyndman Intermittency Cutoffs (ADI 4/3, CV2 0.5), select_sba Kostenko-Hyndman Selection Rule, Classified-Intermittent Implies Selects-SBA by Construction, Syntetos-Boylan-Croston Cutoffs (ADI 1.32, CV2 0.49), Handoff 2026-08-03: Literature Review Closed (+2 more)
+### Community 316 - "Report 53 - S7 G17i: A6 Selection Moved Off the Test Block"
+Cohesion: 0.14
+Nodes (14): Harvey-Leybourne-Newbold Small-Sample Correction Factor, HLN Is Algebraically Zero at Six Folds and Horizon Seven, Report 45 - S4 G17d: Intermittency, Scale Basis and Occurrence, Kostenko-Hyndman Intermittency Cutoffs (ADI 4/3, CV2 0.5), select_sba Kostenko-Hyndman Selection Rule, Classified-Intermittent Implies Selects-SBA by Construction, Syntetos-Boylan-Croston Cutoffs (ADI 1.32, CV2 0.49), render() KeyError on JSON-Stringified per_step Keys (+6 more)
 
 ### Community 317 - "Unread-notes email digest (note-digest queue)"
 Cohesion: 0.20
@@ -2295,12 +2264,12 @@ Cohesion: 0.22
 Nodes (9): 9.1 STEP 1: DIAGNOSIS, 9.2 STEP 2: LITERATURE GAP CHECK, 9.3 STEP 3: DEVIATION PATHWAY, 9.4 STEP 4: RECOMMENDATION, 9. METHODOLOGY DEVIATION AND LITERATURE RECONCILIATION, Mismatch 1: the L1 series are intermittent, and the entire L1 stack assumes continuous demand, Mismatch 2: the exogenous covariates are backtested ex-post and served ex-ante, Mismatch 3: the method is called in a way that disables the capability the brief asked for (+1 more)
 
 ### Community 327 - "Four adversarial review rounds, four with hits"
-Cohesion: 0.13
-Nodes (15): Four adversarial review rounds, four with hits, Multiplicative briefing score, Comparability rules for the portable baseline, D1: round-3 isolation guard never fired on a multi-venue org, D3: reopening-venue false reject (left open by design), D4: misleading reopening error message, D5: PriorState bounds the list, not the content, D6: MAX_SALES_ROWS documentation drift (547,500) (+7 more)
+Cohesion: 0.22
+Nodes (9): Four adversarial review rounds, four with hits, Multiplicative briefing score, D1: round-3 isolation guard never fired on a multi-venue org, D3: reopening-venue false reject (left open by design), D4: misleading reopening error message, D5: PriorState bounds the list, not the content, FLAG-PRIORSTATE-CONTENT-UNBOUNDED, FLAG-SEGMENT-FALSE-REJECT (+1 more)
 
-### Community 328 - "scan_text"
-Cohesion: 0.29
-Nodes (10): main(), paragraphs(), Return (line, code, detail) findings for one file's text., Both directions on all three classes, plus the advisory switch in both states., Split on blank lines, TeX's own paragraph unit. Returns (start line, text)., Every run of three consecutive, distinct venue mentions, canonicalised.      CAN, scan_text(), self_test() (+2 more)
+### Community 328 - "stock-card.tsx"
+Cohesion: 0.32
+Nodes (6): normaliseList(), StockBelowParCard(), StockByNameCard(), StockData, StockItem, ToolCardRendererProps
 
 ### Community 329 - "29 - G12.17c-b (Corrected C1): production-faithful 7-day-cadence freeze of 8 to 14 July"
 Cohesion: 0.22
@@ -2326,9 +2295,9 @@ Nodes (11): invitations.service.ts, InviteBodySchema / CreateInviteInputSchema (
 Cohesion: 0.22
 Nodes (9): OrgProfile, The tenant. No `currency`: compute emits no formatted money, only floats in, The cold-start path. An empty line_items frame with no dtypes makes DuckDB infer, A silently-dropped field is how a caller comes to believe it sent something., Every list a caller controls is a resource dimension on a shared service with no, test_a_new_org_with_no_sales_yet_is_dormant_not_a_failure(), test_an_absurd_venue_count_is_refused(), test_an_org_with_no_venues_returns_an_empty_bundle_not_an_error() (+1 more)
 
-### Community 335 - "main.ts"
-Cohesion: 0.33
-Nodes (6): httpLoggerMiddleware(), logger, requestIdMiddleware(), securityHeadersMiddleware(), bootstrap(), logger
+### Community 335 - "croston_classic"
+Cohesion: 0.21
+Nodes (12): WP2 · Croston / SBA unit tests (fidelity corrections G2.2).  (a) the recursion r, test_croston_reproduces_hand_computed_example(), test_matches_statsforecast_on_bernoulli_gap_series(), test_sba_is_croston_deflated_by_the_bias_factor(), croston_classic(), _croston_core(), croston_fitted(), croston_sba() (+4 more)
 
 ### Community 336 - "test_liveness_gate.py"
 Cohesion: 0.33
@@ -2361,10 +2330,6 @@ Nodes (8): exogenous — known-future covariates, CHRONOS2_EXO_COLS 15 columns, 
 ### Community 343 - "11. CORRECTIONS TO THE EXAMINER'S OWN PRIOR ADVICE"
 Cohesion: 0.25
 Nodes (8): 11.1 Correction 1: conformal prediction. The fix is INSIDE the framework, not outside it., 11.2 Correction 2: the chapter does not merely argue against the data. It misstates its own source., 11.3 Correction 3: the novelty claim of idea A is partly occupied, by PRISM., 11.4 Correction 4: Tier 1 is worth more than stated, because the structural-zero problem is an open gap in the candidate's own domain literature., 11.5 Correction 5: the Diebold-Mariano recommendation is WITHDRAWN. It is mathematically unavailable., 11.6 Correction 6: the MCS recommendation stands, but it is a CONSEQUENCE of raising the fold count, not an alternative, and the honest outcome is a WIDE set., 11.7 Correction 7: the TabPFN-TS versus Chronos-2 "dispute" does not exist. WITHDRAWN., 11. CORRECTIONS TO THE EXAMINER'S OWN PRIOR ADVICE
-
-### Community 344 - "test_briefing.py"
-Cohesion: 0.10
-Nodes (16): Stub `attribute()` for the scaled run. Attribution is a per-DB-query cost, and a, _StubAttribution, briefing(), The proactive-briefing capstone: the four signals composed into one ranked,, _imported(), no_attr(), Proactive-briefing tests (PRJ93 briefing spec, gates G0/G2/G4/G5a-c/G6/G7).  The, Neutralise the store-backed attributor so the pure gates stay offline. (+8 more)
 
 ### Community 345 - "PRJ93 project specification (AI General Manager: Building the Proactive Brain)"
 Cohesion: 0.25
@@ -2411,8 +2376,8 @@ Cohesion: 0.29
 Nodes (8): Finding 3 Library-Bump Flip Refuted (ETS 0.597 Not 0.617), TRT closed since 2026-05-08; band reflects pre-closure rhythm only, A4 L1 ladder results — Two River Taps, TRT milestone: rung2_ets wins (MASE 0.597), gate met; rung3_gbm 0.602, chronos-forecasting==2.3.1 / torch==2.12.1 hard pin as reproducibility anchor, brain/requirements-forecast.txt — production nightly forecast dependencies, brain/requirements-forecast.lock.txt — fully-pinned forecast venv lock, Pinned lock reproduces committed ladder to the digit (TRT ETS 0.597 / GBM 0.602)
 
 ### Community 356 - "S3 Sensitivity Curve: Catch Rate vs Event Magnitude"
-Cohesion: 0.33
-Nodes (6): Clopper-Pearson Coverage Interval, The 1.00 Coverage Claim Had No Power (n=7, P=0.478), Near-Threshold Operating Point as the Honest Hard Case, S3 Sensitivity Curve: Catch Rate vs Event Magnitude, Spike Recall Is the Detector's Weak Kind (0.566 Overall), Wilson 95% Confidence Intervals on Detection Rates
+Cohesion: 0.25
+Nodes (8): FLAG-ELLEL-DIARY (Booking Diary Not Yet Live), Clopper-Pearson Coverage Interval, The 1.00 Coverage Claim Had No Power (n=7, P=0.478), Near-Threshold Operating Point as the Honest Hard Case, S3 Sensitivity Curve: Catch Rate vs Event Magnitude, S7 Honest Small-N Caveats (Ellel Spike-Only, TRT Pre-Closure), Spike Recall Is the Detector's Weak Kind (0.566 Overall), Wilson 95% Confidence Intervals on Detection Rates
 
 ### Community 357 - "Report 48: S6 G17g — Lead-matched Weather and the Exogenous Path"
 Cohesion: 0.25
@@ -2431,16 +2396,16 @@ Cohesion: 0.15
 Nodes (17): ladder(), _load(), `fig:ladder` -- the rolling-origin forecast ladder, three venues, three panels., Vectors, the retained set, and the headline loss to plot.      The headline is r, build(), _folds(), main(), R9 - the functional minimal pair: does the forecast functional drive the bias? (+9 more)
 
 ### Community 361 - "compliance.dto.ts"
-Cohesion: 0.07
-Nodes (35): ComplianceController, ApiBearerAuth, ApiResponse, ApiTags, Body, Controller, Get, HttpCode (+27 more)
+Cohesion: 0.09
+Nodes (21): clamp01(), ComplianceService, EXPIRY_STATUS_SET, ExpiryRecordRow, ExtractedExpiry, Injectable, COMPLIANCE_CATEGORIES, ComplianceCategory (+13 more)
 
 ### Community 362 - "Lean core tool set (8 tools)"
 Cohesion: 0.29
 Nodes (7): Seven-tool listing means MCP shim reached no server, AGENTMEMORY_TOOLS visibility (all vs core), Lean core tool set (8 tools), MCP tools registry table (53 tools), GET /agentmemory/commits, REST is primary; MCP is a bridge on top of it, Build REST query with URLSearchParams to escape branch names
 
 ### Community 363 - "phone.service.ts"
-Cohesion: 0.15
-Nodes (9): hashIp(), PendingEntry, PhoneError, PhoneErrorCode, sendPerIpLimit, sendPerNumberLimit, sendPerUserLimit, PhoneRateLimit (+1 more)
+Cohesion: 0.18
+Nodes (8): PendingEntry, PhoneError, PhoneErrorCode, sendPerIpLimit, sendPerNumberLimit, sendPerUserLimit, PhoneRateLimit, PhoneStatusResponse
 
 ### Community 364 - "Global/Discoursal level — Higher Order Concerns (HOCs)"
 Cohesion: 0.33
@@ -2470,9 +2435,9 @@ Nodes (6): Context profiles and tolerance matrix, Em dash rate ceiling (1 per 1,
 Cohesion: 0.18
 Nodes (11): ActiveStepLabel(), AgentTraceDisclosure(), AgentTraceLive(), formatElapsed(), TraceStep, ChatThread(), MemoChatMessage, Props (+3 more)
 
-### Community 371 - "app/layout.tsx"
-Cohesion: 0.22
-Nodes (7): archivo, geist, metadata, newsreader, splineMono, viewport, Toaster()
+### Community 371 - "pricing/page.tsx"
+Cohesion: 0.29
+Nodes (6): FAQS, metadata, PricingPage(), Tier, TIERS, SectionHeading()
 
 ### Community 372 - "Abstract"
 Cohesion: 0.33
@@ -2506,9 +2471,9 @@ Nodes (6): §6.1 What the brain consumes — **the two disagreements you asked m
 Cohesion: 0.33
 Nodes (6): §7.1 Verdict: re-architect — done, §7.2 Hardcoded-to-Lune inventory — what was de-Luned, and three we handled differently, §7.3 Process-level changes, §7.4 Cold-start for new orgs — **partly done, partly yours**, §7.5 checklist — brain-side items done except the two noted (lru_cache keying,, §7 — Layer 3: multi-tenancy — **Adopted (Phase 3)**, with three deliberate deviations
 
-### Community 380 - "Session 2026-08-07 — Phase 8C-F: local compile, git write path, queue cleared"
-Cohesion: 0.20
-Nodes (10): PUSH IS BLOCKED — the one thing not delivered, Session 2026-08-07 — Phase 8C-F: local compile, git write path, queue cleared, Stage 1.4 — resolved by LOOKING, not by predicting, Stage 1.5 — the assertion boundary is now THREE tiers, Stage 1 — TeX Live and the first real compile, Stage 2 — the git write path, Stage 3.6 — ROOT graph refresh: ATTEMPTED, REFUSED BY THE SHRINK GUARD, Stage 3 — the queue (+2 more)
+### Community 380 - "tasks-list-card.tsx"
+Cohesion: 0.38
+Nodes (6): formatDue(), ListData, ListTask, scopeLabel(), TaskRow(), TasksListCard()
 
 ### Community 381 - "AgentTraceLive (components/chat/agent-trace.tsx)"
 Cohesion: 0.33
@@ -2522,9 +2487,9 @@ Nodes (5): engines, node, name, private, version
 Cohesion: 0.33
 Nodes (6): formatter, enabled, indentStyle, indentWidth, lineEnding, lineWidth
 
-### Community 384 - "Results rewrite — critique log, 8C-3, 2026-08-07"
-Cohesion: 0.20
-Nodes (9): Compression record, How E5 was caught, because it will recur in 8C-4, Results rewrite — critique log, 8C-3, 2026-08-07, Round A — rubric coverage (`00_marking_criteria.md`, `05` §5), Round B — numbers and traceability, Round C — structure and the Results/Discussion boundary, Round D — knowledge-telling against critical writing (`ds-writing` §1), Round E — process reported in place of result (+1 more)
+### Community 384 - "Croston Region (narrow wedge near p=1)"
+Cohesion: 0.50
+Nodes (5): Average Inter-Demand Interval p (x-axis), Croston Method (selected region), Croston Region (narrow wedge near p=1), SBA (Syntetos-Boylan Approximation), SBA Selection Diagonal v > 2 - (3/2)p
 
 ### Community 385 - "Methods argument skeleton — extracted 2026-08-07, before composition (8C-2)"
 Cohesion: 0.40
@@ -2550,13 +2515,13 @@ Nodes (12): B1 · Globality is an estimation-budget argument, not a similarity a
 Cohesion: 0.50
 Nodes (4): Discussion and conclusion sections, Recommendations for future research, Group Activity — discussion and conclusion sections, Limitations and implications of the research
 
-### Community 391 - "The Overleaf push block — diagnosis and proposed fix"
-Cohesion: 0.22
-Nodes (8): It was tested before being proposed, in both directions, Known limitation, stated rather than glossed, Scope boundary — read before applying, The Overleaf push block — diagnosis and proposed fix, The proposed change, What will not work, so it is not proposed, Where it comes from, Why the guard's premise does not hold here
+### Community 391 - "M20 · Chronos-Bolt / Chronos-2 interface"
+Cohesion: 0.67
+Nodes (3): amazon-science/chronos-forecasting declared codebase, M20 · Chronos-Bolt / Chronos-2 interface, rung4_chronos2_exo served model
 
-### Community 392 - "DOWNSTREAM: the "run live or rerun" answer (G12.9g)"
-Cohesion: 0.22
-Nodes (8): Baseline forecasting ladder (rungs 0-4: seasonal-naive to foundation model), Chronos-2 promotion divergence: the real 4-fold T3 gate selects plain rung4_chronos2, not the covariate variant the spec named, Ellel ladder uncapping (MAX_RUNG={}) plus per-fold ladder_selection audit column, Design note for the Discussion (not a code change), DOWNSTREAM: the "run live or rerun" answer (G12.9g), Rerun matrix, What G12.9 actually requires re-running, and why, is_ellel_event self-leak fixed at source (constant 0 on the Ellel feature frame)
+### Community 392 - "HLN Correction Factor vs Evaluation-Window Length (figure)"
+Cohesion: 0.27
+Nodes (12): HLN Correction Factor vs Evaluation-Window Length (figure), Degenerate Boundary n = h (correction factor collapses to zero), Diebold-Mariano Forecast Comparison Test, Evaluation-Window Length n, Forecast Horizon h, Harvey-Leybourne-Newbold Small-Sample Adjustment to Diebold-Mariano, h = 14 Curve (dotted, fortnightly horizon), h = 1 Curve (solid, near-negligible correction) (+4 more)
 
 ### Community 393 - "debugControllerGetRetagQueue"
 Cohesion: 0.40
@@ -2620,7 +2585,7 @@ Nodes (5): getInviteRedeemControllerPreviewQueryKey(), getInviteRedeemController
 
 ### Community 408 - "card-shell.tsx"
 Cohesion: 0.11
-Nodes (22): CardEmpty(), CardShell(), ICON_TILE_TONE, LedgerDiamond(), Props, Tone, ChecklistCard(), ChecklistStep (+14 more)
+Nodes (23): CardEmpty(), CardShell(), ICON_TILE_TONE, LedgerDiamond(), Props, Tone, ChecklistCard(), ChecklistStep (+15 more)
 
 ### Community 409 - "Methodological verdicts extracted from `chapters/literature_review.tex`"
 Cohesion: 0.17
@@ -2647,16 +2612,16 @@ Cohesion: 0.40
 Nodes (5): getMetricsControllerGetPricingFunnelQueryKey(), getMetricsControllerGetPricingFunnelQueryOptions(), getMetricsControllerGetPricingFunnelUrl(), metricsControllerGetPricingFunnel(), useMetricsControllerGetPricingFunnel()
 
 ### Community 415 - "05_paper_architecture.md"
-Cohesion: 0.25
-Nodes (7): 5.1 What this restructure does and does not move, 5. RUBRIC MAP, 6.1 Actions, 6.2 Word-count verification, 6. MECHANICAL COMPLIANCE — items this restructure creates or clears, 7. APPROVED — closed to later sessions, Items reopened after approval
+Cohesion: 0.17
+Nodes (11): 5.1 What this restructure does and does not move, 5. RUBRIC MAP, 6.1 Actions, 6.2 Word-count verification, 6. MECHANICAL COMPLIANCE — items this restructure creates or clears, 7. APPROVED — closed to later sessions, 8.1 The method, 8.2 Evidence base per chapter (+3 more)
 
 ### Community 416 - "2026-08-07 — Phase 8C-2: Chapter 3, Methods. Composed, pushed, floor measured."
-Cohesion: 0.40
-Nodes (5): 2026-08-07 — Phase 8C-2: Chapter 3, Methods. Composed, pushed, floor measured., 8C-3 carry-forward — the hand-off named three floats and it resolves into four exposures, agentmemory — recovered, backfilled, and the loss window characterised, Findings that change the record, Session close addendum, 2026-08-07 — conventions recorded, runtime store untracked
+Cohesion: 0.67
+Nodes (3): 2026-08-07 — Phase 8C-2: Chapter 3, Methods. Composed, pushed, floor measured., agentmemory — recovered, backfilled, and the loss window characterised, Findings that change the record
 
 ### Community 417 - "Session close — 2026-08-06 (TabPFN literature, D-U6 closure, chapter audit)"
-Cohesion: 0.14
-Nodes (14): Analysis produced this session, Chapter audit — three defects found, two of them pre-existing, Chapters, Library integrity audit, run because of (3), New source, Open items carried forward, Outstanding, Rules amended at close — 2026-08-06 (+6 more)
+Cohesion: 0.22
+Nodes (9): Analysis produced this session, Chapter audit — three defects found, two of them pre-existing, Chapters, New source, Open items carried forward, Rules amended at close — 2026-08-06, Session close — 2026-08-06 (TabPFN literature, D-U6 closure, chapter audit), State at close — verified, 2026-08-06 (+1 more)
 
 ### Community 418 - "getNotificationsControllerListQueryOptions"
 Cohesion: 0.40
@@ -2666,17 +2631,9 @@ Nodes (5): getNotificationsControllerListQueryKey(), getNotificationsControllerL
 Cohesion: 0.40
 Nodes (5): getNotificationsControllerListRepliesQueryKey(), getNotificationsControllerListRepliesQueryOptions(), getNotificationsControllerListRepliesUrl(), notificationsControllerListReplies(), useNotificationsControllerListReplies()
 
-### Community 420 - "ChatStartersGenerator"
-Cohesion: 0.29
-Nodes (3): ChatStartersGenerator, Injectable, InjectQueue
-
 ### Community 421 - "getOrganizationControllerGetProfileQueryOptions"
 Cohesion: 0.40
 Nodes (5): getOrganizationControllerGetProfileQueryKey(), getOrganizationControllerGetProfileQueryOptions(), getOrganizationControllerGetProfileUrl(), organizationControllerGetProfile(), useOrganizationControllerGetProfile()
-
-### Community 422 - "phone-otp.ts"
-Cohesion: 0.39
-Nodes (7): generatePin(), hashPin(), issuePhoneOtp(), logger, sendPerNumberLimit, sendPhoneOtp(), verifyPhoneOtp()
 
 ### Community 423 - "getReportsControllerGetOneQueryOptions"
 Cohesion: 0.40
@@ -2690,9 +2647,9 @@ Nodes (9): Chapter 2 rewrite — critique record, Correction — 2026-08-07, the
 Cohesion: 0.18
 Nodes (10): 1 · Pre-registration status — declared, not absorbed, 2 · Code changes, 3 · The confidence sets under the new headline, 4 · The substantive change: the served model is the argument-minimum nowhere, 5 · What this supersedes, 6 · Not superseded, 71 — Flipping the headline metric from MASE to RMSSE, 7 · The α=0.25 check, and it flips (+2 more)
 
-### Community 426 - "8C-4 — Chapter 5, Discussion, composed 2026-08-08"
-Cohesion: 0.25
-Nodes (8): 8C-4 — Chapter 5, Discussion, composed 2026-08-08, A near-miss worth recording, because it is 8C-3's lesson recurring, Corrections this session makes to stores upstream of it, Four of six chapters are now measured, and reallocation cannot be deferred further, Open, with owners, Reference debts, The push did not land, and the reason is worth recording precisely, Two items closed that other files carried as open
+### Community 426 - "cadence_sweep.py"
+Cohesion: 0.36
+Nodes (8): _actuals_l1(), _l2_actuals_and_scale(), _mase(), _predict(), G12.15c - refresh-cadence sweep over June (item-demand focus, on MPS).  Analysis, June L2 category actuals + per-category seasonal-naive scale + recent share., run(), _sweep_venue()
 
 ### Community 427 - "getVenuesControllerGetQueryOptions"
 Cohesion: 0.40
@@ -2810,10 +2767,6 @@ Nodes (4): chatControllerDeleteConversation(), getChatControllerDeleteConversati
 Cohesion: 0.50
 Nodes (4): chatControllerSendMessage(), getChatControllerSendMessageMutationOptions(), getChatControllerSendMessageUrl(), useChatControllerSendMessage()
 
-### Community 456 - "Source-claim verification — T8 discharged for Chapter 5"
-Cohesion: 0.25
-Nodes (7): A wording note, below blocking, Every claim quoted, not named, H12-1 — the Mondrian construction is attributed to a paper that disclaims it, H12-2 — the group-conditional guarantee is over-attributed, and only in Chapter 5, Source-claim verification — T8 discharged for Chapter 5, The two the instrument could not reach, What this run establishes, and what it does not
-
 ### Community 457 - "chatControllerUpdateVisibility"
 Cohesion: 0.50
 Nodes (4): chatControllerUpdateVisibility(), getChatControllerUpdateVisibilityMutationOptions(), getChatControllerUpdateVisibilityUrl(), useChatControllerUpdateVisibility()
@@ -2821,14 +2774,6 @@ Nodes (4): chatControllerUpdateVisibility(), getChatControllerUpdateVisibilityMu
 ### Community 458 - "3. Literature foundation and methodological justification"
 Cohesion: 0.20
 Nodes (10): 3.1 Search and screening protocol, 3.2 Corpus composition, 3.3 Corpus revision under critique, 3.4 Synthesis and critical position, 3.5 Evidence-to-method traceability, 3.6 Sequencing, and why this order, 3.7 Standing limitations of the literature work, 3. Literature foundation and methodological justification (+2 more)
-
-### Community 459 - "self_test"
-Cohesion: 0.43
-Nodes (7): main(), Path, Both directions. A guard seen only to fail has not been seen to work., Return (line number, rule name, line) for every embedded title found., scan_paths(), scan_text(), self_test()
-
-### Community 460 - "graph_write_guard.py"
-Cohesion: 0.54
-Nodes (7): main(), Path, Exercise the guard against the violation it exists to catch.      Two cases, and, self_test(), settle(), _sha256(), snapshot()
 
 ### Community 461 - "conversationsControllerHideConversation"
 Cohesion: 0.50
@@ -2882,10 +2827,6 @@ Nodes (8): check(), main(), DataFrame, ndarray, Series, D-D3 evidence · is the 
 Cohesion: 0.50
 Nodes (4): getInvitationsControllerRevokeMutationOptions(), getInvitationsControllerRevokeUrl(), invitationsControllerRevoke(), useInvitationsControllerRevoke()
 
-### Community 476 - "test_live_cache.py"
-Cohesion: 0.39
-Nodes (6): _counter(), T1 live-fact + cache tests (PRJ93 live-ingest spec, G7 / G-live-a / G-live-e)., test_cache_hit_avoids_a_second_fetch(), test_cache_honours_ttl_expiry(), test_cache_is_keyed_per_metric(), test_force_read_bypasses_the_cache()
-
 ### Community 477 - "2.2 Every data source, verified against the store"
 Cohesion: 0.22
 Nodes (9): 2.1 The principal deviation, stated plainly, 2.2 Every data source, verified against the store, 2.3 Mapping: intended brain function → data requirement → status, 2.4 Scope note — the brain versus the connectors, 2. Data provision: specified versus actual, a. Square sales item transactions, b. Stock data (Excel), c. Conversational data (+1 more)
@@ -2894,10 +2835,6 @@ Nodes (9): 2.1 The principal deviation, stated plainly, 2.2 Every data source, v
 Cohesion: 0.50
 Nodes (4): getNudgeControllerRunNudgeMutationOptions(), getNudgeControllerRunNudgeUrl(), nudgeControllerRunNudge(), useNudgeControllerRunNudge()
 
-### Community 479 - "supplier-card.tsx"
-Cohesion: 0.38
-Nodes (6): asArray(), copy(), Data, Supplier, SupplierCard(), SupplierRow()
-
 ### Community 480 - "10. D-D2 resolved — 2026-08-06"
 Cohesion: 0.22
 Nodes (9): 10. D-D2 resolved — 2026-08-06, Owed to the writing, not written this session, Post-decision status, The argument that carries the decision, The nuance that must not be smoothed over, Three corrections to the row as written at §4, Verification, at source, What Chatfield does license, and it is more than the row claimed (+1 more)
@@ -2905,10 +2842,6 @@ Nodes (9): 10. D-D2 resolved — 2026-08-06, Owed to the writing, not written th
 ### Community 481 - "3. DIVERGES — SHOULD FIX (8)"
 Cohesion: 0.22
 Nodes (9): 3. DIVERGES — SHOULD FIX (8), D-F1 · The Angelopoulos–Bates upper bound is applied at Ellel, where its condition fails, D-F2 · VUS-PR is committed to in the chapter and not computed — but the dependency is available, D-F3 · The interval results print point estimates where the repo holds the dispersion, D-F4 · `tab:ladder` is 27 cells of six-fold means with bolded winners and no dispersion, D-F5 · The Ask-F1 sweep's degeneracy is stated as a general condition and never as our instance, D-F6 · No threat model for the retrieval store, D-F7 · The MinT/WLS_v unbiasedness precondition is never checked on the zero-heavy nodes (+1 more)
-
-### Community 482 - "rank-list.tsx"
-Cohesion: 0.29
-Nodes (6): Props, RankItem, RankList(), Tone, TONE_FILL, TONE_TRACK
 
 ### Community 483 - "pricingRecommendationsControllerCreate"
 Cohesion: 0.50
@@ -2922,9 +2855,9 @@ Nodes (8): Consequence for the write-up, Defect found in passing, not repaired, 
 Cohesion: 0.22
 Nodes (8): Consequence for the write-up, Control, Method, Provenance, R6 result — the unbiasedness precondition WLS_v inherits from MinT, Result — the condition fails, in the direction theory predicts, The source condition, verified this session, What it means, and why it is not a bug
 
-### Community 487 - "Session 2026-08-07 (second run) — 8C-F follow-up: push verified, rules hardened, graph refused again"
-Cohesion: 0.29
-Nodes (7): latexcheck's fixture tested the author's imagination; now it does not, Recorded this session, Session 2026-08-07 (second run) — 8C-F follow-up: push verified, rules hardened, graph refused again, The push block was never git, The push landed, and the PUSHED state was compiled, The ROOT graph refresh was refused AGAIN — and my earlier hypothesis was wrong, Verified end state
+### Community 487 - "metric_ordering.py"
+Cohesion: 0.39
+Nodes (7): build(), main(), _ordering(), R4 / G1 evidence - does the headline metric change which model the ladder picks?, Mean loss per rung on the COMMON fold set, plus the MCS 90% set under that loss., run_venue(), _write_report()
 
 ### Community 488 - "R5 result — ABORTED on a pre-registered condition, with one prediction salvaged"
 Cohesion: 0.22
@@ -2933,14 +2866,6 @@ Nodes (8): Artefacts, Outcome, Prediction (i) — salvaged, because it never nee
 ### Community 489 - "scheduledReportsControllerRemove"
 Cohesion: 0.50
 Nodes (4): getScheduledReportsControllerRemoveMutationOptions(), getScheduledReportsControllerRemoveUrl(), scheduledReportsControllerRemove(), useScheduledReportsControllerRemove()
-
-### Community 490 - "ingest_july_w1_actuals.py"
-Cohesion: 0.43
-Nodes (6): _build_line_items(), G12.17c-b-1 - advance the operational clock through 7 July: ingest 1 to 7 July a, 1 to 7 July store views vs the held-out pull totals, per venue., _reconcile(), run(), _update_manifest()
-
-### Community 491 - "ingest_june_actuals.py"
-Cohesion: 0.43
-Nodes (6): _build_line_items(), G12.17a-0 - advance the operational clock: ingest June 2026 as observed history., June store views vs the held-out pull totals, per venue., _reconcile(), run(), _update_manifest()
 
 ### Community 493 - "05 · Paper architecture — specification for restructuring PRJ93 into a research paper"
 Cohesion: 0.40
@@ -2955,8 +2880,8 @@ Cohesion: 0.40
 Nodes (5): conversationsControllerList(), getConversationsControllerListQueryKey(), getConversationsControllerListQueryOptions(), getConversationsControllerListUrl(), useConversationsControllerList()
 
 ### Community 496 - "2.7 Float placement — every table assessed"
-Cohesion: 0.29
-Nodes (7): 2.7 Float placement — every table assessed, 2.7a Binding reporting conditions on `tab:exchangeability` and Results 4.4, 2.7b Numerics sensitivity in the two confidence-set floats — binding on 8C, 8C-3 deliverable — short titles on every surviving body float, Methodology — three tables, Methods — procedural material against Appendices C and D, Results — sixteen tables and one figure
+Cohesion: 0.33
+Nodes (6): 2.7 Float placement — every table assessed, 2.7a Binding reporting conditions on `tab:exchangeability` and Results 4.4, 2.7b Numerics sensitivity in the two confidence-set floats — binding on 8C, Methodology — three tables, Methods — procedural material against Appendices C and D, Results — sixteen tables and one figure
 
 ### Community 497 - "`main.tex` preamble additions — APPLIED 2026-08-07"
 Cohesion: 0.29
@@ -3138,13 +3063,9 @@ Nodes (6): 4. DIVERGES — DEFENSIBLE (5) — each is a human decision, D-D1 · 
 Cohesion: 0.40
 Nodes (5): 2026-08-05 — Phase LITCONF: literature conformance audit, six runs executed, Addendum — R9, the functional minimal pair (2026-08-06), Basis audit addendum — 2026-08-06, D-D2 addendum — 2026-08-06, D-D3 / D-D4 / D-D5 addendum — 2026-08-06
 
-### Community 811 - "ChatStartersController"
-Cohesion: 0.33
-Nodes (5): ChatStartersController, ApiBearerAuth, ApiTags, Controller, UseGuards
-
-### Community 812 - "invite-token.ts"
-Cohesion: 0.47
-Nodes (5): b64url(), b64urlDecode(), signInviteToken(), VerifiedToken, verifyInviteToken()
+### Community 811 - "refresh"
+Cohesion: 0.18
+Nodes (9): Per-venue T2 append (+ conditional T3). Idempotent: no new data and not     `for, refresh(), FakeAdapter, Refresh left the HTTP surface (M1), so the contract is driven through the     fu, Returns one synthetic closed day beyond the store ceiling., _synthetic_next_day(), test_append_new_closed_day_then_idempotent(), test_append_records_auto_exog_note() (+1 more)
 
 ### Community 813 - "getMetricsControllerGetWauQueryOptions"
 Cohesion: 0.40
@@ -3153,10 +3074,6 @@ Nodes (5): getMetricsControllerGetWauQueryKey(), getMetricsControllerGetWauQuery
 ### Community 814 - "getInvitationsControllerListQueryOptions"
 Cohesion: 0.40
 Nodes (5): getInvitationsControllerListQueryKey(), getInvitationsControllerListQueryOptions(), getInvitationsControllerListUrl(), invitationsControllerList(), useInvitationsControllerList()
-
-### Community 815 - "Embedded figure titles — estate-wide sweep, 2026-08-07 (8C-3 STEP 1)"
-Cohesion: 0.33
-Nodes (5): Embedded figure titles — estate-wide sweep, 2026-08-07 (8C-3 STEP 1), Found by the sweep, and not an embedded-title defect — `ladder.pdf` on Overleaf is stale, The fix, at the generator, The instrument — `brain/scripts/figurecheck.py`, The sweep
 
 ### Community 816 - "getMetricsControllerGetActiveStaffQueryOptions"
 Cohesion: 0.40
@@ -3214,9 +3131,9 @@ Nodes (5): 9. D-D1 resolved, and the minimal pair that resolved it — 2026-08-0
 Cohesion: 0.40
 Nodes (4): Agent Memory, Notes, Required at the start of every session, Required before ending a session
 
-### Community 830 - "2026-08-08 — Phase: critique-loop audit, and SKILL.md §8's trial record discharged"
-Cohesion: 0.33
-Nodes (6): 2026-08-08 — Phase: critique-loop audit, and SKILL.md §8's trial record discharged, Artefacts written, SKILL.md §8's trial record — discharged, having stood Unstarted through three uses, The generalisable part, Unrepaired, and deliberately so, What was found
+### Community 830 - "Session close, second half — 2026-08-06 (Zotero enabled, three corrections)"
+Cohesion: 0.40
+Nodes (5): Library integrity audit, run because of (3), Outstanding, Session close, second half — 2026-08-06 (Zotero enabled, three corrections), Three corrections, in increasing order of how wrong I was, Zotero writes enabled and used
 
 ### Community 831 - "getNotificationsControllerRecipientsQueryOptions"
 Cohesion: 0.40
@@ -3318,17 +3235,9 @@ Nodes (3): 2026-08-05 — Phase: supervisor evidence pack, §3 literature founda
 Cohesion: 0.50
 Nodes (4): getPlacesControllerSearchMutationOptions(), getPlacesControllerSearchUrl(), placesControllerSearch(), usePlacesControllerSearch()
 
-### Community 869 - "web/package.json"
-Cohesion: 0.33
-Nodes (5): engines, node, name, private, version
-
 ### Community 872 - "77 — R1, R2 and R4, and what R4 found instead"
 Cohesion: 0.22
 Nodes (8): 77 — R1, R2 and R4, and what R4 found instead, Blocker B3 — CLEARED as a side effect, and more strongly than required, R1 · Four-block split boundaries — DONE, feeds `fig:blocks` (F1), R2 · Per-day conformity scores — DONE, feeds `fig:drift` (F4), R4 · Corpus screening counts — STOPPED. The counts do not exist and cannot be recovered, The `functional_pair` origin count — decided, and it is a defect rather than a design choice, Verified end state, What R65 can be met with instead
-
-### Community 873 - "8. COMPOSITION METHOD, AND THE EVIDENCE BASE PER CHAPTER"
-Cohesion: 0.40
-Nodes (5): 8.1 The method, 8.1a The critique loop each composed chapter passes through, 8.2 Evidence base per chapter, 8.3 Chapters flagged thin, or at risk of losing reasoning, 8. COMPOSITION METHOD, AND THE EVIDENCE BASE PER CHAPTER
 
 ### Community 879 - "scheduledReportsControllerCancel"
 Cohesion: 0.50
@@ -3410,33 +3319,13 @@ Nodes (4): getTasksControllerRemoveMutationOptions(), getTasksControllerRemoveUr
 Cohesion: 0.50
 Nodes (4): getVenuesControllerCreateMutationOptions(), getVenuesControllerCreateUrl(), useVenuesControllerCreate(), venuesControllerCreate()
 
-### Community 902 - "Discussion argument skeleton — D1–D19, 8C-4"
-Cohesion: 0.40
-Nodes (4): Discussion argument skeleton — D1–D19, 8C-4, The one correction this skeleton makes to its own hand-off, Two things this chapter's composition establishes that were open, What this skeleton does NOT carry, and where it went instead
-
-### Community 903 - "completenesscheck.py"
-Cohesion: 0.15
-Nodes (23): collect_inputs(), expand_inputs(), leaf_sections(), main(), Path, Drop LaTeX comments, preserving line structure so line numbers survive., Return the balanced-brace group starting at `open_index`, and the index after it, TeX appends .tex when the name has no extension; a .sum or .bib is taken as give (+15 more)
+### Community 903 - "artefact"
+Cohesion: 0.53
+Nodes (5): artefact(), count(), main(), Words as a marker counts them: math is one token, citation keys are not prose., Words `count` charges to prose that a marker would not.      Two mechanisms, bot
 
 ### Community 904 - "2026-08-07 — 8C-1 hand-off adjudicated (Phuong). Overrun held PROVISIONAL."
 Cohesion: 0.67
 Nodes (3): 2026-08-07 — 8C-1 hand-off adjudicated (Phuong). Overrun held PROVISIONAL., Correction, same day — the word counter was defective. **Chapter 2 is 4,948, not 4,893.**, Session-close checks, 2026-08-07 — agentmemory was NOT capturing
-
-### Community 905 - "2026-08-08 — 8C-4 closing addendum: the push is verified on the remote"
-Cohesion: 0.40
-Nodes (5): 2026-08-08 — 8C-4 closing addendum: the push is verified on the remote, The fresh-clone compile, re-run against the pushed state, The generalisable part, The push landed, and the verification is not the same act as the push, What this addendum changes in §F
-
-### Community 906 - "2026-08-08 (later) — Phase: reconciliation, the abstract, and the repair batch"
-Cohesion: 0.40
-Nodes (5): 2026-08-08 (later) — Phase: reconciliation, the abstract, and the repair batch, Completed, Open, with owners, The generalisable part, Three errors I made this session, all caught, all worth keeping
-
-### Community 907 - "express-augment.d.ts"
-Cohesion: 0.50
-Nodes (3): express, express-serve-static-core, Request
-
-### Community 908 - "Results argument skeleton — R1–R13, 8C-3"
-Cohesion: 0.50
-Nodes (3): Deliberate cuts brought with their word cost, Hand-off to 8C-4/8C-5 — the factor of 6.6 belongs in Discussion, Results argument skeleton — R1–R13, 8C-3
 
 ## Ambiguous Edges - Review These
 - `Seven-tool listing means MCP shim reached no server` → `Lean core tool set (8 tools)`  [AMBIGUOUS]
@@ -3449,9 +3338,9 @@ Nodes (3): Deliberate cuts brought with their word cost, Hand-off to 8C-4/8C-5 �
   brain/docs/DataSciDissWriting June2026final.md · relation: semantically_similar_to
 
 ## Knowledge Gaps
-- **4496 isolated node(s):** `auto-test.sh script`, `context-recovery.sh script`, `format-on-save.sh script`, `notify.sh script`, `scan-secrets.sh script` (+4491 more)
+- **4371 isolated node(s):** `auto-test.sh script`, `context-recovery.sh script`, `format-on-save.sh script`, `notify.sh script`, `scan-secrets.sh script` (+4366 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **295 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **284 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -3464,9 +3353,9 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Glasman-Deal, 2010` and `Glasman-Neal, Hilary (2020) Science Research Writing`?**
   _Edge tagged AMBIGUOUS (relation: semantically_similar_to) - confidence is low._
-- **Why does `VenueProfileSchema` connect `VenueScope` to `tool-dispatcher.ts`, `button.tsx`, `chat.service.ts`, `index.ts`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `VenueProfileSchema` connect `VenueScope` to `fail`, `chat.service.ts`, `button.tsx`, `gm-agent.ts`?**
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
 - **Why does `formToProfile()` connect `button.tsx` to `VenueScope`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
-- **Why does `cn()` connect `cn` to `integrations-body.tsx`, `report-detail-body.tsx`, `button.tsx`, `chat-composer.tsx`, `incidents-body.tsx`, `card-shell.tsx`, `compliance-body.tsx`, `use-notifications.ts`, `getServerSession`, `scheduled-reports-body.tsx`, `apiFetch`, `history-body.tsx`, `dashboard-body.tsx`, `doc-detail-body.tsx`, `report-card.tsx`, `chart.tsx`, `(marketing)/page.tsx`, `primitives.tsx`, `chat-thread.tsx`, `today-body.tsx`, `chat-body.tsx`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Why does `cn()` connect `cn` to `upload-modal.tsx`, `api-client.ts`, `features/page.tsx`, `button.tsx`, `chat-composer.tsx`, `apiFetch`, `seo.ts`, `card-shell.tsx`, `compliance-body.tsx`, `use-notifications.ts`, `invite-form.tsx`, `debug-body.tsx`, `history-body.tsx`, `doc-detail-body.tsx`, `report-card.tsx`, `chart.tsx`, `tasks-body.tsx`, `(marketing)/page.tsx`, `primitives.tsx`, `hero-chat.tsx`, `chat-thread.tsx`, `pricing/page.tsx`, `today-body.tsx`, `chat-body.tsx`, `tasks-list-card.tsx`?**
+  _High betweenness centrality (0.037) - this node is a cross-community bridge._
