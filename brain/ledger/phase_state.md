@@ -3955,3 +3955,62 @@ citation commands: **12 SUPPORTED, 1 OVERSTATED, 1 UNREACHABLE.**
 
 S-4 and 8C-5, both out of scope by instruction. The recompute set still holds R4, R9, R16, R22 and
 R30, and D3 stays live.
+
+---
+
+## 2026-08-09 (continued) — R24 addendum and S-4 pass one
+
+### R24 reached further than 5.3
+
+Raised by Phuong. Two corrections to the earlier report in this session: the passage already
+repaired **is** 5.3, and **6.6 appears nowhere in reader-facing prose** (single occurrence is the
+trace comment at `discussion.tex`:286).
+
+The real exposure is **three** gap claims scaled by a paired standard error, and only two are their
+venue's leading contrast. Two River Taps' is `rung2_ets` against `rung4_chronos2`, VIF **2.06**
+against Ellel's 9.74. Corrected multiples at the pre-registered block length: Beer Hall 0.02 → 0.01,
+Ellel 0.50 → 0.17, **Two River Taps 3.27 → 1.80** (2.28 at ten lags), straddling 1.96. **The MCS
+elimination is unaffected**, being block-bootstrapped at the same length, so the repair went to the
+gloss and not the verdict.
+
+### S-4 pass one — applied, ruled item by item
+
+Eight approved, #5 declined, #4 closed. **Net −105 marker words** (Ch 4 +61, Ch 5 −166) against an
+orientation estimate of 370–470. Full record: `ledger/s4_deduplication_items.md`.
+
+**The headline is that S-4 is not the instrument for the overrun.** Duplication between the two
+chapters is worth ~400–550 gross; the excess is that four chapters measure 23,046 against a 20,000
+six-chapter total. Ruled: write Introduction and Conclusions, measure, decide on six real floors; if
+still materially over, accept the overrun with the justification already assembled.
+
+### Instrument defect found and fixed
+
+`venueordercheck` printed **PASS having scanned zero files** — zsh does not word-split an unquoted
+variable holding several paths, so one invalid path reached it. Both path-list checkers now fail
+closed on an empty scan, and **both guards were exercised against the violation before being
+trusted**. General form: *a check that examined nothing must not be able to report a clean result.*
+
+### Artefacts
+
+`ledger/s4_deduplication_items.md` (new), `ledger/r24_marginal_acf.md` (addendum),
+`eval/marginal_acf.py` (`--pair`), `scripts/venueordercheck.py` + `scripts/figurecheck.py`
+(zero-scan guards), §F word row, this entry.
+
+### Verified end state
+
+- Overleaf clone `main` = **`29016e7`**, **two commits ahead** of `origin/main` = `422c85d`.
+  **Phuong pushes.** Re-derive both with `git ls-remote --heads origin` and
+  `git rev-list --count origin/main..HEAD`; do not read these SHAs forward.
+- latexcheck **PASS** on the working clone and on a **fresh clone of the local commit**
+  (`main-words.sum` confirmed absent): both **131 pages, 0 errors, 0 undefined references, 0
+  undefined citations, 0 floats lost**, 7 overfull, 35 underfull. Tier 2 only; T3-1 open.
+- figurecheck **1**, completenesscheck **7**, venueordercheck **5** (was 8 — the de-duplication
+  discharged three ORDER findings in Chapter 5 as a by-product).
+- Ch 4 **7,712** · Ch 5 **4,870** · four-chapter total **23,046** · projection **~26,000**.
+- Every protected qualifier verified surviving **by name**; zero em dashes in the diff.
+
+### Not started, deliberately
+
+**8C-5 (Conclusions) is NOT begun**, by instruction. The recompute set still holds R4, R9, R16, R22
+and R30; D3 stays live. S-4 pass two, if there is one, has no items left that this pass did not
+either take, decline or rule unavailable.

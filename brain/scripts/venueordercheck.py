@@ -243,6 +243,17 @@ def main() -> int:
             findings.append((path, line, code, detail))
 
     print(f"scanned {len(files)} file(s)")
+    # A clean result on an empty scan is not a clean result. On 2026-08-09 this script
+    # printed PASS having scanned ZERO files: the caller was zsh, where an unquoted
+    # `$A` holding "chapters abstract.tex" does NOT word-split, so one invalid path
+    # was passed and nothing matched. The verdict was true of what it examined and
+    # said nothing about the document. Fail closed instead: a check that examined
+    # nothing has not run.
+    if not files:
+        print("VERDICT: FAIL - scanned 0 files. This is a caller error, not a clean "
+              "document: check the paths (and note that zsh does not word-split an "
+              "unquoted variable holding several paths).")
+        return 1
     if not findings:
         print("VERDICT: PASS - no unanchored or conflicting venue triple found")
         return 0

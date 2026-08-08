@@ -296,3 +296,89 @@ worsened. **The 0.895 may have to stay** for that clause to parse.
   a qualifier, the row says so and the cut is not made.
 - **Whole-section disposition in Chapter 4** — that is a composition change against an approved
   tree and belongs to an A-row, not to S-4.
+
+---
+
+# PASS ONE APPLIED — 2026-08-09, ruled item by item by Phuong
+
+| # | Ruling | Applied as |
+|---|---|---|
+| 1 | approve, conditional | Ch4 caveat upgraded + corroboration limit migrated in, **then** Ch5 cut |
+| 2 | approve | Ch5 side only |
+| 3 | approve | **PARTIAL, reported not trimmed** (below) |
+| 4 | not available | closed, untouched |
+| 5 | **DECLINE** | untouched; verified by diff that the span was never entered |
+| 6 | approve | applied |
+| 7 | approve | applied, scope limit preserved |
+| 8 | approve partial | ratios kept, corpus counts cut |
+| 9 | approve as scoped | both rates kept, supporting counts cut |
+| 10 | approve partial | `0.895` kept, it is load-bearing for "the two measures disagree" |
+
+## Realised yield, measured rather than estimated
+
+**`wordcount.py`, marker-equivalent: Ch 4 7,651 → 7,712 (+61). Ch 5 5,036 → 4,870 (−166). Net
+−105.** Four-chapter total **23,151 → 23,046**.
+
+**Against the orientation estimate of 370–470, this is a factor of ~3.5 short**, and both reasons
+are worth keeping.
+
+1. **#1's condition added words to Chapter 4 by design.** Replacing *"these intervals are mildly
+   optimistic"* with the sharper statement, and migrating in Chapter 5's corroboration limit, cost
+   +61. That was the price of the item rather than an overrun: the alternative was a downgrade
+   wearing a cut's clothes.
+2. **Every cut was made qualifier-first**, so the realised share of each span came in near half of
+   what the span suggested. The estimate assumed the interpretive sentence was the only thing
+   staying; in practice the scope limits stayed too.
+
+**This is the fifth instance on record of an ad-hoc figure disagreeing with the instrumented one,
+and the first where the ad-hoc figure was optimistic about a SAVING rather than about a result.**
+The direction is the same in substance: the throwaway number flattered the thing about to be acted
+on. The costs above are the instrumented ones.
+
+## #3, reported rather than trimmed to target
+
+The instruction was to stop and report if removing the restatement made the paragraph's reason
+opaque. It would have. Chapter 5's Monte Carlo argument reads *"a $p$-value near $0.19$ carries a
+Monte Carlo standard error of about $0.0124$, so a move of $0.155$ is about twelve times resampling
+noise"*, and $0.155 = 0.191 - 0.036$. **Cutting `0.191 → 0.036` would have left the argument
+referring to a move the reader can no longer see.** Only the second move (`0.209 → 1.000`), which
+the Monte Carlo argument does not use, was cut.
+
+## Unlooked-for side benefit
+
+**`venueordercheck` falls 8 → 5**, all three removals in Chapter 5. Removing a positional venue
+triple is exactly the remedy that instrument asks for, so de-duplicating Chapter 5's restatements
+discharged three of its findings as a by-product.
+
+## Instrument defect found and fixed during this pass
+
+**`venueordercheck` printed `VERDICT: PASS` having scanned ZERO files.** The caller was zsh, where
+an unquoted `$A` holding `"chapters abstract.tex"` does **not** word-split, so one invalid path was
+passed and nothing matched. The verdict was true of what it examined and said nothing about the
+document. It was caught only because the number disagreed with a run minutes earlier.
+
+Both path-list checkers now **fail closed on an empty scan** (`venueordercheck.py`,
+`figurecheck.py`), and both guards were **exercised against the violation before being trusted**:
+empty scan → exit 1, bad path → non-zero, self-tests still pass, real runs unchanged.
+
+**The general form, which is the reusable part:** *a check that examined nothing must not be able to
+report a clean result.* Every guard in this project that takes a path list has this failure mode,
+and the exit code is honest in exactly the way the rules warn about, reporting what the script
+decided rather than what it covered.
+
+## What pass one does NOT close
+
+**~5,600 of the ~6,100 remains, and de-duplication is not the instrument for it.** Ruled by Phuong,
+2026-08-09, and recorded here so it is not re-litigated:
+
+- **Not a whole-section disposition in Chapter 4.** Cutting a section from an approved tree to hit a
+  total would remove reconciled measurement, which is the material that survived four rounds of
+  audit precisely because it is what makes the claims defensible.
+- **Write the two unwritten chapters first and measure.** Introduction 1,400 + Conclusions 1,100 +
+  abstract 300 = 2,800 budgeted, and the projection assumes they land at budget. Both are summaries
+  of decisions taken elsewhere and may come in under. **The reallocation decision is taken on six
+  real floors, not four plus a forecast.**
+- **If the total still lands materially over 20,000, the answer is an accepted overrun with a stated
+  justification**, and the justification is already assembled: the audits, the reconciliations, the
+  restored qualifiers, and a scope that grew because externally-specified data never arrived.
+  **Cutting the evidence to hit a number is not the answer.**

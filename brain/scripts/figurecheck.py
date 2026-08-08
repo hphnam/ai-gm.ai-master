@@ -184,6 +184,12 @@ def main() -> int:
 
     findings, scanned = scan_paths(args.paths)
     print(f"scanned {scanned} figure source file(s)")
+    # See venueordercheck's note: a PASS on an empty scan is a statement about
+    # nothing. Fail closed so a caller error cannot read as a clean document.
+    if not scanned:
+        print("VERDICT: FAIL - scanned 0 files. This is a caller error, not a clean "
+              "document: check the paths.")
+        return 1
     if not findings:
         print("VERDICT: PASS - no embedded figure title found")
         return 0
