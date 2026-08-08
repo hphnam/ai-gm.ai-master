@@ -339,6 +339,47 @@ Corollary, and it is the same failure as the exit-code rule: **cell-by-cell, not
 against aggregate.** One total compared to one other total cannot detect a defect that moves
 both the same way — see the withdrawn "0.14 %" calibration above.
 
+### A claim of absence names what was searched, in the sentence making the claim
+
+**This is the rule below, moved from something to recall to something that has to be typed.** The
+principle — report a clean result with the scope of the check — has been in this file for two
+sessions and was broken again on 2026-08-08: four directories searched for TeX, none of them the
+home directory where it was installed, and the finding written into `BLOCKED_third_party.md` as
+*"No TeX binary is reachable … confirmed both inside and outside the tool sandbox, so it is
+absence and not a permissions artefact."* Confident phrasing made a narrow search sound
+exhaustive, and it went in as state.
+
+**The operational form: you may not write "X is absent". You write "X was not found in A, B, C".**
+The scope goes in the same sentence as the claim, not a clause later and not in a footnote,
+because the sentence is what gets quoted forward. If naming the scope makes the claim look thin,
+that is the rule working — a thin search should look thin.
+
+This binds hardest on **negatives that close work**: a missing tool, an unused citation key, a
+figure with no generator, a row with no owner. Each of those ends an investigation, so each is
+exactly where an unbounded negative costs most. `zotero_search_by_citation_key` already has its own
+entry above for the same reason.
+
+### A value match is not an identity match — confirm what a number *is* before ruling on it
+
+The sibling of the rule above, and it bites in the opposite direction: an unbounded negative
+overstates absence, and a bare value match overstates presence. Verifying the 2026-08-08 push,
+`grep 0.871` on the remote `results.tex` returned four hits, which reads as the old precision
+figure surviving a repair that was supposed to remove it. It is not. **`0.871` at
+`results.tex:471/490/494/538` is the Beer Hall's conformal coverage** — a different quantity that
+happens to carry the same three digits — and the repaired precision prose reads `0.872` a few lines
+away. The repair had landed. A grep-only verification would have reported it failed and sent the
+next session to re-fix a correct line.
+
+**The operational form: before concluding from a numeric grep, read the line and name the
+quantity.** A number is only evidence when you can say what it measures; three digits on their own
+are a coincidence surface. Four digits or a signed value narrow it, and neither closes it.
+
+This is worst in exactly the places this project greps: a corpus with a small number of venues, a
+shared rounding convention and several statistics on $[0,1]$ **manufactures collisions** — coverage,
+precision, recall, VUS-PR and a p-value all live in the same three-decimal range, so a repaired
+value and its replacement often differ in the last digit only. Both failure directions have now
+been observed: a false negative from a narrow search, a false positive from a shared value.
+
 ### A clean result is reported with the scope of the check that produced it
 
 **State what a check establishes and, in the same breath, what it does not.** This matters
@@ -630,3 +671,42 @@ document is 12pt `report` with `\linespread{1.5}` and a 150 mm text width. The c
 survived, but the reported margin was wrong by a third, because at 12pt with 1.5 leading a
 two-line `\scriptsize` label is about a quarter taller. A check run against a convenient
 geometry is a check against a document that does not exist.
+
+### The two instruments that read for PRESENCE — and the one thing neither reaches
+
+Added 2026-08-08, both after the same session found their defects by accident rather than by
+mechanism. Both are verified in both directions by `--self-test` before use, per the assertion
+rule above, and **both self-tests failed on first run and caught real defects in their own
+instruments** — which is the only reason to trust them now.
+
+`brain/scripts/completenesscheck.py` walks `\input` from `main.tex` and asserts four things:
+every target resolves; every file carries prose above a floor; every **leaf** heading carries
+prose above a floor; no issued-template phrase survives in text that reaches the reader. A file
+may opt out of the content floor only by **saying so** — `% CARRIER:` or `% INTENTIONALLY EMPTY:`
+with a reason — which converts a silent absence into a declared one. It exists because the issued
+template abstract, bit.ly link and all, was live on `origin/main` and had passed `latexcheck`,
+`wordcount.py` and `figurecheck.py` for the life of the project: **every instrument here checked
+form, and none asked whether a section says anything.** On its first live run it found Chapter 1
+in the same state.
+
+`brain/scripts/venueordercheck.py` flags three-element lists read positionally against a venue
+order. Two orders coexist legitimately — 4.1 runs BH/TRT/ELL, 4.2–4.4 runs BH/ELL/TRT — so the
+defect is never "the wrong order", it is a list read against the *other* one. Three independent
+occurrences justify it. It grades: `ORDER` (two orders in one paragraph), `UNANCHORED` (positional
+triples with no venue named anywhere in the passage — the abstract defect exactly), and
+`POSITIONAL` (advisory, off by default, because it is how most of Chapter 4 is legitimately
+written). Canonicalising each triple by rotation to Beer-Hall-first is what makes it usable: with
+three venues there are exactly two cyclic classes, and they are exactly the document's two orders,
+so rotations of one order stop reporting as two. Ungrouped it cried wolf twelve times on the first
+live run; grouped it reports six.
+
+**The remedy either tool suggests is the same and it is not "reorder":** name the venues inline.
+A named list cannot be read positionally and survives a later reordering of the table it came from.
+
+**What neither reaches, stated because a clean sweep will otherwise be read as coverage.** Both
+read *presence* and *shape*. Neither can tell a right mapping from a wrong one, and neither can
+tell prose that says something from prose that is fluent and empty — word count is not meaning.
+The critique roles in `autoresearchclaw/SKILL.md` remain the only instrument in this project that
+reads for content, and nothing added here reduces their scope by one line. What these two do is
+make the *specific* failures they were built for — a section nobody wrote, a triple nobody
+anchored — impossible to reach the PDF unnoticed.

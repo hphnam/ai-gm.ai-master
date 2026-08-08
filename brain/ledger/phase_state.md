@@ -3764,3 +3764,22 @@ exists.** `latexcheck` proves the document builds; `wordcount.py` proves it is t
 for the life of the project, because none of them asks whether a section says anything. The
 critique roles are the only instrument that reads for meaning, which is why losing them for two
 chapters cost as much as it did.
+
+---
+
+## 2026-08-08 · push landed, and where the abstract's repair actually lives
+
+`origin/main` = local `main` = **`df47de3`**, zero divergence both directions, eight commits on
+`fe7bd9a`. Content verified on the remote, not just the ref: the composed abstract, the X1
+withdrawal, the Mondrian reattribution to `vovk_algorithmic_2005`, and the de-duplicated bib key.
+
+**Findability note, because this project has already been bitten by a commit describing a subset of
+what it carried: `abstract.tex`'s four corrections — the R5 venue-order swap, "field ten", the
+scoped weather contrast, and the removed component count — are in `df47de3`, whose message is about
+Chapter 5 and does not mention the abstract.** The resolving rebase folded them in. `git log -S"five,
+six and four" -- abstract.tex` finds it; `git log --oneline` does not.
+
+**A verification false alarm worth keeping.** `grep 0.871` on the remote `results.tex` returns four
+hits and reads as the withdrawn precision figure surviving. It is the Beer Hall's conformal
+coverage. The repair had landed. Rule written: *a value match is not an identity match*
+(`PRJ93_RULES.md`).
