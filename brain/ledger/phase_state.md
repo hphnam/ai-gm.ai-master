@@ -3848,3 +3848,40 @@ Barber precedent as the prior for what that turns up. Both commits of this sessi
 Phuong. The stale `build/` inside the Overleaf clone was removed and **deliberately not
 gitignored**: builds belong outside the clone entirely, so a reappearing `build/` should stay
 visible in `git status` rather than be silenced.
+
+### Verified end state, 2026-08-08 close
+
+| | |
+|---|---|
+| brain `HEAD` | `1843274b` — working tree clean except two untracked `.pyc` and seven stale graphify chunk parts (below) |
+| Overleaf clone `HEAD` | `12f8cc7` |
+| Overleaf `origin/main` | **`4e2d209`** — verified with `git ls-remote --heads origin`, not inferred |
+| **Unpushed to Overleaf** | **THREE commits: `3a1c82f`, `f6c55d4`, `12f8cc7`** |
+| Tier-2 pre-flight | PASS · 130 pp · 0 errors · 0 undefined refs · 0 undefined citations · 0 lost floats · 7 overfull, all pre-existing |
+| Graph | 13,862 nodes / 25,344 edges / 925 communities; `graph_write_guard settle` rc=0, write confirmed |
+
+**THE ONE THING THAT MATTERS AT THIS CLOSE.** `HEAD..origin/main` is empty, so nothing on the
+remote is missing locally and there is no divergence — but the three commits above have **not
+landed**. Verified by reading the remote's own files, not by inferring from the commit list:
+
+- `git show origin/main:abstract.tex` still carries **"The detector returns 8 false alarms against
+  124 misses, inverting the failure mode"** — the claim withdrawn under R4, and the sentence a
+  marker reads first. It also still carries the origins triple `273, 260 and 205`.
+- `git show origin/main:chapters/results.tex:456` still reads **"one venue fails in the unsafe
+  direction"** with the Beer Hall named — the reading C3 reordered.
+
+So the published document currently disagrees with this repo on two headline claims. Local green
+plus unpushed equals a broken document, per the compile-and-push lifecycle rule; this is that rule's
+second worked example.
+
+**Left untracked deliberately, both flagged rather than acted on:**
+
+- `graphify-out/.graphify_chunk_{01,05,06,07,08,09,12}.json.part01` — residue of the multi-part
+  extraction the shrink guard refused twice. `84e25c42` cleared them once and they are back. A
+  future run could read them as valid parts. **Not mine to delete a second time without a ruling
+  on whether that extraction is being retried.**
+- `figures/__pycache__/*.pyc` — regenerable bytecode; `__pycache__` is not in `.gitignore`, and
+  `.gitignore` is shared with a collaborator, so the ignore rule is not added unilaterally.
+
+**Owed before any label is read:** `graphify label`. The community set moved this run — 895 saved
+labels against 925 communities, 180 renamed by hub — so the saved names are stale.
