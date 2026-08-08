@@ -3783,3 +3783,61 @@ six and four" -- abstract.tex` finds it; `git log --oneline` does not.
 hits and reads as the withdrawn precision figure surviving. It is the Beer Hall's conformal
 coverage. The repair had landed. Rule written: *a value match is not an identity match*
 (`PRJ93_RULES.md`).
+
+## 2026-08-08 — the `active` sweep, and R24 deferred to the head of the next session
+
+**Trigger.** The 4.4.3 finding from the C3 batch: the robustness check defending the
+under-coverage result was itself computed on the calendar-open group and reported as trading
+days (0.117 against the true 0.108). Phuong ruled a rules line: `active` means calendar-open,
+never traded.
+
+**The ruling could not be written as stated, and that is the finding.** `active` denotes THREE
+populations in this repo, two of them under the identical field name `active_only` in the same
+directory:
+
+| Where | denotes | expression |
+|---|---|---|
+| `store/active_span.py` | a date span | first to last nonzero-revenue day; keeps non-trading days inside it |
+| `eval/exchangeability_diagnostic.py` `active_only` | calendar-open | `state == 0` |
+| `eval/native_interval_probe.py` `active_only` | **traded** | `df["y"] > 0` |
+
+An absolute rule *"active means calendar-open"* would have been false at the third and would have
+manufactured a new error at exactly the site the sweep was meant to protect. `interval_calibration_L1.json`
+avoids the word and keys on `per_state` `0`/`1`, which is why nothing has gone wrong there.
+
+**Written:** `PRJ93_RULES.md` gains *"`active` is three different populations in this repo — resolve
+it at the generator, every time"* (comment the population at every use; keep the word out of prose)
+and *"Compression is not allowed to touch a qualification"* (four instances, the last in the abstract).
+
+**Document repairs, Overleaf `12f8cc7`, pre-flighted PASS / 130 pp / 0 errors / 0 undefined /
+0 lost floats / 7 pre-existing overfull:**
+- `results.tex` 4.4.2 `its active group` → `its calendar-open group`
+- `results.tex` 4.5 `its active-only coverage` → `its trading-day coverage`, plus a POPULATION
+  comment block naming the defining expression per the new rule
+- `appendix/tables.tex` `tab:native-interval` column `Active only` → `Trading days`, caption
+  restated against the calendar-open group
+- **NEW, and it was already in the artefact:** at nominal ninety, Chronos-2's native band covers
+  **0.904 / 0.651 / 0.935** on trading days against the served band's 0.892 / 0.692 / 0.964. An
+  independent corroboration of the C3 reordering — no shared point model, calibration layer or
+  partition, same venue fails, close to the same margin.
+- Checked and left alone: the conclusion's `0.9178` is the ALL-PAIRS figure against the served
+  band's all-pairs `0.871`, so that comparison is like for like.
+
+**Generators stamped:** the cross-file warning now sits at both `active_only` definitions.
+
+**Word floors re-measured:** Ch 4 **7,587** (+881 over the post-repair row), Ch 5 **4,873**,
+abstract **299**. Four chapters **22,924**, projection **~25,900 against HC1's 20,000**.
+
+**Rulings recorded in `BLOCKED_third_party.md`:**
+- **`sec:res-traded` is NOT relocated.** The standing relocation test was run and returned NO:
+  it is the evidence for the corrected headline and Chapter 4 is where evidence lives; Chapter 5's
+  shorter version is the correct relationship, not duplication; relocating recreates the structure
+  8A.1 flagged when `sec:res-basis` was reported as a result. Not reopened by S-4.
+- **S-4 gains a constraint:** qualifiers are protected, not trimmed.
+
+**Open, and it is the first item next session: R24.** Approved, not done — stopped rather than
+rushed at the tail of a long batch. The fold vectors and the 0.811 it is compared against are
+committed; 6.2's pairing defence was untouched by the C3 reordering, so the hold that batched it
+with the 4.4 items has expired.
+
+**Unpushed:** Overleaf `12f8cc7` and the brain commit below it. Push is human-only.

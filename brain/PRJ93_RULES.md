@@ -380,6 +380,66 @@ precision, recall, VUS-PR and a p-value all live in the same three-decimal range
 value and its replacement often differ in the last digit only. Both failure directions have now
 been observed: a false negative from a narrow search, a false positive from a shared value.
 
+### `active` is three different populations in this repo — resolve it at the generator, every time
+
+**Do not learn what `active` means. Look it up in the file that wrote the field, on every use.**
+The obvious rule to write here — *"`active` means calendar-open, never traded"* — is what the
+2026-08-08 evidence appeared to support and it is **false**, which is the whole finding. Three
+definitions are live, and two of them sit under the **identical field name** `active_only` in the
+same directory meaning **opposite** populations:
+
+| Where | `active` denotes | Defining expression |
+|---|---|---|
+| `brain/store/active_span.py` | a **date span** | first to last nonzero-revenue day; `trim_to_active` keeps every non-trading day *inside* the span |
+| `brain/eval/exchangeability_diagnostic.py` — `active_only`, and the local `active` throughout | **calendar-open** | `records["state"] == 0`. At Ellel this is 1185 pairs of which 240 traded |
+| `brain/eval/native_interval_probe.py` — `active_only` | **traded** | `df[df["y"] > 0]` |
+
+`interval_calibration_L1.json` avoids the word entirely and keys on `per_state` `0`/`1`, which is
+why nothing has gone wrong there. That is the pattern worth copying.
+
+**The operational form, in two parts.**
+
+1. **Every number lifted from an `active*` field carries a LaTeX comment naming the population and
+   the defining expression**, next to the number, not in the trace line. `% active_only here is
+   df["y"] > 0, i.e. traded` is the whole requirement.
+2. **The word does not reach the reader.** Write *calendar-open* or *trading-day* in prose, table
+   headers and captions. The document had `its active group` at `sec:res-drift-cause` meaning
+   calendar-open and an `Active only` column in Appendix~D meaning traded, twelve pages apart,
+   both correct against their own generators and irreconcilable to a reader. Both were rewritten
+   on 2026-08-08.
+
+**Why this is a rule and not a note.** The substitution has now been made **four independent
+times**: `tab:mcs`'s coverage row, the abstract's calibration sentence, Chapter 5's echo, and —
+the one that matters — the robustness check at 4.4.3 that existed to *defend* the result, which
+reported the Beer Hall tail fraction on `active` days as 0.117 and called them trading days. The
+true trading-day figure is 0.108. A defence computed on the wrong population is not a weaker
+defence; it is a different claim.
+
+**This is `field name is not a definition` at repo scale.** A field whose name matches the
+quantity you want, in a file you did not write, is the case where checking feels least necessary
+and pays most. The generator is the definition; the name is a hint that has been wrong three times
+out of three files.
+
+### Compression is not allowed to touch a qualification
+
+**When cutting for length, a qualifier is not spare wordage — it is the scope of the claim, and
+removing it does not shorten the sentence, it widens it.** Four instances are now on record, the
+last one mine while trimming the abstract to 300 words: `the only weather contrast excluding zero`
+lost `weather` and became `the only contrast excluding zero`, which is false — Ellel carries three
+basis-versus-basis contrasts excluding zero. Two words saved, one wrong claim bought.
+
+The reason it keeps happening is structural rather than careless. A qualifier is **grammatically
+optional and semantically load-bearing**, so a sentence reads perfectly after the cut and the
+damage is invisible to every instrument in this project: the compile passes, the word count
+improves, and `completenesscheck` sees prose above the floor.
+
+**The operational form: on any de-duplication or length pass, qualifiers are protected by default
+and cut only with the claim re-read whole.** Cut a clause, then read the surviving sentence as if
+you had never seen the original and ask what it now asserts. If the answer is broader than what
+the evidence supports, the words come back and the length is found elsewhere. This binds on the
+S-4 pass specifically, which is a length pass across four chapters and therefore this failure's
+largest available surface.
+
 ### A clean result is reported with the scope of the check that produced it
 
 **State what a check establishes and, in the same breath, what it does not.** This matters

@@ -107,6 +107,14 @@ The cancellation therefore cannot be checked, let alone asserted. Computing the 
 is arithmetic on the fold vectors (`brain/eval/fold_vectors_L1_*.json`); until they exist the
 claim is unsupported rather than wrong.
 
+**STATUS 2026-08-08: APPROVED and NOT DONE. It is the first item of the next session, by Phuong's
+instruction, and the reason is worth keeping.** It was the last approved item in a long batch and
+was stopped rather than rushed — *"right to stop rather than rush it"*. Everything it needs is
+committed: the fold vectors, and the 0.811 it is compared against. Nothing blocks it and nothing
+depends on it, which is exactly what makes it easy to defer twice. **The section it edits (6.2's
+pairing defence) was not touched by the C3 reordering**, so the hold that batched it with the
+4.4 items has expired.
+
 Related, and worth stating because it looks like a defect and is not: **`tab:group`'s caption
 `B = 10{,}000` is CORRECT.** `weather_basis_mcs.json` carries `n_boot = 10000` for the paired CI,
 while the MCS uses `mcs.N_BOOT = 1000`. That is the exact distinction the `bootstrap_b_note` added

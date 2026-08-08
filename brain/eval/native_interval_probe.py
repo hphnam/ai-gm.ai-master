@@ -135,6 +135,9 @@ def venue_report(venue: str) -> dict:
             "n_origins": int(df["origin"].nunique()),
             "native_levels": list(native),
             "levels": {str(l): _score(df, l) for l in native},
+            # `active_only` here is y > 0, i.e. genuinely TRADED. The identically named field in
+            # exchangeability_diagnostic.py is state == 0, i.e. calendar-open. Opposite
+            # populations, same name, same directory -- see the `active` rule in PRJ93_RULES.md.
             "active_only": {str(l): _score(active, l) for l in native},
         }
     return out

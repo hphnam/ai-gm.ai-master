@@ -154,6 +154,8 @@ def _rank_uniformity(records: pd.DataFrame) -> dict:
         "n_banded": int(a.size),
         "mean_rank": float(a.mean()),
         "frac_above_nominal_quantile": float((a > LEVEL).mean()),
+        # CALENDAR-OPEN, not traded -- read the R30 note below before quoting this anywhere.
+        # native_interval_probe.py has a field of the SAME NAME meaning the opposite (y > 0).
         "active_only": {
             "n": int(active.size),
             "mean_rank": float(active.mean()),
