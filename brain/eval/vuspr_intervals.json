@@ -1,0 +1,52 @@
+{
+  "artefact": "vuspr_intervals",
+  "B": 10000,
+  "seed": 93,
+  "level": 0.9,
+  "method": "percentile bootstrap over per-injection VUS-PR values",
+  "caveat": "injections sharing a fold are not independent; interval is mildly optimistic",
+  "cells": {
+    "exo_coincident/beer_hall": {
+      "vus_pr": 0.9319835059672853,
+      "n": 48,
+      "ci_lo": 0.8942032164002213,
+      "ci_hi": 0.9660150867801971
+    },
+    "exo_coincident/two_river_taps": {
+      "vus_pr": 0.9964507894884996,
+      "n": 36,
+      "ci_lo": 0.9926132277635458,
+      "ci_hi": 0.9993330349200426
+    },
+    "regime_shift/beer_hall": {
+      "vus_pr": 0.9335758180734762,
+      "n": 144,
+      "ci_lo": 0.9153031455974222,
+      "ci_hi": 0.9504505146977774
+    },
+    "regime_shift/two_river_taps": {
+      "vus_pr": 0.9722546287269138,
+      "n": 108,
+      "ci_lo": 0.95695774545978,
+      "ci_hi": 0.9853211428086809
+    },
+    "spike/beer_hall": {
+      "vus_pr": 0.7599380977533348,
+      "n": 144,
+      "ci_lo": 0.7144083866378562,
+      "ci_hi": 0.8037000968443012
+    },
+    "spike/ellel": {
+      "vus_pr": 0.7039755529242027,
+      "n": 36,
+      "ci_lo": 0.6795693830218785,
+      "ci_hi": 0.7278837767369187
+    },
+    "spike/two_river_taps": {
+      "vus_pr": 0.9119397430662849,
+      "n": 108,
+      "ci_lo": 0.8729023279724301,
+      "ci_hi": 0.9479163964471282
+    }
+  }
+}
