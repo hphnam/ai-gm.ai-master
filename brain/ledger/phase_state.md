@@ -3841,3 +3841,10 @@ committed; 6.2's pairing defence was untouched by the C3 reordering, so the hold
 with the 4.4 items has expired.
 
 **Unpushed:** Overleaf `12f8cc7` and the brain commit below it. Push is human-only.
+
+**Next session's order, ruled 2026-08-08.** **R24 first**, while it is not the tail of a batch,
+then **T8 for Chapter 4** — twelve cited works never checked against NotebookLM, with Chapter 5's
+Barber precedent as the prior for what that turns up. Both commits of this session pushed by
+Phuong. The stale `build/` inside the Overleaf clone was removed and **deliberately not
+gitignored**: builds belong outside the clone entirely, so a reappearing `build/` should stay
+visible in `git status` rather than be silenced.
