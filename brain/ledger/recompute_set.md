@@ -201,3 +201,99 @@ the resampling, so estimate it from `log/60`'s wall clock before committing to a
 R4 first: it is arithmetic, it is load-bearing for the chapter's headline detection claim, and it
 turns out to fix the 0.871/0.872 discrepancy as a side effect. Then R30, because it gates D3 and
 D3 gates R29's wording. `tab:intermittency` is cheap enough to run alongside either.
+
+---
+
+# RESULTS — 2026-08-08, same session
+
+## R4 — closed. The artefact was fixed first, then the prose
+
+`agent_eval.py` fixed at four points (`_cell` returns the counts; S2 prints them; `cost_curve`
+takes both terms from the corpus; VUS-PR per-injection values persisted), then
+`.venv-eval/bin/python -m eval.agent_eval --scaled` regenerated in **104 s**.
+
+**The integers were predicted before the run and matched exactly.** From the committed
+`precision = 0.8724489795918368 = 171/196` plus the per-venue cells — each an exact rational,
+each yielding a minimal integer pair, all three summing consistently — the prediction was
+**A = 588 surfaced attributable items, S = 75 spurious**. The regenerated run returns 588 and 75.
+Cross-checked on the by-kind partition too (108 + 292 + 168 + 20 = 588; 18 + 36 + 21 + 0 = 75).
+
+**Three populations, and they were being read as one:**
+
+| Population | Size | Failures |
+|---|---|---|
+| injections | 644 | **124 missed** (recall 0.807) |
+| surfaced attributable items | 588 | **75 spurious** (precision 0.872) |
+| un-injected windows | 3 venues | 8 items, 0.667/week — a fatigue bound, not an FP count |
+
+Cost sweep, both terms now from the corpus: **199 / 323 / 695 / 1315** (was 132 / 256 / 628 / 1248).
+Misses dominate throughout; the two failures weigh equally near **0.6:1**, so false alarms would
+dominate only if a miss were worth under three-fifths of a false alarm.
+
+Prose repaired at `abstract.tex`, `results.tex` sec:res-costsweep (both paragraphs), and
+`discussion.tex:112`. The abstract's detector sentence was **rewritten, not renumbered** — 124:8
+reads as an inversion, 124:75 is a lean.
+
+## `tab:intermittency` — the Beer Hall reclassification is not separable
+
+New tool `brain/eval/intermittency_intervals.py` (self-test passes: exact on two hand-derived
+series, orders an irregular interval above a periodic one, refuses an interval on a degenerate
+series, reproduces under seed). Moving-block, length 7, B = 10,000, seed 93. **5.6 s.**
+
+| Venue | Demand day | $p$ | 90 % interval | Crosses 4/3? |
+|---|---|---|---|---|
+| Beer Hall | revenue | 1.3267 | [1.296, 1.368] | **yes** |
+| Beer Hall | till activity | 1.3223 | [1.290, 1.363] | **yes** |
+| Two River Taps | either | 1.1828 | [1.138, 1.231] | no |
+| Ellel | revenue | 5.9231 | [5.041, 7.076] | no |
+
+Both Beer Hall intervals span **1.32 and 4/3 alike**, so the venue is not separable from either
+verdict under either constant set. The table and the prose now say so. Nothing downstream moves:
+the adoption test refuses the intermittent estimator on its own evidence regardless.
+
+## R30 — settled, and it reaches past Ellel
+
+`rank_uniformity` now splits state 0 by `y > 0`. **54 s.** The rank proxy reproduces the served
+band to within 0.002 at all three venues, so the splits are trustworthy.
+
+| Venue | limb | n | coverage | z vs 0.90 |
+|---|---|---|---|---|
+| Beer Hall | all banded | 1750 | 0.8703 | −3.70 |
+| | **traded** | 1229 | **0.8918** | **−0.93** |
+| | false-open | 21 | 0.3810 | −4.90 |
+| Ellel | all banded | 1659 | 0.9126 | +1.82 |
+| | **traded** | 240 | **0.6917** | **−6.99** |
+| | false-open | 945 | 0.9831 | +19.79 |
+| Two River Taps | all banded | 1274 | 0.9615 | +11.42 |
+| | **traded** | 903 | **0.9635** | **+10.16** |
+
+**D3 is settled and Role A was right.** Ellel's `tab:coverage` row is a weighted average of 0.983
+on 945 non-trading days and **0.692 on the 240 days the venue traded**. "Indistinguishable from
+nominal" is a composition artefact. Role B's certification of the float does not survive.
+Predicted 0.6–0.75 before the run from the residual/half-width comparison; observed 0.692.
+
+**AND A SECOND FINDING, OUTSIDE R30's SCOPE AND ABOVE MY AUTHORITY TO ACT ON.** The Beer Hall's
+under-coverage is *also* composition. On traded days it covers **0.8918, z = −0.93 — not
+distinguishable from nominal.** The 0.871 headline is pulled down by 21 false-open days at 0.381
+and by calendar-closed days at about 0.838.
+
+**This reorders C3.** The chapter's strongest result is "the interval under-covers at the Beer
+Hall, and the exchangeability violation responsible reproduces the measured coverage at all
+three". On the days each venue actually trades, the picture is: **Beer Hall at nominal, Ellel
+badly under-covering, Two River Taps badly over-covering.** The claim that the band is
+miscalibrated survives intact and arguably strengthens — but **the venue that fails is Ellel, not
+the Beer Hall**, and section 4.4, C3, the abstract's calibration sentence and 5.x all name the
+Beer Hall.
+
+**Not actioned. This is a headline reordering, not a repair.** The R16 disclosure, the
+`tab:exchangeability` three-decimal fix and the `tab:weather` interval transcription are all
+held with it, because they edit text that this ruling may rewrite.
+
+## `tab:vuspr` — the gate is moot, the cost is now zero
+
+Estimate requested: `log/60` records the whole scaled run, VUS-PR included, at **75 s** — it was
+never the heavy item. It no longer needs a run at all: the regeneration above **persists the
+per-injection VUS-PR values** (`agent_eval.json`, `vus_pr.by_cell[*].values`), so the interval is
+a percentile bootstrap over stored numbers. Proposed **B = 10,000**, matching the paired-CI
+convention. Cells run n = 36 to 144. One caveat to carry into the caption: injections sharing a
+fold are not independent, so the interval is mildly optimistic.

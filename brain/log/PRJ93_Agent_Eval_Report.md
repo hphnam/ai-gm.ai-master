@@ -42,14 +42,16 @@ Attribution detail:
 
 Surfacing rate on un-injected windows (an **upper bound** on weekly false-alarms — on real data these may be genuine): **0.667/week** (8 items across 3 venues).
 
-Cost = ratio·misses + 1·false-alarms, swept (fixed-threshold detector → the operating point is fixed; what moves is which failure dominates):
+That rate is a deployment statistic and is **not** an input to the sweep below.
 
-| miss : false-alarm | misses | false-alarms | weighted cost | dominant |
+Cost = ratio·misses + 1·spurious, **both from the injection corpus**, swept (fixed-threshold detector → the operating point is fixed; what moves is which failure dominates):
+
+| miss : false-alarm | misses | spurious | weighted cost | dominant |
 |---|---|---|---|---|
-| 1 : 1 | 0 | 8 | 8.0 | false-alarms |
-| 2 : 1 | 0 | 8 | 8.0 | false-alarms |
-| 5 : 1 | 0 | 8 | 8.0 | false-alarms |
-| 10 : 1 | 0 | 8 | 8.0 | false-alarms |
+| 1 : 1 | 0 | 0 | 0.0 | false-alarms |
+| 2 : 1 | 0 | 0 | 0.0 | false-alarms |
+| 5 : 1 | 0 | 0 | 0.0 | false-alarms |
+| 10 : 1 | 0 | 0 | 0.0 | false-alarms |
 
 ## 4. Named probes (design weak points, quantified)
 
@@ -103,18 +105,20 @@ The N=4 smoke run above is a plumbing self-test; **this** is the citable run. Th
 
 **Overall** (N=644): recall **0.807** [0.78, 0.84], precision 0.872, F1 0.839.
 
-| By kind | N | Recall | 95% CI | Precision | F1 |
-|---|---|---|---|---|---|
-| exo_coincident | 84 | 1.000 | [0.96, 1.00] | 0.833 | 0.909 |
-| regime_shift | 252 | 0.996 | [0.98, 1.00] | 0.877 | 0.933 |
-| spike | 288 | 0.573 | [0.52, 0.63] | 0.875 | 0.692 |
-| stock_drawdown | 20 | 1.000 | [0.84, 1.00] | 1.000 | 1.000 |
+**Counts, because the two ratios above have different denominators.** Recall is over the 644 INJECTIONS: 520 caught, **124 missed**. Precision is over the 588 SURFACED ATTRIBUTABLE ITEMS: 513 sound, **75 spurious**. The two populations are different sizes and a confusion matrix cannot be assembled across them. A third population, un-injected windows, feeds the fatigue bound in S6 and is not a false-positive count for either.
 
-| By venue | N | Recall | 95% CI | Precision | F1 |
-|---|---|---|---|---|---|
-| beer_hall | 356 | 0.815 | [0.77, 0.85] | 0.922 | 0.865 |
-| ellel | 36 | 0.694 | [0.53, 0.82] | 0.679 | 0.686 |
-| two_river_taps | 252 | 0.813 | [0.76, 0.86] | 0.834 | 0.824 |
+| By kind | N | Recall | 95% CI | Missed | Attributable | Spurious | Precision | F1 |
+|---|---|---|---|---|---|---|---|---|
+| exo_coincident | 84 | 1.000 | [0.96, 1.00] | 0 | 108 | 18 | 0.833 | 0.909 |
+| regime_shift | 252 | 0.996 | [0.98, 1.00] | 1 | 292 | 36 | 0.877 | 0.933 |
+| spike | 288 | 0.573 | [0.52, 0.63] | 123 | 168 | 21 | 0.875 | 0.692 |
+| stock_drawdown | 20 | 1.000 | [0.84, 1.00] | 0 | 20 | 0 | 1.000 | 1.000 |
+
+| By venue | N | Recall | 95% CI | Missed | Attributable | Spurious | Precision | F1 |
+|---|---|---|---|---|---|---|---|---|
+| beer_hall | 356 | 0.815 | [0.77, 0.85] | 66 | 307 | 24 | 0.922 | 0.865 |
+| ellel | 36 | 0.694 | [0.53, 0.82] | 11 | 28 | 9 | 0.679 | 0.686 |
+| two_river_taps | 252 | 0.813 | [0.76, 0.86] | 47 | 253 | 42 | 0.834 | 0.824 |
 
 ### S3. Sensitivity curve — catch rate vs event magnitude (the headline)
 
@@ -234,14 +238,16 @@ Over **N=7** synthetic multi-event days (one per usable fold per net-sales venue
 
 ### S6. Alert fatigue + cost (scaled corpus)
 
-False-alarm upper bound **0.667/week**. Cost = ratio·misses + 1·false-alarms:
+**Fatigue, measured on UN-INJECTED windows and reported on its own: 8 items across three venues, **0.667/week** as an upper bound** — on real data these may be genuine. This is a deployment rate, NOT a false-positive count, and it is not an input to the sweep below.
 
-| miss : false-alarm | misses | false-alarms | weighted cost | dominant |
+Cost = ratio·misses + 1·spurious, **both from the injection corpus**:
+
+| miss : false-alarm | misses | spurious | weighted cost | dominant |
 |---|---|---|---|---|
-| 1 : 1 | 124 | 8 | 132.0 | misses |
-| 2 : 1 | 124 | 8 | 256.0 | misses |
-| 5 : 1 | 124 | 8 | 628.0 | misses |
-| 10 : 1 | 124 | 8 | 1248.0 | misses |
+| 1 : 1 | 124 | 75 | 199.0 | misses |
+| 2 : 1 | 124 | 75 | 323.0 | misses |
+| 5 : 1 | 124 | 75 | 695.0 | misses |
+| 10 : 1 | 124 | 75 | 1315.0 | misses |
 
 ### S6b. VUS-PR (detector-level supplement, continuous z score)
 

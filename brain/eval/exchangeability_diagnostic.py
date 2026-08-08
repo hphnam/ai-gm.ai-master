@@ -111,6 +111,7 @@ def _rank_uniformity(records: pd.DataFrame) -> dict:
     ranks: list[float] = []
     states: list[int] = []
     steps: list[int] = []
+    traded: list[bool] = []
 
     for t in sorted(by_origin):
         while tptr < len(sorted_targets) and sorted_targets[tptr] <= t:
@@ -135,10 +136,20 @@ def _rank_uniformity(records: pd.DataFrame) -> dict:
             ranks.append((below + 0.5 * equal) / grp.size)
             states.append(s)
             steps.append(int(row["step"]))
+            traded.append(bool(row["y"] > 0))
 
     a = np.asarray(ranks)
     st = np.asarray(states)
+    tr = np.asarray(traded)
     active = a[st == 0]
+
+    def _limb(mask) -> dict:
+        sel = a[mask]
+        if sel.size == 0:
+            return {"n": 0, "mean_rank": None, "frac_above_nominal_quantile": None}
+        return {"n": int(sel.size), "mean_rank": float(sel.mean()),
+                "frac_above_nominal_quantile": float((sel > LEVEL).mean())}
+
     return {
         "n_banded": int(a.size),
         "mean_rank": float(a.mean()),
@@ -148,6 +159,13 @@ def _rank_uniformity(records: pd.DataFrame) -> dict:
             "mean_rank": float(active.mean()),
             "frac_above_nominal_quantile": float((active > LEVEL).mean()),
         },
+        # R30. `active_only` is calendar-open (state 0) and at Ellel that still contains
+        # 1037 days the calendar called open and the venue did not trade, so it is NOT the
+        # traded-only figure and reading it as one moves the answer the wrong way. These two
+        # limbs split it. `tab:coverage`'s Ellel row is 80 per cent false-open days; whether
+        # that row is a coverage claim about the venue turns on the first limb below.
+        "traded_only": _limb((st == 0) & tr),
+        "false_open_only": _limb((st == 0) & ~tr),
         "per_step_frac_above": {
             str(h): float((a[np.asarray(steps) == h] > LEVEL).mean())
             for h in range(1, HORIZON + 1)

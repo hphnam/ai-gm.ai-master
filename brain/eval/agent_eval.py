@@ -335,12 +335,26 @@ def fatigue_metrics(con, venues=("beer_hall", "two_river_taps", "ellel")) -> dic
 
 
 def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
-    """Weighted cost = ratio·misses + 1·false-alarms, swept over the miss:false-alarm
+    """Weighted cost = ratio·misses + 1·spurious items, swept over the miss:false-alarm
     ratios. This is a separate cost sweep, not the Ask-F1. A fixed-threshold detector
     has a fixed operating point; what MOVES is which failure dominates the cost
-    reported so the reader sees the trade, not a single hard-coded number (spec §5)."""
+    reported so the reader sees the trade, not a single hard-coded number (spec §5).
+
+    BOTH TERMS COME FROM THE INJECTION CORPUS. They did not: `misses` was the corpus
+    miss count and `false_alarms` was `fatigue["items"]`, the count of items surfaced on
+    UN-INJECTED windows -- a weekly-rate upper bound over three venues, which line 18 of
+    this module's own report says feeds the fatigue rate and NOT the FP count. Summing
+    them produced a confusion matrix over two different populations, and Chapter 4
+    transcribed it faithfully as "8 false alarms against 124 misses on the 644-event
+    corpus". At the scaled corpus the two differ by an order of magnitude, so the ratio
+    at which misses start to dominate moved with them.
+
+    `fatigue` is still taken, and the emitters still report it -- as a deployment rate
+    beside the sweep, which is what it measures. It is no longer added to a corpus count.
+    """
+    del fatigue  # reported separately by the emitters; deliberately not summed here
     fn = detection["fn"]
-    fa = fatigue["items"]
+    fa = detection["fp"]
     rows = []
     for r in config.EVAL_COST_RATIOS:
         rows.append({"miss_to_false_alarm": r, "misses": fn, "false_alarms": fa,
@@ -476,7 +490,16 @@ def _cell(records: list[dict]) -> dict:
     f1 = (2 * precision * recall / (precision + recall)
           if np.isfinite(precision) and np.isfinite(recall) and (precision + recall) > 0
           else float("nan"))
-    return {"n": n, "caught": caught, "recall": recall, "recall_ci": wilson(caught, n),
+    # `attributable` and `spurious` are RETURNED, not just used. They were computed here
+    # and dropped, which left `precision` as the only trace of the spurious count and made
+    # the confusion matrix unreconstructable from the report: a reader with 644, 520 and
+    # 0.872 will infer a false-positive count against the recall denominator and get the
+    # wrong answer, because THIS precision divides by surfaced items, not by TP + FP.
+    # Printing counts also dissolves the 0.871-vs-0.872 split, which was one integer
+    # rounding two ways. PRJ93_RULES.md: print what was counted, derive the ratio.
+    return {"n": n, "caught": caught, "missed": n - caught,
+            "attributable": attributable, "spurious": spurious,
+            "recall": recall, "recall_ci": wilson(caught, n),
             "precision": precision, "f1": f1}
 
 
@@ -601,7 +624,14 @@ def vus_pr_supplement(corpus: list[Injection]) -> dict:
         m = get_metrics(score, label, slidingWindow=7)
         vus_pr = float(m["VUS-PR"] if isinstance(m, dict) else m)
         cells.setdefault((inj_s.kind, inj_s.venue), []).append(vus_pr)
-    by_cell = {f"{k}/{v}": {"vus_pr": float(np.mean(vals)), "n": len(vals)}
+    # Per-injection values are PERSISTED, not just averaged away. `tab:vuspr` prints seven
+    # cell means with no uncertainty, three of them on 36 windows, and the interval that
+    # would settle whether the ordering is real needs the sample the mean was taken over.
+    # Keeping it turns that interval into a bootstrap over stored numbers instead of a
+    # second 75-second run. Caveat for whoever resamples: injections sharing a fold are
+    # not independent, so a percentile bootstrap over this list is mildly optimistic.
+    by_cell = {f"{k}/{v}": {"vus_pr": float(np.mean(vals)), "n": len(vals),
+                            "values": [float(x) for x in vals]}
                for (k, v), vals in sorted(cells.items())}
     return {"available": True, "source": source, "by_cell": by_cell}
 
@@ -626,7 +656,10 @@ def run_scaled(con=None) -> dict:
             latency = latency_distribution(records)
             ranking = scaled_ranking(con)
             fatigue = fatigue_metrics(con)
-        cost = cost_curve({"fn": sum(1 for r in records if not r["caught"])}, fatigue)
+        # Both terms from the corpus: misses from the injections, spurious from the
+        # surfaced attributable items. `detection["overall"]` now carries both.
+        cost = cost_curve({"fn": detection["overall"]["missed"],
+                           "fp": detection["overall"]["spurious"]}, fatigue)
         vus_pr = vus_pr_supplement(corpus)
         out = {"n_injections": len(records), "detection": detection, "latency": latency,
                "ranking": ranking, "fatigue": fatigue, "cost": cost, "vus_pr": vus_pr}
@@ -685,15 +718,25 @@ def _write_scaled_report(out: dict) -> None:
         "### S2. Detection (Wilson 95% CIs)\n",
         f"**Overall** (N={o['n']}): recall **{_f(o['recall'])}** {_ci(o['recall_ci'])}, "
         f"precision {_f(o['precision'])}, F1 {_f(o['f1'])}.\n",
-        "| By kind | N | Recall | 95% CI | Precision | F1 |",
-        "|---|---|---|---|---|---|",
+        "**Counts, because the two ratios above have different denominators.** Recall is "
+        f"over the {o['n']} INJECTIONS: {o['caught']} caught, **{o['missed']} missed**. "
+        f"Precision is over the {o['attributable']} SURFACED ATTRIBUTABLE ITEMS: "
+        f"{o['attributable'] - o['spurious']} sound, **{o['spurious']} spurious**. The two "
+        "populations are different sizes and a confusion matrix cannot be assembled across "
+        "them. A third population, un-injected windows, feeds the fatigue bound in S6 and "
+        "is not a false-positive count for either.\n",
+        "| By kind | N | Recall | 95% CI | Missed | Attributable | Spurious | Precision | F1 |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for k, c in d["by_kind"].items():
         lines.append(f"| {k} | {c['n']} | {_f(c['recall'])} | {_ci(c['recall_ci'])} | "
+                     f"{c['missed']} | {c['attributable']} | {c['spurious']} | "
                      f"{_f(c['precision'])} | {_f(c['f1'])} |")
-    lines += ["\n| By venue | N | Recall | 95% CI | Precision | F1 |", "|---|---|---|---|---|---|"]
+    lines += ["\n| By venue | N | Recall | 95% CI | Missed | Attributable | Spurious | "
+              "Precision | F1 |", "|---|---|---|---|---|---|---|---|---|"]
     for v, c in d["by_venue"].items():
         lines.append(f"| {v} | {c['n']} | {_f(c['recall'])} | {_ci(c['recall_ci'])} | "
+                     f"{c['missed']} | {c['attributable']} | {c['spurious']} | "
                      f"{_f(c['precision'])} | {_f(c['f1'])} |")
     lines += [
         "\n### S3. Sensitivity curve — catch rate vs event magnitude (the headline)\n",
@@ -728,9 +771,13 @@ def _write_scaled_report(out: dict) -> None:
         f"net-sales venue): mean NDCG **{_f(r['ndcg_mean'])}**, mean Spearman "
         f"**{_f(r['spearman_mean'])}** (a shift should rank above a coincident spike).\n",
         "### S6. Alert fatigue + cost (scaled corpus)\n",
-        f"False-alarm upper bound **{out['fatigue']['per_week_upper_bound']}/week**. "
-        "Cost = ratio·misses + 1·false-alarms:\n",
-        "| miss : false-alarm | misses | false-alarms | weighted cost | dominant |",
+        "**Fatigue, measured on UN-INJECTED windows and reported on its own: "
+        f"{out['fatigue']['items']} items across three venues, "
+        f"**{out['fatigue']['per_week_upper_bound']}/week** as an upper bound** — on real "
+        "data these may be genuine. This is a deployment rate, NOT a false-positive count, "
+        "and it is not an input to the sweep below.\n",
+        "Cost = ratio·misses + 1·spurious, **both from the injection corpus**:\n",
+        "| miss : false-alarm | misses | spurious | weighted cost | dominant |",
         "|---|---|---|---|---|",
     ]
     for c in out["cost"]:
@@ -915,9 +962,11 @@ def _write_report(r: EvalResult) -> None:
         f"false-alarms — on real data these may be genuine): "
         f"**{r.fatigue['per_week_upper_bound']}/week** "
         f"({r.fatigue['items']} items across {len(r.fatigue['per_venue'])} venues).\n",
-        "Cost = ratio·misses + 1·false-alarms, swept (fixed-threshold detector → the "
-        "operating point is fixed; what moves is which failure dominates):\n",
-        "| miss : false-alarm | misses | false-alarms | weighted cost | dominant |",
+        "That rate is a deployment statistic and is **not** an input to the sweep below.\n",
+        "Cost = ratio·misses + 1·spurious, **both from the injection corpus**, swept "
+        "(fixed-threshold detector → the operating point is fixed; what moves is which "
+        "failure dominates):\n",
+        "| miss : false-alarm | misses | spurious | weighted cost | dominant |",
         "|---|---|---|---|---|",
     ]
     for c in r.cost:

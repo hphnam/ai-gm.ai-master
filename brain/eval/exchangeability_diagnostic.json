@@ -71,6 +71,16 @@
           "mean_rank": 0.5263098354576367,
           "frac_above_nominal_quantile": 0.1168
         },
+        "traded_only": {
+          "n": 1229,
+          "mean_rank": 0.5199465057918108,
+          "frac_above_nominal_quantile": 0.10821806346623271
+        },
+        "false_open_only": {
+          "n": 21,
+          "mean_rank": 0.8987161287576333,
+          "frac_above_nominal_quantile": 0.6190476190476191
+        },
         "per_step_frac_above": {
           "1": 0.148,
           "2": 0.136,
@@ -248,6 +258,16 @@
           "mean_rank": 0.5567000809028293,
           "frac_above_nominal_quantile": 0.0759493670886076
         },
+        "traded_only": {
+          "n": 240,
+          "mean_rank": 0.8127146167335044,
+          "frac_above_nominal_quantile": 0.30833333333333335
+        },
+        "false_open_only": {
+          "n": 945,
+          "mean_rank": 0.49168051624741976,
+          "frac_above_nominal_quantile": 0.016931216931216932
+        },
         "per_step_frac_above": {
           "1": 0.08016877637130802,
           "2": 0.08860759493670886,
@@ -424,6 +444,16 @@
           "n": 910,
           "mean_rank": 0.48178679138245856,
           "frac_above_nominal_quantile": 0.03956043956043956
+        },
+        "traded_only": {
+          "n": 903,
+          "mean_rank": 0.478557488771822,
+          "frac_above_nominal_quantile": 0.036544850498338874
+        },
+        "false_open_only": {
+          "n": 7,
+          "mean_rank": 0.8983668281545674,
+          "frac_above_nominal_quantile": 0.42857142857142855
         },
         "per_step_frac_above": {
           "1": 0.027472527472527472,

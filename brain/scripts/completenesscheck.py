@@ -85,8 +85,9 @@ _PHRASE_SOURCES = [
      "appendix/introduction.tex, issued template"),
     ("that should go in the appendix", r"that should go in the appendix",
      "appendix/introduction.tex, issued template"),
-    ("PhD word limit", r"80,000 words",
-     "declaration.tex; the PGR limit, and this is an MSc -- confirm the MSc figure"),
+    # The PhD word-limit entry is RETIRED, not forgotten: Phuong ruled on it 2026-08-08 and
+    # declaration.tex now reads 20,000, the MSc figure. Left here as a comment so the next
+    # reader does not re-raise a closed question.
     ("viva boilerplate", r"not required when submitting your thesis before your viva",
      "acknowledgements.tex, issued template"),
     ("addressed to the writer",
