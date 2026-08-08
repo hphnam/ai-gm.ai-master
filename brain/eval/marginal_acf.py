@@ -69,15 +69,31 @@ def variance_inflation(acf: list[float], n: int) -> float:
     return 1.0 + 2.0 * sum((1.0 - k / n) * r for k, r in enumerate(acf, start=1))
 
 
-def leading_contrast(venue: str, max_lag: int = MAX_LAG) -> dict:
+def leading_contrast(venue: str, max_lag: int = MAX_LAG,
+                     pair: tuple[str, str] | None = None) -> dict:
+    """Dependence diagnostics for one contrast at one venue.
+
+    With `pair` unset this is the LEADING contrast: the first pair
+    `mcs.paired_variance` emits, i.e. the two lowest mean-loss rungs of the top four.
+    That is the pair the committed artefact reports and the one the reproduction guard
+    below can check.
+
+    `pair` names an explicit contrast instead. It exists because the write-up scales
+    three gaps by a paired standard error and only two of them are their venue's
+    leading contrast: Two River Taps' served-versus-argument-minimum gap is
+    `rung2_ets` against `rung4_chronos2`, which has its own differential and therefore
+    its own serial dependence. Propagating the leading contrast's inflation factor to
+    it would be a value match standing in for an identity match.
+    """
     payload = _load_vectors(venue)
     metric = _committed()["headline_loss"]
-    top4 = mcs.top_rungs_by_mean(payload, metric, 4)
-    names, folds, L = mcs.common_loss_matrix(payload, top4, metric)
-
-    # The leading contrast is the first pair paired_variance emits: i=0, j=1 over
-    # top4, i.e. the two lowest mean-loss rungs.
-    i, j = 0, 1
+    if pair is None:
+        rungs = mcs.top_rungs_by_mean(payload, metric, 4)
+        i, j = 0, 1
+    else:
+        rungs = list(pair)
+        i, j = 0, 1
+    names, folds, L = mcs.common_loss_matrix(payload, rungs, metric)
     a, b = L[:, i], L[:, j]
     d = a - b
     n = len(d)
@@ -132,6 +148,7 @@ def leading_contrast(venue: str, max_lag: int = MAX_LAG) -> dict:
         "horizon_days": payload["horizon_days"],
         "step_days": payload["step_days"],
         "pair": [names[i], names[j]],
+        "is_leading_contrast": pair is None,
         "mean_diff": float(d.mean()),
         "sd_paired": sd_paired,
         "sd_independent": sd_indep,
@@ -216,6 +233,9 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--max-lag", type=int, default=MAX_LAG)
+    ap.add_argument("--pair", nargs=2, metavar=("RUNG_A", "RUNG_B"), default=None,
+                    help="explicit contrast; skips the committed-row reproduction "
+                         "guard, which only covers the leading contrast")
     ap.add_argument("venues", nargs="*")
     args = ap.parse_args(argv[1:])
 
@@ -225,8 +245,12 @@ def main(argv: list[str]) -> int:
     venues = args.venues or list(config.FORECAST_VENUES)
     out = []
     for venue in venues:
-        rep = leading_contrast(venue, args.max_lag)
-        mismatches = _reproduce_committed(venue, rep)
+        rep = leading_contrast(venue, args.max_lag,
+                               tuple(args.pair) if args.pair else None)
+        # The guard compares against paired_variance_top4[0], which IS the leading
+        # contrast. For an explicit pair there is no committed row to check against,
+        # and saying so is the honest report rather than skipping quietly.
+        mismatches = [] if args.pair else _reproduce_committed(venue, rep)
         rep["reproduces_committed_row"] = not mismatches
         rep["mismatches"] = mismatches
         out.append(rep)
@@ -240,7 +264,11 @@ def main(argv: list[str]) -> int:
             for m in mismatches:
                 print(f"    {m}")
             return 2
-        print("  reproduces mcs_L1_results.json paired_variance_top4[0] cell by cell")
+        if args.pair:
+            print("  EXPLICIT PAIR - no committed row exists for this contrast, so the "
+                  "reproduction guard did not run")
+        else:
+            print("  reproduces mcs_L1_results.json paired_variance_top4[0] cell by cell")
         print(f"  lag:            {'  '.join(f'{k:>7d}' for k in range(1, args.max_lag+1))}")
         for label, key in (("differential", "acf_differential"),
                            (f"marginal {rep['pair'][0]}", "acf_marginal_a"),

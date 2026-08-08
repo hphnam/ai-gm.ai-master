@@ -133,3 +133,66 @@ variance, so the corrected ratios are budget-conditional and are reported as a s
 one number. It says nothing about whether the MCS sets themselves move: those are computed by a
 moving-block bootstrap at `BLOCK_LEN = 7`, which already carries a dependence correction of its own,
 and this run did not re-open them.
+
+---
+
+## Addendum, same day — R24 reaches further than 5.3, and one SEPARATION claim was exposed
+
+Raised by Phuong: does 5.3's pairing argument need updating too? Checking that found the exposure
+is wider than 5.3 and wider than the 6.2 sentence.
+
+**First, two corrections to how the original run was reported.** The repaired passage **is** 5.3
+(`\section{Validity of the approach}`, `sec:disc-validity`, `discussion.tex`:249), not a separate
+section from it. And the **6.6** figure appears nowhere in reader-facing prose: its single
+occurrence in the whole document is the LaTeX trace comment at `discussion.tex`:286. There is no
+6.6-based argument to update.
+
+**What is actually exposed.** The document scales **three** gaps by a paired standard error, as a
+matched set stated once in Chapter 4 (`results.tex`:158–163) and once in Chapter 5
+(`discussion.tex`:36–38). Every one of those standard errors is computed over folds treated as
+independent, so every one is optimistic by that contrast's own `sqrt(VIF_d)`.
+
+**Only two of the three are their venue's leading contrast**, so the factor is not transferable:
+
+| Venue | Contrast | Leading? | VIF@7 | VIF@10 |
+|---|---|---|---|---|
+| Beer Hall | `chronos2_exo` vs `chronos_bolt` | yes | 3.73 | 4.15 |
+| Ellel | `robust_dow` vs `chronos_bolt` | yes | 8.27 | 9.74 |
+| **Two River Taps** | **`rung2_ets` vs `rung4_chronos2`** | **NO** | **3.31** | **2.06** |
+
+Two River Taps' served-versus-argument-minimum gap is **not** the pair `paired_variance_top4[0]`
+carries (that is `chronos2` vs `chronos2_exo`). Its differential decays fast and turns **negative**
+by lag 6 (−0.094, −0.230, −0.179, −0.230, −0.248), so its VIF is **2.06 at ten lags against Ellel's
+9.74**. Assuming Ellel's factor here would have been a value match standing in for an identity
+match, and would have overstated the correction by more than double.
+
+**Result. All three printed multiples reproduce exactly from the vectors, and all three verdicts
+hold, but not equally comfortably.**
+
+| Venue | printed | corrected @7 (pre-registered) | @10 | verdict |
+|---|---|---|---|---|
+| Beer Hall | 0.02 | 0.01 | 0.01 | tie, **strengthens** |
+| Ellel | 0.50 | **0.17** | 0.16 | tie, **strengthens** |
+| Two River Taps | **3.27** | **1.80** | **2.28** | separation, **straddles 1.96** |
+
+**The two ties strengthen**, which is the direction that helps: a smaller pairing gain means the
+non-separation is less likely to be an artefact of insufficient precision, and that is the argument
+5.3 already makes.
+
+**The separation is the finding.** At the project's own pre-registered block length of seven, Two
+River Taps' 3.27 standard errors becomes **1.80**, which is **below 1.96**; at ten lags it is 2.28,
+above it. The claim straddles the conventional threshold depending on a truncation budget nobody
+pre-registered for this purpose.
+
+**What this does NOT overturn, and the distinction matters.** The *elimination* of that rung at
+`\alpha = 0.25` comes from the **MCS, which uses a moving-block bootstrap at `BLOCK_LEN = 7`** and
+is therefore **already dependence-aware**. The `p = 0.220` is not affected by anything here. What is
+affected is the **narrative gloss** "3.27 paired standard errors", which is computed the naive way
+and was carrying rhetorical weight the dependence-aware instrument had already earned properly.
+
+**Repair applied, to the gloss and not the verdict.** Chapter 4 keeps the measurement and now
+discloses the correction and its budget dependence; Chapter 5 carries the short form and attributes
+the elimination to the block bootstrap rather than to the ratio. Beer Hall's 0.02 and Ellel's 0.50
+in `results.tex` are **left alone**: both are ties under either reading, so the correction changes
+nothing they support, and Chapter 5's 5.3 already carries the Ellel correction. Repairing them in
+both chapters would manufacture exactly the duplication S-4 exists to remove.
