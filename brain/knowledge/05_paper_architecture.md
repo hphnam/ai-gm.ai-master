@@ -1362,6 +1362,29 @@ for the words.** Where a justification exists only in the current prose and nowh
 the evidence base, it must be carried across deliberately; §8.3 flags where that risk
 is concentrated.
 
+## 8.1a The critique loop each composed chapter passes through
+
+**Every chapter composed under §8.1 is critiqued under `brain/skills/autoresearchclaw/SKILL.md`
+before it is pushed.** Cite that path in the phase prompt. §3 defines the three roles, §4 the
+T1–T14 pass/fail gate, §2 the process — and §2's requirement of **one separate call per role**
+is load-bearing, not stylistic: *"Three personas sharing a single context share every blind spot
+and cannot disagree in any load-bearing way."*
+
+The three roles are **Role A Methodologist**, **Role B Statistician**, **Role C Claim auditor**.
+They are not a rubric check. §8 of SKILL.md is explicit that the loop *"cannot mark a draft"* and
+sends rubric work to `00_marking_criteria.md` instead, so a rubric round is an addition to the
+three roles and never a substitute for them.
+
+**Phase-specific roles are named inline, and they survive.** Where a phase adds roles — the
+knowledge-telling/critical-writing pass per `ds-writing` §1, or the process-reported-as-result
+pass — spell them out in the prompt. On the 8C-3 audit these inline roles were run correctly in
+the same session that lost the three referenced by name, which is what isolates the cause to the
+reference rather than to the session.
+
+`PRJ93_RULES.md` carries the full account of how the reference decayed across four critique logs
+and why a name degrades where a path does not. It is the same remedy as §4.5's: a requirement
+that lives only in prompts drifts, so it is written into the file that owns the work.
+
 ## 8.2 Evidence base per chapter
 
 | Target | Primary evidence | Secondary |

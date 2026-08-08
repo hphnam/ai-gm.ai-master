@@ -433,6 +433,39 @@ meets it. A section that cannot be traced is not finished. Descriptive
 knowledge-telling that hits the word count still fails — `ds-writing`
 diagnoses this, so run it on any chapter that feels thin.
 
+## The critique loop — name the file, not the roles
+
+Any phase that critiques, revises or checks a chapter draft runs the loop defined in
+**`brain/skills/autoresearchclaw/SKILL.md`**. Write that path. Not "the SKILL.md roles",
+not "the three standing roles", not "the usual roles" — **the path, and the section**:
+§3 for the three roles, §4 for the T1–T14 gate, §2 for the process.
+
+**The rule exists because the reference decayed in three steps across four files, and the
+artefact never revealed it.** Chapter 2's critique log cited the path and headed its rounds
+`Role A, Methodologist`. Chapter 3 kept the name and dropped the path. Chapter 4 dropped
+the name too, wrote *"the three standing roles"*, and ran six rounds of which **none was
+Role A or Role B** — rubric coverage, number-traceability, structural boundary and approval
+compliance had silently taken their place. Chapter 5 inherited the phrase verbatim. By then
+*"the three standing roles"* referred to nothing but itself, and both logs read as complete,
+because every round they described had genuinely been run.
+
+Three properties of this failure are worth carrying to any other referenced-by-name
+requirement:
+
+1. **A name degrades where a path does not.** A path is either right or broken. A name is
+   re-derivable from context, which means it can be re-derived *wrongly* and still resolve
+   to something plausible.
+2. **The substituted work was good.** Nothing was skipped through laziness — the invented
+   rounds each did real work, which is precisely why nothing looked wrong. **Absence of a
+   check is invisible in an artefact that records only what was done.**
+3. **The control case isolates the cause.** In the same session, two roles specified
+   *inline* in the prompt were run correctly while three referenced by name were not. The
+   cause is the reference, not any reluctance to critique.
+
+**§3's roles are not interchangeable with a rubric pass.** SKILL.md §8 says so directly:
+*"It cannot mark a draft… Load `brain/knowledge/00_marking_criteria.md` for that."* Running
+the rubric check in place of the roles satisfies neither.
+
 ## Overleaf pre-flight
 
 Every file bound for Overleaf gets an AI-writing pass before it goes:

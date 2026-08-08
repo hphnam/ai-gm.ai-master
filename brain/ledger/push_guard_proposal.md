@@ -1,8 +1,19 @@
 # The Overleaf push block — diagnosis and proposed fix
 
-**Status: PROPOSED, NOT APPLIED.** Awaiting Phuong's approval. See "Scope boundary" at the
-end — the change lands in `.claude/`, which `PRJ93_RULES.md` puts out of bounds for this
-project and which is shared with a collaborator.
+**Status: NOT APPLIED — and not to be applied from this project.** Ruled 2026-08-07.
+
+The diagnosis and the fix stand; the decision is about *who applies it and where*. Phuong's
+ruling: `.claude/` is Ryan's, shared, and out of bounds under § Scope boundary, and editing
+shared config to unblock one person's workflow is the kind of change that surprises a
+collaborator later. **The hook is arguably wrong for everyone using that repo, not just for
+this project** — it refuses a push permanently whenever the remote has no PR mechanism — so
+this document goes to Ryan as a proposal against the shared config, rather than being applied
+here.
+
+**Interim arrangement: Phuong pushes to Overleaf by hand.** That is not a gap in the
+compile-and-push rule, because clause 3 of that rule requires the push be *reported as
+landed*, confirmed against the remote. A stale Overleaf therefore cannot pass silently
+whether the push was made by a human or by the agent.
 
 ## Where it comes from
 
@@ -107,6 +118,11 @@ out of bounds for this project."*
 
 This change edits `.claude/hooks/block-dangerous-commands.sh`. It is therefore **presented
 for approval and deliberately not applied**, and the collaborator who shares that config is
-affected by it. The alternative standing arrangement is that Phuong performs every Overleaf
-push by hand — workable, and what happened for `d246333`/`24887e2`, but it makes the
-push half of the compile-and-push rule depend on a human being present.
+affected by it.
+
+**Ruled 2026-08-07: not applied from here.** The standing arrangement is that Phuong performs
+every Overleaf push by hand — which is what happened for `d246333`/`24887e2` — and this
+document is carried to Ryan as a proposal against the shared config he owns. The push half of
+the compile-and-push rule therefore depends on a human being present, and clause 3 of that
+rule (report that the push landed, confirmed against the remote) is what keeps that dependency
+visible instead of silent.

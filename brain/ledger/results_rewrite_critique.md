@@ -1,7 +1,19 @@
 # Results rewrite — critique log, 8C-3, 2026-08-07
 
-Five rounds: the three standing roles plus the two named for this phase. Each round names what it
-found, what was changed, and what it deliberately left.
+> **HEADER CORRECTED 2026-08-08 after audit. The original read: *"Five rounds: the three standing
+> roles plus the two named for this phase."* Both halves were wrong. There were six rounds, not
+> five, and *"the three standing roles"* named nothing — none of Rounds A, B or C is a role
+> defined in `brain/skills/autoresearchclaw/SKILL.md` §3. See the audit note appended at the foot
+> of this file for what was and was not run.**
+
+Six rounds, A–F. Rounds **D** and **E** are the two phase-specific roles named inline in the 8C-3
+prompt — knowledge-telling against critical writing per `ds-writing` §1, and process reported in
+place of result — and both were run as specified. Rounds **A**, **B**, **C** and **F** are rubric
+coverage, number-traceability, structural/boundary integrity and §4.5 approval compliance. They
+are useful checks and they are **not** the SKILL.md §3 roles, which are Role A Methodologist,
+Role B Statistician and Role C Claim auditor.
+
+Each round names what it found, what was changed, and what it deliberately left.
 
 ---
 
