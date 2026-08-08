@@ -1,356 +1,357 @@
 {
-  "store_ceiling": "2026-07-07",
-  "device": "cpu",
-  "primary_level": 0.9,
-  "seed": 93,
-  "paired_bootstrap_seed": 94,
-  "block_len": 7,
-  "n_boot": 10000,
-  "incumbent": "D",
-  "provenance": {
-    "environment": ".venv-forecast",
-    "interpreter": "/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python",
-    "python": "3.12.13",
-    "platform": "Darwin arm64",
-    "device": "mps",
-    "packages": {
-      "numpy": "2.5.1",
-      "pandas": "3.0.3",
-      "scikit-learn": "1.9.0",
-      "statsmodels": "0.14.6",
-      "duckdb": "1.5.4",
-      "torch": "2.12.1",
-      "chronos-forecasting": "2.3.1",
-      "TSB-AD": "not installed",
-      "vus": "not installed"
-    },
-    "store_ceiling": "2026-07-07"
+ "store_ceiling": "2026-07-07",
+ "device": "cpu",
+ "primary_level": 0.9,
+ "seed": 93,
+ "paired_bootstrap_seed": 94,
+ "block_len": 7,
+ "n_boot": 10000,
+ "bootstrap_b_note": "n_boot is the paired-CI B; the MCS uses mcs.N_BOOT at seed",
+ "incumbent": "D",
+ "provenance": {
+  "environment": ".venv-forecast",
+  "interpreter": "/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python",
+  "python": "3.12.13",
+  "platform": "Darwin arm64",
+  "device": "mps",
+  "packages": {
+   "numpy": "2.5.1",
+   "pandas": "3.0.3",
+   "scikit-learn": "1.9.0",
+   "statsmodels": "0.14.6",
+   "duckdb": "1.5.4",
+   "torch": "2.12.1",
+   "chronos-forecasting": "2.3.1",
+   "TSB-AD": "not installed",
+   "vus": "not installed"
   },
-  "venues": {
-    "beer_hall": {
-      "venue": "beer_hall",
-      "n_folds": 250,
-      "arms": [
-        "P",
-        "D",
-        "S",
-        "A",
-        "G"
-      ],
-      "mean_winkler": {
-        "P": 1939.6503911362863,
-        "D": 1806.9684472810643,
-        "S": 1928.095970530301,
-        "A": 1814.2914161225824,
-        "G": 1836.6186470455993
-      },
-      "mcs_pvalue": {
-        "P": 0.126,
-        "D": 1.0,
-        "S": 0.126,
-        "A": 0.941,
-        "G": 0.725
-      },
-      "set_90": [
-        "D",
-        "A",
-        "G",
-        "S",
-        "P"
-      ],
-      "set_75": [
-        "D",
-        "A",
-        "G"
-      ],
-      "incumbent": "D",
-      "adoption_candidates": [],
-      "paired_bootstrap": [
-        {
-          "pair": "P-D",
-          "mean_delta": 132.68194385522202,
-          "ci_lo": 30.31881849843924,
-          "ci_hi": 241.87616329117355,
-          "excludes_zero": true
-        },
-        {
-          "pair": "P-S",
-          "mean_delta": 11.554420605985342,
-          "ci_lo": -9.7708346617904,
-          "ci_hi": 35.58127406521619,
-          "excludes_zero": false
-        },
-        {
-          "pair": "P-A",
-          "mean_delta": 125.35897501370391,
-          "ci_lo": 16.458814618383734,
-          "ci_hi": 250.65567503454224,
-          "excludes_zero": true
-        },
-        {
-          "pair": "P-G",
-          "mean_delta": 103.03174409068697,
-          "ci_lo": 23.011057206009696,
-          "ci_hi": 188.46302238796642,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-S",
-          "mean_delta": -121.12752324923667,
-          "ci_lo": -216.08856718775723,
-          "ci_hi": -28.930871351792433,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-A",
-          "mean_delta": -7.3229688415181045,
-          "ci_lo": -153.06124688404043,
-          "ci_hi": 136.59530870061587,
-          "excludes_zero": false
-        },
-        {
-          "pair": "D-G",
-          "mean_delta": -29.650199764535046,
-          "ci_lo": -164.8126704532111,
-          "ci_hi": 96.16845331795365,
-          "excludes_zero": false
-        },
-        {
-          "pair": "S-A",
-          "mean_delta": 113.80455440771857,
-          "ci_lo": 11.936763515987321,
-          "ci_hi": 227.06676782895443,
-          "excludes_zero": true
-        },
-        {
-          "pair": "S-G",
-          "mean_delta": 91.47732348470163,
-          "ci_lo": 18.805108196216146,
-          "ci_hi": 166.66431687407794,
-          "excludes_zero": true
-        },
-        {
-          "pair": "A-G",
-          "mean_delta": -22.32723092301694,
-          "ci_lo": -73.87344752027738,
-          "ci_hi": 20.99871088606716,
-          "excludes_zero": false
-        }
-      ]
+  "store_ceiling": "2026-07-07"
+ },
+ "venues": {
+  "beer_hall": {
+   "venue": "beer_hall",
+   "n_folds": 250,
+   "arms": [
+    "P",
+    "D",
+    "S",
+    "A",
+    "G"
+   ],
+   "mean_winkler": {
+    "P": 1939.6503911362863,
+    "D": 1806.9684472810643,
+    "S": 1928.095970530301,
+    "A": 1814.2914161225824,
+    "G": 1836.6186470455993
+   },
+   "mcs_pvalue": {
+    "P": 0.126,
+    "D": 1.0,
+    "S": 0.126,
+    "A": 0.941,
+    "G": 0.725
+   },
+   "set_90": [
+    "D",
+    "A",
+    "G",
+    "S",
+    "P"
+   ],
+   "set_75": [
+    "D",
+    "A",
+    "G"
+   ],
+   "incumbent": "D",
+   "adoption_candidates": [],
+   "paired_bootstrap": [
+    {
+     "pair": "P-D",
+     "mean_delta": 132.68194385522202,
+     "ci_lo": 30.31881849843924,
+     "ci_hi": 241.87616329117355,
+     "excludes_zero": true
     },
-    "ellel": {
-      "venue": "ellel",
-      "n_folds": 237,
-      "arms": [
-        "P",
-        "D",
-        "S",
-        "A",
-        "G"
-      ],
-      "mean_winkler": {
-        "P": 1435.3004152282012,
-        "D": 1262.535401468765,
-        "S": 1367.2120553222508,
-        "A": 1422.4471538537668,
-        "G": 1479.6286420493986
-      },
-      "mcs_pvalue": {
-        "P": 0.008,
-        "D": 1.0,
-        "S": 0.016,
-        "A": 0.003,
-        "G": 0.001
-      },
-      "set_90": [
-        "D"
-      ],
-      "set_75": [
-        "D"
-      ],
-      "incumbent": "D",
-      "adoption_candidates": [],
-      "paired_bootstrap": [
-        {
-          "pair": "P-D",
-          "mean_delta": 172.76501375943621,
-          "ci_lo": 86.36603577015464,
-          "ci_hi": 260.7576471844601,
-          "excludes_zero": true
-        },
-        {
-          "pair": "P-S",
-          "mean_delta": 68.08835990595048,
-          "ci_lo": 32.62850210976841,
-          "ci_hi": 118.39307441055824,
-          "excludes_zero": true
-        },
-        {
-          "pair": "P-A",
-          "mean_delta": 12.853261374434396,
-          "ci_lo": -31.73614433053376,
-          "ci_hi": 70.32625486728422,
-          "excludes_zero": false
-        },
-        {
-          "pair": "P-G",
-          "mean_delta": -44.328226821197404,
-          "ci_lo": -105.25176629717808,
-          "ci_hi": 19.136294252769005,
-          "excludes_zero": false
-        },
-        {
-          "pair": "D-S",
-          "mean_delta": -104.67665385348573,
-          "ci_lo": -163.59150976362636,
-          "ci_hi": -29.45726015848796,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-A",
-          "mean_delta": -159.91175238500182,
-          "ci_lo": -219.96390894488368,
-          "ci_hi": -88.64166575550688,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-G",
-          "mean_delta": -217.09324058063362,
-          "ci_lo": -286.702218413925,
-          "ci_hi": -145.87956198579383,
-          "excludes_zero": true
-        },
-        {
-          "pair": "S-A",
-          "mean_delta": -55.23509853151609,
-          "ci_lo": -85.8612812055894,
-          "ci_hi": -28.64780165605985,
-          "excludes_zero": true
-        },
-        {
-          "pair": "S-G",
-          "mean_delta": -112.41658672714789,
-          "ci_lo": -171.23017588162557,
-          "ci_hi": -67.01918545594873,
-          "excludes_zero": true
-        },
-        {
-          "pair": "A-G",
-          "mean_delta": -57.1814881956318,
-          "ci_lo": -89.54555597139736,
-          "ci_hi": -32.926207385921735,
-          "excludes_zero": true
-        }
-      ]
+    {
+     "pair": "P-S",
+     "mean_delta": 11.554420605985342,
+     "ci_lo": -9.7708346617904,
+     "ci_hi": 35.58127406521619,
+     "excludes_zero": false
     },
-    "two_river_taps": {
-      "venue": "two_river_taps",
-      "n_folds": 182,
-      "arms": [
-        "P",
-        "D",
-        "S",
-        "A",
-        "G"
-      ],
-      "mean_winkler": {
-        "P": 654.220074896638,
-        "D": 646.3721939104789,
-        "S": 670.3138835797523,
-        "A": 671.2423514964917,
-        "G": 692.6350675629049
-      },
-      "mcs_pvalue": {
-        "P": 0.209,
-        "D": 1.0,
-        "S": 0.191,
-        "A": 0.191,
-        "G": 0.191
-      },
-      "set_90": [
-        "D",
-        "P",
-        "S",
-        "A",
-        "G"
-      ],
-      "set_75": [
-        "D"
-      ],
-      "incumbent": "D",
-      "adoption_candidates": [],
-      "paired_bootstrap": [
-        {
-          "pair": "P-D",
-          "mean_delta": 7.847880986159112,
-          "ci_lo": -4.038741959148086,
-          "ci_hi": 14.587472960896033,
-          "excludes_zero": false
-        },
-        {
-          "pair": "P-S",
-          "mean_delta": -16.093808683114275,
-          "ci_lo": -37.17266820873256,
-          "ci_hi": 1.6274587848841793,
-          "excludes_zero": false
-        },
-        {
-          "pair": "P-A",
-          "mean_delta": -17.022276599853626,
-          "ci_lo": -39.03327171922619,
-          "ci_hi": -0.6194096939636463,
-          "excludes_zero": true
-        },
-        {
-          "pair": "P-G",
-          "mean_delta": -38.41499266626681,
-          "ci_lo": -77.37199139517385,
-          "ci_hi": -3.6871445284747004,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-S",
-          "mean_delta": -23.941689669273387,
-          "ci_lo": -40.69803692064709,
-          "ci_hi": -3.4935470752268936,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-A",
-          "mean_delta": -24.870157586012738,
-          "ci_lo": -43.53009693165088,
-          "ci_hi": -5.139352100986495,
-          "excludes_zero": true
-        },
-        {
-          "pair": "D-G",
-          "mean_delta": -46.262873652425924,
-          "ci_lo": -82.50812088292766,
-          "ci_hi": -9.350315008906977,
-          "excludes_zero": true
-        },
-        {
-          "pair": "S-A",
-          "mean_delta": -0.9284679167393506,
-          "ci_lo": -25.05479249067929,
-          "ci_hi": 16.73572545751663,
-          "excludes_zero": false
-        },
-        {
-          "pair": "S-G",
-          "mean_delta": -22.321183983152537,
-          "ci_lo": -70.17805681793627,
-          "ci_hi": 19.05227020803436,
-          "excludes_zero": false
-        },
-        {
-          "pair": "A-G",
-          "mean_delta": -21.392716066413186,
-          "ci_lo": -54.78973332696456,
-          "ci_hi": 11.24938806864388,
-          "excludes_zero": false
-        }
-      ]
+    {
+     "pair": "P-A",
+     "mean_delta": 125.35897501370391,
+     "ci_lo": 16.458814618383734,
+     "ci_hi": 250.65567503454224,
+     "excludes_zero": true
+    },
+    {
+     "pair": "P-G",
+     "mean_delta": 103.03174409068697,
+     "ci_lo": 23.011057206009696,
+     "ci_hi": 188.46302238796642,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-S",
+     "mean_delta": -121.12752324923667,
+     "ci_lo": -216.08856718775723,
+     "ci_hi": -28.930871351792433,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-A",
+     "mean_delta": -7.3229688415181045,
+     "ci_lo": -153.06124688404043,
+     "ci_hi": 136.59530870061587,
+     "excludes_zero": false
+    },
+    {
+     "pair": "D-G",
+     "mean_delta": -29.650199764535046,
+     "ci_lo": -164.8126704532111,
+     "ci_hi": 96.16845331795365,
+     "excludes_zero": false
+    },
+    {
+     "pair": "S-A",
+     "mean_delta": 113.80455440771857,
+     "ci_lo": 11.936763515987321,
+     "ci_hi": 227.06676782895443,
+     "excludes_zero": true
+    },
+    {
+     "pair": "S-G",
+     "mean_delta": 91.47732348470163,
+     "ci_lo": 18.805108196216146,
+     "ci_hi": 166.66431687407794,
+     "excludes_zero": true
+    },
+    {
+     "pair": "A-G",
+     "mean_delta": -22.32723092301694,
+     "ci_lo": -73.87344752027738,
+     "ci_hi": 20.99871088606716,
+     "excludes_zero": false
     }
+   ]
+  },
+  "ellel": {
+   "venue": "ellel",
+   "n_folds": 237,
+   "arms": [
+    "P",
+    "D",
+    "S",
+    "A",
+    "G"
+   ],
+   "mean_winkler": {
+    "P": 1435.3004152282012,
+    "D": 1262.535401468765,
+    "S": 1367.2120553222508,
+    "A": 1422.4471538537668,
+    "G": 1479.6286420493986
+   },
+   "mcs_pvalue": {
+    "P": 0.008,
+    "D": 1.0,
+    "S": 0.016,
+    "A": 0.003,
+    "G": 0.001
+   },
+   "set_90": [
+    "D"
+   ],
+   "set_75": [
+    "D"
+   ],
+   "incumbent": "D",
+   "adoption_candidates": [],
+   "paired_bootstrap": [
+    {
+     "pair": "P-D",
+     "mean_delta": 172.76501375943621,
+     "ci_lo": 86.36603577015464,
+     "ci_hi": 260.7576471844601,
+     "excludes_zero": true
+    },
+    {
+     "pair": "P-S",
+     "mean_delta": 68.08835990595048,
+     "ci_lo": 32.62850210976841,
+     "ci_hi": 118.39307441055824,
+     "excludes_zero": true
+    },
+    {
+     "pair": "P-A",
+     "mean_delta": 12.853261374434396,
+     "ci_lo": -31.73614433053376,
+     "ci_hi": 70.32625486728422,
+     "excludes_zero": false
+    },
+    {
+     "pair": "P-G",
+     "mean_delta": -44.328226821197404,
+     "ci_lo": -105.25176629717808,
+     "ci_hi": 19.136294252769005,
+     "excludes_zero": false
+    },
+    {
+     "pair": "D-S",
+     "mean_delta": -104.67665385348573,
+     "ci_lo": -163.59150976362636,
+     "ci_hi": -29.45726015848796,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-A",
+     "mean_delta": -159.91175238500182,
+     "ci_lo": -219.96390894488368,
+     "ci_hi": -88.64166575550688,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-G",
+     "mean_delta": -217.09324058063362,
+     "ci_lo": -286.702218413925,
+     "ci_hi": -145.87956198579383,
+     "excludes_zero": true
+    },
+    {
+     "pair": "S-A",
+     "mean_delta": -55.23509853151609,
+     "ci_lo": -85.8612812055894,
+     "ci_hi": -28.64780165605985,
+     "excludes_zero": true
+    },
+    {
+     "pair": "S-G",
+     "mean_delta": -112.41658672714789,
+     "ci_lo": -171.23017588162557,
+     "ci_hi": -67.01918545594873,
+     "excludes_zero": true
+    },
+    {
+     "pair": "A-G",
+     "mean_delta": -57.1814881956318,
+     "ci_lo": -89.54555597139736,
+     "ci_hi": -32.926207385921735,
+     "excludes_zero": true
+    }
+   ]
+  },
+  "two_river_taps": {
+   "venue": "two_river_taps",
+   "n_folds": 182,
+   "arms": [
+    "P",
+    "D",
+    "S",
+    "A",
+    "G"
+   ],
+   "mean_winkler": {
+    "P": 654.220074896638,
+    "D": 646.3721939104789,
+    "S": 670.3138835797523,
+    "A": 671.2423514964917,
+    "G": 692.6350675629049
+   },
+   "mcs_pvalue": {
+    "P": 0.209,
+    "D": 1.0,
+    "S": 0.191,
+    "A": 0.191,
+    "G": 0.191
+   },
+   "set_90": [
+    "D",
+    "P",
+    "S",
+    "A",
+    "G"
+   ],
+   "set_75": [
+    "D"
+   ],
+   "incumbent": "D",
+   "adoption_candidates": [],
+   "paired_bootstrap": [
+    {
+     "pair": "P-D",
+     "mean_delta": 7.847880986159112,
+     "ci_lo": -4.038741959148086,
+     "ci_hi": 14.587472960896033,
+     "excludes_zero": false
+    },
+    {
+     "pair": "P-S",
+     "mean_delta": -16.093808683114275,
+     "ci_lo": -37.17266820873256,
+     "ci_hi": 1.6274587848841793,
+     "excludes_zero": false
+    },
+    {
+     "pair": "P-A",
+     "mean_delta": -17.022276599853626,
+     "ci_lo": -39.03327171922619,
+     "ci_hi": -0.6194096939636463,
+     "excludes_zero": true
+    },
+    {
+     "pair": "P-G",
+     "mean_delta": -38.41499266626681,
+     "ci_lo": -77.37199139517385,
+     "ci_hi": -3.6871445284747004,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-S",
+     "mean_delta": -23.941689669273387,
+     "ci_lo": -40.69803692064709,
+     "ci_hi": -3.4935470752268936,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-A",
+     "mean_delta": -24.870157586012738,
+     "ci_lo": -43.53009693165088,
+     "ci_hi": -5.139352100986495,
+     "excludes_zero": true
+    },
+    {
+     "pair": "D-G",
+     "mean_delta": -46.262873652425924,
+     "ci_lo": -82.50812088292766,
+     "ci_hi": -9.350315008906977,
+     "excludes_zero": true
+    },
+    {
+     "pair": "S-A",
+     "mean_delta": -0.9284679167393506,
+     "ci_lo": -25.05479249067929,
+     "ci_hi": 16.73572545751663,
+     "excludes_zero": false
+    },
+    {
+     "pair": "S-G",
+     "mean_delta": -22.321183983152537,
+     "ci_lo": -70.17805681793627,
+     "ci_hi": 19.05227020803436,
+     "excludes_zero": false
+    },
+    {
+     "pair": "A-G",
+     "mean_delta": -21.392716066413186,
+     "ci_lo": -54.78973332696456,
+     "ci_hi": 11.24938806864388,
+     "excludes_zero": false
+    }
+   ]
   }
+ }
 }

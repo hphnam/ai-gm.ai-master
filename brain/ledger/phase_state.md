@@ -3696,3 +3696,71 @@ wrong — **the absence of a check is invisible in an artefact that records only
 That is the same shape as the stale `main-words.sum` and the stale `ladder.pdf`: in all three the
 instrument reported honestly on what it was pointed at, and nobody had checked what it was pointed
 at.
+
+---
+
+## 2026-08-08 (later) — Phase: reconciliation, the abstract, and the repair batch
+
+### Completed
+
+**Reconciliation of the two-session period.** Governing files verified not doubled; two real
+defects found and fixed, both bookkeeping. **The single-writer rule is now in `PRJ93_RULES.md`**
+beside store-ownership, framed as the same failure at a different radius: that rule stops one fact
+being written in three files, this one stops one file being written by two sessions, and git
+catches neither because both sessions share a working tree.
+
+**S-3/S-4 authority verified in the transcript, not inferred from the ledger.** Phuong's
+recollection was that no ruling had been given; the closed session's transcript carries it
+verbatim. **The transcript outranks recollection, and it is the only place this evidence lives** —
+a ledger row saying *"closed on Phuong's ruling"* is a claim about a conversation.
+
+**T8 = H12**, one gate under two numbering schemes. Chapter 5 discharged; **Chapter 4 never run**.
+
+**The Barber misattribution re-verified at the PDF** and repaired, with `vovk_algorithmic_2005`
+added to Zotero and the bibliography. Chapter 2's two uses are correct and untouched.
+
+**`abstract.tex` composed** — it was template boilerplate with a `bit.ly` link, live in the PDF on
+`origin/main`. 298 marker words.
+
+**The repair batch: seven commits, per item, pre-flighted at 127 pages.** X1 first per §5, then
+§4.1–§4.5 and Chapter 5.
+
+### Three errors I made this session, all caught, all worth keeping
+
+1. **I wrote a false negative into the state store.** Searched `/usr/local/texlive`, `/Library/TeX`,
+   `/opt` and `$PATH`, found no TeX, and recorded *"absence, not a permissions artefact"* — a
+   definitive negative from a partial search. TeX Live 2026 was in `~/texlive`. This is SKILL.md
+   §6's **"absence by grep as proof"**, and the phrase "confirmed inside and outside the sandbox"
+   made a narrow search sound broad. **A negative gets verified more than one way before it is
+   written down**, and the more confident the phrasing the more that matters.
+2. **The abstract carried four defects on its first draft**, one of them R5 — the venue-order
+   mismatch — reproduced independently in my own prose while I was preparing to fix it in Chapter 4.
+   **That is what makes it a class rather than a slip.** Another softened a pooling result that is
+   *stronger* than a null, inherited from the Chapter 5 sentence the audit had already flagged as
+   understating it. The abstract was about to launder a known defect into the section a marker
+   reads first.
+3. **Four hand counts wrong against `wordcount.py`** — 289, 304, 295, 302 — every one caught by the
+   instrument and none by me. Third session running.
+
+### Open, with owners
+
+**Phuong pushes.** Seven commits; `git push` refused by the PreToolUse hook for the third phase
+running. Overleaf still holds the boilerplate abstract and the Chapter 4 / Chapter 5 contradiction.
+
+**Phuong recomputes** R4, R30, R9, R22, R24, R16. **R30 gates D3**, where two roles reached
+opposite verdicts on `tab:coverage`.
+
+**T8 for Chapter 4** — twelve cited works never checked.
+
+**S-4 de-duplication** now decides on **21,883**, not 21,357: the repairs added 526 words, because
+replacing an assertion with a qualified statement is longer. A non-rejection reported honestly
+costs more words than one reported as an affirmed null, and that cost is the right one to pay.
+
+### The generalisable part
+
+**Every instrument in this project checks the artefact's form, and none checks whether its content
+exists.** `latexcheck` proves the document builds; `wordcount.py` proves it is the right length;
+`figurecheck.py` proves no title is painted into an image. An unwritten abstract passed all three
+for the life of the project, because none of them asks whether a section says anything. The
+critique roles are the only instrument that reads for meaning, which is why losing them for two
+chapters cost as much as it did.
