@@ -3543,3 +3543,72 @@ The last three would have printed `??`. The build is the instrument that owns th
 **Graph not refreshed**, by instruction. Still 13,618 nodes, six files stale. The hook demanded a
 refresh on every read and grep, including inside all six subagents; declined every time. Nothing
 was unfindable and nothing in 8C-4 was blocked by the staleness.
+
+---
+
+## 2026-08-08 — 8C-4 closing addendum: the push is verified on the remote
+
+The 8C-4 entry above closed with the push held at the protected-branch guard and handed to Phuong.
+This addendum records the second half of the compile-and-push lifecycle, which that entry could not.
+
+### The push landed, and the verification is not the same act as the push
+
+| Instrument | Result |
+|---|---|
+| `git ls-remote --heads origin` | **`fe7bd9a1bbbeb772bd02a51bf95dc60082ea4d91  refs/heads/main`** |
+| `git log --oneline origin/main..HEAD` after `git fetch` | **empty** — nothing local is unpushed |
+| `git ls-files chapters/` in a clone taken **from `git.overleaf.com`** | `discussion.tex` present; `main.tex`:249–250 carries `\chapter{Discussion}` + `\input{chapters/discussion}` |
+
+**This is the second push attempt of 8C-4, and the first one is the more instructive.** The first
+was reported as done and had moved nothing: `git ls-remote` still read `f903214` while
+`chapters/discussion.tex` was **untracked** and six files were modified but unstaged. The push was
+real; it had nothing to carry. `PRJ93_RULES.md` § "Compile and push" already says a push is
+verified against the remote and never against the exit code of `git push` — 8C-4 shows the rule
+binds the **human** half of the loop identically, and that the failure is silent in both halves.
+§F's "Chapters composed **and pushed**" row now carries this as its worked counter-example.
+
+### The fresh-clone compile, re-run against the pushed state
+
+The 8C-4 entry's fresh-clone PASS was taken on a clone of the **locally committed** `fe7bd9a`,
+which at that moment existed nowhere else. That is a weaker check than it reads as: it proves the
+commit is self-contained, not that the remote received it. Re-run on a clone pulled from
+`git.overleaf.com`:
+
+- `main-words.sum` confirmed **ABSENT** in the clone, so `--shell-escape` generated it. This is the
+  precise defect that made every earlier PASS in this project right for the wrong reason.
+- **PASS · 125 pages · 0 errors · 0 undefined references · 0 undefined citations · 0 floats lost ·
+  8 overfull (largest 182.80 pt) · 33 underfull.**
+- Chapter 5's floor re-measured from the pushed file: **4,646 marker (raw 4,653)** — 5.1 962 ·
+  5.2 1,157 · 5.3 1,031 · 5.4 906 · 5.5 591. Identical to the working-clone measurement, which is
+  the point of taking it twice.
+- Hygiene on the pushed file: **0 em dashes**, 0 double-hyphen prose splices, five `\section`s
+  matching the approved tree, five `sec:disc-*` labels.
+
+**Still tier 2.** TeX Live 2026 locally is not Overleaf's until T3-1 closes, and the title page
+routed through a scratch `svg.sty` stub, so T3-2 remains uncovered by any local run. No claim is
+made about the Overleaf render.
+
+### What this addendum changes in §F
+
+Four rows were false the moment the push landed and are now updated in place, with the instrument
+named in each: chapters composed (3 → **4 of 6**), chapters pushed (`f903214` → **`fe7bd9a`**),
+chapter files live with prose (4 → **5**), and the build row (115 pages on `f903214` → **125 on
+`fe7bd9a`**). The floors row gains Chapter 5 and the totals row becomes **21,357 / 15,800**.
+
+**S-3 is now decidable and is left decided-by-Phuong, not decided by me.** Its deferral condition
+was *"measure Results first"*; Results and Discussion are both measured, and the answer is that
+Results was already a floor at 6,247, so there is less to reallocate than the deferral hoped. The
+recommendation recorded there — relocate each duplicated statistical disclosure once into Chapter 4
+and cite it from Chapter 5 — is not executed, because it edits an approved composition. The one
+finding that reframes the whole question is in `00_marking_criteria.md`:411–414: **the guidance
+states there is no per-section word count**, so §2.1's budgets are this project's own allocation
+and only HC1's 20,000 is mechanical.
+
+### The generalisable part
+
+**A claim about a remote is verified on the remote, and a claim about a local commit is not a claim
+about a remote.** 8C-3 learned that a working clone can pass on a stale artefact; 8C-4 adds that a
+*fresh clone of a local commit* can pass while the remote holds nothing. Both are the same error at
+different radii: checking the thing nearest to hand and reading the result as covering the thing
+that actually matters. The fix in both cases is one command, and in both cases the command was
+available the whole time.
