@@ -144,6 +144,42 @@ When a fact changes, change it in the store that owns it and correct the others 
 pointing at that store rather than by restating the fact in each. A number
 duplicated across three files will be updated in one of them.
 
+### One session at a time on this repo — adopted 2026-08-08
+
+**Two agent sessions must not run against `ai-gm.ai-master` concurrently.** One writer at a time,
+and the second waits.
+
+The rule exists because it was broken and got away with it. On 2026-08-08 two sessions ran in
+parallel and **both edited `PRJ93_RULES.md`, `05_paper_architecture.md` and
+`results_rewrite_critique.md`** — the same three files, for the same reason, within twenty minutes.
+Nothing was lost. The two edits **composed**: one wrote the "cite the path" rule and the other
+wrote the complementary "quote the check, don't name it" rule, and the second even opens by
+referring to the first. That outcome was luck. The same two sessions, one paragraph further apart
+or one minute closer together, produce a doubled rule in the file that governs every other rule,
+or a lost edit with no conflict marker to show for it.
+
+**Why git does not save you here.** Both sessions commit to one branch in one working tree, so
+there is no merge and no conflict — the later `git add` simply stages whatever is on disk,
+including the other session's uncommitted work. `7cf01337` committed one session's files under
+the other's message. A commit whose message describes a subset of its contents is a commit nobody
+can later read as evidence.
+
+**This is the store-ownership rule at a different radius.** That rule stops one fact being written
+in three files; this one stops one file being written by two sessions. Both failures look identical
+afterwards — a store that disagrees with itself, and no record of which write was authoritative.
+
+What to do instead:
+
+- **Finish or close a session before starting another.** If a second is genuinely needed, give it a
+  disjoint file set and say so in both prompts.
+- **On resuming, reconcile before repairing.** Read the governing files end to end for doubled or
+  contradicting entries before trusting any of them, and **report what you find rather than merging
+  silently** — a silent merge destroys the evidence that two writers disagreed.
+- **Never infer authority from a ledger row alone.** A row recording *"closed on Phuong's ruling"*
+  is a claim about a conversation, and the conversation is the evidence. It lives in the owning
+  session's transcript under `~/.claude/projects/<project>/<session-id>.jsonl`; quote the turn.
+  This is the one case where a transcript outranks a ledger, because the ledger is downstream of it.
+
 ### Any claim that something is OPEN gets verified before it is reported
 
 **This is a hard step, not a disposition.** A claim that something is open, unresolved,
