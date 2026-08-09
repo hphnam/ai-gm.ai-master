@@ -313,10 +313,10 @@ reasonably ask for the material.** Read the HIGH block; the rest is recorded for
 | | |
 |---|---|
 | Body at the head of this pass, re-derived not quoted | **27,759** |
-| Body at the close, measured | **19,933** |
-| **Removed** | **7,826** |
+| Body at the close, measured | **19,941** |
+| **Removed** | **7,818** |
 | The cap | 20,000, hard |
-| Margin | 67 |
+| Margin | 59 |
 | Overleaf commits | `4583325`, `7309139`, `20c0f85`, `3ef4946`, `2fb5dfb`, `afc1976`, `559c60d` |
 | Rollback | tag `pre-reduction-full-run` at `ab832a4`, untouched. Nothing amended, nothing force-pushed |
 
@@ -327,12 +327,12 @@ population per `00_marking_criteria.md` §1.1:**
 |---|---|---|---|
 | Abstract | 321 | 321 | 0 (protected, HC4/HC5) |
 | 1 Introduction | 2,035 | 1,273 | 762 |
-| 2 Literature Review | 4,979 | 3,699 | 1,280 |
-| 3 Methodology | 5,486 | 4,283 | 1,203 |
-| 4 Results | 7,883 | 5,581 | 2,302 |
+| 2 Literature Review | 4,979 | 3,662 | 1,317 |
+| 3 Methodology | 5,486 | 4,269 | 1,217 |
+| 4 Results | 7,883 | 5,591 | 2,292 |
 | 5 Discussion | 4,761 | 3,085 | 1,676 |
-| 6 Conclusions | 2,294 | 1,743 | 551 |
-| **Body** | **27,759** | **19,933** | **7,826** |
+| 6 Conclusions | 2,294 | 1,740 | 554 |
+| **Body** | **27,759** | **19,941** | **7,818** |
 
 ### Criteria left undischarged or degraded, by number
 

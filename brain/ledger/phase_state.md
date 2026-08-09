@@ -4660,11 +4660,11 @@ the deliverable.
 |---|---|---|
 | Abstract | 321 | 321 |
 | 1 Introduction | 2,035 | 1,273 |
-| 2 Literature Review | 4,979 | 3,699 |
-| 3 Methodology | 5,486 | 4,283 |
-| 4 Results | 7,883 | 5,581 |
+| 2 Literature Review | 4,979 | 3,662 |
+| 3 Methodology | 5,486 | 4,269 |
+| 4 Results | 7,883 | 5,591 |
 | 5 Discussion | 4,761 | 3,085 |
-| 6 Conclusions | 2,294 | 1,743 |
+| 6 Conclusions | 2,294 | 1,740 |
 
 **Artefacts written.** `brain/ledger/reduction_cost_register.md` §"PASS 8D" is the review list:
 summary, criteria left undischarged by number, the findings the dissertation no longer claims, the
