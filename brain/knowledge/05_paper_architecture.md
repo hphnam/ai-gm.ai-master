@@ -1170,6 +1170,51 @@ settled on six real floors once both remaining chapters are written, not by cutt
 measurement. Chapter 6's floor is now one of the six. The escalation A10 requires is recorded
 here rather than raised as a gate, under the session's standing authority.
 
+**Introduction, whole chapter — 1,400 budgeted against 2,023 measured. Added 2026-08-09 by
+8C-6, and this section had NO CHAPTER 1 ROW BEFORE THAT EITHER.** The absence is recorded as a
+finding in its own right, because it is the *second* time §4.5 has been missing the row for the
+chapter about to breach its budget, and the first (Chapter 6) was found only when someone went
+looking. **A section that cannot be written to budget names its loss here; a section with no row
+here has not been checked.** Measured after composition and the five-role critique: 1.1 **354**
+(budget 300) · 1.2 **472** (300) · 1.3 **360** (350) · 1.4 **605** (250) · 1.5 **233** (200).
+
+**Where the excess is, and why it is not compressible without loss.**
+
+- **1.4 is the overrun, at 605 against 250, and 250 was costed for "five contributions, each one
+  sentence plus a strength qualifier"** (`06_research_questions.md` §6). That costing is the
+  **same one that produced Chapter 6's 6.2 at 962 against 250**, and it fails here for the same
+  reason: the five fixed strings are about 150 words, and everything above that is the
+  qualification the graded-strength convention exists to carry. 1.4 at 605 is **less than
+  two-thirds of 6.2's 962** for the same five claims, which is the correct relationship between
+  a chapter that announces contributions and one that settles them.
+- **About 240 words of 1.4 were added by the critique, each replacing an over-claim**, and
+  `PRJ93_RULES.md` forbids a length pass from touching a qualification, so none is available as
+  a saving: C1's scoping of the origin-count reversal to the Beer Hall (it does not hold at the
+  other two venues, `log/43` §3–5); C1's "statement about the evidence rather than a finding of
+  equivalence"; C2's restriction of the exception to contrasts against the **no-weather**
+  control, whose loss on 2026-08-08 is a recorded incident; C2's confidence level, without which
+  both nulls reverse at α = 0.25; C2's set-level pooling elimination at Two River Taps; C3's n =
+  240; C4's fixed-threshold reason, which replaces a false claim that the sweep could have
+  selected an operating point.
+- **1.2 at 472 against 300** carries five prior-work strands where the first draft carried four.
+  The missing one was **gap limb 5**, measure degeneracy on intermittent demand and rank
+  instability at few origins, and its absence was **blocking**: RQ1, RQ2 and C1's negative limb
+  all rest on it and none had motivating prior work in the Introduction. This is the
+  deletion-of-a-null shape again, caught by enumeration rather than by reading.
+- **1.3 at 360 against 350 is effectively at budget** and is the only section that came in
+  close. It gained one sentence stating that the five questions form a dependency chain rather
+  than a list, which converts the section from knowledge telling to knowledge transforming under
+  `ds-writing` §1.
+
+**Displaced, and where it went instead:** the enumeration of the five reachable limbs was cut
+from 1.2 and left to 1.3, which states them as the research questions; and the second statement
+of the gap was cut, the proposition being stated once and then read rather than twice in two
+registers. Both are genuine de-duplication inside one chapter, and together they are worth about
+70 words. **No qualifier and no finding was cut to reach 2,023.**
+
+**This row does not take the reallocation decision either.** With six real floors now measured
+the precondition §F set is discharged, and the ruling is 8D's.
+
 ---
 
 # 5. RUBRIC MAP

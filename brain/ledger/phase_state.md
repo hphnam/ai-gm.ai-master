@@ -4193,3 +4193,102 @@ thousandth" and no longer says "the one venue that under-covers".
 
 **§4.5's Chapter 6 row was added in the main session** and stands: 1,100 budgeted against 2,328
 measured, with the excess located and each part justified.
+
+---
+
+## 8C-6 — Introduction composed, abstract revised (2026-08-09)
+
+**All six chapters are now composed.** `chapters/introduction.tex` was **0 bytes**, not the
+"three commented template lines" the brief described, and had been flagged by
+`completenesscheck` since that instrument was built. Composed to the approved five-section tree
+and committed at **`eebf3e9`**, unpushed.
+
+**Discovery corrections, all re-derived rather than read forward.**
+
+- `origin/main` re-derived with `git ls-remote --heads origin` at the start: **`49b8f01`**, which
+  is what §F's current row says. That row is still accurate; the check was run because the row
+  it supersedes went stale twice.
+- **Two of §F's five chapter floors were wrong.** Ch 3 5,526 -> **5,569** (stale since
+  `12f8cc7`, the active/traded sweep, and copied forward through three "RE-MEASURED" rows);
+  Ch 4 7,712 -> **7,701** (transcription error; `results.tex` measures 7,701 at `29016e7`).
+- §F's count row names the two open self-closable rows as **S-1 and S-3**; S-3 is struck as
+  closed and **S-4** is its live replacement. Count of 2 correct, one identifier wrong.
+- **§4.5 had no Chapter 1 row**, which is the same absence 8C-5 found for Chapter 6. Reported as
+  a finding and then written, with the excess located and each part justified.
+- `completenesscheck` was **7 findings** at the start and is **5** now. The brief expected the
+  Introduction to clear one; it cleared **two** (a CONTENT finding and a SECTION finding). The
+  remaining five are all `acknowledgements.tex` and `publications.tex` template residue.
+
+**Measured, six real floors, all re-derived on `49b8f01`/`eebf3e9` with `wordcount.py`.**
+
+| | Raw | Artefact | Marker | Budget |
+|---|---|---|---|---|
+| Ch 1 Introduction | 2,030 | 7 | **2,023** | 1,400 |
+| Ch 2 Background | 4,949 | 11 | **4,938** | 4,000 |
+| Ch 3 Methods | 5,661 | 92 | **5,569** | 4,200 |
+| Ch 4 Results | 7,729 | 28 | **7,701** | 5,200 |
+| Ch 5 Discussion | 4,877 | 7 | **4,870** | 2,400 |
+| Ch 6 Conclusions | 2,337 | 9 | **2,328** | 1,100 |
+| Abstract | 300 | 0 | **300** | 300 |
+| **Document** | | | **27,729** | **20,000** |
+
+**Over by 7,729, or +39 %.** The reallocation precondition is discharged and **the ruling was
+not taken** — it is 8D's.
+
+**The critique loop: five independent calls, three from `SKILL.md` §3 and two phase-specific.**
+Log at `ledger/introduction_rewrite_critique.md`, each round carrying its remit quoted from the
+owning file. **22 blocking and 45 advisory findings; 18 blocking applied.** The two that matter:
+
+1. **1.2's gap was one strand short of its own count.** It named four prior-work strands and
+   then asserted five. The missing one was **limb 5**, measure degeneracy on intermittent demand
+   and rank instability at few origins. **RQ1, RQ2 and C1's negative limb all rest on it and none
+   had motivating prior work in the Introduction.** Found by a grep per item, not by reading. It
+   is the deletion-of-a-null shape again, and the omitted limb is the one carrying the failed
+   precondition.
+2. **"Reproducing the measured coverage" names a validation that does not exist.** On the traded
+   limb `1 - frac_above_nominal_quantile` = 0.891780 / 0.691670 / 0.963455 against R30's measured
+   0.8918 / 0.6917 / 0.9635. The implied and measured columns are **the same indicator vector
+   counted twice**. This is stronger than B13's "not to a thousandth": it is not an over-precise
+   claim but an empty one. **06 §6's amendment governs over its own unamended fixed string.**
+
+**Also introduced and repaired:** Chapter 1 called the estate "operating" three times while
+Two River Taps ceased trading two months before the data ceiling and is a frozen control series;
+and the cost sweep's limitation was misattributed to the ratio grid when it is a property of a
+fixed-threshold detector.
+
+**The abstract failed HC4 and no instrument here could see it.** It had been four paragraphs
+since composition; the rubric requires one. Now one paragraph, still 300/300, `venueordercheck`
+still clean. **The "at nominal or above" defect deferred to 8D on word-budget grounds was
+repaired instead** — the budget existed once a self-ranking sentence and a positional triple
+were spent, and the withdrawal is recorded in the file beside the reasoning it replaces.
+
+**Pre-flight, all reported with the size examined.** `humanizer` / `avoid-ai-writing`: clean,
+zero em or en dashes in rendered text, zero curly quotes, zero AI-vocabulary hits; "rather than"
+density 5.4 per 1,000 words against 4.7-7.7 across the composed chapters, so it is a house
+construction. `figurecheck` **PASS, 19 figure sources**. `completenesscheck` **FAIL 5, 25 files
+walked** (was 7). `venueordercheck` **FAIL 5, 12 files scanned**, unchanged, none in
+`introduction.tex` or `abstract.tex`. `latexcheck --shell-escape` on the working clone **PASS**.
+
+**Fresh-clone compile, and its scope stated.** Cloned `eebf3e9` fresh, **`main-words.sum`
+confirmed ABSENT before the run**, and the run generated it (30866), so the check passed for the
+right reason rather than off a stale file. **PASS: 141 pages, 0 errors, 0 undefined references,
+0 undefined citations, 0 floats lost, 7 overfull boxes (largest 182.80 pt,
+`search_screening_body.tex`), 37 underfull.** **This is a clone of a LOCAL commit, not of the
+remote.** `origin/main` is still `49b8f01` and `origin/main..HEAD` is **1**. Tier 2 only, TeX
+Live 2026 locally, which is not Overleaf's until T3-1 closes.
+
+**Handed to Phuong: the push of `eebf3e9`.** Not attempted; the protected-branch hook refuses it
+and routing around the guard is not authorised.
+
+**New §F rows written this session:** the six-chapter position; the two wrong floors; **"to a
+thousandth" reaching five further sites including `log/72_DU6_exchangeability_result.md`:69,
+which is a RESULT FILE and therefore T1's terminal node**; why the numbers audit passed it (X1
+compared full precision against a rounded 0.871); **`log/PRJ93_Agent_Eval_Report.md` §3
+contradicting S6 with the pre-fix cost table**; HC4 repaired; **HC54 unmet and HC57 violated**;
+the appendix re-lettering by an Overleaf web-UI commit and `main.tex`'s now-stale warning
+against it; three stale cells in `06_research_questions.md`; three inherited claims; and T8
+recorded as a **declared advisory FAIL** for Chapter 1 rather than mitigated into a pass.
+
+**Not begun, per instruction: 8D and the reallocation.** No graphify refresh, update or
+re-extraction was run; the hook demanded one on effectively every read and grep and was declined
+every time. Nothing was unfindable.
