@@ -5835,8 +5835,8 @@
     "semantic_hash": "c32468f4563f5a76ab63ac2edc15896a"
   },
   "brain/PRJ93_RULES.md": {
-    "mtime": 1786295942.132377,
-    "ast_hash": "855ecd248ae9f9e7952611f59943ff60",
+    "mtime": 1786311617.2735806,
+    "ast_hash": "0c503b1fb520e9e0354f27d837f364e0",
     "semantic_hash": ""
   },
   "brain/docs/DataSciDissWriting June2026final.md": {
@@ -5870,8 +5870,8 @@
     "semantic_hash": "e6676f720c8d78530a82eec9b51622db"
   },
   "brain/knowledge/00_marking_criteria.md": {
-    "mtime": 1786295909.4117362,
-    "ast_hash": "287563d6a6eabdf024b5600dc8db8cf3",
+    "mtime": 1786296822.1375391,
+    "ast_hash": "88d3da4978652e775bf6075fa7e144aa",
     "semantic_hash": ""
   },
   "brain/knowledge/01_autoresearchclaw_reference.md": {
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786296030.7169278,
-    "ast_hash": "91cf21a554e5c64623538f53a93b1967",
+    "mtime": 1786298018.9451244,
+    "ast_hash": "7a69fa8d3b0c8f71f4f773bd9c4254ad",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786295877.9795218,
-    "ast_hash": "15370a03ed36ad97442ee9e550ac86b4",
+    "mtime": 1786307640.155138,
+    "ast_hash": "5c0f22d24fe60a9af8a4c6138732c475",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6350,8 +6350,8 @@
     "semantic_hash": ""
   },
   "brain/knowledge/06_research_questions.md": {
-    "mtime": 1786278620.5726507,
-    "ast_hash": "459501ee9c1be4b3517ab59f5795828e",
+    "mtime": 1786303116.952199,
+    "ast_hash": "d91eb35228084dc42664486074460d3a",
     "semantic_hash": ""
   },
   "brain/eval/agent_eval.json": {
@@ -6585,8 +6585,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/reduction_plan.md": {
-    "mtime": 1786295790.9573033,
-    "ast_hash": "a5510314001f10c67c371340983f8faf",
+    "mtime": 1786310511.4182222,
+    "ast_hash": "f9539d8634817011d74ebfaa9c6bc7f5",
     "semantic_hash": ""
   },
   "brain/ledger/relocation_candidates.md": {
@@ -6607,6 +6607,16 @@
   "brain/log/79_8C6_Introduction_And_Abstract_Report.md": {
     "mtime": 1786277160.0565474,
     "ast_hash": "d667eca9ae6149cd8742e1cd5627a03a",
+    "semantic_hash": ""
+  },
+  "brain/ledger/reduction_cost_register.md": {
+    "mtime": 1786311595.5774982,
+    "ast_hash": "5656f316d7c68afc3c49904af801cc12",
+    "semantic_hash": ""
+  },
+  "brain/ledger/supervisor_length_query.md": {
+    "mtime": 1786309751.7931905,
+    "ast_hash": "ac03205ac70aa999aeeb35ff283208b1",
     "semantic_hash": ""
   }
 }
