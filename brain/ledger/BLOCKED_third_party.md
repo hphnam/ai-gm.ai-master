@@ -268,6 +268,25 @@ comparison, and the two floors were being held against each other for exactly th
 | **`venueordercheck`: FOUR of five now sit in text the reduction pass rewrites, up from one** | Re-assessed 2026-08-09 against the revised plan, whose Chapter 4 restructure reaches further than the first draft's. `results.tex`:782 (native intervals) and `:513` (empirical coverage) are DEMOTE material; **`:406` goes because `tab:weather` itself is demoted**. **`results.tex`:352 is inside `tab:group`, which the body RETAINS, so it needs its own repair** — the remedy is to name the venues inline, ~20 words, and it edits table text which is **inside** the governing count. `discussion.tex`:29 sits in §5.1, which compresses 1,060 → 500, so **check it after that rewrite rather than repairing it twice** |
 | **Template residue cleared from the preamble** | `\usepackage{lipsum}`, loaded *"just to add random text as an example"* and never called anywhere in the document, removed. Duplicate `\usepackage[utf8]{inputenc}` at the biblatex block removed. Both were listed at `05` §6.1 and both survived every compile, because neither is an error. Same class as the declaration and acknowledgements placeholders |
 
+### The length constraint and the cut list — 2026-08-09, ruling recorded
+
+**FINAL AND BINDING.** **20,000 cannot be breached under any circumstance.** **19,000** remains
+the working ceiling because the forecast carries a ±400 range and a plan landing at 19,900 has no
+margin against its own error. **18,000** is the target. This supersedes every earlier length
+ruling and does not move again.
+
+| Row | State |
+|---|---|
+| **Overleaf `9895924`** | **PUSHED and verified** — `git ls-remote origin main` returns `989592474bba…`, equal to local HEAD. The §F row's own class of defect (a row naming a SHA is a measurement) does not apply: this was re-measured on the remote. |
+| **A17 — `sec:res-chatlog`** | **STANDS, ruled by Phuong.** The knowledge-gap signal (223) stays in Results 4.5: it evidences a specified deliverable that §6.1 revisits under U6, and trading a specification claim for 223 words is a bad trade. **Priced unavailable.** Struck from `reduction_plan.md` §9a. |
+| **Supervisor query** | **FINAL TEXT, released to send** — `brain/ledger/supervisor_length_query.md`, four questions. **Phuong sends it; no mail channel is authorised here.** |
+| **Q4 is the load-bearing one** | *Are the appendices read and assessed?* ~4,900 words have been relocated there across four sessions on the unchecked assumption that they are. If they are excluded from the count **and** not read closely, demotion has been moving evidence out of the marker's view rather than out of the count. |
+| **The cut list** | **PREPARED, NOT EXECUTED** — `reduction_plan.md` §10. Tier 1 is 173 words at zero evidence cost. Tier 3 (Chapter 2's long shots, 820) costs argument rather than measurement. Everything else is refused or needs a per-item ruling. |
+| **The honest floor** | **~20,210 – 20,570 defensible; ~19,100 at the most aggressive.** Above 19,000 in every scenario. 20,000 is reachable only by cutting Chapter 2's surveyed literature, and only if §9 realises in full. |
+| **`sec:res-injection` reclassified** | §9a was **wrong** to place it outside R102. Contribution **C4** names it verbatim — *"with the injection design's contribution to the score measured rather than assumed"* — and C4 maps to RQ5. Re-priced 124 → 58. **The RQ table is not the only map of what a result bears on; the contribution table names limbs the RQ strings do not.** |
+| **Execution is HELD** | The re-priced plan is **not** to be executed until the supervisor answers. The R102-minimum answer changes the plan's shape: if confirmed, the de-duplication is larger than 763 and applies across all five research questions rather than the four sites measured. Executing first means doing Results twice. |
+| **`log/44` G5** | Points at `mcs_L1_results.json` for a full sweep that file does not contain. Another gate whose terminal node does not hold what the citing text claims. **Recorded, not chased.** |
+
 ### Tier-3 items — verifiable only on Overleaf, not unchecked
 
 The assertion boundary in `PRJ93_RULES.md` has three tiers: generator, local compile,

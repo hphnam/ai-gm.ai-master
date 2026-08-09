@@ -1025,3 +1025,29 @@ was correct when written — which is the general shape: **a count in prose is a
 document that goes stale when the document changes, and nothing here re-derives it.** The same
 applies to "five contributions", "three venues", "eight extensions". When a count is added or a
 countable thing is, grep for the number word and the digit both.
+
+## An enumeration is a measurement with a timestamp
+
+An audit that enumerates the document — sections against research questions, promises against
+appendices, floats against their referring text — is a **measurement of the document as it stood
+when the audit ran**. It goes stale the moment the thing enumerated changes, and it goes stale
+**silently**, because the audit's output is prose that still reads as true.
+
+Three instances of the same failure are now on record:
+
+- `06_research_questions.md` §7.2 mapped results to research questions against the **planned**
+  §1.3 inventory. **Five Chapter 4 subsections were composed afterwards.** It was quoted forward
+  through three phases as though it described the composed chapter.
+- The §F rows naming a remote SHA. One asserted "seven commits await a push" and was seven commits
+  stale.
+- Chapter 6's recorded floor, and the appendix count in `introduction.tex` — a count in prose is a
+  claim about the document that goes stale when the document changes, and nothing re-derives it.
+
+**The rule.** Re-run an enumeration before relying on it, or record the commit it was run at so a
+reader can see whether it still holds. Never quote an enumeration forward across a phase that
+composed new material into the population it enumerated.
+
+**Corollary, found 2026-08-09.** The RQ table is not the only map of what a result bears on. The
+**contribution** table names limbs the RQ strings do not, and a result named in a contribution
+string bears on that contribution's question by construction. An enumeration run against one map
+is not an enumeration against the criterion.

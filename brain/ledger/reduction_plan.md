@@ -739,3 +739,226 @@ the protected set re-derived twice against quoted criteria, demotion extended to
 criterion pins in place, compression at the rate its own precedent supports, the duplication
 between two mandated sites removed, and the results that answer no question moved out. What is
 left is material that survived five audit passes and that a criterion requires in the body.
+
+---
+
+## 10 · THE CUT LIST — authorised to prepare, not to execute. 2026-08-09
+
+**Standing constraint.** Material leaving the document entirely is deletion of evidence. Phuong
+rules item by item. Nothing below is executed. **A17 is ruled and stands** — `sec:res-chatlog`
+(223) is protected as the evidence that a specified deliverable was built, revisited by §6.1 under
+U6, and is priced **unavailable**. It is struck from §9a.
+
+### 10a · The screen that decided most of it
+
+Before pricing anything, every candidate was checked for **inbound cross-references from other
+chapters**, because Phuong's rule is that a cut orphaning a citation or leaving a verdict
+unsupported is not a cut. Measured with `grep -rn "ref{<label>}"` across `chapters/`, `appendix/`
+and `main.tex`:
+
+| Candidate | Inbound refs from outside Results |
+|---|---|
+| `sec:res-winkler` + `tab:winkler` | **5** — `methodology.tex`:460 (the served-model justification), `discussion.tex`:178, 298, 316, `appendix/robustness.tex`:141 |
+| `sec:res-injection` | **2** — `conclusion.tex`:169, `appendix/robustness.tex`:37 |
+| `sec:res-costsweep` | **2** — `conclusion.tex`:65, `discussion.tex`:130 |
+| `sec:res-chatlog` | **2** — `conclusion.tex`:49, `methodology.tex`:602 |
+| `sec:res-traded` / `tab:coverage-traded` | **3** — `discussion.tex`:101, `conclusion.tex`:154, `appendix/tables.tex`:200 |
+| `sec:res-exchangeability` / `tab:exchangeability` | **3** — `discussion.tex`:95, `conclusion.tex`:85, 154 |
+
+**Every whole-subsection candidate in Chapter 4 is cited from at least two other chapters.** By
+Phuong's own rule none of them is a cut. They remain demotions, where the cross-reference still
+resolves because the material is in an appendix rather than gone. **The cut list is therefore a
+paragraph-level list, not a section-level one**, and that is a finding about the document rather
+than a limitation of the search.
+
+### 10b · A correction to §9a, found by this screen
+
+**`sec:res-injection` is not outside R102 after all, and §9a was wrong to say so.** Contribution
+**C4** (`06_research_questions.md` §3) states the contribution as *"An evaluation of deviation
+detection under an asymmetric cost, on a measure committed to before the results were seen, **with
+the injection design's contribution to the score measured rather than assumed**."* C4 maps to
+**RQ5**. So the injection-validity result is not a precondition sitting outside the question — it
+is a named limb of the contribution the question's answer claims, and `conclusion.tex`:169 cites
+it for exactly that. It is R102-protected and re-prices from the 64 % band to the 30 % band.
+
+| §9a as corrected | Original | Expected save |
+|---|---|---|
+| 4.4.6 Winkler → App D (unmapped, answers D7 which names no location) | 496 | **376** |
+| 4.5.1 Injection validity → App C — **reclassified R102-bound** | 194 | **58** |
+| 4.5.5 Knowledge-gap — **A17 stands, unavailable** | 223 | **0** |
+| **§9a total** | | **434** (was 643) |
+
+**The generalisable point:** the RQ table is not the only map of what a result bears on. The
+**contribution** table names limbs the RQ strings do not, and a result named in a contribution
+string bears on that contribution's question by construction.
+
+### 10c · The cut list proper, ranked by words gained per unit of evidence lost
+
+**Tier 1 — orphans nothing, loses no measurement. Recommended.**
+
+**C-1 · §4.4.2's second-demonstration paragraph — 111 words. Rule (b), self-declared.**
+The paragraph opens *"That the earlier reading was available is itself a result, and it is the
+**second demonstration** in this section that calendar state and trading state are different
+objects. **The first** is the partition-fidelity check of Section~\ref{sec:res-drift-cause}."*
+*Survivor:* the partition-fidelity check in 4.4.4 — 94 of the Beer Hall's 546 calendar-closed days
+traded, residuals 238.0 against 32.21. *Redundancy:* the same claim, second instance.
+*Claim it supports:* that a marginal coverage figure is a claim about a mixture.
+*Downstream:* nothing cites it; `discussion.tex`:99–101 makes the mixture point in its own words
+against `tab:coverage-traded`, which stays.
+*What the document loses:* the explicit statement that the correction is to report both figures
+rather than replace one with the other. *What a reader could no longer check:* nothing — every
+number is in the table.
+**Ratio: 111 words for zero evidence. The best item on this list and the only one I would take
+without a second thought.**
+
+**C-2 · §4.4.3's two-deflections paragraph — 102 words. Rule (b), but it is a demotion.**
+Two rival explanations for the rank non-uniformity are tested and neither holds: the Beer Hall
+exceeds 0.100 at all seven horizon steps, and independence from the point forecaster follows from
+the served model's 0.870. *Survivor:* `tab:exchangeability`'s rank columns, which exhibit the
+violation directly. *Downstream:* nothing cites it.
+*What the document loses on a full cut:* the record that the account was tested against
+alternatives. **That is a robustness claim, and a reader would be unable to check that the
+explanation was contested.** So it is not a cut — **it is a demotion to Appendix C at ~40
+retained, saving ~62**, and the corrected 0.108 it also carries already appears in the paragraph
+above it.
+**Ratio: 62 words for zero evidence, once correctly classified as a demotion.**
+
+**Tier 1 subtotal: 173 words.**
+
+---
+
+**Tier 2 — where the ratio goes bad, stated so the boundary is visible.**
+
+**C-3 · §4.4.6's horizon-cap paragraph — 76 words. Rule (c) admits it. I recommend against.**
+*"A second prediction is not supported. The rationale for capping the horizon at seven days
+recorded per-step half-widths growing from 181 to 224... the recorded growth was an artefact of
+roughly 26 observations per step."* It is a null, and no RQ asks about horizon length.
+*Downstream:* nothing. `methodology.tex`:291 caps the lead at seven days on **availability**
+grounds, not on this rationale, so no argument in the document rests on the refuted claim.
+**Why it fails anyway.** Its entire content is *the project checked its own stated reason and the
+reason did not hold*. Removing it removes an admission, not a measurement, and the standing rule
+that compression must not delete negative results non-randomly exists for exactly this shape.
+**76 words to make the document less honest is the worst ratio on the list, and it is the point at
+which the list stops being cheap.** Rule (c) admits it on the letter and the standing rule
+refuses it. **The standing rule wins.**
+
+**C-4 · §4.5.4's three-bounds paragraph — 47 words. Refused under rule (d).**
+It is qualification — the misses are synthetic, the two ratios have different denominators, the
+8 fatigue items belong to neither. **No qualification, ever.** Recorded as refused so it is not
+re-offered. Note that its first bound is *already duplicated* at `discussion.tex`:420, so the
+overlap is 9b's business, not this list's.
+
+**C-5 · §4.2.4 occurrence gating — 269 words. Not eligible.**
+Tempting under rule (c): its own text says *"a null is the expected geometry rather than a
+measurement about the venue"*. But `06` §7.2 maps **RQ2's Results column to "classification,
+adoption margin, occurrence gate, failed unbiasedness precondition"** by name. RQ2 asked for it.
+Ineligible, and the temptation is worth recording.
+
+---
+
+**Tier 3 — the one place where cutting costs no measurement at all.**
+
+**C-6 · Chapter 2's long-shot sections and the agent-interventions survey — 1,403 words.
+Currently planned as demotions worth 583. Cut outright: 1,403. Delta +820.**
+
+*Why this is different in kind from everything above.* **It is other people's work, not this
+project's evidence.** Cutting a surveyed study removes no measurement, orphans no verdict and
+leaves no figure uncheckable. And no criterion names Chapter 2's location: **R122** and **R123**
+bind only the *form* of each engagement — *"begins in the author's own voice"*, *"ends in the
+author's own voice, with commentary on that writer's contribution"* — and say nothing about how
+many engagements there are.
+
+*Measured citation exclusivity* (keys cited in the range and nowhere else in `chapters/` or
+`appendix/`):
+
+| Section | Keys | Also cited elsewhere | **Would leave the document** |
+|---|---|---|---|
+| 2.1 Decision support and delegated autonomy | 4 | 1 | **3** |
+| 2.8 Proactive agents and intervention policy | 15 | 11 | **4** |
+| 2.9 Evaluation of agent interventions | 10 | 7 | **3** |
+
+**Ten sources leave the bibliography; nothing is orphaned**, because every key still cited
+elsewhere survives on that other citation.
+
+*What the document loses.* The review's **long-shot band** — `ds-writing` §7's funnel narrows
+from general context through medium shots to close-ups, and this removes the widest ring. A
+reader arrives at the gap with less context for why it is a gap. §2.10 Synthesis and research gap
+(708) and §2.5 Conformal prediction (351) are the close-ups and are untouched.
+*Second cost, and it is real:* **Appendix A records the corpus search and screening.** A review
+discussing ten fewer sources than the screening record admits needs Appendix A's narrative
+reconciled, or the two stores disagree. That is a ~40-word repair, not a blocker, but it must be
+budgeted with the cut rather than after it.
+
+**Ratio: 820 words for zero measurements and ten citations. On evidence terms this is the
+cheapest 820 in the document. On argument terms it is the most expensive thing here, because a
+review is the argument that justifies the work.** That trade is a supervisory judgement about what
+the dissertation claims, which is precisely why it is listed and not taken.
+
+### 10d · Where the ratio gets bad, stated plainly
+
+| | Words | Evidence lost |
+|---|---|---|
+| C-1 | 111 | none |
+| C-2 (as demotion) | 62 | none |
+| **— boundary of the free lunch —** | **173** | **none** |
+| C-6 Chapter 2 | 820 | no measurements; 10 sources; the review's long-shot band |
+| **— boundary of "costs argument, not evidence" —** | **993** | |
+| C-3 | 76 | an admission the project made against itself |
+| Whole-subsection Results cuts | ~1,100 | measurements, and 15 orphaned cross-references needing repair |
+
+**The list stops being cheap at 173 words and stops being defensible at 993.**
+
+---
+
+## 11 · THE HONEST FLOOR
+
+### 11a · With everything applied
+
+| | governing |
+|---|---|
+| Body now | 28,332 |
+| R114 | +150 |
+| §8 re-priced plan | −6,902 |
+| §9a **corrected** (Winkler 376 + injection 58; A17 struck) | −434 |
+| §9b R102/R103 de-duplication | −763 |
+| §10 Tier 1 cut list | −173 |
+| **DEFENSIBLE FLOOR** | **~20,210** |
+
+**Stated as a range, because every forecast in this project has been optimistic in the same
+direction.** §9a and §9b are **unmeasured** — 1,197 words of expected saving with no executed
+item behind either. The measured precedent is that unmeasured estimates here realise at about
+70 %. §10's items are measured word counts of specific paragraphs and are deterministic.
+
+| Scenario | Floor |
+|---|---|
+| §9 realises in full | 20,210 |
+| §9 realises at 70 % | 20,569 |
+| **Defensible floor** | **20,210 – 20,570** |
+
+### 11b · What it looks like below that, and what each step costs
+
+| Take also | Floor | What it costs |
+|---|---|---|
+| **+ C-6, Chapter 2's long shots cut** | **19,390 – 19,750** | The review's long-shot band; 10 sources; Appendix A reconciled |
+| + C-3, the horizon-cap admission | 19,314 – 19,674 | An honest self-refutation |
+| + whole-subsection Results cuts | ~19,100 – 19,470 | Measurements, and 15 cross-references repaired in three other chapters |
+
+### 11c · The answer to the question asked
+
+**The floor is above 19,000 in every scenario, including the one where evidence is deleted.**
+
+- **Nothing survives at 18,000.** The target is unreachable by any combination of levers on this
+  list.
+- **19,000 is unreachable.** The most aggressive scenario — deleting Results evidence, cutting the
+  review's long-shot band, and removing an admission the project made against itself — lands at
+  **~19,100 at its most optimistic**, and its own range tops out at 19,470.
+- **20,000 is reachable only by cutting Chapter 2's surveyed literature**, and only if §9 realises
+  in full. If §9 realises at the historical 70 %, that scenario lands at **19,750** and clears the
+  regulation with 250 words of margin against a forecast whose error band is ±360.
+
+**So the conversation is about scope, not editing, and it needs to happen before more work goes
+in.** The reduction plan can deliver ~8,100 words. It cannot deliver 9,300 without a supervisory
+ruling on what the dissertation claims — and the single most consequential unknown is not any item
+on this list. **It is question 4: whether the appendices are read.** If they are not, the ~4,900
+words already relocated there have been moved out of the marker's view, and the whole strategy
+needs rethinking rather than extending.

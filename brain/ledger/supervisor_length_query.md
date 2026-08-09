@@ -1,6 +1,8 @@
 # The length question, prepared for the supervisor — 2026-08-09
 
-**Status: PREPARED, NOT SENT.** Phuong sends it. Nothing here is a decision.
+**Status: FINAL TEXT, RELEASED TO SEND — Phuong, 2026-08-09.** Question 4 added on the same
+ruling. **The send itself is Phuong's**: no mail channel is authorised in this environment, so
+this file is the artefact and the sending is a human step. Nothing here is a decision.
 
 **Why it is not optional.** The body forecasts to **~20,174 governing words** after every
 available reduction. That breaches the **20,000 regulation**, not merely the 19,000 working
@@ -82,6 +84,12 @@ contribution sits.
    about what the dissertation claims rather than an editorial one about length. Each candidate is
    a result that survived the audit passes, and choosing which findings are not reported changes
    what the work asserts.
+4. **Are the appendices read and assessed?** The whole reduction strategy assumes they are. Every
+   derivation, every reconciliation working and every rejected alternative now sits in Appendices
+   A to E, with the body carrying the finding and a cross-reference. If appendices are excluded
+   from the word count *and* not read closely, then what we have been doing is moving evidence out
+   of the marker's view rather than out of the count, which would be a worse outcome than being
+   over length. We would rather know now than after submission.
 
 ---
 
