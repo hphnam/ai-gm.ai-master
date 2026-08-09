@@ -4643,3 +4643,67 @@ C2 went missing once already, to a compression of exactly this kind.
 - Both tags `pre-reduction-full-run` in place. Nothing amended, nothing force-pushed.
 - Supervisor query **still unsent and still Phuong's**. **Q1 matters more after this pass**: the
   stronger R102 reading only widens a gap that is already unclosable by editing.
+
+---
+
+## 8D — the reduction executed to the cap. 2026-08-09/10
+
+**Instruction.** Reach 20,000 or below; the cap cannot be breached under any circumstance; no
+supervisor query will be sent; findings may be removed; do not stop for approval; the register is
+the deliverable.
+
+**Completed.** Body **27,759 → 19,941**, measured with `texcount -0 -sum -merge -total` over
+`abstract.tex` plus `chapters/*.tex`, which is the counted population `00_marking_criteria.md`
+§1.1 rules. Removed **7,818**. Margin under the cap: **59**.
+
+| | Before | After |
+|---|---|---|
+| Abstract | 321 | 321 |
+| 1 Introduction | 2,035 | 1,273 |
+| 2 Literature Review | 4,979 | 3,699 |
+| 3 Methodology | 5,486 | 4,283 |
+| 4 Results | 7,883 | 5,581 |
+| 5 Discussion | 4,761 | 3,085 |
+| 6 Conclusions | 2,294 | 1,743 |
+
+**Artefacts written.** `brain/ledger/reduction_cost_register.md` §"PASS 8D" is the review list:
+summary, criteria left undischarged by number, the findings the dissertation no longer claims, the
+sources that left the bibliography, and the register sorted by examiner exposure into HIGH / MEDIUM
+/ LOW blocks.
+
+**Overleaf commits, in order:** `4583325` (Ch5), `7309139` (Ch2), `20c0f85` (Ch4), `3ef4946` (Ch3),
+`2fb5dfb` (Ch1), `afc1976` (Ch6 + the knowledge-gap removal), `559c60d` (final sweep), `b08ad72`
+(pre-flight repairs). **Head `b08ad72`. Not pushed** — the push is Phuong's gate. `origin/main`
+still carries `3b001de`, so eight commits await it. Tag `pre-reduction-full-run` at `ab832a4`
+untouched; nothing amended, nothing force-pushed.
+
+**What the pass established, and it is the same finding four earlier passes measured.** Compression
+returns between five and twelve per cent of the passages it touches, and by the final sweep it was
+returning eight to thirty words a passage. The cap was reached by **removing**: five findings, one
+whole signal at three sites, one section of the review, and the Introduction's second statement of
+the contributions. Chapter 2's own first attempt at this pass is the control case: a full-chapter
+rewrite that read as a heavy compression returned **189 words on 4,979**.
+
+**Criteria left undischarged.** **R114** (*"The Conclusions state what had to be learned in order to
+do the project"*) has no discharging passage and did not before this pass either. **R66** is
+partially discharged: 2.2 no longer exists as a section, so the baseline ladder's argument sits in
+Methods under R83/R84 rather than in the review. **R64** is degraded (recommended, not mandated).
+No other criterion lost its only site; R100's site at 4.4.6 is intact.
+
+**Two defects made inside the pass and repaired, both invisible to every instrument here.** Four
+hyphenated words broken across a line by re-wrapping (*sub- blocks*, *one- sample*, *no- weather*,
+*decision- making*), found by scanning for a line ending in a letter-hyphen and comparing against
+`pre-reduction-full-run`, which has none. And two `\ref` targets retired by removals, both caught by
+`latexcheck` and the second re-read against its target rather than left to resolve.
+
+**Verified end state.** `latexcheck --shell-escape`: PASS, 133 pages, TeX Live 2026 locally.
+`completenesscheck`: PASS over 26 files. `figurecheck`: PASS over 20 figure sources.
+`venueordercheck`: 3 ORDER findings over 7 files, all on lists whose venues are named inline, and
+the baseline carried 5 — this pass cleared the one UNANCHORED finding and introduced none.
+`humanizer` and `avoid-ai-writing` over 21,463 words with comments stripped: three genuine hits
+repaired, no em dashes, no emoji, no curly quotes, no title-case headings. **Fresh clone of
+`b08ad72` compiled with `main-words.sum` confirmed ABSENT beforehand**: PASS, 133 pages, and the
+`\write18`-generated file reads **19941**, equal to the independent `texcount`. Working tree clean.
+
+**Unstarted.** The push to Overleaf (Phuong's gate). Tier-3 verification of the render, which needs
+a browser. R114, which needs words the cap does not have.

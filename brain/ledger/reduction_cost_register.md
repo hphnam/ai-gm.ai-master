@@ -5,7 +5,9 @@ with the document in front of them can check each entry.** It is maintained as t
 executed, not reconstructed afterwards. Body length is measured with `texcount -0 -sum -merge
 -total`, excluding bibliography and appendices, which is the measure the 20,000-word cap uses.
 
-**Status: Chapter 3 demotions executed. Body 28,332 → 27,990, measured.**
+**Status: COMPLETE. Body 27,759 → 19,933, measured, against a hard cap of 20,000.** The 8D
+pass at the foot of this file is the review list; read its Summary first. Everything above it
+records the passes that preceded it and the four realisation rates that refuted their forecast.
 
 **Rollback baseline.** Both repositories are tagged `pre-reduction-full-run`. Overleaf
 `ab832a44a8f96fa6910efff5ae79e177727f8694`, confirmed on the remote with `git ls-remote` before
@@ -295,3 +297,164 @@ That is the halt condition as Phuong wrote it: *"If reaching 18,000 would requir
 finding, DO NOT. Stop at whatever compliant number you reach, and report the gap with the
 candidates you would have had to take."* The candidates are the table above. **The document is
 not yet compliant, and closing the gap is a decision about scope rather than about length.**
+
+---
+
+# PASS 8D — execution to the 20,000 cap. THE REVIEW LIST
+
+**This section is the deliverable.** It records every passage removed to bring the body under a
+cap that cannot be breached, sorted by the one column Phuong reviews: **whether an examiner could
+reasonably ask for the material.** Read the HIGH block; the rest is recorded for completeness.
+
+---
+
+## Summary
+
+| | |
+|---|---|
+| Body at the head of this pass, re-derived not quoted | **27,759** |
+| Body at the close, measured | **19,933** |
+| **Removed** | **7,826** |
+| The cap | 20,000, hard |
+| Margin | 67 |
+| Overleaf commits | `4583325`, `7309139`, `20c0f85`, `3ef4946`, `2fb5dfb`, `afc1976`, `559c60d` |
+| Rollback | tag `pre-reduction-full-run` at `ab832a4`, untouched. Nothing amended, nothing force-pushed |
+
+**Per chapter, `texcount -0 -sum -merge -total`, abstract plus Chapters 1--6 being the counted
+population per `00_marking_criteria.md` §1.1:**
+
+| | Before | After | Removed |
+|---|---|---|---|
+| Abstract | 321 | 321 | 0 (protected, HC4/HC5) |
+| 1 Introduction | 2,035 | 1,273 | 762 |
+| 2 Literature Review | 4,979 | 3,699 | 1,280 |
+| 3 Methodology | 5,486 | 4,283 | 1,203 |
+| 4 Results | 7,883 | 5,581 | 2,302 |
+| 5 Discussion | 4,761 | 3,085 | 1,676 |
+| 6 Conclusions | 2,294 | 1,743 | 551 |
+| **Body** | **27,759** | **19,933** | **7,826** |
+
+### Criteria left undischarged or degraded, by number
+
+| Criterion | Wording | State after this pass |
+|---|---|---|
+| **R114** | *"The Conclusions state what had to be learned in order to do the project."* | **UNDISCHARGED, and it was undischarged before this pass** — `00_marking_criteria.md` §1.1b found it unmet on 2026-08-09 and budgeted +150 words to fix it. Under a binding cap those words were not available, so the gap stands and Chapter 6 shrank instead. This is the one criterion with no discharging passage anywhere in the document. |
+| **R66** | *"Every method that actually ships in the built system is argued for in this chapter."* | **PARTIALLY DISCHARGED.** Section 2.2 no longer exists as a section: the bar the baseline ladder is argued against survives as one sentence folded into 2.3, and the ladder's fuller justification now sits in Methods under R83/R84 rather than in the review. Every other shipped method keeps its argument in Chapter 2. |
+| **R64** | *"The literature review narrows via the funnel model."* **Recommended, not mandated.** | **DEGRADED.** 2.1's general-context ring was already cut by the 8C-9 pass; this pass took the Gorry/Kumar framing down to a single sentence. The funnel now opens close to its subject. |
+| **R59, R125** | critical writing; knowledge-transforming prose | **THINNED, not lost.** Chapter 2 keeps every qualification it argued for and loses the length at which it argued them. Chapter 5's section 5.2 states four divergences where it used to argue them. |
+
+**No other criterion lost its only site.** R100's only site (4.4.6, the contrast of alternative
+approaches) is retained; R102's per-question sites are retained; R103--R108 are retained;
+R109--R113, R115 and R116 are retained; R94--R97 keep every float and its textual summary; R7 keeps
+all five research questions verbatim in the Introduction.
+
+### Findings the dissertation no longer claims
+
+1. **The knowledge-gap signal, entirely.** That a chat corpus of 735 staff and assistant messages
+   across 25 active days yields twelve clusters of which four clear an above-baseline threshold;
+   that the signal enters the ranked output on the same footing as the sales signals with its
+   wiring verified additive; and its two disclosed limitations, that most of the corpus carries no
+   venue tag so a gap broadcasts estate-wide, and that it is the first composed signal carrying
+   free-form staff text into a language-model-facing tool.
+2. **The per-step half-width null.** That the recorded growth from 181 to 224 which justified
+   capping the horizon at seven days was an artefact of roughly 26 observations per step, the Beer
+   Hall per-step half-width being flat at power. The cap is retained; its evidence is not.
+3. **The magnitude-gradient second statistic.** That magnitude-one spikes are caught at 0.375,
+   0.500 and 0.333 against 0.958 to 1.000 for regime shifts of the same magnitude.
+4. **The native-interval replication as a body finding.** That Chronos-Bolt's worst venue
+   under-covers by 0.028 against the 0.28 the published figure implies, and that two of three of
+   \citet{kaas_probabilistic_2026}'s orderings replicate. The trading-day corroboration survives at
+   4.4.4 and the per-arm figures survive in Appendix E.
+5. **The step-parameter reproduction check.** That with the step unset the harness reproduces the
+   committed tables, and that the group study's univariate arm reproduces the committed ladder to
+   within $1.4\times10^{-6}$ over 738 folds.
+
+### Sources that left the bibliography
+
+`siffer_anomaly_2017` (SPOT, with the point-anomaly branch of 2.7), `zou_poisonedrag_2025` (with
+the chat corpus's write-path paragraph) and `hollmann_accurate_2025` (TabPFN's lineage in 2.3).
+`staufer_2025_2026` left in the earlier 8C-9 pass, row 10. Cited keys 88 → 84. **No citation is
+orphaned**, verified by set difference over every body and appendix file against
+`pre-reduction-full-run`.
+
+### What was protected and verified present at the close
+
+Twenty-two protected items were greped for by their own wording after the last edit and all
+twenty-two are present: 2.9's research-gap sentence, 4.4.1's premise line that 4.4.3 and 4.4.4
+rest on, 4.2.4's occurrence-gating null, 4.2.1's unbiasedness null, both of C2's limbs stated as
+nulls (weather at `results.tex` *"the set retains the no-weather arm at every venue, weather is
+not statistically separable from no weather"*, pooling at *"Grouping is indistinguishable from or
+worse than forecasting each venue alone"*), 4.5.1's strong null, 4.4.3's *"that agreement does not
+add precision"*, all five of 6.2's contributions, R113's and R116's sentences verbatim, the three
+honesty bounds (Dixon's thirty-two participants without an effect size, the judge's different
+pairings, the rhythm that is not a memory architecture), R93's $F_\beta$ justification, Sun
+supplying motivation with no theorem bounding the coverage, R7's five questions and HC59's six
+divergences.
+
+---
+
+## The register, sorted by examiner exposure
+
+**HIGH — an examiner could reasonably ask for this.**
+
+| # | What it was | Words | Criterion it discharged | Undischarged now? | What the document can no longer show |
+|---|---|---|---|---|---|
+| 17 | **The knowledge-gap signal at all three of its sites**: Methods 3.11 whole (the clustering design, the above-baseline threshold, the pinned embedding backend, and the corpus's write-path paragraph citing `zou_poisonedrag_2025`), Results 4.5.5 whole, and the 6.1.1 sentence naming it | ~390 | none — the document's own words are *"a second signal reaches the same output without answering any research question"*; A17 had ruled it stay, under no length pressure | n/a. R82's *"inherent data limitations"* remains discharged by 3.8's CUSUM-constants passage | That the built system carries a second signal at all. A reader of the specification's four named data domains sees two accounted for and no trace of what the chat corpus produced |
+| 18 | **4.4.6's per-step half-width null**: the flat Beer Hall per-step half-widths at power against the 181-to-224 growth the horizon cap was set on, and the finding that the growth was an artefact of ~26 observations per step | ~90 | R102 via D7 | No. 4.4.6 remains R100's site and keeps the five-method contrast, the adoption verdict and its qualification | Why the seven-day horizon cap is retained. The sentence *"the cap is retained, since nothing measured here evidences extending it"* now asserts what the removed passage measured |
+| 19 | **4.4.5 Native model intervals, whole subsection**: the replication verdict against \citet{kaas_probabilistic_2026}, the 0.028-against-0.28 magnitude non-replication, and the two-of-three ordering result | ~150 | none — it answers no research question; RQ4's answer is carried by 4.4.1 to 4.4.4 and D7 names no location | No | That a published interval finding was tested here at all. The trading-day corroboration survives at 4.4.4 and Appendix E keeps the per-arm figures, so the evidence is in the document and the replication *claim* is not |
+| 20 | **Chapter 2's section 2.2, Demand forecasting on short hospitality series**, folded into 2.3 as one sentence | ~180 | **R66** for the baseline ladder | **PARTIALLY.** The bar survives (*"simple methods are hard to beat … anything more elaborate must clear a classical or linear model on evidence rather than on architecture"*) and the ladder's fuller justification is in Methods under R83/R84, not in the review | The review no longer argues, at length and from three studies, why a simple model is the thing a foundation model has to beat |
+| 21 | **4.5.2's magnitude-gradient second statistic** and the detector-choice explanation behind the weakness on point events | ~110 | R102 | No. The VUS-PR profile, its two exceptions and the cumulative-sum explanation are retained | The magnitude gradient as a second reading of the same corpus |
+
+**MEDIUM — defensible to remove, and a marker might notice the absence.**
+
+| # | What it was | Words | Criterion it discharged | Undischarged now? | What the document can no longer show |
+|---|---|---|---|---|---|
+| 22 | **5.3's numbers-audit paragraph**: 340 figures audited, 309 matching, seventeen mismatches, nine untraceable, two stale, four changing a conclusion, and the 0.045 ranking example | ~170 | R104, as a third validity limb | No. R104 is discharged by the pairing argument and the numerics-regime argument, both retained. **The audit itself survives in the document**, at 6.4, which keeps the 340/309/four figures | The Discussion no longer offers the audit as a validity argument; the Conclusions offer it as a transferable lesson |
+| 23 | **4.1.2's step-parameter reproduction check** | ~70 | none | No | That introducing the one-day origin step was verified not to perturb the univariate path |
+| 24 | **2.1's Gorry/Kumar framing ring**, reduced to one sentence; **2.7's point-anomaly and Bayesian change-point survey** (SPOT leaves the bibliography); **2.6's volunteered TabPFN-3 ranking instance**; **2.9's Ancker clinical effect size**; **2.3's energy-domain weather mechanism pair** and its foundation-model ablation argument | ~700 | R64 (recommended), R57, R59 | R64 **degraded**; R57 and R59 thinned | The review's widest ring, its strongest single piece of evidence that rankings move (a vendor reporting its own ordering moving), and the mechanism argument for why weather can cost more than it contributes |
+| 25 | **5.2's argument for four of the six literature divergences**, now stated with their resolutions rather than argued | ~350 | none binds the Discussion; R60/R61 name the Background chapter and are discharged there | No | Why each divergence is a divergence rather than an error, at the length that shows the reasoning. Bears on **D7**, which names no location and is assessed holistically |
+| 26 | **6.3's five smaller further-work extensions**, reduced to one sentence apiece | ~300 | none — no criterion names a further-work section | No. **R113's and R116's sentences are retained verbatim** in the two extensions that are changes to this work's own method | The reasoning behind five of the eight extensions |
+| 27 | **3.3's Syntetos--Boylan diagonal geometry**, **3.2's Chatfield non-transfer argument** (now argued once, at 5.2), **3.6's confidence-set reading properties** (stated at 4.1.3 and in Chapter 2), **3.4's covariate-availability argument**, **3.1's fourth-location boundary** (argued under HC59 at 5.5) | ~450 | R83, R84 | No — every decision keeps its reason as a sentence, which is what R83 and R84 ask for | The derivations and arguments a reimplementer would read; Appendices B and C carry the demoted ones from the 8C-9 pass |
+
+**LOW — duplication, exposition, or material stated at its criterion-bound site elsewhere.**
+
+| # | What it was | Words | Criterion it discharged | Undischarged now? | What the document can no longer show |
+|---|---|---|---|---|---|
+| 28 | **1.4's five contributions in detail**, reduced to one paragraph naming them and pointing at 6.2 | ~550 | none — no Introduction criterion places contributions here; R109--R112 put them in the Conclusions | No | Nothing. The same five claims, with their measurements, are at 6.2 |
+| 29 | **5.1's restatement of Chapter 4's supporting numbers** | ~355 | R103 | No — each of the five answers keeps the one measurement that carries it and a pointer to the Results section reporting it | This is the R102/R103 duplication the plan identified at §9b: the same measurement stated at two mandated sites |
+| 30 | **1.2's five-limb literature survey** and 1.3's dependency-chain rationale | ~230 | R52 | No — the gap is stated as one proposition and R52 is discharged by it | The Introduction no longer previews Chapter 2's limbs |
+| 31 | **Float captions across Results and Methods**, cut to the quantity, units, $n$ and interval type | ~180 | R136, R96, R97 | No — every float keeps an informative legend and its textual summary. **Every protected qualification is retained**, including `tab:weather`'s *"these are arm means and carry no interval of their own"* and `tab:winkler`'s per-venue $\gamma$-sweep note, both in bold | Explanation a reader gets from the surrounding text |
+| 32 | **2.10's limb-by-limb research-question preview and four-results recapitulation** | ~330 | R62, R63 | No — the gap proposition, the PRISM disclaimer and the three things left undone are all retained | The synthesis no longer recapitulates the chapter before stating the gap |
+| 33 | **Working and exposition across 4.1 to 4.5**: the multiple-comparison rationale, the adoption margin's derivation, the per-origin displacement enumeration, the false-open identity, the two-limbs restatement, the windowing remedy's walk-through, 4.4.2's meta-commentary, 4.4.3's active-versus-traded correction narrative, 4.5.4's inversion-size argument | ~900 | R87--R102 across sites | No — every finding, its number and its float are retained | The working behind results the tables already report |
+| 34 | **6.1's three deliverable subsections and 6.2's argument around the five claims**, compressed | ~250 | R110, R111 | No — each deliverable is named and stated achieved or not; all five contributions keep their headline numbers | Exposition |
+
+---
+
+## Two defects made inside this pass and repaired, recorded because both compile silently
+
+1. **Four hyphenated words broken across a line by re-wrapping** — *sub- blocks*, *one- sample*,
+   *no- weather*, *decision- making*. LaTeX renders a source newline as a space, so each would have
+   printed with a gap. **No compile reports this.** Found by scanning every body and appendix file
+   for a line ending in a letter-hyphen and comparing against `pre-reduction-full-run`, which has
+   none in any chapter. All four repaired; the helper no longer breaks on hyphens.
+2. **Two `\ref` targets retired by a removal.** `\ref{sec:further-work}` was split across a line by
+   the same wrapping, and `sec:rw-rhythm` was retired when 2.2 folded into 2.3 while `results.tex`
+   still cited it. `latexcheck` caught both as undefined references. The second was repointed to
+   `sec:rw-pooling` **and re-read against the target**, which carries the reconciliation sentence
+   and `wickramasuriya_optimal_2019` that the citing sentence promises — a resolving `\ref` is not
+   a true one.
+
+**Two removals were considered and refused on cross-reference grounds rather than on evidence.**
+Removing 4.5.3 (alert suppression) and the whole of 4.4.5 would each have orphaned a substantial
+appendix section written to support them. Appendices are outside the counted population, so
+removing the body anchor buys the cap nothing and costs the appendix its reader. The words were
+found elsewhere.
+
+## What the arithmetic looked like against the four measured rates
+
+The plan's forecast, and the four realisation rates that refuted it, are at the head of this file.
+**They held.** Compression across this pass returned between 5 and 12 per cent of the passages it
+touched, and by the final sweep it was returning eight to thirty words a passage. The cap was
+reached because material was **removed** rather than compressed: five findings, one whole signal,
+one section of the review, and the second statement of the contributions. That is the trade Phuong
+authorised, and the HIGH block above is what it bought.
