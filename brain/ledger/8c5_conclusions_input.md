@@ -3,6 +3,36 @@
 **Discovery run 2026-08-09. NOTHING COMPOSED.** Written because both blockers are the kind that a
 composing session resolves silently and wrongly if it meets them mid-draft.
 
+---
+
+## BOTH BLOCKERS RULED, 2026-08-09. Composition opens next session.
+
+**Ruling 1 — 6.1 revisits the three Student deliverables**, one subsection each. Recorded as unlock
+**U6** in `05_paper_architecture.md` §7, with two binding conditions there: an unmet part is named
+in the same sentence as the delivered part, and the cause is cross-referenced to 5.5 under HC59
+rather than re-argued. The §2.1 purpose cell for 6.1 now carries the referent.
+
+**Ruling 2 — five contributions.** Recorded in `06_research_questions.md` §6, which is now the
+single source for both 1.4 and 6.2. The four surfaces flagged below were checked one at a time and
+**the disagreement was already stale**: `05`:271 and `05`:1317 read five, §11 reads five, and the
+two remaining "four"s (`05`:242 and the live `sec:conclusion-claims`) are **correct as inventory** —
+they describe the document as it stands, which 8C-5 is what changes.
+
+**The finding underneath it, which the count concealed.** The live `sec:conclusion-claims` was read
+end to end and its four claims map to **C1, C3, C4, C5**. The section contains no occurrence of
+*weather*, *pooling* or *covariate*. **C2 is not a fifth claim appended to four good ones — it is a
+contribution the document omits, and it is the pair of nulls.** The gap therefore runs in the exact
+direction this project guards against: a null dropped from the summary while four positive-sounding
+claims survive. 8C-5 closes it by writing C2 in.
+
+**The live floor, measured rather than inherited.** `wordcount.py` on
+`chapters/conclusion.tex`, 2026-08-09: opener 75, *What the work establishes* 307, *Further work*
+**926**, *Closing* 152 — **1,460 marker words** against the 1,100 budget. Neither of the two figures
+in circulation was usable: `05`:1092's 2,672 predates 8C-4's excision, and 1,100 is an allocation
+S-3 retired as a constraint. Note where the excess sits. **6.1 does not exist at all** and needs 400,
+so the pre-compression floor is about 1,860; *Further work* is 926 against 400 and is the only
+section carrying real slack. 6.2's 250 words are close to their 307, and they are fixed strings.
+
 ## The spec, quoted from the owning file
 
 `knowledge/05_paper_architecture.md` §2.1:309–313 — **Chapter 6, 1,100 words**:

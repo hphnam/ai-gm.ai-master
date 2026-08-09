@@ -4014,3 +4014,55 @@ trusted**. General form: *a check that examined nothing must not be able to repo
 **8C-5 (Conclusions) is NOT begun**, by instruction. The recompute set still holds R4, R9, R16, R22
 and R30; D3 stays live. S-4 pass two, if there is one, has no items left that this pass did not
 either take, decline or rule unavailable.
+
+---
+
+## 2026-08-09 — the 8C-5 rulings, recorded. No composition.
+
+**What this entry closes.** The two blockers raised at the 8C-5 discovery were ruled by Phuong and
+are now written where a composing session will meet them, rather than in a report it will not read.
+
+- **Ruling 1 — 6.1 revisits the three Student deliverables** of `docs/PRJ93.md`, one subsection
+  each. Recorded as unlock **U6** in `05_paper_architecture.md` §7, and the §2.1 purpose cell for
+  6.1 now carries the referent instead of the phrase *"Each objective, achieved or not"*, which
+  presupposed a list this project does not have. **Two conditions bind the composer:** an unmet part
+  is named in the same sentence as the delivered part, never in a later hedge; and the cause is
+  cross-referenced to 5.5 under HC59 rather than re-argued, naming D-U1/D-U4/D-U7 and D-U2/D-U5.
+- **Ruling 2 — five contributions.** `06_research_questions.md` §6 is now the single source for
+  both 1.4 and 6.2. The stale *"Recommend updating §2.1"* note is replaced by a resolution record
+  with every occurrence of "four" enumerated and dispositioned.
+
+**The disagreement was stale, and the finding underneath it was not.** `05`:271, `05`:1317 and §11
+already read five; the two surviving "four"s describe the document as it stands and are correct as
+inventory. Reading the live `sec:conclusion-claims` end to end to establish that produced the real
+result: its four claims map to **C1, C3, C4, C5**, and the section contains no occurrence of
+*weather*, *pooling* or *covariate*. **C2 is not a fifth claim appended to four good ones — it is a
+contribution the document omits, and it is the pair of nulls.** So the four/five gap runs in the
+direction this project guards against: a null dropped from the summary while four positive-sounding
+claims survive. This is the same shape as the abstract that passed every instrument while unwritten
+— a count disagreement was the only visible symptom of a missing claim, and nothing here checks
+whether a contribution is *present*, only whether the prose compiles.
+
+**Conclusions measured rather than inherited.** 1,460 marker words (opener 75 · claims 307 ·
+further work 926 · closing 152) against a 1,100 budget. Neither circulating figure was usable:
+2,672 predates 8C-4's excision, 1,100 is an allocation S-3 retired. 6.1 does not exist and needs
+400, so the pre-compression floor is about **1,860**; *Further work* at 926 against 400 holds the
+only real slack.
+
+### Verified end state
+
+- **No `.tex` was touched.** Overleaf clone `main` = `29016e7` = `origin/main`, **ahead 0**,
+  push confirmed independently with `git ls-remote`. The three document checkers had no new text to
+  examine and were not re-run; the last run stands at figurecheck **1**, completenesscheck **7**,
+  venueordercheck **5**.
+- Four brain files changed: `05_paper_architecture.md`, `06_research_questions.md`,
+  `ledger/8c5_conclusions_input.md`, `ledger/BLOCKED_third_party.md` §F.
+- Ch 4 **7,712** · Ch 5 **4,870** · Ch 6 **1,460** · five measured chapters **24,506**.
+
+### Next session
+
+**8C-5, Conclusions.** The prompt is short now: `05`'s §1.4 inventory row and the Chapter 6 spec
+block, `06` §6's fixed strings, U6 and its two conditions, and the standing pre-flight and push
+discipline. Then 8C-6 (Introduction and Abstract, a revision against the finished document), then
+the six-floor measurement and the reallocation ruling. The recompute set still holds R4, R9, R16,
+R22 and R30; D3 stays live; T3-1 and T3-2 remain open.

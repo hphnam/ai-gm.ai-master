@@ -201,14 +201,37 @@ than *why it fails*, even though the answer is that it fails at one venue.
 1.4's budget is **250 words**. Five contributions, each one sentence plus a
 strength qualifier.
 
-**Note a discrepancy for approval.** `05_paper_architecture.md` §2.1 describes
-1.4 as *"Four contributions at graded strength"*, following the four claims in
-the current `sec:conclusion-claims`. The mapping below yields **five**, because
-limb 7's apparatus must be separately visible under §4 above and cannot be
-folded into another claim without concealing it. The word "Four" in §2.1 is a
-purpose description, not a budget, and the 250 words hold five sentences
-comfortably. **Recommend updating §2.1 to read "Five".** Flagged rather than
-changed, since §2.1 is an approved item under §7 of that file.
+**THE COUNT IS FIVE. This subsection is the single source, and it settles the
+question for both 1.4 and 6.2.** Ruled by Phuong, 2026-08-09, restating the
+unlock **U1** already taken at the 2026-08-06 gate. Anything that reads "four"
+outside the two exceptions below is stale and is corrected on sight rather than
+treated as a live disagreement.
+
+**Where "four" still appears, and what each occurrence is.** Checked 2026-08-09
+across `knowledge/`, `ledger/` and the live document:
+
+| Where | Reads | Status |
+|---|---|---|
+| `05_paper_architecture.md` §2.1, the 1.4 purpose cell (:271) | **Five**, "amended from four by explicit unlock, §7 U1" | Already correct. Nothing to do. |
+| `05_paper_architecture.md` §7, unlock **U1** (:1317) | four → **Five** | The authority. Nothing to do. |
+| §11 of this file | *"resolved in favour of five, by unlock U1"* | Already correct. |
+| `05_paper_architecture.md` §1.3 (:242) | *"Four contributions at graded strength"* | **Correctly four.** It is an inventory of the document as it stands, not a target. It stays four until 6.2 is composed. |
+| `chapters/conclusion.tex`, `sec:conclusion-claims` | *"divides into four claims"* | **Correctly four today, and 8C-5 changes it.** |
+
+**The note this replaces recommended updating §2.1 and was discharged the same
+day; the recommendation is kept here because the reason still binds.** Limb 7's
+apparatus must be separately visible under §4 above and cannot be folded into
+another claim without concealing it, and 250 words hold five sentences.
+
+**The finding that makes this more than bookkeeping.** The live
+`sec:conclusion-claims` was read end to end on 2026-08-09 and its four claims map
+to **C1, C3, C4, C5**. It contains no occurrence of *weather*, *pooling* or
+*covariate*. **C2 is not the fifth contribution appended to four existing ones —
+it is a contribution the document currently omits.** The omitted one is the pair
+of nulls: the controlled weather and cross-series-pooling test that returned no
+improvement. So the gap between four and five runs in the direction this project
+guards against, a null dropped from the summary while four positive-sounding
+claims survive, and 8C-5 closes it by writing C2 in rather than by renumbering.
 
 | # | RQ | Contribution as it appears in 1.4 | Strength |
 |---|---|---|---|
