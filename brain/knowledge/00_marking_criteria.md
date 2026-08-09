@@ -42,15 +42,21 @@ project on what the limit counts.**
 | Abstract | **INCLUDED** — the counted body is the abstract plus Chapters 1–6 |
 | Is 20,000 a target or a cap? | **A HARD CEILING.** Exceeding it is penalised seriously and materially affects the mark |
 
-**The ceiling is hard, ruled 2026-08-09 and superseding the same day's softer reading.**
-**There is no acceptable overrun and no justification that covers one.** The three numbers that
-govern, all on `texcount`:
+### FINAL RULING ON LENGTH — Phuong, 2026-08-09. This does not move again.
 
-| | governing words | status |
+| | governing words (`texcount`) | status |
 |---|---|---|
-| **Ceiling** | **20,000** | **hard — cannot be exceeded** |
-| Acceptable | 18,000 | what reads well to a marker |
-| Working aim | 15,000 | |
+| **HARD CEILING** | **19,000** | **exceeding it is not available** |
+| **Target** | **18,000** | what the work aims at |
+| ~~20,000~~ | — | **irrelevant. It is the regulation, not the constraint being worked to** |
+
+**A plan whose EXPECTED landing exceeds 19,000 has not met the constraint, whatever its ceiling
+says.** Clearing a limit on paper while expecting to land over it is not compliance. Never
+present one.
+
+**Superseded and struck:** the 20,000-cap reading; the *"accept ~22,000 with a justification"*
+recommendation; and 15,000 as a working aim — **15,000 is off the table**, which removes any
+reason to push compression past what it safely gives.
 
 **A recommendation to "accept ~22,000 with a justification" was offered on 2026-08-09 and
 withdrawn the same day. It was wrong and must not be re-offered** — recorded at
@@ -60,11 +66,35 @@ limit cannot move, the protected set is what gets re-derived.**
 
 **Doing that re-derivation established which criteria actually name a location**, and it is the
 distinction that governs every relocation decision from here. Quoted verbatim, not paraphrased:
-**R7 ("in the Introduction"), R83 and R84 ("Methods justify…"), R106 and R107 ("The Discussion
-states / explains") and HC59 ("explained in the Discussion") name a location. R8 ("answered by
-the end of the document") and D7 do not.** Where no criterion names a location, keeping material
-in the body is a **judgement about how a marker reads** — legitimate, and it yields to a quoted
-criterion under a hard cap. Table at `ledger/reduction_plan.md` §3a.
+**R7 ("in the Introduction"), R83 and R84 ("Methods justify…"), R102 ("Results state…"), R103 to
+R108 ("The Discussion answers / argues / states / explains…"), R109 to R116 ("The Conclusions…")
+name a location. R8 ("answered by the end of the document") and D7 do not.** Where no criterion
+names a location, keeping material in the body is a **judgement about how a marker reads** —
+legitimate, and it yields to a quoted criterion under a hard ceiling. Table at
+`ledger/reduction_plan.md` §3a.
+
+**CORRECTION, 2026-08-09, appended rather than applied silently.** The first statement of this
+finding said §5.1's protection rested only on R8 and was therefore an inference. **R8 is indeed
+document-scoped, but R103 — *"The Discussion answers what the results reveal in relation to the
+research question(s)"* — is Discussion-bound and protects §5.1's PRESENCE.** The compression of
+§5.1 from 1,060 to ~500 stands, because R103 requires the answers to be there and not to be long.
+**What changes is that §5.1 may be compressed and may NOT be demoted**, and the criterion naming
+it is R103, not R8. The sweep that found this also found the Conclusions are governed by **eight**
+location-bound criteria (R109–R116), which is why Chapter 6 is the wrong place to look for
+savings — see §1.1b.
+
+### 1.1b Coverage gap found while pricing — R114 appears unmet
+
+**R114, *"The Conclusions state what had to be learned in order to do the project"*, has no
+discharging passage in `conclusion.tex`.** R113 and R116 (*"what would be done differently"* /
+*"how the methodology would be modified if the project were repeated"*) **are** discharged, but
+they are embedded inside §6.3's extensions as two sentences — *"the first change this work would
+make to its own method were it repeated"* and *"the second change…"*. R115 is arguably discharged
+by §6.4's transferable lesson.
+
+**Two consequences.** R114 is an open gap and Chapter 6 may need to **grow** rather than shrink.
+And **§6.3 cannot be demoted wholesale**, because R113 and R116 would leave the body with it —
+any demotion there must retain those two sentences explicitly.
 
 **`declaration.tex` is not evidence about any of this.** Its "including appendices and
 footnotes" wording is **inherited template residue**, the same class as the issued-template

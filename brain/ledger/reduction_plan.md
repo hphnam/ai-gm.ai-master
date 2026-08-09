@@ -1,4 +1,4 @@
-# The reduction plan — REVISED against a hard 20,000 ceiling
+# The reduction plan — REVISED against a hard 19,000 ceiling
 
 **Revised 2026-08-09 under the 8C-9 brief. NOT EXECUTED.** Phuong rules section by section.
 Nothing has been compressed, demoted, cut or moved.
@@ -14,10 +14,10 @@ constraint. That draft's recommendation is withdrawn — see §1. It in turn sup
 > **"Execute the plan to its ceiling and accept a body near 22,000"** — first draft §6,
 > 2026-08-09. **WITHDRAWN by Phuong the same day. It was wrong.**
 
-**20,000 is a HARD ceiling.** Exceeding it is penalised seriously and materially affects the
-mark. There is no acceptable overrun and no justification that covers one. A plan landing at
-22,031 does not fall short of a target; **it fails the constraint**, and offering it as an
-outcome was the error.
+**The ceiling is hard.** There is no acceptable overrun and no justification that covers one. A
+plan landing at 22,031 does not fall short of a target; **it fails the constraint**, and offering
+it as an outcome was the error. *(The ceiling was 20,000 when this was withdrawn and is now
+19,000 — see the final ruling below. The withdrawal stands under either.)*
 
 The reasoning that produced it is worth naming, because it is a general failure mode rather
 than a slip. The first draft treated the protected set as fixed and the target as negotiable,
@@ -26,18 +26,24 @@ the protected set is what must be re-examined, and "protected" has to be re-deri
 each criterion actually says rather than carried forward from a pass made under a softer rule.
 Doing that re-derivation is what §3 below is, and it moved material in **both** directions.
 
-**The binding numbers, on `texcount`, which governs:**
+### FINAL RULING — Phuong, 2026-08-09. This does not move again.
 
-| | governing | note |
+| | governing (`texcount`) | note |
 |---|---|---|
-| Hard ceiling | **20,000** | cannot be exceeded |
-| Acceptable | 18,000 | reads well to a marker |
-| Working aim | 15,000 | |
-| **Body today** | **28,750** | as the compiled declaration prints it |
-| **Body today, true** | **~28,980** | +230 the instrument cannot see — §2 |
-| First draft at ceiling | 22,031 | **above the hard limit — insufficient** |
-| **This plan at ceiling** | **17,321** | under the cap by 2,679, under 18,000 by 679 |
-| **This plan at 70 % realisation** | **~20,750** | **above the cap** — §6 |
+| **HARD CEILING** | **19,000** | **exceeding it is not available** |
+| **Target** | **18,000** | |
+| ~~20,000~~ | — | **irrelevant — the regulation, not the constraint being worked to** |
+| **Body today, true** | **~28,980** | 28,750 printed + 230 the instrument cannot see (§2) |
+| **This plan at ceiling** | **16,661** | |
+| **This plan at EXPECTED landing** | **17,989** | **1,011 below the ceiling, 11 below target** |
+
+**A plan whose EXPECTED landing exceeds 19,000 has not met the constraint, whatever its ceiling
+says.** That is the standard this file is now written to, and §6 reports the expected landing
+first and the ceiling second.
+
+**15,000 is off the table**, which removes any reason to push compression past what it safely
+gives. Under a hard ceiling the lever is **demotion**, whose limit is not budget but whether the
+body still discharges its criteria.
 
 ---
 
@@ -116,6 +122,10 @@ revision, and it moved material both ways.
 | **R7** | "A research question (or questions) is explicitly stated **in the Introduction**." | **YES — Introduction** |
 | **R83** | "**Methods** justify why each decision was made." | **YES — Methods** |
 | **R84** | "**Methods** justify why the alternatives considered were rejected." | **YES — Methods** |
+| **R102** | "**Results** state what the findings imply for the research question(s)." | **YES — Results** |
+| **R103** | "**The Discussion** answers what the results reveal in relation to the research question(s)." | **YES — Discussion** |
+| **R104** | "**The Discussion** argues whether the approach is valid, and why." | **YES — Discussion** |
+| **R105** | "**The Discussion** states the inherent limitations of the work." | **YES — Discussion** |
 | **R106** | "**The Discussion** states the potential biases in the work." | **YES — Discussion** |
 | **R107** | "**The Discussion** explains how the underpinning assumptions may have impacted the findings." | **YES — Discussion** |
 | **HC59** | "Any significant difference between the project specification's scope and the project as performed is explained **in the Discussion**." | **YES — Discussion** |
@@ -123,8 +133,18 @@ revision, and it moved material both ways.
 | **HC57** | "**Appendices are placed after** the References section." | YES (met) |
 | **R8** | "Each stated research question is explicitly answered **by the end of the document**." | **NO — document-scoped** |
 | **D7** | "There is an explicit discussion of why the approach taken is better than alternatives that could have been used." | **NO** |
+| **R109–R116** | "**The Conclusions** revisit / state / discuss…" — eight of them | **YES — Conclusions** |
 | **R69** | "Pseudocode and/or flow diagrams are **provided** where algorithms are described." | **NO** (already in App B) |
 | **R65** | "A search protocol is **stated**…" | **NO** (already in App A) |
+
+**CORRECTION to this table's first statement, appended rather than applied silently.** It
+originally listed R8 as the criterion protecting §5.1 and concluded the protection was an
+inference. **R8 is document-scoped, but R103 is not** — *"The Discussion answers what the results
+reveal in relation to the research question(s)"* protects §5.1's **presence in the Discussion**.
+The compression 1,060 → ~500 stands, because R103 requires the answers to be there rather than to
+be long. **What changes is that §5.1 may be compressed and may not be demoted.** The same sweep
+found R102 binding Results and **eight** criteria binding the Conclusions, which is why Chapter 6
+is the wrong place to look for savings — §6f.
 
 **Two findings, and they cut against each other.**
 
@@ -398,59 +418,116 @@ under this plan it inherits the answer detail §5.1 sheds. That is the coupling 
 
 ---
 
-## 6 · The arithmetic, honestly
+## 6 · The arithmetic — expected landing first, ceiling second
 
-| Chapter | Today (governing) | Ceiling floor | At 70 % realisation |
+### 6a · Why the old ~20,750 was wrong
+
+The first revision applied S-4's **70 per cent** realisation rate to the whole 11,429. That rate
+was measured on a **de-duplication pass executed qualifier-first**, where the binding constraint
+was what a sentence could safely lose. **It does not apply uniformly, and applying it uniformly
+was the error.**
+
+| Class | Why its rate is what it is | Rate |
+|---|---|---|
+| **DEMOTION** | Moving 550 words to an appendix moves 550 words. The only risk — that the body needs a retained sentence — is **priced in the item**, not discovered afterwards | **~100 %** |
+| **COMPRESSION** | Where 70 % came from and where it belongs. A paragraph estimated to lose 200 may lose 130 once its qualifications are protected | **70 %** |
+| **CAPTION / INSTRUMENT** | Arithmetic. A short title moved onto one line either is or is not | **~100 %** |
+
+### 6b · The re-split
+
+| Class | Ceiling | Rate | Expected |
 |---|---|---|---|
-| Ch 1 Introduction | 2,027 | 1,320 | 1,530 |
-| Ch 2 Literature Review | 5,011 | 3,500 | 3,950 |
-| Ch 3 Methodology | 5,686 | 3,530 | 4,180 |
-| Ch 4 Results | 8,492 | 4,300 | 5,560 |
-| Ch 5 Discussion | 4,919 | 2,750 | 3,400 |
-| Ch 6 Conclusions | 2,294 | 1,600 | 1,810 |
-| Abstract | 321 | 321 | 321 |
-| **Total** | **28,750** | **17,321** | **~20,750** |
+| **DEMOTION** | **7,552** | 100 % | **7,552** |
+| **COMPRESSION** | **4,427** | 70 % | **3,099** |
+| **CAPTION / INSTRUMENT** | **340** | 100 % | **340** |
+| **Total shed** | **12,319** | | **10,991** |
 
-**The plan reaches 20,000 at its ceiling with 2,679 of margin, and reaches 18,000 with 679.**
-It does **not** reach 15,000.
+| | governing |
+|---|---|
+| Body today, true | 28,980 |
+| **At ceiling** | **16,661** |
+| **EXPECTED LANDING** | **17,989** |
+| Margin below the 19,000 ceiling | **1,011** |
+| Against the 18,000 target | **11 under** |
 
-**And the 70 per cent column is the number to plan against, not the ceiling.** S-4 estimated
-370–470 words from eight approved items and delivered net **−105**. At that realisation rate
-this plan lands at ~20,750 — **above the hard cap by 750**. The ceiling being under 20,000 is
-necessary and not sufficient.
+**Demotion now carries 61 per cent of the ceiling reduction**, which is the right shape under a
+hard ceiling: the deterministic lever does the work and the stochastic one is not asked to
+stretch.
 
-**What follows for execution, and it is a method rather than a caution:** the pass is measured
-**chapter by chapter against a running target**, not trusted to a ceiling and totalled at the
-end. Chapter 4 is executed first, because it carries 4,192 of the 11,429 and its realisation
-rate is the best available estimator for the rest. If Chapter 4 lands above ~5,000 the plan is
-short and the shortfall is known while five chapters remain to absorb it — rather than at the
-end, when only protected material is left.
+### 6c · The sensitivity that actually matters
 
-### What reaching 15,000 would additionally require
+The plan breaches 19,000 only if **compression realises below 47 per cent**. Demotion and the
+instrument fixes alone shed 7,892; landing at 19,000 needs 9,980; so compression must yield
+2,088 of its 4,427 ceiling — **47.2 per cent, against a measured precedent of 70**.
 
-**2,321 beyond the ceiling, and there is no source for it that is not evidence or a
-location-bound criterion.** The four candidates, each with what it costs:
+| If compression realises at | Expected landing | Verdict |
+|---|---|---|
+| 70 % (the S-4 precedent) | **17,989** | target met |
+| 60 % | 18,432 | compliant, 568 of margin |
+| 50 % | 18,874 | compliant, 126 of margin |
+| **47 %** | **19,006** | **break-even — breach** |
 
-1. **§5.4 Limitations, 924 → ~600.** Yields 324. R106 and R107 both say *"The Discussion states
-   / explains"*, so it cannot move; only cutting reaches it, and what would go is the
-   assumptions-impact analysis R107 names.
-2. **Chapter 2 below 3,400.** Yields ~400 and costs the funnel's close-ups — the conformal
-   close-up RQ4 rests on, or the synthesis Chapter 1 §1.2 and Chapter 6 both depend on.
-3. **Chapter 4 below ~4,300.** Yields whatever is taken and takes it from stated measurements,
-   because after this restructure the body holds findings and headline numbers and nothing else.
-4. **Chapter 6 §6.2, 962.** Re-opens the exact omission — C2 and RQ2's nulls — that cost a
-   dedicated session to find, and which left **no symptom of any kind** when it happened.
+**This is the number to watch during execution, and it is a rate rather than a total.** A
+chapter's realised compression rate is measurable the moment that chapter is re-measured, which
+is what makes the stop rule below operable rather than aspirational.
 
-**Finding, stated as the brief asks for it: at 15,000 the constraint and the evidence genuinely
-conflict.** At 18,000 they do not, and at 20,000 there is real margin. The document can be
-compliant and can read well; it cannot also reach 15,000 without deleting evidence or breaching
-a criterion that names its chapter.
+### 6d · Execution method and stop rule — adopted as ruled
 
-**Recommendation: execute to the ceiling, aim at 18,000, treat anything under 20,000 as
-compliant, and re-measure after every chapter.** No overrun is offered and none is acceptable.
+Chapter by chapter against a running target, **Chapter 4 first**. Re-measure with `texcount`
+after each chapter and re-forecast the remainder before starting the next.
 
----
+**Chapter 4's checkpoint: ceiling 4,300, expected 4,622** (its own split is 3,120 demotion
+against 1,072 compression, so it realises better than the document average). Chapter 4 carries
+4,192 of the ceiling reduction, and its realised compression rate is the best available estimator
+for the remaining five chapters.
 
+**STOP RULE. If after any chapter the forecast landing exceeds 19,000, stop and report rather
+than continuing.** A shortfall ruled on at Chapter 4 has five chapters to absorb it; one found at
+Chapter 6 has only criterion-bound material left.
+
+### 6e · The additional demotion that buys the margin
+
+The re-split alone lands at ~19,247 — **247 over the ceiling and with no margin at all**. Closing
+it with compression is forbidden by the standing rules, so it is closed with demotion. Each item
+below states the criterion the **retained body sentence** discharges, quoted.
+
+**Reclassified — the material moves whole rather than being rewritten shorter, so the same
+ceiling amount realises at 100 % instead of 70 %.**
+
+| Item | Ceiling | Retained body sentence discharges — quoted |
+|---|---|---|
+| Ch 2's three long-shot background sections → App A | 624 | **No criterion requires long shots in the body.** What remains is bound by **R122** / **R123**: *"Each engagement with the literature begins / ends in the author's own voice, with commentary on that writer's contribution"* |
+| Ch 5 §5.2's six divergence **arguments** → App D; the declarations stay | 706 | **R103**, *"The Discussion answers what the results reveal in relation to the research question(s)"*, and **D7**, *"there is an explicit discussion of why the approach taken is better than alternatives"* |
+| Ch 4 §4.4.6 Winkler's method-by-method walk-through → App D | 266 | **R97**, *"Every table in Results has a textual summary of the finding it carries"* — `tab:winkler` stays and keeps its summary |
+| Ch 4 §4.2.3 adoption-margin working → App D | 243 | **R102**, *"Results state what the findings imply for the research question(s)"* |
+| Ch 4 §4.5.4 cost-sweep working → App C | 180 | **R102**, as above |
+| **Subtotal** | **2,019** | *gains 606 of expected shed at no change of scope* |
+
+**New demotion.**
+
+| Item | Ceiling | Retained body sentence discharges — quoted |
+|---|---|---|
+| Ch 6 §6.3's eight extensions' detail → App D; body keeps eight one-liners **plus the two "were it repeated" sentences** | 490 | **R113**, *"The Conclusions state what would be done differently if the project were repeated"*, and **R116**, *"…how the methodology would be modified if the project were repeated"*. **Both currently live INSIDE §6.3** — *"the first change this work would make to its own method were it repeated"* and *"the second change…"* — so a wholesale demotion would carry two criteria out of the body with it. This is the one item where the retention is not optional |
+| Ch 5 §5.3 validity working → App D, beyond the 767 already planned | +250 | **R104**, *"The Discussion argues whether the approach is valid, and why"* — the argument stays, the working moves |
+| Ch 3 §3.7 conformal-construction derivation → App B, beyond the plan | +150 | **R83**, *"Methods justify why each decision was made"* — the reason stays; `alg:conformal` already carries the construction and its Mondrian variant |
+| **Subtotal** | **550** | |
+
+**No compression was increased to close the gap**, and no qualification is touched. The standing
+rules on qualifications and on the withdrawn deferral both bind, and with 15,000 off the table
+there is no reason to push compression past what it safely gives.
+
+### 6f · Chapter 6 is the wrong place to look for savings, and it may need to grow
+
+Found while pricing §6.3: **the Conclusions are governed by eight location-bound criteria,
+R109–R116**, more than any other chapter. Three are discharged (**R113** and **R116** inside
+§6.3, **R115** arguably by §6.4's transferable lesson). **R114 — *"The Conclusions state what had
+to be learned in order to do the project"* — has no discharging passage anywhere in
+`conclusion.tex`.**
+
+That is an open coverage gap, and it points the opposite way from this plan: Chapter 6's floor is
+held at 1,600 and R114 may require words rather than release them. **Absence has no syntax**, so
+no instrument here would have found it — it surfaced only because a demotion candidate forced the
+criteria to be enumerated one at a time.
 ## 7 · Carry-forwards
 
 **Appendix C is an empty shell and `completenesscheck` cannot see it.** `appendix/robustness.tex`

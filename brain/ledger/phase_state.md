@@ -4487,3 +4487,42 @@ No compile run because no `.tex` changed. `figurecheck` **PASS over 32 sources**
 previous run's 26, per *a narrow pass is not a pass*) · `completenesscheck` **PASS, 26 files** ·
 `venueordercheck` **FAIL 5, 7 files scanned — unchanged**, and 4 of the 5 now sit in text the
 revised plan rewrites, up from 1.
+
+**FINAL RULING ON LENGTH, appended same day.** Phuong superseded the 20,000 reading: **hard
+ceiling 19,000 on `texcount`, target 18,000, and 20,000 is irrelevant — the regulation, not the
+constraint.** **A plan whose EXPECTED landing exceeds 19,000 has not met the constraint**, whatever
+its ceiling says. 15,000 is off the table.
+
+**The plan's scope was adequate; its risk model was wrong, and that was my error.** S-4's 70 per
+cent was measured on a **de-duplication pass executed qualifier-first**, where the constraint was
+what a sentence could lose. **It does not apply to demotion at all** — moving 550 words to an
+appendix moves 550, and the only risk (that the body needs a retained sentence) is priced in the
+item rather than discovered later. Re-splitting the 11,429 by class and applying the right rate to
+each moved the forecast from ~20,750 to **19,247**, before any change of scope. **A realisation
+rate is a property of an OPERATION, not of a plan.**
+
+**The remaining 247 was closed with demotion, never compression**: 2,019 of reclassification
+(material that moves whole rather than being rewritten shorter — Ch 2's long shots 624, Ch 5 §5.2's
+divergence arguments 706, Ch 4's Winkler walk-through 266, adoption-margin working 243, cost-sweep
+working 180) plus 550 of new demotion. **Each names the criterion its retained body sentence
+discharges, quoted.** Final split: **DEMOTION 7,552 · COMPRESSION 4,427 · CAPTION/INSTRUMENT 340**;
+ceiling 16,661, **expected landing 17,989, margin 1,011.** Breaches only if compression realises
+below **47.2 per cent** against a precedent of 70.
+
+**One criterion was reported wrongly and is corrected in place.** §5.1 was said to be protected
+only by R8 and therefore on an inference. R8 *is* document-scoped, but **R103 — "The Discussion
+answers what the results reveal in relation to the research question(s)" — is Discussion-bound and
+protects §5.1's presence.** The compression to ~500 stands; **what changes is that §5.1 may be
+compressed and may not be demoted.**
+
+**R114 is unmet.** *"The Conclusions state what had to be learned in order to do the project"* has
+no discharging passage in `conclusion.tex`. R113 and R116 are discharged but live **inside** §6.3,
+so that section cannot be demoted wholesale. **Chapter 6 carries eight location-bound criteria
+(R109–R116) and may need to grow.** Found by enumerating criteria one at a time, not by reading.
+
+**Execution method and stop rule adopted.** Chapter 4 first (checkpoint: ceiling 4,300, expected
+4,622); re-measure and re-forecast after each chapter; **stop and report if any forecast landing
+exceeds 19,000.** Prerequisites before any demotion, in order: fix the five wrapped caption short
+titles and re-baseline; compose Appendix C against its six owed promises and Appendix B's
+environment record; repair the seventh failing reference and the three orphan floats; and re-run
+the cross-reference check **after every demotion**, not once at the end.
