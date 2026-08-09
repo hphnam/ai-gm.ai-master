@@ -277,23 +277,26 @@ comparison, and the two floors were being held against each other for exactly th
 
 ### The length constraint — CLOSED 2026-08-10. The cap is met
 
-**The body is 19,941 and the cap is 20,000.** Measured with `texcount -0 -sum -merge -total` over
-`abstract.tex` plus `chapters/*.tex`, re-derived at the head of the pass and again in a fresh clone
-rather than quoted forward. **Every row in the table below that priced this as unreachable is
-SUPERSEDED.** How it was reached, what it cost and what an examiner might ask for is
-`reduction_cost_register.md` §"PASS 8D", which is the review list and the owner of that state.
+**The body is under the cap, with margin.** Measured with `texcount -0 -sum -merge -total` over
+`abstract.tex` plus `chapters/*.tex`, re-derived at the head of every pass and again in a fresh
+clone rather than quoted forward. **No total is written in this file** — `reduction_cost_register.md`
+§"PASS 8E" owns it, and the figure that used to sit here went stale within a day. **Every row in the
+table below that priced the cap as unreachable is SUPERSEDED.** How it was reached, what it cost
+and what an examiner might ask for is that register: §"PASS 8D" is the review list, §"PASS 8E" the
+five rulings on it.
 
 | Row | State |
 |---|---|
-| **The one thing still open** | **The push.** Overleaf local head `b08ad72`; `git ls-remote --heads origin` returns `3b001de`, so **eight commits await a push** and that push is Phuong's gate. *This row names a SHA, so re-measure it rather than quoting it.* |
+| **The one thing still open** | **The push, again.** `b08ad72` **landed** — `git ls-remote --heads origin` confirmed it on the remote on 2026-08-10. Three commits made since (rulings 1, 2 and 5) are unpushed and await Phuong's gate. *This row names SHAs, so re-measure it with `git ls-remote` rather than quoting it. It has been stale four times.* |
 | **19,000 as a working ceiling** | **WITHDRAWN as unreachable, not as wrong.** It was set because a forecast carrying ±400 has no margin at 19,900. The forecast was the thing that failed: four measured realisation rates, and a fifth from this pass, put compression at 5--12 %. Reaching 19,000 needs roughly another 900 words and every remaining candidate is a criterion's only site. 18,000 was never available. |
 | ~~**The honest floor** — 20,210--20,570~~ | **SUPERSEDED.** That floor assumed relocation. The cap was cleared by **removal**: five findings, one whole signal at three sites, Chapter 2's section 2.2, and the Introduction's second statement of the contributions. |
-| ~~**A17 — `sec:res-chatlog` STANDS**~~ | **SUPERSEDED and executed.** The knowledge-gap signal is removed at all three sites. A17 was ruled under no length pressure and the 2026-08-09 instruction ("findings may be removed; do not stop for approval") governs. The document's own words were that it answered no research question. |
+| **A17 — the knowledge-gap signal** | **REVERSED on Phuong's ruling of 2026-08-10, and A17 substantially restored.** 8D removed it at all three sites; the ruling found that 6.1 then stated a deliverable was built while the document showed no trace of it. The specification and the measurement are now **Appendix~B `app:gap-signal`**, outside the counted population, and the body carries three pointer sentences at 71 words. `zou_poisonedrag_2025` returns to the bibliography. Register §"PASS 8E", ruling 2. |
 | ~~**Execution is HELD** pending the supervisor~~ | **SUPERSEDED.** Phuong ruled no query would be sent, so the R102-minimum reading (D1) was applied per question, as `reduction_cost_register.md` records. |
 | **D2, the appendices assumption** | **STILL UNCONFIRMED, and it now covers ~4,900 relocated words plus this pass's demotions.** If appendices are excluded from the count *and* not read closely, the earlier relocations moved evidence out of the marker's view. **This pass deliberately took no new relocation for that reason**: two removals (4.5.3, and all of 4.4.5) were refused because each would have orphaned an appendix section, which buys the cap nothing. |
-| **R114 — the one undischarged criterion** | *"The Conclusions state what had to be learned in order to do the project."* **No discharging passage anywhere**, and none before this pass either. It needs ~150 words the cap does not have. **This is the open item with a mark attached.** |
-| **R66, partially discharged** | Chapter 2's section 2.2 is gone, so the baseline ladder's argument sits in Methods under R83/R84 rather than in the review. **R64 degraded** (recommended, not mandated). No other criterion lost its only site. |
+| ~~**R114 — the one undischarged criterion**~~ | **CLOSED 2026-08-10. Discharged.** A new §6.3, *What the project required*, 156 words, states the four bodies of method the project had to learn, each pointing at the section evidencing it. **No criterion in this document is now undischarged.** |
+| **R66, THIN — checked, not assumed** | 2.3's retained sentence was read against the question *does it argue or merely assert*. It **argues**: a premise, three citations, and an inference marked by *so*, with a second independent route to the same conclusion off Tan's ablation. **R66 is thin, not absent.** **R64 remains degraded** (recommended, not mandated). No criterion lost its only site. |
 | **`log/44` G5** | Points at `mcs_L1_results.json` for a full sweep that file does not contain. **Recorded, not chased.** Unchanged by this pass. |
+| **`venueordercheck` had never scanned the appendices** | Every prior run in this project passed `chapters/` and `abstract.tex`. Widened on 2026-08-10: `appendix/robustness.tex:221` flags **UNANCHORED**, and reading it, the triples are the lag-budget sweep and the pairing ratios, **anchored inline to their named budgets, in a passage about Ellel that says so**. The tool needs three venue names to consider a triple anchored. **Recorded as a tool boundary, not repaired** — its proposed remedy would put venues into a passage that is not about three venues. The carry-forward is that the checker's clean history meant clean *over chapters only*. |
 
 ### Tier-3 items — verifiable only on Overleaf, not unchecked
 

@@ -5,9 +5,12 @@ with the document in front of them can check each entry.** It is maintained as t
 executed, not reconstructed afterwards. Body length is measured with `texcount -0 -sum -merge
 -total`, excluding bibliography and appendices, which is the measure the 20,000-word cap uses.
 
-**Status: COMPLETE. Body 27,759 → 19,933, measured, against a hard cap of 20,000.** The 8D
-pass at the foot of this file is the review list; read its Summary first. Everything above it
-records the passes that preceded it and the four realisation rates that refuted their forecast.
+**Status: COMPLETE, and re-opened once by ruling.** The **8E** pass at the foot of this file
+carries the current body figure and is the only place to read it; 8D's numbers are superseded by
+it and 8D's own head carried a figure (19,933) that was already stale against its own block, which
+is why no total is repeated here. Read 8E's Summary first, then 8D's review list. Everything above
+them records the passes that preceded them and the four realisation rates that refuted their
+forecast.
 
 **Rollback baseline.** Both repositories are tagged `pre-reduction-full-run`. Overleaf
 `ab832a44a8f96fa6910efff5ae79e177727f8694`, confirmed on the remote with `git ls-remote` before
@@ -302,6 +305,13 @@ not yet compliant, and closing the gap is a decision about scope rather than abo
 
 # PASS 8D — execution to the 20,000 cap. THE REVIEW LIST
 
+> **Superseded in part by PASS 8E, below.** Every *figure* in this section — the body total, the
+> margin, the per-chapter table — is stale; 8E owns them. Three of its *judgements* were reversed
+> by ruling: **row 17 is reversed** (the knowledge-gap signal is back, as appendix material),
+> **row 18's retained sentence was reworded** because it asserted what the removal took away, and
+> **R114 is now discharged**. Rows 19 and 21 were reviewed and stand. The rest of this section is
+> unchanged and remains the review list for what left the document.
+
 **This section is the deliverable.** It records every passage removed to bring the body under a
 cap that cannot be breached, sorted by the one column Phuong reviews: **whether an examiner could
 reasonably ask for the material.** Read the HIGH block; the rest is recorded for completeness.
@@ -458,3 +468,177 @@ touched, and by the final sweep it was returning eight to thirty words a passage
 reached because material was **removed** rather than compressed: five findings, one whole signal,
 one section of the review, and the second statement of the contributions. That is the trade Phuong
 authorised, and the HIGH block above is what it bought.
+
+---
+
+# PASS 8E — the five rulings on 8D's HIGH block. 2026-08-10
+
+**8D reached the cap and Phuong then reviewed the HIGH block and ruled on all five rows.** Two
+rows were reversed or repaired, two stand, and the one criterion 8D left undischarged is now
+discharged. This section owns the current body figure; every number in 8D is superseded by it.
+
+## Summary
+
+| | |
+|---|---|
+| Body at the head of this pass, re-derived not quoted | **19,941** |
+| Body at the close, measured | **19,894** |
+| The cap | 20,000, hard. **Margin 106** |
+| The target this pass was set | 19,900 or below — met |
+| Restored to the body | 71 words (the three knowledge-gap pointers) |
+| Added to the body | 156 words (R114's discharge) |
+| Removed from the body | 274 words (LOW-block exposition and duplication) |
+| Added outside the counted population | ~440 words to Appendix~B, which the cap does not count |
+| Overleaf commits | `0288cf6`, `2ecc81f`, `5fc5731` |
+| Rollback | tag `pre-reduction-full-run` at `ab832a4`, untouched. Nothing amended, nothing force-pushed |
+
+**Per chapter, `texcount -0 -sum -merge -total`:**
+
+| | After 8D | After 8E | Change |
+|---|---|---|---|
+| Abstract | 321 | 321 | 0 |
+| 1 Introduction | 1,273 | 1,184 | −89 |
+| 2 Literature Review | 3,662 | 3,662 | 0 |
+| 3 Methodology | 4,269 | 4,288 | +19 |
+| 4 Results | 5,591 | 5,504 | −87 |
+| 5 Discussion | 3,085 | 3,085 | 0 |
+| 6 Conclusions | 1,740 | 1,850 | +110 |
+| **Body** | **19,941** | **19,894** | **−47** |
+
+The seven figures sum to 19,894, which is also what `\quickwordcount` wrote to `main-words.sum`
+on a fresh clone that did not have the file beforehand. Two independent instruments, one number.
+
+## The five rulings, and what each did
+
+### Ruling 1 — row 18's retained sentence. Repaired, and it was free
+
+4.4.6 read *"The seven-day horizon cap is retained, since nothing measured here evidences
+extending it."* When the per-step half-width passage was removed, that sentence kept asserting
+what the passage had measured: it claims an absence of evidence over a chapter that no longer
+reports the measurement establishing it. **The body was claiming something the document cannot
+support**, which is the failure mode this project treats as worse than being long.
+
+It now reads: *"The seven-day horizon is fixed across every arm evaluated here, so the cap stands
+as a design parameter of this evaluation rather than as one of its findings."* That asserts only
+the design fact, which survives, and says plainly that the cap is not a result. The 90 words were
+not restored. **Checked before rewording:** the 181-to-224 growth that originally justified the
+cap is asserted **nowhere else in the body or appendices** (grepped across `chapters/` and
+`appendix/`), so the document does not carry a rationale the removed passage refuted.
+
+### Ruling 2 — row 17 is REVERSED, as appendix material plus body pointers
+
+A17 was ruled twice and never on length grounds. With the signal gone at all three sites, 6.1
+stated that a deliverable was built while the document showed no trace of it, and Methodology's
+data-domain sentence had been silently changed from *"two of the four specified domains"* to
+*"one of the four"* to match the removal.
+
+**What went to Appendix~B** (`app:gap-signal`, under *Method derivations and apparatus*, adjacent
+to `app:agent-apparatus` which holds the sibling specification): the clustering design, the
+above-baseline threshold and its precision-over-recall rationale, the pinned keyless
+term-frequency backend and why three backends would give three clusterings, the write-path
+paragraph citing `zou_poisonedrag_2025` with its three bounding properties, the full measurement,
+and the two limitations. Appendices are outside the counted population, so this costs the cap
+nothing.
+
+**What the body got, 71 words in three places:**
+
+| Site | Sentence |
+|---|---|
+| Methodology §3.1 | *"A second input, a corpus of 735 staff and assistant chat messages, supports the knowledge-gap signal specified in Appendix~\ref{app:gap-signal}."* The domain count is restored to **two of four** in the same edit |
+| Results §4.5.5 | Restored as a subsection: the signal is the second reaching the ranked output, four of twelve clusters clear the threshold, the wiring is verified additive, and the appendix carries the measurement and the two limitations |
+| Conclusions §6.1.1 | *"A second signal reaches the same output without answering any research question, the knowledge-gap detector of Section~\ref{sec:res-chatlog}."* |
+
+**The cross-reference check was run on the new sites, target-side, not by resolution.** Each
+citing sentence's promised noun was grepped in the target: §3.1 promises a *specification* and the
+appendix carries the clustering, threshold and backend; §4.5.5 promises *that measurement and the
+two limitations* and the appendix carries both under those words; §6.1.1 promises *a second signal
+reaching the same output* and §4.5.5 says exactly that. This is the shape that produced
+`methodology.tex:82`, so it was checked rather than assumed.
+
+`zou_poisonedrag_2025` returns to the bibliography. Cited keys 84 → **85**, no undefined citations
+on the compile.
+
+### Ruling 3 — row 20's R66 check. The answer is THIN, not absent
+
+The retained sentence at 2.3 was read against the question Phuong set — does it argue, or merely
+assert? **It argues, and the evidential move survives twice:**
+
+> *"Within that constraint the literature sets a bar rather than an expectation of failure, simple
+> methods being hard to beat on small seasonal hospitality series \citep{chae_value_2024,
+> hossain_comparative_2025, croston_forecasting_1972}, **so** anything more elaborate must clear a
+> classical or linear model on evidence rather than on architecture."*
+
+That is a premise (scarcity binds), a cited empirical claim carrying three sources, and an
+inference marked by *so*. A second, independent move lands on the same conclusion later in the
+same section, off Tan's ablation: *"what transfers is pretraining on time series rather than on
+language, **and a small estate is owed a disciplined baseline ladder**."* Two evidential routes to
+the ladder, both in the review.
+
+**R66 is therefore THIN — the argument is present at reduced length — and not ABSENT.** What was
+lost is the discussion of three studies individually, not the move they support. The 8D table's
+*"partially discharged"* stands as a description; *"absent"* would have been wrong.
+
+### Ruling 4 — rows 19 and 21 stand
+
+Accepted as ruled. No action, and neither was touched by this pass.
+
+### Ruling 5 — R114 is DISCHARGED
+
+*"The Conclusions state what had to be learned in order to do the project."* A new §6.3, **What
+the project required**, 156 words, names four bodies of method: distribution-free uncertainty
+(split conformal, the exchangeability condition, the Mondrian partition) and its later diagnosis;
+the econometrics of short-sample comparison (Harvey--Leybourne--Newbold, the model confidence set,
+the moving-block bootstrap); the elicitation argument, whose learning reversed this work's own
+headline measure partway through; and the non-academic one, that a till export is a transaction
+log and not a demand series. Each claim points at the section of this document that evidences it.
+
+**R114 is no longer undischarged. No criterion in this document is now undischarged.**
+
+## What funded it, and one thing that funding revealed
+
+The user's ruling named LOW rows 33 and 34. **Row 33's Results exposition was already mined out**
+— 8D took ~900 words from it and what remains in 4.1 to 4.5 is findings, nulls, qualifications and
+traces. Enumerating and pricing the rest of the LOW block, per the rule that a deferral without a
+costed alternative is not a decision, the words came from here instead:
+
+| Source | Words | Why it costs nothing |
+|---|---|---|
+| §1.4's five contributions restated in prose, cut to a naming list | ~89 | Row 28's site. No Introduction criterion places contributions there; R109--R112 put them in the Conclusions, where all five are stated with their measurements |
+| §4.2.1's *"chain the review assembles and cannot close"* sentence | ~35 | **Duplication.** `discussion.tex:133` already makes that argument with the same three citations, and the Discussion is where it belongs. All three keys survive elsewhere; nothing orphaned |
+| §4.4.2's *"the correction is therefore to report both"* paragraph | ~35 | The table reports both limbs; the paragraph explained a choice the float already shows |
+| §4.1.2's closing restatement of the two sentences above it | ~36 | Restatement |
+| Chapter 6's roadmap sentence, §6.1.2's and §6.1.3's glosses, §4.5.2's signpost, §4.4.2's closing consequence | ~79 | Exposition and signposting. Row 34's class |
+
+**One defect surfaced while doing it, and it was made by the 8D pass.** `\section{Contributions}`
+had been deleted from `conclusion.tex` while its `\label{sec:conclusion-claims}` was left behind.
+The Introduction's *"Section~\ref{sec:conclusion-claims} states each with the measurement behind
+it"* therefore **resolved to §6.1.3, The technical report** — a reference that compiled cleanly
+and pointed at the wrong thing, which is the class this project has a rule about. Chapter 6's
+contributions had no heading at all, and R109--R112's site was unmarked. The heading is restored.
+
+A second, smaller one: §6.3's opener carried *"No criterion places this section in the
+Conclusions, so each is stated rather than argued"* — the marking rubric reasoning aloud inside
+the submitted document. Cut.
+
+## Pre-flight
+
+| Check | Result |
+|---|---|
+| `latexcheck --shell-escape`, working clone | **PASS**, 135 pages, TeX Live 2026 locally. No undefined reference, no undefined citation, no float lost |
+| Fresh clone of `5fc5731`, `main-words.sum` confirmed **absent** beforehand | **PASS**, 135 pages, and `\write18` wrote **19894**, equal to the independent `texcount` |
+| `completenesscheck` | **PASS** over **26 files** |
+| `figurecheck` | **PASS** over **26 figure sources** — the 8D run reported 20 because it scanned a narrower set |
+| `venueordercheck` | 3 ORDER findings over chapters + abstract, unchanged from 8D's baseline, all on lists whose venues are named inline. **Widening the scan to `appendix/` for the first time surfaced 1 UNANCHORED** — see below |
+| Line-ending hyphens, diffed against `pre-reduction-full-run` | **zero in every body and appendix file**, on both sides |
+| humanizer / avoid-ai-writing over the added prose | zero em or en dashes, zero curly quotes, zero emoji, zero title-case headings, zero flagged vocabulary |
+| The 22 protected items | all present. Three of my own grep needles reported ABSENT and **all three were the needle**: one newline-intolerant across a wrap, one quoting wording an earlier pass superseded, one pointed at the wrong file. The text is intact in all three cases |
+
+**The `venueordercheck` finding is a scope discovery, not a regression.** Every prior run in this
+project scanned `chapters/` and `abstract.tex`; the appendices had **never been examined**.
+`appendix/robustness.tex:221` is flagged UNANCHORED, and reading it, the two "triples" are the
+lag-budget sweep `6.37, 5.82, 5.14, 4.10, 2.53` and the pairing ratios — **anchored inline to the
+named lag budgets, and the whole passage is about Ellel and says so.** The tool needs three venue
+names in a paragraph to consider a triple anchored, and this paragraph names one because only one
+is under discussion. **Recorded as a tool boundary, not repaired**, because the remedy it proposes
+(name the venues inline) would put venues into a passage that is not about three venues. The
+finding to carry forward is that a checker's clean history meant clean *over chapters only*.

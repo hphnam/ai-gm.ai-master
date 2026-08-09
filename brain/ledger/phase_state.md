@@ -4707,3 +4707,55 @@ repaired, no em dashes, no emoji, no curly quotes, no title-case headings. **Fre
 
 **Unstarted.** The push to Overleaf (Phuong's gate). Tier-3 verification of the render, which needs
 a browser. R114, which needs words the cap does not have.
+
+## 8E — the five rulings on 8D's HIGH block. 2026-08-10
+
+**Context.** `b08ad72` was pushed by Phuong and confirmed on the remote with `git ls-remote`.
+Phuong then reviewed 8D's HIGH block and issued five rulings, to be executed in one run against a
+target of 19,900 or below.
+
+**Completed, in order, one commit each.**
+
+1. **Ruling 1, `0288cf6`.** 4.4.6's retained sentence asserted what the removed per-step passage
+   had measured. Reworded to assert only the surviving design fact. Verified first that the
+   181-to-224 rationale the removal refuted is asserted nowhere else in `chapters/` or `appendix/`.
+2. **Ruling 2, `2ecc81f`.** Row 17 reversed. The knowledge-gap signal's specification, write-path
+   paragraph and measurement went to Appendix~B as `app:gap-signal`; the body took three pointer
+   sentences at 71 words, and Methodology's data-domain count was restored to *two of four*.
+   `zou_poisonedrag_2025` returns; cited keys 84 → 85. The appendix cross-reference check was run
+   target-side on all three new sites.
+3. **Ruling 3.** A check, no edit. R66 is **THIN, not absent** — 2.3 argues rather than asserts,
+   and a second route to the same conclusion survives off Tan's ablation.
+4. **Ruling 4.** Rows 19 and 21 stand. No action.
+5. **Ruling 5, `5fc5731`.** R114 discharged by a new §6.3, *What the project required*, 156 words.
+   Funded by 274 words of LOW-block exposition and duplication. **Row 33's Results exposition was
+   already mined out by 8D**, so the funding came from §1.4's restated contributions, a Results
+   passage duplicating `discussion.tex:133`, and assorted signposting.
+
+**Artefacts written.** `reduction_cost_register.md` §"PASS 8E" (the ruling-by-ruling record, the
+funding table and the pre-flight table; 8D marked superseded in its figures and in three of its
+judgements). `BLOCKED_third_party.md` §F: push row re-measured, A17 row reversed, R114 row closed,
+R66 row replaced with the checked verdict, new row for the `venueordercheck` scope discovery.
+
+**Two defects found that neither instrument reports.**
+
+- **`\section{Contributions}` had been deleted from `conclusion.tex` by the 8D pass while its
+  `\label{sec:conclusion-claims}` was left behind.** The Introduction's reference to it therefore
+  resolved to §6.1.3, *The technical report*. A clean compile, a wrong target, and R109--R112's
+  site unmarked. Restored.
+- **`venueordercheck` had never scanned `appendix/`.** Widening it surfaced one UNANCHORED, read
+  and judged a tool boundary rather than a document defect.
+
+**Verified end state.** Body **19,894** by `texcount`, cap 20,000, margin 106; the seven
+per-chapter figures sum to it exactly. Abstract 321, Introduction 1,184, Literature Review 3,662,
+Methodology 4,288, Results 5,504, Discussion 3,085, Conclusions 1,850. `latexcheck --shell-escape`
+**PASS**, 135 pages, TeX Live 2026 locally, no undefined reference or citation and no float lost.
+**Fresh clone of `5fc5731` with `main-words.sum` confirmed ABSENT beforehand: PASS, 135 pages, and
+the `\write18` file reads 19894**, equal to the independent `texcount`. `completenesscheck` PASS
+over 26 files; `figurecheck` PASS over 26 figure sources; `venueordercheck` 3 ORDER over chapters
+plus abstract, unchanged from baseline. Zero line-ending hyphens on both sides of the tag diff. All
+22 protected items present — three grep needles reported ABSENT and all three were the needle.
+Overleaf head `5fc5731`, `origin/main` at `b08ad72`, **three commits await Phuong's push**. Tag
+`pre-reduction-full-run` at `ab832a4` untouched; nothing amended, nothing force-pushed.
+
+**Unstarted.** The push (Phuong's gate). Tier-3 verification of the render, which needs a browser.
