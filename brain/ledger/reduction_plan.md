@@ -1305,3 +1305,65 @@ reading. If the stronger reading governs:
 **And that row already assumes C-6 taken.** There is no further editorial lever; what remains is
 removing findings, which is a scope decision. **This is Q1 in the query, and it is why execution
 is held.**
+
+---
+
+## 17 · CHAPTER 3 EXECUTED — THE STOP RULE FIRES. 2026-08-09
+
+**Measured: 5,828 → 5,486. Realised 342 against a priced 1,215 — 28 %.** Body 28,332 → 27,990.
+
+### 17a · Why, and it is a criterion finding rather than an estimating error
+
+**The plan's Chapter 3 entry cited R83 and R84. Seven criteria name Methods.** Enumerating them
+before demoting — the standing condition, applied here for the first time to this chapter — found
+**R80** (validation), **R81** (noise introduced by the approach), **R82** (bias introduced by the
+approach, *"e.g. third-party tool accuracy, inherent data limitations"*), **R85** (components
+clearly separated) and **R86** (opening restating purpose and aim) alongside them.
+
+**R82 is the one that bites, and it removed two demotions outright:**
+
+- **The detection pairing's literature inheritance (208).** The CUSUM constants are derived for a
+  statistic standardised by a standard deviation; Equation `eq:z` divides by a conformal
+  half-width; their published false-alarm properties are undefined in that unit. **That is a
+  reflection on bias introduced by the approach, and R81/R82 bind it to Methods.**
+- **The chat corpus's write path (141).** Staff compose the messages the signal reads. **R82 names
+  inherent data limitations explicitly.**
+
+Both reclassified to the compression block. Nothing lost.
+
+**And R82/R83 raised the retained sentence on five of the seven that did execute.** The plan
+assumed ~30 words back per demotion. Measured: **1,282 words moved, 940 retained — 73 % retention
+against an assumed 27 %.** The retained text is not padding; each retention is a reason (R83), a
+rejection reason (R84) or a bias reflection (R82), and the criterion is quoted against each row in
+`reduction_cost_register.md`.
+
+**This is the same failure as the 2× summary bias, one level up.** That bias was measured on
+*how long a retention turns out to be*. This is *how many retentions a chapter owes*, and it is
+set by how many criteria name the chapter — which nobody had counted for Chapter 3.
+
+### 17b · The re-forecast, on Chapter 3's own class split
+
+Chapter 3's demotion class is now **measured, not forecast**: 28 % where 84 % was priced.
+Shortfall **873**. The compression block is not re-rated — it is a different class and its 70 % is
+its own measured precedent — but it now carries 349 words of withdrawn demotion.
+
+| | Optimistic | Pessimistic |
+|---|---|---|
+| §16 compliant plan | 18,832 | 19,582 |
+| Chapter 3 demotion shortfall | +873 | +873 |
+| **RE-FORECAST LANDING** | **19,705** | **20,455** |
+| Margin below 20,000 | **+295** | **−455** |
+
+### 17c · STOP
+
+**The stop condition is met: the pessimistic end is 20,455, above 20,000.** The optimistic end at
++295 is also below the 300 floor. Execution halts at the Chapter 3 boundary as ruled.
+
+**What is not yet known** is whether Chapter 3 is representative. Its 28 % came from **seven**
+criteria naming the chapter. Results is governed by R87–R96 plus R102 — **eleven** — and Chapter 5
+by R103–R108 plus HC59. **If the count of location-bound criteria is what sets retention, Results
+is worse than Chapter 3, not better, and Lever 1's 30-word pointers are the assumption most
+exposed by this measurement.** That is a hypothesis with one observation behind it and it is not
+priced here.
+
+**Nothing is deleted, nothing is pushed, and no further chapter is begun.**
