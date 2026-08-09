@@ -59,16 +59,25 @@ available when it was banded, within its own Mondrian state group. Mid-ranks, so
 structural-closure ties at zero bias nothing in either direction. **Under exchangeability that
 rank is Uniform(0,1) by construction**, so the fraction above the 0.90 quantile is 0.10.
 
-| venue | pairs | mean rank | fraction above $q_{0.90}$ | implied coverage | coverage reported at `tab:coverage` |
-|---|---|---|---|---|---|
-| beer_hall | 1750 | 0.554 | **0.1297** | **0.8703** | 0.871 |
-| ellel | 1659 | 0.554 | 0.0874 | 0.9126 | 0.914 |
-| two_river_taps | 1274 | 0.457 | **0.0385** | **0.9615** | 0.963 |
+| venue | pairs | mean rank | fraction above $q_{0.90}$ | implied coverage | arm D at `tab:coverage` | difference |
+|---|---|---|---|---|---|---|
+| beer_hall | 1750 | 0.554 | **0.1297** | **0.870286** | 0.871429 | **0.001143** |
+| ellel | 1659 | 0.554 | 0.0874 | 0.912598 | 0.913804 | **0.001206** |
+| two_river_taps | 1274 | 0.457 | **0.0385** | **0.961538** | 0.963108 | **0.001570** |
 
-The pair counts are the pair counts of `tab:coverage`, and the implied coverage reproduces the
-published coverage at all three venues to within a thousandth. That agreement is the check that
-this diagnostic is measuring the same object the coverage table measures, rather than a
-neighbouring one that happens to point the same way.
+Both columns are carried at six places on purpose, because the earlier three-place version of
+this table is what let the agreement be overstated — see §7.
+
+The pair counts are the pair counts of `tab:coverage`. The implied and published columns agree
+in sign and rough size at all three venues, and that is the whole of what the agreement
+establishes: this diagnostic is addressing the same object the coverage table measures rather
+than a neighbouring one. **It is not an independent reproduction, and it does not narrow how
+large the miscoverage is.** The two columns are the same miss event counted under two
+conventions. `interval_calibration.mondrian_band` bands arm D at the 0.90 quantile of the
+expanding pool within a state group; `_rank_uniformity` mid-ranks the same residual against the
+same pool in the same group and counts it above the same level. They separate only in
+quantile interpolation and in tie handling, which is what the 0.0011 to 0.0016 spread is. A
+statistic that decomposes an indicator cannot corroborate it.
 
 So the under-coverage is not a shortfall to be explained at one remove. It **is** the
 non-uniformity of the conformity-score ranks, exhibited directly on the objects the band is
@@ -111,6 +120,44 @@ expanding one, which is a change to the served band and therefore out of scope h
 
 | Item | Status |
 |---|---|
-| **D-U6** | **CLOSED.** The violation is identified, measured, and cross-checked against the published coverage at all three venues |
+| **D-U6** | **CLOSED.** The violation is identified and measured, and the rank decomposition predicts each venue's published coverage in sign and rough size. **Not "cross-checked" — see §7**; the decomposition and the coverage table share an indicator, so the agreement is arithmetic rather than corroborative |
 | R36 (`barber_conformal_2023`) | **CONFORMS.** The chapter no longer declares a violation it cannot name; the departure from exchangeability is exhibited and its direction predicted per venue |
 | Blocker class | D-U6 was the only UNRESOLVED row never blocked on Ryan, Elliot or a vendor. It is now the only one closed |
+
+## 7 · Correction, 2026-08-09 — "to within a thousandth" was false, and this file is where it started
+
+**Appended, not substituted.** §3 as first written read:
+
+> the implied coverage reproduces the published coverage at all three venues to within a
+> thousandth. That agreement is the check that this diagnostic is measuring the same object the
+> coverage table measures
+
+Both sentences are wrong, in two different ways, and they were wrong from the day this file was
+written.
+
+**The precision claim.** Differencing the two artefacts directly — arm D's `marginal.coverage`
+in `eval/interval_calibration_L1.json` against `1 - rank_uniformity.frac_above_nominal_quantile`
+in `eval/exchangeability_diagnostic.json` — gives **0.001143 / 0.001206 / 0.001570**. A
+thousandth is not met at any venue. `ledger/discussion_rewrite_critique.md` **B13** reached the
+same three figures independently, and they reproduce to five places.
+
+**The stronger error, and the one that survives fixing the digits.** Agreement here is not
+evidence of anything. The two columns are the same miss event under two conventions, as §3 now
+records. `ledger/introduction_rewrite_critique.md` **A2** found the extreme form of this on the
+traded limb, where `1 - frac_above_nominal_quantile` equals R30's measured coverage to six
+places — the same indicator vector counted twice, with nothing left to reproduce.
+
+**Why this correction is worth more than the sentence it fixes.** This file is a
+`brain/log/*result*.md`, which `PRJ93_RULES.md` T1 names as a valid terminal node for a numeric
+trace, and `chapters/discussion.tex` and `chapters/conclusion.tex` both cite it as their trace
+for this claim. **So the claim traced correctly, every time, to a result file that asserts it.**
+It also passed `numbers_audit.md` **X1** as MATCHES, by comparing full-precision implied
+0.870286 against the *rounded* published 0.871 — a difference of 0.0007, under the thousandth
+the audit was testing. The exact published value is $1525/1750 = 0.871429$ and the true
+difference is 0.001143. Three independent audit paths passed a false claim, each for a different
+reason. Both mechanisms are now written into `PRJ93_RULES.md`.
+
+**Downstream sites repaired in the same pass, 2026-08-09:** `chapters/results.tex`:650,
+`chapters/discussion.tex`:93, `knowledge/05_paper_architecture.md`:220/:470/:1110,
+`ledger/literature_conformance.md`:922. §4.5's copy at :1110 was a binding composition
+instruction, so it governed sessions that had not run yet.

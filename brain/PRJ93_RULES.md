@@ -416,6 +416,63 @@ precision, recall, VUS-PR and a p-value all live in the same three-decimal range
 value and its replacement often differ in the last digit only. Both failure directions have now
 been observed: a false negative from a narrow search, a false positive from a shared value.
 
+### A terminal node is only terminal if it was COMPUTED — a result file's prose is not an artefact
+
+**T1 says every number traces to a `brain/log/*result*.md`. That is necessary and it is not
+sufficient, because a result file contains two different kinds of sentence and only one of them
+is evidence.** The numbers a result file *computes* are the artefact. The prose it writes
+*around* them is a claim like any other, and it can be wrong in exactly the way a chapter can be
+wrong — with the difference that nothing downstream will ever question it, because it sits at the
+address the trace rule points to.
+
+**The worked example is the root of this project's longest-lived false claim.**
+`log/72_DU6_exchangeability_result.md`:69 asserted that the rank statistic *"reproduces the
+published coverage at all three venues to within a thousandth"*. `discussion.tex` and
+`conclusion.tex` both cited `log/72` as their trace. **So the claim traced correctly, every time,
+to a result file that asserts it**, and T1 passed on it for the life of the document. The
+computed differences are 0.001143 / 0.001206 / 0.001570 and a thousandth is met at no venue —
+and the numbers proving that were sitting in the two JSON artefacts the whole time, one
+subtraction away.
+
+**The operational form: trace to the computation, not to the file that reports it.** When a
+result file's *prose* carries the claim, the trace has one more hop to go — open the artefact
+the file was generated from and difference the two columns yourself. A result file's tables are
+where it stops; a result file's paragraphs are where it continues.
+
+**And the second half of that example is the more general fault.** The claim was not merely
+imprecise: the two quantities being compared were **the same miss indicator computed under two
+conventions**, so there was nothing to reproduce. Agreement between a statistic and the thing it
+decomposes is arithmetic, not corroboration. **Before reporting that A confirms B, establish
+that A and B are computed from different information.** This project has now produced the
+degenerate case twice — here at 0.0011 apart, and on the traded limb where implied and measured
+coverage agree to **six places** because they are literally the same vector counted twice.
+
+### A MATCHES verdict compares at equal precision, or states the precision it compared at
+
+**Rounding on one side of a comparison and not the other silently loosens the test, and it
+loosens it by exactly the amount the test was checking.** A tolerance claim verified against a
+rounded published figure is not verified.
+
+`numbers_audit.md` **X1** graded *"reproduces published coverage to a thousandth"* as **MATCHES**,
+on *"implied 0.8703 against published 0.871"* — difference 0.0007, inside the thousandth. The
+implied figure was carried at full precision and the published one at three places. The exact
+published value is $1525/1750 = 0.8714286$ and the true difference is **0.0011428**, outside it.
+**The rounding hid the defect the audit existed to catch**, and the audit's own verdict line
+records neither precision.
+
+**The operational form: an audit row states the precision each side was compared at, in the row.**
+Where a claim is *about* precision — "to a thousandth", "agrees at the third decimal", "within
+one per cent" — both sides come from the artefact at full precision and the rounded published
+form is not admissible evidence. This is the sibling of *a value match is not an identity match*:
+that rule says equal digits need not mean the same quantity, this one says unequal digits can be
+manufactured by the display convention rather than by the data.
+
+**Note how the failure compounds with the rule above.** Three independent audit paths passed this
+one claim, each for a different reason — T1 traced it to a result file that asserts it, Role B
+matched its prose against a chapter carrying the same unrepaired sentence, and the numbers audit
+compared full precision against rounded. **Independent checks are only independent if they
+terminate at different places.** All three terminated inside the same unrepaired text.
+
 ### `active` is three different populations in this repo — resolve it at the generator, every time
 
 **Do not learn what `active` means. Look it up in the file that wrote the field, on every use.**
@@ -475,6 +532,43 @@ you had never seen the original and ask what it now asserts. If the answer is br
 the evidence supports, the words come back and the length is found elsewhere. This binds on the
 S-4 pass specifically, which is a length pass across four chapters and therefore this failure's
 largest available surface.
+
+### A word budget is never a reason to defer an accuracy repair
+
+**Three clauses, recorded verbatim as ruled on 2026-08-09:**
+
+> **A word cap constrains the total, not any particular sentence.**
+>
+> **"I cannot afford the true statement" means "I have not looked for what to spend".**
+>
+> **Deferring an accuracy repair on budget grounds launders a known-false statement into a later
+> phase.**
+
+**The instance.** The abstract sat at 300 of 300 and carried *"the other two sitting at nominal or
+above"* of an estate whose second venue measures 0.8918 against nominal 0.90. The file's own
+header recorded this as a declared looseness deferred to 8D *"because the honest repair is a
+word-budget decision, not a wording one"*. Three critique roles found it independently and one
+**costed the repair**: cutting a sentence that ranked the dissertation's own results, and
+converting a positional venue triple to a range, freed more than the repair needed — **twice
+over**. The deferral failed its own arithmetic, and it had been standing on `origin/main`.
+
+**Why the reasoning is seductive rather than lazy.** At a hard cap every sentence is genuinely
+competing, so "no room" is always locally true. What makes it false is that it is a claim about
+the *document* being made from a look at one *sentence*. The budget question is never "can this
+sentence be longer" — it is "is this the least valuable sentence in the file", and that question
+has not been asked.
+
+**The operational form: before recording any defect as unrepairable for length, enumerate what
+else in the same file is rankable, editorial or duplicative, and price it.** Only if that list
+comes up empty is the constraint real, and then the finding is that the file is over-specified
+rather than that the claim is affordable. A deferral written without a costed alternative is not
+a decision; it is the absence of one, wearing a decision's clothes.
+
+**It cuts against the compression rules on either side of it, deliberately.** *Compression is not
+allowed to touch a qualification* says the qualifier stays. This says the length is found
+elsewhere. Together they leave exactly one legitimate move under a cap — **find the words
+somewhere the claim does not live** — and they close the two illegitimate ones, which are to
+widen the claim silently and to postpone it loudly.
 
 ### Compression removes negative results first, and the check is a grep per question
 

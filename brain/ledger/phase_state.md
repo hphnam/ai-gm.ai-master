@@ -4292,3 +4292,76 @@ recorded as a **declared advisory FAIL** for Chapter 1 rather than mitigated int
 **Not begun, per instruction: 8D and the reallocation.** No graphify refresh, update or
 re-extraction was run; the hook demanded one on effectively every read and grep and was declined
 every time. Nothing was unfindable.
+
+---
+
+## 8C-7 — the log/72 root defect, HC54, HC57, and the relocation list prepared (2026-08-09)
+
+**Push verified first, as instructed.** `git ls-remote` returned
+`eebf3e922dc0840d7eb740dc4edccc0e7540cfd7` on `refs/heads/main`. 8C-6's Introduction and
+one-paragraph abstract are live on the publication target.
+
+**Item 1 — "to a thousandth", repaired at source.** The root is
+`log/72_DU6_exchangeability_result.md`:69, a `*result*.md` and therefore T1's own terminal node,
+cited as their trace by both `discussion.tex` and `conclusion.tex`. Corrected there first (§7
+appended, §3 rewritten with both columns at six places), then at eight downstream sites:
+`results.tex`:650, `discussion.tex`:93, `05_paper_architecture.md`:220/:470/:1110,
+`literature_conformance.md`:922, plus `numbers_audit.md` X1 and the superseded 8C-4 draft.
+:1110 was a **binding composition instruction**, so it was directing sessions that had not run.
+
+Values re-derived **by computation, not by citation** — arm D `marginal.coverage` in
+`interval_calibration_L1.json` differenced against `1 - frac_above_nominal_quantile` in
+`exchangeability_diagnostic.json`: **0.001143 / 0.001206 / 0.001570**. B13's figures reproduce to
+five places. Also established that the agreement is not a reproduction at all: both columns are
+the same miss event, `mondrian_band`'s quantile against `_rank_uniformity`'s mid-rank over the
+same pool and the same state group, separating only in tie handling.
+
+`discussion.tex`'s second independent leg now rests on the **scale-drift** evidence (`log/72` §2),
+which genuinely does not share the coverage indicator, rather than on the rank agreement, which
+never did. That repair cost **50 marker words**.
+
+**Two rules written into `PRJ93_RULES.md`:** *a terminal node is only terminal if it was COMPUTED*
+(a result file's prose is a claim, its computed numbers are the artefact), and *a MATCHES verdict
+compares at equal precision, or states the precision it compared at*. Plus the item-5 rule, *a word
+budget is never a reason to defer an accuracy repair*, with Phuong's three clauses verbatim.
+
+**Precision sweep of `numbers_audit.md`:** 335 MATCHES rows scanned, 15 carry a rounded-against-exact
+comparison, of which **2** are tolerance or containment claims where the rounding can move the
+verdict — X1 (reversed) and **row 62**, whose stated range $[0.16, 0.27]$ excludes its own maximum
+0.274. Row 62 listed and **not repaired**, per instruction.
+
+**Items 2 and 3 — HC54 and HC57, both verified on the build.** Appendix E is the issued
+specification, verbatim with two declared departures. References moved before the appendices:
+References 99, appendices 113–130.
+
+**Item 4 — the agent-eval report.** §§1–3 are the N=4 smoke run and are **marked superseded in
+place, not deleted**; the transferable finding is that S1's supersession sentence sat *inside the
+superseding section*, so no reader of §3 could see it. One genuine error corrected: `dominant`
+read "false-alarms" on 0 misses and 0 spurious. Traced to `cost_curve`'s strict `>`, which sent
+every tie to false-alarms; fixed to emit "none". **No artefact regenerated** — S6 has no tie and
+its table reproduces exactly.
+
+**Item 5.** `main.tex`:257–262 and :273 rewritten. §F's "Appendix E" corrected to D **and**
+`tab:window`'s "Appendix D" to C, both verified on the build. §F's two floor errors corrected at
+their source rows (Ch 3 5,569, Ch 4 7,701, five-chapter total 25,406). `06` §5's RQ4 string
+amended "shortfall" → "departure" and its rationale note corrected; §6's C4 cell corrected from
+the withdrawn 124:8 to 124:75.
+
+**Item 6 — prepared, NOT executed.** `ledger/relocation_candidates.md`. **The finding that matters
+is in its §0:** `declaration.tex` states the limit is *"20,000 words INCLUDING APPENDICES"* and
+prints `\quickwordcount`, which counts them, currently **32,208**. Under that wording relocation
+moves nothing, and the declaration is self-refuting on its own line. Not edited — amending a signed
+declaration is not an agent's call. Even granted the supervisor's ruling, the defensible list totals
+**~4,695 against a 7,779 gap**.
+
+**Two things found outside the six items.** `acknowledgements.tex` was shipping the issued
+template's instruction text, live, in the front matter — the issued-template-abstract defect a
+second time, in the adjacent file. And 8C-6's *"figurecheck PASS (19 sources)"* was a **narrow**
+pass: widened to 26 it fails on a standing false positive, confirmed pre-existing by compiling the
+`eebf3e9` baseline. Instrument fixed and exercised both ways.
+
+**End state.** Overleaf clone `ae43af6`, **unpushed — the push is Phuong's**. Tier-2 PASS on the
+working clone and **PASS on a fresh clone with `main-words.sum` confirmed absent before the run**
+(146 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 7 overfull
+boxes — identical to the `eebf3e9` baseline). `figurecheck` PASS 26 · `completenesscheck` **PASS**
+26, its first ever · `venueordercheck` FAIL 5 across 13 files, unchanged and none at a touched line.

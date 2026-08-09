@@ -1001,9 +1001,9 @@ Store ceiling 2026-07-07, full `provenance` block present. Three venues, no four
 
 | # | Claim | Source | Value | Verdict |
 |---|---|---|---|---|
-| X1 | Beer Hall implied coverage reproduces published coverage "to a thousandth" | `venues.beer_hall.rank_uniformity.frac_above_nominal_quantile` = 0.129714 | implied **0.8703** against published **0.871** | **MATCHES** — agrees at the third decimal, which is the claim |
-| X2 | Ellel implied coverage | `venues.ellel.rank_uniformity` | **0.9126** (n_banded 1659) | **MATCHES** |
-| X3 | Two River Taps implied coverage | `venues.two_river_taps.rank_uniformity` | **0.9615** (n_banded 1274) | **MATCHES** |
+| X1 | Beer Hall implied coverage reproduces published coverage "to a thousandth" | `venues.beer_hall.rank_uniformity.frac_above_nominal_quantile` = 0.129714, against `interval_calibration_L1.json` arm D `marginal.coverage` = 0.8714286 | implied **0.870286** against published **0.871429**, difference **0.001143** | **REVERSED 2026-08-09 → REFUTED.** Previously graded MATCHES on *"implied 0.8703 against published 0.871"*, difference 0.0007. **That compared a full-precision value against a rounded one**, and the rounding hid the defect. Exact published is $1525/1750 = 0.8714286$. A thousandth is not met. **Compared at: both sides full precision from artefact.** See `log/72` §7 |
+| X2 | Ellel implied coverage | `venues.ellel.rank_uniformity`, against arm D `marginal.coverage` = 0.9138035 | implied **0.912598** (n_banded 1659), difference **0.001206** | **MATCHES** as a value. **Compared at: both sides full precision.** Does **not** support the "to a thousandth" claim — see X1 |
+| X3 | Two River Taps implied coverage | `venues.two_river_taps.rank_uniformity`, against arm D `marginal.coverage` = 0.9631083 | implied **0.961538** (n_banded 1274), difference **0.001570** | **MATCHES** as a value. **Compared at: both sides full precision.** Does **not** support the "to a thousandth" claim — see X1 |
 | X4 | Ellel drift sits on calendar-open non-trading days | `drift_decomposition.composition.drift_false_open_only` | n = **1037**, ρ = **+0.3672**, p = **1.88e-34** | **MATCHES** `BLOCKED_third_party.md` D-U3 (ρ = +0.367, p = 1.9e-34, n = 1037) |
 | X5 | ...and not on its trading days | `drift_traded_only` (ellel) | n = 263, ρ = 0.0939, **p = 0.129** | **MATCHES** — not significant, which is the decomposition's whole point. State the p-value; a null limb carries the argument here |
 | X6 | Beer Hall false-open limb runs the other way | `drift_false_open_only` (beer_hall) | n = **21**, ρ = **−0.472**, p = 0.031 | **MATCHES** — but n = 21. Do not report this as a per-venue symmetry of Ellel's n = 1037 limb without stating both n |
@@ -1144,3 +1144,38 @@ Lower limbs of +16.5 and +11.9 on intervals roughly 235 wide: the verdict rests 
 few per cent of its own interval. **Do not write either as a clean separation.** The
 defensible phrasing is that A's advantage over P and S at Beer Hall is directionally
 consistent but not robust — which is the same conclusion the empty adoption list reaches.
+
+## Sweep — MATCHES verdicts that compared an exact value against a rounded one (2026-08-09)
+
+Run after X1 was reversed, to answer whether the same mechanism graded anything else. **Scope:
+every `MATCHES` row in this file (335 of them), machine-scanned for a pair of numeric tokens
+where the longer-precision one rounds to the shorter and the two are not equal.** It does not
+cover claims whose two sides are in different files, claims carrying no digits, or rows where
+the rounding is on the repo side rather than the document side.
+
+**Raw count: 15 rows.** But the count that matters is smaller, because rounding one side is only
+a defect when the **claim is about agreement** — a tolerance, a bound, a containment. Where the
+document simply reports a rounded figure, the rounding is a display convention and the verdict is
+unaffected. Splitting on that:
+
+| Class | Count | Rows |
+|---|---|---|
+| **Tolerance or containment claim — rounding can move the verdict** | **2** | **X1** (reversed above), **62** |
+| Ordinary display rounding — verdict unaffected | 12 | 16, 28, 32, 40, 26, 14, 31, 55, 56, 61, 63, 65, X4 |
+| False positive of the scan | 1 | V4 — the two tokens are F1 0.839 and a recall CI bound 0.84, different quantities |
+
+**The one live instance, not repaired this session per instruction — listed only.**
+
+**Row 62.** The document reads *"ratio of paired to independent standard deviation lies between
+$0.16$ and $0.27$"*. `eval/mcs_L1_results.json` `beer_hall.paired_variance_top4` holds 0.162,
+0.219, 0.222, 0.228, 0.272, **0.274**. The upper bound is stated at two places; the true maximum
+is 0.274 and **lies outside the stated interval**. Graded MATCHES against the rounded 0.27. Same
+mechanism as X1: a containment claim checked at the precision of its own display. Direction is
+narrowing — the document reports a tighter spread than the data carries. Magnitude 0.004.
+**Owner: unassigned. Not repaired here.**
+
+**On the twelve.** Each states or implies its rounding (*"MATCHES (rounded)"*, *"(rounded down)"*,
+*"(derived, not stated)"*, *"near"*), and none of their claims turn on the digits dropped. They
+are now non-conforming to the new precision rule in `PRJ93_RULES.md` in form — the rule asks each
+row to name the precision it compared at — but not in substance. Bringing them into form is
+bookkeeping, not correction.

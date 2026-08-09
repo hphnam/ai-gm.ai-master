@@ -4,9 +4,29 @@ Evaluates whether the proactive briefing surfaces, ranks, and attributes the rig
 
 > **Small-N, stated honestly (G-eval-d).** A ~270-day single-estate dataset yields few injectable windows. Every aggregate below carries its N and a confidence interval; nothing is over-claimed.
 
+> ## ⚠ SECTIONS 1 TO 3 ARE SUPERSEDED — read S1–S6 instead
+>
+> **Added 2026-08-09.** Sections 1, 2 and 3 report the **N=4 plumbing smoke run**. The citable
+> run is the **N=644** scaled grid at **S1–S6**, and every figure the dissertation cites comes
+> from there. This banner exists because the supersession was already stated — once, at S1
+> (*"The N=4 smoke run above is a plumbing self-test; **this** is the citable run"*) — **inside
+> the superseding section, roughly a hundred lines below the sections it supersedes.** A reader
+> arriving at §3 to check a claim never reached it.
+>
+> **The collision that matters.** §3 and **S6** carry near-identical headings, an identical table
+> schema and an identical framing sentence, and they disagree: §3 shows **0 misses / 0 spurious /
+> dominant "false-alarms"**, S6 shows **124 / 75 / dominant "misses"**. Anyone verifying the
+> detection contribution against §3 refutes it. Neither table is wrong for its own corpus; §3 is
+> four injections and S6 is 644.
+>
+> **Nothing here is deleted.** A smoke run is a real record of a real run, and removing it would
+> hide that the pipeline was self-tested before it was scaled. What was missing was the pointer,
+> which is now at the top rather than the bottom. **One genuine error is corrected below**, at §3's
+> `dominant` column.
+
 ## 1. Synthetic-injection oracle — detection
 
-Detection over **N=4** injected events (regime shift, spike, stock drawdown, exo-coincident dip), matched by venue, direction, and onset within ±3 days.
+**SUPERSEDED by S2 (N=644).** Detection over **N=4** injected events (regime shift, spike, stock drawdown, exo-coincident dip), matched by venue, direction, and onset within ±3 days.
 
 | Metric | Value | 95% CI (Wilson) |
 |---|---|---|
@@ -40,6 +60,10 @@ Attribution detail:
 
 ## 3. Fatigue + miss-to-false-alarm cost sweep
 
+**SUPERSEDED by S6 (N=644), which reports 124 misses and 75 spurious with misses dominant at
+every ratio.** The table below is the N=4 smoke run and must not be used to check any claim in
+the dissertation. See the banner above §1.
+
 Surfacing rate on un-injected windows (an **upper bound** on weekly false-alarms — on real data these may be genuine): **0.667/week** (8 items across 3 venues).
 
 That rate is a deployment statistic and is **not** an input to the sweep below.
@@ -48,10 +72,17 @@ Cost = ratio·misses + 1·spurious, **both from the injection corpus**, swept (f
 
 | miss : false-alarm | misses | spurious | weighted cost | dominant |
 |---|---|---|---|---|
-| 1 : 1 | 0 | 0 | 0.0 | false-alarms |
-| 2 : 1 | 0 | 0 | 0.0 | false-alarms |
-| 5 : 1 | 0 | 0 | 0.0 | false-alarms |
-| 10 : 1 | 0 | 0 | 0.0 | false-alarms |
+| 1 : 1 | 0 | 0 | 0.0 | none |
+| 2 : 1 | 0 | 0 | 0.0 | none |
+| 5 : 1 | 0 | 0 | 0.0 | none |
+| 10 : 1 | 0 | 0 | 0.0 | none |
+
+**CORRECTED 2026-08-09: the `dominant` column read "false-alarms" in all four rows and that is
+an error, not a finding.** With 0 misses and 0 spurious the weighted cost is 0 at every ratio and
+**nothing dominates**; the generator's comparison resolved a 0-versus-0 tie toward false-alarms
+and the tie-break was printed as a verdict. It also happens to point the opposite way from S6's
+"misses" on the same estate, which is how a tie-break artefact reads as a contradicting result.
+The N=4 run's own numbers (0/0) are correct and are left standing.
 
 ## 4. Named probes (design weak points, quantified)
 

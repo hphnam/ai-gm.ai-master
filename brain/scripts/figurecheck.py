@@ -55,6 +55,13 @@ RULES = [
 SUFFIXES = {".py": ("set_title", "suptitle", "plt.title"),
             ".tex": ("pgfplots title=",)}
 
+# `title=` is a pgfplots axis key AND a biblatex/tocloft option key, and only the first
+# paints text into an image. \printbibliography[heading=bibintoc,title=References] names
+# the References heading; it is not a figure title and there is no \caption to move it to.
+# Left unexcluded it fires on every run of a document that has a bibliography, which is the
+# case the module docstring warns about: a guard that flags legitimate calls gets silenced.
+TITLE_KEY_FALSE_POSITIVES = re.compile(r"\\(?:printbibliography|printbibheading|addbibresource)")
+
 
 def scan_text(text: str, suffix: str) -> list[tuple[int, str, str]]:
     """Return (line number, rule name, line) for every embedded title found."""
@@ -67,8 +74,11 @@ def scan_text(text: str, suffix: str) -> list[tuple[int, str, str]]:
         if suffix == ".tex" and stripped.startswith("%"):
             continue
         for name, pattern in RULES:
-            if name in applicable and pattern.search(line):
-                hits.append((lineno, name, line.strip()))
+            if name not in applicable or not pattern.search(line):
+                continue
+            if name == "pgfplots title=" and TITLE_KEY_FALSE_POSITIVES.search(line):
+                continue
+            hits.append((lineno, name, line.strip()))
     return hits
 
 

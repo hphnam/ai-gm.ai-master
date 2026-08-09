@@ -918,10 +918,13 @@ three while its 90th percentile is flat, so the drift is in the body and not the
 tail — the venue whose residuals move most is the venue whose coverage moves
 least, and that asymmetry is what a tail-quantile band would predict.
 
-The rank statistic reproduces the published coverage at all three venues to a
-thousandth, on the same pair counts (1750 / 1659 / 1274) as `tab:coverage`. That
-agreement is the check that the diagnostic measures the coverage table's own
-object rather than a neighbour pointing the same way.
+The rank statistic agrees with the published coverage at all three venues to within
+0.0016, on the same pair counts (1750 / 1659 / 1274) as `tab:coverage`. That agreement
+establishes only that the diagnostic addresses the coverage table's own object rather
+than a neighbour pointing the same way; it is not corroboration, because the two count
+the same miss event under different tie conventions. **CORRECTED 2026-08-09**: this read
+*"reproduces … to a thousandth"* and *"That agreement is the check"*, and both are
+refuted at source — the differences are 0.001143 / 0.001206 / 0.001570. See `log/72` §7.
 
 **Bounded deliberately.** The cause of the Beer Hall's growing error scale is not
 identified; growth in trade is the obvious candidate and is untested. And the

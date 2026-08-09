@@ -217,7 +217,7 @@ Thirty headings. A research paper's results chapter does not have thirty heading
 | 17 | § | `sec:res-coverage` | Interval calibration | 0 | **KEEP** | Container heading, zero prose. |
 | 18 | §§ | `sec:res-power` | A seven-point window cannot support a miscalibration claim | 122 | **CUT** | Withdraws an earlier claim of this project's own. *"It was computed on seven observations … the finding is withdrawn."* |
 | 19 | §§ | `sec:res-undercoverage` | Measured with power, one venue under-covers | 650 | **KEEP** | **Headline.** |
-| 20 | §§ | `sec:res-exchangeability` | Naming the exchangeability violation | 605 | **KEEP** | **Headline.** Reproduces measured coverage to a thousandth at all three venues. |
+| 20 | §§ | `sec:res-exchangeability` | Naming the exchangeability violation | 605 | **KEEP** | **Headline.** **CORRECTED 2026-08-09; this cell read "Reproduces measured coverage to a thousandth at all three venues" and that is refuted at source** (`log/72` §7): the differences are 0.001143 / 0.001206 / 0.001570. The agreement is also not a reproduction — the rank statistic decomposes `tab:coverage`'s own miss indicator. What the section establishes is the **form** of the violation, corroborated by the **independent** scale-drift evidence (`log/72` §2), not a second measurement of its size. |
 | 21 | §§ | `sec:res-drift-cause` | What moves the scale, and what a shorter memory would buy | **1,310** | **REFRAME + DEMOTE** | Headline cause-identification, with an embedded counterfactual sweep that is an appendix item. Carries an explicit ledger supersession: *"Supersedes log/72 section 5's untested remedy pointer and log/73 section 5's statement that Ellel's drift is unexplained"*. |
 | 22 | §§ | `sec:res-native-interval` | A published interval finding, replicated on this estate | 740 | **KEEP** | Partial replication of `kaas_probabilistic_2026`. Ordering transfers, magnitude does not. |
 | 23 | §§ | `sec:res-winkler` | No interval method displaces the incumbent on the Winkler score | 770 | **REFRAME** | Null result wrapped in an implementation-correction narrative: *"The aggregated arm was first implemented with three departures from the method it is named for"*. |
@@ -467,7 +467,7 @@ faster as a sentence than as a float.
 | `tab:group` | 7×3 | **Body 4.3** | A null result needs its paired intervals visible or it reads as an absence of effort. |
 | `tab:weather` | 7×3 | **Body 4.3** | Five arms across three venues; the mutual indistinguishability is the finding and it is only visible as a table. |
 | `tab:coverage` | 4×3 | **Body 4.4** | Headline. Pairs, coverage and the Clopper–Pearson interval per venue. **Power and MDE are GONE** — no power analysis exists in the project and one computed now would be retrofitted (B2, `blocker_clearance_package.md`). Applied to the chapter 2026-08-07. |
-| `tab:exchangeability` | 6×3 | **Body 4.4** | The check that makes the finding: implied coverage against published coverage, agreeing to a thousandth. The agreement is the argument. **Two binding reporting conditions — see §2.7a.** |
+| `tab:exchangeability` | 6×3 | **Body 4.4** | Implied coverage against published coverage. **CORRECTED 2026-08-09; this cell read "agreeing to a thousandth. The agreement is the argument" and both clauses were false** (`log/72` §7). The agreement is 0.001143 / 0.001206 / 0.001570, and it is **not** the argument: the two columns count the same misses, so the table exhibits the violation's form and cannot corroborate its size. The argument is the mean ranks departing from 0.5 in venue-specific directions. **Two binding reporting conditions — see §2.7a.** |
 | `tab:winkler` | 7×3 | **Body 4.4** | Five interval methods against the incumbent — this is the comparison-against-rejected-alternatives evidence **D7** requires. **Its "90% set" column is numerics-sensitive — see §2.7b.** |
 | `tab:vuspr` | 4×7 | **Body 4.5** | Detection headline, by event kind and venue. |
 | `tab:ladder` | 4×9 | **Appendix E** | The historical committed gate on a superseded basis. See §2.8a — this is what dissolves the 525-word caption. |
@@ -1106,9 +1106,17 @@ plus a replication and a five-method comparison. **Displaced:** the windowed-poo
 counterfactual sweep in full (Appendix D); the implementation-correction narrative in
 `sec:res-winkler`; the per-venue detail of `sec:res-native-interval`, which reduces to
 the ordering-transfers/magnitude-does-not result plus the Chronos-Bolt decile finding.
-What must survive at full strength is the rank statistic reproducing published coverage
-to a thousandth, because that is the check that the diagnostic measures the coverage
-table's own object.
+What must survive at full strength is the rank statistic naming the **form** of the
+violation — mean ranks departing from 0.5 in venue-specific directions — together with
+the **independent** scale-drift evidence of `log/72` §2 that predicts those directions.
+**CORRECTED 2026-08-09.** This instruction previously read *"the rank statistic
+reproducing published coverage to a thousandth, because that is the check that the
+diagnostic measures the coverage table's own object"*, and it was a **binding
+composition instruction carrying a refuted claim**, so it directed sessions that had not
+yet run. Two faults: the agreement is 0.001143 / 0.001206 / 0.001570 and meets a
+thousandth nowhere, and the rank statistic decomposes `tab:coverage`'s own miss indicator
+rather than checking it. See `log/72` §7. **Nothing composed against this row may present
+the implied-versus-published agreement as corroboration.**
 
 **Results 4.1, Forecast accuracy and model selection — 1,400 against 3,244 current.**
 **Displaced:** the whole of the pairing and block-length material to Appendix D, and

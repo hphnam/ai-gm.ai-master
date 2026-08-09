@@ -357,9 +357,17 @@ def cost_curve(detection: dict, fatigue: dict) -> list[dict]:
     fa = detection["fp"]
     rows = []
     for r in config.EVAL_COST_RATIOS:
+        # A strict > sent every TIE to "false-alarms", including the 0-vs-0 tie a clean run
+        # produces, so the N=4 smoke run printed "dominant: false-alarms" on zero misses and
+        # zero spurious. A tie-break is not a verdict, and it read as one contradicting S6.
+        miss_cost, fa_cost = r * fn, fa
+        if miss_cost == fa_cost:
+            dominant = "none"
+        else:
+            dominant = "misses" if miss_cost > fa_cost else "false-alarms"
         rows.append({"miss_to_false_alarm": r, "misses": fn, "false_alarms": fa,
                      "weighted_cost": round(r * fn + fa, 2),
-                     "dominant": "misses" if r * fn > fa else "false-alarms"})
+                     "dominant": dominant})
     return rows
 
 
