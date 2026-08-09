@@ -4149,3 +4149,47 @@ carries zero floats and zero tables, so it can neither pass nor fail them.
 - **No graphify refresh, update or re-extraction was run**, per instruction. The hook demanded one on
   effectively every read and grep, including inside all five critique subagents; declined every time.
   Nothing was unfindable.
+
+### 8C-5 post-push follow-up (2026-08-09)
+
+**Push landed and is verified on the remote, not from its exit code.** `git ls-remote --heads origin`
+returns **`49b8f01`**; `origin/main..HEAD` is empty. Five of six chapters are now composed **and
+pushed**; only the Introduction is unwritten.
+
+**Four records written, and one of them is a new rule.**
+
+1. **`PRJ93_RULES.md` — "Compression removes negative results first, and the check is a grep per
+   question."** Placed beside the qualifier rule because it is its sibling and the more expensive
+   one: that rule says a length pass widens a claim, this one says it deletes a finding, and it
+   deletes them non-randomly. Evidence is the two omissions in one chapter, one of which
+   (**RQ2's limb**) had **no symptom of any kind** and was found only by grepping per research
+   question.
+2. **§F — the "to a thousandth" repair, and it is worse than recorded.** B13 logged **one** site;
+   the sweep found **two** in the pushed document, `results.tex`:650 and `discussion.tex`:93.
+   B13's repair had landed the *"does not add precision / decomposes the same indicators"* caveat
+   at both while leaving the false figure at both. **A repair that corrects what a number means
+   does not correct the number.** Refuting values 0.00114 / 0.00121 / 0.00157 recorded with it.
+3. **§F — a new failure mode for T1.** Role B verified the claim as MATCHES against a chapter
+   carrying the same wrong claim. T1 does not distinguish a prose-to-prose match from a
+   prose-to-artefact one. Rule recorded: **the terminal node of a verification must be an artefact
+   or a result file, never another `.tex`.**
+4. **§F — the two Further-work protocol findings** (the Mondrian leakage, ranked closest to
+   executable; the Two River Taps item waiting on an input that cannot arrive), and **the overrun
+   justification as a deliverable to assemble** rather than a sentence to write at the end.
+
+**The upstream sweep, with its scope stated, and it is uneven.** Three claims across
+`chapters/` (all five), `abstract.tex` and `appendix/`: **"to a thousandth" LIVE at two sites**;
+**power language CLEAN** — the one hit, `results.tex`:872 *"flat at power"*, is a different sense,
+quotes no power value, is audited MATCHES, and is **not** to be repaired; **the B17 sample-size
+claim CLEAN** — zero occurrences outside `conclusion.tex`. Every *"calibrated band"* hit in
+Chapters 2 and 5 is definitional or quotes RQ5's own wording. **Three named claims, seven files.
+It says nothing about any other inherited claim.**
+
+**`06` §6's C2 and C3 strength cells are amended in the table itself**, not only in a note beneath
+it: C2 no longer says "both arms return nulls" (pooling is eliminated from the set at Two River
+Taps and is a detected small loss at two venues), no longer claims the pooling limb fills a gap,
+and records that §5.3 may be cited for the model-comparison arms only; C3 no longer says "to a
+thousandth" and no longer says "the one venue that under-covers".
+
+**§4.5's Chapter 6 row was added in the main session** and stands: 1,100 budgeted against 2,328
+measured, with the excess located and each part justified.

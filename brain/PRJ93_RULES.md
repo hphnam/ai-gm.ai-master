@@ -476,6 +476,38 @@ the evidence supports, the words come back and the length is found elsewhere. Th
 S-4 pass specifically, which is a length pass across four chapters and therefore this failure's
 largest available surface.
 
+### Compression removes negative results first, and the check is a grep per question
+
+**This is the sibling of the rule above and it is the more expensive one.** That rule says a length
+pass silently widens a claim by cutting its qualifier. This one says a length pass silently *deletes
+a finding*, and it deletes them **non-randomly**: the ones that go are the nulls, the
+non-separations and the failed preconditions, because a positive claim reads as content and a
+negative one reads as an absence of content.
+
+**Two instances, in one chapter, found on 2026-08-09.** The pre-8C-5 Conclusions stated four
+contributions and covered **three of the five research questions**. The two missing were:
+
+| Missing | What it was | How it was found |
+|---|---|---|
+| **C2**, RQ3 | the controlled weather and cross-series-pooling test | a **count disagreement** — the spec said five contributions, the document had four |
+| **RQ2's limb** | the unbiasedness precondition failing at 22 of 41 nodes, and the median-under-a-mean's-name estimand | **nothing.** No symptom of any kind. Found by a critique role grepping `reconcil`, `hierarch`, `coherent`, `median` and getting zero hits |
+
+**The second one is why this is a rule.** C2 had a symptom and it still took a dedicated session to
+resolve. RQ2's had none: every count was consistent, the chapter compiled, `completenesscheck` saw
+prose above the floor, and four confident paragraphs sat where five belonged. **Absence has no
+syntax, so no instrument in this project can find it** — the same defect class as the issued-template
+abstract that passed every check for the life of the project, and as the four-versus-five contest
+whose real content was a missing claim.
+
+**The operational form: enumerate what the section is supposed to cover and grep for each item's
+distinctive noun. Do not read the section and judge whether it feels complete.** Reading finds what
+is there; only enumeration finds what is not. For a contributions or answers section, the
+enumeration is the research questions, one grep each. For a limitations section it is the declared
+threat list. The grep is seconds and it is the only check that reads for absence.
+
+**And treat the bias as directional when triaging.** If a compressed section is short by one item,
+look for the null before looking for anything else.
+
 ### A clean result is reported with the scope of the check that produced it
 
 **State what a check establishes and, in the same breath, what it does not.** This matters
