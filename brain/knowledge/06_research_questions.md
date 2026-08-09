@@ -215,8 +215,33 @@ across `knowledge/`, `ledger/` and the live document:
 | `05_paper_architecture.md` §2.1, the 1.4 purpose cell (:271) | **Five**, "amended from four by explicit unlock, §7 U1" | Already correct. Nothing to do. |
 | `05_paper_architecture.md` §7, unlock **U1** (:1317) | four → **Five** | The authority. Nothing to do. |
 | §11 of this file | *"resolved in favour of five, by unlock U1"* | Already correct. |
-| `05_paper_architecture.md` §1.3 (:242) | *"Four contributions at graded strength"* | **Correctly four.** It is an inventory of the document as it stands, not a target. It stays four until 6.2 is composed. |
-| `chapters/conclusion.tex`, `sec:conclusion-claims` | *"divides into four claims"* | **Correctly four today, and 8C-5 changes it.** |
+| `05_paper_architecture.md` §1.3 (:242) | *"Four contributions at graded strength"* | ~~**Correctly four.** It is an inventory of the document as it stands, not a target. It stays four until 6.2 is composed.~~ **DISCHARGED 2026-08-09.** 6.2 is composed; a note beside that row records the recomposed state and the row is kept as history. |
+| `chapters/conclusion.tex`, `sec:conclusion-claims` | *"divides into four claims"* | ~~**Correctly four today, and 8C-5 changes it.**~~ **CHANGED 2026-08-09 by 8C-5.** Now *"divides into five claims"*; the heading is **Contributions**; C2 is written in at its numbered place and nothing was renumbered. |
+
+**What writing C2 in actually cost, recorded because the strength column above was optimistic.**
+C2's fixed string and its strength note survive, but **two clauses of the strength note did not
+survive contact with the evidence** and the composed text departs from them deliberately:
+
+1. *"Both arms return nulls; state the null as the finding"* — **the pooling arm is not a null.**
+   `tab:group` retains `{U}` alone at Two River Taps, so both grouped arms are *eliminated*, and
+   the paired intervals exclude zero at the two data-rich venues. Only Ellel spans zero. Found
+   independently by two critique roles. The composed sentence reads "neither buys accuracy",
+   which is the claim the evidence supports, and names the loss where it was detected.
+2. The weather limb is a **set-level** null with one pairwise exception the Results chapter
+   instructs be read *against* it, not past it: the Beer Hall no-weather against horizon-matched
+   contrast at $+0.0163\,[0.0004,0.0337]$. It is now inside the same sentence as the null.
+
+**C3's strength note is also stale and was not followed.** It reads *"Reproduces measured
+coverage to a thousandth at all three venues"*. `discussion_rewrite_critique.md` **B13** measures
+that agreement at **0.00114 / 0.00121 / 0.00157**, so a thousandth is not met anywhere, and B13
+records `results.tex`:526/650 as still carrying the unrepaired phrase. **Chapter 4's copy is
+still live and is carried forward to 8D.**
+
+**And one contribution was missing that this table never flagged.** RQ2 maps to **C1** in §3
+above, but C1's fixed string says nothing about reconciliation or the estimand, so the composed
+chapter had no statement of the 22-of-41 unbiasedness failure until a critique role grepped for
+it. The limb is now carried inside C1. **A fixed-string table guarantees the strings are
+consistent across sites; it does not guarantee they cover the RQs they are mapped to.**
 
 **The note this replaces recommended updating §2.1 and was discharged the same
 day; the recommendation is kept here because the reason still binds.** Limb 7's
