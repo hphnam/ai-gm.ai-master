@@ -638,3 +638,104 @@ own precedent supports and the standing rules forbid pushing it further; and the
 has been extended to every passage no criterion pins in place. The remaining 2,580 can only come
 from material leaving the document, or from the constraint moving. **Both are Phuong's, and
 neither is pre-empted here.**
+
+---
+
+## 9 · Two selection rules the plan had not applied — 2026-08-09
+
+### 9a · R102 protects results that bear on a research question. Three bear on none.
+
+**The prior enumeration was stale.** `06_research_questions.md` §7.2 ran this against the
+*planned* §1.3 inventory and found one homeless result. **Five of Chapter 4's subsections were
+composed after that**, and nobody re-ran it. Run fresh against the composed chapter, mapping every
+subsection to the five RQ strings verbatim:
+
+| Subsection | Words | Maps to |
+|---|---|---|
+| 4.1.1 Ladder at the gate · 4.1.2 Origin counts · 4.1.3 Confidence sets · 4.2.3 Adoption margin | 1,203 | **RQ1** — separation, and whether origin count changes selection |
+| 4.1.4 Squared-loss ordering · 4.2.1 Unbiasedness · 4.2.2 Classification · 4.2.4 Occurrence gating | 912 | **RQ2** — estimand and coherent reconciliation |
+| 4.3.1 Cross-series ICL · 4.3.2 Weather | 841 | **RQ3** |
+| 4.4.1–4.4.5 coverage, traded, exchangeability, drift, native intervals | 2,170 | **RQ4** — coverage, and which property accounts for departure |
+| 4.5.2 VUS-PR · 4.5.3 Suppression · 4.5.4 Cost sweep | 815 | **RQ5** |
+| **4.4.6 Interval methods on the Winkler score** | **496** | **NONE.** RQ4 asks whether split conformal holds coverage and what accounts for departure. A comparison of five *alternative methods* answers **D7**, which names no location |
+| **4.5.1 Injection-design validity** | **194** | **NONE.** It establishes the instrument, not a finding. A precondition for RQ5's answer rather than part of it |
+| **4.5.5 Knowledge-gap signal** | **223** | **NONE** — already established by A17 and `06` §7.2: *"something the project built and demonstrated, not something the project established"* |
+
+**913 words sit outside R102's protection**, and they were priced in §8 at 14 %, and not priced at
+all for the other two. Re-priced with the measured retention multiplier applied to the new
+estimates as well:
+
+| Item | Original | Priced retention | ×2.0 | Expected save | Efficiency |
+|---|---|---|---|---|---|
+| 4.4.6 Winkler → App D | 496 | 60 | 120 | **376** | **76 %** |
+| 4.5.1 Injection validity → App C | 194 | 35 | 70 | **124** | **64 %** |
+| 4.5.5 Knowledge-gap → App D | 223 | 40 | 80 | **143** | **64 %** |
+| | | | | **643** | |
+
+**Winkler moves from the worst band to nearly the best** — 14 % to 76 % — on nothing but a correct
+reading of which criterion protects it. **One ruling needed:** A17 directed the knowledge-gap
+signal to *stay* in Results 4.5 as a specification-level deliverable. That disposition was taken
+under no length pressure and this pass reopens it; it is Phuong's, not assumed here.
+
+### 9b · The R102/R103 overlap is real, and it is demonstrated rather than argued
+
+R102 wants **Results** to state what findings imply for the research questions. R103 wants **the
+Discussion** to answer what the results reveal in relation to them. Read side by side, §5.1
+already carries the Results numbers:
+
+| §5.1 says | Restating |
+|---|---|
+| "retain five of those nine at the Beer Hall, four at Two River Taps and six at Ellel" | §4.1.3 |
+| "six origins placed the served Beer Hall model second of nine and $273$ origins return it to first with the day-of-week baseline falling to fifth" | §4.1.2 |
+| "$3.27$ paired standard errors behind the argument-minimum, or between $1.8$ and $2.3$ once that standard error carries the differential's own serial dependence" | §4.1.4 |
+| "fails at $22$ of the Beer Hall hierarchy's $41$ nodes, on uncorrected one-sample $t$-tests over $56$ held-out residuals apiece" | §4.2.1 |
+
+**So the same measurement is stated with its numbers at both sites, and both sites are
+criterion-protected.** S-4 found this and could not act on it, because neither criterion yields to
+the other.
+
+**What breaks the deadlock is that the two criteria ask for different things.** R103 asks what the
+results *reveal* — interpretation. R102 asks what the findings *imply* — and the implication for
+a research question is exactly what §5.1 is mandated to argue. **The minimum R102 accepts is
+therefore the finding and its number; the consequence clause is R103's job.**
+
+Measured on the one retained section available: of §4.1.4's retained 145 words, **40 (28 %) are
+consequence** — *"the pre-registered rule holds the incumbent … so no served model changes; Two
+River Taps closed … so the restraint costs nothing there"* — and §5.1 states the same conclusion.
+
+| | words |
+|---|---|
+| Chapter 4's remaining R102-bound retained prose (post-plan, excluding floats, the three executed retentions and the unmapped sections) | ~4,657 |
+| Consequence share at the measured 28 % | 1,304 |
+| At 70 % realisation | 913 |
+| Less growth in §5.1 to absorb consequences it does not already carry | −150 |
+| **Net** | **~763** |
+
+**This is a real saving the plan has never costed**, and unlike everything else in §8 it takes
+nothing out of the document: the consequence is stated once instead of twice.
+
+### 9c · The arithmetic with both rules applied
+
+| | governing |
+|---|---|
+| Body now | 28,332 |
+| R114 | +150 |
+| §8 re-priced plan | −6,902 |
+| §9a unmapped results | −643 |
+| §9b R102/R103 de-duplication | −763 |
+| **EXPECTED LANDING** | **~20,174** |
+| Range on the two new estimates | **19,700 – 20,550** |
+| Against the 19,000 ceiling | **+1,174** |
+| Against the 20,000 regulation | **+174, and the range straddles it** |
+
+**Both new rules together find ~1,406 and the gap does not close.** The estimates in §9 are
+**unmeasured** — no item in either has been executed — and are stated with the measured retention
+multiplier already applied, because presenting an unmeasured estimate with the confidence of a
+measured one is the error this pass has now made twice.
+
+**The conclusion is that this is no longer an editorial question.** At ~20,174 the body breaches
+the 20,000 regulation, not merely the working ceiling, and every remaining lever has been taken:
+the protected set re-derived twice against quoted criteria, demotion extended to every passage no
+criterion pins in place, compression at the rate its own precedent supports, the duplication
+between two mandated sites removed, and the results that answer no question moved out. What is
+left is material that survived five audit passes and that a criterion requires in the body.

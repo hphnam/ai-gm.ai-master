@@ -503,6 +503,32 @@ sentence and its target are edited in separate operations and only one of them h
 forgotten. Run the check after every such pass, and state the number of reference sites
 examined, per the empty-scan rule.
 
+### Never lead a pass with the item whose estimate is least constrained
+
+**Sequencing a pass by expected size sends you at the item you understand worst, and it does so
+by construction**, because the largest estimate is usually large for the same reason it is
+unreliable.
+
+The reduction pass of 2026-08-09 led with Chapter 4 on an explicit and reasonable argument: it
+carried 4,192 of the 11,429, so its realised rate would be the best available estimator for the
+rest. **Both halves were wrong in the same way.** Chapter 4's estimate was the largest *because*
+the chapter is dense with measurement — and a chapter dense with measurement is one where the
+body must keep the measurement, so its retention cost was the highest in the document and the
+least like anything else. Executing it first spent the most effort on the least efficient
+material and produced a rate that did not generalise. **Chapter 3, priced smaller, ran at 84 per
+cent against Chapter 4's remaining 6 to 30**, because its demotions answer R83/R84, which want a
+reason — one sentence — where R102 wants a finding, its number and its consequence.
+
+**The operational form: order a pass by what is best understood, not by what is biggest.** Lead
+with the item whose estimate rests on something already measured, or whose constraint is
+structurally simple, and let it calibrate the estimates that are shakier. If the largest item
+must go first for another reason, say explicitly that its rate will not transfer, and forecast
+the remainder from its *class* rather than from its number.
+
+**The generalisation past sequencing: an estimate's size and its reliability are often produced
+by the same property**, so ranking by size ranks by uncertainty as well. Ask what makes an item
+large before treating it as the anchor.
+
 ### A value the quantity cannot take is a defect in the instrument, not a datum
 
 **Zero is a value, and an instrument reporting it for something that cannot be zero is

@@ -294,6 +294,17 @@ All five map to a Results section holding a measured answer. RQ5's answer is
 qualified (the cost sweep is degenerate) but the degeneracy is itself measured
 and reportable, so the question is answered rather than unanswered.
 
+> **SUPERSEDED 2026-08-09 — this enumeration was run against the PLANNED §1.3 inventory, and
+> five of Chapter 4's subsections were composed after it.** Re-run against the composed chapter
+> under the 8C-9 pass, the answer is **three**, not one: `sec:res-chatlog` (223) as below, plus
+> **`sec:res-winkler` (496)** — a comparison of five alternative interval methods, which answers
+> **D7** rather than RQ4, since RQ4 asks whether split conformal holds coverage and what accounts
+> for the departure — and **`sec:res-injection` (194)**, which establishes the instrument rather
+> than reporting a finding. Full table at `ledger/reduction_plan.md` §9a. **The general lesson is
+> that an enumeration is a measurement of the document at a moment**: this one was correct when
+> written, was never re-run, and was quoted forward for three phases while the chapter it
+> described grew by five sections.
+
 ### 7.2 Substantial results answering no question — one
 
 **`sec:res-chatlog`, "A second learning domain reaches the output", 348 words.**
