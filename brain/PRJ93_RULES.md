@@ -1051,3 +1051,35 @@ composed new material into the population it enumerated.
 **contribution** table names limbs the RQ strings do not, and a result named in a contribution
 string bears on that contribution's question by construction. An enumeration run against one map
 is not an enumeration against the criterion.
+
+## Re-price in the original item namespace
+
+**A re-pricing pass that names its items differently from the pass it re-prices cannot see its own
+overlaps.** Three double-counts surfaced in a single pass on 2026-08-09, each one lever counted
+twice under two names: *"the traded meta-paragraph"* and *"§4.4.2's second demonstration"*; *"the
+exchangeability narrative"* and *"the two-deflections paragraph"*; *"Winkler at 14 %"* and
+*"Winkler at 76 %"*. Each looked like new saving and was not.
+
+**Operational form.** Re-price in the **original item namespace**, or map every new item to the
+row it supersedes **before** summing. A new item that cannot be mapped to an existing row is
+either genuinely new or badly named, and which one it is must be settled before it enters a total.
+
+## Untaken and uncounted are different things
+
+Chapter 3's nine derivations were the largest untaken item in the plan and were **fully counted**
+in its total. Reading "untaken" as "missing from the arithmetic" and adding them again would have
+returned a landing of ~19,031 and a **false compliance verdict**.
+
+**Before adding a lever to a forecast, find it in the forecast.** Not having been executed is no
+evidence at all about whether it has been priced.
+
+## A lever that never refuses anywhere has not been tested
+
+When the R102-minimum reading was tested per research question, **RQ3 refused it**: that question
+names two limbs, the limbs measure differently, and C2's own amendment forbids writing them as a
+matched pair, so neither is secondary and nothing relocates.
+
+**That refusal is the control case.** A per-item test that returns "applies here, dead there" is
+evidence the test was applied to the material; a test that returns "applies" everywhere it is
+pointed has been applied to a target. **Record where a lever fails, and treat a lever with no
+recorded failures as unvalidated rather than as unusually good.**

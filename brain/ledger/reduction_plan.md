@@ -1223,3 +1223,85 @@ on it, and together they are 1,611 of the 1,819-word improvement. **If the super
 R102 needs each finding stated in the body, both die together and the compliant plan dies with
 them** — which is why execution stays held on Q1, and why the split chapter is not an independent
 fallback.
+
+---
+
+## 16 · THE COMPLIANT PLAN, RE-COST WITH 4.4.4 RETAINED — 2026-08-09. **This supersedes §15.**
+
+**Ruling applied:** 4.4.4 drift cause is retained in the body. The reading that would relocate it
+— that RQ4's *"property accounting for the departure"* is the exchangeability violation, with the
+drift cause a level below it — is **defensible rather than clear**, it is the mechanism behind the
+dissertation's strongest result (C3), and reversing it after the body has been rewritten around
+its absence is expensive. **Buying certainty with margin is the better trade where the margin
+exists**, and it does.
+
+### 16a · Lever 1 as revised — six subsections, not seven
+
+| § | Words | §8/§9a claims | Relocate whole | Incremental |
+|---|---|---|---|---|
+| 4.1.1 Ladder | 237 | 96 | 207 | +111 |
+| 4.2.3 Adoption margin | 413 | 73 | 383 | +310 |
+| 4.2.4 Occurrence gating | 269 | 111 | 239 | +128 |
+| 4.4.1 Empirical coverage | 423 | 135 | 393 | +258 |
+| 4.5.1 Injection validity | 194 | 66 | 164 | +98 |
+| 4.4.6 Winkler | 496 | 376 | 466 | +90 |
+| ~~4.4.4 Drift cause~~ | ~~645~~ | — | **RETAINED IN BODY** | **0** |
+| **TOTAL** | **2,032** | 857 | 1,852 | **+995** |
+
+Pessimistic **+815** (2× bias on six 30-word retentions). §9b re-bases from the smaller shrinkage:
+**568 optimistic / 352 pessimistic** (was 489 / 297 with 4.4.4 relocated, 763 with no relocation).
+
+### 16b · The landing
+
+| | Optimistic | Pessimistic |
+|---|---|---|
+| Body now + R114 | 28,482 | 28,482 |
+| §8 re-priced plan (includes Ch 3's 1,215) | −6,902 | −6,902 |
+| §9a Winkler — superseded by Lever 1 | −340 | −238 |
+| C-1 | −25 | −25 |
+| Lever 1, six subsections | −995 | −815 |
+| §9b, re-based | −568 | −352 |
+| Retention band (multiplier at 212 % not 204 %) | — | +252 |
+| Sub-total | 19,652 | 20,402 |
+| **C-6** — Chapter 2's long shots, deterministic | −820 | −820 |
+| **LANDING** | **18,832** | **19,582** |
+| **Margin below 20,000** | **+1,168** | **+418** |
+
+**418 at the pessimistic end, against the 300 required. It clears with 4.4.4 retained.**
+**RECOMMENDATION: retain 4.4.4.** The reading is not needed and should not be relied on.
+
+### 16c · The same test applied to 4.2.3 — the room is NOT there
+
+| Relocation set | Optimistic | Pessimistic | Pessimistic margin |
+|---|---|---|---|
+| All seven (§15) | 18,510 | 19,266 | +734 |
+| **Six — 4.4.4 retained** | **18,832** | **19,582** | **+418 ✓** |
+| Five — 4.4.4 **and** 4.2.3 retained | 19,081 | 19,819 | **+181 ✗** |
+
+**Retaining 4.2.3 as well leaves 181, which is below the 300 floor. 4.2.3 must relocate.** It is
+the second-riskiest item and it is taken anyway, because the arithmetic does not leave a choice.
+Its risk is recorded, not resolved: it is a pre-registered methodological device a reader may
+expect stated rather than pointed at, and its retained sentence must name the rule, the refusal
+and the criterion value ($+0.026$ where a negative is required) rather than merely pointing.
+
+### 16d · Unclaimed upside — R97's five floats. STAYS UNCLAIMED, ruled
+
+R97 forces `tab:ladder`, `tab:coverage`, `tab:winkler` and `fig:validity-efficiency` to move with
+their subsections (`fig:drift` no longer moves, since 4.4.4 stays). Worth **~200–350** on
+estimate. **It is excluded from every figure above and must not be used to pad a margin.**
+The rule that says the least-constrained estimate must not lead a pass applies equally to letting
+it fill a gap. **It is claimed only when the floats have moved and it can be measured.**
+
+### 16e · The single point of failure
+
+**1,563 of the 1,819-word improvement is Lever 1 (995) plus §9b (568), and both rest on the same
+R102-minimum reading.** The split chapter is **not** a fallback — §14 rests on the identical
+reading. If the stronger reading governs:
+
+| | Landing with C-6 | Against 20,000 |
+|---|---|---|
+| Stronger R102 reading — no Lever 1, no §9b | **20,395 – 20,749** | **breach by 395 – 749** |
+
+**And that row already assumes C-6 taken.** There is no further editorial lever; what remains is
+removing findings, which is a scope decision. **This is Q1 in the query, and it is why execution
+is held.**
