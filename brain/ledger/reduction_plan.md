@@ -962,3 +962,114 @@ ruling on what the dissertation claims — and the single most consequential unk
 on this list. **It is question 4: whether the appendices are read.** If they are not, the ~4,900
 words already relocated there have been moved out of the marker's view, and the whole strategy
 needs rethinking rather than extending.
+
+---
+
+## 12 · THE CONSTRAINT RESTATED, AND THREE DOUBLE-COUNTS FOUND — 2026-08-09
+
+### 12a · The constraint, corrected
+
+**19,000 was never the supervisor's number.** It was Phuong's margin against forecast error, and
+it has been treated in §1 and §8–§11 as though it were a hard line. **The supervisor's confirmed
+position is: 20,000 hard cap excluding bibliography and appendices, serious penalty for breach,
+18,000 acceptable though not welcome.** Every figure below is stated against **20,000 with a
+declared margin**, which is the correct shape for a constraint with a forecast either side of it.
+
+**C-3 is DECLINED, ruled.** Seventy-six words to make the document less honest is the worst trade
+on the list. **And rule (c) admitting it was a defect in how the rule was written**, not a
+judgement the rule should have produced: a null nobody asked for is still a null the project
+recorded against itself. §10c's C-3 entry stands as the reasoning; the disposition is now closed.
+
+### 12b · Chapter 3's 1,215 is NOT missing. It is inside the 6,902, and always was
+
+Summed from §8a's rows: 199 + **1,215** + 214 + 159 + 135 + 101 + 86 + 3,114 + 414 + 290 + 381 +
+169 + 256 + 73 + 50 + 36 + 10 = **6,902**. Chapter 3's nine derivations at 84 % are the second row
+of the table and the single largest item in it.
+
+**Adding it again would have produced a landing of ~19,031 and a false compliance verdict.** The
+item is untaken — no derivation has moved yet — but *untaken* and *uncounted* are different
+things, and the plan counts it.
+
+### 12c · Two more double-counts, found by checking Tier 1 against §5's per-subsection table
+
+**§10's Tier 1 is not additive to §8. Both its items sit inside §8 rows.**
+
+| Tier 1 item | The §8 row it sits inside | §8 already claims | Tier 1 claims | **Incremental** |
+|---|---|---|---|---|
+| **C-1** §4.4.2's second-demonstration ¶ (111) | *"4.4.2 traded **meta-paragraph** — 373 → 86"* | **86** from that same paragraph | 111 by cutting it | **+25** |
+| **C-2** §4.4.3's two-deflections ¶ (62 as a demotion) | *"4.4.3 exchangeability **narrative** — 457 → 159"*, and §5 reads *"DEMOTE correction narrative"* | **159**, and the correction narrative **is** the two-deflections ¶ | 62 | **0 — already counted, at a higher price** |
+
+**So Tier 1 contributes +25, not +173.** C-2 does not merely fail to add: pricing the same
+paragraph at 62 where §8 claims 159 is evidence that **§8's 159 is optimistic**, and it is
+recorded here as a risk rather than folded into the forecast.
+
+**And §9a's injection line is worse than what was already planned.** §5 prices 4.5.1 as
+`COMPRESS 194 → keeps 100`, a saving of **94**, inside §8a's 4,449-word compression block.
+§9a's reclassification prices it at **58**. The planned compression is the better instrument and
+the §9a line is **withdrawn**; incremental **0**. The 30 %-band demotion was never an improvement
+on a compression already budgeted.
+
+**§9a's true incremental is Winkler alone, and net of the 36 already in §8a: 376 − 36 = +340.**
+§9c added the full 643 to the full 6,902 and double-counted that 36.
+
+**The pattern in all three.** Every one is a lever counted in two places under two names — *"the
+traded meta-paragraph"* and *"§4.4.2's second demonstration"*, *"the exchangeability narrative"*
+and *"the two-deflections paragraph"*, *"Winkler at 14 %"* and *"Winkler at 76 %"*. **A re-pricing
+pass that names its items differently from the pass it re-prices cannot see its own overlaps.**
+
+### 12d · The landing, restated against 20,000
+
+| | governing |
+|---|---|
+| Body now | 28,332 |
+| R114 | +150 |
+| §8 re-priced plan — **includes Chapter 3's 1,215** | −6,902 |
+| §9a Winkler re-price, **incremental** (376 − 36) | −340 |
+| §9a injection — **withdrawn**, planned compression is better | 0 |
+| §9b R102/R103 de-duplication | −763 |
+| §10 Tier 1: C-1 **incremental**; C-2 already counted; C-3 declined | −25 |
+| **EXPECTED LANDING** | **20,452** |
+
+**The range.** Unmeasured components carry the risk; counted paragraphs do not.
+
+| Component | Optimistic | Pessimistic | Basis |
+|---|---|---|---|
+| §9b de-duplication (763) | full | +229 | unmeasured, no executed item; 70 % is this project's measured rate for unmeasured estimates |
+| §9a Winkler (340) | full | +102 | same |
+| Demotion retention across §8 | at 204 % | +252 | the multiplier is calibrated on three points spanning **194–212 %**; the pessimistic end is 212 % |
+| §8 compression block (3,114) | — | — | 70 % is already the **measured** S-4 rate; no further haircut, that would double-discount |
+| C-1, floats | — | — | counted words, deterministic |
+| **Landing** | **20,452** | **21,035** | |
+
+**Margin below 20,000: −452 optimistic, −1,035 pessimistic. Breach at both ends.**
+
+### 12e · Is C-6 still required? Yes, and it is not sufficient at the pessimistic end
+
+C-6 is Chapter 2's three long-shot sections cut rather than demoted: **+820**, deterministic
+(counted words of existing sections), costing no measurement and orphaning no citation.
+
+| | Optimistic | Pessimistic |
+|---|---|---|
+| Without C-6 | 20,452 (**−452**) | 21,035 (**−1,035**) |
+| **With C-6** | **19,632 (+368)** | **20,215 (−215)** |
+
+**20,000 is not reachable without C-6.** With it, the plan complies at the optimistic end with
+**368 words of margin** and breaches by **215** at the pessimistic end.
+
+**So the decision about what the literature review argues stays on the critical path.** It cannot
+be removed from it by arithmetic, and saying otherwise would be the third time this pass reported
+a number more confident than its evidence.
+
+**What closes the remaining 215 if the pessimistic end obtains** is the R102-minimum answer. If
+the supervisor confirms the reading, §9b applies across **all five** research questions rather
+than the four sites measured, and the de-duplication is larger than 763 by an amount nobody can
+price until the reading is confirmed. **That is the whole reason execution is held.**
+
+### 12f · The supervisor query narrows to two questions
+
+Q1 (**the R102 minimum**) and Q4 (**are the appendices read and assessed?**) are load-bearing and
+stay. Q2 and Q3 were framed for a 19,000 working ceiling and a document that could not comply;
+with C-6 the document can comply at the expected landing, so they are **context, not asks**.
+**Q4 is now the most consequential item in the project**: ~4,900 words have been relocated to
+appendices across four sessions on an assumption that has never been checked, and if it is wrong
+the strategy needs replacing rather than extending.
