@@ -4570,3 +4570,76 @@ about what it costs to keep the body coherent.**
 needs **2,434 more expected shed ≈ 3,428 more priced demotion**. Reported for a ruling rather than
 worked around. Compile PASS 153 pages, 0 errors, 0 undefined refs/citations, 0 floats lost, 7
 overfull boxes unchanged. Overleaf `535c1d3`, **unpushed**.
+
+---
+
+## 8C-9 · The reduction full run — HALTED. 2026-08-09
+
+**Instruction.** Execute the reduction end to end, report once at the end, land in 18,000–19,582,
+never exceed 20,000, and **halt only if reaching the target would require removing a finding**.
+Re-price Lever 1 first against the criterion-count hypothesis. Tag a rollback baseline, commit per
+chapter, never amend or force-push.
+
+### Completed
+
+1. **Rollback baseline.** Both repos tagged `pre-reduction-full-run` at `ab832a4`, verified on the
+   Overleaf remote with `git ls-remote` **before** any edit.
+2. **Lever 1 re-priced (J1).** Every one of the six Results subsections was read against the
+   criteria it discharges. **Fifteen criteria name Results** (R87–R101 plus R102), 4–8 bind each
+   subsection, and the ~30-word pointer the lever assumed is available nowhere. **2,032 → ~480**,
+   all six reclassified from relocation to compression.
+3. **C-6 re-priced (J2).** §2.8 and §2.9 are **not** the long-shot band C-6 was approved against.
+   They are **R66's site** for the shipped intervention policy, the $F_\beta$ measure **R93** sends
+   Results back to, and Guo's ECE instrument; **§2.9's closing sentence is the R62/R63 gap**.
+   §2.9 retained whole. **1,403 → ~260**.
+4. **Executed.** Body **27,990 → 27,759**. The Bartlett serial-dependence working demoted to a new
+   `app:pairing-correction`; §5.3's numerics figures de-duplicated back to `sec:res-winkler`, which
+   is R102's site for them; §2.1's general-context ring compressed, `staufer_2025_2026` leaving the
+   bibliography.
+5. **Compile.** `latexcheck` **PASS under TeX Live 2026 locally**, 156 pages, 0 undefined
+   references, 0 undefined citations. No markdown or curly-quote leakage. The one new `\ref` was
+   checked for *truth* and not only for resolution.
+
+### Artefacts written
+
+| Path | What |
+|---|---|
+| `brain/ledger/reduction_cost_register.md` | The deliverable beside the document. J1 and J2 at its head, the executed rows with each retention quoted against its criterion, the declined candidates with what each would remove, and the arithmetic |
+| `brain/PRJ93_RULES.md` | Two rules added — *count the criteria before pricing the cut*, and *a cut approved on a description of the material is approved on the description* |
+| `brain/ledger/BLOCKED_third_party.md` §F | Seven state rows; the stale "four questions" supervisor row corrected to two |
+| `appendix/robustness.tex` | `app:pairing-correction`, the demotion target, built before anything moved into it |
+
+### The halt, and why it is the specified one
+
+**Four realisation rates are now measured and they agree: 19–28 % against a plan that priced at
+70–84 %.** Ch 3 derivations 342/1,215 · Lever 1 2,032→~480 · C-6 1,403→~260 · this pass 231.
+**The cause is identical each time and it is arithmetic: each criterion demands its own retained
+sentence, so retention scales with how many criteria name the chapter, and the plan modelled it as
+a constant fraction.**
+
+| | |
+|---|---|
+| Body, measured | **27,759** |
+| Gap to the cap | **7,759** |
+| Everything unexecuted, at the plan's own prices | ~7,000 — **still lands above 20,000** |
+| The same, at the measured 24–28 % | ~1,900 — lands near **25,800** |
+
+**Short by 4,300–5,800 words at any defensible rate, and every remaining candidate removes a
+finding.** Halted exactly on the stated condition. **Closing the gap is a scope decision, not a
+length one**, and it is Phuong's.
+
+### Unstarted, and why
+
+The compression block, §9b re-based, C-1, and Chapters 1/6 were not begun. Not for want of time:
+the three levers that were re-priced consumed the entire margin the plan had, and executing the
+remainder at prices the plan's own measurements have refuted three times would have produced more
+words of register for the same halt. **§6.2 Contributions was declined outright** — that is where
+C2 went missing once already, to a compression of exactly this kind.
+
+### Verified end state
+
+- Overleaf `3b001de`, **1 unpushed**, `origin/main` at `ab832a4`. **Phuong pushes.**
+- Brain `brain-construction-local`, committed, tree clean.
+- Both tags `pre-reduction-full-run` in place. Nothing amended, nothing force-pushed.
+- Supervisor query **still unsent and still Phuong's**. **Q1 matters more after this pass**: the
+  stronger R102 reading only widens a gap that is already unclosable by editing.
