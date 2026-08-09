@@ -275,24 +275,25 @@ comparison, and the two floors were being held against each other for exactly th
 | **`venueordercheck`: FOUR of five now sit in text the reduction pass rewrites, up from one** | Re-assessed 2026-08-09 against the revised plan, whose Chapter 4 restructure reaches further than the first draft's. `results.tex`:782 (native intervals) and `:513` (empirical coverage) are DEMOTE material; **`:406` goes because `tab:weather` itself is demoted**. **`results.tex`:352 is inside `tab:group`, which the body RETAINS, so it needs its own repair** — the remedy is to name the venues inline, ~20 words, and it edits table text which is **inside** the governing count. `discussion.tex`:29 sits in §5.1, which compresses 1,060 → 500, so **check it after that rewrite rather than repairing it twice** |
 | **Template residue cleared from the preamble** | `\usepackage{lipsum}`, loaded *"just to add random text as an example"* and never called anywhere in the document, removed. Duplicate `\usepackage[utf8]{inputenc}` at the biblatex block removed. Both were listed at `05` §6.1 and both survived every compile, because neither is an error. Same class as the declaration and acknowledgements placeholders |
 
-### The length constraint and the cut list — 2026-08-09, ruling recorded
+### The length constraint — CLOSED 2026-08-10. The cap is met
 
-**FINAL AND BINDING.** **20,000 cannot be breached under any circumstance.** **19,000** remains
-the working ceiling because the forecast carries a ±400 range and a plan landing at 19,900 has no
-margin against its own error. **18,000** is the target. This supersedes every earlier length
-ruling and does not move again.
+**The body is 19,941 and the cap is 20,000.** Measured with `texcount -0 -sum -merge -total` over
+`abstract.tex` plus `chapters/*.tex`, re-derived at the head of the pass and again in a fresh clone
+rather than quoted forward. **Every row in the table below that priced this as unreachable is
+SUPERSEDED.** How it was reached, what it cost and what an examiner might ask for is
+`reduction_cost_register.md` §"PASS 8D", which is the review list and the owner of that state.
 
 | Row | State |
 |---|---|
-| **Overleaf `9895924`** | **PUSHED and verified** — `git ls-remote origin main` returns `989592474bba…`, equal to local HEAD. The §F row's own class of defect (a row naming a SHA is a measurement) does not apply: this was re-measured on the remote. |
-| **A17 — `sec:res-chatlog`** | **STANDS, ruled by Phuong.** The knowledge-gap signal (223) stays in Results 4.5: it evidences a specified deliverable that §6.1 revisits under U6, and trading a specification claim for 223 words is a bad trade. **Priced unavailable.** Struck from `reduction_plan.md` §9a. |
-| ~~**Supervisor query** — four questions~~ **STALE, corrected 2026-08-09** | ~~FINAL TEXT, released to send, four questions.~~ **The query carries TWO asks, not four** — Q1 (the R102-minimum reading) and Q2 (are the appendices read and assessed?); the former Q2 and Q3 were demoted to a *"Context, not asks"* section when Q1 was rewritten from a question into a dependency statement. **State is held by the row above**, not here. *A count in a row is a measurement with a timestamp, same as a SHA.* |
-| **Q4 is the load-bearing one** | *Are the appendices read and assessed?* ~4,900 words have been relocated there across four sessions on the unchecked assumption that they are. If they are excluded from the count **and** not read closely, demotion has been moving evidence out of the marker's view rather than out of the count. |
-| **The cut list** | **PREPARED, NOT EXECUTED** — `reduction_plan.md` §10. Tier 1 is 173 words at zero evidence cost. Tier 3 (Chapter 2's long shots, 820) costs argument rather than measurement. Everything else is refused or needs a per-item ruling. |
-| **The honest floor** | **~20,210 – 20,570 defensible; ~19,100 at the most aggressive.** Above 19,000 in every scenario. 20,000 is reachable only by cutting Chapter 2's surveyed literature, and only if §9 realises in full. |
-| **`sec:res-injection` reclassified** | §9a was **wrong** to place it outside R102. Contribution **C4** names it verbatim — *"with the injection design's contribution to the score measured rather than assumed"* — and C4 maps to RQ5. Re-priced 124 → 58. **The RQ table is not the only map of what a result bears on; the contribution table names limbs the RQ strings do not.** |
-| **Execution is HELD** | The re-priced plan is **not** to be executed until the supervisor answers. The R102-minimum answer changes the plan's shape: if confirmed, the de-duplication is larger than 763 and applies across all five research questions rather than the four sites measured. Executing first means doing Results twice. |
-| **`log/44` G5** | Points at `mcs_L1_results.json` for a full sweep that file does not contain. Another gate whose terminal node does not hold what the citing text claims. **Recorded, not chased.** |
+| **The one thing still open** | **The push.** Overleaf local head `b08ad72`; `git ls-remote --heads origin` returns `3b001de`, so **eight commits await a push** and that push is Phuong's gate. *This row names a SHA, so re-measure it rather than quoting it.* |
+| **19,000 as a working ceiling** | **WITHDRAWN as unreachable, not as wrong.** It was set because a forecast carrying ±400 has no margin at 19,900. The forecast was the thing that failed: four measured realisation rates, and a fifth from this pass, put compression at 5--12 %. Reaching 19,000 needs roughly another 900 words and every remaining candidate is a criterion's only site. 18,000 was never available. |
+| ~~**The honest floor** — 20,210--20,570~~ | **SUPERSEDED.** That floor assumed relocation. The cap was cleared by **removal**: five findings, one whole signal at three sites, Chapter 2's section 2.2, and the Introduction's second statement of the contributions. |
+| ~~**A17 — `sec:res-chatlog` STANDS**~~ | **SUPERSEDED and executed.** The knowledge-gap signal is removed at all three sites. A17 was ruled under no length pressure and the 2026-08-09 instruction ("findings may be removed; do not stop for approval") governs. The document's own words were that it answered no research question. |
+| ~~**Execution is HELD** pending the supervisor~~ | **SUPERSEDED.** Phuong ruled no query would be sent, so the R102-minimum reading (D1) was applied per question, as `reduction_cost_register.md` records. |
+| **D2, the appendices assumption** | **STILL UNCONFIRMED, and it now covers ~4,900 relocated words plus this pass's demotions.** If appendices are excluded from the count *and* not read closely, the earlier relocations moved evidence out of the marker's view. **This pass deliberately took no new relocation for that reason**: two removals (4.5.3, and all of 4.4.5) were refused because each would have orphaned an appendix section, which buys the cap nothing. |
+| **R114 — the one undischarged criterion** | *"The Conclusions state what had to be learned in order to do the project."* **No discharging passage anywhere**, and none before this pass either. It needs ~150 words the cap does not have. **This is the open item with a mark attached.** |
+| **R66, partially discharged** | Chapter 2's section 2.2 is gone, so the baseline ladder's argument sits in Methods under R83/R84 rather than in the review. **R64 degraded** (recommended, not mandated). No other criterion lost its only site. |
+| **`log/44` G5** | Points at `mcs_L1_results.json` for a full sweep that file does not contain. **Recorded, not chased.** Unchanged by this pass. |
 
 ### Tier-3 items — verifiable only on Overleaf, not unchecked
 
