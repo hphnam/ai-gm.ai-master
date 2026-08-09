@@ -4135,8 +4135,8 @@ carries zero floats and zero tables, so it can neither pass nor fail them.
   All three self-tested clean first.
 - AI-writing pass: **zero em dashes**, zero `---`, zero `--`; no Tier 1/Tier 2 vocabulary; no vague
   attribution; sentence-length stdev 16.3 (not metronomic).
-- Ch 2 **4,938** · Ch 3 **5,526** · Ch 4 **7,712** · Ch 5 **4,870** · **Ch 6 2,325** · abstract 299.
-  **Five chapters 25,371**; projection **~27,100 against HC1's 20,000**.
+- Ch 2 **4,938** · Ch 3 **5,526** · Ch 4 **7,712** · Ch 5 **4,870** · **Ch 6 2,328** · abstract 299.
+  **Five chapters 25,374**; projection **~27,100 against HC1's 20,000**.
 
 ### Carried forward
 

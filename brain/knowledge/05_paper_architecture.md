@@ -240,7 +240,7 @@ have been evicted from the body.
 |---|---|---|---|---|---|
 | — | `chap:conclusion` | *(lede)* | 76 | **KEEP** | Roadmap. |
 | § | `sec:conclusion-claims` | What the work establishes | 300 | **KEEP** | Four contributions at graded strength. The only place contributions are stated. |
-| | | *(inventory row above is the **pre-8C-5** state and is kept as history.)* **Recomposed 2026-08-09:** heading renamed to **Contributions** per §3.5 (N1, N6); **five** contributions per U1; `sec:conclusion-objectives` (6.1) added before it per U6; the section measures **959**. C2 and RQ2's limb were both absent from the four-claim version. | | | |
+| | | *(inventory row above is the **pre-8C-5** state and is kept as history.)* **Recomposed 2026-08-09:** heading renamed to **Contributions** per §3.5 (N1, N6); **five** contributions per U1; `sec:conclusion-objectives` (6.1) added before it per U6; the section measures **962**. C2 and RQ2's limb were both absent from the four-claim version. | | | |
 | § | `sec:conclusion-divergences` | Where the literature and this estate disagree | 42 | **DEMOTE to Discussion** | Signposting for two subsections that are interpretation. |
 | §§ | `sec:conclusion-reversal` | The ranking reversal moved in a direction no cited work predicts | 272 | **DEMOTE to Discussion** | Adjudication against Brigato and Hewamalage — textbook Discussion material. |
 | §§ | `sec:conclusion-adaptive` | Adaptive calibration performed worse than leaving the band alone | 344 | **DEMOTE to Discussion** | Resolves an apparent contradiction with the adaptive-conformal literature. Genuinely critical argumentation, in the wrong chapter. |
@@ -1137,7 +1137,7 @@ appears once, in Discussion 5.5, as a scope divergence.
 omissions, and R106 (biases) and R107 (assumptions), neither of which is currently
 addressed as such.
 
-**Conclusions, whole chapter — 1,100 budgeted against 2,325 measured. Added 2026-08-09 by
+**Conclusions, whole chapter — 1,100 budgeted against 2,328 measured. Added 2026-08-09 by
 8C-5, and this section had NO Chapter 6 row before that.** The absence was itself the finding:
 §4.5 exists so that a section which cannot be written to budget names its loss here rather than
 exceeding the budget silently, and Chapter 6 was exceeding it with nothing recorded. Measured
