@@ -1,309 +1,484 @@
-# The reduction plan — PROTECT, COMPRESS, DEMOTE
+# The reduction plan — REVISED against a hard 20,000 ceiling
 
-**Prepared 2026-08-09 under item 2 of the 8C-8 brief. NOT EXECUTED.** Phuong rules section by
-section. Nothing has been compressed, demoted, cut or moved.
+**Revised 2026-08-09 under the 8C-9 brief. NOT EXECUTED.** Phuong rules section by section.
+Nothing has been compressed, demoted, cut or moved.
 
-Supersedes `ledger/relocation_candidates.md`, which was costed against a 20,000 cap and a
-relocation-only lever. Its protected set carries forward unchanged; its available column is now
-one of three classes rather than the whole plan.
+**Supersedes the 2026-08-09 first draft of this file**, which was costed against a soft
+constraint. That draft's recommendation is withdrawn — see §1. It in turn superseded
+`ledger/relocation_candidates.md`.
 
 ---
 
-## 0 · The governing arithmetic, and a correction to the brief's
+## 1 · The withdrawal, recorded so it is not re-offered
 
-The brief states *"Body 27,779 against a 15,000 target: ~12,800 to shed."* That is the
-`wordcount.py` marker figure. **The governing instrument is `texcount`** — Phuong's own criterion,
-*"the number that governs must be the one a marker's count resembles"*, and the reconciliation at
-`00_marking_criteria.md` §1.1a settles it: texcount counts captions (872 words here, which a
-marker reads) and does not count `\ref` keys (which render as "4.4", not as prose).
+> **"Execute the plan to its ceiling and accept a body near 22,000"** — first draft §6,
+> 2026-08-09. **WITHDRAWN by Phuong the same day. It was wrong.**
 
-| | marker | **texcount, governing** |
+**20,000 is a HARD ceiling.** Exceeding it is penalised seriously and materially affects the
+mark. There is no acceptable overrun and no justification that covers one. A plan landing at
+22,031 does not fall short of a target; **it fails the constraint**, and offering it as an
+outcome was the error.
+
+The reasoning that produced it is worth naming, because it is a general failure mode rather
+than a slip. The first draft treated the protected set as fixed and the target as negotiable,
+then reported the residual as a finding. **That inverts the constraint.** When a limit is hard,
+the protected set is what must be re-examined, and "protected" has to be re-derived from what
+each criterion actually says rather than carried forward from a pass made under a softer rule.
+Doing that re-derivation is what §3 below is, and it moved material in **both** directions.
+
+**The binding numbers, on `texcount`, which governs:**
+
+| | governing | note |
 |---|---|---|
-| Body today (abstract + Ch 1–6) | 27,779 | **28,750** |
-| Working target | 15,000 | **15,000** |
-| **Gap** | 12,779 | **13,750** |
-
-**Any plan costed in marker words understates what it must find by about a thousand.** All costs
-below are marker, because that is the only instrument with section granularity; add ~3.5 per cent
-when converting a chapter total to the governing number.
-
-**One lever the marker instrument cannot see.** Captions are inside the counted population.
-Compressing a caption, or demoting a float to an appendix, reduces the governing number and shows
-as **zero** in `wordcount.py`. Results carries **771 caption words** and Methods 101.
-
-**What enforces this.** Not HC1 — HC1 is satisfied at 19,999. **HC2** (*"not unstructured or
-overly verbose — such reports will be penalised rather than rewarded"*) and **HC3** (*"not padded
-with irrelevant content"*), both quoting the issued documentation directly. Every COMPRESS item
-below answers to HC2.
+| Hard ceiling | **20,000** | cannot be exceeded |
+| Acceptable | 18,000 | reads well to a marker |
+| Working aim | 15,000 | |
+| **Body today** | **28,750** | as the compiled declaration prints it |
+| **Body today, true** | **~28,980** | +230 the instrument cannot see — §2 |
+| First draft at ceiling | 22,031 | **above the hard limit — insufficient** |
+| **This plan at ceiling** | **17,321** | under the cap by 2,679, under 18,000 by 679 |
+| **This plan at 70 % realisation** | **~20,750** | **above the cap** — §6 |
 
 ---
 
-## 1 · Method, and the honesty constraint on it
+## 2 · The governing instrument is under-reporting, and the defect is verified
 
-**Assignment rule.** Every paragraph in all six chapters was priced with `wordcount.py`'s own
-`count`/`artefact` primitives and classified:
+**`texcount` silently drops the entire caption of any float whose `\caption[...]` short title
+wraps a line.** Not the short title — the whole caption body.
 
-- **PROTECT** — a rubric criterion names it, or its absence leaves a verdict in the body
-  unsupported. The criterion is named per item. *Not costed for saving.*
-- **COMPRESS** — supportive prose arguing something at greater length than the rubric requires.
-  A supporting argument in three sentences instead of eight is not a lost finding.
-- **DEMOTE** — full derivations, procedural detail, secondary tables, reconciliation working.
-  Body keeps the finding plus a cross-reference; the detail goes to an appendix and leaves the
-  counted population entirely.
+Found by pricing each float empirically: remove the float from a scratch copy, re-run
+`texcount -0 -sum -merge -total`, take the delta. Five of nineteen floats priced at **exactly
+zero**, which is not a property captions can have.
 
-**The estimate warning, and it is not boilerplate.** This project has costed a length pass once
-before. **S-4 estimated 370–470 words from eight approved de-duplication items and delivered net
-−105.** The lesson recorded then was that de-duplication was not the instrument. Compression is a
-different operation with a better ratio, but the direction of the error is established: **estimates
-here run optimistic.** Every COMPRESS figure below is a *ceiling*, not a forecast, and the plan is
-scored twice — once at the ceiling and once at a 70 per cent realisation.
-
-**Three standing rules bind the execution and are stated here so a later session cannot mislay
-them.** Compression may not touch a qualification (it widens the claim rather than shortening the
-sentence). Compression removes negative results first, so every section's nulls are enumerated and
-grepped after any pass. And a cap constrains the total, not any particular sentence — no item is
-deferred as "unaffordable" without a costed alternative.
-
----
-
-## 2 · Chapter 4, Results — 7,701 marker / 8,492 texcount
-
-The largest volume and the **least compressible**, because most paragraphs state a measurement and
-its verdict in the same breath. Budget 5,200; the protected core alone is 4,745.
-
-### PROTECT — 4,745 marker
-
-| Item | Cost | Criterion |
-|---|---|---|
-| Four-limb reconciliation: `sec:res-coverage` 423, `sec:res-traded` 373, `sec:res-exchangeability` 457, `sec:res-drift` 720 | **1,973** | RQ4 / C3. `sec:res-traded` is Phuong's standing precedent, relocation already ruled against |
-| Weather + cross-series pooling | **841** | C2. The pair the document **omitted entirely** until 8C-5; `PRJ93_RULES.md` directional-bias rule |
-| Detection: VUS-PR 359, injection validity 194, cost sweep 350 | **903** | C4, whose fixed string requires the injection design's contribution *measured rather than assumed* |
-| MCS 345 + origin-count reversal 208 | **553** | **D7**, `05` §5.1: *"the single named Distinction blocker"* |
-| Unbiasedness of base forecasts | **294** | RQ2's negative limb. Found *missing* once already |
-| Occurrence gating degeneracy | **181** | Negative result |
-
-### COMPRESS — ceiling 720
-
-| Item | Cost | Ceiling | Reason | Body retains |
-|---|---|---|---|---|
-| Winkler comparison (`sec:res-winkler`) 496 | 496 | **200** | Four paragraphs to say no method both enters the set and beats the incumbent. The qualification and the numerics-sensitivity note are separable | The verdict, the qualification, table cross-ref |
-| Ladder results at the gate 237 | 237 | **80** | ¶2's two bounding properties restate Methods | The nine-entrant result |
-| Adoption margin 413 | 413 | **150** | ¶1 argues the bare-inequality problem at length; the *rule* is the finding | Criterion, its value, the refusal |
-| Demand-pattern classification 204 | 204 | **70** | A table read-out in prose | The classification and its consequence |
-| Knowledge-gap signal 223 | 223 | **70** | Secondary signal, twice-stated footing | That it enters on the same footing |
-| Empirical coverage ¶2 (binomial retention) 157 | 157 | **50** | The caveat is restated in 5.3 | The interval and the caveat once |
-| **Captions** | 771 | **250** | 14 floats averaging 55 caption words; the 15/45 short-title rule is met, the bodies are long | Caption bodies at ~35 words |
-
-### DEMOTE — 926
-
-| Item | Cost | Destination | Body retains |
+| Float | Chapter | Caption words a marker reads | `texcount` counts |
 |---|---|---|---|
-| `sec:res-mcs-squared`, secondary-loss ordering, entire | **537** | App. D | "Ordering unchanged under squared loss at two venues, ties at the third" + cross-ref |
-| Native-interval per-venue detail (Ellel's zeros artefact) | **192** | App. D | Ordering-transfers/magnitude-does-not + the Chronos-Bolt decile |
-| Adoption-margin correction narrative | **137** | App. C | Corrected figures, that they were controlled |
-| `sec:res-refit` alert suppression | **197** | App. C | That suppression never costs the original detection |
+| `fig:drift` | 4 | 52 | **0** |
+| `fig:validity-efficiency` | 4 | 45 | **0** |
+| `fig:pipeline` | 3 | 42 | **0** |
+| `tab:bases` | 3 | 49 | **0** |
+| `fig:gap-map` | 2 | 42 | **0** |
+| | | **230** | **0** |
 
-**Chapter 4 reachable floor: ~7,701 − 720 − 926 = 6,055 marker**, plus caption saving 250, so
-**~7,300 texcount** against 8,492 today. It cannot go below **~6,900 texcount** without cutting
-protected measurement.
+**The wrapped-short-title hypothesis predicts all five and only those five — 19 of 19 floats
+classified correctly, no false positives, no false negatives.** `fig:ladder`'s short title fits
+on one line and prices at 51; `fig:drift`'s wraps after *"calendar-open days that did not"* and
+prices at 0.
+
+**Three consequences, and the third is the one that binds this plan.**
+
+1. **The compiled declaration understates the dissertation by 230 words.** It prints 28,750
+   against a true ~28,980. That is a printed number that is wrong, in the file this project has
+   already had to repair once for printing a false statement.
+2. **The brief's premise "demoting a float moves its caption out of the count entirely" is false
+   for 5 of 19 floats.** Demoting `fig:drift` saves exactly zero governing words. Any plan that
+   priced the caption lever from `texcount` deltas alone would have mispriced those five.
+3. **The fix is free of content and must run FIRST.** Putting each short title on one line
+   changes nothing a marker reads and nothing the LoF shows; it changes only what the instrument
+   sees. It will **raise** the printed count from 28,750 to ~28,980 before anything falls, which
+   is the honest direction. Executing the reduction before this fix means measuring the whole
+   pass with an instrument known to be blind in five places.
+
+This is `verify the instrument, not only the artefact` at the exact point the instrument became
+load-bearing. The first draft quoted 872 caption words from `texcount` and `wordcount.py`
+reported 1,136; the first draft recorded the difference and did not chase it. The difference
+*was* the defect.
+
+### The caption lever, priced properly
+
+The brief asks for this specifically, and the honest figure is lower than hoped.
+
+| | governing words |
+|---|---|
+| All 19 float captions, as a marker reads them | 1,136 |
+| — of which `texcount` cannot see | −230 |
+| **Visible to the governing instrument** | **806** (Ch 4 806, Ch 3 102, Ch 2 0 — Ch 2's only float is a dropped one) |
+| Recoverable by **demoting** floats the body does not need (`tab:intermittency` 90, `tab:weather` 109) | **199** |
+| Recoverable by **compressing** the 12 retained captions from ~55 words to ~35 | **~240** |
+| **Caption lever, realistic total** | **~440** |
+
+It is real, it is cheap, and it is **not** the cheapest large reduction available — it is about
+5 per cent of what has to be found. The floats the body could most afford to lose are the ones
+carrying the least caption, and the two largest captions (`tab:weather` 109, `tab:winkler` 107)
+sit on the C2 and D7 evidence tables respectively, only one of which can move.
 
 ---
 
-## 3 · Chapter 3, Methodology — 5,569 marker / 5,686 texcount
+## 3 · The protected set, re-examined against what the criteria actually say
 
-**The best DEMOTE chapter in the document**, because Appendix B ("Method specifications and
-pseudocode") already exists for exactly this, and `ds-writing` §8's test — *"sufficient detail for
-a reader to replicate the work"* — is satisfied by the **document**, not by the chapter.
+**The brief's instruction: "If a criterion demands the material in the body specifically, quote
+the criterion saying so — do not infer it."** Doing that is the largest single result of this
+revision, and it moved material both ways.
 
-### PROTECT — ~1,150 marker
+### 3a · Which criteria name a location, verbatim
 
-| Item | Cost | Criterion |
+| Criterion | Wording, quoted from `00_marking_criteria.md` | Names a location? |
 |---|---|---|
-| Availability-lead basis and the five arms | **380** | Makes RQ3's null interpretable. A null on a wrongly specified basis is a different claim |
-| Study design, estate, unit of analysis | **428** | R69/D3 replicability; also the three-venue scope RQ-wide |
-| The pre-registered one-standard-error margin (clause only) | **~80** | `05` §4.5 ruling: the *fact* survives, it licenses the adoption rule |
-| Conformal construction, the band definition itself | **~260** | RQ4 depends on it |
+| **R7** | "A research question (or questions) is explicitly stated **in the Introduction**." | **YES — Introduction** |
+| **R83** | "**Methods** justify why each decision was made." | **YES — Methods** |
+| **R84** | "**Methods** justify why the alternatives considered were rejected." | **YES — Methods** |
+| **R106** | "**The Discussion** states the potential biases in the work." | **YES — Discussion** |
+| **R107** | "**The Discussion** explains how the underpinning assumptions may have impacted the findings." | **YES — Discussion** |
+| **HC59** | "Any significant difference between the project specification's scope and the project as performed is explained **in the Discussion**." | **YES — Discussion** |
+| **HC54** | "…is included **as an appendix**." | YES — appendix (met) |
+| **HC57** | "**Appendices are placed after** the References section." | YES (met) |
+| **R8** | "Each stated research question is explicitly answered **by the end of the document**." | **NO — document-scoped** |
+| **D7** | "There is an explicit discussion of why the approach taken is better than alternatives that could have been used." | **NO** |
+| **R69** | "Pseudocode and/or flow diagrams are **provided** where algorithms are described." | **NO** (already in App B) |
+| **R65** | "A search protocol is **stated**…" | **NO** (already in App A) |
 
-### COMPRESS — ceiling 900
+**Two findings, and they cut against each other.**
 
-| Item | Cost | Ceiling | Reason |
+**R8 and D7 do not require body placement, and the first draft's largest protections rested on
+inferring that they did.** R8 says *by the end of the document*. An appendix is part of the
+document. So §5.1's 1,060 words are not immovable, and D7's material carries no placement
+requirement at all.
+
+**R83 and R84 DO require body placement, and the first draft was demoting material they
+protect.** *"Methods justify why each decision was made"* and *"why the alternatives considered
+were rejected"* bind those justifications to Chapter 3. The first draft's demote list included
+*"Mondrian-as-observed-variable justification"* (163) and *"adaptive alternative"* (104) — a
+decision's reason and a rejected alternative's reason. **They cannot leave Methods.** What
+*can* leave is the derivation, the implementation narrative and the supporting working; the
+reason must stay as a sentence. That retention costs roughly 230 words back across the nine
+demoted items, and §5 now carries it.
+
+**Where no criterion names a location, the argument for keeping something in the body is a
+judgement about how a marker reads, and it is recorded as a judgement.** It is not worthless —
+a rejected-alternatives discussion in an appendix is less likely to be read as D7's *"explicit
+discussion"* than one in Chapter 3 — but it is not a requirement, and under a hard ceiling a
+judgement yields where a quoted criterion does not.
+
+### 3b · The five populations the brief named
+
+**The test, per the brief: not "is this load-bearing" but "does the BODY need this inline, or
+does the body need the FINDING plus a cross-reference while the working sits in an appendix?"**
+
+---
+
+#### (i) The four-limb reconciliation — 1,973 marker · **PARTIALLY DEMOTABLE, ~550**
+
+No criterion places it. Taken limb by limb rather than as a block:
+
+| Limb | Today | Body retains | Moves to | Saves |
+|---|---|---|---|---|
+| **4.4.1** Empirical coverage | 423 | The three coverage figures, `tab:coverage`, the verdict that the band under-covers at the Beer Hall and the dependence caveat on overlapping origins | App D: the binomial retention regions, the 80 %-level cross-check, the withheld-upper-limb continuity condition | ~200 |
+| **4.4.2** Traded decomposition | 373 | **The reversal in full** — Ellel 0.692 on 240 trading pairs, ~7 SE, the largest miscalibration in the study — plus `tab:coverage-traded` | App D: ¶3, the methodological reflection on why the earlier reading was available | ~105 |
+| **4.4.3** Exchangeability | 457 | Trading-day mean ranks 0.52 / 0.81 / 0.48 predicting coverage in sign and size | App C: the `active`-versus-traded correction narrative, the two checked deflections | ~80 |
+| **4.4.4** Drift cause | 720 | Both mechanisms — deflation dissolves BH and TRT drift; Ellel's is composition — **and the second violation**, 94 of 546 calendar-closed days traded | App C: the false-open identity working, and the windowing-remedy paragraph whose table (`tab:window`) is **already** in App C | ~165 |
+
+**Verdict.** The limbs are not one object and must not be ruled on as one. ~550 words of
+working leave; every verdict stays where it is made. The windowing paragraph is the cleanest
+single item in the chapter: ~200 words of remedy evaluation in the body pointing at a table in
+Appendix C, replaceable by *"capping the calibration pool helps one venue, is neutral at a
+second and harms the third, so it is not adoptable without per-venue tuning"* plus the
+cross-reference, at ~35 words.
+
+#### (ii) `sec:res-traded` — 373 marker · **PROTECT, and the earlier ruling is CORRECT for a stronger reason**
+
+The brief reopens this. Re-examined, it should stand — but **not** on precedent, and not on a
+criterion.
+
+**§4.4.1 states a verdict that §4.4.2 reverses.** §4.4.1 reports Ellel as *"indistinguishable
+from nominal"*; §4.4.2 shows Ellel covers 0.692 on the days it traded. Demote §4.4.2 and
+**§4.4.1's verdict stands uncorrected in the body**, with the correction one appendix away. That
+is not a body missing its working; it is a body asserting something the document elsewhere
+refutes — the exact defect class this project spent 8C-7 removing from `log/72`, and
+`PRJ93_RULES.md` already records that a supersession belongs *in the superseded text*.
+
+**A correctness argument outranks a placement judgement**, and it is available here where it is
+not available for the other limbs. ~105 words of meta-commentary can still leave.
+
+#### (iii) C2 — weather and cross-series pooling — 841 marker · **DEMOTABLE, ~520**
+
+No criterion places it. The population the document **omitted entirely** until 8C-5.
+
+| | Today | Body retains | Moves to App D | Saves |
+|---|---|---|---|---|
+| 4.3.1 Cross-series ICL | 351 | The finding and `tab:group` | the per-arm walk-through | ~210 |
+| 4.3.2 Weather | 490 | The controlled contrast's verdict and its headline numbers; **the null stated as a null** | the arm-by-arm working and `tab:weather` (109 governing) | ~310 + 109 |
+
+**The directional-compression rule is satisfied and must be checked on execution.** That rule
+says a length pass deletes nulls first. **Demotion is not deletion** — but the *finding* stays
+in the body as a stated negative result, not as a cross-reference. The post-pass check is the
+one the rule specifies: grep `weather`, `pool`, `cross-series`, `exogenous` in the body and
+confirm each still returns a stated result.
+
+#### (iv) D7 — MCS and the origin-count reversal — 553 marker · **COMPRESSIBLE, not demotable in practice**
+
+**D7's text names no location**, so the first draft's protection was inferred rather than quoted.
+But two things keep this in the body on judgement:
+
+- `05_paper_architecture.md` §4.5 already rules that *"what must survive is the origin-count
+  reversal and the confidence sets, because D7 … is the single named reason Distinction is not
+  met"*. That is a project ruling, not a criterion, and it is recorded as such.
+- D7 is a **holistic distinction-band** criterion assessed by a marker reading the dissertation.
+  An explicit comparison against rejected alternatives sitting only in an appendix is materially
+  less likely to be read as one.
+
+**Verdict: keep in the body, compress 553 → ~400.** Saves ~150. The adjacent
+`sec:res-mcs-functional` (537) is a different matter — 05 §4.5 already displaced its hypothetical,
+and it demotes to App D for ~477 retaining ~60.
+
+#### (v) RQ2's unbiasedness null — 294 marker · **DEMOTABLE, ~175**
+
+No criterion places it; R8 is document-scoped.
+
+**Body retains the null itself:** the condition fails, 22 of 41 nodes reject a zero mean
+residual, 19 of the 22 positive, so no minimum-variance optimality may be claimed on this
+estate. **Moves to App D:** the 41-node test design, the two node-level intervals, and the
+three-citation theoretical chain.
+
+**This is the limb the document was missing entirely until a critique role grepped for it, and
+it left no symptom of any kind.** Demotion is safe; deletion is not, and the retained sentence
+is the negative result rather than a pointer to one. Flag on execution.
+
+#### (vi) `sec:res-traded`'s sibling risk — the appendices become load-bearing
+
+Roughly **3,700 words** move into Appendices B, C and D under this plan. Three of the four are
+currently 50–120 lines. **They stop being supplementary and become where the working lives**,
+which raises the standard they have to meet: cross-references must resolve *to the material
+named*, and §4 shows seven that already do not.
+
+---
+
+## 4 · The appendix cross-reference check — 7 FAILURES, run before any demotion
+
+**The brief requires this before anything moves. It was run over all 21 `\ref{app:*}` sites in
+the body.** The method is the one `methodology.tex`:382 was caught by: read the citing sentence,
+name what it promises, open the target, look for it.
+
+**`latexcheck` is silent on every one of these, because every `\ref` resolves.**
+
+| # | Site | The citing sentence promises | In the target? |
 |---|---|---|---|
-| Accuracy measures / denominator basis 707 | 707 | **250** | `sec:ruler-ellel` 254 + `sec:ruler-functional` 214 argue a general property of scoring rules. The *ruling* is 3 sentences |
-| Model comparison procedure 481 | 481 | **150** | ¶1/¶2 argue origin advancement; the conservatism note is one clause |
-| Demand-pattern classification 477 | 477 | **150** | The estimator-adoption walk-through at 245 is procedure |
-| Deviation detection 455 | 455 | **150** | The literature-inheritance argument at 208 belongs in 5.2 or an appendix |
-| Candidate models / adoption gate 439 | 439 | **100** | ¶3 and ¶4 specify entrants scored at no venue |
-| Occurrence modelling 342, knowledge-gap 270 | 612 | **100** | Both secondary to every RQ |
+| 1 | `methodology.tex`:82 | "Library versions, the model revision hash and the compute device … Appendix~B **records them**" | **NO.** App B has no environment record of any kind |
+| 2 | `methodology.tex`:33 | "parameter grids, computational environment and robustness variants … in Appendices B and C" | **NO** for grids and environment |
+| 3 | `methodology.tex`:255 | "Appendix~C reports the **classification's sensitivity to the constant pair**" | **NO.** No classification material in App C |
+| 4 | `methodology.tex`:384 | "Appendix~C reports it with a **block-length sweep**" (paired-loss variance) | **NO** |
+| 5 | `methodology.tex`:573 | "Appendix~C records the **stratification and the seed**" | **NO.** Neither appears |
+| 6 | `results.tex`:136 | "the **sweep and the pairing variance** behind it are in Appendix~C" | **NO** |
+| 7 | `introduction.tex`:305 | "Appendix~D the full ladder and **confidence-set tables**" | **Partly.** Ladder yes; the confidence-set table `tab:mcs-config` is in Appendix **B** |
 
-### DEMOTE — 1,466
+**Failure 1 is the most serious and was not previously known.** It is a **reproducibility**
+claim — library versions, revision hash, compute device — pointing at an appendix that records
+none of them. R69 is met by the pseudocode, but a reader following that sentence for the
+environment finds nothing.
 
-| Item | Cost | Destination |
+**These are not random rot. Six of seven point into Appendices B and C, whose file headers both
+read *"Prose for this appendix is composed by 8C-7"*, and `results.tex`:143 carries the comment
+*"Block-length sweep and pairing variance displaced to Appendix C per 05 §4.5"*.** They are
+**approved displacements that were ruled and never executed**. The chapters were written against
+the post-move state; the appendices were never composed.
+
+**That reframes the composition task.** Appendix C is not a blank page — **the body has already
+written its specification**, in six sentences, and discharging them is what makes the existing
+document honest before a single new word is demoted into it.
+
+### Orphan floats — referenced from nowhere in the body
+
+`ds-writing` §9: *"Reference every figure and table in the text before it appears."*
+
+| Float | Where | Status |
 |---|---|---|
-| `sec:ruler-functional` derivation | **214** | App. B |
-| $k > n$ edge case; upper coverage bound | **183** | App. B |
-| Mondrian-as-observed-variable justification | **163** | App. B |
-| Adaptive alternative, implementation narrative | **104** | App. B |
-| Detection pairing's literature inheritance | **208** | App. B |
-| Control arm + second injection pipeline | **209** | App. C — **and Appendix C currently promises this and does not deliver it, see §7** |
-| Chat-corpus write path | **141** | App. B |
-| Intervention-layer apparatus (C5 is unmeasured) | **229** | App. B |
-| Estimator-adoption walk-through | **~15** | folded into the compress line above |
+| `tab:bootstrap` | App D, "Denominator uncertainty" | **never `\ref`'d from anywhere** |
+| `fig:injection` | App C | **never `\ref`'d from the body** |
+| `fig:deployment` | App B | `\ref`'d only from **another float's caption** (`methodology.tex`:106) |
 
-**Chapter 3 reachable floor: ~5,569 − 900 − 1,466 = 3,203 marker ≈ 3,300 texcount** against 5,686
-today. This is the single largest reduction available anywhere in the document.
+`alg:conformal`, `alg:adoption` and `alg:detection` are not `\ref`'d by label but are named by
+their citing sentences, and each **delivers what its sentence promises** — the Mondrian variant,
+three fail-closed exits, both detectors. Those three pass.
 
----
+### Execution order this forces
 
-## 4 · Chapter 2, Literature Review — 4,938 marker / 5,011 texcount
-
-Genuinely compressible and **not** demotable: a review is the argument justifying the work, and an
-appendix cannot carry it. Appendix A is a *search and screening record*, not a home for synthesis.
-The lever is `ds-writing` §7's funnel — long shots take a grouped citation, close-ups keep their
-detail.
-
-| Section | Cost | Class | Ceiling | Reason / criterion |
-|---|---|---|---|---|
-| Synthesis and research gap | 708 | **PROTECT** | — | R7/R50–R56. It *is* the gap Chapter 1 §1.2 must not exceed |
-| Conformal prediction intervals | 351 | PROTECT | — | Close-up for RQ4 |
-| Error measures and model comparison | 685 | COMPRESS | **250** | Two 200-word paragraphs summarising three papers each. Medium shot |
-| Cross-series pooling and exogenous covariates | 836 | COMPRESS | **300** | Six paragraphs; the foundation-model landscape is a long shot at 72+162 |
-| Evaluation of agent interventions | 569 | COMPRESS | **200** | Four paragraphs, one conclusion |
-| Deviation detection from calibrated intervals | 499 | COMPRESS | **150** | ¶3 at 228 is a single-paper close-up on CPTC |
-| Proactive agents and intervention policy | 456 | COMPRESS | **150** | Two preprints argued at 170 and 64 |
-| Intermittent demand | 323 | COMPRESS | **80** | Medium shot |
-| Decision support and delegated autonomy | 283 | COMPRESS | **80** | Long shot; opens the funnel |
-| Demand forecasting on short series | 228 | COMPRESS | **50** | Long shot |
-
-**Chapter 2 reachable floor: ~4,938 − 1,260 = 3,678 marker ≈ 3,730 texcount.** Below ~3,400 the
-funnel loses its close-ups and R7 is at risk.
+1. Fix the five wrapped caption short titles (§2). Re-baseline. The number goes **up** to ~28,980.
+2. Compose Appendix C against the six promises above, and Appendix B's environment record.
+3. Repair failure 7 and the three orphan floats.
+4. **Only then** begin demoting, chapter by chapter, re-measuring after each.
 
 ---
 
-## 5 · Chapters 5, 1 and 6
+## 5 · The revised plan, chapter by chapter
 
-### Chapter 5, Discussion — 4,920 marker
+Costs are `wordcount.py` marker words for prose (the only instrument with subsection
+granularity, all figures re-measured 2026-08-09) and empirical `texcount` deltas for floats.
+Governing ≈ marker + counted caption, verified within ±75 on every chapter.
 
-| Item | Cost | Class | Ceiling | Criterion / reason |
+### Chapter 4, Results — 8,492 governing → **~4,300**. The restructure the brief asks for.
+
+**Findings and headline numbers in the body; reconciliation working and secondary tables in an
+appendix.** Twenty-one subsections, each priced.
+
+| §  | Subsection | Today | Body keeps | Class |
 |---|---|---|---|---|
-| 5.1 Answers to the research questions | 1,060 | **PROTECT** | — | **R8** — 1.3's questions must be 5.1's answered questions |
-| 5.4 Limitations, biases, assumptions | 924 | **PROTECT** | — | **HC59** mandatory; R106/R107; `05` §4.5 rules it the one section that *grows* |
-| 5.3 ¶2 pairing bounds the non-separations | 394 | **DEMOTE** | 394 | Restates Ch 4's paired standard errors. **Highest single yield in the document** |
-| 5.3 ¶3 confidence sets, second sense | 373 | **DEMOTE** | 373 | Same duplication S-3 named; pairs with Ch 4's numerics-sensitivity line |
-| 5.2 six divergences | 1,156 | COMPRESS | **450** | Each divergence must be *declared*; the full argument for each need not be. D7-adjacent, so the declaration is protected and the argument is not |
-| 5.5 specification divergence | 600 | COMPRESS | **200** | ¶6 vendor constraint at 165 is a transferable lesson, not a divergence of this work |
-| 5.3 ¶4 "a second sighting" | 93 | DEMOTE | 93 | Says in its own first clause that it is a second sighting |
-| 5.3 ¶5 neither measurement reaches the nulls | 86 | **PROTECT** | — | A stated limit on a negative result |
+| 4.1.1 | Ladder at the gate | 237 | 100 | COMPRESS |
+| 4.1.2 | Origin-count reversal | 208 | 170 | COMPRESS (D7) |
+| 4.1.3 | Model confidence sets | 345 | 230 | COMPRESS (D7) |
+| 4.1.4 | Ordering under squared loss | 537 | 70 | **DEMOTE** App D |
+| 4.2.1 | Unbiasedness null | 294 | 150 | DEMOTE working, **null stays** |
+| 4.2.2 | Demand-pattern classification | 204 | 90 | COMPRESS + demote `tab:intermittency` |
+| 4.2.3 | Adoption margin | 413 | 170 | COMPRESS |
+| 4.2.4 | Occurrence gating | 269 | 110 | COMPRESS, **null stays** |
+| 4.3.1 | Cross-series ICL | 351 | 170 | COMPRESS (C2) |
+| 4.3.2 | Weather | 490 | 220 | DEMOTE working + `tab:weather` (C2) |
+| 4.4.1 | Empirical coverage | 423 | 230 | DEMOTE working |
+| 4.4.2 | Traded decomposition | 373 | 250 | **PROTECT** the reversal |
+| 4.4.3 | Exchangeability | 457 | 230 | DEMOTE correction narrative |
+| 4.4.4 | Drift cause | 720 | 340 | DEMOTE windowing ¶ + identity working |
+| 4.4.5 | Native intervals | 421 | 140 | DEMOTE (table already in App D) |
+| 4.4.6 | Winkler | 496 | 230 | COMPRESS (D7 table stays) |
+| 4.5.1 | Injection validity | 194 | 100 | COMPRESS |
+| 4.5.2 | VUS-PR | 359 | 230 | COMPRESS |
+| 4.5.3 | Alert suppression | 197 | 50 | **DEMOTE** App C |
+| 4.5.4 | Cost-ratio sweep | 350 | 170 | COMPRESS |
+| 4.5.5 | Knowledge-gap signal | 223 | 100 | COMPRESS |
+| | openers and §-preambles | 140 | 140 | — |
+| | **prose** | **7,701** | **3,690** | |
+| | **floats** (12 of 14 retained) | 806 | **607** | `tab:intermittency` + `tab:weather` demoted |
+| | **governing** | **8,492** | **~4,300** | **−4,192** |
 
-**Floor: ~4,920 − 860 (demote) − 650 (compress) = 3,410 marker.**
+**Why this is not "compress harder".** Fourteen of the twenty-one subsections keep 40–65 per
+cent of their words; the large savings come from four demotions (4.1.4, 4.3.2, 4.4.4, 4.4.5)
+where a derivation or a remedy evaluation leaves and a verdict stays. **No qualification is cut
+and no null is removed** — 4.2.1, 4.2.4 and 4.3.2 keep their negative results stated in the body.
 
-### Chapter 1, Introduction — 2,023 marker
+### Chapter 3, Methodology — 5,686 governing → **~3,530**
 
-1.3 (360) and 1.4 (605) are **PROTECT** — the RQ strings are fixed verbatim by `06` §5 and R8, and
-1.4's excess is the five contribution strings *with their strength qualifiers*, which the
-compression rule forbids touching. 1.2 at 472 against a 300 budget is the only real COMPRESS
-(**ceiling 150**), and it must not exceed Chapter 2's gap. **Floor ~1,870.**
+The first draft's floor was 3,300. **R83/R84 raise it.** Nine demotions each leave a
+reason-sentence in Methods (~230 back), because *"Methods justify why each decision was made"*
+and *"why the alternatives considered were rejected"* bind the reason — not the derivation, the
+implementation narrative or the apparatus — to this chapter.
 
-### Chapter 6, Conclusions — 2,328 marker
+Demote to App B (~1,466): the `sec:ruler-functional` derivation 214; the $k > n$ edge case and
+upper coverage bound 183; the Mondrian-as-observed-variable **working, reason retained** 163;
+the adaptive alternative's implementation narrative, **rejection reason retained** 104; the
+detection pairing's literature inheritance 208; the chat-corpus write path 141; the
+intervention-layer apparatus 229 (C5 is unmeasured). To App C (~209): the control arm and second
+injection pipeline — **which is cross-reference failure 5 and is owed there already.**
 
-6.2 at 962 is **PROTECT** — it carries C2 and RQ2's nulls, both of which the document omitted
-entirely until 8C-5 found them by enumeration, plus ~180 words of critique-added qualifiers.
-6.3 Further work at 690 is eight extensions already compressed 926 → 690; **ceiling 150**.
-6.1 objectives 429, **ceiling 80**. **Floor ~2,100.**
+Compress ~900: accuracy measures and denominator basis 707 → 250; model comparison 481 → 150;
+demand-pattern classification 477 → 150; deviation detection 455 → 150; candidate models 439 →
+100; occurrence + knowledge-gap 612 → 100.
 
-### Abstract — 300 marker / 321 texcount
+**Still the largest single reduction available anywhere in the document**, and Appendix B exists
+for exactly this: `ds-writing` §8's replicability test is satisfied by the **document**.
 
-**PROTECT, fixed.** HC5 requires approximately 300 words; HC4 one paragraph. No change.
+### Chapter 5, Discussion — 4,919 governing → **~2,750**
+
+| § | Today | Keeps | Basis |
+|---|---|---|---|
+| 5.1 Answers to the RQs | 1,060 | **500** | **R8 is document-scoped** — "answered by the end of the document". Ch 6 §6.2 carries the detail. *This is the largest change from the criterion re-reading.* |
+| 5.2 Divergences | 1,156 | 450 | COMPRESS. Each divergence declared; the full argument for each need not be |
+| 5.3 Validity | 1,181 | 400 | DEMOTE the pairing bounds and the confidence-set second sense to App D |
+| 5.4 Limitations, biases, assumptions | 924 | **924** | **PROTECT, location-bound.** R106 "**The Discussion** states"; R107 "**The Discussion** explains"; HC59 |
+| 5.5 Scope divergence | 600 | 450 | **Location-bound** — HC59 "explained **in the Discussion**". Compress only |
+
+### Chapter 2, Literature Review — 5,011 → **~3,500**
+
+Not demotable: a review is the argument justifying the work, and Appendix A is a search and
+screening record. That is a judgement about what a review is, **not** a criterion — no criterion
+names Chapter 2's location. Compress on `ds-writing` §7's funnel: long shots take a grouped
+citation, close-ups keep their detail. Synthesis and research gap (708) and conformal prediction
+(351) are the close-ups and stay. Below ~3,400 the funnel loses them.
+
+### Chapter 1 — 2,027 → **~1,320**
+
+§1.3 Aims and research questions (360) is **PROTECT, location-bound**: R7, *"explicitly stated
+**in the Introduction**"*. §1.1 354 → 200; §1.2 problem and gap 472 → 250 and it must not exceed
+Chapter 2's gap section; §1.4 contributions 605 → 350, the five strings keeping their strength
+qualifiers; §1.5 structure 233 → 150.
+
+### Chapter 6, Conclusions — 2,294 → **~1,600**
+
+§6.2 Contributions (962) is **PROTECT and may need to grow**: it carries C2 and RQ2's nulls, and
+under this plan it inherits the answer detail §5.1 sheds. That is the coupling to watch —
+**§5.1 and §6.2 cannot both be compressed.** §6.1 objectives 420 → 150; §6.3 further work 690 →
+350; §6.4 closing 162 → 100.
+
+### Abstract — 321. **PROTECT, fixed.** HC5 approximately 300, HC4 one paragraph.
 
 ---
 
 ## 6 · The arithmetic, honestly
 
-| Chapter | Today (texcount) | Ceiling floor | At 70 % realisation |
+| Chapter | Today (governing) | Ceiling floor | At 70 % realisation |
 |---|---|---|---|
-| Ch 1 Introduction | 2,027 | 1,870 | 1,920 |
-| Ch 2 Literature Review | 5,011 | 3,730 | 4,130 |
-| Ch 3 Methodology | 5,686 | 3,300 | 4,010 |
-| Ch 4 Results | 8,492 | 7,300 | 7,650 |
-| Ch 5 Discussion | 4,919 | 3,410 | 3,860 |
-| Ch 6 Conclusions | 2,294 | 2,100 | 2,160 |
+| Ch 1 Introduction | 2,027 | 1,320 | 1,530 |
+| Ch 2 Literature Review | 5,011 | 3,500 | 3,950 |
+| Ch 3 Methodology | 5,686 | 3,530 | 4,180 |
+| Ch 4 Results | 8,492 | 4,300 | 5,560 |
+| Ch 5 Discussion | 4,919 | 2,750 | 3,400 |
+| Ch 6 Conclusions | 2,294 | 1,600 | 1,810 |
 | Abstract | 321 | 321 | 321 |
-| **Total** | **28,750** | **22,031** | **24,051** |
+| **Total** | **28,750** | **17,321** | **~20,750** |
 
-**The plan does not reach 15,000. It does not reach 18,000 either.**
+**The plan reaches 20,000 at its ceiling with 2,679 of margin, and reaches 18,000 with 679.**
+It does **not** reach 15,000.
 
-- At every ceiling met in full: **22,031**. Over the 15,000 target by **7,031**; over the 18,000
-  acceptability bound by **4,031**.
-- At the 70 per cent realisation the S-4 precedent argues for: **24,051**.
+**And the 70 per cent column is the number to plan against, not the ceiling.** S-4 estimated
+370–470 words from eight approved items and delivered net **−105**. At that realisation rate
+this plan lands at ~20,750 — **above the hard cap by 750**. The ceiling being under 20,000 is
+necessary and not sufficient.
 
-**PROTECT plus the irreducible core is roughly 22,000, and that is the number.** It is stated
-rather than engineered downward, per the brief's own instruction not to pad a list to a target.
+**What follows for execution, and it is a method rather than a caution:** the pass is measured
+**chapter by chapter against a running target**, not trusted to a ceiling and totalled at the
+end. Chapter 4 is executed first, because it carries 4,192 of the 11,429 and its realisation
+rate is the best available estimator for the rest. If Chapter 4 lands above ~5,000 the plan is
+short and the shortfall is known while five chapters remain to absorb it — rather than at the
+end, when only protected material is left.
 
-### What reaching 15,000 would actually cost
+### What reaching 15,000 would additionally require
 
-Only three populations are large enough to close a 7,000-word gap, and each is currently protected
-for a stated reason:
+**2,321 beyond the ceiling, and there is no source for it that is not evidence or a
+location-bound criterion.** The four candidates, each with what it costs:
 
-1. **The four-limb reconciliation (1,973) plus the rest of Chapter 4's protected core (2,772).**
-   Demoting the whole of Chapter 4's measurement to an appendix and leaving verdicts with
-   cross-references would yield ~3,500. **It would leave every headline verdict in the body
-   unsupported at the point it is made** — the definition of PROTECT in the brief.
-2. **Chapter 2 below its funnel (~1,300 more).** Costs R7 and the gap argument that Chapter 1 §1.2
-   and Chapter 6 both depend on.
-3. **Chapter 6's 6.2 (962) and Chapter 5's 5.1 (1,060).** Breaks R8 and re-opens the exact
-   omission — C2 and RQ2's nulls — that `PRJ93_RULES.md`'s directional-compression rule exists to
-   prevent, and that cost a dedicated session to find last time.
+1. **§5.4 Limitations, 924 → ~600.** Yields 324. R106 and R107 both say *"The Discussion states
+   / explains"*, so it cannot move; only cutting reaches it, and what would go is the
+   assumptions-impact analysis R107 names.
+2. **Chapter 2 below 3,400.** Yields ~400 and costs the funnel's close-ups — the conformal
+   close-up RQ4 rests on, or the synthesis Chapter 1 §1.2 and Chapter 6 both depend on.
+3. **Chapter 4 below ~4,300.** Yields whatever is taken and takes it from stated measurements,
+   because after this restructure the body holds findings and headline numbers and nothing else.
+4. **Chapter 6 §6.2, 962.** Re-opens the exact omission — C2 and RQ2's nulls — that cost a
+   dedicated session to find, and which left **no symptom of any kind** when it happened.
 
-**Recommendation, for Phuong to rule on.** Execute the plan to its ceiling and accept a body near
-**22,000**, which is 10 per cent over the cap rather than 44 per cent, and pair it with the
-strongest available HC2 answer: a body of 22,000 whose appendices carry the derivations, the
-secondary analyses and the reconciliation working is *structurally* succinct even where it is
-numerically over. If the cap must be met absolutely, the 2,031 beyond 20,000 comes from item 1
-above and nowhere cheaper, and that is a decision to leave verdicts cross-referenced rather than
-supported in place.
+**Finding, stated as the brief asks for it: at 15,000 the constraint and the evidence genuinely
+conflict.** At 18,000 they do not, and at 20,000 there is real margin. The document can be
+compliant and can read well; it cannot also reach 15,000 without deleting evidence or breaching
+a criterion that names its chapter.
 
----
-
-## 7 · Two findings the plan depends on, found while pricing it
-
-**Appendix C is an empty shell, and `completenesscheck` cannot see it.** `appendix/robustness.tex`
-carries **8 words of body prose**. It passes the 40-word content floor because the floor tests
-`count(raw)`, which includes caption and table text, and the file's two figure/table captions total
-177. Its own header says *"Prose for this appendix is composed by 8C-7"* — a TODO that no
-instrument reads. **This is the defect class the tool was built for**, in the tool's own blind
-spot: a file consisting entirely of floats passes a prose floor designed to catch a section nobody
-wrote. Reported, not fixed — fixing it mid-plan would move the pre-flight baseline.
-
-**`methodology.tex`:382–384 promises content Appendix C does not contain.** It states the paired
-loss differential's variance *"is measured rather than assumed, and Appendix~\ref{app:robustness}
-reports it with a block-length sweep."* Appendix C contains no paired-variance material and no
-block-length sweep. The `\ref` resolves, so `latexcheck` is silent. **This is good news for the
-plan:** Appendix C is the prepared destination for Chapter 3's 1,466 words of DEMOTE, and it
-already has a promise waiting to be discharged.
+**Recommendation: execute to the ceiling, aim at 18,000, treat anything under 20,000 as
+compliant, and re-measure after every chapter.** No overrun is offered and none is acceptable.
 
 ---
 
-## 8 · Carry-forwards
+## 7 · Carry-forwards
+
+**Appendix C is an empty shell and `completenesscheck` cannot see it.** `appendix/robustness.tex`
+carries **8 words of body prose**. It clears the 40-word floor because the floor tests
+`count(raw)`, which includes caption and table text, and its two float captions total 177. **A
+file consisting entirely of floats passes a prose floor built to catch a section nobody wrote** —
+the tool's own defect class in the tool's blind spot. It is now the destination for Chapter 3's
+209, Chapter 4's ~450 and six owed cross-references, and §4 requires it be composed **first**.
 
 **Row 62 is not repairable, because the claim is no longer in the document.** Searched
-`chapters/*.tex`, `appendix/*.tex` and `abstract.tex` for the phrasing and for both endpoints:
-zero occurrences of "paired to independent", "0.162" or "0.274". `methodology.tex`:382 now reads
-*"that quantity is measured rather than assumed, and Appendix~\ref{app:robustness} reports it with
-a block-length sweep"* — no numeric range at all. **The audit row is stale, not the document
-wrong**; it was composed out during 8C-3. Row 62 is annotated accordingly rather than "repaired",
-and the real defect it surfaced is the dangling promise above.
+`chapters/*.tex`, `appendix/*.tex` and `abstract.tex` for the phrasing and both endpoints: zero
+occurrences of "paired to independent", "0.162" or "0.274". Composed out during 8C-3. **The
+audit row is stale, not the document wrong** — annotated, not "repaired". The real defect it
+surfaced is cross-reference failure 4.
 
-**`venueordercheck` — 1 of the 5 sits in text the reduction pass rewrites anyway.**
+**`venueordercheck` — 4 of 5 now sit in text this plan rewrites**, up from 1 under the first
+draft, because Chapter 4's restructure reaches further.
 
-| Finding | Section | Plan class | Rewritten by the pass? |
+| Finding | Section | Class now | Rewritten? |
 |---|---|---|---|
-| `results.tex`:782 UNANCHORED | 4.4.5 Native model intervals | **DEMOTE** | **Yes** — the per-venue detail carrying the triple is the demoted material |
-| `results.tex`:513 ORDER | 4.4.1 Empirical coverage | COMPRESS ¶2 | Partly — the binomial paragraph is a compress target |
-| `results.tex`:352 ORDER | 4.3 Cross-series ICL | PROTECT, and it is **inside a table float** | No |
-| `results.tex`:406 ORDER | 4.3 Weather | PROTECT, **inside a table float** | No |
-| `discussion.tex`:29 ORDER | 5.1 Answers | **PROTECT under R8** | No |
+| `results.tex`:782 UNANCHORED | 4.4.5 Native intervals | DEMOTE | **Yes** |
+| `results.tex`:513 ORDER | 4.4.1 Empirical coverage | DEMOTE working | **Yes** |
+| `results.tex`:406 ORDER | 4.3.2 Weather, in `tab:weather` | **DEMOTE the float** | **Yes** — the float leaves the body |
+| `results.tex`:352 ORDER | 4.3.1, inside `tab:group` | float retained | No — needs its own repair |
+| `discussion.tex`:29 ORDER | 5.1 Answers | COMPRESS to 500 | Likely, but not guaranteed |
 
-**So three need their own repair regardless, and two of those are in table floats** — where the
-remedy (name the venues inline) edits caption and table text, which is *inside* the governing
-count. Naming venues inline costs words. It is the correct fix anyway and the cost is ~20 words.
+One repair (`tab:group`) is certainly still owed; `discussion.tex`:29 should be checked after
+§5.1 is rewritten rather than repaired twice. The remedy in both cases is to name the venues
+inline, which costs ~20 words and is correct regardless.
 
-**`acknowledgements.tex` left commented**, content is Phuong's.
+**`acknowledgements.tex` left commented** — content is Phuong's.

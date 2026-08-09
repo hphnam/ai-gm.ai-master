@@ -473,6 +473,63 @@ matched its prose against a chapter carrying the same unrepaired sentence, and t
 compared full precision against rounded. **Independent checks are only independent if they
 terminate at different places.** All three terminated inside the same unrepaired text.
 
+### A cross-reference that RESOLVES is not a cross-reference that is TRUE
+
+**`latexcheck` reads whether a `\ref` has a target. Nothing in this project reads whether the
+target says what the citing sentence claims**, and those are different questions that look
+identical in a clean compile.
+
+**Run over all 21 `\ref{app:*}` sites on 2026-08-09, the check found seven failures and every
+one compiled silently.** The worst was `methodology.tex`:82 — *"Library versions, the model
+revision hash and the compute device are pinned per environment and stamped on every artefact
+for the same reason; Appendix~B records them"* — pointing at an appendix that records none of
+them. A **reproducibility** claim resolving to nothing.
+
+**The method is three steps and takes minutes: read the citing sentence, name the noun it
+promises, open the target and look for that noun.** Not "does the ref resolve" — grep the
+target for the specific thing named. It is the artefact rule (*confirm a change by searching the
+artefact for the thing that was supposed to change*) applied across a file boundary.
+
+**Six of the seven shared one cause, and it is the cause to expect.** Both target appendices
+carried headers reading *"Prose for this appendix is composed by 8C-7"*, and `results.tex`:143
+carried *"displaced to Appendix C per 05 §4.5"*. **They were approved displacements that were
+ruled and never executed.** The chapters had been rewritten against the post-move state while
+the appendices were never composed — so the *document* recorded the move as done in the only
+place a reader would look, and the ledger recorded it as ruled. Neither store recorded it as
+outstanding.
+
+**This binds hardest on any pass that MOVES material between files**, which is where the citing
+sentence and its target are edited in separate operations and only one of them has to be
+forgotten. Run the check after every such pass, and state the number of reference sites
+examined, per the empty-scan rule.
+
+### A value the quantity cannot take is a defect in the instrument, not a datum
+
+**Zero is a value, and an instrument reporting it for something that cannot be zero is
+reporting its own failure in a form indistinguishable from data.**
+
+Pricing each float's cost against `texcount` on 2026-08-09, **five of nineteen returned exactly
+zero governing words**. A caption that exists cannot cost zero. The cause was that `texcount`
+silently drops the entire caption body of any float whose `\caption[...]` short title wraps a
+line — and the hypothesis, once formed, classified **all 19 floats correctly, five positives and
+fourteen negatives**, which is what promoted it from a guess to a finding.
+
+**Two operational forms.**
+
+1. **Before using a measurement, ask what values the quantity cannot take, and check for them.**
+   Zero, negative, and exactly-equal are the three that carry information about the instrument
+   rather than the subject.
+2. **A hypothesis about an instrument's defect is tested against the cases it says are CLEAN as
+   well as the ones it says are broken.** Five zeros are consistent with several stories; five
+   zeros and fourteen non-zeros falling exactly where the hypothesis puts them is consistent with
+   one. This is the both-directions requirement the guard rules already impose, applied to a
+   diagnosis rather than to a guard.
+
+**The cost of not doing it was already accruing.** The disagreement between the two counters —
+872 caption words against 1,136 — had been measured, recorded as an instrument disagreement, and
+not chased. **The disagreement was the defect**, and the number the compiled declaration printed
+was 230 words short of the truth for as long as it went unexamined.
+
 ### `active` is three different populations in this repo — resolve it at the generator, every time
 
 **Do not learn what `active` means. Look it up in the file that wrote the field, on every use.**

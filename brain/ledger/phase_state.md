@@ -4429,3 +4429,61 @@ Chapter 3's demoted material.
 PASS · **fresh-clone PASS with `main-words.sum` confirmed ABSENT before the run and generated at
 28,750** (146 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 7
 overfull boxes, baseline-identical).
+
+---
+
+## 8C-9 — the ceiling turns hard, and the protected set is re-derived rather than re-asserted
+
+**2026-08-09.** `83b3114` verified on the remote before anything else (`git ls-remote`: local,
+remote and `origin/main` all `83b3114b4d9…`, 0 unpushed). **No `.tex` was changed this session**,
+so the clone is untouched and **there is nothing to push.**
+
+**The ruling.** Phuong withdrew the previous day's softer reading: **20,000 is a HARD ceiling**,
+exceeding it is penalised seriously, and the first draft's *"execute to the ceiling and accept a
+body near 22,000"* is struck. Recorded at `00_marking_criteria.md` §1.1, `BLOCKED_third_party.md`
+§F and `reduction_plan.md` §1, with the reasoning fault named: **the draft held the protected set
+fixed and reported the residual as a finding, which inverts a hard constraint.**
+
+**The largest result is that the protected set had been INFERRED, not quoted.** Reading each
+criterion verbatim splits them: **R7, R83, R84, R106, R107 and HC59 name a location; R8 ("answered
+by the end of the document") and D7 do not.** It moved material both ways. §5.1's 1,060 words were
+protected on an inference and are compressible to ~500. **R83/R84 bind justifications to Chapter 3,
+so the first draft was demoting material a criterion protects** — the derivation may leave, the
+reason may not, at ~230 words back across nine items.
+
+**Two defects found in instruments, both by pricing rather than by inspection.**
+
+1. **`texcount` drops the entire caption body of any float whose `\caption[...]` short title wraps
+   a line.** Five of nineteen floats priced at exactly zero governing words. The hypothesis then
+   classified **19 of 19 correctly**. 230 words invisible; **the compiled declaration prints 28,750
+   against a true ~28,980.** The 872-versus-1,136 caption disagreement recorded the day before *was
+   this defect*, unchased. Fix is free of content, runs first, and raises the printed count.
+2. **The appendix cross-reference check found 7 failures across 21 `\ref{app:*}` sites, all
+   compiling silently.** Worst is `methodology.tex`:82, a **reproducibility** claim (library
+   versions, revision hash, compute device) pointing at an appendix recording none of them. **Six of
+   seven are approved displacements that were ruled and never executed** — both target appendices
+   carry *"Prose composed by 8C-7"* headers and `results.tex`:143 records the displacement as
+   ruled. Also three orphan floats (`tab:bootstrap` referenced from nowhere at all).
+
+**The revised plan** (`ledger/reduction_plan.md`, NOT EXECUTED): **ceiling 17,321 governing —
+under the cap by 2,679 and under 18,000 by 679 — but ~20,750 at the 70 per cent realisation the
+S-4 precedent argues for, which is ABOVE the cap.** So the ceiling clearing 20,000 is necessary and
+not sufficient, and execution is chapter by chapter against a running target, **Chapter 4 first**,
+because it carries 4,192 of the 11,429 and its realisation rate estimates the rest. Chapter 4 is
+priced as a restructure across all 21 subsections: 8,492 → ~4,300, four demotions carrying the
+large savings, **no qualification cut and no null removed**. **15,000 is not reachable** without
+deleting evidence or breaching a location-bound criterion — stated as the finding it is.
+
+**`sec:res-traded` reopened and re-protected on a stronger basis.** Not precedent and not a
+criterion: §4.4.1 states a verdict §4.4.2 reverses, so demoting §4.4.2 leaves the body asserting
+something the document elsewhere refutes. A correctness argument outranks a placement judgement.
+
+**Two rules written into `PRJ93_RULES.md`:** *a cross-reference that resolves is not a
+cross-reference that is true*, and *a value the quantity cannot take is a defect in the instrument,
+not a datum*.
+
+**End state.** Overleaf clone **unchanged at `83b3114`, pushed, 0 unpushed, nothing to hand over.**
+No compile run because no `.tex` changed. `figurecheck` **PASS over 32 sources** (wider than the
+previous run's 26, per *a narrow pass is not a pass*) · `completenesscheck` **PASS, 26 files** ·
+`venueordercheck` **FAIL 5, 7 files scanned — unchanged**, and 4 of the 5 now sit in text the
+revised plan rewrites, up from 1.

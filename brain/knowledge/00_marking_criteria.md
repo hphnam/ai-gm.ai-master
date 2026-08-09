@@ -40,7 +40,31 @@ project on what the limit counts.**
 | Bibliography | **EXCLUDED** |
 | Appendices | **EXCLUDED** |
 | Abstract | **INCLUDED** — the counted body is the abstract plus Chapters 1–6 |
-| Is 20,000 a target or a cap? | **A cap, with a penalty** |
+| Is 20,000 a target or a cap? | **A HARD CEILING.** Exceeding it is penalised seriously and materially affects the mark |
+
+**The ceiling is hard, ruled 2026-08-09 and superseding the same day's softer reading.**
+**There is no acceptable overrun and no justification that covers one.** The three numbers that
+govern, all on `texcount`:
+
+| | governing words | status |
+|---|---|---|
+| **Ceiling** | **20,000** | **hard — cannot be exceeded** |
+| Acceptable | 18,000 | what reads well to a marker |
+| Working aim | 15,000 | |
+
+**A recommendation to "accept ~22,000 with a justification" was offered on 2026-08-09 and
+withdrawn the same day. It was wrong and must not be re-offered** — recorded at
+`ledger/reduction_plan.md` §1 with the reasoning fault that produced it: it held the protected
+set fixed and reported the residual as a finding, which inverts a hard constraint. **When the
+limit cannot move, the protected set is what gets re-derived.**
+
+**Doing that re-derivation established which criteria actually name a location**, and it is the
+distinction that governs every relocation decision from here. Quoted verbatim, not paraphrased:
+**R7 ("in the Introduction"), R83 and R84 ("Methods justify…"), R106 and R107 ("The Discussion
+states / explains") and HC59 ("explained in the Discussion") name a location. R8 ("answered by
+the end of the document") and D7 do not.** Where no criterion names a location, keeping material
+in the body is a **judgement about how a marker reads** — legitimate, and it yields to a quoted
+criterion under a hard cap. Table at `ledger/reduction_plan.md` §3a.
 
 **`declaration.tex` is not evidence about any of this.** Its "including appendices and
 footnotes" wording is **inherited template residue**, the same class as the issued-template
@@ -103,6 +127,28 @@ docstring already says.
 in marker words understates what it has to find by about a thousand. **Captions are inside the
 counted population, so compressing a caption or relocating a float to an appendix reduces the
 governing number — a lever the marker instrument cannot even see.**
+
+### The governing instrument has a verified defect — found 2026-08-09
+
+**`texcount` silently drops the entire caption of any float whose `\caption[...]` short title
+wraps a line.** Not the short title: the whole caption body. Found by pricing each float
+empirically — remove it from a scratch copy, re-run `texcount -0 -sum -merge -total`, take the
+delta — at which **five of nineteen floats priced at exactly zero**, a value a caption cannot
+have. The wrapped-short-title hypothesis then predicted **all five and only those five, 19 of 19
+classified correctly**: `fig:drift` 52, `fig:validity-efficiency` 45, `fig:pipeline` 42,
+`tab:bases` 49, `fig:gap-map` 42.
+
+**So the compiled declaration prints 28,750 against a true ~28,980, and the caption reconciliation
+above is 872 seen against 1,136 real.** The 264-word difference recorded there as an
+instrument disagreement **was this defect**, unchased.
+
+**The repair is free of content and runs before any reduction:** put each short title on one
+line. Nothing a marker reads changes, nothing in the List of Figures changes, and the printed
+count **rises** to ~28,980 before anything falls. Reducing first would measure the whole pass
+with an instrument blind in five places.
+
+This is *verify the instrument, not only the artefact*, at the point the instrument became
+load-bearing.
 
 ## 1.2 Typesetting and format
 
