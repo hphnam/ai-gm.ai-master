@@ -263,6 +263,42 @@ Corollary: **`git diff` on a regenerated artefact is part of the run, not an opt
 afterwards.** A regeneration whose diff nobody read has not been verified, whatever it
 printed.
 
+### A check that examined nothing must not be able to report a clean result
+
+**This is the sentence, and it is a requirement on every instrument this project writes.** A
+verdict is a claim about a body of material. When the material is silently empty or silently
+reduced, the verdict is still *true* — true of nothing — and no amount of reading the output
+reveals it, because the output is not lying.
+
+**Three distinct instances are now on record, and they fail in three different places.**
+
+| Instrument | What was empty | What it reported |
+|---|---|---|
+| the scratchpad word counter | every line quoting a percentage, discarded by a `%.*` comment strip that also matched an escaped `\%` | a confident count over the surviving text; Chapter 2 read 4,893 instead of 4,948 |
+| `latexcheck.py` | the PDF, on a fatal svg/Inkscape failure (2026-08-07) | `VERDICT: PASS` over a build that produced no PDF at all |
+| `venueordercheck.py` | the **file list** (2026-08-09) | `VERDICT: PASS - no unanchored or conflicting venue triple found`, having scanned **zero files** |
+
+**The third one's cause was the shell, not the script**, which is why it is worth writing down.
+The call was `A="chapters abstract.tex"; check.py $A`. That word-splits in bash. **In zsh it does
+not**, so one invalid path arrived, nothing matched, and the tool correctly reported a clean result
+about the empty set. It was caught only because a run minutes earlier had said `FAIL - 8` and the
+two disagreed. Pass paths literally, or use an array (`A=(chapters abstract.tex)`).
+
+**What every instrument here must therefore do**, and all three now do:
+
+1. **Print the size of what it examined** — `scanned N files`, `N pages`, `N words`. That line is
+   not decoration; it is the only thing separating a clean document from an empty scan.
+2. **Fail closed when that size is zero.** A caller error must not be able to read as a clean
+   document.
+3. **Be exercised against the empty case before being trusted**, per the assertion rule above. Both
+   path-list checkers were fed an empty scan and watched to raise before this was relied on.
+
+**Why it belongs beside the exit-code rule rather than inside it.** The exit-code rule says a
+command reports what it *attempted* rather than what it *left on disk*. This one is narrower and
+nastier: the command reports what it **covered**, and coverage is invisible in the verdict. An exit
+code can be checked against the artefact. A clean verdict over an empty input has no artefact to
+check it against, so the guard has to live in the tool.
+
 ### A constraint added to make a run COMPLETE becomes a constraint on what it PRODUCES
 
 **A mitigation and a specification are different things, and a mitigation written into a
