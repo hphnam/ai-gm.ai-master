@@ -1141,12 +1141,12 @@ addressed as such.
 8C-5, and this section had NO Chapter 6 row before that.** The absence was itself the finding:
 §4.5 exists so that a section which cannot be written to budget names its loss here rather than
 exceeding the budget silently, and Chapter 6 was exceeding it with nothing recorded. Measured
-after composition and the five-role critique: opener 85 · **6.1** 429 (budget 400) · **6.2** 959
+after composition and the five-role critique: opener 85 · **6.1** 429 (budget 400) · **6.2** 962
 (budget 250) · **6.3** 690 (budget 400) · **6.4** 162 (budget 50).
 
 **Where the excess is, and why it is not compressible without loss.**
 
-- **6.2 is the overrun, at 959 against 250, and 250 was costed for five one-sentence claims.**
+- **6.2 is the overrun, at 962 against 250, and 250 was costed for five one-sentence claims.**
   What the section now carries is five claims each with its evidence pointer *and* its strength
   qualifier, plus two things the budget never anticipated: **C2, the weather and pooling pair,
   which the document omitted entirely**, and **RQ2's reconciliation and estimand result, which
