@@ -1305,14 +1305,16 @@ them rather than rediscover them.
 
 | Item | Action | Criterion |
 |---|---|---|
-| `\quickwordcount{main}` in `main.tex` | **Remove**, with the macro definition. Nothing on file requires a printed word count; `00_marking_criteria.md` §1.9 lists the question as unverified, and the submission document does not mention one. If the department does require a declared figure, add it as a plain number checked against `texcount`. | — |
-| `declaration.tex` | **Cut.** Inherited PhD boilerplate. Replace with the department's originality declaration if one is required. **The 80,000-word assertion is not carried forward in any form.** | — |
+| `\quickwordcount{main}` in `main.tex` | ~~**Remove**, with the macro definition.~~ **SUPERSEDED 2026-08-09 by Phuong's instruction, and the deviation is declared rather than silent.** The macro is **kept and re-scoped**, renamed `\bodywordcount`, counting `chapters/*.tex` + `abstract.tex` explicitly and excluding the appendices and bibliography. Reason for keeping what this row said to remove: §1.1's HC2 makes length an **assessed quality** rather than a mere cap, so a correctly scoped figure is a positive signal; and it keeps a live measurement in front of the author on every compile, which the reduction pass needs. Files are listed rather than globbed so a glob matching nothing cannot report a confident zero. | HC2 |
+| `declaration.tex` | ~~**Cut.** Inherited PhD boilerplate.~~ **SUPERSEDED 2026-08-09.** Phuong's instruction offered rewrite-or-remove and said *"prefer correctness over preserving its wording"*. **Rewritten, not cut.** What stood there was worse than the 80,000 assertion this row anticipated: it claimed compliance with *"20,000 words **including appendices** and footnotes"* beside a printed 32,208 — a false statement in the compiled PDF, and the reason relocation moved the declared number by zero. The new text states the measured count and the limit and **does not assert compliance**, because asserting it today would repeat the original fault; it becomes a compliance claim by arithmetic once the body is under. | HC2 |
 | `lipsum` package in `main.tex` | Remove. Loaded with the comment *"just to add random text as an example"*. | HC3 |
 | `inputenc` loaded twice in `main.tex` | Remove the duplicate. | — |
 | Appendix chapter titled **Introduction** | Rename. It is the template default and it collides with Chapter 1 in the contents page. | R2 |
 | `tables/appendix/introduction/appendix_table.tex` | Delete. Currently **compiled**, so a 2×2 grid of the digits 5–8 captioned `Caption` appears in the List of Tables. | HC38–HC40 |
 | `tables/introduction/intro_table.tex` | Delete. Not compiled, and its only reference site is the empty introduction. | — |
-| Project specification | **Add as Appendix A.** Mandatory and currently absent. | **HC54** |
+| Project specification | ~~**Add as Appendix A.**~~ **DONE 2026-08-09, as Appendix E, and the letter differs from this row deliberately.** Appending after D leaves A–D undisturbed; relettering was verified safe first (zero hardcoded "Appendix «letter»" in prose, all 22 references are `\ref{app:…}`) but carries no benefit. Verified on the build at page 130. | **HC54** |
+| `lipsum` package | **DONE 2026-08-09.** Removed; loaded *"just to add random text as an example"* and never called anywhere in the document. | HC3 |
+| `inputenc` loaded twice | **DONE 2026-08-09.** Duplicate at the biblatex block removed; the load at the top of the preamble stands. | — |
 | Search and screening protocol | **Add as Appendix B.** Content already written in `04_supervisor_evidence_pack.md` §3.1 and never transferred. | **R65** |
 | Four unlabelled literature-review subsections | Add `\label`s. Nothing can currently cross-reference them. | HC34 |
 | Appendix ordering | Appendices follow the References section. | HC57, HC58 |

@@ -29,8 +29,80 @@ submission, and check every one.
 - **HC1.** Total dissertation is ≤ 20,000 words ("must not exceed 20,000 words").
 - **HC2.** The report is not unstructured or overly verbose — such reports "will be penalised rather than rewarded".
 - **HC3.** The report is not padded with irrelevant content.
+
+### The scope of the 20,000, and the working target — RULED 2026-08-09 by Phuong
+
+**This resolves four of the §1.9 unknowns and supersedes every earlier statement in this
+project on what the limit counts.**
+
+| Question | Ruling |
+|---|---|
+| Bibliography | **EXCLUDED** |
+| Appendices | **EXCLUDED** |
+| Abstract | **INCLUDED** — the counted body is the abstract plus Chapters 1–6 |
+| Is 20,000 a target or a cap? | **A cap, with a penalty** |
+
+**`declaration.tex` is not evidence about any of this.** Its "including appendices and
+footnotes" wording is **inherited template residue**, the same class as the issued-template
+abstract and the acknowledgements placeholder, and it was carrying a false compliance claim
+into the compiled PDF. It has been rewritten to the ruled terms; it is not binding and must
+not be quoted back as a source.
+
+**The working target is 15,000 body words. 18,000 is the upper bound of what reads
+acceptably.** This is not a rule and it governs anyway, because a lengthy dissertation costs
+marks through the marker's judgement well inside the cap.
+
+**That judgement is documented, not merely inferred.** The submission documentation states it
+directly: *"The dissertation must not exceed 20,000 words. Note that this is **an upper limit**
+and that competence in producing a succinct and coherent report is essential. Reports that are
+unstructured, **overly verbose** and contain irrelevant content **will be penalised rather than
+rewarded**."*
+
+**So the reduction pass is enforced by HC2 and HC3, not by HC1.** HC1 is satisfied at 19,999 and
+HC2 is not. Any ruling that trades length against content must name which of the three it is
+answering to, because they are not the same requirement and 20,000 discharges only the first.
+
+**Measurement.** The counted population is `chapters/*.tex` plus `abstract.tex`. Two instruments
+measure it and they disagree by ~970; see §1.1a.
 - **HC4.** The abstract is a single paragraph.
 - **HC5.** The abstract is approximately 300 words.
+
+## 1.1a The two word-count instruments, reconciled — 2026-08-09
+
+They disagree by **~970 on the same body**, and the cause is now measured rather than assumed.
+
+| | `texcount` | `wordcount.py` |
+|---|---|---|
+| Chapters + abstract | **28,750** | **27,779** |
+| Captions | counted | **excluded** (floats are stripped whole) |
+| Heading words | all levels counted | only `\section` names subtracted, so subsection headings are counted |
+| `\ref{...}` | counted as **0** | the key is left as **1 word** |
+| Inline math | 1 per formula | 1 per formula (`MATHTOKEN`) |
+
+**Decomposition, per file, texcount minus marker:** Ch1 +4 · Ch2 +73 · Ch3 +117 · Ch4 **+791** ·
+Ch5 −1 · Ch6 −34 · abstract +21. **Captions are the dominant term — 872 words, of which 771 are
+in Results alone.** The negative cells at Chapters 5 and 6 are the `\ref` effect running the other
+way: those two carry 71 references between them and no captions.
+
+**`texcount` is authoritative for any number that governs a decision.** Three reasons, and the
+third is the deciding one:
+
+1. It is the counter Overleaf reports and the one the submission convention assumes.
+2. It counts captions, which a marker reads and which are 872 words of this document.
+3. Phuong's ruling: *"the number that governs must be the one a marker's count resembles."* A
+   marker reads captions and does not read `\ref` keys, so on both of the two material
+   differences texcount is the closer model of the page.
+
+**`wordcount.py` remains the working instrument** for pricing an edit and for per-section
+budgets, because texcount has no section granularity, no budget column and no artefact column.
+Use it to compare two revisions, where its systematic offsets cancel — which is what its own
+docstring already says.
+
+**Consequence for the target, and it is not cosmetic.** Against the 15,000 target the gap is
+**13,750 on the governing instrument**, not the 12,779 the marker figure implies. Any plan costed
+in marker words understates what it has to find by about a thousand. **Captions are inside the
+counted population, so compressing a caption or relocating a float to an appendix reduces the
+governing number — a lever the marker instrument cannot even see.**
 
 ## 1.2 Typesetting and format
 
@@ -125,11 +197,11 @@ documents do **not** state. Do not invent a rule; check the module handbook,
 Moodle, or the supervisor. Listed so a later session knows these are unverified
 rather than absent.
 
-- Whether the 20,000-word limit includes or excludes the abstract.
-- Whether the limit includes or excludes references/bibliography.
-- Whether the limit includes or excludes appendices.
-- Whether the limit includes or excludes figure captions and table contents.
-- Whether a word-count declaration is required.
+- ~~Whether the 20,000-word limit includes or excludes the abstract.~~ **RESOLVED 2026-08-09: INCLUDED. See §1.1.**
+- ~~Whether the limit includes or excludes references/bibliography.~~ **RESOLVED 2026-08-09: EXCLUDED. See §1.1.**
+- ~~Whether the limit includes or excludes appendices.~~ **RESOLVED 2026-08-09: EXCLUDED. See §1.1.**
+- Whether the limit includes or excludes figure captions and table contents. **STILL OPEN, and it is now worth 872 words** — see §1.1a. The governing instrument (`texcount`) counts them, so they are treated as **INCLUDED** by default, which is the conservative reading. If they turn out to be excluded, the body is 872 lighter than reported and Results alone drops 771.
+- Whether a word-count declaration is required. **STILL OPEN.** Nothing in the issued documentation requires one. The dissertation carries one anyway, correctly scoped, because §1.1's HC2 makes length an assessed quality rather than a mere cap.
 - Whether any page limit applies.
 - Required contents of the title page (name, student ID, degree, department, date, supervisor).
 - Whether a declaration of originality / plagiarism statement is required, and its wording.

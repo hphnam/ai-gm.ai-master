@@ -4365,3 +4365,67 @@ working clone and **PASS on a fresh clone with `main-words.sum` confirmed absent
 (146 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 7 overfull
 boxes — identical to the `eebf3e9` baseline). `figurecheck` PASS 26 · `completenesscheck` **PASS**
 26, its first ever · `venueordercheck` FAIL 5 across 13 files, unchanged and none at a touched line.
+
+---
+
+## 8C-8 — the word-count scope ruled, the macro fixed, and the reduction plan prepared (2026-08-09)
+
+**Push verified first.** `git ls-remote` returned `ae43af6829c89137f3e411c32330419442b50783` on
+`refs/heads/main`, 0 unpushed. HC54, HC57 and the log/72 repair are live.
+
+**The ruling, and it supersedes everything earlier in this project on the subject.** Phuong: the
+20,000 **excludes the bibliography and the appendices**, **includes the abstract**, and is **a cap
+with a penalty**. Working target **15,000 body words**, acceptability bound **18,000**.
+`declaration.tex` is inherited template residue and is not evidence about the scope. Recorded at
+`00_marking_criteria.md` §1.1, resolving three of §1.9's unknowns; §1.9's caption question stays
+open and is now worth **872 words**.
+
+**The enforcing criteria are HC2 and HC3, not HC1**, and both quote the issued documentation:
+*"an upper limit … reports that are unstructured, overly verbose and contain irrelevant content
+will be penalised rather than rewarded."* HC1 is satisfied at 19,999 and HC2 is not.
+
+**Item 1 — the macro printed a false statement and now does not.** `\quickwordcount{main}` ran
+texcount over `main.tex`, whose `-merge` follows every `\input`, so it counted the appendices and
+printed **32,208** beside a compliance claim. Renamed **`\bodywordcount`**, scoped to
+`chapters/*.tex` + `abstract.tex`, files listed explicitly rather than globbed. **Prints 28,750,
+verified on the build.** `declaration.tex` rewritten to state the count and the limit **without
+asserting compliance** — asserting it today repeats the original fault. **This deviates from `05`
+§6.1, which said remove both; declared in that row, not applied silently.**
+
+**Instrument reconciliation, measured cell by cell.** texcount 28,750 against marker 27,779.
+**Captions are the dominant term at 872, of which 771 are Results alone**; heading treatment adds
+~256; `\ref` keys subtract ~181, which is why Chapters 5 and 6 read negative. **texcount is
+authoritative for decisions** on Phuong's own criterion — a marker reads captions and does not read
+`\ref` keys. `wordcount.py` stays the working instrument for pricing edits. §1.1a. **Consequence:
+the real gap to 15,000 is 13,750, not the brief's 12,800.**
+
+**Item 2 — `ledger/reduction_plan.md`, PREPARED, NOT EXECUTED.** PROTECT / COMPRESS / DEMOTE per
+paragraph across all six chapters, each with criterion or reason, measured cost, and what the body
+retains. **Ceiling 22,031; at 70 per cent realisation 24,051.** Over the 15,000 target by 7,031 at
+best and over 18,000 by 4,031. **Stated, not engineered downward.** Largest reduction available is
+**Chapter 3, 5,686 → ~3,300**, because Appendix B exists and `ds-writing` §8's replicability test
+is satisfied by the document rather than the chapter. Highest single item is `discussion.tex` 5.3
+¶2 at 394. Reaching 15,000 requires one of three protected populations, each named with what it
+costs.
+
+**Item 3 — carry-forwards.** Row 62 is **stale, not a live defect**: the claim is absent from
+`chapters/`, `appendix/` and `abstract.tex`, composed out during 8C-3, annotated accordingly. Its
+real residue is that **`methodology.tex`:382 promises a block-length sweep Appendix C does not
+contain** — the `\ref` resolves, so no instrument reads whether a cross-reference target says what
+the citing sentence claims. `venueordercheck`: **1 of 5** sits in text the pass rewrites
+(`results.tex`:782); two are inside table floats in protected 4.3 material and one is in 5.1 under
+R8, so three need their own repair.
+
+**Found while pricing: Appendix C is an empty shell with 8 words of body prose**, passing the
+40-word floor because the floor tests `count(raw)` and its two float captions total 177. Its header
+says the prose is 8C-7's job. **A file consisting entirely of floats passes a prose floor built to
+catch a section nobody wrote.** Reported, not fixed. It is also the prepared destination for
+Chapter 3's demoted material.
+
+**Template residue cleared:** unused `lipsum`, duplicate `inputenc`.
+
+**End state.** Overleaf `83b3114`, **unpushed — the push is Phuong's**. `figurecheck` PASS 26 ·
+`completenesscheck` PASS 26 · `venueordercheck` FAIL 5 across 13 files, unchanged · `latexcheck`
+PASS · **fresh-clone PASS with `main-words.sum` confirmed ABSENT before the run and generated at
+28,750** (146 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats lost, 7
+overfull boxes, baseline-identical).
