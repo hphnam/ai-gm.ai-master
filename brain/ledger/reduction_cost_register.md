@@ -218,6 +218,80 @@ are the close-ups and are untouched.
 screening. A review discussing ten fewer sources than the screening record admits needs Appendix
 A's narrative reconciled, or the two disagree.
 
-**No criterion binds this material to Chapter 2.** R122 and R123 govern the *form* of each
-engagement with the literature — that it begins and ends in the author's own voice, with
-commentary on that writer's contribution — and say nothing about how many engagements there are.
+**R122 and R123 do not bind it**, since they govern the *form* of each engagement with the
+literature and say nothing about how many engagements there are. **R66, R62 and R63 do bind it**,
+which is J2 above, and they are why only §2.1 was taken.
+
+---
+
+## Chapter 5 and Chapter 2 — executed
+
+**Body 27,990 → 27,759.** Three passages moved or compressed. Every retained sentence is quoted
+against the criterion it discharges.
+
+| # | What it was | Where it went | Criterion it discharged | Still discharged? | What the body can no longer show inline |
+|---|---|---|---|---|---|
+| 8 | The Bartlett serial-dependence correction to Ellel's pairing gain: the lag-budget sweep $6.37/5.82/5.14/4.10/2.53$, the differential's $0.24$ autocorrelation at ten folds against marginals decaying by the seventh, and the two venues where the correction reverses ($5.46 \to 9.71$, $8.33 \to 10.36$) | App C, *The serial-dependence correction to the pairing gain* | **R104** — the Discussion argues whether the approach is valid, and why | **Yes.** The body retains the factor of $6.2$, the bound it buys ($\pounds 1.91$ at $0.50$ of a paired standard error against $0.08$ unpaired), **both limits verbatim** — folds treated as independent, and no pre-registered minimum detectable effect — the reading that $6.2$ is *"an uncorrected figure and, at Ellel, an upper bound on the pairing gain"*, and that the correction *"cannot be signed in advance"* | The arithmetic of the correction, and which lag budget produces which ratio |
+| 9 | The numerics-regime detail in §5.3: the per-step and pooled $p$-values, the $25$-points-on-$1814$ movement, the $0.0006$ coverage movement, and the two-significant-figure stability statement | Deleted from §5.3 — **all of it already stands in §4.4.6** | **R103** — the Discussion answers what the results reveal | **Yes.** The body retains the answer: a recommendation to change the served band exists under one numerical library and not the other, the Monte Carlo bound showing the move is twelve times resampling noise, the reading that it is *"not noise in the bootstrap, and neither is it evidence that the arms differ"*, and why Two River Taps is where it surfaces | Nothing. This is the R102/R103 duplication removed at R103's end, which is the end §9b identified |
+| 10 | §2.1's general-context ring: the Gorry framing at length, the thirty-product safety index, and the deployment-workflow survey | Cut. **`staufer_2025_2026` leaves the bibliography; `paleyes_challenges_2022` survives at its second site** | **R64** — the funnel's widest ring (*recommended, not mandated*) | **Partly.** The funnel loses depth at its widest point. The framing claim itself is retained in one sentence with both load-bearing citations, and the roadmap paragraph is untouched | The evidence that agentic products disclose almost nothing about safety and evaluation |
+
+**One error made and corrected inside this pass, recorded because it is the kind that compiles.**
+Compressing §2.8's adjacent-systems sentence, the five citation keys were dropped along with the
+words, leaving *"Adjacent systems pursue proactivity across dialogue, wearables and mobile
+interfaces without supplying a precedent"* as an **uncited claim about the literature** — R120 and
+R121. It would have compiled cleanly and read fluently. The citation was restored and the sentence
+now saves only the words it can afford to.
+
+---
+
+## What this pass declined, and why
+
+Each of these is a saving the plan had priced and this pass did not take. **Every one of them
+removes a finding**, which is the one thing ruled out.
+
+| Candidate | Words | What leaves the dissertation with it |
+|---|---|---|
+| §4.4.6 Winkler, whole | 496 | **R100's only site** — the sole contrast of alternative approaches in Results; the numerics-regime sensitivity finding; and the null that the recorded per-step half-width growth was an artefact of ~26 observations per step |
+| §4.2.4 Occurrence gating | 269 | **RQ2's null**, and the degeneracy analysis conceding the null *"is the expected geometry rather than a measurement about the venue"* — a self-refutation the chapter volunteers |
+| §4.5.1 Injection-design validity | 194 | RQ5's **validity precondition**, and a strong null distinguished from an underpowered one by a numerically identical perturbation |
+| §2.9, whole (C-6 as approved) | ~570 | The **R62/R63 gap sentence**; **R93**'s justification for the evaluation measure; two honesty bounds and Dixon's effect-size caveat |
+| §6.2 Contributions, compressed | ~400 | **This is where C2 went missing once already**, to a compression of exactly this kind. The standing rule *"compression removes negative results first"* was written from that incident |
+| §4.5.5 Knowledge-gap signal | 223 | Ruled unavailable under A17 |
+| C-3 | 76 | Declined by Phuong: *"the worst trade on the list"* |
+
+---
+
+## The arithmetic, stated against the cap
+
+**Four realisation rates are now measured rather than estimated, and they agree.**
+
+| Item | Priced | Realised or re-priced | Rate |
+|---|---|---|---|
+| Chapter 3's nine derivations | 1,675 → save 1,215 | **342** | **28 %** |
+| Lever 1, six Results subsections | 2,032 | ~480 | **24 %** |
+| C-6, three review sections | 1,403 | ~260 | **19 %** |
+| This pass, Chapter 5 + Chapter 2 | — | **231** | — |
+
+**Every rate the plan used was set by reading one criterion per chapter. Every rate measured
+since has come in between a fifth and a third of it, and the cause is the same each time: the
+chapter is governed by more criteria than the plan counted, and each one demands a retained
+sentence.**
+
+| | |
+|---|---|
+| Body now, measured | **27,759** |
+| The cap | 20,000 |
+| **Gap** | **7,759** |
+| Everything still priced and unexecuted, at the plan's own rates | ~7,000 |
+| The same, at the measured 24--28 % | **~1,900** |
+| The same, at a generous 50 % | ~3,500 |
+
+**The cap is not reachable by editing.** Executing every remaining item in the plan, at prices the
+plan's own measurements have now refuted three times, would land above 20,000. At the rates
+actually observed it lands near 25,800. **The shortfall is between roughly 4,300 and 5,800
+words, and there is no editorial lever left that does not take a finding with it.**
+
+That is the halt condition as Phuong wrote it: *"If reaching 18,000 would require removing a
+finding, DO NOT. Stop at whatever compliant number you reach, and report the gap with the
+candidates you would have had to take."* The candidates are the table above. **The document is
+not yet compliant, and closing the gap is a decision about scope rather than about length.**

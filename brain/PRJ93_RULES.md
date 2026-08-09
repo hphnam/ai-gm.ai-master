@@ -1083,3 +1083,41 @@ matched pair, so neither is secondary and nothing relocates.
 evidence the test was applied to the material; a test that returns "applies" everywhere it is
 pointed has been applied to a target. **Record where a lever fails, and treat a lever with no
 recorded failures as unvalidated rather than as unusually good.**
+
+## Count the criteria before pricing the cut, not after
+
+**Three items in one plan were priced by reading ONE criterion per chapter, and all three came in
+between a fifth and a third of price.** The cause is identical in each and it is arithmetic, not
+optimism: a chapter is governed by more criteria than the plan counted, and **each criterion
+demands its own retained sentence**, so retention scales with criterion count while the plan
+modelled it as a constant.
+
+| Item | Criteria the plan cited | Criteria that actually name the chapter | Priced | Realised |
+|---|---|---|---|---|
+| Chapter 3's derivations | R83, R84 | **seven** (R80--R86) | 1,215 | **342** |
+| Lever 1, six Results subsections | R102 | **fifteen** (R87--R101 plus R102); 4--8 bind each subsection | 2,032 | ~480 |
+| C-6, three review sections | none | **R66, R62, R63** bind two of the three | 1,403 | ~260 |
+
+**The operational form: before pricing any demotion, enumerate every criterion naming that
+chapter and count how many the passage discharges. Price the retention at one sentence per
+criterion.** A passage discharging six criteria does not relocate; it compresses, and saying so
+before executing is cheaper than measuring it afterwards.
+
+**The corollary that killed the largest lever.** A whole-section relocation assumes the section is
+*secondary*. Test that separately from the word count, because the two are unrelated: §4.1.1 is
+237 words and is the settings-and-procedures anchor for its whole section; §4.4.6 is 496 words and
+is the only site in Results discharging R100. **A short section can be structurally primary, and a
+long one can be the only place a criterion is met anywhere.**
+
+## A cut approved on a description of the material is approved on the description
+
+**C-6 was approved to cut three sections on the stated basis that the review would lose "its
+long-shot band". Two of the three were close-ups**, and the description was never checked against
+the sections. §2.8 and §2.9 are where R66's shipped methods are argued — the intervention policy,
+the $F_\beta$ measure R93 sends Results back to, the calibration instrument — and §2.9's closing
+sentence *"no surveyed system reports it"* **is** the R62/R63 research gap.
+
+The approval was sound given the description. The description was wrong, and nothing between the
+two ever compared them. **Re-read the material against the description in the sentence that
+authorised the cut, immediately before executing it** — not the plan, the material. This is the
+enumeration rule pointed at an approval rather than at a document.
