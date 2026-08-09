@@ -559,3 +559,82 @@ One repair (`tab:group`) is certainly still owed; `discussion.tex`:29 should be 
 inline, which costs ~20 words and is correct regardless.
 
 **`acknowledgements.tex` left commented** — content is Phuong's.
+
+---
+
+## 8 · RE-PRICED at the measured retention rate — 2026-08-09, authorised by Phuong
+
+**The model, derived from measurement rather than estimated.** Three fully-executed demotions
+priced retentions of 70, 140 and 50 and delivered **145, 272 and 106 — 207 %, 194 %, 212 %**.
+Three items inside 18 points is a bias, so:
+
+> **actual retention $= 2.0 \times$ priced retention**, and therefore
+> **realised save fraction $= 1 - 2\times(\text{priced retention} / \text{original})$.**
+
+**One consequence falls straight out of the algebra and it is the important one.** Where priced
+retention was already $\geq 50\,\%$ of a section, doubling it exceeds the section. **Those items
+were never demotions.** They were compressions wearing a demotion's label, and they are
+reclassified and re-costed at the compression rate. Five of Chapter 4's nine remaining demotions
+fall into that category.
+
+### 8a · Every remaining candidate, ranked by efficiency
+
+| Eff. | Chapter | Item | Original | Expected save | Location-bound criteria |
+|---|---|---|---|---|---|
+| **100 %** | Ch 4 | Float demotions (`tab:intermittency`, `tab:weather`) | 199 | **199** | R97 — the textual summary stays in the body |
+| **84 %** | **Ch 3** | **Nine derivations / apparatus → App B and C** | **1,675** | **1,215** | R83/R84 — the *reason* is retained, the derivation moves |
+| 70 % | Ch 4 | 4.4.4 drift-cause remainder — *reclassified* | 645 | 214 | R102 |
+| 70 % | Ch 4 | 4.4.3 exchangeability narrative — *reclassified* | 457 | 159 | R102 |
+| 70 % | Ch 4 | 4.4.1 empirical-coverage working — *reclassified* | 423 | 135 | R102 |
+| 70 % | Ch 4 | 4.2.1 unbiasedness working — *reclassified* | 294 | 101 | R102 |
+| 70 % | Ch 4 | 4.4.2 traded meta-paragraph — *reclassified* | 373 | 86 | R102 |
+| 70 % | — | All planned compressions (nine chapters' worth) | 4,449 | 3,114 | various |
+| **66 %** | Ch 2 | Three long-shot sections → App A | 834 | **414** | **none** (R122/R123 bind the remainder) |
+| 59 % | Ch 6 | 6.3 extension detail → App D | 690 | 290 | R113, R116 retained explicitly |
+| 49 % | Ch 5 | 5.3 validity working → App D | 1,181 | 381 | R104 |
+| 46 % | Ch 2 | Agent-interventions survey → App A | 569 | 169 | **none** (R122/R123) |
+| 36 % | Ch 5 | 5.2 divergence arguments → App D | 1,156 | 256 | R103, D7 |
+| 30 % | Ch 4 | 4.2.3 adoption-margin working | 413 | 73 | R102 |
+| 19 % | Ch 4 | 4.3.2 weather working | 490 | 50 | R102 |
+| 14 % | Ch 4 | 4.4.6 Winkler walk-through | 496 | 36 | R97, R102, D7 |
+| **6 %** | Ch 4 | 4.5.4 cost-sweep working | 350 | **10** | R102 |
+| | | **TOTAL EXPECTED SHED** | | **6,902** | |
+
+### 8b · The ranking confirms the criterion-load hypothesis, and it indicts the execution order
+
+**Efficiency tracks criterion load, exactly as predicted.** The two items with **no location-bound
+criterion** (Chapter 2's surveyed literature) sit at 66 % and 46 %. Chapter 3's derivations sit at
+84 %, because R83/R84 want *a reason*, which is one sentence. **Every remaining Chapter 4
+candidate sits between 6 % and 30 %, and every one of them is under R102** — *"Results state what
+the findings imply for the research question(s)"* — which does not accept a cross-reference. It
+demands the finding, its number and its consequence, and that is a summary rather than a sentence.
+
+**So Chapter 4 was the wrong chapter to execute first.** It was chosen because it carried the
+largest priced reduction, 4,192, and the largest priced reduction was the most optimistic number
+in the plan for precisely the reason that made it large: a chapter dense with measurement is a
+chapter where the body must keep the measurement. **Chapter 3 is the efficient chapter — 1,215
+words at 84 %, the single best item in the document — and it is 84 % efficient because Appendix B
+already exists and R83/R84 ask for a reason rather than a result.**
+
+### 8c · The arithmetic, and it does not reach
+
+| | governing |
+|---|---|
+| Body now (four demotions executed) | 28,332 |
+| R114, budgeted | +150 |
+| Total expected shed, re-priced | −6,902 |
+| **EXPECTED LANDING** | **21,580** |
+| **Against the 19,000 ceiling** | **+2,580** |
+| Against the 18,000 target | +3,580 |
+
+**The re-priced plan does not reach 19,000, and no reordering of it does.** Executing every
+remaining item in the table, in the most efficient order, at the measured rates, leaves the body
+2,580 words above a ceiling that is not available. Reordering changes when the shortfall is
+visible, not whether it exists.
+
+**What is left is not an editorial question.** Every item in the table is already taken; the
+protected set has been re-derived twice against quoted criteria; compression is at the rate its
+own precedent supports and the standing rules forbid pushing it further; and the demotion lever
+has been extended to every passage no criterion pins in place. The remaining 2,580 can only come
+from material leaving the document, or from the constraint moving. **Both are Phuong's, and
+neither is pre-empted here.**

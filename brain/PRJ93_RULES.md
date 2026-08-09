@@ -989,3 +989,13 @@ The critique roles in `autoresearchclaw/SKILL.md` remain the only instrument in 
 reads for content, and nothing added here reduces their scope by one line. What these two do is
 make the *specific* failures they were built for — a section nobody wrote, a triple nobody
 anchored — impossible to reach the PDF unnoticed.
+
+**A third thing neither reaches: a COUNT of things.** On 2026-08-09 the Introduction read *"Four
+appendices follow"* while `main.tex` `\input`s **five**, and the mandatory HC54 project-specification
+appendix was **not signposted anywhere in the body**. `completenesscheck` walks every `\input` and
+saw all five; `latexcheck` resolved every `\ref`; the sentence naming the wrong number contains no
+defect either tool has a syntax for. The defect was created by *adding* the appendix — the count
+was correct when written — which is the general shape: **a count in prose is a claim about the
+document that goes stale when the document changes, and nothing here re-derives it.** The same
+applies to "five contributions", "three venues", "eight extensions". When a count is added or a
+countable thing is, grep for the number word and the digit both.
