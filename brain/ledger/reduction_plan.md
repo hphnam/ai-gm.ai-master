@@ -1073,3 +1073,153 @@ with C-6 the document can comply at the expected landing, so they are **context,
 **Q4 is now the most consequential item in the project**: ~4,900 words have been relocated to
 appendices across four sessions on an assumption that has never been checked, and if it is wrong
 the strategy needs replacing rather than extending.
+
+---
+
+## 13 · LEVER 1 — WHOLE-SECTION RELOCATION, TESTED PER RESEARCH QUESTION. 2026-08-09
+
+**The question, asked for the first time:** does R102 accept a *pointer* for a **secondary**
+finding? R102 reads *"Results state what the findings imply for the research question(s)."*
+**It quantifies over questions, not over findings.** A question with four supporting results needs
+its implication stated — not stated four times. Every demotion so far has assumed the stronger
+reading without testing it, which is why R102-bound material returns 6–30 %.
+
+**What relocation means here:** the subsection leaves whole, **its float leaves with it** — R97
+(*"Every table in Results has a textual summary of the finding it carries"*) makes that mandatory,
+not optional — and the body retains **one sentence** naming the finding and pointing at the
+appendix. Not a summary. The measured 2× retention bias is a bias on *summaries*; a single
+sentence has a natural ceiling a summary does not.
+
+### 13a · The test, question by question
+
+**RQ1** — *can approaches be separated, and does origin count change the selection?* Two limbs,
+so two implications.
+| § | Words | Verdict |
+|---|---|---|
+| 4.1.3 Model confidence sets | 345 | **BODY** — carries limb 1: 5/4/6 of nine retained *is* the non-separation |
+| 4.1.2 Origin-count reversal | 208 | **BODY** — carries limb 2 |
+| 4.1.1 Ladder at the gate | 237 | **RELOCATE.** The ladder is the input measurement; the confidence set is the implication. **Confidence: high** |
+| 4.2.3 Adoption margin | 413 | **RELOCATE.** Its own text: *"What the margin refuses is a win small relative to its own variability"* — the same implication 4.1.3 delivers, by a second route. **Confidence: medium.** It is also a pre-registered methodological device, and a reader might expect it stated rather than pointed at |
+
+**RQ2** — *do intermittency and hierarchy admit the estimand and the reconciliation?* Two limbs.
+4.2.2 classification holds the estimand limb, 4.2.1's null holds the reconciliation limb; both
+stay. 4.1.4 is already executed and is **excluded** — the three done are not reopened.
+**RELOCATE: 4.2.4 occurrence gating (269).** Its own text says the null is *"the expected geometry
+rather than a measurement about the venue"*, and its implication for RQ2 duplicates 4.2.2's.
+**Confidence: medium-high.**
+
+**RQ3** — *does weather, or cross-series pooling, improve accuracy?* **THE LEVER IS DEAD HERE, and
+this is the clearest result of the test.** The question **names both limbs**, and C2's amended cell
+is explicit that they measure differently — weather a set-level null with one pairwise exception,
+pooling *not* a null but a detected small loss — and that *"writing this limb as a clean matched
+pair of nulls would be the mirror image of the over-claiming C2 exists to correct."* Neither is
+secondary to the other. **RELOCATE: nothing. Confidence: high.**
+
+**RQ4** — *does the interval hold coverage, and which property accounts for the departure?* The
+largest block, 2,170 across five.
+| § | Words | Verdict |
+|---|---|---|
+| 4.4.2 Traded decomposition | 373 | **BODY** — C3: the venue failing in the unsafe direction is Ellel at 0.692, *"which is invisible in the marginals"*. This carries limb 1 |
+| 4.4.3 Exchangeability | 457 | **BODY** — the property itself. This *is* limb 2, and C3 calls it the strongest contribution |
+| 4.4.1 Empirical coverage | 423 | **RELOCATE.** The marginals are the input, and they survive in the body anyway: `tab:coverage-traded`'s caption states its all-pairs column *"is an independent estimate of Table~\ref{tab:coverage} and reproduces it to 0.002"*. **Confidence: high** |
+| 4.4.4 Drift cause | 645 | **RELOCATE.** Limb 2 asks which *property* accounts for the departure; the property is the exchangeability violation, and the drift cause is a level below it. **Confidence: medium, and this is the riskiest item on the list** — it is the mechanism behind the dissertation's strongest result, and three cross-references from Chapters 5 and 6 point at it. They resolve, but a reader following them leaves the body |
+
+**RQ5** — *does detection perform well enough to justify surfacing?* 4.5.2 (VUS-PR) and 4.5.4 (the
+cost sweep's degeneracy, which is the answer) both stay. 4.5.5 is **A17-protected**.
+**RELOCATE: 4.5.1 injection validity (194).** C4 claims the injection design's contribution was
+*"measured rather than assumed"*, and a one-sentence pointer to a measured appendix result still
+supports that claim. **Confidence: medium.**
+
+**Unmapped:** 4.4.6 Winkler (496) answers D7, which names no location. Relocation supersedes §9a's
+demotion.
+
+### 13b · The costing, incremental over what §8 and §9a already claim
+
+| § | Words | §8/§9a claims | Relocate whole (w − 30) | **Incremental** |
+|---|---|---|---|---|
+| 4.1.1 Ladder | 237 | 96 | 207 | **+111** |
+| 4.2.3 Adoption margin | 413 | 73 | 383 | **+310** |
+| 4.2.4 Occurrence gating | 269 | 111 | 239 | **+128** |
+| 4.4.1 Empirical coverage | 423 | 135 | 393 | **+258** |
+| 4.4.4 Drift cause | 645 | 214 | 615 | **+401** |
+| 4.5.1 Injection validity | 194 | 66 | 164 | **+98** |
+| 4.4.6 Winkler | 496 | 376 | 466 | **+90** |
+| **TOTAL** | **2,677** | **1,071** | **2,467** | **+1,396** |
+
+**Pessimistic end: +1,186**, applying the measured 2× bias to the 30-word retentions (60 actual,
+30 lost × 7).
+
+**Unclaimed upside, deliberately.** R97 forces five floats to move with their subsections
+(`tab:ladder`, `tab:coverage`, `fig:drift`, `tab:winkler`, `fig:validity-efficiency`). The Winkler
+block alone measures 652 against 496 of prose, so its floats are ~156. **This is worth roughly
+250–400 more and it is excluded from every figure below**, because it is the least-constrained
+estimate in the costing and this project's own rule says such an item must not lead.
+
+**One overlap netted out.** §9b's de-duplication was computed on ~4,657 words of R102-bound
+*retained* prose. Relocation shrinks that base by ~1,396, so §9b re-prices from **763 to 489**.
+Lever 1's net contribution is therefore **+1,122 optimistic**, not +1,396 — recorded here rather
+than discovered later, which is the failure §12 documented three times.
+
+## 14 · LEVER 2 — THE SPLIT-CHAPTER OPTION. Priced as an option, not recommended
+
+Chapter 4 measures **7,883** today. Under a structural split — a short Results chapter reporting
+findings, a full appendix carrying the measurement — a ~3,000-word chapter contains:
+
+| | words |
+|---|---|
+| 21 subsections × ~95, each a finding, its number and its consequence | 1,995 |
+| Chapter opener and five section preambles | 140 |
+| Three to five headline floats retained in the body | ~300 |
+| An explicit synthesis section, which R98 requires (*"key features of the results are brought out explicitly"*) and which the current chapter discharges implicitly | ~400 |
+| **Total** | **~2,835** |
+
+**Criterion check.** **R97** survives and is in fact easier: it governs tables *in* Results, so a
+chapter with four tables needs four summaries rather than fourteen. **D7** names no location and is
+already discharged by Winkler wherever it sits. **R102 is the exposure**, and it is the same
+question Lever 1 asks — at 95 words per subsection the body states each finding, its number and
+its implication, which is R102's minimum on the §9b reading. **If the supervisor rejects that
+reading, the split fails for exactly the reason Lever 1 fails, and they are not independent bets.**
+
+**Saving: ~4,883 from Chapter 4, about 1,000 beyond what the compliant plan below already takes
+from it.** That estimate is soft.
+
+**The risk, stated plainly.** It changes what the dissertation looks like. A Results chapter of
+3,000 against a Methodology of 5,828 inverts the weighting `ds-writing` §4 warns about — the
+weight should sit where the contribution sits, and the contribution is the measurement. A marker
+who does not read appendices closely sees a thin Results chapter. **That is the same exposure as
+Q4 in the supervisor query, concentrated into one structural decision instead of spread over
+forty demotions.** It is Phuong's ruling and is not recommended here.
+
+## 15 · THE COMPLIANT PLAN
+
+| | Optimistic | Pessimistic |
+|---|---|---|
+| Body now + R114 | 28,482 | 28,482 |
+| §8 re-priced plan (includes Ch 3's 1,215) | −6,902 | −6,902 |
+| §9a Winkler — **superseded by Lever 1** | −340 | −238 |
+| C-1 | −25 | −25 |
+| **Lever 1, whole-section relocation** | **−1,396** | **−1,186** |
+| §9b, re-based after relocation | −489 | −297 |
+| Demotion-retention band (multiplier at 212 % not 204 %) | — | +252 |
+| **Landing** | **19,330** | **20,086** |
+| Margin below 20,000 | +670 | **−86** |
+
+**Lever 1 alone does not reach it.** It closes 1,122 of a 1,035-word pessimistic gap and lands
+86 over.
+
+| **Add C-6** (Chapter 2's long shots cut, 820, deterministic) | **18,510** | **19,266** |
+|---|---|---|
+| **Margin below 20,000** | **+1,490** | **+734** |
+
+**This is the compliant plan: the re-priced §8 plan, C-1, whole-section relocation of seven
+subsections, the re-based §9b de-duplication, and C-6.** It clears 20,000 by **734 at the
+pessimistic end**, against the 300 required.
+
+**It requires C-6. It does not require the split chapter, and it does not require C-3.** The
+~250–400 of float relocation R97 forces is unclaimed on top.
+
+**The one thing that can still break it** is the R102-minimum reading. Lever 1 and §9b both rest
+on it, and together they are 1,611 of the 1,819-word improvement. **If the supervisor rules that
+R102 needs each finding stated in the body, both die together and the compliant plan dies with
+them** — which is why execution stays held on Q1, and why the split chapter is not an independent
+fallback.
