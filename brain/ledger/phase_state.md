@@ -4526,3 +4526,47 @@ exceeds 19,000.** Prerequisites before any demotion, in order: fix the five wrap
 titles and re-baseline; compose Appendix C against its six owed promises and Appendix B's
 environment record; repair the seventh failing reference and the three orphan floats; and re-run
 the cross-reference check **after every demotion**, not once at the end.
+
+## 8C-9 execution — prerequisites done, and the STOP RULE FIRED at Chapter 4
+
+**2026-08-09, same session.** Approved for execution with four conditions. Prerequisites complete;
+Chapter 4 stopped part-way on the rule rather than on the work.
+
+**Prerequisite 1 — the instrument now tells the truth.** Five wrapped `\caption` short titles
+unwrapped. Governing count **28,750 → 28,979 against a predicted ~28,980 — the defect diagnosis
+confirmed to one word** (lit +41, methodology +91, results +97).
+
+**Prerequisite 2 — the appendices keep their promises.** Appendix C composed against all six
+(injection stratification and both seeds, classification sensitivity, paired variance, block-length
+sweep, windowed counterfactual prose); Appendix B gained the environment record `methodology.tex`:82
+asserted it already had. **The classification sensitivity is a real finding**: the Beer Hall's ADI
+is 1.327, exceeding the (1.32, 0.49) cutoff and falling below (4/3, 0.5), so the venue is lumpy
+under one published pair and erratic under the other — and its bootstrap interval [1.296, 1.368]
+contains both, so the class is **not identified at this sample size**. Two venues are stable.
+**One boundary stated rather than smoothed:** the per-length set memberships behind the sweep are
+in no committed artefact, and log/44's gate G5 points at `mcs_L1_results.json` for a "full sweep"
+that file does not contain.
+
+**Prerequisite 3 — and an eighth defect found.** The Introduction said **four** appendices where
+**five** are `\input`, and **did not signpost the mandatory HC54 specification appendix at all** —
+created when Appendix E was added and invisible to every instrument. Repaired, along with the three
+orphan floats. Appendix reference sites 21 → 25, all resolving to material that exists.
+
+**Correctness costs words: +59 governing.** Baseline for execution **29,038**.
+
+**THE STOP RULE FIRED.** Four demotions executed (squared-loss ordering 537→145, native intervals
+421→272, alert suppression 197→106, the windowing paragraph). Body **29,038 → 28,332**.
+
+| | priced | realised | rate |
+|---|---|---|---|
+| Three fully-executed demotions | 895 | **632** | **71 %** |
+
+**The material moved whole; the RETENTION was under-priced.** Priced retentions of 70, 140 and 50
+came in at **145, 272 and 106 — 207 %, 194 %, 212 %**. Three items landing within 18 points of each
+other is a bias, not noise. **The class model was right that demotion is deterministic and wrong
+about what it costs to keep the body coherent.**
+
+**Re-forecast at the measured rate: ~20,434 — above the 19,000 ceiling by 1,434.** Reaching 18,000
+needs **2,434 more expected shed ≈ 3,428 more priced demotion**. Reported for a ruling rather than
+worked around. Compile PASS 153 pages, 0 errors, 0 undefined refs/citations, 0 floats lost, 7
+overfull boxes unchanged. Overleaf `535c1d3`, **unpushed**.
