@@ -172,7 +172,7 @@ def main() -> None:
         lines.append(
             f"  \\node[anchor=north,align=center,text width={label_w:.3f}cm]"
             f" at ({x0 + w / 2:.3f},{LABEL_TOP_Y}) {{\\scriptsize\\textbf{{{SHORT[blk['block']]}}}"
-            f"\\\\[-2pt] $n{{=}}{blk['n_days']}$}};")
+            f"\\\\[-2pt] $n_{{\\mathrm{{days}}}}{{=}}{blk['n_days']}$}};")
 
     lines += [
         "  %% time axis -- placed below the computed label extent, not at a coordinate",

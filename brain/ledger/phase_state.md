@@ -4800,3 +4800,44 @@ Counted body **19,899** (was 19,894; +5, the rename gloss). figurecheck PASS ove
 completenesscheck PASS over 28 files, venueordercheck FAIL 4 over 23 — **the same four findings
 byte-for-byte at baseline**, so this pass introduced none. Hyphen diff against
 `pre-reduction-full-run`: 0 word-hyphens over 1,278 added lines.
+
+---
+
+## Ad-hoc, 2026-08-10 (second run) — the acronym and notation defects repaired
+
+**Completed.** Four deliverables, four commits, none pushed. Started from `70a67c0`, an
+**Overleaf web-UI commit by Phuong** deleting the MSc row from `acronyms.tex` — found by
+fetching before comparing, and respected rather than reverted. A second writer on the remote
+is the class §F already records from `4e2d209`.
+
+**Running counted body, per item.** 19,899 → **19,931** (item 1, acronym expansions) →
+**19,940** (item 2, collisions) → **19,961** (item 3, Page) → **19,961** (item 4, tables are
+front matter). **39 below the 20,000 cap.** Abstract 300 → **303** marker words against HC5's
+"approximately 300"; MASE is spelled out there without introducing the acronym, which is one
+word cheaper and correct for a standalone abstract.
+
+**Item 1.** All nine first-use defects repaired. BH and TRT were *removed* rather than expanded
+— both venues spelled out in `tab:group`, `tab:bootstrap`, and the acronym rows struck.
+Appendix E was deliberately **not** edited: it reproduces the issued specification with exactly
+two declared departures, so SOP, IP and MCP are expanded in the appendix's own framing
+paragraph instead. API likewise in `fig:deployment`'s caption, that figure being generator-owned.
+
+**Item 2.** Eleven collisions and two double-denotations resolved; a **third** double-denotation
+was found in the sweep — the persistence rule written `(m,n)` in one place and `k`-of-`n` in the
+same algorithm's heading and in `fig:injection`, with `k` there colliding with CUSUM slack four
+lines above. Both generators edited and both figures regenerated; regenerating also exposed
+stale appendix letters in the generator's comments, corrected at source.
+
+**Item 3.** **Page 1954 does not support the notation cited to it.** In Page, `h` and `k` are
+both decision thresholds (Rule 4, quoted verbatim in `notation_and_acronyms.md` §5); he defines
+no slack, and his recursion `S'_n = max(S'_{n-1} + x_n, 0)` subtracts nothing because the scores
+are pre-centred. Aligning to Page was rejected — this document genuinely uses the later
+control-chart recursion — so the departure is **stated at the definition**.
+
+**Verified end state.** Overleaf clone `1cc46d2`. Fresh clone with `main-words.sum` confirmed
+**absent** beforehand: latexcheck **PASS**, 144 pages, 0 errors, 0 undefined references,
+0 undefined citations, 0 floats lost, 7 overfull and 34 underfull boxes — baseline-identical.
+Counted body **19,961**, matching the count the build itself generated. figurecheck PASS 28,
+completenesscheck PASS 28, venueordercheck FAIL 4 over 23 — **the same four as baseline**.
+Hyphen diff against `pre-reduction-full-run`: 0 over 1,357 added lines. Both tables verified in
+both directions: every new symbol present in the body, every superseded form at zero.
