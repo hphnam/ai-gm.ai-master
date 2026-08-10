@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786377956.2261412,
-    "ast_hash": "3566ee39cf487fddf4dbaa62908653cb",
+    "mtime": 1786298018.9451244,
+    "ast_hash": "7a69fa8d3b0c8f71f4f773bd9c4254ad",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786377964.6726098,
-    "ast_hash": "30810f180d062fd6a40f98ec3f735f56",
+    "mtime": 1786307640.155138,
+    "ast_hash": "5c0f22d24fe60a9af8a4c6138732c475",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6610,28 +6610,13 @@
     "semantic_hash": ""
   },
   "brain/ledger/reduction_cost_register.md": {
-    "mtime": 1786319061.136073,
-    "ast_hash": "8f2a682876cebf9154f8dbdc203b4d29",
+    "mtime": 1786311595.5774982,
+    "ast_hash": "5656f316d7c68afc3c49904af801cc12",
     "semantic_hash": ""
   },
   "brain/ledger/supervisor_length_query.md": {
     "mtime": 1786309751.7931905,
     "ast_hash": "ac03205ac70aa999aeeb35ff283208b1",
-    "semantic_hash": ""
-  },
-  "brain/docs/simon_status_report.md": {
-    "mtime": 1786360122.609545,
-    "ast_hash": "17c2a7606e76636bd2e403bff30f9189",
-    "semantic_hash": ""
-  },
-  "brain/ledger/notation_and_acronyms.md": {
-    "mtime": 1786377238.6823852,
-    "ast_hash": "2883e13294acf6c6a5dbd5c0e80b0995",
-    "semantic_hash": ""
-  },
-  "brain/docs/Status_report.pdf": {
-    "mtime": 1786360142.9071317,
-    "ast_hash": "c7e5755ce2665232bee4939b1a80e76b",
     "semantic_hash": ""
   }
 }
