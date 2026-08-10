@@ -4759,3 +4759,44 @@ Overleaf head `5fc5731`, `origin/main` at `b08ad72`, **three commits await Phuon
 `pre-reduction-full-run` at `ab832a4` untouched; nothing amended, nothing force-pushed.
 
 **Unstarted.** The push (Phuong's gate). Tier-3 verification of the render, which needs a browser.
+
+---
+
+## Ad-hoc, 2026-08-10 — front-matter acronym and notation tables, and the s_M5 rename
+
+**Completed.** Three deliverables, three commits on the Overleaf clone, none pushed.
+
+**Gate answered first.** The word-count assumption was verified before anything was built,
+empirically and in both directions: a 2,001-word probe at the intended front-matter position
+left the governing count at 19,894 and moved the whole-document count by +2,001. The second
+figure is the control that makes the first evidence. Recorded at `BLOCKED_third_party.md` §F
+and `ledger/notation_and_acronyms.md` §0.
+
+**Artefacts written.**
+- `acronyms.tex` — 41 entries, ordered by first use, swept over the 26 files reachable from
+  `main.tex`. A first pass scoped to the obvious 20 missed `appendix/search_screening_body.tex`.
+- `notation.tex` — every symbol in 6 displayed equations and 498 inline maths spans, grouped
+  by owning instrument.
+- `chapters/methodology.tex` — `s_{\mathrm{M5}}` → `s_{\mathrm{sq},1}`, the only site.
+- `main.tex` — `longtable` + `array` added, both tables wired after `\listoffigures`.
+- `brain/ledger/notation_and_acronyms.md` — the inventory, verification scope and defect list.
+
+**Findings, all reported and none repaired — Phuong rules.** Nine acronyms used before or
+without expansion, MASE the worst at 24 uses from the abstract onward and spelled out nowhere.
+Eleven symbols carrying more than one meaning, `h` (horizon 7 / CUSUM threshold 5, same chapter)
+the sharpest. Two quantities under two symbols each. `\varepsilon` and `\gamma` used once each
+and never defined. One source-convention mismatch: the `(k, h)` slack/threshold reading is
+cited to Page 1954, and Page uses `k` for the second decision interval, not for slack.
+
+**Verified end state.** Overleaf clone `91efd62`. `git ls-remote --heads origin` returns
+`5fc5731` for `main`, so `origin/main..HEAD` is **3 — this pass's commits only.** *An earlier
+draft of this entry said six, on the §F row asserting that 8E's rulings 1, 2 and 5 were still
+waiting; they had already landed. That row is a measurement with a timestamp, and reading it
+forward is the mistake §F itself documents. Corrected before this file was committed.* Push is
+Phuong's. Fresh clone of `91efd62` with `main-words.sum` confirmed **absent** beforehand:
+latexcheck **PASS**, 144 pages, 0 errors, 0 undefined references, 0 undefined citations, 0 floats
+lost, 7 overfull and 35 underfull boxes — identical to the HEAD baseline built in a worktree.
+Counted body **19,899** (was 19,894; +5, the rename gloss). figurecheck PASS over 28 sources,
+completenesscheck PASS over 28 files, venueordercheck FAIL 4 over 23 — **the same four findings
+byte-for-byte at baseline**, so this pass introduced none. Hyphen diff against
+`pre-reduction-full-run`: 0 word-hyphens over 1,278 added lines.
