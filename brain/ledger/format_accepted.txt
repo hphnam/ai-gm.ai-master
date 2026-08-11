@@ -1,0 +1,22 @@
+# Margin spills that have been RULED and may pass brain/scripts/formatcheck.py.
+#
+# Format:  <max_pt> <substring of the offending text>
+#
+# The cap is a CEILING, not a label. The same defect getting worse is a new
+# defect and still fails the gate. Delete a line the moment its defect is
+# repaired -- an accept file nobody prunes is an accept file that hides the
+# next regression.
+#
+# Nothing goes in here without a ruling recorded in the decision log or in a
+# ledger entry. "It has always been there" is not a ruling.
+
+# Zotero translator artefact in ref.bib:652 -- `note = {\_eprint: https://...}`
+# duplicating the doi and url already printed in the same entry. Not a URL as
+# far as biblatex is concerned, so the biburl penalties cannot break it.
+# Repair is a bibliography-data edit. Raised 2026-08-11, ruling pending.
+75.0 eprint: https://onlinelibrary.wiley.com
+
+# appendix/project_specification.tex, the line ending "...to answer staff".
+# 1.3mm, and TeX reports NO overfull box against it. \emergencystretch=2em did
+# not clear it. Raised 2026-08-11, ruling pending.
+5.0 staff

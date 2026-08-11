@@ -94,7 +94,10 @@ a float body, or the preamble.
    clone *before* it is pushed. **A clean `latexcheck` is the precondition for a push, not a
    courtesy.** A push whose compile was not run is unpre-flighted; a push whose compile was
    run and not reported is unverified, because the run is only evidence once someone can read
-   what it said.
+   what it said. **A clean `latexcheck` is not sufficient on its own** — when a chapter or an
+   edit is *finished*, the rendered PDF also goes through the formatting gate, which catches
+   the defect class the log cannot see. Specified once, under **Overleaf pre-flight → The
+   formatting gate**; not restated here.
 2. **Compiling locally does not end the work.** A change that compiles locally and is **not
    pushed** leaves Overleaf holding a state that may not build at all. That is not
    hypothetical: `fig_pipeline`'s `out`/`outb` key collision sat on Overleaf in a
@@ -887,6 +890,100 @@ cleaned text, not the raw draft.
 
 Plain tables are a defect, not a baseline — every table must be justified
 against a chart alternative.
+
+### The formatting gate — run when the writing is done, before the push
+
+**Adopted 2026-08-11.** Composition and revision are judged on what the text says.
+**The marker opens a PDF**, and the PDF has a second class of defect that no amount of
+reading the source finds: a table off the edge of the page, an algorithm six pages from
+the section that introduces it, a page carrying two lines. **This gate closes that
+class, and it runs at the same moment as the AI-writing pass above** — when a chapter,
+an appendix or an edit is finished, before anything is handed over to push.
+
+**The instrument is `brain/scripts/formatcheck.py`, and the command is:**
+
+```
+python3 brain/scripts/formatcheck.py <outdir>/main.pdf \
+    --aux <outdir>/main.aux --body-from <first arabic page> \
+    --accept brain/ledger/format_accepted.txt
+```
+
+It runs **after** `latexcheck.py`, on the PDF that run produced, because it reads the
+rendered artefact rather than the log. `--self-test` exercises it in both directions and
+is the precondition for trusting it, per the assertion rule.
+
+**Why it is not part of `latexcheck`, and why the log cannot stand in for it.** A
+compile log reports what TeX *warned about*; this reports **where ink actually landed**,
+and the two disagree in both directions. A 2.54 pt overfull box in a *centred* float
+bleeds 1.27 pt per side and puts **no** ink outside the text block — a warning with no
+defect. A line in `appendix/project_specification.tex` puts **3.61 pt of real ink in the
+right margin and TeX reports no overfull box at all** — a defect with no warning. Reading
+the overfull list as a margin check gets both cases wrong.
+
+**Verify by rendering and looking.** This is a visual defect class, so a clean verdict
+from any tool is a starting point and not the finding. Render the pages the tool names,
+open them, and look. `formatcheck` exists to tell you *which* pages to open over 146 of
+them, not to save you from opening them.
+
+**Three sections, and only the first one fails the run.**
+
+| | Reads | Fails? |
+|---|---|---|
+| 1 · margin spill | ink outside the text block, which is where information is lost | **yes** |
+| 2 · white space | vertical holes, **INNER** (between content) reported apart from **BOTTOM** (slack at the foot) | advisory |
+| 3 · float distance | how far each float sits from the nearest text naming it, against the requirement quoted below | advisory |
+
+**Section 2's split is the whole point of section 2.** Under `\raggedbottom` the slack
+is *supposed* to collect at the bottom margin, so a metric that sums all white per page
+scores the remedy as the disease — the first version of this measurement reported gaps
+rising 22 → 32 while the real defect had fallen 10 → 2.
+
+**The criterion section 3 serves is quoted, not paraphrased:** *"Try to position each
+table or figure close to where it is first referenced"* — `Student Documentation - MSc
+DS - Dissertation Submission.md`, **Format and Presentation**. Section 3 cannot see a
+float that is never referred to **by number** at all, because an absent `\ref` has no
+syntax; it lists those as UNREFERENCED for a human, and ten floats are currently in that
+state.
+
+#### Two invariants that bind any pass that is *only* formatting
+
+1. **The counted body is identical at the end, and both figures are reported.** Measured
+   with the instrument the compiled declaration itself uses —
+   `texcount -0 -sum -merge -total` over the six chapter files plus `abstract.tex`, the
+   scope `\bodywordcount` defines in `main.tex`. If that number moved, the pass was not
+   a formatting pass. **No sentence is rewritten to fix a page break, nothing is cut and
+   nothing is added** — the compression rules above apply here with full force, and a
+   page break is a far worse reason to touch a qualifier than a word budget is.
+2. **A mandated value is never changed to make content fit.** 12 pt body font, A4,
+   standard margins, full justification, chapter-starts-a-new-page. Line spacing and the
+   exact margins are *unspecified* by the requirements — **and silence is not permission**.
+   Leave the Lancaster template's `\linespread{1.5}` and 35/25/25/25 mm alone. If a
+   defect genuinely cannot be cleared without touching one of them, **that is a human
+   gate**: present it with a recommendation and wait. It has not been needed yet — every
+   overrun so far was recoverable by column geometry, and every white-space defect by
+   float parameters.
+
+#### `[H]` is not available, and the accept file is not a silencer
+
+**Never `[H]`.** It defeats the float algorithm and manufactures exactly the white space
+the gate is looking for. `[htbp]` is the default answer; `[!htbp]` is available and was
+measured to change nothing on this document. `\FloatBarrier` at appendix `\section*`
+boundaries is what stops a float crossing into the next section — called **explicitly**,
+because a starred heading can slip out of placeins' `[section]` option silently.
+
+**`brain/ledger/format_accepted.txt` is the only way a spill escapes the gate, and every
+line in it needs a ruling.** It exists for the same reason `completenesscheck` lets a
+file opt out with `% CARRIER:` — a guard that fires on known-and-ruled cases is a guard
+the next person switches off. Each entry is keyed on the offending **text**, not the
+page, because pagination moves; and each carries a **ceiling**, so the same defect
+getting worse is a new defect and still fails. **Delete a line the moment its defect is
+repaired.** An accept file nobody prunes is an accept file that hides the next
+regression, which is this project's stale-`main-words.sum` failure wearing new clothes.
+
+**The worked record of the first run of this gate is
+`brain/ledger/formatting_pass_2026-08-11.md`** — what the requirements mandate and leave
+open, each table fix with its method and why that method, the float parameters, and the
+three defects reported rather than resolved.
 
 ## Scope boundary
 

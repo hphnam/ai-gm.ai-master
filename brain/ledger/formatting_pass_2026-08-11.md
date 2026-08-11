@@ -256,3 +256,43 @@ would be worse, not better.
 
 **Tier 2 only.** All of the above is TeX Live 2026 locally, which is not Overleaf's
 until T3-1 closes. None of it is a claim about the target render.
+
+---
+
+## Made repeatable — the gate, added the same day
+
+This pass was run with four throwaway scratchpad scripts. That is exactly the shape
+the rules warn about twice over: *a number that enters a decision comes from an
+instrumented tool, never an ad-hoc script*, and the `svg.sty` stub that has been
+re-created under a different directory name in each of the last three sessions. A
+process nobody can re-run is a process that will be re-invented differently.
+
+So the measurements are now one committed instrument, **`brain/scripts/formatcheck.py`**,
+and the requirement to run it is one rule, `PRJ93_RULES.md` →
+**Overleaf pre-flight → The formatting gate**, with a pointer from the compile-and-push
+lifecycle. Specified once, pointed at once.
+
+**Verified in both directions before being relied on**, per the assertion rule.
+`--self-test` plants a known spill and asserts it is found on every page, plants none
+and asserts none is found, feeds an empty scan and confirms the tool refuses rather
+than passing, and checks that bottom slack is not counted as an inner gap.
+
+**The self-test failed on its first two runs and both failures were real.** The first
+fixture shifted a long line leftwards so its right edge would overshoot by a chosen
+amount — which pushed its *left* edge 30pt into the left margin, and the tool correctly
+reported that instead of the planted defect. The second fixture ran off the physical
+page, so the span bbox was clipped and a 269pt overshoot measured as 173pt. A fixture
+assertion now refuses a fixture that does not fit on the page.
+
+**Validated against the real document, not only the fixture.** Run on the pre-pass
+build it reports the same six spilling pages the hand-rolled scripts found, to within
+0.1pt. Run on the post-pass build it reports two, both of them the ones raised for a
+ruling. The derived text block comes out at 99.2–524.5pt, **150.0 mm** — independently
+reproducing `\newgeometry{left=35mm, right=25mm}` without being told it, which is the
+cross-check that the geometry is measured rather than assumed. Calibration: 84 per cent
+of justified body lines land on the derived right margin.
+
+**`brain/ledger/format_accepted.txt`** carries the two ruled exceptions so the gate
+stays usable — the Hansen `note` artefact and the 3.5pt `project_specification` line.
+Each is keyed on text rather than page, and capped, so the same defect getting worse
+still fails. **Both lines are deleted the moment their defects are repaired.**
