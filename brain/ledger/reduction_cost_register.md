@@ -873,3 +873,51 @@ ruling"***. D7 at ~150–200 fits inside the current margin without any further 
 makes the Distinction-band exposure the first thing worth funding rather than the last.
 
 **Unchanged:** the reserve is Phuong's to set, and nothing here is funded without an instruction.
+
+## 8H execution — Tier 3 resolved 2026-08-12, and what it actually cost
+
+`prj93-overleaf` `ff4c728`. **19,818 → 19,989. Margin 11.**
+
+| Item | Priced at 8H | Actual | Why the difference |
+|---|---|---|---|
+| **R101** | ~40–60 | **~103** | Defining three diagnostics takes more than naming them. The population is **three**, not four: adaptive conformal was already at `methodology.tex`:389–390 |
+| **R68** reconciliation | ~100–350 | **~44** | The gap was **location, not absence** — the projection is at `sec:rw-pooling` and the test at `sec:res-reconciliation`; Methods reached neither. A pointer discharged it |
+| **D7** | ~150–200 | **~24** | Discharged by **reframing**, not by argument — see below |
+| | **~290–610** | **171** | |
+
+**D7 is the one worth recording as a method.** The 8D audit read
+*"Five smaller divergences are stated without further argument"* as the Distinction-band exposure
+and priced arguing two or three of the five. **That sentence declared an absence that is not
+real:** each of the five carries its reason inline, and Methods refuses three named alternatives
+on evidence (Chatfield's inventory-cost objective, integration over the served model's emitted
+quantiles, the intermittent estimator). D7 is **EXACT and names no chapter**, so those refusals
+already discharged it. **The exposure was the framing, and the repair was to stop declaring a
+shortfall the document does not have** — 24 words against ~150–200.
+
+**Generalisable:** before pricing a criterion as thin, check whether the evidence for thinness is
+the document's own modest framing rather than a missing passage. This project has now made that
+error twice — here, and at HC60 where a criterion was graded from a teaching slide.
+
+**Two invented citation keys were caught before a compile.** `clopper_use_1934` and
+`paparrizos_tsb-uad_2022` were written into the draft and **neither exists in `ref.bib`**. Adding
+a paper is a human gate, so Clopper--Pearson is now named without a citation exactly as
+`results.tex`:384 and :407 name it, and VUS-PR uses `liu_elephant_2024`, the key the corpus
+already holds for that source. **`latexcheck` would have caught both as undefined citations — but
+only after they had been written and only if the run was read.** Checking the key before writing
+the sentence is the cheaper order.
+
+### Margin 11 — stated, not hidden
+
+**This is below any safe reserve and the next session must not read it as headroom.** Tier 3 cost
+171 against a margin of 182, and there is no repetition left to harvest: the 8G sweep over 22,788
+words returned 109, and the appendix removal's 70 came from citing passages rather than the
+appendix itself.
+
+**Outstanding, and unfunded at this margin:** R68's remaining two limbs — the intervention layer's
+language model is named nowhere in the document (~30) and Tier 2's residue (~75). **R108 (~35)
+also remains**, unchanged since 8F.
+
+**To restore a reserve, one of three, and all are Phuong's to rule:** reverse the 8G refusal on
+§5.1's five question restatements (~57, refused on readability, not on criterion); relocate a body
+passage to an appendix (buys cap words, costs the marker's view, `D2` unconfirmed); or accept the
+document as it stands and hold the 11 for nothing.
