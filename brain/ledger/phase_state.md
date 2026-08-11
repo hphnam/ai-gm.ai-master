@@ -4841,3 +4841,37 @@ Counted body **19,961**, matching the count the build itself generated. figurech
 completenesscheck PASS 28, venueordercheck FAIL 4 over 23 — **the same four as baseline**.
 Hyphen diff against `pre-reduction-full-run`: 0 over 1,357 added lines. Both tables verified in
 both directions: every new symbol present in the body, every superseded form at zero.
+
+### Follow-up, 2026-08-11 — two repairs on Phuong's review of the run above
+
+**Push confirmed.** `git ls-remote --heads origin` returns `1cc46d2`; the four repair commits
+landed. One further commit now waits.
+
+**k-collision re-verified across all three surfaces after regeneration**, which is what the
+review asked for, because the defect had been inconsistent across three files: `alg_detection`'s
+notation block reads `$(m_{\mathrm{brk}},n_{\mathrm{win}})$`, its own Detector B heading reads
+`$m_{\mathrm{brk}}$-of-$n_{\mathrm{win}}$`, and `fig_injection`'s node reads the same. Zero
+occurrences of the old `k`-of-`n` form anywhere. `k_{\mathrm{cs}}` is unambiguously the slack.
+
+**Block length `l` → `L`.** Outside the eleven, taken anyway: confusable glyphs are a
+comprehension defect regardless of role separation. The block length moved because it is the
+rarer symbol (two sites against `\ell`'s three) and both sites are in an appendix, so the cost
+against the cap is zero. `L` was confirmed unused as a symbol first.
+
+**Appendix E acronyms.** The reproduction is still unaltered. The front-matter table now records
+that **twelve** entries appear only inside it, and the appendix's framing paragraph points at
+the table rather than naming an arbitrary three.
+
+**Two cells corrected while checking, neither previously known.** `API`'s first-use column named
+Appendix E; its first reader-facing use is `fig:deployment` in Appendix B. `LLM` was tested the
+same way and is genuinely specification-only — its single hit in `results.tex` is inside a LaTeX
+comment. **The first grep did not strip comments and the comment-stripped re-run did**, which is
+the same instrument distinction that governs every count in this project.
+
+**Verified end state.** Overleaf `ec334a6`, one commit ahead of `origin/main` `1cc46d2`.
+Fresh clone with `main-words.sum` confirmed **absent**: latexcheck **PASS**, 144 pages, 0 errors,
+0 undefined references, 0 undefined citations, 0 floats lost, 7 overfull and 34 underfull —
+baseline-identical. Counted body **19,961**, matching the count the build generated, **39 below
+the cap**. figurecheck PASS 28, completenesscheck PASS 28, venueordercheck FAIL 4 over 23 (the
+same four as baseline). Hyphen diff against `pre-reduction-full-run`: 0 over 1,359 added lines.
+All 95 cross-references in the two tables resolve.
