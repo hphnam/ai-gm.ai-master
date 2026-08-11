@@ -3,9 +3,41 @@
 Every line below is phrased so a later session can mark it **PASS** or **FAIL**
 by inspecting the dissertation. No criteria are merged; one line, one check.
 
-Sources: `docs/Student Documentation - MSc DS - Dissertation Submission.md`
-(MSc Data Science and AI Dissertation Writing and Marking Guidelines 2025/26)
-and `docs/DataSciDissWriting June2026final.md` (writing workshop).
+## SOURCE PRECEDENCE — RULED BY PHUONG 2026-08-12. NOT OPEN.
+
+| Rank | Document | Standing |
+|---|---|---|
+| **1 — HIGHEST AUTHORITY** | `docs/Student Documentation - MSc DS - Dissertation Submission.md` | **The issued requirements.** This is what the marker is given. Where it and the deck disagree, **this wins, and the disagreement is not a question to reopen** |
+| **2 — supporting only** | `docs/DataSciDissWriting June2026final.md` (writing workshop deck) | **Assistant/supporter.** Teaching material. It may *explain* a requirement and may *suggest* good practice. **It cannot create a requirement the issued document does not contain** |
+
+**A criterion whose only warrant is the deck is ADVICE, not a requirement**, and must not be
+graded as a failure, priced as a debt, or used to justify writing words. It may still be followed
+where it is free.
+
+**Why this ruling exists.** On 2026-08-11 HC60/HC61 (ethics) were graded as **mechanical
+failures** — §0 of the audit, *"these lose marks without any judgement involved"* — on the
+strength of **one conditional bullet on deck slide 57**. The issued requirements contain the
+string *ethic* **zero times**. The criteria file recorded no provenance, so a teaching-deck bullet
+and a "must" from the issued document were indistinguishable on the page.
+
+## CLASSIFICATION — applied 2026-08-12 against both sources, read end to end
+
+Every criterion below is tagged where it is anything other than an exact restatement of the
+issued requirements. **Untagged means EXACT: the issued document says it, unhedged.**
+
+| Tag | Meaning | How to treat it |
+|---|---|---|
+| *(untagged)* | **EXACT** — restates the issued document | Requirement. Grade it |
+| `[h]` | **EXACT, hedged** — the source says `should` / `try to` / `as appropriate` | Requirement, but a shortfall is a deduction risk, not a mechanical fail |
+| `[T]` | **TIGHTENED** — the source says something weaker; the criterion added force, scope or a quantifier | **Grade against the SOURCE's wording, not this line.** The tag names what was added |
+| `[I]` | **INFERRED** — no source sentence; convention or the derivation itself | Not a requirement. Follow only if free |
+| `[U]` | **UNSOURCED** — no warrant in either document | **Not a requirement. Do not price, do not grade, do not write words for it** |
+| `[W]` | **WORKSHOP DECK ONLY** — advice under the precedence ruling above | Not a requirement |
+
+Full working with every source sentence quoted verbatim beside its criterion:
+**`ledger/criteria_provenance_audit.md`** (2026-08-12). That file is the evidence; this file is the
+authority. **Do not re-derive the classification — it was done once, against both files end to
+end, and the quotes are recorded.**
 
 **Module code caveat.** The guidance names module **DS591** throughout, not
 PRJ93. Confirm it applies before relying on the submission mechanics (HC39–HC45).
@@ -27,13 +59,22 @@ submission, and check every one.
 ## 1.1 Length
 
 - **HC1.** Total dissertation is ≤ 20,000 words ("must not exceed 20,000 words").
-- **HC2.** The report is not unstructured or overly verbose — such reports "will be penalised rather than rewarded".
-- **HC3.** The report is not padded with irrelevant content.
+- **HC2.** `[T]` The report is not unstructured or overly verbose — such reports "will be penalised rather than rewarded". *Tightening: the source conjoins three faults with **and** — "unstructured, overly verbose **and** contain irrelevant content" — and HC2/HC3 split them into independently-failing criteria. The genuine unhedged warrant is the adjacent sentence, "competence in producing a succinct and coherent report is **essential**".*
+- **HC3.** `[T]` The report is not padded with irrelevant content. *Same split as HC2.*
 
-### The scope of the 20,000, and the working target — RULED 2026-08-09 by Phuong
+### The scope of the 20,000, and the working target — RULED 2026-08-09 by Phuong.
+### CONFIRMED 2026-08-12 AGAINST THE ISSUED SOURCE. CLOSED — DO NOT ASK AGAIN.
 
 **This resolves four of the §1.9 unknowns and supersedes every earlier statement in this
 project on what the limit counts.**
+
+**Confirmation, 2026-08-12.** The issued requirements were read end to end for this. They say
+**only** *"The dissertation must not exceed 20,000 words"* (:16) — **the source is silent on what
+the 20,000 counts.** There is no sentence about the bibliography, the appendices, the abstract,
+captions or footnotes anywhere in the document. So the scope is **not derivable and never will
+be**: it is Phuong's ruling, it is the only answer this project has or can have, and **a later
+session that re-opens it is re-opening a question with no source-side answer.** Recorded here as
+**CLOSED**.
 
 | Question | Ruling |
 |---|---|
@@ -144,11 +185,29 @@ abstract and the acknowledgements placeholder, and it was carrying a false compl
 into the compiled PDF. It has been rewritten to the ruled terms; it is not binding and must
 not be quoted back as a source.
 
-**The working target is 15,000 body words. 18,000 is the upper bound of what reads
-acceptably.** This is not a rule and it governs anyway, because a lengthy dissertation costs
-marks through the marker's judgement well inside the cap.
+**STRUCK 2026-08-12 by Phuong, and left visible rather than deleted:**
 
-**That judgement is documented, not merely inferred.** The submission documentation states it
+> ~~**The working target is 15,000 body words. 18,000 is the upper bound of what reads
+> acceptably.** This is not a rule and it governs anyway, because a lengthy dissertation costs
+> marks through the marker's judgement well inside the cap.~~
+
+**Phuong's words: *"ignore 15,000 it's impossible for our text, we tried many times but can not
+squeeze anymore."*** This is a **measurement**, not a preference. The record supports it: the
+reduction pass moved 105 net words across four chapters; a full rewrite of a 4,979-word chapter
+returned 189; eight approved de-duplication items returned −105 against a 370–470 estimate; and
+the 8G repetition sweep over 22,788 words found **109**. Five independent attempts, each an
+order of magnitude below its forecast. **15,000 was never reachable from this document, and
+18,000 is not either.**
+
+**This paragraph had been contradicting the file's own §1.1 for three days.** The strike at the
+head of this section already said *"15,000 is off the table"*; this one went on stating it as
+the working target sixty lines later. Two live sentences, one file, opposite claims — the
+store-ownership failure at its smallest radius, and the second instance of it inside §1.1.
+
+**The only length numbers now in force are HC1's 20,000 cap and the reserve Phuong sets per
+session.** No other target exists. Do not reintroduce one.
+
+**HC2 and HC3 still bind, and they are not a number.** The submission documentation states it
 directly: *"The dissertation must not exceed 20,000 words. Note that this is **an upper limit**
 and that competence in producing a succinct and coherent report is essential. Reports that are
 unstructured, **overly verbose** and contain irrelevant content **will be penalised rather than
@@ -160,8 +219,8 @@ answering to, because they are not the same requirement and 20,000 discharges on
 
 **Measurement.** The counted population is `chapters/*.tex` plus `abstract.tex`. Two instruments
 measure it and they disagree by ~970; see §1.1a.
-- **HC4.** The abstract is a single paragraph.
-- **HC5.** The abstract is approximately 300 words.
+- **HC4.** `[h]` The abstract is a single paragraph. *Source: "The `abstract' **should** summarize, **in one paragraph**, the major aspects of the dissertation."*
+- **HC5.** `[T]` `[W]` The abstract is approximately 300 words. **NOT A REQUIREMENT.** *The issued document specifies **no abstract word count**. The only warrant is deck slide 25, "**Typically** 300 words". Under the precedence ruling this is advice. The abstract is currently 324 and **that is compliant** — do not spend words moving it, and do not record an overrun against it.*
 
 ## 1.1a The two word-count instruments, reconciled — 2026-08-09
 
@@ -234,12 +293,12 @@ load-bearing.
 - **HC13.** Headings are justified to the left-hand margin.
 - **HC14.** Subsections are not indented further than their enclosing sections.
 - **HC15.** Paragraph formatting is consistent throughout.
-- **HC16.** Full justification (both edges) is used in preference to ragged right.
+- **HC16.** `[T]` Full justification (both edges) is used in preference to ragged right. *Source: "Justified on both left and right edges, rather than ragged right edge, **is best**." A preference.*
 - **HC17.** If first-line indentation is used, it is used consistently.
 - **HC18.** Bold and underlining are never used together on the same text.
 - **HC19.** Every page is numbered.
 - **HC20.** The title is large, bold and centred.
-- **HC21.** Main chapter headings are large, bold and centred.
+- **HC21.** `[T]` Main chapter headings are large, bold and centred. *Source: "Use a large and bold font for the main chapter headings and the title (centred)." The "(centred)" plausibly attaches to the title alone.*
 - **HC22.** First-level subsection titles are bold.
 - **HC23.** First-level subsection titles are in a font size slightly larger than body text.
 - **HC24.** Lower-level subsection titles are in a smaller font than first-level ones.
@@ -249,10 +308,10 @@ load-bearing.
 - **HC28.** Sections do not start on a new page unless necessary.
 - **HC29.** Subsections are numbered x.1, x.2 …
 - **HC30.** Sub-subsections are numbered x.1.1, x.1.2 …
-- **HC31.** Section nesting is no deeper than three levels.
+- **HC31.** `[T]` Section nesting is no deeper than three levels. *Source: "It is **not advisable** to have a subsection structure deeper than this." Advice, recorded here as a hard constraint.*
 - **HC32.** The report is written in the past tense throughout.
-- **HC33.** Spelling has been checked; there are no spelling errors.
-- **HC34.** Every cross-reference resolves (no broken refs, no "??").
+- **HC33.** `[T]` Spelling has been checked; there are no spelling errors. *Source: "**Check** your spelling and cross references **very carefully**." An instruction to check, not a guarantee of zero errors.*
+- **HC34.** `[T]` Every cross-reference resolves (no broken refs, no "??"). *Same sentence as HC33.*
 
 ## 1.3 Figures and tables
 
@@ -265,8 +324,8 @@ load-bearing.
 - **HC41.** Caption positioning is consistent throughout.
 - **HC42.** Every figure is referred to in the body text.
 - **HC43.** Every table is referred to in the body text.
-- **HC44.** Each figure is positioned close to where it is first referenced.
-- **HC45.** Each table is positioned close to where it is first referenced.
+- **HC44.** `[T]` Each figure is positioned close to where it is first referenced. *Source: "**Try to** position each table or figure close to where it is first referenced." `formatcheck` §3 already treats this as advisory, which is the correct reading.*
+- **HC45.** `[T]` Each table is positioned close to where it is first referenced. *Same sentence as HC44.*
 - **HC46.** References to figures/tables are grammatical ("as shown in Figure 3.1" / "(see Figure 3.1)"), leaving no sentence broken by the reference.
 - **HC47.** Tables are created by the author, not copied from computer/software output.
 - **HC48.** Items labelled as figures are predominantly pictorial or diagrammatic.
@@ -276,22 +335,31 @@ load-bearing.
 
 - **HC50.** A recognised referencing format is used (Harvard or Numbering are the stated examples).
 - **HC51.** The chosen referencing format is applied consistently throughout, with no mixed styles.
-- **HC52.** A bibliography is present.
-- **HC53.** Every method based on someone else's work is referenced.
+- **HC52.** `[I]` A bibliography is present. *Warrant is a band descriptor — "accompanied by relevant figures, tables and a bibliography" — not a stated requirement. Met regardless.*
+- **HC53.** `[W]` Every method based on someone else's work is referenced. *Deck slide 57 only: "If you have based your methods on someone else's work remember to reference them!" Advice under the precedence ruling, and met regardless.*
 
 ## 1.5 Appendices and source code
 
-- **HC54.** The project specification prepared at the start of the project period is included as an appendix.
+- **HC54.** `[h]` The project specification prepared at the start of the project period is included as an appendix. *Source: "The project specification … **should** be included as an appendix." Hedged, but the only such appendix the issued document names at all — treat as binding. **Part 4 formerly called this "MANDATORY"; that word is the derivation's, not the source's.***
 - **HC55.** The Methods chapter contains no source code, except possibly very small portions solving a particularly interesting or difficult problem.
 - **HC56.** Where algorithmic detail is needed in Methods, pseudocode is used in preference to code.
-- **HC57.** Appendices are placed after the References section.
+- **HC57.** `[I]` Appendices are placed after the References section. **NOT A REQUIREMENT.** *The source says only "(references and appendices will follow this)" — it states **no order between them**. HC57 read the order off the parenthetical's word order. The 8C HC57 reordering was work done for an inferred rule; harmless, and not to be redone or defended.*
 - **HC58.** References and appendices both follow the Conclusions chapter.
 
 ## 1.6 Mandatory content
 
-- **HC59.** Any significant difference between the project specification's scope and the project as performed is explained in the Discussion. (Divergence itself is explicitly NOT penalised when accounted for; failing to account for it is.)
-- **HC60.** Ethics approval is included if the project needed it.
-- **HC61.** Ethics considerations are discussed if the project needed them.
+- **HC59.** `[h]` Any significant difference between the project specification's scope and the project as performed is explained in the Discussion. (Divergence itself is explicitly NOT penalised when accounted for; failing to account for it is.) *Source: "An explanation … **should** be given in the Discussion section", plus the exculpation "differences … **will not be seen as a disadvantage** where an account is given of how the project evolved." Genuine; hedged.*
+- ~~**HC60.** Ethics approval is included if the project needed it.~~ **`[W]` STRUCK 2026-08-11, confirmed 2026-08-12. NOT A REQUIREMENT AND NOT A FAILURE.**
+- ~~**HC61.** Ethics considerations are discussed if the project needed them.~~ **`[W]` STRUCK with HC60.**
+
+> **The ethics items, closed.** The issued requirements contain the string *ethic* **zero times**
+> — verified by grep over the whole file. The sole warrant is **deck slide 57**, and it is
+> **conditional**: *"Remember to include ethics approval and considerations **if this was needed
+> for your project**."* Under the precedence ruling at the head of this file, deck-only material
+> is advice. Ruled not compulsory by Phuong 2026-08-11. **No ethics statement is written, none is
+> owed, and this is not to be re-raised.** The 8D audit graded these as *mechanical* failures,
+> which was wrong twice over — wrong that they were required, and wrong that a conditional
+> criterion could ever be judgement-free.
 
 ## 1.7 Submission mechanics
 
@@ -307,6 +375,20 @@ load-bearing.
 - **HC68.** A poster is prepared.
 - **HC69.** The Poster Conference on 11 September 2026 (Infolab; boards from 11:00, conference 12:30–14:30) is attended.
 - **HC70.** The poster is printed in A1 Landscape format — "no other formats will be accepted".
+
+## 1.9a ADDED 2026-08-12 — issued requirements that had NO criterion
+
+Found by the provenance sweep walking the issued document top to bottom. **Under-derivation
+costs marks silently**, so these are recorded even though none is expensive.
+
+- **HC71.** The report has a clear and attractive layout. *Source, unhedged: "**It is important that your report has a clear and attractive layout.**" An assessed presentation property that had no check at all for the life of this project. Partly covered by `formatcheck` §1 by accident. **Currently met** — PASS on the formatting gate, 2 accepted spills.*
+- **HC72.** `[h]` Figures are used in Methods to support the textual communication of methods and procedures. *Source: "**Use figures, as appropriate**, to support your textual communication of methods and procedures used." R69 covers only pseudocode and flow diagrams. **Currently met** — `fig:pipeline`, `fig:blocks`, `fig:origins`.*
+- **HC73.** `[h]` The Methods chapter flows logically. *Source: "**You should ensure that your methods section flows logically.**" R28 is document-level; nothing was Methods-specific.*
+- **HC74.** `[h]` Report length and content were discussed with the supervisor. *Source: "You **should** discuss the length and content of your report with your supervisor." Process item, and the source's own remedy for HC1/HC2 — worth naming so the supervisor conversation is not treated as optional courtesy.*
+- **HC75.** `[h]` The report structure was discussed with the supervisor. *Source, twice: "You should discuss a suitable report structure for your specific project with your supervisor" and "The structure of this chapter(s) should be discussed with your supervisor."*
+
+*(Not carried as a criterion: "printed on A4 **white** paper" — HC11 covers A4 and whiteness is
+immaterial to a PDF submission.)*
 
 ## 1.9 NOT SPECIFIED in these documents — resolve elsewhere
 
@@ -384,8 +466,8 @@ rather than absent.
 - **R27.** Good mathematical understanding is demonstrated.
 - **R28.** The account flows logically — each chapter connects to the next.
 - **R29.** Data collection / sourcing / integration is described.
-- **R30.** Exploratory data analysis is present.
-- **R31.** The exploratory data analysis leads to the formulation of models or hypotheses.
+- **R30.** `[T]` Exploratory data analysis is present. **OPTIONAL AT THE AUTHOR'S ELECTION.** *The issued document makes EDA elective in terms: "if your project is more data analytical in nature, then you **may elect to have** sections describing the data and data source and the exploratory data analyses." Its only other appearance is inside a "**for example**" in the 60–69 band. **The ~300-words-plus-a-figure debt is cancelled.***
+- **R31.** `[T]` The exploratory data analysis leads to the formulation of models or hypotheses. *Same two hedges as R30. Cancelled with it.*
 - **R32.** Models for testing are explicitly formulated.
 - **R33.** Hypotheses for testing are explicitly formulated.
 - **R34.** The experimental setup is defended, not merely described.
@@ -395,6 +477,16 @@ rather than absent.
 - **R38.** The Conclusion demonstrates that the methodology addressed the research question.
 - **R39.** The Conclusion demonstrates that the methodology answered the research question.
 - **R40.** That demonstration is competent, convincing and well-reasoned.
+
+**`[T]` on R29 and R32–R37.** The 60–69 band reads: *"The account should flow logically and be
+largely complete (**for example**, following the data science pipeline, including:
+data-collection/sourcing/integration etc., exploratory data analysis leading to the formulation
+of appropriate models and hypotheses for testing, validating of results (**e.g.** by defending
+the experimental setup and procedures followed; by assessing model fit and predictive
+capacity))."* **Everything inside that bracket is illustrative, under two nested hedges.** The
+unhedged requirement is *"the account should flow logically and be largely complete"*. Do not
+grade the pipeline as a checklist, and do not price a missing stage as a debt. R38–R40 are
+outside the bracket and are EXACT.
 
 ## 2.6 Title and abstract
 
@@ -406,7 +498,14 @@ rather than absent.
 - **R46.** The abstract states the conclusions.
 - **R47.** The abstract's results sentences carry specific statistical detail, not vague claims.
 - **R48.** The abstract stands alone — comprehensible without reading the report.
-- **R49.** The abstract does not act as an introduction ("common mistake!").
+- **R49.** `[W]` The abstract does not act as an introduction ("common mistake!").
+
+**`[T]` on R43–R46, `[W]` on R47–R49.** The issued source hedges the abstract's contents:
+*"The paragraph should have a logical structure, **for example**, the question(s) you
+investigated (or aims), the design/analytical methods used, the major findings … and
+conclusions."* The four elements are an **illustration of a logical structure**, not a required
+set. R47–R49 come from deck slide 25 and the deck's abstract-features table. **The only unhedged
+abstract requirement in the issued document is HC4: one paragraph.**
 
 ## 2.7 Introduction
 
@@ -420,21 +519,30 @@ rather than absent.
 
 ## 2.8 Background / Related Work
 
-- **R57.** The chapter is structured as a systematic review.
+- **R57.** `[h]` The chapter is structured as a systematic review. *Source: "It **should** be structured as a systematic review using a concept-centric structure." Hedged, but genuine and unelaborated — the source never says what a systematic review requires, which is why R65's four sub-parts are `[U]`. **The declared FAIL stands**, and it is a hedged requirement rather than a mechanical one.*
 - **R58.** The chapter uses a concept-centric structure (not chronological or author-by-author).
 - **R59.** The writing is critical — it highlights limitations of existing approaches.
 - **R60.** The chapter details how this work differs from those existing approaches.
 - **R61.** The chapter details how this work overcomes the limitations it identifies.
-- **R62.** The chapter elicits the gap that the method fills.
-- **R63.** The gap elicited is the same gap the method actually fills.
+- **R62.** *(conditional)* The chapter elicits the gap that the method fills. *Source: "**In the latter case**, the Background/Related Work section … should have clearly elicited the gap that your novel method fills." **The condition is contributing NEW methodology**, which this work explicitly disclaims ("No claim of methodological novelty … is available"). Met anyway.*
+- **R63.** `[I]` The gap elicited is the same gap the method actually fills. *Derivation; no source sentence. Sound practice.*
 - **R64.** The literature review narrows via the funnel model — general context, then summarised relevant work, then critically examined directly relevant work. (Recommended, not mandated.)
-- **R65.** A search protocol is stated (databases, query strings, inclusion/exclusion criteria, screened-vs-retained counts).
-- **R66.** Every method that actually ships in the built system is argued for in this chapter.
-- **R67.** Reliance on unrefereed preprints is flagged where load-bearing claims rest on them.
+- **R65.** `[U]` A search protocol is stated (databases, query strings, inclusion/exclusion criteria, screened-vs-retained counts). **NOT A REQUIREMENT — NOT A FAILURE.** *Verified by grep over **both** documents: `protocol` 0/0, `databases` 0/0, `query string` 0/0, `inclusion` 0/0, `exclusion` 0/0, `PRISMA` 0/0; the two `screen` hits in the deck are image alt-text. The four sub-parts are the derivation's own gloss on "systematic review". **The recorded FAIL F5 ("two of four sub-parts unrecoverable") is withdrawn** — there was nothing to recover.*
+- **R66.** `[U]` Every method that actually ships in the built system is argued for in this chapter. **NOT A REQUIREMENT — NOT A FAILURE.** *No sentence in either document requires **every shipped method** to be argued in Background/Related Work. The nearest warrants are **D7** (approach-level, Distinction band, no chapter named) and **R62** (conditional on contributing **novel** methodology, which this work explicitly disclaims). **The ~300-word debt for arguing the Winkler score and the Breiman one-standard-error rule is cancelled.** What survives is D7's approach-level requirement, which is a different and smaller thing.*
+- **R67.** `[U]` Reliance on unrefereed preprints is flagged where load-bearing claims rest on them. *No warrant in either document. Good practice; already done; not owed.*
 
 ## 2.9 Methods
 
-- **R68.** Methods contain sufficient detail for a reader to replicate the work.
+**`[h]` on R68, R79–R82; `[T]` on R69–R76.** The Methods requirements are hedged twice over.
+*"This chapter **should** be sufficiently detailed, (**for example**, with pseudocode diagrams,
+flow diagrams of processes, unambiguous model definitions (**typically** numbered)) so that the
+reader would be able to replicate your work"* — the mechanisms are examples and the numbering is
+"typically". *"This chapter should, **as appropriate**, detail methods of data sourcing, data
+preparation (**e.g.** cleaning, removing outliers, integrating data, engineering of features
+etc.)"* — R72–R76 are an "e.g." list inside an "as appropriate". **The replication standard
+(R68) is the real requirement; the itemisation is not.**
+
+- **R68.** `[h]` Methods contain sufficient detail for a reader to replicate the work. *The one Methods criterion both documents state plainly. **Stands.** For hierarchical reconciliation the gap is **location** rather than absence — `results.tex`:148–152 gives the test, α, node count and 56 held-out observations — so a Methods pointer may discharge it far below the recorded ~350.*
 - **R69.** Pseudocode and/or flow diagrams are provided where algorithms are described.
 - **R70.** Model definitions are unambiguous.
 - **R71.** Model definitions are numbered.
@@ -443,16 +551,16 @@ rather than absent.
 - **R74.** Methods detail outlier removal.
 - **R75.** Methods detail data integration.
 - **R76.** Methods detail feature engineering.
-- **R77.** Methods state the precise software used.
-- **R78.** Methods state the precise libraries and versions used.
+- **R77.** `[T]` Methods state the precise software used. *Source: "(including precise details of the software and libraries used, **if appropriate**)".*
+- **R78.** `[T]` Methods state the precise libraries and versions used. *Same hedge, and **"versions" appears nowhere in either document** — added by the derivation.*
 - **R79.** Methods state how models were applied/fitted.
 - **R80.** Methods state how models were validated.
 - **R81.** Methods reflect on whether noise could have been introduced by the approach.
 - **R82.** Methods reflect on whether bias could have been introduced by the approach (e.g. third-party tool accuracy, inherent data limitations).
-- **R83.** Methods justify why each decision was made.
-- **R84.** Methods justify why the alternatives considered were rejected.
-- **R85.** Methods components are clearly separated (data/source, EDA, theory/notation, models, estimation framework, validation).
-- **R86.** Methods opens with a brief introduction restating purpose, materials background, and the aim/problem.
+- **R83.** `[W]` Methods justify why each decision was made. *Deck slide 56: "Remember to justify your decisions". Advice under the precedence ruling — but see D7, which gives the same idea a real warrant at approach level.*
+- **R84.** `[T]` `[W]` Methods justify why the alternatives considered were rejected. *Deck slide 56: "**We often see** justification of significant choices and the reason for rejecting alternative options given in full" — **an observation of what good dissertations do, not a requirement.** The genuine warrant is **D7**, which is approach-level and names no chapter. **Chapter 3's nine derivations were priced against R83/R84; that pricing was against deck advice.***
+- **R85.** `[T]` Methods components are clearly separated (data/source, EDA, theory/notation, models, estimation framework, validation). *The named split comes from "you **may elect to have** sections describing the data … **This may then be followed by** a theory section…". The unhedged part is "You should try to clearly separate out the different components"; the six-part list is illustrative.*
+- **R86.** `[T]` `[W]` Methods opens with a brief introduction restating purpose, materials background, and the aim/problem. *Deck slide 55: "**It is more reader-friendly to** start with an introduction for your methods section" — a readability preference.*
 
 ## 2.10 Results
 
@@ -465,28 +573,36 @@ rather than absent.
 - **R93.** Results state why those evaluation measures were chosen.
 - **R94.** Results include graphical information.
 - **R95.** Results include tabular information.
-- **R96.** Every figure in Results has a textual summary of the finding it carries.
-- **R97.** Every table in Results has a textual summary of the finding it carries.
+- **R96.** `[T]` Every figure in Results has a textual summary of the finding it carries. **THE QUANTIFIER IS NOT THE SOURCE'S.** *Source: "You should include both graphical and tabular information, **supported by textual summaries of your findings**." The summaries attach to **your findings**, at chapter level — there is no per-figure rule anywhere in either document (`each figure` occurs once, about **captions**). Results is plainly supported by textual summaries of its findings, so **the criterion is met and the recorded FAIL F3 is withdrawn.** `fig:ladder` and `fig:validity-efficiency` having content-style introductions is a **style observation**, worth taking if words are free and not a debt.*
+- **R97.** `[T]` Every table in Results has a textual summary of the finding it carries. *Same sentence, same quantifier problem as R96.*
 - **R98.** The key features of the results are brought out explicitly.
 - **R99.** Suitable statistical methods are applied to compare model performance.
 - **R100.** Suitable statistical methods are applied to contrast the different approaches tried.
-- **R101.** The statistical methods used for comparison are the ones detailed in Methods.
+- **R101.** `[T]` The statistical methods used for comparison are the ones detailed in Methods. *Source: "**Ensure that you apply** suitable statistical methods **(as detailed in the methods section)** to compare model performance and to contrast different approaches." The imperative is R99/R100 — apply suitable methods — and both PASS. The correspondence is a **parenthetical**, which R101 promoted to a standalone **bidirectional completeness** rule the source does not assert. **Discharge by naming each method and pointing at where it is defined, not by writing a Methods specification of the battery.** Four methods are affected, not nine.*
 - **R102.** Results state what the findings imply for the research question(s).
+
+**`[h]` on R87–R95.** Source: *"you **should** begin by explaining the procedures that you
+followed and include **as much details as possible** about what your experimental settings were,
+how many data items you were dealing with, what properties you set for your model and how (**e.g.**
+hyper-parameter tuning), and what evaluation measures you used and why."* R98–R100 and R102 are
+unhedged and EXACT: *"You need to bring out the key features of your results"* and *"**Ensure
+that you apply** suitable statistical methods … to compare model performance and to contrast
+different approaches."*
 
 ## 2.11 Discussion
 
 - **R103.** The Discussion answers what the results reveal in relation to the research question(s).
 - **R104.** The Discussion argues whether the approach is valid, and why.
-- **R105.** The Discussion states the inherent limitations of the work.
-- **R106.** The Discussion states the potential biases in the work.
+- **R105.** *(one bullet, split)* The Discussion states the inherent limitations of the work.
+- **R106.** *(one bullet, split)* The Discussion states the potential biases in the work. *R105 and R106 are **one** source bullet: "Are there inherent limitations, **including potential biases**, in your work?" Defensible split, but two independent FAILs must not be recorded where the source poses one question.*
 - **R107.** The Discussion explains how the underpinning assumptions may have impacted the findings.
-- **R108.** The Discussion explains any significant scope divergence from the project specification. (Also HC59.)
+- **R108.** `[h]` The Discussion explains any significant scope divergence from the project specification. (Also HC59.) *Hedged "should", and the source adds an **exculpation** R108 omits: "differences … **will not be seen as a disadvantage** where an account is given of how the project evolved." Content requirement genuine; the four-domains divergence remains undeclared in §5.5 at ~35 words.*
 
 ## 2.12 Conclusions
 
 - **R109.** The Conclusions revisit the general aim.
 - **R110.** The Conclusions revisit each individual objective.
-- **R111.** The Conclusions state whether each objective was achieved.
+- **R111.** `[T]` The Conclusions state whether each objective was achieved. *Source: "revisit the general aim of your research and each of your objectives, **reflecting on whether you have achieved your general aim, or not**." The achieved/not judgement attaches to the **general aim**; R111 distributed it across every objective. §6.1's opening discharges the source's actual wording.*
 - **R112.** The Conclusions discuss the project as a whole.
 - **R113.** The Conclusions state what would be done differently if the project were repeated.
 - **R114.** The Conclusions state what had to be learned in order to do the project.
@@ -512,9 +628,12 @@ rather than absent.
 - **R131.** Lower-order concerns are clean: word choice and technical style.
 - **R132.** There is no repetitive writing.
 - **R133.** There are no repeated structural or sentence stems.
-- **R134.** Every figure is integrated into the text with an explanation of how it relates to the research aims.
-- **R135.** Every figure is integrated into the text with an explanation of why it relates to the research aims.
-- **R136.** Every figure has a good, informative legend.
+- **R134.** `[T]` `[W]` Every figure is integrated into the text with an explanation of how it relates to the research aims. *Deck slide 62 is **commentary on ONE figure in ONE worked example** — "Integrates figure 4.1 into the text and explains how and why that figure is related to the overall objectives". The "every" is the derivation's.*
+- **R135.** `[T]` `[W]` …an explanation of why it relates to the research aims. *Same slide, same quantifier problem.*
+- **R136.** `[T]` `[W]` Every figure has a good, informative legend. *Deck slide 62, "Has a good figure legend" — same worked example.*
+
+**R120–R133 are `[W]`** — workshop deck and its checklists throughout. Good writing practice,
+followed where free, **not requirements** under the precedence ruling. R117–R119 likewise.
 
 ---
 
@@ -539,7 +658,7 @@ research question should be answered logically and completely."*
 - **D4.** Route (a): conceptual understanding of that methodology is demonstrated.
 - **D5.** Route (a): computational or statistical proficiency in that methodology is demonstrated.
 - **D6.** Route (b): an appropriate in-module methodology is used, with deep understanding of the relationship between the methods used and the subject matter.
-- **D7.** There is an explicit discussion of why the approach taken is better than alternatives that could have been used. *(Named and separable — a dissertation with no stated comparison against rejected alternatives cannot reach this band, whichever route is taken.)*
+- **D7.** There is an explicit discussion of why the approach taken is better than alternatives that could have been used. **EXACT — verbatim from the band descriptor, and the strongest warrant in the whole outstanding set.** *(The former gloss "cannot reach this band" is `[T]`: the guide is holistic and closes with "the balance amongst the above criteria may vary according to the nature of each dissertation topic." Separable and named, yes; disqualifying on its own, not stated.)* **D7 now outranks R66 and R84, which were competing with it on warrants that do not exist.**
 - **D8.** The document demonstrates a high level of insight.
 - **D9.** The document demonstrates a high level of understanding.
 - **D10.** The document demonstrates a high level of clarity.
@@ -573,7 +692,13 @@ Appendix A is explicitly a **"Suggested Report Structure"** — *"the structure
 may vary depending on the specific project type and aims… You should discuss a
 suitable report structure for your specific project with your supervisor."*
 The chapter set is therefore RECOMMENDED; the formatting rules (Part 1) and the
-project-specification appendix (HC54) are MANDATORY.
+project-specification appendix (HC54) are treated as BINDING.
+
+**Wording corrected 2026-08-12.** This line read *"are MANDATORY"*. The source hedges both: the
+formatting rules are *"should be used"* and HC54 is *"**should** be included as an appendix"*.
+They are followed — a marker's presentation judgement is real and the specification appendix is
+the only appendix the issued document names — but **"mandatory" is the derivation's word, not the
+source's**, and it must not be quoted back as though the source said it.
 
 1. **Title** — recommended as a named element, mandatory in practice.
 2. **Abstract** — recommended. One paragraph: aims → design/methods → major findings in context → conclusions. Workshop feature list: background 1–2 sentences, aim 1, method/design 2–3, results 2–4 with specific statistical detail, conclusion 1–2. Order and length may be rearranged to suit the study.

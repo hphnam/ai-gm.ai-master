@@ -727,6 +727,15 @@ argued. The criterion is not about the ladder.
 
 ---
 
+> **PRICES BELOW ARE STALE AS OF 2026-08-12 — read the classification before pricing anything.**
+> `knowledge/00_marking_criteria.md` now carries a provenance tag per criterion, ruled against the
+> issued requirements as the highest authority and the workshop deck as support only. **R66 and
+> R65 are `[U]` (no warrant in either document); R30/R31 are optional in the source's own words;
+> R96's per-figure quantifier is not the source's.** Their rows here are left unedited **as a
+> record of what was decided when**, per *corrections are appended, never overwritten* — but the
+> criteria file owns the classification and this file must not be priced from without reading it.
+> Working with every source sentence quoted: `ledger/criteria_provenance_audit.md`.
+
 # PHASE 8G — THE DE-DUPLICATION HARVEST, AND WHY IT CAME IN AT A THIRD OF FORECAST
 
 **Appended 2026-08-12.** Brief: buy margin, harvest **repetition only**, target 19,700, leave
