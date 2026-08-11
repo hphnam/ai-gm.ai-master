@@ -5870,8 +5870,8 @@
     "semantic_hash": "e6676f720c8d78530a82eec9b51622db"
   },
   "brain/knowledge/00_marking_criteria.md": {
-    "mtime": 1786296822.1375391,
-    "ast_hash": "88d3da4978652e775bf6075fa7e144aa",
+    "mtime": 1786463494.286023,
+    "ast_hash": "b820064984d6e42e4d6e5b52d10eb99b",
     "semantic_hash": ""
   },
   "brain/knowledge/01_autoresearchclaw_reference.md": {
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786451422.847303,
-    "ast_hash": "e83ee899c5e08bdcdf9d561165093a13",
+    "mtime": 1786482758.538399,
+    "ast_hash": "28ced4a74ffab8eda9c6e8a3db0c473a",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786451445.5137198,
-    "ast_hash": "87c755ad5fef851f9b7f0a86500c3d32",
+    "mtime": 1786463521.5092986,
+    "ast_hash": "385c3328a2a3ac2c1833d3b68422448f",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6495,8 +6495,8 @@
     "semantic_hash": ""
   },
   "brain/scripts/latexcheck.py": {
-    "mtime": 1786120538.638201,
-    "ast_hash": "a857f449887a33ea2071fbca49b03da9",
+    "mtime": 1786463379.951231,
+    "ast_hash": "e447dce23fdc030a6625caa44e87c715",
     "semantic_hash": ""
   },
   "brain/scripts/venueordercheck.py": {
@@ -6610,8 +6610,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/reduction_cost_register.md": {
-    "mtime": 1786319061.136073,
-    "ast_hash": "8f2a682876cebf9154f8dbdc203b4d29",
+    "mtime": 1786482546.3975713,
+    "ast_hash": "c757d46380c08342fa5b64707443b224",
     "semantic_hash": ""
   },
   "brain/ledger/supervisor_length_query.md": {
@@ -6647,6 +6647,21 @@
   "brain/ledger/format_accepted.txt": {
     "mtime": 1786456765.239113,
     "ast_hash": "f6f7121efba530056bb513d958aeb313",
+    "semantic_hash": ""
+  },
+  "brain/docs/ethics_form.md": {
+    "mtime": 1781367132.3605752,
+    "ast_hash": "2d9cc24aaaa931c40bdbe354a4af49d0",
+    "semantic_hash": ""
+  },
+  "brain/docs/project_specification.md": {
+    "mtime": 1781366715.4888592,
+    "ast_hash": "58f9f48a5ff9dff1e879d72291a35221",
+    "semantic_hash": ""
+  },
+  "brain/ledger/final_audit.md": {
+    "mtime": 1786482128.6336288,
+    "ast_hash": "0a1264f53b34926b1bf46751e6139ac2",
     "semantic_hash": ""
   }
 }
