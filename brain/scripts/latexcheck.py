@@ -63,6 +63,7 @@ RE_MISSING_CHAR = re.compile(r"Missing character: There is no (.+?) in font (.+?
 RE_PKG_ERROR = re.compile(r"^(?:! )?(Package|Class) (\S+) Error: (.*)")
 RE_LATEX_ERROR = re.compile(r"^! (?:LaTeX|Package|Class)?\s*(.*)")
 RE_PAGES = re.compile(r"Output written on (\S+) \((\d+) pages?, (\d+) bytes\)")
+RE_RESTRICTED = re.compile(r"runsystem\((.*?)\)\.\.\.disabled")
 # Three distinct ways TeX says "there is no PDF". Matching only the first one
 # let a fatal svg/Inkscape failure through as VERDICT: PASS -- see the 2026-08-07
 # note in the module docstring.
@@ -160,6 +161,7 @@ class Report:
         self.pages = None
         self.output = None
         self.no_output = False
+        self.restricted_writes = []           # \write18 calls the run refused
 
     @property
     def has_errors(self):
@@ -168,7 +170,8 @@ class Report:
     @property
     def fatal(self):
         """Exit non-zero conditions: any error class, plus undefined references."""
-        return self.has_errors or bool(self.undefined_refs) or bool(self.undefined_cites)
+        return (self.has_errors or bool(self.undefined_refs)
+                or bool(self.undefined_cites) or bool(self.restricted_writes))
 
 
 def parse_log(log_text):
@@ -243,6 +246,18 @@ def parse_log(log_text):
 
         if RE_NO_OUTPUT.search(line):
             rep.no_output = True
+
+        # A refused \write18 is the "passed for the wrong reason" case, not a
+        # warning. main.tex's \bodywordcount SHELLS OUT to texcount and then
+        # \input's the result; when the run is restricted the shell-out is
+        # skipped silently and \input reads whatever stale main-words.sum
+        # happens to be in the clone. On 2026-08-12 that stale file held 20005 --
+        # an abandoned intermediate from the session before, 5 OVER the hard cap
+        # -- and the build reported PASS while printing it into the declaration.
+        # The log says so plainly and nothing was reading the line.
+        m = RE_RESTRICTED.search(line)
+        if m:
+            rep.restricted_writes.append(m.group(1).strip()[:110])
 
         stack.feed(line)
 
@@ -458,6 +473,10 @@ def print_report(rep, logpath, pdfpath, latexmk_rc=None, git_presence=None):
     print(fmt_table(["char", "font", "count"],
                     [(c, f, n) for (c, f), n in rep.missing_chars.items()]))
 
+    print(f"\n[8] REFUSED \\write18 CALLS ({len(rep.restricted_writes)})")
+    print(fmt_table(["command the run refused to execute"],
+                    [(c,) for c in rep.restricted_writes]))
+
     print("\n" + "-" * 78)
     print(f"  pages       : {rep.pages if rep.pages is not None else 'NO OUTPUT'}")
     print(f"  output      : {pdfpath if pdfpath and Path(pdfpath).exists() else '(not written)'}")
@@ -482,6 +501,9 @@ def print_report(rep, logpath, pdfpath, latexmk_rc=None, git_presence=None):
         verdict.append(f"{len(rep.undefined_cites)} undefined citation(s)")
     if git_errors:
         verdict.append(f"{len(git_errors)} source file(s) not in git")
+    if rep.restricted_writes:
+        verdict.append(f"{len(rep.restricted_writes)} refused \\write18 call(s) "
+                       "-- rerun with --shell-escape")
     print("VERDICT: " + ("FAIL - " + "; ".join(verdict) if verdict else "PASS"))
     return rep
 
@@ -562,8 +584,20 @@ FIXTURE_RUNAWAY_BRACE = r"""
 """
 
 # name -> (source, must_exit_nonzero, expect_no_pdf)
+# A build that succeeds in every visible way while a shell-out it depends on was
+# silently skipped. This is the shape main.tex has: \bodywordcount writes
+# main-words.sum through \write18 and then \input's it, so a restricted run prints
+# whatever stale value is lying in the clone. The fixture therefore expects a PDF.
+FIXTURE_RESTRICTED_WRITE = r"""\documentclass{article}
+\begin{document}
+\immediate\write18{echo 12345 > fixture-words.sum}%
+A page that compiles cleanly while its shell-out was refused.
+\end{document}
+"""
+
 FIXTURE_CASES = [
     ("clean-control",          FIXTURE_CLEAN,           False, False),
+    ("restricted-write18",     FIXTURE_RESTRICTED_WRITE, True, False),
     ("warnings-ref-cite-box",  FIXTURE,                 True,  False),
     ("missing-end-document",   FIXTURE_NO_END,          True,  None),
     ("undefined-control-seq",  FIXTURE_UNDEFINED_CS,    True,  True),
@@ -800,9 +834,14 @@ def main():
         return 1
 
     _, git_scanned, git_errors = git_presence
+    # NOTE: this repeats print_report's verdict logic rather than reading it, and
+    # the duplication has already cost once -- the refused-\write18 term was added
+    # to Report.fatal and to print_report, and this copy went on returning 0 while
+    # the report printed FAIL. Any new failure class goes in all three.
     fatal = (rep.has_errors
              or (not args.allow_undefined and (rep.undefined_refs or rep.undefined_cites))
-             or (git_scanned > 0 and git_errors))
+             or (git_scanned > 0 and git_errors)
+             or rep.restricted_writes)
     return 1 if fatal else 0
 
 

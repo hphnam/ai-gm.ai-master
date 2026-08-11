@@ -724,3 +724,83 @@ weak passage.
 
 **8E's Ruling 3 was right about the baseline ladder and wrong to close R66 on it.** The ladder is
 argued. The criterion is not about the ladder.
+
+---
+
+# PHASE 8G — THE DE-DUPLICATION HARVEST, AND WHY IT CAME IN AT A THIRD OF FORECAST
+
+**Appended 2026-08-12.** Brief: buy margin, harvest **repetition only**, target 19,700, leave
+**≥250 unspent**. Outcome: **19,997 → 19,888, harvest 109, margin 112, nothing funded.**
+
+## The three named sources, checked before they were mined
+
+Per *an enumeration is a measurement with a timestamp*, each was re-derived rather than taken from
+`final_audit.md`. **Two of the three do not exist.**
+
+| Source as named in the brief | What is actually there |
+|---|---|
+| *"§5.3's numbers-audit material duplicated at §6.4"* | **No such duplication.** Section numbering confirmed from `main.toc`: §5.3 is *Validity of the approach*, §6.4 is *Further work*. The numbers-audit passage — 340 claims, 309 exact, four changing a conclusion — occurs **once in the document**, at **§6.5 Closing** (`conclusion.tex:226-240`). Grep over `discussion.tex`, `conclusion.tex` and `results.tex` for `340`/`audited`/`numerical claims`/`recompute` returns that one site. §5.3 cites `numbers_audit.md` in a trace comment for a *different* quantity (the numpy-regime verdict flip), which is what the audit most likely saw |
+| *"the ~250–300 words of cross-chapter redundancy identified in `final_audit.md` §4.6"* | **There is no §4.6.** `final_audit.md` runs §4.0–§4.5 then straight to the tier tables. The funding paragraph is at lines 1021–1028, inside §5, and it **names candidates without enumerating a single passage** — so no 250–300 word figure was ever measured. It is an estimate quoted forward as though it were a count |
+| *"the LOW-block exposition at §4.1–§4.5 that 8D priced but did not exhaust"* | **Already exhausted, and this register says so.** Line 599: *"Row 33's Results exposition was already mined out — 8D took ~900 words from it and what remains in 4.1 to 4.5 is findings, nulls, qualifications and traces."* The audit's "did not exhaust" predates that pass |
+
+**So the entire harvest had to come from §5.1, plus whatever an independent sweep could find.**
+
+## The instrument, because reading for repetition does not work
+
+`scratchpad/dupcheck.py` — repeated 8-grams across the seven counted files, markup and comments
+stripped, printing the size of what it examined and failing closed on an empty scan. Exercised
+against an empty argument list (FAIL) and a planted repeat (found) **before** it was used, per the
+assertion rule. **22,788 words, 60 repeated spans.** It is orientation only: every span it proposed
+was read in both copies before anything was cut, which is what the brief required anyway.
+
+Triage of the 60: caption short-titles repeating their own long form (**required** — the List of
+Figures needs them); the five research questions in §1.3 against their restatements in §5.1
+(**refused**, below); claims stated three times because three chapters' criteria each demand them;
+and **five genuine removals**, taken.
+
+## What was taken — 109 words
+
+| # | Span | Survivor, and why it is the survivor | Words |
+|---|---|---|---|
+| 1 | §5.1 RQ1, the six-origins/273-origins pair | **§6.2.** Carries both numbers *and* §5.1's interpretation. Decisive: this register (line 606) cut the Introduction's contributions to a naming list **on the basis that** §6.2 states each *with its measurement* — removing them there would strand a trade already made | ~24 |
+| 2 | §5.1 RQ2, *"19 of them with a positive mean residual"* | **`results.tex:154-157`**, which carries it with the reason the direction was predicted | ~7 |
+| 3 | §5.1 RQ4, *"Ellel covers 0.692 … Beer Hall's shortfall … calendar-closed pairs"* | **`conclusion.tex:137-140`**, a strict superset — same numbers plus *"the largest miscalibration in the study"*. Checked that the next sentence's *"the decomposition"* keeps its antecedent | ~20 |
+| 4 | §5.5, the transfer test's mechanism | **§5.4**, R105's site, 95 lines earlier, where *"which would recur"* is what makes it a property of the problem. §5.5 keeps its own claim, that this is not a provisioning failure | ~13 |
+| 5 | §2.x, Chapter 2's **third** statement of the unmeasured limb | **`introduction.tex:111-113`**, R7's site, verbatim. Chapter 2 still states the graded form twice — `:303` and the `fig:gap-map` caption — so the strong form repaired on 2026-08-11 does not return by this removal | ~46 |
+
+**Side effect, verified rather than assumed:** `venueordercheck` goes **4 findings → 3**. Running it
+against a worktree at the parent commit confirms `discussion.tex:30`'s two-orders-in-one-paragraph
+collision existed before and went with removal 1.
+
+## What was refused, which is the substance of the pass
+
+| Candidate | Why not |
+|---|---|
+| *"the forecasts remain exactly coherent"* (§5.1 RQ2) | Reads as spare and is not. Without it the negative claim widens from *"optimality cannot be claimed"* to *"coherence broke"*. **A qualification wearing repetition's clothes** — priced at ~8 words and refused |
+| §5.1 RQ3's marginal weather detection; RQ5's cost-ratio clause | Both are **nulls carrying their own bounding qualifiers**. *Compression removes negative results first*, so these are exactly where a length pass must not go |
+| The five question restatements in §5.1 (~137 words, verbatim overlap with §1.3) | Genuine repetition, ~57 words recoverable. **Refused on judgement:** R103 asks the Discussion to make the relation to each question visible, and a terse tag reads worse for no criterion's benefit |
+| §6.2's measurements generally | `00_marking_criteria.md` §1.1: *"Chapter 6 is the wrong place to look for savings"* — eight location-bound criteria, R109–R116 |
+| Results' restatements of Methods rules (`results.tex:215-217`, `:290-291`) | ~40 words available. Refused: each is the rule stated **at the point of its application**, next to the number it produced, and one is the explanation of the Beer Hall anomaly |
+
+## The ruled §5.1 target of ~500 is not reachable by de-duplication, and that is a finding
+
+`00_marking_criteria.md` §1.1 approves **§5.1 from 1,060 to ~500**. It is now **598**. Closing the
+last ~98 requires cutting answers, controls, nulls or qualifiers — not repetition.
+
+Per *a cut approved on a description of the material is approved on the description*: the ~500
+figure was set when §5.1 was 1,060 and thick with restatement. **Re-read against the material as it
+now stands, the description no longer holds.** The remaining 598 is five answers, one control (the
+exogenous forecaster under-covering identically), the independent scale-drift leg, and the
+qualifiers bounding two nulls. **Reaching ~500 is a ruling about content, not a compression.**
+
+## Why nothing was funded
+
+Final **19,888**, margin **112**, reserve required **≥250**. Funding even the cheapest item — R108
+at ~35 — lands the reserve at 77. R101 (~80–120), R96 (~50) and R108 (~35) therefore **stay
+unfunded**, and the register above still prices them. Per the brief: *"A document at 19,900 with
+three criteria thin is a better position than one at 19,700 with a finding missing."*
+
+**The reserve is 138 words short and cannot be closed from repetition.** Closing it needs a ruling:
+either cut a finding or a qualifier, or relocate a body passage to an appendix — which buys cap
+words, appendices being outside the counted population, at a cost to the marker's view that `D2`
+still records as unconfirmed.

@@ -1031,6 +1031,32 @@ unconfirmed.
 outright FAILs among them; D7 is the Distinction-band item. That is a decision for Phuong,
 and this audit does not take it.
 
+**CORRECTION, 2026-08-12, appended rather than applied silently.** The paragraph above was used
+as the plan for a de-duplication pass, and **two of its three funding candidates do not exist**.
+
+- ~~*"§5.3's numbers-audit material already duplicated at §6.4"*~~ — **there is no such
+  duplication.** Section numbering from `main.toc`: §5.3 is *Validity of the approach*, §6.4 is
+  *Further work*. The numbers-audit passage occurs **once in the document**, at §6.5 *Closing*
+  (`conclusion.tex:226-240`). What §5.3 has is a *trace comment* citing `numbers_audit.md` for a
+  different quantity — the numpy-regime verdict flip — which is most likely what was seen.
+- ~~*"the LOW-block exposition at §4.1–§4.5 that 8D priced but did not exhaust"*~~ — **exhausted
+  before this audit was written.** `reduction_cost_register.md:599` records 8D taking ~900 words
+  and states that what remains is *"findings, nulls, qualifications and traces"*.
+- The third candidate, §5.1's restatements, is **real** and yielded ~64 of the 109 words the pass
+  found. §5.1 is now 598 against the ruled ~500, and the remainder is not repetition.
+
+**Two general faults, both already named in `PRJ93_RULES.md`.** First, the estimate *"~250–300
+words of cross-chapter redundancy"* was quoted forward as though it were a count; **no passage
+was ever enumerated**, which is why it could not be reconciled against the document. Second, the
+brief that consumed this paragraph cited it as **§4.6** — *there is no §4.6 in this file*; it runs
+§4.0–§4.5 and then the tier tables. A section number invented in transit is the *name degrades
+where a path does not* failure, one file further on.
+
+**The one it got right, and the one it got wrong, have the same cause.** An audit that names a
+candidate without quoting it cannot be checked, so a real candidate and an imagined one are
+indistinguishable to the next reader. Every row in the 8G harvest quotes both copies for exactly
+this reason.
+
 ---
 
 # 6 · WHAT THIS AUDIT DID NOT COVER

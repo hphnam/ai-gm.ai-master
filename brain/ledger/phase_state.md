@@ -4991,3 +4991,63 @@ directory rather than the root's; fixed, then zero false positives over 30 targe
 cause was **stale latexmk state in the output directory**, not the document. The scratchpad stub
 is never committed and had been cleaned mid-session — the same class as the stale
 `main-words.sum`, and the reason the tier-2 invocation is recorded rather than remembered.
+
+---
+
+## PHASE 8G — DE-DUPLICATION HARVEST + THE RESTRICTED-\write18 GUARD (2026-08-12)
+
+**Brief:** buy margin from repetition only; target 19,700; leave ≥250 unspent; then fund R101, R96,
+R108 in that order. **Outcome: 19,997 → 19,888 (harvest 109), margin 112, nothing funded.**
+
+### Completed
+
+- **Push verified on the remote before starting.** `git ls-remote origin main` = `8530186` =
+  local HEAD. The four commits from 8F had landed.
+- **De-duplication harvest, `prj93-overleaf` `f34a486`.** Five removals across `discussion.tex`
+  (four) and `literature_review.tex` (one), each with both copies quoted, the survivor named, and
+  the survivor checked for every qualifier the removed copy held. Four candidates refused, three of
+  them because they were qualifications or nulls rather than repetition. Full record with the
+  per-item word costs: `ledger/reduction_cost_register.md` **§ PHASE 8G**.
+- **`brain/scripts/latexcheck.py` — new section [8], refused `\write18` calls.** Fails the run when
+  the log carries `runsystem(...)...disabled (restricted)`. Self-test fixture `restricted-write18`
+  added; it **builds a PDF** and still exits 1, which is the point.
+
+### The defect that prompted the guard
+
+The first compile of this session reported **VERDICT: PASS, 147 pages** and the declaration read
+**20005** — five over the hard cap. `--shell-escape` had not been passed, so `\bodywordcount`'s
+shell-out never ran and `\input{main-words.sum}` read a **stale file in the working clone**. That
+file was last written at 22:06 the previous session, during the abandoned R109 placement that
+measured 20,005 before being tightened. It had sat in the clone ever since.
+
+`PRJ93_RULES.md` already documents this trap in prose. **Prose did not stop it**; the flag was
+simply omitted. The log said `disabled (restricted)` on line 1392 and nothing was reading the line.
+
+**A second defect surfaced while fixing the first, and it is the more general one.** The new failure
+class was added to `Report.fatal` and to `print_report`'s verdict — and the run still **exited 0
+while printing FAIL**, because `main()` recomputes the verdict in a third place. One fact, three
+stores. A comment at `main()`'s copy now says so.
+
+### Verified end state
+
+| Check | Result |
+|---|---|
+| Fresh clone of `f34a486`, `main-words.sum` absent and **0 untracked files** confirmed first | **PASS**, 147 pp, TeX Live 2026 locally |
+| `\write18` against independent `texcount` | **19888 = 19888** |
+| `latexcheck` §[0] git presence | 29 targets, 28 tracked, 1 declared-ignored, **0 failing** |
+| `latexcheck` §[8] refused `\write18` | **0** |
+| Guard exercised against the violation | stale `main-words.sum` + no `--shell-escape` → **exit 1** on a 147-page clean build; with `--shell-escape` → exit 0. Full self-test: 7 broken builds, 2 git-absent targets, 4 clean controls, all as expected |
+| `completenesscheck` | **PASS** over 28 files |
+| `figurecheck` | **PASS** over **28** sources (whole tree; a `figures chapters appendix` scan reads only 20 — narrower, and not to be reported as a pass) |
+| `venueordercheck` | 28 files, **3 findings, down from 4** at the parent commit — `discussion.tex:30` cleared by harvest item 1, confirmed against a worktree at HEAD |
+| `formatcheck` §1 | **PASS**, 128 of 147 pages, 2566 justified lines, 2 accepted spills |
+| Line-ending hyphens vs `pre-reduction-full-run` | **0 and 0** over 28 tracked `.tex` files |
+
+### Unstarted / not done
+
+- **The push.** `prj93-overleaf` is at `f34a486`, **one commit ahead** of `origin/main`
+  (`8530186`). Handed to Phuong per the brief.
+- **R101 (~80–120), R96 (~50), R108 (~35) remain unfunded** — the harvest does not reach the
+  reserve, let alone past it. R68, R66, D7 and EDA stay knowingly thin.
+- **The ≥250 reserve is 138 words short** and cannot be closed from repetition. Closing it is a
+  ruling: cut a finding or a qualifier, or relocate body text to an appendix.
