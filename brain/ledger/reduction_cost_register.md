@@ -642,3 +642,85 @@ names in a paragraph to consider a triple anchored, and this paragraph names one
 is under discussion. **Recorded as a tool boundary, not repaired**, because the remedy it proposes
 (name the venues inline) would put venues into a passage that is not about three venues. The
 finding to carry forward is that a checker's clean history meant clean *over chapters only*.
+
+---
+
+# PHASE 8F — WHAT THE MARGIN COULD NOT BUY
+
+**Appended 2026-08-11.** Ruled by Phuong: *"take in this order and stop when the margin runs
+out."* It ran out. This section is the stated trade, so that every item below is a decision on
+the record rather than something nobody looked at.
+
+**Where the count went.** 19,961 at the start of 8F; 19,997 at the end; the cap is 20,000 and the
+margin is **3**. In between: +5 for the `active span` repair, +12 for the Tier 0 contradictions,
+−5 returned by withdrawing two false appendix promises, −1 by promoting the split-conformal
+half-width to a numbered equation, −31 from four phrases carrying no claim, and +58 for R109.
+
+## What was bought
+
+| Item | Words | Why it went first |
+|---|---|---|
+| **R109** | +58 net | The only criterion that was **undischarged** rather than thin. Chapter 6 answered the three deliverables and never the aim |
+| Tier 0 contradictions | +12 | Correctness, not compliance. A document that contradicts itself loses more than a criterion is worth |
+| Two false appendix promises | **−5** | Withdrawals pay for themselves |
+
+## What was not bought, with the price of each
+
+**These are priced at one retained sentence per criterion the passage must discharge**, which is
+the correction the register already records: three items priced by reading ONE criterion each came
+in between a fifth and a third of price.
+
+| Criterion | State | Cost to discharge | Ruling |
+|---|---|---|---|
+| **R101** | **FAIL** | **~80–120** | **Take first if any margin appears.** Not funded |
+| **R68** | **THIN** — hierarchical reconciliation has no Methods section and RQ2 turns on it | ~350 | Not funded |
+| **R66** | **KNOWINGLY THIN** | ~300 | **Phuong's explicit ruling: not funded, recorded as a stated trade** |
+| **D7** | Five of six divergences *"stated without further argument"* — the document's own words | ~150–200 | Not funded |
+| **R30/R31** | No exploratory data analysis; **no figure shows the raw demand series** | ~300 + a figure | Not funded |
+| **R96** | `fig:ladder` and `fig:validity-efficiency` carry no finding sentence | ~50 | Not funded |
+| **R108** | The four-domains divergence is declared in Methods, not §5.5 | ~35 | Not funded |
+| Tier 2 | The dropped strong null with its failed pre-registered prediction; R102; R36 | ~100 | Not funded |
+
+### R101 was priced wrong, and the error is the one this project keeps making
+
+**The 8D audit reported *"nine statistical methods used in Results and absent from Methods"*. The
+true number is FOUR**, and the other five were **grep artefacts**:
+
+| Claimed absent | Actually | Why the grep missed it |
+|---|---|---|
+| moving-block bootstrap | **present**, `methodology.tex:331` | Methods writes *"moving block bootstrap"* **unhyphenated**; the needle carried the hyphen |
+| model confidence set | **present**, `sec:mcs` at `methodology.tex:325-345`, a full section | The exact phrase is rarer in Methods than the thing itself |
+| Winkler score | present, 2 sites | — |
+| Harvey–Leybourne–Newbold | present | — |
+| Syntetos–Boylan–Croston | present | — |
+
+**The four that are genuinely absent from Methodology and used in Results:** `VUS-PR` (5 uses —
+the headline detector measure for RQ5), `Clopper–Pearson`/exact binomial (2 — the interval on
+every coverage figure in the document), the rank-uniformity statistic (1 — *"the instrument this
+work adds"*), and adaptive conformal/AgACI (2).
+
+**This is `a claim of absence names what was searched` at needle level rather than at scope
+level.** The recorded form of that rule is about *which files* were searched. This failure is
+about *which string*: the search was exhaustive over the corpus and narrow over the spelling, and
+a hyphen was enough to manufacture an absence. **A negative from a grep is evidence about the
+needle until the variants have been tried** — and the register already carries the sibling case,
+where three protected needles reported ABSENT and all three were the needle.
+
+**Consequence for the ruling.** R101 is roughly a third of what 8D priced it at, which does not
+change that it is unaffordable at a margin of 3, but does change its rank: at ~80–120 words it is
+the cheapest of the unfunded items per criterion discharged, and it remains first in line.
+
+### R66 — recorded as knowingly thin, per Phuong's ruling
+
+R66 quantifies over **every shipped method**, and enumerating them rather than reading the chapter
+finds two decision instruments argued nowhere in Chapter 2: the **Winkler score**, which selects
+among interval methods, and the **Breiman one-standard-error rule**, which sets the adoption
+margin. Both are used to decide something and neither is defended against an alternative.
+
+**Cost to discharge: ~300 words** — roughly 150 each, since each needs the alternative it was
+chosen over, not merely a definition. **Not funded, knowingly.** The trade is that R109 was
+undischarged while R66 is thin, and a criterion with no discharging passage outranks one with a
+weak passage.
+
+**8E's Ruling 3 was right about the baseline ladder and wrong to close R66 on it.** The ladder is
+argued. The criterion is not about the ladder.
