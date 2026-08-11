@@ -77,9 +77,11 @@ rounded. Every digit in Tables 3.2, A.2 and D.2 is the digit that was there befo
 
 ### Verified by rendering, not by the absence of a warning
 
-`scratchpad/marginspill.py` measures **where ink actually landed** on every page,
-which is a different question from what TeX warned about, and the two disagree in
-both directions.
+Measured **where ink actually landed** on every page, which is a different question
+from what TeX warned about, and the two disagree in both directions. *(Run at the time
+with a scratchpad script; that measurement is now section 1 of the committed
+`brain/scripts/formatcheck.py` — see "Made repeatable" at the foot of this file. Do not
+go looking for the scratchpad version.)*
 
 ```
                     before            after

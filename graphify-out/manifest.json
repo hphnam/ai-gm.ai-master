@@ -5835,8 +5835,8 @@
     "semantic_hash": "c32468f4563f5a76ab63ac2edc15896a"
   },
   "brain/PRJ93_RULES.md": {
-    "mtime": 1786311617.2735806,
-    "ast_hash": "0c503b1fb520e9e0354f27d837f364e0",
+    "mtime": 1786456863.7750442,
+    "ast_hash": "e878046895c8ca3ed22e8311f4da95a3",
     "semantic_hash": ""
   },
   "brain/docs/DataSciDissWriting June2026final.md": {
@@ -6635,8 +6635,18 @@
     "semantic_hash": ""
   },
   "brain/ledger/formatting_pass_2026-08-11.md": {
-    "mtime": 1786451404.8677769,
-    "ast_hash": "3003806fd3195dfed524774aeb853163",
+    "mtime": 1786456955.2453566,
+    "ast_hash": "a5aa056d1a375be46317d11a27023a1a",
+    "semantic_hash": ""
+  },
+  "brain/scripts/formatcheck.py": {
+    "mtime": 1786456887.8044782,
+    "ast_hash": "5d7b67cd0d61f451c813effb18aef1aa",
+    "semantic_hash": ""
+  },
+  "brain/ledger/format_accepted.txt": {
+    "mtime": 1786456765.239113,
+    "ast_hash": "f6f7121efba530056bb513d958aeb313",
     "semantic_hash": ""
   }
 }

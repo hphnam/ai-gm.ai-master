@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786377956.2261412,
-    "ast_hash": "3566ee39cf487fddf4dbaa62908653cb",
+    "mtime": 1786451422.847303,
+    "ast_hash": "e83ee899c5e08bdcdf9d561165093a13",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786377964.6726098,
-    "ast_hash": "30810f180d062fd6a40f98ec3f735f56",
+    "mtime": 1786451445.5137198,
+    "ast_hash": "87c755ad5fef851f9b7f0a86500c3d32",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6375,8 +6375,8 @@
     "semantic_hash": ""
   },
   "figures/fig_blocks.py": {
-    "mtime": 1786118554.713538,
-    "ast_hash": "b27594254c093c9d3573aa135448f040",
+    "mtime": 1786397424.6382923,
+    "ast_hash": "8e7cdb893c1515a4276a925a13f4cadc",
     "semantic_hash": ""
   },
   "figures/fig_drift.py": {
@@ -6430,8 +6430,8 @@
     "semantic_hash": ""
   },
   "figures/fig_appendix_tikz.py": {
-    "mtime": 1786118603.7934377,
-    "ast_hash": "ce2768d51342a17604c6c1855c88c5e4",
+    "mtime": 1786397464.6503193,
+    "ast_hash": "b7a2cec6a3e76b0f4e0540e2f7bab9be",
     "semantic_hash": ""
   },
   "brain/ledger/main_preamble_diff.md": {
@@ -6632,6 +6632,11 @@
   "brain/docs/Status_report.pdf": {
     "mtime": 1786360142.9071317,
     "ast_hash": "c7e5755ce2665232bee4939b1a80e76b",
+    "semantic_hash": ""
+  },
+  "brain/ledger/formatting_pass_2026-08-11.md": {
+    "mtime": 1786451404.8677769,
+    "ast_hash": "3003806fd3195dfed524774aeb853163",
     "semantic_hash": ""
   }
 }
