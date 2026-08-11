@@ -22,6 +22,10 @@ citation key and a deliberate overfull hbox, and asserts all three are caught.
 NOTE: TeX wraps log lines at 79 columns by default, which splits label names
 across lines and silently truncates any parse of them. We set max_print_line
 high for every run. A parser that does not do this under-reports.
+
+It also runs a static scan BEFORE the build asserting that every ``\\input``,
+``\\include`` and ``\\addbibresource`` target is IN GIT, not merely on disk --
+see ``scan_git_presence``.
 """
 
 import argparse
@@ -282,10 +286,142 @@ def fmt_table(headers, rows):
     return "\n".join(out)
 
 
-def print_report(rep, logpath, pdfpath, latexmk_rc=None):
+# --- Source files that are on disk but not in git -----------------------------
+#
+# WHY THIS EXISTS. On 2026-08-11 origin/main carried
+# `\addbibresource{ref_additions.bib}` for a file an Overleaf-side commit had
+# deleted from the tree. Every pre-flight passed, because the deleted file was
+# still sitting in the working clone -- so biber read it, every citation
+# resolved, and the check reported a document that a fresh checkout could not
+# build. That is the stale `main-words.sum` failure exactly: a build that passes
+# because of working-directory state rather than committed state.
+#
+# The build cannot catch this by construction. TeX resolves against the
+# filesystem and git is not the filesystem, so the ONLY moment the two can be
+# compared is before the compiler runs.
+#
+# Three outcomes, and the middle one is the point:
+#   TRACKED  - in the index. Fine.
+#   IGNORED  - matched by .gitignore. Fine, and REPORTED, because an untracked
+#              target has to be a DECLARED absence rather than a silent one.
+#              `main-words.sum` is the legitimate case: a build artefact written
+#              by \write18 on every compile. This is the same device as
+#              completenesscheck's `% CARRIER:` opt-out.
+#   UNTRACKED- on disk, in no index, matched by no ignore rule. FAILS. Nobody
+#              can tell an in-progress file from one git has silently lost.
+#   MISSING  - not on disk at all. FAILS.
+RE_TEX_INPUT = re.compile(
+    r"\\(input|include|addbibresource)\s*\{([^}]*)\}"
+)
+# A comment kills the rest of the line, but an ESCAPED percent does not. `%.*`
+# gets this wrong and has already cost this project a wrong word count.
+RE_TEX_COMMENT = re.compile(r"(?<!\\)%.*$")
+
+
+def _git(repo, *args):
+    proc = subprocess.run(["git", "-C", str(repo), *args],
+                          capture_output=True, text=True)
+    return proc.returncode, proc.stdout.strip()
+
+
+def _resolve_target(raw, base, kind):
+    """LaTeX's own resolution rules.
+
+    `base` is the ROOT document's directory, not the including file's. TeX
+    resolves \\input against the working directory it was launched in, so
+    `figures/x` inside `chapters/methodology.tex` means `figures/x` from the
+    root -- NOT `chapters/figures/x`. Resolving against the including file
+    invented ten missing files on the first run of this check against the real
+    document, which is the "a guard that cries wolf gets switched off" case.
+    """
+    p = (base / raw)
+    if kind == "addbibresource":
+        return p
+    return p if p.suffix else p.with_suffix(".tex")
+
+
+def scan_git_presence(texfile):
+    """Walk \\input from the root and classify every target against the index.
+
+    Returns (rows, scanned, errors). `rows` is every target found; `errors` is
+    the subset that fails. Follows \\input recursively so a target named three
+    files deep is checked too.
+    """
+    root = Path(texfile).resolve()
+    repo_dir = root.parent
+    rc, toplevel = _git(repo_dir, "rev-parse", "--show-toplevel")
+    if rc != 0:
+        return [], 0, ["not a git work tree - presence check SKIPPED, not passed"]
+    repo = Path(toplevel)
+
+    rc, tracked_out = _git(repo, "ls-files")
+    tracked = {(repo / line).resolve() for line in tracked_out.splitlines() if line}
+
+    rows, seen, queue = [], {root}, [root]
+    while queue:
+        current = queue.pop(0)
+        try:
+            text = current.read_text(errors="replace")
+        except OSError:
+            continue
+        for line in text.splitlines():
+            line = RE_TEX_COMMENT.sub("", line)
+            for kind, raw in RE_TEX_INPUT.findall(line):
+                raw = raw.strip()
+                if not raw:
+                    continue
+                target = _resolve_target(raw, root.parent, kind)
+                resolved = target.resolve()
+                # Ignore-status is checked FIRST and on the PATH, because a
+                # declared build artefact is legitimately absent before the
+                # build that writes it -- `main-words.sum` is written by
+                # \write18 during the very run this scan precedes.
+                if _git(repo, "check-ignore", "-q", str(target))[0] == 0:
+                    status = "IGNORED"
+                elif resolved in tracked:
+                    status = "TRACKED"
+                elif not target.exists():
+                    status = "MISSING"
+                else:
+                    status = "UNTRACKED"
+                rows.append((status, kind, str(target.relative_to(repo))
+                             if repo in target.parents else str(target),
+                             current.name))
+                if status != "MISSING" and kind in ("input", "include") \
+                        and resolved not in seen:
+                    seen.add(resolved)
+                    queue.append(target)
+
+    errors = [r for r in rows if r[0] in ("MISSING", "UNTRACKED")]
+    return rows, len(rows), errors
+
+
+def print_git_presence(rows, scanned, errors):
+    print("\n[0] SOURCE FILES vs GIT")
+    if scanned == 0 and errors:
+        # A check that examined nothing must not be able to report clean.
+        print("  " + errors[0])
+        return
+    shown = [r for r in rows if r[0] != "TRACKED"]
+    print(fmt_table(["status", "directive", "target", "named in"], shown)
+          if shown else "  (all targets tracked)")
+    print(f"  scanned {scanned} target(s); "
+          f"{sum(1 for r in rows if r[0]=='TRACKED')} tracked, "
+          f"{sum(1 for r in rows if r[0]=='IGNORED')} declared-ignored, "
+          f"{len(errors)} failing")
+
+
+def print_report(rep, logpath, pdfpath, latexmk_rc=None, git_presence=None):
     print("=" * 78)
     print("LATEXCHECK REPORT")
     print("=" * 78)
+
+    git_errors = []
+    if git_presence is not None:
+        rows, scanned, git_errors = git_presence
+        print_git_presence(rows, scanned, git_errors)
+        if scanned == 0 and git_errors:   # skipped, not failed
+            git_errors = []
 
     print("\n[1] ERRORS (package / class / TeX)")
     print(fmt_table(["kind", "file", "detail"],
@@ -344,6 +480,8 @@ def print_report(rep, logpath, pdfpath, latexmk_rc=None):
         verdict.append(f"{len(rep.undefined_refs)} undefined reference(s)")
     if rep.undefined_cites:
         verdict.append(f"{len(rep.undefined_cites)} undefined citation(s)")
+    if git_errors:
+        verdict.append(f"{len(git_errors)} source file(s) not in git")
     print("VERDICT: " + ("FAIL - " + "; ".join(verdict) if verdict else "PASS"))
     return rep
 
@@ -435,6 +573,96 @@ FIXTURE_CASES = [
 ]
 
 
+# name -> (helper on disk?, helper tracked?, gitignored?, declare a missing bib?,
+#          want non-zero exit)
+GIT_PRESENCE_CASES = [
+    # The 2026-08-11 defect itself: on disk, in no index, matched by no ignore
+    # rule. The build is green and a fresh checkout cannot reproduce it.
+    ("untracked-input",    True,  False, False, False, True),
+    # The bib resource declared for a file the tree does not carry at all.
+    ("missing-bibresource", True, True,  False, True,  True),
+    # Control 1: everything tracked. Distinguishes a working guard from one that
+    # fails on everything.
+    ("all-tracked",        True,  True,  False, False, False),
+    # Control 2: untracked BUT declared in .gitignore -- `main-words.sum`, which
+    # is written by \write18 on every compile and must stay untracked. A guard
+    # that failed this would be switched off within a week.
+    ("declared-ignored",   True,  False, True,  False, False),
+]
+
+
+def git_presence_self_test():
+    """Both directions, in a real git repo, per the assertion rule."""
+    tmp = Path(tempfile.mkdtemp(prefix="latexcheck-gitfixture-"))
+    rows, failures = [], []
+
+    for name, on_disk, track, ignore, missing_bib, want_nonzero in GIT_PRESENCE_CASES:
+        repo = tmp / name
+        repo.mkdir(parents=True)
+        subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.email", "t@t"], check=True)
+        subprocess.run(["git", "-C", str(repo), "config", "user.name", "t"], check=True)
+
+        bib = "\\addbibresource{gone.bib}" if missing_bib else ""
+        (repo / "main.tex").write_text(
+            "\\documentclass[12pt,a4paper]{article}\n"
+            f"{bib}\n"
+            "\\begin{document}\n\\input{helper}\n\\end{document}\n"
+        )
+        if on_disk:
+            (repo / "helper.tex").write_text("Helper text.\n")
+        if ignore:
+            (repo / ".gitignore").write_text("helper.tex\n")
+
+        subprocess.run(["git", "-C", str(repo), "add", "main.tex"], check=True)
+        if ignore:
+            subprocess.run(["git", "-C", str(repo), "add", ".gitignore"], check=True)
+        if track:
+            subprocess.run(["git", "-C", str(repo), "add", "helper.tex"], check=True)
+        subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", "f"], check=True)
+
+        outdir = repo / "out"
+        outdir.mkdir()
+        proc = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve()), str(repo / "main.tex"),
+             "--outdir", str(outdir), "--allow-undefined"],
+            capture_output=True, text=True,
+        )
+        verdict_line = next(
+            (l for l in proc.stdout.splitlines() if l.startswith("VERDICT:")),
+            "(no VERDICT line)",
+        )
+        ok = (proc.returncode != 0) if want_nonzero else (proc.returncode == 0)
+        if not ok:
+            failures.append(f"{name}: expected "
+                            f"{'non-zero' if want_nonzero else 'zero'} exit, "
+                            f"got {proc.returncode}")
+        if want_nonzero and "PASS" in verdict_line:
+            failures.append(f"{name}: reported PASS over a target that is not in git")
+            ok = False
+        # The scan must say what it covered. A verdict over an unstated scope is
+        # the empty-scan failure wearing a clean result.
+        if "scanned " not in proc.stdout:
+            failures.append(f"{name}: no scanned-count line - scope unstated")
+            ok = False
+
+        rows.append((name, proc.returncode,
+                     verdict_line.replace("VERDICT: ", "")[:46],
+                     "PASS" if ok else "FAIL"))
+
+    print("\n" + "=" * 78)
+    print("GIT-PRESENCE SELF-TEST")
+    print("=" * 78)
+    print(fmt_table(["case", "exit", "verdict", "result"], rows))
+    if failures:
+        print("\nGIT-PRESENCE SELF-TEST FAILED:")
+        for f in failures:
+            print("  - " + f)
+        return 1, failures
+    shutil.rmtree(tmp, ignore_errors=True)
+    return 0, []
+
+
 def self_test():
     """Feed the guard the violations it exists to catch and watch it raise.
 
@@ -499,15 +727,20 @@ def self_test():
     print("=" * 78)
     print(fmt_table(["case", "exit", "pdf", "verdict", "result"], rows))
 
+    git_rc, git_failures = git_presence_self_test()
+    failures.extend(git_failures)
+
     if failures:
         print("\nSELF-TEST FAILED:")
         for f in failures:
             print("  - " + f)
         return 1
     print("\nSELF-TEST PASSED - the guard has been seen to fail on purpose on "
-          f"{sum(1 for c in FIXTURE_CASES if c[2])} broken builds, and to pass a clean one.")
+          f"{sum(1 for c in FIXTURE_CASES if c[2])} broken builds and "
+          f"{sum(1 for c in GIT_PRESENCE_CASES if c[5])} git-absent targets, "
+          "and to pass a clean build, a tracked tree and a declared-ignored file.")
     shutil.rmtree(tmp, ignore_errors=True)
-    return 0
+    return git_rc
 
 
 def main():
@@ -536,18 +769,24 @@ def main():
     outdir = Path(args.outdir).resolve() if args.outdir else tex.parent / "build"
     outdir.mkdir(parents=True, exist_ok=True)
 
+    # Before the compiler runs: TeX resolves against the filesystem, so this is
+    # the only moment the filesystem and the index can be compared.
+    git_presence = scan_git_presence(tex)
+
     proc = run_latexmk(tex, outdir, shell_escape=args.shell_escape)
     logpath = outdir / (tex.stem + ".log")
     pdfpath = outdir / (tex.stem + ".pdf")
 
     if not logpath.exists():
         print("BUILD PRODUCED NO LOG - latexmk itself failed:")
+        print_git_presence(*git_presence)
         print(proc.stdout[-4000:])
         print(proc.stderr[-3000:])
         return 2
 
     rep = parse_log(logpath.read_text(errors="replace"))
-    print_report(rep, logpath, pdfpath, latexmk_rc=proc.returncode)
+    print_report(rep, logpath, pdfpath, latexmk_rc=proc.returncode,
+                 git_presence=git_presence)
 
     if not pdfpath.exists():
         rep.no_output = True
@@ -560,7 +799,10 @@ def main():
         print(proc.stdout[-2500:])
         return 1
 
-    fatal = rep.has_errors or (not args.allow_undefined and (rep.undefined_refs or rep.undefined_cites))
+    _, git_scanned, git_errors = git_presence
+    fatal = (rep.has_errors
+             or (not args.allow_undefined and (rep.undefined_refs or rep.undefined_cites))
+             or (git_scanned > 0 and git_errors))
     return 1 if fatal else 0
 
 
