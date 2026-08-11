@@ -1191,3 +1191,73 @@ able to report a clean result* — and in both cases the check reported cleanly 
 **silently reduced population**. The remedy is the one already written down: **print the size
 of what was examined.** A sweep that says *"scanned 18 files"* when the project has 24 is
 legible; one that says *"PASS"* is not.
+
+---
+
+# 7 · POST-AUDIT DEFECTS FOUND 2026-08-12, AFTER THIS AUDIT CLOSED
+
+## D-1 · `sec:exo` misdescribed the model behind `tab:weather` — SEVEN declared, FIFTEEN passed
+
+**Flagged by Phuong; confirmed at the generator, not inferred.** `brain/eval/weather_basis.py`:52,78
+does `EXO_COLS = list(CHRONOS2_EXO_COLS)` and hands that set to **every arm**;
+`brain/models/foundation.py`:103–113 defines it as **fifteen columns in four groups** —
+`_CALENDAR_EXO` 4, `_EVENT_EXO` 1, `_WORLD_CUP_EXO` **6**, `_WEATHER_EXO` 4. The section declared
+**seven in three groups**. Eight covariates were undeclared, **including an entire group**.
+
+**Why no instrument caught it.** It is not a cross-reference, a count in prose about the document,
+or a number traceable to a result file — it is a **specification that disagrees with the code it
+specifies**. Nothing in this project reads the generator against the Methods text. `latexcheck`,
+`completenesscheck`, `figurecheck` and the numbers audit all pass over it, and the T1 trace rule
+points at `brain/log/48_G17g_Weather_Basis.md`, which reports the *arms* rather than the
+*covariate set*.
+
+**The general form, and it is the one to carry forward:** *a Methods section is a claim about the
+code, and the only check is to open the code.* This is the artefact rule pointed at a
+specification rather than at a result.
+
+## D-2 · A comment block inserted MID-PARAGRAPH deleted a clause from the PDF
+
+`f34a486` (2026-08-12) put an explanatory comment inside a paragraph at `sec:disc-answers`, and
+its last line **swallowed** *"The estimand survives, qualified by a"*. The rendered paragraph read
+*"…may be claimed for them here. served forecaster that returns a median…"* — a broken fragment,
+with **RQ2's second answer limb deleted from the PDF**. It compiled clean, passed every checker,
+and **was pushed to Overleaf in that state**.
+
+**All three content checkers read form.** A comment that eats a clause leaves `\input` resolution,
+prose volume and float structure untouched. The defect is only visible by reading the rendered
+sentence.
+
+**The signature is greppable and now was:** prose resuming in **lower case** on the line after a
+comment line. A sweep over 13 files found **two real instances** — this one and a second created
+the same day by the D7 comment — and **two false positives** that join grammatically
+(`results.tex`:120, `:620`), each read individually rather than assumed.
+
+**Rule: never open a `%` comment on a line that still carries prose, and never place a comment
+block inside a paragraph — put it after the paragraph's final line.**
+
+## D-3 · VUS-PR was attributed to the wrong paper, caught before it compiled
+
+The 2026-08-12 draft credited the **definition** of VUS-PR to `liu_elephant_2024` (TSB-AD).
+NotebookLM against the primary sources establishes that VUS-PR is introduced in
+**`paparrizos_volume_2022`** (*"We introduce VUS-ROC and VUS-PR, parameter-free measures…"*, PVLDB
+**15(11)**:2774–2787), that **TSB-UAD** (PVLDB 15(8)) does not introduce it either, and that the
+draft's *mechanism* was wrong too: the integration is over **buffer length** from 0 to $\ell$, and
+**lag-robustness is the consequence**. *"Integrates over a range of lag tolerances"* named the
+effect as the mechanism.
+
+**Two near-misses worth recording.** Before that, the same draft carried
+`\citet{clopper_use_1934}` and `\citet{paparrizos_tsb-uad_2022}` — **neither key existed in
+`ref.bib`**. `latexcheck` would have caught them as undefined citations, but only after they were
+written and only if the run was read. **Checking the key before writing the sentence is the
+cheaper order**, and checking *what the paper actually claims* is a separate check again.
+
+## D-4 · Where the words came from
+
+The repairs cost **+109 net against a margin of 11**. Ninety-eight came from four trades, none
+touching a finding: covariate names, arm definitions, the 1 mm threshold and the discount-share
+exclusion relocated to the new `app:exo-cols` (outside the counted population); the M5 sentence
+tightened; `sec:disc-answers`' pointer clause and its five question openers compressed against the
+Introduction's numbered list.
+
+**Counted body 19,989 → 19,995. Margin 5**, which is reported rather than hidden and must not be
+read as headroom.
