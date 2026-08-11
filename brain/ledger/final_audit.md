@@ -146,8 +146,45 @@ marker with a checklist may dock it. Recommendation: leave it.
 |---|---|---|---|
 | **HC52** | A bibliography is present | **FAIL** | M0. `main.tex`:112 points at a file that does not exist |
 | **HC53** | Every method based on someone else's work is referenced | **FAIL** | `vovk_algorithmic_2005`, cited twice, defined nowhere |
-| **HC60** | Ethics approval included if the project needed it | **FAIL / no statement either way** | **Zero matches** for *ethic · consent · GDPR · anonymis · data protection · confidential* across every `.tex` in the project |
-| **HC61** | Ethics considerations discussed if the project needed them | **FAIL / no statement either way** | As above. **This is not a technicality here:** `appendix/pseudocode.tex`:281–302 analyses *"735 messages, 376 from staff and 359 from the assistant"* — human-generated workplace text from identifiable employees of a **named** commercial partner (`title_page.tex`:19, Lune Brew Co.) — plus that partner's commercial revenue. Whether approval was **needed** is not this audit's ruling to make. That the document says **nothing either way** is a gap on either answer |
+| ~~**HC60**~~ | ~~Ethics approval included if the project needed it~~ | **WITHDRAWN — Phuong's ruling, 2026-08-11: not compulsory, no statement required** | See the correction below. This row overstated a conditional criterion as a mechanical failure |
+| ~~**HC61**~~ | ~~Ethics considerations discussed if the project needed them~~ | **WITHDRAWN — same ruling** | See the correction below |
+**CORRECTION, 2026-08-11, appended rather than applied silently — HC60/HC61 withdrawn.**
+Phuong asked which part of the rubric or the guidelines requires an ethics statement. Tracing
+it rather than assuming it, the answer is **one bullet on one slide**, and this audit had
+mis-graded it twice over.
+
+| Authority | What it says about ethics |
+|---|---|
+| `Student Documentation - MSc DS - Dissertation Submission.md` — **the requirements as issued, and the marking guide at its Appendix B** | **Nothing.** `grep -ci 'ethic'` over the whole file returns **0** |
+| `DataSciDissWriting June2026final.md` **Slide 57**, in the *Materials and Methods* section | *"Remember to include ethics approval and considerations if this was needed for your project"* — a bullet on a reminders slide whose other bullet is *"If you have based your methods on someone else's work remember to reference them!"* |
+| `00_marking_criteria.md` HC60/HC61 | **This project's own derivation from Slide 57.** Not independent authority. §1.9 already logged *"The required format for ethics documentation"* as an UNKNOWN |
+
+**Both halves of the grading were wrong.** These rows sat in §0, whose stated test is *"these
+lose marks without any judgement involved"* — and (1) the requirement is **explicitly
+conditional**, *"if this was needed for your project"*, so it turns on precisely the judgement a
+mechanical criterion must not need; (2) its sole source is a **writing-guide reminder slide**,
+not the issued requirements and not the marking guide. A criterion derived from a teaching deck
+was reported at the same severity as a missing bibliography.
+
+**The general fault, and it is one this project already has a rule for.** `00_marking_criteria.md`
+is *"the same rubric converted for working use"*, and a converted criterion carries the authority
+of its source, not of the file it now lives in. HC60/HC61 read in that file exactly like HC1 or
+HC52, which come from the issued document — the conversion **flattened the provenance**, and
+nothing in the file records which criteria are derived from what. This is *a claim of absence
+names what was searched* pointed at a claim of presence: a criterion asserted without its source
+is a criterion nobody can weigh.
+
+**RULED by Phuong, 2026-08-11: not compulsory. No ethics statement is written.** The ~45 words
+are released to R101, which is sourced to the rubric proper.
+
+**What this ruling does not touch**, recorded because it is not a marks question: the prepared
+form (`brain/docs/ethics_form.md`) answers **Q14 — supervisor agreement to submit for ethical
+review — as `N/A`** and carries no approval reference or decision; and its Q40 undertaking that
+*"venue names will be pseudonymised where this does not undermine the analysis"* stands against
+211 named-venue mentions and a partner named on the title page. Those are governance matters
+between Phuong and the department, they are outside this audit's remit, and the ruling above is
+about the dissertation's contents rather than about them.
+
 | **HC21** | Main chapter headings large, bold **and centred** | **FAIL** | No `titlesec`, `sectsty`, `fncychap`, `quotchap`, or `\@makechapterhead` redefinition is loaded. `report`'s default chapter head is `\huge\bfseries` **flush left**. Large ✓ bold ✓ centred ✗ |
 | **HC29** | Subsections numbered x.1, x.2 … | **FAIL, appendices only** | Chapters 1–6 number correctly. **All 38 appendix headings are `\section*`** — zero unstarred across the five appendix files — so appendices carry **no A.1/A.2 numbering and no ToC entries**, despite `main.tex`:95 `\setcounter{tocdepth}{4}` |
 | **HC43** | Every table is referred to in the body text | **FAIL** | **7 tables never `\ref`-ed anywhere**: `tab:screening-criteria`, `tab:screening-boundaries`, `tab:screening-counts`, `tab:environment`, `tab:intermittency-sensitivity`, `tab:paired-variance`, `tab:native-interval`. All 23 body-chapter floats **are** referenced |
@@ -568,9 +605,18 @@ provenance carefully — *"the write path does not belong to the author. Staff c
 messages the signal reads"* — and bounds the exposure with three stated properties. That is a
 security argument, not an ethics one.
 
-**Fix: text change if approval exists (cite it, ~25 words); a human gate if it does not.**
-This audit does not rule on whether approval was required. **Not answerable from the
-appendices.**
+**RULED 2026-08-11: no statement is written. The question stays on this list anyway, and that
+is the point of separating a viva risk from a rubric item.** The rubric does not compel an
+ethics statement — HC60/HC61 are withdrawn, see the correction in §0 — so nothing is owed to a
+marker. An examiner in a viva is not marking against HC60; they are asking a person about
+people. The honest answer is available and does not need to be in the document: an application
+was prepared covering this corpus, the analysis is aggregate, no individual is identified, and
+the one quoted example is paraphrased — all of which the document already demonstrates even
+though it never says so.
+
+**Fix: none in the text.** The exposure that remains is conversational, and the material to
+answer it is `brain/docs/ethics_form.md` rather than any chapter. **Not answerable from the
+appendices**, and after this ruling it does not need to be.
 
 ---
 
@@ -949,7 +995,7 @@ Ordered by **marks per word**, which under a 39-word margin is the only sensible
 | 9 | One finding sentence each for `fig:ladder` and `fig:validity-efficiency` | ~50 | **R96 FAIL** |
 | 10 | Add the four-domains divergence to §5.5 | ~35 | **R108**, examiner F8 |
 | 11 | Fix the Introduction's Chapter 6 overview | ~8 | R56 |
-| 12 | **Ethics: cite the approval if it exists, or state why none was required** | ~25 | **HC60/HC61 — or escalate as a human gate** |
+| ~~12~~ | ~~Ethics: cite the approval if it exists~~ | **0 — struck** | **RULED not compulsory, Phuong 2026-08-11.** HC60/HC61 withdrawn; the ~25 words go to R101 |
 | 13 | Reference the three algorithm floats by number from Methods; `\ref` the seven orphan appendix tables | ~20 | HC43, R69 reachability |
 | 14 | Flag `stocker_gentle_2025` and `sun_conformal_2025` as preprints at `discussion.tex`:138–139 | ~10 | R67 at its load-bearing site |
 | 15 | Quote or re-voice the three unmarked-lift sites in Chapter 2 | ~5 | R118, R119 |
@@ -997,8 +1043,10 @@ and this audit does not take it.
 - **HC62–HC70** (submission mechanics, viva, poster) are process items outside the document.
 - **Appendix prose** was read where a body cross-reference pointed into it and where a check
   required the target; it was not read end to end.
-- **This audit does not rule on whether ethics approval was required.** It reports only that
-  the document contains no statement either way.
+- **Ethics: ruled out of scope by Phuong on 2026-08-11 and no statement is written.** The audit
+  originally graded HC60/HC61 as mechanical failures; it should not have, and the correction in
+  §0 traces the criterion to its single source and says why. What this audit never established
+  — and still has not — is whether approval was *granted*, as distinct from applied for.
 
 ---
 
