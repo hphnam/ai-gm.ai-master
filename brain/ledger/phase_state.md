@@ -4875,3 +4875,44 @@ baseline-identical. Counted body **19,961**, matching the count the build genera
 the cap**. figurecheck PASS 28, completenesscheck PASS 28, venueordercheck FAIL 4 over 23 (the
 same four as baseline). Hyphen diff against `pre-reduction-full-run`: 0 over 1,359 added lines.
 All 95 cross-references in the two tables resolve.
+
+---
+
+## 2026-08-11 — Formatting pass on the compiled document (items 1–3)
+
+**Completed.** Typesetting-only pass over the Overleaf clone. No content change:
+nothing rewritten to fix a page break, nothing cut, nothing added. **Counted body
+19,961 words before and after**, same instrument as the compiled declaration.
+
+**Artefacts written**
+- `brain/ledger/formatting_pass_2026-08-11.md` — the full record: what the
+  submission requirements mandate and leave open, each table fix with its method
+  and rationale, the float-parameter changes, the before/after measurements.
+- Three commits on `/Users/hapuna/Downloads/prj93-overleaf`, one per item:
+  `7367ea2` (margin spills) · `cd6bf2f` (float placement) · `45e4090` (white space).
+
+**Verified end state**
+- Overleaf clone `main` at **`45e4090`**; `origin/main` at **`ec334a64`**, unchanged.
+  **Three commits await a push, which is Phuong's.**
+- Fresh clone of `45e4090`, `main-words.sum` confirmed ABSENT: `latexcheck` **PASS**,
+  **146 pages**, 0 errors, 0 undefined refs, 0 undefined citations, 0 floats lost;
+  overfull **7 → 3**, underfull **34 → 7**.
+- `completenesscheck` PASS (28 files) · `figurecheck` PASS (20 + 8 sources) ·
+  `venueordercheck` FAIL 4 — **pre-existing, verified identical on `ec334a64`**.
+- Ink outside the text block: **6 pages of 144 → 2 of 146**.
+- Inner white space (holes between content, excluding benign bottom slack under
+  `\raggedbottom`): body **10 → 2** pages over 60pt, appendices **5 → 0**.
+- Appendix B: worst heading-to-float separation **9 pages → 1**.
+
+**Unstarted / handed on**
+- **The push.** Refused by the protected-branch hook, as standing.
+- **Ruling needed:** the Hansen `note` field in `ref.bib`:652 — a Zotero
+  `\_eprint:` artefact duplicating the entry's own doi and url — puts 73.3pt of ink
+  in the right margin and cannot be broken by typesetting. Dropping it is a
+  bibliography-data edit, outside a formatting pass.
+- **Reported, not repaired:** five Chapter 4 tables (`tab:weather`, `tab:coverage`,
+  `tab:exchangeability`, `tab:winkler`, `tab:vuspr`) carry **no `\ref` inside
+  `results.tex`** — every citing site is in Chapter 5. Bears on the requirement that
+  every table be referred to in the text. Repair is a content change.
+- **Reported, not repaired:** 3.61pt (1.3mm) of ink in the right margin at
+  `appendix/project_specification.tex`, with no overfull box against it.
