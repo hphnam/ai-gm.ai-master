@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786482758.538399,
-    "ast_hash": "28ced4a74ffab8eda9c6e8a3db0c473a",
+    "mtime": 1786485017.2805865,
+    "ast_hash": "a065cf90cae9e3cfe03833c55cb060af",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6495,8 +6495,8 @@
     "semantic_hash": ""
   },
   "brain/scripts/latexcheck.py": {
-    "mtime": 1786463379.951231,
-    "ast_hash": "e447dce23fdc030a6625caa44e87c715",
+    "mtime": 1786484784.6791477,
+    "ast_hash": "b1c5d3a9aefd965789d7474824112402",
     "semantic_hash": ""
   },
   "brain/scripts/venueordercheck.py": {
@@ -6610,8 +6610,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/reduction_cost_register.md": {
-    "mtime": 1786482546.3975713,
-    "ast_hash": "c757d46380c08342fa5b64707443b224",
+    "mtime": 1786484991.75859,
+    "ast_hash": "1bc1540fc9bd39efb04b93d046d23d84",
     "semantic_hash": ""
   },
   "brain/ledger/supervisor_length_query.md": {
@@ -6660,8 +6660,13 @@
     "semantic_hash": ""
   },
   "brain/ledger/final_audit.md": {
-    "mtime": 1786482128.6336288,
-    "ast_hash": "0a1264f53b34926b1bf46751e6139ac2",
+    "mtime": 1786485036.379146,
+    "ast_hash": "db3cb72dfba72730455a27493bfdcdce",
+    "semantic_hash": ""
+  },
+  "brain/scripts/dupcheck.py": {
+    "mtime": 1786485042.7539854,
+    "ast_hash": "94615bc347829cb9b3899057823af4b4",
     "semantic_hash": ""
   }
 }
