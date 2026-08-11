@@ -4916,3 +4916,78 @@ nothing rewritten to fix a page break, nothing cut, nothing added. **Counted bod
   every table be referred to in the text. Repair is a content change.
 - **Reported, not repaired:** 3.61pt (1.3mm) of ink in the right margin at
   `appendix/project_specification.tex`, with no overfull box against it.
+
+---
+
+## Phase 8F — build repair, figures sweep, Tier 0 contradictions, R109 (2026-08-11)
+
+**Verified end state.** Dissertation `prj93-overleaf` at **`8530186`**, **4 commits ahead of
+`origin/main` (`df10821`)**, unpushed — the push is Phuong's. `ai-gm.ai-master` at **`a06068c6`**
+on `brain-construction-local`. **Counted body 19,997** against the ruled cap of **20,000**;
+margin **3**.
+
+### The cap moved, and the ruling was in the wrong store
+
+19,000 was Phuong's margin against forecast error, withdrawn 2026-08-10 as unreachable. That
+withdrawal went into `BLOCKED_third_party.md` §F, which owns *what is open now* and not rulings —
+so `00_marking_criteria.md` §1.1 went on reading *"HARD CEILING 19,000 | exceeding it is not
+available"* over a 19,961-word document, and `BLOCKED_third_party.md` contradicted **itself**,
+asserting the ruling at line 255 and its withdrawal at line 293. Both corrected; the ruling now
+lives in §1.1 and the §F row points there. *"This does not move again"* struck.
+
+### The build was broken on `origin/main` and the cause was not what 8D reported
+
+`main.tex` declared `ref_additions.bib`; **an Overleaf-side commit (`eb83e35`) had deleted that
+tracked file**, and `df10821` restored it 84 minutes later. 8D reported it as never-tracked, which
+was true of the tree it read and wrong about the history. Consolidated into `ref.bib` — and three
+of its four entries were **already there**, which biber resolves silently by picking one. Only
+`vovk_algorithmic_2005` was unique.
+
+`latexcheck` gained section **[0]**: every `\input`/`\include`/`\addbibresource` target is
+classified against the git index **before** the compiler runs, because TeX resolves against the
+filesystem and that is the only moment the two can be compared. Verified against the violation —
+a clone at `eb83e35` with the file restored untracked now FAILs where the old tool passed. Its
+first run **invented ten missing files** by resolving `\input` against the including file's
+directory rather than the root's; fixed, then zero false positives over 30 targets.
+
+### Four criteria-relevant findings nobody could have found by reading
+
+- **`figures/` had never been swept.** Every prior pass scoped to `chapters/`, `abstract.tex` and
+  `appendix/`. The **withdrawn** *"8 false alarms against 124 misses"* was live there, rendering
+  inside Appendix B, three days after being repaired at all five chapter sites **with trap
+  comments**. Also two symbol collisions ten lines below the legend declaring them repaired.
+- **"Appendix 24" rendered on seven pages.** A `\label` after a `\section*` captures whatever
+  counter was last stepped. `latexcheck` reported it clean because every reference *resolved*.
+  38 headings unstarred; the three labels now give B.8, B.8.6 and C.5.
+- **R109 was undischarged and Chapter 6 said so itself** — §6.1 opens by stating it revisits the
+  three deliverables, and nothing else answered the aim.
+- **R101 is four methods, not the nine 8D reported.** Five were **grep artefacts**: Methods writes
+  *"moving block bootstrap"* unhyphenated, and `sec:mcs` is a full section the exact phrase does
+  not appear in.
+
+### Ruled and recorded rather than done
+
+- **Ethics: not compulsory — Phuong, 2026-08-11.** Traced on challenge: the issued requirements
+  contain **zero** occurrences of *ethic*; the only source is one bullet on Slide 57 of a writing
+  deck, and it is conditional. 8D had graded HC60/HC61 as *mechanical* failures, which they are
+  not on either count. Withdrawn from the audit.
+- **Unfunded, each with its price, in `reduction_cost_register.md` §8F:** R101 (~80–120), R68
+  (~350), **R66 (~300, knowingly thin on Phuong's explicit ruling)**, D7 (~150–200), EDA (~300 +
+  a figure), R96 (~50), R108 (~35), Tier 2 (~100).
+
+### Verification, with scope
+
+| Check | Result |
+|---|---|
+| Fresh clone of `8530186`, `main-words.sum` **absent** and **no untracked `.bib`** confirmed first | **PASS**, 148pp. `\write18` wrote **19997**, equal to the independent `texcount` |
+| `latexcheck` §[0] | **29 targets, 28 tracked, 1 declared-ignored, 0 failing** |
+| `completenesscheck` | **PASS over 28 files** |
+| `figurecheck` | **PASS over 20 figure sources** |
+| `venueordercheck` | **21 files: 3 ORDER + 1 UNANCHORED — identical to the recorded baseline**, all four already adjudicated. No regression |
+| `formatcheck` §1 | **PASS**, 2 accepted spills, both ruled and capped |
+| Line-ending hyphens vs `pre-reduction-full-run` | **0 at HEAD, 0 at the tag**, over 13 files |
+
+**A note on one of those runs.** The first fresh-clone compile FAILED on the svg stub and the
+cause was **stale latexmk state in the output directory**, not the document. The scratchpad stub
+is never committed and had been cleaned mid-session — the same class as the stale
+`main-words.sum`, and the reason the tier-2 invocation is recorded rather than remembered.
