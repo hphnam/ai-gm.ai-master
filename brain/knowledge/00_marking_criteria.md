@@ -42,21 +42,49 @@ project on what the limit counts.**
 | Abstract | **INCLUDED** — the counted body is the abstract plus Chapters 1–6 |
 | Is 20,000 a target or a cap? | **A HARD CEILING.** Exceeding it is penalised seriously and materially affects the mark |
 
-### FINAL RULING ON LENGTH — Phuong, 2026-08-09. This does not move again.
+### RULING ON LENGTH — the operative one is below. Phuong, 2026-08-11.
+
+**THE CAP IS 20,000 GOVERNING WORDS.** It is the regulation and it is also the constraint.
 
 | | governing words (`texcount`) | status |
 |---|---|---|
-| **HARD CEILING** | **19,000** | **exceeding it is not available** |
-| **Target** | **18,000** | what the work aims at |
-| ~~20,000~~ | — | **irrelevant. It is the regulation, not the constraint being worked to** |
+| **HARD CEILING** | **20,000** | the regulation, and the only ceiling now in force |
+| ~~19,000~~ | — | **WITHDRAWN 2026-08-11 as unreachable, not as wrong** |
+| ~~18,000~~ | — | withdrawn with it |
 
-**A plan whose EXPECTED landing exceeds 19,000 has not met the constraint, whatever its ceiling
-says.** Clearing a limit on paper while expecting to land over it is not compliance. Never
-present one.
+**What 19,000 was, in Phuong's words: *"my margin against forecast error, withdrawn when it
+proved unreachable"*.** It was never a second regulation. It was a buffer, and a buffer that
+cannot be reached is not a constraint — it is a forecast that turned out low. The document
+stands at **19,961**, which clears the cap by 39 and exceeds the withdrawn buffer by 961.
 
-**Superseded and struck:** the 20,000-cap reading; the *"accept ~22,000 with a justification"*
-recommendation; and 15,000 as a working aim — **15,000 is off the table**, which removes any
-reason to push compression past what it safely gives.
+**Why this is written HERE and not only in the ledger.** The withdrawal was recorded on
+2026-08-10 in `BLOCKED_third_party.md` §F alone, and §F is *"what is open now"* — it does not own
+rulings. So for a day this file, which every rubric pass reads as the authority, carried
+*"HARD CEILING 19,000 | exceeding it is not available"* over a document at 19,961, and the
+struck line below asserted that it would not move. **A fact changed in the wrong store is a fact
+two readers will disagree about**, and both of them will be quoting a real file.
+
+**STRUCK, 2026-08-11, and left visible rather than deleted:**
+
+> ~~**FINAL RULING ON LENGTH — Phuong, 2026-08-09. This does not move again.**~~
+>
+> ~~A plan whose EXPECTED landing exceeds 19,000 has not met the constraint, whatever its
+> ceiling says.~~
+
+**The sentence that did the damage is *"This does not move again"*.** It is a claim about the
+future written into the store that adjudicates the present, and it made the correct later move
+look like a violation of the rules rather than an application of them. **Do not write
+finality into a criteria file.** Record the ruling, the date and who made it; a future ruling
+supersedes it on its own authority and needs no permission from this one.
+
+**What survives the withdrawal, unchanged:** the *"accept ~22,000 with a justification"*
+recommendation is still wrong and must not be re-offered, and the scope ruling above
+(bibliography and appendices excluded, abstract included) is untouched.
+
+**Superseded and struck:** 15,000 as a working aim — **15,000 is off the table**, which removes
+any reason to push compression past what it safely gives. (This paragraph formerly also struck
+*"the 20,000-cap reading"*. That strike is itself withdrawn — 20,000 is the operative cap, per
+the ruling above.)
 
 **A recommendation to "accept ~22,000 with a justification" was offered on 2026-08-09 and
 withdrawn the same day. It was wrong and must not be re-offered** — recorded at
@@ -83,18 +111,32 @@ it is R103, not R8. The sweep that found this also found the Conclusions are gov
 location-bound criteria (R109–R116), which is why Chapter 6 is the wrong place to look for
 savings — see §1.1b.
 
-### 1.1b Coverage gap found while pricing — R114 appears unmet
+### 1.1b R114 — CLOSED. Discharged at `conclusion.tex:156-170`, §6.3.
 
-**R114, *"The Conclusions state what had to be learned in order to do the project"*, has no
-discharging passage in `conclusion.tex`.** R113 and R116 (*"what would be done differently"* /
-*"how the methodology would be modified if the project were repeated"*) **are** discharged, but
-they are embedded inside §6.3's extensions as two sentences — *"the first change this work would
-make to its own method were it repeated"* and *"the second change…"*. R115 is arguably discharged
-by §6.4's transferable lesson.
+**R114, *"The Conclusions state what had to be learned in order to do the project"*, is
+DISCHARGED.** The passage is §6.3, *"What the project required"*, whose opening sentence is
+*"Four bodies of method had to be learned before this study could be attempted"* and which then
+names all four: distribution-free uncertainty and the Mondrian partition; the econometrics of
+comparing forecasters on short samples; the elicitation argument that an error measure names a
+functional; and reading a demand series out of a till export. Verified in the file on
+2026-08-11, not inferred from a ledger row.
 
-**Two consequences.** R114 is an open gap and Chapter 6 may need to **grow** rather than shrink.
-And **§6.3 cannot be demoted wholesale**, because R113 and R116 would leave the body with it —
-any demotion there must retain those two sentences explicitly.
+**STRUCK, 2026-08-11:** ~~*"R114 … has no discharging passage in `conclusion.tex`"*~~. That was
+true when written and was made false by the 8C-5 composition of §6.3. Nothing re-derived it, so
+it stood in the authority file and was carried into the 8D brief as a known gap. **This is the
+enumeration rule: an audit is a measurement of the document as it stood when the audit ran, and
+it goes stale silently because its output is prose that still reads as true.**
+
+R113 and R116 (*"what would be done differently"* / *"how the methodology would be modified if
+the project were repeated"*) **are** discharged, embedded inside §6.4's extensions as two
+sentences — *"the first change this work would make to its own method were it repeated"* and
+*"the second change…"*. R115 is arguably discharged by the transferable lesson.
+
+**The consequence that survives:** **§6.4 cannot be demoted wholesale**, because R113 and R116
+would leave the body with it — any demotion there must retain those two sentences explicitly.
+Chapter 6 no longer needs to grow for R114. It does for **R109**, which the 8D audit found
+undischarged: the aim in §1.3 is *whether the estate holds enough data*, and Chapter 6 never
+answers it.
 
 **`declaration.tex` is not evidence about any of this.** Its "including appendices and
 footnotes" wording is **inherited template residue**, the same class as the issued-template
