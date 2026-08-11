@@ -727,6 +727,9 @@ argued. The criterion is not about the ladder.
 
 ---
 
+> **See PHASE 8H at the foot of this file for the re-priced outstanding set. Prices in the 8F
+> section below are superseded.**
+>
 > **PRICES BELOW ARE STALE AS OF 2026-08-12 — read the classification before pricing anything.**
 > `knowledge/00_marking_criteria.md` now carries a provenance tag per criterion, ruled against the
 > issued requirements as the highest authority and the workshop deck as support only. **R66 and
@@ -813,3 +816,60 @@ three criteria thin is a better position than one at 19,700 with a finding missi
 either cut a finding or a qualifier, or relocate a body passage to an appendix — which buys cap
 words, appendices being outside the counted population, at a cost to the marker's view that `D2`
 still records as unconfirmed.
+
+---
+
+# PHASE 8H — THE OUTSTANDING SET RE-PRICED AGAINST THE SOURCE
+
+**Appended 2026-08-12.** Every price in 8F was set against `00_marking_criteria.md` as it then
+stood. The provenance audit of this date read **both** source documents end to end and found that
+several of those criteria were the derivation's, not the source's. Phuong then ruled the
+**issued** requirements highest authority and the **workshop deck** support only. These are the
+prices that ruling produces.
+
+**The four criteria that vanished, with the sentence that decides each.**
+
+| Criterion | Recorded | Now | The deciding fact |
+|---|---|---|---|
+| **R66** — every shipped method argued in Ch 2 | ~300 | **0** | **No sentence in either document says it.** Nearest warrants: D7 (approach-level, Distinction band, no chapter named) and R62 (conditional on *novel* methodology, which this work disclaims) |
+| **R30/R31** — EDA present | ~300 + a figure | **0** | *"if your project is more data analytical in nature, then you **may elect to have** sections describing the data and data source and the exploratory data analyses"* — **elective in the source's own words.** Its only other appearance is inside a *"for example"* in the 60–69 band |
+| **R65** — a search protocol is stated | recorded FAIL, *"not repairable"* | **not a failure** | `protocol` 0/0, `databases` 0/0, `query string` 0/0, `inclusion` 0/0, `exclusion` 0/0, `PRISMA` 0/0 across **both** files; the two `screen` hits are image alt-text |
+| **R96/R97** — every figure/table has a finding summary | ~50, *"take first"* | **0 as a failure** | *"supported by **textual summaries of your findings**"* — chapter level. `each figure` occurs once in the issued file and it is about **captions** |
+
+**Also released, from the THIN list:** R75/R76 (~380) and R77 (~40) sit inside *"should, **as
+appropriate**, detail … (**e.g.** …)"*; R36 and R71 inside the same nested-hedge bracket; R85's
+six-part split comes from *"may elect to have"*; R63 has no source sentence at all.
+
+**The outstanding set as it now stands.**
+
+| # | Item | Class | Price | Note |
+|---|---|---|---|---|
+| 1 | **D7** — argue two or three of the five bare divergences | **EXACT** | **~150–200** | *"This should include a discussion of why the approach taken is better than alternatives that could have been used."* Verbatim, Distinction band. **The only item here with an unarguable warrant, and it was ranked below R66, which has none** |
+| 2 | **R101** — name each method and point at its definition | `[T]` | **~40–60** | Was ~80–120. The correspondence is a parenthetical; R99/R100 carry the imperative and both PASS. Four methods, not nine |
+| 3 | **R108** — the four-domains divergence into §5.5 | `[h]` | **~35** | Unchanged. Genuine significant difference |
+| 4 | **R68** — reconciliation reachable from Methods | `[h]` | **~100–350** | Criterion stands and is the one Methods requirement both documents state plainly. But the gap is **location, not absence** — `results.tex`:148–152 already gives the test, α, node count and 56 held-out observations — so a Methods pointer may discharge it near the bottom of that range |
+| 5 | Tier 2 residue | mixed | **~75** | Item 14's R36 framing rests on a nested "for example" |
+
+**Recorded total: ~1,365–1,455 words plus one figure. Now ~400–720, no figure.**
+
+## What this cost, said plainly
+
+**R66 was the largest single item in the set and it was graded an outright FAIL.** On 2026-08-11
+it was recorded as *"knowingly thin"* under a ruling that funded R109 ahead of it. **That trade
+was between a real criterion and a derived one, and it came out right by luck rather than by
+method** — R109 is EXACT (*"you will revisit the general aim of your research"*) and was the
+correct call, but nothing in the process could have told the difference at the time.
+
+**R96 is the sharper one.** It was described here as *"the cheapest FAIL in the document and
+should be taken first"*, and it duly sat at the head of the 8G funding order. Had the margin been
+larger, words would have been spent on a per-figure rule **the source does not contain**.
+
+## Room, and what it is for
+
+The appendix removal of the same date (`prj93-overleaf` `9317b19`) took the counted body to
+**19,818**, margin **182**. Combined with the ~650 words of cancelled debt, **Tier 3 is now
+affordable where the 8D audit recorded it as *"not affordable against the cap without a
+ruling"***. D7 at ~150–200 fits inside the current margin without any further harvest — which
+makes the Distinction-band exposure the first thing worth funding rather than the last.
+
+**Unchanged:** the reserve is Phuong's to set, and nothing here is funded without an instruction.

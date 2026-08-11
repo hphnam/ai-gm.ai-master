@@ -240,9 +240,34 @@ stale.
 **Totals: 136 R-criteria plus D1–D17 considered. 5 FAIL, 21 THIN, the remainder PASS.**
 **Mechanically (HC1–HC70): 44 PASS, 10 FAIL, 4 THIN, 15 not checkable without a compile.**
 
-## 1.1 The five FAILs
+## 1.1 The five FAILs — **THREE, as of 2026-08-12**
 
-### F1 · R66 — "Every method that actually ships in the built system is argued for in this chapter" — **FAIL, and not for the reason on record**
+> **WITHDRAWN 2026-08-12 after the provenance audit, and left visible rather than deleted.**
+> **F1 (R66), F3 (R96) and F5 (R65) are no longer failures.** Each was graded against a
+> criterion that the derivation, not the source, put there. The blocks below stand as the
+> record of what was believed when; each carries its own withdrawal note. **The surviving
+> FAILs are F2 (R101, downgraded to a parenthetical mismatch) and F4 (R57, which is real
+> and hedged).** Ruling: Phuong, on `knowledge/00_marking_criteria.md`'s source-precedence
+> ruling of the same date. Working: `ledger/criteria_provenance_audit.md`.
+
+### ~~F1 · R66~~ — **WITHDRAWN 2026-08-12. NOT A FAILURE.**
+
+> **R66 is `[U]`: no sentence in either source document requires every shipped method to be
+> argued in Background/Related Work.** The nearest warrants are **D7** — *"This should include
+> a discussion of why the approach taken is better than alternatives that could have been
+> used"*, which is approach-level, sits in the Distinction band and names no chapter — and
+> **R62**, which is conditional on *contributing novel methodology*, a claim this work
+> explicitly disclaims. **The ~300-word debt for arguing the Winkler score and the Breiman
+> one-standard-error rule in Chapter 2 is cancelled.**
+>
+> **This one cost a real decision.** R66 was the largest item in the outstanding set, was
+> graded an outright FAIL here, and on 2026-08-11 was recorded as *"knowingly thin"* under a
+> ruling that funded R109 ahead of it. That trade was between a genuine criterion and a
+> derived one — and it happened to come out right, which is luck rather than method.
+>
+> The block below stands as written, as the record of what was believed.
+
+### F1 · R66 — "Every method that actually ships in the built system is argued for in this chapter" — ~~**FAIL, and not for the reason on record**~~
 
 This is the audit's most consequential rubric finding, because **the ruling that closed
 it checked the wrong method**.
@@ -294,7 +319,19 @@ enumeration finds what is not.*
 Minimum defensible repair: ~300 words for the two decision instruments.** Not affordable
 in a 39-word margin; see §4 for funding.
 
-### F2 · R101 — "The statistical methods used for comparison are the ones detailed in Methods" — **FAIL**
+### F2 · R101 — **DOWNGRADED 2026-08-12: a parenthetical mismatch, not a FAIL**
+
+> The issued sentence is *"**Ensure that you apply** suitable statistical methods **(as detailed
+> in the methods section)** to compare model performance and to contrast different approaches."*
+> The imperative is **R99/R100**, and both **PASS**. The correspondence rides in a
+> **parenthetical**, which R101 promoted to a standalone *bidirectional completeness* rule the
+> source does not assert. **Discharge by naming each method and pointing at where it is defined
+> — not by writing a Methods specification of the whole battery.** Revised cost **~40–60**, from
+> ~80–120. And the population is **four** methods, not nine: five of the original nine were grep
+> artefacts (`methodology.tex`:331 writes *"moving block bootstrap"* unhyphenated; `sec:mcs` is a
+> full section the exact phrase never appears in).
+
+### F2 · R101 — "The statistical methods used for comparison are the ones detailed in Methods" — ~~**FAIL**~~
 
 Nine statistical procedures are used in Results and specified nowhere in Methods:
 an uncorrected one-sample *t*-test (`results.tex`:146); an exact two-sided binomial test
@@ -320,7 +357,19 @@ The findings in the vicinity belong to `tab:mcs`. `fig:validity-efficiency` (`:6
 pointer to *"the plane the adoption rule is defined on"*; the trade-off finding at `:637–638`
 is stated of ACI rather than read off the figure. The other three figures pass.
 
-**Cost: ~50 words.** This is the cheapest FAIL in the document and should be taken first.
+**Cost: ~50 words.** ~~This is the cheapest FAIL in the document and should be taken first.~~
+
+> **WITHDRAWN 2026-08-12 — the quantifier is not the source's.** The issued requirement is
+> *"You should include both graphical and tabular information, **supported by textual
+> summaries of your findings**."* The summaries attach to **your findings**, at chapter
+> level. **There is no per-figure rule in either document** — `each figure` occurs once in
+> the issued file and it is about **captions**. Results is plainly supported by textual
+> summaries of its findings, so **R96 is met and this FAIL does not stand.**
+>
+> `fig:ladder` and `fig:validity-efficiency` having content-style introductions rather than
+> finding-style ones remains a **style observation** worth taking if words are free. It is
+> not a debt, and it should no longer be described as *"the cheapest FAIL"* or funded first
+> — which is precisely what it was, at the head of the 8G funding order.
 
 ### F4 · R57 — "The chapter is structured as a systematic review" — **FAIL, declared**
 
@@ -344,6 +393,25 @@ record"*. That is the right call and should be said aloud.
 
 **Not repairable.** ~150 words would improve the signposting so a reader does not assume
 the appendix contains a protocol.
+
+> **WITHDRAWN 2026-08-12 — R65 IS `[U]`, AND THE APPENDIX IS GONE.** Grep over **both**
+> source documents: `protocol` 0/0, `databases` 0/0, `query string` 0/0, `inclusion` 0/0,
+> `exclusion` 0/0, `PRISMA` 0/0; the two `screen` hits in the workshop deck are image
+> alt-text. **The four sub-parts this row grades against appear in no issued requirement**
+> — they are the derivation's gloss on "systematic review", which the source states and
+> never elaborates. There were no "two of four sub-parts" to recover, because there were
+> never four sub-parts.
+>
+> Phuong ruled the appendix removed on 2026-08-12 (`prj93-overleaf` `9317b19`), with the
+> `discussion.tex` paragraph that confessed against these sub-parts and the four acronym
+> rows that served only it. **The viva note above still holds and is still a credit** —
+> refusing to draw a PRISMA diagram from reconstructed numbers was right — but it is now a
+> point about judgement rather than a mitigation of a failure.
+>
+> **What R65 leaves behind is F4, not itself.** R57 (*"it should be structured as a
+> systematic review"*) is a real hedged requirement and its declared FAIL stands;
+> `literature_review.tex` still declares the corpus was assembled thematically rather than
+> through a pre-registered protocol.
 
 ## 1.2 R114, R66, R64 — the three the brief named, adjudicated
 
@@ -380,6 +448,23 @@ have it.
 39-word margin at the low end; comfortably affordable with any of §4's funding.
 
 ## 1.4 The remaining THIN criteria, with word cost
+
+> **RE-WEIGHED 2026-08-12 against the provenance audit. Read this before pricing anything below.**
+>
+> | Row | Now | Why |
+> |---|---|---|
+> | **R30 / R31** | **NOT A REQUIREMENT** | The issued source: *"you **may elect to have** sections describing the data and data source and the exploratory data analyses."* Its only other appearance is inside a *"for example"* in the 60–69 band. **~300 words and one figure cancelled.** The remark at :640 that the band *"names EDA explicitly"* is true and incomplete — it names it inside an illustration |
+> | **R36** | advisory | Same *"for example … e.g."* bracket. ~25 optional |
+> | **R71** | advisory | Source: *"(**typically** numbered)"*. Already discharged at ~0 cost in 8F |
+> | **R75 / R76** | advisory | Source: *"This chapter should, **as appropriate**, detail … (**e.g.** cleaning, removing outliers, integrating data, engineering of features etc.)"* — an "e.g." list inside an "as appropriate". **~380 no longer owed** |
+> | **R77** | advisory | *"(including precise details of the software and libraries used, **if appropriate**)"*. Note R78's *"and versions"* appears in **neither** document |
+> | **R85** | advisory | The six-part split comes from *"you **may elect to have** …"* |
+> | **R63** | `[I]` | No source sentence. Sound practice, not a debt |
+> | **R108** | stands, ~35 | Hedged *"should"*, but a genuine significant difference |
+> | **R68** | stands | The one Methods criterion both documents state plainly. But the reconciliation gap is **location, not absence** — `results.tex`:148–152 gives the test, α, node count and 56 held-out observations — so a pointer may discharge it far below ~350 |
+> | **D7** | **stands, and rises to first** | **EXACT and verbatim.** With R66 and R84 withdrawn it is the only Distinction-band item in the set with a real warrant |
+>
+> R56, R89/R90/R91 and R102 are unaffected. Working: `ledger/criteria_provenance_audit.md`.
 
 | Criterion | Verdict | Where | Cost to discharge |
 |---|---|---|---|
@@ -992,7 +1077,7 @@ Ordered by **marks per word**, which under a 39-word margin is the only sensible
 | # | Repair | Words | Closes |
 |---|---|---|---|
 | 8 | **Chapter 6 answers the general aim** | ~40 | **R109 — the undischarged criterion** |
-| 9 | One finding sentence each for `fig:ladder` and `fig:validity-efficiency` | ~50 | **R96 FAIL** |
+| ~~9~~ | ~~One finding sentence each for `fig:ladder` and `fig:validity-efficiency`~~ **Optional style item — R96's per-figure quantifier is not the source's (2026-08-12)** | ~50 | ~~R96 FAIL~~ |
 | 10 | Add the four-domains divergence to §5.5 | ~35 | **R108**, examiner F8 |
 | 11 | Fix the Introduction's Chapter 6 overview | ~8 | R56 |
 | ~~12~~ | ~~Ethics: cite the approval if it exists~~ | **0 — struck** | **RULED not compulsory, Phuong 2026-08-11.** HC60/HC61 withdrawn; the ~25 words go to R101 |
@@ -1009,6 +1094,22 @@ Ordered by **marks per word**, which under a 39-word margin is the only sensible
 | 14 | Frame §4.2.1 and rank uniformity as the fit assessment | ~25 | **R36** |
 
 ### Tier 3 — the expensive ones, in priority order, and each needs a funding decision
+
+> **RE-PRICED 2026-08-12. Three of the five rows below are cancelled, and the priority order
+> inverts.**
+>
+> | # | Row | Now |
+> |---|---|---|
+> | 15 | R66, Winkler and the one-standard-error rule argued in Ch 2 | **CANCELLED — R66 is `[U]`.** ~300 released |
+> | 16 | R101, Methods specification of the calibration battery | **~40–60**, not ~180. Name each method and point at its definition |
+> | 17 | D7, argue two or three of the five bare divergences | **~150–200, and now FIRST.** The only row here with a verbatim warrant |
+> | 18 | R68, a Methods section for hierarchical reconciliation | stands; possibly far below ~350, the gap being location rather than absence |
+> | 19 | EDA subsection plus a figure of the raw series | **CANCELLED — the source says "may elect to have".** ~300 and a figure released |
+>
+> **Tier 3 was ~1,280 words. It is now ~340–610, and its head is D7 rather than R66.** The
+> paragraph below — *"Tier 3 is not affordable against the cap without a ruling"* — was written
+> when R66 and the EDA row were in it. **Tier 3 is now affordable**: the document sits at 19,818
+> against 20,000 after the appendix removal of the same date.
 
 | # | Repair | Words | Closes |
 |---|---|---|---|
