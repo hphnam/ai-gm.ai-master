@@ -409,7 +409,15 @@ rather than absent.
 - Whether an AI/LLM use declaration is required.
 - The required font family (only the 12pt size is specified).
 - Exact margin measurements ("standard margins" only).
-- Required line spacing.
+- Required line spacing. **RULED 2026-08-12 — CLOSED. Single spacing stands; `\linespread{1.5}`
+  is commented out in `main.tex` (Overleaf commit `c000b7d`, Phuong's edit, confirmed deliberate
+  when raised). The submission document specifies A4, 12pt, standard margins and justification and
+  says nothing about spacing, so nothing it requires is violated. The RESIDUAL RISK is named
+  rather than hidden: `main.tex`'s own template comment attributes 1.5 to "the MARP regulations
+  (Appendix 2) … for the purpose of examiner annotation", and no copy of MARP is held in this
+  project, so that claim is UNVERIFIED in both directions. Do not re-open this from the template
+  comment alone; re-open only if MARP Appendix 2 is obtained and says otherwise. Cost of the
+  ruling: 144 pages → 102, body word count unchanged at 19,986.**
 - Whether a Table of Contents is mandatory.
 - Whether a List of Figures / List of Tables is mandatory.
 - Whether Acknowledgements are mandatory.

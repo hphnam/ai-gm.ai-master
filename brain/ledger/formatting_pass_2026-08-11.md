@@ -50,6 +50,13 @@ limit, the font *family* (only the size is specified), exact margin measurements
 anything unusual, so `\linespread{1.5}` and the 35/25/25/25 mm margins were left
 exactly as the Lancaster template sets them.
 
+> **SUPERSEDED for line spacing, 2026-08-12.** Phuong commented `\linespread{1.5}` out on
+> Overleaf (`c000b7d`) and confirmed it as deliberate when it was raised. **Single spacing
+> stands**; the ruling and the residual MARP risk are recorded at
+> `knowledge/00_marking_criteria.md`, under "Required line spacing", which is where rulings
+> live. The margins are untouched and this paragraph still governs them. The document is
+> **102 pages** rather than 144; the body word count is unaffected.
+
 **Declined on those grounds:** nothing in this pass reduces line spacing, shrinks a
 margin or changes a font size to gain space. No such change was needed — every
 overrun was recoverable by column geometry, and every white-space defect by float

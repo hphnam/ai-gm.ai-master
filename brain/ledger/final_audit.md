@@ -1364,3 +1364,69 @@ the target's noun. Now *"the numerics-regime sensitivity"*, which texcount score
 **Counted body 19,995 → 19,989. Margin 11.** Every repair in D-5 to D-9 was funded by the caption
 harvest or cost nothing, so **no finding was touched and the margin improved by 6**. It is still
 thin, and it is still Phuong's to rule on.
+
+## D-11 · A second writer, and what it changed
+
+`prj93-overleaf` HEAD is no longer where this project left it. Phuong pushed `762a028`, then
+Overleaf's web UI committed twice on its own (`338b442`, `c000b7d`) and a pull merged them. **The
+reflog is the evidence**, not the row that used to hold a SHA. Everything this project repaired
+survives the merge — checked one by one, not assumed: the `alg_conformal` clause, the six `_eprint`
+deletions, all four appendix `\ref`s. **No tracked file was deleted this time**, which is worth
+stating because [[the-overleaf-web-ui-can-delete-a-tracked-file]] is on record.
+
+Three things changed that this project has to answer for:
+
+**1. `\linespread{1.5}` commented out in `main.tex` — 144 pages became 102.** Raised with Phuong
+and **RULED: single spacing stands.** The ruling and its one residual risk — `main.tex`'s own
+comment attributes 1.5 to MARP Appendix 2, which is not held here and so is unverified in both
+directions — are recorded at `knowledge/00_marking_criteria.md`, where rulings live, and the
+superseded sentence in `ledger/formatting_pass_2026-08-11.md` now points at it.
+
+**2. Wording, kept.** *thesis* → *dissertation* in the abstract front block and the declaration; a
+Name/Date block on the declaration. All correct, and *dissertation* is the submission document's
+own word.
+
+**3. The acronym table, five expansions — see D-12.** Four of the five were wrong.
+
+## D-12 · Five acronyms expanded, one invented
+
+The five rows that had deliberately read *"not expanded by its source"* were expanded. Each was
+checked against the source, one at a time:
+
+| | verdict |
+|---|---|
+| **PRISM** | **INVENTED.** *"Proactive Risk Sensitive Intervention with a Slow mode Margin"* appears nowhere. The paper is *"PRISM: Festina Lente Proactivity — Risk-Sensitive, Uncertainty-Aware Deliberation for Proactive Agents"* and never expands the name (arXiv 2602.01532, read at the abstract page). **Reverted.** It reads as a backronym assembled from the subtitle. |
+| **CPTC** | **The edit is right and the old text was wrong.** Sun and Yu's abstract reads *"Conformal Prediction for Time-series with Change points (CPTC)"* verbatim. **Kept.** A row asserting a source does not expand a name is itself a claim about the source, and this one had never been checked. |
+| **VUS-PR** | expansion right, **attribution wrong** — it credited the TSB-AD benchmark with naming it, which D-3 established is `paparrizos_volume_2022`'s. Plus *"Recal"* for *"Recall"*. **Both fixed.** |
+| **TabPFN-TS** | not expanded by `hoo_tables_2026`. The expansion belongs to `hollmann_accurate_2025`, **which was in `ref.bib` and cited by nothing** — the second dormant entry this week. Now cited here. |
+| **POT, SPOT, DSPOT** | expansions kept; **"Named for contrast only; none is implemented here" restored.** It is a scope statement about *this* work, and without it the table implies three detectors that were never run. This is the qualifier-loss class, arriving from outside the reduction passes. |
+
+## D-13 · The preprint label, applied to one entry and not to the class
+
+`PRJ93_RULES.md` records that Ye et al. was called a preprint and is a peer-reviewed NeurIPS 2025
+paper (decision row 104). **The repair went to that entry.** `\citep[a 2024 preprint]{yao_-bench_2024}`
+was still in the literature review, and τ-bench is **published at ICLR 2025** — same defect, second
+occurrence, sitting untouched while the lesson was on record. This is [[an-accept-line-names-an-occurrence-not-a-defect]]
+in a different store: **a ruling recorded once is not a repair applied everywhere.**
+
+The entry now carries the proceedings; Zotero `TNSWETSA` is migrated to `conferencePaper` with the
+key pinned. **The class was then swept, which is the part that was missing the first time**: all
+eight `\citep[a YYYY preprint]{…}` prenotes checked, seven stand — Chronos-2 (arXiv 2510.15821),
+TabPFN-TS (2501.02945, still under review at OpenReview), `lu_proactive_2024` and the four 2026
+postings have **no venue of record**. Recorded in `ref.bib` beside the entry so the next reader
+does not re-derive it.
+
+## D-14 · The swallowed-clause check now reads the artefact
+
+`commentsweep.py` gained `--pdf`: it scans the **rendered** text for a sentence beginning in lower
+case, **inside one typeset block**. Block scoping is the whole precision — over a page's flattened
+text it returns 73 hits on this document and every one is a reading-order artefact: a caption
+butting against the body beside it, a sentence split across a page break (`…this work returns the
+largest observed` on p.50, `residual rather than…` on p.51 — checked at the source and intact), and
+the bibliography's `doi:`/`url:`/`issn:`. Reference pages are taken from the **PDF outline** and
+skipped, because a reference list is biblatex's casing rather than the author's; algorithm floats
+are skipped for the same reason (`input :`). Fixtures assert the real p.113 damage is caught, the
+repaired text passes, and all three noise classes pass. **92 rendered pages scanned, PASS.**
+
+The source scan sees the swallowed clause only when the resumption happens to start a line in lower
+case. This one sees the wound whatever cut it.
