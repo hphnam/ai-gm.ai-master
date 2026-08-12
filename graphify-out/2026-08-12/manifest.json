@@ -5870,8 +5870,8 @@
     "semantic_hash": "e6676f720c8d78530a82eec9b51622db"
   },
   "brain/knowledge/00_marking_criteria.md": {
-    "mtime": 1786486977.4841344,
-    "ast_hash": "30a70cfc1380f804afd45fae9df25605",
+    "mtime": 1786463494.286023,
+    "ast_hash": "b820064984d6e42e4d6e5b52d10eb99b",
     "semantic_hash": ""
   },
   "brain/knowledge/01_autoresearchclaw_reference.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786533532.132363,
-    "ast_hash": "6b8136660bb47a3f2e986169b34558b1",
+    "mtime": 1786463521.5092986,
+    "ast_hash": "385c3328a2a3ac2c1833d3b68422448f",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6500,8 +6500,8 @@
     "semantic_hash": ""
   },
   "brain/scripts/venueordercheck.py": {
-    "mtime": 1786532769.5445724,
-    "ast_hash": "bb4eb8ea32f8a21eb78f28a0382cd8a9",
+    "mtime": 1786233171.8569467,
+    "ast_hash": "bd0f1ba744b9954eef230f1ddc4cae71",
     "semantic_hash": ""
   },
   "brain/ledger/discussion_argument_skeleton.md": {
@@ -6610,8 +6610,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/reduction_cost_register.md": {
-    "mtime": 1786533513.5935378,
-    "ast_hash": "1e2c797312eba66ac7085506d9579b49",
+    "mtime": 1786484991.75859,
+    "ast_hash": "1bc1540fc9bd39efb04b93d046d23d84",
     "semantic_hash": ""
   },
   "brain/ledger/supervisor_length_query.md": {
@@ -6645,8 +6645,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/format_accepted.txt": {
-    "mtime": 1786533104.259049,
-    "ast_hash": "57f018ae748288fdcc180eae9663ee77",
+    "mtime": 1786456765.239113,
+    "ast_hash": "f6f7121efba530056bb513d958aeb313",
     "semantic_hash": ""
   },
   "brain/docs/ethics_form.md": {
@@ -6660,23 +6660,13 @@
     "semantic_hash": ""
   },
   "brain/ledger/final_audit.md": {
-    "mtime": 1786533610.7236974,
-    "ast_hash": "39948dc6a8e19110de22fe7c05b14ed9",
+    "mtime": 1786485036.379146,
+    "ast_hash": "db3cb72dfba72730455a27493bfdcdce",
     "semantic_hash": ""
   },
   "brain/scripts/dupcheck.py": {
     "mtime": 1786485042.7539854,
     "ast_hash": "94615bc347829cb9b3899057823af4b4",
-    "semantic_hash": ""
-  },
-  "brain/scripts/commentsweep.py": {
-    "mtime": 1786533593.5220265,
-    "ast_hash": "d18549ce9f7385152f1c274a77bb1614",
-    "semantic_hash": ""
-  },
-  "brain/ledger/criteria_provenance_audit.md": {
-    "mtime": 1786485854.968018,
-    "ast_hash": "85b4b3794f72006f5efe0645ece51f60",
     "semantic_hash": ""
   }
 }
