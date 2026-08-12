@@ -1279,7 +1279,10 @@ pass excluded"_.** A commit whose purpose was to close a blind spot opened a def
 `.tex`**, and the third instance was in the other thirteen. This is
 `a-narrow-pass-is-not-a-pass` again, in the very check written to answer D-2 — a check's
 population is part of its result, so **the file count is now printed and an empty scan exits
-non-zero** (`commentsweep.py`). The two standing hits at `results.tex`:120 and :620 were re-read
+non-zero** — `brain/scripts/commentsweep.py`, committed with a self-test that plants the
+swallowed clause, passes the same comment placed after the paragraph, and asserts the
+empty-scan refusal. It is an instrument in git, not a scratchpad script the next session
+cannot run. The two standing hits at `results.tex`:120 and :620 were re-read
 in the **rendered PDF** this session and both join grammatically; the count is 2, unchanged.
 
 ## D-6 · One bibliography artefact, six occurrences, two instruments, one accept line
