@@ -26,7 +26,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from _style import (BRAIN, OKABE_ITO, TEXT_WIDTH, VENUE_LABEL, VENUES,
+from _style import (AXIS, BRAND, BRAIN, MUTED, TEXT_WIDTH, VENUE_LABEL, VENUES,
                     assert_estate, panel_label, save, use_style)
 
 ROLL_DAYS = 28
@@ -58,21 +58,21 @@ def main() -> None:
         closed = v[v["state"] == 1]
 
         ax.scatter(closed["target"], closed["score"], s=1.6, marker=".",
-                   color="0.72", alpha=0.55, lw=0, label="structural closure", zorder=1)
+                   color=MUTED, alpha=0.45, lw=0, label="structural closure", zorder=1)
         ax.scatter(false_open["target"], false_open["score"], s=5.5, marker="x",
-                   color=OKABE_ITO["vermillion"], alpha=0.75, lw=0.55,
+                   color=BRAND["ruby"], alpha=0.75, lw=0.55,
                    label="calendar-open, did not trade", zorder=3)
         ax.scatter(traded["target"], traded["score"], s=3.0, marker="o",
-                   color=OKABE_ITO["blue"], alpha=0.55, lw=0,
+                   color=BRAND["teal"], alpha=0.55, lw=0,
                    label="traded", zorder=2)
 
         daily = v.groupby("target")["score"].median()
         roll = daily.rolling(f"{ROLL_DAYS}D").median()
-        ax.plot(roll.index, roll.values, color="black", lw=1.2,
+        ax.plot(roll.index, roll.values, color=AXIS, lw=1.2,
                 label=f"{ROLL_DAYS}-day rolling median", zorder=4)
 
         q = v["score"].quantile(QUANTILE)
-        ax.axhline(q, color=OKABE_ITO["green"], lw=1.0, ls=(0, (5, 2)), zorder=4,
+        ax.axhline(q, color=BRAND["gold"], lw=1.4, ls=(0, (5, 2)), zorder=4,
                    label=f"{QUANTILE:.0%} calibration quantile")
 
         share = len(false_open) / len(open_days) if len(open_days) else 0.0

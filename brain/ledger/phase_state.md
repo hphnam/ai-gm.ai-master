@@ -5051,3 +5051,48 @@ stores. A comment at `main()`'s copy now says so.
   reserve, let alone past it. R68, R66, D7 and EDA stay knowingly thin.
 - **The ≥250 reserve is 138 words short** and cannot be closed from repetition. Closing it is a
   ruling: cut a finding or a qualifier, or relocate body text to an appendix.
+
+---
+
+## 2026-08-12 — Figure visual consistency pass (palette, font, type scale)
+
+**Completed.** All 14 floats given one palette, one font and one type scale. Presentation
+only: counted body **19,986 before and after**, measured with `texcount -0 -sum -merge
+-total` over the six chapter files plus `abstract.tex`.
+
+**Artefacts written**
+
+- `brain/log/81_figure_consistency_result.md` — the full result, nine sections.
+- `brain/scripts/palettecheck.py` — CVD + greyscale palette instrument, `--self-test`,
+  `--search`, `--matrix`.
+- `brain/scripts/figurestylecheck.py` — cross-figure type-scale and 1:1 instrument,
+  `--self-test`.
+- `figures/lunebrew_colours.tex` (in the Overleaf clone) — the single definition point for
+  the TikZ palette, the 0.6 pt rule weight and the three `\lunefig*` sizes.
+- Rewritten `figures/_style.py`: pgf backend, brand-derived series, 9/8/7 scale, 150 mm
+  canvas, three write-refusing guards.
+- Overleaf clone commit **`b8203ec`**, tree clean.
+
+**Verified end state** — fresh clone of `b8203ec` with `main-words.sum` confirmed absent:
+`latexcheck` PASS, 102 pages, 0 errors / undefined refs / undefined citations / floats
+lost / refused `\write18`; 3 overfull (all pre-existing), 9 underfull.
+`figurecheck` PASS over **29** sources (tree), `completenesscheck` PASS 27,
+`venueordercheck` PASS 27, `commentsweep` 27 with 2 pre-existing joins.
+`figurestylecheck` PASS over 6 figure PDFs, against 27 findings and 5 distinct page
+scales before.
+
+**Rulings recorded**
+
+- The LuneBrew kit's §5.1 categorical sequence is **refused for data-bearing series**
+  (gold/lime ΔE00 3.05 deuteranopia, 2.69 protanopia). 0 of 462 five-subsets of the whole
+  kit clear both floors. Phuong ruled in a brand-**derived** sequence — ink, gold, grey-2,
+  teal, ruby — which beats the incumbent Okabe-Ito on both CVD conditions and greyscale.
+- Structural elements take kit colours unmodified.
+
+**Unstarted / open**
+
+- **`fig_sensitivity`'s three unplottable points** (`stock_drawdown` at the Beer Hall,
+  mag −2.0 / −1.0 / 0.0 on a log axis). Pre-existing, invisible on the page, and the cause
+  of a `formatcheck` FAIL on one page. Needs Phuong's ruling; every repair changes what the
+  figure shows. Owned by `BLOCKED_third_party.md` §F.
+- **The push.** `b8203ec` is local; `origin/main` is `eb0c110`. Phuong pushes.

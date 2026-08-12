@@ -22,8 +22,8 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 
-from _style import (OKABE_ITO, TEXT_WIDTH, VENUE_LABEL, VENUES, assert_estate,
-                    load, panel_label, save, use_style)
+from _style import (BRAND, FS_ANNOT, FS_TICK, GRID, MUTED, TEXT_WIDTH, VENUE_LABEL, VENUES,
+                    assert_estate, load, panel_label, save, use_style)
 
 FAMILIES = (("Weather", "eval/weather_basis_mcs.json"),
             ("Pooling", "eval/group_icl_mcs.json"))
@@ -36,6 +36,10 @@ def main() -> None:
         assert_estate(data["venues"].keys())
 
     fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH, 3.1), constrained_layout=True)
+    # Inset the layout by ~2 pt a side. The rightmost panel's x-label is centred on
+    # its panel and reaches past the canvas otherwise -- constrained_layout reserves
+    # height for a label, not horizontal room for one sitting under an edge panel.
+    fig.get_layout_engine().set(rect=(0.006, 0, 0.988, 1))
 
     for ax, venue, tag in zip(axes, VENUES, "ABC"):
         rows, boundaries = [], []
@@ -45,43 +49,46 @@ def main() -> None:
                 rows.append((fam, entry, block["loss_metric"]))
             boundaries.append(len(rows))
 
-        ax.axvline(0.0, color="0.55", lw=0.7, ls=(0, (4, 2)), zorder=1)
+        ax.axvline(0.0, color=MUTED, lw=0.7, ls=(0, (4, 2)), zorder=1)
 
         ypos = range(len(rows) - 1, -1, -1)
         for y, (fam, e, _) in zip(ypos, rows):
             # Colour marks the verdict, but the filled/open marker carries it too, so the
             # figure survives greyscale printing and colour vision deficiency alike.
             excl = e["excludes_zero"]
-            colour = OKABE_ITO["vermillion"] if excl else OKABE_ITO["blue"]
+            colour = BRAND["ruby"] if excl else BRAND["teal"]
             ax.plot([e["ci_lo"], e["ci_hi"]], [y, y], color=colour, lw=1.0,
                     solid_capstyle="butt", zorder=2)
             ax.plot(e["mean_delta"], y, marker="o", ms=3.8, color=colour,
                     mfc=colour if excl else "white", mew=0.9, ls="none", zorder=3)
 
         ax.set_yticks(list(ypos))
-        ax.set_yticklabels([e["pair"] for _, e, _ in rows], fontsize=6.5)
+        ax.set_yticklabels([e["pair"] for _, e, _ in rows], fontsize=FS_TICK)
         ax.set_ylim(-0.8, len(rows) - 0.2)
 
         # The family separator: which pairs belong to which experiment, without a legend.
         split = len(rows) - boundaries[0]
-        ax.axhline(split - 0.5, color="0.8", lw=0.6, zorder=0)
+        ax.axhline(split - 0.5, color=GRID, lw=0.6, zorder=0)
         ax.text(0.985, 0.985, "weather", transform=ax.transAxes, ha="right", va="top",
-                fontsize=6, color="0.35", style="italic")
+                fontsize=FS_ANNOT, color=MUTED, style="italic")
         ax.text(0.985, 0.015, "pooling", transform=ax.transAxes, ha="right", va="bottom",
-                fontsize=6, color="0.35", style="italic")
+                fontsize=FS_ANNOT, color=MUTED, style="italic")
 
         # The unit rides the x-axis label alone. Repeating it in a panel title
         # duplicated it inside the figure as well as against the caption.
         unit = "MASE" if rows[0][2].lower().startswith("mase") else "£"
-        ax.set_xlabel(f"Paired mean difference ({unit})")
+        # Wrapped, not shortened. At 9 pt the one-line form overruns a 50 mm panel and
+        # the three labels ran into each other; the unit stays on its own line so no
+        # word is lost to the layout.
+        ax.set_xlabel(f"Paired mean\ndifference ({unit})")
         ax.margins(x=0.14)
         ax.tick_params(axis="x", labelrotation=0)
         panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
 
     handles = [
-        plt.Line2D([], [], color=OKABE_ITO["blue"], marker="o", mfc="white", mew=0.9,
+        plt.Line2D([], [], color=BRAND["teal"], marker="o", mfc="white", mew=0.9,
                    ms=3.8, label="interval includes zero"),
-        plt.Line2D([], [], color=OKABE_ITO["vermillion"], marker="o", ms=3.8,
+        plt.Line2D([], [], color=BRAND["ruby"], marker="o", ms=3.8,
                    label="interval excludes zero"),
     ]
     fig.legend(handles=handles, loc="outside lower center", ncol=2,

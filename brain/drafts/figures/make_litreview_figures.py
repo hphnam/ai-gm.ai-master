@@ -41,6 +41,7 @@ saying anything about the literature as a body.
 Run:  python brain/drafts/figures/make_litreview_figures.py
 """
 
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -48,16 +49,28 @@ from matplotlib.patches import FancyBboxPatch
 
 OUT = Path(__file__).parent
 
-INK = "#1a1a1a"
-MUTED = "#8a8a8a"
-FAINT = "#d8d8d8"
-MARK = "#b03a2e"
+# The one style module, reached by path because this generator lives outside figures/.
+# Styled independently until 2026-08-12, which is why it drifted: its own rcParams and
+# its own 7.4 in canvas put its labels on the page at x0.807, so its 7.5 pt row labels
+# printed at 6.1 pt against fig_drift's 7.9 pt ticks.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "figures"))
+from _style import (AXIS, BRAND, FS_ANNOT, FS_LABEL, FS_TICK, GRID,  # noqa: E402
+                    MUTED, TEXT_WIDTH, assert_no_ink_outside, assert_no_text_dropped,
+                    assert_page_width, use_style)
+
+INK = AXIS
+FAINT = GRID
+MARK = BRAND["ruby"]
 
 COLUMNS = [
     "a language model\nas judge",
     "simulated or\nscripted users",
-    "annotated corpora\nof recorded activity",
-    "the operator's own\naccept-or-dismiss\ndecisions",
+    # Rewrapped, not reworded. Columns sit 63 pt apart, so two adjacent labels collide
+    # unless their half-widths sum to less than that: "annotated corpora" (60 pt) beside
+    # "the operator's own" (62 pt) left a 2 pt gap and read as one run of text. Broken so
+    # the widest line in each is about 36 pt and 58 pt, which clears it.
+    "annotated\ncorpora of\nrecorded\nactivity",
+    "the operator's\nown\naccept-or-dismiss\ndecisions",
 ]
 
 ROWS = [
@@ -82,15 +95,11 @@ SYSTEMS = [
 
 TARGET = (3, 2)
 
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.size": 9,
-    "axes.linewidth": 0.6,
-})
 
 
 def gap_map() -> None:
-    fig, ax = plt.subplots(figsize=(7.4, 3.5))
+    use_style()
+    fig, ax = plt.subplots(figsize=(TEXT_WIDTH, 3.5))
     ax.set_xlim(-0.62, 3.62)
     ax.set_ylim(-0.55, 2.62)
 
@@ -109,29 +118,35 @@ def gap_map() -> None:
         boxstyle="round,pad=0,rounding_size=0.04",
         linewidth=1.1, edgecolor=MARK, facecolor=MARK, alpha=0.10, zorder=2))
     ax.text(tx, ty, "this\ndissertation", ha="center", va="center",
-            fontsize=8.5, color=MARK, linespacing=1.5, zorder=4)
+            fontsize=FS_LABEL, color=MARK, linespacing=1.5, zorder=4)
 
     for x, y, label, dy in SYSTEMS:
         ax.annotate(label, (x, y), textcoords="offset points", xytext=(0, dy),
-                    ha="center", va="center", fontsize=7.5, color=INK, zorder=4)
+                    ha="center", va="center", fontsize=FS_ANNOT, color=INK, zorder=4)
 
     ax.set_xticks(range(len(COLUMNS)))
-    ax.set_xticklabels(COLUMNS, fontsize=7.5, color=INK, linespacing=1.5)
+    ax.set_xticklabels(COLUMNS, fontsize=FS_TICK, color=INK, linespacing=1.5)
     ax.set_yticks(range(len(ROWS)))
-    ax.set_yticklabels(ROWS, fontsize=7.5, color=INK, linespacing=1.5)
+    ax.set_yticklabels(ROWS, fontsize=FS_TICK, color=INK, linespacing=1.5)
     ax.tick_params(length=0, pad=7)
 
     ax.set_xlabel("what the intervention decision is scored against "
-                  r"$\longrightarrow$", fontsize=8.5, color=MUTED, labelpad=9)
+                  r"$\longrightarrow$", fontsize=FS_LABEL, color=MUTED, labelpad=9)
     ax.set_ylabel(r"intervention policy $\longrightarrow$",
-                  fontsize=8.5, color=MUTED, labelpad=9)
+                  fontsize=FS_LABEL, color=MUTED, labelpad=9)
 
     for s in ax.spines.values():
         s.set_visible(False)
 
     fig.tight_layout()
-    fig.savefig(OUT / "gap_map.pdf", bbox_inches="tight")
-    fig.savefig(OUT / "gap_map.png", dpi=200, bbox_inches="tight")
+    # No bbox_inches="tight": cropping is what put this figure on the page at x0.807.
+    path = OUT / "gap_map.pdf"
+    fig.savefig(path)
+    assert_page_width(path)
+    assert_no_ink_outside(path)
+    assert_no_text_dropped(fig, path)
+    import pymupdf
+    pymupdf.open(path)[0].get_pixmap(dpi=200).save(OUT / "gap_map.png")
     plt.close(fig)
 
 

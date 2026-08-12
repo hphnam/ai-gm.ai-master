@@ -16,9 +16,10 @@ Source: brain/eval/interval_calibration_L1.json (.venv-forecast, stamped).
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
-from _style import (ARM_STYLE, TEXT_WIDTH, VENUE_LABEL, VENUES, assert_estate,
-                    load, panel_label, save, use_style)
+from _style import (ARM_STYLE, FS_ANNOT, MUTED, TEXT_WIDTH, VENUE_LABEL, VENUES,
+                    assert_estate, load, panel_label, save, use_style)
 
 LEVEL = "0.9"
 NOMINAL = 0.90
@@ -29,11 +30,15 @@ def main() -> None:
     data = load("eval/interval_calibration_L1.json")
     assert_estate(data["venues"].keys())
 
-    fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH, 2.35), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH, 2.75), constrained_layout=True)
+    # Inset the layout a couple of points a side: the rightmost panel's x-label is centred
+    # on its panel and reaches past the canvas otherwise. constrained_layout reserves
+    # HEIGHT for a label, not horizontal room for one under an edge panel.
+    fig.get_layout_engine().set(rect=(0.006, 0, 0.988, 1))
 
     for ax, venue, tag in zip(axes, VENUES, "ABC"):
         metrics = data["venues"][venue]["per_level"][LEVEL]["metrics"]
-        ax.axvline(NOMINAL, color="0.55", lw=0.7, ls=(0, (4, 2)), zorder=1)
+        ax.axvline(NOMINAL, color=MUTED, lw=0.7, ls=(0, (4, 2)), zorder=1)
 
         for arm, (colour, marker, _) in ARM_STYLE.items():
             m = metrics[arm]
@@ -47,8 +52,11 @@ def main() -> None:
                     mec="white" if arm == "D" else colour, mew=0.7 if arm == "D" else 0.0,
                     ls="none", zorder=3)
             ax.annotate(arm, (cov, width), textcoords="offset points", xytext=(0, 5),
-                        ha="center", fontsize=6.5, color=colour, zorder=4)
+                        ha="center", fontsize=FS_ANNOT, color=colour, zorder=4)
 
+        # Three ticks, not the default five: at a third of the text block a narrow
+        # coverage range prints "0.8750.9000.925" with the labels touching.
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=3))
         ax.set_xlabel("Empirical coverage")
         panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
         ax.margins(x=0.18, y=0.22)
@@ -57,11 +65,13 @@ def main() -> None:
     # Nominal is annotated once. Repeating it in all three panels is ink for no reading.
     axes[0].annotate("nominal 0.90", xy=(NOMINAL, axes[0].get_ylim()[0]),
                      xytext=(-3, 6), textcoords="offset points", rotation=90,
-                     fontsize=6, color="0.4", ha="right", va="bottom")
+                     fontsize=FS_ANNOT, color=MUTED, ha="right", va="bottom")
 
     handles = [plt.Line2D([], [], color=c, marker=m, ls="none", ms=4.5, label=f"{k} — {lab}")
                for k, (c, m, lab) in ARM_STYLE.items()]
-    fig.legend(handles=handles, loc="outside lower center", ncol=5,
+    # Two rows of three, not one of five: five entries at 9 pt overrun a 150 mm
+    # block and the end labels were being clipped once cropping was removed.
+    fig.legend(handles=handles, loc="outside lower center", ncol=3,
                handletextpad=0.3, columnspacing=1.1)
 
     save(fig, "fig_validity_efficiency")

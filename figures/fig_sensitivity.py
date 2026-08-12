@@ -22,14 +22,14 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 
-from _style import (OKABE_ITO, TEXT_WIDTH, VENUE_LABEL, VENUES, assert_estate,
-                    load, panel_label, save, use_style)
+from _style import (BRAND, FS_ANNOT, MUTED, TEXT_WIDTH, VENUE_LABEL, VENUES,
+                    assert_estate, load, panel_label, save, use_style)
 
 KIND_STYLE = {
-    "spike": (OKABE_ITO["vermillion"], "o", "Spike"),
-    "regime_shift": (OKABE_ITO["blue"], "s", "Regime shift"),
-    "exo_coincident": (OKABE_ITO["green"], "^", "Exogenous-coincident"),
-    "stock_drawdown": (OKABE_ITO["purple"], "D", "Stock drawdown"),
+    "spike": (BRAND["ruby"], "o", "Spike"),
+    "regime_shift": (BRAND["teal"], "s", "Regime shift"),
+    "exo_coincident": (BRAND["gold"], "^", "Exogenous-coincident"),
+    "stock_drawdown": (BRAND["grey2"], "D", "Stock drawdown"),
 }
 
 
@@ -41,7 +41,7 @@ def main() -> None:
     venues_present = {v for kind in sensitivity.values() for v in kind}
     assert_estate(venues_present)
 
-    fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH, 2.6), constrained_layout=True,
+    fig, axes = plt.subplots(1, 3, figsize=(TEXT_WIDTH, 2.95), constrained_layout=True,
                              sharey=True)
 
     for ax, venue, tag in zip(axes, VENUES, "ABC"):
@@ -57,13 +57,21 @@ def main() -> None:
             rates = [p["rate"] for p in points]
             lo = [p["ci"][0] for p in points]
             hi = [p["ci"][1] for p in points]
+            # NOTE: the Beer Hall's stock_drawdown points at mag -2.0, -1.0 and 0.0 are
+            # undefined on the log x-axis set below, so matplotlib places them at about
+            # x=-16000pt instead of dropping them. They are invisible on the page (the
+            # \includegraphics BBox clips them) but they are real ink outside the text
+            # block as far as formatcheck is concerned. Reported 2026-08-12 and NOT
+            # repaired here: every available repair -- filtering them, or moving to a
+            # symlog axis -- changes what this figure shows, which is Phuong's ruling and
+            # not a formatting pass's. Filtering was measured to move 651 subpixels.
             ax.fill_between(mags, lo, hi, color=colour, alpha=0.14, lw=0, zorder=1)
             ax.plot(mags, rates, color=colour, marker=marker, ms=3.4, lw=1.1, zorder=3)
             endpoints.append((rates[-1], colour, points[0]["n"]))
 
         if not drawn:
             ax.text(0.5, 0.5, "no injections", transform=ax.transAxes,
-                    ha="center", va="center", fontsize=7, color="0.45")
+                    ha="center", va="center", fontsize=FS_ANNOT, color=MUTED)
 
         # n is constant across magnitudes within a cell by construction of the injection
         # grid, so it is printed once per series. Curves that saturate together would
@@ -71,7 +79,7 @@ def main() -> None:
         for rank, (rate, colour, n) in enumerate(sorted(endpoints, reverse=True)):
             ax.annotate(f"n={n}", (1.0, rate), xycoords=("axes fraction", "data"),
                         textcoords="offset points", xytext=(3, 3.5 - 6.5 * rank),
-                        fontsize=5.8, color=colour, va="center", annotation_clip=False)
+                        fontsize=FS_ANNOT, color=colour, va="center", annotation_clip=False)
 
         ax.set_ylim(-0.04, 1.12)
         # Log spacing separates 1, 1.25 and 1.5, which crowd into one tick on a linear
@@ -79,7 +87,11 @@ def main() -> None:
         ax.set_xscale("log")
         ax.set_xlim(0.92, 4.4)
         ax.set_xticks([1, 1.25, 1.5, 2, 3, 4])
-        ax.set_xticklabels(["1", "1.25", "1.5", "2", "3", "4"])
+        # Rotated rather than thinned. The magnitudes are unevenly spaced on a linear
+        # axis, so 1 / 1.25 / 1.5 crowd the left fifth and printed as "11.2555 2";
+        # dropping labels would hide which magnitudes were actually sampled.
+        ax.set_xticklabels(["1", "1.25", "1.5", "2", "3", "4"],
+                           rotation=45, ha="right", rotation_mode="anchor")
         ax.minorticks_off()
         ax.set_xlabel("Injected magnitude (z)")
         panel_label(ax, f"({tag}) {VENUE_LABEL[venue]}")
