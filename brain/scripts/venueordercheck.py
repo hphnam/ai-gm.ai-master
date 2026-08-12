@@ -123,9 +123,17 @@ def scan_text(text: str, advisory: bool = False) -> list[tuple[int, str, str]]:
             findings.append((start, "ORDER",
                              f"two venue orders in one paragraph: {shown}"))
         elif len(triples) >= 2 and not orders:
+            # The trigger is "no venue ORDER", which is not the same as "no venue named":
+            # one or two names state no order either, so detection is right to fire. The
+            # message was wrong, and said "no venue named in the paragraph" of a paragraph
+            # whose second sentence read "At Ellel they do not" (appendix/robustness.tex:228,
+            # 2026-08-12). A finding that misdescribes what it measured gets dismissed as
+            # noise or, worse, acted on -- so it names what it actually found.
+            named = [code for code, pattern in VENUES if pattern.search(passage)]
+            anchor = f"only {', '.join(named)} named" if named else "no venue named"
             findings.append((start, "UNANCHORED",
-                             f"{len(triples)} positional triple(s), no venue named in the "
-                             "paragraph; name the venues inline"))
+                             f"{len(triples)} positional triple(s), {anchor} in the "
+                             "paragraph, so no order anchors them; name the venues inline"))
         elif advisory and orders and triples:
             findings.append((start, "POSITIONAL",
                              f"venue order {'/'.join(distinct[0])} with {len(triples)} "
@@ -173,15 +181,26 @@ At the Beer Hall, Ellel and Two River Taps the confidence set retains five, four
 of the nine approaches that scored at the committed gate.
 """
 
+# One venue named, two positional triples. Detection is deliberately UNCHANGED -- a single
+# name states no order -- but the message must report what it found. This is the shape the
+# message lied about at appendix/robustness.tex:228, which names Ellel.
+FIXTURE_UNANCHORED_ONE_NAMED = """
+At Ellel the sweep over lag budgets of two, seven and ten returns 6.37, 5.82 and 5.14,
+so the correction's size depends on the budget it is charged against.
+"""
+
+# (name, source, advisory, expected count, expected code, substring the message must carry)
 FIXTURE_CASES = [
-    ("unanchored-abstract", FIXTURE_UNANCHORED, False, 1, "UNANCHORED"),
-    ("order-clash", FIXTURE_ORDER_CLASH, False, 1, "ORDER"),
-    ("clean-named-inline", FIXTURE_NAMED, False, 0, None),
-    ("clean-single-triple", FIXTURE_SINGLE_TRIPLE, False, 0, None),
-    ("clean-rotation-of-one-order", FIXTURE_ROTATION, False, 0, None),
-    ("positional-off-by-default", FIXTURE_POSITIONAL, False, 0, None),
-    ("positional-with-advisory", FIXTURE_POSITIONAL, True, 1, "POSITIONAL"),
-    ("clean-named-under-advisory", FIXTURE_NAMED, True, 0, None),
+    ("unanchored-abstract", FIXTURE_UNANCHORED, False, 1, "UNANCHORED", "no venue named"),
+    ("unanchored-one-named", FIXTURE_UNANCHORED_ONE_NAMED, False, 1, "UNANCHORED",
+     "only ELL named"),
+    ("order-clash", FIXTURE_ORDER_CLASH, False, 1, "ORDER", None),
+    ("clean-named-inline", FIXTURE_NAMED, False, 0, None, None),
+    ("clean-single-triple", FIXTURE_SINGLE_TRIPLE, False, 0, None, None),
+    ("clean-rotation-of-one-order", FIXTURE_ROTATION, False, 0, None, None),
+    ("positional-off-by-default", FIXTURE_POSITIONAL, False, 0, None, None),
+    ("positional-with-advisory", FIXTURE_POSITIONAL, True, 1, "POSITIONAL", None),
+    ("clean-named-under-advisory", FIXTURE_NAMED, True, 0, None, None),
 ]
 
 
@@ -189,12 +208,17 @@ def self_test() -> int:
     """Both directions on all three classes, plus the advisory switch in both states."""
     tmp = Path(tempfile.mkdtemp(prefix="venueordercheck-fixture-"))
     rows, failures = [], []
-    for name, source, advisory, want, want_code in FIXTURE_CASES:
+    for name, source, advisory, want, want_code, want_text in FIXTURE_CASES:
         (tmp / f"{name}.tex").write_text(source)
         got = scan_text(source, advisory=advisory)
         ok = len(got) == want and (want_code is None or
                                    all(c == want_code for _, c, _ in got))
-        if not ok:
+        if ok and want_text is not None:
+            ok = all(want_text in detail for _, _, detail in got)
+            if not ok:
+                failures.append(f"{name}: message lacks {want_text!r}: "
+                                f"{[d for _, _, d in got]}")
+        elif not ok:
             failures.append(f"{name}: expected {want} {want_code or ''} finding(s), "
                             f"got {[(c) for _, c, _ in got]}")
         rows.append(f"  {name:<28} expected {want} {str(want_code or '-'):<11} "

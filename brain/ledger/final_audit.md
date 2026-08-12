@@ -1261,3 +1261,103 @@ Introduction's numbered list.
 
 **Counted body 19,989 → 19,995. Margin 5**, which is reported rather than hidden and must not be
 read as headroom.
+
+## D-5 · A THIRD swallowed clause, in the file a narrower sweep never opened
+
+`figures/alg_conformal.tex`:87–90 carried the identical defect to D-2 — a `%` block opened inside
+a paragraph, its last line ending **"What the construction guarantees is"**. Page 113 printed:
+
+> …splitting calendar-open days from structurally closed ones, not an inferred regime. **the
+> ordinary split-conformal property applied within each group.**
+
+A lower-case fragment with the guarantee deleted, live on Overleaf since it was pushed.
+
+**Introduced by `69292e2`, whose subject is _"Sweep `figures/`: the directory every correctness
+pass excluded"_.** A commit whose purpose was to close a blind spot opened a defect inside it.
+
+**Why D-2's sweep missed it.** That sweep covered **13 files**; this one covers all **26 tracked
+`.tex`**, and the third instance was in the other thirteen. This is
+`a-narrow-pass-is-not-a-pass` again, in the very check written to answer D-2 — a check's
+population is part of its result, so **the file count is now printed and an empty scan exits
+non-zero** (`commentsweep.py`). The two standing hits at `results.tex`:120 and :620 were re-read
+in the **rendered PDF** this session and both join grammatically; the count is 2, unchanged.
+
+## D-6 · One bibliography artefact, six occurrences, two instruments, one accept line
+
+`brain/ledger/format_accepted.txt` carried a ruled 75 pt spill for a Zotero `note = {\_eprint:
+https://…}` field in `ref.bib`, described as being **at line 652**. It was at **six** lines. The
+accept file named one because that entry (Hansen) was the only one whose URL was long enough to
+reach the margin; the other five printed the same junk inside the text block, where **no
+instrument looks**.
+
+Deleting all six also cleared the **88.49 pt overfull hbox at `main.tex`:384**, carried as a
+separate finding since 2026-08-11. **One defect wearing two instruments' labels** — and the
+overfull box was the larger signal, so the accept line had capped the symptom that spilled while
+leaving the one that did not.
+
+Margin spills **2 → 1**; the remaining one (`…to answer staff`, 3.52 pt) is untouched and still
+awaits a ruling.
+
+## D-7 · `venueordercheck` said "no venue named" of a paragraph that named Ellel
+
+`appendix/robustness.tex`:228 was reported as *"2 positional triple(s), **no venue named in the
+paragraph**"*. Its second sentence is *"At Ellel they do not."* The trigger is `not orders`, and
+`orders` requires **three consecutive distinct venue names** — so the detection was right (one
+name states no order) and **the message asserted something false about what it had measured**.
+A finding that misdescribes itself is dismissed as noise or acted on wrongly; both were available
+here. The message now names the venues it found, and the fixture `unanchored-one-named` asserts
+that text — **verified in both directions**: reverting the message alone fails the self-test
+(exit 1), the repaired file passes (exit 0).
+
+The three live findings are closed, all at zero cost to the counted body:
+- the two ORDER hits were **caption vs table-row order** in `tab:group` and `tab:weather`. Both
+  captions restated the table's own **Loss column**, so the survivor is the column and the
+  captions keep only what the column lacks — **the unit, "in pounds"**. Harvest: **−6 words**.
+- the UNANCHORED hit is repaired the way the check prescribes: each ratio is now **named to its
+  lag budget** (`$6.37$ at a lag budget of two, $5.82$ at seven…`). The mapping is **unchanged**
+  and was confirmed against the preceding sentence before the rewrite (*"5.8 at the pre-registered
+  block length of seven"*, *"2.5 at twenty-one"*). Appendix, so free.
+
+## D-8 · Four appendix tables that nothing referenced
+
+`formatcheck --aux` (section 3, which the previous run never reached because `--aux` was not
+passed) reports floats **unreferenced by number**. Four: `tab:environment`, `tab:intermittency-
+sensitivity`, `tab:paired-variance`, `tab:native-interval` — confirmed by grep, **zero `\ref` to
+any of them anywhere**. `tab:native-interval` had no prose at all above it, only a section
+heading.
+
+Each now carries a pointer in the prose above it. All four are in appendices, so the repair costs
+**nothing** against the counted body. *An absent `\ref` has no syntax* — this class is invisible
+to `latexcheck`, which can only see references that exist.
+
+## D-9 · A cross-reference that dropped half the noun it promised
+
+`results.tex`:113 read *"these sets inherit **the numerics** sensitivity Section~4.4.5
+demonstrates"*. `sec:res-winkler`'s own sentence is *"The set column is more sensitive to **the
+numerics regime** than the Winkler means"*, and it demonstrates exactly that (numpy 1.26.4 against
+the committed 2.5.1 moves two verdicts at Two River Taps). So the reference was **true** and the
+citing sentence was ungrammatical — *"the numerics sensitivity"* — for want of the second half of
+the target's noun. Now *"the numerics-regime sensitivity"*, which texcount scores as one token:
+**zero words**.
+
+## D-10 · The obligations that were open at the end of 2026-08-11, closed
+
+- **Zotero.** `paparrizos_volume_2022` (`MF54DQ7Z`) and `clopper_use_1934` (`58UCMN7J`) are in the
+  library, filed with the other dissertation sources, keys **pinned in both `citationKey` and an
+  Extra `Citation Key:` line**, and both now resolve through `zotero_search_by_citation_key` —
+  which is the check that only works on pinned items. CrossRef's own record, fetched
+  independently by the add, **confirms both bibliographies a second time**: PVLDB **15(11)**:
+  2774–2787 and Biometrika **26(4)**:404–413.
+- **`clopper_use_1934` was in `ref.bib` and cited by nothing.** An entry added for a citation
+  never made is invisible to biber and to every checker here. It is now cited where the interval
+  is specified, and renders *"(Clopper and Pearson, 1934)"* on p.50 with the full entry on p.98.
+  The citation attributes the interval and claims **nothing about the paper's contents**, which is
+  the right scope: the paper is paywalled, could not be read in NotebookLM, and no claim about
+  what it argues appears anywhere in the document.
+- **Both pushes.** `ai-gm.ai-master` landed 26 commits (`4c7f26b2..79f2fdce`), verified with
+  `git ls-remote`, not from the exit code. `prj93-overleaf` `origin/main` is `60a5efd` and equals
+  the local HEAD as of that measurement — Phuong's manual push landed.
+
+**Counted body 19,995 → 19,989. Margin 11.** Every repair in D-5 to D-9 was funded by the caption
+harvest or cost nothing, so **no finding was touched and the margin improved by 6**. It is still
+thin, and it is still Phuong's to rule on.

@@ -921,3 +921,26 @@ also remains**, unchanged since 8F.
 §5.1's five question restatements (~57, refused on readability, not on criterion); relocate a body
 passage to an appendix (buys cap words, costs the marker's view, `D2` unconfirmed); or accept the
 document as it stands and hold the 11 for nothing.
+
+## PHASE 8I — the caption harvest, 2026-08-12
+
+**One trade, and it was found by a checker rather than by a reduction sweep.** `venueordercheck`'s
+two ORDER findings were both **captions restating their own table's Loss column** in a different
+venue order from the rows. The column is the survivor; the captions keep only what it lacks.
+
+| | `tab:group` and `tab:weather` captions |
+|---|---|
+| **Copy A (removed)** | *"Beer Hall and Two River Taps on MASE, Ellel on mean absolute error in pounds."* |
+| **Copy B (kept)** | the tables' own `Loss` column: `MASE` / `MAE` / `MASE`, one per row |
+| **Survivor** | Copy B — per row, unambiguous, and immune to a later reordering |
+| **Qualifier carried** | **the unit.** Copy B says `MAE`, not that it is in pounds, so the captions now read *"Each venue's loss is named in its own row, Ellel's in pounds."* |
+| **Realised** | **−6** (predicted −16; the estimate was again roughly three times the outturn) |
+
+**19,995 → 19,989. Margin 11.** Everything else repaired on 2026-08-12 — a third swallowed clause,
+six bibliography artefacts, four unreferenced appendix tables, one half-dropped noun — cost
+**zero**: appendices sit outside the counted population, a `\citep` scores nothing, and
+`numerics-regime` is one token where `numerics` was one token.
+
+**The three levers for restoring a reserve are unchanged and all remain Phuong's to rule.** The
+−6 is not a reserve; it returns the margin to what it was before the `sec:exo` correctness repair
+spent it.

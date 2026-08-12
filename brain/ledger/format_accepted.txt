@@ -10,11 +10,13 @@
 # Nothing goes in here without a ruling recorded in the decision log or in a
 # ledger entry. "It has always been there" is not a ruling.
 
-# Zotero translator artefact in ref.bib:652 -- `note = {\_eprint: https://...}`
-# duplicating the doi and url already printed in the same entry. Not a URL as
-# far as biblatex is concerned, so the biburl penalties cannot break it.
-# Repair is a bibliography-data edit. Raised 2026-08-11, ruling pending.
-75.0 eprint: https://onlinelibrary.wiley.com
+# REPAIRED 2026-08-12, line removed per the pruning rule above. The Zotero
+# translator artefact `note = {\_eprint: https://...}` was deleted from ref.bib,
+# where it stood SIX times and not once -- the accept line named only the Hansen
+# entry because that was the only one long enough to spill. Deleting all six also
+# cleared the 88.49pt overfull hbox at main.tex:384, which had been carried as a
+# separate finding since 2026-08-11: one defect wearing two instruments' labels.
+# Recorded in ledger/final_audit.md section 7 (D-6).
 
 # appendix/project_specification.tex, the line ending "...to answer staff".
 # 1.3mm, and TeX reports NO overfull box against it. \emergencystretch=2em did
