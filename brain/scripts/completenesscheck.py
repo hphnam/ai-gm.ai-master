@@ -33,6 +33,9 @@ FOUR ASSERTIONS, and they are separate because they fail separately:
             shallower heading -- carries prose above a floor. Non-leaf headings are
             skipped: a \section whose body is entirely \subsections is structural, and
             requiring lead-in prose from it would be an editorial opinion, not a check.
+            A file reproducing an external document verbatim may opt out of THIS floor
+            only, with a `% REPRODUCED: <why>` line: its section lengths are the source's
+            and padding them would destroy the reproduction. CONTENT still applies.
   TEMPLATE  no issued-template phrase survives in text that reaches the reader.
 
 WHAT THIS CATCHES, and what it does not. It catches a file nobody wrote, a heading with
@@ -106,6 +109,14 @@ TEMPLATE_PHRASES = [
 
 CARRIER_RE = re.compile(r"^\s*%\s*CARRIER:\s*\S", re.M)
 EMPTY_RE = re.compile(r"^\s*%\s*INTENTIONALLY EMPTY:\s*\S", re.M)
+# A verbatim reproduction of an external document. Its section lengths belong to the
+# SOURCE and are not this work's to lengthen: HC54's specification appendix carries a
+# 29-word "Research Question" subsection because that is what the specification says,
+# and padding it would destroy the property the criterion asks for. The SECTION floor is
+# therefore lifted for such a file -- and only when it SAYS SO with a reason, which is the
+# same declared-not-silent principle as CARRIER above. The CONTENT floor still applies,
+# so a reproduction that reproduces nothing is still caught.
+REPRODUCED_RE = re.compile(r"^\s*%\s*REPRODUCED:\s*\S", re.M)
 
 # `(?<!\\)` keeps \% out of it. An \input inside a macro body carries `#1` and is a
 # definition, not a target; main.tex:122 is exactly that.
@@ -245,7 +256,7 @@ def scan_file(path: Path, file_floor: int, section_floor: int,
                          f"{words} prose words, floor {file_floor}; declare "
                          "'% CARRIER: <why>' or '% INTENTIONALLY EMPTY: <why>' if deliberate"))
 
-    if not declared_empty:
+    if not declared_empty and not REPRODUCED_RE.search(raw):
         for line, title, section_body in leaf_sections(body, root):
             got = count(section_body)
             if got < section_floor:
@@ -343,6 +354,26 @@ them, which is the one place where a mechanism and a measurement agree this clos
 """
 
 
+# A verbatim reproduction: a short leaf section is the SOURCE's length, not a gap in this
+# work's prose, but only because the file says so. The undeclared twin below is the same
+# text with the declaration removed, and it must still fire -- otherwise the exemption is
+# a hole rather than a declaration.
+FIXTURE_REPRODUCED = r"""
+% REPRODUCED: the Week 1 project specification, verbatim for HC54.
+\section{Project Background and Motivation}
+The company frames the product as a role rather than a tool, reads every standard operating
+procedure, runs the opening and closing checklists, monitors stock, drafts supplier purchase
+orders and answers staff questions throughout each shift across four venues, with external
+operators onboarding next and a proactive layer still to be built on top of all of it.
+
+\subsection{Research Question}
+How can an agent given a venue's operational data and tools learn that venue's rhythm?
+"""
+
+FIXTURE_REPRODUCED_UNDECLARED = FIXTURE_REPRODUCED.replace(
+    "% REPRODUCED: the Week 1 project specification, verbatim for HC54.\n", "")
+
+
 def self_test() -> int:
     """Both directions on all four assertions. Expected counts derived by hand first."""
     tmp = Path(tempfile.mkdtemp(prefix="completenesscheck-fixture-"))
@@ -361,6 +392,8 @@ def self_test() -> int:
         "allcomments.tex": FIXTURE_ALL_COMMENTS,
         "section_then_sub.tex": FIXTURE_SECTION_THEN_SUB,
         "undeclared_carrier.tex": "\\label{app:search}\n\\input{written}\n",
+        "reproduced.tex": FIXTURE_REPRODUCED,
+        "reproduced_undeclared.tex": FIXTURE_REPRODUCED_UNDECLARED,
     }
     for name, text in files.items():
         (tmp / name).write_text(text)
@@ -397,6 +430,12 @@ def self_test() -> int:
     check("SECTION follows \\input (clean)", codes("crossfile_ok.tex", "SECTION"), 0)
     check("SECTION follows \\input (empty ch)", codes("crossfile_empty.tex", "SECTION"), 1)
     check("SECTION skips a label-only parent", codes("section_then_sub.tex", "SECTION"), 0)
+    # Both directions on the REPRODUCED declaration: the 15-word "Research Question"
+    # subsection is exempt when the file declares itself a reproduction and is a finding
+    # when it does not. The CONTENT floor is unaffected either way.
+    check("SECTION exempt when declared reproduced", codes("reproduced.tex", "SECTION"), 0)
+    check("SECTION fires without the declaration", codes("reproduced_undeclared.tex", "SECTION"), 1)
+    check("CONTENT still applies to a reproduction", codes("reproduced.tex", "CONTENT"), 0)
 
     # TEMPLATE dirty: bit.ly, the regulations pointer, and the regulations boilerplate --
     # the last of which is deliberately WRAPPED across a newline in the fixture, because

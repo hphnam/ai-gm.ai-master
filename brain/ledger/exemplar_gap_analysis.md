@@ -273,3 +273,88 @@ problem.
 What that chapter never does is leave the reader unsure whether anything was achieved.
 PRJ93 currently does, on the strength of work more sophisticated than the exemplar's.
 The gap is one of presentation and framing, not of substance.
+
+---
+
+## 6. Applied 2026-08-13
+
+Phuong's instruction: skip D1 for now, do D6 by choosing the best example from the whole
+experiment, apply D9 past tense "where appropriate", and replace the final appendix with
+`brain/docs/project_specification.md` rather than the project brief.
+
+### The appendix was reproducing the wrong document
+
+`appendix/project_specification.tex` reproduced `brain/docs/PRJ93.md` — the issued
+PRJ93-AIG-AIG **advert**, the host's recruitment description, written before the project
+period and not by the student. HC54 asks for "the project specification prepared at the
+start of the project period", which is `brain/docs/project_specification.md`, the Week 1
+draft carrying the aim, five objectives, data audit, deliverables, candidate techniques,
+fourteen-week plan and risk register. Swapped, and the reproduction verified mechanically:
+a token-level diff of source against LaTeX returns **zero content differences**, the only
+diff blocks being markdown table-separator rows and the diff script's own `&` stripping.
+
+**Three claims elsewhere in the document were true of the advert and false of the
+specification, and each is corrected with a note recording what it superseded:**
+
+| Site | Was | Now |
+|---|---|---|
+| `conclusion.tex` §6.1 | "The specification sets out no objectives under that name" | five objectives, mapped one-to-many onto the three deliverables |
+| `discussion.tex` §5.5 | "which the specification calls the interesting research" | "which the specification makes central to its modelling approach" |
+| `introduction.tex` §1.5 | "the project specification as issued" | "prepared in Week 1" |
+
+`methodology.tex`'s "two of the four specified domains" was **checked and survives**: the
+Week 1 document names exactly four domains in a table, so that claim is now better
+supported than it was.
+
+### D6 — the example chosen, and what it found
+
+The best available case was not a day but a **defect in the evaluation harness**, and
+finding it corrected a false causal claim standing in two chapters.
+
+`results.tex` and `conclusion.tex` both attributed the spike weakness (recall 0.573
+against 0.996 for regime shifts; 123 of 124 misses are spikes) to the cumulative-sum
+detector. `agent_eval.item_covers` sets `want_sources` for a spike truth to
+`{"deviation"}` alone, so the change-point limb never votes on a spike — a property of
+CUSUM cannot explain a number CUSUM does not enter.
+
+The operative cause is `stream.tail(config.DEV_SCAN_WINDOW)`: the point limb reads the
+last **14 trading days**, the corpus places onsets across a **28-calendar-day** window,
+and an onset placed earlier is unexamined at any magnitude. `brain/eval/spike_reachability.py`
+predicts a ceiling per venue **before** the sensitivity curve is read — 2/3 at the Beer
+Hall, 2/3 at Two River Taps, **1 at Ellel**, whose window holds four trading days and is
+scanned entire — and all three match the observed plateaux exactly. The decomposition
+closes without slack: 84 unexamined + 39 examined misses = the 123 reported spike misses.
+Full record at `brain/log/82_D6_spike_reachability_result.md`.
+
+Also added: the **Two River Taps closure** (`sec:res-closure`), the estate's one deviation
+with an onset fixed independently of the detector, at eight trading days' delay — the
+chapter reported no detection latency at all before this. Appendix C carries both in full
+(`app:spike-reachability`, `app:closure-case`).
+
+**Not claimed:** that deployed recall is 0.809. Deployment scans daily; the harness
+surfaces each window once at its end. No run measures that case, and `agent_eval.json` is
+untouched — every published number stands.
+
+### D9
+
+Past tense applied to reported findings across Results, Discussion and Conclusion.
+Document-referring sentences ("Table~4.3 classifies", "Section~3.2 gives"), definitions and
+persisting method properties stay present, which is what "where appropriate" protects.
+
+### Budget
+
+Additions ran the counted body to 20,233 and it landed at **19,990**. The words came from
+relocation, not from rewording: `app:squared-loss` and `app:native-quantiles` are new
+appendix sections holding working whose findings stayed in the chapter.
+
+### Open after this pass
+
+- **D1** still blocked, still the highest-value item.
+- `formatcheck` **FAILS** on page 58, and it is not this pass's defect. `fig_sensitivity`
+  places the Beer Hall's stock-drawdown points at magnitudes $-2$, $-1$ and $0$, which are
+  undefined on its log x-axis, so matplotlib parks them at about $x = -16{,}324$pt. The
+  generator's own comment records this as reported 2026-08-12 and deferred, because every
+  repair (filtering the points, or a symlog axis) changes what the figure shows — a figure
+  gate that belongs to Phuong.
+- `completenesscheck` found `sec:res-chatlog` at 35 prose words against a floor of 40,
+  **already failing at HEAD** from the 2026-08-12 reduction. Repaired.

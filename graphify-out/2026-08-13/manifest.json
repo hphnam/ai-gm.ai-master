@@ -5870,8 +5870,8 @@
     "semantic_hash": "e6676f720c8d78530a82eec9b51622db"
   },
   "brain/knowledge/00_marking_criteria.md": {
-    "mtime": 1786486977.4841344,
-    "ast_hash": "30a70cfc1380f804afd45fae9df25605",
+    "mtime": 1786537009.9217303,
+    "ast_hash": "e051317cccdc19d0d7fe81ee6527e329",
     "semantic_hash": ""
   },
   "brain/knowledge/01_autoresearchclaw_reference.md": {
@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786485017.2805865,
-    "ast_hash": "a065cf90cae9e3cfe03833c55cb060af",
+    "mtime": 1786545559.8512847,
+    "ast_hash": "947559ed4de114cd8dbfa3e105b01711",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -5990,9 +5990,9 @@
     "semantic_hash": ""
   },
   "brain/drafts/figures/make_litreview_figures.py": {
-    "mtime": 1785779733.2981887,
-    "ast_hash": "96d412162620786283797c4444f04a1b",
-    "semantic_hash": "96d412162620786283797c4444f04a1b"
+    "mtime": 1786543817.75334,
+    "ast_hash": "026ea7f5415241adaa832d3755f0d8fe",
+    "semantic_hash": ""
   },
   ".claude/skills/avoid-ai-writing/SKILL.md": {
     "mtime": 1785714254.866638,
@@ -6030,9 +6030,9 @@
     "semantic_hash": ""
   },
   "brain/drafts/figures/gap_map.pdf": {
-    "mtime": 1785779733.746865,
-    "ast_hash": "3419341f1b824cdc1afde6d8b6ec447f",
-    "semantic_hash": "3419341f1b824cdc1afde6d8b6ec447f"
+    "mtime": 1786543818.8177123,
+    "ast_hash": "e5d66eaac6c4fd979bae61d2d72fdb12",
+    "semantic_hash": ""
   },
   "brain/drafts/figures/hln_correction.pdf": {
     "mtime": 1785774713.5701373,
@@ -6050,9 +6050,9 @@
     "semantic_hash": "c27799d7c26d3e956e0f02ff228bb57f"
   },
   "brain/drafts/figures/gap_map.png": {
-    "mtime": 1785779733.777531,
-    "ast_hash": "73f9e508f7f25b8e89796be9e72d28ea",
-    "semantic_hash": "73f9e508f7f25b8e89796be9e72d28ea"
+    "mtime": 1786543818.8767946,
+    "ast_hash": "b9a8643133e2fec22e2ef1f59f49cdd5",
+    "semantic_hash": ""
   },
   "brain/drafts/figures/hln_correction.png": {
     "mtime": 1785717111.524764,
@@ -6065,8 +6065,8 @@
     "semantic_hash": "298133a07d55f8f6741eb1e200cccdef"
   },
   "brain/drafts/figures/make_ladder_figure.py": {
-    "mtime": 1786138119.5334063,
-    "ast_hash": "283d6db57f99a812f26e7d95f3751943",
+    "mtime": 1786543728.658263,
+    "ast_hash": "9a82bdb1d6b01933c71d5ea3c550aea6",
     "semantic_hash": ""
   },
   "brain/eval/chronos2_covariate_probe.json": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786533532.132363,
-    "ast_hash": "6b8136660bb47a3f2e986169b34558b1",
+    "mtime": 1786545537.9455369,
+    "ast_hash": "056ea701adc4300fd8b66839aa9899d8",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6310,8 +6310,8 @@
     "semantic_hash": ""
   },
   "brain/drafts/figures/ladder.pdf": {
-    "mtime": 1786138128.6406662,
-    "ast_hash": "9ab9471db61ae38344aad0301bfbac70",
+    "mtime": 1786543729.9292357,
+    "ast_hash": "15f56d0a1510b376e6f836731fc32423",
     "semantic_hash": ""
   },
   "brain/docs/LuneBrew_Brand_Kit/assets/logo-black.png": {
@@ -6340,8 +6340,8 @@
     "semantic_hash": ""
   },
   "brain/drafts/figures/ladder.png": {
-    "mtime": 1786138128.7036183,
-    "ast_hash": "3e2d938fc24156a53d6214e113a4878b",
+    "mtime": 1786543730.0058634,
+    "ast_hash": "10ae68c8852c00aad5038f494a4e9db6",
     "semantic_hash": ""
   },
   "brain/knowledge/05_paper_architecture.md": {
@@ -6370,33 +6370,33 @@
     "semantic_hash": ""
   },
   "figures/_style.py": {
-    "mtime": 1786059461.7878492,
-    "ast_hash": "6c3dab2396cff26925985b517fef49ef",
+    "mtime": 1786543490.7722435,
+    "ast_hash": "f16397372305398e6187b7925be011c5",
     "semantic_hash": ""
   },
   "figures/fig_blocks.py": {
-    "mtime": 1786397424.6382923,
-    "ast_hash": "8e7cdb893c1515a4276a925a13f4cadc",
+    "mtime": 1786544225.9664655,
+    "ast_hash": "9cc9a4adb7e5bb2eb71e22912ec0506b",
     "semantic_hash": ""
   },
   "figures/fig_drift.py": {
-    "mtime": 1786136939.9177556,
-    "ast_hash": "88b3f9201ef9a02e941d1c08b32cdedf",
+    "mtime": 1786542952.269532,
+    "ast_hash": "f24a05f1e95b04d68517b7d795579dad",
     "semantic_hash": ""
   },
   "figures/fig_nulls.py": {
-    "mtime": 1786136953.6832402,
-    "ast_hash": "08ebb7b2382ee0de15307911474d97f0",
+    "mtime": 1786543242.7962463,
+    "ast_hash": "a6288eaeb2979f36e76c22aac209e326",
     "semantic_hash": ""
   },
   "figures/fig_sensitivity.py": {
-    "mtime": 1786136949.538391,
-    "ast_hash": "2c2006bc0a5cc6385c1c4318f775ff94",
+    "mtime": 1786545070.0042226,
+    "ast_hash": "55418a43cfe2fe416470e3bfe770f036",
     "semantic_hash": ""
   },
   "figures/fig_validity_efficiency.py": {
-    "mtime": 1786136947.5518084,
-    "ast_hash": "7e39e973af99c53f5bdf12f3fd6cda4e",
+    "mtime": 1786545271.8058777,
+    "ast_hash": "2384a76611b6c6f8235ac369a9b2476a",
     "semantic_hash": ""
   },
   "brain/knowledge/07_figure_programme.md": {
@@ -6430,8 +6430,8 @@
     "semantic_hash": ""
   },
   "figures/fig_appendix_tikz.py": {
-    "mtime": 1786397464.6503193,
-    "ast_hash": "b7a2cec6a3e76b0f4e0540e2f7bab9be",
+    "mtime": 1786544300.46397,
+    "ast_hash": "b2bcdb3b970a255872c0edea22125435",
     "semantic_hash": ""
   },
   "brain/ledger/main_preamble_diff.md": {
@@ -6635,8 +6635,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/formatting_pass_2026-08-11.md": {
-    "mtime": 1786456955.2453566,
-    "ast_hash": "a5aa056d1a375be46317d11a27023a1a",
+    "mtime": 1786537018.2945335,
+    "ast_hash": "3f707de0fefe6a7f16d762d114055ba6",
     "semantic_hash": ""
   },
   "brain/scripts/formatcheck.py": {
@@ -6660,8 +6660,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/final_audit.md": {
-    "mtime": 1786533610.7236974,
-    "ast_hash": "39948dc6a8e19110de22fe7c05b14ed9",
+    "mtime": 1786537051.2171483,
+    "ast_hash": "09be87a8f72e1f046443d3d626565063",
     "semantic_hash": ""
   },
   "brain/scripts/dupcheck.py": {
@@ -6670,13 +6670,28 @@
     "semantic_hash": ""
   },
   "brain/scripts/commentsweep.py": {
-    "mtime": 1786533593.5220265,
-    "ast_hash": "d18549ce9f7385152f1c274a77bb1614",
+    "mtime": 1786536930.1530793,
+    "ast_hash": "e678f0b5059a358a816fb48e0e6120a8",
     "semantic_hash": ""
   },
   "brain/ledger/criteria_provenance_audit.md": {
     "mtime": 1786485854.968018,
     "ast_hash": "85b4b3794f72006f5efe0645ece51f60",
+    "semantic_hash": ""
+  },
+  "brain/scripts/figurestylecheck.py": {
+    "mtime": 1786545289.018967,
+    "ast_hash": "9e7aa5736024b89f2b6cc8247f35206a",
+    "semantic_hash": ""
+  },
+  "brain/scripts/palettecheck.py": {
+    "mtime": 1786542536.6056821,
+    "ast_hash": "e3f711ca1505f54c197ebcf32f927f00",
+    "semantic_hash": ""
+  },
+  "brain/log/81_figure_consistency_result.md": {
+    "mtime": 1786545506.9440212,
+    "ast_hash": "1d001ad34ab725633b73e6060e6a4ece",
     "semantic_hash": ""
   }
 }

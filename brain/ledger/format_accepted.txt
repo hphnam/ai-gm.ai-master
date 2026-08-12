@@ -18,7 +18,14 @@
 # separate finding since 2026-08-11: one defect wearing two instruments' labels.
 # Recorded in ledger/final_audit.md section 7 (D-6).
 
-# appendix/project_specification.tex, the line ending "...to answer staff".
-# 1.3mm, and TeX reports NO overfull box against it. \emergencystretch=2em did
-# not clear it. Raised 2026-08-11, ruling pending.
+# appendix/project_specification.tex, a line breaking inside "answers staff
+# questions on WhatsApp". TeX reports NO overfull box against it and
+# \emergencystretch=2em did not clear it. Raised 2026-08-11, ruling pending.
+#
+# STILL LIVE after the 2026-08-13 source swap, which is the point of keying on
+# text rather than on a page: that appendix now reproduces the Week 1
+# specification instead of the project advert, and the same clause spilled again
+# at a different page and a different width (3.61pt then, 3.51pt now). Both sit
+# under the ceiling. Delete this line if a future edition of that sentence
+# breaks elsewhere.
 5.0 staff

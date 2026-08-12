@@ -5096,3 +5096,57 @@ scales before.
   of a `formatcheck` FAIL on one page. Needs Phuong's ruling; every repair changes what the
   figure shows. Owned by `BLOCKED_third_party.md` §F.
 - **The push.** `b8203ec` is local; `origin/main` is `eb0c110`. Phuong pushes.
+
+---
+
+## 2026-08-13 — 8D applied: specification appendix swapped, D6 executed, D9 pass
+
+**Instruction (Phuong):** read `PRJ93_RULES.md` and follow it to the end of the session;
+D1 skipped for now; D6 to pick the best example from the whole experiment and analyse it
+rigorously; D9 past tense "where appropriate"; the final appendix to become the exact
+`brain/docs/project_specification.md` rather than the project brief.
+
+**Completed**
+
+1. `appendix/project_specification.tex` now reproduces `brain/docs/project_specification.md`
+   (the Week 1 specification) in place of `brain/docs/PRJ93.md` (the advert). Verified by a
+   token-level diff: zero content differences. Three downstream claims that were true of the
+   advert and false of the specification were corrected in `conclusion.tex`,
+   `discussion.tex` and `introduction.tex`, each with a superseding note.
+2. **D6.** New instrument `brain/eval/spike_reachability.py` (`--self-test` green in both
+   directions) and result `brain/log/82_D6_spike_reachability_result.md`. It refutes the
+   cumulative-sum explanation of the spike weakness that stood in `results.tex` §4.5.2 and
+   `conclusion.tex` §6.2, and replaces it with a measured reachability ceiling that predicts
+   all three venues' plateaux (0.667 / 0.667 / 1.000) before the curve is read. New body
+   subsection `sec:res-closure` (the Two River Taps closure, the only ground-truth onset, at
+   eight trading days' delay) and two appendix sections, `app:spike-reachability` and
+   `app:closure-case`.
+3. **D9.** Past-tense pass over Results, Discussion and Conclusion, confined to reported
+   findings; document-referring and definitional sentences left in the present.
+4. `brain/scripts/completenesscheck.py` gained a declared `% REPRODUCED:` opt-out from the
+   SECTION floor only, exercised in both directions in `--self-test`. Needed because a
+   verbatim reproduction's section lengths belong to the source.
+5. Two appendix sections created to hold relocated working: `app:squared-loss` and
+   `app:native-quantiles`. Every finding stayed in the chapter.
+
+**Verified end state** (local, TeX Live 2026; tier 2, not a claim about Overleaf)
+
+| Check | Result |
+|---|---|
+| `latexcheck` | PASS, 115 pages, 0 undefined references, 0 undefined citations, 0 lost floats |
+| declared body in the compiled PDF | **19,990** against the 20,000 cap |
+| `venueordercheck` | PASS, 11 files scanned |
+| `figurecheck` | PASS, 19 sources scanned |
+| `completenesscheck` | PASS, 27 files walked |
+| `dupcheck` | 51 repeated spans, down from 53 at HEAD |
+| `formatcheck` | **FAIL**, 1 page — pre-existing, see below |
+
+**Open**
+
+- `formatcheck` fails on page 58: `fig_sensitivity` parks three stock-drawdown points at
+  about $x = -16{,}324$pt because magnitudes $-2$, $-1$ and $0$ are undefined on its log
+  x-axis. Pre-existing, recorded in the generator's own comment as reported 2026-08-12 and
+  deferred. Repair changes what the figure shows, so it is a figure gate and Phuong's call.
+- D1 (the miss-to-false-alarm cost ratio) remains blocked on the operator.
+- Nothing is pushed. `PRJ93_RULES.md` makes the Overleaf push a human gate, and the
+  2026-08-12 session recorded an unexplained push landing 21 seconds after a local commit.

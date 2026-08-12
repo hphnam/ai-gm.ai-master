@@ -1,0 +1,161 @@
+{
+ "artefact": "spike_reachability",
+ "dev_scan_window": 14,
+ "z_grid": [
+  1.0,
+  1.25,
+  1.5,
+  2.0,
+  3.0,
+  4.0
+ ],
+ "onsets": [
+  "early",
+  "mid",
+  "late"
+ ],
+ "venues": {
+  "beer_hall": {
+   "per_fold": [
+    {
+     "n_test_trading_days": 20,
+     "first_examined_index": 6,
+     "onset_index": {
+      "early": 3,
+      "mid": 10,
+      "late": 16
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    },
+    {
+     "n_test_trading_days": 20,
+     "first_examined_index": 6,
+     "onset_index": {
+      "early": 3,
+      "mid": 10,
+      "late": 16
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    },
+    {
+     "n_test_trading_days": 20,
+     "first_examined_index": 6,
+     "onset_index": {
+      "early": 3,
+      "mid": 10,
+      "late": 16
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    },
+    {
+     "n_test_trading_days": 20,
+     "first_examined_index": 6,
+     "onset_index": {
+      "early": 3,
+      "mid": 10,
+      "late": 16
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    }
+   ],
+   "n_injections": 144,
+   "reachable": 96,
+   "unreachable": 48,
+   "predicted_ceiling": 0.6666666666666666,
+   "observed_plateau": 0.6666666666666666,
+   "agrees": true
+  },
+  "two_river_taps": {
+   "per_fold": [
+    {
+     "n_test_trading_days": 28,
+     "first_examined_index": 14,
+     "onset_index": {
+      "early": 3,
+      "mid": 14,
+      "late": 24
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    },
+    {
+     "n_test_trading_days": 28,
+     "first_examined_index": 14,
+     "onset_index": {
+      "early": 3,
+      "mid": 14,
+      "late": 24
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    },
+    {
+     "n_test_trading_days": 25,
+     "first_examined_index": 11,
+     "onset_index": {
+      "early": 3,
+      "mid": 12,
+      "late": 21
+     },
+     "reachable": {
+      "early": false,
+      "mid": true,
+      "late": true
+     }
+    }
+   ],
+   "n_injections": 108,
+   "reachable": 72,
+   "unreachable": 36,
+   "predicted_ceiling": 0.6666666666666666,
+   "observed_plateau": 0.6666666666666666,
+   "agrees": true
+  },
+  "ellel": {
+   "per_fold": [
+    {
+     "n_test_trading_days": 4,
+     "first_examined_index": 0,
+     "onset_index": {
+      "early": 3,
+      "mid": 2,
+      "late": 0
+     },
+     "reachable": {
+      "early": true,
+      "mid": true,
+      "late": true
+     }
+    }
+   ],
+   "n_injections": 36,
+   "reachable": 36,
+   "unreachable": 0,
+   "predicted_ceiling": 1.0,
+   "observed_plateau": 1.0,
+   "agrees": true
+  }
+ }
+}
