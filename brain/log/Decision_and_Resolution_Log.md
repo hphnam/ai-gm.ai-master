@@ -2980,3 +2980,72 @@ them into the append-only log so it is the continuous WP1-to-present record.
      FLAG-PD1 itself rather than only here, because a supersession a hundred lines away from the
      text it supersedes is not read by anyone reading that text.
      Evidence: `brain/log/85_defect_evidence.md`, sections 0 and 1.2.
+
+108. **PRE-REGISTRATION, written before the C7 instrument exists. The availability/occurrence
+     partition contrast, its predicted direction per venue, and what would refute it.**
+     This row is written and committed BEFORE any line of the instrument in Part 3 is authored and
+     before any output of it has been seen. The git timestamp on the commit carrying this row is
+     the ordering proof; the instrument's first commit is strictly later.
+     **The claim being tested**, stated narrowly because the broad version is not novel (A1's own
+     stock experiment already partitions by day of week, so a calendar-defined Mondrian partition
+     is not a contribution): *the partition variable available at forecast time encodes
+     AVAILABILITY, the partition variable that governs the score distribution encodes OCCURRENCE,
+     and at a booking-driven venue these are different variables.* The operational point is that
+     occurrence is not knowable at forecast time. A deployment can condition on whether a venue is
+     scheduled to open; it cannot condition on whether the venue will take money. So the partition
+     that would work is unavailable and the partition that is available misgroups.
+     **What I already know, disclosed so the blindness of this prediction can be judged.** From
+     report 84: Ellel's calibration pool is roughly 79.8 per cent exact ties at zero, and the
+     persisted `n_calendar_closed_but_traded` counts exist per venue and were reproduced in that
+     session. I have NOT computed coverage or interval width under either partition, for any
+     venue, in any cell. Nothing below is informed by a coverage number.
+     **Definitions.** For each venue, over one calibration population, two partitions:
+     AVAILABILITY = the closure calendar as currently used; OCCURRENCE = whether the venue took
+     money that day. The four cells are (scheduled open, traded), (scheduled open, took nothing),
+     (scheduled closed, traded), (scheduled closed, took nothing). For a cell `c`, let
+     `Δ_c = coverage_under_availability(c) − coverage_under_occurrence(c)`.
+     **Predicted direction, per venue.**
+     - **Ellel.** The largest divergence of the three, and the venue the framing is about. Its
+       calibration pool is dominated by non-trading days, so a partition that pools them with
+       trading days yields a conformal quantile driven by the zeros. Predicted: on the TRADED
+       cell, `Δ < 0` (the availability partition covers LESS than the occurrence partition), and
+       the availability partition's traded-cell coverage sits BELOW nominal. On the TOOK-NOTHING
+       cell, `Δ > 0`, plausibly saturating at 1.0. Predicted width: availability is NARROWER than
+       occurrence on the traded cell and WIDER on the took-nothing cell. That is the "wide in the
+       wrong place" the width table exists to catch.
+     - **Beer Hall.** Trades essentially every scheduled-open day, so the two partitions nearly
+       coincide. Predicted `Δ ≈ 0` on every populated cell, and no cell materially off nominal
+       under either partition. If the Beer Hall shows an Ellel-sized effect, the mechanism claimed
+       above is wrong, because the Beer Hall has no availability/occurrence gap to speak of.
+     - **Two River Taps.** Intermediate, and for a different reason: the closure of 2026-05-08
+       makes the two variables agree on the bulk (pre-closure scheduled-open-and-traded,
+       post-closure scheduled-closed-and-took-nothing). Predicted `Δ` nonzero but SMALLER in
+       magnitude than Ellel's, concentrated in whichever off-diagonal cell the closure calendar
+       and the till disagree on.
+     **What would refute the framing, pre-committed.** Any one of these is a refutation and is to
+     be reported first and at full prominence rather than softened:
+     1. Ellel's traded-cell coverage under the AVAILABILITY partition is at or above nominal. The
+        claimed harm then does not exist in the direction claimed.
+     2. `Δ` at the Beer Hall is of the same magnitude as at Ellel. The effect would then not be
+        driven by an availability/occurrence gap, since the Beer Hall has almost none.
+     3. `Δ` on the traded cell is POSITIVE at all three venues. The sign of the framing is wrong.
+     4. Both off-diagonal cells are empty or negligible at all three venues. The two partitions
+        are then the same variable measured twice and there is no contrast to report.
+     **What is reported if the two partitions AGREE (pre-committed, because a null here is a
+     result).** The report states plainly that at this estate the closure calendar is a sufficient
+     statistic for occurrence within measurement error, that the availability/occurrence
+     distinction is therefore a conceptual hazard without empirical consequence HERE, and that the
+     C7 claim reduces to a caution for deployments where the two diverge. That is written as the
+     headline of report 86, not as a caveat inside it.
+     **Method commitments, so they cannot be chosen after the fact.** Interval method:
+     Clopper-Pearson exact binomial, chosen because several cells will be small and possibly at 0
+     or n successes, where a Wald interval is degenerate and a Wilson interval still misbehaves at
+     the extremes; the cost is conservatism, which is the right error here. Every coverage figure
+     is reported WITH its cell size, and an empty cell is reported as empty rather than backfilled
+     with a marginal. Interval WIDTH is reported per cell alongside coverage, because coverage
+     alone cannot show a band that is wide in the wrong place. The instrument's
+     scheduled-closed-but-traded count must reproduce the persisted
+     `n_calendar_closed_but_traded` EXACTLY at all three venues, compared as integers with no
+     tolerance, and the run fails loudly on any mismatch, because a mismatch means the two
+     populations are not the same and nothing downstream is trustworthy.
+     Instrument and results: `brain/log/86_c7_partition_contrast.md`.
