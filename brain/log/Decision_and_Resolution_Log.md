@@ -2945,3 +2945,38 @@ them into the append-only log so it is the continuous WP1-to-present record.
      book `54Z6YNAL`), one is *Algorithmic Learning in a Random World* which the chapters cite
      zero times, and one is an unrelated stray capture about copolymer degradation.
      **No citation in any chapter is backed only by a trashed item.**
+
+107. **The deviation primitive has no closure guard, it fires 14 times on a closed venue, and
+     it is being left in place on purpose.**
+     `signals/deviation.py` contains zero `is_closed` references. The trading-day filter it
+     relies on (`signals/residual.py:96`, `if exp_i <= _EPS: continue`) tests the expanding
+     day-of-week MEDIAN, a property of the venue's history, not of the day being scored, so a
+     venue that stops trading keeps a live expectation for months while its actuals are
+     structural zeros. Two River Taps therefore raises 14 deviations between 2026-05-09 and
+     2026-07-03, all `actual = 0.00`, all down/medium, `z` from −1.049 to −1.519, all Fridays
+     and Saturdays. `POST /deviation/check` and `POST /deviation/scan` reach it directly.
+     **Not fixed, and the reason is the calendar, not the difficulty.** Adding the guard changes
+     detector output, which would invalidate every deviation result already reported and every
+     artefact downstream of them, eleven days before the build window closes. Recorded as
+     **FLAG-DEV-CLOSURE-UNGUARDED** in `FLAGS.md`, with the post-submission fix specified.
+     **The served path is clean and that is the load-bearing part.** `signals/briefing.py:156-158`
+     drops post-closure deviations for a closed venue (the G5c guard), and `briefing_runs` holds
+     zero `deviation` rows for Two River Taps. So `appendix/robustness.tex:440` ("A repeated alarm
+     on a known-closed venue would have violated that behaviour") is TRUE for the two production
+     change-point detectors its paragraph names. It is silent about the primitive, not wrong about
+     the detectors, and the document correction is a scoping one that can be made word-neutral.
+     **Second site, and this one reaches a printed number.** `eval/agent_eval.py:_signals_from_stream`
+     reimplements the same collection step and omits both closure guards while its docstring claims
+     it works "exactly as `briefing.collect` does"; `fatigue_metrics` picks its window with
+     `inject.holdout` rather than the closure-filtered `_usable_folds`. The reported fatigue bound
+     of 8 items / 0.667 per week (results.tex:911) decomposes as 3/2/3 across the three venues, and
+     one of the two Two River Taps items is a post-closure change-point alarm (onset 2026-05-22,
+     −73.24%) that the production path suppresses. Recorded as **FLAG-EVAL-HARNESS-UNGUARDED**.
+     The figure is published as an UPPER bound, so the error is in the conservative direction; it is
+     not being corrected for the same calendar reason.
+     **FLAG-PD1 in `FLAGS.md` is narrowed by this row** (it has no numbered row of its own; it
+     asserts that structural-zero days never raise a false deviation, which holds for Ellel and
+     not for a closed venue), and a pointer to that effect now sits inside
+     FLAG-PD1 itself rather than only here, because a supersession a hundred lines away from the
+     text it supersedes is not read by anyone reading that text.
+     Evidence: `brain/log/85_defect_evidence.md`, sections 0 and 1.2.

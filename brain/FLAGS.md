@@ -240,6 +240,12 @@ longer error). No code change was needed to recover the files.
   days — the shared residual stream excludes structural-zero days, so a
   booking-driven venue's empty days never raise a false deviation. Ellel
   therefore deviates only on real booking days.
+  **NARROWED by FLAG-DEV-CLOSURE-UNGUARDED (S12, report 85), read that first.**
+  The exclusion above is not what the code does. The stream's trading-day test is
+  an expanding day-of-week median above zero, which is a property of a venue's
+  HISTORY, not of the day being scored. It holds for Ellel, whose empty days are
+  interleaved with trading days, and it fails for a venue that stops trading
+  altogether: Two River Taps raises 14 structural-zero deviations after closure.
 - **FLAG-PD2 (band-multiple severity).** Point severity uses band multiples
   (`DEV_BAND_K`, `DEV_SEVERE_K`), deliberately distinct from change-point's
   persistence-aware `_severity` (a single point has no run length).
@@ -1123,3 +1129,73 @@ does.
   larger corpus shifts toward genuinely per-venue staff chat (WhatsApp, not web), this broadcast
   decision should be revisited: it is calibrated to a corpus where almost nothing names a venue, not a
   general rule. Evidence: report 51 Part 2, `signals/chatlog_kb_gap.json`.
+
+## S12 closure guard on the deviation primitive (report 85)
+
+- **FLAG-DEV-CLOSURE-UNGUARDED (OPEN, will not be fixed before submission, deliberately).**
+  `signals/deviation.py` contains no `is_closed` guard (`grep -c is_closed
+  signals/deviation.py` returns **0**, against 3 in `change_point.py`, 3 in
+  `briefing.py` and 3 in `residual.py`). The module's own docstring claims "The
+  stream is leakage-free (expanding one-step-ahead), trading days only, so a
+  booking-driven venue's structural-zero days never raise a false deviation",
+  and that is false for a venue that stops trading. The trading-day test at
+  `signals/residual.py:96` is `if exp_i <= _EPS: continue`, which tests the
+  EXPANDING DAY-OF-WEEK MEDIAN, a property of the venue's history rather than of
+  the day being scored. After a closure the median stays well above zero for
+  months, so each structural zero is scored against a live expectation.
+  **Observed:** Two River Taps (last active day 2026-05-08) raises **14**
+  deviations between **2026-05-09 and 2026-07-03**, every one with `actual = 0.00`,
+  every one `down`/`medium`, `z` from −1.049 to −1.519, every one a Friday or a
+  Saturday (the two weekdays whose day-of-week median is large enough for a zero
+  to clear `|z| > 1`). The effect is self-limiting: each zero pulls the median
+  down, and the magnitudes decay across the run.
+  **Endpoints that reach it:** `POST /deviation/check` (`service/app.py:249`, via
+  `signals.deviation.check_point`) and `POST /deviation/scan` (`app.py:277`, via
+  `signals.deviation.scan`). Both import the module directly and neither consults
+  `is_closed`.
+  **The served briefing path is guarded and shows none of the 14.**
+  `signals/briefing.py:156-158` drops any deviation whose onset is at or after the
+  last active day of a closed venue (the G5c guard), and `briefing_runs` in the
+  live store holds zero `deviation` rows for Two River Taps against 10
+  `change_point` and 5 `sop`. So this is a defect of the raw primitive and of the
+  two endpoints that expose it, not of the daily feed.
+  **Why it is not being fixed.** Adding the guard changes detector output. Every
+  deviation result already reported, and every artefact downstream of them, would
+  have to be re-derived and re-checked eleven days before the build window closes.
+  The cost of a wrong re-derivation at this distance exceeds the cost of a
+  recorded, bounded, non-serving defect.
+  **What a fix would require after submission.** A closure filter in
+  `signals.deviation.scan` and `check_point` mirroring the G5c predicate, applied
+  in the primitive rather than in each consumer, so the four consumers stop
+  disagreeing; then a re-run of `eval/deviation_eval.md`, `sim/june2026_brain_result.json`,
+  `sim/july2026_brain_result.json` and the `eval/agent_eval.py` fatigue bound;
+  then a correction to FLAG-PD1 above, whose claim this flag narrows. The cleaner
+  fix is a per-day occurrence test rather than a history-derived one, which is the
+  same distinction the C7 instrument measures (report 86).
+  **Evidence:** report 85 sections 1.2 items 8-11.
+
+- **FLAG-EVAL-HARNESS-UNGUARDED (OPEN, and this one touches a printed number).**
+  The same missing guard has a second site, and it is the one that matters.
+  `eval/agent_eval.py:_signals_from_stream` reimplements `briefing.collect`'s
+  signal assembly over a perturbed stream and omits BOTH closure guards, while its
+  docstring says it works "exactly as `briefing.collect` does from the store". It
+  carries no `is_closed` call and no G5c predicate. Upstream of it,
+  `fatigue_metrics` (`agent_eval.py:318`) picks its window with
+  `inject.holdout(stream)` rather than `_usable_folds`, which is the one function
+  in that module that does carry the closure filter, so for a closed venue the
+  fatigue window is post-closure by construction.
+  **Consequence, measured:** the reported alert-fatigue bound of **8 items,
+  0.667/week** decomposes as Beer Hall 3, Two River Taps 2, Ellel 3, and one of
+  the two Two River Taps items is a post-closure change-point alarm, `onset
+  2026-05-22, down, medium, magnitude −73.24%`, fourteen days after closure. On
+  the production path that alarm does not exist: `signals/change_point.py:173-183`
+  collapses every post-closure downward shift into the single closure alarm, and
+  `briefing_runs` holds only the 2025-11-01 and 2026-05-08 onsets.
+  **So one of the 8 is an artefact of the harness rather than of the estate.** No
+  post-closure DEVIATION fire reaches any reported result; this change-point alarm
+  does, at `results.tex:911`.
+  **Not fixed, same reason:** correcting it moves the 0.667 and the cost sweep
+  derived from it. The bound is described in the document as an upper bound on a
+  weekly false-alarm rate, and it remains an upper bound with this item in it, so
+  the direction of the error is conservative. Recorded so it is not lost.
+  **Evidence:** report 85 section 0.
