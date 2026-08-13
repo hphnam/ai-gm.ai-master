@@ -166,6 +166,25 @@ Three facts that decide the handling:
 Left standing, reported, and NOT added to `format_accepted.txt` — an accept line needs a
 ruling, and this one has not had one.
 
+### SUPERSEDED 2026-08-13 — see `log/83`
+
+The section above is right that the real defect is not formatting and wrong about what it
+is. **`mag` is one field name over two quantities**: `agent_eval` sweeps `stock_drawdown`
+over `config.EVAL_STOCK_COVER_GRID`, which is *days of cover* running 2 to −2 with severity
+**decreasing** in x, while every other kind sweeps `EVAL_INJECT_Z_GRID`. The series never
+belonged on an axis reading "Injected magnitude (z)" at all, so the three unplottable points
+are a symptom rather than the finding, and **the two plottable ones — at x = 1 and 2, legible
+and reading as z — were the worse half.** Both repairs this section proposed, filtering and
+symlog, would have kept them.
+
+The third bullet above is therefore withdrawn: this was not a choice between two lossy
+presentations. `tab:vuspr` already excluded the kind for the same underlying reason, so the
+document was excluding it in one float and mis-plotting it in the next. The kind is now
+dropped from the figure and its result reported in the text in days. `formatcheck` PASSES.
+
+`log/83` also records why §4's `assert_no_ink_outside` did not catch this: it read `get_text`
+only, so it checked text while its name promised ink.
+
 ## 8 · Verification, with populations
 
 | instrument | population | result |

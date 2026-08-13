@@ -4,7 +4,8 @@ The chapter's answer to "does detection perform well enough to justify surfacing
 currently rests on one VUS-PR figure per cell. A single scalar cannot express the
 operating point an operator cares about: the deviation magnitude at which the catch
 rate becomes usable. This plots catch rate against injected magnitude with Wilson
-intervals as bands, one line per event kind, faceted by venue.
+intervals as bands, one line per event kind swept over the z grid, faceted by venue.
+See EXCLUDED_KINDS below for the one kind that is swept over something else.
 
 Rejected: a line plot of the cost sweep over the miss-to-false-alarm ratio. The sweep
 is degenerate -- misses (124) and false alarms (8) are constant across all four ratios
@@ -29,8 +30,21 @@ KIND_STYLE = {
     "spike": (BRAND["ruby"], "o", "Spike"),
     "regime_shift": (BRAND["teal"], "s", "Regime shift"),
     "exo_coincident": (BRAND["gold"], "^", "Exogenous-coincident"),
-    "stock_drawdown": (BRAND["grey2"], "D", "Stock drawdown"),
 }
+
+# `stock_drawdown` is absent from KIND_STYLE and therefore from this figure. Its `mag`
+# field is not a magnitude: `agent_eval._SCALED_VENUE_KINDS` sweeps that kind over
+# `config.EVAL_STOCK_COVER_GRID`, which is DAYS OF COVER (2, 1, 0, -1, -2, commented
+# "mildly low -> clearly out"), while every other kind sweeps `EVAL_INJECT_Z_GRID`.
+# Three consequences, any one of which disqualifies the series from this axis: the units
+# are days rather than standardised residuals; severity DECREASES with x where the z
+# kinds increase; and three of the five points are non-positive and undefined on the log
+# scale, which is how they reached the PDF at x ~ -16000 pt and failed the formatting
+# gate on 2026-08-12. The two survivors at x = 1 and 2 were the worse defect, being
+# legible and reading as z. `agent_eval._magbin` keeps the two parameterisations apart
+# ("in-cover (doc>0)" against the |z| bins); this figure did not. The result itself --
+# caught at every level of cover -- is reported in the text, in days.
+EXCLUDED_KINDS = ("stock_drawdown",)
 
 
 def main() -> None:
@@ -57,14 +71,12 @@ def main() -> None:
             rates = [p["rate"] for p in points]
             lo = [p["ci"][0] for p in points]
             hi = [p["ci"][1] for p in points]
-            # NOTE: the Beer Hall's stock_drawdown points at mag -2.0, -1.0 and 0.0 are
-            # undefined on the log x-axis set below, so matplotlib places them at about
-            # x=-16000pt instead of dropping them. They are invisible on the page (the
-            # \includegraphics BBox clips them) but they are real ink outside the text
-            # block as far as formatcheck is concerned. Reported 2026-08-12 and NOT
-            # repaired here: every available repair -- filtering them, or moving to a
-            # symlog axis -- changes what this figure shows, which is Phuong's ruling and
-            # not a formatting pass's. Filtering was measured to move 651 subpixels.
+            # A non-positive x is undefined on the log scale set below, and matplotlib
+            # parks it at about x = -16000 pt rather than dropping it -- ink far outside
+            # the canvas, invisible behind the \includegraphics BBox and fatal to the
+            # formatting gate. It is arithmetic, so it is asserted here per the rule that
+            # geometry a generator can check is not left to a render.
+            assert min(mags) > 0, f"{kind}/{venue}: x<=0 is undefined on a log axis"
             ax.fill_between(mags, lo, hi, color=colour, alpha=0.14, lw=0, zorder=1)
             ax.plot(mags, rates, color=colour, marker=marker, ms=3.4, lw=1.1, zorder=3)
             endpoints.append((rates[-1], colour, points[0]["n"]))

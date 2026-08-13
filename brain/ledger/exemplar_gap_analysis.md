@@ -350,11 +350,12 @@ appendix sections holding working whose findings stayed in the chapter.
 ### Open after this pass
 
 - **D1** still blocked, still the highest-value item.
-- `formatcheck` **FAILS** on page 58, and it is not this pass's defect. `fig_sensitivity`
-  places the Beer Hall's stock-drawdown points at magnitudes $-2$, $-1$ and $0$, which are
-  undefined on its log x-axis, so matplotlib parks them at about $x = -16{,}324$pt. The
-  generator's own comment records this as reported 2026-08-12 and deferred, because every
-  repair (filtering the points, or a symlog axis) changes what the figure shows — a figure
-  gate that belongs to Phuong.
+- ~~`formatcheck` **FAILS** on page 58~~ **RESOLVED 2026-08-13, and not by the repair this
+  entry proposed.** The parked points were a symptom: `mag` is days of cover for
+  `stock_drawdown` and a standardised residual for every other kind, so that series was on
+  the wrong axis in the wrong units and the wrong direction, and its two *plottable* points
+  were the worse defect. Neither proposed repair — filtering, or symlog — would have touched
+  them. The kind is dropped from the figure, matching `tab:vuspr`, which already excluded it
+  for the same reason. `formatcheck` PASSES. See `brain/log/83_fig_sensitivity_units_result.md`.
 - `completenesscheck` found `sec:res-chatlog` at 35 prose words against a floor of 40,
   **already failing at HEAD** from the 2026-08-12 reduction. Repaired.

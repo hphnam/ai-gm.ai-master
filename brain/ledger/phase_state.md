@@ -5150,3 +5150,64 @@ rigorously; D9 past tense "where appropriate"; the final appendix to become the 
 - D1 (the miss-to-false-alarm cost ratio) remains blocked on the operator.
 - Nothing is pushed. `PRJ93_RULES.md` makes the Overleaf push a human gate, and the
   2026-08-12 session recorded an unexplained push landing 21 seconds after a local commit.
+
+---
+
+## 2026-08-13 — the p.58 formatcheck failure, closed at its cause
+
+Continuation of the same session. The one instrument still failing was resolved, and the
+resolution was not the repair the previous entry proposed.
+
+1. **`fig_sensitivity` was plotting two different quantities on one axis.** `mag` is one
+   field name over two: `agent_eval` sweeps `stock_drawdown` over
+   `config.EVAL_STOCK_COVER_GRID` (days of cover, 2 to −2, severity *decreasing* in x) and
+   every other kind over `EVAL_INJECT_Z_GRID`. Three of five points were non-positive and
+   undefined on the log scale, which is the ink `formatcheck` saw; **the two that plotted,
+   at x = 1 and 2, were the worse half** — legible, and reading as z. Both repairs the
+   previous entry offered (filtering, symlog) would have kept them.
+2. **Repair: the kind is dropped from the figure**, which `tab:vuspr` already did for the
+   same reason — the document was excluding it in one float and mis-plotting it in the
+   next. Its result moved into the body text in its own units. `agent_eval.json` untouched;
+   no measured quantity moved.
+3. **Two figure guards were examining nothing.** `figures/_style.assert_no_ink_outside`
+   read `get_text` only, so it checked text while its name promised ink; it now reads
+   `get_drawings` on both axes (six committed figures measure 0.00 pt overshoot,
+   `fig_sensitivity` measured 16324.44). Both it and `assert_no_text_dropped` returned
+   silently on a pymupdf `ImportError`, making them no-ops in `brain/.venv-eval`, which has
+   no pymupdf; both now fail closed via `_require_pymupdf`. A tier-1 `min(mags) > 0`
+   assertion was added to the generator.
+4. **Word budget.** The repair cost +30 against a 10-word margin, landing 20,020. The words
+   came from the five-arm weather glossary, stated in `results.tex` prose and again in
+   `tab:weather`'s caption three lines below — `dupcheck` flags it as a repeated span. The
+   caption keeps the glossary and M's qualification moved into it rather than being cut.
+
+**Artefacts written**
+
+- `brain/log/83_fig_sensitivity_units_result.md` — the traceable result.
+- `brain/log/81_figure_consistency_result.md` §7 — supersession appended, not overwritten.
+- `brain/ledger/BLOCKED_third_party.md` — the `fig_sensitivity` row closed, a second row
+  added for the two guards, and a new current build row superseding the 2026-08-12 one.
+- `brain/ledger/exemplar_gap_analysis.md` — the "Open after this pass" entry struck.
+
+**Verified end state** (local, TeX Live 2026; tier 2, not a claim about Overleaf)
+
+| Check | Result |
+|---|---|
+| `latexcheck` | PASS, 115 pages, 0 undefined references, 0 undefined citations, 0 lost floats |
+| `formatcheck` | **PASS**, 1 accepted spill (`and answers staff`, 3.51 pt), 0 unaccepted |
+| declared body in the compiled PDF | **19,994** against the 20,000 cap; `texcount` agrees |
+| `venueordercheck` | PASS, 11 files scanned |
+| `figurecheck` | PASS, 9 sources scanned |
+| `completenesscheck` | PASS, 27 files walked |
+| `dupcheck` | 51 repeated spans over 7 files; the weather-glossary span is gone |
+| figure artefact | worst drawing overshoot 0.00 pt; legend carries three kinds |
+| graphify | 14,482 nodes, 26,065 edges, 974 communities; write guard confirms the write landed |
+
+Page 58 was rendered and read by eye, per the gate's own requirement.
+
+**Open**
+
+- D1 (the miss-to-false-alarm cost ratio) remains blocked on the operator, deferred by
+  Phuong for this session.
+- **Nothing is pushed.** The Overleaf push is a human gate. `origin/main` still holds
+  `1dfb029`.

@@ -201,8 +201,28 @@ def assert_page_width(path: Path) -> None:
                  "type would not match the other figures.")
 
 
+def _require_pymupdf(guard: str):
+    """Fail the build rather than let a geometry guard quietly examine nothing.
+
+    Both guards below used to swallow the ImportError and `return`, which made them
+    no-ops in `brain/.venv-eval` -- the venv that carries duckdb and pandas and does
+    NOT carry pymupdf, and is therefore a venv a figure can plausibly be built in.
+    A guard that is off prints exactly what a guard that passed prints, which is the
+    project's standing rule that a check examining nothing must not be able to report
+    a clean result. There is no fallback here: the whole point of these two is that
+    they read the written artefact.
+    """
+    try:
+        import pymupdf
+    except ImportError:
+        sys.exit(f"STOP: {guard} needs pymupdf and this interpreter has none, so the "
+                 "figure would be written unchecked. Build figures with an interpreter "
+                 "that has it (pip install pymupdf) rather than skipping the guard.")
+    return pymupdf
+
+
 def assert_no_ink_outside(path: Path) -> None:
-    """Refuse a figure whose text runs off its own canvas.
+    """Refuse a figure whose text OR drawn ink runs off its own canvas.
 
     Removing `savefig.bbox='tight'` (see the module docstring) means the canvas no
     longer grows to swallow an over-long label -- it clips instead, and a clipped axis
@@ -212,13 +232,24 @@ def assert_no_ink_outside(path: Path) -> None:
     here rather than left to a render. `constrained_layout` manages a label's HEIGHT but
     not the horizontal reach of one centred under an edge panel, which is why this is
     needed at all.
+
+    The drawings half was added 2026-08-13, because for its first life this function
+    read `get_text` only and so checked TEXT while its name, and every caller reading
+    that name, promised INK. `fig_sensitivity` put a marker at x = -16324 pt -- a
+    non-positive value on a log axis, which matplotlib parks rather than drops -- and
+    this guard passed it, the \\includegraphics BBox hid it, and it was caught two tiers
+    downstream by `formatcheck` on the rendered page. A check whose scope is narrower
+    than its verdict is this project's recurring defect; the repair is to widen the
+    scope, since the name was the honest half.
+
+    Both directions, against the real estate rather than fixtures: at the time of
+    writing the six other committed figures measure a worst overshoot of exactly
+    0.00 pt and `fig_sensitivity` measured 16324.44, so the 0.1 pt tolerance separates
+    them by five orders of magnitude and is not a tuned threshold.
     """
-    try:
-        import pymupdf
-    except ImportError:
-        return
+    pymupdf = _require_pymupdf("assert_no_ink_outside")
     page = pymupdf.open(path)[0]
-    width = page.rect.width
+    width, height = page.rect.width, page.rect.height
     spilled = [(s["text"], s["bbox"][0], s["bbox"][2])
                for b in page.get_text("dict")["blocks"] if b["type"] == 0
                for line in b["lines"] for s in line["spans"]
@@ -227,6 +258,17 @@ def assert_no_ink_outside(path: Path) -> None:
         detail = "; ".join(f"{t!r} spans {x0:.1f}..{x1:.1f}" for t, x0, x1 in spilled)
         sys.exit(f"STOP: {path.name} has text outside its {width:.1f} pt canvas and will "
                  f"print clipped: {detail}")
+    # Vertical is checked here and not for text, because a parked point escapes on
+    # whichever axis carries the undefined value and there is no reason to guess which.
+    drawn = [d["rect"] for d in page.get_drawings()
+             if d["rect"].x0 < -0.1 or d["rect"].x1 > width + 0.1
+             or d["rect"].y0 < -0.1 or d["rect"].y1 > height + 0.1]
+    if drawn:
+        r = max(drawn, key=lambda q: max(-q.x0, q.x1 - width, -q.y0, q.y1 - height))
+        sys.exit(f"STOP: {path.name} draws ink outside its {width:.1f}x{height:.1f} pt "
+                 f"canvas -- worst path spans x {r.x0:.1f}..{r.x1:.1f}, y {r.y0:.1f}.."
+                 f"{r.y1:.1f}, over {len(drawn)} path(s). A point undefined on a log "
+                 "axis is the usual cause: matplotlib parks it, it does not drop it.")
 
 
 def assert_no_text_dropped(fig, path: Path) -> None:
@@ -244,10 +286,7 @@ def assert_no_text_dropped(fig, path: Path) -> None:
     LaTeX legitimately rewrites maths, macros and punctuation on its way to the page and
     a guard that fires on those would be switched off within a week.
     """
-    try:
-        import pymupdf
-    except ImportError:
-        return
+    pymupdf = _require_pymupdf("assert_no_text_dropped")
     from matplotlib.text import Text
 
     rendered = "".join(pymupdf.open(path)[0].get_text().split()).lower()

@@ -5915,8 +5915,8 @@
     "semantic_hash": "eac572d0db3e829f11bd3a85718d3ffc"
   },
   "brain/ledger/phase_state.md": {
-    "mtime": 1786545559.8512847,
-    "ast_hash": "947559ed4de114cd8dbfa3e105b01711",
+    "mtime": 1786578148.2394865,
+    "ast_hash": "4c3b2645cae90c9b3f0010cddfaead5d",
     "semantic_hash": ""
   },
   "brain/ledger/tooling_verdict.md": {
@@ -6195,8 +6195,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/BLOCKED_third_party.md": {
-    "mtime": 1786545537.9455369,
-    "ast_hash": "056ea701adc4300fd8b66839aa9899d8",
+    "mtime": 1786646319.5203335,
+    "ast_hash": "1f974d01929c9cd06bcbee64741287e0",
     "semantic_hash": ""
   },
   "brain/ledger/defensible_divergences_writeup_pack.md": {
@@ -6370,8 +6370,8 @@
     "semantic_hash": ""
   },
   "figures/_style.py": {
-    "mtime": 1786543490.7722435,
-    "ast_hash": "f16397372305398e6187b7925be011c5",
+    "mtime": 1786646012.4197736,
+    "ast_hash": "b26b35a551b5a1a2dc19d53d2fa126c3",
     "semantic_hash": ""
   },
   "figures/fig_blocks.py": {
@@ -6390,8 +6390,8 @@
     "semantic_hash": ""
   },
   "figures/fig_sensitivity.py": {
-    "mtime": 1786545070.0042226,
-    "ast_hash": "55418a43cfe2fe416470e3bfe770f036",
+    "mtime": 1786645895.4273384,
+    "ast_hash": "597d81a52b0db6aa53e47e576d8beab6",
     "semantic_hash": ""
   },
   "figures/fig_validity_efficiency.py": {
@@ -6690,8 +6690,8 @@
     "semantic_hash": ""
   },
   "brain/log/81_figure_consistency_result.md": {
-    "mtime": 1786545506.9440212,
-    "ast_hash": "1d001ad34ab725633b73e6060e6a4ece",
+    "mtime": 1786646391.4461577,
+    "ast_hash": "90c1da928ba46a0a961df83051d914c3",
     "semantic_hash": ""
   },
   "brain/eval/spike_reachability.json": {
@@ -6715,8 +6715,8 @@
     "semantic_hash": ""
   },
   "brain/ledger/exemplar_gap_analysis.md": {
-    "mtime": 1786578106.3788736,
-    "ast_hash": "b8fa6d654b5edabacdac23d8c85b40a8",
+    "mtime": 1786646410.3709707,
+    "ast_hash": "26a3c5657183cc07f7b64d92d589c448",
     "semantic_hash": ""
   },
   "brain/log/82_D6_spike_reachability_result.md": {
@@ -6727,6 +6727,11 @@
   "brain/docs/Sample Dissertation.pdf": {
     "mtime": 1786566206.1119056,
     "ast_hash": "459937fc3c0a000806deba10a2fc2893",
+    "semantic_hash": ""
+  },
+  "brain/log/83_fig_sensitivity_units_result.md": {
+    "mtime": 1786646369.5871334,
+    "ast_hash": "47783299e7cfb0429cc37370d6ad03f8",
     "semantic_hash": ""
   }
 }
