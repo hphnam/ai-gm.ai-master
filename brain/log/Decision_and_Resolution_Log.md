@@ -3049,3 +3049,97 @@ them into the append-only log so it is the continuous WP1-to-present record.
      tolerance, and the run fails loudly on any mismatch, because a mismatch means the two
      populations are not the same and nothing downstream is trustworthy.
      Instrument and results: `brain/log/86_c7_partition_contrast.md`.
+
+109. **S14: "served" is used in three senses, the term can be made coherent for zero words,
+     and the flag amendment is a selector defect rather than a second missing guard.**
+     Read-only on every `.tex` file and on `ref.bib`. No reduction made. Store ceiling
+     2026-07-07 before and after. Counted body re-verified at HEAD `d2f05a9b`: **19,993**,
+     margin **+7**, `texcount -0 -sum -merge -total` over the six chapters plus `abstract.tex`.
+     **(a) The term is undefined and carries three referents.** No definition exists anywhere
+     in `chapters/` or `appendix/`. Of roughly forty occurrences of served/production/
+     deployment/deployed/live, most designate the adoption gate's selection, two assert a
+     running deployment (`discussion.tex:188`, `discussion.tex:318-320`), and two are readable
+     either way (`results.tex:103` table header, `results.tex:114`). The third referent is
+     outside the enumerated scope and is the sharpest: `notation.tex:40` glosses
+     $\tilde{y}_t$ as "Day-of-week median forecast, **the incumbent served model**", which is
+     the deviation detector's baseline. `signals.residual.build_residual_stream` recomputes
+     that median at every venue and never reads `served_forecast` (row 5 measured this), so
+     the gloss is false at the Beer Hall and Two River Taps, where the gate adopted the
+     foundation arm and exponential smoothing. `notation.tex` is front matter and outside
+     `\bodywordcount`, so repairing it costs nothing against the cap.
+     **(b) The estimand argument SURVIVES the gate-selection reading, and this was the
+     package's stop condition.** `methodology.tex:271-274`, `discussion.tex:107` and
+     `conclusion.tex:126` carry the median-under-a-mean's-name claim. Under "served = adopted
+     by the gate" all three are claims about what the adopted arm emits
+     (`models/foundation.py:364-368` takes the `"0.5"` quantile column and clips at zero) and
+     about what a revenue decision requires. Neither needs a running system. **A sharper
+     confirmation: the claim would be FALSE under a "whatever the store holds" reading**,
+     because the store's most recent band at every venue is `conformal_rung2_ets` and
+     `rung2_ets` (`models/ladder.py:219-225`) returns `ExponentialSmoothing.forecast`, a
+     conditional mean, not a median. The reading that makes the contribution true is the
+     gate-selection one. No stop condition fired.
+     **(c) Coherence is free.** Six edits, priced in situ on scratch copies of all seven
+     counted files, total **Δ 0**: table header `Served model` to `Adopted model` (0);
+     `discussion.tex:188` "the model already in production" to "the model the gate had already
+     adopted" (+2); `discussion.tex:318-319` "the model in production ... a property of this
+     deployment" to "the adopted model ... a property of that selection" (−1);
+     `results.tex:114` "No deployed choice" to "No adopted choice" (0); `results.tex:911`
+     "deployment fatigue rate" to "harness fatigue rate" (0); and the rung-4 repair below (−1).
+     Repairing only the two Chapter 5 sentences costs **+1** and leaves the header and the
+     notation gloss standing. An explicit one-sentence definition costs a further **+10** and
+     is optional once the six edits land, since nothing then reads as deployment.
+     **(d) The rung-4 sentence is cheaper than report 87 priced it, because the serving claim
+     comes out with the arm count.** Four candidates measured in situ against
+     `methodology.tex:356-358` (39 words): enumerate with per-arm citations **+4**; point at
+     `Appendix~\ref{app:tables}` keeping the `sec:exo` link **+1**; point at the appendix
+     dropping `sec:exo` **−10** but losing the covariate-conditioning fact the rung-by-rung
+     argument needs; joint `\citep` with "in two univariate arms" and "served" struck **−1**.
+     All four fix the arithmetic defect report 87 found, that the paragraph enumerates eight
+     entrants under its own opening claim of nine. Dropping `\ref{sec:exo}` does not orphan the
+     label: four other references remain (`results.tex:320`, `:330`,
+     `appendix/pseudocode.tex:88`, `:109`).
+     **(e) A second entrant-count inconsistency, not previously recorded.**
+     `methodology.tex:389` states "Two further entrants are specified and scored at no venue"
+     (one for its backend, one for a vendor-service licensing question), so eleven are
+     specified. `results.tex:38` states "A tenth entrant scored at no venue for want of its
+     backend", which implies ten. Both agree nine scored. Repair priced at **+1**.
+     **(f) The gate-versus-promotion divergence is NOT disclosed in the document.** Ten
+     passages describe the Beer Hall rung-4 selection (`results.tex:35`, `:52-53`, `:105`,
+     `:371`, `:461`; `discussion.tex:140`; `conclusion.tex:113`; `methodology.tex:271`;
+     `appendix/tables.tex:37`, `:151`; `appendix/robustness.tex:271`) and not one distinguishes
+     the six-fold gate winner `rung4_chronos2_exo` at 0.745 from the four-fold refit path's
+     winner, plain `rung4_chronos2` at 0.823, which row 5 recorded as "a genuine divergence
+     from the spec's stated decision, surfaced, not hidden". Surfaced in this log is not
+     surfaced in the dissertation. Minimum honest disclosure priced at **+19** attached to
+     `results.tex:38`, or **+31** naming the arm and the MASE. Not written.
+     A near-miss worth recording so it is not mistaken for a disclosure:
+     `appendix/tables.tex:128` prints `0.823` for the Beer Hall, but it is a native-interval
+     COVERAGE figure and coincides with the promotion MASE by accident.
+     **(g) `CONTRACT.md` reported, not changed (Ryan's file).** Its three assertions that the
+     exogenous arm is served (`:123`, `:152-153`, `:175`) are correct about the gate winner and
+     the G12.12 go-live config, and wrong about anything ever promoted or persisted: the only
+     foundation rows in the store are plain `conformal_rung4_chronos2` from 2026-07-08. Its own
+     OPEN item 6 already says the compute path never re-runs the gate.
+     **(h) FLAG-EVAL-HARNESS-UNGUARDED amended.** The wrong-selector mechanism and the
+     docstring-parity failure were already recorded by S12; S14 re-read both at source and
+     they hold. What is added: `_usable_folds` (`agent_eval.py:418-425`) carries the closure
+     filter and states why, `fatigue_metrics` (`:318-330`) reaches past it to
+     `inject.holdout`, so **this is a selector defect and a fix that only adds a third guard
+     to `_signals_from_stream` would repair nothing**; and `fatigue_metrics`' own docstring
+     already calls the figure "an honest UPPER BOUND", which is what keeps the printed number
+     safe. New flag **FLAG-CLOSURE-ARTEFACT-CONTRADICTIONS** records the two artefact
+     self-contradictions of report 85 item 11, both re-verified at source
+     (`sim/july2026_brain_result.json` `trt_closed_note` against its own
+     `two_river_taps.n_deviation = 1` on 2026-07-03; `eval/deviation_eval.md`'s 2026-07-05
+     Two River Taps row at `actual = 0.0` under a footnote claiming the stream excludes
+     structural-zero days). Neither artefact is cited by any `.tex` file. The second row is
+     classified `normal` at `z = -0.60`, so it is a false claim about the stream's population
+     rather than a false fire.
+     **(i) `ledger/relocation_candidates.md` §0 corrected.** It was headed "READ THIS FIRST,
+     the lever is currently disconnected" and its own stated precondition has been executed:
+     `\bodywordcount` (`main.tex:255-257`) counts the six chapters plus `abstract.tex` only,
+     and `declaration.tex:23` matches it. Relocating a body passage now buys its full
+     `texcount` value. Appended as §0a rather than by editing §0, which is preserved as the
+     record of the state it described.
+     **Nothing in this row is applied to the document.** Every figure is a price. The `.tex`
+     edits are made in Overleaf, which is canonical.

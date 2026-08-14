@@ -12,6 +12,12 @@ the 20,000, confirmed by my supervisor, and that lever has never been pulled at 
 
 ## 0 · READ THIS FIRST — the lever is currently disconnected, and one line of the document is why
 
+> **SUPERSEDED 2026-08-14 by §0a below, which is the section to act on.** The precondition
+> this section sets out has been executed: `\quickwordcount{main}` was replaced by
+> `\bodywordcount`, scoped to the six chapters plus `abstract.tex`, and `declaration.tex`
+> was rewritten to match. **Relocation now buys words.** Everything below in §0 is the
+> record of the state as it stood on 2026-08-09 and is retained for that reason only.
+
 **`declaration.tex` states the opposite of the supervisor's ruling, in the document, above a
 printed number that refutes it.** Verbatim:
 
@@ -55,6 +61,80 @@ the one printed on the declaration page. Every target below is therefore stated 
 
 **Target, under the supervisor's ruling:** chapters + abstract at or under 20,000.
 **Gap to close: −8,750 texcount (−7,779 marker).**
+
+---
+
+## 0a · SUPERSEDES §0. The lever is CONNECTED. Corrected 2026-08-14 (S14, decision-log row 109)
+
+**§0 above is preserved as the record of the state it described, and it is no longer
+true.** Its own stated precondition has been executed. Read §0a before acting on §0.
+
+`\quickwordcount{main}` is gone. `main.tex:255-257` now defines:
+
+```latex
+\newcommand{\bodywordcount}{%
+  \immediate\write18{texcount -0 -sum -merge -total chapters/introduction.tex chapters/literature_review.tex chapters/methodology.tex chapters/results.tex chapters/discussion.tex chapters/conclusion.tex abstract.tex > main-words.sum }%
+  \input{main-words.sum}%
+}
+```
+
+Six chapter files plus `abstract.tex`, listed explicitly, appendices excluded.
+`declaration.tex:23` was rewritten to match and no longer asserts compliance:
+
+> "The body of this dissertation, comprising the abstract and Chapters 1 to 6, contains
+> \bodywordcount{} words. That count excludes the bibliography and the appendices, and
+> the permitted maximum is 20,000 words."
+
+**Consequence, and it reverses §0's consequence 1: moving a paragraph from `chapters/`
+to `appendix/` now reduces the declared number by that paragraph's full `texcount`
+value.** Every item in §1 to §5 below is a live lever, not an accounting exercise.
+
+§0's consequence 2 is also discharged. The declaration is no longer self-refuting: it
+states a measured count and a limit without claiming compliance, and the comment at
+`declaration.tex:19-21` records that this becomes a compliance claim by arithmetic once
+the body is under. **At the current 19,993 it already is.**
+
+**Position at 2026-08-14, `texcount -0 -sum -merge -total`, recomputed at HEAD
+`d2f05a9b`, not read from `main-words.sum`:**
+
+| File | Words |
+|---|---|
+| `chapters/introduction.tex` | 1,172 |
+| `chapters/literature_review.tex` | 3,588 |
+| `chapters/methodology.tex` | 4,916 |
+| `chapters/results.tex` | 5,561 |
+| `chapters/discussion.tex` | 2,592 |
+| `chapters/conclusion.tex` | 1,844 |
+| `abstract.tex` | 320 |
+| **counted body** | **19,993** |
+| | |
+| `appendix/project_specification.tex` | 2,366 |
+| `appendix/pseudocode.tex` | 3,293 |
+| `appendix/robustness.tex` | 3,019 |
+| `appendix/tables.tex` | 919 |
+| **appendices, all outside the count** | **9,597** |
+
+**§0's "gap to close, −8,750" is spent.** The body is under the cap with **7 words** of
+margin. The per-chapter table in §1 below is from 2026-08-09 and every figure in it is
+now stale by thousands of words; use the table above.
+
+**What the lever is for now, which is not what §0 was written for.** It is no longer a
+reduction programme. It is the cheapest source of the **15 words** report 88 identifies
+as the gap between the C7 finding entering the document and not entering it, and of any
+future correction that does not fit the margin. Relocating one 15-word body clause
+closes it exactly.
+
+**Two cautions that survive the reversal.**
+
+1. **A saving made INSIDE `appendix/` buys nothing**, for the same reason relocation now
+   works. S13 costed a closure-scope repair in `appendix/robustness.tex` at −1 word and
+   the counted body did not move. Price a reduction against the seven counted files or
+   do not price it.
+2. **Relocation costs the marker's view**, which §1 to §5 already say. A criterion bound
+   to a chapter location is not served by an appendix, and that trade is Phuong's to
+   rule item by item, exactly as the 8C-7 brief set out.
+
+**Nothing was relocated by S14.** This section corrects a statement; it executes nothing.
 
 ---
 
