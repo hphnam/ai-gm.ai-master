@@ -3208,3 +3208,88 @@ them into the append-only log so it is the continuous WP1-to-present record.
      de-duplication plus C7 landing at **exactly 20,000, margin 0**; all three at 20,002, over.
      **So C7 is fundable only by consuming the entire margin**, and nothing is left for any later
      correction. Not applied. This remains Phuong's ruling.
+
+111. **S17: the G12.9 resolution banked at source, the format gate greened, and the reason three
+     packages missed the fix, which is that row 5 has no forward pointer.**
+     Forward pointer from row 110(b). **No numbered row edited.** Store ceiling 2026-07-07 before
+     and after. Counted body **19,993**, margin **+7**, unchanged by everything in this row.
+     **(a) The divergence is closed, and the closure is now recorded with its evidence.** Row 5
+     reported that the real T3 re-fit evaluated at 4 folds and selected plain `rung4_chronos2`
+     while the 6-fold ladder CLI preview selected `rung4_chronos2_exo`, and left the
+     reconciliation as "a call for Nam, not made unilaterally here". Row 6(a) made that call on
+     the side of 6. **Verified at source rather than from either row:** `ingest/refresh.py:302`
+     reads `ladder.evaluate_rolling(venue, n_folds=6, horizon=7, with_prophet=False)`, and
+     `n_folds=6` first entered that file at commit **`a04eb2d6`, 2026-07-08 19:20:09 +0100**
+     ("expand ellel forecasting rung"). The four-fold path does not exist.
+     **(b) The store's rung-4 row is stale output, not evidence of a live mismatch, and the clock
+     proves it.** The only foundation bands in the store are `conformal_rung4_chronos2` at the
+     Beer Hall, 114 rows, written **2026-07-08 15:23:41**, which is **four hours and fifty-seven
+     minutes BEFORE** the unification commit. It is therefore output of the four-fold path,
+     produced before the fix and never regenerated, and not a case of the six-fold path selecting
+     the plain arm. Nothing re-promotes it (`CONTRACT.md` OPEN item 6). `served_forecast` and
+     `ladder_selection` are both **empty** in the current store, and the most recent bands at all
+     three venues are `conformal_rung2_ets` from 2026-08-06.
+     **(c) `CONTRACT.md`'s three exogenous-arm assertions are correct going forward, which S14
+     could not say.** `:123`, `:152-153` and `:175` assert the served Beer Hall model is the
+     exogenous arm. S14 found them right about the gate and wrong about anything ever promoted.
+     With the refit path now selecting on six folds, the mechanism that made them wrong is gone:
+     a refit run today would evaluate on the same fold count the gate used, at which the
+     exogenous arm is the Beer Hall winner. **Two conditions on that, both stated rather than
+     buried.** It holds only if a refit ever runs, and OPEN item 6 says nothing in the compute
+     path re-runs the gate, so the assertions describe what a refit WOULD select and not what any
+     store holds. And it is a claim about the mechanism, not a prediction: whether a six-fold
+     refit on future data reproduces the exogenous win is a question about that data.
+     **Reported only. `CONTRACT.md` is Ryan's.**
+     **(d) Why three packages missed this, and it is a structural defect not an oversight.**
+     **Row 5 carries no forward pointer to row 6(a).** Row 5 ends by naming the reconciliation as
+     an open call for Nam; row 6(a) resolves it about sixty rows later under a different section
+     heading, and nothing in row 5 says so. S14, S15 and S16 each read row 5, verified that the
+     document omits the divergence, and never verified that the divergence still existed. **A gap
+     has two halves, the absent statement and the live fact it would state, and only the first
+     was ever checked.** In an append-only log a resolution can only be found by reading forward.
+     **(e) Artefacts that still describe the divergence as open or the refit as four-fold.** Listed
+     for one later pass, none edited here.
+     - `log/Decision_and_Resolution_Log.md` **row 5** (:111-160): "reconciling T3's fold count
+       with the ladder CLI's ... is a call for Nam, not made unilaterally here". Resolved at row
+       6(a), no forward pointer. **The root of the whole thread.**
+     - `log/15_Fidelity_Corrections_Addendum_Report.md:201-205`: "the real T3 refit (4 folds, no
+       prophet - pre-existing, unmodified settings)". Archival WP12 report, correct when written,
+       names a fold count changed at G12.9, no forward pointer.
+     - `log/16_Chronos2_Promotion_Report.md:25-26, :47`: the 0.823/0.834/0.845 triple, then
+       "Reconciling T3's fold count with the ladder CLI's" as pending work.
+     - `brain/CONTRACT.md:123, :152-153, :175`: correct going forward per (c), still worth a
+       pointer at the resolution.
+     No `FLAGS.md` entry describes the fold divergence as open; the sweep found none.
+     **(f) The format gate now passes, and the fix is word-neutral.** `formatcheck.py` had failed
+     at HEAD on 3.51 pt of ink in the right margin, p108,
+     `appendix/project_specification.tex:113`, and failed identically on an unpatched baseline, so
+     it was pre-existing. **Cause, measured rather than guessed:** the line ends in "staff", whose
+     Computer Modern `ff` ligature has ink extending past its advance width. The ligature's advance
+     ends at 524.44 against a derived text block of 524.48, so TeX justified a line it considers
+     perfect and reported no overfull box, while the ink reaches 528.01. No `\hfuzz` is set
+     anywhere and TeX reports a 0.98 pt box elsewhere, so suppression is ruled out. `\sloppypar`
+     around the paragraph changed nothing, because TeX was not struggling with the line.
+     **The repair is one tie**, `staff~questions`, forbidding the break after "staff" so the line
+     breaks earlier. The appendix is a verbatim reproduction for HC54 and **no word was changed,
+     dropped, reordered or reworded**; a tie renders as an ordinary space. Verified: gate **PASS**
+     over 115 of 115 pages and 2914 justified lines, counted body still 19,993, 0 errors, 0
+     undefined, overfull and underfull identical to a controlled unpatched baseline, and a
+     page-by-page diff of the rendered text shows a single word "a" moving from page 107 to 108
+     and nothing else. Committed to the Overleaf clone as **`fbf64a2`**.
+     **(g) The push is still outstanding and the clone now holds two unpushed commits**,
+     `f966f3d4` and `fbf64a2`. `origin/main` remains `99ee32b7`. The blocker is a Claude Code
+     PreToolUse hook at `.claude/hooks/block-dangerous-commands.sh:43`, not a git hook and not an
+     Overleaf rejection; the clone has no `pre-push` hook and no `core.hooksPath`. **A person
+     running `git push origin main` in a terminal is not subject to it.**
+     **(h) The reserve, from the submission documentation and from this project's own policy.**
+     The documentation states no tolerance above 20,000 and grants no exclusion; it also makes
+     brevity assessable in its own right, "competence in producing a succinct and coherent report
+     is essential" and verbose reports "will be penalised rather than rewarded". The appendices
+     are **9,597** uncounted words, so the exclusion the declaration claims is load-bearing and
+     rests on the 8C-7 supervisor confirmation rather than on the rules.
+     `ledger/reduction_cost_register.md:810` sets the project's own floor: **reserve required
+     >=250**. Margins of 112 and of 11 were both recorded as below any safe reserve, the latter
+     with "the next session must not read it as headroom". **The document stands at +7, which is
+     243 below its own stated floor.** Against that policy the C7 displacement is not fundable at
+     any price, and the question is not whether 23 words fit inside 7.
+     **Nothing in this row applies a reduction or a Part 3 item.**
