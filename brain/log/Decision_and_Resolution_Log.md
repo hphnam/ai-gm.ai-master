@@ -135,6 +135,22 @@ runtime venv and its dependencies are untouched.
      hidden**; reconciling T3's fold count with the ladder CLI's (so future
      refits and the documented preview agree) is a call for Nam, not made
      unilaterally here.
+   - **FORWARD POINTER, appended 2026-08-14 (S18). That call was made at row 6(a),
+     on the side of 6, and this divergence is CLOSED.** Nothing above this line is
+     edited; the bullet above is what was true on 2026-07-08 and it is left standing.
+     `ingest.refresh._refit_ladder` now evaluates at `n_folds=6`, so the real T3
+     re-fit and the `models.ladder` CLI backtest agree on fold count and the 0.823
+     versus 0.779 split above cannot recur. Verified at source rather than from
+     either row: `ingest/refresh.py:302` reads `ladder.evaluate_rolling(venue,
+     n_folds=6, horizon=7, with_prophet=False)`, and `n_folds=6` first entered that
+     file at commit **`a04eb2d6`, 2026-07-08 19:20:09 +0100**. **The four-fold path
+     does not exist.** The `conformal_rung4_chronos2` band still in the store was
+     written 2026-07-08 15:23:41, four hours and fifty-seven minutes BEFORE that
+     commit, so it is four-fold output produced before the fix and never
+     regenerated, and not evidence of a live mismatch. Full evidence at row 111(a)
+     and 111(b). **Read this before citing anything above as open**: row 111(d)
+     records that three packages priced a dissertation disclosure for a divergence
+     that had already been resolved, because this pointer was missing.
    - Promotion executed from a new `.venv-forecast` (Python 3.12, uv-
      provisioned; `requirements-forecast.txt`: chronos-forecasting + torch
      only, no eval-only deps). `served_forecast(beer_hall) = rung4_chronos2`,

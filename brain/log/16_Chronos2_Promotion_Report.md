@@ -287,3 +287,55 @@ Edited: `models/foundation.py` (`chronos2_exo_predict`, `CHRONOS2_EXO_COLS`,
 `tests/test_ingest_refresh.py`, `PRJ93_Decision_and_Resolution_Log.md`,
 `PRJ93_Fidelity_Corrections_Addendum_Report.md`, plus regenerated
 `models/ladder_results_L1_*.md`.
+
+---
+
+## CORRECTION appended 2026-08-14 (S18): §0's headline divergence is closed, and §0 is where a reader meets it
+
+**Appended, not substituted**, per the corrections-are-appended rule in
+`PRJ93_RULES.md`. Nothing above this line is edited. This report's §0 is headed
+"Read this first: the headline finding", so it is the first thing a reader of this
+file sees, and it is the reason this correction is here rather than only in the
+decision log.
+
+**Two passages are corrected.** §0's second bullet:
+
+> The **actual promotion mechanism** (`ingest.refresh`'s T3 re-fit, a
+> pre-existing code path this work did not modify) uses a **4-fold, no-prophet**
+> backtest, not 6 folds. At that fold count, plain **`rung4_chronos2`** wins
+> (MASE **0.823**), beating `rung4_chronos2_exo` (0.834) and `rung4_chronos_bolt`
+> (0.845).
+
+and §0's closing sentence:
+
+> Reconciling T3's fold count with the ladder CLI's (so future refits and the
+> documented preview agree) is a decision for Nam, not made unilaterally here
+
+**The decision was made, at G12.9a, on the side of 6.** `ingest.refresh._refit_ladder`
+now evaluates at `n_folds=6`, so T3 and the `models.ladder` CLI agree on fold count
+and the 0.823 versus 0.779 split cannot recur. Recorded at decision log row **6(a)**
+and in report `17_G12_9_Report.md`.
+
+**Verified at source rather than from a row.** `ingest/refresh.py:302` reads
+`ladder.evaluate_rolling(venue, n_folds=6, horizon=7, with_prophet=False)`;
+`n_folds=6` first entered that file at commit **`a04eb2d6`, 2026-07-08 19:20:09
++0100**. The four-fold path does not exist.
+
+**What still stands.** The whole of §0's reasoning: that the gate decides formally,
+that hand-picking was refused, that the divergence was reported with its exact
+numbers and root cause. The fold-count sensitivity finding stands as the diagnosis
+that motivated the unification. The 0.823/0.834/0.845 triple stands as a record of
+what the four-fold path produced on 2026-07-08. **What does not stand is the
+present tense.** "uses a 4-fold backtest" and "is a decision for Nam" describe a
+state that ended on the evening of the same day this report was written.
+
+**One consequence worth naming.** The `conformal_rung4_chronos2` band in the store
+was written 2026-07-08 15:23:41, four hours and fifty-seven minutes BEFORE the
+unification commit. It is four-fold output produced before the fix and never
+regenerated. It is not evidence that the six-fold path selects the plain arm, and it
+should not be cited as such.
+
+**Why this correction was needed.** Section B row 5 of the decision log carried no
+forward pointer to row 6(a), and three later work packages (S14, S15, S16) priced a
+dissertation disclosure for a divergence that had already been resolved. Full
+account at decision log row **111(d)**; the pointer is now in row 5 itself.

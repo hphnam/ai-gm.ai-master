@@ -284,3 +284,41 @@ Edited: `models/ladder.py`, `ingest/refresh.py`, `service/app.py`, `README.md`,
 `.gitignore`, `tests/test_foundation.py`, `tests/test_ingest_refresh.py`,
 `PRJ93_Decision_and_Resolution_Log.md`, plus regenerated
 `models/ladder_results_L1_*.md`.
+
+---
+
+## CORRECTION appended 2026-08-14 (S18): the four-fold T3 refit no longer exists
+
+**Appended, not substituted**, per the corrections-are-appended rule in
+`PRJ93_RULES.md`. Nothing above this line is edited. The G12.6 bullet in the WP12
+summary reads:
+
+> **G12.6** Actual promotion run, `.venv-forecast`, clean store. **Headline
+> finding: the real T3 refit (4 folds, no prophet - pre-existing, unmodified
+> settings) selects plain `rung4_chronos2` (MASE 0.823), not
+> `rung4_chronos2_exo`** (0.834 at that fold count), diverging from G12.2's
+> 6-fold preview.
+
+**That was true on 2026-07-08 and it is false now.** `ingest.refresh._refit_ladder`
+evaluates at `n_folds=6`, unified with the `models.ladder` CLI backtest at **G12.9a**
+(decision log row **6(a)**, report `17_G12_9_Report.md`). The reconciliation this
+report and Section B row 5 both left open for Nam was made there, on the side of 6.
+There is no live fold-count divergence.
+
+**Verified at source rather than from a row.** `ingest/refresh.py:302` reads
+`ladder.evaluate_rolling(venue, n_folds=6, horizon=7, with_prophet=False)`;
+`n_folds=6` first entered that file at commit **`a04eb2d6`, 2026-07-08 19:20:09
++0100**. The four-fold path does not exist.
+
+**What still stands from the bullet above.** That the gate was allowed to decide
+rather than hand-picked, that the divergence was surfaced rather than hidden, and
+the 0.823/0.834 figures as a record of what the four-fold path produced on the day.
+What does not stand is any reading of it as a live or open condition. The
+`conformal_rung4_chronos2` band still in the store was written 2026-07-08 15:23:41,
+four hours and fifty-seven minutes BEFORE the unification commit, so it is
+pre-fix output that was never regenerated.
+
+**Why this correction was needed.** Row 5 carried no forward pointer to row 6(a),
+and three later work packages (S14, S15, S16) priced a dissertation disclosure for a
+divergence that had already been resolved. Full account at decision log row
+**111(d)**; the pointer is now in row 5 itself.
