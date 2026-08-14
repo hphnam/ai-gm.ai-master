@@ -3143,3 +3143,68 @@ them into the append-only log so it is the continuous WP1-to-present record.
      record of the state it described.
      **Nothing in this row is applied to the document.** Every figure is a price. The `.tex`
      edits are made in Overleaf, which is canonical.
+
+110. **S16: the divergence row 109(f) said was undisclosed had already been resolved, so no
+     disclosure is owed; the eleven repairs are applied; and the de-duplication menu the funding
+     decision rested on was a misread of a table headed "What was taken".**
+     Forward pointer to row 109. **Row 109 is not edited.** Store ceiling 2026-07-07 before and
+     after. Counted body at the Overleaf clone after applying the eleven: **19,993**, margin
+     **+7**, unchanged.
+     **(a) Row 109(f)'s figures are individually right and are not a comparable pair.** 109(f)
+     framed the divergence as the six-fold gate winner `rung4_chronos2_exo` at **0.745** against
+     the four-fold refit path's winner, plain `rung4_chronos2` at **0.823**. The 0.745 is
+     `tab:ladder`'s figure, and `appendix/tables.tex:42-43` states what that table is: "the
+     historical committed gate, restated rather than re-run, ending at each venue's last active
+     day as the store stood when that gate was taken". Row 5's six-fold ladder check puts the
+     exogenous arm at **0.779**, not 0.745. So the two figures sit at different store vintages and
+     printing them side by side would attribute to fold count a gap that is partly vintage. The
+     internally consistent set is row 5's own, one run and one fold count at four folds: plain
+     `rung4_chronos2` **0.823**, `rung4_chronos2_exo` **0.834**, `rung4_chronos_bolt` **0.845**,
+     the ordering reversing by **0.011**.
+     **(b) The divergence was resolved at G12.9, which closes the disclosure question outright.**
+     Row 6(a) records the fold unification: `ingest.refresh._refit_ladder` now evaluates at
+     `n_folds=6` (was 4), "so the real T3 re-fit and the `models.ladder` CLI backtest agree on
+     fold count. This resolves the WP12 divergence flagged in Section B row 5 ... the fold-count
+     reconciliation left open for Nam there is now made, on the side of 6." **Verified at source
+     rather than from the log:** `ingest/refresh.py:302` reads
+     `ladder.evaluate_rolling(venue, n_folds=6, horizon=7, with_prophet=False)`, and `n_folds=6`
+     first entered that file at commit `a04eb2d6`, 2026-07-08 19:20. The four-fold path that
+     produced the divergent winner no longer exists. Row 109(f) was literally true that the
+     document does not disclose the divergence, and the absence is not a defect, because there is
+     no live divergence to disclose. **The ten Chapter 4 passages stand and the +33 disclosure
+     priced in report 90 section 3.1 is withdrawn.** Two further grounds point the same way: the
+     project specification reproduced at `app:specification` says nothing about foundation models,
+     model selection, fold counts, MASE or benchmarks, and row 5's "spec" is the WP12
+     work-package spec, not the project specification, so `sec:disc-specification` was never the
+     right home for it either. Residue worth keeping visible: the store's last foundation write is
+     `conformal_rung4_chronos2` at the Beer Hall, 114 band rows, 2026-07-08 15:23, four hours
+     BEFORE the unification commit, and nothing re-promotes it (`CONTRACT.md` OPEN item 6). The
+     document makes no claim about what the store holds, and after (c) it says so explicitly.
+     **(c) The eleven repairs of report 90 are APPLIED and committed.** This is a state change and
+     row 109's closing line, "nothing in this row is applied to the document", no longer describes
+     the document. Overleaf clone `99ee32b7` to **`f966f3d4`**, five files, 21 insertions and 20
+     deletions: `chapters/results.tex`, `chapters/discussion.tex`, `chapters/methodology.tex`,
+     `notation.tex`, `appendix/robustness.tex`. Counted body 19,993 before and after, compile
+     clean at 0 errors and 0 undefined references, overfull and underfull box counts identical to
+     a controlled unpatched baseline built in the same session. `ref.bib` untouched. **The push to
+     Overleaf was blocked by a local protected-branch guard and the commit is unpushed;** it is
+     not rejected by Overleaf, whose `origin/main` is still `99ee32b7`.
+     **(d) Report 87 section 3.4's two de-duplications do not exist and cannot fund anything.**
+     Report 87 read `ledger/reduction_cost_register.md:777-781` as a menu, saying "both are marked
+     as available rather than taken". That table is headed **"## What was taken, 109 words"** at
+     `:773`; the refused items are a separate table at `:787`. Both were executed in the 8G pass.
+     Confirmed against the document: `0.692`, "calendar-closed pairs" and "largest miscalibration"
+     appear nowhere in `chapters/discussion.tex`, and section 5.5 carries no restatement of the
+     transfer mechanism, deferring to `Section~\ref{sec:disc-limitations}` instead. **Measured
+     saving from each: 0.** The C7 funding decision rested on about 33 words that were spent
+     before report 87 was written.
+     **(e) What is actually available at those sites, measured.** One span of residual duplication
+     remains, section 5.1 RQ4's "The served band missed nominal at all three venues with the
+     departures running in opposite directions", against `conclusion.tex:155-157` which carries it
+     with the optimistic-interval reason. Removing it saves **16** words, measured in situ.
+     Combinations, all measured on the clone after the eleven: C7 displacement alone **+23**
+     (20,016); C7 plus the Clopper-Pearson interval **+25** (20,018), the interval costing **+2**
+     and not the about +6 report 88 estimated; the residual de-duplication alone **-16** (19,977);
+     de-duplication plus C7 landing at **exactly 20,000, margin 0**; all three at 20,002, over.
+     **So C7 is fundable only by consuming the entire margin**, and nothing is left for any later
+     correction. Not applied. This remains Phuong's ruling.
