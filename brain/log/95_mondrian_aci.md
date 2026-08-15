@@ -609,7 +609,9 @@ network-dependent test is the deselected node.
 ## 11 · End state
 
 **HEAD SHA at start: `8f1d86c60279f5471d32cd03ec4521d803ab8294`.**
-**HEAD SHA at end: `c1e0b16f` (this commit).**
+**HEAD SHA at end: the tail of `git log` is authoritative.** The last commit carrying
+measurement content is **`c15ab728`**; every commit after it touches only this end-state
+table, because a commit cannot state its own SHA.
 
 Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
 
@@ -622,7 +624,7 @@ Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
 | `dbb4f1d7` | — | two claims in report 95 the artefact does not support, corrected |
 | `29b24b2c` | — | the artefact schema report 95 was missing |
 | `114f5b12` | — | ledger row 113, `phase_state.md`, the open-question pointer |
-| `c1e0b16f` | — | the suite result and this table |
+| `c15ab728` | — | the scoped suite result, in report 95 and ledger row 113(l) |
 
 **Store ceiling 2026-07-07**, asserted before and after every pass.
 **Nothing was pushed**, per the package. The Overleaf remote is unchanged and still holds
