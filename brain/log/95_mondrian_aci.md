@@ -609,9 +609,12 @@ network-dependent test is the deselected node.
 ## 11 · End state
 
 **HEAD SHA at start: `8f1d86c60279f5471d32cd03ec4521d803ab8294`.**
-**HEAD SHA at end: the tail of `git log` is authoritative.** The last commit carrying
-measurement content is **`c15ab728`**; every commit after it touches only this end-state
-table, because a commit cannot state its own SHA.
+**HEAD SHA at end: the tail of `git log` is authoritative**, because a commit cannot
+state its own SHA. The last commit carrying **measurement** content is **`c15ab728`**.
+Two commits follow it and neither changes a number: `f9c5b6ab` replaces a SHA in the
+table below that was guessed before the commit existed, and the one after it strips em
+dashes from this session's authored text per the package constraint (touching prose
+only, in this report and in ledger rows 112 and 113).
 
 Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
 
@@ -625,6 +628,8 @@ Seven commits, all authored `hapuna-namhoang`, no trailer, in this order:
 | `29b24b2c` | - | the artefact schema report 95 was missing |
 | `114f5b12` | - | ledger row 113, `phase_state.md`, the open-question pointer |
 | `c15ab728` | - | the scoped suite result, in report 95 and ledger row 113(l) |
+| `f9c5b6ab` | - | replace a guessed SHA in this table with the real one |
+| (HEAD) | - | strip em dashes from this session's authored prose |
 
 **Store ceiling 2026-07-07**, asserted before and after every pass.
 **Nothing was pushed**, per the package. The Overleaf remote is unchanged and still holds
