@@ -3411,3 +3411,159 @@ them into the append-only log so it is the continuous WP1-to-present record.
      243 below its own stated floor.** Against that policy the C7 displacement is not fundable at
      any price, and the question is not whether 23 words fit inside 7.
      **Nothing in this row applies a reduction or a Part 3 item.**
+
+112. **PRE-REGISTRATION, written and committed BEFORE the S20 instrument exists. Mondrian x AgACI:
+     can adaptive calibration repair a misspecified partition?**
+     This row is authored and committed BEFORE any line of the S20 instrument is written and before
+     any output of any arm has been seen. The git timestamp on the commit carrying this row is the
+     ordering proof; the instrument's first commit is strictly later. Row 108 is the model followed.
+     Store ceiling asserted **2026-07-07** before writing this row.
+     **(a) THE COMPOSITION IS PRIOR ART AND THIS ARM CLAIMS NO METHOD.** Bharti, Pal, Teneggi and
+     Sulam, *Parameter-Free and Group Conditional Online Conformal Prediction*, **arXiv:2606.00419**
+     (v1 2026-05-29, v4 2026-07-07; **no journal-ref and no peer-reviewed venue of record**), state
+     in their own words, quoted from report 84 section A.2 which queried the full text: *"We
+     introduce the first parameter-free algorithm for group-conditional online conformal prediction,
+     that we dub Portfolios for Online Group Conformal (POGO)."* Report 84 also records that POGO's
+     stock experiment already defines Mondrian groups by *"calendar-year markers such as
+     day-of-week"*, so **a calendar-defined group-conditional online conformal arm is not novel and
+     is not claimed as novel here.** Every artefact key, table header and report line produced by
+     S20 must say so. What S20 measures is not the composition but the question C7 opened: whether
+     adapting the LEVEL repairs a partition that is wrong about MEMBERSHIP. Report 84 records that
+     POGO treats groups as given objects and that group misspecification, partition
+     misspecification and availability-versus-occurrence are **not present** in its text.
+     **(b) What I already know, disclosed so the blindness of these predictions can be judged.** All
+     of report 86 (C7): the four-cell contingency at all three venues, the availability and
+     occurrence coverage and width per cell, the shortfall attribution, and the finding that the
+     ungrouped band beats both Mondrian arms at the Beer Hall. I have computed **no** coverage,
+     width or degeneracy figure under ANY adaptive arm, at any venue, in any cell. Nothing in
+     sections (d) to (h) below is informed by an adaptive-arm number.
+     **(c) DESIGN, fixed here and not revised after the run.** One residual stream per venue,
+     `eval.interval_calibration.generate_records(venue)`; point model `rung2_ets` at all three
+     venues; level **0.90**; warmup pool **140**; the same folds and the same rolling origins for
+     every arm. Five arms:
+     | Arm | Partition | Level | Source |
+     |---|---|---|---|
+     | **A** Unpartitioned | none | fixed | `run_online(avail)["P"]` |
+     | **B** Mondrian only | closure calendar | fixed | `run_online(avail)["D"]`, **C7's own path** |
+     | **C** AgACI only | none | adaptive | `run_online(avail)["G"]` |
+     | **D** Mondrian x AgACI | closure calendar | adaptive, **per group** | new driver, wraps `conformal.methods.AgACI` |
+     | **E** Occurrence ORACLE | did it trade | fixed | `run_online(occur)["D"]`, C7's oracle path |
+     Arms A, B and C come from ONE `run_online` call on the availability records, so they share the
+     pool ordering, the point forecasts and the warmup by construction. Arm E comes from one call on
+     the occurrence records. **Only arm D is new code.**
+     **ARM E IS AN ORACLE AND IS UNAVAILABLE AT FORECAST TIME.** Occurrence is not knowable when the
+     band is built; a deployment can condition on the rota and not on the till. The word ORACLE
+     appears in its artefact key, in every table header naming it, and in every report line.
+     **(d) DEPARTURE FROM THE PACKAGE SPEC, stated before the run because it is a design decision.**
+     The S20 spec's build constraint 10 says `signals/residual.py` supplies the residual stream and
+     group assignment. **It does not, and using it would refute R5 by construction.** Report 86
+     section 8 recorded this in S12: *"`signals/residual.py` was read and is NOT the right
+     foundation here: it supplies the deviation detector's stream, a different object from the
+     conformal calibration pass, and importing it would have measured the wrong band."* Arm B is
+     required by the spec's own Part 3.1 to reuse C7's path, and C7's path is
+     `eval.interval_calibration.run_online` with `conformal.methods.mondrian_band`. The reuse
+     constraint and constraint 10 are in direct conflict; **the reuse constraint wins**, because R5
+     is the check every other comparison runs through.
+     **(e) PER-GROUP ADAPTATION, stated explicitly because it is the decision most easily made by
+     accident.** Arm D maintains a **separate AgACI instance per Mondrian group**, so the effective
+     miscoverage state is keyed by **(group, horizon step)** and each group's alpha sequence evolves
+     only from outcomes banded under that group. A single alpha sequence shared across groups is a
+     DIFFERENT ARM, does not test the hypothesis, and is not what is being run. Each group's band is
+     drawn from that group's residual slice of the shared pool.
+     **(f) AgACI IS PRIMARY AND NO LEARNING RATE IS TUNED.** The existing
+     `conformal.methods.AgACI` is used unmodified: per-step ACI experts over a gamma grid,
+     aggregated by Bernstein Online Aggregation (Wintenberger 2017) independently for each bound
+     under its own pinball loss, which carries no free learning rate. **The gamma grid is
+     `eval.interval_calibration.ACI_GAMMAS = (0.005, 0.01, 0.02, 0.05, 0.1)`, pre-registered here,
+     already committed in the repository, and NOT revised after any result.** If per-gamma fixed-ACI
+     arms are reported, **every gamma in that grid is reported, including any that performs badly**,
+     and no gamma is selected on the basis of any S20 output. Selecting a rate after seeing results
+     would invalidate the arm and is forbidden.
+     **(g) INTERVAL DEGENERACY, and the convention adopted.** The existing convention is
+     `conformal.methods.safe_conformal_quantile`, which returns **0.0** when the effective level
+     falls to or below 0 (a zero-width point interval) and **the largest observed residual** when it
+     reaches or exceeds 1, rather than an infinite interval. S20 adopts it unchanged. Three
+     degeneracy counts are reported **per arm and per group, as results and not as diagnostics**:
+     1. **Zero-width intervals**, `hi - lo == 0`, read directly off every arm's banded rows and
+        attributed to a group by the row's own state label. Exact for all five arms.
+     2. **Level-excursion clamps**, the effective alpha leaving [0,1], counted by `ACI.clamps`.
+        Applies to the adaptive arms C and D only; per group for D.
+     3. **Attainability clamps**, where a group's calibration slice is too small for the level to be
+        attained, i.e. `ceil((n+1)*level) > n`, which at level 0.90 is exactly `n < 9`. Computed
+        from the pool sizes for the fixed arms and in-driver for arm D.
+     **Fallback when a group's pool slice is EMPTY at banding time:** fall back to the whole pool for
+     that row, mirroring `mondrian_band`'s own fallback, and COUNT the event as `group_pool_empty`.
+     No empty cell is ever backfilled with a marginal; an empty cell is reported empty.
+     **(h) SPARSE-GROUP UPDATE CADENCE.** A group's alpha advances **once per observed outcome that
+     was banded under that group**, at the lag at which that step's outcome is revealed. A group
+     receiving few observations therefore updates rarely and its alpha stays near its initialisation
+     (alpha_target = 0.10) for long stretches, which is a property of the design and not a defect.
+     **At Ellel** the calendar-open group carries 1,300 of 1,820 record-frame observations (71.4 per
+     cent) and **1,037 of those 1,300 took nothing**, so that group updates often but against a
+     residual slice that is overwhelmingly near zero, while the calendar-closed group (520
+     observations) updates less often. That asymmetry is what P4 predicts the consequence of.
+     **(i) WHAT IS MEASURED.** For every arm, every venue and every one of C7's four cells:
+     empirical coverage with a **Clopper-Pearson exact binomial** interval (chosen here, before any
+     figure is seen, because several cells are small and several sit at 0 or n successes where a
+     Wald interval is degenerate and Wilson still misbehaves; the cost is conservatism, which is the
+     right direction of error on a cell of seven); mean and median interval width; the three
+     degeneracy counts of (g); and marginal coverage and width per venue for arm-level comparison.
+     **NO CELL COVERAGE IS EVER REPORTED WITHOUT ITS CELL SIZE.**
+     **(j) THE FIVE PREDICTIONS, pre-committed.**
+     - **P1.** At the Beer Hall, cell coverage for scheduled-closed-but-traded rises from 0.489
+       under arm B toward nominal under arm D.
+     - **P2.** At the Beer Hall, mean interval width in the calendar-closed group increases under
+       arm D relative to arm B. Adaptation pays for the cell out of the group.
+     - **P3.** At the Beer Hall, arm D does not overtake arm A. C7 found the unpartitioned band
+       beats both Mondrian arms there at 0.880.
+     - **P4.** At Ellel, arm D's adaptation is dominated by the group whose mass is zeros — read
+       here, and the reading is stated because the phrase is ambiguous, as **the calendar-OPEN
+       group, 1,037 of whose 1,300 observations took nothing** — and the calendar-open group's bands
+       widen without conditional coverage improving proportionally.
+     - **P5.** The misgrouping counts are unchanged across all arms: **94, 21, 65**. Adaptation
+       changes level, not membership.
+     **(k) THE FIVE REFUTATION CRITERIA, pre-committed. A refuted prediction is a result and is
+     reported FIRST, at full prominence, and is never softened into a partial confirmation.**
+     - **R1.** If P1 holds and P2 does not — the cell reaches nominal without a material width
+       increase — then adaptation repaired misspecification and **the C7 framing is wrong. Say so
+       plainly.**
+     - **R2.** If arm D beats arm A at the Beer Hall on **both** coverage and width, **C7's
+       conclusion that the partition does not pay there reverses.**
+     - **R3.** If Ellel's marginal coverage improves under arm D **without** the oracle, **the
+       sparse-venue account needs rewriting.**
+     - **R4.** Arm E must reproduce C7's published ORACLE cell coverages for
+       scheduled-closed-but-traded: **0.926 / 1.000 / 1.000** (beer_hall / ellel / two_river_taps).
+       If it does not, the instruments are reading different populations. **HALT.**
+     - **R5.** Arm B must reproduce C7's published Mondrian cell coverages for
+       scheduled-closed-but-traded: **0.489 / 0.000 / 0.737**. **Arm B is the baseline every
+       comparison runs through, so this is the check that most matters. If it does not reproduce,
+       every arm comparison in S20 is void. HALT.**
+     **PRECISION, stated here per the rule that a MATCHES verdict states the precision it compared
+     at.** C7 published these to **four decimal places** in report 86 sections 3.1 to 3.3 and 6.1:
+     arm B 0.4894 / 0.0000 / 0.7368, arm E 0.9255 / 1.0000 / 1.0000. **R4 and R5 are checked at four
+     decimal places against those published figures**, and the full-precision difference against the
+     persisted `eval/partition_contrast.json` floats is reported beside them rather than rounded
+     away. Cell SIZES are compared as integers with no tolerance.
+     **P5 IS ALSO A REPRODUCTION CHECK: exact, integer, no tolerance, raises on mismatch, and gets
+     its own test.** It is true by construction in this design, because cell membership is a
+     property of the day and is taken once from the records rather than from any arm; the test
+     exists to guard the construction, and the construction IS what P5 asserts.
+     **FRAME, stated because the spec conflates two populations.** 94 / 21 / 65 are **full record
+     frame** counts. On the **banded** frame, which is smaller because the first 140 pool residuals
+     are consumed by the warmup, two_river_taps' scheduled-closed-but-traded cell is **38, not 65**
+     (report 86 section 2.2), and 0.737 is a coverage over those 38. **Both frames are reported for
+     every venue**, and no coverage is quoted against the frame it was not computed on.
+     **(l) IF THE RESULT IS NULL, pre-committed now.** If arms B, C and D are indistinguishable
+     within their intervals, **that is reported as a null at the same prominence as any positive
+     finding**, and the conclusion recorded is that this estate's data cannot separate these
+     calibration strategies. That would sit **alongside** the existing Model Confidence Set result
+     rather than against it.
+     **(m) CONSTRAINTS.** Nothing in S20 may be imported by any existing signal, endpoint or
+     evaluated path; the arm is a leaf. No served path, no evaluated path and no frozen artefact is
+     modified. Loud failure and no silent fallback. Tests are added and none removed. Wall time is
+     reported, and if any arm exceeds thirty minutes the cost is reported before the full grid runs.
+     **NOTHING FROM THIS PACKAGE ENTERS THE DISSERTATION. No `.tex` file is touched, no reduction is
+     made and no word is spent. No placement recommendation is made here or in report 95; the
+     verdict on placement is taken elsewhere, after the numbers exist.**
+     Instrument and results: `brain/eval/mondrian_aci.py`, `brain/eval/mondrian_aci.json`,
+     `brain/log/95_mondrian_aci.md`, `brain/tests/test_mondrian_aci.py`.
