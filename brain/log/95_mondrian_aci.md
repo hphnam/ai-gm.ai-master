@@ -425,8 +425,9 @@ slices the pool on both axes at once, so arm D's quantiles are drawn from
 (group × step) slices roughly a seventh the size of arm B's group slices.
 
 The consequence is measured. Arm B recorded **zero** attainability clamps at all three
-venues over 500 / 474 / 364 examined (origin, group) events, with the smallest group
-slice it ever saw at 39 — comfortably above the attainable minimum of 9. Arm D recorded
+venues over 500 / 474 / 364 examined (origin, group) events, and the smallest group slice
+it ever saw at any venue was **37** (Two River Taps; 39 at the Beer Hall, 40 at Ellel) —
+comfortably above the attainable minimum of 9. Arm D recorded
 **324 attainability clamps at the Beer Hall alone** (7.3 per cent of its 8,750 quantile
 calls degenerate, counting both kinds).
 
@@ -434,20 +435,32 @@ calls degenerate, counting both kinds).
 per-step adaptive method with a group partition inherits it, and the cost scales with the
 product of the two granularities.
 
-### 7.5 · Arm D moves two venues from over-coverage to under-coverage, which is the unsafe direction
-
-| Venue | B marginal | D marginal | crossing |
-|---|---|---|---|
-| ellel | 0.9138 [0.899, 0.927] | 0.8885 [0.872, 0.903] | over → **under** |
-| two_river_taps | 0.9631 [0.951, 0.973] | 0.9270 [0.911, 0.941] | over → **under** |
+### 7.5 · At Ellel arm D crosses from over-coverage to under-coverage, which is the unsafe direction — and at Two River Taps it does the opposite
 
 `CONTRACT.md` (Bundle out) records over-coverage as split conformal's **safe** failure
-mode and under-coverage as the one that is not. At Ellel the absolute distance to nominal
-narrows slightly (0.0138 → 0.0115) while the *direction* of the error flips. A summary
-that ranked these arms on |coverage − nominal| alone would score that flip as an
-improvement. Recorded because R3 is phrased as "improves" and the honest answer depends
-on which of the two readings is meant; on either reading R3 does not fire, but the
-readings disagree about why.
+mode and under-coverage as the one that is not. Marginal coverage against nominal 0.900:
+
+| Venue | B marginal | side | D marginal | side | verdict |
+|---|---|---|---|---|---|
+| beer_hall | 0.8714 [0.855, 0.887] | under | 0.8726 [0.856, 0.888] | under | no crossing; both under |
+| **ellel** | 0.9138 [0.899, 0.927] | over | 0.8885 [0.872, 0.903] | **under** | **crosses to the unsafe side** |
+| two_river_taps | 0.9631 [0.951, 0.973] | over | 0.9270 [0.911, 0.941] | over | **moves toward nominal and stays safe** |
+
+**Only Ellel crosses.** Its absolute distance to nominal narrows slightly (0.0138 →
+0.0115) while the *direction* of the error flips, so a summary ranking arms on
+|coverage − nominal| alone would score that flip as an improvement. This matters for R3,
+which is phrased as "improves": on the distance reading Ellel improves by 0.0023, a
+change roughly a tenth the width of either interval; on the safety reading it gets worse.
+**R3 does not fire on either reading**, but the readings disagree about why, and the
+disagreement is worth carrying rather than resolving silently.
+
+**Two River Taps is the one place arm D looks good and it is reported as such.** It moves
+marginal coverage from 0.9631 to 0.9270, a genuine narrowing toward nominal on the safe
+side of it, at a slightly smaller mean width (535.02 → 512.14). That is arm D's best
+result anywhere in this grid. It is not a clean win either: at the same venue arm D lifts
+the misgrouped `closed_traded` cell 0.7368 → 0.7632 (n = 38) while pushing
+`closed_took_nothing` down 0.9939 → 0.9448 (n = 326), so the marginal gain is bought from
+the larger cell (§7.6).
 
 ### 7.6 · Arm E over-covers at Two River Taps rather than being right, and arm D makes its safest cell worse
 
