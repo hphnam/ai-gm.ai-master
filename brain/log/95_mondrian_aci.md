@@ -601,3 +601,12 @@ It claims what was measured: **adapting the level, per group, on a partition tha
 wrong about membership, bought a 19 per cent wider calendar-closed group at the Beer Hall
 and moved the misgrouped cell 3 points of the 41 it needed — and at Ellel, where the
 misgrouped group's residuals are all zeros, it moved the cell not at all.**
+
+**FORWARD POINTER, placed here because this is where a reader arriving by grep stops.**
+The placement question — whether any of this enters the dissertation — **is OPEN and has
+not been decided by anyone.** The S20 package forbade taking it here and it was not taken.
+The decision, when it is taken, belongs in a ledger row above **113**; row **113(k)**
+records the question as live and notes the constraint it meets first, which is that row
+**111(h)** puts the document at **+7 words against its own stated reserve floor of 250**.
+Do not read this report's silence on placement as a verdict against inclusion; it is the
+absence of a decision, not the presence of one.

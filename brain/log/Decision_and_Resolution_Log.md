@@ -3567,3 +3567,78 @@ them into the append-only log so it is the continuous WP1-to-present record.
      verdict on placement is taken elsewhere, after the numbers exist.**
      Instrument and results: `brain/eval/mondrian_aci.py`, `brain/eval/mondrian_aci.json`,
      `brain/log/95_mondrian_aci.md`, `brain/tests/test_mondrian_aci.py`.
+
+113. **S20 RESULT: adaptation moved the level, did not move membership, and did not repair the
+     misgrouped cell. Two of five pre-registered predictions REFUTED. No refutation criterion
+     fired. Nothing entered the dissertation and no placement decision is taken.**
+     Pre-registration is row **112**, committed `6348a082` at 2026-08-15T17:33:52+01:00; the
+     instrument's first commit is `d76abf7c` at 17:40:22, six and a half minutes later, so the
+     ordering is checkable from `git log` and no prediction was written or revised after any
+     output was seen. Store ceiling **2026-07-07** asserted before and after every pass.
+     Instrument `brain/eval/mondrian_aci.py`, artefact `brain/eval/mondrian_aci.json`, tests
+     `brain/tests/test_mondrian_aci.py` (26), report **`brain/log/95_mondrian_aci.md`**.
+     **(a) Both HALT checks PASS, exactly, at full precision.** R5 (arm B against C7's published
+     Mondrian coverage on scheduled-closed-but-traded) and R4 (arm E against C7's published oracle
+     coverage) reproduce report 86's figures with **absolute difference 0.0** at all three venues,
+     not merely at the four decimal places report 86 published. P5 (membership invariance) is
+     exact as integers across all ten banded arms. Arm B is the baseline every comparison runs
+     through, so R5 passing is what makes the rest of the row admissible.
+     **(b) P4 REFUTED, wrong in SIGN.** At Ellel the calendar-open group's mean width was predicted
+     to WIDEN under arm D. It **narrowed**, by 9.55 (−1.34 per cent), and coverage fell 0.9257
+     [0.909, 0.940] to 0.8852 [0.866, 0.903] on n = 1,185, the two intervals disjoint.
+     **(c) P1 REFUTED in substance; only its sign held.** The Beer Hall's
+     scheduled-closed-but-traded cell moved 0.4894 to 0.5213 on n = 94 — **7.8 per cent of the
+     0.4106 gap to nominal** — and arm D's interval [0.416, 0.625] still excludes nominal by
+     0.275, overlapping arm B's across roughly 85 per cent of its length. No between-arm
+     significance test was pre-registered and none was run, because choosing an adjudicating test
+     after seeing the result is the move the package exists to prevent.
+     **(d) P2, P3 and P5 HELD.** P2: the Beer Hall's calendar-closed group widened 164.16 to
+     195.52, **+19.10 per cent**, n = 500 — so the group paid and the cell did not collect. P3: arm
+     D does not overtake arm A there, being both further from nominal (0.8726 against 0.8800) and
+     wider (997.85 against 947.84). P5: 94 / 21 / 65 on the record frame, identical across arms.
+     **(e) The mechanism's hard limit, which is the finding.** At Ellel the misgrouped cell is
+     0.0000 coverage under BOTH arm B and arm D on n = 21; adaptation moved its mean width from
+     0.00 to 12.49 and **covered none of the twenty-one**. ACI adapts the LEVEL, and the quantile
+     that level is taken of is drawn from the group's own residuals — when those are all near
+     zero, every quantile of them is near zero. **Adaptation cannot manufacture a residual the
+     group has never seen**, so it is powerless exactly where misgrouping is worst.
+     **(f) Unsolicited: the unpartitioned band already matches the ORACLE on the broken cell.** At
+     the Beer Hall arms A (unpartitioned fixed), C (AgACI unpartitioned) and E (occurrence ORACLE)
+     all land on **87 of 94, coverage 0.9255 [0.853, 0.970], identically**, against arm B's 0.4894.
+     Not partitioning at all is exactly as good as knowing the answer on the cell the partition
+     breaks. This sharpens report 86 section 6.3, which observed only a marginal difference.
+     **(g) Unsolicited: the COMPOSITION manufactures a degeneracy neither part has alone.** AgACI
+     here is per horizon step and Mondrian is per group, so composing them slices the pool on both
+     axes and arm D draws its quantiles from (group x step) slices about a seventh the size of arm
+     B's. Arm B recorded **zero** attainability clamps over 500 / 474 / 364 examined (origin,
+     group) events with a smallest slice of 37; arm D recorded **324 at the Beer Hall alone**, 7.3
+     per cent of its 8,750 quantile calls degenerate. **This is a property of the composition, not
+     of this estate**, and any deployment composing a per-step adaptive method with a group
+     partition inherits it.
+     **(h) Unsolicited: the package brief names the wrong module and following it would have
+     refuted R5.** Build constraint 10 says `signals/residual.py` supplies the residual stream and
+     group assignment. Report 86 section 8 already recorded in S12 that it does not — it *"supplies
+     the deviation detector's stream, a different object from the conformal calibration pass, and
+     importing it would have measured the wrong band"*. Constraint 10 and the brief's own
+     requirement that arm B reuse C7's path are in direct conflict; the reuse requirement won, and
+     R5 then reproduced exactly. Recorded in row 112(d) BEFORE the run, not discovered after it.
+     **(i) Unsolicited: the brief conflates two populations.** 94 / 21 / 65 are RECORD-frame
+     counts; R5's 0.737 is a coverage over Two River Taps' **38** BANDED days, the warmup having
+     consumed the difference. Both frames are reported for every venue.
+     **(j) Unsolicited: two defects in this session's own work, found and repaired.** The first
+     reporting pass attributed zero-width intervals by each arm's own `state` column, which for arm
+     E is the OCCURRENCE label — a different variable from the other four arms', making the row
+     incomparable. The second differenced the per-group widths by hand from rounded display values
+     and got Ellel's delta as −9.54 against the instrumented −9.55; the delta is now a field
+     (`b_to_d_group_deltas`) for the same reason C7 added `cell_deltas` to its own instrument.
+     **(k) THE PLACEMENT QUESTION IS OPEN AND IS NOT DECIDED HERE.** The S20 package forbids a
+     placement recommendation, a word price and any comparison against
+     `ledger/reduction_cost_register.md`, and none was made. **The numbers now exist at
+     `brain/log/95_mondrian_aci.md` and `brain/eval/mondrian_aci.json`.** Whether any of this
+     enters the dissertation is a separate decision that has not been taken by anyone; a future
+     session reading report 95 or this row should treat that question as live and should note that
+     row 111(h) records the document at **+7 words against a stated reserve floor of 250**, which
+     is the constraint any such decision runs into first.
+     **(l) Nothing was pushed.** No `.tex`, `.bib` or figure was touched; the Overleaf remote is
+     unchanged. Nothing served or evaluated was modified and the arm is a leaf: `rg` finds
+     `mondrian_aci` referenced in exactly two files, its own module and its own test.

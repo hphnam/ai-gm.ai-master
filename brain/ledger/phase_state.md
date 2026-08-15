@@ -5379,3 +5379,53 @@ break references already made to it from the other stores, and the numbering has
 **Still untracked and deliberately so:** `brain/docs/Sample Dissertation.pdf` and its `.md`
 conversion. They are supplied reference material rather than a project artefact, and a binary
 of that kind is not committed without being asked for.
+
+## 2026-08-15 · S20, the Mondrian × AgACI arm (pre-registered, measured, reported)
+
+**Completed.** A five-arm group-conditional adaptive conformal factorial over the three venues,
+pre-registered before the instrument existed and reported in full. Decision log rows **112**
+(pre-registration) and **113** (result).
+
+**Ordering, which is the thing this package was really about.** Row 112 committed `6348a082` at
+2026-08-15T17:33:52+01:00; the instrument's first commit is `d76abf7c` at 17:40:22. Six and a
+half minutes, and the gap is checkable from `git log` rather than asserted.
+
+**Artefacts written.**
+
+- `brain/eval/mondrian_aci.py` — the instrument. Only arm D (Mondrian × AgACI, one AgACI **per
+  group**) is new code; arms A, B, C and E are `interval_calibration.run_online` and
+  `partition_contrast` reused unmodified.
+- `brain/eval/mondrian_aci.json` — 101,870 bytes, schema documented at `log/95` §8.
+- `brain/tests/test_mondrian_aci.py` — 26 tests, synthetic, no store and no network.
+- `brain/log/95_mondrian_aci.md` — the report.
+
+**Verified end state.**
+
+- Store ceiling **2026-07-07** asserted before and after every pass.
+- **R5 and R4 both PASS at absolute difference 0.0** against `eval/partition_contrast.json` —
+  exact at full precision, not merely at report 86's four published decimals. **P5 exact as
+  integers** across all ten banded arms.
+- **P4 and P1 REFUTED**, P2, P3 and P5 held, **no refutation criterion fired**. Two of five
+  predictions wrong, both reported first and unsoftened.
+- Total wall **32.9 s** for three venues; the point-forecast pass is 94 per cent of it.
+- The arm is a leaf: `rg` finds `mondrian_aci` in exactly two files, its own module and its own
+  test. Nothing served or evaluated was modified.
+- `graphify update .` run at close: 14,837 → **14,915 nodes**, 26,620 edges, 991 communities.
+  `graphify label` deliberately NOT run — it reports a skip and removes `graph.html`.
+
+**Unstarted, and deliberately so.** The **placement question is OPEN**: whether any of this
+enters the dissertation was forbidden to this package and was not decided. Row **113(k)** carries
+the pointer, and `log/95` §12 repeats it at the site a reader arrives at. Row **111(h)** records
+the document at **+7 words against a reserve floor of 250**, which is what any such decision runs
+into first.
+
+**Nothing was pushed and nothing needed to be.** S20 touched no `.tex`, no `.bib` and no figure.
+The Overleaf remote is unchanged and still holds two unpushed commits from S19 (`f966f3d4`,
+`fbf64a2`); the Overleaf push remains a human gate.
+
+**Two defects in this session's own work, found and repaired rather than left.** The first
+reporting pass split arm E's zero-width counts by the OCCURRENCE label while splitting the other
+four arms' by availability, making the row incomparable; and the per-group width deltas were first
+differenced by hand from rounded display values, which put Ellel's at −9.54 against the
+instrumented −9.55. The delta is now an artefact field (`b_to_d_group_deltas`) for the same reason
+C7 added `cell_deltas` to its own instrument.
