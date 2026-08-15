@@ -1,0 +1,3233 @@
+{
+  "artefact": "mondrian_aci",
+  "prior_art": {
+    "composition": "group-conditional online conformal prediction is PRIOR ART",
+    "reference": "Bharti, Pal, Teneggi, Sulam, arXiv:2606.00419 (POGO), v1 2026-05-29, v4 2026-07-07, no peer-reviewed venue of record",
+    "claim_made_here": "empirical measurement on one estate; NO method is claimed"
+  },
+  "pre_registration": {
+    "ledger_row": 112,
+    "commit": "6348a082",
+    "committed_at": "2026-08-15T17:33:52+01:00"
+  },
+  "store_ceiling": "2026-07-07",
+  "level": 0.9,
+  "gammas": [
+    0.005,
+    0.01,
+    0.02,
+    0.05,
+    0.1
+  ],
+  "warmup_pool": 140,
+  "arms": {
+    "A_unpartitioned_fixed": "unpartitioned, fixed level; run_online(availability)['P']",
+    "B_mondrian_fixed": "Mondrian on the closure calendar, fixed level; run_online(availability)['D'] - C7's own path, reused",
+    "C_agaci_unpartitioned_adaptive": "AgACI, adaptive level, no partition; run_online(availability)['G']",
+    "D_mondrian_agaci_pergroup": "Mondrian x AgACI, adaptive level PER GROUP; this module's driver",
+    "E_occurrence_ORACLE_fixed": "ORACLE. Occurrence partition, fixed level; run_online(occurrence)['D']. NOT DEPLOYABLE: occurrence is unknown at forecast time"
+  },
+  "reproduction_check": {
+    "per_venue": {
+      "beer_hall": {
+        "cell_n_measured": 94,
+        "cell_n_persisted": 94,
+        "cell_n_match": true,
+        "R5_arm_B": {
+          "measured": 0.48936170212765956,
+          "measured_rounded": 0.4894,
+          "persisted": 0.48936170212765956,
+          "persisted_rounded": 0.4894,
+          "published": 0.4894,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        },
+        "R4_arm_E": {
+          "measured": 0.925531914893617,
+          "measured_rounded": 0.9255,
+          "persisted": 0.925531914893617,
+          "persisted_rounded": 0.9255,
+          "published": 0.9255,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        }
+      },
+      "ellel": {
+        "cell_n_measured": 21,
+        "cell_n_persisted": 21,
+        "cell_n_match": true,
+        "R5_arm_B": {
+          "measured": 0.0,
+          "measured_rounded": 0.0,
+          "persisted": 0.0,
+          "persisted_rounded": 0.0,
+          "published": 0.0,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        },
+        "R4_arm_E": {
+          "measured": 1.0,
+          "measured_rounded": 1.0,
+          "persisted": 1.0,
+          "persisted_rounded": 1.0,
+          "published": 1.0,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        }
+      },
+      "two_river_taps": {
+        "cell_n_measured": 38,
+        "cell_n_persisted": 38,
+        "cell_n_match": true,
+        "R5_arm_B": {
+          "measured": 0.7368421052631579,
+          "measured_rounded": 0.7368,
+          "persisted": 0.7368421052631579,
+          "persisted_rounded": 0.7368,
+          "published": 0.7368,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        },
+        "R4_arm_E": {
+          "measured": 1.0,
+          "measured_rounded": 1.0,
+          "persisted": 1.0,
+          "persisted_rounded": 1.0,
+          "published": 1.0,
+          "abs_diff_full_precision": 0.0,
+          "match_at_published_dp": true,
+          "published_matches_artefact": true
+        }
+      }
+    },
+    "all_match": true,
+    "published_dp": 4
+  },
+  "membership_check_P5": {
+    "per_venue": {
+      "beer_hall": {
+        "persisted": 94,
+        "measured_records_frame": 94,
+        "banded_frame_n_by_arm": {
+          "A_unpartitioned_fixed": 94,
+          "B_mondrian_fixed": 94,
+          "C_agaci_unpartitioned_adaptive": 94,
+          "D_mondrian_agaci_pergroup": 94,
+          "E_occurrence_ORACLE_fixed": 94,
+          "ACI_fixed_gamma_0.005": 94,
+          "ACI_fixed_gamma_0.01": 94,
+          "ACI_fixed_gamma_0.02": 94,
+          "ACI_fixed_gamma_0.05": 94,
+          "ACI_fixed_gamma_0.1": 94
+        },
+        "identical_across_arms": true,
+        "match": true
+      },
+      "ellel": {
+        "persisted": 21,
+        "measured_records_frame": 21,
+        "banded_frame_n_by_arm": {
+          "A_unpartitioned_fixed": 21,
+          "B_mondrian_fixed": 21,
+          "C_agaci_unpartitioned_adaptive": 21,
+          "D_mondrian_agaci_pergroup": 21,
+          "E_occurrence_ORACLE_fixed": 21,
+          "ACI_fixed_gamma_0.005": 21,
+          "ACI_fixed_gamma_0.01": 21,
+          "ACI_fixed_gamma_0.02": 21,
+          "ACI_fixed_gamma_0.05": 21,
+          "ACI_fixed_gamma_0.1": 21
+        },
+        "identical_across_arms": true,
+        "match": true
+      },
+      "two_river_taps": {
+        "persisted": 65,
+        "measured_records_frame": 65,
+        "banded_frame_n_by_arm": {
+          "A_unpartitioned_fixed": 38,
+          "B_mondrian_fixed": 38,
+          "C_agaci_unpartitioned_adaptive": 38,
+          "D_mondrian_agaci_pergroup": 38,
+          "E_occurrence_ORACLE_fixed": 38,
+          "ACI_fixed_gamma_0.005": 38,
+          "ACI_fixed_gamma_0.01": 38,
+          "ACI_fixed_gamma_0.02": 38,
+          "ACI_fixed_gamma_0.05": 38,
+          "ACI_fixed_gamma_0.1": 38
+        },
+        "identical_across_arms": true,
+        "match": true
+      }
+    },
+    "all_match": true
+  },
+  "provenance": {
+    "environment": ".venv-forecast",
+    "interpreter": "/Users/hapuna/Downloads/ai-gm.ai-master/brain/.venv-forecast/bin/python",
+    "python": "3.12.13",
+    "platform": "Darwin arm64",
+    "device": "mps",
+    "packages": {
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.9.0",
+      "statsmodels": "0.14.6",
+      "duckdb": "1.5.4",
+      "torch": "2.12.1",
+      "chronos-forecasting": "2.3.1",
+      "TSB-AD": "not installed",
+      "vus": "not installed"
+    },
+    "store_ceiling": "2026-07-07"
+  },
+  "wall_seconds_total": 30.962606917000812,
+  "venues": {
+    "beer_hall": {
+      "venue": "beer_hall",
+      "point_model": "rung2_ets",
+      "n_origins": 273,
+      "level": 0.9,
+      "gammas": [
+        0.005,
+        0.01,
+        0.02,
+        0.05,
+        0.1
+      ],
+      "warmup_pool": 140,
+      "contingency_records": {
+        "n": 1911,
+        "counts": {
+          "open_traded": 1344,
+          "open_took_nothing": 21,
+          "closed_traded": 94,
+          "closed_took_nothing": 452
+        },
+        "shares": {
+          "open_traded": 0.7032967032967034,
+          "open_took_nothing": 0.01098901098901099,
+          "closed_traded": 0.049188906331763475,
+          "closed_took_nothing": 0.23652537938252224
+        },
+        "n_calendar_closed": 546,
+        "n_took_nothing": 473,
+        "n_disagreeing": 115,
+        "disagreement_rate": 0.06017791732077447
+      },
+      "contingency_banded": {
+        "n": 1750,
+        "counts": {
+          "open_traded": 1229,
+          "open_took_nothing": 21,
+          "closed_traded": 94,
+          "closed_took_nothing": 406
+        },
+        "shares": {
+          "open_traded": 0.7022857142857143,
+          "open_took_nothing": 0.012,
+          "closed_traded": 0.053714285714285714,
+          "closed_took_nothing": 0.232
+        },
+        "n_calendar_closed": 500,
+        "n_took_nothing": 427,
+        "n_disagreeing": 115,
+        "disagreement_rate": 0.06571428571428571
+      },
+      "arms": {
+        "A_unpartitioned_fixed": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.88,
+            "ci": [
+              0.8638490166735795,
+              0.8948641259555488
+            ],
+            "mean_width": 947.8413535872945,
+            "median_width": 948.1519207917795
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8462164361269324,
+              "ci": [
+                0.8248164573815209,
+                0.8659445528477453
+              ],
+              "mean_width": 1067.3105417754102,
+              "median_width": 1058.2629438024308
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.3333333333333333,
+              "ci": [
+                0.1458769423430967,
+                0.5696754829041242
+              ],
+              "mean_width": 1342.6108488225032,
+              "median_width": 1391.2408302579438
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 699.7905891116546,
+              "median_width": 686.9772821074237
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 623.2082998374834,
+              "median_width": 608.3703106785392
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8376,
+              "ci": [
+                0.815965186520171,
+                0.8576331456041892
+              ],
+              "mean_width": 1071.9355869338012,
+              "median_width": 1060.3620574196636
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 637.6057702210276,
+              "median_width": 615.7132663151881
+            }
+          }
+        },
+        "B_mondrian_fixed": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8714285714285714,
+            "ci": [
+              0.8548359736222378,
+              0.8867642101245934
+            ],
+            "mean_width": 960.6042376615649,
+            "median_width": 1168.1125346681413
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8925956061838893,
+              "ci": [
+                0.8739296887943456,
+                0.9093577614578827
+              ],
+              "mean_width": 1276.0849206546482,
+              "median_width": 1320.3235677161774
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.38095238095238093,
+              "ci": [
+                0.18107162554017314,
+                0.6156456096213541
+              ],
+              "mean_width": 1460.4073153142513,
+              "median_width": 1528.6134205290864
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.48936170212765956,
+              "ci": [
+                0.38478341916945447,
+                0.5946285211902449
+              ],
+              "mean_width": 187.68980971929898,
+              "median_width": 194.45866550996777
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 0.9211822660098522,
+              "ci": [
+                0.8905532160959753,
+                0.9454661068901082
+              ],
+              "mean_width": 158.71343026591813,
+              "median_width": 159.28362848169616
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.884,
+              "ci": [
+                0.8649385375294443,
+                0.9012328473659426
+              ],
+              "mean_width": 1279.1815368849295,
+              "median_width": 1324.9265939708253
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.84,
+              "ci": [
+                0.8048719777202828,
+                0.8710441448957739
+              ],
+              "mean_width": 164.16098960315372,
+              "median_width": 162.75089051657446
+            }
+          }
+        },
+        "C_agaci_unpartitioned_adaptive": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8914285714285715,
+            "ci": [
+              0.8759056600154678,
+              0.9056245216413699
+            ],
+            "mean_width": 1025.6485081186127,
+            "median_width": 957.719202555397
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8624898291293734,
+              "ci": [
+                0.8419615805378359,
+                0.8812655202594386
+              ],
+              "mean_width": 1144.4325885197786,
+              "median_width": 1083.569922023548
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.3333333333333333,
+              "ci": [
+                0.1458769423430967,
+                0.5696754829041242
+              ],
+              "mean_width": 1826.8958214849354,
+              "median_width": 1825.9106418878655
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 849.1961545888582,
+              "median_width": 746.4128376665532
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 665.4876530399707,
+              "median_width": 630.5833202123362
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8536,
+              "ci": [
+                0.8327729917808875,
+                0.8727476386424893
+              ],
+              "mean_width": 1155.8979708335933,
+              "median_width": 1094.3822602331607
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 700.0248513311616,
+              "median_width": 647.6635361755211
+            }
+          }
+        },
+        "D_mondrian_agaci_pergroup": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8725714285714286,
+            "ci": [
+              0.8560363501521185,
+              0.8878455692519527
+            ],
+            "mean_width": 997.8487264474724,
+            "median_width": 1069.8959212269615
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8942229454841334,
+              "ci": [
+                0.8756685460372239,
+                0.910865313094806
+              ],
+              "mean_width": 1306.458731105359,
+              "median_width": 1264.9579020873575
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.5714285714285714,
+              "ci": [
+                0.34020630928027457,
+                0.7818031431148698
+              ],
+              "mean_width": 2039.790160440361,
+              "median_width": 2045.3663054998624
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.5212765957446809,
+              "ci": [
+                0.4157323526463903,
+                0.6254437103865189
+              ],
+              "mean_width": 238.9215530324967,
+              "median_width": 209.2752352427283
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 0.9039408866995073,
+              "ci": [
+                0.8710263936937116,
+                0.9307985580427333
+              ],
+              "mean_width": 185.476037931744,
+              "median_width": 171.96234269068142
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8888,
+              "ci": [
+                0.8700497652291671,
+                0.9056977909139202
+              ],
+              "mean_width": 1318.778699118187,
+              "median_width": 1275.7664730186248
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.832,
+              "ci": [
+                0.7962889764221586,
+                0.8637261840948709
+              ],
+              "mean_width": 195.5237947706855,
+              "median_width": 173.42411086463045
+            }
+          }
+        },
+        "E_occurrence_ORACLE_fixed": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.864,
+            "ci": [
+              0.8470432163280788,
+              0.8797256328108245
+            ],
+            "mean_width": 933.4299255407616,
+            "median_width": 1104.2137916708423
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8803905614320586,
+              "ci": [
+                0.8609260519288882,
+                0.8980129774879656
+              ],
+              "mean_width": 1216.5680211051374,
+              "median_width": 1246.4820517176436
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.1610976152190796
+              ],
+              "mean_width": 137.7166881594782,
+              "median_width": 121.99981857540115
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 805.8008486599762,
+              "median_width": 764.5563583103667
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 0.8448275862068966,
+              "ci": [
+                0.805879292056545,
+                0.8786545811297711
+              ],
+              "mean_width": 147.05158012988247,
+              "median_width": 132.60764462558456
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8656,
+              "ci": [
+                0.8454307259696906,
+                0.8840312870533484
+              ],
+              "mean_width": 1198.4433187116504,
+              "median_width": 1241.668459477954
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.86,
+              "ci": [
+                0.8264561435062904,
+                0.8892104657359341
+              ],
+              "mean_width": 270.89644261354005,
+              "median_width": 150.17600704852168
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.005": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8897142857142857,
+            "ci": [
+              0.8740941053068756,
+              0.9040135402888867
+            ],
+            "mean_width": 986.2222513081383,
+            "median_width": 983.0770085680892
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8600488201790073,
+              "ci": [
+                0.8393843812564524,
+                0.8789728434172188
+              ],
+              "mean_width": 1108.5735290812643,
+              "median_width": 1070.0333366988561
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.3333333333333333,
+              "ci": [
+                0.1458769423430967,
+                0.5696754829041242
+              ],
+              "mean_width": 1416.388659898889,
+              "median_width": 1483.3119995148559
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 745.419441733853,
+              "median_width": 716.5278405700086
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 649.3558698707126,
+              "median_width": 633.4777921829944
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8512,
+              "ci": [
+                0.8302469825761978,
+                0.8704853335983789
+              ],
+              "mean_width": 1113.7448232790005,
+              "median_width": 1077.8741966579814
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 667.415821380983,
+              "median_width": 661.5741017300277
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.01": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.888,
+            "ci": [
+              0.8722836633549048,
+              0.9024014387859657
+            ],
+            "mean_width": 992.679029216527,
+            "median_width": 946.9230760474543
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8576078112286412,
+              "ci": [
+                0.8368091619884,
+                0.8766781724719005
+              ],
+              "mean_width": 1114.3788921690716,
+              "median_width": 1064.753484430984
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.3333333333333333,
+              "ci": [
+                0.1458769423430967,
+                0.5696754829041242
+              ],
+              "mean_width": 1466.874134271206,
+              "median_width": 1492.1815661384383
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 759.6456320820115,
+              "median_width": 725.8338470576903
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 653.7083655609084,
+              "median_width": 635.0580590825307
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8488,
+              "ci": [
+                0.8277227324982139,
+                0.8682212580082849
+              ],
+              "mean_width": 1120.3008122363874,
+              "median_width": 1069.2019883844346
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 673.6245716668757,
+              "median_width": 677.1997741825226
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.02": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.888,
+            "ci": [
+              0.8722836633549048,
+              0.9024014387859657
+            ],
+            "mean_width": 1021.0778314906082,
+            "median_width": 928.6108205964615
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8527257933279089,
+              "ci": [
+                0.8316644963473548,
+                0.872083017733795
+              ],
+              "mean_width": 1140.8934792665648,
+              "median_width": 1054.023516627746
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6190476190476191,
+              "ci": [
+                0.3843543903786459,
+                0.8189283744598268
+              ],
+              "mean_width": 1667.8677866892851,
+              "median_width": 1693.934296666203
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 818.1881413808986,
+              "median_width": 762.7522924829334
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 671.9044588169371,
+              "median_width": 621.008826009701
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8488,
+              "ci": [
+                0.8277227324982139,
+                0.8682212580082849
+              ],
+              "mean_width": 1149.7466476312666,
+              "median_width": 1058.8150464770074
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 699.405791138962,
+              "median_width": 689.7260792101176
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.05": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8954285714285715,
+            "ci": [
+              0.8801370796648397,
+              0.9093789890550924
+            ],
+            "mean_width": 1041.494454752285,
+            "median_width": 906.9130650205984
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8584214808787632,
+              "ci": [
+                0.8376673510530995,
+                0.8774432816735335
+              ],
+              "mean_width": 1155.9768219119005,
+              "median_width": 1046.651615912828
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.9047619047619048,
+              "ci": [
+                0.6962255930860758,
+                0.9882506821155542
+              ],
+              "mean_width": 2123.268331157399,
+              "median_width": 1963.045871280935
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 942.8921851907667,
+              "median_width": 799.6102975005206
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 661.8208899619101,
+              "median_width": 561.9575500641806
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8592,
+              "ci": [
+                0.8386740573350231,
+                0.878019259250008
+              ],
+              "mean_width": 1172.2273192672249,
+              "median_width": 1055.315535139495
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 714.6622934649351,
+              "median_width": 665.1804955531211
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.1": {
+          "overall": {
+            "n": 1750,
+            "empty": false,
+            "coverage": 0.8977142857142857,
+            "ci": [
+              0.8825579302976058,
+              0.9115214821275605
+            ],
+            "mean_width": 1175.6806178942127,
+            "median_width": 972.2971865213458
+          },
+          "cells": {
+            "open_traded": {
+              "n": 1229,
+              "empty": false,
+              "coverage": 0.8616761594792515,
+              "ci": [
+                0.8411022914274825,
+                0.8805015189318532
+              ],
+              "mean_width": 1291.8556907640843,
+              "median_width": 1126.4750021644495
+            },
+            "open_took_nothing": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.9047619047619048,
+              "ci": [
+                0.6962255930860758,
+                0.9882506821155542
+              ],
+              "mean_width": 2267.8800725758247,
+              "median_width": 2246.2333850584046
+            },
+            "closed_traded": {
+              "n": 94,
+              "empty": false,
+              "coverage": 0.925531914893617,
+              "ci": [
+                0.8525702358671984,
+                0.9695364870588125
+              ],
+              "mean_width": 1144.8894327347057,
+              "median_width": 865.0610530819145
+            },
+            "closed_took_nothing": {
+              "n": 406,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9909552421654058,
+                1.0
+              ],
+              "mean_width": 774.643717154331,
+              "median_width": 702.1227502880654
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1250,
+              "empty": false,
+              "coverage": 0.8624,
+              "ci": [
+                0.8420506681692612,
+                0.8810270089468544
+              ],
+              "mean_width": 1308.2529003785216,
+              "median_width": 1136.0700949859533
+            },
+            "1": {
+              "n": 500,
+              "empty": false,
+              "coverage": 0.986,
+              "ci": [
+                0.9713683838166639,
+                0.9943532389296755
+              ],
+              "mean_width": 844.2499116834414,
+              "median_width": 734.6755543256476
+            }
+          }
+        }
+      },
+      "degeneracy": {
+        "attainable_min_n": 9,
+        "arms": {
+          "A_unpartitioned_fixed": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "attainability": {
+              "clamp_rows_by_group": {
+                "0": 0
+              },
+              "examined_origin_group_events": null,
+              "note": "ungrouped: the pool is never smaller than the warmup (140), which is far above the attainable minimum, so the level is always attainable"
+            }
+          },
+          "B_mondrian_fixed": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 20,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 20
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 500,
+              "smallest_group_pool_slice": 39,
+              "attainable_min_n": 9
+            }
+          },
+          "C_agaci_unpartitioned_adaptive": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "D_mondrian_agaci_pergroup": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 18,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 18
+            },
+            "quantile_degeneracy_calls_by_group": {
+              "1": {
+                "attainability_clamp": 260,
+                "max_residual_level_excursion": 96
+              },
+              "0": {
+                "attainability_clamp": 64,
+                "max_residual_level_excursion": 218
+              }
+            },
+            "quantile_calls_total": 8750,
+            "group_pool_empty_rows": {}
+          },
+          "E_occurrence_ORACLE_fixed": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 83,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 83
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 497,
+              "smallest_group_pool_slice": 39,
+              "attainable_min_n": 9
+            }
+          },
+          "ACI_fixed_gamma_0.005": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.01": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.02": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.05": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.1": {
+            "n_rows": 1750,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          }
+        },
+        "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
+      },
+      "wall_seconds": {
+        "generate_records": 10.32313245899968,
+        "run_online_availability_ABC": 0.5117930420001358,
+        "run_online_occurrence_E": 0.579776958000366,
+        "arm_D_grouped_agaci": 0.21339762499974313
+      },
+      "adaptive_clamps": {
+        "C_agaci_unpartitioned_adaptive": 339,
+        "D_mondrian_agaci_pergroup": {
+          "0": 192,
+          "1": 96
+        }
+      }
+    },
+    "ellel": {
+      "venue": "ellel",
+      "point_model": "rung2_ets",
+      "n_origins": 260,
+      "level": 0.9,
+      "gammas": [
+        0.005,
+        0.01,
+        0.02,
+        0.05,
+        0.1
+      ],
+      "warmup_pool": 140,
+      "contingency_records": {
+        "n": 1820,
+        "counts": {
+          "open_traded": 263,
+          "open_took_nothing": 1037,
+          "closed_traded": 21,
+          "closed_took_nothing": 499
+        },
+        "shares": {
+          "open_traded": 0.1445054945054945,
+          "open_took_nothing": 0.5697802197802198,
+          "closed_traded": 0.011538461538461539,
+          "closed_took_nothing": 0.2741758241758242
+        },
+        "n_calendar_closed": 520,
+        "n_took_nothing": 1536,
+        "n_disagreeing": 1058,
+        "disagreement_rate": 0.5813186813186814
+      },
+      "contingency_banded": {
+        "n": 1659,
+        "counts": {
+          "open_traded": 240,
+          "open_took_nothing": 945,
+          "closed_traded": 21,
+          "closed_took_nothing": 453
+        },
+        "shares": {
+          "open_traded": 0.14466546112115733,
+          "open_took_nothing": 0.569620253164557,
+          "closed_traded": 0.012658227848101266,
+          "closed_took_nothing": 0.2730560578661845
+        },
+        "n_calendar_closed": 474,
+        "n_took_nothing": 1398,
+        "n_disagreeing": 966,
+        "disagreement_rate": 0.5822784810126582
+      },
+      "arms": {
+        "A_unpartitioned_fixed": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9101868595539482,
+            "ci": [
+              0.8953913136560329,
+              0.9235113850443347
+            ],
+            "mean_width": 575.0313780129321,
+            "median_width": 539.4337452549873
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6291666666666667,
+              "ci": [
+                0.5646765405983609,
+                0.6904229852851338
+              ],
+              "mean_width": 643.6945460202448,
+              "median_width": 602.3093059683464
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9439153439153439,
+              "ci": [
+                0.9272785910891167,
+                0.9577100470383183
+              ],
+              "mean_width": 596.148892926985,
+              "median_width": 547.4089360642843
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6666666666666666,
+              "ci": [
+                0.4303245170958757,
+                0.8541230576569032
+              ],
+              "mean_width": 510.9746932781028,
+              "median_width": 514.4312729102897
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 497.56996181844266,
+              "median_width": 511.6494463470155
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.880168776371308,
+              "ci": [
+                0.8603069283027559,
+                0.8981203869066029
+              ],
+              "mean_width": 605.7783922876454,
+              "median_width": 554.6504564944187
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9852320675105485,
+              "ci": [
+                0.9698102173918497,
+                0.9940424510675809
+              ],
+              "mean_width": 498.1638423261491,
+              "median_width": 514.1860281517231
+            }
+          }
+        },
+        "B_mondrian_fixed": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9138034960819771,
+            "ci": [
+              0.8992535968304032,
+              0.9268686407776587
+            ],
+            "mean_width": 513.420034253876,
+            "median_width": 603.7339345788212
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6916666666666667,
+              "ci": [
+                0.6290459048011966,
+                0.7494797864466615
+              ],
+              "mean_width": 806.5762845686999,
+              "median_width": 690.8667302459562
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9851851851851852,
+              "ci": [
+                0.975268076350265,
+                0.9918775600085479
+              ],
+              "mean_width": 689.6251692096528,
+              "median_width": 623.0365171340478
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.1610976152190796
+              ],
+              "mean_width": 0.0,
+              "median_width": 0.0
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 0.9249448123620309,
+              "ci": [
+                0.8966950567932404,
+                0.9474647851744329
+              ],
+              "mean_width": 14.326144873224438,
+              "median_width": 0.0
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.9257383966244725,
+              "ci": [
+                0.9093059027860114,
+                0.9400171624442966
+              ],
+              "mean_width": 713.311471054523,
+              "median_width": 634.6002162785883
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.8839662447257384,
+              "ci": [
+                0.8516550620611674,
+                0.9113808954979198
+              ],
+              "mean_width": 13.6914422522588,
+              "median_width": 0.0
+            }
+          }
+        },
+        "C_agaci_unpartitioned_adaptive": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.8812537673297167,
+            "ci": [
+              0.8647080742219302,
+              0.8964365730136903
+            ],
+            "mean_width": 564.4370157808278,
+            "median_width": 523.9561518875508
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6208333333333333,
+              "ci": [
+                0.5561784468995398,
+                0.6824635988233987
+              ],
+              "mean_width": 678.6054683077462,
+              "median_width": 622.7778721126787
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.8952380952380953,
+              "ci": [
+                0.8739363748300756,
+                0.9140369719556685
+              ],
+              "mean_width": 572.7449377172338,
+              "median_width": 533.1719682475516
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6666666666666666,
+              "ci": [
+                0.4303245170958757,
+                0.8541230576569032
+              ],
+              "mean_width": 478.12379126659914,
+              "median_width": 475.82091205136794
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 490.6205982939288,
+              "median_width": 476.81207632328494
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8396624472573839,
+              "ci": [
+                0.8175115458329324,
+                0.860112253005875
+              ],
+              "mean_width": 594.1850451786033,
+              "median_width": 548.2328063633483
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9852320675105485,
+              "ci": [
+                0.9698102173918497,
+                0.9940424510675809
+              ],
+              "mean_width": 490.0669422863889,
+              "median_width": 476.7084656706952
+            }
+          }
+        },
+        "D_mondrian_agaci_pergroup": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.8884870403857745,
+            "ci": [
+              0.872346844234452,
+              0.9032375510655059
+            ],
+            "mean_width": 512.537201439738,
+            "median_width": 570.5408881021804
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6833333333333333,
+              "ci": [
+                0.6203959122213797,
+                0.7416735726838163
+              ],
+              "mean_width": 817.8833814069666,
+              "median_width": 696.5221492569956
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9365079365079365,
+              "ci": [
+                0.9190253629041548,
+                0.9512027528681194
+              ],
+              "mean_width": 674.7826999589131,
+              "median_width": 615.0542143340283
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.1610976152190796
+              ],
+              "mean_width": 12.493424709125284,
+              "median_width": 0.0
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 0.9381898454746137,
+              "ci": [
+                0.9119034872659237,
+                0.9585383065542208
+              ],
+              "mean_width": 35.486075652955414,
+              "median_width": 0.0
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8852320675105485,
+              "ci": [
+                0.8656988803359177,
+                0.9028285316461976
+              ],
+              "mean_width": 703.7651164547215,
+              "median_width": 629.605052865379
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.8966244725738397,
+              "ci": [
+                0.8656401688831097,
+                0.9225392732727545
+              ],
+              "mean_width": 34.4674139022794,
+              "median_width": 0.0
+            }
+          }
+        },
+        "E_occurrence_ORACLE_fixed": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.8426763110307414,
+            "ci": [
+              0.8242506117980186,
+              0.8598803745468894
+            ],
+            "mean_width": 341.4495424826562,
+            "median_width": 184.63330362743287
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.7875,
+              "ci": [
+                0.7302533926273076,
+                0.837495358358856
+              ],
+              "mean_width": 1323.1859426546632,
+              "median_width": 1237.3274088160188
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.782010582010582,
+              "ci": [
+                0.7542989672609501,
+                0.8079519016862887
+              ],
+              "mean_width": 175.8650843136879,
+              "median_width": 123.14345800597283
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.8389023847809204,
+                1.0
+              ],
+              "mean_width": 1064.31663099573,
+              "median_width": 1185.2628597783919
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 0.9911699779249448,
+              "ci": [
+                0.9775469822836479,
+                0.9975890252689694
+              ],
+              "mean_width": 133.23843446856984,
+              "median_width": 114.39892357404634
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.7831223628691983,
+              "ci": [
+                0.7585478768351261,
+                0.8062828813125135
+              ],
+              "mean_width": 408.2338657498348,
+              "median_width": 228.39573738971262
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9915611814345991,
+              "ci": [
+                0.9785351751679084,
+                0.997696056912352
+              ],
+              "mean_width": 174.48873431470986,
+              "median_width": 115.35937506381416
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.005": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9113924050632911,
+            "ci": [
+              0.8966779812025895,
+              0.9246312373123232
+            ],
+            "mean_width": 587.8515513672943,
+            "median_width": 545.0230142256239
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6583333333333333,
+              "ci": [
+                0.5945730232047546,
+                0.7181266015008937
+              ],
+              "mean_width": 709.4271500061283,
+              "median_width": 639.2216983522417
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9386243386243386,
+              "ci": [
+                0.9213769467491085,
+                0.9530686141512654
+              ],
+              "mean_width": 595.497794895104,
+              "median_width": 550.3762064241242
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6666666666666666,
+              "ci": [
+                0.4303245170958757,
+                0.8541230576569032
+              ],
+              "mean_width": 491.55784867551006,
+              "median_width": 510.02813675105386
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 511.95381174130557,
+              "median_width": 510.1167603441053
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8818565400843882,
+              "ci": [
+                0.8621030430936485,
+                0.8996909819462506
+              ],
+              "mean_width": 618.5720946644254,
+              "median_width": 571.7343267203063
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9852320675105485,
+              "ci": [
+                0.9698102173918497,
+                0.9940424510675809
+              ],
+              "mean_width": 511.0501931244665,
+              "median_width": 510.02813675105386
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.01": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9065702230259193,
+            "ci": [
+              0.8915357100512659,
+              0.9201473907515022
+            ],
+            "mean_width": 573.460008434175,
+            "median_width": 539.7473367042536
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.65,
+              "ci": [
+                0.5860064380044503,
+                0.7102362048394801
+              ],
+              "mean_width": 695.1150579447019,
+              "median_width": 639.0345628858372
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9322751322751323,
+              "ci": [
+                0.9143364616040923,
+                0.9474564487332281
+              ],
+              "mean_width": 580.4543671324315,
+              "median_width": 542.3135820246646
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6666666666666666,
+              "ci": [
+                0.4303245170958757,
+                0.8541230576569032
+              ],
+              "mean_width": 485.6152133140576,
+              "median_width": 508.7539617616073
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 498.4883966133001,
+              "median_width": 499.69781051142127
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8751054852320675,
+              "ci": [
+                0.8549255415329728,
+                0.8934015831201921
+              ],
+              "mean_width": 603.67678552479,
+              "median_width": 567.2588957490166
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9852320675105485,
+              "ci": [
+                0.9698102173918497,
+                0.9940424510675809
+              ],
+              "mean_width": 497.9180657076374,
+              "median_width": 499.69781051142127
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.02": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9029535864978903,
+            "ci": [
+              0.8876864414138712,
+              0.9167770079464728
+            ],
+            "mean_width": 544.8002137739115,
+            "median_width": 535.4667277200369
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6416666666666667,
+              "ci": [
+                0.5774597919186506,
+                0.7023257114336529
+              ],
+              "mean_width": 665.235252165193,
+              "median_width": 624.924623888424
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.928042328042328,
+              "ci": [
+                0.9096652400779128,
+                0.9436920955791158
+              ],
+              "mean_width": 551.6200185023133,
+              "median_width": 536.2353098509788
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.6666666666666666,
+              "ci": [
+                0.4303245170958757,
+                0.8541230576569032
+              ],
+              "mean_width": 461.3969275778004,
+              "median_width": 487.24673480725505
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 470.6332034601614,
+              "median_width": 461.79029786005054
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.870042194092827,
+              "ci": [
+                0.8495541734474135,
+                0.8886726759303282
+              ],
+              "mean_width": 574.6306987378333,
+              "median_width": 545.0230142256239
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9852320675105485,
+              "ci": [
+                0.9698102173918497,
+                0.9940424510675809
+              ],
+              "mean_width": 470.2240013641074,
+              "median_width": 467.10586427479666
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.05": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.9017480409885473,
+            "ci": [
+              0.8864047046687635,
+              0.9156521831527844
+            ],
+            "mean_width": 575.9394701514715,
+            "median_width": 539.4337452549873
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6083333333333333,
+              "ci": [
+                0.5434667953895609,
+                0.670488814353994
+              ],
+              "mean_width": 682.718352012628,
+              "median_width": 622.2721774544715
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9322751322751323,
+              "ci": [
+                0.9143364616040923,
+                0.9474564487332281
+              ],
+              "mean_width": 584.4865616517332,
+              "median_width": 540.9276062188155
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.7619047619047619,
+              "ci": [
+                0.5283401723453787,
+                0.9178241244069774
+              ],
+              "mean_width": 511.51991037826417,
+              "median_width": 437.9993908152387
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 504.5241890053621,
+              "median_width": 487.24673480725505
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8666666666666667,
+              "ci": [
+                0.8459785811659797,
+                0.885514708231119
+              ],
+              "mean_width": 604.3816078007752,
+              "median_width": 565.1225681802032
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.989451476793249,
+              "ci": [
+                0.97555602273058,
+                0.996566299253593
+              ],
+              "mean_width": 504.83412602821215,
+              "median_width": 486.9541626374847
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.1": {
+          "overall": {
+            "n": 1659,
+            "empty": false,
+            "coverage": 0.8999397227245328,
+            "ci": [
+              0.8844833299046333,
+              0.9139637058062584
+            ],
+            "mean_width": 667.7150208153955,
+            "median_width": 555.4083845970118
+          },
+          "cells": {
+            "open_traded": {
+              "n": 240,
+              "empty": false,
+              "coverage": 0.6,
+              "ci": [
+                0.5350156969769947,
+                0.6624821596774743
+              ],
+              "mean_width": 754.2568404126024,
+              "median_width": 607.4347308783979
+            },
+            "open_took_nothing": {
+              "n": 945,
+              "empty": false,
+              "coverage": 0.9322751322751323,
+              "ci": [
+                0.9143364616040923,
+                0.9474564487332281
+              ],
+              "mean_width": 679.4204535983158,
+              "median_width": 570.955145674844
+            },
+            "closed_traded": {
+              "n": 21,
+              "empty": false,
+              "coverage": 0.7142857142857143,
+              "ci": [
+                0.47824888175288627,
+                0.8871905960780592
+              ],
+              "mean_width": 692.1875379489536,
+              "median_width": 535.4667277200369
+            },
+            "closed_took_nothing": {
+              "n": 453,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9918898444612019,
+                1.0
+              ],
+              "mean_width": 596.3119445615454,
+              "median_width": 510.1167603441053
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 1185,
+              "empty": false,
+              "coverage": 0.8649789029535865,
+              "ci": [
+                0.8441923294839156,
+                0.8839341677832248
+              ],
+              "mean_width": 694.5771901682978,
+              "median_width": 573.5857909518129
+            },
+            "1": {
+              "n": 474,
+              "empty": false,
+              "coverage": 0.9873417721518988,
+              "ci": [
+                0.9726531072420854,
+                0.995340870097599
+              ],
+              "mean_width": 600.5595974331393,
+              "median_width": 510.88310334556036
+            }
+          }
+        }
+      },
+      "degeneracy": {
+        "attainable_min_n": 9,
+        "arms": {
+          "A_unpartitioned_fixed": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "attainability": {
+              "clamp_rows_by_group": {
+                "0": 0
+              },
+              "examined_origin_group_events": null,
+              "note": "ungrouped: the pool is never smaller than the warmup (140), which is far above the attainable minimum, so the level is always attainable"
+            }
+          },
+          "B_mondrian_fixed": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 308,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 308
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 474,
+              "smallest_group_pool_slice": 40,
+              "attainable_min_n": 9
+            }
+          },
+          "C_agaci_unpartitioned_adaptive": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "D_mondrian_agaci_pergroup": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 294,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 294
+            },
+            "quantile_degeneracy_calls_by_group": {
+              "1": {
+                "attainability_clamp": 111,
+                "max_residual_level_excursion": 10
+              },
+              "0": {
+                "attainability_clamp": 14,
+                "max_residual_level_excursion": 52
+              }
+            },
+            "quantile_calls_total": 8295,
+            "group_pool_empty_rows": {}
+          },
+          "E_occurrence_ORACLE_fixed": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 181,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 181
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 409,
+              "smallest_group_pool_slice": 21,
+              "attainable_min_n": 9
+            }
+          },
+          "ACI_fixed_gamma_0.005": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.01": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.02": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.05": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.1": {
+            "n_rows": 1659,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          }
+        },
+        "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
+      },
+      "wall_seconds": {
+        "generate_records": 9.52086354199946,
+        "run_online_availability_ABC": 0.46888391700031207,
+        "run_online_occurrence_E": 0.4864386659992306,
+        "arm_D_grouped_agaci": 0.26854220800032635
+      },
+      "adaptive_clamps": {
+        "C_agaci_unpartitioned_adaptive": 127,
+        "D_mondrian_agaci_pergroup": {
+          "0": 50,
+          "1": 10
+        }
+      }
+    },
+    "two_river_taps": {
+      "venue": "two_river_taps",
+      "point_model": "rung2_ets",
+      "n_origins": 205,
+      "level": 0.9,
+      "gammas": [
+        0.005,
+        0.01,
+        0.02,
+        0.05,
+        0.1
+      ],
+      "warmup_pool": 140,
+      "contingency_records": {
+        "n": 1435,
+        "counts": {
+          "open_traded": 1018,
+          "open_took_nothing": 7,
+          "closed_traded": 65,
+          "closed_took_nothing": 345
+        },
+        "shares": {
+          "open_traded": 0.7094076655052265,
+          "open_took_nothing": 0.004878048780487805,
+          "closed_traded": 0.04529616724738676,
+          "closed_took_nothing": 0.24041811846689895
+        },
+        "n_calendar_closed": 410,
+        "n_took_nothing": 352,
+        "n_disagreeing": 72,
+        "disagreement_rate": 0.050174216027874564
+      },
+      "contingency_banded": {
+        "n": 1274,
+        "counts": {
+          "open_traded": 903,
+          "open_took_nothing": 7,
+          "closed_traded": 38,
+          "closed_took_nothing": 326
+        },
+        "shares": {
+          "open_traded": 0.7087912087912088,
+          "open_took_nothing": 0.005494505494505495,
+          "closed_traded": 0.029827315541601257,
+          "closed_took_nothing": 0.25588697017268447
+        },
+        "n_calendar_closed": 364,
+        "n_took_nothing": 333,
+        "n_disagreeing": 45,
+        "disagreement_rate": 0.03532182103610675
+      },
+      "arms": {
+        "A_unpartitioned_fixed": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.945839874411303,
+            "ci": [
+              0.93195401645684,
+              0.957619148335676
+            ],
+            "mean_width": 521.7262036143062,
+            "median_width": 541.5982115983084
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.9390919158361019,
+              "ci": [
+                0.9214544405865828,
+                0.9537897055202542
+              ],
+              "mean_width": 593.1346210395736,
+              "median_width": 576.4218407413592
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 593.3556283606042,
+              "median_width": 575.2297295900719
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.8157894736842105,
+              "ci": [
+                0.6567380056890788,
+                0.9225731481611512
+              ],
+              "mean_width": 383.08755597373374,
+              "median_width": 339.65561839571455
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 338.5515462587884,
+              "median_width": 319.6249820243761
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9318681318681319,
+              "ci": [
+                0.9135056530257074,
+                0.9473682058294075
+              ],
+              "mean_width": 593.1363210958893,
+              "median_width": 575.8233514349383
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9807692307692307,
+              "ci": [
+                0.9607802881601119,
+                0.9922341301258268
+              ],
+              "mean_width": 343.2009099103486,
+              "median_width": 324.5489397472604
+            }
+          }
+        },
+        "B_mondrian_fixed": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9631083202511774,
+            "ci": [
+              0.9512417737182168,
+              0.9727698389903631
+            ],
+            "mean_width": 535.0223164499419,
+            "median_width": 577.6178583383374
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.964562569213732,
+              "ci": [
+                0.9503391872891124,
+                0.9756369602050148
+              ],
+              "mean_width": 657.2050295343087,
+              "median_width": 641.6319997801754
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.5714285714285714,
+              "ci": [
+                0.184051567640083,
+                0.9010117215574921
+              ],
+              "mean_width": 695.598144904755,
+              "median_width": 693.028176952182
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.7368421052631579,
+              "ci": [
+                0.5689917562977604,
+                0.8659662769750264
+              ],
+              "mean_width": 262.97593985076986,
+              "median_width": 226.3325156036771
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 0.9938650306748467,
+              "ci": [
+                0.9780152607085703,
+                0.9992561613094599
+              ],
+              "mean_width": 224.84667717510055,
+              "median_width": 212.80473240024304
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9615384615384616,
+              "ci": [
+                0.9469129767328246,
+                0.973066555120346
+              ],
+              "mean_width": 657.5003611910043,
+              "median_width": 642.0997860611775
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.967032967032967,
+              "ci": [
+                0.9431217443294014,
+                0.9828516651340331
+              ],
+              "mean_width": 228.8272045972858,
+              "median_width": 218.69292071789462
+            }
+          }
+        },
+        "C_agaci_unpartitioned_adaptive": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9175824175824175,
+            "ci": [
+              0.9011070641645278,
+              0.9320982283056053
+            ],
+            "mean_width": 502.6967214507101,
+            "median_width": 463.7407750457985
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.8981173864894795,
+              "ci": [
+                0.8765170321598097,
+                0.9170764401646726
+              ],
+              "mean_width": 568.7030028680286,
+              "median_width": 497.86291542657375
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 573.4141926012468,
+              "median_width": 491.8645075944166
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.8421052631578947,
+              "ci": [
+                0.687466391708095,
+                0.9397702720826153
+              ],
+              "mean_width": 493.0171732027187,
+              "median_width": 530.7189310118217
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 319.47318898301455,
+              "median_width": 264.31529238934286
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.8912087912087913,
+              "ci": [
+                0.8691481031188663,
+                0.9106968257085931
+              ],
+              "mean_width": 568.7392427890534,
+              "median_width": 497.4256776308971
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9835164835164835,
+              "ci": [
+                0.9644692876753852,
+                0.9939274298988438
+              ],
+              "mean_width": 337.5904181048518,
+              "median_width": 272.96295178157305
+            }
+          }
+        },
+        "D_mondrian_agaci_pergroup": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9270015698587127,
+            "ci": [
+              0.9113159475373918,
+              0.9406797616861184
+            ],
+            "mean_width": 512.1424683355413,
+            "median_width": 496.79446380879926
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.9346622369878184,
+              "ci": [
+                0.9165251020140797,
+                0.9498933636344512
+              ],
+              "mean_width": 636.7245842646431,
+              "median_width": 553.7419970429645
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 583.7745156416837,
+              "median_width": 535.5497469669666
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.7631578947368421,
+              "ci": [
+                0.5975876394285091,
+                0.8855582951774693
+              ],
+              "mean_width": 274.1101842567699,
+              "median_width": 281.1956099778083
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 0.9447852760736196,
+              "ci": [
+                0.914138636688931,
+                0.9669516152393279
+              ],
+              "mean_width": 193.2656333044717,
+              "median_width": 190.07709224523762
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9274725274725275,
+              "ci": [
+                0.9086485757304363,
+                0.9434664992956643
+              ],
+              "mean_width": 636.3172760444666,
+              "median_width": 553.6358629231133
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9258241758241759,
+              "ci": [
+                0.8939111861608525,
+                0.9505512301803828
+              ],
+              "mean_width": 201.70544906322812,
+              "median_width": 198.71436620258953
+            }
+          }
+        },
+        "E_occurrence_ORACLE_fixed": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9638932496075353,
+            "ci": [
+              0.9521303075005414,
+              0.9734463825517103
+            ],
+            "mean_width": 517.066243627804,
+            "median_width": 565.5686041134464
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.9590254706533776,
+              "ci": [
+                0.9439618741861127,
+                0.9709889037477817
+              ],
+              "mean_width": 632.7581116634092,
+              "median_width": 625.7175704324229
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 333.1195707734436,
+              "median_width": 333.63126129572424
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9074872385841217,
+                1.0
+              ],
+              "mean_width": 406.7464352069264,
+              "median_width": 358.36074352159153
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 0.9938650306748467,
+              "ci": [
+                0.9780152607085703,
+                0.9992561613094599
+              ],
+              "mean_width": 213.41600618554148,
+              "median_width": 197.19245972939535
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9516483516483516,
+              "ci": [
+                0.9356309042670943,
+                0.9646510917796498
+              ],
+              "mean_width": 630.4531998104095,
+              "median_width": 624.2306096822888
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9945054945054945,
+              "ci": [
+                0.9802938923400195,
+                0.9993338958766478
+              ],
+              "mean_width": 233.5988531712905,
+              "median_width": 197.19245972939535
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.005": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9403453689167975,
+            "ci": [
+              0.9258992240561593,
+              0.9527144565792657
+            ],
+            "mean_width": 522.4666534338164,
+            "median_width": 507.96934886957706
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.9324473975636767,
+              "ci": [
+                0.9140683494070556,
+                0.9479370943322456
+              ],
+              "mean_width": 593.6561102997042,
+              "median_width": 542.2666897013655
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 542.9142412671725,
+              "median_width": 541.5982115983084
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.7894736842105263,
+              "ci": [
+                0.6268117163983604,
+                0.9044588845441258
+              ],
+              "mean_width": 386.8321135714405,
+              "median_width": 348.6085090888802
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 340.6473278204426,
+              "median_width": 308.0774574817525
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9252747252747253,
+              "ci": [
+                0.9062267554843811,
+                0.9415087909153231
+              ],
+              "mean_width": 593.2657882302232,
+              "median_width": 542.2666897013655
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.978021978021978,
+              "ci": [
+                0.9571553806517762,
+                0.9904648113995141
+              ],
+              "mean_width": 345.4688164427996,
+              "median_width": 313.57919269149386
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.01": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9293563579277865,
+            "ci": [
+              0.9138784031917839,
+              0.9428147678808817
+            ],
+            "mean_width": 504.45987734416855,
+            "median_width": 483.286001888328
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.9169435215946844,
+              "ci": [
+                0.8969990063679906,
+                0.9341126518862126
+              ],
+              "mean_width": 574.2490874392167,
+              "median_width": 530.3645628178531
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 513.287140113069,
+              "median_width": 483.25752915494354
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.7894736842105263,
+              "ci": [
+                0.6268117163983604,
+                0.9044588845441258
+              ],
+              "mean_width": 381.3617991062357,
+              "median_width": 346.10472448665723
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 325.3073602209495,
+              "median_width": 288.3614305740314
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.9098901098901099,
+              "ci": [
+                0.8893842629508371,
+                0.9276925523772691
+              ],
+              "mean_width": 573.7801493828619,
+              "median_width": 530.0657046261434
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.978021978021978,
+              "ci": [
+                0.9571553806517762,
+                0.9904648113995141
+              ],
+              "mean_width": 331.1591972474355,
+              "median_width": 293.2849050063612
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.02": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9152276295133438,
+            "ci": [
+              0.8985642656890924,
+              0.9299432999058659
+            ],
+            "mean_width": 493.99483873352705,
+            "median_width": 469.8825987769104
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.8970099667774086,
+              "ci": [
+                0.8753191791135926,
+                0.9160672364569111
+              ],
+              "mean_width": 562.9525392867981,
+              "median_width": 520.0458909664928
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 507.37074414151186,
+              "median_width": 464.86869955252087
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.7894736842105263,
+              "ci": [
+                0.6268117163983604,
+                0.9044588845441258
+              ],
+              "mean_width": 394.0835730370877,
+              "median_width": 380.3820321211439
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 314.34512449734603,
+              "median_width": 274.4208851834555
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.8901098901098901,
+              "ci": [
+                0.8679639700751083,
+                0.9096907620311606
+              ],
+              "mean_width": 562.5249870164497,
+              "median_width": 520.0458909664928
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.978021978021978,
+              "ci": [
+                0.9571553806517762,
+                0.9904648113995141
+              ],
+              "mean_width": 322.6694680262202,
+              "median_width": 282.1814371158672
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.05": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9050235478806907,
+            "ci": [
+              0.8875841580826521,
+              0.9205661334432773
+            ],
+            "mean_width": 505.2097060372176,
+            "median_width": 438.15133880087694
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.8815060908084164,
+              "ci": [
+                0.8586188844505032,
+                0.901867821650219
+              ],
+              "mean_width": 570.1788128992522,
+              "median_width": 480.3593900442406
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.0,
+              "ci": [
+                0.0,
+                0.40961639722500337
+              ],
+              "mean_width": 529.5317252818566,
+              "median_width": 464.86869955252087
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.8157894736842105,
+              "ci": [
+                0.6567380056890788,
+                0.9225731481611512
+              ],
+              "mean_width": 633.3414262667088,
+              "median_width": 648.1958304372654
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 309.7914146266336,
+              "median_width": 255.90465318317257
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.8747252747252747,
+              "ci": [
+                0.8514491433681137,
+                0.8955420692238665
+              ],
+              "mean_width": 569.866142994503,
+              "median_width": 480.3593900442406
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9807692307692307,
+              "ci": [
+                0.9607802881601119,
+                0.9922341301258268
+              ],
+              "mean_width": 343.5686136440041,
+              "median_width": 260.0229454832464
+            }
+          }
+        },
+        "ACI_fixed_gamma_0.1": {
+          "overall": {
+            "n": 1274,
+            "empty": false,
+            "coverage": 0.9003139717425431,
+            "ci": [
+              0.8825358862562637,
+              0.9162185255849469
+            ],
+            "mean_width": 525.6688464360558,
+            "median_width": 428.7000688339947
+          },
+          "cells": {
+            "open_traded": {
+              "n": 903,
+              "empty": false,
+              "coverage": 0.8704318936877077,
+              "ci": [
+                0.8467617580135827,
+                0.8916528681401221
+              ],
+              "mean_width": 589.7692478616948,
+              "median_width": 467.24022342482516
+            },
+            "open_took_nothing": {
+              "n": 7,
+              "empty": false,
+              "coverage": 0.2857142857142857,
+              "ci": [
+                0.03669256617608555,
+                0.7095791362626572
+              ],
+              "mean_width": 576.3201290966251,
+              "median_width": 432.0731220563789
+            },
+            "closed_traded": {
+              "n": 38,
+              "empty": false,
+              "coverage": 0.868421052631579,
+              "ci": [
+                0.7191361541162467,
+                0.9558625599420856
+              ],
+              "mean_width": 741.823154733143,
+              "median_width": 849.5342029524206
+            },
+            "closed_took_nothing": {
+              "n": 326,
+              "empty": false,
+              "coverage": 1.0,
+              "ci": [
+                0.9887481992433568,
+                1.0
+              ],
+              "mean_width": 321.83116183094745,
+              "median_width": 235.57458210238622
+            }
+          },
+          "by_availability_group": {
+            "0": {
+              "n": 910,
+              "empty": false,
+              "coverage": 0.865934065934066,
+              "ci": [
+                0.8420603690440303,
+                0.8874082917055992
+              ],
+              "mean_width": 589.6657931019636,
+              "median_width": 467.0167323112579
+            },
+            "1": {
+              "n": 364,
+              "empty": false,
+              "coverage": 0.9862637362637363,
+              "ci": [
+                0.968236886249584,
+                0.9955252292363678
+              ],
+              "mean_width": 365.67647977128655,
+              "median_width": 247.72523814363916
+            }
+          }
+        }
+      },
+      "degeneracy": {
+        "attainable_min_n": 9,
+        "arms": {
+          "A_unpartitioned_fixed": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "attainability": {
+              "clamp_rows_by_group": {
+                "0": 0
+              },
+              "examined_origin_group_events": null,
+              "note": "ungrouped: the pool is never smaller than the warmup (140), which is far above the attainable minimum, so the level is always attainable"
+            }
+          },
+          "B_mondrian_fixed": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 364,
+              "smallest_group_pool_slice": 37,
+              "attainable_min_n": 9
+            }
+          },
+          "C_agaci_unpartitioned_adaptive": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "D_mondrian_agaci_pergroup": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "quantile_degeneracy_calls_by_group": {
+              "1": {
+                "attainability_clamp": 110
+              },
+              "0": {
+                "max_residual_level_excursion": 42,
+                "attainability_clamp": 10
+              }
+            },
+            "quantile_calls_total": 6370,
+            "group_pool_empty_rows": {}
+          },
+          "E_occurrence_ORACLE_fixed": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            },
+            "attainability": {
+              "clamp_rows_by_group": {},
+              "examined_origin_group_events": 351,
+              "smallest_group_pool_slice": 14,
+              "attainable_min_n": 9
+            }
+          },
+          "ACI_fixed_gamma_0.005": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.01": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.02": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.05": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          },
+          "ACI_fixed_gamma_0.1": {
+            "n_rows": 1274,
+            "zero_width_rows_total": 0,
+            "zero_width_rows_by_group": {
+              "0": 0,
+              "1": 0
+            }
+          }
+        },
+        "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
+      },
+      "wall_seconds": {
+        "generate_records": 7.2465744170003745,
+        "run_online_availability_ABC": 0.36159966599916515,
+        "run_online_occurrence_E": 0.4236800830003631,
+        "arm_D_grouped_agaci": 0.15511683399927279
+      },
+      "adaptive_clamps": {
+        "C_agaci_unpartitioned_adaptive": 124,
+        "D_mondrian_agaci_pergroup": {
+          "0": 29,
+          "1": 0
+        }
+      }
+    }
+  }
+}

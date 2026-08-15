@@ -132,11 +132,12 @@ def _quantile_tap():
     installed ONLY around arm D's banding, where this module owns every call and can therefore
     attribute each one to a group exactly, with no inference from call ordering.
     """
-    tap = {"group": None, "counts": {}}
+    tap = {"group": None, "counts": {}, "total_calls": 0}
     original = methods.safe_conformal_quantile
 
     def counting(scores, level):
         n = int(np.asarray(scores).size)
+        tap["total_calls"] += 1
         kind = classify_quantile_call(n, float(level))
         if kind is not None:
             bucket = tap["counts"].setdefault(tap["group"], {})
@@ -193,18 +194,29 @@ def fixed_arm_attainability(records: pd.DataFrame, level: float = LEVEL,
     fires for a group at an origin exactly when that group's pool slice is smaller than
     `attainable_min_n(level)`, and it then fires for every row banded under that group at that
     origin. Counted in ROWS, so it is commensurable with the zero-width counts.
+
+    A zero here is only a result if the loop examined something, so the number of (origin, group)
+    banding events examined is returned with it. A count of zero clamps over zero examined events
+    is UNKNOWN, not clean, and the caller can see which it got.
     """
     by_origin = {o: g.sort_values("step") for o, g in records.groupby("origin")}
     min_n = attainable_min_n(level)
-    out: dict[str, int] = {}
+    clamped: dict[str, int] = {}
+    examined = 0
+    smallest = None
     for origin, _pr, _ps, pst in pool_trace(records, warmup):
         states = by_origin[origin]["state"].to_numpy(int)
         for grp in np.unique(states):
+            examined += 1
             n_g = int((pst == grp).sum())
+            smallest = n_g if smallest is None else min(smallest, n_g)
             if n_g < min_n:
                 key = str(int(grp))
-                out[key] = out.get(key, 0) + int((states == grp).sum())
-    return out
+                clamped[key] = clamped.get(key, 0) + int((states == grp).sum())
+    return {"clamp_rows_by_group": clamped,
+            "examined_origin_group_events": examined,
+            "smallest_group_pool_slice": smallest,
+            "attainable_min_n": min_n}
 
 
 # --- Arm D: Mondrian x AgACI, a separate alpha sequence per group ------------
@@ -279,6 +291,7 @@ def run_grouped_agaci(records: pd.DataFrame, level: float = LEVEL, *,
                     los, his, lo_pred, hi_pred = agg.last_experts[h]
                     pending[grp][h][targets[j]] = (los.copy(), his.copy(), lo_pred, hi_pred)
         degeneracy_calls = {g: dict(c) for g, c in tap["counts"].items()}
+        degeneracy_total_calls = int(tap["total_calls"])
 
     return {
         "banded": pd.DataFrame(banded),
@@ -288,6 +301,7 @@ def run_grouped_agaci(records: pd.DataFrame, level: float = LEVEL, *,
         "clamps_per_group": {str(g): int(a.clamps) for g, a in aggs.items()},
         "group_pool_empty": group_pool_empty,
         "quantile_degeneracy_calls": degeneracy_calls,
+        "quantile_calls_total": degeneracy_total_calls,
         "attainable_min_n": min_n,
         "groups": sorted(int(g) for g in aggs),
     }
@@ -358,6 +372,8 @@ def venue_block(venue: str, level: float = LEVEL) -> dict:
     occur_lab = pc.occurrence_state(banded[ARM_B])
 
     arms = {arm: pc._arm_stats(df, avail_lab, occur_lab) for arm, df in banded.items()}
+    for arm, df in banded.items():
+        arms[arm]["by_availability_group"] = group_stats(df, avail_lab)
 
     block = {
         "venue": venue,
@@ -382,6 +398,24 @@ def venue_block(venue: str, level: float = LEVEL) -> dict:
         },
     }
     return block
+
+
+def group_stats(banded: pd.DataFrame, avail_lab: np.ndarray) -> dict:
+    """Coverage and width for each MONDRIAN GROUP, not each cell.
+
+    P2 and P4 are claims about a whole calendar group -- "adaptation pays for the cell out of the
+    group" -- and a group is the union of two cells, so neither can be read off the per-cell
+    table without an arithmetic step. That step is taken here, in the instrument, so the number
+    entering the verdict comes from an instrumented path rather than from a hand calculation.
+    Group 0 is calendar-open, group 1 is calendar-closed, matching `CELLS`' first coordinate.
+    """
+    y = banded["y"].to_numpy(float)
+    lo = banded["lo"].to_numpy(float)
+    hi = banded["hi"].to_numpy(float)
+    covered = (y >= lo) & (y <= hi)
+    width = hi - lo
+    return {str(int(g)): pc._cell_stats(covered[avail_lab == g], width[avail_lab == g])
+            for g in np.unique(avail_lab)}
 
 
 def degeneracy_block(banded: dict, d_out: dict, records: pd.DataFrame,
@@ -410,14 +444,14 @@ def degeneracy_block(banded: dict, d_out: dict, records: pd.DataFrame,
             "zero_width_rows_by_group": {str(int(s)): int((zero & (state == s)).sum())
                                          for s in np.unique(state)},
         }
-    out["arms"][ARM_B]["attainability_clamp_rows_by_group"] = fixed_arm_attainability(
-        records, level)
-    out["arms"][ARM_E]["attainability_clamp_rows_by_group"] = fixed_arm_attainability(
-        occur_records, level)
-    out["arms"][ARM_A]["attainability_clamp_rows_by_group"] = {
-        "0": 0, "note": "ungrouped: the pool is never smaller than the warmup, so the level is "
-                        "always attainable"}
+    out["arms"][ARM_B]["attainability"] = fixed_arm_attainability(records, level)
+    out["arms"][ARM_E]["attainability"] = fixed_arm_attainability(occur_records, level)
+    out["arms"][ARM_A]["attainability"] = {
+        "clamp_rows_by_group": {"0": 0}, "examined_origin_group_events": None,
+        "note": "ungrouped: the pool is never smaller than the warmup (140), which is far above "
+                "the attainable minimum, so the level is always attainable"}
     out["arms"][ARM_D]["quantile_degeneracy_calls_by_group"] = d_out["quantile_degeneracy_calls"]
+    out["arms"][ARM_D]["quantile_calls_total"] = d_out["quantile_calls_total"]
     out["arms"][ARM_D]["group_pool_empty_rows"] = d_out["group_pool_empty"]
     out["scope_note"] = (
         "Arm C's attainability clamps are not separately attributable. Its bands are produced "

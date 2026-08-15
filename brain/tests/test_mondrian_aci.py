@@ -235,10 +235,27 @@ def test_arm_d_preserves_every_row_s_group_label():
 def test_a_group_that_never_reaches_nine_observations_is_counted_as_clamped():
     """Group 1 gets one observation every fortnight, so its slice stays under nine all through."""
     rows = [(1 if i % 14 == 0 else 0, 100.0 + (i % 5) * 10.0, 100.0) for i in range(200)]
-    counts = fixed_arm_attainability(_records(rows), 0.90, warmup=40)
-    assert counts.get("1", 0) > 0
+    out = fixed_arm_attainability(_records(rows), 0.90, warmup=40)
+    assert out["clamp_rows_by_group"].get("1", 0) > 0
 
 
 def test_a_well_populated_group_is_not_counted_as_clamped():
-    counts = fixed_arm_attainability(_alternating(200, 40), 0.90, warmup=40)
-    assert counts.get("0", 0) == 0
+    out = fixed_arm_attainability(_alternating(200, 40), 0.90, warmup=40)
+    assert out["clamp_rows_by_group"].get("0", 0) == 0
+
+
+def test_a_clean_attainability_count_reports_how_much_it_examined():
+    """A zero over an unexamined loop is UNKNOWN, not clean, so the scope rides with the count."""
+    out = fixed_arm_attainability(_alternating(200, 40), 0.90, warmup=40)
+    assert out["examined_origin_group_events"] > 0
+
+
+# --- The instrumentation must not outlive itself -----------------------------
+
+def test_the_quantile_tap_restores_the_shared_function():
+    """Arm D instruments a module global, so the restore is the thing that keeps arms A, B, C
+    and E measuring what they would have measured without it."""
+    from conformal import methods
+    before = methods.safe_conformal_quantile
+    run_grouped_agaci(_alternating(200, 40), 0.90, gammas=(0.05,), warmup=40)
+    assert methods.safe_conformal_quantile is before
