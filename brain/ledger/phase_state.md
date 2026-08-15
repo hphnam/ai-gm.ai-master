@@ -5211,3 +5211,171 @@ Page 58 was rendered and read by eye, per the gate's own requirement.
   Phuong for this session.
 - **Nothing is pushed.** The Overleaf push is a human gate. `origin/main` still holds
   `1dfb029`.
+
+## 2026-08-15 (S19): the pointer retrofit, two discharges, and the rule that became a mechanism
+
+Append-only package. No `.tex` edited, no `ref.bib` edited, no reduction made, no numbered
+decision-log row edited, no served path changed, no test removed. One commit, `076fa062`,
+5 files, 671 insertions and 1 deletion, authored `hapuna-namhoang`, no trailer. Zero em dashes
+across all 192 added prose lines (checked on the diff, not on the files, which carry older ones).
+
+1. **The accept file now holds no data lines at all.** `ledger/format_accepted.txt`'s single
+   entry, `5.0 staff`, was deleted and a removal record appended in its place following the
+   file's own 2026-08-12 precedent. The S17 line break at the `ffi` ligature had already cleared
+   the spill, so the line accepted nothing and was pure exposure: the format keys on a
+   **substring of the offending text**, and the substring was `staff`, which would have excused
+   up to 5.0 pt of margin ink on any future line containing that word anywhere in a hospitality
+   dissertation. Proved inert rather than assumed inert by running the gate with **no accept
+   file at all** and getting a byte-identical result, `0 accepted` both ways.
+2. **Seven forward pointers, each at the deferring sentence rather than at row end.**
+   85 to 87/88; 75 to 79 and 92; 76 to 79, 80, 81, 82 and 84 (the "presented separately, none
+   batched" requirement met at 91); 87, 88 and 90 each to the other two plus 91; 91 to 92.
+   Rows 87, 88 and 90 are one "Still owed" list copied three times and shortened each time, so
+   each pointer names its two siblings. Two pointers carry more than a location because a bare
+   location would perpetuate an error: row 85's records that row 87 **withdrew** its own
+   "~20% movement" framing (Ellel is ruled `unscaled`, so its rows become MAE in GBP, a
+   structural change and not a rescale), and the 87/88/90 pointers distinguish items
+   **discharged** from the `tab:ladder` re-score, which left the list by being **wrong** rather
+   than by being done (row 89: it is the frozen six-origin committed gate, never built from the
+   fold vectors).
+3. **Two discharges appended, both verified in the source.** Row 93: `conclusion.tex` is now
+   260 lines, `\section{Further work}` at `:202`, `\label{sec:further-work}` at `:203`, the
+   counterfactual at `:240-241`; the discharge also records that the inline home moved on
+   2026-08-13 (working relocated to `app:squared-loss`), which row 93 could not have
+   anticipated. Row 95: all four closed, D-F8 at `results.tex:771`, D-F7 at `:157`, D-U6 at
+   `:520`, C11/C12 at `discussion.tex:172`.
+4. **A discharge in another store names two sections that never compiled.**
+   `ledger/literature_conformance.md` §15 records C11 and C12 closed at `sec:conclusion-reversal`
+   and `sec:conclusion-adaptive`. Neither label exists in any `.tex` file or in `main.aux`, which
+   settles it. The work was done and landed where both rows said it must, in the Discussion. The
+   location was written from the plan, not from the artefact. This is the mirror of the
+   missing-pointer defect and costs more: a missing pointer leaves a reader searching, a false
+   location is recorded exactly where the reader looks and sends them away concluding the work
+   was never done. Recorded as a `**CORRECTION**` sub-block inside row 95 and in `log/94` §3.
+   **`literature_conformance.md` itself is not yet amended.**
+5. **Rows 9 and 45 were re-verified and left OPEN, because in both cases what they wait for has
+   changed shape rather than arrived.** Row 9 (`wc_*` retention): the data **did** arrive, the
+   store now ends 2026-07-07 with 32 June-onward Beer Hall rows, and the probe ran at row 85(b)
+   (beer_hall 1.056 with `wc_*` against 1.127 without). But no row anywhere **rules** on
+   retention, and evidence is not a decision. Two facts a decider needs that no row states: the
+   store stops twelve days before the tournament final, so the window is the first four weeks
+   and no knockouts; and 85(b) is directional with no dispersion statistic, a standard this
+   project rejects everywhere else. The blocker moved from data to a ruling. Row 45 (the S8b
+   live half): key and `anthropic` SDK both still absent, re-verified today, **and the row names
+   one blocker where there are two**. `signals/agent.py:177` sends
+   `temperature=config.AGENT_TEMPERATURE` against `claude-opus-4-8` (`config.py:513-514`);
+   sampling parameters were removed on Opus 4.7 and later, so the "one command" run 400s on call
+   one even with a valid key. The one-line fix is safe for the pre-registration (temperature is
+   not a term in the cache key, so the frozen prompt hash survives) and was **not** made, because
+   S19 changes no evaluated path.
+6. **`PRJ93_RULES.md:199-206` was replaced as a mechanism and left standing as text.** An
+   `#### AMENDMENT 2026-08-15 (S19)` was inserted after `:206`, so a reader landing on `:199` by
+   grep meets the replacement within eight lines. The obligation moved off the reader and onto
+   the deciding session: *when a deferral is decided, the pointer is appended at the deferral
+   site, in the same session as the decision*, and a session that records a decision without
+   appending that pointer has not finished the decision. The amendment states outright that the
+   old rule was written about row 85 and then **failed to prevent the identical failure in S14,
+   S15 and S16**, each of which read Section B row 5, each of which confirmed the dissertation
+   omits the divergence, and none of which checked whether the divergence still existed (row
+   111(d)). The variable predicting the miss is not care, it is whether a pointer exists where
+   the reader arrives.
+7. **`log/16` line 10 claims no em dashes and the file contains 29.** Correction appended, body
+   untouched, and the correction adds none of its own. All 29 are in the report's own prose,
+   none in quotations or tables, and all precede line 293 where the S18 correction begins, so
+   all 29 date from the 2026-07-08 authoring. The claim was written rather than measured. The
+   siblings were swept rather than assumed: `phase_state.md` (574) and
+   `Decision_and_Resolution_Log.md` (76) are **not in breach**, their claims being scoped to
+   named `.tex` deliverables, and `log/30` (215) is defensible because its subject *is* em dashes
+   and those are quoted BEFORE-samples carrying source line numbers. `log/16` is the only one
+   whose claim is untrue.
+
+**Artefacts written**
+
+| Path | What |
+|---|---|
+| `brain/log/94_pointer_retrofit_and_discharge.md` | new, 479 lines, the S19 report in nine parts |
+| `brain/ledger/format_accepted.txt` | the `5.0 staff` line deleted, a removal record appended |
+| `brain/log/Decision_and_Resolution_Log.md` | nine append blocks (7 pointers, 2 discharges), all 4-space indented to their rows, no row edited |
+| `brain/PRJ93_RULES.md` | the amendment after `:206`, 40 lines |
+| `brain/log/16_Chronos2_Promotion_Report.md` | the em-dash correction, 40 lines |
+
+**Verified end state**
+
+All three document measurements were taken against the Overleaf remote and on a **fresh clone**
+at that SHA, not on the working clone.
+
+| Check | Result |
+|---|---|
+| Overleaf `origin/main` (`git ls-remote`) | `fbf64a2bb7db3ab99c26b023d56562c34547bfac` |
+| counted body, `texcount -0 -sum -merge -total` over `abstract.tex` + six chapters | **19,993** against the 20,000 cap, margin **+7** |
+| `formatcheck --body-from 21` (canonical scope) | **PASS**, exit 0, scanned 95 pages of 115, 2588 justified lines, **0 accepted** |
+| the same run with `--accept` omitted entirely | byte-identical |
+| `formatcheck --body-from 1` (wider scope, stated because a PASS is only as wide as what it scanned) | PASS, 115 of 115 pages, 2914 justified lines |
+| pytest `--collect-only` | 642 of 643 collected, 1 deselected |
+| pytest full run | exit 0, **641 passed, 1 skipped, 1 deselected**, 1 warning, 600.23 s |
+| `store.warehouse.assert_store_ceiling()` | **2026-07-07**, re-asserted at close as well as at open |
+| graphify, `brain/` | 6,724 nodes, 10,856 edges, 465 communities |
+| graphify, repo root | 14,836 nodes, 26,465 edges, 984 communities |
+
+**The one skip and the one deselect are reported, not folded into the pass count.** The skip is
+`tests/test_intermittent.py::test_matches_statsforecast_on_bernoulli_gap_series`, a venv boundary
+rather than a defect: `statsforecast` is eval-only and does not build on the 3.14 runtime venv.
+Run in `.venv-eval` it **passes** (verified, 1 passed in 10.67 s), so 642 of 642 selected tests
+are green across the two venvs the project uses. The deselected test is
+`tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted`, which
+is network-dependent and **still unmarked**, so it can only be excluded by node id.
+
+**Both graphify community sets shifted and neither could be relabelled.** `brain/` moved from 456
+saved labels to 465 communities and the root from 987 to 984, with 77 and 179 communities
+respectively renamed by their hub. `graphify label` ran and reported *no LLM backend configured*,
+so the new communities keep `Community N` placeholders. The structure is current; the names are
+not. Set `GOOGLE_API_KEY` and re-run `graphify label` before any session that navigates by
+community name.
+
+**One incident worth carrying: `graphify label` DELETED `brain/graphify-out/graph.html`.** It
+skipped writing the file (*"Graph has 6723 nodes, too large for HTML viz, limit 5000"*) but did
+not leave the existing one in place, so `git status` showed a deletion rather than a skip. A
+second `graphify update .` regenerated it, at 402,882 bytes and in the aggregated form that
+`update` writes for graphs above the limit. Check `git status` after `label`, because the tool
+reports the skip and not the removal.
+
+**Open**
+
+- **Rows 9 and 45** in the decision log, both open for the reasons in item 5 above. Neither is
+  closable by this session: row 9 needs a ruling from Phuong on `wc_*` retention, row 45 needs a
+  credential **and** the one-line `temperature` removal.
+- **`ledger/literature_conformance.md` §15** records C11/C12 against two labels that do not
+  exist. The finding is recorded in two places; the file itself is unamended.
+- **The +7 word margin.** The document sits 243 below this project's own reserve floor of 250,
+  which is the level at which the register refuses new items.
+- **C7 displacement (+23, form (c) or nothing)** remains Phuong's ruling, to be made in Overleaf,
+  which is canonical.
+- **`CONTRACT.md`'s pointer sentence** is Ryan's.
+- **Nothing was pushed and nothing needed to be.** S19 touched no `.tex`, no `.bib` and no
+  figure. The Overleaf remote is unchanged at `fbf64a2`, and the Overleaf push remains a human
+  gate.
+
+**A gap in this file, recorded rather than back-filled.** This is the first entry since
+2026-08-13. Seven commits land in between with no entry here: `d2f05a9b`, `bc6792f1`, `54c8a470`,
+`2914bad1`, `c5fdab45` and `a2de0583` (all 2026-08-14) and `076fa062` (today, covered above).
+Their work is recorded in `brain/log/88` through `brain/log/94` and in the decision log; it is
+this ledger that is behind, and it is not reconstructed here because a history written from a
+git log rather than from the session is exactly the failure item 4 above describes. Note also
+that the 2026-08-13 entry closes with *"`origin/main` still holds `1dfb029`"*. That was a
+measurement with a date on it, not a standing fact, and the Overleaf remote has moved twice
+since.
+
+**Three substantive artefacts were sitting untracked and are committed here rather than left
+that way.** `brain/log/83_novelty_feasibility_audit.md` (68,739 bytes),
+`brain/log/84_method_source_verification.md` (67,026 bytes) and
+`brain/ledger/staged_references.bib` (21,461 bytes), all written 2026-08-13 and none of them
+ever added to git. An uncommitted artefact is indistinguishable from one that was never written,
+which is why the close requires a clean tree. Nothing in them was edited. **Note a report-number
+collision that is deliberately NOT repaired here:** `log/` now holds both
+`83_fig_sensitivity_units_result.md` and `83_novelty_feasibility_audit.md`. Renaming either would
+break references already made to it from the other stores, and the numbering has since run past
+94, so "report 83" is ambiguous and must be qualified by its slug from now on.
+
+**Still untracked and deliberately so:** `brain/docs/Sample Dissertation.pdf` and its `.md`
+conversion. They are supplied reference material rather than a project artefact, and a binary
+of that kind is not committed without being asked for.

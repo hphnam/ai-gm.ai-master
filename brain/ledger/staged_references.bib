@@ -1,0 +1,432 @@
+% =====================================================================
+% STAGED REFERENCES — PRJ93 method-source verification audit (report 84)
+% =====================================================================
+%
+% STAGED ONLY. This file is NOT ref.bib, is NOT \input or \addbibresource'd
+% by any .tex file, and nothing here has been moved into the Overleaf clone.
+% An entry added to ref.bib for a citation never made is invisible to biber
+% and to every checker in this project, so entries are held here until the
+% citation that uses them is actually written.
+%
+% Written by report 84 (brain/log/84_method_source_verification.md).
+% ai-gm.ai-master HEAD at time of writing: e7fae52efe9d0aff8d4e27ad72839dbed4e02e5d
+% Overleaf clone HEAD (read only, not modified): 99ee32b
+%
+% ADMISSION RULE. An entry appears here only if it was resolved to a venue of
+% record and its metadata confirmed from two sources. The comment above each
+% entry names both sources and the read-state. Where only one confirmation was
+% obtained, the comment says so in those words rather than implying two.
+% Papers that could not be resolved are omitted, not stubbed.
+%
+% READ-STATES USED
+%   FULL TEXT (queried)  complete text retrieved and queried by targeted
+%                        extraction; not read page-by-page.
+%   ABSTRACT ONLY        abstract, listing metadata or withdrawal notice only.
+%   BIBLIOGRAPHIC        metadata resolved; no contents read.
+%
+% ---------------------------------------------------------------------
+% DELIBERATE OMISSIONS — read this before adding anything
+% ---------------------------------------------------------------------
+%
+% DO NOT CITE — Deng, Ardeshir, Hsu, "Group conditional validity via
+%   multi-group learning", arXiv:2303.03995. WITHDRAWN by Daniel Hsu.
+%   The arXiv comments field reads, verbatim:
+%     "Valid prediction intervals constructed by proposed method do not appear
+%      to be any shorter than those constructed by baseline methods"
+%   It is not a preprint awaiting a venue. It is a retracted claim, and the
+%   stated reason is that the method did not deliver. Omitted on purpose.
+%
+% OMITTED, unresolved — not evidence of absence, just unfinished:
+%   * EEMUA 191 (4th ed.), ANSI/ISA-18.2, IEC 62682:2023 — UNOBTAINABLE
+%     (purchase-only / paywalled). No claim about their contents is made
+%     anywhere in report 84, and none may be made until they are read.
+%   * Wang, Yang, Chen, Shah (2016), IEEE Trans. Automation Science and
+%     Engineering — the free author PDF fetched at 2 MB and failed to parse to
+%     text. Volume, issue, pages and DOI unconfirmed.
+%   * Naghoosi, Izadi, Chen (2011), J. Process Control 21(9), 1243-1249, and
+%     Kondaveeti, Izadi, Shah et al. (2013), Chem. Eng. Research and Design
+%     91(12), 2550-2558 — citations seen only in a search summary, not
+%     confirmed at CrossRef or publisher. These two are the papers most likely
+%     to close candidate C3; obtaining them is one library request.
+%   * Farrington et al. (1996), Noufaily et al. (2013), Salmon, Schumacher &
+%     Hoehle (2016), Colon-Gonzalez et al. (2019) — not obtained.
+%   * Yoneoka et al. (2021), Stat. Med., DOI 10.1002/sim.9182 — UNOBTAINABLE,
+%     HTTP 402 Payment Required.
+%   * Hennhoefer, Kirsch, Preisach (2026), arXiv:2605.13642, the `nonconform`
+%     paper — ONE confirming source only (the repository's own README). Held
+%     back under the admission rule above.
+%   * Gneiting (2011) JASA 106; Gneiting (2011) IJF 27; Vovk et al. ICML 2003;
+%     Fedorova et al. ICML 2012; Vovk et al. COPA 2021; Vovk, Statistical
+%     Science 2021 — not verified this session.
+%
+% ALREADY IN ref.bib — do not duplicate:
+%   gibbs_adaptive_2021, zaffran_adaptive_2022, ansari_chronos_2024,
+%   ansari_chronos-2_2025.
+%
+% =====================================================================
+
+
+% ---------------------------------------------------------------------
+% GROUP B — Murphy diagrams and forecast dominance (candidate C1)
+% ---------------------------------------------------------------------
+
+% READ-STATE: FULL TEXT (queried), via the OUP open-access HTML.
+% CONFIRMED TWICE, independently:
+%   (1) CrossRef API, api.crossref.org/works/10.1111/rssb.12154
+%   (2) Oxford University Press publisher page,
+%       academic.oup.com/jrsssb/article/78/3/505/7040984
+% Both return 78(3), 505-562, 2016, the same four authors and the same title.
+%
+% METADATA CORRECTION. The "pages 1-29" form circulating for this paper appears
+% in NEITHER confirming source and is early-view / author-manuscript
+% pagination. Do not use it. The publisher of record is now OUP; the DOI is
+% unchanged from the Wiley era.
+%
+% WHY IT IS STAGED. Supplies the elementary/extremal scoring functions and the
+% Choquet mixture representation for candidate C1, and its own dominance test
+% is Diebold-Mariano with a Newey-West HAC variance estimator, which is the
+% native answer to this project's overlapping rolling origins.
+%
+% SCOPE LIMIT TO CARRY WITH ANY CITATION OF IT. The paper assumes the scoring
+% function and the forecaster's directive AGREE. It does not discuss evaluating
+% forecasts under a functional they do not target, so it gives no licence to
+% read a median-functional dominance result as correcting a selection made
+% under a mean-consistent loss. See report 84 section B.2.
+@article{ehm_quantiles_2016,
+	title = {Of Quantiles and Expectiles: Consistent Scoring Functions, Choquet Representations and Forecast Rankings},
+	shorttitle = {Of Quantiles and Expectiles},
+	author = {Ehm, Werner and Gneiting, Tilmann and Jordan, Alexander and Krüger, Fabian},
+	journaltitle = {Journal of the Royal Statistical Society Series B: Statistical Methodology},
+	volume = {78},
+	number = {3},
+	pages = {505--562},
+	date = {2016},
+	doi = {10.1111/rssb.12154},
+	publisher = {Oxford University Press},
+	langid = {english},
+}
+
+% READ-STATE: ABSTRACT ONLY.
+% CONFIRMED TWICE, independently:
+%   (1) CrossRef API bibliographic query
+%   (2) Andrew Patton's institutional publication list, Duke University
+%
+% ATTRIBUTION CORRECTION, and it is the reason this comment is long.
+% This work is widely referred to as "Patton 2020, On the sensitivity of
+% forecast rankings to the choice of scoring function". NO PAPER OF THAT TITLE
+% EXISTS in CrossRef or on the author's own list. The title below is the real
+% one. A second, genuinely DIFFERENT paper matches part of the same informal
+% description and must not be conflated with it:
+%   Barendse & Patton, "Comparing Predictive Accuracy in the Presence of a Loss
+%   Function Shape Parameter", J. Business & Economic Statistics 40(3),
+%   1057-1069, 2022.
+% Cite by title, never by the paraphrase.
+@article{patton_comparing_2020,
+	title = {Comparing Possibly Misspecified Forecasts},
+	author = {Patton, Andrew J.},
+	journaltitle = {Journal of Business \& Economic Statistics},
+	volume = {38},
+	number = {4},
+	pages = {796--809},
+	date = {2020},
+	doi = {10.1080/07350015.2019.1585256},
+	publisher = {Taylor \& Francis},
+	langid = {english},
+}
+
+
+% ---------------------------------------------------------------------
+% GROUP A — Group-conditional conformal prediction (candidate C7)
+% ---------------------------------------------------------------------
+
+% READ-STATE: FULL TEXT (queried), arXiv HTML of v3.
+% CONFIRMED TWICE, independently:
+%   (1) arXiv abstract page, arxiv.org/abs/2606.00419
+%   (2) arXiv full-text HTML, arxiv.org/html/2606.00419v3
+%
+% PREPRINT ONLY. Checked for a peer-reviewed venue: the arXiv record carries NO
+% journal-ref and NO comments field naming a venue. Four versions: v1
+% 2026-05-29, v2 2026-06-02, v3 2026-06-08, v4 2026-07-07. Cite as a preprint
+% and say so in the prose, as this document already does for Chronos-2 and
+% TabPFN-TS.
+%
+% WHAT IT CLAIMS, quoted: "We introduce the first parameter-free algorithm for
+% group-conditional online conformal prediction, that we dub Portfolios for
+% Online Group Conformal (POGO)." Note the claim is to be first at being
+% PARAMETER-FREE, not at anything about group construction.
+%
+% RELEVANCE TO C7, AND THE LIMIT OF IT. Groups enter as given objects: a
+% "collection of soft indicator functions" where each "represents the
+% likelihood of input X belonging to group j". The paper does not discuss group
+% misspecification, within-group heterogeneity or zero-inflation. Its stock
+% experiment DOES define groups by day-of-week calendar markers, so
+% calendar-defined Mondrian groups are NOT novel; what is unaddressed is a
+% partition that is correct about availability and wrong about the score
+% distribution.
+%
+% REGIME. MIMIC-IV, ~26,000 test samples, groups by race/insurance/sex; stocks
+% (AAPL, DAL, BA) ~2,500 trading days each. Ellel's 66 traded days sit outside
+% this by roughly an order of magnitude. Code: github.com/beepulbharti/pogo
+% (not inspected; licence unverified).
+@misc{bharti_parameter-free_2026,
+	title = {Parameter-Free and Group Conditional Online Conformal Prediction},
+	author = {Bharti, Beepul and Pal, Ambar and Teneggi, Jacopo and Sulam, Jeremias},
+	date = {2026-07-07},
+	number = {arXiv:2606.00419},
+	publisher = {arXiv},
+	doi = {10.48550/arXiv.2606.00419},
+	eprinttype = {arxiv},
+	eprint = {2606.00419 [stat.ML]},
+	url = {http://arxiv.org/abs/2606.00419},
+	keywords = {Machine Learning (stat.ML), Machine Learning (cs.LG)},
+	langid = {english},
+}
+
+% READ-STATE: BIBLIOGRAPHIC. Contents not read.
+% CONFIRMED TWICE, independently:
+%   (1) Royal Holloway Research Portal record for the technical report
+%   (2) MAPIE theoretical documentation, which attributes the Mondrian taxonomy
+%       to this line and to Vovk, Gammerman & Shafer (2005) Section 4.5
+%
+% WHY BOTH THIS AND THE BOOK BELOW ARE STAGED. This 2003 technical report is
+% where Mondrian conformal predictors are first introduced; the 2005 book is
+% the citable formalisation and is where Section 4.5 defines the Mondrian
+% taxonomy. This project's Methods uses the term "Mondrian" and currently
+% attributes it to nothing. Cite the book for the definition and this report
+% for priority, or the book alone if only one is affordable.
+%
+% The name is a tribute to the painter Piet Mondrian, after the grid the
+% partition function induces.
+@techreport{vovk_mondrian_2003,
+	title = {Mondrian Confidence Machine},
+	author = {Vovk, Vladimir and Lindsay, David and Nouretdinov, Ilia and Gammerman, Alex},
+	date = {2003},
+	institution = {Royal Holloway, University of London},
+	type = {Technical Report},
+	langid = {english},
+}
+
+% READ-STATE: BIBLIOGRAPHIC. Contents not read.
+% CONFIRMED TWICE, independently:
+%   (1) publisher/aggregator records (Springer; ACM Digital Library book record)
+%   (2) MAPIE theoretical documentation, citing "Vovk et al. (2005), Section 4.5"
+%
+% SECTION-NUMBER CAVEAT — READ BEFORE WRITING A SECTION NUMBER INTO METHODS.
+% Section 4.5 "Mondrian conformal predictors" is confirmed for the edition the
+% secondary sources cite. A SECOND EDITION exists (2022). If the second edition
+% is the copy consulted, RE-CHECK the section number before quoting it. This
+% project has already printed one wrong cross-reference that compiled cleanly.
+@book{vovk_algorithmic_2005,
+	title = {Algorithmic Learning in a Random World},
+	author = {Vovk, Vladimir and Gammerman, Alexander and Shafer, Glenn},
+	date = {2005},
+	publisher = {Springer},
+	location = {New York},
+	langid = {english},
+	note = {Mondrian conformal predictors are defined in Section 4.5. A second edition was published in 2022; section numbering must be re-checked against whichever edition is consulted.},
+}
+
+% READ-STATE: FULL TEXT (queried), arXiv HTML.
+% CONFIRMED TWICE, independently:
+%   (1) arXiv HTML full text, arxiv.org/html/2605.04219
+%   (2) search index listing (title, authors, identifier, date)
+%
+% PREPRINT ONLY. No journal-ref.
+%
+% WHY IT IS STAGED. It is the strongest available evidence for what candidate
+% C7 is NOT. It identifies the right symptom — conformity scores "may fail to
+% adequately capture structural features of the outcome distribution, for
+% example the presence of excessive zeros" — but partitions on the OUTCOME
+% (classify zero vs non-zero, then conformalise the non-zero part) and
+% explicitly declines the class-conditional framing, noting that
+% "class-conditional coverage is often unnecessary when marginal coverage
+% suffices". Asked directly, it does NOT discuss a group defined by a calendar
+% or availability variable that fails to coincide with the zero/non-zero split.
+% That gap is the whole of C7's claim, and this entry is what bounds it.
+%
+% REGIME. Simulations at n = 1,000-5,000; UCI Air Quality, 9,358 hourly records.
+@misc{li_classification-powered_2026,
+	title = {Classification-Powered Conformal Inference for Zero-inflated Outcomes},
+	author = {Li, Zhirui and Diaz-Rincon, Ricardo and Shickel, Benjamin and Zhang, Sai and Bhattacharya, Sohom and Liang, Muxuan},
+	date = {2026-05-05},
+	number = {arXiv:2605.04219},
+	publisher = {arXiv},
+	doi = {10.48550/arXiv.2605.04219},
+	eprinttype = {arxiv},
+	eprint = {2605.04219 [stat.ME]},
+	url = {http://arxiv.org/abs/2605.04219},
+	langid = {english},
+}
+
+% READ-STATE: FULL TEXT (queried), arXiv HTML.
+% CONFIRMED TWICE, independently:
+%   (1) arXiv HTML full text, arxiv.org/html/2606.29403v1
+%   (2) search index listing (title, authors, identifier, date)
+%
+% PREPRINT ONLY. No journal-ref.
+%
+% WHY IT IS STAGED. It is the nearest thing in the literature to a treatment of
+% badly-chosen groups, and it frames the problem DIFFERENTLY from C7 — as
+% granularity and calibration-set size, not as the partition variable tracking
+% the wrong quantity: "the difficulty is granularity, since meaningful groups
+% often have too few calibration examples for stable thresholds". Asked
+% directly, it does NOT use the terms "group misspecification" or "partition
+% misspecification". Cite it to show the distinction, not to support C7.
+%
+% REGIME. Eight datasets, none of them time series: five regression
+% (Bio/CASP, Bike Sharing, California Housing, Concrete, Auto MPG) and three
+% classification (CIFAR-10, Covertype, MNIST).
+@misc{berthier_self-organized_2026,
+	title = {Self-Organized Conformal Prediction: Reducing Regional Coverage Gaps with Unsupervised Group Discovery},
+	shorttitle = {Self-Organized Conformal Prediction},
+	author = {Berthier, Louis and Shokry, Ahmed and Moreaud, Maxime and Ramelet, Guillaume and Dieuleveut, Aymeric},
+	date = {2026-06-28},
+	number = {arXiv:2606.29403},
+	publisher = {arXiv},
+	doi = {10.48550/arXiv.2606.29403},
+	eprinttype = {arxiv},
+	eprint = {2606.29403},
+	url = {http://arxiv.org/abs/2606.29403},
+	langid = {english},
+}
+
+
+% ---------------------------------------------------------------------
+% GROUP C — Conformal test martingales (candidate C6)
+% ---------------------------------------------------------------------
+
+% READ-STATE: ABSTRACT ONLY.
+% CONFIRMED TWICE, independently:
+%   (1) arXiv abstract page, arxiv.org/abs/1706.03415
+%   (2) search index listing
+%
+% AUTHOR-ORDER CORRECTION. This paper is commonly cited with Burnaev SECOND.
+% arXiv gives him LAST. The order below is arXiv's and is the one to use.
+%
+% VENUE CAVEAT. A PMLR COPA volume 60 (2017), pages 132-153 publication is
+% widely reported for this work and was NOT verified this session. The entry
+% below is therefore staged as the arXiv preprint. Verify the PMLR record
+% before citing it as a proceedings paper; if confirmed, convert to
+% @inproceedings and keep the eprint field.
+%
+% WHAT THE ABSTRACT ESTABLISHES: the method "requires only the independence and
+% identical distribution of observations". The abstract does NOT name the
+% evaluation datasets, so this project's regime-comparison row for it is
+% UNRESOLVED and must stay that way until the full text is read.
+@misc{volkhonskiy_inductive_2017,
+	title = {Inductive Conformal Martingales for Change-Point Detection},
+	author = {Volkhonskiy, Denis and Nouretdinov, Ilia and Gammerman, Alexander and Vovk, Vladimir and Burnaev, Evgeny},
+	date = {2017-06-11},
+	number = {arXiv:1706.03415},
+	publisher = {arXiv},
+	doi = {10.48550/arXiv.1706.03415},
+	eprinttype = {arxiv},
+	eprint = {1706.03415 [stat.ML]},
+	url = {http://arxiv.org/abs/1706.03415},
+	note = {22 pages, 9 figures, 5 tables. A PMLR COPA v60 (2017) publication is reported but was not verified.},
+	langid = {english},
+}
+
+% READ-STATE: ABSTRACT ONLY. The abstract is quoted rather than paraphrased in
+% report 84 section C.3, and no claim is made here about anything past it.
+% CONFIRMED TWICE, independently:
+%   (1) arXiv abstract page, arxiv.org/abs/2602.13848
+%   (2) search index listing
+%
+% PREPRINT ONLY. v1 2026-02-14, v2 2026-06-12. No journal-ref, no comments.
+%
+% WHY IT IS STAGED, AND IT IS NOT FRIENDLY TO US. Its contamination argument
+% applies to detectors that build the martingale by "continually growing a
+% reference set with each incoming sample" — which is exactly this project's
+% expanding pool (eval/exchangeability_diagnostic.py:117-120; the file's own
+% header records "The band's calibration pool is EXPANDING"). The stated
+% consequence is "test-time contamination: after a change, post-shift
+% observations enter the reference set and dilute the evidence for distribution
+% shift". Two River Taps' 8 May 2026 closure is the one dated shift in this
+% corpus, and every post-closure zero would dilute exactly the evidence a
+% martingale is meant to accumulate about it. Cite it as a limitation on C6,
+% not as support for it.
+@misc{shaer_testing_2026,
+	title = {Testing For Distribution Shifts with Conditional Conformal Test Martingales},
+	author = {Shaer, Shalev and Bar, Yarin and Prinster, Drew and Romano, Yaniv},
+	date = {2026-06-12},
+	number = {arXiv:2602.13848},
+	publisher = {arXiv},
+	doi = {10.48550/arXiv.2602.13848},
+	eprinttype = {arxiv},
+	eprint = {2602.13848 [cs.LG]},
+	url = {http://arxiv.org/abs/2602.13848},
+	langid = {english},
+}
+
+
+% ---------------------------------------------------------------------
+% GROUP D — Forecastability (candidate C2)
+% ---------------------------------------------------------------------
+
+% READ-STATE: BIBLIOGRAPHIC. Contents not read; the description of the measure
+% below comes from secondary sources and from the ForeCA package documentation,
+% not from the paper's own text.
+% CONFIRMED TWICE, independently:
+%   (1) PMLR proceedings listing, proceedings.mlr.press/v28/goerg13.pdf
+%   (2) ACM Digital Library record for ICML 2013, volume 28
+%
+% THIS IS THE PRIMARY SOURCE FOR THE MEASURE, and it is the one to cite.
+% Hyndman & Athanasopoulos (FPP) and the tsfeatures R package both USE the
+% spectral-entropy forecastability measure Omega; neither introduces it. Omega
+% is defined from the entropy of the spectral density: high entropy, low
+% forecastability; 0 for white noise, 1 for a pure sinusoid. Reference
+% implementation is the ForeCA R package (same author).
+@inproceedings{goerg_forecastable_2013,
+	title = {Forecastable Component Analysis},
+	author = {Goerg, Georg M.},
+	booktitle = {Proceedings of the 30th International Conference on Machine Learning},
+	series = {Proceedings of Machine Learning Research},
+	volume = {28},
+	number = {2},
+	pages = {64--72},
+	date = {2013},
+	publisher = {PMLR},
+	langid = {english},
+}
+
+% READ-STATE: FULL TEXT (queried), via the PubMed Central deposit.
+% CONFIRMATION — ONE SOURCE, STATED PLAINLY RATHER THAN INFLATED. Title,
+% authors, journal, volume, issue, article number and DOI were all read from
+% the PMC-hosted full text (PMC7516527). An independent CrossRef or publisher
+% check was NOT run. Treat the metadata as single-sourced from a
+% publisher-deposited full text, which is stronger than a search snippet and
+% weaker than the two-source rule this file otherwise holds to.
+%
+% WHY IT IS STAGED, AND WHAT IT DOES *NOT* SUPPORT. This is the closest
+% peer-reviewed work to candidate C2's claim, and it declines to make it.
+%   It DOES establish a relationship between complexity and ERROR LEVEL:
+%     "when the complexity measures are higher, the log(MASE) value is higher too"
+%   It does NOT establish separability of competing methods, and says so:
+%     "there are no specific regions in which any of the tested methods obtain
+%      better performance than the rest, which is consistent with the
+%      No-Free Lunch theorem"
+% So a sentence reading "as the literature predicts, low forecastability
+% explains a flat MCS" is NOT supported. "We observe" is, with this paper cited
+% as a consistent neighbour rather than as a prediction.
+%
+% REGIME CAVEAT. 215 synthetic series of 10,000 observations and 22,610 M4
+% series, with a MINIMUM THRESHOLD OF 250 OBSERVATIONS applied. Ellel has 66
+% trading days. Even the null was not measured near our smallest venue.
+@article{ponce-flores_time_2020,
+	title = {Time Series Complexities and Their Relationship to Forecasting Performance},
+	author = {Ponce-Flores, Mirna and Frausto-Solís, Juan and Santamaría-Bonfil, Guillermo and Pérez-Ortega, Joaquín and González-Barbosa, Juan J.},
+	journaltitle = {Entropy},
+	volume = {22},
+	number = {1},
+	pages = {89},
+	date = {2020},
+	doi = {10.3390/e22010089},
+	publisher = {MDPI},
+	langid = {english},
+}
+
+% =====================================================================
+% END. 11 entries staged (verified: `grep -c "^@" staged_references.bib` -> 11).
+% Nothing here has been added to ref.bib.
+% =====================================================================
