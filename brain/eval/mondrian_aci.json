@@ -186,7 +186,7 @@
     },
     "store_ceiling": "2026-07-07"
   },
-  "wall_seconds_total": 30.962606917000812,
+  "wall_seconds_total": 32.69849470899953,
   "venues": {
     "beer_hall": {
       "venue": "beer_hall",
@@ -1071,13 +1071,35 @@
           }
         }
       },
+      "b_to_d_group_deltas": {
+        "0": {
+          "n": 1250,
+          "b_coverage": 0.884,
+          "d_coverage": 0.8888,
+          "delta_coverage": 0.0048000000000000265,
+          "b_mean_width": 1279.1815368849295,
+          "d_mean_width": 1318.778699118187,
+          "delta_mean_width": 39.59716223325745,
+          "relative_width_change": 0.030955076423073376
+        },
+        "1": {
+          "n": 500,
+          "b_coverage": 0.84,
+          "d_coverage": 0.832,
+          "delta_coverage": -0.008000000000000007,
+          "b_mean_width": 164.16098960315372,
+          "d_mean_width": 195.5237947706855,
+          "delta_mean_width": 31.362805167531775,
+          "relative_width_change": 0.19104907471226196
+        }
+      },
       "degeneracy": {
         "attainable_min_n": 9,
         "arms": {
           "A_unpartitioned_fixed": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -1092,7 +1114,7 @@
           "B_mondrian_fixed": {
             "n_rows": 1750,
             "zero_width_rows_total": 20,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 20
             },
@@ -1100,13 +1122,14 @@
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 500,
               "smallest_group_pool_slice": 39,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "availability (the calendar)"
             }
           },
           "C_agaci_unpartitioned_adaptive": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -1114,7 +1137,7 @@
           "D_mondrian_agaci_pergroup": {
             "n_rows": 1750,
             "zero_width_rows_total": 18,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 18
             },
@@ -1134,7 +1157,7 @@
           "E_occurrence_ORACLE_fixed": {
             "n_rows": 1750,
             "zero_width_rows_total": 83,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 83
             },
@@ -1142,13 +1165,14 @@
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 497,
               "smallest_group_pool_slice": 39,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "OCCURRENCE, which is what arm E bands on; not the calendar"
             }
           },
           "ACI_fixed_gamma_0.005": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -1156,7 +1180,7 @@
           "ACI_fixed_gamma_0.01": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -1164,7 +1188,7 @@
           "ACI_fixed_gamma_0.02": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -1172,7 +1196,7 @@
           "ACI_fixed_gamma_0.05": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -1180,19 +1204,20 @@
           "ACI_fixed_gamma_0.1": {
             "n_rows": 1750,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
           }
         },
+        "zero_width_group_variable": "availability (the calendar), for every arm, so the arms are commensurable",
         "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
       },
       "wall_seconds": {
-        "generate_records": 10.32313245899968,
-        "run_online_availability_ABC": 0.5117930420001358,
-        "run_online_occurrence_E": 0.579776958000366,
-        "arm_D_grouped_agaci": 0.21339762499974313
+        "generate_records": 10.943173457999364,
+        "run_online_availability_ABC": 0.53922112500004,
+        "run_online_occurrence_E": 0.6161426250000659,
+        "arm_D_grouped_agaci": 0.2295375409994449
       },
       "adaptive_clamps": {
         "C_agaci_unpartitioned_adaptive": 339,
@@ -2085,13 +2110,35 @@
           }
         }
       },
+      "b_to_d_group_deltas": {
+        "0": {
+          "n": 1185,
+          "b_coverage": 0.9257383966244725,
+          "d_coverage": 0.8852320675105485,
+          "delta_coverage": -0.040506329113924044,
+          "b_mean_width": 713.311471054523,
+          "d_mean_width": 703.7651164547215,
+          "delta_mean_width": -9.546354599801589,
+          "relative_width_change": -0.013383150260697124
+        },
+        "1": {
+          "n": 474,
+          "b_coverage": 0.8839662447257384,
+          "d_coverage": 0.8966244725738397,
+          "delta_coverage": 0.012658227848101333,
+          "b_mean_width": 13.6914422522588,
+          "d_mean_width": 34.4674139022794,
+          "delta_mean_width": 20.775971650020594,
+          "relative_width_change": 1.5174421560002558
+        }
+      },
       "degeneracy": {
         "attainable_min_n": 9,
         "arms": {
           "A_unpartitioned_fixed": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -2106,7 +2153,7 @@
           "B_mondrian_fixed": {
             "n_rows": 1659,
             "zero_width_rows_total": 308,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 308
             },
@@ -2114,13 +2161,14 @@
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 474,
               "smallest_group_pool_slice": 40,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "availability (the calendar)"
             }
           },
           "C_agaci_unpartitioned_adaptive": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -2128,7 +2176,7 @@
           "D_mondrian_agaci_pergroup": {
             "n_rows": 1659,
             "zero_width_rows_total": 294,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 294
             },
@@ -2148,21 +2196,22 @@
           "E_occurrence_ORACLE_fixed": {
             "n_rows": 1659,
             "zero_width_rows_total": 181,
-            "zero_width_rows_by_group": {
-              "0": 0,
-              "1": 181
+            "zero_width_rows_by_availability_group": {
+              "0": 111,
+              "1": 70
             },
             "attainability": {
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 409,
               "smallest_group_pool_slice": 21,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "OCCURRENCE, which is what arm E bands on; not the calendar"
             }
           },
           "ACI_fixed_gamma_0.005": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -2170,7 +2219,7 @@
           "ACI_fixed_gamma_0.01": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -2178,7 +2227,7 @@
           "ACI_fixed_gamma_0.02": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -2186,7 +2235,7 @@
           "ACI_fixed_gamma_0.05": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -2194,19 +2243,20 @@
           "ACI_fixed_gamma_0.1": {
             "n_rows": 1659,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
           }
         },
+        "zero_width_group_variable": "availability (the calendar), for every arm, so the arms are commensurable",
         "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
       },
       "wall_seconds": {
-        "generate_records": 9.52086354199946,
-        "run_online_availability_ABC": 0.46888391700031207,
-        "run_online_occurrence_E": 0.4864386659992306,
-        "arm_D_grouped_agaci": 0.26854220800032635
+        "generate_records": 10.099724040999718,
+        "run_online_availability_ABC": 0.4870053340000595,
+        "run_online_occurrence_E": 0.49240945800011104,
+        "arm_D_grouped_agaci": 0.2740772079996532
       },
       "adaptive_clamps": {
         "C_agaci_unpartitioned_adaptive": 127,
@@ -3099,13 +3149,35 @@
           }
         }
       },
+      "b_to_d_group_deltas": {
+        "0": {
+          "n": 910,
+          "b_coverage": 0.9615384615384616,
+          "d_coverage": 0.9274725274725275,
+          "delta_coverage": -0.034065934065934056,
+          "b_mean_width": 657.5003611910043,
+          "d_mean_width": 636.3172760444666,
+          "delta_mean_width": -21.183085146537792,
+          "relative_width_change": -0.03221760229631888
+        },
+        "1": {
+          "n": 364,
+          "b_coverage": 0.967032967032967,
+          "d_coverage": 0.9258241758241759,
+          "delta_coverage": -0.04120879120879117,
+          "b_mean_width": 228.8272045972858,
+          "d_mean_width": 201.70544906322812,
+          "delta_mean_width": -27.121755534057684,
+          "relative_width_change": -0.11852504854826769
+        }
+      },
       "degeneracy": {
         "attainable_min_n": 9,
         "arms": {
           "A_unpartitioned_fixed": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -3120,7 +3192,7 @@
           "B_mondrian_fixed": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -3128,13 +3200,14 @@
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 364,
               "smallest_group_pool_slice": 37,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "availability (the calendar)"
             }
           },
           "C_agaci_unpartitioned_adaptive": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -3142,7 +3215,7 @@
           "D_mondrian_agaci_pergroup": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -3161,7 +3234,7 @@
           "E_occurrence_ORACLE_fixed": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             },
@@ -3169,13 +3242,14 @@
               "clamp_rows_by_group": {},
               "examined_origin_group_events": 351,
               "smallest_group_pool_slice": 14,
-              "attainable_min_n": 9
+              "attainable_min_n": 9,
+              "group_variable": "OCCURRENCE, which is what arm E bands on; not the calendar"
             }
           },
           "ACI_fixed_gamma_0.005": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -3183,7 +3257,7 @@
           "ACI_fixed_gamma_0.01": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -3191,7 +3265,7 @@
           "ACI_fixed_gamma_0.02": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -3199,7 +3273,7 @@
           "ACI_fixed_gamma_0.05": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
@@ -3207,19 +3281,20 @@
           "ACI_fixed_gamma_0.1": {
             "n_rows": 1274,
             "zero_width_rows_total": 0,
-            "zero_width_rows_by_group": {
+            "zero_width_rows_by_availability_group": {
               "0": 0,
               "1": 0
             }
           }
         },
+        "zero_width_group_variable": "availability (the calendar), for every arm, so the arms are commensurable",
         "scope_note": "Arm C's attainability clamps are not separately attributable. Its bands are produced inside `run_online`, which computes every arm in one pass, so a tap installed there would count calls belonging to arms P, D, S and the five fixed-gamma ACI arms as well; and `run_online` is reused unmodified. Arm C's level-excursion count is reported instead, and it is the quantity that drives the clamp for an ungrouped adaptive arm."
       },
       "wall_seconds": {
-        "generate_records": 7.2465744170003745,
-        "run_online_availability_ABC": 0.36159966599916515,
-        "run_online_occurrence_E": 0.4236800830003631,
-        "arm_D_grouped_agaci": 0.15511683399927279
+        "generate_records": 7.609183665999808,
+        "run_online_availability_ABC": 0.3827642090000154,
+        "run_online_occurrence_E": 0.4428445419998752,
+        "arm_D_grouped_agaci": 0.16360474999964936
       },
       "adaptive_clamps": {
         "C_agaci_unpartitioned_adaptive": 124,

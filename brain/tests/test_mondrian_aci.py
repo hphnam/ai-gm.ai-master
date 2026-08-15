@@ -259,3 +259,14 @@ def test_the_quantile_tap_restores_the_shared_function():
     before = methods.safe_conformal_quantile
     run_grouped_agaci(_alternating(200, 40), 0.90, gammas=(0.05,), warmup=40)
     assert methods.safe_conformal_quantile is before
+
+
+# --- The B-to-D group delta, which P2 and P4 are verdicts about --------------
+
+def test_the_group_delta_reports_the_width_change_p2_is_a_verdict_about():
+    from eval.mondrian_aci import ARM_D as D, b_to_d_group_deltas
+    arms = {ARM_B: {"by_availability_group": {"1": {"n": 500, "coverage": 0.84,
+                                                    "mean_width": 100.0}}},
+            D: {"by_availability_group": {"1": {"n": 500, "coverage": 0.83,
+                                                "mean_width": 125.0}}}}
+    assert b_to_d_group_deltas(arms)["1"]["delta_mean_width"] == 25.0

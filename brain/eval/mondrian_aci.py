@@ -385,7 +385,9 @@ def venue_block(venue: str, level: float = LEVEL) -> dict:
         "contingency_records": pc.contingency(records),
         "contingency_banded": pc.contingency(banded[ARM_B]),
         "arms": arms,
-        "degeneracy": degeneracy_block(banded, d_out, records, occur_records, level),
+        "b_to_d_group_deltas": b_to_d_group_deltas(arms),
+        "degeneracy": degeneracy_block(banded, d_out, records, occur_records, level,
+                                       avail_lab),
         "wall_seconds": {
             "generate_records": t_records,
             "run_online_availability_ABC": t_avail,
@@ -418,8 +420,36 @@ def group_stats(banded: pd.DataFrame, avail_lab: np.ndarray) -> dict:
             for g in np.unique(avail_lab)}
 
 
+def b_to_d_group_deltas(arms: dict) -> dict:
+    """Arm B to arm D, per Mondrian group: the quantity P2 and P4 are verdicts about.
+
+    Added to the instrument rather than subtracted in the report, for the reason C7 added
+    `cell_deltas` to `partition_contrast`: a number that enters a verdict comes from an
+    instrumented path, and a subtraction done once in prose is exactly the ad-hoc measurement
+    this project has been bitten by. P2 is the sign of `delta_mean_width` on group 1 at the Beer
+    Hall; P4 is the sign of the same field on group 0 at Ellel.
+    """
+    out = {}
+    for g, b in arms[ARM_B]["by_availability_group"].items():
+        d = arms[ARM_D]["by_availability_group"][g]
+        if b["coverage"] is None or d["coverage"] is None:
+            out[g] = {"n": b["n"], "delta_coverage": None, "delta_mean_width": None}
+            continue
+        out[g] = {
+            "n": b["n"],
+            "b_coverage": b["coverage"], "d_coverage": d["coverage"],
+            "delta_coverage": d["coverage"] - b["coverage"],
+            "b_mean_width": b["mean_width"], "d_mean_width": d["mean_width"],
+            "delta_mean_width": d["mean_width"] - b["mean_width"],
+            "relative_width_change": ((d["mean_width"] - b["mean_width"]) / b["mean_width"]
+                                      if b["mean_width"] else None),
+        }
+    return out
+
+
 def degeneracy_block(banded: dict, d_out: dict, records: pd.DataFrame,
-                     occur_records: pd.DataFrame, level: float) -> dict:
+                     occur_records: pd.DataFrame, level: float,
+                     avail_lab: np.ndarray) -> dict:
     """Degenerate-interval counts per arm and per group. A RESULT, not a diagnostic.
 
     Three kinds, each stated with the scope it is exact over:
@@ -433,19 +463,27 @@ def degeneracy_block(banded: dict, d_out: dict, records: pd.DataFrame,
                                pool slice sizes, and exact per group for arm D from the tap.
                                NOT separately attributable for arm C -- see `scope_note`.
     """
-    out = {"attainable_min_n": attainable_min_n(level), "arms": {}}
+    out = {"attainable_min_n": attainable_min_n(level), "arms": {},
+           "zero_width_group_variable": "availability (the calendar), for every arm, so the "
+                                        "arms are commensurable"}
     for arm, df in banded.items():
         width = df["hi"].to_numpy(float) - df["lo"].to_numpy(float)
-        state = df["state"].to_numpy(int)
         zero = width == 0.0
+        # Attributed by the AVAILABILITY label for every arm. Arm E's own `state` column carries
+        # the OCCURRENCE label, because that is what it bands on, so reading its group split off
+        # its own rows would split a different variable and make the row incomparable with the
+        # other four. The banding groups arm E actually used are reported under `attainability`.
         out["arms"][arm] = {
             "n_rows": int(len(df)),
             "zero_width_rows_total": int(zero.sum()),
-            "zero_width_rows_by_group": {str(int(s)): int((zero & (state == s)).sum())
-                                         for s in np.unique(state)},
+            "zero_width_rows_by_availability_group": {
+                str(int(s)): int((zero & (avail_lab == s)).sum()) for s in np.unique(avail_lab)},
         }
     out["arms"][ARM_B]["attainability"] = fixed_arm_attainability(records, level)
     out["arms"][ARM_E]["attainability"] = fixed_arm_attainability(occur_records, level)
+    out["arms"][ARM_E]["attainability"]["group_variable"] = (
+        "OCCURRENCE, which is what arm E bands on; not the calendar")
+    out["arms"][ARM_B]["attainability"]["group_variable"] = "availability (the calendar)"
     out["arms"][ARM_A]["attainability"] = {
         "clamp_rows_by_group": {"0": 0}, "examined_origin_group_events": None,
         "note": "ungrouped: the pool is never smaller than the warmup (140), which is far above "
