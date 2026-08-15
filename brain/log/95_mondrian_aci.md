@@ -1,17 +1,17 @@
 # 95 · S20, Mondrian × AgACI: can adaptive calibration repair a misspecified partition?
 
 Package S20. Instrument: `brain/eval/mondrian_aci.py`. Artefact:
-`brain/eval/mondrian_aci.json`. Tests: `brain/tests/test_mondrian_aci.py` (25 tests,
+`brain/eval/mondrian_aci.json`. Tests: `brain/tests/test_mondrian_aci.py` (26 tests,
 all passing).
 
 **HEAD SHA at start: `8f1d86c60279f5471d32cd03ec4521d803ab8294`.**
-**HEAD SHA at end: recorded in §10.**
+**HEAD SHA at end: recorded in §11.**
 
 Store ceiling asserted **2026-07-07** before and after every pass. Level 0.90,
 warmup pool 140, point model `rung2_ets` at all three venues, γ grid
 `(0.005, 0.01, 0.02, 0.05, 0.1)`. Environment `.venv-forecast`, python 3.12.13,
 Darwin arm64. Total wall **32.9 s** over three venues; no arm approached the
-thirty-minute threshold (§8).
+thirty-minute threshold (§9).
 
 **Nothing in this package enters the dissertation.** No `.tex` file was touched, no
 reduction was made, no word was spent, and **no placement recommendation is made
@@ -482,7 +482,47 @@ the first table looked entirely reasonable and nothing in it was flagged by any 
 
 ---
 
-## 8 · Cost, constraints and what was not done
+## 8 · Artefact schema
+
+`brain/eval/mondrian_aci.json`, 101,870 bytes, written by `eval.mondrian_aci.build()`.
+
+| Key | Type | Meaning |
+|---|---|---|
+| `artefact` | str | `"mondrian_aci"` |
+| `prior_art` | obj | `composition`, `reference` (POGO, arXiv:2606.00419), `claim_made_here`. Present so the arm cannot be quoted as a claimed method |
+| `pre_registration` | obj | `ledger_row` 112, `commit`, `committed_at` |
+| `store_ceiling` | str | value returned by `assert_store_ceiling()` at build |
+| `level` / `gammas` / `warmup_pool` | float / list / int | 0.90, the pre-registered γ grid, 140 |
+| `arms` | obj | arm key → one-line definition. Arm E's key and text both carry **ORACLE** |
+| `reproduction_check` | obj | R5 and R4; `all_match` false is unreachable, a mismatch raises |
+| `membership_check_P5` | obj | P5; a mismatch raises |
+| `provenance` | obj | `provenance.runtime_stamp()` |
+| `wall_seconds_total` | float | whole build |
+| `venues.<venue>` | obj | the per-venue block below |
+
+Per venue:
+
+| Key | Meaning |
+|---|---|
+| `point_model` / `n_origins` | forecaster behind the residuals; rolling origins in the calibration pass |
+| `contingency_records` / `contingency_banded` | C7's four-cell counts and shares over the FULL record frame and the BANDED frame |
+| `arms.<arm>` | `overall`, `cells.<cell>`, `by_availability_group.<0\|1>` — **ten arms**: the five factorial arms plus `ACI_fixed_gamma_<γ>` for each pre-registered γ |
+| `b_to_d_group_deltas.<group>` | `b_coverage`, `d_coverage`, `delta_coverage`, `b_mean_width`, `d_mean_width`, `delta_mean_width`, `relative_width_change` — the fields P2 and P4 are verdicts about |
+| `degeneracy` | `attainable_min_n`, `zero_width_group_variable`, `scope_note`, and `arms.<arm>` |
+| `wall_seconds` | `generate_records`, `run_online_availability_ABC`, `run_online_occurrence_E`, `arm_D_grouped_agaci` |
+| `adaptive_clamps` | arm C's level-excursion total; arm D's per group |
+
+Cell and group stats carry `n`, `empty`, `coverage`, `ci` (Clopper-Pearson, α = 0.05),
+`mean_width`, `median_width`. An empty cell returns `empty: true` with null coverage and
+is never backfilled with a marginal. Cell keys are C7's: `open_traded`,
+`open_took_nothing`, `closed_traded`, `closed_took_nothing`. Degeneracy arm blocks carry
+`n_rows`, `zero_width_rows_total`, `zero_width_rows_by_availability_group`, plus
+`attainability` (fixed arms) or `quantile_degeneracy_calls_by_group`,
+`quantile_calls_total` and `group_pool_empty_rows` (arm D).
+
+---
+
+## 9 · Cost, constraints and what was not done
 
 **Wall time**, total **32.9 s** for three venues. No arm came near the thirty-minute
 threshold, so the full grid ran without a prior cost report being needed.
@@ -510,7 +550,7 @@ including the new one, is under a second per venue.
   raise. Arm alignment across ten arms is asserted, as is agreement between the
   reconstructed pool and the banded pass. Empty cells report `empty: true` and are never
   backfilled with a marginal.
-- **Tests added, none removed.** 25 new tests in `tests/test_mondrian_aci.py`, all
+- **Tests added, none removed.** 26 new tests in `tests/test_mondrian_aci.py`, all
   synthetic, no store and no network. Both HALT checks and P5 are exercised in the
   failing direction, and the shared-function restore that arm D's instrumentation depends
   on has its own test.
@@ -519,14 +559,14 @@ including the new one, is under a second per venue.
   function. It is installed only around arm D's banding, after arms A/B/C/E have already
   been computed, and its restore is tested.
 
-**Suite scope.** See §9 — the suite is reported in its correctly scoped form and no bare
+**Suite scope.** See §10 — the suite is reported in its correctly scoped form and no bare
 green is claimed.
 
 ---
 
-## 9 · Test suite, scoped
+## 10 · Test suite, scoped
 
-`tests/test_mondrian_aci.py` alone: **25 passed**, in `.venv-forecast`.
+`tests/test_mondrian_aci.py` alone: **26 passed**, in `.venv-forecast`.
 
 The full `brain/tests/` suite carries one unmarked network-dependent test excludable
 only by node id —
@@ -539,18 +579,18 @@ one venv-boundary skip. The scoped run is:
     --deselect "tests/test_a4_ladder.py::test_ellel_is_not_capped_and_higher_rungs_are_at_least_attempted"
 ```
 
-**Result: recorded in §10 with its counts.** Nothing in this session imports or is
+**Result: recorded below with its counts.** Nothing in this session imports or is
 imported by the ladder.
 
 ---
 
-## 10 · End state
+## 11 · End state
 
 Recorded at close of session; see the closing entry appended below.
 
 ---
 
-## 11 · What this report does not claim
+## 12 · What this report does not claim
 
 It does not claim the composition is novel; it is not, and §0 quotes the paper that owns
 it. It does not claim any arm should be adopted. It does not claim arm E is available;
